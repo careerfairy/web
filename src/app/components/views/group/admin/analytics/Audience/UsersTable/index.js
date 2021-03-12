@@ -172,7 +172,7 @@ const UsersTable = ({
     }
 
     const mapStreamsWatched = () => {
-        const updatedUsers = totalUniqueUsers.map(user => {
+        const updatedUsers = totalUniqueUsers?.map(user => {
             user.watchedEvent = false
             const currentUserEmail = user.userEmail
             if (currentUserEmail) {
@@ -191,7 +191,7 @@ const UsersTable = ({
         setUsers(updatedUsers)
     }
     const mapStreamsRegistered = () => {
-        const updatedUsers = totalUniqueUsers.map(currentUser => {
+        const updatedUsers = totalUniqueUsers?.map(currentUser => {
             if (currentUser.userEmail) {
                 const registeredStreams = []
                 streamsFromTimeFrameAndFuture.forEach(stream => {

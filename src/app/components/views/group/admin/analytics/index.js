@@ -2,21 +2,18 @@ import React, {Fragment, useEffect, useMemo, useRef, useState} from "react";
 import {v4 as uuid} from 'uuid';
 import SwipeableViews from 'react-swipeable-views';
 import General from "./General";
-import {useTheme, fade, makeStyles} from "@material-ui/core/styles";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import {SwipeablePanel} from "../../../../../materialUI/GlobalPanels/GlobalPanels";
 import Audience from "./Audience";
 import Title from "./Title";
-import {
-    handleFlattenOptions,
-    handleFlattenOptionsWithoutLvlOfStudy
-} from "../../../../helperFunctions/streamFormFunctions";
+import {handleFlattenOptions} from "../../../../helperFunctions/streamFormFunctions";
 import Feedback from "./Feedback";
 import {universityCountriesMap} from "../../../../util/constants";
-import {useFirestoreConnect, withFirestore, isLoaded} from "react-redux-firebase";
-import {useSelector, shallowEqual} from "react-redux";
+import {isLoaded, useFirestoreConnect, withFirestore} from "react-redux-firebase";
+import {shallowEqual, useSelector} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 
-import { AppBar, Tabs, Tab, Box } from '@material-ui/core';
+import {AppBar, Box, Tab, Tabs} from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
 
@@ -218,18 +215,19 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const [streamDataType, setStreamDataType] = useState(streamDataTypes[0]);
     const [groupOptions, setGroupOptions] = useState([]);
     const [currentStream, setCurrentStream] = useState(null);
-    const [groupOptionsWithoutLvlOfStudy, setGroupOptionsWithoutLvlOfStudy] = useState([]);
     const [fetchingQuestions, setFetchingQuestions] = useState(false);
     const [fetchingRatings, setFetchingRatings] = useState(false);
     const [fetchingPolls, setFetchingPolls] = useState(false);
     const [limitedUserTypes, setLimitedUserTypes] = useState(userTypes);
     const [currentUserDataSet, setCurrentUserDataSet] = useState(userDataSets[0]);
 
-    useFirestoreConnect(() => [{
+    const query = useMemo(() => [{
         collection: `livestreams`,
         where: [["start", ">", new Date(globalTimeFrame.double)], ["groupIds", "array-contains", group.id], ["test", "==", false]],
         orderBy: ["start", "asc"]
     }], [globalTimeFrame])
+
+    useFirestoreConnect(query)
 
     const userDataSetDictionary = useSelector(state => state.firestore.data[currentUserDataSet.dataSet], shallowEqual)
     const userDataSet = useSelector(state => state.firestore.ordered[currentUserDataSet.dataSet], shallowEqual)
@@ -238,16 +236,14 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         const livestream = {...streamObj}
         livestream.date = livestream.start?.toDate()
         for (const userType of userTypes) {
-            // if (currentUserDataSet.dataSet === "groupUniversityStudents") {// Change the graph and status data if we're looking at the groups university Students
             livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
-            // }
             livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
                 ...userDataSetDictionary?.[userEmail],
                 universityCountry: universityCountriesMap[userDataSetDictionary?.[userEmail]?.universityCountryCode]
             }))
         }
         return livestream
-    }) || [], [livestreamsInStore, userDataSet]);
+    }) || [], [livestreamsInStore, userDataSetDictionary]);
 
     useEffect(() => {
         if (group.universityCode) {
@@ -255,7 +251,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
                 try {
                     await firestore.get({
                         collection: "userData",
-                        where: ["university.code", "==", group.universityCode],
+                        where: [["university.code", "==", group.universityCode], ["groupIds", "array-contains", group.id]],
                         storeAs: "groupUniversityStudents",
                     })
                 } catch (e) {
@@ -290,10 +286,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
 
     useEffect(() => {
         const flattenedGroupOptions = handleFlattenOptions(group)
-        const flattenedGroupOptionsWithoutLvlOfStudy = handleFlattenOptionsWithoutLvlOfStudy(group)
-        setGroupOptionsWithoutLvlOfStudy(flattenedGroupOptionsWithoutLvlOfStudy)
         setGroupOptions(flattenedGroupOptions)
-
     }, [group])
 
     useEffect(() => {
@@ -322,12 +315,10 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             const unsubscribeQuestions = firebase.listenToLivestreamQuestions(currentStream.id, querySnapshot => {
                 const questions = querySnapshot.docs.map(doc => {
                     const questionData = doc.data()
-                    const authorData = userDataSet.find(follower => follower.userEmail === questionData.author)
                     return {
                         id: doc.id,
                         ...questionData,
                         date: questionData.timestamp?.toDate(),
-                        authorData
                     }
                 })
                 setCurrentStream(prevState => ({...prevState, questions}));

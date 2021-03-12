@@ -111,14 +111,12 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
     useEffect(() => {
         if (participatingStudents && participatingStudents.length && userRequestedDownload) {
             let studentsOfGroup = [];
-            console.log("-> participatingStudents", participatingStudents);
             participatingStudents.forEach( student => {
                 if (studentBelongsToGroup(student)) {
                     let publishedStudent = StatsUtil.getStudentInGroupDataObject(student, group);
                     studentsOfGroup.push(publishedStudent);
                 }
             });
-            console.log("-> studentsOfGroup", studentsOfGroup);
             setParticipatingStudentsFromGroup(studentsOfGroup);
         }      
     }, [participatingStudents, userRequestedDownload]);
