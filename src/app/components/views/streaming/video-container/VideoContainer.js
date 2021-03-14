@@ -161,23 +161,27 @@ function VideoContainer(props) {
     const [timeoutState, setTimeoutState] = useState(null);
 
     useEffect(() => {
-        if (localMediaStream && externalMediaStreams && externalMediaStreams.length > 3) {
-            if (props.streamerId === props.currentLivestream.currentSpeakerId && props.currentLivestream.mode !== "desktop" && props.currentLivestream.mode !== "presentation") {
-                if (timeoutState) {
-                    clearTimeout(timeoutState);
+        if (localMediaStream && externalMediaStreams) {
+            if (externalMediaStreams.length > 3) {
+                if (props.streamerId === props.currentLivestream.currentSpeakerId && props.currentLivestream.mode !== "desktop" && props.currentLivestream.mode !== "presentation") {
+                    if (timeoutState) {
+                        clearTimeout(timeoutState);
+                    }
+                    let newTimeout = setTimeout(() => {
+                        localMediaStream.setVideoProfile("480p_9")
+                    }, 20000);
+                    setTimeoutState(newTimeout)
+                } else {
+                    if (timeoutState) {
+                        clearTimeout(timeoutState);
+                    }
+                    let newTimeout = setTimeout(() => {
+                        localMediaStream.setVideoProfile("180p")
+                    }, 20000);
+                    setTimeoutState(newTimeout)
                 }
-                let newTimeout = setTimeout(() => {
-                    localMediaStream.setVideoProfile("480p_9")
-                }, 20000);
-                setTimeoutState(newTimeout)
             } else {
-                if (timeoutState) {
-                    clearTimeout(timeoutState);
-                }
-                let newTimeout = setTimeout(() => {
-                    localMediaStream.setVideoProfile("180p")
-                }, 20000);
-                setTimeoutState(newTimeout)
+                localMediaStream.setVideoProfile("480p_9")
             }
         }
     }, [localMediaStream, externalMediaStreams, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
