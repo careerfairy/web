@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer, showAudience}) => {
+const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience}) => {
     const {currentLivestream} = useCurrentStream()
 
     const classes = useStyles({hasStarted: currentLivestream?.hasStarted})
@@ -214,7 +214,8 @@ const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer, showAudience
                             <Box className={classes.viewCount}>
                                 {mobile ? <Tooltip title="See who joined">
                                         <IconButton color="inherit" onClick={showAudience}>
-                                            <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
+                                            <Badge max={999999} color="secondary"
+                                                   badgeContent={mobile ? numberOfViewers : 0}>
                                                 <PeopleIcon/>
                                             </Badge>
                                         </IconButton>
@@ -223,11 +224,12 @@ const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer, showAudience
                                         title={`You currently have ${numberOfViewers} ${maybePluralize(numberOfViewers, "viewer")}`}>
                                         <Button color="primary" size="large"
                                                 startIcon={
-                                                    <Badge color="secondary"
+                                                    <Badge max={999999} color="secondary"
                                                            anchorOrigin={{
                                                                vertical: 'top',
                                                                horizontal: 'right',
                                                            }}
+
                                                            badgeContent={numberOfViewers}>
                                                         <PeopleIcon/>
                                                     </Badge>
