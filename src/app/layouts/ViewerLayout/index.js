@@ -134,16 +134,18 @@ const ViewerLayout = (props) => {
                 setStreamerId(currentLivestream.id + joiningId)
             } else if (authenticatedUser?.email) {
                 setStreamerId(currentLivestream.id + authenticatedUser.email)
+            } else {
+                setStreamerId("12673648")
             }
         }
     }, [currentLivestream?.test, currentLivestream?.id, authenticatedUser?.email])
 
-    if (notAuthorized) {
-        replace({
-            pathname: `/login`,
-            query: {absolutePath: asPath},
-        });
-    }
+    // if (notAuthorized) {
+    //     replace({
+    //         pathname: `/login`,
+    //         query: {absolutePath: asPath},
+    //     });
+    // }
 
     const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
     const handleStateChange = useCallback((state) => {
@@ -219,7 +221,7 @@ const ViewerLayout = (props) => {
         setShowMenu(!showMenu)
     }, [showMenu])
 
-    if (!isLoaded(currentLivestream) || notAuthorized) {
+    if (!isLoaded(currentLivestream)) {
         return <Loader/>
     }
 
