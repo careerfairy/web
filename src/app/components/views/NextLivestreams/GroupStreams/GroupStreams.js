@@ -5,7 +5,10 @@ import {Grid, LinearProgress, Typography} from "@material-ui/core";
 import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 import LazyLoad from 'react-lazyload'
 import Spinner from "./groupStreamCard/Spinner";
+import useInfiniteScrollClient from "../../../custom-hook/useInfiniteScrollClient";
+import clsx from "clsx";
 
+const gridItemHeight = 530
 const useStyles = makeStyles((theme) => ({
     root: {
         flex: 1,
@@ -29,25 +32,33 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "center",
         justifyContent: "center",
     },
+    streamGridItem: {
+        height: gridItemHeight,
+        display: "flex"
+    },
+    dynamicHeight:{
+        height: "auto"
+    }
 }));
+
 
 const Wrapper = ({children, index, streamId}) => {
 
-        return (index <= 2)? (
-            <>
-                {children}
-            </>
-        ):(
-            <LazyLoad
-                style={{height: "-webkit-fill-available"}}
-                key={streamId}
-                height={600}
-                unmountIfInvisible
-                offset={[0, 0]}
-                placeholder={<Spinner/>}>
-                {children}
-            </LazyLoad>
-        )
+    return (index <= 2) ? (
+        <>
+            {children}
+        </>
+    ) : (
+        <LazyLoad
+            style={{flex: 1, display: "flex", width: "-webkit-fill-available"}}
+            key={streamId}
+            height={gridItemHeight}
+            // unmountIfInvisible
+            offset={[0, 0]}
+            placeholder={<Spinner/>}>
+            {children}
+        </LazyLoad>
+    )
 
 }
 const GroupStreams = ({
@@ -68,34 +79,54 @@ const GroupStreams = ({
         const classes = useStyles()
         const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
         const searchedButNoResults = selectedOptions.length && !searching && !livestreams.length
+        const [slicedLivestreams, loadMoreLivestreams, hasMoreLivestreams, totalLivestreams] = useInfiniteScrollClient(livestreams, 6, 3);
+
+        const handleScroll = () => {
+            const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 300
+            if (bottom && hasMoreLivestreams) {
+                loadMoreLivestreams()
+            }
+        };
+
+        useEffect(() => {
+            window.addEventListener('scroll', handleScroll, {
+                passive: true
+            });
+
+            return () => {
+                window.removeEventListener('scroll', handleScroll);
+            };
+        }, [totalLivestreams, slicedLivestreams]);
+
         useEffect(() => {
             if (globalCardHighlighted) {
                 setGlobalCardHighlighted(false)
             }
         }, [groupData])
 
-        const renderStreamCards = livestreams?.map((livestream, index) => {
+
+        const renderStreamCards = slicedLivestreams?.map((livestream, index, array) => {
             if (livestream) {
                 return (
-                    <Grid style={{height: 600}} key={livestream.id} xs={12} sm={12} md={6}
-                          lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
+                    <Grid
+                        className={clsx(classes.streamGridItem, {
+                            [classes.dynamicHeight]: mobile && (index >= array.length - 2)
+                        })}
+                        key={livestream.id} xs={12} sm={12} md={hasCategories? 12:6}
+                        lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
                         <Wrapper
                             index={index}
                             streamId={livestream.id}
                         >
                             <GroupStreamCardV2
-                                index={index}
-                                width={width}
                                 mobile={mobile}
                                 setGlobalCardHighlighted={setGlobalCardHighlighted}
                                 globalCardHighlighted={globalCardHighlighted}
-                                hasCategories={hasCategories}
                                 groupData={groupData}
                                 listenToUpcoming={listenToUpcoming}
                                 careerCenterId={careerCenterId}
                                 livestreamId={livestreamId}
-                                user={user} userData={userData} fields={null}
-                                careerCenters={[]}
+                                user={user} userData={userData}
                                 id={livestream.id}
                                 key={livestream.id}
                                 livestream={livestream}
