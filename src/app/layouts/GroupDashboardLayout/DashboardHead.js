@@ -2,8 +2,8 @@ import React from 'react';
 import Head from "next/head";
 import PropTypes from 'prop-types';
 
-const DashboardHead = ({title, group, isCompany}) => {
-    const pageTitle = `${title} ${!group ? "" : isCompany ? group?.companyName : group?.universityName}`
+const DashboardHead = ({title, group}) => {
+    const pageTitle = `${title} ${group?.universityName}`
     return (
         <Head>
             <title>{pageTitle}</title>
@@ -12,9 +12,8 @@ const DashboardHead = ({title, group, isCompany}) => {
 };
 
 DashboardHead.propTypes = {
-  group: PropTypes.object,
-  isCompany: PropTypes.bool,
-  title: PropTypes.string.isRequired
-}
+    title: PropTypes.string.isRequired,
+    group: PropTypes.object
+};
 
 export default DashboardHead;

@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     highlighted: {}
 }));
 
-const Index = ({group, typeOfStream, query, isAdmin, isCompany}) => {
+const Index = ({group, typeOfStream, query, isAdmin}) => {
     const classes = useStyles();
     const {userData, authenticatedUser} = useAuth();
     const {enqueueSnackbar} = useSnackbar()
@@ -41,7 +41,7 @@ const Index = ({group, typeOfStream, query, isAdmin, isCompany}) => {
     useEffect(() => {
         if (group?.id) {
             setFetching(true)
-            const unsubscribe = query(isCompany, group.id,
+            const unsubscribe = query(group.id,
                 (querySnapshot) => {
                     const streamsData = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
                     if (livestreamId && typeOfStream === "draft") {
@@ -235,7 +235,6 @@ const SearchMessage = ({message}) => (
 Index.propTypes = {
   group: PropTypes.object,
   isAdmin: PropTypes.bool,
-  isCompany: PropTypes.bool,
   query: PropTypes.func.isRequired,
   typeOfStream: PropTypes.string.isRequired
 }

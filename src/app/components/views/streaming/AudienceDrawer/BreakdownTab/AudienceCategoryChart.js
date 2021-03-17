@@ -165,7 +165,7 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
                 textColor="primary"
                 variant="fullWidth"
             >
-                {careerCenters?.map(cc => <Tab key={cc.id} wrapped label={cc.name}/>)}
+                {careerCenters?.map(cc => <Tab key={cc.id} wrapped label={cc.universityName}/>)}
             </Tabs>
             <CardContent>
                 {!hasNoData() &&

@@ -26,15 +26,14 @@ export default class DataAccessUtil {
             }
         });
     }
-
-    static sendDashboardInvite(recipientEmail, userData, group, invite_link, isCompany) {
+    static sendDashboardInvite(recipientEmail, userData, group, invite_link) {
         return axios({
             method: 'post',
             url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDashboardInviteEmail',
             data: {
                 recipientEmail: recipientEmail,
                 sender_first_name: userData.firstName,
-                group_name: isCompany ? group.name : group.universityName,
+                group_name: group.universityName,
                 invite_link: invite_link
             }
         });

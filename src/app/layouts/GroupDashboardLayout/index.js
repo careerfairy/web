@@ -67,10 +67,8 @@ const GroupDashboardLayout = (props) => {
 GroupDashboardLayout.propTypes = {
     children: PropTypes.node.isRequired,
     firebase: PropTypes.object,
-    isCompany: PropTypes.bool
 }
 
 GroupDashboardLayout.defaultProps = {
-    isCompany: false
 }
 export default withFirebase(GroupDashboardLayout);

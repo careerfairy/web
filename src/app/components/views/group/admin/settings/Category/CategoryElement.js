@@ -106,7 +106,6 @@ function CategoryElement({
     return (
         <Fragment>
             <CategoryEdit group={group}
-                          isCompany={isCompany}
                           isLocal={isLocal}
                           handleUpdateCategory={handleUpdateCategory}
                           handleAddTempCategory={handleAddTempCategory}
@@ -125,7 +124,6 @@ CategoryElement.propTypes = {
   handleAddTempCategory: PropTypes.func,
   handleDeleteLocalCategory: PropTypes.func,
   handleUpdateCategory: PropTypes.func,
-  isCompany: PropTypes.bool,
   isLocal: PropTypes.bool
 }
 export default withFirebase(CategoryElement);

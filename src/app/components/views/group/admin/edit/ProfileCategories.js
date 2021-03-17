@@ -1,13 +1,40 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Box, Button, Card, CardContent, CardHeader, Divider, Grid, Grow} from '@material-ui/core';
+import {useSnackbar} from "notistack";
+import {GENERAL_ERROR} from "../../../../util/constants";
 import AddIcon from "@material-ui/icons/Add";
 import CategoryElement from "../settings/Category/CategoryElement";
 import CategoryEdit from "../settings/Category/CategoryEdit";
 
 
-const ProfileCategories = ({group, firebase, className, isCompany, ...rest}) => {
+const ProfileCategories = ({group, firebase, className, ...rest}) => {
+        const {enqueueSnackbar} = useSnackbar()
         const [createMode, setCreateMode] = useState(false);
+
+        const handleSubmitForm = async (values, {setStatus}) => {
+            try {
+                await firebase.updateCareerCenter(group.id, {
+                    description: values.description,
+                    universityName: values.universityName,
+                });
+                enqueueSnackbar("Your profile has been updated!", {
+                    variant: "success",
+                    preventDuplicate: true,
+                    anchorOrigin: {
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }
+                })
+            } catch (e) {
+                console.log("error", e);
+                enqueueSnackbar(GENERAL_ERROR, {
+                    variant: "error",
+                    preventDuplicate: true,
+                })
+                setStatus(e)
+            }
+        }
 
         return (
 
@@ -47,7 +74,6 @@ const ProfileCategories = ({group, firebase, className, isCompany, ...rest}) => 
                                     group={group}
                                     category={{}}
                                     options={[]}
-                                    isCompany={isCompany}
                                     newCategory={true}
                                     setEditMode={setCreateMode}/>
                             </Grid>
@@ -61,7 +87,7 @@ const ProfileCategories = ({group, firebase, className, isCompany, ...rest}) => 
                                     md={12}
                                     xs={12}
                                 >
-                                    <CategoryElement  isCompany={isCompany} group={group} category={category}/>
+                                    <CategoryElement group={group} category={category}/>
                                 </Grid>
                             );
                         })}

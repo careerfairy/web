@@ -13,13 +13,7 @@ import {
     TextField
 } from "@material-ui/core";
 import {Formik} from "formik";
-import {
-    COMPANY_DASHBOARD_INVITE,
-    EMAIL_REGEX,
-    GENERAL_ERROR,
-    GROUP_DASHBOARD_INVITE,
-    USER_DATA_COLLECTION
-} from "../../../../util/constants";
+import {EMAIL_REGEX, GENERAL_ERROR} from "../../../../util/constants";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import {useSnackbar} from "notistack";
@@ -27,7 +21,7 @@ import {withFirebase} from "../../../../../context/firebase";
 
 const useStyles = makeStyles(theme => ({}));
 
-const AddMemberModal = ({open = false, onClose, group, firebase, isCompany}) => {
+const AddMemberModal = ({open = false, onClose, group, firebase}) => {
         const {enqueueSnackbar} = useSnackbar()
         const classes = useStyles()
         const {userData} = useAuth()
@@ -43,25 +37,23 @@ const AddMemberModal = ({open = false, onClose, group, firebase, isCompany}) => 
             if (window?.location?.origin) {
                 baseUrl = window.location.origin
             }
-            const groupPath = isCompany ? "company" : "group"
-            return `${baseUrl}/${groupPath}/${group.id || group.groupId}/admin?dashboardInviteId=${notificationId}`
+            return `${baseUrl}/group/${group.id || group.groupId}/admin?dashboardInviteId=${notificationId}`
         }
 
         const handleSubmit = async (values, {resetForm}) => {
             try {
-                const notificationType = isCompany ? COMPANY_DASHBOARD_INVITE : GROUP_DASHBOARD_INVITE
+                const notificationType = "dashboardInvite"
                 let successMessage = `An invitation email has been sent to ${values.email}`
                 const notificationDetails = {
                     type: notificationType,
                     receiver: values.email,
                     requester: group.id,
-                    for: USER_DATA_COLLECTION
                 }
 
                 const invitationRef = await firebase.createNotification(notificationDetails, {force: true});
                 const notificationId = invitationRef.id
                 const inviteLink = buildInviteLink(notificationId)
-                await DataAccessUtil.sendDashboardInvite(values.email, userData, group, inviteLink, isCompany)
+                await DataAccessUtil.sendDashboardInvite(values.email, userData, group, inviteLink)
                 enqueueSnackbar(successMessage, {
                     preventDuplicate: true,
                     variant: "success",
@@ -110,21 +102,21 @@ const AddMemberModal = ({open = false, onClose, group, firebase, isCompany}) => 
                         <DialogTitle>Invite Member</DialogTitle>
                         <DialogContent>
                             <DialogContentText>
-                                Please provide an email that you would like to invite
+                               Please provide an email that you would like to invite
                             </DialogContentText>
-                            <TextField
-                                fullWidth
-                                helperText={errors.email}
-                                label="Email"
-                                autoFocus
-                                autoComplete="email"
-                                disabled={isSubmitting}
-                                name="email"
-                                onChange={handleChange}
-                                required
-                                error={Boolean(errors.email)}
-                                value={values.email}
-                            />
+                                <TextField
+                                    fullWidth
+                                    helperText={errors.email}
+                                    label="Email"
+                                    autoFocus
+                                    autoComplete="email"
+                                    disabled={isSubmitting}
+                                    name="email"
+                                    onChange={handleChange}
+                                    required
+                                    error={Boolean(errors.email)}
+                                    value={values.email}
+                                />
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={() => handleClose(resetForm)}>Cancel</Button>
@@ -150,7 +142,6 @@ const AddMemberModal = ({open = false, onClose, group, firebase, isCompany}) => 
 AddMemberModal.propTypes = {
     firebase: PropTypes.object,
     group: PropTypes.object,
-    isCompany: PropTypes.bool,
     onClose: PropTypes.func,
     open: PropTypes.bool
 }

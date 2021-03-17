@@ -66,7 +66,6 @@ const MembersTable = ({
                           openAddMemberModal,
                           handleCloseAreYouSureModal,
                           loading,
-                          isCompany,
                           handleClickKickButton,
                           handleClickPromoteButton,
                           handleConfirm,
@@ -161,7 +160,7 @@ const MembersTable = ({
         },
     ]
 
-    const getTitle = () => `Admin Members of ${isCompany ? group.name : group.universityName}`
+    const getTitle = () => `Admin Members of ${group.universityName}`
 
 
     return (
@@ -228,7 +227,6 @@ MembersTable.propTypes = {
     handleClickPromoteButton: PropTypes.func,
     handleCloseAreYouSureModal: PropTypes.func,
     handleConfirm: PropTypes.func,
-    isCompany: PropTypes.bool,
     loading: PropTypes.bool,
     openAddMemberModal: PropTypes.func
 }

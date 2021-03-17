@@ -1,11 +1,5 @@
 import firebase from '../../Firebase/Firebase';
 import {v4 as uuidv4} from 'uuid';
-import {
-    CAREER_CENTER_COLLECTION,
-    COMPANY_COLLECTION,
-    COMPANY_DASHBOARD_INVITE,
-    GROUP_DASHBOARD_INVITE
-} from "../../components/util/constants";
 
 // import firebase from "firebase/app";
 // import "firebase/auth";
@@ -199,16 +193,6 @@ class Firebase {
     updateCareerCenter = (groupId, newCareerCenter) => {
         let ref = this.firestore.collection("careerCenterData").doc(groupId);
         return ref.update(newCareerCenter);
-    };
-
-    updateCompany = (companyId, newCompany) => {
-        let ref = this.firestore.collection(COMPANY_COLLECTION).doc(companyId);
-        return ref.update(newCompany);
-    };
-
-    updateGroup = (groupId, newGroup, collection) => {
-        let ref = this.firestore.collection(collection).doc(groupId);
-        return ref.update(newGroup);
     };
 
     deleteCareerCenterFromAllUsers = (careerCenterId) => {
@@ -665,12 +649,11 @@ class Firebase {
         return ref.onSnapshot(callback)
     }
 
-    listenToUpcomingLiveStreamsByGroupId = (isCompany, groupId, callback) => {
+    listenToUpcomingLiveStreamsByGroupId = (groupId, callback) => {
         var ninetyMinutesInMilliseconds = 1000 * 60 * 90;
-        const field = isCompany ? "companyIds" : "groupIds"
         let ref = this.firestore
             .collection("livestreams")
-            .where(field, "array-contains", groupId)
+            .where("groupIds", "array-contains", groupId)
             .where("test", "==", false)
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
@@ -713,11 +696,10 @@ class Firebase {
         return ref.get()
     }
 
-    listenToDraftLiveStreamsByGroupId = (isCompany, groupId, callback) => {
-        const field = isCompany ? "companyIds" : "groupIds"
+    listenToDraftLiveStreamsByGroupId = (groupId, callback) => {
         let ref = this.firestore
             .collection("draftLivestreams")
-            .where(field, "array-contains", groupId)
+            .where("groupIds", "array-contains", groupId)
             .orderBy("start", "asc")
         return ref.onSnapshot(callback)
     }
@@ -747,14 +729,13 @@ class Firebase {
         return ref.get()
     }
 
-    listenToPastLiveStreamsByGroupId = (isCompany, id, callback) => {
+    listenToPastLiveStreamsByGroupId = (groupId, callback) => {
         let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
         const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
-        const field = isCompany ? "companyIds" : "groupIds"
         let ref = this.firestore
             .collection("livestreams")
             .where("test", "==", false)
-            .where(field, "array-contains", id)
+            .where("groupIds", "array-contains", groupId)
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
             .orderBy("start", "desc")
@@ -1207,13 +1188,13 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    updateGroupCategoryElements = (groupId, newCategories, collection) => {
-        let groupRef = this.firestore.collection(collection).doc(groupId);
+    updateGroupCategoryElements = (groupId, newCategories) => {
+        let groupRef = this.firestore.collection("careerCenterData").doc(groupId);
         return groupRef.update({categories: newCategories});
     };
 
-    addGroupCategoryWithElements = (groupId, newCategoryObj, collection) => {
-        let groupRef = this.firestore.collection(collection).doc(groupId);
+    addGroupCategoryWithElements = (groupId, newCategoryObj) => {
+        let groupRef = this.firestore.collection("careerCenterData").doc(groupId);
 
         return groupRef.update({
             categories: firebase.firestore.FieldValue.arrayUnion(newCategoryObj),
@@ -1820,10 +1801,9 @@ class Firebase {
 
     //Dashboard Queries
 
-    joinGroupDashboard = (groupId, userEmail, invitationId, isCompany) => {
-        const baseCollection = isCompany ? COMPANY_COLLECTION : CAREER_CENTER_COLLECTION
+    joinGroupDashboard = (groupId, userEmail, invitationId) => {
         let groupRef = this.firestore
-            .collection(baseCollection)
+            .collection("careerCenterData")
             .doc(groupId)
 
         let userRef = this.firestore
@@ -1841,7 +1821,7 @@ class Firebase {
                     adminEmails: firebase.firestore.FieldValue.arrayUnion(userData.userEmail),
                 });
                 let groupAdminRef = this.firestore
-                    .collection(baseCollection)
+                    .collection("careerCenterData")
                     .doc(groupId)
                     .collection("admins")
                     .doc(userData.userEmail)
@@ -1977,7 +1957,7 @@ class Firebase {
         await notificationRef.delete()
     }
 
-    validateDashboardInvite = async (notificationId, groupId, isCompany) => {
+    validateDashboardInvite = async (notificationId, groupId) => {
         let ref = this.firestore.collection("notifications")
             .doc(notificationId)
         const refSnap = await ref.get()
@@ -1985,8 +1965,7 @@ class Firebase {
             return false
         }
         const notification = refSnap.data()
-        const notificationType = isCompany ? COMPANY_DASHBOARD_INVITE : GROUP_DASHBOARD_INVITE
-        return notification.details.type === notificationType && notification.open && notification.details.requester === groupId
+        return notification.details.type === "dashboardInvite" && notification.open && notification.details.requester === groupId
     }
 
     getNotification = (notificationId) => {

@@ -17,7 +17,6 @@ import {
 import {v4 as uuidv4} from 'uuid'
 import {makeStyles} from "@material-ui/core/styles";
 import EditIcon from "@material-ui/icons/Edit";
-import {CAREER_CENTER_COLLECTION, COMPANY_COLLECTION} from "../../../../../util/constants";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -58,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
     errorButton: {
         color: theme.palette.error.main
     },
-    nameError: {
+    nameError:{
         height: theme.spacing(2),
         margin: theme.spacing(1)
     }
@@ -71,7 +70,6 @@ function CategoryEditModal({
                                handleUpdateCategory,
                                newCategory,
                                firebase,
-                               isCompany,
                                setEditMode,
                                handleAddTempCategory,
                                group,
@@ -79,6 +77,7 @@ function CategoryEditModal({
                                isLocal
                            }) {
     const classes = useStyles()
+
     const [categoryName, setCategoryName] = useState('');
 
     const [editableOptions, setEditableOptions] = useState([]);
@@ -131,8 +130,7 @@ function CategoryEditModal({
         }
         const existingCategories = [...group.categories]
         const newCategories = existingCategories.filter(el => el.id !== category.id)
-        const collection = isCompany ? COMPANY_COLLECTION : CAREER_CENTER_COLLECTION
-        firebase.updateGroupCategoryElements(group.id, newCategories, collection).then(() => {
+        firebase.updateGroupCategoryElements(group.id, newCategories).then(() => {
             setEditMode(false);
         })
     }
@@ -191,9 +189,7 @@ function CategoryEditModal({
             return setEditMode(false)
         }
         if (newCategory && !isLocal) {
-            const collection = isCompany ? COMPANY_COLLECTION : CAREER_CENTER_COLLECTION
-
-            firebase.addGroupCategoryWithElements(group.id, buildCategory(), collection).then(() => {
+            firebase.addGroupCategoryWithElements(group.id, buildCategory()).then(() => {
                 setEditMode(false);
             })
         } else {
@@ -201,9 +197,7 @@ function CategoryEditModal({
             const index = newCategories.findIndex(el => el.id === category.id)
             newCategories[index].name = categoryName
             newCategories[index].options = editableOptions
-            const collection = isCompany ? COMPANY_COLLECTION : CAREER_CENTER_COLLECTION
-
-            firebase.updateGroupCategoryElements(group.id, newCategories, collection).then(() => {
+            firebase.updateGroupCategoryElements(group.id, newCategories).then(() => {
                 setEditMode(false);
             })
         }
@@ -347,7 +341,6 @@ CategoryEditModal.propTypes = {
     handleAddTempCategory: PropTypes.func,
     handleDeleteLocalCategory: PropTypes.func,
     handleUpdateCategory: PropTypes.func,
-    isCompany: PropTypes.bool,
     isLocal: PropTypes.bool,
     newCategory: PropTypes.any,
     setEditMode: PropTypes.func

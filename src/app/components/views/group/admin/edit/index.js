@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const EditOverview = ({firebase, group, isCompany}) => {
+const EditOverview = ({firebase, group}) => {
 
     const classes = useStyles()
 
@@ -33,7 +33,7 @@ const EditOverview = ({firebase, group, isCompany}) => {
                     md={6}
                     xs={12}
                 >
-                    <Profile isCompany={isCompany}  firebase={firebase} group={group}/>
+                    <Profile firebase={firebase} group={group}/>
                 </Grid>
                 <Grid
                     item
@@ -48,7 +48,8 @@ const EditOverview = ({firebase, group, isCompany}) => {
                             md={12}
                             xs={12}
                         >
-                            <ProfileDetails isCompany={isCompany} firebase={firebase} group={group}/>
+                            <ProfileDetails firebase={firebase} group={group}/>
+
                         </Grid>
                         <Grid
                             item
@@ -57,7 +58,7 @@ const EditOverview = ({firebase, group, isCompany}) => {
                             xs={12}
                         >
 
-                            <ProfileCategories isCompany={isCompany} firebase={firebase} group={group}/>
+                            <ProfileCategories firebase={firebase} group={group}/>
                         </Grid>
                         <Grid
                             item
@@ -66,7 +67,7 @@ const EditOverview = ({firebase, group, isCompany}) => {
                             xs={12}
                         >
 
-                            <ProfilePrivacyPolicy isCompany={isCompany} firebase={firebase} group={group}/>
+                            <ProfilePrivacyPolicy firebase={firebase} group={group}/>
                         </Grid>
                     </Grid>
                 </Grid>
@@ -79,7 +80,6 @@ const EditOverview = ({firebase, group, isCompany}) => {
 EditOverview.propTypes = {
   firebase: PropTypes.object,
   group: PropTypes.object,
-  isCompany: PropTypes.bool
 }
 
 export default withFirebase(EditOverview);
