@@ -195,8 +195,8 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         {
             id: uuid(),
             dataSet: "followers",
-            displayName: "Subscribed students",
-            miscName: "All subscribed students"
+            displayName: "Total engaged students",
+            miscName: "All students"
         },
     ]
 
@@ -234,23 +234,30 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const userDataSetDictionary = useSelector(state => uniStudents ? state.firestore.data[currentUserDataSet.dataSet] : state.userDataSet.mapped, shallowEqual)
     const userDataSet = useSelector(state => uniStudents ? state.firestore.ordered[currentUserDataSet.dataSet] : state.userDataSet.ordered, shallowEqual)
     const livestreamsInStore = useSelector(state => state.firestore.ordered.livestreams)
-    const livestreams = useMemo(() => livestreamsInStore?.map(streamObj => {
-        const livestream = {...streamObj}
-        livestream.date = livestream.start?.toDate()
-        for (const userType of userTypes) {
-            if (isLoaded(userDataSetDictionary)) {
-                livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
-            }
-            livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
-                ...userDataSetDictionary?.[userEmail],
-                universityCountry: universityCountriesMap[userDataSetDictionary?.[userEmail]?.universityCountryCode]
-            }))
+    const livestreams = useMemo(() => {
+        let streams = []
+        if (livestreamsInStore) {
+            streams = livestreamsInStore.map(streamObj => {
+                const livestream = {...streamObj}
+                livestream.date = livestream.start?.toDate()
+                for (const userType of userTypes) {
+                    if (isLoaded(userDataSetDictionary)) {
+                        livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
+                    }
+                    livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
+                        ...userDataSetDictionary?.[userEmail],
+                        universityCountry: universityCountriesMap[userDataSetDictionary?.[userEmail]?.universityCountryCode]
+                    }))
+                }
+                return livestream
+            })
         }
         if (!streamsMounted) {
             setStreamsMounted(true)
         }
-        return livestream
-    }) || [], [livestreamsInStore, userDataSetDictionary, streamsMounted]);
+        return streams
+
+    }, [livestreamsInStore, userDataSetDictionary, streamsMounted]);
 
 
     useEffect(() => {
