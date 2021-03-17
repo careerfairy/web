@@ -6,7 +6,7 @@ import {useRouter} from "next/router";
 import {useAuth} from "../../HOCs/AuthProvider";
 
 
-const useDashboardRedirect = (group, firebase, isCompany) => {
+const useDashboardRedirect = (group, firebase) => {
     const [joiningGroup, setJoiningGroup] = useState(false);
     const {query: {dashboardInviteId}, pathname, replace} = useRouter()
     const dispatch = useDispatch()
@@ -19,8 +19,8 @@ const useDashboardRedirect = (group, firebase, isCompany) => {
         return userData?.isAdmin
             || (group?.adminEmails?.includes(authenticatedUser?.email))
     }
-    const analyticsPath = isCompany ? `/company/${group?.id}/admin/analytics` : `/group/${group?.id}/admin/analytics`
-    const basePath = isCompany ? "/company/[companyId]/admin" : "/group/[groupId]/admin"
+    const analyticsPath =  `/group/${group?.id}/admin/analytics`
+    const basePath =  "/group/[groupId]/admin"
 
     useEffect(() => {
         (async function () {
@@ -68,7 +68,7 @@ const useDashboardRedirect = (group, firebase, isCompany) => {
 
     const handleJoinDashboard = async () => {
         try {
-            const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId, group.id, isCompany)
+            const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId, group.id)
             console.log("-> isValidInvite", isValidInvite);
             if (!isValidInvite) {
                 await replace("/")
@@ -83,9 +83,9 @@ const useDashboardRedirect = (group, firebase, isCompany) => {
                 })
             } else {
                 setJoiningGroup(true)
-                await firebase.joinGroupDashboard(group.id, userData.userEmail, dashboardInviteId, isCompany)
+                await firebase.joinGroupDashboard(group.id, userData.userEmail, dashboardInviteId)
                 await replace(analyticsPath)
-                const message = `Congrats, you are now an admin of ${isCompany ? group.name : group.universityName}`
+                const message = `Congrats, you are now an admin of ${group.universityName}`
                 enqueueSnackbar({
                     message,
                     options: {

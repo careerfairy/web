@@ -41,7 +41,6 @@ const useStyles = makeStyles((theme) => ({
 function CategoryElement({
                              handleUpdateCategory,
                              category,
-                             isCompany,
                              firebase,
                              handleAddTempCategory,
                              handleDeleteLocalCategory,

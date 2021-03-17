@@ -104,7 +104,6 @@ ProfileCategories.propTypes = {
   className: PropTypes.string,
   firebase: PropTypes.object,
   group: PropTypes.object,
-  isCompany: PropTypes.bool
 }
 
 export default ProfileCategories;

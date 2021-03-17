@@ -34,7 +34,7 @@ const initialDrawerBottomLinks = [
         title: 'FOR CAREER CENTERS'
     }
 ]
-const useDashboardLinks = (group, isCompany) => {
+const useDashboardLinks = (group) => {
     const {authenticatedUser} = useAuth()
 
     const [headerLinks, setHeaderLinks] = useState(initialHeaderLinks);
@@ -61,8 +61,8 @@ const useDashboardLinks = (group, isCompany) => {
 
     useEffect(() => {
         if (isLoaded(group) && !isEmpty(group)) {
-            const baseHrefPath = isCompany ? "company" : "group"
-            const baseParam = isCompany ? "[companyId]" : "[groupId]"
+            const baseHrefPath = "group"
+            const baseParam = "[groupId]"
             setDrawerTopLinks([
                 {
                     href: `/${baseHrefPath}/${group.id}/admin/upcoming-livestreams`,

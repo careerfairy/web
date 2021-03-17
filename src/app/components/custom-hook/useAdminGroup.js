@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
 import {populate, useFirestoreConnect} from "react-redux-firebase";
-import {CAREER_CENTER_COLLECTION, COMPANY_COLLECTION} from "../util/constants";
+import {CAREER_CENTER_COLLECTION} from "../util/constants";
 import {useAuth} from "../../HOCs/AuthProvider";
 import {shallowEqual, useSelector} from "react-redux";
 import GroupsUtil from "../../data/util/GroupsUtil";
@@ -10,12 +10,12 @@ const populates = [
 ]
 
 
-const useAdminGroup = (groupId, isCompany) => {
+const useAdminGroup = (groupId) => {
     const {authenticatedUser} = useAuth()
     const queries = useMemo(() => {
         let queriesArray = []
         const targetId = groupId
-        const targetCollection = isCompany ? COMPANY_COLLECTION : CAREER_CENTER_COLLECTION
+        const targetCollection = CAREER_CENTER_COLLECTION
         if (targetId) {
             queriesArray.push(...[{
                     collection: targetCollection,

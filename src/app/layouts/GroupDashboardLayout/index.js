@@ -16,18 +16,18 @@ import useDashboardLinks from "../../components/custom-hook/useDashboardLinks";
 const useStyles = makeStyles(styles);
 
 const GroupDashboardLayout = (props) => {
-    const {children, firebase, isCompany} = props
+    const {children, firebase} = props
     const classes = useStyles();
-    const {query: {groupId, companyId}} = useRouter()
+    const {query: {groupId}} = useRouter()
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
     const {userData, authenticatedUser} = useAuth()
     const notifications = useSelector(({firestore}) => firestore.ordered.notifications || [])
 
-    const group = useAdminGroup(isCompany ? companyId : groupId, isCompany)
+    const group = useAdminGroup(groupId)
 
-    useDashboardRedirect(group, firebase, isCompany)
+    useDashboardRedirect(group, firebase)
 
-    const {headerLinks, drawerTopLinks, drawerBottomLinks} = useDashboardLinks(group, isCompany)
+    const {headerLinks, drawerTopLinks, drawerBottomLinks} = useDashboardLinks(group)
 
     const isAdmin = useMemo(() => userData?.isAdmin || (group?.adminEmails?.includes(authenticatedUser?.email)), [userData?.isAdmin, group?.adminEmails, authenticatedUser?.email])
 
@@ -53,7 +53,6 @@ const GroupDashboardLayout = (props) => {
                             notifications,
                             isAdmin,
                             group,
-                            isCompany,
                             ...props
                         }))}
                     </div>
