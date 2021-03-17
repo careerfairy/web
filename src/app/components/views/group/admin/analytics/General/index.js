@@ -244,7 +244,7 @@ const General = ({
                     </Grid>
                 </Tooltip>
                 <Tooltip arrow
-                         title={`This block displays the total number of individual viewers who registered to your events over the past ${globalTimeFrame.name}.`}>
+                         title={`This block displays the total number of individual users who registered to your events over the past ${globalTimeFrame.name}.`}>
                     <Grid {...getCategoryProps()}>
                         <TotalUniqueRegistrations
                             fetchingStreams={loading}
@@ -271,7 +271,7 @@ const General = ({
                          title={
                              isUni ?
                                  `This block displays the total number of students from ${group.universityName} on CareerFairy.`
-                                 : `This block displays the total number of individual viewers who registered or attended your events over the past ${globalTimeFrame.name}.`
+                                 : `This block displays the total number of individual users who registered or attended your events over the past ${globalTimeFrame.name}.`
                          }>
                     <Grid {...getCategoryProps()}>
                         <UserCount
@@ -285,7 +285,7 @@ const General = ({
                 </Tooltip>
                 {(mediumScreen && !group.universityCode) &&
                 <Tooltip arrow
-                         title={`This block displays the total number of individual viewers who watched your events over the past ${globalTimeFrame.name}.`}>
+                         title={`This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}>
                     <Grid item xs={12} md={12} sm={12}>
                         <TotalUniqueParticipatingStudents
                             fetchingStreams={loading}
@@ -319,7 +319,7 @@ const General = ({
                     <Grid container spacing={3}>
                         {(!mediumScreen && !group.universityCode) &&
                         <Tooltip arrow
-                                 title={`This block displays the total number of individual viewers who watched your events over the past ${globalTimeFrame.name}.`}>
+                                 title={`This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}>
                             <Grid xs={12} item>
                                 <TotalUniqueParticipatingStudents
                                     fetchingStreams={loading}
