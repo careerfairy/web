@@ -1,9 +1,10 @@
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {populate, useFirestoreConnect} from "react-redux-firebase";
 import {CAREER_CENTER_COLLECTION} from "../util/constants";
 import {useAuth} from "../../HOCs/AuthProvider";
-import {shallowEqual, useSelector} from "react-redux";
+import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import GroupsUtil from "../../data/util/GroupsUtil";
+import * as actions from '../../store/actions'
 
 const populates = [
     {child: 'adminEmails', root: 'userData', childAlias: 'admins'} // replace owner with user object
@@ -11,7 +12,17 @@ const populates = [
 
 
 const useAdminGroup = (groupId) => {
+    const dispatch = useDispatch()
     const {authenticatedUser} = useAuth()
+
+    useEffect(() => {
+
+        return () => {
+            dispatch(actions.removeOrderedUserDataSet())
+            dispatch(actions.removeMappedUserDataSet())
+        }
+    },[])
+
     const queries = useMemo(() => {
         let queriesArray = []
         const targetId = groupId

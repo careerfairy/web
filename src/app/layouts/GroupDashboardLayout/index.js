@@ -24,12 +24,12 @@ const GroupDashboardLayout = (props) => {
     const notifications = useSelector(({firestore}) => firestore.ordered.notifications || [])
 
     const group = useAdminGroup(groupId)
-
     useDashboardRedirect(group, firebase)
 
     const {headerLinks, drawerTopLinks, drawerBottomLinks} = useDashboardLinks(group)
 
     const isAdmin = useMemo(() => userData?.isAdmin || (group?.adminEmails?.includes(authenticatedUser?.email)), [userData?.isAdmin, group?.adminEmails, authenticatedUser?.email])
+    const isCorrectGroup = useMemo(() => groupId === group?.groupId, [groupId, group?.groupId])
 
     return (
         <div className={classes.root}>
@@ -49,7 +49,7 @@ const GroupDashboardLayout = (props) => {
             <div className={classes.wrapper}>
                 <div className={classes.contentContainer}>
                     <div className={classes.content}>
-                        {(isLoaded(group) && !isEmpty(group)) && React.Children.map(children, child => React.cloneElement(child, {
+                        {(isLoaded(group) && !isEmpty(group) && isCorrectGroup) && React.Children.map(children, child => React.cloneElement(child, {
                             notifications,
                             isAdmin,
                             group,

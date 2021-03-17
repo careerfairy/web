@@ -15,6 +15,7 @@ import * as actions from '../../../../../store/actions'
 import {AppBar, Box, Tab, Tabs} from '@material-ui/core';
 import AnalyticsUtil from "../../../../../data/util/AnalyticsUtil";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
+import {useRouter} from "next/router";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -203,6 +204,8 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     if (!group.universityCode) {
         userDataSets.shift()
     }
+
+
     const dispatch = useDispatch()
     const classes = useStyles();
     const breakdownRef = useRef(null)
@@ -226,14 +229,14 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         collection: `livestreams`,
         where: [["start", ">", new Date(globalTimeFrame.double)], ["groupIds", "array-contains", group.id], ["test", "==", false]],
         orderBy: ["start", "asc"],
-    }], [globalTimeFrame])
+        storeAs: `livestreams of ${group.groupId}`
+    }], [globalTimeFrame, group.groupId])
 
     useFirestoreConnect(query)
-
-    const uniStudents = useMemo(() => Boolean(currentUserDataSet.dataSet === "groupUniversityStudents"), [currentUserDataSet])
+    const uniStudents = useMemo(() => Boolean(currentUserDataSet.dataSet === "groupUniversityStudents"), [currentUserDataSet, group.id])
     const userDataSetDictionary = useSelector(state => uniStudents ? state.firestore.data[currentUserDataSet.dataSet] : state.userDataSet.mapped, shallowEqual)
     const userDataSet = useSelector(state => uniStudents ? state.firestore.ordered[currentUserDataSet.dataSet] : state.userDataSet.ordered, shallowEqual)
-    const livestreamsInStore = useSelector(state => state.firestore.ordered.livestreams)
+    const livestreamsInStore = useSelector(state => state.firestore.ordered[`livestreams of ${group.groupId}`])
     const livestreams = useMemo(() => {
         let streams = []
         if (livestreamsInStore) {
@@ -260,6 +263,10 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     }, [livestreamsInStore, userDataSetDictionary, streamsMounted]);
 
     useEffect(() => {
+        return () => setStreamsMounted(false)
+    }, [])
+
+    useEffect(() => {
         if (group.universityCode) {
             (async function getStudents() {
                 try {
@@ -279,7 +286,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         if (streamsMounted && !uniStudents && (!userDataSetDictionary || !userDataSet)) {
             (async function getTotalEngagedUsers() {
                 try {
-                    const totalIds = AnalyticsUtil.getTotalUniqueIds(livestreams)
+                    const totalIds = AnalyticsUtil.getTotalUniqueIds(livestreamsInStore)
                     const totalUsers = await firebase.getUsersByEmail(totalIds)
                     const dictionaryOfUsers = AnalyticsUtil.convertArrayOfUserObjectsToDictionary(totalUsers)
                     dispatch(actions.setOrderedUserDataSet(totalUsers))

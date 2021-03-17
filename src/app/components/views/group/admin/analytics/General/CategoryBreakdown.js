@@ -199,7 +199,7 @@ const CategoryBreakdown = ({
                         value={currentCategory.id}
                         onChange={handleGroupCategorySelect}
                     >
-                        {group.categories.map(({id, name}) => (
+                        {group.categories?.map(({id, name}) => (
                             <MenuItem key={id} value={id}>{name}</MenuItem>
                         ))}
                     </Select>
