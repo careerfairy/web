@@ -90,10 +90,7 @@ const PersonalInfo = ({userData}) => {
                 firstName: userData?.firstName || '',
                 lastName: userData?.lastName || '',
                 linkedinUrl: userData?.linkedinUrl || '' ? userData.linkedinUrl : '',
-                university: {
-                    code: userData?.universityCode || 'other',
-                    name: userData?.universityName || ''
-                },
+                university: userData?.university,
                 universityCountryCode: userData?.universityCountryCode || ''
             }}
             enableReinitialize

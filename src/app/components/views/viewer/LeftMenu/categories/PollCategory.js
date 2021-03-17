@@ -66,9 +66,11 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
 
     const voteForPollOption = async (index) => {
         let authEmail = livestream.test ? 'streamerEmail' : authenticatedUser.email;
-        setVoting(true)
-        await firebase.voteForPollOption(livestream.id, currentPoll.id, authEmail, index);
-        setVoting(false)
+        if (authEmail) {
+            setVoting(true)
+            await firebase.voteForPollOption(livestream.id, currentPoll.id, authEmail, index);
+            setVoting(false)   
+        }
     }
 
     let authEmail = (authenticatedUser && authenticatedUser.email && !livestream.test) ? authenticatedUser.email : 'streamerEmail';

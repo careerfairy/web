@@ -473,7 +473,6 @@ function UpcomingLivestream(props) {
         return <Loader/>;
     }
 
-
     return (
         <div>
             <div className="topLevelContainer">

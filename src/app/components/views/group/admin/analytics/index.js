@@ -222,11 +222,13 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const [currentUserDataSet, setCurrentUserDataSet] = useState(userDataSets[0]);
     const [streamsMounted, setStreamsMounted] = useState(false);
 
-    useFirestoreConnect(() => [{
+    const query = useMemo(() => [{
         collection: `livestreams`,
         where: [["start", ">", new Date(globalTimeFrame.double)], ["groupIds", "array-contains", group.id], ["test", "==", false]],
         orderBy: ["start", "asc"],
     }], [globalTimeFrame])
+
+    useFirestoreConnect(query)
 
     const uniStudents = useMemo(() => Boolean(currentUserDataSet.dataSet === "groupUniversityStudents"), [currentUserDataSet])
     const userDataSetDictionary = useSelector(state => uniStudents ? state.firestore.data[currentUserDataSet.dataSet] : state.userDataSet.mapped, shallowEqual)
@@ -257,7 +259,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
                 try {
                     await firestore.get({
                         collection: "userData",
-                        where: ["universityCode", "==", group.universityCode],
+                        where: [["university.code", "==", group.universityCode], ["groupIds", "array-contains", group.id]],
                         storeAs: "groupUniversityStudents",
                     })
                 } catch (e) {
@@ -295,7 +297,6 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     useEffect(() => {
         const flattenedGroupOptions = GroupsUtil.handleFlattenOptions(group)
         setGroupOptions(flattenedGroupOptions)
-
     }, [group])
 
     useEffect(() => {
@@ -324,12 +325,10 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             const unsubscribeQuestions = firebase.listenToLivestreamQuestions(currentStream.id, querySnapshot => {
                 const questions = querySnapshot.docs.map(doc => {
                     const questionData = doc.data()
-                    const authorData = userDataSet.find(follower => follower.userEmail === questionData.author)
                     return {
                         id: doc.id,
                         ...questionData,
                         date: questionData.timestamp?.toDate(),
-                        authorData
                     }
                 })
                 setCurrentStream(prevState => ({...prevState, questions}));

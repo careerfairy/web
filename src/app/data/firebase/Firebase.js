@@ -831,15 +831,17 @@ class Firebase {
         return this.firestore.runTransaction((transaction) => {
             return transaction.get(ref).then((livestreamDoc) => {
                 let livestream = livestreamDoc.data()
-                let updatedSpeakers = livestream.speakers.filter(existingSpeaker => existingSpeaker.id !== speaker.id)
-                updatedSpeakers.forEach(existingSpeaker => {
-                    if (existingSpeaker.speakerUuid === speaker.speakerUuid) {
-                        delete existingSpeaker.speakerUuid;
-                    }
-                });
+                let updatedSpeakers = livestream.liveSpeakers?.filter(existingSpeaker => existingSpeaker.id !== speaker.id) || [];
+                if (updatedSpeakers && updatedSpeakers.length > 0){
+                    updatedSpeakers.forEach(existingSpeaker => {
+                        if (existingSpeaker.speakerUuid === speaker.speakerUuid) {
+                            delete existingSpeaker.speakerUuid;
+                        }
+                    });
+                }         
                 updatedSpeakers.push(speaker)
                 transaction.update(ref, {
-                    speakers: updatedSpeakers
+                    liveSpeakers: updatedSpeakers
                 });
             });
         });
@@ -854,7 +856,7 @@ class Firebase {
                 let livestream = livestreamDoc.data()
                 let speakerRef = this.firestore.collection("livestreams").doc(livestreamDoc.id).collection("speakers").doc();
                 speaker.id = speakerRef.id;
-                let updatedSpeakers = livestream.speakers ? [...livestream.speakers] : []
+                let updatedSpeakers = livestream.liveSpeakers ? [...livestream.liveSpeakers] : []
                 updatedSpeakers.forEach(existingSpeaker => {
                     if (existingSpeaker.speakerUuid === speaker.speakerUuid) {
                         delete existingSpeaker.speakerUuid;
@@ -862,7 +864,7 @@ class Firebase {
                 });
                 updatedSpeakers.push(speaker)
                 transaction.update(ref, {
-                    speakers: updatedSpeakers
+                    liveSpeakers: updatedSpeakers
                 });
             });
         });
@@ -1435,8 +1437,8 @@ class Firebase {
                         };
                     }
                 });
-                (poll.voters = firebase.firestore.FieldValue.arrayUnion(userEmail)),
-                    (poll.options = updatedOptions);
+                poll.voters = firebase.firestore.FieldValue.arrayUnion(userEmail)
+                poll.options = updatedOptions
                 transaction.update(ref, poll);
             });
         });
