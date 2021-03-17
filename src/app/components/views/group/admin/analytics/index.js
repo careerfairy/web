@@ -8,7 +8,7 @@ import Audience from "./Audience";
 import Title from "./Title";
 import Feedback from "./Feedback";
 import {universityCountriesMap} from "../../../../util/constants";
-import {isLoaded, useFirestoreConnect, withFirestore} from "react-redux-firebase";
+import {isEmpty, isLoaded, useFirestoreConnect, withFirestore} from "react-redux-firebase";
 import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import * as actions from '../../../../../store/actions'
@@ -196,7 +196,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             id: uuid(),
             dataSet: "followers",
             displayName: "Total engaged students",
-            miscName: "All students"
+            miscName: "Total engaged students"
         },
     ]
 
@@ -241,7 +241,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
                 const livestream = {...streamObj}
                 livestream.date = livestream.start?.toDate()
                 for (const userType of userTypes) {
-                    if (isLoaded(userDataSetDictionary)) {
+                    if (isLoaded(userDataSetDictionary) && !isEmpty((userDataSetDictionary))) {
                         livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
                     }
                     livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
@@ -251,14 +251,13 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
                 }
                 return livestream
             })
-        }
-        if (!streamsMounted) {
-            setStreamsMounted(true)
+            if (!streamsMounted) {
+                setStreamsMounted(true)
+            }
         }
         return streams
 
     }, [livestreamsInStore, userDataSetDictionary, streamsMounted]);
-
 
     useEffect(() => {
         if (group.universityCode) {
@@ -278,7 +277,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
 
     useEffect(() => {
         if (streamsMounted && !uniStudents && (!userDataSetDictionary || !userDataSet)) {
-            (async function getFollowers() {
+            (async function getTotalEngagedUsers() {
                 try {
                     const totalIds = AnalyticsUtil.getTotalUniqueIds(livestreams)
                     const totalUsers = await firebase.getUsersByEmail(totalIds)

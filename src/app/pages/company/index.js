@@ -1,16 +1,15 @@
-import { Fragment, useState, useEffect, useRef } from 'react';
+import {Fragment, useState, useEffect, useRef} from 'react';
 
-import { useRouter } from 'next/router';
-import { withFirebasePage } from '../../context/firebase'
+import {useRouter} from 'next/router';
 
+import {withFirebasePage} from "../../context/firebase";
 import CompanyLandingPage from '../../components/views/company-profile/CompanyLandingPage';
 import CompanyDiscoverPage from '../../components/views/company-profile/CompanyDiscoverPage';
 import CompanyWatchPage from '../../components/views/company-profile/CompanyWatchPage';
-import CompanyMeetPage from '../../components/views/company-profile/CompanyMeetPage';
 
 import Loader from '../../components/views/loader/Loader';
 
-function CompanyProfile(props) {    
+function CompanyProfile(props) {
     const router = useRouter();
     const [company, setCompanyData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -27,7 +26,7 @@ function CompanyProfile(props) {
     useEffect(() => {
         if (props.companyId) {
             setLoading(true);
-            props.firebase.getCompanyById(props.companyId).then( querySnapshot => {
+            props.firebase.getCompanyById(props.companyId).then(querySnapshot => {
                 let company = querySnapshot.data();
                 company.id = querySnapshot.id;
                 setCompanyData(company);
@@ -43,7 +42,8 @@ function CompanyProfile(props) {
     return (
         <Fragment>
             <div className="sectionOne">
-                <CompanyLandingPage {...props} company={company} scrollToSecond={() => scrollToRef(sectionTwoRef)} scrollToThird={() => scrollToRef(sectionThreeRef)}/>
+                <CompanyLandingPage {...props} company={company} scrollToSecond={() => scrollToRef(sectionTwoRef)}
+                                    scrollToThird={() => scrollToRef(sectionThreeRef)}/>
             </div>
             <div className="section" ref={sectionTwoRef}>
                 <CompanyDiscoverPage {...props} company={company}/>
@@ -52,19 +52,19 @@ function CompanyProfile(props) {
                 <CompanyWatchPage {...props} company={company}/>
             </div>
             <style jsx>{`
-                .sectionOne {
-                    position: relative;
-                    width: 100%;
-                    height: 100%;
-                    min-height: 800px;
-                }
+              .sectionOne {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                min-height: 800px;
+              }
             `}</style>
         </Fragment>
     );
 }
 
-CompanyProfile.getInitialProps = ({ query }) => {
-    return { companyId: query.companyId }
+CompanyProfile.getInitialProps = ({query}) => {
+    return {companyId: query.companyId}
 }
 
 export default withFirebasePage(CompanyProfile);
