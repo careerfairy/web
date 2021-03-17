@@ -11,7 +11,6 @@ const populates = [
 
 
 const useAdminGroup = (groupId, isCompany) => {
-
     const {authenticatedUser} = useAuth()
     const queries = useMemo(() => {
         let queriesArray = []

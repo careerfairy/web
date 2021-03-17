@@ -77,7 +77,7 @@ const EditOverview = ({firebase, group, isCompany}) => {
 };
 
 EditOverview.propTypes = {
-  firebase: PropTypes.bool,
+  firebase: PropTypes.object,
   group: PropTypes.object,
   isCompany: PropTypes.bool
 }
