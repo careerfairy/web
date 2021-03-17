@@ -188,10 +188,10 @@ const ProfileDetails = ({group, firebase, className, ...rest}) => {
     }
 ;
 
-ProfileDetails.propTypes =
-    {
-        className: PropTypes.string
-    }
-;
+ProfileDetails.propTypes = {
+    className: PropTypes.string,
+    firebase: PropTypes.object,
+    group: PropTypes.object,
+}
 
 export default ProfileDetails;

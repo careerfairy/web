@@ -187,10 +187,10 @@ const ProfilePrivacyPolicy = ({group, firebase, className, ...rest}) => {
     }
 ;
 
-ProfilePrivacyPolicy.propTypes =
-    {
-        className: PropTypes.string
-    }
-;
+ProfilePrivacyPolicy.propTypes = {
+  className: PropTypes.string,
+  firebase: PropTypes.any,
+  group: PropTypes.any,
+}
 
 export default ProfilePrivacyPolicy;

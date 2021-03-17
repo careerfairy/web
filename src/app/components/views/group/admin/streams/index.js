@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Fragment, useEffect, useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {Box, CircularProgress, Container, Grid, Typography} from "@material-ui/core";
@@ -231,5 +232,12 @@ const SearchMessage = ({message}) => (
     </Grid>
 )
 
+Index.propTypes = {
+  group: PropTypes.object,
+  isAdmin: PropTypes.bool,
+  query: PropTypes.func.isRequired,
+  typeOfStream: PropTypes.string.isRequired
+}
 
 export default Index;
+

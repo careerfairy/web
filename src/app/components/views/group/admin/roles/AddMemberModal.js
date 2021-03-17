@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {GlassDialog} from "../../../../../materialUI/GlobalModals";
@@ -80,7 +81,6 @@ const AddMemberModal = ({open = false, onClose, group, firebase}) => {
                     } else if (!EMAIL_REGEX.test(values.email)) {
                         errors.email = "Please enter a valid email";
                     }
-                    console.log("-> errors", errors);
                     return errors;
                 }}
                 onSubmit={handleSubmit}
@@ -138,5 +138,16 @@ const AddMemberModal = ({open = false, onClose, group, firebase}) => {
         );
     }
 ;
+
+AddMemberModal.propTypes = {
+    firebase: PropTypes.object,
+    group: PropTypes.object,
+    onClose: PropTypes.func,
+    open: PropTypes.bool
+}
+
+AddMemberModal.defaultProps = {
+    open: false
+}
 
 export default withFirebase(AddMemberModal);

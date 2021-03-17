@@ -6,14 +6,15 @@ import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import {SwipeablePanel} from "../../../../../materialUI/GlobalPanels/GlobalPanels";
 import Audience from "./Audience";
 import Title from "./Title";
-import {handleFlattenOptions} from "../../../../helperFunctions/streamFormFunctions";
 import Feedback from "./Feedback";
 import {universityCountriesMap} from "../../../../util/constants";
-import {isLoaded, useFirestoreConnect, withFirestore} from "react-redux-firebase";
-import {shallowEqual, useSelector} from "react-redux";
+import {isEmpty, isLoaded, useFirestoreConnect, withFirestore} from "react-redux-firebase";
+import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
-
+import * as actions from '../../../../../store/actions'
 import {AppBar, Box, Tab, Tabs} from '@material-ui/core';
+import AnalyticsUtil from "../../../../../data/util/AnalyticsUtil";
+import GroupsUtil from "../../../../../data/util/GroupsUtil";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -194,21 +195,20 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         {
             id: uuid(),
             dataSet: "followers",
-            displayName: "Subscribed students",
-            miscName: "All subscribed students"
+            displayName: "Total engaged students",
+            miscName: "Total engaged students"
         },
     ]
 
     if (!group.universityCode) {
         userDataSets.shift()
     }
-
+    const dispatch = useDispatch()
     const classes = useStyles();
     const breakdownRef = useRef(null)
     const theme = useTheme()
     const [value, setValue] = useState(0);
     const {userData} = useAuth();
-
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [showBar, setShowBar] = useState(false);
     const [userType, setUserType] = useState(userTypes[0]);
@@ -220,30 +220,44 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const [fetchingPolls, setFetchingPolls] = useState(false);
     const [limitedUserTypes, setLimitedUserTypes] = useState(userTypes);
     const [currentUserDataSet, setCurrentUserDataSet] = useState(userDataSets[0]);
+    const [streamsMounted, setStreamsMounted] = useState(false);
 
     const query = useMemo(() => [{
         collection: `livestreams`,
         where: [["start", ">", new Date(globalTimeFrame.double)], ["groupIds", "array-contains", group.id], ["test", "==", false]],
-        orderBy: ["start", "asc"]
+        orderBy: ["start", "asc"],
     }], [globalTimeFrame])
 
     useFirestoreConnect(query)
 
-    const userDataSetDictionary = useSelector(state => state.firestore.data[currentUserDataSet.dataSet], shallowEqual)
-    const userDataSet = useSelector(state => state.firestore.ordered[currentUserDataSet.dataSet], shallowEqual)
+    const uniStudents = useMemo(() => Boolean(currentUserDataSet.dataSet === "groupUniversityStudents"), [currentUserDataSet])
+    const userDataSetDictionary = useSelector(state => uniStudents ? state.firestore.data[currentUserDataSet.dataSet] : state.userDataSet.mapped, shallowEqual)
+    const userDataSet = useSelector(state => uniStudents ? state.firestore.ordered[currentUserDataSet.dataSet] : state.userDataSet.ordered, shallowEqual)
     const livestreamsInStore = useSelector(state => state.firestore.ordered.livestreams)
-    const livestreams = useMemo(() => livestreamsInStore?.map(streamObj => {
-        const livestream = {...streamObj}
-        livestream.date = livestream.start?.toDate()
-        for (const userType of userTypes) {
-            livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
-            livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
-                ...userDataSetDictionary?.[userEmail],
-                universityCountry: universityCountriesMap[userDataSetDictionary?.[userEmail]?.universityCountryCode]
-            }))
+    const livestreams = useMemo(() => {
+        let streams = []
+        if (livestreamsInStore) {
+            streams = livestreamsInStore.map(streamObj => {
+                const livestream = {...streamObj}
+                livestream.date = livestream.start?.toDate()
+                for (const userType of userTypes) {
+                    if (isLoaded(userDataSetDictionary) && !isEmpty((userDataSetDictionary))) {
+                        livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
+                    }
+                    livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
+                        ...userDataSetDictionary?.[userEmail],
+                        universityCountry: universityCountriesMap[userDataSetDictionary?.[userEmail]?.universityCountryCode]
+                    }))
+                }
+                return livestream
+            })
+            if (!streamsMounted) {
+                setStreamsMounted(true)
+            }
         }
-        return livestream
-    }) || [], [livestreamsInStore, userDataSetDictionary]);
+        return streams
+
+    }, [livestreamsInStore, userDataSetDictionary, streamsMounted]);
 
     useEffect(() => {
         if (group.universityCode) {
@@ -262,18 +276,20 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     }, [group?.universityCode]);
 
     useEffect(() => {
-        (async function getFollowers() {
-            try {
-                await firestore.get({
-                    collection: "userData",
-                    where: ["groupIds", "array-contains", group.id],
-                    storeAs: "followers",
-                })
-            } catch (e) {
-                console.log("-> e in getting followers", e);
-            }
-        })()
-    }, []);
+        if (streamsMounted && !uniStudents && (!userDataSetDictionary || !userDataSet)) {
+            (async function getTotalEngagedUsers() {
+                try {
+                    const totalIds = AnalyticsUtil.getTotalUniqueIds(livestreams)
+                    const totalUsers = await firebase.getUsersByEmail(totalIds)
+                    const dictionaryOfUsers = AnalyticsUtil.convertArrayOfUserObjectsToDictionary(totalUsers)
+                    dispatch(actions.setOrderedUserDataSet(totalUsers))
+                    dispatch(actions.setMapUserDataSet(dictionaryOfUsers))
+                } catch (e) {
+                    console.log("-> e in getting followers", e);
+                }
+            })()
+        }
+    }, [streamsMounted, uniStudents]);
 
     useEffect(() => {
         if (currentUserDataSet.dataSet === "followers" && !userData?.isAdmin) {
@@ -285,7 +301,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     }, [currentUserDataSet.dataSet, userData])
 
     useEffect(() => {
-        const flattenedGroupOptions = handleFlattenOptions(group)
+        const flattenedGroupOptions = GroupsUtil.handleFlattenOptions(group)
         setGroupOptions(flattenedGroupOptions)
     }, [group])
 
@@ -470,6 +486,8 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
                 <Title
                     setGlobalTimeFrame={setGlobalTimeFrame}
                     userDataSets={userDataSets}
+                    streamsMounted={streamsMounted}
+                    setStreamsMounted={setStreamsMounted}
                     currentUserDataSet={currentUserDataSet}
                     setCurrentUserDataSet={setCurrentUserDataSet}
                     globalTimeFrames={globalTimeFrames}

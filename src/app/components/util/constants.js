@@ -54,3 +54,14 @@ export const universityCountriesMap = {
 
 
 export const EMOTE_MESSAGE_TEXT_TYPE = "EMOTE"
+
+// Collections
+
+export const COMPANY_COLLECTION = "companyData"
+export const CAREER_CENTER_COLLECTION = "careerCenterData"
+export const USER_DATA_COLLECTION = "userData"
+
+// Notification types
+
+export const COMPANY_DASHBOARD_INVITE = "COMPANY_DASHBOARD_INVITE"
+export const GROUP_DASHBOARD_INVITE = "GROUP_DASHBOARD_INVITE"
