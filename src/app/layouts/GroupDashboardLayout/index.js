@@ -12,6 +12,7 @@ import styles from "../../materialUI/styles/groupDashboardStyles";
 import useDashboardRedirect from "../../components/custom-hook/useDashboardRedirect";
 import useAdminGroup from "../../components/custom-hook/useAdminGroup";
 import useDashboardLinks from "../../components/custom-hook/useDashboardLinks";
+import {CircularProgress} from "@material-ui/core";
 
 const useStyles = makeStyles(styles);
 
@@ -49,12 +50,14 @@ const GroupDashboardLayout = (props) => {
             <div className={classes.wrapper}>
                 <div className={classes.contentContainer}>
                     <div className={classes.content}>
-                        {(isLoaded(group) && !isEmpty(group) && isCorrectGroup) && React.Children.map(children, child => React.cloneElement(child, {
+                        {(isLoaded(group) && !isEmpty(group) && isCorrectGroup) ? React.Children.map(children, child => React.cloneElement(child, {
                             notifications,
                             isAdmin,
                             group,
                             ...props
-                        }))}
+                        })):(
+                            <CircularProgress style={{margin: "auto"}}/>
+                        )}
                     </div>
                 </div>
             </div>
