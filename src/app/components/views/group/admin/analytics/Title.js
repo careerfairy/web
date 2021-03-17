@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import { Button, Card, CardHeader, Grid, Menu, MenuItem, Box, Typography } from "@material-ui/core";
+import {Button, Card, CardHeader, Grid, Menu, MenuItem, Box, Typography} from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import {StyledTooltipWithButton, TooltipHighlight} from "../../../../../materialUI/GlobalTooltips";
 
@@ -34,6 +34,8 @@ const Title = ({
                    currentUserDataSet,
                    userDataSets,
                    setCurrentUserDataSet,
+                   setStreamsMounted,
+                   streamsMounted,
                    globalTimeFrame
                }) => {
 
@@ -54,6 +56,9 @@ const Title = ({
     };
 
     const handleDateMenuItemClick = (event, index) => {
+        if (streamsMounted) {
+            setStreamsMounted(false)
+        }
         setGlobalTimeFrame(globalTimeFrames[index])
         setDateAnchorEl(null);
     };

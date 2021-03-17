@@ -1134,6 +1134,43 @@ class Firebase {
         return groups;
     };
 
+    getGroupsByGroupId = async (arrayOfIds = [""]) => {
+        let groups = []
+        let i, j, temparray, chunk = 10;
+        for (i = 0, j = arrayOfIds.length; i < j; i += chunk) {
+            temparray = arrayOfIds.slice(i, i + chunk);
+            const snapshots = await this.firestore.collection("careerCenterData").where('groupId', 'in', temparray).get()
+            const snapGroups = snapshots.docs.map(doc => ({id: doc.id, ...doc.data()}))
+            groups = [...groups, ...snapGroups]
+        }
+        return groups;
+    };
+
+    getUsersByEmailInBatches = async (arrayOfEmails = [""]) => {
+        let totalUsers = []
+        let i, j, temparray, chunk = 10;
+        for (i = 0, j = arrayOfEmails.length; i < j; i += chunk) {
+            temparray = arrayOfEmails.slice(i, i + chunk);
+            const userEmailSnaps = await this.firestore.collection("userData").where('userEmail', 'in', temparray).get()
+            const newUsers = userEmailSnaps.docs.map(doc => ({id: doc.id, ...doc.data()}))
+            totalUsers = [...totalUsers, ...newUsers]
+        }
+        return totalUsers;
+    };
+
+    getUsersByEmail = async (arrayOfEmails = [""]) => {
+        let totalUsers = []
+        let i, j, temparray, chunk = 800;
+        for (i = 0, j = arrayOfEmails.length; i < j; i += chunk) {
+            temparray = arrayOfEmails.slice(i, i + chunk);
+            const userSnaps = await Promise.all(temparray.map(email => this.firestore.collection("userData").doc(email).get()))
+            const newUsers = userSnaps.filter(doc => doc.exists).map(doc => ({id: doc.id, ...doc.data()}))
+            totalUsers = [...totalUsers, ...newUsers]
+        }
+        return totalUsers
+    };
+
+
     listenCareerCentersByAdminEmail = (email, callback) => {
         let ref = this.firestore
             .collection("careerCenterData")

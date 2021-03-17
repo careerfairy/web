@@ -3,6 +3,7 @@ import {populate, useFirestoreConnect} from "react-redux-firebase";
 import {CAREER_CENTER_COLLECTION, COMPANY_COLLECTION} from "../util/constants";
 import {useAuth} from "../../HOCs/AuthProvider";
 import {shallowEqual, useSelector} from "react-redux";
+import GroupsUtil from "../../data/util/GroupsUtil";
 
 const populates = [
     {child: 'adminEmails', root: 'userData', childAlias: 'admins'} // replace owner with user object
@@ -57,7 +58,8 @@ const useAdminGroup = (groupId, isCompany) => {
 
     return useSelector(({firestore}) => firestore.data.group && {
         ...populate(firestore, "group", populates),
-        id: groupId
+        id: groupId,
+        options: GroupsUtil.handleFlattenOptions(firestore.data.group)
     }, shallowEqual)
 };
 

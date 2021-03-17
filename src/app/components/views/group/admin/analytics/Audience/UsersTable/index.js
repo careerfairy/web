@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { Card, Slide, Tabs, Tab } from '@material-ui/core';
+import {Card, Slide, Tabs, Tab} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
@@ -10,6 +10,7 @@ import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} fro
 import UserInnerTable from "./UserInnerTable";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 import {makeStyles} from "@material-ui/core/styles";
+import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -124,12 +125,8 @@ const UsersTable = ({
     ]
 
     useEffect(() => {
-        setUsers(totalUniqueUsers)
-        mapUserCategories()
-        mapStreamsWatched()
-        mapStreamsRegistered()
+        setUsers(totalUniqueUsers.map(user => AnalyticsUtil.mapUserEngagement(user, streamsFromTimeFrameAndFuture, group)))
         setSelection([])
-
     }, [totalUniqueUsers])
 
     useEffect(() => {
@@ -137,75 +134,6 @@ const UsersTable = ({
             dataTableRef.current.onAllSelected(false)
         }
     }, [currentStream?.id])
-
-    const getCategoryOptionName = (targetCategoryId, user) => {
-        if (user.registeredGroups) {
-            const targetGroup = user.registeredGroups.find(groupObj => groupObj.groupId === group.id)
-            if (targetGroup?.categories) {
-                const targetCategory = targetGroup.categories.find(categoryObj => categoryObj.id === targetCategoryId)
-                if (targetCategory?.selectedValueId) {
-                    const targetOption = groupOptions.find(option => option.id === targetCategory.selectedValueId)
-                    if (targetOption?.name) {
-                        return targetOption.name
-                    }
-                }
-            }
-        }
-    }
-
-    const mapUserCategories = () => {
-        const groupCategories = group.categories ? [...group.categories] : []
-        if (groupCategories.length) {
-            const updatedUsers = totalUniqueUsers?.map(user => {
-                const updatedUser = user
-                groupCategories.forEach(category => {
-                    const targetCategoryId = category.id
-                    if (targetCategoryId) {
-                        const propertyName = category.name
-                        updatedUser[propertyName] = getCategoryOptionName(targetCategoryId, user)
-                    }
-                })
-                return updatedUser
-            })
-            setUsers(updatedUsers)
-        }
-    }
-
-    const mapStreamsWatched = () => {
-        const updatedUsers = totalUniqueUsers.map(user => {
-            user.watchedEvent = false
-            const currentUserEmail = user.userEmail
-            if (currentUserEmail) {
-                const watchedStreams = []
-                streamsFromTimeFrameAndFuture.forEach(stream => {
-                    if (stream?.participatingStudents?.some(userEmail => userEmail === currentUserEmail)) {
-                        watchedStreams.push(stream)
-                        user.watchedEvent = true
-                    }
-                })
-                user.numberOfStreamsWatched = watchedStreams.length
-                user.streamsWatched = watchedStreams
-            }
-            return user
-        })
-        setUsers(updatedUsers)
-    }
-    const mapStreamsRegistered = () => {
-        const updatedUsers = totalUniqueUsers.map(currentUser => {
-            if (currentUser.userEmail) {
-                const registeredStreams = []
-                streamsFromTimeFrameAndFuture.forEach(stream => {
-                    if (stream?.registeredUsers?.some(userEmail => userEmail === currentUser.userEmail)) {
-                        registeredStreams.push(stream)
-                    }
-                })
-                currentUser.numberOfStreamsRegistered = registeredStreams.length
-                currentUser.streamsRegistered = registeredStreams
-            }
-            return currentUser
-        })
-        setUsers(updatedUsers)
-    }
 
     const handleCopyEmails = () => {
         const emails = selection.map(user => user.id).join(";")
