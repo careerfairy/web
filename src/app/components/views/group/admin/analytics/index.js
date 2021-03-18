@@ -16,6 +16,7 @@ import {AppBar, Box, Tab, Tabs} from '@material-ui/core';
 import AnalyticsUtil from "../../../../../data/util/AnalyticsUtil";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import {useRouter} from "next/router";
+import PollUtil from "../../../../../data/util/PollUtil";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -218,6 +219,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const [streamDataType, setStreamDataType] = useState(streamDataTypes[0]);
     const [groupOptions, setGroupOptions] = useState([]);
     const [currentStream, setCurrentStream] = useState(null);
+    console.log("-> currentStream", currentStream);
     const [fetchingQuestions, setFetchingQuestions] = useState(false);
     const [fetchingRatings, setFetchingRatings] = useState(false);
     const [fetchingPolls, setFetchingPolls] = useState(false);
@@ -319,10 +321,11 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
                 const pollEntries = querySnapshot.docs.map(doc => {
                     const data = doc.data()
                     return {
+                        ...data,
                         id: doc.id,
                         date: data.timestamp?.toDate(),
                         votes: data.voters?.length || 0,
-                        ...data
+                        options: PollUtil.convertPollOptionsObjectToArray(data.options),
                     }
                 })
                 setCurrentStream(prevState => ({...prevState, pollEntries}));

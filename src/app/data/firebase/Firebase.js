@@ -1325,18 +1325,10 @@ class Firebase {
             .collection("livestreams")
             .doc(livestreamId)
             .collection("polls");
-
-        const hashedOptions = Object.assign({}, ...pollOptions.map((option, index) => ({
-            [index]: {
-                name: option,
-                votes: 0,
-                voters: [],
-            }
-        })))
         let pollObject = {
             timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
             question: pollQuestion,
-            options: hashedOptions,
+            options: pollOptions,
             voters: [],
             state: "upcoming",
         };
@@ -1350,18 +1342,9 @@ class Firebase {
             .doc(livestreamId)
             .collection("polls")
             .doc(pollId);
-
-        const hashedOptions = Object.assign({}, ...pollOptions.map((option, index) => ({
-            [index]: {
-                name: option,
-                votes: 0,
-                voters: [],
-            }
-        })))
-
         let pollObject = {
             question: pollQuestion,
-            options: hashedOptions,
+            options: pollOptions,
         };
         return ref.update(pollObject);
     };
@@ -1403,13 +1386,10 @@ class Firebase {
             .doc(pollId);
 
         return pollRef.update({
-            [`options.${optionIndex}`]: {
-                voters: firebase.firestore.FieldValue.arrayUnion(userEmail),
-                votes: firebase.firestore.FieldValue.increment(1)
-            },
+            [`options.${optionIndex}.votes`]: firebase.firestore.FieldValue.increment(1),
+            [`options.${optionIndex}.voters`]: firebase.firestore.FieldValue.arrayUnion(userEmail),
             voters: firebase.firestore.FieldValue.arrayUnion(userEmail)
         })
-
     };
 
     setPollState = (livestreamId, pollId, state) => {

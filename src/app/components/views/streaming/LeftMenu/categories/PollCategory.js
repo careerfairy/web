@@ -19,6 +19,7 @@ import {
     WhiteTooltip
 } from "../../../../../materialUI/GlobalTooltips";
 import {makeStyles} from "@material-ui/core/styles";
+import PollUtil from "../../../../../data/util/PollUtil";
 
 const useStyles = makeStyles(theme => ({
     pollHeader: {
@@ -41,11 +42,8 @@ const PollCategory = ({firebase, streamer, livestream, selectedState, showMenu, 
                     return {
                         id: doc.id,
                         ...data,
-                        options: Object.keys(data.options).map((key) => ({
-                            ...data.options[key],
-                            index: key
-                        }))}
-                })
+                        options: PollUtil.convertPollOptionsObjectToArray(data.options)
+                    }})
                 setPollEntries(pollEntries);
             });
             return () => unsubscribe();

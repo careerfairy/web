@@ -11,6 +11,7 @@ import {makeStyles, useTheme, withStyles} from "@material-ui/core/styles";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import {isServer} from "../../../../helperFunctions/HelperFunctions";
 import {v4 as uuid} from 'uuid';
+import PollUtil from "../../../../../data/util/PollUtil";
 
 const PollWrapper = withStyles(theme => ({
     root: {
@@ -46,10 +47,7 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
                 let pollSwitch = null;
                 querySnapshot.forEach(doc => {
                     let poll = doc.data();
-                    poll.options = Object.keys(poll.options).map((key) => ({
-                        ...poll.options[key],
-                        index: key
-                    }))
+                    poll.options = PollUtil.convertPollOptionsObjectToArray(poll.options)
                     if (poll.state === 'current') {
                         poll.id = doc.id;
                         pollSwitch = poll;

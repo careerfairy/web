@@ -18,6 +18,7 @@ import {
 } from '@material-ui/core';
 import {BarChart} from "@material-ui/icons";
 import {GlassDialog} from "../../../../../../../materialUI/GlobalModals";
+import PollUtil from "../../../../../../../data/util/PollUtil";
 
 function PollCreationModal({open, handleClose, livestreamId, initialOptions, initialPoll, firebase}) {
 
@@ -63,8 +64,9 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
         }
 
         setLoading(true);
+        const optionsObject = PollUtil.convertPollOptionsArrayToObject(options)
         if (initialPoll) {
-            firebase.updateLivestreamPoll(livestreamId, initialPoll.id, question, options).then(() => {
+            firebase.updateLivestreamPoll(livestreamId, initialPoll.id, question, optionsObject).then(() => {
                 handleClose();
                 setError(false);
                 setQuestion('');
@@ -72,7 +74,7 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
                 return setLoading(false);
             });
         } else {
-            firebase.createLivestreamPoll(livestreamId, question, options).then(() => {
+            firebase.createLivestreamPoll(livestreamId, question, optionsObject).then(() => {
                 handleClose();
                 setError(false);
                 setQuestion('');
