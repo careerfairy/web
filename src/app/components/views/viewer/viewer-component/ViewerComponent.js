@@ -42,7 +42,7 @@ function ViewerComponent(props) {
     const [showScreenShareModal, setShowScreenShareModal] = useState(false);
     const [optimizationMode, setOptimizationMode] = useState("detail");
 
-    const {userData, authenticatedUser} = useAuth();
+    const {authenticatedUser} = useAuth();
 
     const streamerReady = true;
 
