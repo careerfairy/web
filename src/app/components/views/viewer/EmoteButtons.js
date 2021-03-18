@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { Box, ClickAwayListener, Fab, CircularProgress } from "@material-ui/core";
+import {Box, ClickAwayListener, Fab, CircularProgress} from "@material-ui/core";
 import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import {makeStyles, fade} from "@material-ui/core/styles";
@@ -150,7 +150,6 @@ const EmoteButtons =
          smoothness,
          enableIcons
      }) => {
-
         const classes = useStyles({handRaiseActive});
         const SPEED = isNaN(smoothness) ? 2 : smoothness
         const DELAY = isNaN(delay) ? 3000 : delay

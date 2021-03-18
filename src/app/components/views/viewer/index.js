@@ -19,7 +19,6 @@ const useStyles = makeStyles(theme => ({
         position: "absolute",
         bottom: ({mobile}) => mobile ? 80 : 60,
         right: 60,
-        // zIndex: 100,
         width: 80,
         zIndex: 7250
     },
@@ -86,7 +85,6 @@ const ViewerOverview = ({
                             hideAudience,
                             audienceDrawerOpen,
                         }) => {
-
     const {currentLivestream} = useCurrentStream()
 
     const classes = useStyles({mobile})
