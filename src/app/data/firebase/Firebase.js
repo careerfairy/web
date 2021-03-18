@@ -286,7 +286,7 @@ class Firebase {
                 {
                     message: "How would you rate this live stream?",
                     type: "overall",
-                    appearAfter: 20,
+                    appearAfter: 35,
                     hasRated: false,
                     isForEnd: false
                 },
@@ -300,7 +300,7 @@ class Firebase {
                 {
                     message: `After this stream, are you more likely to apply to ${livestream.company}?`,
                     type: "willingnessToApply",
-                    appearAfter: 25,
+                    appearAfter: 40,
                     hasRated: false,
                     isForEnd: true
                 },
