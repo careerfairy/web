@@ -76,8 +76,8 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
     let authEmail = (authenticatedUser && authenticatedUser.email && !livestream.test) ? authenticatedUser.email : 'streamerEmail';
 
     if (currentPoll && authEmail) {
-        if (currentPoll.voters.indexOf(authEmail) === -1) {
-            let optionElementsLarge = currentPoll.options.map((option, index) => {
+        if (currentPoll.voters?.indexOf(authEmail) === -1) {
+            let optionElementsLarge = currentPoll.options?.map((option, index) => {
                 return (
                     <DynamicColorButton
                         key={option.index || uuid()}
