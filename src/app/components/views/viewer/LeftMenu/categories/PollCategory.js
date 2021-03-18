@@ -11,6 +11,7 @@ import {makeStyles, useTheme, withStyles} from "@material-ui/core/styles";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import {isServer} from "../../../../helperFunctions/HelperFunctions";
 import {v4 as uuid} from 'uuid';
+import PollUtil from "../../../../../data/util/PollUtil";
 
 const PollWrapper = withStyles(theme => ({
     root: {
@@ -46,6 +47,7 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
                 let pollSwitch = null;
                 querySnapshot.forEach(doc => {
                     let poll = doc.data();
+                    poll.options = PollUtil.convertPollOptionsObjectToArray(poll.options)
                     if (poll.state === 'current') {
                         poll.id = doc.id;
                         pollSwitch = poll;
@@ -77,18 +79,18 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
 
     if (currentPoll && authEmail) {
         if (currentPoll.voters?.indexOf(authEmail) === -1) {
-            let optionElementsLarge = currentPoll.options?.map((option, index) => {
+            let optionElementsLarge = currentPoll.options?.map((option) => {
                 return (
                     <DynamicColorButton
-                        key={option.index || uuid()}
+                        key={option.index}
                         variant="contained"
                         loading={voting}
                         className={classes.pollButton}
-                        color={colorsArray[index]}
+                        color={colorsArray[option.index]}
                         children={option.name}
                         fullWidth
                         disabled={voting}
-                        onClick={() => voteForPollOption(index)}
+                        onClick={() => voteForPollOption(option.index)}
                         size='small'/>
                 );
             });

@@ -284,13 +284,6 @@ class Firebase {
         try {
             const ratings = [
                 {
-                    message: "How would you rate this live stream?",
-                    type: "overall",
-                    appearAfter: 20,
-                    hasRated: false,
-                    isForEnd: false
-                },
-                {
                     message: `How happy are you with the content shared by ${livestream.company}?`,
                     type: "company",
                     appearAfter: 30,
@@ -298,11 +291,19 @@ class Firebase {
                     isForEnd: false
                 },
                 {
-                    message: `After this stream, are you more likely to apply to ${livestream.company}?`,
+                    message: `Are you more likely to apply to ${livestream.company} thanks to this live stream?`,
                     type: "willingnessToApply",
-                    appearAfter: 25,
+                    appearAfter: 40,
                     hasRated: false,
                     isForEnd: true
+                },
+                {
+                    message: "How would you rate this live stream experience? Any feedback you would like to share?",
+                    type: "overall",
+                    appearAfter: 45,
+                    hasText: true,
+                    hasRated: false,
+                    isForEnd: false
                 },
             ]
 
@@ -813,13 +814,13 @@ class Firebase {
             return transaction.get(ref).then((livestreamDoc) => {
                 let livestream = livestreamDoc.data()
                 let updatedSpeakers = livestream.liveSpeakers?.filter(existingSpeaker => existingSpeaker.id !== speaker.id) || [];
-                if (updatedSpeakers && updatedSpeakers.length > 0){
+                if (updatedSpeakers && updatedSpeakers.length > 0) {
                     updatedSpeakers.forEach(existingSpeaker => {
                         if (existingSpeaker.speakerUuid === speaker.speakerUuid) {
                             delete existingSpeaker.speakerUuid;
                         }
                     });
-                }         
+                }
                 updatedSpeakers.push(speaker)
                 transaction.update(ref, {
                     liveSpeakers: updatedSpeakers
@@ -1325,22 +1326,14 @@ class Firebase {
             .collection("livestreams")
             .doc(livestreamId)
             .collection("polls");
-
         let pollObject = {
             timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
             question: pollQuestion,
-            options: [],
+            options: pollOptions,
             voters: [],
             state: "upcoming",
         };
-        pollOptions.forEach((option, index) => {
-            pollObject.options.push({
-                name: option,
-                votes: 0,
-                voters: [],
-                index: index,
-            });
-        });
+
         return ref.add(pollObject);
     };
 
@@ -1350,19 +1343,10 @@ class Firebase {
             .doc(livestreamId)
             .collection("polls")
             .doc(pollId);
-
         let pollObject = {
             question: pollQuestion,
-            options: [],
+            options: pollOptions,
         };
-        pollOptions.forEach((option, index) => {
-            pollObject.options.push({
-                name: option,
-                votes: 0,
-                voters: [],
-                index: index,
-            });
-        });
         return ref.update(pollObject);
     };
 
@@ -1396,33 +1380,17 @@ class Firebase {
     };
 
     voteForPollOption = (livestreamId, pollId, userEmail, optionIndex) => {
-        let ref = this.firestore
+        let pollRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("polls")
             .doc(pollId);
-        return this.firestore.runTransaction((transaction) => {
-            return transaction.get(ref).then((pollDoc) => {
-                let poll = pollDoc.data();
-                const updatedOptions = poll.options.map((option, index) => {
-                    if (index !== optionIndex) {
-                        return option;
-                    } else {
-                        return {
-                            name: option.name,
-                            votes: option.votes ? option.votes + 1 : 1,
-                            index: index,
-                            voters: option.voters
-                                ? [...option.voters, userEmail]
-                                : [userEmail],
-                        };
-                    }
-                });
-                poll.voters = firebase.firestore.FieldValue.arrayUnion(userEmail)
-                poll.options = updatedOptions
-                transaction.update(ref, poll);
-            });
-        });
+
+        return pollRef.update({
+            [`options.${optionIndex}.votes`]: firebase.firestore.FieldValue.increment(1),
+            [`options.${optionIndex}.voters`]: firebase.firestore.FieldValue.arrayUnion(userEmail),
+            voters: firebase.firestore.FieldValue.arrayUnion(userEmail)
+        })
     };
 
     setPollState = (livestreamId, pollId, state) => {

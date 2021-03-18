@@ -46,19 +46,23 @@ const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
         const testPolls = [{
             question: 'What should we discuss next?',
             state: 'upcoming',
-            options: [{
-                index: 0,
-                name: 'Our next product',
-                votes: 0
-            }, {
-                index: 1,
-                name: 'What our internships look like',
-                votes: 0
-            }, {
-                index: 2,
-                name: 'Our personal story',
-                votes: 0
-            }],
+            options: {
+                "0": {
+                    index: 0,
+                    name: 'Our next product',
+                    votes: 0
+                },
+                "1": {
+                    index: 1,
+                    name: 'What our internships look like',
+                    votes: 0
+                },
+                "2": {
+                    index: 2,
+                    name: 'Our personal story',
+                    votes: 0
+                }
+            },
             timestamp: firebase.getFirebaseTimestamp('March 17, 2020 03:24:00'),
             voters: []
         }];
