@@ -284,13 +284,6 @@ class Firebase {
         try {
             const ratings = [
                 {
-                    message: "How would you rate this live stream?",
-                    type: "overall",
-                    appearAfter: 35,
-                    hasRated: false,
-                    isForEnd: false
-                },
-                {
                     message: `How happy are you with the content shared by ${livestream.company}?`,
                     type: "company",
                     appearAfter: 30,
@@ -298,11 +291,19 @@ class Firebase {
                     isForEnd: false
                 },
                 {
-                    message: `After this stream, are you more likely to apply to ${livestream.company}?`,
+                    message: `Are you more likely to apply to ${livestream.company} thanks to this live stream?`,
                     type: "willingnessToApply",
                     appearAfter: 40,
                     hasRated: false,
                     isForEnd: true
+                },
+                {
+                    message: "How would you rate this live stream experience? Any feedback you would like to share?",
+                    type: "overall",
+                    appearAfter: 45,
+                    hasText: true,
+                    hasRated: false,
+                    isForEnd: false
                 },
             ]
 
