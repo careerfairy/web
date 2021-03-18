@@ -219,7 +219,6 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const [streamDataType, setStreamDataType] = useState(streamDataTypes[0]);
     const [groupOptions, setGroupOptions] = useState([]);
     const [currentStream, setCurrentStream] = useState(null);
-    console.log("-> currentStream", currentStream);
     const [fetchingQuestions, setFetchingQuestions] = useState(false);
     const [fetchingRatings, setFetchingRatings] = useState(false);
     const [fetchingPolls, setFetchingPolls] = useState(false);
