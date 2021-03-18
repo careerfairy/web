@@ -6,8 +6,8 @@ export default class PollUtil {
         }));
     }
 
-    static convertPollOptionsArrayToObject(pollOptionsArray = []) {
-        return Object.assign({}, ...pollOptionsArray.map((option, index) => ({
+    static convertPollOptionNamesArrayToObject(arrayOfPollOptionNames = ["optionName"]) {
+        return Object.assign({}, ...arrayOfPollOptionNames.map((option, index) => ({
             [index]: {
                 name: option,
                 votes: 0,

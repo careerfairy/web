@@ -64,7 +64,7 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
         }
 
         setLoading(true);
-        const optionsObject = PollUtil.convertPollOptionsArrayToObject(options)
+        const optionsObject = PollUtil.convertPollOptionNamesArrayToObject(options)
         if (initialPoll) {
             firebase.updateLivestreamPoll(livestreamId, initialPoll.id, question, optionsObject).then(() => {
                 handleClose();
