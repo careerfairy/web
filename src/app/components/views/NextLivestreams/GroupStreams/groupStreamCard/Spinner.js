@@ -5,7 +5,7 @@ import Skeleton from "@material-ui/lab/Skeleton";
 
 const useStyles = makeStyles(theme => ({
     root: {
-
+        flex: 1,
         height: "100%",
         borderRadius: theme.spacing(2),
         display: "flex",

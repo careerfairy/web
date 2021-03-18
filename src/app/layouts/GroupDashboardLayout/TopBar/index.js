@@ -133,8 +133,14 @@ const TopBar = ({className, notifications, links, onMobileNavOpen, ...rest}) => 
 };
 
 TopBar.propTypes = {
-    className: PropTypes.string,
-    onMobileNavOpen: PropTypes.func
-};
+  className: PropTypes.string,
+  links: PropTypes.array,
+  notifications: PropTypes.array,
+  onMobileNavOpen: PropTypes.func
+}
 
+TopBar.defaultProps = {
+  links: []
+}
 export default TopBar;
+

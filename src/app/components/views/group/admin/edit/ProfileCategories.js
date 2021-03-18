@@ -6,29 +6,9 @@ import {GENERAL_ERROR} from "../../../../util/constants";
 import AddIcon from "@material-ui/icons/Add";
 import CategoryElement from "../settings/Category/CategoryElement";
 import CategoryEdit from "../settings/Category/CategoryEdit";
-import {makeStyles} from "@material-ui/core/styles";
 
-const states = [
-    {
-        value: 'alabama',
-        label: 'Alabama'
-    },
-    {
-        value: 'new-york',
-        label: 'New York'
-    },
-    {
-        value: 'san-francisco',
-        label: 'San Francisco'
-    }
-];
-
-const useStyles = makeStyles(() => ({
-    root: {}
-}));
 
 const ProfileCategories = ({group, firebase, className, ...rest}) => {
-        const classes = useStyles();
         const {enqueueSnackbar} = useSnackbar()
         const [createMode, setCreateMode] = useState(false);
 
@@ -120,10 +100,10 @@ const ProfileCategories = ({group, firebase, className, ...rest}) => {
     }
 ;
 
-ProfileCategories.propTypes =
-    {
-        className: PropTypes.string
-    }
-;
+ProfileCategories.propTypes = {
+  className: PropTypes.string,
+  firebase: PropTypes.object,
+  group: PropTypes.object,
+}
 
 export default ProfileCategories;

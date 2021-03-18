@@ -63,7 +63,6 @@ function MyApp({Component, pageProps}) {
     const [showBubbles, setShowBubbles] = useState(false)
     const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
 
-
     useEffect(() => {
         // Remove the server-side injected CSS.
         const jssStyles = document.querySelector('#jss-server-side');

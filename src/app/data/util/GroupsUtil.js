@@ -11,6 +11,18 @@ export default class GroupsUtil {
         return searchForOption.name;
     }
 
+    static handleFlattenOptions = (group) => {
+        let optionsArray = []
+        if (group.categories && group.categories.length) {
+            group.categories.forEach(category => {
+                if (category.options && category.options.length) {
+                    category.options.forEach(option => optionsArray.push(option))
+                }
+            })
+        }
+        return optionsArray
+    }
+
     static getPolicyStatus = async (groups, userEmail, firebase) => {
         let hasAgreedToAll = true
         const updatedGroups = await Promise.all(groups.map(async group => {

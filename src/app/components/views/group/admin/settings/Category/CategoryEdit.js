@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {useState, useEffect} from 'react';
 import AddIcon from '@material-ui/icons/Add';
 import {withFirebase} from "context/firebase";
@@ -192,7 +193,7 @@ function CategoryEditModal({
                 setEditMode(false);
             })
         } else {
-            const newCategories = [...group.categories]
+            const newCategories = group.categories.map(category => ({...category}))
             const index = newCategories.findIndex(el => el.id === category.id)
             newCategories[index].name = categoryName
             newCategories[index].options = editableOptions
@@ -331,4 +332,17 @@ function CategoryEditModal({
     );
 }
 
+
+CategoryEditModal.propTypes = {
+    category: PropTypes.any,
+    firebase: PropTypes.object,
+    group: PropTypes.object,
+    groupId: PropTypes.string,
+    handleAddTempCategory: PropTypes.func,
+    handleDeleteLocalCategory: PropTypes.func,
+    handleUpdateCategory: PropTypes.func,
+    isLocal: PropTypes.bool,
+    newCategory: PropTypes.any,
+    setEditMode: PropTypes.func
+}
 export default withFirebase(CategoryEditModal);
