@@ -651,7 +651,7 @@ class Firebase {
     }
 
     listenToUpcomingLiveStreamsByGroupId = (groupId, callback) => {
-        var ninetyMinutesInMilliseconds = 1000 * 60 * 90;
+        var ninetyMinutesInMilliseconds = 1000 * 60 * 360;
         let ref = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
@@ -732,7 +732,7 @@ class Firebase {
 
     listenToPastLiveStreamsByGroupId = (groupId, callback) => {
         let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
-        const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
+        const fortyFiveMinutesInMilliseconds = 1000 * 60 * 180;
         let ref = this.firestore
             .collection("livestreams")
             .where("test", "==", false)
