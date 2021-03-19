@@ -1,5 +1,5 @@
 import StatsUtil from 'data/util/StatsUtil';
-import { useState, useEffect } from 'react';
+import {useState, useEffect} from 'react';
 
 export function useTalentPoolMetadata(livestream, allGroups, group, firebase, registeredStudentsFromGroup, userRequestedDownload) {
 
@@ -10,7 +10,7 @@ export function useTalentPoolMetadata(livestream, allGroups, group, firebase, re
     useEffect(() => {
         if (talentPool !== undefined) {
             setHasDownloadedTalentPool(true);
-        }  
+        }
     }, [talentPool]);
 
     useEffect(() => {
@@ -19,18 +19,25 @@ export function useTalentPoolMetadata(livestream, allGroups, group, firebase, re
                 let registeredStudents = [];
                 querySnapshot.forEach(doc => {
                     let element = doc.data();
-                    if (registeredStudentsFromGroup.some( student => student.Email === doc.id)) {
-                        let publishedStudent = StatsUtil.getStudentInGroupDataObject(element, group);
+                    if (registeredStudentsFromGroup.some(student => student.Email === doc.id)) {
+                        let publishedStudent
+                        if (group.universityCode) {
+                            publishedStudent = StatsUtil.getStudentInGroupDataObject(element, group);
+                        } else {
+                            const livestreamGroups = allGroups.filter(group => livestream.groupIds.includes(group.id))
+                            const livestreamGroupUserBelongsTo = StatsUtil.getFirstGroupThatUserBelongsTo(element, livestreamGroups, group)
+                            publishedStudent = StatsUtil.getStudentInGroupDataObject(element, livestreamGroupUserBelongsTo || {})
+                        }
                         registeredStudents.push(publishedStudent);
                     } else {
                         let publishedStudent = StatsUtil.getStudentOutsideGroupDataObject(element, allGroups);
                         registeredStudents.push(publishedStudent);
-                    }    
+                    }
                 });
                 setTalentPool(registeredStudents);
             })
-        }      
+        }
     }, [livestream, userRequestedDownload]);
-  
-    return { hasDownloadedTalentPool, talentPool };
+
+    return {hasDownloadedTalentPool, talentPool};
 }
