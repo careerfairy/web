@@ -11,9 +11,6 @@ import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import PollUtil from "../../../../../data/util/PollUtil";
 import {isServer} from "../../../../helperFunctions/HelperFunctions";
-import {v4 as uuid} from 'uuid';
-
-const randomKey = uuid()
 
 const usePollWrapperStyles = makeStyles(theme => ({
     root: {
@@ -73,7 +70,7 @@ const PollOptionsDisplay = ({currentPoll, voting, voteForPollOption}) => {
                                 disabled={voting}
                                 onClick={() => voteForPollOption(option.index)}
                                 size='small'>
-                                <span key={randomKey}>
+                                <span key={`${option.index}-span`}>
                                 {option.name}
                                 </span>
                             </DynamicColorButton>
