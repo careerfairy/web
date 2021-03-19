@@ -7,12 +7,12 @@ import {GreyPermanentMarker, PollQuestion} from "../../../../../materialUI/Globa
 import {CategoryContainerCentered} from "../../../../../materialUI/GlobalContainers";
 import {colorsArray} from "../../../../util/colors";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
-import {makeStyles, useTheme, withStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import PollUtil from "../../../../../data/util/PollUtil";
 import {isServer} from "../../../../helperFunctions/HelperFunctions";
 
-const PollWrapper = withStyles(theme => ({
+const usePollWrapperStyles = makeStyles(theme => ({
     root: {
         borderRadius: 15,
         margin: 10,
@@ -25,7 +25,22 @@ const PollWrapper = withStyles(theme => ({
         padding: theme.spacing(2, 0),
         boxShadow: theme.shadows[3]
     },
-}))(Paper);
+}))
+
+const PollWrapper = ({children, ...rest}) => {
+    const classes = usePollWrapperStyles()
+    return (
+        <Paper {...rest} className={classes.root}>
+            {children}
+        </Paper>
+    )
+}
+
+PollWrapper.propTypes = {
+    children: PropTypes.node.isRequired,
+    style: PropTypes.object
+}
+
 const useStyles = makeStyles(theme => ({
     pollButton: {
         marginTop: theme.spacing(1)
@@ -51,11 +66,14 @@ const PollOptionsDisplay = ({currentPoll, voting, voteForPollOption}) => {
                                 loading={voting}
                                 className={classes.pollButton}
                                 color={colorsArray[option.index]}
-                                children={option.name}
                                 fullWidth
                                 disabled={voting}
                                 onClick={() => voteForPollOption(option.index)}
-                                size='small'/>
+                                size='small'>
+                                <span key={`${option.index}-span`}>
+                                {option.name}
+                                </span>
+                            </DynamicColorButton>
                         );
                     })}
                 </div>
@@ -168,4 +186,3 @@ PollCategory.propTypes = {
     setShowMenu: PropTypes.func.isRequired
 }
 export default withFirebase(PollCategory);
-
