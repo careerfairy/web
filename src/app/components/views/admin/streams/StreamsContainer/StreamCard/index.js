@@ -8,7 +8,6 @@ import {
     ListItem,
     ListItemAvatar,
     ListItemText,
-    CardActionArea,
     CardActions,
     CardContent,
     CardMedia,
@@ -43,7 +42,7 @@ const useStyles = makeStyles(theme => ({
     cardHeader:{
         "& .MuiCardHeader-content": {
             flex: "1 1 auto",
-            width: "100%"
+            width: "calc(100% - 30px)"
         }
     }
 }));
@@ -109,9 +108,8 @@ const StreamCard = ({stream}) => {
                         <IconButton onClick={handleClick}>
                             <MoreVertIcon/>
                         </IconButton>
-                        <Menu
+                        {<Menu
                             anchorEl={anchorEl}
-                            keepMounted
                             open={Boolean(anchorEl)}
                             onClose={handleClose}
                         >
@@ -127,7 +125,7 @@ const StreamCard = ({stream}) => {
                             >
                                 Get streamer links
                             </MenuItem>
-                        </Menu>
+                        </Menu>}
                     </React.Fragment>
                 }
             />
