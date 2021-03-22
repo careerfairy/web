@@ -15,32 +15,61 @@
  */
 'use strict';
 
-const algoliasearch = require('algoliasearch');
 const dotenv = require('dotenv');
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 var serviceAccount = require('./keys/admin.json');
 
+
+// Imported Group Cloud functions
+
+exports.algolia = require('./algolia');
+
+// Imported Individual Cloud functions
+
+const hosting = require('./hosting')
+const auth = require('./auth')
+const agora = require('./agora')
+
+// Hosting
+exports.production = hosting.production
+
+exports.testing = hosting.testing
+
+exports.testing2 = hosting.testing2
+
+
+// Auth
+exports.resendPostmarkEmailVerificationEmailWithPin = auth.resendPostmarkEmailVerificationEmailWithPin
+
+exports.sendPostmarkEmailUserDataAndUniWithName = auth.sendPostmarkEmailUserDataAndUniWithName
+exports.sendPostmarkEmailUserDataAndUni = auth.sendPostmarkEmailUserDataAndUni
+
+exports.sendPostmarkResetPasswordEmail = auth.sendPostmarkResetPasswordEmail
+exports.verifyEmailWithPin = auth.verifyEmailWithPin
+exports.updateFakeUser = auth.updateFakeUser
+
+
+// Agora
+exports.generateAgoraToken = agora.generateAgoraToken
+
+exports.generateAgoraTokenSecure = agora.generateAgoraTokenSecure
+
+exports.startRecordingLivestream = agora.startRecordingLivestream
+
+
+
 // load values from the .env file in this directory into process.env
 dotenv.config();
 
-const ALGOLIA_APP_ID = process.env.ALGOLIA_APP_ID
-const ALGOLIA_ADMIN_KEY = process.env.ALGOLIA_API_KEY
-const ALGOLIA_GROUP_INDEX_NAME = process.env.ALGOLIA_INDEX_NAME
-const ALGOLIA_STREAM_INDEX_NAME = process.env.ALGOLIA_STREAM_INDEX_NAME
-
 
 // configure algolia
-const algolia = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_KEY);
-const groupIndex = algolia.initIndex(ALGOLIA_GROUP_INDEX_NAME);
-const streamIndex = algolia.initIndex(ALGOLIA_STREAM_INDEX_NAME);
 
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 
-const routes = require('./routes');
 
 var api_key = '13db35c5779d693ddad243d21e9d5cba-e566273b-b2967fc4';
 var domain = 'mail.careerfairy.io';
@@ -49,119 +78,6 @@ var host = 'api.eu.mailgun.net';
 const mailgun = require('mailgun-js')({apiKey: api_key, domain: domain, host: host});
 var {DateTime} = require('luxon');
 
-exports.next = functions.https.onRequest(async (req, res) => {
-    const next = require('next');
-
-    const app = next({conf: {distDir: "dist/client"}});
-    const handler = routes.getRequestHandler(app);
-    await app.prepare().then(() => {
-        return handler(req, res);
-    });
-});
-
-exports.next2 = functions.https.onRequest(async (req, res) => {
-    const next = require('next');
-
-    const app = next({conf: {distDir: "dist/client"}});
-    const handler = routes.getRequestHandler(app);
-    await app.prepare().then(() => {
-        return handler(req, res);
-    });
-});
-
-exports.next3 = functions.https.onRequest(async (req, res) => {
-    const next = require('next');
-
-    const app = next({conf: {distDir: "dist/client"}});
-    const handler = routes.getRequestHandler(app);
-    await app.prepare().then(() => {
-        return handler(req, res);
-    });
-});
-
-// Cloud Trigger functions
-
-exports.addToIndex = functions.firestore.document('careerCenterData/{careerCenter}')
-    .onCreate(snapshot => {
-        const data = snapshot.data();
-        const objectID = snapshot.id
-        data.groupId = objectID
-        // deletes personal Identifiable data
-        delete data.adminEmail
-        delete data.adminEmails
-        return groupIndex.saveObject({...data, objectID})
-            .then(() => {
-                functions.logger.log('Groups imported into Algolia');
-            })
-            .catch(error => {
-                functions.logger.warn('Error when importing group into Algolia', error);
-            });
-
-    })
-
-exports.addToStreamIndex = functions.firestore.document('livestreams/{livestream}')
-    .onCreate(snapshot => {
-        const data = snapshot.data();
-        if (data.test === false) { // dont add test streams to algolia
-            const objectID = snapshot.id
-            data.numberOfRegistered = data.registeredUsers?.length || 0
-
-            // deletes personal Identifiable data
-            delete data.registeredUsers
-            return streamIndex.saveObject({...data, objectID})
-                .then(() => {
-                    functions.logger.log('Stream imported into Algolia');
-                })
-                .catch(error => {
-                    functions.logger.warn('Error when importing stream into Algolia', error);
-                });
-        }
-    })
-
-exports.updateIndex = functions.firestore.document('careerCenterData/{careerCenter}')
-    .onUpdate(change => {
-        const newData = change.after.data();
-        // deletes personal Identifiable data
-        delete newData.adminEmail
-        delete newData.adminEmails
-
-        const objectID = change.after.id;
-        return groupIndex.saveObject({...newData, objectID})
-            .then(() => {
-                functions.logger.log('Groups updated into Algolia');
-            })
-            .catch(error => {
-                functions.logger.warn('Error when importing group into Algolia', error);
-            })
-    })
-
-exports.updateStreamIndex = functions.firestore.document('livestreams/{livestream}')
-    .onUpdate(change => {
-        const newData = change.after.data();
-        if (newData.test === false) { // dont add test streams to algolia
-
-            newData.numberOfRegistered = newData.registeredUsers?.length || 0
-            // deletes personal Identifiable data
-            delete newData.registeredUsers
-
-            const objectID = change.after.id;
-            return streamIndex.saveObject({...newData, objectID})
-                .then(() => {
-                    functions.logger.log('Stream updated into Algolia');
-                })
-                .catch(error => {
-                    functions.logger.warn('Error when importing stream into Algolia', error);
-                })
-
-        }
-    })
-
-exports.deleteFromIndex = functions.firestore.document('careerCenterData/{careerCenter}')
-    .onDelete(snapshot => groupIndex.deleteObject(snapshot.id))
-
-exports.deleteStreamFromIndex = functions.firestore.document('livestreams/{livestream}')
-    .onDelete(snapshot => streamIndex.deleteObject(snapshot.id))
-
 
 // Http functions
 
@@ -169,122 +85,9 @@ const postmark = require("postmark");
 var serverToken = "3f6d5713-5461-4453-adfd-71f5fdad4e63";
 var client = new postmark.ServerClient(serverToken);
 
-exports.resendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(async (req, res) => {
 
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
 
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
 
-    const recipient_email = req.body.recipientEmail;
-    const pinCode = getRandomInt(9999);
-
-    await admin.firestore().collection("userData").doc(recipient_email).update({validationPin: pinCode});
-
-    const email = {
-        "TemplateId": 17669843,
-        "From": 'CareerFairy <noreply@careerfairy.io>',
-        "To": recipient_email,
-        "TemplateModel": {pinCode: pinCode}
-    };
-
-    return client.sendEmailWithTemplate(email).then(response => {
-        res.sendStatus(200);
-    }, error => {
-        res.sendStatus(500);
-    });
-});
-
-function getRandomInt(max) {
-    let variable = Math.floor(Math.random() * Math.floor(max));
-    if (variable < 1000) {
-        return variable + 1000;
-    } else {
-        return variable;
-    }
-}
-
-exports.verifyEmailWithPin = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    const recipient_email = req.body.recipientEmail;
-    const pinCode = req.body.pinCode;
-
-    admin.firestore().collection("userData").doc(recipient_email).get().then(querySnapshot => {
-        if (!querySnapshot.isEmpty) {
-            let user = querySnapshot.data();
-            if (user.validationPin === pinCode) {
-                admin.auth().getUserByEmail(recipient_email).then(userRecord => {
-                    admin.auth().updateUser(userRecord.uid, {
-                        emailVerified: true
-                    }).then(userRecord => {
-                        console.log(userRecord);
-                        res.sendStatus(200);
-                    })
-                })
-            } else {
-                res.sendStatus(403);
-            }
-        }
-    }).catch(error => {
-        res.sendStatus(500);
-    });
-});
-
-exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    }
-
-    const recipient_email = req.body.recipientEmail;
-    const redirect_link = req.body.redirect_link;
-
-    const actionCodeSettings = {
-        url: redirect_link
-    };
-
-    admin.auth().generatePasswordResetLink(recipient_email, actionCodeSettings)
-        .then((link) => {
-            const email = {
-                "TemplateId": 16531013,
-                "From": 'CareerFairy <noreply@careerfairy.io>',
-                "To": recipient_email,
-                "TemplateModel": {action_url: link}
-            };
-            return client.sendEmailWithTemplate(email).then(response => {
-                res.send(200);
-            }, error => {
-                res.send('Error: ' + error);
-            });
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-});
 
 exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onRequest(async (req, res) => {
 
@@ -426,135 +229,7 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(async (req, re
     });
 });
 
-exports.updateFakeUser = functions.https.onRequest(async (req, res) => {
 
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-    admin.auth().updateUser(req.body.uid, {
-        emailVerified: true
-    })
-        .then(function (userRecord) {
-            // See the UserRecord reference doc for the contents of userRecord.
-            console.log('Successfully updated user', userRecord.toJSON());
-        })
-        .catch(function (error) {
-            console.log('Error updating user:', error);
-        });
-});
-
-exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    const recipient_email = req.body.recipientEmail;
-    const recipient_first_name = req.body.firstName;
-    const recipient_last_name = req.body.lastName;
-    const recipient_university = req.body.universityCode;
-    const recipient_university_country_code = req.body.universityCountryCode;
-    const pinCode = getRandomInt(9999);
-
-    admin.firestore().collection("userData").doc(recipient_email).set(
-        {
-            id: recipient_email,
-            validationPin: pinCode,
-            firstName: recipient_first_name,
-            lastName: recipient_last_name,
-            userEmail: recipient_email,
-            universityCode: recipient_university,
-            universityCountryCode: recipient_university_country_code,
-        }).then(() => {
-        const email = {
-            "TemplateId": 17669843,
-            "From": 'CareerFairy <noreply@careerfairy.io>',
-            "To": recipient_email,
-            "TemplateModel": {pinCode: pinCode}
-        };
-
-        return client.sendEmailWithTemplate(email).then(response => {
-            console.log(`Successfully sent PIN email to ${recipient_email}`);
-            res.sendStatus(200);
-        }, error => {
-            console.error(`Error sending PIN email to ${recipient_email}`, error);
-            res.sendStatus(500);
-        });
-    }).catch((error) => {
-        console.error(`Error creating user ${recipient_email}`, error);
-        res.sendStatus(500);
-    });
-});
-
-exports.sendPostmarkEmailUserDataAndUniWithName = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    const recipient_email = req.body.recipientEmail;
-    const recipient_first_name = req.body.firstName;
-    const recipient_last_name = req.body.lastName;
-    const recipient_university = req.body.universityCode;
-    const recipient_university_name = req.body.universityName;
-    const recipient_university_country_code = req.body.universityCountryCode;
-    const pinCode = getRandomInt(9999);
-
-    admin.firestore().collection("userData").doc(recipient_email).set(
-        {
-            id: recipient_email,
-            validationPin: pinCode,
-            firstName: recipient_first_name,
-            lastName: recipient_last_name,
-            userEmail: recipient_email,
-            universityCode: recipient_university,
-            university: {
-                name: recipient_university_name,
-                code: recipient_university
-            },
-            universityName: recipient_university_name,
-            universityCountryCode: recipient_university_country_code,
-        }).then(() => {
-        const email = {
-            "TemplateId": 17669843,
-            "From": 'CareerFairy <noreply@careerfairy.io>',
-            "To": recipient_email,
-            "TemplateModel": {pinCode: pinCode}
-        };
-
-        return client.sendEmailWithTemplate(email).then(response => {
-            console.log(`Successfully sent PIN email to ${recipient_email}`);
-            res.sendStatus(200);
-        }, error => {
-            console.error(`Error sending PIN email to ${recipient_email}`, error);
-            res.sendStatus(500);
-        });
-    }).catch((error) => {
-        console.error(`Error creating user ${recipient_email}`, error);
-        res.sendStatus(500);
-    });
-});
 
 exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async (req, res) => {
 
@@ -615,126 +290,12 @@ exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async 
 });
 
 
-const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
-const appID = '53675bc6d3884026a72ecb1de3d19eb1';
-const appCertificate = '286a21681469490783ab75247de35f37';
 
-exports.generateAgoraToken = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    const channelName = req.body.channel;
-    const streamerToken = req.body.token;
-    const rtcRole = req.body.isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
-    const rtmRole = 0;
-    const expirationTimeInSeconds = 21600
-    const uid = req.body.uid;
-    const currentTimestamp = Math.floor(Date.now() / 1000)
-    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-    
-    // IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
-    
-    // Build token with uid
-        const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
-        console.log("Token With Integer Number Uid: " + rtcToken);
-        const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
-        console.log("Token With Integer Number Uid: " + rtmToken);
-    
-        return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
-})
 
 const axios = require('axios');
 
-exports.startRecordingLivestream = functions.https.onRequest(async (req, res) => {
 
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
 
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    }
-
-    const customerKey = "fd45e86c6ffe445ebb87571344e945b1";
-    const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0";
-
-    let plainCredentials = `${customerKey}:${customerSecret}`;
-    let base64Credentials = Buffer.from(plainCredentials).toString('base64');
-
-    let authorizationHeader = `Basic ${base64Credentials}`;
-
-    let acquire = await axios({
-        method: 'post',
-        data: {
-            "cname": "bnruMEB6DGte14VNaZ9M",
-            "uid": 1234232,
-            "clientRequest": {}
-        },
-        url: `https://api.agora.io/dev/v1/apps/${appID}/cloud_recording/acquire`,
-        headers: {
-            'Authorization': authorizationHeader,
-            'Content-Type': 'application/json'
-        }
-    })
-    console.log(acquire);
-});
-
-exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    const channelName = req.body.channel;
-    const sentToken = req.body.token;
-    const rtcRole = req.body.isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
-    const rtmRole = 0;
-    const expirationTimeInSeconds = 21600
-    const uid = req.body.uid;
-    const currentTimestamp = Math.floor(Date.now() / 1000)
-    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-        
-    // Build token with uid
-    if (rtcRole === RtcRole.PUBLISHER) {
-        let livestreamDoc = await admin.firestore().collection('livestreams').doc(channelName).get();
-        let livestream = livestreamDoc.data();
-
-        if (!livestream.test) {
-            let storedTokenDoc =  await admin.firestore().collection('livestreams').doc(channelName).collection('tokens').doc('secureToken').get();
-            let storedToken = storedTokenDoc.data().value;
-            if (storedToken !== sentToken) {
-                return res.status(401).send();
-            }
-        }
-        const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
-        const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
-        return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
-    } else {
-        const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
-        const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
-    
-        return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
-    }    
-})
 
 
 exports.sendReminderEmailToRegistrants = functions.https.onRequest(async (req, res) => {
@@ -797,19 +358,19 @@ exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(async
     console.log(groups)
     let recipients = new Set();
 
-    const emailsToRemove = ["christine.kaiser@hr.ethz.ch", "ekappel@gmx.ch,", "franziska.liese@hr.ethz.ch","anja.pauling@hr.ethz.ch", "lorena.coletti@hr.ethz.ch",
-    "john.imonopi@lernende.ethz.ch", "michael.grunder@hr.ethz.ch", "daniela.gunz@uzh.ch", "roger.gfroerer@careerservices.uzh.ch"]
+    const emailsToRemove = ["christine.kaiser@hr.ethz.ch", "ekappel@gmx.ch,", "franziska.liese@hr.ethz.ch", "anja.pauling@hr.ethz.ch", "lorena.coletti@hr.ethz.ch",
+        "john.imonopi@lernende.ethz.ch", "michael.grunder@hr.ethz.ch", "daniela.gunz@uzh.ch", "roger.gfroerer@careerservices.uzh.ch"]
 
     let snapshot = await admin.firestore().collection("userData").where("groupIds", "array-contains-any", groups).get();
     console.log(snapshot.size)
-    snapshot.forEach( doc => {
+    snapshot.forEach(doc => {
         let student = doc.data()
-        groups.forEach( group => {
-            let registeredGroup = student.registeredGroups.find( registeredGroup => registeredGroup.groupId === group)
+        groups.forEach(group => {
+            let registeredGroup = student.registeredGroups.find(registeredGroup => registeredGroup.groupId === group)
             if (registeredGroup) {
                 let categoryId = recipientsGroupsAndCategories[group].categoryId;
                 let selectedOptions = recipientsGroupsAndCategories[group].selectedOptions;
-                let registeredCategory = registeredGroup.categories.find( category => category.id === categoryId);
+                let registeredCategory = registeredGroup.categories.find(category => category.id === categoryId);
                 if (selectedOptions.includes(registeredCategory.selectedValueId) && !emailsToRemove.includes(student.userEmail) && !student.unsubscribed) {
                     recipients.add(student.userEmail);
                 }
@@ -818,7 +379,7 @@ exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(async
     })
     console.log(recipients.size)
     let testEmails = ["maximilian@careerfairy.io"]
-    recipients.forEach( recipient => {
+    recipients.forEach(recipient => {
         const email = {
             "TemplateId": 22068118,
             "From": 'CareerFairy <noreply@careerfairy.io>',
@@ -897,15 +458,15 @@ exports.assertLivestreamRegistrationWasCompleted = functions.firestore
 
 
 exports.assertLivestreamDeregistrationWasCompleted = functions.firestore
-.document('livestreams/{livestreamId}/registeredStudents/{studentId}')
-.onDelete((snapshot, context) => {
-    console.log(`Documents deleted in registeredStudents in ${context.params.livestreamId}`);
-    admin.firestore().collection("livestreams").doc(context.params.livestreamId).update({
-        registeredUsers: admin.firestore.FieldValue.arrayRemove(context.params.studentId)
-    }).then(() => {
-        console.log(`Successfully removed user from registeredUsers in ${context.params.livestreamId}`)
-    })
-});
+    .document('livestreams/{livestreamId}/registeredStudents/{studentId}')
+    .onDelete((snapshot, context) => {
+        console.log(`Documents deleted in registeredStudents in ${context.params.livestreamId}`);
+        admin.firestore().collection("livestreams").doc(context.params.livestreamId).update({
+            registeredUsers: admin.firestore.FieldValue.arrayRemove(context.params.studentId)
+        }).then(() => {
+            console.log(`Successfully removed user from registeredUsers in ${context.params.livestreamId}`)
+        })
+    });
 
 function generateEmailData(livestreamId, livestream, startingNow) {
     let recipientEmails = livestream.registeredUsers.join();
