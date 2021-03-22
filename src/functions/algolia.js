@@ -41,7 +41,7 @@ exports.addToStreamIndex = functions.firestore.document('livestreams/{livestream
         const data = snapshot.data();
         if (data.test === false) { // dont add test streams to algolia
             const objectID = snapshot.id
-            data.numberOfRegistered = data.registeredUsers?.length || 0
+            data.numberOfRegistered = (data.registeredUsers && data.registeredUsers.length) || 0
 
             // deletes personal Identifiable data
             delete data.registeredUsers
@@ -77,7 +77,7 @@ exports.updateStreamIndex = functions.firestore.document('livestreams/{livestrea
         const newData = change.after.data();
         if (newData.test === false) { // dont add test streams to algolia
 
-            newData.numberOfRegistered = newData.registeredUsers?.length || 0
+            newData.numberOfRegistered = (newData.registeredUsers && newData.registeredUsers.length) || 0
             // deletes personal Identifiable data
             delete newData.registeredUsers
 

@@ -29,11 +29,7 @@ const groupAdmin = require('./groupAdmin')
 const reminders = require('./reminders')
 const livestreams = require('./livestreams')
 const universityEmails = require('./universityEmails')
-
-// Imported Group Cloud functions
-
-// Algolia
-exports.algolia = require('./algolia');
+const algolia = require('./algolia')
 
 // Hosting
 exports.production = hosting.production
@@ -75,3 +71,11 @@ exports.sendPhysicalEventRegistrationConfirmationEmail = livestreams.sendPhysica
 
 // University Emails
 exports.sendEmailToStudentOfUniversityAndField = universityEmails.sendEmailToStudentOfUniversityAndField
+
+// Algolia
+exports.addToIndex = algolia.addToIndex
+exports.updateIndex = algolia.updateIndex
+exports.deleteFromIndex = algolia.deleteFromIndex
+exports.addToStreamIndex = algolia.addToStreamIndex
+exports.updateStreamIndex = algolia.updateStreamIndex
+exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex
