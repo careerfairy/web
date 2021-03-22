@@ -1,76 +1,232 @@
 import PropTypes from 'prop-types'
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+import React, {useState} from 'react';
+import {makeStyles} from '@material-ui/core/styles';
+import {languageCodes} from "../../../../../helperFunctions/streamFormFunctions";
+import {
+    CardHeader,
+    List,
+    ListItem,
+    ListItemAvatar,
+    ListItemText,
+    CardActionArea,
+    CardActions,
+    CardContent,
+    CardMedia,
+    Button,
+    Card,
+    Avatar, IconButton, Menu, MenuItem
+} from "@material-ui/core";
+import {getBaseUrl, prettyDate} from "../../../../../helperFunctions/HelperFunctions";
+import RegistrationsIcon from '@material-ui/icons/People';
+import ParticipationIcon from '@material-ui/icons/Visibility';
+import JoinIcon from '@material-ui/icons/RecordVoiceOver';
+import {useFirestore} from "react-redux-firebase";
+import {useDispatch} from "react-redux";
+import * as actions from '../../../../../../store/actions/index'
+import MoreVertIcon from "@material-ui/icons/MoreVert";
+import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
     root: {
         // maxWidth: 345,
     },
-});
+    media: {
+        objectFit: "contain",
+        padding: theme.spacing(1)
+    },
+    list: {
+        width: "100%"
+    },
+    spyButton: {
+        color: `${theme.palette.common.white} !important`
+    },
+    cardHeader:{
+        "& .MuiCardHeader-content": {
+            flex: "1 1 auto",
+            width: "100%"
+        }
+    }
+}));
 
-const StreamCard = ({}) => {
+const StreamCard = ({stream}) => {
     const classes = useStyles();
-    return(
+    const firestore = useFirestore()
+    const dispatch = useDispatch()
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [openStreamerLinksDialog, setOpenStreamerLinksDialog] = React.useState(false);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleJoinAsStreamer = async () => {
+        try {
+            const tokenDoc = await firestore.get({
+                collection: "livestreams",
+                doc: stream.id,
+                subcollections: [{
+                    collection: "tokens",
+                    doc: "secureToken",
+                }]
+            })
+            if (tokenDoc.exists) {
+                const secureToken = tokenDoc.data().value
+                const baseUrl = getBaseUrl()
+                const url = `${baseUrl}/streaming/${stream.id}/joining-streamer?token=${secureToken}`
+                const newWindow = window.open(url, '_blank')
+                newWindow.focus();
+            } else {
+                dispatch(actions.sendGeneralError("This stream has no token"))
+            }
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
+
+    }
+
+    return (
         <Card className={classes.root}>
-            <CardActionArea>
-                <CardMedia
-                    component="img"
-                    alt="Contemplative Reptile"
-                    height="140"
-                    image="/static/images/cards/contemplative-reptile.jpg"
-                    title="Contemplative Reptile"
-                />
-                <CardContent>
-                    <Typography gutterBottom variant="h5" component="h2">
-                        Lizard
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                        Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
-                        across all continents except Antarctica
-                    </Typography>
-                </CardContent>
-            </CardActionArea>
+            <CardMedia
+                component="img"
+                alt="Contemplative Reptile"
+                height="140"
+                className={classes.media}
+                image={stream.companyLogoUrl}
+                title={stream.company}
+            />
+            <CardHeader
+            className={classes.cardHeader}
+                title={stream.company}
+                titleTypographyProps={{noWrap: true}}
+                subheader={prettyDate(stream.start)}
+                action={
+                    <React.Fragment>
+                        <IconButton onClick={handleClick}>
+                            <MoreVertIcon/>
+                        </IconButton>
+                        <Menu
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                        >
+                            <MenuItem
+                                component="a"
+                                target="_blank"
+                                onClick={handleClose}
+                                href={`https://console.firebase.google.com/u/0/project/careerfairy-e1fd9/firestore/data~2Flivestreams~2F${stream.id}`}
+                            >View in firebase
+                            </MenuItem>
+                            <MenuItem
+                                onClick={() => setOpenStreamerLinksDialog(true)}
+                            >
+                                Get streamer links
+                            </MenuItem>
+                        </Menu>
+                    </React.Fragment>
+                }
+            />
+            <CardContent>
+                <List dense className={classes.list}>
+                    <ListItem>
+                        <ListItemAvatar>
+                            <Avatar>
+                                <RegistrationsIcon/>
+                            </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary="Registrations" secondary={stream.registeredUsers?.length || 0}/>
+                    </ListItem>
+                    <ListItem>
+                        <ListItemAvatar>
+                            <Avatar>
+                                <ParticipationIcon/>
+                            </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary="Participating"
+                                      secondary={stream.participatingStudents?.length || 0}/>
+                    </ListItem>
+                </List>
+            </CardContent>
             <CardActions>
-                <Button size="small" color="primary">
-                    Share
+                <Button
+                    variant="contained"
+                    className={classes.spyButton}
+                    target="_blank"
+                    startIcon={<ParticipationIcon/>}
+                    href={`https://testing2-careerfairy.web.app/streaming/${stream.id}/viewer`}
+                    color="primary">
+                    Spy
                 </Button>
-                <Button size="small" color="primary">
-                    Learn More
+                <Button
+                    startIcon={<JoinIcon/>}
+                    variant="contained"
+                    onClick={handleJoinAsStreamer}
+                    color="secondary"
+                >
+                    Join as streamer
                 </Button>
             </CardActions>
+            <StreamerLinksDialog
+                onClose={handleClose}
+                livestreamId={stream.id}
+                openDialog={openStreamerLinksDialog}
+                setOpenDialog={setOpenStreamerLinksDialog}
+            />
         </Card>
     )
 }
 
 StreamCard.propTypes = {
-  stream: PropTypes.shape({
-      author: PropTypes.shape({
-          email: PropTypes.string,
-          groupId: PropTypes.string
-      }),
-      backgroundImageUrl: PropTypes.string,
-      company: PropTypes.string,
-      companyId: PropTypes.string,
-      companyLogoUrl: PropTypes.string,
-      created: PropTypes.shape({
-          seconds: PropTypes.number,
-          nanoseconds: PropTypes.number
-      }),
-      currentSpeakerId: PropTypes.string,
-      groupIds: PropTypes.array,
-      hidden: PropTypes.bool,
-      id: PropTypes.string,
-      language: PropTypes.shape({
-          code: PropTypes.oneOf(["en", "de", ])
-      })
-  }).isRequired
+    stream: PropTypes.shape({
+        author: PropTypes.shape({
+            email: PropTypes.string,
+            groupId: PropTypes.string
+        }),
+        backgroundImageUrl: PropTypes.string,
+        company: PropTypes.string,
+        companyId: PropTypes.string,
+        companyLogoUrl: PropTypes.string,
+
+        currentSpeakerId: PropTypes.string,
+        groupIds: PropTypes.array,
+        hidden: PropTypes.bool,
+        id: PropTypes.string,
+        language: PropTypes.shape({
+            code: PropTypes.oneOf(languageCodes.map(({code}) => code)),
+            name: PropTypes.oneOf(languageCodes.map(({name}) => name))
+        }),
+        registeredUsers: PropTypes.array,
+        talentPool: PropTypes.array,
+        participatingStudents: PropTypes.array,
+        speakers: PropTypes.array,
+        lastUpdated: PropTypes.shape({
+            seconds: PropTypes.number,
+            nanoseconds: PropTypes.number,
+            toDate: PropTypes.func
+        }),
+        start: PropTypes.shape({
+            seconds: PropTypes.number,
+            nanoseconds: PropTypes.number,
+            toDate: PropTypes.func
+        }),
+        created: PropTypes.shape({
+            seconds: PropTypes.number,
+            nanoseconds: PropTypes.number,
+            toDate: PropTypes.func
+        }),
+        summary: PropTypes.string,
+
+        targetCategories: PropTypes.object,
+        test: PropTypes.bool,
+        title: PropTypes.string,
+        type: PropTypes.string,
+
+    }).isRequired
 }
 
 export default StreamCard

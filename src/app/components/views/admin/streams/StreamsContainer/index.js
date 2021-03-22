@@ -27,7 +27,7 @@ const StreamsContainer = ({streams}) => {
         <React.Fragment>
             {streams.map(stream => (
                 <Grid item xs={12} sm={6} md={4} lg={3}>
-                    <StreamCard stream={stream} key={stream.id}/>
+                    <StreamCard stream={stream} key={stream.id || new Date()}/>
                 </Grid>
             ))}
         </React.Fragment>

@@ -28,7 +28,7 @@ const AdminStreams = ({typeOfStream}) => {
     const query = useMemo(() => [{
         collection: "livestreams",
         where: [["start", ">", new Date(Date.now() - fortyFiveMinutesInMilliseconds)], ["test", "==", false]],
-        orderBy: ["start", "desc"],
+        orderBy: ["start", "asc"],
         storeAs: "upcoming-livestreams"
     }], [typeOfStream])
 
@@ -57,7 +57,7 @@ const AdminStreams = ({typeOfStream}) => {
 
 
 AdminStreams.propTypes = {
-    typeOfStream: PropTypes.string
+    typeOfStream: PropTypes.oneOf(["upcoming", "past"])
 }
 
 export default AdminStreams;
