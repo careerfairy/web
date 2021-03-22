@@ -6,7 +6,6 @@ const {axios} = require('./api/axios')
 const {admin} = require('./api/firestoreAdmin')
 
 
-
 const appID = '53675bc6d3884026a72ecb1de3d19eb1';
 const appCertificate = '286a21681469490783ab75247de35f37';
 
@@ -70,16 +69,7 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
 
 exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) => {
 
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
+    setHeaders(req, res)
 
     const channelName = req.body.channel;
     const sentToken = req.body.token;
