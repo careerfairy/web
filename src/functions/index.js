@@ -30,6 +30,7 @@ exports.algolia = require('./algolia');
 const hosting = require('./hosting')
 const auth = require('./auth')
 const agora = require('./agora')
+const backup = require('./backup')
 
 // Hosting
 exports.production = hosting.production
@@ -57,7 +58,9 @@ exports.generateAgoraTokenSecure = agora.generateAgoraTokenSecure
 
 exports.startRecordingLivestream = agora.startRecordingLivestream
 
+// Backup
 
+exports.exportFirestoreBackup = backup.exportFirestoreBackup
 
 // load values from the .env file in this directory into process.env
 dotenv.config();
@@ -290,14 +293,6 @@ exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async 
 });
 
 
-
-
-const axios = require('axios');
-
-
-
-
-
 exports.sendReminderEmailToRegistrants = functions.https.onRequest(async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', '*');
@@ -514,32 +509,7 @@ function getLivestreamTimeInterval(livestreamStartDateTime) {
     return '(' + formatHour(startDateTime) + ')';
 }
 
-// Run this function every hour
-exports.exportFirestoreBackup = functions.pubsub.schedule('every 1 hours').timeZone('Europe/Zurich').onRun((context) => {
-    const firestore = require('@google-cloud/firestore');
-    const client = new firestore.v1.FirestoreAdminClient();
 
-    const dateNow = new Date(Date.now());
-    const bucket = `gs://careerfairy-backup/${dateNow.toDateString()}-${dateNow.toTimeString()}`;
-
-    const projectId = process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT;
-    const databaseName =
-        client.databasePath(projectId, '(default)');
-
-    return client.exportDocuments({
-        name: databaseName,
-        outputUriPrefix: bucket,
-        collectionIds: []
-    })
-        .then(responses => {
-            const response = responses[0];
-            console.log(`Operation Name: ${response['name']}`);
-        })
-        .catch(err => {
-            console.error(err);
-            throw new Error('Export operation failed');
-        });
-});
 
 exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every sunday 09:00').timeZone('Europe/Zurich').onRun((context) => {
     admin.firestore().collection("livestreams")
