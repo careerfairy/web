@@ -12,7 +12,6 @@ const Toolbar = ({}) => {
     const classes = useStyles()
     const dispatch = useDispatch()
     const currentFilterGroup = useSelector(state => state.currentFilterGroup)
-    console.log("-> currentFilterGroup", currentFilterGroup);
     const handleCreateNewDataSet = () => dispatch(actions.createFilterGroup())
     const handleDeleteCurrentFilterGroup = () => dispatch(actions.deleteFilterGroup(currentFilterGroup.id))
 

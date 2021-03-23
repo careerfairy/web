@@ -3,6 +3,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Grid} from "@material-ui/core";
 import FilterCard from "./FilterCard";
 import GroupAddButton from "./GroupAddButton";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -13,13 +14,17 @@ const useStyles = makeStyles(theme => ({
 const FilterComponent = ({}) => {
 
     const classes = useStyles()
+    const filters = useSelector(state => state.currentFilterGroup.data.filters || [])
+    console.log("-> filters", filters);
 
     return (
         <Grid alignContent="center" alignItems="center" container spacing={2} className={classes.root}>
+            {filters.map(filter => (
+                <Grid item>
+                    <FilterCard key={filter.groupId} filter={filter}/>
+                </Grid>
+            ))}
             <Grid item>
-                <FilterCard/>
-            </Grid>
-            <Grid  item>
                 <GroupAddButton/>
             </Grid>
         </Grid>
