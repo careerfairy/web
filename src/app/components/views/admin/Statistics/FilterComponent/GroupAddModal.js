@@ -61,6 +61,7 @@ const Content = ({handleClose}) => {
                     value={value}
                     onChange={handleChange}
                     getOptionLabel={(option) => mapGroups[option].universityName}
+                    disableClearable
                     defaultValue={[orderedGroups[0]]}
                     filterSelectedOptions
                     renderInput={(params) => (

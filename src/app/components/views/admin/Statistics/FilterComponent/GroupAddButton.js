@@ -26,7 +26,7 @@ const GroupAddButton = ({}) => {
         <React.Fragment>
             <Fab color="primary" variant="extended" onClick={handleOpenGroupAddModal} aria-label="add">
                 <AddIcon className={classes.extendedIcon}/>
-                Add a group
+                Add or remove a group
             </Fab>
             <GroupAddModal open={groupAddModalOpen} onClose={handleCloseGroupAddModal}/>
         </React.Fragment>
