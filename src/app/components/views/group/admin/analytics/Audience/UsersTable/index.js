@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { Card, Slide, Tabs, Tab } from '@material-ui/core';
+import {Card, Slide, Tabs, Tab} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
@@ -11,6 +11,9 @@ import UserInnerTable from "./UserInnerTable";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 import {makeStyles} from "@material-ui/core/styles";
 import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil";
+import {useSelector} from "react-redux";
+import StatsUtil from "../../../../../../../data/util/StatsUtil";
+import GroupsUtil from "../../../../../../../data/util/GroupsUtil";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -42,6 +45,7 @@ const UsersTable = ({
                         futureStreams,
                         isFollowers,
                         handleReset,
+                        currentUserDataSet,
                         totalUniqueUsers,
                         streamsFromTimeFrameAndFuture,
                         breakdownRef,
@@ -55,6 +59,7 @@ const UsersTable = ({
     const [selection, setSelection] = useState([]);
     const {enqueueSnackbar} = useSnackbar()
     const [users, setUsers] = useState([]);
+    const [targetGroups, setTargetGroups] = useState([]);
 
     const columns = [
         {
@@ -124,10 +129,35 @@ const UsersTable = ({
         }
     ]
 
+    const allGroupsMap = useSelector(state => state.firestore.data?.allGroups || {})
+
     useEffect(() => {
-        setUsers(totalUniqueUsers.map(user => AnalyticsUtil.mapUserEngagement(user, streamsFromTimeFrameAndFuture, group)))
+        let newTargetGroups = []
+        if (currentUserDataSet.dataSet === "followers" && currentStream?.groupIds?.length > 1) {
+            newTargetGroups = currentStream.groupIds.map(groupId => ({
+                ...allGroupsMap[groupId],
+                options: GroupsUtil.handleFlattenOptions(allGroupsMap[groupId])
+            }))
+        }
+        setTargetGroups(newTargetGroups)
+
+    }, [currentUserDataSet, currentStream?.groupIds])
+
+    useEffect(() => {
+        let newUsers;
+        if (targetGroups.length) {
+            newUsers = totalUniqueUsers?.map(user => {
+                const relevantGroup = StatsUtil.getFirstGroupThatUserBelongsTo(user, targetGroups, group)
+                return AnalyticsUtil.mapUserEngagement(user, streamsFromTimeFrameAndFuture, relevantGroup || group)
+            }) || []
+        } else {
+            newUsers = totalUniqueUsers?.map(user => {
+                return AnalyticsUtil.mapUserEngagement(user, streamsFromTimeFrameAndFuture, group)
+            }) || []
+        }
+        setUsers(newUsers)
         setSelection([])
-    }, [totalUniqueUsers])
+    }, [totalUniqueUsers, targetGroups])
 
     useEffect(() => {
         if (dataTableRef.current) {

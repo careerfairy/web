@@ -25,6 +25,7 @@ const Audience = ({
                       setUserType,
                       limitedUserTypes,
                       streamsFromTimeFrame,
+                      currentUserDataSet,
                       handleReset,
                       streamsFromTimeFrameAndFuture,
                       groupOptions,
@@ -92,6 +93,7 @@ const Audience = ({
                         fetchingStreams={loading}
                         userTypes={limitedUserTypes}
                         handleReset={handleReset}
+                        currentUserDataSet={currentUserDataSet}
                         setUserType={setUserType}
                         groupOptions={groupOptions}
                         isFollowers={isFollowers}

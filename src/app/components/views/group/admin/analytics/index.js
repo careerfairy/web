@@ -234,6 +234,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     }], [globalTimeFrame, group.groupId])
 
     useFirestoreConnect(query)
+    const allGroups = useSelector(state => state.firestore.ordered?.allGroups)
     const uniStudents = useMemo(() => Boolean(currentUserDataSet.dataSet === "groupUniversityStudents"), [currentUserDataSet, group.id])
     const userDataSetDictionary = useSelector(state => uniStudents ? state.firestore.data[currentUserDataSet.dataSet] : state.userDataSet.mapped, shallowEqual)
     const userDataSet = useSelector(state => uniStudents ? state.firestore.ordered[currentUserDataSet.dataSet] : state.userDataSet.ordered, shallowEqual)
@@ -282,6 +283,22 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             })()
         }
     }, [group?.universityCode]);
+
+
+    useEffect(() => {
+        if (!allGroups) {
+            (async function getAllGroups() {
+                try {
+                    await firestore.get({
+                        collection: "careerCenterData",
+                        storeAs: "allGroups",
+                    })
+                } catch (e) {
+                    console.log("-> e in getting student", e);
+                }
+            })()
+        }
+    }, []);
 
     useEffect(() => {
         if (streamsMounted && !uniStudents && (!userDataSetDictionary || !userDataSet)) {
@@ -479,7 +496,8 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         }),
         ...(tabName === "audience" && {
             isFollowers,
-            limitedUserTypes
+            limitedUserTypes,
+            currentUserDataSet
         }),
         ...(tabName === "general" && {
             streamsFromBeforeTimeFrame,
