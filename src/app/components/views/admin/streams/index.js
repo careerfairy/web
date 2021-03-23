@@ -35,7 +35,6 @@ const AdminStreams = ({typeOfStream}) => {
     useFirestoreConnect(query)
 
     const streams = useSelector(state => state.firestore.ordered["upcoming-livestreams"])
-    console.log("-> streams", streams);
 
     return (
         <Fragment>
