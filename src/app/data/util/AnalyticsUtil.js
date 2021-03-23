@@ -2,7 +2,7 @@ export default class AnalyticsUtil {
 
     static getCategoryOptionName = (targetCategoryId, user, groupContext) => {
         if (user.registeredGroups) {
-            const targetGroup = user.registeredGroups.find(groupObj => groupObj.groupId === groupContext.id)
+            const targetGroup = user.registeredGroups.find(groupObj => groupObj.groupId === groupContext.groupId)
             if (targetGroup?.categories) {
                 const targetCategory = targetGroup.categories.find(categoryObj => categoryObj.id === targetCategoryId)
                 if (targetCategory?.selectedValueId) {

@@ -172,13 +172,17 @@ export default class StatsUtil {
         }
     }
 
+    static studentFollowsGroup(student = {}, group = {}) {
+        return student.groupIds && student.groupIds.includes(group.groupId);
+    }
+
     static getFirstGroupThatUserBelongsTo(student = {}, arrayOfGroups = [], requestingGroup) {
         let groupThatUserBelongsTo
-        const userFollowsRequestingGroup = StatsUtil.studentBelongsToGroup(student, requestingGroup)
+        const userFollowsRequestingGroup = StatsUtil.studentFollowsGroup(student, requestingGroup)
         if (userFollowsRequestingGroup) {
             groupThatUserBelongsTo = requestingGroup
         } else {
-            groupThatUserBelongsTo = arrayOfGroups.find(group => StatsUtil.studentBelongsToGroup(student, group))
+            groupThatUserBelongsTo = arrayOfGroups.find(group => StatsUtil.studentFollowsGroup(student, group))
         }
         return groupThatUserBelongsTo
     }
