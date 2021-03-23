@@ -18,3 +18,4 @@ export {
 } from './userDataSetActions.js';
 
 export {closeSnackbar, enqueueSnackbar, removeSnackbar, sendGeneralError} from './snackbarActions.js'
+export {createFilterGroup, deleteFilterGroup, setFilterOptions} from './filterActions.js'

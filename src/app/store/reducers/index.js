@@ -8,6 +8,7 @@ import rtmChannelReducer from "./rtmChannelReducer";
 import emotesReducer from "./emotesReducer";
 import snackbarReducer from "./snackbarReducer";
 import userDataSetReducer from "./userDataSetReducer";
+import currentFilterGroupReducer from "./currentFilterGroupReducer";
 
 export default combineReducers({
     auth: authReducer,
@@ -18,4 +19,5 @@ export default combineReducers({
     emotes: emotesReducer,
     snackbars: snackbarReducer,
     userDataSet: userDataSetReducer,
+    currentFilterGroup: currentFilterGroupReducer,
 });
