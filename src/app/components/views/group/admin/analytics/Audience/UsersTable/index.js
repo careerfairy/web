@@ -6,11 +6,12 @@ import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import MaterialTable from "material-table";
-import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} from "../../common/TableUtils";
+// import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} from "../../common/TableUtils";
 import UserInnerTable from "./UserInnerTable";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 import {makeStyles} from "@material-ui/core/styles";
 import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil";
+import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} from "../../../../../../util/tableUtils";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -171,8 +172,6 @@ const UsersTable = ({
         setUserType(userTypes[index])
     };
 
-
-    const isTalentPool = () => userType.propertyName === "talentPool"
 
     const getTitle = () => currentStream ? `For ${currentStream.company} on ${prettyDate(currentStream.start)}` : "For all Events"
 

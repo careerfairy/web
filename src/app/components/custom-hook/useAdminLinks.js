@@ -5,6 +5,7 @@ import {
     Film as StreamIcon,
     User as ProfileIcon
 } from "react-feather";
+import TableIcon from '@material-ui/icons/Toc';
 import {useAuth} from "../../HOCs/AuthProvider";
 
 const initialHeaderLinks = [
@@ -76,6 +77,12 @@ const useAdminLinks = () => {
                     icon: StatisticsIcon,
                     title: 'Statistics',
                     basePath: `/admin/statistics`
+                },
+                {
+                    href: `/admin/user-table`,
+                    icon: TableIcon,
+                    title: 'User Table',
+                    basePath: `/admin/user-table`
                 }
             ])
         } else {

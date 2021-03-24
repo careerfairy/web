@@ -37,7 +37,8 @@ const AuthProvider = ({children}) => {
     useFirestoreConnect(() => {
         return auth.email ? [
             {
-                collection: 'userData', doc: auth.email,  // or `userData/${auth.email}`
+                collection: 'userData',
+                doc: auth.email,  // or `userData/${auth.email}`
                 storeAs: "userProfile",
             }
         ] : []
