@@ -88,26 +88,24 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
 }
 
 
-
-const QuestionContainer = memo( ({
-                               sliding,
-                               user,
-                               livestream,
-                               streamer,
-                               question,
-                               firebase,
-                               index,
-                               isNextQuestions,
-                               selectedState,
-                               goToThisQuestion,
-                               showMenu
-                           }) => {
+const QuestionContainer = memo(({
+                                    sliding,
+                                    user,
+                                    livestream,
+                                    streamer,
+                                    question,
+                                    firebase,
+                                    index,
+                                    isNextQuestions,
+                                    selectedState,
+                                    goToThisQuestion,
+                                    showMenu
+                                }) => {
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
     const {authenticatedUser, userData} = useAuth();
     const {tutorialSteps, handleConfirmStep} = useContext(TutorialContext);
-
     const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream?.test)
     const active = question?.type === 'current'
     const old = question?.type !== 'new'
@@ -195,11 +193,15 @@ const QuestionContainer = memo( ({
                 <Box className={classes.questionComment} borderRadius={8} mb={1} p={1} component={Card}>
                     <div style={{wordBreak: "break-word"}}>
                         <Linkify componentDecorator={componentDecorator}>
+                            <span>
                             {comment.title}
+                            </span>
                         </Linkify>
                     </div>
                     <div style={{fontSize: "0.8em", color: "rgb(160,160,160)"}}>
+                        <span>
                         @{comment.author}
+                        </span>
                     </div>
                 </Box>
             </Slide>
@@ -223,12 +225,17 @@ const QuestionContainer = memo( ({
                 <Paper elevation={4} className={classes.questionContainer}>
                     <div style={{padding: "20px 20px 5px 20px"}}>
                         <div className={classes.upVotes}>
-                            {question.votes} <ThumbUpRoundedIcon color="inherit"
-                                                                 style={{verticalAlign: "text-top"}}
-                                                                 fontSize='small'/>
+                            <span>
+                            {question.votes}
+                            </span>
+                            <ThumbUpRoundedIcon color="inherit"
+                                                style={{verticalAlign: "text-top"}}
+                                                fontSize='small'/>
                         </div>
                         <div className={classes.reactionsQuestion}>
+                            <span>
                             {question.title}
+                            </span>
                         </div>
                         <Typography style={{
                             fontSize: "1em",
@@ -237,7 +244,7 @@ const QuestionContainer = memo( ({
                             color: active ? "white" : "rgb(200,200,200)",
                             marginBottom: "1rem"
                         }}>
-                            {comments.length} reaction{comments.length !== 1 && "s"}
+                            {comments.length} reaction{comments.length !== 1 && <span>s</span>}
                         </Typography>
                         {commentsElements[0]}
                         <Collapse style={{width: "100%"}} in={showAllReactions}>
@@ -301,7 +308,6 @@ const QuestionContainer = memo( ({
                             } open={isOpen(1)}>
                             <Button
                                 startIcon={<ThumbUpRoundedIcon/>}
-                                children={active ? "Answering" : old ? "Answered" : "Answer Now"}
                                 size='small'
                                 disableElevation
                                 disabled={old}
@@ -313,11 +319,15 @@ const QuestionContainer = memo( ({
                                     isOpen(1) && handleConfirmStep(1)
                                 }}
                                 variant="contained"
-                            />
+                            >
+                                {active ?
+                                    <span>Answering</span> : old ? <span>Answered</span> :
+                                        <span>Answer Now</span>
+                                }
+                            </Button>
                         </WhiteTooltip>
                         : <Button
                             startIcon={<ThumbUpRoundedIcon/>}
-                            children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
                             size='small'
                             disableElevation
                             className={classes.questionButton}
@@ -325,7 +335,17 @@ const QuestionContainer = memo( ({
                             fullWidth
                             variant="contained"
                             onClick={() => upvoteLivestreamQuestion()}
-                            disabled={old || upvoted}/>}
+                            disabled={old || upvoted}>
+                            {!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ?
+                                <span>
+                                UPVOTED!
+                                </span>
+                                :
+                                <span>
+                                UPVOTE
+                                </span>
+                            }
+                        </Button>}
                 </Paper>
             </WhiteTooltip>
         </Grow>
