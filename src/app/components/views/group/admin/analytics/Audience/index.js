@@ -4,6 +4,7 @@ import {Container, Grid} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 import UsersTable from "./UsersTable";
+import {getUniqueUsersByEmailWithArrayOfUsers} from "../../../../../../data/util/AnalyticsUtil";
 
 
 const useStyles = makeStyles(theme => ({
@@ -25,6 +26,7 @@ const Audience = ({
                       setUserType,
                       limitedUserTypes,
                       streamsFromTimeFrame,
+                      currentUserDataSet,
                       handleReset,
                       streamsFromTimeFrameAndFuture,
                       groupOptions,
@@ -42,21 +44,11 @@ const Audience = ({
         } else {
             const totalViewers = streamsFromTimeFrameAndFuture.reduce(
                 (accumulator, livestream) => {
-                    if (livestream[userType.propertyDataName]) {
-                        return [...accumulator, ...livestream[userType.propertyDataName]];
-                    } else {
-                        return accumulator
-                    }
+                    return livestream?.[userType.propertyDataName] ? accumulator.concat(livestream[userType.propertyDataName]) : accumulator
                 },
                 []
             );
-            return totalViewers.filter(function (el) {
-                if (!this[el.userEmail]) {
-                    this[el.userEmail] = true;
-                    return true;
-                }
-                return false;
-            }, Object.create(null))
+            return getUniqueUsersByEmailWithArrayOfUsers(totalViewers)
         }
     };
 
@@ -92,6 +84,7 @@ const Audience = ({
                         fetchingStreams={loading}
                         userTypes={limitedUserTypes}
                         handleReset={handleReset}
+                        currentUserDataSet={currentUserDataSet}
                         setUserType={setUserType}
                         groupOptions={groupOptions}
                         isFollowers={isFollowers}

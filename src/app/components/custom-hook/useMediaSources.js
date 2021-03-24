@@ -26,17 +26,24 @@ export default function useMediaSources(devices, streamId, localStream, showSoun
 
     useEffect(() => {
         if (devices && localStream) {
-            if (devices.audioInputList && devices.audioInputList.length > 0 && (!audioSource || !devices.audioInputList.some( device => device.value === audioSource))) {
-                setAudioSource(devices.audioInputList[0].value)
-            }
-            if (devices.videoDeviceList && devices.videoDeviceList.length > 0 && (!videoSource || !devices.videoDeviceList.some( device => device.value === videoSource))) {
-                setVideoSource(devices.videoDeviceList[0].value)
+            if (devices.audioInputList && devices.audioInputList.length > 0 && (!audioSource || !devices.audioInputList.some( device => device.value === audioSource))
+                && devices.videoDeviceList && devices.videoDeviceList.length > 0 && (!videoSource || !devices.videoDeviceList.some( device => device.value === videoSource))) {
+                initalizeAudioAndVideoSources(devices.audioInputList[0].value, devices.videoDeviceList[0].value)
             }
             if (devices.audioOutputList && devices.audioOutputList.length > 0 && (!speakerSource || !devices.audioOutputList.some( device => device.value === speakerSource))) {
-                setSpeakerSource(devices.audioOutputList[0].value);
+                updateSpeakerSource(devices.audioOutputList[0].value);
             }
         }   
     },[devices, localStream]);
+
+    const initalizeAudioAndVideoSources = (audioDeviceId, videoDeviceId) => {
+        localStream.switchDevice("audio", audioDeviceId, () => {
+            setAudioSource(audioDeviceId);
+            localStream.switchDevice("video", videoDeviceId, () => {
+                setVideoSource(videoDeviceId);
+            })
+        })
+    }
 
     function updateAudioSource(deviceId) {
         localStream.switchDevice("audio", deviceId, () => {
