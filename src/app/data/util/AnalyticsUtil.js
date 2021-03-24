@@ -95,6 +95,16 @@ const getUniqueUsers = (streamsArray, prop) => {
     }, Object.create(null));
 };
 
+const getUniqueUsersByEmailWithArrayOfUsers = (ArrayOfUsers = []) => {
+    return ArrayOfUsers.filter(function (el) {
+        if (!this[el.userEmail]) {
+            this[el.userEmail] = true;
+            return true;
+        }
+        return false;
+    }, Object.create(null))
+}
+
 const getAggregateCategories = (participants, group) => {
     let categories = []
     participants.forEach(user => {
@@ -158,5 +168,6 @@ module.exports = {
     getAggregateCategories,
     getTypeOfStudents,
     getTotalUniqueStreamGroupIdsFromStreams,
-    arraysOfIdsEqual
+    arraysOfIdsEqual,
+    getUniqueUsersByEmailWithArrayOfUsers
 }

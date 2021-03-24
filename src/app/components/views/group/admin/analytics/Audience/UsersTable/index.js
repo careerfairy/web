@@ -248,7 +248,85 @@ const UsersTable = ({
                     isLoading={fetchingStreams}
                     data={users}
                     options={defaultTableOptions}
-                    columns={[...columns]}
+                    columns={[
+                        {
+                            field: "firstName",
+                            title: "First Name",
+                            cellStyle: {
+                                width: 300,
+                            },
+                        },
+                        {
+                            field: "lastName",
+                            title: "Last Name",
+                            cellStyle: {
+                                width: 300,
+                            },
+                        },
+                        {
+                            field: "university.name",
+                            title: "University",
+                            cellStyle: {
+                                width: 300,
+                            },
+                        },
+                        {
+                            field: "universityCountry",
+                            title: "University Country",
+                            cellStyle: {
+                                width: 300,
+                            },
+                        },
+                        {
+                            field: "Field of study",
+                            title: "Field of Study",
+                        },
+                        {
+                            field: "Level of study",
+                            title: "Level of study",
+
+                        },
+                        {
+                            field: "numberOfStreamsWatched",
+                            title: "Events Attended",
+                            type: "numeric"
+                        },
+                        {
+                            field: "numberOfStreamsRegistered",
+                            title: "Events Registered To",
+                            type: "numeric"
+                        },
+                        {
+                            field: "userEmail",
+                            title: "Email",
+                            // hidden: userType.propertyName !== "talentPool",
+                            // export: userType.propertyName === "talentPool",
+                            render: ({id}) => (
+                                <a href={`mailto:${id}`}>
+                                    {id}
+                                </a>
+                            ),
+                            cellStyle: {
+                                width: 300,
+                            },
+                        },
+                        {
+                            field: "linkedinUrl",
+                            title: "LinkedIn",
+                            render: (rowData) => LinkifyText(rowData.linkedinUrl),
+                            cellStyle: {
+                                width: 300,
+                            },
+                        },
+                        {
+                            field: "watchedEvent",
+                            title: "Attended Event",
+                            type: "boolean",
+                            width: 170,
+                            export: Boolean(currentStream),
+                            hidden: Boolean(!currentStream)
+                        }
+                    ]}
                     detailPanel={[
                         ({numberOfStreamsRegistered, streamsRegistered, firstName, lastName}) => ({
                             icon: tableIcons.LibraryAddOutlinedIcon,

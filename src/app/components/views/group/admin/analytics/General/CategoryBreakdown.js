@@ -4,18 +4,18 @@ import PropTypes from 'prop-types';
 import {Doughnut} from 'react-chartjs-2';
 import {
     Box,
+    Button,
     Card,
     CardContent,
     CardHeader,
     Divider,
-    Typography,
-    Select,
-    MenuItem,
-    Switch,
     FormControlLabel,
-    Button,
-    Tabs,
+    MenuItem,
+    Select,
+    Switch,
     Tab,
+    Tabs,
+    Typography,
 } from '@material-ui/core';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
@@ -253,17 +253,7 @@ const CategoryBreakdown = ({
                     </Button>
                 }
             />
-            {hasPartnerGroups &&
-            <Tabs
-                value={value}
-                onChange={handleChange}
-                indicatorColor="primary"
-                textColor="primary"
-                variant="scrollable"
-            >
-                {groups?.map(cc => <Tab key={cc.id} wrapped label={cc.universityName}/>)}
-            </Tabs>}
-            <Divider/>
+
             <Tabs
                 value={localUserType.propertyName}
                 indicatorColor="primary"
@@ -281,6 +271,17 @@ const CategoryBreakdown = ({
                     />
                 ))}
             </Tabs>
+            <Divider/>
+            {hasPartnerGroups &&
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    indicatorColor="secondary"
+                    textColor="secondary"
+                    variant="scrollable"
+                >
+                    {groups?.map(cc => <Tab key={cc.id} wrapped label={cc.universityName}/>)}
+                </Tabs>}
             <Divider/>
             <CardContent>
                 {currentCategory.id &&
@@ -351,6 +352,7 @@ const CategoryBreakdown = ({
                         colors={localColors}
                         chartRef={chartRef}
                         fullWidth
+                        hideEmpty
                         chartData={data}
                         optionDataType="Student"
                         optionValueProp="count"
