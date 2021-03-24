@@ -13,11 +13,17 @@ import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import * as actions from '../../../../../store/actions'
 import {AppBar, Box, Tab, Tabs} from '@material-ui/core';
-import AnalyticsUtil from "../../../../../data/util/AnalyticsUtil";
+import AnalyticsUtil, {
+    arraysOfIdsEqual,
+    getTotalUniqueStreamGroupIdsFromStreams
+} from "../../../../../data/util/AnalyticsUtil";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import {createSelector} from 'reselect'
 import PollUtil from "../../../../../data/util/PollUtil";
 import useTimeFrames from "../../../../custom-hook/useTimeFrames";
+import useUserDataSet from "../../../../custom-hook/useUserDataSet";
+import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDictionary";
+import {repositionElement} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -158,9 +164,10 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
 
     useFirestoreConnect(query)
     const allGroups = useSelector(state => state.firestore.ordered?.allGroups)
+    const allGroupsDictionary = useSelector(state => state.firestore.data?.allGroups)
     const uniStudents = useMemo(() => Boolean(currentUserDataSet.dataSet === "groupUniversityStudents"), [currentUserDataSet, group.id])
-    const userDataSetDictionary = useSelector(state => uniStudents ? state.firestore.data[currentUserDataSet.dataSet] : state.userDataSet.mapped, shallowEqual)
-    const userDataSet = useSelector(state => uniStudents ? state.firestore.ordered[currentUserDataSet.dataSet] : state.userDataSet.ordered, shallowEqual)
+    const userDataSetDictionary = useUserDataSetDictionary(currentUserDataSet)
+    const userDataSet = useUserDataSet(currentUserDataSet)
 
     const livestreams = useSelector(({firestore: {ordered}}) =>
         streamsSelector(ordered[`livestreams of ${group.groupId}`], {
@@ -173,6 +180,30 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     useEffect(() => {
         return () => setStreamsMounted(false)
     }, [])
+
+    useEffect(() => {
+        if (uniStudents) {
+            setGroups([{...group, options: GroupsUtil.handleFlattenOptions(group)}])
+        } else if (allGroupsDictionary) {
+            const streams = currentStream ? [currentStream] : streamsFromTimeFrameAndFuture
+            let newGroupIds = getTotalUniqueStreamGroupIdsFromStreams(streams)
+            const adminGroupIdIndex = newGroupIds.findIndex(groupId => groupId === group.id)
+            if (adminGroupIdIndex > -1) {
+                repositionElement(newGroupIds, adminGroupIdIndex, 0)
+            }
+            const areEqual = arraysOfIdsEqual(newGroupIds, groups.map(({groupId}) => groupId))
+
+            if (!areEqual) {
+                const newGroups = newGroupIds.map(groupId => {
+                    const group = allGroupsDictionary[groupId]
+                    return {...group, id: group.groupId, options: GroupsUtil.handleFlattenOptions(group)}
+                })
+                setGroups(newGroups)
+            }
+
+        }
+
+    }, [streamsMounted, currentStream, allGroupsDictionary, uniStudents])
 
     useEffect(() => {
         if (group.universityCode) {
@@ -408,7 +439,8 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         ...(tabName === "general" && {
             streamsFromBeforeTimeFrame,
             userDataSet,
-            currentUserDataSet
+            currentUserDataSet,
+            groups
         }),
     })
 

@@ -121,6 +121,30 @@ const getTypeOfStudents = (prop, {currentStream, streamsFromTimeFrameAndFuture, 
     return flattenedGroupOptions.sort((a, b) => b.count - a.count);
 }
 
+const getTotalUniqueStreamGroupIdsFromStreams = (arrayOfStreams = []) => {
+    const totalIds = arrayOfStreams.reduce((acc, curr) => curr.groupIds ? acc.concat(curr.groupIds) : acc, [])
+    return [...new Set(totalIds)]
+}
+
+const arraysOfIdsEqual = (array1, array2) => {
+    if (array1 === array2) return true;
+    if (array1 == null || array2 == null) return false;
+    if (array1.length !== array2.length) return false;
+
+    const array1Sorted = [...array1].sort()
+    const array2Sorted = [...array2].sort()
+
+    // If you don't care about the order of the elements inside
+    // the array, you should sort both arrays here.
+    // Please note that calling sort on an array will modify that array.
+    // you might want to clone your array first.
+
+    for (let i = 0; i < array1Sorted.length; ++i) {
+        if (array1Sorted[i] !== array2Sorted[i]) return false;
+    }
+    return true;
+}
+
 module.exports = {
     mapUserEngagement,
     getUniqueIds,
@@ -132,5 +156,7 @@ module.exports = {
     getTotalUniqueIds,
     mapUserCategories,
     getAggregateCategories,
-    getTypeOfStudents
+    getTypeOfStudents,
+    getTotalUniqueStreamGroupIdsFromStreams,
+    arraysOfIdsEqual
 }

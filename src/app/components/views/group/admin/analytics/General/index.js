@@ -37,6 +37,7 @@ const General = ({
                      handleScrollToBreakdown,
                      handleReset,
                      userDataSet,
+                     groups,
                      userTypes,
                      userType,
                      setUserType,
@@ -295,8 +296,12 @@ const General = ({
                                 breakdownRef={breakdownRef}
                                 typesOfOptions={typesOfOptions}
                                 localUserType={localUserType}
+                                currentUserDataSet={currentUserDataSet}
                                 setLocalUserType={setLocalUserType}
                                 userTypes={userTypes}
+                                streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}
+                                groups={groups}
+                                isUni={isUni}
                                 handleReset={handleReset}
                                 setCurrentCategory={setCurrentCategory}
                                 currentCategory={currentCategory}
