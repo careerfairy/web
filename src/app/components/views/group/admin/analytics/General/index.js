@@ -10,6 +10,11 @@ import LatestEvents from "../common/LatestEvents";
 import UserCount from "./UserCount";
 import TotalUniqueParticipatingStudents from "./TotalUniqueParticipatingStudents";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import {
+    getTotalEmailsFromStreamsByProperty,
+    getTypeOfStudents,
+    getUniqueIds
+} from "../../../../../../data/util/AnalyticsUtil";
 
 
 const useStyles = makeStyles(theme => ({
@@ -65,42 +70,14 @@ const General = ({
         return mustBeNumber(total);
     };
 
-    const getTotal = (streamsArray, prop) => {
-        return streamsArray.reduce(
-            (accumulator, livestream) => {
-                if (livestream?.[prop] === undefined) {
-                    livestream[prop] = []
-                }
-                return [...accumulator, ...livestream[prop]];
-            },
-            []
-        );
-    }
-
-    const getUniqueIds = (arrayOfIds) => {
-        return [...new Set(arrayOfIds)]
-    }
-
-    const getUniqueUsers = (streamsArray, prop) => {
-        const totalViewers = getTotal(streamsArray, prop)
-        // new Set method removes all duplicates from array
-        return totalViewers.filter(function (el) {
-            if (!this[el.userEmail]) {
-                this[el.userEmail] = true;
-                return true;
-            }
-            return false;
-        }, Object.create(null));
-    };
-
     const getAverageRegistrationsPerEvent = () => {
         const average = totalRegistrations / streamsFromTimeFrameAndFuture.length;
         return mustBeNumber(average, 0);
     };
 
     const compareRegistrations = () => {
-        const registrationsFromTimeFrame = getTotal(streamsFromTimeFrame, "registeredUsers").length
-        const registrationsFromBeforeTimeFrame = getTotal(streamsFromBeforeTimeFrame, "registeredUsers").length
+        const registrationsFromTimeFrame = getTotalEmailsFromStreamsByProperty(streamsFromTimeFrame, "registeredUsers").length
+        const registrationsFromBeforeTimeFrame = getTotalEmailsFromStreamsByProperty(streamsFromBeforeTimeFrame, "registeredUsers").length
         const {
             positive,
             percentage,
@@ -114,8 +91,8 @@ const General = ({
     }
 
     const compareUniqueRegistrations = (prop) => {
-        const totalUsersFromTimeFrame = getTotal(streamsFromTimeFrame, prop)
-        const totalUsersFromBeforeTimeFrame = getTotal(streamsFromBeforeTimeFrame, prop)
+        const totalUsersFromTimeFrame = getTotalEmailsFromStreamsByProperty(streamsFromTimeFrame, prop)
+        const totalUsersFromBeforeTimeFrame = getTotalEmailsFromStreamsByProperty(streamsFromBeforeTimeFrame, prop)
         const uniqueUsersFromTimeFrame = getUniqueIds(totalUsersFromTimeFrame).length
         const uniqueUsersFromBeforeTimeFrame = getUniqueIds(totalUsersFromBeforeTimeFrame).length
         const {
@@ -146,40 +123,15 @@ const General = ({
     }
 
     const getTotalUniqueUsers = (streamsArray) => {
-        const totalUsers = getTotal(streamsArray, "registeredUsers")
+        const totalUsers = getTotalEmailsFromStreamsByProperty(streamsArray, "registeredUsers")
         return getUniqueIds(totalUsers).length
     }
 
     const getTotalUniqueParticipants = (streamsArray) => {
-        const totalUsers = getTotal(streamsArray, "participatingStudents")
+        const totalUsers = getTotalEmailsFromStreamsByProperty(streamsArray, "participatingStudents")
         return getUniqueIds(totalUsers).length
     }
 
-    const getAggregateCategories = (participants) => {
-        let categories = []
-        participants.forEach(user => {
-            const matched = user.registeredGroups?.find(groupData => groupData.groupId === group.id)
-            if (matched) {
-                categories.push(matched)
-            }
-        })
-        return categories
-    }
-
-    const getTypeOfStudents = (prop) => {
-        let students = []
-        if (currentStream?.[prop]) {
-            students = currentStream[prop]
-        } else {//Get total Students
-            students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop)
-        }
-        const aggregateCategories = getAggregateCategories(students)
-        const flattenedGroupOptions = [...currentCategory.options].map(option => {
-            const count = aggregateCategories.filter(category => category.categories.some(userOption => userOption.selectedValueId === option.id)).length
-            return {...option, count}
-        })
-        return flattenedGroupOptions.sort((a, b) => b.count - a.count);
-    }
 
     const getTotalUserDataSetCount = () => {
         return userDataSet?.length
@@ -221,7 +173,13 @@ const General = ({
     );
 
     const typesOfOptions = useMemo(
-        () => getTypeOfStudents(localUserType.propertyDataName),
+        () => getTypeOfStudents(localUserType.propertyDataName,
+            {
+                currentStream,
+                currentCategory,
+                group,
+                streamsFromTimeFrameAndFuture
+            }),
         [streamsFromTimeFrameAndFuture, currentStream, localUserType, currentCategory.id]
     );
 
