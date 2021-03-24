@@ -294,7 +294,6 @@ const General = ({
                             <CategoryBreakdown
                                 currentStream={currentStream}
                                 breakdownRef={breakdownRef}
-                                typesOfOptions={typesOfOptions}
                                 localUserType={localUserType}
                                 currentUserDataSet={currentUserDataSet}
                                 setLocalUserType={setLocalUserType}
@@ -303,8 +302,6 @@ const General = ({
                                 groups={groups}
                                 isUni={isUni}
                                 handleReset={handleReset}
-                                setCurrentCategory={setCurrentCategory}
-                                currentCategory={currentCategory}
                                 setUserType={setUserType}
                                 setCurrentStream={setCurrentStream}
                                 group={group}

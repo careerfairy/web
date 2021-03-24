@@ -68,14 +68,11 @@ const CategoryBreakdown = ({
                                group,
                                setCurrentStream,
                                currentStream,
-                               // typesOfOptions,
                                userTypes,
                                breakdownRef,
                                setUserType,
                                currentUserDataSet,
                                handleReset,
-                               // setCurrentCategory,
-                               // currentCategory,
                                streamsFromTimeFrameAndFuture,
                                isUni,
                                groups,
@@ -273,6 +270,7 @@ const CategoryBreakdown = ({
             </Tabs>
             <Divider/>
             {hasPartnerGroups &&
+            <React.Fragment>
                 <Tabs
                     value={value}
                     onChange={handleChange}
@@ -281,8 +279,9 @@ const CategoryBreakdown = ({
                     variant="scrollable"
                 >
                     {groups?.map(cc => <Tab key={cc.id} wrapped label={cc.universityName}/>)}
-                </Tabs>}
-            <Divider/>
+                </Tabs>
+                <Divider/>
+            </React.Fragment>}
             <CardContent>
                 {currentCategory.id &&
                 <>
@@ -364,7 +363,20 @@ const CategoryBreakdown = ({
 };
 
 CategoryBreakdown.propTypes = {
-    className: PropTypes.string
-};
+    breakdownRef: PropTypes.object.isRequired,
+    className: PropTypes.string,
+    currentStream: PropTypes.object,
+    currentUserDataSet: PropTypes.object,
+    group: PropTypes.object,
+    groups: PropTypes.array,
+    handleReset: PropTypes.func,
+    isUni: PropTypes.bool,
+    localUserType: PropTypes.object,
+    setCurrentStream: PropTypes.func,
+    setLocalUserType: PropTypes.func,
+    setUserType: PropTypes.func,
+    streamsFromTimeFrameAndFuture: PropTypes.array,
+    userTypes: PropTypes.array
+}
 
 export default withFirebase(CategoryBreakdown);
