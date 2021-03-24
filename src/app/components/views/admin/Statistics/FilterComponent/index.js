@@ -1,9 +1,9 @@
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {Grid} from "@material-ui/core";
-import FilterCard from "./FilterCard";
 import GroupAddButton from "./GroupAddButton";
 import {useSelector} from "react-redux";
+import FilterCard from "./FilterCard";
 
 const useStyles = makeStyles(theme => ({
     root: {

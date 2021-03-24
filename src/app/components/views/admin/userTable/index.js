@@ -1,9 +1,11 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {Container, Grid} from "@material-ui/core";
 import AdminUsersTable from "./AdminUsersTable";
-import {useFirestore, isLoaded, isEmpty} from "react-redux-firebase";
+import {isLoaded, useFirestore} from "react-redux-firebase";
 import {useSelector} from "react-redux";
+import {createSelector} from 'reselect'
+import {universityCountriesMap} from "../../../util/constants";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -14,11 +16,23 @@ const useStyles = makeStyles(theme => ({
         width: "100%"
     }
 }));
+
+const usersSelector = createSelector(
+    state => state.firestore.ordered.users,
+    (users) => users.map(user => ({
+        ...user,
+        universityCountry: universityCountriesMap[user.universityCountryCode]
+    }))
+
+)
 const UserTableOverview = ({}) => {
 
     const classes = useStyles()
     const firestore = useFirestore()
-    const users = useSelector(state => state.firestore.ordered.users?.map(user => ({...user})))
+    const users = useSelector(state =>
+        usersSelector(state)
+    )
+    // const users = useSelector(state => state.firestore.ordered.users?.map(user => ({...user})))
     console.log("-> users", users);
     useEffect(() => {
         if (!users) {

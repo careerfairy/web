@@ -6,7 +6,7 @@ const UserTablePage = ({}) => {
 
     return (
         <AdminDashboardLayout>
-            <UserTableOverview/>
+            {/*<UserTableOverview/>*/}
         </AdminDashboardLayout>
     );
 };

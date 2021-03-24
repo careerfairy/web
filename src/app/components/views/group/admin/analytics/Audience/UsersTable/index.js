@@ -6,7 +6,6 @@ import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import MaterialTable from "material-table";
-// import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} from "../../common/TableUtils";
 import UserInnerTable from "./UserInnerTable";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 import {makeStyles} from "@material-ui/core/styles";
