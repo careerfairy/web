@@ -9,7 +9,7 @@ import Title from "./Title";
 import Feedback from "./Feedback";
 import {universityCountriesMap} from "../../../../util/constants";
 import {isEmpty, isLoaded, useFirestoreConnect, withFirestore} from "react-redux-firebase";
-import {shallowEqual, useDispatch, useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import * as actions from '../../../../../store/actions'
 import {AppBar, Box, Tab, Tabs} from '@material-ui/core';
