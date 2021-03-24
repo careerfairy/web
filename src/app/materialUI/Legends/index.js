@@ -1,6 +1,7 @@
+import PropTypes from 'prop-types'
 import React, {useEffect, useRef, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import { Checkbox, Collapse, List, ListItem, Slide, ListItemIcon, ListItemText } from "@material-ui/core";
+import {Checkbox, Collapse, List, ListItem, Slide, ListItemIcon, ListItemText} from "@material-ui/core";
 import {colorsArray} from "../../components/util/colors";
 import {TransitionGroup} from "react-transition-group";
 
@@ -22,7 +23,8 @@ const CustomLegend = ({
                           optionLabelProp = "name",
                           optionDataType = "Vote",
                           fullWidth = false,
-                          chartData = {}
+                          chartData = {},
+                          hideEmpty
                       }) => {
     const classes = useStyles({fullWidth})
     const [legendLabels, setLegendLabels] = useState([]);
@@ -30,7 +32,7 @@ const CustomLegend = ({
     useEffect(() => {
         const chart = chartRef?.current?.chartInstance
         if (chart) {
-            const totalLegends = []
+            let totalLegends = []
             chart.data.datasets.forEach((dataSet, dataSetIndex) => {
                 const meta = chart.getDatasetMeta(dataSetIndex)
                 const newLegends = meta.data.map(labelMetaData => {
@@ -44,9 +46,13 @@ const CustomLegend = ({
                 )
                 totalLegends.push(...newLegends)
             })
+
+            if (hideEmpty) {
+                totalLegends = totalLegends.filter(legend => legend[optionValueProp])
+            }
             setLegendLabels(totalLegends)
         }
-    }, [chartData, colors.length])
+    }, [chartData, colors.length, hideEmpty])
 
     const handleClickLegend = (e, index) => {
         const chart = chartRef?.current?.chartInstance;
@@ -94,4 +100,29 @@ const CustomLegend = ({
     );
 };
 
+CustomLegend.propTypes = {
+    chartData: PropTypes.object,
+    chartRef: PropTypes.object,
+    colors: PropTypes.array,
+    fullWidth: PropTypes.bool,
+    hideEmpty: PropTypes.bool,
+    optionDataType: PropTypes.string,
+    optionLabelProp: PropTypes.string,
+    optionValueProp: PropTypes.string,
+    options: PropTypes.array
+}
+
+CustomLegend.defaultProps = {
+    chartData: {},
+    chartRef: {},
+    colors: colorsArray,
+    fullWidth: false,
+    hideEmpty: false,
+    optionDataType: "Vote",
+    optionLabelProp: "name",
+    optionValueProp: "votes",
+    options: []
+}
+
 export default CustomLegend;
+

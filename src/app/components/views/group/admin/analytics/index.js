@@ -9,14 +9,21 @@ import Title from "./Title";
 import Feedback from "./Feedback";
 import {universityCountriesMap} from "../../../../util/constants";
 import {isEmpty, isLoaded, useFirestoreConnect, withFirestore} from "react-redux-firebase";
-import {shallowEqual, useDispatch, useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import * as actions from '../../../../../store/actions'
 import {AppBar, Box, Tab, Tabs} from '@material-ui/core';
-import AnalyticsUtil from "../../../../../data/util/AnalyticsUtil";
+import AnalyticsUtil, {
+    arraysOfIdsEqual,
+    getTotalUniqueStreamGroupIdsFromStreams
+} from "../../../../../data/util/AnalyticsUtil";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
-import {useRouter} from "next/router";
+import {createSelector} from 'reselect'
 import PollUtil from "../../../../../data/util/PollUtil";
+import useTimeFrames from "../../../../custom-hook/useTimeFrames";
+import useUserDataSet from "../../../../custom-hook/useUserDataSet";
+import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDictionary";
+import {repositionElement} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -42,113 +49,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const now = new Date()
-
-const sevenDays = new Date().setDate(new Date().getDate() - 7)
-const twoWeeks = new Date().setDate(new Date().getDate() - 14)
-
-const fourWeeks = new Date().setDate(new Date().getDate() - 28)
-
-const thirtyDays = new Date().setMonth(new Date().getMonth() - 1)
-const twoMonths = new Date().setMonth(new Date().getMonth() - 2)
-
-const fourMonths = new Date().setMonth(new Date().getMonth() - 4)
-const eightMonths = new Date().setMonth(new Date().getMonth() - 8)
-
-const sixMonths = new Date().setMonth(new Date().getMonth() - 6)
-
-const oneYear = new Date().setFullYear(new Date().getFullYear() - 1)
-const twoYears = new Date().setFullYear(new Date().getFullYear() - 2)
-
-const timeFrames = [
-    {
-        name: "1 Year",
-        pastName: "year",
-        date: oneYear,
-        id: uuid()
-    },
-    {
-        name: "6 Months",
-        pastName: "6 months",
-        date: sixMonths,
-        id: uuid()
-    },
-    {
-        name: "4 Months",
-        pastName: "4 months",
-        date: fourMonths,
-        id: uuid()
-    },
-    {
-        name: "2 Months",
-        pastName: "2 months",
-        date: twoMonths,
-        id: uuid()
-    },
-    {
-        name: "month",
-        pastName: "month",
-        date: thirtyDays,
-        id: uuid()
-    },
-    {
-        name: "week",
-        pastName: "week",
-        date: sevenDays,
-        id: uuid()
-    },
-]
-
-const globalTimeFrames = [
-    {
-        globalDate: oneYear,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= oneYear),
-        name: "year",
-        id: uuid(),
-        double: twoYears
-    },
-    {
-        globalDate: sixMonths,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= sixMonths),
-        name: "six months",
-        id: uuid(),
-        double: oneYear
-    },
-    {
-        globalDate: fourMonths,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= fourMonths),
-        name: "four months",
-        id: uuid(),
-        double: eightMonths
-    },
-    {
-        globalDate: twoMonths,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= twoMonths),
-        name: "two months",
-        id: uuid(),
-        double: fourMonths
-    },
-    {
-        globalDate: thirtyDays,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= thirtyDays),
-        name: "month",
-        id: uuid(),
-        double: twoMonths
-    },
-    {
-        globalDate: twoWeeks,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= twoWeeks),
-        name: "2 weeks",
-        id: uuid(),
-        double: fourWeeks
-    },
-    {
-        globalDate: sevenDays,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= sevenDays),
-        name: "week",
-        id: uuid(),
-        double: twoWeeks
-    },
-]
 
 const userTypes = [
     {
@@ -185,7 +85,35 @@ const streamDataTypes = [
         displayName: "Feedback",
     }]
 
-
+const streamsSelector = createSelector(
+    livestreams => livestreams,
+    (_, {userDataSetDictionary}) => userDataSetDictionary,
+    (_, {streamsMounted}) => streamsMounted,
+    (_, {setStreamsMounted}) => setStreamsMounted,
+    (livestreams, userDataSetDictionary, streamsMounted, setStreamsMounted) => {
+        let streams = []
+        if (livestreams) {
+            streams = livestreams.map(streamObj => {
+                const livestream = {...streamObj}
+                livestream.date = livestream.start?.toDate()
+                for (const userType of userTypes) {
+                    if (isLoaded(userDataSetDictionary) && !isEmpty((userDataSetDictionary))) {
+                        livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
+                    }
+                    livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
+                        ...userDataSetDictionary?.[userEmail],
+                        universityCountry: universityCountriesMap[userDataSetDictionary?.[userEmail]?.universityCountryCode]
+                    }))
+                }
+                return livestream
+            })
+            if (!streamsMounted) {
+                setStreamsMounted(true)
+            }
+        }
+        return streams
+    }
+)
 const AnalyticsOverview = ({firebase, group, firestore}) => {
     const userDataSets = [
         {
@@ -205,7 +133,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     if (!group.universityCode) {
         userDataSets.shift()
     }
-
+    const {globalTimeFrames} = useTimeFrames()
 
     const dispatch = useDispatch()
     const classes = useStyles();
@@ -225,6 +153,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const [limitedUserTypes, setLimitedUserTypes] = useState(userTypes);
     const [currentUserDataSet, setCurrentUserDataSet] = useState(userDataSets[0]);
     const [streamsMounted, setStreamsMounted] = useState(false);
+    const [groups, setGroups] = useState([]);
 
     const query = useMemo(() => [{
         collection: `livestreams`,
@@ -235,38 +164,46 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
 
     useFirestoreConnect(query)
     const allGroups = useSelector(state => state.firestore.ordered?.allGroups)
+    const allGroupsDictionary = useSelector(state => state.firestore.data?.allGroups)
     const uniStudents = useMemo(() => Boolean(currentUserDataSet.dataSet === "groupUniversityStudents"), [currentUserDataSet, group.id])
-    const userDataSetDictionary = useSelector(state => uniStudents ? state.firestore.data[currentUserDataSet.dataSet] : state.userDataSet.mapped, shallowEqual)
-    const userDataSet = useSelector(state => uniStudents ? state.firestore.ordered[currentUserDataSet.dataSet] : state.userDataSet.ordered, shallowEqual)
-    const livestreamsInStore = useSelector(state => state.firestore.ordered[`livestreams of ${group.groupId}`])
-    const livestreams = useMemo(() => {
-        let streams = []
-        if (livestreamsInStore) {
-            streams = livestreamsInStore.map(streamObj => {
-                const livestream = {...streamObj}
-                livestream.date = livestream.start?.toDate()
-                for (const userType of userTypes) {
-                    if (isLoaded(userDataSetDictionary) && !isEmpty((userDataSetDictionary))) {
-                        livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
-                    }
-                    livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
-                        ...userDataSetDictionary?.[userEmail],
-                        universityCountry: universityCountriesMap[userDataSetDictionary?.[userEmail]?.universityCountryCode]
-                    }))
-                }
-                return livestream
-            })
-            if (!streamsMounted) {
-                setStreamsMounted(true)
-            }
-        }
-        return streams
+    const userDataSetDictionary = useUserDataSetDictionary(currentUserDataSet)
+    const userDataSet = useUserDataSet(currentUserDataSet)
 
-    }, [livestreamsInStore, userDataSetDictionary, streamsMounted]);
+    const livestreams = useSelector(({firestore: {ordered}}) =>
+        streamsSelector(ordered[`livestreams of ${group.groupId}`], {
+            userDataSetDictionary,
+            streamsMounted,
+            setStreamsMounted
+        })
+    )
 
     useEffect(() => {
         return () => setStreamsMounted(false)
     }, [])
+
+    useEffect(() => {
+        if (uniStudents) {
+            setGroups([{...group, options: GroupsUtil.handleFlattenOptions(group)}])
+        } else if (allGroupsDictionary) {
+            const streams = currentStream ? [currentStream] : streamsFromTimeFrameAndFuture
+            let newGroupIds = getTotalUniqueStreamGroupIdsFromStreams(streams)
+            const adminGroupIdIndex = newGroupIds.findIndex(groupId => groupId === group.id)
+            if (adminGroupIdIndex > -1) {
+                repositionElement(newGroupIds, adminGroupIdIndex, 0)
+            }
+            const areEqual = arraysOfIdsEqual(newGroupIds, groups.map(({groupId}) => groupId))
+
+            if (!areEqual) {
+                const newGroups = newGroupIds.map(groupId => {
+                    const group = allGroupsDictionary[groupId]
+                    return {...group, id: group.groupId, options: GroupsUtil.handleFlattenOptions(group)}
+                })
+                setGroups(newGroups)
+            }
+
+        }
+
+    }, [streamsMounted, currentStream, allGroupsDictionary, uniStudents])
 
     useEffect(() => {
         if (group.universityCode) {
@@ -304,7 +241,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         if (streamsMounted && !uniStudents && (!userDataSetDictionary || !userDataSet)) {
             (async function getTotalEngagedUsers() {
                 try {
-                    const totalIds = AnalyticsUtil.getTotalUniqueIds(livestreamsInStore)
+                    const totalIds = AnalyticsUtil.getTotalUniqueIds(livestreams)
                     const totalUsers = await firebase.getUsersByEmail(totalIds)
                     const dictionaryOfUsers = AnalyticsUtil.convertArrayOfUserObjectsToDictionary(totalUsers)
                     dispatch(actions.setOrderedUserDataSet(totalUsers))
@@ -470,7 +407,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         group,
         futureStreams,
         globalTimeFrame,
-        loading: !isLoaded(livestreamsInStore) || !isLoaded(userDataSet),
+        loading: !isLoaded(livestreams) || !isLoaded(userDataSet),
         streamsFromTimeFrame,
         showBar,
         handleToggleBar,
@@ -502,7 +439,8 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         ...(tabName === "general" && {
             streamsFromBeforeTimeFrame,
             userDataSet,
-            currentUserDataSet
+            currentUserDataSet,
+            groups
         }),
     })
 

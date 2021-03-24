@@ -4,18 +4,18 @@ import PropTypes from 'prop-types';
 import {Doughnut} from 'react-chartjs-2';
 import {
     Box,
+    Button,
     Card,
     CardContent,
     CardHeader,
     Divider,
-    Typography,
-    Select,
-    MenuItem,
-    Switch,
     FormControlLabel,
-    Button,
-    Tabs,
+    MenuItem,
+    Select,
+    Switch,
     Tab,
+    Tabs,
+    Typography,
 } from '@material-ui/core';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
@@ -26,7 +26,28 @@ import Chart from 'chart.js';
 import 'chartjs-plugin-labels';
 import {customDonutConfig} from "../common/TableUtils";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
+import {useSelector} from "react-redux";
+import {createSelector} from 'reselect'
+import StatsUtil from "../../../../../../data/util/StatsUtil";
 
+const audienceSelector = createSelector(
+    state => state,
+    (_, {currentUserDataSet}) => currentUserDataSet,
+    (_, {currentGroup}) => currentGroup,
+    (_, {currentStream}) => currentStream,
+    (_, {localUserType}) => localUserType,
+    (_, {streamsFromTimeFrameAndFuture}) => streamsFromTimeFrameAndFuture,
+    (state, currentUserDataSet, currentGroup, currentStream, localUserType, streamsFromTimeFrameAndFuture) => {
+        const totalUsers = currentUserDataSet.dataSet === "groupUniversityStudents" ?
+            state.firestore.ordered[currentUserDataSet.dataSet]
+            : state.userDataSet.ordered
+        if (currentStream) {
+            return totalUsers?.filter(user => currentStream[localUserType.propertyName]?.includes(user.userEmail) && StatsUtil.studentFollowsGroup(user, currentGroup))
+        } else {
+            return totalUsers?.filter(user => streamsFromTimeFrameAndFuture?.some(stream => stream?.[localUserType.propertyName]?.includes(user.userEmail) && StatsUtil.studentFollowsGroup(user, currentGroup)))
+        }
+    }
+)
 Chart.defaults.global.plugins.labels = false;
 
 
@@ -41,17 +62,20 @@ function randomColor() {
     return '#' + Math.round(Math.random() * max).toString(16);
 }
 
+const initialCurrentCategory = {options: []}
+
 const CategoryBreakdown = ({
                                group,
                                setCurrentStream,
                                currentStream,
-                               typesOfOptions,
                                userTypes,
                                breakdownRef,
                                setUserType,
+                               currentUserDataSet,
                                handleReset,
-                               setCurrentCategory,
-                               currentCategory,
+                               streamsFromTimeFrameAndFuture,
+                               isUni,
+                               groups,
                                localUserType,
                                setLocalUserType,
                                className,
@@ -60,10 +84,22 @@ const CategoryBreakdown = ({
     const classes = useStyles();
     const theme = useTheme();
     const chartRef = useRef()
-
     const [localColors, setLocalColors] = useState(colorsArray);
     const [total, setTotal] = useState(0);
     const [showPercentage, setShowPercentage] = useState(true);
+    const [value, setValue] = useState(0);
+    const [currentGroup, setCurrentGroup] = useState(groups?.[0] || {});
+    const [typesOfOptions, setTypesOfOptions] = useState([]);
+    const [currentCategory, setCurrentCategory] = useState(initialCurrentCategory);
+    const audience = useSelector(state =>
+        audienceSelector(state, {
+            currentGroup,
+            currentStream,
+            localUserType,
+            streamsFromTimeFrameAndFuture,
+            currentUserDataSet
+        })
+    )
     const [data, setData] = useState({
         datasets: [],
         labels: [],
@@ -72,12 +108,25 @@ const CategoryBreakdown = ({
 
 
     useEffect(() => {
+        if (groups?.length || !currentGroup?.id) {
+            setCurrentGroup(groups[0])
+            setCurrentCategory(groups?.[0]?.categories?.[0] || initialCurrentCategory)
+            setValue(0)
+        }
+    }, [groups])
+
+    useEffect(() => {
         if (group.categories?.length) {
             if (localColors.length < typesOfOptions.length) { // only add more colors if there arent enough colors
                 setLocalColors([...colorsArray, ...typesOfOptions.map(() => randomColor())])
             }
         }
     }, [group.categories, typesOfOptions.length])
+
+    useEffect(() => {
+        const newTypeOfOptions = getTypeOfStudents()
+        setTypesOfOptions(newTypeOfOptions)
+    }, [audience, currentCategory])
 
     useEffect(() => {
         if (typesOfOptions.length) {
@@ -104,6 +153,26 @@ const CategoryBreakdown = ({
         })
     }, [typesOfOptions, localColors])
 
+    const getTypeOfStudents = () => {
+        const aggregateCategories = getAggregateCategories(audience)
+        const flattenedGroupOptions = [...currentCategory.options].map(option => {
+            const count = aggregateCategories.filter(category => category.categories.some(userOption => userOption.selectedValueId === option.id)).length
+            return {...option, count}
+        })
+        return flattenedGroupOptions.sort((a, b) => b.count - a.count);
+    }
+
+    const getAggregateCategories = (participants) => {
+        let categories = []
+        participants?.forEach(user => {
+            const matched = user.registeredGroups?.find(groupData => groupData.groupId === currentGroup.id)
+            if (matched) {
+                categories.push(matched)
+            }
+        })
+        return categories
+    }
+
 
     const options = {
         cutoutPercentage: 70,
@@ -129,6 +198,12 @@ const CategoryBreakdown = ({
         },
     };
 
+    const handleChange = (event, newValue) => {
+        setCurrentGroup(groups[newValue])
+        setCurrentCategory(groups[newValue].categories?.[0] || initialCurrentCategory)
+        setValue(newValue);
+    };
+
 
     const hasNoData = () => {
         return Boolean(typesOfOptions.length && total === 0)
@@ -140,7 +215,7 @@ const CategoryBreakdown = ({
     };
 
     const handleGroupCategorySelect = ({target: {value}}) => {
-        const targetCategory = group.categories.find(category => category.id === value)
+        const targetCategory = currentGroup.categories.find(category => category.id === value)
         if (targetCategory) {
             setCurrentCategory(targetCategory)
         }
@@ -149,6 +224,8 @@ const CategoryBreakdown = ({
     const togglePercentage = () => {
         setShowPercentage(!showPercentage)
     }
+
+    const hasPartnerGroups = Boolean(groups.length > 1)
 
     return (
         <Card
@@ -173,7 +250,7 @@ const CategoryBreakdown = ({
                     </Button>
                 }
             />
-            <Divider/>
+
             <Tabs
                 value={localUserType.propertyName}
                 indicatorColor="primary"
@@ -192,14 +269,29 @@ const CategoryBreakdown = ({
                 ))}
             </Tabs>
             <Divider/>
+            {hasPartnerGroups &&
+            <React.Fragment>
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    indicatorColor="secondary"
+                    textColor="secondary"
+                    variant="scrollable"
+                >
+                    {groups?.map(cc => <Tab key={cc.id} wrapped label={cc.universityName}/>)}
+                </Tabs>
+                <Divider/>
+            </React.Fragment>}
             <CardContent>
                 {currentCategory.id &&
-                <Box display="flex" justifyContent="space-between">
+                <>
                     <Select
                         value={currentCategory.id}
+                        variant="outlined"
+                        fullWidth
                         onChange={handleGroupCategorySelect}
                     >
-                        {group.categories?.map(({id, name}) => (
+                        {currentGroup.categories.map(({id, name}) => (
                             <MenuItem key={id} value={id}>{name}</MenuItem>
                         ))}
                     </Select>
@@ -218,7 +310,7 @@ const CategoryBreakdown = ({
                             </Typography>
                         }
                     />
-                </Box>
+                </>
                 }
                 <Box
                     height={300}
@@ -259,6 +351,7 @@ const CategoryBreakdown = ({
                         colors={localColors}
                         chartRef={chartRef}
                         fullWidth
+                        hideEmpty
                         chartData={data}
                         optionDataType="Student"
                         optionValueProp="count"
@@ -270,7 +363,20 @@ const CategoryBreakdown = ({
 };
 
 CategoryBreakdown.propTypes = {
-    className: PropTypes.string
-};
+    breakdownRef: PropTypes.object.isRequired,
+    className: PropTypes.string,
+    currentStream: PropTypes.object,
+    currentUserDataSet: PropTypes.object,
+    group: PropTypes.object,
+    groups: PropTypes.array,
+    handleReset: PropTypes.func,
+    isUni: PropTypes.bool,
+    localUserType: PropTypes.object,
+    setCurrentStream: PropTypes.func,
+    setLocalUserType: PropTypes.func,
+    setUserType: PropTypes.func,
+    streamsFromTimeFrameAndFuture: PropTypes.array,
+    userTypes: PropTypes.array
+}
 
 export default withFirebase(CategoryBreakdown);

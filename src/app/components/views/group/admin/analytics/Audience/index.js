@@ -4,6 +4,7 @@ import {Container, Grid} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 import UsersTable from "./UsersTable";
+import {getUniqueUsersByEmailWithArrayOfUsers} from "../../../../../../data/util/AnalyticsUtil";
 
 
 const useStyles = makeStyles(theme => ({
@@ -43,21 +44,11 @@ const Audience = ({
         } else {
             const totalViewers = streamsFromTimeFrameAndFuture.reduce(
                 (accumulator, livestream) => {
-                    if (livestream[userType.propertyDataName]) {
-                        return [...accumulator, ...livestream[userType.propertyDataName]];
-                    } else {
-                        return accumulator
-                    }
+                    return livestream?.[userType.propertyDataName] ? accumulator.concat(livestream[userType.propertyDataName]) : accumulator
                 },
                 []
             );
-            return totalViewers.filter(function (el) {
-                if (!this[el.userEmail]) {
-                    this[el.userEmail] = true;
-                    return true;
-                }
-                return false;
-            }, Object.create(null))
+            return getUniqueUsersByEmailWithArrayOfUsers(totalViewers)
         }
     };
 

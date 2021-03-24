@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Card, Slide, Tabs, Tab} from '@material-ui/core';
+import {Card, Slide, Tab, Tabs} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
@@ -61,26 +61,27 @@ const UsersTable = ({
     const [users, setUsers] = useState([]);
     const [targetGroups, setTargetGroups] = useState([]);
 
-    const columns = [
+  const columns =  [
         {
             field: "firstName",
             title: "First Name",
-            width: 140,
+            cellStyle: {
+                width: 300,
+            },
         },
         {
             field: "lastName",
             title: "Last Name",
-            width: 140,
-        },
-        {
-            field: "linkedinUrl",
-            title: "LinkedIn",
-            width: 180,
+            cellStyle: {
+                width: 300,
+            },
         },
         {
             field: "university.name",
             title: "University",
-            width: 150,
+            cellStyle: {
+                width: 300,
+            },
         },
         {
             field: "universityCountry",
@@ -92,40 +93,51 @@ const UsersTable = ({
         {
             field: "Field of study",
             title: "Field of Study",
-            width: 300
         },
         {
             field: "Level of study",
             title: "Level of study",
-            width: 300
 
         },
         {
             field: "numberOfStreamsWatched",
             title: "Events Attended",
-            width: 150,
+            type: "numeric"
         },
         {
             field: "numberOfStreamsRegistered",
             title: "Events Registered To",
-            width: 170,
+            type: "numeric"
         },
         {
             field: "userEmail",
             title: "Email",
-            width: 200,
             // hidden: userType.propertyName !== "talentPool",
-            render: (params) => (
-                <a href={`mailto:${params.value}`}>
-                    {params.value}
+            // export: userType.propertyName === "talentPool",
+            render: ({id}) => (
+                <a href={`mailto:${id}`}>
+                    {id}
                 </a>
             ),
+            cellStyle: {
+                width: 300,
+            },
+        },
+        {
+            field: "linkedinUrl",
+            title: "LinkedIn",
+            render: (rowData) => LinkifyText(rowData.linkedinUrl),
+            cellStyle: {
+                width: 300,
+            },
         },
         {
             field: "watchedEvent",
             title: "Attended Event",
+            type: "boolean",
             width: 170,
-            hidden: !currentStream
+            export: Boolean(currentStream),
+            hidden: Boolean(!currentStream)
         }
     ]
 
