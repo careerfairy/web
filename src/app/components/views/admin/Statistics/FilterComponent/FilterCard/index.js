@@ -27,7 +27,6 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const {filterOptions, groupId} = filter
     const group = useSelector(state => state.firestore.data.careerCenterData?.[groupId])
     const [filterOptionsWithData, setFilterOptionsWithData] = React.useState([]);
-    const [hasMoreCategories, setHasMoreCategories] = React.useState(false);
 
     useEffect(() => {
         if (group?.categories) {
@@ -37,7 +36,6 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
             })
             setFilterOptionsWithData(newFilterOptionsWithData)
         }
-        setHasMoreCategories(group?.categories?.length > filterOptions?.length)
     }, [group?.categories, filterOptions])
 
     useEffect(() => {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React from 'react';
 import * as actions from '../../../../../store/actions'
 import {makeStyles} from "@material-ui/core/styles";
@@ -7,7 +8,7 @@ import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/Global
 
 const useStyles = makeStyles(theme => ({}));
 
-const Toolbar = ({}) => {
+const Toolbar = ({handleQueryCurrentFilterGroup}) => {
 
     const classes = useStyles()
     const dispatch = useDispatch()
@@ -43,9 +44,23 @@ const Toolbar = ({}) => {
                 >
                     Delete Current Dataset
                 </DynamicColorButton>}
+                <DynamicColorButton
+                    type="submit"
+                    loading={currentFilterGroup.loading}
+                    variant="contained"
+                    size="large"
+                    color="#44a6c6"
+
+                >
+                    Query Current Dataset
+                </DynamicColorButton>
             </CardActions>
         </Card>
     );
 };
+Toolbar.propTypes = {
+  handleQueryCurrentFilterGroup: PropTypes.func.isRequired
+}
 
 export default Toolbar;
+

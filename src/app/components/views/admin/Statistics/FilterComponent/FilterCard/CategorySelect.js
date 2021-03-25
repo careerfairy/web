@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        "& .MuiTextField-root":{
+        "& .MuiTextField-root": {
             minWidth: 300
         }
     }
@@ -57,9 +57,9 @@ const CategorySelect = ({option, groupId, handleRemoveFilterOption}) => {
                 <div className={classes.inputWrapper}>
                     <TextField
                         {...params}
-                        required
                         variant="outlined"
                         label={name}
+                        required={(!targetOptionIds || targetOptionIds?.length === 0)}
                         fullWidth={false}
                         placeholder="Choose options"
                     />

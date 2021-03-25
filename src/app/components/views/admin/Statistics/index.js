@@ -5,6 +5,7 @@ import FilterComponent from "./FilterComponent";
 import useGetAllGroups from "../../../custom-hook/useGetAllGroups";
 import {useFirestore} from "react-redux-firebase";
 import Toolbar from "./Toolbar";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -20,7 +21,8 @@ const StatisticsOverview = (props) => {
 
     const classes = useStyles()
     const firestore = useFirestore()
-
+    const currentFilterGroup = useSelector(state => state.currentFilterGroup)
+    console.log("-> currentFilterGroup", currentFilterGroup);
     useEffect(() => {
         (async function getAllGroups() {
             await firestore.get({
@@ -29,11 +31,15 @@ const StatisticsOverview = (props) => {
         })()
     }, [])
 
+    const handleQueryCurrentFilterGroup = async (e) => {
+        e.preventDefault?.()
+        alert("hi")
+    }
     return (
         <Container className={classes.root} maxWidth={false}>
-            <Grid container spacing={2}>
+            <Grid onSubmit={handleQueryCurrentFilterGroup} component="form" container spacing={2}>
                 <Grid item xs={12}>
-                    <Toolbar/>
+                    <Toolbar handleQueryCurrentFilterGroup={handleQueryCurrentFilterGroup}/>
                 </Grid>
                 <Grid item xs={12}>
                     <FilterComponent/>
