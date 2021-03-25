@@ -1,15 +1,22 @@
 import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Chip, TextField} from "@material-ui/core";
+import {Box, Chip, IconButton, TextField} from "@material-ui/core";
 import {Autocomplete} from "@material-ui/lab";
 import {convertArrayOfObjectsToDictionaryByProp} from "../../../../../../data/util/AnalyticsUtil";
 import {useDispatch} from "react-redux";
 import * as actions from '../../../../../../store/actions'
+import CancelSharpIcon from '@material-ui/icons/CancelSharp';
 
-const useStyles = makeStyles(theme => ({}));
+const useStyles = makeStyles(theme => ({
+    inputWrapper: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between"
+    }
+}));
 
-const CategorySelect = ({option, groupId}) => {
+const CategorySelect = ({option, groupId, handleRemoveFilterOption}) => {
     const classes = useStyles()
     const dispatch = useDispatch()
     const {data: {options, name}, categoryId, targetOptionIds} = option
@@ -41,16 +48,24 @@ const CategorySelect = ({option, groupId}) => {
             value={targetOptionIds}
             onChange={(e, value) => handleChange(value, categoryId, groupId)}
             getOptionLabel={(option) => optionsMap[option]?.name}
-            disableClearable
             defaultValue={targetOptionIds}
             filterSelectedOptions
             renderInput={(params) => (
-                <TextField
-                    {...params}
-                    variant="outlined"
-                    label={name}
-                    placeholder="Choose options"
-                />
+                <div className={classes.inputWrapper}>
+                    <TextField
+                        {...params}
+                        required
+                        variant="outlined"
+                        label={name}
+                        fullWidth={false}
+                        placeholder="Choose options"
+                    />
+                    <Box ml={1}>
+                        <IconButton onClick={() => handleRemoveFilterOption(categoryId, groupId)} color="secondary">
+                            <CancelSharpIcon/>
+                        </IconButton>
+                    </Box>
+                </div>
             )}
             renderTags={(value, getTagProps) =>
                 value.map((option, index) => (
@@ -66,6 +81,8 @@ const CategorySelect = ({option, groupId}) => {
 };
 
 CategorySelect.propTypes = {
+    groupId: PropTypes.string.isRequired,
+    handleRemoveFilterOption: PropTypes.func.isRequired,
     option: PropTypes.shape({
         categoryId: PropTypes.string,
         targetOptionIds: PropTypes.arrayOf(PropTypes.string),
@@ -73,12 +90,11 @@ CategorySelect.propTypes = {
             id: PropTypes.string,
             name: PropTypes.string,
             options: PropTypes.arrayOf(PropTypes.shape({
-                id: PropTypes.string,
-                name: PropTypes.string
-            })).isRequired
-        }).isRequired
-    }).isRequired,
-    groupId: PropTypes.string.isRequired
+                id: PropTypes.string
+            }).isRequired)
+        })
+    })
 }
+
 export default CategorySelect;
 
