@@ -10,7 +10,13 @@ import {isEmpty, isLoaded} from "react-redux-firebase";
 import Skeleton from "@material-ui/lab/Skeleton";
 import GroupsUtil from "../../../../../../data/util/GroupsUtil";
 
-const useStyles = makeStyles(theme => ({}));
+const useStyles = makeStyles(theme => ({
+    content:{
+        '& > * + *': {
+            marginTop: theme.spacing(3),
+        },
+    }
+}));
 
 const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const dispatch = useDispatch()
@@ -98,7 +104,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                     </IconButton>
                 }
             />
-            <CardContent>
+            <CardContent className={classes.content}>
                 {!isLoaded(group) ? (
                     <React.Fragment>
                         <Skeleton animation="wave" height={10} style={{marginBottom: 6}}/>
