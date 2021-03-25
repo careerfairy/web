@@ -6,14 +6,14 @@ import {useDispatch, useSelector} from "react-redux";
 import * as actions from '../../../../../../store/actions'
 import {Autocomplete} from "@material-ui/lab";
 import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
+import useDeleteFilter from "../../../../../custom-hook/useDeleteFilter";
 
 const useStyles = makeStyles(theme => ({}));
 
 
 const Content = ({handleClose}) => {
     const dispatch = useDispatch()
-    const [groupIdToRemove, setGroupIdToRemove] = React.useState("");
-    const currentFilterGroup = useSelector(state => state.currentFilterGroup)
+    const {handlers, message, open} = useDeleteFilter()
     const orderedGroups = useSelector(state => state.firestore.ordered["careerCenterData"].map(group => group.id))
     const mapGroups = useSelector(state => state.firestore.data["careerCenterData"])
 
@@ -22,29 +22,8 @@ const Content = ({handleClose}) => {
             .map(filter => filter.groupId) || []
     )
 
-
     const handleChange = (event, selectedOptions) => {
         dispatch(actions.setFilters(selectedOptions))
-    }
-
-    const handleDelete = (groupId) => {
-        const targetIdToRemove = groupId || groupIdToRemove
-        dispatch(actions.setFilters(value.filter(groupId => groupId !== targetIdToRemove)))
-    }
-
-    const handleClickDelete = (groupId) => {
-        const hasActiveFilters = currentFilterGroup.data.filters.some(filterObject => {
-            return Boolean(filterObject.groupId === groupId && filterObject.filterOptions.length)
-        })
-        return hasActiveFilters ? handleOpenAreYouSureModal(groupId) : handleDelete(groupId)
-    }
-
-    const handleOpenAreYouSureModal = (groupId) => setGroupIdToRemove(groupId)
-    const handleCloseAreYouSureModal = () => setGroupIdToRemove("")
-
-    const handleConfirm = () => {
-        handleDelete()
-        handleCloseAreYouSureModal()
     }
 
 
@@ -77,7 +56,7 @@ const Content = ({handleClose}) => {
                             <Chip variant="default"
                                   label={mapGroups[option].universityName}
                                   {...getTagProps({index})}
-                                  onDelete={() => handleClickDelete(option)}
+                                  onDelete={() => handlers.handleClickDelete(option)}
                             />
                         ))
                     }
@@ -89,10 +68,10 @@ const Content = ({handleClose}) => {
                 </Button>
             </DialogActions>
             <AreYouSureModal
-                message="The group you're try to delete has active filters, once deleted, those filters will be permanently gone"
-                handleClose={handleCloseAreYouSureModal}
-                handleConfirm={handleConfirm}
-                open={Boolean(groupIdToRemove)}
+                message={message}
+                handleClose={handlers.handleCloseAreYouSureModal}
+                handleConfirm={handlers.handleConfirm}
+                open={open}
             />
         </React.Fragment>
     )

@@ -10,6 +10,8 @@ import {isEmpty, isLoaded} from "react-redux-firebase";
 import Skeleton from "@material-ui/lab/Skeleton";
 import GroupsUtil from "../../../../../../data/util/GroupsUtil";
 import AddOrRemoveCategoryButton from "./AddOrRemoveCategoryButton";
+import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
+import useDeleteFilter from "../../../../../custom-hook/useDeleteFilter";
 
 const useStyles = makeStyles(theme => ({
     content: {
@@ -20,6 +22,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
+    const {handlers, message, open} = useDeleteFilter()
     const dispatch = useDispatch()
     const {filterOptions, groupId} = filter
     const group = useSelector(state => state.firestore.data.careerCenterData?.[groupId])
@@ -94,10 +97,6 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
         })
     }
 
-    const handleClickAddCategory = () => {
-
-    }
-
 
     const classes = useStyles()
     return (
@@ -112,9 +111,17 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                 }
                 subheader="Eth students"
                 action={
-                    <IconButton>
-                        <DeleteFilterIcon/>
-                    </IconButton>
+                    <React.Fragment>
+                        <IconButton onClick={() => handlers.handleClickDelete(groupId)}>
+                            <DeleteFilterIcon/>
+                        </IconButton>
+                        <AreYouSureModal
+                            handleClose={handlers.handleCloseAreYouSureModal}
+                            open={open}
+                            handleConfirm={handlers.handleConfirm}
+                            message={message}
+                        />
+                    </React.Fragment>
                 }
             />
             <CardContent className={classes.content}>
