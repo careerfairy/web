@@ -57,8 +57,8 @@ export const deleteFilterGroup = (filterGroupId = "") => async (dispatch, getSta
     dispatch({type: actions.LOADING_FILTER_GROUP_END})
 };
 
-// Delete the currently active filter group
-export const setFilterOptions = (arrayOfGroupIds = []) => async (dispatch, getState, {getFirestore}) => {
+// Set the filterGroups of a query
+export const setFilters = (arrayOfGroupIds = []) => async (dispatch, getState) => {
     try {
         const state = getState()
         const oldFilterOptions = state.currentFilterGroup.data?.filters || []
@@ -70,7 +70,57 @@ export const setFilterOptions = (arrayOfGroupIds = []) => async (dispatch, getSt
             }
         })
         dispatch({
-            type: actions.SET_FILTER_OPTIONS,
+            type: actions.SET_FILTERS,
+            payload: newFilterOptions
+        })
+    } catch (e) {
+        dispatch(actionMethods.sendGeneralError(e))
+    }
+};
+
+// Set the category options of a filter
+export const setFilterOptions = (arrayOfCategoryIds = [], groupId) => async (dispatch, getState) => {
+    try {
+        const state = getState()
+        const newFilterOptions = state.currentFilterGroup.data?.filters.map(filter => {
+            if (filter.groupId === groupId) {
+                filter.filterOptions = arrayOfCategoryIds.map(categoryId => {
+                    const oldCategories = filter.filterOptions || []
+                    const currentCategory = oldCategories.find(category => category.categoryId === categoryId)
+                    return currentCategory || {
+                        categoryId,
+                        targetOptions: []
+                    }
+                })
+            }
+            return filter
+        })
+        dispatch({
+            type: actions.SET_FILTERS,
+            payload: newFilterOptions
+        })
+    } catch (e) {
+        dispatch(actionMethods.sendGeneralError(e))
+    }
+};
+
+// Set the category options of a filter
+export const setFilterOptionTargetOptions = (arrayOfOptionIds = [], categoryId, groupId) => async (dispatch, getState) => {
+    try {
+        const state = getState()
+        const newFilterOptions = state.currentFilterGroup.data?.filters.map(filter => {
+            if (filter.groupId === groupId) {
+                filter.filterOptions = filter.filterOptions.map(categoryFilter => {
+                    if (categoryFilter.categoryId === categoryId) {
+                        categoryFilter.targetOptionIds = arrayOfOptionIds
+                    }
+                    return categoryFilter
+                })
+            }
+            return filter
+        })
+        dispatch({
+            type: actions.SET_FILTERS,
             payload: newFilterOptions
         })
     } catch (e) {

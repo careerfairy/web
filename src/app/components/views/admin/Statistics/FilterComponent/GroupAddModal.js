@@ -24,12 +24,12 @@ const Content = ({handleClose}) => {
 
 
     const handleChange = (event, selectedOptions) => {
-        dispatch(actions.setFilterOptions(selectedOptions))
+        dispatch(actions.setFilters(selectedOptions))
     }
 
     const handleDelete = (groupId) => {
         const targetIdToRemove = groupId || groupIdToRemove
-        dispatch(actions.setFilterOptions(value.filter(groupId => groupId !== targetIdToRemove)))
+        dispatch(actions.setFilters(value.filter(groupId => groupId !== targetIdToRemove)))
     }
 
     const handleClickDelete = (groupId) => {
