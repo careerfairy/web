@@ -22,7 +22,6 @@ const StatisticsOverview = (props) => {
     const classes = useStyles()
     const firestore = useFirestore()
     const currentFilterGroup = useSelector(state => state.currentFilterGroup)
-    console.log("-> currentFilterGroup", currentFilterGroup);
     useEffect(() => {
         (async function getAllGroups() {
             await firestore.get({

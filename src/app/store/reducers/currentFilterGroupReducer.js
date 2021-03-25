@@ -9,12 +9,12 @@ const initialState = {
                 groupId: "GXW3MtpTehSmAe0aP1J4",
                 filterOptions: [
                     {
-                        categoryId: "c8090110-89ec-4287-b561-23f1f6dcb180" + "d",
+                        categoryId: "c8090110-89ec-4287-b561-23f1f6dcb180",
                         targetOptionIds: ["1a66d82d-ee97-43e2-8eac-3d2a51a4127f", "532c6170-c0aa-4638-8c46-4b24aca6fdb0"]
                     },
                     {
                         categoryId: "f4c3e50d-b7bc-4197-9cf0-b2ae45b40586",
-                        targetOptionIds: ["eb4d76db-fd99-4ca7-b7a1-a3a87e30ee2e" + "a"]
+                        targetOptionIds: ["eb4d76db-fd99-4ca7-b7a1-a3a87e30ee2e" ]
                     }
                 ]
             },

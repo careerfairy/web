@@ -19,5 +19,5 @@ export {
 
 export {closeSnackbar, enqueueSnackbar, removeSnackbar, sendGeneralError} from './snackbarActions.js'
 export {
-    createFilterGroup, deleteFilterGroup, setFilters, setFilterOptions, setFilterOptionTargetOptions
+    createFilterGroup, deleteFilterGroup, setFilters, setFilterOptions, setFilterOptionTargetOptions,setCurrentFilterGroupLoaded, setCurrentFilterGroupLoading
 } from './filterActions.js'

@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types'
 import React, {useCallback, useEffect} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Card, CardContent, CardHeader, IconButton} from "@material-ui/core";
+import {Button, Card, CardActions, CardContent, CardHeader, IconButton} from "@material-ui/core";
 import * as actions from '../../../../../../store/actions'
 import {useDispatch, useSelector} from "react-redux";
 import CategorySelect from "./CategorySelect";
 import DeleteFilterIcon from '@material-ui/icons/DeleteForever';
-import {isEmpty, isLoaded} from "react-redux-firebase";
+import {isEmpty, isLoaded, useFirestore} from "react-redux-firebase";
 import Skeleton from "@material-ui/lab/Skeleton";
 import GroupsUtil from "../../../../../../data/util/GroupsUtil";
 import AddOrRemoveCategoryButton from "./AddOrRemoveCategoryButton";
@@ -18,15 +18,19 @@ const useStyles = makeStyles(theme => ({
         '& > * + *': {
             marginTop: theme.spacing(2),
         },
-    }
+    },
 }));
+
 
 const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const {handlers, message, open} = useDeleteFilter()
     const dispatch = useDispatch()
     const {filterOptions, groupId} = filter
     const group = useSelector(state => state.firestore.data.careerCenterData?.[groupId])
+    const followerCount = useSelector(state => state.firestore.ordered?.[`followers of ${groupId}`]?.length)
+    const firestore = useFirestore()
     const [filterOptionsWithData, setFilterOptionsWithData] = React.useState([]);
+    const loading = useSelector(state => state.currentFilterGroup.loading)
 
     useEffect(() => {
         if (group?.categories) {
@@ -87,16 +91,34 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const handleCheckAndRemoveRedundantTargetOptions = (groupFilterOptions, group) => {
         const flattenedGroupOptions = GroupsUtil.handleFlattenOptions(group)
         groupFilterOptions.forEach(filterOption => {
-            const filteredTargetOptions = filterOption.targetOptionIds.filter(optionId => flattenedGroupOptions.some(({id}) => id === optionId))
-            const isRedundant = checkIfRedundant(filterOption.targetOptionIds, filteredTargetOptions)
-            if (isRedundant) {
-                handleRemoveRedundantTargetOptions(filteredTargetOptions, filterOption.categoryId, group.groupId)
+            if (filterOption.targetOptionIds) {
+                const filteredTargetOptions = filterOption.targetOptionIds.filter(optionId => flattenedGroupOptions.some(({id}) => id === optionId))
+                const isRedundant = checkIfRedundant(filterOption.targetOptionIds, filteredTargetOptions)
+                if (isRedundant) {
+                    handleRemoveRedundantTargetOptions(filteredTargetOptions, filterOption.categoryId, group.groupId)
+                }
             }
         })
     }
 
+    const handleGetFollowers = async (groupId) => {
+        dispatch(actions.setCurrentFilterGroupLoading())
+        try {
+            if (!isLoaded(followerCount)) {
+                await firestore.get({
+                    collection: "userData",
+                    where: ["groupIds", "array-contains", groupId],
+                    storeAs: `followers of ${groupId}`
+                })
+            }
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
+        dispatch(actions.setCurrentFilterGroupLoaded())
+    }
 
     const classes = useStyles()
+
     return (
         <Card>
             <CardHeader
@@ -107,7 +129,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                         `${group.universityName}`
                     )
                 }
-                subheader="Eth students"
+                subheader={followerCount ? `${followerCount} Total Followers` : null}
                 action={
                     <React.Fragment>
                         <IconButton onClick={() => handlers.handleClickDelete(groupId)}>
@@ -140,13 +162,22 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                         }
                     </React.Fragment>
                 )}
+            </CardContent>
+            <CardActions>
                 {group?.categories &&
                 <AddOrRemoveCategoryButton
                     groupCategories={group.categories}
                     filterOptions={filterOptions}
                     groupId={groupId}
                 />}
-            </CardContent>
+                <Button
+                    onClick={() => handleGetFollowers(groupId)}
+                    variant="contained"
+                    color="secondary"
+                    disabled={(isLoaded(followerCount) || loading)}>
+                    Get followers
+                </Button>
+            </CardActions>
         </Card>
     );
 };

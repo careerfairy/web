@@ -9,6 +9,8 @@ import {isLoaded} from "react-redux-firebase";
 const useStyles = makeStyles(theme => ({
     root: {
         width: "100%"
+    },
+    item:{
     }
 }));
 
@@ -16,6 +18,7 @@ const FilterComponent = ({}) => {
     const dispatch = useDispatch()
     const classes = useStyles()
     const filters = useSelector(state => state.currentFilterGroup.data.filters || [])
+
     const groupsLoaded = useSelector(({firestore:{data:{careerCenterData}}}) => isLoaded(careerCenterData))
     const handleRemoveGroupFromFilters = (targetGroupId) => {
         const newFilters = filters.map(({groupId}) => groupId).filter(groupId => groupId !== targetGroupId)
@@ -25,7 +28,7 @@ const FilterComponent = ({}) => {
     return (
         <Grid alignContent="center" alignItems="center" container spacing={2} className={classes.root}>
             {filters.map(filter => (
-                <Grid xs={12} md={6} lg={4}  key={filter.groupId} item>
+                <Grid className={classes.item} xs={12} md={6} lg={4}  key={filter.groupId} item>
                     <FilterCard groupsLoaded={groupsLoaded} handleRemoveGroupFromFilters={handleRemoveGroupFromFilters} key={filter.groupId} filter={filter}/>
                 </Grid>
             ))}

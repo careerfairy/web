@@ -2,21 +2,26 @@ import PropTypes from 'prop-types'
 import React from 'react';
 import * as actions from '../../../../../store/actions'
 import {makeStyles} from "@material-ui/core/styles";
-import {Button, Card, CardActions, CardHeader} from "@material-ui/core";
+import {Card, CardActions, CardHeader} from "@material-ui/core";
 import {useDispatch, useSelector} from "react-redux";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
+import {isLoaded} from "react-redux-firebase";
 
 const useStyles = makeStyles(theme => ({}));
 
-const Toolbar = ({handleQueryCurrentFilterGroup}) => {
+const Toolbar = () => {
 
     const classes = useStyles()
     const dispatch = useDispatch()
     const currentFilterGroup = useSelector(state => state.currentFilterGroup)
     const handleCreateNewDataSet = () => dispatch(actions.createFilterGroup())
     const handleDeleteCurrentFilterGroup = () => dispatch(actions.deleteFilterGroup(currentFilterGroup.id))
+    const groupsLoaded = useSelector(({firestore: {data: {careerCenterData}}}) => isLoaded(careerCenterData))
+
 
     const currentFilterGroupLabel = useSelector(state => state.currentFilterGroup.data.label || "")
+
+    const loading = Boolean(currentFilterGroup.loading || !groupsLoaded)
 
     return (
         <Card>
@@ -27,7 +32,7 @@ const Toolbar = ({handleQueryCurrentFilterGroup}) => {
             <CardActions>
                 <DynamicColorButton
                     variant="contained"
-                    loading={currentFilterGroup.loading}
+                    loading={loading}
                     size="large"
                     color="primary"
                     onClick={handleCreateNewDataSet}
@@ -36,7 +41,7 @@ const Toolbar = ({handleQueryCurrentFilterGroup}) => {
                 </DynamicColorButton>
                 {currentFilterGroup.data &&
                 <DynamicColorButton
-                    loading={currentFilterGroup.loading}
+                    loading={loading}
                     variant="contained"
                     size="large"
                     color="secondary"
@@ -46,11 +51,10 @@ const Toolbar = ({handleQueryCurrentFilterGroup}) => {
                 </DynamicColorButton>}
                 <DynamicColorButton
                     type="submit"
-                    loading={currentFilterGroup.loading}
+                    loading={loading}
                     variant="contained"
                     size="large"
                     color="#44a6c6"
-
                 >
                     Query Current Dataset
                 </DynamicColorButton>
@@ -59,7 +63,7 @@ const Toolbar = ({handleQueryCurrentFilterGroup}) => {
     );
 };
 Toolbar.propTypes = {
-  handleQueryCurrentFilterGroup: PropTypes.func.isRequired
+    handleQueryCurrentFilterGroup: PropTypes.func.isRequired
 }
 
 export default Toolbar;
