@@ -287,23 +287,17 @@ class Firebase {
                     message: `How happy are you with the content shared by ${livestream.company}?`,
                     type: "company",
                     appearAfter: 30,
-                    hasRated: false,
-                    isForEnd: false
                 },
                 {
                     message: `Are you more likely to apply to ${livestream.company} thanks to this live stream?`,
                     type: "willingnessToApply",
                     appearAfter: 40,
-                    hasRated: false,
-                    isForEnd: true
                 },
                 {
                     message: "How would you rate this live stream experience? Any feedback you would like to share?",
                     type: "overall",
                     appearAfter: 45,
                     hasText: true,
-                    hasRated: false,
-                    isForEnd: false
                 },
             ]
 
@@ -338,7 +332,8 @@ class Firebase {
                 batch.set(ratingRef, {
                     title: rating.type,
                     question: rating.message,
-                    appearAfter: rating.appearAfter
+                    appearAfter: rating.appearAfter,
+                    hasText: Boolean(rating.hasText)
                 })
             }
 
