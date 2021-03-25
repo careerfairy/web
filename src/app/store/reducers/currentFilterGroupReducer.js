@@ -9,7 +9,7 @@ const initialState = {
                 groupId: "GXW3MtpTehSmAe0aP1J4",
                 filterOptions: [
                     {
-                        categoryId: "c8090110-89ec-4287-b561-23f1f6dcb180",
+                        categoryId: "c8090110-89ec-4287-b561-23f1f6dcb180" + "d",
                         targetOptionIds: ["1a66d82d-ee97-43e2-8eac-3d2a51a4127f", "532c6170-c0aa-4638-8c46-4b24aca6fdb0"]
                     },
                     {
