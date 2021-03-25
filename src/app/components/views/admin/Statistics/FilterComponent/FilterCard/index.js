@@ -9,11 +9,12 @@ import DeleteFilterIcon from '@material-ui/icons/DeleteForever';
 import {isEmpty, isLoaded} from "react-redux-firebase";
 import Skeleton from "@material-ui/lab/Skeleton";
 import GroupsUtil from "../../../../../../data/util/GroupsUtil";
+import AddOrRemoveCategoryButton from "./AddOrRemoveCategoryButton";
 
 const useStyles = makeStyles(theme => ({
     content: {
         '& > * + *': {
-            marginTop: theme.spacing(3),
+            marginTop: theme.spacing(2),
         },
     }
 }));
@@ -23,6 +24,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const {filterOptions, groupId} = filter
     const group = useSelector(state => state.firestore.data.careerCenterData?.[groupId])
     const [filterOptionsWithData, setFilterOptionsWithData] = React.useState([]);
+    const [hasMoreCategories, setHasMoreCategories] = React.useState(false);
 
     useEffect(() => {
         if (group?.categories) {
@@ -32,6 +34,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
             })
             setFilterOptionsWithData(newFilterOptionsWithData)
         }
+        setHasMoreCategories(group?.categories?.length > filterOptions?.length)
     }, [group?.categories, filterOptions])
 
     useEffect(() => {
@@ -91,6 +94,10 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
         })
     }
 
+    const handleClickAddCategory = () => {
+
+    }
+
 
     const classes = useStyles()
     return (
@@ -118,15 +125,22 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                     </React.Fragment>
                 ) : (
                     <React.Fragment>
-                        {filterOptionsWithData.map(option => <CategorySelect
-                            key={option.categoryId}
-                            handleRemoveFilterOption={handleRemoveFilterOption}
-                            groupId={groupId}
-                            option={option}/>)
+                        {filterOptionsWithData.map(option =>
+                            <CategorySelect
+                                key={option.categoryId}
+                                handleRemoveFilterOption={handleRemoveFilterOption}
+                                groupId={groupId}
+                                option={option}
+                            />)
                         }
                     </React.Fragment>
                 )}
-
+                {group?.categories &&
+                <AddOrRemoveCategoryButton
+                    groupCategories={group.categories}
+                    filterOptions={filterOptions}
+                    groupId={groupId}
+                />}
             </CardContent>
         </Card>
     );

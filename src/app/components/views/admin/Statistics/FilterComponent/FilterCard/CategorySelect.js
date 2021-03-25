@@ -12,7 +12,10 @@ const useStyles = makeStyles(theme => ({
     inputWrapper: {
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        "& .MuiTextField-root":{
+            minWidth: 300
+        }
     }
 }));
 
@@ -45,7 +48,7 @@ const CategorySelect = ({option, groupId, handleRemoveFilterOption}) => {
             multiple
             id="tags-outlined"
             options={arrayOfOptionIds}
-            value={targetOptionIds}
+            value={targetOptionIds || []}
             onChange={(e, value) => handleChange(value, categoryId, groupId)}
             getOptionLabel={(option) => optionsMap[option]?.name}
             defaultValue={targetOptionIds}
