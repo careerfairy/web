@@ -14,19 +14,21 @@ const CategorySelect = ({option, groupId}) => {
     const dispatch = useDispatch()
     const {data: {options, name}, categoryId, targetOptionIds} = option
     const [optionsMap, setOptionsMap] = useState({});
+    const [arrayOfOptionIds, setArrayOfOptionIds] = useState([]);
 
     useEffect(() => {
         if (options?.length) {
             const newOptionsMap = convertArrayOfObjectsToDictionaryByProp(options, "id")
+            setArrayOfOptionIds(options.map(({id}) => id))
             setOptionsMap(newOptionsMap)
         }
     }, [options])
 
-    const handleChange = () => {
-
+    const handleChange = (newTargetOptionIds, categoryId, groupId) => {
+        dispatch(actions.setFilterOptionTargetOptions(newTargetOptionIds, categoryId, groupId))
     }
 
-    const handleDeleteTargetOption = (targetOptionIds,optionIdToRemove, categoryId, groupId) => {
+    const handleDeleteTargetOption = (targetOptionIds, optionIdToRemove, categoryId, groupId) => {
         const newTargetOptionIds = targetOptionIds.filter(optionId => optionId !== optionIdToRemove)
         dispatch(actions.setFilterOptionTargetOptions(newTargetOptionIds, categoryId, groupId))
     }
@@ -35,10 +37,10 @@ const CategorySelect = ({option, groupId}) => {
         <Autocomplete
             multiple
             id="tags-outlined"
-            options={options}
+            options={arrayOfOptionIds}
             value={targetOptionIds}
-            onChange={handleChange}
-            getOptionLabel={(option) => option.name}
+            onChange={(e, value) => handleChange(value, categoryId, groupId)}
+            getOptionLabel={(option) => optionsMap[option]?.name}
             disableClearable
             defaultValue={targetOptionIds}
             filterSelectedOptions
@@ -55,7 +57,7 @@ const CategorySelect = ({option, groupId}) => {
                     <Chip variant="default"
                           label={optionsMap[option]?.name}
                           {...getTagProps({index})}
-                        onDelete={() => handleDeleteTargetOption(targetOptionIds, option, categoryId, groupId)}
+                          onDelete={() => handleDeleteTargetOption(targetOptionIds, option, categoryId, groupId)}
                     />
                 ))
             }
