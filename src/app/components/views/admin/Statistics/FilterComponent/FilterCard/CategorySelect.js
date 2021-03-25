@@ -4,11 +4,14 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Chip, TextField} from "@material-ui/core";
 import {Autocomplete} from "@material-ui/lab";
 import {convertArrayOfObjectsToDictionaryByProp} from "../../../../../../data/util/AnalyticsUtil";
+import {useDispatch} from "react-redux";
+import * as actions from '../../../../../../store/actions'
 
 const useStyles = makeStyles(theme => ({}));
 
-const CategorySelect = ({option}) => {
+const CategorySelect = ({option, groupId}) => {
     const classes = useStyles()
+    const dispatch = useDispatch()
     const {data: {options, name}, categoryId, targetOptionIds} = option
     const [optionsMap, setOptionsMap] = useState({});
 
@@ -21,6 +24,11 @@ const CategorySelect = ({option}) => {
 
     const handleChange = () => {
 
+    }
+
+    const handleDeleteTargetOption = (targetOptionIds,optionIdToRemove, categoryId, groupId) => {
+        const newTargetOptionIds = targetOptionIds.filter(optionId => optionId !== optionIdToRemove)
+        dispatch(actions.setFilterOptionTargetOptions(newTargetOptionIds, categoryId, groupId))
     }
 
     return (
@@ -47,7 +55,7 @@ const CategorySelect = ({option}) => {
                     <Chip variant="default"
                           label={optionsMap[option]?.name}
                           {...getTagProps({index})}
-                        // onDelete={() => handleClickDelete(option)}
+                        onDelete={() => handleDeleteTargetOption(targetOptionIds, option, categoryId, groupId)}
                     />
                 ))
             }
@@ -68,6 +76,7 @@ CategorySelect.propTypes = {
             })).isRequired
         }).isRequired
     }).isRequired,
+    groupId: PropTypes.string.isRequired
 }
 export default CategorySelect;
 

@@ -108,6 +108,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                     <React.Fragment>
                         {filterOptionsWithData.map(option => <CategorySelect
                             key={option.categoryId}
+                            groupId={groupId}
                             option={option}/>)
                         }
                     </React.Fragment>
