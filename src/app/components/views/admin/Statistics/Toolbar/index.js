@@ -15,10 +15,13 @@ const Toolbar = ({}) => {
     const handleCreateNewDataSet = () => dispatch(actions.createFilterGroup())
     const handleDeleteCurrentFilterGroup = () => dispatch(actions.deleteFilterGroup(currentFilterGroup.id))
 
+    const currentFilterGroupLabel = useSelector(state => state.currentFilterGroup.data.label || "")
+
     return (
         <Card>
             <CardHeader
                 title="Create and manage statistics"
+                subheader={currentFilterGroupLabel}
             />
             <CardActions>
                 <DynamicColorButton

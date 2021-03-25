@@ -14,6 +14,7 @@ import GroupsUtil from "../../../../../../data/util/GroupsUtil";
 const useStyles = makeStyles(theme => ({}));
 
 const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
+    console.log("-> filter", filter);
     const dispatch = useDispatch()
     const {filterOptions, groupId} = filter
     console.log("-> filterOptions", filterOptions);
