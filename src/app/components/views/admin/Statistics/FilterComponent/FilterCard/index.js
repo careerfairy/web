@@ -3,7 +3,7 @@ import React, {useCallback, useEffect} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {Button, Card, CardActions, CardContent, CardHeader, IconButton} from "@material-ui/core";
 import * as actions from '../../../../../../store/actions'
-import {useDispatch, useSelector} from "react-redux";
+import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import CategorySelect from "./CategorySelect";
 import DeleteFilterIcon from '@material-ui/icons/DeleteForever';
 import {isEmpty, isLoaded, useFirestore} from "react-redux-firebase";
@@ -27,7 +27,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const dispatch = useDispatch()
     const {filterOptions, groupId} = filter
     const group = useSelector(state => state.firestore.data.careerCenterData?.[groupId])
-    const followerCount = useSelector(state => state.firestore.ordered?.[`followers of ${groupId}`]?.length)
+    const followerCount = useSelector(state => state.firestore.ordered?.[`followers of ${groupId}`]?.length, shallowEqual)
     const firestore = useFirestore()
     const [filterOptionsWithData, setFilterOptionsWithData] = React.useState([]);
     const loading = useSelector(state => state.currentFilterGroup.loading)

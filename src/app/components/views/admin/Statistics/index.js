@@ -2,10 +2,11 @@ import React, {useEffect} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {Container, Grid} from "@material-ui/core";
 import FilterComponent from "./FilterComponent";
-import useGetAllGroups from "../../../custom-hook/useGetAllGroups";
 import {useFirestore} from "react-redux-firebase";
 import Toolbar from "./Toolbar";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {convertArrayOfObjectsToDictionaryByProp} from "../../../../data/util/AnalyticsUtil";
+import * as actions from '../../../../store/actions'
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -18,10 +19,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const StatisticsOverview = (props) => {
-
+    const dispatch = useDispatch()
     const classes = useStyles()
     const firestore = useFirestore()
     const currentFilterGroup = useSelector(state => state.currentFilterGroup)
+    const ordered = useSelector(state => state.firestore.ordered)
+    const data = useSelector(state => state.firestore.data)
+    console.log("-> data", data);
     useEffect(() => {
         (async function getAllGroups() {
             await firestore.get({
@@ -32,7 +36,32 @@ const StatisticsOverview = (props) => {
 
     const handleQueryCurrentFilterGroup = async (e) => {
         e.preventDefault?.()
-        alert("hi")
+        try {
+            dispatch(actions.setCurrentFilterGroupLoading())
+            const groupIds = currentFilterGroup.data.filters.map(({groupId}) => groupId) || []
+            let totalUsersMap = {}
+
+            for (const groupId of groupIds) {
+                let groupFollowersMap = data[`followers of ${groupId}`]
+                if (!groupFollowersMap) {
+                    const userSnaps = await firestore.get({
+                        collection: "userData",
+                        where: ["groupIds", "array-contains", groupId],
+                        storeAs: `followers of ${groupId}`
+                    })
+                    const arrayOfUserData = userSnaps.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                    groupFollowersMap = convertArrayOfObjectsToDictionaryByProp(arrayOfUserData, "id")
+                }
+                totalUsersMap = Object.assign(totalUsersMap, (groupFollowersMap || {}))
+            }
+            console.log("-> totalUsersMap", totalUsersMap);
+            console.log("-> length", Object.keys(totalUsersMap).length);
+            alert("hi")
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
+
+        dispatch(actions.setCurrentFilterGroupLoaded())
     }
     return (
         <Container className={classes.root} maxWidth={false}>

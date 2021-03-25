@@ -80,31 +80,6 @@ export const setCurrentFilterGroupLoading = () => async (dispatch) =>  {
 export const setCurrentFilterGroupLoaded = () => async (dispatch) =>  {
     dispatch({type: actions.LOADING_FILTER_GROUP_END})
 }
-// Query the currently active filter group
-export const queryGroupFollowers = (groupId) => async (dispatch, getState, {getFirestore}) => {
-    dispatch({type: actions.LOADING_FILTER_GROUP_START})
-    try {
-        const state = getState()
-        console.log("-> state", state);
-        const firestore = getFirestore();
-        const firebase = getFirebase();
-        console.log("-> firebase", firebase);
-        console.log("-> firestore", firestore);
-        const currentFollowers = state.firestore.ordered[`followers of ${groupId}`]
-        if (!isLoaded(currentFollowers)) {
-            await firestore.get({
-                collection: "userData",
-                where: ["groupIds", "array-contains", groupId],
-                storeAs: `followers of ${groupId}`
-            })
-        }
-        dispatch({type: actions.LOADING_FILTER_GROUP_END})
-        return "hiiii"
-    } catch (e) {
-        dispatch(actionMethods.sendGeneralError(e))
-    }
-    dispatch({type: actions.LOADING_FILTER_GROUP_END})
-};
 
 // Set the filterGroups of a query
 export const setFilters = (arrayOfGroupIds = []) => async (dispatch, getState) => {

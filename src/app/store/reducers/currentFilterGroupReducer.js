@@ -16,7 +16,7 @@ const initialState = {
                         categoryId: "f4c3e50d-b7bc-4197-9cf0-b2ae45b40586",
                         targetOptionIds: ["eb4d76db-fd99-4ca7-b7a1-a3a87e30ee2e" ]
                     }
-                ]
+                ],
             },
             {
                 groupId: "JBjEIACEOW00NvTVozJL",
@@ -29,7 +29,7 @@ const initialState = {
                         categoryId: "259cd82f-76cc-4c4a-85ee-31b606e2995b",
                         targetOptionIds: ["9fc3daa1-13b0-4ea2-abbe-6945a5d44e80", "8fdb0df8-9152-432a-aef5-1d2986afc491"]
                     }
-                ]
+                ],
             },
         ],
     },
