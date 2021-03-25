@@ -70,6 +70,10 @@ const convertArrayOfUserObjectsToDictionary = (arrayOfUsers) => {
     return Object.assign({}, ...arrayOfUsers.map(user => ({[user.userEmail]: user})))
 }
 
+const convertArrayOfObjectsToDictionaryByProp = (arrayOfObjects, prop) => {
+    return Object.assign({}, ...arrayOfObjects.map(obj => ({[obj[prop]]: obj})))
+}
+
 const getTotalEmailsFromStreamsByProperty = (streamsArray, prop) => {
     return streamsArray.reduce(
         (accumulator, livestream) =>
@@ -169,5 +173,6 @@ module.exports = {
     getTypeOfStudents,
     getTotalUniqueStreamGroupIdsFromStreams,
     arraysOfIdsEqual,
-    getUniqueUsersByEmailWithArrayOfUsers
+    getUniqueUsersByEmailWithArrayOfUsers,
+    convertArrayOfObjectsToDictionaryByProp
 }

@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types'
 import React, {useEffect} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Card, CardContent, CardHeader, CircularProgress, IconButton} from "@material-ui/core";
+import {Card, CardContent, CardHeader, IconButton} from "@material-ui/core";
 import * as actions from '../../../../../../store/actions'
 import {useDispatch, useSelector} from "react-redux";
-import useFollowers from "../../../../../custom-hook/useFollowers";
 import CategorySelect from "./CategorySelect";
 import DeleteFilterIcon from '@material-ui/icons/DeleteForever';
 import {isEmpty, isLoaded} from "react-redux-firebase";
@@ -14,16 +13,20 @@ import GroupsUtil from "../../../../../../data/util/GroupsUtil";
 const useStyles = makeStyles(theme => ({}));
 
 const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
-    console.log("-> filter", filter);
     const dispatch = useDispatch()
     const {filterOptions, groupId} = filter
-    console.log("-> filterOptions", filterOptions);
-    // const {loading} = useFollowers(groupId)
     const group = useSelector(state => state.firestore.data.careerCenterData?.[groupId])
+    const [filterOptionsWithData, setFilterOptionsWithData] = React.useState([]);
 
     useEffect(() => {
-
-    }, [group])
+        if (group?.categories) {
+            const newFilterOptionsWithData = filterOptions.map(filterOption => {
+                const data = group.categories.find(({id}) => id === filterOption.categoryId) || {}
+                return {...filterOption, data}
+            })
+            setFilterOptionsWithData(newFilterOptionsWithData)
+        }
+    }, [group?.categories, filterOptions])
 
     useEffect(() => {
         if (groupsLoaded) {
@@ -78,7 +81,6 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
 
 
     const classes = useStyles()
-
     return (
         <Card>
             <CardHeader
@@ -104,9 +106,10 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                     </React.Fragment>
                 ) : (
                     <React.Fragment>
-                        {filterOptions.map(option => <CategorySelect categoryData={group.categories}
-                                                                     key={option.category}
-                                                                     option={option}/>)}
+                        {filterOptionsWithData.map(option => <CategorySelect
+                            key={option.categoryId}
+                            option={option}/>)
+                        }
                     </React.Fragment>
                 )}
 

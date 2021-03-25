@@ -25,7 +25,7 @@ const FilterComponent = ({}) => {
     return (
         <Grid alignContent="center" alignItems="center" container spacing={2} className={classes.root}>
             {filters.map(filter => (
-                <Grid item>
+                <Grid key={filter.groupId} item>
                     <FilterCard groupsLoaded={groupsLoaded} handleRemoveGroupFromFilters={handleRemoveGroupFromFilters} key={filter.groupId} filter={filter}/>
                 </Grid>
             ))}

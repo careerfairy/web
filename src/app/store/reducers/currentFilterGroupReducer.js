@@ -14,7 +14,7 @@ const initialState = {
                     },
                     {
                         categoryId: "f4c3e50d-b7bc-4197-9cf0-b2ae45b40586",
-                        targetOptionIds: ["eb4d76db-fd99-4ca7-b7a1-a3a87e30ee2e"]
+                        targetOptionIds: ["eb4d76db-fd99-4ca7-b7a1-a3a87e30ee2e" + "a"]
                     }
                 ]
             },
