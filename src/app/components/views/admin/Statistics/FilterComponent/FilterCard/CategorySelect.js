@@ -5,7 +5,6 @@ import {makeStyles} from "@material-ui/core/styles";
 const useStyles = makeStyles(theme => ({}));
 
 const CategorySelect = ({option, groupCategories}) => {
-console.log("-> groupCategories", groupCategories);
     const classes = useStyles()
 
     return (

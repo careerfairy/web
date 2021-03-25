@@ -9,7 +9,7 @@ const initialState = {
                 groupId: "GXW3MtpTehSmAe0aP1J4",
                 filterOptions: [
                     {
-                        categoryId: "c8090110-89ec-4287-b561-23f1f6dcb180" + "a",
+                        categoryId: "c8090110-89ec-4287-b561-23f1f6dcb180",
                         targetOptionIds: ["1a66d82d-ee97-43e2-8eac-3d2a51a4127f", "532c6170-c0aa-4638-8c46-4b24aca6fdb0"]
                     },
                     {
@@ -22,7 +22,7 @@ const initialState = {
                 groupId: "JBjEIACEOW00NvTVozJL",
                 filterOptions: [
                     {
-                        categoryId: "01b5033c-c456-45ac-acf5-0e83ae67dc4a" + "a",
+                        categoryId: "01b5033c-c456-45ac-acf5-0e83ae67dc4a",
                         targetOptionIds: ["e915f411-7bb2-4cc7-9665-eeca1d3bb449", "c72c1a53-827f-4a07-892d-e1b57b3d7332"]
                     },
                     {
