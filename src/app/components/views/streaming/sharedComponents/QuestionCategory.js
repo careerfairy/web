@@ -324,7 +324,7 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
                         <EmptyList/>}
                 </TabPanel>
             </SwipeableViews>
-            <Dialog TransitionComponent={Slide} PaperProps={{className: classes.dialog}} fullWidth onClose={handleClose}
+            <Dialog TransitionComponent={Slide} PaperProps={{className: `${classes.dialog} notranslate`}} fullWidth onClose={handleClose}
                     open={showQuestionModal}>
                 <DialogTitle style={{color: "white"}}>
                     Add a Question
