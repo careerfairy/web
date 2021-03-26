@@ -44,10 +44,10 @@ const StatisticsOverview = () => {
     }, [])
 
     useEffect(() => {
+        // Comment this out if you dont want to calculate total once groups are mounted
         if (!totalData && filters.some(filter => filter.filteredGroupFollowerData.data)) {
             (async () => {
                 await handleQueryCurrentFilterGroup()
-                console.log("-> handleQueryCurrentFilterGroup");
             })()
         }
     }, [totalData, filters])
