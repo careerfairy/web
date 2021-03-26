@@ -47,8 +47,8 @@ const StatisticsOverview = () => {
                     textColor="primary"
                 >
                     <Tab className={classes.tab} label="Queries"/>
-                    <Tab className={classes.tab} label={`Filtered - [${filteredCount}]`}/>
-                    <Tab className={classes.tab} label={`Total - [${totalCount}]`}/>
+                    <Tab className={classes.tab} label={`Filtered Users Table - [${filteredCount}]`}/>
+                    <Tab className={classes.tab} label={`Total Users Table - [${totalCount}]`}/>
                 </Tabs>
             </AppBar>
             <SwipeableViews

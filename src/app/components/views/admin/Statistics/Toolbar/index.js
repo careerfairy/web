@@ -12,18 +12,15 @@ import SearchIcon from '@material-ui/icons/Search';
 import {colorsArray} from "../../../../util/colors";
 import DataSetDrawer from "./DataSetDrawer";
 
-const useStyles = makeStyles(theme => ({}));
-
 const Toolbar = ({queryDataSet, loading}) => {
 
-    const classes = useStyles()
     const dispatch = useDispatch()
     const currentFilterGroup = useSelector(state => state.currentFilterGroup)
     const handleCreateNewDataSet = () => dispatch(actions.createFilterGroup())
-    const handleDeleteCurrentFilterGroup = () => dispatch(actions.deleteFilterGroup(currentFilterGroup.id))
+    const handleDeleteCurrentFilterGroup = () => dispatch(actions.deleteFilterGroup())
     const totalCount = useSelector(state => state.currentFilterGroup.totalStudentsData.count)
     const filteredCount = useSelector(state => state.currentFilterGroup.filteredStudentsData.count)
-    const justFiltered = useSelector(state => state.currentFilterGroup.justFiltered)
+    // const justFiltered = useSelector(state => state.currentFilterGroup.justFiltered)
     const [datasetDrawerOpen, setDatasetDrawerOpen] = useState(false);
     const currentFilterGroupLabel = useSelector(state => state.currentFilterGroup.data.label || "")
 

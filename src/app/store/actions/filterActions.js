@@ -14,6 +14,7 @@ export const createFilterGroup = () => async (dispatch, getState, {getFirestore}
             .doc()
         const filterGroupId = filterGroupDocRef.id
         const newFilterGroup = buildFilterGroup(filterGroupId)
+        console.log("-> newFilterGroup", newFilterGroup);
         await firestore
             .collection("filterGroups")
             .doc(filterGroupId)
@@ -32,17 +33,22 @@ export const createFilterGroup = () => async (dispatch, getState, {getFirestore}
 
 // Delete the currently active filter group
 export const deleteFilterGroup = (filterGroupId = "") => async (dispatch, getState, {getFirestore}) => {
-    dispatch({type: actions.LOADING_FILTER_GROUP_START})
+    const isCurrentFilterGroup = !filterGroupId
+    const state = getState()
+    const targetId = isCurrentFilterGroup ? state.currentFilterGroup.data.id : filterGroupId
+        dispatch({type: actions.LOADING_FILTER_GROUP_START})
     try {
         const firestore = getFirestore();
         const filterGroupRef = firestore
             .collection('filterGroups')
-            .doc(filterGroupId)
-        await firestore.delete(filterGroupRef)
+            .doc(targetId)
+        await filterGroupRef.delete()
 
-        dispatch({
-            type: actions.CLEAR_CURRENT_FILTER_GROUP,
-        });
+        if (isCurrentFilterGroup) {
+            dispatch({
+                type: actions.CLEAR_CURRENT_FILTER_GROUP,
+            });
+        }
 
     } catch (e) {
         dispatch(actionMethods.sendGeneralError(e))
@@ -234,17 +240,6 @@ export const setFilterOptionTargetOptions = (arrayOfOptionIds = [], categoryId, 
     }
 };
 
-const buildFilterGroup = (id) => {
-    return {
-        data: {
-            id,
-            label: "",
-            filters: [],
-            filteredStudents: [],
-        },
-        saved: true
-    }
-}
 
 const checkIfUserMatches = (user, filterCategories = [], targetGroupId) => {
     const {categories: userCategories} = user.registeredGroups.find(({groupId}) => groupId === targetGroupId) || {}
@@ -263,4 +258,19 @@ const initialTotalData = {
     ordered: undefined,
     data: undefined,
     count: undefined
+}
+const buildFilterGroup = (id) => {
+
+    return {
+        data: {
+            id,
+            label: "",
+            filters: [],
+        },
+        totalStudentsData: {},
+        filteredStudentsData: {},
+        saved: false,
+        loading: false,
+        justFiltered: false
+    }
 }

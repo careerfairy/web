@@ -32,13 +32,13 @@ const FilterComponent = () => {
             columnsCountBreakPoints={{350: 1, 800: 2, 1280: 2, 1450: 3}}
 
         >
-            <Masonry gutter={theme.spacing(2)}>
+            <Masonry gutter={`${theme.spacing(2)}px`}>
                 {filters.map(filter => (
                     <FilterCard groupsLoaded={groupsLoaded} handleRemoveGroupFromFilters={handleRemoveGroupFromFilters}
                                 key={filter.groupId} filter={filter}/>
                 ))}
                 <Box display="flex" justifyContent="center">
-                <GroupAddButton/>
+                    <GroupAddButton/>
                 </Box>
             </Masonry>
         </ResponsiveMasonry>

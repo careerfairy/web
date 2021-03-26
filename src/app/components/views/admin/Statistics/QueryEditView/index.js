@@ -26,7 +26,7 @@ const QueryEditView = ({}) => {
     const dispatch = useDispatch()
     const classes = useStyles()
     const firestore = useFirestore()
-    const filters = useSelector(state => state.currentFilterGroup.data.filters || [])
+    const filters = useSelector(state => state.currentFilterGroup.data?.filters || [])
     const currentFilterGroupLoading = useSelector(state => state.currentFilterGroup.loading)
     const totalData = useSelector(state => Boolean(state.currentFilterGroup.totalStudentsData.data))
     const data = useSelector(state => state.firestore.data)
