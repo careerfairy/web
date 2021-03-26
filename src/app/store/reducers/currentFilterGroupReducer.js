@@ -2,6 +2,56 @@ import * as actions from '../actions/actionTypes';
 
 const initialState = {
     data: {
+        id: "",
+        label: "",
+        filters: [],
+    },
+    totalStudentsData: {
+        ordered: undefined,
+        data: undefined,
+        count: undefined
+    },
+    filteredStudentsData: {
+        ordered: undefined,
+        data: undefined,
+        count: undefined
+    },
+    saved: false,
+    loading: false,
+    justFiltered: false
+};
+
+const currentFilterGroupReducer = (state = initialState, {type, payload}) => {
+    switch (type) {
+        case actions.SET_CURRENT_FILTER_GROUP:
+            return {...state, ...payload};
+        case actions.CLEAR_CURRENT_FILTER_GROUP:
+            return initialState;
+        case actions.SET_FILTERS:
+            return {...state, data: {...state.data, filters: [...payload]}};
+        case actions.LOADING_FILTER_GROUP_START:
+            return {...state, loading: true};
+        case actions.CLEAR_CURRENT_FILTER_GROUP_FILTERED_DATA:
+            return {...state, filteredStudentsData: payload};
+        case actions.SET_CURRENT_FILTER_GROUP_NOT_FILTERED:
+            return {...state, justFiltered: false};
+        case actions.SET_CURRENT_FILTER_GROUP_FILTERED:
+            return {...state, justFiltered: true};
+        case actions.LOADING_FILTER_GROUP_END:
+            return {...state, loading: false};
+        case actions.SET_TOTAL_FILTER_GROUP_USERS:
+            return {...state, totalStudentsData: payload};
+        case actions.SET_FILTERED_FILTER_GROUP_USERS:
+            return {...state, filteredStudentsData: payload};
+        default:
+            return state;
+    }
+};
+
+export default currentFilterGroupReducer
+
+const demoState = {
+    data: {
         id: "rgdfgfdgfdgw324",
         label: "Eth and Epfl mechanical Engineers",
         filters: [
@@ -59,32 +109,3 @@ const initialState = {
     loading: false,
     justFiltered: false
 };
-
-const currentFilterGroupReducer = (state = initialState, {type, payload}) => {
-    switch (type) {
-        case actions.SET_CURRENT_FILTER_GROUP:
-            return {...state, ...payload};
-        case actions.CLEAR_CURRENT_FILTER_GROUP:
-            return initialState;
-        case actions.SET_FILTERS:
-            return {...state, data: {...state.data, filters: [...payload]}};
-        case actions.LOADING_FILTER_GROUP_START:
-            return {...state, loading: true};
-        case actions.CLEAR_CURRENT_FILTER_GROUP_FILTERED_DATA:
-            return {...state, filteredStudentsData: payload};
-        case actions.SET_CURRENT_FILTER_GROUP_NOT_FILTERED:
-            return {...state, justFiltered: false};
-        case actions.SET_CURRENT_FILTER_GROUP_FILTERED:
-            return {...state, justFiltered: true};
-        case actions.LOADING_FILTER_GROUP_END:
-            return {...state, loading: false};
-        case actions.SET_TOTAL_FILTER_GROUP_USERS:
-            return {...state, totalStudentsData: payload};
-        case actions.SET_FILTERED_FILTER_GROUP_USERS:
-            return {...state, filteredStudentsData: payload};
-        default:
-            return state;
-    }
-};
-
-export default currentFilterGroupReducer

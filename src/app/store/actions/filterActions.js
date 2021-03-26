@@ -1,7 +1,7 @@
 import * as actions from './actionTypes';
 import * as actionMethods from './index'
 import {convertArrayOfObjectsToDictionaryByProp} from "../../data/util/AnalyticsUtil";
-import {useSelector} from "react-redux";
+const cloneDeep = require('lodash.clonedeep');
 
 
 // Create a new filter group and store it in redux as current filter group
@@ -60,7 +60,7 @@ export const saveCurrentFilterGroup = () => async (dispatch, getState, {getFires
             message: "Query has successfully been saved",
             options: {
                 variant: "success",
-                preventDefault: true,
+                preventDuplicate: true,
             }
         }))
     } catch (e) {
@@ -101,7 +101,7 @@ export const setFilterGroupAsCurrentWithId = (filterGroupId) => async (dispatch,
     if (targetFilterGroup) {
         dispatch({
             type: actions.SET_CURRENT_FILTER_GROUP,
-            payload: targetFilterGroup
+            payload: cloneDeep(targetFilterGroup)
         })
     }
 }
@@ -166,14 +166,15 @@ export const filterAndSetGroupFollowers = (groupId) => async (dispatch, getState
         }
         const oldFilterOptions = state.currentFilterGroup.data?.filters || []
         const newFilterOptions = oldFilterOptions.map(filterOption => {
-            if (filterOption.groupId === groupId) {
-                filterOption.filteredGroupFollowerData = {
+            const clonedFilterOption = {...filterOption}
+            if (clonedFilterOption.groupId === groupId) {
+                clonedFilterOption.filteredGroupFollowerData = {
                     ordered: filteredFollowers,
                     data: filteredFollowerMap,
                     count: filteredFollowers.length
                 }
             }
-            return filterOption
+            return clonedFilterOption
         })
         dispatch(handleSetNewTotalFilteredStudents())
         handleSetNewTotalFilteredStudents()

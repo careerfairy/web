@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
 const StatisticsOverview = () => {
     const classes = useStyles()
     const theme = useTheme()
-    const [value, setValue] = React.useState(1);
+    const [value, setValue] = React.useState(0);
     const totalCount = useSelector(state => state.currentFilterGroup.totalStudentsData.count)
     const filteredCount = useSelector(state => state.currentFilterGroup.filteredStudentsData.count)
 

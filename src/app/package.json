@@ -46,6 +46,7 @@
     "formik": "^2.1.2",
     "global": "^4.4.0",
     "lodash": "^4.17.20",
+    "lodash.clonedeep": "^4.5.0",
     "lodash.debounce": "^4.0.8",
     "material-table": "^1.69.2",
     "memoize-one": "^5.1.1",
