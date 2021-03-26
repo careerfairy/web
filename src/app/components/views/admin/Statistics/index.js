@@ -1,10 +1,11 @@
-import React, {Fragment} from 'react';
+import React from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import SwipeableViews from "react-swipeable-views";
 import QueryEditView from "./QueryEditView";
 import {SwipeablePanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import UserTableView from "./UserTableView";
 import {AppBar, Tab, Tabs} from "@material-ui/core";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     slide: {
@@ -23,6 +24,8 @@ const StatisticsOverview = () => {
     const classes = useStyles()
     const theme = useTheme()
     const [value, setValue] = React.useState(1);
+    const totalCount = useSelector(state => state.currentFilterGroup.totalStudentsData.count)
+    const filteredCount = useSelector(state => state.currentFilterGroup.filteredStudentsData.count)
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -44,8 +47,8 @@ const StatisticsOverview = () => {
                     textColor="primary"
                 >
                     <Tab className={classes.tab} label="Queries"/>
-                    <Tab className={classes.tab} label="Filtered"/>
-                    <Tab className={classes.tab} label="Total"/>
+                    <Tab className={classes.tab} label={`Filtered - [${filteredCount}]`}/>
+                    <Tab className={classes.tab} label={`Total - [${totalCount}]`}/>
                 </Tabs>
             </AppBar>
             <SwipeableViews

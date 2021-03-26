@@ -4,6 +4,8 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Container, Grid} from "@material-ui/core";
 import AdminUsersTable from "./AdminUsersTable";
 import {useSelector} from "react-redux";
+import {createSelector} from "reselect";
+import {universityCountriesMap} from "../../../../util/constants";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -12,15 +14,25 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+const usersSelector = createSelector(
+    state => state.currentFilterGroup,
+    (_, {isFiltered}) => isFiltered,
+    (currentFilterGroup, isFiltered) => {
+        let users = isFiltered ? currentFilterGroup?.filteredStudentsData.ordered : currentFilterGroup?.totalStudentsData.ordered
+        return users?.map(user => ({
+            ...user,
+            universityCountry: universityCountriesMap[user.universityCountryCode]
+        })) || []
+    }
+)
+
+
 const UserTableView = ({isFiltered}) => {
 
     const classes = useStyles()
-    const users = useSelector(({
-                                   currentFilterGroup: {
-                                       totalStudentsData,
-                                       filteredStudentsData
-                                   }
-                               }) => isFiltered ? filteredStudentsData.ordered : totalStudentsData.ordered || [])
+    const users = useSelector(state =>
+        usersSelector(state, {isFiltered})
+    )
 
     return (
         <Container className={classes.root} maxWidth={false}>
@@ -34,7 +46,7 @@ const UserTableView = ({isFiltered}) => {
 };
 
 UserTableView.propTypes = {
-  isFiltered: PropTypes.bool
+    isFiltered: PropTypes.bool
 }
 
 export default UserTableView;
