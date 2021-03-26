@@ -12,7 +12,6 @@ import GroupsUtil from "../../../../../../data/util/GroupsUtil";
 import AddOrRemoveCategoryButton from "./AddOrRemoveCategoryButton";
 import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import useDeleteFilter from "../../../../../custom-hook/useDeleteFilter";
-import {convertArrayOfObjectsToDictionaryByProp} from "../../../../../../data/util/AnalyticsUtil";
 
 const useStyles = makeStyles(theme => ({
     content: {
@@ -27,9 +26,6 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const {handlers, message, open} = useDeleteFilter()
     const dispatch = useDispatch()
     const {filterOptions, groupId, filteredGroupFollowerData} = filter
-    if (groupId === "JBjEIACEOW00NvTVozJL") {
-        // console.log(`-> filterOptions in FilterCard for ${groupId}`, filterOptions);
-    }
     const group = useSelector(state => state.firestore.data.careerCenterData?.[groupId])
     const totalFollowers = useSelector(state => state.firestore.ordered?.[`followers of ${groupId}`], shallowEqual)
     const firestore = useFirestore()
@@ -38,6 +34,9 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const filteredData = useSelector(state => Boolean(state.currentFilterGroup.filteredStudentsData.data))
 
     useEffect(() => {
+        (async () => {
+            await handleGetFollowers(groupId)
+        })()
         return () => recalculateTotals()
     }, [])
 
@@ -141,7 +140,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const handleFilterFollowers = () => {
         dispatch(actions.filterAndSetGroupFollowers(groupId))
     }
-    const recalculateTotals =() => {
+    const recalculateTotals = () => {
         dispatch(actions.handleCalculateAndSetNewTotalStudents())
         dispatch(actions.handleSetNewTotalFilteredStudents())
     }

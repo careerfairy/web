@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
         paddingTop: theme.spacing(3),
         width: "100%"
     },
-    backdrop:{
+    backdrop: {
         zIndex: theme.zIndex.tooltip
     }
 }));
@@ -28,6 +28,7 @@ const StatisticsOverview = () => {
     const firestore = useFirestore()
     const filters = useSelector(state => state.currentFilterGroup.data.filters || [])
     const currentFilterGroupLoading = useSelector(state => state.currentFilterGroup.loading)
+    const totalData = useSelector(state => Boolean(state.currentFilterGroup.totalStudentsData.data))
     const data = useSelector(state => state.firestore.data)
 
     const groupsLoaded = useSelector(({firestore: {data: {careerCenterData}}}) => isLoaded(careerCenterData))
@@ -41,6 +42,15 @@ const StatisticsOverview = () => {
             })
         })()
     }, [])
+
+    useEffect(() => {
+        if (!totalData && filters.some(filter => filter.filteredGroupFollowerData.data)) {
+            (async () => {
+                await handleQueryCurrentFilterGroup()
+                console.log("-> handleQueryCurrentFilterGroup");
+            })()
+        }
+    }, [totalData, filters])
 
     const handleQueryCurrentFilterGroup = async () => {
         try {
@@ -83,7 +93,7 @@ const StatisticsOverview = () => {
                 </Grid>
             </Grid>
             <Backdrop className={classes.backdrop} open={loading}>
-                <CircularProgress color="inherit" />
+                <CircularProgress color="inherit"/>
             </Backdrop>
         </Container>
     );

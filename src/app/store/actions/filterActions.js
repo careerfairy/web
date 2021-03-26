@@ -1,6 +1,7 @@
 import * as actions from './actionTypes';
 import * as actionMethods from './index'
 import {convertArrayOfObjectsToDictionaryByProp} from "../../data/util/AnalyticsUtil";
+import {useSelector} from "react-redux";
 
 
 // Create a new filter group and store it in redux as current filter group
@@ -158,11 +159,19 @@ export const setFilters = (arrayOfGroupIds = []) => async (dispatch, getState) =
         const state = getState()
         const oldFilterOptions = state.currentFilterGroup.data?.filters || []
         const newFilterOptions = arrayOfGroupIds.map(groupId => {
-            const currentFilter = oldFilterOptions.find(filter => filter.groupId === groupId)
-            return currentFilter || {
-                groupId,
-                filterOptions: []
+            let currentFilter = oldFilterOptions.find(filter => filter.groupId === groupId)
+            if (!currentFilter) {
+                let filterOptions = []
+                const {categories} = state.firestore.data.careerCenterData?.[groupId] || {}
+                if (categories?.length) {
+                    filterOptions = categories.map(({id}) => ({categoryId: id, targetOptionIds: []}))
+                }
+                currentFilter = {
+                    groupId,
+                    filterOptions
+                }
             }
+            return currentFilter
         })
 
         dispatch({
