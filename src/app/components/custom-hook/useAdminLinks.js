@@ -67,23 +67,11 @@ const useAdminLinks = () => {
                     basePath: `/admin/upcoming-livestreams`
                 },
                 {
-                    href: `/admin/past-livestreams`,
-                    icon: PastStreamIcon,
-                    title: 'Past Streams',
-                    basePath: `/admin/past-livestreams`
-                },
-                {
                     href: `/admin/statistics`,
                     icon: StatisticsIcon,
                     title: 'Statistics',
                     basePath: `/admin/statistics`
                 },
-                {
-                    href: `/admin/user-table`,
-                    icon: TableIcon,
-                    title: 'User Table',
-                    basePath: `/admin/user-table`
-                }
             ])
         } else {
             setDrawerTopLinks([])
