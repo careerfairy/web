@@ -47,7 +47,6 @@ const StatisticsOverview = () => {
             dispatch(actions.setCurrentFilterGroupLoading())
             let groupIds = filters.map(({groupId}) => groupId) || []
             let totalUsersMap = {}
-
             for (const groupId of groupIds) {
                 let groupFollowersMap = data[`followers of ${groupId}`]
                 if (!groupFollowersMap) {

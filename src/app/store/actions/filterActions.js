@@ -76,6 +76,17 @@ export const handleSetNewTotalFilteredStudents = () => async (dispatch, getState
     }, {})
     dispatch(setTotalFilterGroupUsers(newTotalFilteredStudentsMap, true))
 }
+
+export const handleCalculateAndSetNewTotalStudents = () => async (dispatch, getState) => {
+    const state = getState()
+    const groupFilters = state.currentFilterGroup.data.filters || []
+    const data = state.firestore.data
+    const groupDataKeys = groupFilters.map(({groupId}) => `followers of ${groupId}`)
+    const newTotalStudentsMap = groupDataKeys.reduce((acc, curr) => {
+        return data[curr] ? Object.assign(acc, data[curr]) : acc
+    }, {})
+    dispatch(setTotalFilterGroupUsers(newTotalStudentsMap))
+}
 // Filter Group followers by Categories
 export const filterAndSetGroupFollowers = (groupId) => async (dispatch, getState) => {
     const state = getState()

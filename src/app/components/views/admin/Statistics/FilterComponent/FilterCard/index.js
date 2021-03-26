@@ -38,7 +38,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const filteredData = useSelector(state => Boolean(state.currentFilterGroup.filteredStudentsData.data))
 
     useEffect(() => {
-        return () => dispatch(actions.handleSetNewTotalFilteredStudents())
+        return () => recalculateTotals()
     }, [])
 
     useEffect(() => {
@@ -140,6 +140,10 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
 
     const handleFilterFollowers = () => {
         dispatch(actions.filterAndSetGroupFollowers(groupId))
+    }
+    const recalculateTotals =() => {
+        dispatch(actions.handleCalculateAndSetNewTotalStudents())
+        dispatch(actions.handleSetNewTotalFilteredStudents())
     }
 
     const classes = useStyles()
