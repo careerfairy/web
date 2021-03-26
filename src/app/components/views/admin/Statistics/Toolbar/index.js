@@ -18,6 +18,7 @@ const Toolbar = ({queryDataSet, loading}) => {
     const currentFilterGroup = useSelector(state => state.currentFilterGroup)
     const handleCreateNewDataSet = () => dispatch(actions.createFilterGroup())
     const handleDeleteCurrentFilterGroup = () => dispatch(actions.deleteFilterGroup())
+    const handleSaveCurrentFilterGroup = () => dispatch(actions.saveCurrentFilterGroup())
     const totalCount = useSelector(state => state.currentFilterGroup.totalStudentsData.count)
     const filteredCount = useSelector(state => state.currentFilterGroup.filteredStudentsData.count)
     // const justFiltered = useSelector(state => state.currentFilterGroup.justFiltered)
@@ -47,6 +48,7 @@ const Toolbar = ({queryDataSet, loading}) => {
                 <DynamicColorButton
                     disabled={loading}
                     startIcon={<SaveIcon/>}
+                    onClick={handleSaveCurrentFilterGroup}
                     variant="contained"
                     color={colorsArray[0]}
                     size="large"

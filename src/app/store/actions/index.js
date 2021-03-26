@@ -33,5 +33,6 @@ export {
     setCurrentFilterGroupNotFiltered,
     clearCurrentFilterGroupFilteredData,
     handleSetNewTotalFilteredStudents,
-    handleCalculateAndSetNewTotalStudents
+    handleCalculateAndSetNewTotalStudents,
+    saveCurrentFilterGroup
 } from './filterActions.js'

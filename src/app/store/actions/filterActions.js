@@ -31,12 +31,49 @@ export const createFilterGroup = () => async (dispatch, getState, {getFirestore}
     dispatch({type: actions.LOADING_FILTER_GROUP_END})
 };
 
+// Save the current filter group
+export const saveCurrentFilterGroup = () => async (dispatch, getState, {getFirestore}) => {
+    try {
+        dispatch({type: actions.LOADING_FILTER_GROUP_START})
+        const firestore = getFirestore();
+        const state = getState()
+        const currentFilterGroup = state.currentFilterGroup
+        let targetId = currentFilterGroup.data.id
+        if (!targetId) {
+            const filterGroupDocRef = firestore
+                .collection('filterGroups')
+                .doc()
+
+            targetId = filterGroupDocRef.id
+        }
+        await firestore
+            .collection("filterGroups")
+            .doc(targetId)
+            .set(currentFilterGroup)
+
+        dispatch({
+            type: actions.SET_CURRENT_FILTER_GROUP,
+            payload: currentFilterGroup
+        });
+        dispatch(actionMethods.enqueueSnackbar({
+            message: "Query has successfully been saved",
+            options: {
+                variant: "success",
+                preventDefault: true,
+            }
+        }))
+    } catch (e) {
+        dispatch(actionMethods.sendGeneralError(e))
+    }
+    dispatch({type: actions.LOADING_FILTER_GROUP_END})
+};
+
 // Delete the currently active filter group
 export const deleteFilterGroup = (filterGroupId = "") => async (dispatch, getState, {getFirestore}) => {
     const isCurrentFilterGroup = !filterGroupId
     const state = getState()
     const targetId = isCurrentFilterGroup ? state.currentFilterGroup.data.id : filterGroupId
-        dispatch({type: actions.LOADING_FILTER_GROUP_START})
+    dispatch({type: actions.LOADING_FILTER_GROUP_START})
     try {
         const firestore = getFirestore();
         const filterGroupRef = firestore
