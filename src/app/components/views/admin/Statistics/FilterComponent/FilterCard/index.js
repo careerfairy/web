@@ -12,6 +12,7 @@ import GroupsUtil from "../../../../../../data/util/GroupsUtil";
 import AddOrRemoveCategoryButton from "./AddOrRemoveCategoryButton";
 import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import useDeleteFilter from "../../../../../custom-hook/useDeleteFilter";
+import {convertArrayOfObjectsToDictionaryByProp} from "../../../../../../data/util/AnalyticsUtil";
 
 const useStyles = makeStyles(theme => ({
     content: {
@@ -119,6 +120,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                     where: ["groupIds", "array-contains", groupId],
                     storeAs: `followers of ${groupId}`
                 })
+                dispatch(actions.addGroupFollowersToTotal(groupId))
             }
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
@@ -151,7 +153,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                             <Typography>
                                 {filteredGroupFollowerData?.count ?
                                     `${filteredGroupFollowerData.count} Followers Match These Categories` :
-                                    filteredGroupFollowerData.count === 0 ?
+                                    filteredGroupFollowerData?.count === 0 ?
                                         `NO MATCHES` : ""
                                 }
                             </Typography>

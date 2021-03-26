@@ -101,6 +101,18 @@ export const filterAndSetGroupFollowers = (groupId) => async (dispatch, getState
 
 }
 
+// Add group Followers to Total
+
+export const addGroupFollowersToTotal = (groupId) => async (dispatch, getState) => {
+    const state = getState()
+    const totalFollowers = state.currentFilterGroup.totalStudentsData.data
+    if (totalFollowers) {
+        const groupFollowers = state.firestore.data[`followers of ${groupId}`] || {}
+        const newTotalFollowers = Object.assign(totalFollowers, groupFollowers)
+        dispatch(setTotalFilterGroupUsers(newTotalFollowers))
+    }
+
+}
 // Set Total users
 export const setTotalFilterGroupUsers = (studentsMap = {}, isFiltered) => async (dispatch) => {
     const studentsArray = Object.keys(studentsMap).map(key => ({...studentsMap[key]}))
@@ -135,6 +147,7 @@ export const setFilters = (arrayOfGroupIds = []) => async (dispatch, getState) =
         dispatch(actionMethods.sendGeneralError(e))
     }
 };
+
 
 // Set the category options of a filter
 export const setFilterOptions = (arrayOfCategoryIds = [], groupId) => async (dispatch, getState) => {
