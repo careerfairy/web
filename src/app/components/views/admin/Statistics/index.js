@@ -1,101 +1,71 @@
-import React, {useEffect} from 'react';
-import {makeStyles} from "@material-ui/core/styles";
-import {Backdrop, CircularProgress, Container, Grid} from "@material-ui/core";
-import FilterComponent from "./FilterComponent";
-import {isLoaded, useFirestore} from "react-redux-firebase";
-import Toolbar from "./Toolbar";
-import {useDispatch, useSelector} from "react-redux";
-import {convertArrayOfObjectsToDictionaryByProp} from "../../../../data/util/AnalyticsUtil";
-import * as actions from '../../../../store/actions'
-import AdminUsersTable from "./AdminUsersTable";
+import React, {Fragment} from 'react';
+import {makeStyles, useTheme} from "@material-ui/core/styles";
+import SwipeableViews from "react-swipeable-views";
+import QueryEditView from "./QueryEditView";
+import {SwipeablePanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
+import UserTableView from "./UserTableView";
+import {AppBar, Tab, Tabs} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
-    root: {
-        backgroundColor: theme.palette.background.dark,
-        minHeight: "100%",
-        paddingBottom: theme.spacing(3),
-        paddingTop: theme.spacing(3),
-        width: "100%"
+    slide: {
+        overflow: "hidden !important",
     },
-    backdrop: {
-        zIndex: theme.zIndex.tooltip
-    }
+    indicator: {
+        height: theme.spacing(0.8),
+        padding: theme.spacing(0, 0.5)
+    },
+    tab: {
+        fontWeight: 600
+    },
 }));
 
 const StatisticsOverview = () => {
-    const dispatch = useDispatch()
     const classes = useStyles()
-    const firestore = useFirestore()
-    const filters = useSelector(state => state.currentFilterGroup.data.filters || [])
-    const currentFilterGroupLoading = useSelector(state => state.currentFilterGroup.loading)
-    const totalData = useSelector(state => Boolean(state.currentFilterGroup.totalStudentsData.data))
-    const data = useSelector(state => state.firestore.data)
+    const theme = useTheme()
+    const [value, setValue] = React.useState(1);
 
-    const groupsLoaded = useSelector(({firestore: {data: {careerCenterData}}}) => isLoaded(careerCenterData))
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
 
-    const loading = Boolean(currentFilterGroupLoading || !groupsLoaded)
+    const handleChangeIndex = (index) => {
+        setValue(index);
+    };
 
-    useEffect(() => {
-        (async function getAllGroups() {
-            await firestore.get({
-                collection: "careerCenterData"
-            })
-        })()
-    }, [])
-
-    useEffect(() => {
-        // Comment this out if you dont want to calculate total once groups are mounted
-        if (!totalData && filters.some(filter => filter.filteredGroupFollowerData.data)) {
-            (async () => {
-                await handleQueryCurrentFilterGroup()
-            })()
-        }
-    }, [totalData, filters])
-
-    const handleQueryCurrentFilterGroup = async () => {
-        try {
-            dispatch(actions.setCurrentFilterGroupLoading())
-            let groupIds = filters.map(({groupId}) => groupId) || []
-            let totalUsersMap = {}
-            for (const groupId of groupIds) {
-                let groupFollowersMap = data[`followers of ${groupId}`]
-                if (!groupFollowersMap) {
-                    const userSnaps = await firestore.get({
-                        collection: "userData",
-                        where: ["groupIds", "array-contains", groupId],
-                        storeAs: `followers of ${groupId}`
-                    })
-                    const arrayOfUserData = userSnaps.docs.map(doc => ({id: doc.id, ...doc.data()}))
-                    groupFollowersMap = convertArrayOfObjectsToDictionaryByProp(arrayOfUserData, "id")
-                }
-                totalUsersMap = Object.assign(totalUsersMap, (groupFollowersMap || {}))
-            }
-            dispatch(actions.setCurrentFilterGroupFiltered())
-            dispatch(actions.setTotalFilterGroupUsers(totalUsersMap))
-        } catch (e) {
-            dispatch(actions.sendGeneralError(e))
-        }
-
-        dispatch(actions.setCurrentFilterGroupLoaded())
-    }
 
     return (
-        <Container className={classes.root} maxWidth={false}>
-            <Grid component="form" container spacing={2}>
-                <Grid item xs={12}>
-                    <Toolbar loading={loading} queryDataSet={handleQueryCurrentFilterGroup}/>
-                </Grid>
-                <Grid item xs={12}>
-                    <FilterComponent/>
-                </Grid>
-                <Grid item xs={12}>
-                    {/*<AdminUsersTable/>*/}
-                </Grid>
-            </Grid>
-            <Backdrop className={classes.backdrop} open={loading}>
-                <CircularProgress color="inherit"/>
-            </Backdrop>
-        </Container>
+        <React.Fragment>
+            <AppBar className={classes.appBar} position="sticky" color="default">
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    indicatorColor="primary"
+                    TabIndicatorProps={{className: classes.indicator}}
+                    textColor="primary"
+                >
+                    <Tab className={classes.tab} label="Queries"/>
+                    <Tab className={classes.tab} label="Filtered"/>
+                    <Tab className={classes.tab} label="Total"/>
+                </Tabs>
+            </AppBar>
+            <SwipeableViews
+                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                index={value}
+                slideClassName={classes.slide}
+                disabled
+                onChangeIndex={handleChangeIndex}
+            >
+                <SwipeablePanel index={0} value={value}>
+                    <QueryEditView/>
+                </SwipeablePanel>
+                <SwipeablePanel index={1} value={value}>
+                    <UserTableView isFiltered/>
+                </SwipeablePanel>
+                <SwipeablePanel index={2} value={value}>
+                    <UserTableView/>
+                </SwipeablePanel>
+            </SwipeableViews>
+        </React.Fragment>
     );
 };
 
