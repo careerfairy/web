@@ -16,7 +16,6 @@ const useStyles = makeStyles(theme => ({
 const DrawerContent = () => {
     const dispatch = useDispatch()
     const filterGroups = useSelector(state => state.firestore.ordered.filterGroups || [])
-    console.log("-> filterGroups", filterGroups);
     useFirestoreConnect(() => [{
         collection: "filterGroups",
         storeAs: "filterGroups"
