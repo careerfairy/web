@@ -30,5 +30,7 @@ export {
     filterAndSetGroupFollowers,
     addGroupFollowersToTotal,
     setCurrentFilterGroupFiltered,
-    setCurrentFilterGroupNotFiltered
+    setCurrentFilterGroupNotFiltered,
+    clearCurrentFilterGroupFilteredData,
+    handleSetNewTotalFilteredStudents
 } from './filterActions.js'

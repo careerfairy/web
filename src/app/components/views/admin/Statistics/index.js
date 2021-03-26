@@ -1,8 +1,8 @@
 import React, {useEffect} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Container, Grid} from "@material-ui/core";
+import {Backdrop, CircularProgress, Container, Grid} from "@material-ui/core";
 import FilterComponent from "./FilterComponent";
-import {useFirestore} from "react-redux-firebase";
+import {isLoaded, useFirestore} from "react-redux-firebase";
 import Toolbar from "./Toolbar";
 import {useDispatch, useSelector} from "react-redux";
 import {convertArrayOfObjectsToDictionaryByProp} from "../../../../data/util/AnalyticsUtil";
@@ -16,6 +16,9 @@ const useStyles = makeStyles(theme => ({
         paddingBottom: theme.spacing(3),
         paddingTop: theme.spacing(3),
         width: "100%"
+    },
+    backdrop:{
+        zIndex: theme.zIndex.tooltip
     }
 }));
 
@@ -24,7 +27,12 @@ const StatisticsOverview = () => {
     const classes = useStyles()
     const firestore = useFirestore()
     const filters = useSelector(state => state.currentFilterGroup.data.filters || [])
+    const currentFilterGroupLoading = useSelector(state => state.currentFilterGroup.loading)
     const data = useSelector(state => state.firestore.data)
+
+    const groupsLoaded = useSelector(({firestore: {data: {careerCenterData}}}) => isLoaded(careerCenterData))
+
+    const loading = Boolean(currentFilterGroupLoading || !groupsLoaded)
 
     useEffect(() => {
         (async function getAllGroups() {
@@ -34,13 +42,10 @@ const StatisticsOverview = () => {
         })()
     }, [])
 
-    const handleQueryCurrentFilterGroup = async (unMountingGroupId) => {
+    const handleQueryCurrentFilterGroup = async () => {
         try {
             dispatch(actions.setCurrentFilterGroupLoading())
             let groupIds = filters.map(({groupId}) => groupId) || []
-            if (unMountingGroupId) {
-                groupIds = groupIds.filter(groupId => groupId !== unMountingGroupId)
-            }
             let totalUsersMap = {}
 
             for (const groupId of groupIds) {
@@ -67,17 +72,20 @@ const StatisticsOverview = () => {
 
     return (
         <Container className={classes.root} maxWidth={false}>
-            <Grid onSubmit={handleQueryCurrentFilterGroup} component="form" container spacing={2}>
+            <Grid component="form" container spacing={2}>
                 <Grid item xs={12}>
-                    <Toolbar queryDataSet={handleQueryCurrentFilterGroup}/>
+                    <Toolbar loading={loading} queryDataSet={handleQueryCurrentFilterGroup}/>
                 </Grid>
                 <Grid item xs={12}>
-                    <FilterComponent queryAllGroups={handleQueryCurrentFilterGroup}/>
+                    <FilterComponent/>
                 </Grid>
                 <Grid item xs={12}>
-                    <AdminUsersTable/>
+                    {/*<AdminUsersTable/>*/}
                 </Grid>
             </Grid>
+            <Backdrop className={classes.backdrop} open={loading}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </Container>
     );
 };

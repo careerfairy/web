@@ -70,6 +70,8 @@ const currentFilterGroupReducer = (state = initialState, {type, payload}) => {
             return {...state, data: {...state.data, filters: [...payload]}};
         case actions.LOADING_FILTER_GROUP_START:
             return {...state, loading: true};
+        case actions.CLEAR_CURRENT_FILTER_GROUP_FILTERED_DATA:
+            return {...state, filteredStudentsData: payload};
         case actions.SET_CURRENT_FILTER_GROUP_NOT_FILTERED:
             return {...state, justFiltered: false};
         case actions.SET_CURRENT_FILTER_GROUP_FILTERED:

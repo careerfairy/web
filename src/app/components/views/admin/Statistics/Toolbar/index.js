@@ -5,27 +5,21 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Card, CardActions, CardHeader, Typography} from "@material-ui/core";
 import {useDispatch, useSelector} from "react-redux";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
-import {isLoaded} from "react-redux-firebase";
 import {colorsArray} from "../../../../util/colors";
 
 const useStyles = makeStyles(theme => ({}));
 
-const Toolbar = ({queryDataSet}) => {
+const Toolbar = ({queryDataSet, loading}) => {
 
     const classes = useStyles()
     const dispatch = useDispatch()
     const currentFilterGroup = useSelector(state => state.currentFilterGroup)
     const handleCreateNewDataSet = () => dispatch(actions.createFilterGroup())
     const handleDeleteCurrentFilterGroup = () => dispatch(actions.deleteFilterGroup(currentFilterGroup.id))
-    const groupsLoaded = useSelector(({firestore: {data: {careerCenterData}}}) => isLoaded(careerCenterData))
     const totalCount = useSelector(state => state.currentFilterGroup.totalStudentsData.count)
     const filteredCount = useSelector(state => state.currentFilterGroup.filteredStudentsData.count)
     const justFiltered = useSelector(state => state.currentFilterGroup.justFiltered)
-    console.log("-> justFiltered", justFiltered);
-
     const currentFilterGroupLabel = useSelector(state => state.currentFilterGroup.data.label || "")
-
-    const loading = Boolean(currentFilterGroup.loading || !groupsLoaded)
 
     return (
         <Card>
@@ -84,9 +78,11 @@ const Toolbar = ({queryDataSet}) => {
         </Card>
     );
 };
+
 Toolbar.propTypes = {
-        queryDataSet: PropTypes.func.isRequired
-    }
+    queryDataSet: PropTypes.func.isRequired,
+    loading: PropTypes.bool.isRequired,
+}
 
 export default Toolbar;
 

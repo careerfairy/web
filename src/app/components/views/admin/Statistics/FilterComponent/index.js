@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const FilterComponent = ({queryAllGroups}) => {
+const FilterComponent = () => {
     const dispatch = useDispatch()
     const classes = useStyles()
     const filters = useSelector(state => state.currentFilterGroup.data.filters || [])
@@ -30,7 +30,7 @@ const FilterComponent = ({queryAllGroups}) => {
         <Grid alignContent="center" alignItems="center" container spacing={2} className={classes.root}>
             {filters.map(filter => (
                 <Grid className={classes.item} xs={12} md={6} lg={4}  key={filter.groupId} item>
-                    <FilterCard queryAllGroups={queryAllGroups} groupsLoaded={groupsLoaded} handleRemoveGroupFromFilters={handleRemoveGroupFromFilters} key={filter.groupId} filter={filter}/>
+                    <FilterCard  groupsLoaded={groupsLoaded} handleRemoveGroupFromFilters={handleRemoveGroupFromFilters} key={filter.groupId} filter={filter}/>
                 </Grid>
             ))}
             <Grid item>
@@ -41,7 +41,6 @@ const FilterComponent = ({queryAllGroups}) => {
 };
 
 FilterComponent.propTypes = {
-  queryAllGroups: PropTypes.func.isRequired
 }
 export default FilterComponent;
 

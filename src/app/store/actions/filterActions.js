@@ -61,7 +61,21 @@ export const setCurrentFilterGroupFiltered = () => async (dispatch) => {
 export const setCurrentFilterGroupNotFiltered = () => async (dispatch) => {
     dispatch({type: actions.SET_CURRENT_FILTER_GROUP_NOT_FILTERED})
 }
+export const clearCurrentFilterGroupFilteredData = () => async (dispatch) => {
+    dispatch({
+        type: actions.CLEAR_CURRENT_FILTER_GROUP_FILTERED_DATA,
+        payload: initialTotalData
+    })
+}
 
+export const handleSetNewTotalFilteredStudents = () => async (dispatch, getState) => {
+    const state = getState()
+    const groupFilters = state.currentFilterGroup.data.filters || []
+    const newTotalFilteredStudentsMap = groupFilters.reduce((acc, curr) => {
+        return curr.filteredGroupFollowerData?.data ? Object.assign(acc, curr.filteredGroupFollowerData?.data) : acc
+    }, {})
+    dispatch(setTotalFilterGroupUsers(newTotalFilteredStudentsMap, true))
+}
 // Filter Group followers by Categories
 export const filterAndSetGroupFollowers = (groupId) => async (dispatch, getState) => {
     const state = getState()
@@ -69,13 +83,7 @@ export const filterAndSetGroupFollowers = (groupId) => async (dispatch, getState
     const groupCategories = state.firestore.data.careerCenterData?.[groupId]?.categories
     const groupFollowers = state.firestore.ordered[`followers of ${groupId}`]
 
-    const handleSetNewTotalFilteredStudents = () => {
-        const groupFilters = state.currentFilterGroup.data.filters || []
-        const newTotalFilteredStudentsMap = groupFilters.reduce((acc, curr) => {
-            return curr.filteredGroupFollowerData?.data ? Object.assign(acc, curr.filteredGroupFollowerData?.data) : acc
-        }, {})
-        dispatch(setTotalFilterGroupUsers(newTotalFilteredStudentsMap, true))
-    }
+
     if (filterOptions && groupCategories?.length && groupFollowers?.length) {
         const noCategorySelected = filterOptions?.length === 0
         let filteredFollowers;
@@ -98,6 +106,7 @@ export const filterAndSetGroupFollowers = (groupId) => async (dispatch, getState
             }
             return filterOption
         })
+        dispatch(handleSetNewTotalFilteredStudents())
         handleSetNewTotalFilteredStudents()
         dispatch({
             type: actions.SET_FILTERS,
@@ -153,7 +162,6 @@ export const setFilters = (arrayOfGroupIds = []) => async (dispatch, getState) =
         dispatch(actionMethods.sendGeneralError(e))
     }
 };
-
 
 
 // Set the category options of a filter
@@ -230,4 +238,9 @@ const checkIfUserMatches = (user, filterCategories = [], targetGroupId) => {
         })
     }
     return false
+}
+const initialTotalData = {
+    ordered: undefined,
+    data: undefined,
+    count: undefined
 }

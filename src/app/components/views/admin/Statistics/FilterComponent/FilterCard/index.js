@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded, queryAllGroups}) => {
+const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const {handlers, message, open} = useDeleteFilter()
     const dispatch = useDispatch()
     const {filterOptions, groupId, filteredGroupFollowerData} = filter
@@ -35,11 +35,11 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded, queryAl
     const firestore = useFirestore()
     const [filterOptionsWithData, setFilterOptionsWithData] = React.useState([]);
     const loading = useSelector(state => state.currentFilterGroup.loading)
+    const filteredData = useSelector(state => Boolean(state.currentFilterGroup.filteredStudentsData.data))
 
-    // Works but slows down page ...
-    // useEffect(() => {
-    //     return () => queryAllGroups(groupId)
-    // }, [])
+    useEffect(() => {
+        return () => dispatch(actions.handleSetNewTotalFilteredStudents())
+    }, [])
 
     useEffect(() => {
         dispatch(actions.setCurrentFilterGroupNotFiltered())
@@ -50,7 +50,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded, queryAl
         if (totalFollowers?.length && group) {
             handleFilterFollowers()
         }
-    }, [filterOptions, totalFollowers, group])
+    }, [filterOptions, totalFollowers, group, filteredData])
 
     useEffect(() => {
         if (group?.categories) {
@@ -236,7 +236,6 @@ FilterCard.propTypes = {
     }).isRequired,
     groupsLoaded: PropTypes.bool.isRequired,
     handleRemoveGroupFromFilters: PropTypes.func.isRequired,
-    queryAllGroups: PropTypes.func.isRequired,
 }
 export default FilterCard;
 
