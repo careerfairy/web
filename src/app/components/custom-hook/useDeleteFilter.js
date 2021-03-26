@@ -26,7 +26,7 @@ const useDeleteFilter = () => {
     const handlers = React.useMemo(() => ({
         handleClickDelete: (groupId) => {
             const hasActiveFilters = currentFilterGroup.data.filters.some(filterObject => {
-                return Boolean(filterObject.groupId === groupId && filterObject.filterOptions.length)
+                return Boolean(filterObject.groupId === groupId && filterObject?.filterOptions.some(option => option?.targetOptionIds?.length))
             })
             return hasActiveFilters ? handleOpenAreYouSureModal(groupId) : handleDelete(groupId)
         },
