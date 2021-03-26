@@ -18,6 +18,11 @@ const columns = [
         title: "University",
     },
     {
+        field: "unsubscribed",
+        title: "Has Unsubscribed From Newsletter",
+        type: "boolean"
+    },
+    {
         field: "universityCountry",
         title: "University Country",
     },

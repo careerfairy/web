@@ -14,9 +14,15 @@ const initialState = {
                     },
                     {
                         categoryId: "f4c3e50d-b7bc-4197-9cf0-b2ae45b40586",
-                        targetOptionIds: ["eb4d76db-fd99-4ca7-b7a1-a3a87e30ee2e" ]
+                        targetOptionIds: ["eb4d76db-fd99-4ca7-b7a1-a3a87e30ee2e"]
                     }
                 ],
+                filteredGroupFollowerData: {
+                    ordered: undefined,
+                    data: undefined,
+                    count: undefined
+                },
+
             },
             {
                 groupId: "JBjEIACEOW00NvTVozJL",
@@ -30,10 +36,25 @@ const initialState = {
                         targetOptionIds: ["9fc3daa1-13b0-4ea2-abbe-6945a5d44e80", "8fdb0df8-9152-432a-aef5-1d2986afc491"]
                     }
                 ],
+                filteredGroupFollowerData: {
+                    ordered: undefined,
+                    data: undefined,
+                    count: undefined
+                },
+
             },
         ],
     },
-    filteredStudents: [],
+    totalStudentsData: {
+        ordered: undefined,
+        data: undefined,
+        count: undefined
+    },
+    filteredStudentsData: {
+        ordered: undefined,
+        data: undefined,
+        count: undefined
+    },
     saved: false,
     loading: false,
 };
@@ -50,6 +71,10 @@ const currentFilterGroupReducer = (state = initialState, {type, payload}) => {
             return {...state, loading: true};
         case actions.LOADING_FILTER_GROUP_END:
             return {...state, loading: false};
+        case actions.SET_TOTAL_FILTER_GROUP_USERS:
+            return {...state, totalStudentsData: payload};
+        case actions.SET_FILTERED_FILTER_GROUP_USERS:
+            return {...state, filteredStudentsData: payload};
         default:
             return state;
     }

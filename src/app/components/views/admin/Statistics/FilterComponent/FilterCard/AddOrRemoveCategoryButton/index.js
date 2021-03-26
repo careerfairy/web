@@ -1,15 +1,11 @@
 import PropTypes from 'prop-types'
 import React from 'react';
-import {makeStyles} from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/AddSharp";
 import {Button} from "@material-ui/core";
 import CategoryAddModal from "./CategoryAddModal";
 
-const useStyles = makeStyles(theme => ({}));
-
 const AddOrRemoveCategoryButton = (props) => {
     const [open, setOpen] = React.useState(false);
-    const classes = useStyles()
     const handleClose = () => setOpen(false)
     const handleOpen = () => setOpen(true)
 

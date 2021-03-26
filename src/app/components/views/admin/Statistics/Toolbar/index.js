@@ -2,10 +2,11 @@ import PropTypes from 'prop-types'
 import React from 'react';
 import * as actions from '../../../../../store/actions'
 import {makeStyles} from "@material-ui/core/styles";
-import {Card, CardActions, CardHeader} from "@material-ui/core";
+import {Card, CardActions, CardHeader, Typography} from "@material-ui/core";
 import {useDispatch, useSelector} from "react-redux";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import {isLoaded} from "react-redux-firebase";
+import {colorsArray} from "../../../../util/colors";
 
 const useStyles = makeStyles(theme => ({}));
 
@@ -17,7 +18,8 @@ const Toolbar = () => {
     const handleCreateNewDataSet = () => dispatch(actions.createFilterGroup())
     const handleDeleteCurrentFilterGroup = () => dispatch(actions.deleteFilterGroup(currentFilterGroup.id))
     const groupsLoaded = useSelector(({firestore: {data: {careerCenterData}}}) => isLoaded(careerCenterData))
-
+    const totalCount = useSelector(state => state.currentFilterGroup.totalStudentsData.count)
+    const filteredCount = useSelector(state => state.currentFilterGroup.filteredStudentsData.count)
 
     const currentFilterGroupLabel = useSelector(state => state.currentFilterGroup.data.label || "")
 
@@ -26,7 +28,17 @@ const Toolbar = () => {
     return (
         <Card>
             <CardHeader
-                title="Create and manage statistics"
+                title={totalCount ?
+                    <React.Fragment>
+                        <Typography variant="h4">
+                            Total users: {totalCount}
+                        </Typography>
+                        {filteredCount &&
+                        <Typography color="textSecondary" variant="h5">
+                            Filtered Users {filteredCount}
+                        </Typography>}
+                    </React.Fragment>
+                    : "Make a query"}
                 subheader={currentFilterGroupLabel}
             />
             <CardActions>
@@ -34,7 +46,7 @@ const Toolbar = () => {
                     variant="contained"
                     loading={loading}
                     size="large"
-                    color="primary"
+                    color={colorsArray[0]}
                     onClick={handleCreateNewDataSet}
                 >
                     Create a new Dataset
@@ -44,7 +56,7 @@ const Toolbar = () => {
                     loading={loading}
                     variant="contained"
                     size="large"
-                    color="secondary"
+                    color={colorsArray[1]}
                     onClick={handleDeleteCurrentFilterGroup}
                 >
                     Delete Current Dataset
@@ -53,18 +65,27 @@ const Toolbar = () => {
                     type="submit"
                     loading={loading}
                     variant="contained"
+                    color={colorsArray[2]}
                     size="large"
-                    color="#44a6c6"
                 >
                     Query Current Dataset
+                </DynamicColorButton>
+                <DynamicColorButton
+                    loading={loading}
+                    variant="contained"
+                    color={colorsArray[3]}
+                    size="large"
+                >
+                    Save Current Dataset
                 </DynamicColorButton>
             </CardActions>
         </Card>
     );
 };
-Toolbar.propTypes = {
-    handleQueryCurrentFilterGroup: PropTypes.func.isRequired
-}
+Toolbar.propTypes =
+    {
+        handleQueryCurrentFilterGroup: PropTypes.func.isRequired
+    }
 
 export default Toolbar;
 

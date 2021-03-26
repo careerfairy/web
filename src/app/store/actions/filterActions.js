@@ -1,16 +1,7 @@
 import * as actions from './actionTypes';
 import * as actionMethods from './index'
-import {getFirebase, isLoaded} from "react-redux-firebase";
+import {convertArrayOfObjectsToDictionaryByProp} from "../../data/util/AnalyticsUtil";
 
-const buildFilterGroup = (id) => {
-    return {
-        id,
-        label: "",
-        filters: [],
-        filteredStudents: [],
-        saved: false
-    }
-}
 
 // Create a new filter group and store it in redux as current filter group
 export const createFilterGroup = () => async (dispatch, getState, {getFirestore}) => {
@@ -58,27 +49,69 @@ export const deleteFilterGroup = (filterGroupId = "") => async (dispatch, getSta
     dispatch({type: actions.LOADING_FILTER_GROUP_END})
 };
 
-
-// Query the currently active filter group
-export const queryCurrentFilterGroup = () => async (dispatch, getState, {getFirestore}) => {
-    dispatch({type: actions.LOADING_FILTER_GROUP_START})
-    try {
-        const state = getState()
-        const firestore = getFirestore();
-        const oldFilterOptions = state.currentFilterGroup.data?.filters || []
-
-
-    } catch (e) {
-        dispatch(actionMethods.sendGeneralError(e))
-    }
-    dispatch({type: actions.LOADING_FILTER_GROUP_END})
-};
-
-export const setCurrentFilterGroupLoading = () => async (dispatch) =>  {
+export const setCurrentFilterGroupLoading = () => async (dispatch) => {
     dispatch({type: actions.LOADING_FILTER_GROUP_START})
 }
-export const setCurrentFilterGroupLoaded = () => async (dispatch) =>  {
+export const setCurrentFilterGroupLoaded = () => async (dispatch) => {
     dispatch({type: actions.LOADING_FILTER_GROUP_END})
+}
+
+// Filter Group followers by Categories
+export const filterAndSetGroupFollowers = (groupId) => async (dispatch, getState) => {
+    const state = getState()
+    const {filterOptions} = state.currentFilterGroup.data.filters.find(filter => filter.groupId === groupId) || {}
+    const groupCategories = state.firestore.data.careerCenterData?.[groupId]?.categories
+    const groupFollowers = state.firestore.ordered[`followers of ${groupId}`]
+
+    const handleSetNewTotalFilteredStudents = () => {
+        const groupFilters = state.currentFilterGroup.data.filters || []
+        const newTotalFilteredStudentsMap = groupFilters.reduce((acc, curr) => {
+            return curr.filteredGroupFollowerData?.data ? Object.assign(acc, curr.filteredGroupFollowerData?.data) : acc
+        }, {})
+        dispatch(setTotalFilterGroupUsers(newTotalFilteredStudentsMap, true))
+    }
+    if (filterOptions && groupCategories?.length && groupFollowers?.length) {
+        const noCategorySelected = filterOptions?.length === 0
+        let filteredFollowers;
+        let filteredFollowerMap;
+        if (noCategorySelected) {
+            filteredFollowers = groupFollowers
+            filteredFollowerMap = state.firestore.data[`followers of ${groupId}`]
+        } else {
+            filteredFollowers = groupFollowers.filter(user => checkIfUserMatches(user, filterOptions, groupId))
+            filteredFollowerMap = convertArrayOfObjectsToDictionaryByProp(filteredFollowers, "id")
+        }
+        const oldFilterOptions = state.currentFilterGroup.data?.filters || []
+        const newFilterOptions = oldFilterOptions.map(filterOption => {
+            if (filterOption.groupId === groupId) {
+                filterOption.filteredGroupFollowerData = {
+                    ordered: filteredFollowers,
+                    data: filteredFollowerMap,
+                    count: filteredFollowers.length
+                }
+            }
+            return filterOption
+        })
+        handleSetNewTotalFilteredStudents()
+        dispatch({
+            type: actions.SET_FILTERS,
+            payload: newFilterOptions
+        })
+    }
+
+}
+
+// Set Total users
+export const setTotalFilterGroupUsers = (studentsMap = {}, isFiltered) => async (dispatch) => {
+    const studentsArray = Object.keys(studentsMap).map(key => ({...studentsMap[key]}))
+    dispatch({
+        type: isFiltered ? actions.SET_FILTERED_FILTER_GROUP_USERS : actions.SET_TOTAL_FILTER_GROUP_USERS,
+        payload: {
+            ordered: studentsArray,
+            data: studentsMap,
+            count: studentsArray.length
+        }
+    })
 }
 
 // Set the filterGroups of a query
@@ -93,6 +126,7 @@ export const setFilters = (arrayOfGroupIds = []) => async (dispatch, getState) =
                 filterOptions: []
             }
         })
+
         dispatch({
             type: actions.SET_FILTERS,
             payload: newFilterOptions
@@ -113,7 +147,7 @@ export const setFilterOptions = (arrayOfCategoryIds = [], groupId) => async (dis
                     const currentCategory = oldCategories.find(category => category.categoryId === categoryId)
                     return currentCategory || {
                         categoryId,
-                        targetOptions: []
+                        targetOptionIds: []
                     }
                 })
             }
@@ -151,3 +185,29 @@ export const setFilterOptionTargetOptions = (arrayOfOptionIds = [], categoryId, 
         dispatch(actionMethods.sendGeneralError(e))
     }
 };
+
+const buildFilterGroup = (id) => {
+    return {
+        data: {
+            id,
+            label: "",
+            filters: [],
+            filteredStudents: [],
+        },
+        saved: true
+    }
+}
+
+const checkIfUserMatches = (user, filterCategories = [], targetGroupId) => {
+    const {categories: userCategories} = user.registeredGroups.find(({groupId}) => groupId === targetGroupId) || {}
+    if (userCategories) {
+        return filterCategories.every(filterCategory => {
+            const noOptionsSelected = filterCategory.targetOptionIds?.length === 0
+            return noOptionsSelected || userCategories.some(({id, selectedValueId}) =>
+                id === filterCategory.categoryId
+                && filterCategory.targetOptionIds?.includes(selectedValueId
+                ));
+        })
+    }
+    return false
+}

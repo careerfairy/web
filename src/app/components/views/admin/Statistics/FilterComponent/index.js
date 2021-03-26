@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const FilterComponent = ({}) => {
+const FilterComponent = () => {
     const dispatch = useDispatch()
     const classes = useStyles()
     const filters = useSelector(state => state.currentFilterGroup.data.filters || [])

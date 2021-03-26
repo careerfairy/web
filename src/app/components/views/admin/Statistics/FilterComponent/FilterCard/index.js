@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, {useCallback, useEffect} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Button, Card, CardActions, CardContent, CardHeader, IconButton} from "@material-ui/core";
+import {Button, Card, CardActions, CardContent, CardHeader, IconButton, Typography} from "@material-ui/core";
 import * as actions from '../../../../../../store/actions'
 import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import CategorySelect from "./CategorySelect";
@@ -25,12 +25,21 @@ const useStyles = makeStyles(theme => ({
 const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const {handlers, message, open} = useDeleteFilter()
     const dispatch = useDispatch()
-    const {filterOptions, groupId} = filter
+    const {filterOptions, groupId, filteredGroupFollowerData} = filter
+    if (groupId === "JBjEIACEOW00NvTVozJL") {
+        // console.log(`-> filterOptions in FilterCard for ${groupId}`, filterOptions);
+    }
     const group = useSelector(state => state.firestore.data.careerCenterData?.[groupId])
-    const followerCount = useSelector(state => state.firestore.ordered?.[`followers of ${groupId}`]?.length, shallowEqual)
+    const totalFollowers = useSelector(state => state.firestore.ordered?.[`followers of ${groupId}`], shallowEqual)
     const firestore = useFirestore()
     const [filterOptionsWithData, setFilterOptionsWithData] = React.useState([]);
     const loading = useSelector(state => state.currentFilterGroup.loading)
+
+    useEffect(() => {
+        if (totalFollowers?.length && group) {
+            handleFilterFollowers()
+        }
+    }, [filterOptions, totalFollowers, group])
 
     useEffect(() => {
         if (group?.categories) {
@@ -104,7 +113,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const handleGetFollowers = async (groupId) => {
         dispatch(actions.setCurrentFilterGroupLoading())
         try {
-            if (!isLoaded(followerCount)) {
+            if (!isLoaded(totalFollowers)) {
                 await firestore.get({
                     collection: "userData",
                     where: ["groupIds", "array-contains", groupId],
@@ -115,6 +124,10 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
             dispatch(actions.sendGeneralError(e))
         }
         dispatch(actions.setCurrentFilterGroupLoaded())
+    }
+
+    const handleFilterFollowers = () => {
+        dispatch(actions.filterAndSetGroupFollowers(groupId))
     }
 
     const classes = useStyles()
@@ -129,7 +142,23 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                         `${group.universityName}`
                     )
                 }
-                subheader={followerCount ? `${followerCount} Total Followers` : null}
+                subheader={
+                    totalFollowers ?
+                        <React.Fragment>
+                            <Typography>
+                                {totalFollowers.length} Total Followers
+                            </Typography>
+                            <Typography>
+                                {filteredGroupFollowerData?.count ?
+                                    `${filteredGroupFollowerData.count} Followers Match These Categories` :
+                                    filteredGroupFollowerData.count === 0 ?
+                                        `NO MATCHES` : ""
+                                }
+                            </Typography>
+                        </React.Fragment>
+                        :
+                        null
+                }
                 action={
                     <React.Fragment>
                         <IconButton onClick={() => handlers.handleClickDelete(groupId)}>
@@ -174,7 +203,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                     onClick={() => handleGetFollowers(groupId)}
                     variant="contained"
                     color="secondary"
-                    disabled={(isLoaded(followerCount) || loading)}>
+                    disabled={(isLoaded(totalFollowers) || loading)}>
                     Get followers
                 </Button>
             </CardActions>

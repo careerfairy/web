@@ -7,6 +7,7 @@ import Toolbar from "./Toolbar";
 import {useDispatch, useSelector} from "react-redux";
 import {convertArrayOfObjectsToDictionaryByProp} from "../../../../data/util/AnalyticsUtil";
 import * as actions from '../../../../store/actions'
+import AdminUsersTable from "./AdminUsersTable";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -18,14 +19,13 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const StatisticsOverview = (props) => {
+const StatisticsOverview = () => {
     const dispatch = useDispatch()
     const classes = useStyles()
     const firestore = useFirestore()
-    const currentFilterGroup = useSelector(state => state.currentFilterGroup)
-    const ordered = useSelector(state => state.firestore.ordered)
+    const filters = useSelector(state => state.currentFilterGroup.data.filters || [])
     const data = useSelector(state => state.firestore.data)
-    console.log("-> data", data);
+
     useEffect(() => {
         (async function getAllGroups() {
             await firestore.get({
@@ -38,7 +38,7 @@ const StatisticsOverview = (props) => {
         e.preventDefault?.()
         try {
             dispatch(actions.setCurrentFilterGroupLoading())
-            const groupIds = currentFilterGroup.data.filters.map(({groupId}) => groupId) || []
+            const groupIds = filters.map(({groupId}) => groupId) || []
             let totalUsersMap = {}
 
             for (const groupId of groupIds) {
@@ -54,15 +54,14 @@ const StatisticsOverview = (props) => {
                 }
                 totalUsersMap = Object.assign(totalUsersMap, (groupFollowersMap || {}))
             }
-            console.log("-> totalUsersMap", totalUsersMap);
-            console.log("-> length", Object.keys(totalUsersMap).length);
-            alert("hi")
+            dispatch(actions.setTotalFilterGroupUsers(totalUsersMap))
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
         }
 
         dispatch(actions.setCurrentFilterGroupLoaded())
     }
+
     return (
         <Container className={classes.root} maxWidth={false}>
             <Grid onSubmit={handleQueryCurrentFilterGroup} component="form" container spacing={2}>
@@ -71,6 +70,9 @@ const StatisticsOverview = (props) => {
                 </Grid>
                 <Grid item xs={12}>
                     <FilterComponent/>
+                </Grid>
+                <Grid item xs={12}>
+                    <AdminUsersTable/>
                 </Grid>
             </Grid>
         </Container>
