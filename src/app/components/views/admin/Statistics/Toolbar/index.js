@@ -26,13 +26,13 @@ const Toolbar = ({queryDataSet, loading}) => {
             <CardHeader
                 title={totalCount ?
                     <React.Fragment>
-                        <Typography variant="h4">
-                            Total users: {totalCount}
-                        </Typography>
                         {filteredCount &&
-                        <Typography color="textSecondary" variant="h5">
+                        <Typography variant="h4">
                             Filtered Users {filteredCount}
                         </Typography>}
+                        <Typography color="textSecondary" variant="h5">
+                            Total users: {totalCount}
+                        </Typography>
                     </React.Fragment>
                     : "Make a query"}
                 subheader={currentFilterGroupLabel}

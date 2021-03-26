@@ -160,15 +160,15 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                 subheader={
                     totalFollowers ?
                         <React.Fragment>
-                            <Typography>
-                                {totalFollowers.length} Total Followers
-                            </Typography>
-                            <Typography>
+                            <Typography variant="h6" color="textPrimary">
                                 {filteredGroupFollowerData?.count ?
                                     `${filteredGroupFollowerData.count} Followers Match These Categories` :
                                     filteredGroupFollowerData?.count === 0 ?
                                         `NO MATCHES` : ""
                                 }
+                            </Typography>
+                            <Typography>
+                                {totalFollowers.length} Total Followers
                             </Typography>
                         </React.Fragment>
                         :
