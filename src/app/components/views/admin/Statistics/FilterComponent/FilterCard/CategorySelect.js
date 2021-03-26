@@ -59,7 +59,6 @@ const CategorySelect = ({option, groupId, handleRemoveFilterOption}) => {
                         {...params}
                         variant="outlined"
                         label={name}
-                        required={(!targetOptionIds || targetOptionIds?.length === 0)}
                         fullWidth={false}
                         placeholder="Choose options"
                     />

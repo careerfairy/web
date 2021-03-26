@@ -55,6 +55,12 @@ export const setCurrentFilterGroupLoading = () => async (dispatch) => {
 export const setCurrentFilterGroupLoaded = () => async (dispatch) => {
     dispatch({type: actions.LOADING_FILTER_GROUP_END})
 }
+export const setCurrentFilterGroupFiltered = () => async (dispatch) => {
+    dispatch({type: actions.SET_CURRENT_FILTER_GROUP_FILTERED})
+}
+export const setCurrentFilterGroupNotFiltered = () => async (dispatch) => {
+    dispatch({type: actions.SET_CURRENT_FILTER_GROUP_NOT_FILTERED})
+}
 
 // Filter Group followers by Categories
 export const filterAndSetGroupFollowers = (groupId) => async (dispatch, getState) => {
@@ -147,6 +153,7 @@ export const setFilters = (arrayOfGroupIds = []) => async (dispatch, getState) =
         dispatch(actionMethods.sendGeneralError(e))
     }
 };
+
 
 
 // Set the category options of a filter

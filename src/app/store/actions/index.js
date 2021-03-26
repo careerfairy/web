@@ -28,5 +28,7 @@ export {
     setCurrentFilterGroupLoading,
     setTotalFilterGroupUsers,
     filterAndSetGroupFollowers,
-    addGroupFollowersToTotal
+    addGroupFollowersToTotal,
+    setCurrentFilterGroupFiltered,
+    setCurrentFilterGroupNotFiltered
 } from './filterActions.js'

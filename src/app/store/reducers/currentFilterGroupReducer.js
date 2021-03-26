@@ -57,6 +57,7 @@ const initialState = {
     },
     saved: false,
     loading: false,
+    justFiltered: false
 };
 
 const currentFilterGroupReducer = (state = initialState, {type, payload}) => {
@@ -69,6 +70,10 @@ const currentFilterGroupReducer = (state = initialState, {type, payload}) => {
             return {...state, data: {...state.data, filters: [...payload]}};
         case actions.LOADING_FILTER_GROUP_START:
             return {...state, loading: true};
+        case actions.SET_CURRENT_FILTER_GROUP_NOT_FILTERED:
+            return {...state, justFiltered: false};
+        case actions.SET_CURRENT_FILTER_GROUP_FILTERED:
+            return {...state, justFiltered: true};
         case actions.LOADING_FILTER_GROUP_END:
             return {...state, loading: false};
         case actions.SET_TOTAL_FILTER_GROUP_USERS:

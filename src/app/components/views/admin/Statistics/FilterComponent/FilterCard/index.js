@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
+const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded, queryAllGroups}) => {
     const {handlers, message, open} = useDeleteFilter()
     const dispatch = useDispatch()
     const {filterOptions, groupId, filteredGroupFollowerData} = filter
@@ -35,6 +35,16 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const firestore = useFirestore()
     const [filterOptionsWithData, setFilterOptionsWithData] = React.useState([]);
     const loading = useSelector(state => state.currentFilterGroup.loading)
+
+    // Works but slows down page ...
+    // useEffect(() => {
+    //     return () => queryAllGroups(groupId)
+    // }, [])
+
+    useEffect(() => {
+        dispatch(actions.setCurrentFilterGroupNotFiltered())
+        return () => dispatch(actions.setCurrentFilterGroupNotFiltered())
+    }, [])
 
     useEffect(() => {
         if (totalFollowers?.length && group) {
@@ -175,6 +185,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                     </React.Fragment>
                 }
             />
+            {!!filterOptionsWithData.length &&
             <CardContent className={classes.content}>
                 {!isLoaded(group) ? (
                     <React.Fragment>
@@ -193,10 +204,11 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                         }
                     </React.Fragment>
                 )}
-            </CardContent>
+            </CardContent>}
             <CardActions>
                 {group?.categories &&
                 <AddOrRemoveCategoryButton
+                    disabled={loading}
                     groupCategories={group.categories}
                     filterOptions={filterOptions}
                     groupId={groupId}
@@ -205,7 +217,8 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                     onClick={() => handleGetFollowers(groupId)}
                     variant="contained"
                     color="secondary"
-                    disabled={(isLoaded(totalFollowers) || loading)}>
+                    disabled={(isLoaded(totalFollowers) || loading)}
+                >
                     Get followers
                 </Button>
             </CardActions>
@@ -222,7 +235,8 @@ FilterCard.propTypes = {
         }))
     }).isRequired,
     groupsLoaded: PropTypes.bool.isRequired,
-    handleRemoveGroupFromFilters: PropTypes.func.isRequired
+    handleRemoveGroupFromFilters: PropTypes.func.isRequired,
+    queryAllGroups: PropTypes.func.isRequired,
 }
 export default FilterCard;
 

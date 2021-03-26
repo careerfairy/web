@@ -10,7 +10,7 @@ import {colorsArray} from "../../../../util/colors";
 
 const useStyles = makeStyles(theme => ({}));
 
-const Toolbar = () => {
+const Toolbar = ({queryDataSet}) => {
 
     const classes = useStyles()
     const dispatch = useDispatch()
@@ -20,6 +20,8 @@ const Toolbar = () => {
     const groupsLoaded = useSelector(({firestore: {data: {careerCenterData}}}) => isLoaded(careerCenterData))
     const totalCount = useSelector(state => state.currentFilterGroup.totalStudentsData.count)
     const filteredCount = useSelector(state => state.currentFilterGroup.filteredStudentsData.count)
+    const justFiltered = useSelector(state => state.currentFilterGroup.justFiltered)
+    console.log("-> justFiltered", justFiltered);
 
     const currentFilterGroupLabel = useSelector(state => state.currentFilterGroup.data.label || "")
 
@@ -44,7 +46,7 @@ const Toolbar = () => {
             <CardActions>
                 <DynamicColorButton
                     variant="contained"
-                    loading={loading}
+                    disabled={loading}
                     size="large"
                     color={colorsArray[0]}
                     onClick={handleCreateNewDataSet}
@@ -53,7 +55,7 @@ const Toolbar = () => {
                 </DynamicColorButton>
                 {currentFilterGroup.data &&
                 <DynamicColorButton
-                    loading={loading}
+                    disabled={loading}
                     variant="contained"
                     size="large"
                     color={colorsArray[1]}
@@ -62,8 +64,8 @@ const Toolbar = () => {
                     Delete Current Dataset
                 </DynamicColorButton>}
                 <DynamicColorButton
-                    type="submit"
-                    loading={loading}
+                    onClick={queryDataSet}
+                    disabled={loading || justFiltered}
                     variant="contained"
                     color={colorsArray[2]}
                     size="large"
@@ -71,7 +73,7 @@ const Toolbar = () => {
                     Query Current Dataset
                 </DynamicColorButton>
                 <DynamicColorButton
-                    loading={loading}
+                    disabled={loading}
                     variant="contained"
                     color={colorsArray[3]}
                     size="large"
@@ -82,9 +84,8 @@ const Toolbar = () => {
         </Card>
     );
 };
-Toolbar.propTypes =
-    {
-        handleQueryCurrentFilterGroup: PropTypes.func.isRequired
+Toolbar.propTypes = {
+        queryDataSet: PropTypes.func.isRequired
     }
 
 export default Toolbar;

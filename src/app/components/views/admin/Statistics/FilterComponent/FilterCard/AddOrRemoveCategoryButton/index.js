@@ -4,7 +4,7 @@ import AddIcon from "@material-ui/icons/AddSharp";
 import {Button} from "@material-ui/core";
 import CategoryAddModal from "./CategoryAddModal";
 
-const AddOrRemoveCategoryButton = (props) => {
+const AddOrRemoveCategoryButton = ({disabled, ...props}) => {
     const [open, setOpen] = React.useState(false);
     const handleClose = () => setOpen(false)
     const handleOpen = () => setOpen(true)
@@ -14,6 +14,7 @@ const AddOrRemoveCategoryButton = (props) => {
             <Button
                 onClick={handleOpen}
                 variant="contained"
+                disabled={disabled}
                 color="primary"
                 startIcon={<AddIcon/>}
             >
@@ -32,6 +33,7 @@ AddOrRemoveCategoryButton.propTypes = {
         categoryId: PropTypes.string,
         targetOptionIds: PropTypes.arrayOf(PropTypes.string),
     })).isRequired,
+    disabled: PropTypes.bool,
     groupCategories: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string,
         name: PropTypes.string,

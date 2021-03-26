@@ -34,11 +34,13 @@ const StatisticsOverview = () => {
         })()
     }, [])
 
-    const handleQueryCurrentFilterGroup = async (e) => {
-        e.preventDefault?.()
+    const handleQueryCurrentFilterGroup = async (unMountingGroupId) => {
         try {
             dispatch(actions.setCurrentFilterGroupLoading())
-            const groupIds = filters.map(({groupId}) => groupId) || []
+            let groupIds = filters.map(({groupId}) => groupId) || []
+            if (unMountingGroupId) {
+                groupIds = groupIds.filter(groupId => groupId !== unMountingGroupId)
+            }
             let totalUsersMap = {}
 
             for (const groupId of groupIds) {
@@ -54,6 +56,7 @@ const StatisticsOverview = () => {
                 }
                 totalUsersMap = Object.assign(totalUsersMap, (groupFollowersMap || {}))
             }
+            dispatch(actions.setCurrentFilterGroupFiltered())
             dispatch(actions.setTotalFilterGroupUsers(totalUsersMap))
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
@@ -66,10 +69,10 @@ const StatisticsOverview = () => {
         <Container className={classes.root} maxWidth={false}>
             <Grid onSubmit={handleQueryCurrentFilterGroup} component="form" container spacing={2}>
                 <Grid item xs={12}>
-                    <Toolbar handleQueryCurrentFilterGroup={handleQueryCurrentFilterGroup}/>
+                    <Toolbar queryDataSet={handleQueryCurrentFilterGroup}/>
                 </Grid>
                 <Grid item xs={12}>
-                    <FilterComponent/>
+                    <FilterComponent queryAllGroups={handleQueryCurrentFilterGroup}/>
                 </Grid>
                 <Grid item xs={12}>
                     <AdminUsersTable/>
