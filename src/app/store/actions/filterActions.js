@@ -31,6 +31,7 @@ export const createFilterGroup = () => async (dispatch, getState, {getFirestore}
     dispatch({type: actions.LOADING_FILTER_GROUP_END})
 };
 
+
 // Save the current filter group
 export const saveCurrentFilterGroup = () => async (dispatch, getState, {getFirestore}) => {
     try {
@@ -49,7 +50,7 @@ export const saveCurrentFilterGroup = () => async (dispatch, getState, {getFires
         await firestore
             .collection("filterGroups")
             .doc(targetId)
-            .set(currentFilterGroup)
+            .set(cleanFilterGroup(currentFilterGroup))
 
         dispatch({
             type: actions.SET_CURRENT_FILTER_GROUP,
@@ -92,6 +93,19 @@ export const deleteFilterGroup = (filterGroupId = "") => async (dispatch, getSta
     }
     dispatch({type: actions.LOADING_FILTER_GROUP_END})
 };
+
+// Set a filter group as current
+export const setFilterGroupAsCurrentWithId = (filterGroupId) => async (dispatch, getState) => {
+    const state = getState()
+    const targetFilterGroup = state.firestore.data.filterGroups?.[filterGroupId]
+    if (targetFilterGroup) {
+        dispatch({
+            type: actions.SET_CURRENT_FILTER_GROUP,
+            payload: targetFilterGroup
+        })
+    }
+}
+
 
 export const setCurrentFilterGroupLoading = () => async (dispatch) => {
     dispatch({type: actions.LOADING_FILTER_GROUP_START})
@@ -295,6 +309,28 @@ const initialTotalData = {
     ordered: undefined,
     data: undefined,
     count: undefined
+}
+
+const cleanFilterGroup = (filterGroup) => {
+    return {
+        ...filterGroup,
+        data: {
+            ...filterGroup.data,
+            filters: filterGroup.data.filters.map(filter => ({
+                ...filter,
+                filteredGroupFollowerData: {
+                    count: filter?.filteredGroupFollowerData?.count || 0
+                }
+            }))
+        },
+        totalStudentsData: {
+            count: filterGroup.totalStudentsData?.count || 0
+        },
+        filteredStudentsData: {
+            count: filterGroup.filteredStudentsData?.count || 0
+        },
+        loading: false
+    }
 }
 const buildFilterGroup = (id) => {
 

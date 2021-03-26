@@ -23,13 +23,14 @@ const DrawerContent = () => {
     }])
 
     const handleDeleteFilterGroup = (filterGroupId) => dispatch(actions.deleteFilterGroup(filterGroupId))
+    const handleSetFilterGroupAsCurrent = (filterGroupId) => dispatch(actions.setFilterGroupAsCurrentWithId(filterGroupId))
 
     return (
         <List>
             {filterGroups.map(filterGroup =>
-                <ListItem button key={filterGroup.id}>
+                <ListItem onClick={() => handleSetFilterGroupAsCurrent(filterGroup.id)} button key={filterGroup.id}>
                     <ListItemText>
-                        {filterGroup.label || "Untitled Query Group"}
+                        {filterGroup.data.label || "Untitled Query Group"}
                     </ListItemText>
                     <ListItemSecondaryAction>
                         <IconButton
