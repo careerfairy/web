@@ -14,7 +14,6 @@ export const createFilterGroup = () => async (dispatch, getState, {getFirestore}
             .doc()
         const filterGroupId = filterGroupDocRef.id
         const newFilterGroup = buildFilterGroup(filterGroupId)
-        console.log("-> newFilterGroup", newFilterGroup);
         await firestore
             .collection("filterGroups")
             .doc(filterGroupId)
