@@ -88,7 +88,6 @@ const QueryEditView = ({}) => {
                 <Grid item xs={12}>
                     <FilterComponent/>
                 </Grid>
-
             </Grid>
             <Backdrop className={classes.backdrop} open={loading}>
                 <CircularProgress color="inherit"/>
