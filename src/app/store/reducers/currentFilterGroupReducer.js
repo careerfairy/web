@@ -116,5 +116,8 @@ const demoState = {
     },
     saved: false,
     loading: false,
-    justFiltered: false
+    justFiltered: false,
+    errors: {
+        labelError: null
+    }
 };
