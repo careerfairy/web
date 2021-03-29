@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Drawer, IconButton, List, ListItem, ListItemSecondaryAction, ListItemText, Typography} from "@material-ui/core";
+import {Drawer, IconButton, List, ListItem, ListItemSecondaryAction, ListItemText} from "@material-ui/core";
 import {useFirestoreConnect} from "react-redux-firebase";
 import {useDispatch, useSelector} from "react-redux";
 import * as actions from "../../../../../store/actions"
@@ -30,10 +30,10 @@ const DrawerContent = () => {
 
     return (
         <List>
-            {filterGroups.map(({id, data, filteredStudentsData, totalStudentsData}) =>
+            {filterGroups.map(({id, label, filteredStudentsData, totalStudentsData}) =>
                 <ListItem onClick={() => handleSetFilterGroupAsCurrent(id)} button key={id}>
                     <ListItemText
-                        primary={data.label || "Untitled Query Group"}
+                        primary={label || "Untitled Query Group"}
                         secondary={
                             <React.Fragment>
                                 Filtered: {filteredStudentsData.count}

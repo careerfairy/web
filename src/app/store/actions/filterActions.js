@@ -300,22 +300,20 @@ const initialTotalData = {
     count: undefined
 }
 
-const cleanFilterGroup = (filterGroup) => {
+const cleanFilterGroup = (filterGroupData) => {
     return {
-        data: {
-            ...filterGroup.data,
-            filters: filterGroup.data.filters.map(filter => ({
-                ...filter,
-                filteredGroupFollowerData: {
-                    count: filter?.filteredGroupFollowerData?.count || 0
-                }
-            }))
-        },
+        ...filterGroupData,
+        filters: filterGroupData.filters.map(filter => ({
+            ...filter,
+            filteredGroupFollowerData: {
+                count: filter?.filteredGroupFollowerData?.count || 0
+            }
+        })),
         totalStudentsData: {
-            count: filterGroup.totalStudentsData?.count || 0
+            count: filterGroupData.totalStudentsData?.count || 0
         },
         filteredStudentsData: {
-            count: filterGroup.filteredStudentsData?.count || 0
+            count: filterGroupData.filteredStudentsData?.count || 0
         },
     }
 }
