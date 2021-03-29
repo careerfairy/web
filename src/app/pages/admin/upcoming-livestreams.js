@@ -3,7 +3,7 @@ import AdminDashboardLayout from "../../layouts/AdminDashboardLayout";
 import AdminStreams from "../../components/views/admin/streams";
 import {withFirebase} from "../../context/firebase";
 
-const UpcomingStreamsPage = ({firebase}) => {
+const UpcomingStreamsPage = () => {
 
     return (
         <AdminDashboardLayout>

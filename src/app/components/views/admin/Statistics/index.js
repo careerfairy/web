@@ -2,7 +2,7 @@ import React from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import SwipeableViews from "react-swipeable-views";
 import QueryEditView from "./QueryEditView";
-import {SwipeablePanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
+import {SwipeablePanel, TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import UserTableView from "./UserTableView";
 import {AppBar, Tab, Tabs} from "@material-ui/core";
 import {useSelector} from "react-redux";
@@ -46,8 +46,8 @@ const StatisticsOverview = () => {
                     textColor="primary"
                 >
                     <Tab className={classes.tab} label="Queries"/>
-                    <Tab className={classes.tab} label={`Filtered Users Table - [${filteredCount}]`}/>
-                    <Tab className={classes.tab} label={`Total Users Table - [${totalCount}]`}/>
+                    <Tab className={classes.tab} label={`Filtered Users Table - [${filteredCount || "-"}]`}/>
+                    <Tab className={classes.tab} label={`Total Users Table - [${totalCount || "-"}]`}/>
                 </Tabs>
             </AppBar>
             <SwipeableViews
@@ -57,15 +57,15 @@ const StatisticsOverview = () => {
                 disabled
                 onChangeIndex={handleChangeIndex}
             >
-                <SwipeablePanel index={0} value={value}>
+                <TabPanel index={0} value={value}>
                     <QueryEditView/>
-                </SwipeablePanel>
-                <SwipeablePanel index={1} value={value}>
+                </TabPanel>
+                <TabPanel index={1} value={value}>
                     <UserTableView isFiltered/>
-                </SwipeablePanel>
-                <SwipeablePanel index={2} value={value}>
+                </TabPanel>
+                <TabPanel index={2} value={value}>
                     <UserTableView/>
-                </SwipeablePanel>
+                </TabPanel>
             </SwipeableViews>
         </React.Fragment>
     );

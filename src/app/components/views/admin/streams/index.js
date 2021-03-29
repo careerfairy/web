@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import React, {Fragment, useMemo} from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import {Container, Grid} from "@material-ui/core";
-import {useFirestoreConnect} from "react-redux-firebase";
+import {CircularProgress, Container, Grid, Typography} from "@material-ui/core";
+import {isLoaded, useFirestoreConnect, isEmpty} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 import Search from "./Search";
 import StreamsContainer from "./StreamsContainer";
@@ -45,7 +45,19 @@ const AdminStreams = ({typeOfStream}) => {
                     </Grid>
                     <Grid item xs={12}>
                         <Grid container spacing={2}>
-                            <StreamsContainer streams={streams}/>
+                            {!isLoaded(streams) ?
+                                <Grid item xs={12}>
+                                    <CircularProgress/>
+                                </Grid>
+                                :
+                                isEmpty(streams) ?
+                                    <Grid item xs={12}>
+                                        <Typography>
+                                            No upcoming streams...
+                                        </Typography>
+                                    </Grid>
+                                    :
+                                    <StreamsContainer streams={streams}/>}
                         </Grid>
                     </Grid>
                 </Grid>

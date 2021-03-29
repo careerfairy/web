@@ -47,8 +47,8 @@ export const universityCountriesMap = {
     NL: "Netherlands",
     NO: "Norway",
     SE: "Sweden",
-    OTHER: "",
-    other: ""
+    OTHER: "other",
+    other: "other"
 }
 
 

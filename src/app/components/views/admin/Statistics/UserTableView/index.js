@@ -5,7 +5,6 @@ import {Container, Grid} from "@material-ui/core";
 import AdminUsersTable from "./AdminUsersTable";
 import {useSelector} from "react-redux";
 import {createSelector} from "reselect";
-import {universityCountriesMap} from "../../../../util/constants";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -18,11 +17,7 @@ const usersSelector = createSelector(
     state => state.currentFilterGroup.data,
     (_, {isFiltered}) => isFiltered,
     (currentFilterGroupData, isFiltered) => {
-        let users = isFiltered ? currentFilterGroupData?.filteredStudentsData.ordered : currentFilterGroupData?.totalStudentsData.ordered
-        return users?.map(user => ({
-            ...user,
-            universityCountry: universityCountriesMap[user.universityCountryCode]
-        })) || []
+        return isFiltered ? currentFilterGroupData?.filteredStudentsData.ordered : currentFilterGroupData?.totalStudentsData.ordered
     }
 )
 
@@ -30,9 +25,12 @@ const usersSelector = createSelector(
 const UserTableView = ({isFiltered}) => {
 
     const classes = useStyles()
-    const users = useSelector(state =>
-        usersSelector(state, {isFiltered})
+    const users = useSelector(({currentFilterGroup:{data:{totalStudentsData, filteredStudentsData}}}) =>
+       isFiltered ? filteredStudentsData.ordered : totalStudentsData.ordered
     )
+    // const users = useSelector(state =>
+    //     usersSelector(state, {isFiltered})
+    // )
 
     return (
         <Container className={classes.root} maxWidth={false}>

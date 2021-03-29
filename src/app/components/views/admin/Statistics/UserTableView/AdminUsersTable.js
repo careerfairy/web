@@ -5,6 +5,7 @@ import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} fro
 import useUserTable from "../../../../custom-hook/useUserTable";
 import {useSelector} from "react-redux";
 import PropTypes from 'prop-types'
+import {universityCountriesMap} from "../../../../util/constants";
 
 const customTableOptions = {...defaultTableOptions}
 const columns = [
@@ -26,8 +27,9 @@ const columns = [
         type: "boolean"
     },
     {
-        field: "universityCountry",
+        field: "universityCountryCode",
         title: "University Country",
+        lookup: universityCountriesMap
     },
     {
         field: "userEmail",
@@ -48,12 +50,11 @@ const columns = [
 
     }
 ]
-const AdminUsersTable = ({users}) => {
+const AdminUsersTable = ({users = []}) => {
 
     const {setSelection, selection, handlers} = useUserTable()
 
     const loading = useSelector(state => state.currentFilterGroup.loading)
-
 
     return (
         <Card>
@@ -81,8 +82,9 @@ const AdminUsersTable = ({users}) => {
                         type: "boolean"
                     },
                     {
-                        field: "universityCountry",
+                        field: "universityCountryCode",
                         title: "University Country",
+                        lookup: universityCountriesMap
                     },
                     {
                         field: "userEmail",
@@ -134,9 +136,7 @@ const AdminUsersTable = ({users}) => {
 };
 
 AdminUsersTable.propTypes = {
-    users: PropTypes.arrayOf(PropTypes.shape({
-
-    }))
+    users: PropTypes.arrayOf(PropTypes.shape({}))
 }
 
 AdminUsersTable.defaultProps = {
