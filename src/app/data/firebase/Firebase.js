@@ -27,6 +27,17 @@ class Firebase {
         this.auth = firebase.auth();
         this.firestore = firebase.firestore();
         this.storage = firebase.storage();
+        this.functions = firebase.functions()
+        // if (process.env.NODE_ENV === 'development') {
+        //     this.functions.useFunctionsEmulator('http://localhost:5001');
+        // }
+    }
+
+    // *** Functions Api ***
+
+    getPartnerFollowerData = async (requestingGroup, groups, streams, currentUserDataSet) => {
+        const getGroupsAndTheirFollowers = this.functions.httpsCallable("getGroupsAndTheirFollowers")
+        return await getGroupsAndTheirFollowers({requestingGroup, groups, streams, currentUserDataSet})
     }
 
     // *** Auth API ***
