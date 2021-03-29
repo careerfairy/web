@@ -92,7 +92,6 @@ const useStyles = makeStyles(theme => ({
 function MiniChatContainer({isStreamer, livestream, firebase, className}) {
     const {authenticatedUser, userData} = useAuth();
     const {tutorialSteps, setTutorialSteps, handleConfirmStep} = useContext(TutorialContext);
-    console.log("-> Re-rendered MiniChatContainer");
 
     const [chatEntries, setChatEntries] = useState([]);
     const [focused, setFocused] = useState(false);
