@@ -4,6 +4,33 @@ import {convertArrayOfObjectsToDictionaryByProp} from "../../data/util/Analytics
 
 const cloneDeep = require('lodash.clonedeep');
 
+// Create a new filter group and store it in redux as current filter group
+export const createFilterGroup = () => async (dispatch, getState, {getFirestore}) => {
+    try {
+        dispatch({type: actions.LOADING_FILTER_GROUP_START})
+        const firestore = getFirestore();
+        const filterGroupDocRef = firestore
+            .collection('filterGroups')
+            .doc()
+        const filterGroupId = filterGroupDocRef.id
+        const newFilterGroup = buildFilterGroup(filterGroupId)
+        await firestore
+            .collection("filterGroups")
+            .doc(filterGroupId)
+            .set(newFilterGroup)
+
+        dispatch({
+            type: actions.SET_CURRENT_FILTER_GROUP,
+            payload: newFilterGroup
+        });
+
+    } catch (e) {
+        dispatch(actionMethods.sendGeneralError(e))
+    }
+    dispatch({type: actions.LOADING_FILTER_GROUP_END})
+};
+
+
 // Save the current filter group
 export const saveCurrentFilterGroup = () => async (dispatch, getState, {getFirestore}) => {
     try {
@@ -28,7 +55,7 @@ export const saveCurrentFilterGroup = () => async (dispatch, getState, {getFires
         await firestore
             .collection("filterGroups")
             .doc(targetId)
-            .set(cleanFilterGroup(currentFilterGroupData, targetId),{merge: true})
+            .set(cleanFilterGroup(currentFilterGroupData, targetId), {merge: true})
 
         dispatch(setFilterGroupAsCurrentWithId(targetId))
         dispatch(actionMethods.enqueueSnackbar({
@@ -315,17 +342,11 @@ const cleanFilterGroup = (filterGroupData, id) => {
     }
 }
 const buildFilterGroup = (id) => {
-
     return {
-        data: {
-            id,
-            label: "",
-            filters: [],
-            totalStudentsData: {},
-            filteredStudentsData: {},
-        },
-        saved: false,
-        loading: false,
-        justFiltered: false
+        id,
+        label: "",
+        filters: [],
+        totalStudentsData: {},
+        filteredStudentsData: {},
     }
 }

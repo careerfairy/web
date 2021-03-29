@@ -27,7 +27,7 @@ const initialState = {
 const currentFilterGroupReducer = (state = initialState, {type, payload}) => {
     switch (type) {
         case actions.SET_CURRENT_FILTER_GROUP:
-            return {...state, data: payload};
+            return {...initialState, data: payload};
         case actions.CLEAR_CURRENT_FILTER_GROUP:
             return initialState;
         case actions.SET_FILTERS:

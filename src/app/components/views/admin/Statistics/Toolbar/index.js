@@ -8,14 +8,16 @@ import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/Global
 import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/DeleteForever';
 import SearchIcon from '@material-ui/icons/Search';
+import AddDatasetIcon from '@material-ui/icons/PostAdd';
 import DataSetDrawer from "./DataSetDrawer";
 
 const Toolbar = ({queryDataSet, loading}) => {
-    const {palette: {primary, secondary, error}} = useTheme()
+    const {palette: {primary, secondary, error, navyBlue}} = useTheme()
     const dispatch = useDispatch()
     const currentFilterGroup = useSelector(state => state.currentFilterGroup)
     const handleDeleteCurrentFilterGroup = () => dispatch(actions.deleteFilterGroup())
     const handleSaveCurrentFilterGroup = () => dispatch(actions.saveCurrentFilterGroup())
+    const handleCreateNewFilterGroup = () => dispatch(actions.createFilterGroup())
     const totalCount = useSelector(state => state.currentFilterGroup.data.totalStudentsData.count)
     const filteredCount = useSelector(state => state.currentFilterGroup.data.filteredStudentsData.count)
     const [datasetDrawerOpen, setDatasetDrawerOpen] = useState(false);
@@ -44,6 +46,14 @@ const Toolbar = ({queryDataSet, loading}) => {
             startIcon: <SearchIcon/>,
             hide: false,
             color: secondary.main
+        },
+        {
+            disabled: false,
+            label: "Create a new Dataset",
+            onClick: () => handleCreateNewFilterGroup(),
+            startIcon: <AddDatasetIcon/>,
+            hide: false,
+            color: navyBlue.main
         },
         {
             disabled: false,
@@ -76,7 +86,7 @@ const Toolbar = ({queryDataSet, loading}) => {
                         placeholder="please provide a label"
                         value={currentFilterGroupLabel}
                         variant="outlined"
-                        error={labelError}
+                        error={Boolean(labelError)}
                         helperText={labelError &&
                         <span>
                         This field is required

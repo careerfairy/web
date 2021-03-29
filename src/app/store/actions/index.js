@@ -35,5 +35,6 @@ export {
     handleCalculateAndSetNewTotalStudents,
     saveCurrentFilterGroup,
     setFilterGroupAsCurrentWithId,
-    handleChangeFilterLabel
+    handleChangeFilterLabel,
+    createFilterGroup
 } from './filterActions.js'
