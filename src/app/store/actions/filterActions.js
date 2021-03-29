@@ -175,12 +175,11 @@ export const filterAndSetGroupFollowers = (groupId) => async (dispatch, getState
             }
             return clonedFilterOption
         })
-        dispatch(handleSetNewTotalFilteredStudents())
-        handleSetNewTotalFilteredStudents()
         dispatch({
             type: actions.SET_FILTERS,
             payload: newFilterOptions
         })
+        dispatch(handleSetNewTotalFilteredStudents())
     }
 
 }

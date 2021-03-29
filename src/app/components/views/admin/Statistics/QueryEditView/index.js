@@ -27,6 +27,8 @@ const QueryEditView = ({}) => {
     const classes = useStyles()
     const firestore = useFirestore()
     const filters = useSelector(state => state.currentFilterGroup.data?.filters || [])
+    const currentFilterGroup = useSelector(state => state.currentFilterGroup)
+    console.log("-> currentFilterGroup", currentFilterGroup);
     const currentFilterGroupLoading = useSelector(state => state.currentFilterGroup.loading)
     const totalData = useSelector(state => Boolean(state.currentFilterGroup.totalStudentsData.data))
     const data = useSelector(state => state.firestore.data)
@@ -45,7 +47,7 @@ const QueryEditView = ({}) => {
 
     useEffect(() => {
         // Comment this out if you dont want to calculate total once groups are mounted
-        if (!totalData && filters.some(filter => filter.filteredGroupFollowerData.data)) {
+        if (!totalData && filters.some(filter => filter.filteredGroupFollowerData?.data)) {
             (async () => {
                 await handleQueryCurrentFilterGroup()
             })()
