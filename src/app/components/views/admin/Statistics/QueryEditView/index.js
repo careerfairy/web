@@ -27,10 +27,8 @@ const QueryEditView = ({}) => {
     const classes = useStyles()
     const firestore = useFirestore()
     const filters = useSelector(state => state.currentFilterGroup.data?.filters || [])
-    const currentFilterGroup = useSelector(state => state.currentFilterGroup)
-    console.log("-> currentFilterGroup", currentFilterGroup);
     const currentFilterGroupLoading = useSelector(state => state.currentFilterGroup.loading)
-    const totalData = useSelector(state => Boolean(state.currentFilterGroup.totalStudentsData.data))
+    const totalData = useSelector(state => Boolean(state.currentFilterGroup.data.totalStudentsData.data))
     const data = useSelector(state => state.firestore.data)
 
     const groupsLoaded = useSelector(({firestore: {data: {careerCenterData}}}) => isLoaded(careerCenterData))

@@ -31,7 +31,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
     const firestore = useFirestore()
     const [filterOptionsWithData, setFilterOptionsWithData] = React.useState([]);
     const loading = useSelector(state => state.currentFilterGroup.loading)
-    const filteredData = useSelector(state => Boolean(state.currentFilterGroup.filteredStudentsData.data))
+    const filteredData = useSelector(state => Boolean(state.currentFilterGroup.data.filteredStudentsData.data))
 
     useEffect(() => {
         (async () => {

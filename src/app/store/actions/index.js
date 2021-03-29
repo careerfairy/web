@@ -19,7 +19,6 @@ export {
 
 export {closeSnackbar, enqueueSnackbar, removeSnackbar, sendGeneralError} from './snackbarActions.js'
 export {
-    createFilterGroup,
     deleteFilterGroup,
     setFilters,
     setFilterOptions,
@@ -35,5 +34,6 @@ export {
     handleSetNewTotalFilteredStudents,
     handleCalculateAndSetNewTotalStudents,
     saveCurrentFilterGroup,
-    setFilterGroupAsCurrentWithId
+    setFilterGroupAsCurrentWithId,
+    handleChangeFilterLabel
 } from './filterActions.js'

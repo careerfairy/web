@@ -5,20 +5,23 @@ const initialState = {
         id: "",
         label: "",
         filters: [],
-    },
-    totalStudentsData: {
-        ordered: undefined,
-        data: undefined,
-        count: undefined
-    },
-    filteredStudentsData: {
-        ordered: undefined,
-        data: undefined,
-        count: undefined
+        totalStudentsData: {
+            ordered: undefined,
+            data: undefined,
+            count: undefined
+        },
+        filteredStudentsData: {
+            ordered: undefined,
+            data: undefined,
+            count: undefined
+        },
     },
     saved: false,
     loading: false,
-    justFiltered: false
+    justFiltered: false,
+    errors: {
+        labelError: null
+    }
 };
 
 const currentFilterGroupReducer = (state = initialState, {type, payload}) => {
@@ -32,7 +35,7 @@ const currentFilterGroupReducer = (state = initialState, {type, payload}) => {
         case actions.LOADING_FILTER_GROUP_START:
             return {...state, loading: true};
         case actions.CLEAR_CURRENT_FILTER_GROUP_FILTERED_DATA:
-            return {...state, filteredStudentsData: payload};
+            return {...state, data: {...state.data, filteredStudentsData: payload}};
         case actions.SET_CURRENT_FILTER_GROUP_NOT_FILTERED:
             return {...state, justFiltered: false};
         case actions.SET_CURRENT_FILTER_GROUP_FILTERED:
@@ -40,9 +43,15 @@ const currentFilterGroupReducer = (state = initialState, {type, payload}) => {
         case actions.LOADING_FILTER_GROUP_END:
             return {...state, loading: false};
         case actions.SET_TOTAL_FILTER_GROUP_USERS:
-            return {...state, totalStudentsData: payload};
+            return {...state, data: {...state.data, totalStudentsData: payload}};
         case actions.SET_FILTERED_FILTER_GROUP_USERS:
-            return {...state, filteredStudentsData: payload};
+            return {...state, data: {...state.data, filteredStudentsData: payload}};
+        case actions.SET_FILTER_LABEL:
+            return {...state, data: {...state.data, label: payload}};
+        case actions.SET_FILTER_LABEL_ERROR:
+            return {...state, errors: {labelError: payload}};
+        case actions.CLEAR_FILTER_LABEL_ERROR:
+            return {...state, errors: {labelError: null}};
         default:
             return state;
     }
@@ -94,16 +103,16 @@ const demoState = {
 
             },
         ],
-    },
-    totalStudentsData: {
-        ordered: undefined,
-        data: undefined,
-        count: undefined
-    },
-    filteredStudentsData: {
-        ordered: undefined,
-        data: undefined,
-        count: undefined
+        totalStudentsData: {
+            ordered: undefined,
+            data: undefined,
+            count: undefined
+        },
+        filteredStudentsData: {
+            ordered: undefined,
+            data: undefined,
+            count: undefined
+        },
     },
     saved: false,
     loading: false,

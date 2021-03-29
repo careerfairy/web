@@ -1,32 +1,59 @@
 import PropTypes from 'prop-types'
 import React, {useState} from 'react';
 import * as actions from '../../../../../store/actions'
-import {makeStyles} from "@material-ui/core/styles";
-import {Card, CardActions, CardHeader, Typography} from "@material-ui/core";
+import {useTheme} from "@material-ui/core/styles";
+import {Card, CardActions, CardHeader, TextField, Typography} from "@material-ui/core";
 import {useDispatch, useSelector} from "react-redux";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import SaveIcon from '@material-ui/icons/Save';
-import CreateIcon from '@material-ui/icons/PostAdd';
 import DeleteIcon from '@material-ui/icons/DeleteForever';
 import SearchIcon from '@material-ui/icons/Search';
-import {colorsArray} from "../../../../util/colors";
 import DataSetDrawer from "./DataSetDrawer";
 
 const Toolbar = ({queryDataSet, loading}) => {
-
+    const {palette: {primary, secondary, error}} = useTheme()
     const dispatch = useDispatch()
     const currentFilterGroup = useSelector(state => state.currentFilterGroup)
-    const handleCreateNewDataSet = () => dispatch(actions.createFilterGroup())
     const handleDeleteCurrentFilterGroup = () => dispatch(actions.deleteFilterGroup())
     const handleSaveCurrentFilterGroup = () => dispatch(actions.saveCurrentFilterGroup())
-    const totalCount = useSelector(state => state.currentFilterGroup.totalStudentsData.count)
-    const filteredCount = useSelector(state => state.currentFilterGroup.filteredStudentsData.count)
-    // const justFiltered = useSelector(state => state.currentFilterGroup.justFiltered)
+    const totalCount = useSelector(state => state.currentFilterGroup.data.totalStudentsData.count)
+    const filteredCount = useSelector(state => state.currentFilterGroup.data.filteredStudentsData.count)
     const [datasetDrawerOpen, setDatasetDrawerOpen] = useState(false);
     const currentFilterGroupLabel = useSelector(state => state.currentFilterGroup.data.label || "")
-
+    const labelError = useSelector(state => state.currentFilterGroup.errors.labelError)
     const handleOpenDataSetDrawer = () => setDatasetDrawerOpen(true)
     const handleCloseDataSetDrawer = () => setDatasetDrawerOpen(false)
+    const handleChange = (event) => {
+        const value = event.target.value
+        dispatch(actions.handleChangeFilterLabel(value))
+    }
+
+    const buttons = [
+        {
+            disabled: false,
+            label: "Save Current Dataset",
+            onClick: () => handleSaveCurrentFilterGroup(),
+            startIcon: <SaveIcon/>,
+            hide: false,
+            color: primary.main
+        },
+        {
+            disabled: false,
+            label: "Choose Another Dataset",
+            onClick: () => handleOpenDataSetDrawer(),
+            startIcon: <SearchIcon/>,
+            hide: false,
+            color: secondary.main
+        },
+        {
+            disabled: false,
+            label: "Delete Current Dataset",
+            onClick: () => handleDeleteCurrentFilterGroup(),
+            startIcon: <DeleteIcon/>,
+            hide: !currentFilterGroup.data,
+            color: error.main
+        },
+    ].filter(({hide}) => !hide)
 
     return (
         <Card>
@@ -42,60 +69,36 @@ const Toolbar = ({queryDataSet, loading}) => {
                         </Typography>
                     </React.Fragment>
                     : "Make a query"}
-                subheader={currentFilterGroupLabel}
+                subheader={
+                    <TextField
+                        label="Label"
+                        onChange={handleChange}
+                        placeholder="please provide a label"
+                        value={currentFilterGroupLabel}
+                        variant="outlined"
+                        error={labelError}
+                        helperText={labelError &&
+                        <span>
+                        This field is required
+                        </span>}
+                        margin="dense"
+                    />
+                }
             />
             <CardActions>
-                <DynamicColorButton
-                    disabled={loading}
-                    startIcon={<SaveIcon/>}
-                    onClick={handleSaveCurrentFilterGroup}
-                    variant="contained"
-                    color={colorsArray[0]}
-                    size="large"
-                >
-                    Save Current Dataset
-                </DynamicColorButton>
-                <DynamicColorButton
-                    variant="contained"
-                    disabled={loading}
-                    startIcon={<CreateIcon/>}
-                    size="large"
-                    color={colorsArray[1]}
-                    onClick={handleCreateNewDataSet}
-                >
-                    Create a new Dataset
-                </DynamicColorButton>
-                {currentFilterGroup.data &&
-                <DynamicColorButton
-                    disabled={loading}
-                    variant="contained"
-                    startIcon={<DeleteIcon/>}
-                    size="large"
-                    color={colorsArray[2]}
-                    onClick={handleDeleteCurrentFilterGroup}
-                >
-                    Delete Current Dataset
-                </DynamicColorButton>}
-                <DynamicColorButton
-                    variant="contained"
-                    disabled={loading}
-                    startIcon={<SearchIcon/>}
-                    size="large"
-                    color={colorsArray[3]}
-                    onClick={handleOpenDataSetDrawer}
-                >
-                    Choose Another Dataset
-                </DynamicColorButton>
-                {/* Querying is automatic now*/}
-                {/*<DynamicColorButton*/}
-                {/*    onClick={queryDataSet}*/}
-                {/*    disabled={loading || justFiltered}*/}
-                {/*    variant="contained"*/}
-                {/*    color={colorsArray[4]}*/}
-                {/*    size="large"*/}
-                {/*>*/}
-                {/*    Query Current Dataset*/}
-                {/*</DynamicColorButton>*/}
+                {buttons.map(({startIcon, onClick, disabled, label, color}, index) => (
+                    <DynamicColorButton
+                        key={label}
+                        disabled={loading || disabled}
+                        startIcon={startIcon}
+                        size="large"
+                        variant="contained"
+                        onClick={onClick}
+                        color={color}
+                    >
+                        {label}
+                    </DynamicColorButton>
+                ))}
                 <DataSetDrawer open={datasetDrawerOpen} onClose={handleCloseDataSetDrawer}/>
             </CardActions>
         </Card>

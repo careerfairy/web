@@ -15,10 +15,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const usersSelector = createSelector(
-    state => state.currentFilterGroup,
+    state => state.currentFilterGroup.data,
     (_, {isFiltered}) => isFiltered,
-    (currentFilterGroup, isFiltered) => {
-        let users = isFiltered ? currentFilterGroup?.filteredStudentsData.ordered : currentFilterGroup?.totalStudentsData.ordered
+    (currentFilterGroupData, isFiltered) => {
+        let users = isFiltered ? currentFilterGroupData?.filteredStudentsData.ordered : currentFilterGroupData?.totalStudentsData.ordered
         return users?.map(user => ({
             ...user,
             universityCountry: universityCountriesMap[user.universityCountryCode]

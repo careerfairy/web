@@ -24,8 +24,8 @@ const StatisticsOverview = () => {
     const classes = useStyles()
     const theme = useTheme()
     const [value, setValue] = React.useState(0);
-    const totalCount = useSelector(state => state.currentFilterGroup.totalStudentsData.count)
-    const filteredCount = useSelector(state => state.currentFilterGroup.filteredStudentsData.count)
+    const totalCount = useSelector(state => state.currentFilterGroup.data.totalStudentsData.count)
+    const filteredCount = useSelector(state => state.currentFilterGroup.data.filteredStudentsData.count)
 
     const handleChange = (event, newValue) => {
         setValue(newValue);

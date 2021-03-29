@@ -9,15 +9,10 @@ import {isLoaded} from "react-redux-firebase";
 import Masonry, {ResponsiveMasonry} from "react-responsive-masonry"
 
 const useStyles = makeStyles(theme => ({
-    root: {
-        width: "100%"
-    },
-    item: {}
 }));
 
 const FilterComponent = () => {
     const dispatch = useDispatch()
-    const classes = useStyles()
     const filters = useSelector(state => state.currentFilterGroup.data.filters || [])
     const theme = useTheme()
 

@@ -1,44 +1,24 @@
 import * as actions from './actionTypes';
 import * as actionMethods from './index'
 import {convertArrayOfObjectsToDictionaryByProp} from "../../data/util/AnalyticsUtil";
+
 const cloneDeep = require('lodash.clonedeep');
-
-
-// Create a new filter group and store it in redux as current filter group
-export const createFilterGroup = () => async (dispatch, getState, {getFirestore}) => {
-    try {
-        dispatch({type: actions.LOADING_FILTER_GROUP_START})
-        const firestore = getFirestore();
-        const filterGroupDocRef = firestore
-            .collection('filterGroups')
-            .doc()
-        const filterGroupId = filterGroupDocRef.id
-        const newFilterGroup = buildFilterGroup(filterGroupId)
-        await firestore
-            .collection("filterGroups")
-            .doc(filterGroupId)
-            .set(newFilterGroup)
-
-        dispatch({
-            type: actions.SET_CURRENT_FILTER_GROUP,
-            payload: newFilterGroup
-        });
-
-    } catch (e) {
-        dispatch(actionMethods.sendGeneralError(e))
-    }
-    dispatch({type: actions.LOADING_FILTER_GROUP_END})
-};
-
 
 // Save the current filter group
 export const saveCurrentFilterGroup = () => async (dispatch, getState, {getFirestore}) => {
     try {
-        dispatch({type: actions.LOADING_FILTER_GROUP_START})
         const firestore = getFirestore();
         const state = getState()
-        const currentFilterGroup = state.currentFilterGroup
-        let targetId = currentFilterGroup.data.id
+        const filterLabel = state.currentFilterGroup.data.label
+        if (!filterLabel) {
+            return dispatch({
+                type: actions.SET_FILTER_LABEL_ERROR,
+                payload: "This field is required."
+            })
+        }
+        dispatch({type: actions.LOADING_FILTER_GROUP_START})
+        const currentFilterGroupData = state.currentFilterGroup.data
+        let targetId = currentFilterGroupData.id
         if (!targetId) {
             const filterGroupDocRef = firestore
                 .collection('filterGroups')
@@ -49,11 +29,11 @@ export const saveCurrentFilterGroup = () => async (dispatch, getState, {getFires
         await firestore
             .collection("filterGroups")
             .doc(targetId)
-            .set(cleanFilterGroup(currentFilterGroup))
+            .set(cleanFilterGroup(currentFilterGroupData))
 
         dispatch({
             type: actions.SET_CURRENT_FILTER_GROUP,
-            payload: currentFilterGroup
+            payload: currentFilterGroupData
         });
         dispatch(actionMethods.enqueueSnackbar({
             message: "Query has successfully been saved",
@@ -152,11 +132,11 @@ export const filterAndSetGroupFollowers = (groupId) => async (dispatch, getState
     const groupFollowers = state.firestore.ordered[`followers of ${groupId}`]
 
 
-    if (filterOptions && groupCategories?.length && groupFollowers?.length) {
+    if (filterOptions && groupFollowers?.length) {
         const noCategorySelected = filterOptions?.length === 0
         let filteredFollowers;
         let filteredFollowerMap;
-        if (noCategorySelected) {
+        if (noCategorySelected || !groupCategories?.length) {
             filteredFollowers = groupFollowers
             filteredFollowerMap = state.firestore.data[`followers of ${groupId}`]
         } else {
@@ -188,7 +168,7 @@ export const filterAndSetGroupFollowers = (groupId) => async (dispatch, getState
 
 export const addGroupFollowersToTotal = (groupId) => async (dispatch, getState) => {
     const state = getState()
-    const totalFollowers = state.currentFilterGroup.totalStudentsData.data
+    const totalFollowers = state.currentFilterGroup.data.totalStudentsData.data
     if (totalFollowers) {
         const groupFollowers = state.firestore.data[`followers of ${groupId}`] || {}
         const newTotalFollowers = Object.assign(totalFollowers, groupFollowers)
@@ -290,6 +270,16 @@ export const setFilterOptionTargetOptions = (arrayOfOptionIds = [], categoryId, 
     }
 };
 
+export const handleChangeFilterLabel = (newValue) => async (dispatch) => {
+    if (newValue) {
+        dispatch({type: actions.CLEAR_FILTER_LABEL_ERROR})
+    }
+    dispatch({
+        type: actions.SET_FILTER_LABEL,
+        payload: newValue
+    })
+}
+
 
 const checkIfUserMatches = (user, filterCategories = [], targetGroupId) => {
     const {categories: userCategories} = user.registeredGroups.find(({groupId}) => groupId === targetGroupId) || {}
@@ -312,7 +302,6 @@ const initialTotalData = {
 
 const cleanFilterGroup = (filterGroup) => {
     return {
-        ...filterGroup,
         data: {
             ...filterGroup.data,
             filters: filterGroup.data.filters.map(filter => ({
@@ -328,7 +317,6 @@ const cleanFilterGroup = (filterGroup) => {
         filteredStudentsData: {
             count: filterGroup.filteredStudentsData?.count || 0
         },
-        loading: false
     }
 }
 const buildFilterGroup = (id) => {
@@ -338,9 +326,9 @@ const buildFilterGroup = (id) => {
             id,
             label: "",
             filters: [],
+            totalStudentsData: {},
+            filteredStudentsData: {},
         },
-        totalStudentsData: {},
-        filteredStudentsData: {},
         saved: false,
         loading: false,
         justFiltered: false
