@@ -20,6 +20,7 @@ const DrawerContent = () => {
     const classes = useStyles()
     const dispatch = useDispatch()
     const filterGroups = useSelector(state => state.firestore.ordered.filterGroups || [])
+
     useFirestoreConnect(() => [{
         collection: "filterGroups",
         storeAs: "filterGroups"

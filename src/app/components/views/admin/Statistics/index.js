@@ -35,7 +35,6 @@ const StatisticsOverview = () => {
         setValue(index);
     };
 
-
     return (
         <React.Fragment>
             <AppBar className={classes.appBar} position="sticky" color="default">

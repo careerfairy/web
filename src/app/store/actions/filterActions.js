@@ -9,7 +9,8 @@ export const saveCurrentFilterGroup = () => async (dispatch, getState, {getFires
     try {
         const firestore = getFirestore();
         const state = getState()
-        const filterLabel = state.currentFilterGroup.data.label
+        const currentFilterGroupData = state.currentFilterGroup.data
+        const filterLabel = currentFilterGroupData.label
         if (!filterLabel) {
             return dispatch({
                 type: actions.SET_FILTER_LABEL_ERROR,
@@ -17,24 +18,19 @@ export const saveCurrentFilterGroup = () => async (dispatch, getState, {getFires
             })
         }
         dispatch({type: actions.LOADING_FILTER_GROUP_START})
-        const currentFilterGroupData = state.currentFilterGroup.data
         let targetId = currentFilterGroupData.id
         if (!targetId) {
             const filterGroupDocRef = firestore
                 .collection('filterGroups')
                 .doc()
-
             targetId = filterGroupDocRef.id
         }
         await firestore
             .collection("filterGroups")
             .doc(targetId)
-            .set(cleanFilterGroup(currentFilterGroupData))
+            .set(cleanFilterGroup(currentFilterGroupData, targetId),{merge: true})
 
-        dispatch({
-            type: actions.SET_CURRENT_FILTER_GROUP,
-            payload: currentFilterGroupData
-        });
+        dispatch(setFilterGroupAsCurrentWithId(targetId))
         dispatch(actionMethods.enqueueSnackbar({
             message: "Query has successfully been saved",
             options: {
@@ -300,9 +296,10 @@ const initialTotalData = {
     count: undefined
 }
 
-const cleanFilterGroup = (filterGroupData) => {
+const cleanFilterGroup = (filterGroupData, id) => {
     return {
         ...filterGroupData,
+        id,
         filters: filterGroupData.filters.map(filter => ({
             ...filter,
             filteredGroupFollowerData: {
