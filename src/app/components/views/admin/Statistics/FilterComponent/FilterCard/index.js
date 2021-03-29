@@ -47,6 +47,7 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
 
     useEffect(() => {
         if (totalFollowers?.length && group) {
+            dispatch(actions.addGroupFollowersToTotal(groupId))
             handleFilterFollowers()
         }
     }, [filterOptions, totalFollowers, group, filteredData])
@@ -129,7 +130,6 @@ const FilterCard = ({filter, handleRemoveGroupFromFilters, groupsLoaded}) => {
                     where: ["groupIds", "array-contains", groupId],
                     storeAs: `followers of ${groupId}`
                 })
-                dispatch(actions.addGroupFollowersToTotal(groupId))
             }
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
