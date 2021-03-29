@@ -52,6 +52,9 @@ const UniversityCountriesChart = () => {
     const {data, colors, dataArray} = useSelector(state =>
         distributionSelector(state, {theme})
     )
+    const handleExportChartToCSV = () => {
+        exportChartDataToCsv(chartRef, "Student University Country Distribution")
+    }
 
     return (
         <Card>
@@ -60,7 +63,7 @@ const UniversityCountriesChart = () => {
                 action={
                     <Tooltip title="Export this chart data to CSV">
                         <IconButton
-                            onClick={() => exportChartDataToCsv(chartRef, "Student University Country Distribution")}>
+                            onClick={handleExportChartToCSV}>
                             <ExportCSVIcon/>
                         </IconButton>
                     </Tooltip>

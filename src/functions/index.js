@@ -30,6 +30,7 @@ const reminders = require('./reminders')
 const livestreams = require('./livestreams')
 const universityEmails = require('./universityEmails')
 const algolia = require('./algolia')
+const analytics = require('./analytics')
 
 // Hosting
 exports.production = hosting.production
@@ -79,3 +80,6 @@ exports.deleteFromIndex = algolia.deleteFromIndex
 exports.addToStreamIndex = algolia.addToStreamIndex
 exports.updateStreamIndex = algolia.updateStreamIndex
 exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex
+
+// Analytics
+exports.updateGeneralUserAnalyticsStats = analytics.updateGeneralUserAnalyticsStats
