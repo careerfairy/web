@@ -2,18 +2,51 @@ const functions = require('firebase-functions');
 const {admin} = require('./api/firestoreAdmin')
 
 
-exports.updateGeneralUserAnalyticsStats = functions.firestore.document('userData/{userId}')
-    .onUpdate((change, context) => {
-        // Get an object representing the document
-        // e.g. {'name': 'Marie', 'age': 66}
+exports.updateUserDataAnalyticsOnWrite = functions.firestore.document('userData/{userId}')
+    .onWrite(async (change, context) => {
         const newValue = change.after.data();
-        console.log("-> newValue", newValue);
-        functions.logger.log("-> newValue", newValue)
-
-        // ...or the previous value before this update
         const previousValue = change.before.data();
-        console.log("-> previousValue", previousValue);
-        functions.logger.log("-> previousValue", previousValue)
-        // const db = admin.firestore();
+        try {
+            const universityCountryCodeHasChanged = newValue.universityCountryCode !== previousValue.universityCountryCode
+            if (universityCountryCodeHasChanged) {
+                let newData = {}
+                const analyticsUserDataRef = admin.firestore().collection("analytics")
+                    .doc("userData")
+                const oldUniCountryCode = previousValue.universityCountryCode || null
+                const newUniCountryCode = newValue.universityCountryCode || null
+                if (oldUniCountryCode) {
+                    // Decrement university country count in db
+                    newData = {
+                        ...newData,
+                        [`totalByCountry.${oldUniCountryCode}`]: admin.firestore.FieldValue.increment(-1)
+                    }
+
+                }
+                if (newUniCountryCode) {
+                    // Increment new uni country in db
+                    newData = {
+                        ...newData,
+                        [`totalByCountry.${newUniCountryCode}`]: admin.firestore.FieldValue.increment(1)
+                    }
+                }
+
+                if (!oldUniCountryCode && newUniCountryCode) {
+                    // Increment total field
+                    newData = {
+                        ...newData,
+                        total: admin.firestore.FieldValue.increment(1)
+                    }
+                } else if (oldUniCountryCode && !newUniCountryCode) {
+                    newData = {
+                        ...newData,
+                        total: admin.firestore.FieldValue.increment(-1)
+                    }
+                }
+                await analyticsUserDataRef.update(newData)
+                functions.logger.info(`successfully updated userData country analytics, OLD:${oldUniCountryCode}, NEW:${newUniCountryCode}`)
+            }
+        } catch (error) {
+            functions.logger.error("failed to update userData analytics with error:", error)
+        }
 
     })

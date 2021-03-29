@@ -82,4 +82,4 @@ exports.updateStreamIndex = algolia.updateStreamIndex
 exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex
 
 // Analytics
-exports.updateGeneralUserAnalyticsStats = analytics.updateGeneralUserAnalyticsStats
+exports.updateUserDataAnalyticsOnWrite = analytics.updateUserDataAnalyticsOnWrite
