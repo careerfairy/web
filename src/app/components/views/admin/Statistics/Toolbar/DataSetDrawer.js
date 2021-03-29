@@ -16,7 +16,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const DrawerContent = () => {
+const DrawerContent = ({handleClose}) => {
     const classes = useStyles()
     const dispatch = useDispatch()
     const filterGroups = useSelector(state => state.firestore.ordered.filterGroups || [])
@@ -27,7 +27,10 @@ const DrawerContent = () => {
     }])
 
     const handleDeleteFilterGroup = (filterGroupId) => dispatch(actions.deleteFilterGroup(filterGroupId))
-    const handleSetFilterGroupAsCurrent = (filterGroupId) => dispatch(actions.setFilterGroupAsCurrentWithId(filterGroupId))
+    const handleSetFilterGroupAsCurrent = (filterGroupId) => {
+        dispatch(actions.setFilterGroupAsCurrentWithId(filterGroupId))
+        handleClose()
+    }
 
     return (
         <List>
@@ -56,8 +59,13 @@ const DrawerContent = () => {
                 </ListItem>)}
         </List>
     )
-
 }
+
+
+DrawerContent.propTypes = {
+    handleClose: PropTypes.func.isRequired
+}
+
 const DataSetDrawer = ({onClose, open}) => {
     const classes = useStyles()
     const handleClose = () => {
@@ -70,7 +78,7 @@ const DataSetDrawer = ({onClose, open}) => {
             onClose={handleClose}
             PaperProps={{className: classes.drawerPaperRoot}}
         >
-            <DrawerContent/>
+            <DrawerContent handleClose={handleClose}/>
         </Drawer>
     );
 };
@@ -80,4 +88,3 @@ DataSetDrawer.propTypes = {
 }
 
 export default DataSetDrawer;
-

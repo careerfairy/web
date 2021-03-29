@@ -1,15 +1,11 @@
 import React from 'react';
-import {makeStyles, useTheme} from "@material-ui/core/styles";
-import {Box, Grid} from "@material-ui/core";
+import {useTheme} from "@material-ui/core/styles";
 import GroupAddButton from "./GroupAddButton";
 import {useDispatch, useSelector} from "react-redux";
 import FilterCard from "./FilterCard";
 import * as actions from '../../../../../store/actions'
 import {isLoaded} from "react-redux-firebase";
 import Masonry, {ResponsiveMasonry} from "react-responsive-masonry"
-
-const useStyles = makeStyles(theme => ({
-}));
 
 const FilterComponent = () => {
     const dispatch = useDispatch()
@@ -32,9 +28,7 @@ const FilterComponent = () => {
                     <FilterCard groupsLoaded={groupsLoaded} handleRemoveGroupFromFilters={handleRemoveGroupFromFilters}
                                 key={filter.groupId} filter={filter}/>
                 ))}
-                <Box display="flex" justifyContent="center">
                     <GroupAddButton/>
-                </Box>
             </Masonry>
         </ResponsiveMasonry>
     )
