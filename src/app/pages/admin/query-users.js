@@ -1,14 +1,14 @@
 import React from 'react';
 import AdminDashboardLayout from "../../layouts/AdminDashboardLayout";
-import UserTableOverview from "../../components/views/admin/userTable";
+import QueryUsersOverview from "../../components/views/admin/queryUsers";
 
-const UserTablePage = ({}) => {
+const QueryDataPage = ({}) => {
 
     return (
         <AdminDashboardLayout>
-            {/*<UserTableOverview/>*/}
+            <QueryUsersOverview/>
         </AdminDashboardLayout>
     );
 };
 
-export default UserTablePage;
+export default QueryDataPage;

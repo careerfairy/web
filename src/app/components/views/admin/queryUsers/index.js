@@ -2,7 +2,7 @@ import React from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import SwipeableViews from "react-swipeable-views";
 import QueryEditView from "./QueryEditView";
-import {SwipeablePanel, TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
+import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import UserTableView from "./UserTableView";
 import {AppBar, Tab, Tabs} from "@material-ui/core";
 import {useSelector} from "react-redux";
@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const StatisticsOverview = () => {
+const QueryUsersOverview = () => {
     const classes = useStyles()
     const theme = useTheme()
     const [value, setValue] = React.useState(0);
@@ -71,4 +71,4 @@ const StatisticsOverview = () => {
     );
 };
 
-export default StatisticsOverview;
+export default QueryUsersOverview;

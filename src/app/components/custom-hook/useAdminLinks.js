@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {
-    Archive as PastStreamIcon,
     BarChart2 as StatisticsIcon,
     Film as StreamIcon,
-    User as ProfileIcon
+    User as ProfileIcon,
+    Search as FindIcon,
 } from "react-feather";
-import TableIcon from '@material-ui/icons/Toc';
 import {useAuth} from "../../HOCs/AuthProvider";
 
 const initialHeaderLinks = [
@@ -61,16 +60,22 @@ const useAdminLinks = () => {
         if (userData?.isAdmin) {
             setDrawerTopLinks([
                 {
+                    href: `/admin/statistics`,
+                    icon: StatisticsIcon,
+                    title: 'Statistics',
+                    basePath: `/admin/statistics`
+                },
+                {
                     href: `/admin/upcoming-livestreams`,
                     icon: StreamIcon,
                     title: 'Upcoming Streams',
                     basePath: `/admin/upcoming-livestreams`
                 },
                 {
-                    href: `/admin/statistics`,
-                    icon: StatisticsIcon,
-                    title: 'Statistics',
-                    basePath: `/admin/statistics`
+                    href: `/admin/query-users`,
+                    icon: FindIcon,
+                    title: 'Query and Manage Users',
+                    basePath: `/admin/query-users`
                 },
             ])
         } else {

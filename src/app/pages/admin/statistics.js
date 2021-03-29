@@ -1,13 +1,8 @@
 import React from 'react';
-import {makeStyles} from "@material-ui/core/styles";
-import StatisticsOverview from "../../components/views/admin/Statistics";
 import AdminDashboardLayout from "../../layouts/AdminDashboardLayout";
+import StatisticsOverview from "../../components/views/admin/statistics";
 
-const useStyles = makeStyles(theme => ({}));
-
-const StatisticsPage = ({}) => {
-
-    const classes = useStyles()
+const UserTablePage = ({}) => {
 
     return (
         <AdminDashboardLayout>
@@ -16,4 +11,4 @@ const StatisticsPage = ({}) => {
     );
 };
 
-export default StatisticsPage;
+export default UserTablePage;
