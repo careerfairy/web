@@ -1,58 +1,16 @@
 import React from 'react';
 import {Card} from "@material-ui/core";
 import MaterialTable from "material-table";
-import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} from "../../../../util/tableUtils";
+import {defaultTableOptions, exportSelectionAction, tableIcons} from "../../../../util/tableUtils";
 import useUserTable from "../../../../custom-hook/useUserTable";
 import {useSelector} from "react-redux";
 import PropTypes from 'prop-types'
-import {universityCountriesMap} from "../../../../util/constants";
 
 const customTableOptions = {...defaultTableOptions}
-const columns = [
-    {
-        field: "firstName",
-        title: "First Name",
-    },
-    {
-        field: "lastName",
-        title: "Last Name",
-    },
-    {
-        field: "university.name",
-        title: "University",
-    },
-    {
-        field: "unsubscribed",
-        title: "Has Unsubscribed From Newsletter",
-        type: "boolean"
-    },
-    {
-        field: "universityCountryCode",
-        title: "University Country",
-        lookup: universityCountriesMap
-    },
-    {
-        field: "userEmail",
-        title: "Email",
-        render: ({id}) => (
-            <a href={`mailto:${id}`}>
-                {id}
-            </a>
-        ),
-        cellStyle: {
-            width: 300,
-        },
-    },
-    {
-        field: "linkedinUrl",
-        title: "LinkedIn",
-        render: (rowData) => LinkifyText(rowData.linkedinUrl),
 
-    }
-]
 const AdminUsersTable = ({users = []}) => {
 
-    const {setSelection, selection, handlers} = useUserTable()
+    const {setSelection, selection, handlers, columns, tableActions} = useUserTable()
 
     const loading = useSelector(state => state.currentFilterGroup.loading)
 
@@ -63,68 +21,11 @@ const AdminUsersTable = ({users = []}) => {
                 isLoading={loading}
                 data={users}
                 options={customTableOptions}
-                columns={[
-                    {
-                        field: "firstName",
-                        title: "First Name",
-                    },
-                    {
-                        field: "lastName",
-                        title: "Last Name",
-                    },
-                    {
-                        field: "university.name",
-                        title: "University",
-                    },
-                    {
-                        field: "unsubscribed",
-                        title: "Has Unsubscribed From Newsletter",
-                        type: "boolean"
-                    },
-                    {
-                        field: "universityCountryCode",
-                        title: "University Country",
-                        lookup: universityCountriesMap
-                    },
-                    {
-                        field: "userEmail",
-                        title: "Email",
-                        render: ({id}) => (
-                            <a href={`mailto:${id}`}>
-                                {id}
-                            </a>
-                        ),
-                        cellStyle: {
-                            width: 300,
-                        },
-                    },
-                    {
-                        field: "linkedinUrl",
-                        title: "LinkedIn",
-                        render: (rowData) => LinkifyText(rowData.linkedinUrl),
-
-                    }
-                ]}
+                columns={columns()}
                 actions={[
-                    exportSelectionAction(columns, `Users - ${users.length}`),
-                    (rowData) => ({
-                        tooltip: !(rowData.length === 0
-                        ) && "Copy Emails",
-                        position: "toolbarOnSelect",
-                        icon: tableIcons.EmailIcon,
-                        disabled: (rowData.length === 0
-                        ),
-                        onClick: handlers.handleCopyEmails
-                    }),
-                    (rowData) => ({
-                        tooltip: !(rowData.length === 0
-                        ) && "Copy LinkedIn Addresses",
-                        position: "toolbarOnSelect",
-                        icon: tableIcons.LinkedInIcon,
-                        disabled: (rowData.length === 0
-                        ),
-                        onClick: handlers.handleCopyLinkedin
-                    }),
+                    exportSelectionAction(columns(), `Users - ${users.length}`),
+                    tableActions.copyEmails,
+                    tableActions.copyLinkedIn
                 ]}
                 onSelectionChange={(rows) => {
                     setSelection(rows);

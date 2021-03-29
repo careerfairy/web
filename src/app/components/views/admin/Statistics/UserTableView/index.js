@@ -25,12 +25,12 @@ const usersSelector = createSelector(
 const UserTableView = ({isFiltered}) => {
 
     const classes = useStyles()
-    const users = useSelector(({currentFilterGroup:{data:{totalStudentsData, filteredStudentsData}}}) =>
-       isFiltered ? filteredStudentsData.ordered : totalStudentsData.ordered
-    )
-    // const users = useSelector(state =>
-    //     usersSelector(state, {isFiltered})
+    // const users = useSelector(({currentFilterGroup:{data:{totalStudentsData, filteredStudentsData}}}) =>
+    //    isFiltered ? filteredStudentsData.ordered : totalStudentsData.ordered
     // )
+    const users = useSelector(state =>
+        usersSelector(state, {isFiltered})
+    )
 
     return (
         <Container className={classes.root} maxWidth={false}>

@@ -2,9 +2,10 @@ import React, {useMemo, useState} from 'react';
 import {copyStringToClipboard} from "../helperFunctions/HelperFunctions";
 import {useDispatch} from "react-redux";
 import * as actions from '../../store/actions'
-import {LinkifyText} from "../util/tableUtils";
+import {LinkifyText, tableIcons} from "../util/tableUtils";
+import {universityCountriesMap} from "../util/constants";
 
-const columns = [
+const columns = () => [
     {
         field: "firstName",
         title: "First Name",
@@ -23,8 +24,9 @@ const columns = [
         type: "boolean"
     },
     {
-        field: "universityCountry",
+        field: "universityCountryCode",
         title: "University Country",
+        lookup: universityCountriesMap
     },
     {
         field: "userEmail",
@@ -64,7 +66,9 @@ const useUserTable = () => {
             copyStringToClipboard(emails)
             sendMessage("Emails have been copied!")
         },
-
+        getEmails: () => {
+            return selection.map(user => user.id)
+        },
         handleCopyLinkedin: () => {
             const linkedInAddresses = selection.filter(user => user.linkedinUrl).map(user => user.linkedinUrl).join(",")
             if (linkedInAddresses?.length) {
@@ -76,7 +80,28 @@ const useUserTable = () => {
         },
     }), [selection])
 
-    return {selection, setSelection, handlers, columns}
+    const tableActions = useMemo(() => ({
+        copyEmails: (rowData) => ({
+            tooltip: !(rowData.length === 0
+            ) && "Copy Emails",
+            position: "toolbarOnSelect",
+            icon: tableIcons.EmailIcon,
+            disabled: (rowData.length === 0
+            ),
+            onClick: handlers.handleCopyEmails
+        }),
+        copyLinkedIn: (rowData) => ({
+            tooltip: !(rowData.length === 0
+            ) && "Copy LinkedIn Addresses",
+            position: "toolbarOnSelect",
+            icon: tableIcons.LinkedInIcon,
+            disabled: (rowData.length === 0
+            ),
+            onClick: handlers.handleCopyLinkedin
+        })
+    }), [handlers])
+
+    return {selection, setSelection, handlers, columns, tableActions}
 }
 
 
