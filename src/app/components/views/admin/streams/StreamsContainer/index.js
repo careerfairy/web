@@ -4,6 +4,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {CircularProgress, Grid} from "@material-ui/core";
 import StreamCard from "./StreamCard";
 import {isEmpty, isLoaded} from "react-redux-firebase";
+import {streamType} from "../../../../../types";
 
 const useStyles = makeStyles(theme => ({
     loader: {
@@ -26,8 +27,8 @@ const StreamsContainer = ({streams}) => {
     return (
         <React.Fragment>
             {streams.map(stream => (
-                <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-                    <StreamCard stream={stream} key={stream.id || new Date()}/>
+                <Grid key={stream.id || new Date()} item xs={12} sm={6} md={4} lg={4} xl={3}>
+                    <StreamCard stream={stream}/>
                 </Grid>
             ))}
         </React.Fragment>
@@ -35,7 +36,7 @@ const StreamsContainer = ({streams}) => {
 };
 
 StreamsContainer.propTypes = {
-    streams: PropTypes.oneOf([PropTypes.array, PropTypes.any]).isRequired
+    streams: PropTypes.arrayOf(streamType).isRequired
 }
 
 export default StreamsContainer;

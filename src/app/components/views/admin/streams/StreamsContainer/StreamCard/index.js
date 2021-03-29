@@ -24,6 +24,7 @@ import {useDispatch} from "react-redux";
 import * as actions from '../../../../../../store/actions/index'
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog";
+import {streamType} from "../../../../../../types";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -180,51 +181,7 @@ const StreamCard = ({stream}) => {
 }
 
 StreamCard.propTypes = {
-    stream: PropTypes.shape({
-        author: PropTypes.shape({
-            email: PropTypes.string,
-            groupId: PropTypes.string
-        }),
-        backgroundImageUrl: PropTypes.string,
-        company: PropTypes.string,
-        companyId: PropTypes.string,
-        companyLogoUrl: PropTypes.string,
-
-        currentSpeakerId: PropTypes.string,
-        groupIds: PropTypes.array,
-        hidden: PropTypes.bool,
-        id: PropTypes.string,
-        language: PropTypes.shape({
-            code: PropTypes.oneOf(languageCodes.map(({code}) => code)),
-            name: PropTypes.oneOf(languageCodes.map(({name}) => name))
-        }),
-        registeredUsers: PropTypes.array,
-        talentPool: PropTypes.array,
-        participatingStudents: PropTypes.array,
-        speakers: PropTypes.array,
-        lastUpdated: PropTypes.shape({
-            seconds: PropTypes.number,
-            nanoseconds: PropTypes.number,
-            toDate: PropTypes.func
-        }),
-        start: PropTypes.shape({
-            seconds: PropTypes.number,
-            nanoseconds: PropTypes.number,
-            toDate: PropTypes.func
-        }),
-        created: PropTypes.shape({
-            seconds: PropTypes.number,
-            nanoseconds: PropTypes.number,
-            toDate: PropTypes.func
-        }),
-        summary: PropTypes.string,
-
-        targetCategories: PropTypes.object,
-        test: PropTypes.bool,
-        title: PropTypes.string,
-        type: PropTypes.string,
-
-    }).isRequired
+    stream: streamType.isRequired
 }
 
 export default StreamCard

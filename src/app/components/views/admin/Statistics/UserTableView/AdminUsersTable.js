@@ -8,11 +8,13 @@ import PropTypes from 'prop-types'
 
 const customTableOptions = {...defaultTableOptions}
 
-const AdminUsersTable = ({users = []}) => {
+const AdminUsersTable = ({users, isFiltered}) => {
 
     const {setSelection, selection, handlers, columns, tableActions} = useUserTable()
 
     const loading = useSelector(state => state.currentFilterGroup.loading)
+
+    const title = React.useMemo(() => `${isFiltered ? "Filtered" : "Total"} Users - ${users.length}`, [users.length, isFiltered])
 
     return (
         <Card>
@@ -23,25 +25,27 @@ const AdminUsersTable = ({users = []}) => {
                 options={customTableOptions}
                 columns={columns()}
                 actions={[
-                    exportSelectionAction(columns(), `Users - ${users.length}`),
+                    exportSelectionAction(columns(), title),
                     tableActions.copyEmails,
                     tableActions.copyLinkedIn
                 ]}
                 onSelectionChange={(rows) => {
                     setSelection(rows);
                 }}
-                title={`Users - ${users.length}`}
+                title={title}
             />
         </Card>
     )
 };
 
 AdminUsersTable.propTypes = {
-    users: PropTypes.arrayOf(PropTypes.shape({}))
+    users: PropTypes.arrayOf(PropTypes.shape({})),
+    isFiltered: PropTypes.bool
 }
 
 AdminUsersTable.defaultProps = {
-    loading: false
+    loading: false,
+    users: [],
 }
 export default AdminUsersTable;
 

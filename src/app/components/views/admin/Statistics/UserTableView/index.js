@@ -25,9 +25,7 @@ const usersSelector = createSelector(
 const UserTableView = ({isFiltered}) => {
 
     const classes = useStyles()
-    // const users = useSelector(({currentFilterGroup:{data:{totalStudentsData, filteredStudentsData}}}) =>
-    //    isFiltered ? filteredStudentsData.ordered : totalStudentsData.ordered
-    // )
+
     const users = useSelector(state =>
         usersSelector(state, {isFiltered})
     )
@@ -36,7 +34,7 @@ const UserTableView = ({isFiltered}) => {
         <Container className={classes.root} maxWidth={false}>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
-                    <AdminUsersTable users={users}/>
+                    <AdminUsersTable isFiltered={isFiltered} users={users}/>
                 </Grid>
             </Grid>
         </Container>
