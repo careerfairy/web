@@ -1,17 +1,18 @@
 import React, {useRef, useState} from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
-import {Box, Card, CardContent, CardHeader} from "@material-ui/core";
+import {Box, Card, CardContent, CardHeader, IconButton, Tooltip} from "@material-ui/core";
 import {useSelector} from "react-redux";
 import {Doughnut} from "react-chartjs-2";
-import {doughnutOptions, randomColor} from "../../../../util/chartUtils";
+import {doughnutOptions, exportChartDataToCsv, randomColor} from "../../../../util/chartUtils";
 import CustomLegend from "../../../../../materialUI/Legends";
 import {createSelector} from "reselect";
 import {universityCountriesMap} from "../../../../util/constants";
 import {convertStringToArray} from "../../../../helperFunctions/HelperFunctions";
 import {colorsArray} from "../../../../util/colors";
 import Chart from "chart.js";
+import ExportCSVIcon from '@material-ui/icons/GetApp';
 
-// Chart.defaults.global.plugins.labels = false;
+Chart.defaults.global.plugins.labels = false;
 const useStyles = makeStyles(theme => ({}));
 
 const distributionSelector = createSelector(
@@ -44,9 +45,8 @@ const distributionSelector = createSelector(
     }
 )
 
-const UniversityCountriesChart = ({}) => {
+const UniversityCountriesChart = () => {
     const chartRef = useRef()
-
     const classes = useStyles()
     const theme = useTheme()
     const {data, colors, dataArray} = useSelector(state =>
@@ -57,6 +57,14 @@ const UniversityCountriesChart = ({}) => {
         <Card>
             <CardHeader
                 title="Student University Country Distribution"
+                action={
+                    <Tooltip title="Export this chart data to CSV">
+                        <IconButton
+                            onClick={() => exportChartDataToCsv(chartRef, "Student University Country Distribution")}>
+                            <ExportCSVIcon/>
+                        </IconButton>
+                    </Tooltip>
+                }
             />
             <CardContent>
                 <Box

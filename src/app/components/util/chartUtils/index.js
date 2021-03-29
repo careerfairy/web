@@ -1,3 +1,5 @@
+import 'chartjs-plugin-labels';
+import {CsvBuilder} from "filefy";
 
 export const percentageDonutConfig = [{
     display: false,
@@ -41,4 +43,30 @@ export const doughnutOptions = (showPercentage, theme) => ({
 export const randomColor = () => {
     const max = 0xffffff;
     return '#' + Math.round(Math.random() * max).toString(16);
+}
+
+export const exportChartDataToCsv = (chartRef, title) => {
+    const {current:{
+        props:{
+            data:{
+                labels,
+                datasets
+            }
+        }
+    }} = chartRef
+
+    const tableTitle = title.split(" ").join("_")
+    const builder = new CsvBuilder(
+        tableTitle + ".csv"
+    );
+    builder
+        .setColumns(labels)
+        .addRows(
+            datasets.map(({data}) =>
+                labels.map((_, index) =>
+                        data[index]
+                )
+            )
+        )
+        .exportFile();
 }
