@@ -1,18 +1,18 @@
 import PropTypes from 'prop-types'
 import React from "react";
-import BackgroundImage from "./BackgroundImage";
 import {makeStyles} from "@material-ui/core/styles";
 import clsx from "clsx";
 import {Box} from "@material-ui/core";
+import BackgroundImage from "../BackgroundImage";
 
 const useStyles = makeStyles(theme => ({
     sectionComponent: {
-        backgroundColor: theme.palette.navyBlue.main,
+        backgroundColor: (props) => props.backgroundColor,
         display: "block",
         position: "relative",
         [theme.breakpoints.up("sm")]: {
-            paddingTop: 160,
-            paddingBottom: 160
+            paddingTop: (props) => props.big ? 160 : 80,
+            paddingBottom: (props) => props.big ? 160 : 80
         },
         [theme.breakpoints.down("sm")]: {
             paddingTop: 48,
@@ -31,17 +31,21 @@ const Section = (props) => {
         backgroundImageOpacity,
         backgroundImageRepeat,
         children,
+        backgroundColor,
+        big,
         // Passed to section element
         ...otherProps
     } = props;
 
-    const classes = useStyles()
+    const classes = useStyles({
+        backgroundColor: backgroundColor,
+        big: big
+    })
 
     return (
         <Box
             component="section"
             className={
-                // "SectionComponent hero section is-block is-relative" +
                 clsx(classes.sectionComponent)
             }
             {...otherProps}
@@ -62,7 +66,8 @@ Section.propTypes = {
     backgroundImageOpacity: PropTypes.number,
     backgroundImageRepeat: PropTypes.bool,
     children: PropTypes.any,
-    color: PropTypes.string
+    color: PropTypes.string,
+    big: PropTypes.bool,
 }
 
 export default Section;
