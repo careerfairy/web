@@ -9,7 +9,6 @@ const useStyles = makeStyles(theme => ({
         width: theme.spacing(20),
         height: theme.spacing(20),
         marginBottom: theme.spacing(2),
-        cursor: "pointer",
         "& img": {
             transition: theme.transitions.create(['all'], {
                 easing: theme.transitions.easing.sharp,

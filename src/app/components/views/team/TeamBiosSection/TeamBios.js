@@ -4,11 +4,12 @@ import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {Grid} from "@material-ui/core";
 import {TeamMemberCard} from "./TeamMemberCard";
 import Masonry, {ResponsiveMasonry} from "react-responsive-masonry"
+import Bounce from 'react-reveal/Bounce';
 
 const useStyles = makeStyles(theme => ({
 
     gridItem: {
-      display: 'flex',
+        display: 'flex',
     }
 }));
 
@@ -28,8 +29,11 @@ const TeamBios = ({people}) => {
 
         >
             <Masonry gutter={`${theme.spacing(4)}px`}>
-                {people.map((person) => (
-                    <TeamMemberCard person={person} key={person.name} classes={classes}/>
+                {people.map((person, index) => (
+                    <Bounce ssrFadeout key={person.name} delay={index % 2 !== 0 ? 300 : 0} left={index % 2 === 0}
+                            right={index % 2 !== 0}>
+                        <TeamMemberCard person={person} classes={classes}/>
+                    </Bounce>
                 ))}
             </Masonry>
         </ResponsiveMasonry>

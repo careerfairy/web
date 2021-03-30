@@ -14,7 +14,7 @@ const people = [
         bio:
             "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum consequatur numquam aliquam tenetur ad amet inventore hic beatae, quas accusantium perferendis sapiente explicabo.",
         twitterUrl: "",
-        linkedinUrl: "https://linkedin.com",
+        linkedinUrl: "https://www.linkedin.com/in/thomas-schulz-553301a9/",
     },
     {
         avatar: "https://media-exp1.licdn.com/dms/image/C4D03AQEpVEBu4cq9nA/profile-displayphoto-shrink_200_200/0/1578944108740?e=1622678400&v=beta&t=8nBUaTRFxUwT8lShOKGjQ6bCNZkKILO_QGWMezHRu_I",
