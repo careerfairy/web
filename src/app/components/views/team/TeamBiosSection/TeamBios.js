@@ -1,20 +1,21 @@
 import PropTypes from 'prop-types'
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Avatar, Card, CardContent, Grid} from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
+import {Grid} from "@material-ui/core";
+import {TeamMemberCard} from "./TeamMemberCard";
 
 const useStyles = makeStyles(theme => ({
-    avatar: {
-        width: theme.spacing(14),
-        height: theme.spacing(14),
-        marginBottom: theme.spacing(2)
-    },
-    gridItem:{
+
+    gridItem: {
         display: "flex"
     }
 }));
 
+
+TeamMemberCard.propTypes = {
+    person: PropTypes.any,
+    classes: PropTypes.any
+};
 const TeamBios = ({people}) => {
 
     const classes = useStyles()
@@ -22,34 +23,17 @@ const TeamBios = ({people}) => {
     return (
         <Grid container
               justify="center"
-              spacing={3}>
+              spacing={4}>
             {people.map((person, index) => (
                 <Grid
                     item
                     className={classes.gridItem}
                     xs={12}
-                    sm={6}
-                    md={4}
+                    sm={12}
+                    md={6}
                     key={index}
                 >
-                    <Card>
-                        <CardContent align="center">
-                                <Avatar
-                                    className={classes.avatar}
-                                    src={person.avatar}
-                                    alt={person.name}
-                                />
-                            <Typography variant="h5">
-                                {person.name}
-                            </Typography>
-                            <Typography gutterBottom color="textSecondary" variant="subtitle1">
-                                {person.role}
-                            </Typography>
-                            <Typography paragraph>
-                                {person.bio}
-                            </Typography>
-                        </CardContent>
-                    </Card>
+                    <TeamMemberCard person={person} classes={classes}/>
                 </Grid>
             ))}
         </Grid>

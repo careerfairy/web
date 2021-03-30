@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {Box, Divider, Drawer, Hidden, List} from '@material-ui/core';
+import {Box, Divider, Drawer, List} from '@material-ui/core';
 import {LogOut as LogoutIcon} from 'react-feather';
 import NavItem from './NavItem';
 import {useRouter} from "next/router";
@@ -34,7 +34,6 @@ const SideBar = ({
                     onMobileClose,
                     openMobile,
                     drawerTopLinks,
-                    headerLinks,
                     drawerBottomLinks,
                     logout
                 }) => {
@@ -73,15 +72,6 @@ const SideBar = ({
             <Box flexGrow={1}/>
             <Box p={2}>
                 <List>
-                    {/*<Hidden lgUp>*/}
-                    {/*    {headerLinks.map((item) => (*/}
-                    {/*        <NavItem*/}
-                    {/*            href={item.href}*/}
-                    {/*            key={item.title}*/}
-                    {/*            title={item.title}*/}
-                    {/*        />*/}
-                    {/*    ))}*/}
-                    {/*</Hidden>*/}
                     {drawerBottomLinks.map((item) => (
                         <NavItem
                             href={item.href}
@@ -102,8 +92,6 @@ const SideBar = ({
     );
 
     return (
-        <>
-            {/*<Hidden lgUp>*/}
                 <Drawer
                     anchor="left"
                     classes={{paper: clsx(classes.mobileDrawer, classes.background)}}
@@ -114,19 +102,6 @@ const SideBar = ({
                 >
                     {content}
                 </Drawer>
-            {/*</Hidden>*/}
-            {/*<Hidden mdDown>*/}
-            {/*    <Drawer*/}
-            {/*        anchor="left"*/}
-            {/*        classes={{paper: clsx(classes.desktopDrawer, classes.background)}}*/}
-            {/*        className={classes.drawer}*/}
-            {/*        open*/}
-            {/*        variant="persistent"*/}
-            {/*    >*/}
-            {/*        {content}*/}
-            {/*    </Drawer>*/}
-            {/*</Hidden>*/}
-        </>
     );
 };
 
