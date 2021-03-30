@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {Button, ListItem,} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import {useRouter} from "next/router";
-import Link from '../../../materialUI/NextNavLink'
+import Link from '../../../../materialUI/NextNavLink'
 
 
 const useStyles = makeStyles((theme) => ({

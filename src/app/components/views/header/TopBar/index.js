@@ -6,61 +6,16 @@ import MenuIcon from '@material-ui/icons/Menu';
 import NotificationIcon from '@material-ui/icons/NotificationsOutlined';
 import ActiveNotificationIcon from '@material-ui/icons/Notifications';
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
-import Link from '../../../materialUI/NextNavLink'
-import {MainLogo, MiniLogo} from "../../../components/logos";
+import Link from '../../../../materialUI/NextNavLink'
+import {MainLogo, MiniLogo} from "../../../logos";
 import {makeStyles} from "@material-ui/core/styles"
-import {maybePluralize} from "../../../components/helperFunctions/HelperFunctions";
+import {maybePluralize} from "../../../helperFunctions/HelperFunctions";
 import Notifications from "./Notifications";
+import topBarStyles from "../../../../materialUI/styles/topBarStyles";
 
-const useStyles = makeStyles((theme) => ({
-    avatar: {
-        width: 60,
-        height: 60
-    },
-    navIconButton: {
-        color: "white !important"
-    },
-    toolbar: {
-        display: "flex",
-        justifyContent: "space-between"
-    },
-    navLinks: {
-        fontWeight: 600,
-        opacity: 1,
-        color: `${theme.palette.primary.contrastText} !important`,
-        "&:before": {
-            content: '""',
-            position: "absolute",
-            width: "100%",
-            height: 2,
-            bottom: 4,
-            left: "0",
-            backgroundColor: theme.palette.common.white,
-            visibility: "hidden",
-            WebkitTransform: "scaleX(0)",
-            transform: "scaleX(0)",
-            transition: theme.transitions.create(['all'], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.complex,
-            }),
-        },
-        "&:hover:before": {
-            visibility: "visible",
-            WebkitTransform: "scaleX(1)",
-            transform: "scaleX(1)"
-        }
-    },
-    indicator: {
-        background: theme.palette.common.white,
-        color: theme.palette.common.white
-    },
-    root: {
-        // Ensures top bar's Zindex is always above the drawer
-        zIndex: theme.zIndex.drawer + 1
-    }
-}));
+const useStyles = makeStyles(topBarStyles);
 
-const TopBar = ({className, notifications = [], links, onMobileNavOpen, ...rest}) => {
+const TopBar = ({className, notifications , links, onMobileNavOpen, ...rest}) => {
     const classes = useStyles();
     const [notificationAnchor, setNotificationAnchor] = React.useState(null);
 
@@ -73,14 +28,14 @@ const TopBar = ({className, notifications = [], links, onMobileNavOpen, ...rest}
     };
 
     return (
-        <AppBar elevation={1} className={clsx(classes.root, className)} {...rest}>
+        <AppBar  elevation={1} className={clsx(classes.root, className)} {...rest}>
             <Toolbar className={classes.toolbar}>
-                <Hidden smDown>
+                {/*<Hidden xsDown>*/}
                     <MainLogo white/>
-                </Hidden>
-                <Hidden mdUp>
-                    <MiniLogo/>
-                </Hidden>
+                {/*</Hidden>*/}
+                {/*<Hidden mdUp>*/}
+                {/*    <MiniLogo/>*/}
+                {/*</Hidden>*/}
                 <Hidden smDown>
                     <Tabs value={false} classes={{indicator: classes.indicator}}>
                         {links.map((item) => {
@@ -133,14 +88,15 @@ const TopBar = ({className, notifications = [], links, onMobileNavOpen, ...rest}
 };
 
 TopBar.propTypes = {
-  className: PropTypes.string,
-  links: PropTypes.array,
-  notifications: PropTypes.array,
-  onMobileNavOpen: PropTypes.func
+    className: PropTypes.string,
+    links: PropTypes.array,
+    notifications: PropTypes.array,
+    onMobileNavOpen: PropTypes.func
 }
 
 TopBar.defaultProps = {
-  links: []
+    links: [],
+    notifications: []
 }
 export default TopBar;
 
