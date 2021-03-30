@@ -411,7 +411,6 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         streamsFromTimeFrame,
         showBar,
         handleToggleBar,
-        streamsFromTimeFrameAndFuture,
         breakdownRef,
         handleScrollToBreakdown,
         currentStream,
@@ -421,6 +420,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         setUserType,
         groupOptions,
         ...(tabName !== "feedback" && {
+            streamsFromTimeFrameAndFuture,
             handleReset
         }),
         ...(tabName === "feedback" && {
