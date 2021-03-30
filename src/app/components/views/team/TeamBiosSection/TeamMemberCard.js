@@ -3,6 +3,7 @@ import BioAvatar from "./BioAvatar";
 import Typography from "@material-ui/core/Typography";
 import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
     avatar: {
@@ -22,6 +23,9 @@ const useStyles = makeStyles(theme => ({
             transform: "scale(1.1)"
         },
 
+    },
+    greenBorder:{
+      borderBottom: `${theme.spacing(0.5)}px solid ${theme.palette.primary.dark}`
     }
 }));
 export const TeamMemberCard = props => {
@@ -42,8 +46,13 @@ export const TeamMemberCard = props => {
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             raised={hovered}
+                className={clsx({
+                    [classes.greenBorder]: hovered
+                })}
         >
-            <CardContent align="center">
+            <CardContent
+                align="center"
+            >
                 <BioAvatar hovered={hovered} person={props.person} classes={classes}/>
                 <Typography variant="h5">
                     {props.person.name}
