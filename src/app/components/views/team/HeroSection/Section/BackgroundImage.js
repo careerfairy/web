@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
         bottom: "0",
         right: "0",
         position: "absolute",
-        zIndex: -1,
+        // zIndex: -1,
     },
     repeat: {
         backgroundSize: "auto",

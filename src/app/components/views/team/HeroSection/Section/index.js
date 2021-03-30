@@ -3,6 +3,7 @@ import React from "react";
 import BackgroundImage from "./BackgroundImage";
 import {makeStyles} from "@material-ui/core/styles";
 import clsx from "clsx";
+import {Box} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     sectionComponent: {
@@ -37,15 +38,15 @@ const Section = (props) => {
     const classes = useStyles()
 
     return (
-        <section
+        <Box
+            component="section"
             className={
                 // "SectionComponent hero section is-block is-relative" +
-                clsx(classes.sectionComponent, {
-                    [classes.isWhite]: color === "white"
-                })
+                clsx(classes.sectionComponent)
             }
             {...otherProps}
         >
+            {props.children}
             {backgroundImage && (
                 <BackgroundImage
                     image={backgroundImage}
@@ -53,8 +54,7 @@ const Section = (props) => {
                     repeat={backgroundImageRepeat}
                 />
             )}
-            {props.children}
-        </section>
+        </Box>
     );
 }
 Section.propTypes = {

@@ -5,7 +5,14 @@ import {Container} from "@material-ui/core";
 import Section from "./Section";
 import SectionHeader from "./SectionHeader";
 
-const useStyles = makeStyles(theme => ({}));
+const useStyles = makeStyles(theme => ({
+    container: {
+        zIndex: 1,
+        "&.MuiContainer-root": {
+            position: "relative"
+        }
+    },
+}));
 
 const HeroSection = (props) => {
 
@@ -17,7 +24,7 @@ const HeroSection = (props) => {
             backgroundImage={props.backgroundImage}
             backgroundImageOpacity={props.backgroundImageOpacity}
         >
-            <Container style={{zIndex: 2}}>
+            <Container className={classes.container}>
                 <SectionHeader
                     color={props.color}
                     title={props.title}

@@ -5,11 +5,11 @@ import TeamBiosSection from "../components/views/team/TeamBiosSection";
 import {useTheme} from "@material-ui/core/styles";
 const placeholderBackground = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2F6098fdd8-f209-4736-8db7-d86025eb1806_CF.PNG?alt=media"
 const TeamPage = () => {
-    const {palette:{common:{black}, text:{secondary}}} = useTheme()
+    const {palette:{common:{white}, text:{secondary}}} = useTheme()
     return (
         <GeneralLayout>
             <HeroSection
-                color={secondary}
+                color={white}
                 backgroundImage={placeholderBackground}
                 backgroundImageOpacity={0.5}
                 title="We help you make money"
