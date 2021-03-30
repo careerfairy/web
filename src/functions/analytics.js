@@ -15,7 +15,7 @@ exports.updateUserDataAnalyticsOnWrite = functions.firestore.document('userData/
                 const oldUniCountryCode = previousValue.universityCountryCode || null
                 const newUniCountryCode = newValue.universityCountryCode || null
                 if (oldUniCountryCode) {
-                    // Decrement university country count in db
+                    // Decrement previous university country count in db
                     newData = {
                         ...newData,
                         [`totalByCountry.${oldUniCountryCode}`]: admin.firestore.FieldValue.increment(-1)
@@ -23,7 +23,7 @@ exports.updateUserDataAnalyticsOnWrite = functions.firestore.document('userData/
 
                 }
                 if (newUniCountryCode) {
-                    // Increment new uni country in db
+                    // Increment new university country in db
                     newData = {
                         ...newData,
                         [`totalByCountry.${newUniCountryCode}`]: admin.firestore.FieldValue.increment(1)
@@ -31,12 +31,13 @@ exports.updateUserDataAnalyticsOnWrite = functions.firestore.document('userData/
                 }
 
                 if (!oldUniCountryCode && newUniCountryCode) {
-                    // Increment total field
+                    // Increment total field if you previously didn't have any university country
                     newData = {
                         ...newData,
                         total: admin.firestore.FieldValue.increment(1)
                     }
                 } else if (oldUniCountryCode && !newUniCountryCode) {
+                    // Decrement total field if you previously did have a university country but now you dont
                     newData = {
                         ...newData,
                         total: admin.firestore.FieldValue.increment(-1)
