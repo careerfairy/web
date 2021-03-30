@@ -5,7 +5,7 @@ import React from "react";
 import {withStyles} from "@material-ui/core/styles";
 import clsx from "clsx";
 
-const SmallAvatar = withStyles((theme) => ({
+export const SmallAvatar = withStyles((theme) => ({
     root: {
         bottom: 10,
         width: 35,
