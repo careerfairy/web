@@ -15,11 +15,12 @@ const TeamPage = () => {
                 backgroundImage={placeholderBackground}
                 backgroundImageOpacity={0.5}
                 title="We help you make money"
-                subtitle="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum consequatur numquam aliquam tenetur ad amet inventore hic beatae, quas accusantium perferendis sapiente explicabo, corporis totam!"
+                subtitle="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum consequatur numquam aliquam tenetur ad amet
+                inventore hic beatae, quas accusantium perferendis sapiente explicabo, corporis totam!"
             />
             <TeamBiosSection
                 color={primary}
-                // backgroundColor={}
+                backgroundColor=""
                 backgroundImage=""
                 backgroundImageOpacity={1}
                 title="Meet the Team"
