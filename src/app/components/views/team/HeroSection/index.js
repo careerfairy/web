@@ -2,8 +2,8 @@ import PropTypes from 'prop-types'
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {Container} from "@material-ui/core";
-import Section from "../common/Section";
-import SectionHeader from "../common/SectionHeader";
+import Section from "../../common/Section";
+import SectionHeader from "../../common/SectionHeader";
 
 const useStyles = makeStyles(theme => ({
     container: {

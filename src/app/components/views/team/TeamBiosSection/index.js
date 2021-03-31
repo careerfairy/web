@@ -1,9 +1,9 @@
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {Container} from "@material-ui/core";
-import Section from "../common/Section";
-import SectionHeader from "../common/SectionHeader";
 import TeamBios from "./TeamBios";
+import Section from "../../common/Section";
+import SectionHeader from "../../common/SectionHeader";
 
 const useStyles = makeStyles(theme => ({}));
 const people = [
@@ -30,7 +30,11 @@ const people = [
         name: "Solène Wolf",
         role: "Business Development & Strategy",
         bio:
-            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum consequatur numquam aliquam tenetur ad amet inventore hic beatae, quas accusantium perferendis sapiente explicabo, corporis totam! Labore reprehenderit beatae magnam animi!",
+            "Solène owns a Master in Management from Skema Business School in France and started her international path during her exchange semesters in Munich, Germany and Québec, Canada.\\n" +
+            "Starting her career in HR Marketing for Alstom in Switzerland made her decide to join Randstad Professionals to deepen her knowledge in recruitment. This experiences were later applied at " +
+            "the Career Center of the Swiss Federal Institute of Technology (ETH Zürich), where she helped students find the right career start. This path naturally lead her to CareerFairy where she " +
+            "enables companies to attract their next generation of talents and realises her purpose: helping students get the insights they need to start their career.\\n" +
+            "She loves to spend time with her friends and family, hiking or skiing in the Swiss mountains.",
         twitterUrl: "",
         linkedinUrl: "https://www.linkedin.com/in/solwolff/",
     },
@@ -54,10 +58,7 @@ const people = [
     },
 ]
 const TeamBiosSection = (props) => {
-    // const [people, setPeople] = React.useState([]);
     const classes = useStyles()
-
-
 
     return (
         <Section

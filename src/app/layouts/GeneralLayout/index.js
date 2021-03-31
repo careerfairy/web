@@ -7,6 +7,7 @@ import styles from "../../materialUI/styles/groupDashboardStyles";
 import useGeneralLinks from "../../components/custom-hook/useGeneralLinks";
 import TopBar from "../../components/views/header/TopBar";
 import SideBar from "../../components/views/header/SideBar";
+import Footer from "../../components/views/footer/Footer";
 
 const useStyles = makeStyles(styles);
 const useWrapperStyles = makeStyles(theme => ({
@@ -37,7 +38,7 @@ const GeneralLayout = (props) => {
                 notifications={notifications}
                 onMobileNavOpen={() => setMobileNavOpen(true)}
             />
-          <SideBar
+            <SideBar
                 drawerTopLinks={mainLinks}
                 drawerBottomLinks={secondaryLinks}
                 headerLinks={mainLinks}
@@ -51,6 +52,7 @@ const GeneralLayout = (props) => {
                             notifications,
                             ...props
                         }))}
+                        <Footer/>
                     </div>
                 </div>
             </div>
@@ -64,6 +66,5 @@ GeneralLayout.propTypes = {
     firebase: PropTypes.object,
 }
 
-GeneralLayout.defaultProps = {
-}
+GeneralLayout.defaultProps = {}
 export default withFirebase(GeneralLayout);

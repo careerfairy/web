@@ -4,6 +4,7 @@ import Typography from "@material-ui/core/Typography";
 import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import clsx from "clsx";
+import {MultilineText} from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(theme => ({
     avatar: {
@@ -62,7 +63,7 @@ export const TeamMemberCard = props => {
                 </Typography>
                 <Collapse in={hovered}>
                     <Typography paragraph>
-                        {props.person.bio}
+                        <MultilineText text={props.person.bio}/>
                     </Typography>
                 </Collapse>
             </CardContent>
