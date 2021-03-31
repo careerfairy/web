@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {useMemo, useState} from 'react';
+import React, {useMemo, useState, useEffect} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import NavBar from './NavBar';
 import {withFirebase} from "../../context/firebase";
@@ -8,17 +8,41 @@ import TopBar from "./TopBar";
 import styles from "../../materialUI/styles/groupDashboardStyles";
 import {CircularProgress} from "@material-ui/core";
 import useAdminLinks from "../../components/custom-hook/useAdminLinks";
+import {useRouter} from "next/router";
+import * as actions from '../../store/actions'
+import {useDispatch} from "react-redux";
 
 const useStyles = makeStyles(styles);
 
 const AdminDashboardLayout = (props) => {
-    const {children, firebase} = props
+    const {children} = props
     const classes = useStyles();
+    const dispatch = useDispatch()
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
-    const {userData} = useAuth()
+    const {userData, authenticatedUser} = useAuth()
+    const {replace} = useRouter()
+    const enqueueSnackbar = (...args) => dispatch(actions.enqueueSnackbar(...args))
 
 
     const {headerLinks, drawerTopLinks, drawerBottomLinks} = useAdminLinks()
+
+    useEffect(() => {
+        (async function handleRedirect() {
+            const unAuthorized = (authenticatedUser.isLoaded && userData) && !userData.isAdmin
+            if (unAuthorized) {
+                await replace("/")
+                const message = "You do not have permission to visit this page"
+                enqueueSnackbar({
+                    message,
+                    options: {
+                        variant: "error",
+                        preventDuplicate: true,
+                        key: message
+                    }
+                })
+            }
+        })()
+    }, [authenticatedUser?.isLoaded, userData])
 
     const isAdmin = useMemo(() => userData?.isAdmin, [userData?.isAdmin])
 
@@ -41,7 +65,7 @@ const AdminDashboardLayout = (props) => {
                         {(isAdmin) ? React.Children.map(children, child => React.cloneElement(child, {
                             isAdmin,
                             ...props
-                        })):(
+                        })) : (
                             <CircularProgress style={{margin: "auto"}}/>
                         )}
                     </div>
@@ -57,6 +81,5 @@ AdminDashboardLayout.propTypes = {
     firebase: PropTypes.object,
 }
 
-AdminDashboardLayout.defaultProps = {
-}
+AdminDashboardLayout.defaultProps = {}
 export default withFirebase(AdminDashboardLayout);
