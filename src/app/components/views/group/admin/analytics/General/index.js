@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useMemo, useState} from "react";
 import {Container, Grid, Tooltip} from "@material-ui/core";
 import TotalRegistrations from "./TotalRegistrations";
 import TotalUniqueRegistrations from "./TotalUniqueRegistrations";
@@ -10,11 +10,7 @@ import LatestEvents from "../common/LatestEvents";
 import UserCount from "./UserCount";
 import TotalUniqueParticipatingStudents from "./TotalUniqueParticipatingStudents";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import {
-    getTotalEmailsFromStreamsByProperty,
-    getTypeOfStudents,
-    getUniqueIds
-} from "../../../../../../data/util/AnalyticsUtil";
+import {getTotalEmailsFromStreamsByProperty, getUniqueIds} from "../../../../../../data/util/AnalyticsUtil";
 
 
 const useStyles = makeStyles(theme => ({
@@ -49,17 +45,10 @@ const General = ({
                      showBar
                  }) => {
     const classes = useStyles()
-    const [currentCategory, setCurrentCategory] = useState({options: []});
     const [localUserType, setLocalUserType] = useState(userTypes[0]);
     const theme = useTheme()
     const mediumScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-    useEffect(() => {
-        if (group.categories?.length) {
-            setCurrentCategory({...group.categories[0]})
-        }
-
-    }, [group.categories])
 
     const getTotalRegisteredUsers = (streamsArray) => {
         const total = streamsArray.reduce(
@@ -173,16 +162,6 @@ const General = ({
         [streamsFromTimeFrameAndFuture, streamsFromBeforeTimeFrame]
     );
 
-    const typesOfOptions = useMemo(
-        () => getTypeOfStudents(localUserType.propertyDataName,
-            {
-                currentStream,
-                currentCategory,
-                group,
-                streamsFromTimeFrameAndFuture
-            }),
-        [streamsFromTimeFrameAndFuture, currentStream, localUserType, currentCategory.id]
-    );
 
     const getCategoryProps = () => ({item: true, xs: 12, sm: 6, lg: 3, xl: 3})
     return (
