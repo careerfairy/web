@@ -30,9 +30,11 @@ const Toolbar = ({queryDataSet, loading}) => {
         dispatch(actions.handleChangeFilterLabel(value))
     }
 
+    const isEmpty = !currentFilterGroup.data.label && !currentFilterGroup.data.filters.length && !currentFilterGroup.data.id
+
     const buttons = [
         {
-            disabled: false,
+            disabled: isEmpty,
             label: "Save Current Dataset",
             onClick: () => handleSaveCurrentFilterGroup(),
             startIcon: <SaveIcon/>,
@@ -52,7 +54,7 @@ const Toolbar = ({queryDataSet, loading}) => {
             label: "Create a new Dataset",
             onClick: () => handleCreateNewFilterGroup(),
             startIcon: <AddDatasetIcon/>,
-            hide: false,
+            hide: !currentFilterGroup.data?.id,
             color: navyBlue.main
         },
         {
@@ -60,10 +62,11 @@ const Toolbar = ({queryDataSet, loading}) => {
             label: "Delete Current Dataset",
             onClick: () => handleDeleteCurrentFilterGroup(),
             startIcon: <DeleteIcon/>,
-            hide: !currentFilterGroup.data,
+            hide: !currentFilterGroup.data?.id,
             color: error.main
         },
     ].filter(({hide}) => !hide)
+    console.log("-> currentFilterGroup", currentFilterGroup);
 
     return (
         <Card>

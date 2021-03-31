@@ -3,9 +3,9 @@ import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {Box, Chip, IconButton, TextField} from "@material-ui/core";
 import {Autocomplete} from "@material-ui/lab";
-import {convertArrayOfObjectsToDictionaryByProp} from "../../../../../../data/util/AnalyticsUtil";
+import {convertArrayOfObjectsToDictionaryByProp} from "../../../../../../../data/util/AnalyticsUtil";
 import {useDispatch} from "react-redux";
-import * as actions from '../../../../../../store/actions'
+import * as actions from '../../../../../../../store/actions'
 import CancelSharpIcon from '@material-ui/icons/CancelSharp';
 
 const useStyles = makeStyles(theme => ({

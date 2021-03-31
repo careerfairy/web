@@ -3,11 +3,11 @@ import React, {useEffect} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {Container, Grid} from "@material-ui/core";
 import Toolbar from "../Toolbar";
-import FilterComponent from "../FilterComponent";
 import {useDispatch, useSelector} from "react-redux";
 import {useFirestore} from "react-redux-firebase";
 import * as actions from "../../../../../store/actions";
 import {convertArrayOfObjectsToDictionaryByProp} from "../../../../../data/util/AnalyticsUtil";
+import FilterComponent from "./FilterComponent";
 
 const useStyles = makeStyles(theme => ({
     root: {

@@ -2,16 +2,16 @@ import PropTypes from 'prop-types'
 import React, {useCallback, useEffect} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {Button, Card, CardActions, CardContent, CardHeader, IconButton, Typography} from "@material-ui/core";
-import * as actions from '../../../../../../store/actions'
+import * as actions from '../../../../../../../store/actions'
 import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import CategorySelect from "./CategorySelect";
 import DeleteFilterIcon from '@material-ui/icons/DeleteForever';
 import {isEmpty, isLoaded, useFirestore} from "react-redux-firebase";
 import Skeleton from "@material-ui/lab/Skeleton";
-import GroupsUtil from "../../../../../../data/util/GroupsUtil";
+import GroupsUtil from "../../../../../../../data/util/GroupsUtil";
 import AddOrRemoveCategoryButton from "./AddOrRemoveCategoryButton";
-import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
-import useDeleteFilter from "../../../../../custom-hook/useDeleteFilter";
+import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal";
+import useDeleteFilter from "../../../../../../custom-hook/useDeleteFilter";
 
 const useStyles = makeStyles(theme => ({
     content: {

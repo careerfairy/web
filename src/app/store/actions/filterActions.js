@@ -52,12 +52,18 @@ export const saveCurrentFilterGroup = () => async (dispatch, getState, {getFires
                 .doc()
             targetId = filterGroupDocRef.id
         }
+        const cleanedFilterGroup = cleanFilterGroup(currentFilterGroupData, targetId)
         await firestore
             .collection("filterGroups")
             .doc(targetId)
-            .set(cleanFilterGroup(currentFilterGroupData, targetId), {merge: true})
+            .set(cleanedFilterGroup, {merge: true})
 
-        dispatch(setFilterGroupAsCurrentWithId(targetId))
+        dispatch({
+            type: actions.SET_CURRENT_FILTER_GROUP,
+            payload: cleanedFilterGroup
+        });
+        // dispatch(setFilterGroupAsCurrentWithId(targetId))
+
         dispatch(actionMethods.enqueueSnackbar({
             message: "Query has successfully been saved",
             options: {

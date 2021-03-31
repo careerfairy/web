@@ -1,14 +1,11 @@
 import PropTypes from 'prop-types'
 import React from 'react';
-import {makeStyles} from "@material-ui/core/styles";
 import {Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
 import {useDispatch, useSelector} from "react-redux";
-import * as actions from '../../../../../../store/actions'
+import * as actions from '../../../../../../../store/actions'
 import {Autocomplete} from "@material-ui/lab";
-import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
-import useDeleteFilter from "../../../../../custom-hook/useDeleteFilter";
-
-const useStyles = makeStyles(theme => ({}));
+import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal";
+import useDeleteFilter from "../../../../../../custom-hook/useDeleteFilter";
 
 
 const Content = ({handleClose}) => {

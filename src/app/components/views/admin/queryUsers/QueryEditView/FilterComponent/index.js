@@ -3,7 +3,7 @@ import {useTheme} from "@material-ui/core/styles";
 import GroupAddButton from "./GroupAddButton";
 import {useDispatch, useSelector} from "react-redux";
 import FilterCard from "./FilterCard";
-import * as actions from '../../../../../store/actions'
+import * as actions from '../../../../../../store/actions'
 import {isLoaded} from "react-redux-firebase";
 import Masonry, {ResponsiveMasonry} from "react-responsive-masonry"
 

@@ -1,13 +1,10 @@
 import PropTypes from 'prop-types'
 import React, {useEffect} from 'react';
-import {makeStyles} from "@material-ui/core/styles";
 import {Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
 import {Autocomplete} from "@material-ui/lab";
-import {convertArrayOfObjectsToDictionaryByProp} from "../../../../../../../data/util/AnalyticsUtil";
-import * as actions from '../../../../../../../store/actions'
+import {convertArrayOfObjectsToDictionaryByProp} from "../../../../../../../../data/util/AnalyticsUtil";
+import * as actions from '../../../../../../../../store/actions'
 import {useDispatch} from "react-redux";
-
-const useStyles = makeStyles(theme => ({}));
 
 
 const Content = ({groupCategories, handleClose, filterOptions, groupId}) => {
