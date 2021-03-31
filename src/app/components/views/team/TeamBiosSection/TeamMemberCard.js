@@ -34,10 +34,10 @@ export const TeamMemberCard = props => {
 
     const classes = useStyles()
 
-    const handleMouseEnter = event => {
+    const handleMouseEnter = () => {
         setHovered(true)
     }
-    const handleMouseLeave = event => {
+    const handleMouseLeave = () => {
         setHovered(false)
     }
 

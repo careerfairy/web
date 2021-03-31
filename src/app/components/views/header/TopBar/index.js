@@ -7,7 +7,7 @@ import NotificationIcon from '@material-ui/icons/NotificationsOutlined';
 import ActiveNotificationIcon from '@material-ui/icons/Notifications';
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
 import Link from '../../../../materialUI/NextNavLink'
-import {MainLogo, MiniLogo} from "../../../logos";
+import {MainLogo} from "../../../logos";
 import {makeStyles} from "@material-ui/core/styles"
 import {maybePluralize} from "../../../helperFunctions/HelperFunctions";
 import Notifications from "./Notifications";
@@ -15,7 +15,7 @@ import topBarStyles from "../../../../materialUI/styles/topBarStyles";
 
 const useStyles = makeStyles(topBarStyles);
 
-const TopBar = ({className, notifications , links, onMobileNavOpen, ...rest}) => {
+const TopBar = ({className, notifications, links, onMobileNavOpen, ...rest}) => {
     const classes = useStyles();
     const [notificationAnchor, setNotificationAnchor] = React.useState(null);
 
@@ -28,14 +28,9 @@ const TopBar = ({className, notifications , links, onMobileNavOpen, ...rest}) =>
     };
 
     return (
-        <AppBar  elevation={1} className={clsx(classes.root, className)} {...rest}>
+        <AppBar elevation={1} className={clsx(classes.root, className)} {...rest}>
             <Toolbar className={classes.toolbar}>
-                {/*<Hidden xsDown>*/}
-                    <MainLogo white/>
-                {/*</Hidden>*/}
-                {/*<Hidden mdUp>*/}
-                {/*    <MiniLogo/>*/}
-                {/*</Hidden>*/}
+                <MainLogo white/>
                 <Hidden smDown>
                     <Tabs value={false} classes={{indicator: classes.indicator}}>
                         {links.map((item) => {

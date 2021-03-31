@@ -24,6 +24,9 @@ module.exports = (phase, {defaultConfig}) => {
 
             return config
         },
+        // future: {
+        //     webpack5: true
+        // }
     }
     if (phase === PHASE_PRODUCTION_BUILD) {
         config.distDir = '../../dist/client'
