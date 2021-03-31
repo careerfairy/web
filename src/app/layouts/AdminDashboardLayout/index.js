@@ -28,7 +28,7 @@ const AdminDashboardLayout = (props) => {
 
     useEffect(() => {
         (async function handleRedirect() {
-            const unAuthorized = (authenticatedUser.isLoaded && userData) && !userData.isAdmin
+            const unAuthorized = authenticatedUser.isLoaded && (authenticatedUser.isEmpty || (!authenticatedUser.isEmpty && userData && !userData.isAdmin))
             if (unAuthorized) {
                 await replace("/")
                 const message = "You do not have permission to visit this page"
@@ -42,7 +42,7 @@ const AdminDashboardLayout = (props) => {
                 })
             }
         })()
-    }, [authenticatedUser?.isLoaded, userData])
+    }, [authenticatedUser, userData])
 
     const isAdmin = useMemo(() => userData?.isAdmin, [userData?.isAdmin])
 
