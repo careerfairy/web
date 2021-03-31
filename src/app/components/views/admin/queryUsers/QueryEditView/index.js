@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types'
 import React, {useEffect} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Backdrop, CircularProgress, Container, Grid} from "@material-ui/core";
+import {Container, Grid} from "@material-ui/core";
 import Toolbar from "../Toolbar";
 import FilterComponent from "../FilterComponent";
 import {useDispatch, useSelector} from "react-redux";
-import {isLoaded, useFirestore} from "react-redux-firebase";
+import {useFirestore} from "react-redux-firebase";
 import * as actions from "../../../../../store/actions";
 import {convertArrayOfObjectsToDictionaryByProp} from "../../../../../data/util/AnalyticsUtil";
 
@@ -16,24 +17,19 @@ const useStyles = makeStyles(theme => ({
         paddingTop: theme.spacing(3),
         width: "100%"
     },
-    backdrop: {
-        zIndex: theme.zIndex.tooltip
-    }
+
 }));
 
-const QueryEditView = ({}) => {
+const QueryEditView = ({loading}) => {
 
     const dispatch = useDispatch()
     const classes = useStyles()
     const firestore = useFirestore()
     const filters = useSelector(state => state.currentFilterGroup.data?.filters || [])
-    const currentFilterGroupLoading = useSelector(state => state.currentFilterGroup.loading)
     const totalData = useSelector(state => Boolean(state.currentFilterGroup.data.totalStudentsData.data))
     const data = useSelector(state => state.firestore.data)
 
-    const groupsLoaded = useSelector(({firestore: {data: {careerCenterData}}}) => isLoaded(careerCenterData))
 
-    const loading = Boolean(currentFilterGroupLoading || !groupsLoaded)
 
     useEffect(() => {
         (async function getAllGroups() {
@@ -89,11 +85,12 @@ const QueryEditView = ({}) => {
                     <FilterComponent/>
                 </Grid>
             </Grid>
-            <Backdrop className={classes.backdrop} open={loading}>
-                <CircularProgress color="inherit"/>
-            </Backdrop>
         </Container>
     );
 };
 
+QueryEditView.propTypes = {
+  loading: PropTypes.bool
+}
 export default QueryEditView;
+

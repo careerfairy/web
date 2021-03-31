@@ -4,8 +4,9 @@ import SwipeableViews from "react-swipeable-views";
 import QueryEditView from "./QueryEditView";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import UserTableView from "./UserTableView";
-import {AppBar, Tab, Tabs} from "@material-ui/core";
+import {AppBar, Backdrop, CircularProgress, Container, Grid, Tab, Tabs} from "@material-ui/core";
 import {useSelector} from "react-redux";
+import {isLoaded} from "react-redux-firebase";
 
 const useStyles = makeStyles(theme => ({
     slide: {
@@ -18,6 +19,9 @@ const useStyles = makeStyles(theme => ({
     tab: {
         fontWeight: 600
     },
+    backdrop: {
+        zIndex: theme.zIndex.tooltip
+    }
 }));
 
 const QueryUsersOverview = () => {
@@ -26,6 +30,9 @@ const QueryUsersOverview = () => {
     const [value, setValue] = React.useState(0);
     const totalCount = useSelector(state => state.currentFilterGroup.data.totalStudentsData.count)
     const filteredCount = useSelector(state => state.currentFilterGroup.data.filteredStudentsData.count)
+    const currentFilterGroupLoading = useSelector(state => state.currentFilterGroup.loading)
+    const groupsLoaded = useSelector(({firestore: {data: {careerCenterData}}}) => isLoaded(careerCenterData))
+    const loading = Boolean(currentFilterGroupLoading || !groupsLoaded)
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -58,7 +65,7 @@ const QueryUsersOverview = () => {
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel index={0} value={value}>
-                    <QueryEditView/>
+                    <QueryEditView loading={loading}/>
                 </TabPanel>
                 <TabPanel index={1} value={value}>
                     <UserTableView isFiltered/>
@@ -67,6 +74,9 @@ const QueryUsersOverview = () => {
                     <UserTableView/>
                 </TabPanel>
             </SwipeableViews>
+            <Backdrop className={classes.backdrop} open={loading}>
+                <CircularProgress color="inherit"/>
+            </Backdrop>
         </React.Fragment>
     );
 };
