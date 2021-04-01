@@ -18,3 +18,23 @@ export {
 } from './userDataSetActions.js';
 
 export {closeSnackbar, enqueueSnackbar, removeSnackbar, sendGeneralError} from './snackbarActions.js'
+export {
+    deleteFilterGroup,
+    setFilters,
+    setFilterOptions,
+    setFilterOptionTargetOptions,
+    setCurrentFilterGroupLoaded,
+    setCurrentFilterGroupLoading,
+    setTotalFilterGroupUsers,
+    filterAndSetGroupFollowers,
+    addGroupFollowersToTotal,
+    setCurrentFilterGroupFiltered,
+    setCurrentFilterGroupNotFiltered,
+    clearCurrentFilterGroupFilteredData,
+    handleSetNewTotalFilteredStudents,
+    handleCalculateAndSetNewTotalStudents,
+    saveCurrentFilterGroup,
+    setFilterGroupAsCurrentWithId,
+    handleChangeFilterLabel,
+    createFilterGroup
+} from './filterActions.js'

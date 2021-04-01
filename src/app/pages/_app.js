@@ -30,7 +30,7 @@ config({ssrFadeout: true});
 
 // react-redux-firebase config
 const rrfConfig = {
-    userProfile: 'userData',
+    // userProfile: 'userData',
     useFirestoreForProfile: true, // Firestore for Profile instead of Realtime DB
     attachAuthIsReady: true, // attaches auth is ready promise to store
 };
