@@ -261,6 +261,15 @@ export const  addMinutes = (date, minutes) => {
     return new Date(date.getTime() + minutes * 60000);
 }
 
+export const toTitleCase =(str) => {
+    return str.replace(
+        /\w\S*/g,
+        function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        }
+    );
+}
+
 export const makeExternalLink = (url) => {
     const urlPattern = new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/);
     let string = url

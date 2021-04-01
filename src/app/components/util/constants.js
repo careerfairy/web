@@ -20,20 +20,21 @@ export const SUBMIT_FOR_APPROVAL = "SUBMIT_FOR_APPROVAL"
 
 export const LONG_NUMBER = 9999999
 
-const universityCountries = [
-    {code: "CH", name: "Switzerland"},
-    {code: "AT", name: "Austria"},
-    {code: "US", name: "United States"},
-    {code: "DE", name: "Germany"},
-    {code: "ES", name: "Spain"},
-    {code: "FI", name: "Finland"},
-    {code: "FR", name: "France"},
-    {code: "GB", name: "United Kingdom"},
-    {code: "IT", name: "Italy"},
-    {code: "NL", name: "Netherlands"},
-    {code: "NO", name: "Norway"},
-    {code: "SE", name: "Sweden"},
-]
+// const universityCountries = [
+//     {code: "CH", name: "Switzerland"},
+//     {code: "AT", name: "Austria"},
+//     {code: "US", name: "United States"},
+//     {code: "DE", name: "Germany"},
+//     {code: "ES", name: "Spain"},
+//     {code: "FI", name: "Finland"},
+//     {code: "FR", name: "France"},
+//     {code: "GB", name: "United Kingdom"},
+//     {code: "IT", name: "Italy"},
+//     {code: "NL", name: "Netherlands"},
+//     {code: "NO", name: "Norway"},
+//     {code: "SE", name: "Sweden"},
+//     {code: "BE", name: "Belgium"},
+// ]
 export const universityCountriesMap = {
     CH: "Switzerland",
     AT: "Austria",
@@ -47,10 +48,22 @@ export const universityCountriesMap = {
     NL: "Netherlands",
     NO: "Norway",
     SE: "Sweden",
-    OTHER: "other",
-    other: "other"
+    OTHER: "Other",
+    "": "None",
+    // New
+    BE: "Belgium",
+    IE: "Ireland",
+    BG: "Bulgaria",
+    EE: "Estonia",
+    HU: "Hungary",
+    PL: "Poland",
+    PT: "Portugal",
+    SK: "Slovakia",
+    SI: "Slovenia",
+
 }
 
+export const universityCountries = Object.keys(universityCountriesMap).map(key =>({code: key, name: universityCountriesMap[key]}))
 
 
 export const EMOTE_MESSAGE_TEXT_TYPE = "EMOTE"
