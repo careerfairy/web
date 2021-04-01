@@ -65,7 +65,7 @@ const userTypes = [
     },
     {
         propertyName: "participatingStudents",
-        displayName: "Participating Students",
+        displayName: "Participating Users",
         propertyDataName: "participatingStudentsData",
         universityPropertyDataName: "universityParticipatingStudentsData"
     },
@@ -102,7 +102,6 @@ const streamsSelector = createSelector(
                     }
                     livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
                         ...userDataSetDictionary?.[userEmail],
-                        universityCountry: universityCountriesMap[userDataSetDictionary?.[userEmail]?.universityCountryCode]
                     }))
                 }
                 return livestream
@@ -447,7 +446,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
 
     return (
         <Fragment>
-            <Box className={classes.title} p={3}>
+            <Box className={classes.title} >
                 <Title
                     setGlobalTimeFrame={setGlobalTimeFrame}
                     userDataSets={userDataSets}

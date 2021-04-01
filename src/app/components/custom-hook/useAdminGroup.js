@@ -62,7 +62,7 @@ const useAdminGroup = (groupId) => {
         }
 
         return queriesArray
-    }, [authenticatedUser?.email])
+    }, [authenticatedUser?.email, groupId])
 
     useFirestoreConnect(queries)
 

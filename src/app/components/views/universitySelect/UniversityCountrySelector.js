@@ -35,6 +35,15 @@ const UniversityCountrySelector = ({handleClose, handleOpen, open, value, handle
                 <MenuItem value={"NL"}>Netherlands</MenuItem>
                 <MenuItem value={"NO"}>Norway</MenuItem>
                 <MenuItem value={"SE"}>Sweden</MenuItem>
+                <MenuItem value={"BE"}>Belgium</MenuItem>
+                <MenuItem value={"IE"}>Ireland</MenuItem>
+                <MenuItem value={"BG"}>Bulgaria</MenuItem>
+                <MenuItem value={"EE"}>Estonia</MenuItem>
+                <MenuItem value={"HU"}>Hungary</MenuItem>
+                <MenuItem value={"PL"}>Poland</MenuItem>
+                <MenuItem value={"PT"}>Portugal</MenuItem>
+                <MenuItem value={"SK"}>Slovakia</MenuItem>
+                <MenuItem value={"SI"}>Slovenia</MenuItem>
             </Select>
             <Collapse in={Boolean(error)}>
                 <FormHelperText error={Boolean(error)}>
