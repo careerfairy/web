@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import {withFirebase} from "../../context/firebase";
@@ -56,6 +57,7 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamerLayout = (props) => {
     const {children, firebase} = props
+
     const {query: {token, livestreamId}, pathname} = useRouter()
     const router = useRouter();
     const [numberOfViewers, setNumberOfViewers] = useState(0);
@@ -254,4 +256,9 @@ const StreamerLayout = (props) => {
     );
 };
 
+StreamerLayout.propTypes = {
+  children: PropTypes.node.isRequired,
+  firebase: PropTypes.object
+}
 export default withFirebase(StreamerLayout);
+

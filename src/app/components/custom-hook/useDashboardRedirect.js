@@ -69,7 +69,6 @@ const useDashboardRedirect = (group, firebase) => {
     const handleJoinDashboard = async () => {
         try {
             const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId, group.id)
-            console.log("-> isValidInvite", isValidInvite);
             if (!isValidInvite) {
                 await replace("/")
                 const message = "This invite link provided is no longer valid"

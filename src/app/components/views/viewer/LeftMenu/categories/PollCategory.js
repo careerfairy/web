@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
 import {Paper} from "@material-ui/core";
@@ -7,13 +7,12 @@ import {GreyPermanentMarker, PollQuestion} from "../../../../../materialUI/Globa
 import {CategoryContainerCentered} from "../../../../../materialUI/GlobalContainers";
 import {colorsArray} from "../../../../util/colors";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
-import {makeStyles, useTheme, withStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
-import {isServer} from "../../../../helperFunctions/HelperFunctions";
-import {v4 as uuid} from 'uuid';
 import PollUtil from "../../../../../data/util/PollUtil";
+import {isServer} from "../../../../helperFunctions/HelperFunctions";
 
-const PollWrapper = withStyles(theme => ({
+const usePollWrapperStyles = makeStyles(theme => ({
     root: {
         borderRadius: 15,
         margin: 10,
@@ -26,16 +25,94 @@ const PollWrapper = withStyles(theme => ({
         padding: theme.spacing(2, 0),
         boxShadow: theme.shadows[3]
     },
-}))(Paper);
+}))
+
+const PollWrapper = ({children, ...rest}) => {
+    const classes = usePollWrapperStyles()
+    return (
+        <Paper {...rest} className={classes.root}>
+            {children}
+        </Paper>
+    )
+}
+
+PollWrapper.propTypes = {
+    children: PropTypes.node.isRequired,
+    style: PropTypes.object
+}
+
 const useStyles = makeStyles(theme => ({
     pollButton: {
         marginTop: theme.spacing(1)
     }
 }))
 
-const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => {
+
+const PollOptionsDisplay = ({currentPoll, voting, voteForPollOption}) => {
     const theme = useTheme()
     const classes = useStyles()
+    return (
+        <CategoryContainerCentered>
+            <PollWrapper style={{padding: theme.spacing(2)}}>
+                <PollQuestion style={{margin: "1.5rem 0"}}>
+                    {currentPoll?.question}
+                </PollQuestion>
+                <div>
+                    {currentPoll?.options?.map((option) => {
+                        return (
+                            <DynamicColorButton
+                                key={option.index}
+                                variant="contained"
+                                loading={voting}
+                                className={classes.pollButton}
+                                color={colorsArray[option.index]}
+                                fullWidth
+                                disabled={voting}
+                                onClick={() => voteForPollOption(option.index)}
+                                size='small'>
+                                <span key={`${option.index}-span`}>
+                                {option.name}
+                                </span>
+                            </DynamicColorButton>
+                        );
+                    })}
+                </div>
+            </PollWrapper>
+        </CategoryContainerCentered>
+    )
+}
+
+PollOptionsDisplay.propTypes = {
+    currentPoll: PropTypes.object,
+    voteForPollOption: PropTypes.func,
+    voting: PropTypes.bool
+}
+
+const PollDisplay = ({currentPoll}) => {
+
+    return (
+        <CategoryContainerCentered>
+            <PollWrapper>
+                {(currentPoll && !isServer()) && <CurrentPollGraph currentPoll={currentPoll}/>}
+            </PollWrapper>
+        </CategoryContainerCentered>
+    )
+}
+
+PollDisplay.propTypes = {
+    currentPoll: PropTypes.object
+}
+
+const NoPollDisplay = () => {
+    return (
+        <CategoryContainerCentered>
+            <GreyPermanentMarker>
+                No current poll
+            </GreyPermanentMarker>
+        </CategoryContainerCentered>
+    )
+}
+const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => {
     const {authenticatedUser} = useAuth();
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentPollId, setCurrentPollId] = useState(null);
@@ -71,60 +148,36 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
         if (authEmail) {
             setVoting(true)
             await firebase.voteForPollOption(livestream.id, currentPoll.id, authEmail, index);
-            setVoting(false)   
+            setVoting(false)
         }
     }
 
     let authEmail = (authenticatedUser && authenticatedUser.email && !livestream.test) ? authenticatedUser.email : 'streamerEmail';
+    const hasVoted = useMemo(() => currentPoll?.voters?.indexOf(authEmail) > -1, [authEmail, currentPoll?.voters])
 
-    if (currentPoll && authEmail) {
-        if (currentPoll.voters?.indexOf(authEmail) === -1) {
-            let optionElementsLarge = currentPoll.options?.map((option) => {
-                return (
-                    <DynamicColorButton
-                        key={option.index}
-                        variant="contained"
-                        loading={voting}
-                        className={classes.pollButton}
-                        color={colorsArray[option.index]}
-                        children={option.name}
-                        fullWidth
-                        disabled={voting}
-                        onClick={() => voteForPollOption(option.index)}
-                        size='small'/>
-                );
-            });
-            return (
-                <CategoryContainerCentered>
-                    <PollWrapper style={{padding: theme.spacing(2)}}>
-                        <PollQuestion style={{margin: "1.5rem 0"}}>
-                            {currentPoll.question}
-                        </PollQuestion>
-                        <div>
-                            {optionElementsLarge}
-                        </div>
-                    </PollWrapper>
-                </CategoryContainerCentered>
-            );
-        } else {
-            return (
-                <CategoryContainerCentered>
-                    <PollWrapper>
-                        {!isServer() && <CurrentPollGraph currentPoll={currentPoll}/>}
-                    </PollWrapper>
-                </CategoryContainerCentered>
-            )
-
+    const renderPollComponent = () => {
+        switch (true) {
+            case !Boolean(currentPoll && authEmail) :
+                return <NoPollDisplay/>
+            case !hasVoted:
+                return (<PollOptionsDisplay
+                    currentPoll={currentPoll}
+                    voteForPollOption={voteForPollOption}
+                    voting={voting}
+                />)
+            case hasVoted:
+                return (<PollDisplay currentPoll={currentPoll}/>)
+            default:
+                return <NoPollDisplay/>;
         }
-    } else {
-        return (
-            <CategoryContainerCentered>
-                <GreyPermanentMarker>
-                    No current poll
-                </GreyPermanentMarker>
-            </CategoryContainerCentered>
-        );
     }
+
+
+    return (
+        <>
+            {renderPollComponent()}
+        </>
+    )
 }
 PollCategory.propTypes = {
     firebase: PropTypes.any,
@@ -133,4 +186,3 @@ PollCategory.propTypes = {
     setShowMenu: PropTypes.func.isRequired
 }
 export default withFirebase(PollCategory);
-

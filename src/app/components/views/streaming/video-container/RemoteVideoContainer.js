@@ -91,7 +91,10 @@ function RemoteVideoContainer(props) {
 
     useEffect(() => {
         if (!props.isPlayMode) {
-            props.attachSinkId(videoElement.current, props.speakerSource)
+            let audioElement = document.getElementById(`audio${props.stream.streamId}`)
+            if (audioElement) {
+                props.attachSinkId(audioElement, props.speakerSource)
+            }
         }
     }, [props.speakerSource])
 

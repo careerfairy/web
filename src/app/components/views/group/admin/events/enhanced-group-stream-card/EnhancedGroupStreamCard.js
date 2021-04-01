@@ -143,14 +143,18 @@ const EnhancedGroupStreamCard = ({
 
     useEffect(() => {
         if (registeredStudents && registeredStudents.length) {
-            let studentsOfGroup = [];
-            registeredStudents.forEach(registeredStudent => {
-                if (studentBelongsToGroup(registeredStudent)) {
-                    let publishedStudent = StatsUtil.getStudentInGroupDataObject(registeredStudent, group);
-                    studentsOfGroup.push(publishedStudent);
-                }
-            });
-            setRegisteredStudentsFromGroup(studentsOfGroup);
+            let newRegisteredStudentsFromGroup = []
+            if (group.universityCode) {
+                newRegisteredStudentsFromGroup = registeredStudents.filter(student => studentBelongsToGroup(student))
+                    .map(filteredStudent => StatsUtil.getStudentInGroupDataObject(filteredStudent, group))
+            } else {
+                const livestreamGroups = allGroups.filter(group => livestream.groupIds.includes(group.id))
+                newRegisteredStudentsFromGroup = registeredStudents.map(student => {
+                    const livestreamGroupUserBelongsTo = StatsUtil.getFirstGroupThatUserBelongsTo(student, livestreamGroups, group)
+                    return StatsUtil.getStudentInGroupDataObject(student, livestreamGroupUserBelongsTo || {})
+                })
+            }
+            setRegisteredStudentsFromGroup(newRegisteredStudentsFromGroup);
         }
     }, [registeredStudents]);
 

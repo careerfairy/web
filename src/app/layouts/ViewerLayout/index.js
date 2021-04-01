@@ -151,7 +151,7 @@ const ViewerLayout = (props) => {
             setShowMenu(true);
         }
         setSelectedState(state);
-    },[showMenu])
+    }, [showMenu])
     const showAudience = useCallback(() => {
         setAudienceDrawerOpen(true)
     }, []);
@@ -226,7 +226,7 @@ const ViewerLayout = (props) => {
 
     return (
         <CurrentStreamContext.Provider value={{currentLivestream}}>
-            <div className={classes.root}>
+            <div className={`${classes.root} notranslate`}>
                 <ViewerTopBar
                     showAudience={showAudience}
                     showMenu={showMenu}
