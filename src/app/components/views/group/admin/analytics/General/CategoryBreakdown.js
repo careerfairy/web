@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {Doughnut} from 'react-chartjs-2';
 import {
+    Accordion, AccordionDetails, AccordionSummary,
     Box,
     Button,
     Card,
@@ -29,6 +30,8 @@ import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {useSelector} from "react-redux";
 import {createSelector} from 'reselect'
 import StatsUtil from "../../../../../../data/util/StatsUtil";
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 
 const audienceSelector = createSelector(
     state => state,
@@ -51,10 +54,24 @@ const audienceSelector = createSelector(
 Chart.defaults.global.plugins.labels = false;
 
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
     root: {
         height: '100%'
+    },
+    accordionRoot: {
+        boxShadow: theme.shadows[2],
+        "&:before":{
+            backgroundColor: "transparent !important"
+        }
+    },
+    heading: {
+        fontSize: theme.typography.pxToRem(15),
+        fontWeight: theme.typography.fontWeightMedium,
+    },
+    expanded: {
+        marginTop: "0 !important"
     }
+
 }));
 
 function randomColor() {
@@ -87,6 +104,7 @@ const CategoryBreakdown = ({
     const [localColors, setLocalColors] = useState(colorsArray);
     const [total, setTotal] = useState(0);
     const [showPercentage, setShowPercentage] = useState(true);
+    const [showLabels, setShowLabels] = useState(true);
     const [value, setValue] = useState(0);
     const [currentGroup, setCurrentGroup] = useState(groups?.[0] || {});
     const [typesOfOptions, setTypesOfOptions] = useState([]);
@@ -341,22 +359,37 @@ const CategoryBreakdown = ({
                         />}
                 </Box>
                 {!hasNoData() &&
-                <Box
-                    display="flex"
-                    justifyContent="center"
-                    mt={2}
-                >
-                    <CustomLegend
-                        options={currentCategory.options}
-                        colors={localColors}
-                        chartRef={chartRef}
-                        fullWidth
-                        hideEmpty
-                        chartData={data}
-                        optionDataType="Student"
-                        optionValueProp="count"
-                    />
-                </Box>}
+                <Accordion
+                    expanded={showLabels}
+                    classes={{expanded: classes.expanded, root: classes.accordionRoot}}
+                    onClick={() => setShowLabels(!showLabels)}>
+                    <AccordionSummary
+                        expandIcon={<ExpandMoreIcon/>}
+                        style={{minHeight: 45}}
+                    >
+                        <Typography className={classes.heading}>
+                            {showLabels ? "Hide Breakdown" : "Show Breakdown"}
+                        </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <Box
+                            display="flex"
+                            justifyContent="center"
+                        >
+                            <CustomLegend
+                                options={currentCategory.options}
+                                colors={localColors}
+                                chartRef={chartRef}
+                                fullWidth
+                                hideEmpty
+                                chartData={data}
+                                optionDataType="Student"
+                                optionValueProp="count"
+                            />
+                        </Box>
+                    </AccordionDetails>
+                </Accordion>
+                }
             </CardContent>
         </Card>
     );
