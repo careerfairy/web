@@ -40,7 +40,8 @@ const Audience = ({
     const classes = useStyles()
     const getUsers = () => {
         if (currentStream) {
-            return currentStream[userType.propertyDataName]
+            const updatedStream = streamsFromTimeFrameAndFuture.find(stream => stream.id === currentStream.id)
+            return updatedStream?.[userType.propertyDataName] || currentStream[userType.propertyDataName]
         } else {
             const totalViewers = streamsFromTimeFrameAndFuture.reduce(
                 (accumulator, livestream) => {
@@ -51,10 +52,11 @@ const Audience = ({
             return getUniqueUsersByEmailWithArrayOfUsers(totalViewers)
         }
     };
-
     const totalUniqueUsers = useMemo(() => getUsers(), [
         streamsFromTimeFrameAndFuture, currentStream, userType
     ]);
+    // console.log("-> streamsFromTimeFrameAndFuture", streamsFromTimeFrameAndFuture);
+    // console.log("-> totalUniqueUsers", totalUniqueUsers);
 
 
     return (
