@@ -224,7 +224,7 @@ const General = ({
                         </Tooltip>
                         {(mediumScreen && !group.universityCode) &&
                         <Tooltip arrow
-                                 title={`This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}>
+                                 title={`11111This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}>
                             <Grid item xs={12} md={12} sm={12}>
                                 <TotalUniqueParticipatingStudents
                                     fetchingStreams={loading}
@@ -237,6 +237,7 @@ const General = ({
                             </Grid>
                         </Tooltip>
                         }
+
                         <Grid item xs={12}>
                             <LatestEvents
                                 timeFrames={globalTimeFrame.timeFrames}
@@ -254,43 +255,43 @@ const General = ({
                                 group={group}
                             />
                         </Grid>
-                        <Grid item lg={4} md={6} xl={3} xs={12}>
-                            <Grid container spacing={3}>
-                                {(!mediumScreen && !group.universityCode) &&
-                                <Tooltip arrow
-                                         title={`This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}>
-                                    <Grid xs={12} item>
-                                        <TotalUniqueParticipatingStudents
-                                            fetchingStreams={loading}
-                                            totalUniqueParticipatingStudents={totalUniqueParticipatingStudents}
-                                            uniqueParticipationStatus={uniqueParticipationStatus}
-                                            timeFrames={globalTimeFrame.timeFrames}
-                                            globalTimeFrame={globalTimeFrame}
-                                            group={group}
-                                        />
-                                    </Grid>
-                                </Tooltip>}
-                            </Grid>
-                        </Grid>
 
                     </Grid>
                 </Grid>
-                <Grid xs={12} sm={12} md={5} lg={4}  item>
-                    <CategoryBreakdown
-                        currentStream={currentStream}
-                        breakdownRef={breakdownRef}
-                        localUserType={localUserType}
-                        currentUserDataSet={currentUserDataSet}
-                        setLocalUserType={setLocalUserType}
-                        userTypes={userTypes}
-                        streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}
-                        groups={groups}
-                        isUni={isUni}
-                        handleReset={handleReset}
-                        setUserType={setUserType}
-                        setCurrentStream={setCurrentStream}
-                        group={group}
-                    />
+                <Grid xs={12} sm={12} md={5} lg={4} item>
+                    <Grid container spacing={3}>
+                        {(!mediumScreen && !group.universityCode) &&
+                        <Tooltip arrow
+                                 title={`22222This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}>
+                            <Grid xs={12} item>
+                                <TotalUniqueParticipatingStudents
+                                    fetchingStreams={loading}
+                                    totalUniqueParticipatingStudents={totalUniqueParticipatingStudents}
+                                    uniqueParticipationStatus={uniqueParticipationStatus}
+                                    timeFrames={globalTimeFrame.timeFrames}
+                                    globalTimeFrame={globalTimeFrame}
+                                    group={group}
+                                />
+                            </Grid>
+                        </Tooltip>}
+                        <Grid item xs={12}>
+                            <CategoryBreakdown
+                                currentStream={currentStream}
+                                breakdownRef={breakdownRef}
+                                localUserType={localUserType}
+                                currentUserDataSet={currentUserDataSet}
+                                setLocalUserType={setLocalUserType}
+                                userTypes={userTypes}
+                                streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}
+                                groups={groups}
+                                isUni={isUni}
+                                handleReset={handleReset}
+                                setUserType={setUserType}
+                                setCurrentStream={setCurrentStream}
+                                group={group}
+                            />
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
         </Container>

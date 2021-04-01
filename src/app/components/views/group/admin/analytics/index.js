@@ -24,6 +24,7 @@ import useTimeFrames from "../../../../custom-hook/useTimeFrames";
 import useUserDataSet from "../../../../custom-hook/useUserDataSet";
 import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDictionary";
 import {repositionElement} from "../../../../helperFunctions/HelperFunctions";
+import HideOnScroll from "../../../common/HideOnScroll";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -446,20 +447,20 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
 
     return (
         <Fragment>
-            <Box className={classes.title} >
-                <Title
-                    setGlobalTimeFrame={setGlobalTimeFrame}
-                    userDataSets={userDataSets}
-                    streamsMounted={streamsMounted}
-                    setStreamsMounted={setStreamsMounted}
-                    currentUserDataSet={currentUserDataSet}
-                    setCurrentUserDataSet={setCurrentUserDataSet}
-                    globalTimeFrames={globalTimeFrames}
-                    group={group}
-                    globalTimeFrame={globalTimeFrame}
-                />
-            </Box>
             <AppBar className={classes.appBar} position="sticky" color="default">
+                <Box className={classes.title}>
+                    <Title
+                        setGlobalTimeFrame={setGlobalTimeFrame}
+                        userDataSets={userDataSets}
+                        streamsMounted={streamsMounted}
+                        setStreamsMounted={setStreamsMounted}
+                        currentUserDataSet={currentUserDataSet}
+                        setCurrentUserDataSet={setCurrentUserDataSet}
+                        globalTimeFrames={globalTimeFrames}
+                        group={group}
+                        globalTimeFrame={globalTimeFrame}
+                    />
+                </Box>
                 <Tabs
                     value={value}
                     TabIndicatorProps={{className: classes.indicator}}
