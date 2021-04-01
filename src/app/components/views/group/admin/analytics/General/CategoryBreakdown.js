@@ -59,8 +59,10 @@ const useStyles = makeStyles(theme => ({
         height: '100%'
     },
     accordionRoot: {
-        // boxShadow: "none",
-        backgroundColor: theme.palette.background.default,
+        boxShadow: theme.shadows[2],
+        "&:before":{
+            backgroundColor: "transparent !important"
+        }
     },
     heading: {
         fontSize: theme.typography.pxToRem(15),
