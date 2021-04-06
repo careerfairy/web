@@ -13,8 +13,8 @@ const useStyles = makeStyles(theme => ({
             marginBottom: "3rem"
         }
     },
-    searchWrapper:{
-      marginTop: theme.spacing(5)
+    searchWrapper: {
+        marginTop: theme.spacing(5)
     },
     subtitle: {
         // Subtitle text generally isn't very long
@@ -50,7 +50,7 @@ function SectionHeader(props) {
             )}
             {props.hasSearch && (
                 <div className={classes.searchWrapper}>
-                <GeneralSearch/>
+                    <GeneralSearch/>
                 </div>
             )}
         </header>
