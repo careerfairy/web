@@ -1,17 +1,35 @@
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {SwipeablePanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import {Paper, Tab, Tabs} from "@material-ui/core";
+import {supportSections} from "../dumyData";
+import {useRouter} from "next/router";
 
 const useStyles = makeStyles(theme => ({
     root: {
         flexGrow: 1,
         display: 'flex',
-        height: 224,
-        position: "sticky"
+        boxShadow: theme.shadows[4],
+        overflowY: "auto",
+        '&::-webkit-scrollbar': {
+            width: '0.4em'
+        },
+        '&::-webkit-scrollbar-track': {
+            boxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
+            webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)'
+        },
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0,0,0,.1)',
+        },
+        position: "sticky",
+        top: 165,
+        maxHeight: "calc(100vh - 180px)"
     },
     tabs: {
         borderRight: `1px solid ${theme.palette.divider}`,
+        width: "100%",
+        "&.MuiTab-root": {
+            maxWidth: "auto"
+        }
     },
     indicatorRoot: {
         left: "0",
@@ -29,31 +47,27 @@ function a11yProps(index) {
 const SupportNav = () => {
 
     const classes = useStyles()
-
-    const [value, setValue] = React.useState(0);
-
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
+    const {pathname} = useRouter()
 
     return (
         <Paper className={classes.root}>
             <Tabs
                 orientation="vertical"
                 variant="scrollable"
-                value={value}
+                value={pathname}
                 TabIndicatorProps={{classes: {root: classes.indicatorRoot}}}
-                onChange={handleChange}
                 aria-label="Vertical tabs example"
                 className={classes.tabs}
             >
-                <Tab label="Item One" {...a11yProps(0)} />
-                <Tab label="Item Two" {...a11yProps(1)} />
-                <Tab label="Item Three" {...a11yProps(2)} />
-                <Tab label="Item Four" {...a11yProps(3)} />
-                <Tab label="Item Five" {...a11yProps(4)} />
-                <Tab label="Item Six" {...a11yProps(5)} />
-                <Tab label="Item Seven" {...a11yProps(6)} />
+                {supportSections.map((section, index) => (
+                    <Tab
+                        key={section.href}
+                        value={section.href}
+                        href={section.href}
+                        label={section.title}
+                        {...a11yProps(index)}
+                    />
+                ))}
             </Tabs>
         </Paper>
     );
