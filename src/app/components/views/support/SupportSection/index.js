@@ -3,7 +3,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import Section from "../../common/Section";
 import SectionHeader from "../../common/SectionHeader";
 import {Container} from "@material-ui/core";
-import SupportSearch from "./SupportSearch";
+import Support from "./Support";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -11,13 +11,16 @@ const useStyles = makeStyles(theme => ({
         "&.MuiContainer-root": {
             position: "relative"
         },
-
+        color: props => props.color
     },
 }));
 
 const SupportSection = (props) => {
 
-    const classes = useStyles()
+    const classes = useStyles({
+        color: props.color
+    })
+
 
     return (
         <Section
@@ -32,12 +35,10 @@ const SupportSection = (props) => {
                 <SectionHeader
                     color={props.color}
                     title={props.title}
+                    hasSearch={props.hasSearch}
                     subtitle={props.subtitle}
                 />
-                <SupportSearch/>
-                {/*<Faq*/}
-                {/*    items={}*/}
-                {/*/>*/}
+                <Support title={props.supportTitle}/>
             </Container>
         </Section>
     );

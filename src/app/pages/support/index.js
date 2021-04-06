@@ -15,6 +15,8 @@ const SupportPage = ({}) => {
                 backgroundColor={navyBlue.main}
                 // backgroundImage={placeholderBackground}
                 backgroundImageOpacity={0.5}
+                hasSearch
+                supportTitle="Help Desk"
                 title="CareerFairy Help Center"
                 subtitle=""
             />

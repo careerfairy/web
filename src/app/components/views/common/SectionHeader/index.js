@@ -3,6 +3,7 @@ import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import clsx from "clsx";
 import {Typography} from "@material-ui/core";
+import GeneralSearch from "../GeneralSearch";
 
 const useStyles = makeStyles(theme => ({
     sectionHeader: {
@@ -11,6 +12,9 @@ const useStyles = makeStyles(theme => ({
         "&:not(:last-child)": {
             marginBottom: "3rem"
         }
+    },
+    searchWrapper:{
+      marginTop: theme.spacing(5)
     },
     subtitle: {
         // Subtitle text generally isn't very long
@@ -43,6 +47,11 @@ function SectionHeader(props) {
                 <Typography align="center" variant="subtitle1">
                     <span className={classes.subtitle}>{props.subtitle}</span>
                 </Typography>
+            )}
+            {props.hasSearch && (
+                <div className={classes.searchWrapper}>
+                <GeneralSearch/>
+                </div>
             )}
         </header>
     );
