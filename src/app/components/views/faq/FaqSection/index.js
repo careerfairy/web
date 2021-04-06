@@ -2,18 +2,10 @@ import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import Section from "../../common/Section";
 import SectionHeader from "../../common/SectionHeader";
-import {Container} from "@material-ui/core";
 import Faq from "./Faq";
+import SupportContainer from "../../support/SupportContainer";
 
-const useStyles = makeStyles(theme => ({
-    container: {
-        zIndex: 1,
-        "&.MuiContainer-root": {
-            position: "relative"
-        },
-
-    },
-}));
+const useStyles = makeStyles(theme => ({}));
 
 const FaqSection = (props) => {
 
@@ -27,8 +19,7 @@ const FaqSection = (props) => {
             backgroundImageOpacity={props.backgroundImageOpacity}
             backgroundColor={props.backgroundColor}
         >
-            <Container className={classes.container}>
-
+            <SupportContainer>
                 <SectionHeader
                     color={props.color}
                     title={props.title}
@@ -141,7 +132,7 @@ const FaqSection = (props) => {
                         },
                     ]}
                 />
-            </Container>
+            </SupportContainer>
         </Section>
     );
 };

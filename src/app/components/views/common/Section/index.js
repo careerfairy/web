@@ -4,6 +4,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import clsx from "clsx";
 import {Box} from "@material-ui/core";
 import BackgroundImage from "../BackgroundImage";
+import SupportNav from "../../support/SupportNav";
 
 const useStyles = makeStyles(theme => ({
     sectionComponent: {
