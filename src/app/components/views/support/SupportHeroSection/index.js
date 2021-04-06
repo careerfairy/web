@@ -3,7 +3,6 @@ import {makeStyles} from "@material-ui/core/styles";
 import Section from "../../common/Section";
 import SectionHeader from "../../common/SectionHeader";
 import {Container} from "@material-ui/core";
-import Support from "./Support";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -15,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const SupportSection = (props) => {
+const SupportHeroSection = (props) => {
 
     const classes = useStyles({
         color: props.color
@@ -24,24 +23,23 @@ const SupportSection = (props) => {
 
     return (
         <Section
-            big
             color={props.color}
+            big={props.big}
             backgroundImage={props.backgroundImage}
             backgroundImageOpacity={props.backgroundImageOpacity}
             backgroundColor={props.backgroundColor}
         >
             <Container className={classes.container}>
-
                 <SectionHeader
                     color={props.color}
                     title={props.title}
-                    hasSearch={props.hasSearch}
+                    hasSearch
                     subtitle={props.subtitle}
                 />
-                <Support title={props.supportTitle}/>
+
             </Container>
         </Section>
     );
 };
 
-export default SupportSection;
+export default SupportHeroSection;

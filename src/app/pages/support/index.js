@@ -1,7 +1,8 @@
 import React from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import GeneralLayout from "../../layouts/GeneralLayout";
-import SupportSection from "../../components/views/support/SupportSection";
+import SupportHeroSection from "../../components/views/support/SupportHeroSection";
+import SupportCategoriesSection from "../../components/views/support/SupportCategoriesSection";
 
 const useStyles = makeStyles(theme => ({}));
 
@@ -12,14 +13,21 @@ const SupportPage = ({}) => {
     const {palette: {common: {white}, text: {primary}, navyBlue}} = useTheme()
     return (
         <GeneralLayout>
-            <SupportSection
+            <SupportHeroSection
                 color={white}
                 backgroundColor={navyBlue.main}
                 backgroundImage={supportBanner}
                 backgroundImageOpacity={0.5}
                 hasSearch
-                supportTitle="Help Desk"
                 title="CareerFairy Help Center"
+                subtitle=""
+            />
+            <SupportCategoriesSection
+                color={primary}
+                backgroundColor=""
+                backgroundImage=""
+                backgroundImageOpacity={1}
+                title="Help Desk"
                 subtitle=""
             />
         </GeneralLayout>

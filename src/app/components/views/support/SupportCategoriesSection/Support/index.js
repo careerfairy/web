@@ -56,12 +56,12 @@ const Support = ({title}) => {
     return (
         <React.Fragment>
             <Grid spacing={3} container>
-                {title &&
-                <Grid item xs={12}>
-                    <Typography color="inherit" variant="h3" className={classes.title}>
-                        {title}
-                    </Typography>
-                </Grid>}
+                {/*{title &&*/}
+                {/*<Grid item xs={12}>*/}
+                {/*    <Typography color="inherit" variant="h3" className={classes.title}>*/}
+                {/*        {title}*/}
+                {/*    </Typography>*/}
+                {/*</Grid>}*/}
                 {sections.map(section => (
                     <Grid className={classes.sectionGridItem} item xs={12} md={6} lg={4} key={section.title}>
                         <SupportSectionCard section={section}/>
