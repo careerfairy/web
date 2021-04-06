@@ -1,9 +1,10 @@
-import React, {createContext, useContext, useEffect} from "react";
+import React, {createContext, useContext, useEffect, useMemo} from "react";
 import {useRouter} from "next/router";
 import dynamic from "next/dynamic";
+
 const Loader = dynamic(
     () => import('../components/views/loader/Loader'),
-    { ssr: false }
+    {ssr: false}
 )
 import {useSelector} from "react-redux";
 import {useFirestoreConnect} from 'react-redux-firebase'
@@ -30,18 +31,16 @@ const AuthProvider = ({children}) => {
 
     const auth = useSelector((state) => state.firebase.auth)
 
-    // const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'ownerObj'}]
-
     const {pathname, replace, asPath} = useRouter();
 
-    useFirestoreConnect(() => {
-        return auth.email ? [
-            {
-                collection: 'userData', doc: auth.email,  // or `userData/${auth.email}`
-                storeAs: "userProfile",
-            }
-        ] : []
-    }, [auth.email])
+    const query = useMemo(() => auth.email ? [
+        {
+            collection: 'userData', doc: auth.email,  // or `userData/${auth.email}`
+            storeAs: "userProfile",
+        }
+    ] : [], [auth?.email])
+
+    useFirestoreConnect(query)
 
     const userData = useSelector(({firestore}) => auth.email ? firestore.data.userProfile : null)
 

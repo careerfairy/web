@@ -1,3 +1,5 @@
+import {toTitleCase} from "../../components/helperFunctions/HelperFunctions";
+
 const getCategoryOptionName = (targetCategoryId, user, groupContext) => {
     if (user.registeredGroups) {
         const targetGroup = user.registeredGroups.find(groupObj => groupObj.groupId === groupContext.groupId)
@@ -17,15 +19,23 @@ const mapUserCategories = (user, group) => {
     group.categories.forEach(category => {
         const targetCategoryId = category.id
         if (targetCategoryId) {
-            const propertyName = category.name
-            user[propertyName] = getCategoryOptionName(targetCategoryId, user, group)
+            const propertyName = toTitleCase(category.name)
+            if (!user[propertyName]) {
+                const categoryOptionName = getCategoryOptionName(targetCategoryId, user, group) || ""
+                user[propertyName] = toTitleCase(categoryOptionName.toLowerCase())
+            }
         }
     })
     return user
 }
 
-const mapUserEngagement = (user, streams, group) => {
-    const categoryUser = mapUserCategories(user, group)
+const mapUserEngagement = (user, streams, group, requestingCompanyGroup) => {
+    let categoryUser = user
+    categoryUser = mapUserCategories(user, group)
+    if (requestingCompanyGroup) {
+        // Try and map the requesting company's categories to the user
+        categoryUser = mapUserCategories(user, requestingCompanyGroup)
+    }
     categoryUser.watchedEvent = false
     const registeredStreams = []
     const watchedStreams = []
@@ -68,6 +78,10 @@ const getTotalUniqueIds = (streams = []) => {
 
 const convertArrayOfUserObjectsToDictionary = (arrayOfUsers) => {
     return Object.assign({}, ...arrayOfUsers.map(user => ({[user.userEmail]: user})))
+}
+
+const convertArrayOfObjectsToDictionaryByProp = (arrayOfObjects, prop) => {
+    return Object.assign({}, ...arrayOfObjects.map(obj => ({[obj[prop]]: obj})))
 }
 
 const getTotalEmailsFromStreamsByProperty = (streamsArray, prop) => {
@@ -169,5 +183,6 @@ module.exports = {
     getTypeOfStudents,
     getTotalUniqueStreamGroupIdsFromStreams,
     arraysOfIdsEqual,
-    getUniqueUsersByEmailWithArrayOfUsers
+    getUniqueUsersByEmailWithArrayOfUsers,
+    convertArrayOfObjectsToDictionaryByProp
 }

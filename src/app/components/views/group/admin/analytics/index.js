@@ -24,6 +24,7 @@ import useTimeFrames from "../../../../custom-hook/useTimeFrames";
 import useUserDataSet from "../../../../custom-hook/useUserDataSet";
 import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDictionary";
 import {repositionElement} from "../../../../helperFunctions/HelperFunctions";
+import HideOnScroll from "../../../common/HideOnScroll";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -65,7 +66,7 @@ const userTypes = [
     },
     {
         propertyName: "participatingStudents",
-        displayName: "Participating Students",
+        displayName: "Participating Users",
         propertyDataName: "participatingStudentsData",
         universityPropertyDataName: "universityParticipatingStudentsData"
     },
@@ -102,7 +103,6 @@ const streamsSelector = createSelector(
                     }
                     livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
                         ...userDataSetDictionary?.[userEmail],
-                        universityCountry: universityCountriesMap[userDataSetDictionary?.[userEmail]?.universityCountryCode]
                     }))
                 }
                 return livestream
@@ -411,7 +411,6 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         streamsFromTimeFrame,
         showBar,
         handleToggleBar,
-        streamsFromTimeFrameAndFuture,
         breakdownRef,
         handleScrollToBreakdown,
         currentStream,
@@ -421,6 +420,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         setUserType,
         groupOptions,
         ...(tabName !== "feedback" && {
+            streamsFromTimeFrameAndFuture,
             handleReset
         }),
         ...(tabName === "feedback" && {
@@ -447,20 +447,20 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
 
     return (
         <Fragment>
-            <Box className={classes.title} p={3}>
-                <Title
-                    setGlobalTimeFrame={setGlobalTimeFrame}
-                    userDataSets={userDataSets}
-                    streamsMounted={streamsMounted}
-                    setStreamsMounted={setStreamsMounted}
-                    currentUserDataSet={currentUserDataSet}
-                    setCurrentUserDataSet={setCurrentUserDataSet}
-                    globalTimeFrames={globalTimeFrames}
-                    group={group}
-                    globalTimeFrame={globalTimeFrame}
-                />
-            </Box>
             <AppBar className={classes.appBar} position="sticky" color="default">
+                <Box className={classes.title}>
+                    <Title
+                        setGlobalTimeFrame={setGlobalTimeFrame}
+                        userDataSets={userDataSets}
+                        streamsMounted={streamsMounted}
+                        setStreamsMounted={setStreamsMounted}
+                        currentUserDataSet={currentUserDataSet}
+                        setCurrentUserDataSet={setCurrentUserDataSet}
+                        globalTimeFrames={globalTimeFrames}
+                        group={group}
+                        globalTimeFrame={globalTimeFrame}
+                    />
+                </Box>
                 <Tabs
                     value={value}
                     TabIndicatorProps={{className: classes.indicator}}
