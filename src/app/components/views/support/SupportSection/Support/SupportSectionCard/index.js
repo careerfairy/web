@@ -6,7 +6,9 @@ import {Card, CardActionArea, CardContent, CardHeader, CardMedia, Typography} fr
 const useStyles = makeStyles(theme => ({
     media: {
         height: 200,
-        backgroundSize: "contain"
+        backgroundSize: "contain",
+        maxWidth: "90%",
+        marginTop: theme.spacing(2)
     },
 }));
 
@@ -16,7 +18,7 @@ const SupportSectionCard = ({section: {description, href, image, title}}) => {
 
     return (
         <Card align="center">
-            <CardActionArea href={href}>
+            <CardActionArea target="_blank" href={href}>
                 <CardMedia
                     className={classes.media}
                     image={image}
