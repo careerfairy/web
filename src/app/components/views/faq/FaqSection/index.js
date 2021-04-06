@@ -10,7 +10,8 @@ const useStyles = makeStyles(theme => ({
         zIndex: 1,
         "&.MuiContainer-root": {
             position: "relative"
-        }
+        },
+
     },
 }));
 
@@ -27,6 +28,7 @@ const FaqSection = (props) => {
             backgroundColor={props.backgroundColor}
         >
             <Container className={classes.container}>
+
                 <SectionHeader
                     color={props.color}
                     title={props.title}

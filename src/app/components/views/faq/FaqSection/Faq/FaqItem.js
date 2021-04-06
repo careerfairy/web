@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const FaqItem = (props) => {
+const FaqItem = ({answer, href, question}) => {
     const [expanded, setExpanded] = useState(false);
     const [summaryHovered, setSummaryHovered] = useState(false);
     const classes = useStyles();
@@ -29,10 +29,10 @@ const FaqItem = (props) => {
     const {asPath} = useRouter()
 
     useEffect(() => {
-        if (asPath === `/faq#${props.href}`) {
+        if (asPath === `/faq#${href}`) {
             setExpanded(true)
         }
-    }, [asPath, props.href])
+    }, [asPath, href])
 
     const enqueueSnackbar = (...args) => dispatch(actions.enqueueSnackbar(...args))
     const handleCopyFaqLink = () => {
@@ -40,7 +40,7 @@ const FaqItem = (props) => {
         if (window?.location?.origin) {
             baseUrl = window.location.origin;
         }
-        const targetPath = `${baseUrl}/faq#${props.href}`;
+        const targetPath = `${baseUrl}/faq#${href}`;
         copyStringToClipboard(targetPath);
         const message = "Link has been copied to your clipboard!"
         enqueueSnackbar({
@@ -60,7 +60,7 @@ const FaqItem = (props) => {
     return (
         <Accordion
             component="article"
-            id={props.href}
+            id={href}
             expanded={expanded}
             onClick={handleClick}>
             <AccordionSummary
@@ -74,11 +74,11 @@ const FaqItem = (props) => {
                     variant="h6"
                     className={classes.heading}
                 >
-                    {props.question}
+                    {question}
                 </Typography>
                 <Grow in={summaryHovered}>
                     <IconButton
-                        href={`#${props.href}`}
+                        href={`#${href}`}
                         className={classes.summaryLinkIcon}
                         onClick={handleCopyFaqLink}
                         component="a"
@@ -89,7 +89,7 @@ const FaqItem = (props) => {
             </AccordionSummary>
             <AccordionDetails>
                 <Typography>
-                    {props.answer}
+                    {answer}
                 </Typography>
             </AccordionDetails>
         </Accordion>
