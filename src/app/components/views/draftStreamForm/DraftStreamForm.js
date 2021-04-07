@@ -110,7 +110,7 @@ const DraftStreamForm = ({
                          }) => {
     const router = useRouter()
     const {userData} = useAuth()
-    const SPEAKER_LIMIT = userData.isAdmin ? 15 : 5
+    const SPEAKER_LIMIT = userData?.isAdmin ? 15 : 5
     let {
         query: {careerCenterIds, draftStreamId},
         replace,
