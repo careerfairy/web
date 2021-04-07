@@ -18,6 +18,8 @@ import {useSnackbar} from "notistack";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
 import {useAuth} from "../../../HOCs/AuthProvider";
 import Link from '../../../materialUI/NextNavLink'
+import {useSelector} from "react-redux";
+import {isEmpty, isLoaded} from "react-redux-firebase";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -33,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
     },
     drawer: {
         width: ({drawerWidth}) => drawerWidth,
+        position: "absolute",
         flexShrink: 0,
         whiteSpace: 'nowrap',
         "& ::-webkit-scrollbar": {
@@ -103,33 +106,11 @@ const FeedDrawer = memo(({
     const {enqueueSnackbar} = useSnackbar();
     const classes = useStyles({drawerWidth: 270, drawerClosedWidth, scrolling});
     const theme = useTheme();
-    const [userGroups, setUserGroups] = useState([])
     const [fetching, setFetching] = useState(false)
-    const {userData, authenticatedUser} = useAuth();
 
-    useEffect(() => {
-        if (userData?.groupIds?.length) {
-            (async function handleSetGroupIds() {
-                try {
-                    setFetching(true)
-                    let totalExistingGroups
-                    totalExistingGroups = await firebase.getCareerCentersByGroupId(userData.groupIds)
-                    setUserGroups(totalExistingGroups)
-                    setFetching(false)
-                } catch (error) {
-                    setFetching(false)
-                    console.log("-> e", error);
-                    enqueueSnackbar(error, {
-                        variant: "error",
-                        preventDuplicate: true,
-                        key: error,
-                    })
-                }
-            })()
-        }
-    }, [userData?.groupIds])
+    const followingGroups = useSelector(state => state.firestore.ordered["followingGroups"])
 
-    const renderGroups = userGroups.map(({universityName, groupId, logoUrl}, index) => {
+    const renderGroups = followingGroups?.map(({universityName, groupId, logoUrl}, index) => {
         return (
             <ListItem className={classes.logoButton} button key={groupId}>
                 <ListItemAvatar>
@@ -146,8 +127,6 @@ const FeedDrawer = memo(({
         )
     })
 
-
-    console.log("-> openMobile", openMobile);
 
     return (
         <Drawer
@@ -180,17 +159,17 @@ const FeedDrawer = memo(({
                     </Collapse>
                     {drawerTopLinks.map(({title, href, icon}) => (
                         <Link className={classes.navLink} key={title} href={href}>
-                                <ListItem button>
-                                    <ListItemIcon>
-                                        {icon}
-                                    </ListItemIcon>
-                                    <ListItemText primary={title}/>
-                                </ListItem>
+                            <ListItem button>
+                                <ListItemIcon>
+                                    {icon}
+                                </ListItemIcon>
+                                <ListItemText primary={title}/>
+                            </ListItem>
                         </Link>
                     ))}
                     <Divider/>
                 </Collapse>
-                {fetching ? <ListSpinner/> : renderGroups}
+                {!isLoaded(followingGroups) ? <ListSpinner/> : isEmpty(followingGroups) ? <div/> : renderGroups}
             </List>
             <Divider/>
             <List>

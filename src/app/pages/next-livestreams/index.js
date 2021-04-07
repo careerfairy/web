@@ -9,8 +9,8 @@ import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
 
 const useStyles = makeStyles(theme => ({
         containerRoot: {
-            display: "flex",
-            flex: 1,
+            // display: "flex",
+            // flex: 1,
         },
         footer: {
             marginTop: "auto"
@@ -69,10 +69,10 @@ const nextLivestreams = (props) => {
             searchParams={searchParams}
         >
 
-            <Container disableGutters className={classes.containerRoot}>
-                <div className={classes.drawerSpace}/>
+            {/*<Container disableGutters className={classes.containerRoot}>*/}
+                {/*<div className={classes.drawerSpace}/>*/}
                 <NextLivestreams/>
-            </Container>
+            {/*</Container>*/}
 
         </NextLivestreamsLayout>
     )

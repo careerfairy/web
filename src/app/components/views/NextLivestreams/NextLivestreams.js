@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {withFirebase} from "../../../context/firebase";
-import GroupsCarousel from "./GroupsCarousel/GroupsCarousel";
 import {useMediaQuery} from "@material-ui/core";
 import {useTheme} from "@material-ui/core/styles";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
@@ -25,95 +24,39 @@ const NextLivestreams = ({firebase}) => {
     const [groupData, setGroupData] = useState({});
     const [groupIds, setGroupIds] = useState(["upcoming"]);
     const [livestreams, setLivestreams] = useState([]);
-    const [groupIdsToRemove, setGroupIdsToRemove] = useState([])
+    console.log("--> livestreams", livestreams)
     const [searching, setSearching] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [listenToUpcoming, setListenToUpcoming] = useState(false);
 
     useEffect(() => {
-        if (listenToUpcoming) { // && routerMounted
-            const unsubscribe = firebase.listenToUpcomingLivestreams(
-                (querySnapshot) => {
-                    let livestreams = [];
-                    querySnapshot.forEach((doc) => {
-                        let livestream = doc.data();
-                        livestream.id = doc.id;
-                        livestreams.push(livestream);
-                    });
-                    if (livestreamId && !careerCenterId) {
-                        const currentIndex = livestreams.findIndex(
-                            (el) => el.id === livestreamId
-                        );
-                        if (currentIndex > -1) {
-                            repositionElement(livestreams, currentIndex, 0);
-                        }
+        const unsubscribe = firebase.listenToUpcomingLivestreams(
+            (querySnapshot) => {
+                let livestreams = [];
+                querySnapshot.forEach((doc) => {
+                    let livestream = doc.data();
+                    livestream.id = doc.id;
+                    livestreams.push(livestream);
+                });
+                if (livestreamId && !careerCenterId) {
+                    const currentIndex = livestreams.findIndex(
+                        (el) => el.id === livestreamId
+                    );
+                    if (currentIndex > -1) {
+                        repositionElement(livestreams, currentIndex, 0);
                     }
-                    livestreams = livestreams.filter(livestream => !livestream.hidden);
-                    setLivestreams(livestreams);
-                },
-                (error) => {
-                    console.log(error);
                 }
-            );
-            return () => unsubscribe();
-        }
-    }, [listenToUpcoming, livestreamId]);
+                livestreams = livestreams.filter(livestream => !livestream.hidden);
+                setLivestreams(livestreams);
+            },
+            (error) => {
+                console.log(error);
+            }
+        );
+        return () => unsubscribe();
 
-    useEffect(() => {
-        if (userData && userData.groupIds && userData.registeredGroups && groupIdsToRemove && groupIdsToRemove.length) {
-            const filteredGroupIds = [...userData.groupIds].filter(id => !groupIdsToRemove.includes(id))
-            const filteredRegisteredGroups = [...userData.registeredGroups].filter(group => !groupIdsToRemove.includes(group.groupId))
-            const userId = userData.id || userData.userEmail
-            return firebase.updateUserGroups(userId, filteredGroupIds, filteredRegisteredGroups)
-        }
-    }, [groupIdsToRemove])
+    }, [livestreamId]);
 
-    useEffect(() => {
-        if (groupData && groupData.groupId) {
-            setSearching(true);
-            const unsubscribe = firebase.listenToUpcomingLiveStreamsByGroupId(
-                groupData.groupId,
-                (querySnapshot) => {
-                    setSearching(false);
-                    let livestreams = [];
-                    querySnapshot.forEach((doc) => {
-                        let livestream = doc.data();
-                        livestream.id = doc.id;
-                        if (livestream.targetCategories) {
-                            const livestreamCategories =
-                                livestream.targetCategories[groupData.groupId];
-                            if (selectedOptions.length && livestreamCategories) {
-                                if (
-                                    checkIfLivestreamHasAll(selectedOptions, livestreamCategories)
-                                ) {
-                                    livestreams.push(livestream);
-                                }
-                            } else if (!selectedOptions.length) {
-                                livestreams.push(livestream);
-                            }
-                        } else {
-                            livestreams.push(livestream);
-                        }
-                    });
-                    if (
-                        livestreamId &&
-                        careerCenterId &&
-                        careerCenterId === groupData.groupId
-                    ) {
-                        const currentIndex = livestreams.findIndex(
-                            (el) => el.id === livestreamId
-                        );
-                        if (currentIndex > -1) {
-                            repositionElement(livestreams, currentIndex, 0);
-                        }
-                    }
-                    setLivestreams(livestreams);
-                    setSearching(false);
-                }
-            );
-            return () => unsubscribe();
-        }
-    }, [groupData, selectedOptions]);
 
     useEffect(() => {
         if (groupData && groupData.categories) {
@@ -204,28 +147,6 @@ const NextLivestreams = ({firebase}) => {
         return selected.some((v) => arr.includes(v)); // switch to selected.includes to make it an AND Operator
     };
 
-    const handleSetGroup = (groupObj) => {
-        scrollToTop();
-        if (groupObj.universityName) {
-            setListenToUpcoming(false);
-            const newGroupObj = {
-                ...groupObj,
-                alreadyJoined: userData
-                    ? userData.groupIds?.includes(groupObj.id)
-                    : false,
-            };
-
-            if (newGroupObj.categories) {
-                newGroupObj.categories.forEach((category) => {
-                    category.options.forEach((option) => (option.active = false));
-                });
-            }
-            setGroupData(newGroupObj);
-        } else {
-            setGroupData(groupObj);
-            setListenToUpcoming(true);
-        }
-    };
 
     const handleResetGroup = () => {
         setGroupData({});
@@ -256,55 +177,41 @@ const NextLivestreams = ({firebase}) => {
         }
     }
 
-    return (
-        <>
-            <GroupsCarousel
-                groupData={groupData}
-                mobile={mobile}
-                groupIdsToRemove={groupIdsToRemove}
-                setGroupIdsToRemove={setGroupIdsToRemove}
-                user={authenticatedUser}
-                handleResetGroup={handleResetGroup}
-                handleSetGroup={handleSetGroup}
-                groupIds={groupIds}
-            />
-            {mobile ? (
-                <MobileFeed
-                    groupData={groupData}
-                    hasCategories={hasCategories()}
-                    user={authenticatedUser}
-                    selectedOptions={selectedOptions}
-                    scrollToTop={scrollToTop}
-                    handleResetGroup={handleResetGroup}
-                    searching={searching}
-                    livestreams={livestreams}
-                    listenToUpcoming={listenToUpcoming}
-                    careerCenterId={careerCenterId}
-                    livestreamId={livestreamId}
-                    alreadyJoined={groupData.alreadyJoined}
-                    handleToggleActive={handleToggleActive}
-                    userData={userData}
-                />
-            ) : (
-                <DesktopFeed
-                    alreadyJoined={groupData.alreadyJoined}
-                    handleToggleActive={handleToggleActive}
-                    userData={userData}
-                    hasCategories={hasCategories()}
-                    listenToUpcoming={listenToUpcoming}
-                    livestreamId={livestreamId}
-                    searching={searching}
-                    selectedOptions={selectedOptions}
-                    careerCenterId={careerCenterId}
-                    handleResetGroup={handleResetGroup}
-                    user={authenticatedUser}
-                    livestreams={livestreams}
-                    mobile={mobile}
-                    groupData={groupData}
-                />
-            )}
-        </>
-    );
+    return mobile ? (
+        <MobileFeed
+            groupData={groupData}
+            hasCategories={hasCategories()}
+            user={authenticatedUser}
+            selectedOptions={selectedOptions}
+            scrollToTop={scrollToTop}
+            handleResetGroup={handleResetGroup}
+            searching={searching}
+            livestreams={livestreams}
+            listenToUpcoming
+            careerCenterId={careerCenterId}
+            livestreamId={livestreamId}
+            alreadyJoined={groupData.alreadyJoined}
+            handleToggleActive={handleToggleActive}
+            userData={userData}
+        />
+    ) : (
+        <DesktopFeed
+            alreadyJoined={groupData.alreadyJoined}
+            handleToggleActive={handleToggleActive}
+            userData={userData}
+            hasCategories={hasCategories()}
+            listenToUpcoming
+            livestreamId={livestreamId}
+            searching={searching}
+            selectedOptions={selectedOptions}
+            careerCenterId={careerCenterId}
+            handleResetGroup={handleResetGroup}
+            user={authenticatedUser}
+            livestreams={livestreams}
+            mobile={mobile}
+            groupData={groupData}
+        />
+    )
 };
 
 export default withFirebase(NextLivestreams);

@@ -1,6 +1,3 @@
-import {PaperBackground} from "../../materialUI/GlobalBackground/GlobalBackGround";
-import Head from "next/head";
-import {FeedHeader} from "../../components/views/header";
 import {useEffect, useState} from "react";
 import {withFirebase} from "../../context/firebase";
 import {Container} from "@material-ui/core";
@@ -9,21 +6,13 @@ import {groupsIndex, streamsIndex} from "../../algolia";
 import SearchComponent from "../../components/views/NextLivestreams/SearchComponent";
 import {isNotEmptyString} from "../../components/helperFunctions/HelperFunctions";
 import {useRouter} from "next/router";
+import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
 
 const useStyles = makeStyles(theme => ({
         containerRoot: {
             display: "flex",
             flex: 1,
         },
-        footer: {
-            marginTop: "auto"
-        },
-        mainBackground: {
-            // minWidth: "fit-content"
-        },
-        drawerSpace: {
-            minWidth: ({drawerClosedWidth}) => drawerClosedWidth,
-        }
     })
 )
 
@@ -151,18 +140,23 @@ const search = () => {
 
 
     return (
-        <PaperBackground className={classes.mainBackground}>
-            <Head>
-                <title key="title">CareerFairy | Next Live Streams</title>
-            </Head>
-            <FeedHeader
-                drawerClosedWidth={drawerClosedWidth}
-                handleSubmitSearch={handleSubmitSearch}
-                handleChange={handleChange}
-                searchParams={searchParams}
-            />
+        // <PaperBackground className={classes.mainBackground}>
+        //     <Head>
+        //         <title key="title">CareerFairy | Next Live Streams</title>
+        //     </Head>
+        //     <FeedHeader
+        //         drawerClosedWidth={drawerClosedWidth}
+        //         handleSubmitSearch={handleSubmitSearch}
+        //         handleChange={handleChange}
+        //         searchParams={searchParams}
+        //     />
+        <NextLivestreamsLayout
+            drawerClosedWidth={drawerClosedWidth}
+            handleSubmitSearch={handleSubmitSearch}
+            handleChange={handleChange}
+            searchParams={searchParams}
+        >
             <Container disableGutters className={classes.containerRoot}>
-                <div className={classes.drawerSpace}/>
                 <SearchComponent
                     searching={searching}
                     groupHits={groupHits}
@@ -180,7 +174,8 @@ const search = () => {
                     loadMoreStreams={loadMoreStreams}
                 />
             </Container>
-        </PaperBackground>
+            {/*// </PaperBackground>*/}
+        </NextLivestreamsLayout>
     );
 };
 

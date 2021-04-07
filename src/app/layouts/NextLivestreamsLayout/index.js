@@ -3,32 +3,35 @@ import React, {useMemo, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import NavBar from './NavBar';
 import {withFirebase} from "../../context/firebase";
-import {useAuth} from "../../HOCs/AuthProvider";
-import styles from "../../materialUI/styles/groupDashboardStyles";
-import {CircularProgress} from "@material-ui/core";
-import {useRouter} from "next/router";
-import * as actions from '../../store/actions'
-import {useDispatch} from "react-redux";
+import styles from "../../materialUI/styles/layoutStyles/nextLivestreamsLayoutStyles";
 import TopBar from "./TopBar";
 import Head from "next/head";
 import Footer from "../../components/views/footer/Footer";
 import useGeneralLinks from "../../components/custom-hook/useGeneralLinks";
+import {useFirestoreConnect} from "react-redux-firebase";
+import {useSelector} from "react-redux";
+import {useAuth} from "../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(styles);
 
 const NextLivestreamsLayout = (props) => {
-    const {children} = props
-    const classes = useStyles();
-    const dispatch = useDispatch()
-    const [isMobileNavOpen, setMobileNavOpen] = useState(true);
-    const {userData, authenticatedUser} = useAuth()
-    const {replace} = useRouter()
-    const enqueueSnackbar = (...args) => dispatch(actions.enqueueSnackbar(...args))
+    const {children, drawerClosedWidth} = props
+    const classes = useStyles({drawerClosedWidth});
+    const [isMobileNavOpen, setMobileNavOpen] = useState(false);
+    const {userData} = useAuth()
+    const query = useMemo(() => {
+        const basQuery = {
+            collection: 'careerCenterData',
+            where: userData?.isAdmin ? ["test", "==", false] : ["groupId", "in", userData?.groupIds],
+            storeAs: "followingGroups"
+        }
+        return userData ? [basQuery] : []
+    }, [userData?.isAdmin, userData?.groupIds])
+    useFirestoreConnect(query)
 
 
     const {mainLinks, secondaryLinks} = useGeneralLinks()
 
-    const isAdmin = useMemo(() => userData?.isAdmin, [userData?.isAdmin])
 
     const handleDrawerOpen = () => setMobileNavOpen(true)
     const handleDrawerClose = () => setMobileNavOpen(false)
@@ -56,13 +59,10 @@ const NextLivestreamsLayout = (props) => {
                 <div className={classes.wrapper}>
                     <div className={classes.contentContainer}>
                         <div className={classes.content}>
-                            {(isAdmin) ? React.Children.map(children, child => React.cloneElement(child, {
-                                isAdmin,
+                            {React.Children.map(children, child => React.cloneElement(child, {
                                 ...props
-                            })) : (
-                                <CircularProgress style={{margin: "auto"}}/>
-                            )}
-                            <Footer/>
+                            }))}
+                            {/*<Footer/>*/}
                         </div>
                     </div>
                 </div>
