@@ -109,6 +109,10 @@ export const isEmptyObject = (obj) => {
     return isEmpty(obj);
 }
 
+export const isNotEmptyString = (myString) => {
+    return myString && myString.match(/^\s+$/) === null
+}
+
 export const isServer = () => {
     return typeof window === 'undefined'
 }
