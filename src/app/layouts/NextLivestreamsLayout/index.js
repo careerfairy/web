@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, {useMemo, useState} from 'react';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles, useTheme} from '@material-ui/core/styles';
 import NavBar from './NavBar';
 import {withFirebase} from "../../context/firebase";
 import styles from "../../materialUI/styles/layoutStyles/nextLivestreamsLayoutStyles";
@@ -15,7 +15,9 @@ import {useAuth} from "../../HOCs/AuthProvider";
 const useStyles = makeStyles(styles);
 
 const NextLivestreamsLayout = (props) => {
-    const {children, drawerClosedWidth} = props
+    const {children} = props
+    const theme = useTheme()
+    const drawerClosedWidth = theme.spacing(8)
     const classes = useStyles({drawerClosedWidth});
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
     const {userData} = useAuth()
@@ -35,6 +37,7 @@ const NextLivestreamsLayout = (props) => {
 
     const handleDrawerOpen = () => setMobileNavOpen(true)
     const handleDrawerClose = () => setMobileNavOpen(false)
+    const handleDrawerToggle = () => setMobileNavOpen(!isMobileNavOpen)
 
     return (
         <React.Fragment>
@@ -51,6 +54,8 @@ const NextLivestreamsLayout = (props) => {
                 <NavBar
                     {...props}
                     drawerTopLinks={mainLinks}
+                    handleDrawerToggle={handleDrawerToggle}
+                    drawerClosedWidth={drawerClosedWidth}
                     drawerBottomLinks={secondaryLinks}
                     onMobileNavOpen={handleDrawerOpen}
                     onMobileClose={handleDrawerClose}
@@ -62,7 +67,7 @@ const NextLivestreamsLayout = (props) => {
                             {React.Children.map(children, child => React.cloneElement(child, {
                                 ...props
                             }))}
-                            {/*<Footer/>*/}
+                            <Footer/>
                         </div>
                     </div>
                 </div>

@@ -8,55 +8,16 @@ import {useRouter} from "next/router";
 import {getServerSideRouterQuery} from "../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../HOCs/AuthProvider";
 
-const NextLivestreams = ({firebase}) => {
+const NextLivestreams = ({livestreamId, livestreams}) => {
     const {userData, authenticatedUser} = useAuth();
     const theme = useTheme();
     const mobile = useMediaQuery(theme.breakpoints.down("sm"));
     const router = useRouter();
 
-    // const {
-    //     query:{ livestreamId, careerCenterId}
-    // } = router
-
-    const livestreamId = getServerSideRouterQuery("livestreamId", router)
     const careerCenterId = getServerSideRouterQuery("careerCenterId", router)
 
     const [groupData, setGroupData] = useState({});
-    const [groupIds, setGroupIds] = useState(["upcoming"]);
-    const [livestreams, setLivestreams] = useState([]);
-    console.log("--> livestreams", livestreams)
-    const [searching, setSearching] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState([]);
-    const [listenToUpcoming, setListenToUpcoming] = useState(false);
-
-    useEffect(() => {
-        const unsubscribe = firebase.listenToUpcomingLivestreams(
-            (querySnapshot) => {
-                let livestreams = [];
-                querySnapshot.forEach((doc) => {
-                    let livestream = doc.data();
-                    livestream.id = doc.id;
-                    livestreams.push(livestream);
-                });
-                if (livestreamId && !careerCenterId) {
-                    const currentIndex = livestreams.findIndex(
-                        (el) => el.id === livestreamId
-                    );
-                    if (currentIndex > -1) {
-                        repositionElement(livestreams, currentIndex, 0);
-                    }
-                }
-                livestreams = livestreams.filter(livestream => !livestream.hidden);
-                setLivestreams(livestreams);
-            },
-            (error) => {
-                console.log(error);
-            }
-        );
-        return () => unsubscribe();
-
-    }, [livestreamId]);
-
 
     useEffect(() => {
         if (groupData && groupData.categories) {
@@ -72,79 +33,8 @@ const NextLivestreams = ({firebase}) => {
         }
     }, [groupData.categories, groupData]);
 
-    useEffect(() => {
-        // This checks if the params from the next router have been defined and only then will it set groupIds
-        if (careerCenterId || userData !== undefined) {
-            handleGetGroupIds();
-        }
-    }, [userData, careerCenterId]);
-
-    useEffect(() => {
-        if (groupIds.length > 1 && setToUpcomingSlide()) {
-            const newGroupIds = [...groupIds]
-            const currentIndex = newGroupIds.findIndex((el) => el === "upcoming");
-            if (currentIndex > -1) {
-                swapPositions(newGroupIds, 0, currentIndex);
-            }
-            setGroupIds([...new Set(newGroupIds)]);
-        }
-    }, [livestreamId, careerCenterId, router])
-
-
-    const setToUpcomingSlide = () => {
-        return livestreamId && !careerCenterId || (!livestreamId && !careerCenterId)
-    }
-
-    const checkIfCareerCenterExists = async (centerId) => {
-        const querySnapshot = await firebase.getCareerCenterById(centerId);
-        return querySnapshot.exists;
-    };
-
-    const handleGetGroupIds = () => {
-        let newGroupIds = [...groupIds];
-        if (userData && userData.groupIds) {
-            newGroupIds = [...groupIds, ...userData.groupIds];
-        }
-        if (careerCenterId) {
-            return handleGetParams(newGroupIds);
-        } else {
-            setGroupIds([...new Set(newGroupIds)]);
-        }
-    };
-
-    const handleGetParams = async (userGroupIds) => {
-        let newGroupIds = [...userGroupIds];
-        if (newGroupIds.includes(careerCenterId)) {
-            const currentIndex = newGroupIds.findIndex((el) => el === careerCenterId);
-            if (currentIndex > -1) {
-                swapPositions(newGroupIds, 0, currentIndex);
-            }
-            setGroupIds([...new Set(newGroupIds)]);
-        } else {
-            const exists = await checkIfCareerCenterExists(careerCenterId);
-            if (exists) {
-                newGroupIds.unshift(careerCenterId);
-            }
-            setGroupIds([...new Set(newGroupIds)]);
-        }
-    };
-
     const scrollToTop = () => {
         window.scrollTo(0, 0);
-    };
-
-    const repositionElement = (arr, fromIndex, toIndex) => {
-        const element = arr[fromIndex];
-        arr.splice(fromIndex, 1);
-        arr.splice(toIndex, 0, element);
-    };
-
-    const swapPositions = (arr, index1, index2) => {
-        [arr[index1], arr[index2]] = [arr[index2], arr[index1]];
-    };
-
-    const checkIfLivestreamHasAll = (selected, arr) => {
-        return selected.some((v) => arr.includes(v)); // switch to selected.includes to make it an AND Operator
     };
 
 
@@ -185,7 +75,6 @@ const NextLivestreams = ({firebase}) => {
             selectedOptions={selectedOptions}
             scrollToTop={scrollToTop}
             handleResetGroup={handleResetGroup}
-            searching={searching}
             livestreams={livestreams}
             listenToUpcoming
             careerCenterId={careerCenterId}
@@ -202,7 +91,6 @@ const NextLivestreams = ({firebase}) => {
             hasCategories={hasCategories()}
             listenToUpcoming
             livestreamId={livestreamId}
-            searching={searching}
             selectedOptions={selectedOptions}
             careerCenterId={careerCenterId}
             handleResetGroup={handleResetGroup}

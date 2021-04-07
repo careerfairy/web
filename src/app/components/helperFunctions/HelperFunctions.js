@@ -99,6 +99,14 @@ export const repositionElement = (arr, fromIndex, toIndex) => {
     arr.splice(toIndex, 0, element);
 };
 
+export const repositionStream = (arr, fromIndex, toIndex) => {
+    const newArray = [...arr]
+    const element = arr[fromIndex];
+    newArray.splice(fromIndex, 1);
+    newArray.splice(toIndex, 0, element);
+    return newArray
+};
+
 export const getLength = (arr, prop) => {
     return arr.map((el) => {
         return el?.[prop]?.length || 0

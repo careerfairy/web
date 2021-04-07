@@ -155,7 +155,7 @@ const MobileFeed = ({
             </>
             }
             <BindKeyboardSwipeableViews
-                style={{overflow: "hidden", flex: 1}}
+                style={{overflowX: "hidden", flex: 1}}
                 disabled={!Boolean(groupData.categories)}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}

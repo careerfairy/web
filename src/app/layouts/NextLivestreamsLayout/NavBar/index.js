@@ -97,22 +97,22 @@ const FeedDrawer = memo(({
                              openMobile,
                              showHeaderLinks,
                              firebase,
+                             handleDrawerToggle,
                              drawerClosedWidth,
                              drawerBottomLinks,
                              drawerTopLinks
 
                          }) => {
     const scrolling = useScrollTrigger()
-    const {enqueueSnackbar} = useSnackbar();
     const classes = useStyles({drawerWidth: 270, drawerClosedWidth, scrolling});
-    const theme = useTheme();
-    const [fetching, setFetching] = useState(false)
 
     const followingGroups = useSelector(state => state.firestore.ordered["followingGroups"])
 
+    console.log(" --> openMobile", openMobile)
+
     const renderGroups = followingGroups?.map(({universityName, groupId, logoUrl}, index) => {
         return (
-            <ListItem className={classes.logoButton} button key={groupId}>
+            <ListItem component={Link} className={classes.logoButton} href={`/next-livestreams/${groupId}`} button key={groupId}>
                 <ListItemAvatar>
                     <Avatar className={classes.groupAvaWrapper} alt={universityName} variant="rounded" src={logoUrl}/>
                 </ListItemAvatar>
@@ -130,8 +130,8 @@ const FeedDrawer = memo(({
 
     return (
         <Drawer
-            onMouseEnter={onMobileNavOpen}
-            onMouseLeave={onMobileClose}
+            // onMouseEnter={onMobileNavOpen}
+            // onMouseLeave={onMobileClose}
             variant="permanent"
             className={clsx(classes.drawer, {
                 [classes.drawerOpen]: openMobile,
@@ -145,30 +145,30 @@ const FeedDrawer = memo(({
             }}
         >
             <div className={classes.toolbar}>
-                <IconButton onClick={onMobileClose}>
+                <IconButton onClick={handleDrawerToggle}>
                     {openMobile ? <ChevronLeftIcon/> : <ChevronRightIcon/>}
                 </IconButton>
             </div>
             <Divider/>
             <List>
-                <Collapse in={!showHeaderLinks}>
-                    <Collapse in={openMobile}>
-                        <ListItem>
-                            <ListItemText primary={"Nav"}/>
-                        </ListItem>
-                    </Collapse>
-                    {drawerTopLinks.map(({title, href, icon}) => (
-                        <Link className={classes.navLink} key={title} href={href}>
-                            <ListItem button>
-                                <ListItemIcon>
-                                    {icon}
-                                </ListItemIcon>
-                                <ListItemText primary={title}/>
-                            </ListItem>
-                        </Link>
-                    ))}
-                    <Divider/>
-                </Collapse>
+                {/*<Collapse in={!showHeaderLinks}>*/}
+                {/*    <Collapse in={openMobile}>*/}
+                {/*        <ListItem>*/}
+                {/*            <ListItemText primary={"Nav"}/>*/}
+                {/*        </ListItem>*/}
+                {/*    </Collapse>*/}
+                {/*    {drawerTopLinks.map(({title, href, icon}) => (*/}
+                {/*        <Link className={classes.navLink} key={title} href={href}>*/}
+                {/*            <ListItem button>*/}
+                {/*                <ListItemIcon>*/}
+                {/*                    {icon}*/}
+                {/*                </ListItemIcon>*/}
+                {/*                <ListItemText primary={title}/>*/}
+                {/*            </ListItem>*/}
+                {/*        </Link>*/}
+                {/*    ))}*/}
+                {/*    <Divider/>*/}
+                {/*</Collapse>*/}
                 {!isLoaded(followingGroups) ? <ListSpinner/> : isEmpty(followingGroups) ? <div/> : renderGroups}
             </List>
             <Divider/>
