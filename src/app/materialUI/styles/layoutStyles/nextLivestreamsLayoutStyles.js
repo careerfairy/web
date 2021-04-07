@@ -16,7 +16,7 @@ const nextLivestreamsLayoutStyles = (theme) => ({
         backgroundColor: theme.palette.background.dark,
         display: 'flex',
         overflow: 'hidden',
-        width: '100%'
+        width: '100%',
     },
     content: {
         ...basicLayoutStyles(theme).content,

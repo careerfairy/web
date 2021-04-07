@@ -1,7 +1,7 @@
 import {createSelector} from "reselect";
 import {repositionStream} from "../helperFunctions/HelperFunctions";
 
-const nextLivestreamsSelector = createSelector(
+const upcomingLivestreamsSelector = createSelector(
     livestreams => livestreams,
     (_, {livestreamId}) => livestreamId,
     (livestreams, livestreamId) => {
@@ -21,4 +21,4 @@ const nextLivestreamsSelector = createSelector(
     }
 )
 
-export default nextLivestreamsSelector
+export default upcomingLivestreamsSelector

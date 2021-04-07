@@ -1,9 +1,12 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {store} from "../_app";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
 import GroupBannerSection from "../../components/views/NextLivestreams/group/GroupBannerSection";
 import NextLivestreams from "../../components/views/NextLivestreams/NextLivestreams";
+import useGroupUpcomingStreams from "../../components/custom-hook/useGroupUpcomingStreams";
+import {isLoaded} from "react-redux-firebase";
+import {CircularProgress} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     backgroundImage: {
@@ -16,8 +19,9 @@ const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfai
 const GroupPage = ({currentGroup, livestreamId}) => {
 
     const classes = useStyles()
-    console.log("--> currentGroup", currentGroup)
     const {palette: {common: {white}, text: {primary}, navyBlue}} = useTheme()
+    const [selectedOptions, setSelectedOptions] = useState([]);
+    const upcomingLivestreams = useGroupUpcomingStreams(livestreamId, currentGroup.groupId, selectedOptions)
 
     return (
         <NextLivestreamsLayout>
@@ -31,7 +35,14 @@ const GroupPage = ({currentGroup, livestreamId}) => {
                 title={currentGroup.universityName}
                 subtitle={currentGroup.description}
             />
-            <NextLivestreams livestreamId={livestreamId}/>
+            {!isLoaded(upcomingLivestreams) ? <CircularProgress/> : (
+                <NextLivestreams
+                    livestreamId={livestreamId}
+                    setSelectedOptions={setSelectedOptions}
+                    selectedOptions={selectedOptions}
+                                 livestreams={upcomingLivestreams}
+                                 currentGroup={currentGroup}/>
+            )}
         </NextLivestreamsLayout>
     );
 };
@@ -43,7 +54,7 @@ export async function getServerSideProps({params: {groupId}, query: {livestreamI
         currentGroup = snap.data()
     }
     return {
-        props: {currentGroup, livestreamId}, // will be passed to the page component as props
+        props: {currentGroup, livestreamId: livestreamId || ""}, // will be passed to the page component as props
     }
 }
 

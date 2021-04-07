@@ -1,21 +1,22 @@
 import React from 'react';
 import {useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
-import nextLivestreamsSelector from "../selectors/nextLivestreamsSelector";
+import groupUpcomingLivestreamsSelector from "../selectors/groupUpcomingLivestreamsSelector";
 
 var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
 const targetTime = new Date(Date.now() - fortyFiveMinutesInMilliseconds)
-const useGroupUpcomingStreams = (livestreamId, groupId) => {
+
+const useGroupUpcomingStreams = (livestreamId, groupId, selectedOptions) => {
 
     useFirestoreConnect(() => [{
         collection: "livestreams",
-        where: [["start", ">", targetTime], ["test", "==", false]],
+        where: [["groupIds", "array-contains", groupId],["start", ">", targetTime], ["test", "==", false]],
         orderBy: ["start", "asc"],
         storeAs: `upcomingLivestreams of ${groupId}`
     }])
 
     return useSelector(state =>
-        nextLivestreamsSelector(state.firestore.ordered[`upcomingLivestreams of ${groupId}`], {livestreamId})
+        groupUpcomingLivestreamsSelector(state.firestore.ordered[`upcomingLivestreams of ${groupId}`], {livestreamId, groupId, selectedOptions})
     )
 };
 

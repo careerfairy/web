@@ -8,7 +8,7 @@ import {useRouter} from "next/router";
 import {getServerSideRouterQuery} from "../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../HOCs/AuthProvider";
 
-const NextLivestreams = ({livestreamId, livestreams}) => {
+const NextLivestreams = ({livestreamId, livestreams, currentGroup, selectedOptions, setSelectedOptions}) => {
     const {userData, authenticatedUser} = useAuth();
     const theme = useTheme();
     const mobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -17,7 +17,12 @@ const NextLivestreams = ({livestreamId, livestreams}) => {
     const careerCenterId = getServerSideRouterQuery("careerCenterId", router)
 
     const [groupData, setGroupData] = useState({});
-    const [selectedOptions, setSelectedOptions] = useState([]);
+
+    useEffect(() => {
+        if (currentGroup) {
+            setGroupData(currentGroup)
+        }
+    }, [currentGroup])
 
     useEffect(() => {
         if (groupData && groupData.categories) {
@@ -38,10 +43,6 @@ const NextLivestreams = ({livestreamId, livestreams}) => {
     };
 
 
-    const handleResetGroup = () => {
-        setGroupData({});
-    };
-
     const handleToggleActive = (categoryId, optionId) => {
         const newGroupData = {...groupData};
         const targetCategory = newGroupData.categories.find(
@@ -52,9 +53,9 @@ const NextLivestreams = ({livestreamId, livestreams}) => {
         );
         targetOption.active = !targetOption.active;
         setGroupData(newGroupData);
-        if (!mobile) {
-            scrollToTop();
-        }
+        // if (!mobile) {
+        //     scrollToTop();
+        // }
     };
 
 
@@ -74,7 +75,6 @@ const NextLivestreams = ({livestreamId, livestreams}) => {
             user={authenticatedUser}
             selectedOptions={selectedOptions}
             scrollToTop={scrollToTop}
-            handleResetGroup={handleResetGroup}
             livestreams={livestreams}
             listenToUpcoming
             careerCenterId={careerCenterId}
@@ -93,7 +93,6 @@ const NextLivestreams = ({livestreamId, livestreams}) => {
             livestreamId={livestreamId}
             selectedOptions={selectedOptions}
             careerCenterId={careerCenterId}
-            handleResetGroup={handleResetGroup}
             user={authenticatedUser}
             livestreams={livestreams}
             mobile={mobile}
