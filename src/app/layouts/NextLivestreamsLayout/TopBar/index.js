@@ -139,7 +139,6 @@ const TopBar = ({
     }, []);
 
     return (
-        <HideOnScroll>
             <AppBar elevation={1} className={clsx(classes.root, className)}>
                 <Toolbar className={classes.toolbar}>
                     <Hidden smDown>
@@ -200,7 +199,6 @@ const TopBar = ({
                     </Box>
                 </Toolbar>
             </AppBar>
-        </HideOnScroll>
     )
 }
 export default withFirebase(TopBar);

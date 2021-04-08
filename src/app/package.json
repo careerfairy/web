@@ -83,7 +83,7 @@
     "react-sizeme": "^2.6.12",
     "react-slick": "^0.27.11",
     "react-stack-grid": "^0.7.1",
-    "react-sticky-el": "^2.0.6",
+    "react-stickynode": "^3.0.5",
     "react-swipeable-views": "^0.13.9",
     "react-swipeable-views-utils": "^0.14.0-alpha.0",
     "react-transition-group": "^4.4.1",

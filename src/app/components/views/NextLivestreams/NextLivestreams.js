@@ -8,7 +8,7 @@ import {useRouter} from "next/router";
 import {getServerSideRouterQuery} from "../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../HOCs/AuthProvider";
 
-const NextLivestreams = ({livestreamId, livestreams, currentGroup, selectedOptions, setSelectedOptions}) => {
+const NextLivestreams = ({livestreamId, livestreams, currentGroup, selectedOptions, setSelectedOptions, isPastLivestreams}) => {
     const {userData, authenticatedUser} = useAuth();
     const theme = useTheme();
     const mobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -39,7 +39,10 @@ const NextLivestreams = ({livestreamId, livestreams, currentGroup, selectedOptio
     }, [groupData.categories, groupData]);
 
     const scrollToTop = () => {
-        window.scrollTo(0, 0);
+        window.scrollTo({
+            top: 300,
+            behavior: 'smooth'
+        });
     };
 
 
@@ -82,6 +85,7 @@ const NextLivestreams = ({livestreamId, livestreams, currentGroup, selectedOptio
             alreadyJoined={groupData.alreadyJoined}
             handleToggleActive={handleToggleActive}
             userData={userData}
+            isPastLivestreams={isPastLivestreams}
         />
     ) : (
         <DesktopFeed
@@ -97,6 +101,7 @@ const NextLivestreams = ({livestreamId, livestreams, currentGroup, selectedOptio
             livestreams={livestreams}
             mobile={mobile}
             groupData={groupData}
+            isPastLivestreams={isPastLivestreams}
         />
     )
 };

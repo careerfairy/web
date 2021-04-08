@@ -74,6 +74,7 @@ const GroupStreams = ({
                           listenToUpcoming,
                           selectedOptions,
                           hasCategories,
+                          isPastLivestreams,
                           width
                       }) => {
         const classes = useStyles()
@@ -82,7 +83,7 @@ const GroupStreams = ({
         const [slicedLivestreams, loadMoreLivestreams, hasMoreLivestreams, totalLivestreams] = useInfiniteScrollClient(livestreams, 6, 3);
 
         const handleScroll = () => {
-            const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 300
+            const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 700
             if (bottom && hasMoreLivestreams) {
                 loadMoreLivestreams()
             }
@@ -110,7 +111,7 @@ const GroupStreams = ({
                 return (
                     <Grid
                         className={clsx(classes.streamGridItem, {
-                            [classes.dynamicHeight]: mobile && (index >= array.length - 2)
+                            [classes.dynamicHeight]: mobile
                         })}
                         key={livestream.id} xs={12} sm={12} md={hasCategories ? 12 : 6}
                         lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
@@ -120,6 +121,7 @@ const GroupStreams = ({
                         >
                             <GroupStreamCardV2
                                 mobile={mobile}
+                                isPastLivestreams={isPastLivestreams}
                                 setGlobalCardHighlighted={setGlobalCardHighlighted}
                                 globalCardHighlighted={globalCardHighlighted}
                                 groupData={groupData}

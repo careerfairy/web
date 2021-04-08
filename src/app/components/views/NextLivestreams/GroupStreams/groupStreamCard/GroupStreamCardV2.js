@@ -248,6 +248,7 @@ const GroupStreamCardV2 = memo(({
                                     listenToUpcoming,
                                     isTargetDraft,
                                     setGlobalCardHighlighted,
+                                    isPastLivestreams,
                                     globalCardHighlighted,
                                     isAdmin,
                                 }) => {
@@ -530,7 +531,7 @@ const GroupStreamCardV2 = memo(({
                                 {(targetOptions.length > maxOptions && !cardHovered) &&
                                 <Tag option={{id: "hasMore", name: "..."}}/>}
                             </Box>
-                            <Box marginTop={1}>
+                            {!isPastLivestreams ? (<Box marginTop={1}>
                                 <DetailsButton
                                     size="small"
                                     mobile={mobile}
@@ -551,7 +552,7 @@ const GroupStreamCardV2 = memo(({
                                         </Typography>
                                     </div>
                                 </Grow>
-                            </Box>
+                            </Box>) : null}
                         </div>
                     </Box>
                     <Row
@@ -660,7 +661,8 @@ GroupStreamCardV2.propTypes = {
     mobile: PropTypes.bool,
     setGlobalCardHighlighted: PropTypes.func,
     user: PropTypes.object,
-    userData: PropTypes.object
+    userData: PropTypes.object,
+    isPastLivestreams: PropTypes.bool,
 }
 
 export default withFirebase(GroupStreamCardV2);

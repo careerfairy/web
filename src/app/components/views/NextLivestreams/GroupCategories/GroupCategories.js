@@ -5,8 +5,8 @@ import CategoryCard from "./CategoryCard";
 import {SizeMe} from "react-sizeme";
 import StackGrid from "react-stack-grid";
 import {MultilineText} from "../../../helperFunctions/HelperFunctions";
-import Sticky from 'react-sticky-el';
 import clsx from "clsx";
+import Sticky from 'react-stickynode';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -65,11 +65,15 @@ const useStyles = makeStyles((theme) => ({
     groupDescription: {
         padding: `0 ${theme.spacing(3)}px`,
     },
+    cardWrapper: {
+        paddingTop: props => props.isSticky && theme.spacing(10)
+    }
 }));
 
 const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, hasCategories}) => {
 
-    const classes = useStyles({mobile});
+    const [isSticky, setIsSticky] = useState(false);
+    const classes = useStyles({mobile, isSticky});
     const [grid, setGrid] = useState(null);
 
 
@@ -80,6 +84,11 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
             }, 10);
         }
     }, [grid, groupData]);
+
+    const handleStateChange = (status) => {
+        if (status.status === Sticky.STATUS_FIXED) return setIsSticky(true)
+        setIsSticky(false)
+    }
 
     if (groupData.groupId === 'EllidQJoeiKjrXp55n3m') {
 
@@ -114,44 +123,45 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
     }
 
     return (
-        <Grid id="scroll-grid" item xs={12} sm={12} md={4} lg={4} xl={4}
-              className={classes.root}>
-            <Sticky boundaryElement="#scroll-grid" disabled={mobile}>
-                <Card className={clsx(classes.card, {
-                    [classes.mobile]: mobile
-                })}>
-                    <CardMedia className={classes.media}>
-                        <div className={classes.imageContainer}>
-                            <img src={groupData.logoUrl} className={classes.image}
-                                 alt={`${groupData.universityName} logo`}/>
-                        </div>
-                    </CardMedia>
-                    {groupData.extraInfo &&
-                    <Typography component="div" variant="body1" className={classes.groupDescription}>
-                        <MultilineText text={groupData.extraInfo}/>
-                    </Typography>}
-                    {!!hasCategories && <CardContent>
-                        <Box className={classes.actions}>
-                            <SizeMe>{({size}) => (
-                                <StackGrid
-                                    style={{marginTop: 10}}
-                                    duration={20}
-                                    columnWidth={"100%"}
-                                    gridRef={grid => setGrid(grid)}>
-                                    {groupData.categories.map(category => {
-                                        if (category.name.toLowerCase() !== "level of study") {
-                                            return (
-                                                <CategoryCard width={size.width} mobile={mobile} key={category.id}
-                                                              category={category}
-                                                              handleToggleActive={handleToggleActive}/>
-                                            )
-                                        }
-                                    })}
-                                </StackGrid>
-                            )}</SizeMe>
-                        </Box>
-                    </CardContent>}
-                </Card>
+        <Grid id="scroll-grid" item xs={12} sm={12} md={4} lg={4} xl={4} className={classes.root}>
+            <Sticky onStateChange={handleStateChange} bottomBoundary="#scroll-grid" enabled={!mobile}>
+                <div className={classes.cardWrapper}>
+                    <Card className={clsx(classes.card, {
+                        [classes.mobile]: mobile
+                    })}>
+                        <CardMedia className={classes.media}>
+                            <div className={classes.imageContainer}>
+                                <img src={groupData.logoUrl} className={classes.image}
+                                     alt={`${groupData.universityName} logo`}/>
+                            </div>
+                        </CardMedia>
+                        {groupData.extraInfo &&
+                        <Typography component="div" variant="body1" className={classes.groupDescription}>
+                            <MultilineText text={groupData.extraInfo}/>
+                        </Typography>}
+                        {!!hasCategories && <CardContent>
+                            <Box className={classes.actions}>
+                                <SizeMe>{({size}) => (
+                                    <StackGrid
+                                        style={{marginTop: 10}}
+                                        duration={20}
+                                        columnWidth={"100%"}
+                                        gridRef={grid => setGrid(grid)}>
+                                        {groupData.categories.map(category => {
+                                            if (category.name.toLowerCase() !== "level of study") {
+                                                return (
+                                                    <CategoryCard width={size.width} mobile={mobile} key={category.id}
+                                                                  category={category}
+                                                                  handleToggleActive={handleToggleActive}/>
+                                                )
+                                            }
+                                        })}
+                                    </StackGrid>
+                                )}</SizeMe>
+                            </Box>
+                        </CardContent>}
+                    </Card>
+                </div>
             </Sticky>
             {/*</Grid>*/}
         </Grid>

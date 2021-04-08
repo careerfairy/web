@@ -4,14 +4,26 @@ import {store} from "../_app";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
 import GroupBannerSection from "../../components/views/NextLivestreams/group/GroupBannerSection";
 import NextLivestreams from "../../components/views/NextLivestreams/NextLivestreams";
-import useGroupUpcomingStreams from "../../components/custom-hook/useGroupUpcomingStreams";
+import useListenToGroupStreams from "../../components/custom-hook/useGroupUpcomingStreams";
 import {isLoaded} from "react-redux-firebase";
 import {CircularProgress} from "@material-ui/core";
+
+import {SwipeablePanel} from "../../materialUI/GlobalPanels/GlobalPanels";
+import {PAST_LIVESTREAMS_NAME} from "../../data/constants/streamContants";
 
 const useStyles = makeStyles(theme => ({
     backgroundImage: {
         // border: "2px solid pink",
         // backgroundSize: "contain"
+    },
+    swipeableContainer: {
+        "& > div": {
+            border: "2px solid green",
+            minHeight: "50vh",
+        }
+    },
+    spinner:{
+        margin: "auto"
     }
 }));
 
@@ -19,41 +31,61 @@ const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfai
 const GroupPage = ({currentGroup, livestreamId}) => {
 
     const classes = useStyles()
-    const {palette: {common: {white}, text: {primary}, navyBlue}} = useTheme()
+    const {palette: {common: {white}, text: {primary}, navyBlue}, direction} = useTheme()
     const [value, setValue] = useState(0);
+
     const [selectedOptions, setSelectedOptions] = useState([]);
-    const upcomingLivestreams = useGroupUpcomingStreams(livestreamId, currentGroup.groupId, selectedOptions)
+    const upcomingLivestreams = useListenToGroupStreams(livestreamId, currentGroup.groupId, selectedOptions)
+    const pastLivestreams = useListenToGroupStreams(livestreamId, currentGroup.groupId, selectedOptions, PAST_LIVESTREAMS_NAME)
 
-    const handleChange = useCallback((event, newValue)=> {
+    const handleChange = useCallback((event, newValue) => {
         setValue(newValue);
-    },[]);
+    }, []);
 
-    const handleChangeIndex = useCallback( (index) => {
-        setValue(index);
-    },[]);
 
     return (
         <NextLivestreamsLayout>
-            <GroupBannerSection
-                color={white}
-                backgroundImageClassName={classes.backgroundImage}
-                backgroundColor={navyBlue.main}
-                groupLogo={currentGroup.logoUrl}
-                backgroundImage={placeholderBanner}
-                backgroundImageOpacity={0.5}
-                title={currentGroup.universityName}
-                subtitle={currentGroup.description}
-                handleChange={handleChange}
-                value={value}
-            />
-            {!isLoaded(upcomingLivestreams) ? <CircularProgress/> : (
-                <NextLivestreams
-                    livestreamId={livestreamId}
-                    setSelectedOptions={setSelectedOptions}
-                    selectedOptions={selectedOptions}
-                                 livestreams={upcomingLivestreams}
-                                 currentGroup={currentGroup}/>
-            )}
+            <div>
+                <GroupBannerSection
+                    color={white}
+                    backgroundImageClassName={classes.backgroundImage}
+                    backgroundColor={navyBlue.main}
+                    groupLogo={currentGroup.logoUrl}
+                    backgroundImage={placeholderBanner}
+                    backgroundImageOpacity={0.5}
+                    title={currentGroup.universityName}
+                    subtitle={currentGroup.description}
+                    handleChange={handleChange}
+                    value={value}
+                />
+                <div style={{minHeight: "50vh"}}>
+                <SwipeablePanel value={value} index={0} dir={direction}>
+                    {isLoaded(upcomingLivestreams) ? (
+                        <NextLivestreams
+                            livestreamId={livestreamId}
+                            setSelectedOptions={setSelectedOptions}
+                            selectedOptions={selectedOptions}
+                            livestreams={upcomingLivestreams || []}
+                            currentGroup={currentGroup}/>
+                    ) : (
+                        <CircularProgress className={classes.spinner} color="primary"/>
+                    )}
+                </SwipeablePanel>
+                <SwipeablePanel value={value} index={1} dir={direction}>
+                    {isLoaded(pastLivestreams) ? (
+                        <NextLivestreams
+                            livestreamId={livestreamId}
+                            setSelectedOptions={setSelectedOptions}
+                            selectedOptions={selectedOptions}
+                            isPastLivestreams
+                            livestreams={pastLivestreams || []}
+                            currentGroup={currentGroup}/>
+                    ) : (
+                        <CircularProgress className={classes.spinner} color="primary"/>
+                    )}
+                </SwipeablePanel>
+                </div>
+            </div>
         </NextLivestreamsLayout>
     );
 };

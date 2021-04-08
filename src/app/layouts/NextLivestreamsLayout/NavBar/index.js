@@ -20,14 +20,15 @@ import {useAuth} from "../../../HOCs/AuthProvider";
 import Link from '../../../materialUI/NextNavLink'
 import {useSelector} from "react-redux";
 import {isEmpty, isLoaded} from "react-redux-firebase";
+import GroupsUtil from "../../../data/util/GroupsUtil";
 
 
 const useStyles = makeStyles((theme) => ({
     drawerPaper: {
         [theme.breakpoints.up('sm')]: {
-            paddingTop: ({scrolling}) => scrolling ? 0 : theme.mixins.toolbar["@media (min-width:600px)"].minHeight
+            paddingTop:  theme.mixins.toolbar["@media (min-width:600px)"].minHeight
         },
-        paddingTop: ({scrolling}) => scrolling ? 0 : theme.mixins.toolbar.minHeight,
+        paddingTop: theme.mixins.toolbar.minHeight,
         transition: theme.transitions.create('paddingTop', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
@@ -106,11 +107,10 @@ const FeedDrawer = memo(({
     const scrolling = useScrollTrigger()
     const classes = useStyles({drawerWidth: 270, drawerClosedWidth, scrolling});
 
-    const followingGroups = useSelector(state => state.firestore.ordered["followingGroups"])
+    const {userData} = useAuth()
 
-    console.log(" --> openMobile", openMobile)
 
-    const renderGroups = followingGroups?.map(({universityName, groupId, logoUrl}, index) => {
+    const renderGroups = GroupsUtil.getUniqueGroupsFromArrayOfGroups(userData?.followingGroups).map(({universityName, groupId, logoUrl}, index) => {
         return (
             <ListItem component={Link} className={classes.logoButton} href={`/next-livestreams/${groupId}`} button key={groupId}>
                 <ListItemAvatar>
@@ -169,7 +169,7 @@ const FeedDrawer = memo(({
                 {/*    ))}*/}
                 {/*    <Divider/>*/}
                 {/*</Collapse>*/}
-                {!isLoaded(followingGroups) ? <ListSpinner/> : isEmpty(followingGroups) ? <div/> : renderGroups}
+                {!isLoaded(userData?.followingGroups) ? <ListSpinner/> : isEmpty(userData?.followingGroups) ? <div/> : renderGroups}
             </List>
             <Divider/>
             <List>

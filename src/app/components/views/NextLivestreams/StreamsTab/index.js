@@ -8,7 +8,7 @@ const useStyles = makeStyles(theme => ({
     indicator: {
         backgroundColor: theme.palette.common.white,
         height: theme.spacing(0.7),
-        borderRadius: theme.spacing(1, 1, 0.2, 0.2)
+        borderRadius: theme.spacing(1, 1, 0.3, 0.3)
     },
     root: {
         boxShadow: "none"

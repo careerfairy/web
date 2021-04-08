@@ -1,14 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
+import Sticky from 'react-stickynode';
 
-import { Button, Grid, Typography, AppBar, Tabs, Tab, Box } from "@material-ui/core";
+import {Button, Grid, Typography, AppBar, Tabs, Tab, Box} from "@material-ui/core";
 import {withFirebase} from "../../../context/firebase";
 import GroupCategories from "./GroupCategories/GroupCategories";
 import GroupStreams from "./GroupStreams/GroupStreams";
 import {useRouter} from "next/router";
 import GroupJoinModal from "../profile/GroupJoinModal";
 import {bindKeyboard} from 'react-swipeable-views-utils';
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 const BindKeyboardSwipeableViews = bindKeyboard(SwipeableViews);
 
@@ -33,8 +35,9 @@ const useStyles = makeStyles((theme) => ({
         top: 165,
         zIndex: 20
     },
-    tabPanel: {
-
+    tabPanel: {},
+    sticky: {
+        zIndex: 1
     }
 }));
 
@@ -68,7 +71,8 @@ const MobileFeed = ({
                         livestreamId,
                         careerCenterId,
                         listenToUpcoming,
-                        selectedOptions
+                        selectedOptions,
+                        isPastLivestreams
                     }) => {
     const classes = useStyles();
     const theme = useTheme();
@@ -76,7 +80,13 @@ const MobileFeed = ({
     const absolutePath = router.asPath
     const [value, setValue] = useState(0);
     const [openJoinModal, setOpenJoinModal] = useState(false);
+    const [topOffset, setTopOffset] = useState(0);
+    const matches = useMediaQuery(theme.breakpoints.up('sm'));
 
+    useEffect(() => {
+        const newOffset = matches ? theme.mixins.toolbar["@media (min-width:600px)"].minHeight : theme.mixins.toolbar.minHeight
+        setTopOffset(newOffset)
+    }, [matches])
     useEffect(() => {
         if (groupData) {
             handleResetView()
@@ -120,25 +130,30 @@ const MobileFeed = ({
 
     return (
         <>
-            <AppBar className={classes.bar} position="static" color="default">
-                <Tabs
-                    value={value}
-                    variant="fullWidth"
-                    onChange={handleChange}
-                    indicatorColor="primary"
-                    textColor="primary"
-                    centered
-                >
-                    <Tab wrapped value={0}  {...a11yProps(0)} fullWidth
-                         label={<Typography variant="h5">Events</Typography>}/>
-                    {hasCategories ?
-                        <Tab value={1} wrapped fullWidth disabled={!groupData.categories}
-                             {...a11yProps(1)}
-                             label={<Typography variant="h5">Filter</Typography>}/>
-                        :
-                        null}
-                </Tabs>
-            </AppBar>
+            <Sticky
+                innerClass={classes.sticky}
+                top={topOffset}
+            >
+                <AppBar className={classes.bar} color="default">
+                    <Tabs
+                        value={value}
+                        variant="fullWidth"
+                        onChange={handleChange}
+                        indicatorColor="primary"
+                        textColor="primary"
+                        centered
+                    >
+                        <Tab wrapped value={0}  {...a11yProps(0)} fullWidth
+                             label={<Typography variant="h5">Events</Typography>}/>
+                        {hasCategories ?
+                            <Tab value={1} wrapped fullWidth disabled={!groupData.categories}
+                                 {...a11yProps(1)}
+                                 label={<Typography variant="h5">Filter</Typography>}/>
+                            :
+                            null}
+                    </Tabs>
+                </AppBar>
+            </Sticky>
             {!userData?.groupIds?.includes(groupData.groupId) && !listenToUpcoming &&
             <>
                 <Button className={classes.followButton} onClick={handleJoin} size="large" variant="contained" fullWidth
@@ -169,6 +184,7 @@ const MobileFeed = ({
                                       livestreamId={livestreamId}
                                       listenToUpcoming={listenToUpcoming}
                                       careerCenterId={careerCenterId}
+                                      isPastLivestreams={isPastLivestreams}
                                       selectedOptions={selectedOptions}
                                       searching={searching}
                                       alreadyJoined={alreadyJoined}

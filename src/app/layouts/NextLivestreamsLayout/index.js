@@ -20,20 +20,8 @@ const NextLivestreamsLayout = (props) => {
     const drawerClosedWidth = theme.spacing(8)
     const classes = useStyles({drawerClosedWidth});
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
-    const {userData} = useAuth()
-    const query = useMemo(() => {
-        const basQuery = {
-            collection: 'careerCenterData',
-            where: userData?.isAdmin ? ["test", "==", false] : ["groupId", "in", userData?.groupIds],
-            storeAs: "followingGroups"
-        }
-        return userData ? [basQuery] : []
-    }, [userData?.isAdmin, userData?.groupIds])
-    useFirestoreConnect(query)
-
 
     const {mainLinks, secondaryLinks} = useGeneralLinks()
-
 
     const handleDrawerOpen = () => setMobileNavOpen(true)
     const handleDrawerClose = () => setMobileNavOpen(false)
