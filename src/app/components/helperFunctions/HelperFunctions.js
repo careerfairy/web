@@ -17,7 +17,7 @@ dayjs.extend(relativeTime)
 
 export const uploadLogo = (location, fileObject, firebase, callback) => {
     var storageRef = firebase.getStorageRef();
-    let fullPath = `${location}/${uuidv4()}_${fileObject.name}`;
+    let fullPath = `${location}/${uuidv4()}_${fileObject.name.split(' ').join('_')}`;
     let companyLogoRef = storageRef.child(fullPath);
     var uploadTask = companyLogoRef.put(fileObject);
 
@@ -259,6 +259,15 @@ export const getMinutesPassed = (livestream) => {
 
 export const  addMinutes = (date, minutes) => {
     return new Date(date.getTime() + minutes * 60000);
+}
+
+export const toTitleCase =(str) => {
+    return str.replace(
+        /\w\S*/g,
+        function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        }
+    );
 }
 
 export const makeExternalLink = (url) => {

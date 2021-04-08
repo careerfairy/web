@@ -14,7 +14,7 @@
       "rewrites": [
         {
           "source": "**",
-          "function": "next"
+          "function": "production"
         }
       ]
     },
@@ -29,7 +29,7 @@
       "rewrites": [
         {
           "source": "**/**",
-          "function": "next2"
+          "function": "testing"
         }
       ]
     },
@@ -44,7 +44,7 @@
       "rewrites": [
         {
           "source": "**/**",
-          "function": "next3"
+          "function": "testing2"
         }
       ]
     }

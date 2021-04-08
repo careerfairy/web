@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Fragment, useEffect, useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {Box, CircularProgress, Container, Grid, Typography} from "@material-ui/core";
@@ -6,10 +7,10 @@ import {Pagination} from "@material-ui/lab";
 import StreamsToolbar from "./StreamsToolbar";
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
-import GroupStreamCardV2 from "../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
 import NewStreamModal from "./NewStreamModal";
 import {useRouter} from "next/router";
 import {repositionElement} from "../../../../helperFunctions/HelperFunctions";
+import GroupStreamCardV2Old from "../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2Old";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -20,8 +21,7 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         flexDirection: "column"
     },
-    streamCard: {
-    },
+    streamCard: {},
     highlighted: {}
 }));
 
@@ -141,7 +141,7 @@ const Index = ({group, typeOfStream, query, isAdmin}) => {
                 xl={4}
                 item
             >
-                <GroupStreamCardV2
+                <GroupStreamCardV2Old
                     mobile
                     isAdmin
                     id={livestream.id}
@@ -232,5 +232,12 @@ const SearchMessage = ({message}) => (
     </Grid>
 )
 
+Index.propTypes = {
+  group: PropTypes.object,
+  isAdmin: PropTypes.bool,
+  query: PropTypes.func.isRequired,
+  typeOfStream: PropTypes.string.isRequired
+}
 
 export default Index;
+

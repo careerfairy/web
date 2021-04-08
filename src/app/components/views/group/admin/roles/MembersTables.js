@@ -219,7 +219,16 @@ const MembersTable = ({
 };
 
 MembersTable.propTypes = {
-    className: PropTypes.string
-};
+    areYouSureModalMessage: PropTypes.string,
+    areYouSureModalOpen: PropTypes.bool,
+    className: PropTypes.string,
+    group: PropTypes.object,
+    handleClickKickButton: PropTypes.func,
+    handleClickPromoteButton: PropTypes.func,
+    handleCloseAreYouSureModal: PropTypes.func,
+    handleConfirm: PropTypes.func,
+    loading: PropTypes.bool,
+    openAddMemberModal: PropTypes.func
+}
 
 export default MembersTable

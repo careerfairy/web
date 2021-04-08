@@ -1,4 +1,4 @@
-import { Category } from "@material-ui/icons";
+import {Category} from "@material-ui/icons";
 
 export default class StatsUtil {
 
@@ -7,70 +7,70 @@ export default class StatsUtil {
             'First Name': student.firstName,
             'Last Name': student.lastName,
             'Email': student.userEmail,
-            'University': student.universityName ? student.universityName : 'N/A'
+            'University': student.university?.name || 'N/A'
         }
         let studentCategoriesForGroup = StatsUtil.getRegisteredGroupById(student, group.groupId)
         if (studentCategoriesForGroup && studentCategoriesForGroup.categories && studentCategoriesForGroup.categories.length && group.categories) {
-            group.categories.forEach( category => {
-                let studentCatValue = studentCategoriesForGroup.categories.find( studCat => studCat.id === category.id);
+            group.categories.forEach(category => {
+                let studentCatValue = studentCategoriesForGroup.categories.find(studCat => studCat.id === category.id);
                 if (studentCatValue) {
-                    let studentSelectedOption = category.options.find( option => option.id === studentCatValue.selectedValueId);
+                    let studentSelectedOption = category.options.find(option => option.id === studentCatValue.selectedValueId);
                     if (studentSelectedOption) {
                         studentDataObject[category.name] = studentSelectedOption.name;
                     }
                 }
             })
-        }      
+        }
         return studentDataObject;
     }
 
     static getStudentOutsideGroupDataObject(student, allGroups) {
-        let studentMainGroup = allGroups.find( group => {
+        let studentMainGroup = allGroups.find(group => {
             if (group.universityCode) {
-                return group.universityCode === student.universityCode;
+                return group.universityCode === student.university?.code;
             }
         });
         let studentDataObject = {
             'First Name': student.firstName,
             'Last Name': student.lastName,
             'Email': student.userEmail,
-            'University': student.universityName ? student.universityName : 'N/A'
+            'University': student.university?.name || 'N/A'
         }
         if (studentMainGroup) {
             let studentCategoriesForGroup = StatsUtil.getRegisteredGroupById(student, studentMainGroup.groupId)
             if (studentCategoriesForGroup && studentCategoriesForGroup.categories && studentCategoriesForGroup.categories.length && studentMainGroup.categories) {
-                studentMainGroup.categories.forEach( category => {
-                    let studentCatValue = studentCategoriesForGroup.categories.find( studCat => studCat.id === category.id);
+                studentMainGroup.categories.forEach(category => {
+                    let studentCatValue = studentCategoriesForGroup.categories.find(studCat => studCat.id === category.id);
                     if (studentCatValue) {
-                        let studentSelectedOption = category.options.find( option => option.id === studentCatValue.selectedValueId);
+                        let studentSelectedOption = category.options.find(option => option.id === studentCatValue.selectedValueId);
                         if (studentSelectedOption) {
                             studentDataObject[category.name] = studentSelectedOption.name;
                         }
-                    }     
+                    }
                 })
-            }  
-        } else if (student.groupIds && student.groupIds[0]){
-            let currentGroup = allGroups.find( group => group.groupId === student.groupIds[0]);
+            }
+        } else if (student.groupIds && student.groupIds[0]) {
+            let currentGroup = allGroups.find(group => group.groupId === student.groupIds[0]);
             if (currentGroup) {
                 let studentCategoriesForGroup = StatsUtil.getRegisteredGroupById(student, student.groupIds[0])
                 if (studentCategoriesForGroup && studentCategoriesForGroup.categories && studentCategoriesForGroup.categories.length && currentGroup.categories) {
-                    currentGroup.categories.forEach( category => {
-                        let studentCatValue = studentCategoriesForGroup.categories.find( studCat => studCat.id === category.id);
+                    currentGroup.categories.forEach(category => {
+                        let studentCatValue = studentCategoriesForGroup.categories.find(studCat => studCat.id === category.id);
                         if (studentCatValue) {
-                            let studentSelectedOption = category.options.find( option => option.id === studentCatValue.selectedValueId);
+                            let studentSelectedOption = category.options.find(option => option.id === studentCatValue.selectedValueId);
                             if (studentSelectedOption) {
                                 studentDataObject[category.name] = studentSelectedOption.name;
                             }
-                        } 
+                        }
                     })
                 }
-            }   
-        } 
-        return studentDataObject;      
+            }
+        }
+        return studentDataObject;
     }
-    
+
     static getGroupByUniversityCode(allGroups, universityCode) {
-        return allGroups.find( group => group.universityCode === universityCode );
+        return allGroups.find(group => group.universityCode === universityCode);
     }
 
     static getStudentCategories(student, allGroups) {
@@ -88,8 +88,8 @@ export default class StatsUtil {
         }
         let categoryStats = {};
         if (group.categories && group.length) {
-            group.categories.forEach( category => {
-                category.options.forEach( option => {
+            group.categories.forEach(category => {
+                category.options.forEach(option => {
                     if (!categoryStats[category.id]) {
                         categoryStats[category.id] = {};
                     }
@@ -97,10 +97,10 @@ export default class StatsUtil {
                 })
                 categoryStats[category.id].name = category.name;
             });
-            registeredStudentsFromGroup.forEach( student  => {
+            registeredStudentsFromGroup.forEach(student => {
                 let registeredGroup = StatsUtil.getRegisteredGroupById(student, group.groupId);
                 if (registeredGroup) {
-                    registeredGroup.categories.forEach( category => {
+                    registeredGroup.categories.forEach(category => {
                         categoryStats[category.id][category.selectedValueId] = categoryStats[category.id][category.selectedValueId] + 1;
                     })
                 }
@@ -111,30 +111,30 @@ export default class StatsUtil {
 
     static groupHasSpecializedCategories(group) {
         if (group.categories) {
-            let fieldOfStudyCategory = group.categories.find( category => category.name.toLowerCase() === 'field of study');
-            let levelOfStudyCategory = group.categories.find( category => category.name.toLowerCase() === 'level of study');
+            let fieldOfStudyCategory = group.categories.find(category => category.name.toLowerCase() === 'field of study');
+            let levelOfStudyCategory = group.categories.find(category => category.name.toLowerCase() === 'level of study');
             return fieldOfStudyCategory && levelOfStudyCategory;
         }
         return false;
     }
 
     static getSpecializedStudentStats(registeredStudentsFromGroup, group) {
-        let fieldOfStudyCategory = group.categories.find( category => category.name.toLowerCase() === 'field of study');
-        let levelOfStudyCategory = group.categories.find( category => category.name.toLowerCase() === 'level of study');
+        let fieldOfStudyCategory = group.categories.find(category => category.name.toLowerCase() === 'field of study');
+        let levelOfStudyCategory = group.categories.find(category => category.name.toLowerCase() === 'level of study');
         let categoryStats = {
             type: 'specialized',
             id: fieldOfStudyCategory.id,
             options: {},
-            names: levelOfStudyCategory.options.map( option => option.name )
+            names: levelOfStudyCategory.options.map(option => option.name)
         };
-        fieldOfStudyCategory.options.forEach( option => {
+        fieldOfStudyCategory.options.forEach(option => {
             let optionObj = {
                 name: option.name,
                 id: levelOfStudyCategory.id,
                 entries: 0,
                 subOptions: {}
             }
-            levelOfStudyCategory.options.forEach( option2 => {
+            levelOfStudyCategory.options.forEach(option2 => {
                 let option2Obj = {
                     name: option2.name,
                     entries: 0
@@ -143,21 +143,48 @@ export default class StatsUtil {
             })
             categoryStats.options[option.id] = optionObj;
         });
-        registeredStudentsFromGroup.forEach( student => {
+        registeredStudentsFromGroup.forEach(student => {
             let registeredGroup = StatsUtil.getRegisteredGroupById(student, group.groupId);
-            let fieldOfStudyOptionId = registeredGroup.categories.find( category => category.id === fieldOfStudyCategory.id)?.selectedValueId;
-            let levelOfStudyOptionId = registeredGroup.categories.find( category => category.id === levelOfStudyCategory.id)?.selectedValueId; 
+            let fieldOfStudyOptionId = registeredGroup.categories.find(category => category.id === fieldOfStudyCategory.id)?.selectedValueId;
+            let levelOfStudyOptionId = registeredGroup.categories.find(category => category.id === levelOfStudyCategory.id)?.selectedValueId;
             if (categoryStats.options[fieldOfStudyOptionId] && categoryStats.options[fieldOfStudyOptionId].subOptions[levelOfStudyOptionId]) {
                 categoryStats.options[fieldOfStudyOptionId].entries = categoryStats.options[fieldOfStudyOptionId].entries + 1;
                 categoryStats.options[fieldOfStudyOptionId].subOptions[levelOfStudyOptionId].entries = categoryStats.options[fieldOfStudyOptionId].subOptions[levelOfStudyOptionId].entries + 1;
             }
-            
+
         })
         return categoryStats;
     }
 
     static getRegisteredGroupById(student, groupId) {
-        return student.registeredGroups?.find( category => category.groupId === groupId);
+        return student.registeredGroups?.find(category => category.groupId === groupId);
+    }
+
+    static studentBelongsToGroup(student = {}, group = {}) {
+        if (group.universityCode) {
+            if (student.university?.code === group.universityCode) {
+                return student.groupIds && student.groupIds.includes(group.groupId);
+            } else {
+                return false;
+            }
+        } else {
+            return student.groupIds && student.groupIds.includes(group.groupId);
+        }
+    }
+
+    static studentFollowsGroup(student = {}, group = {}) {
+        return student.groupIds && student.groupIds.includes(group.groupId);
+    }
+
+    static getFirstGroupThatUserBelongsTo(student = {}, arrayOfGroups = [], requestingGroup) {
+        let groupThatUserBelongsTo
+        const userFollowsRequestingGroup = StatsUtil.studentFollowsGroup(student, requestingGroup)
+        if (userFollowsRequestingGroup) {
+            groupThatUserBelongsTo = requestingGroup
+        } else {
+            groupThatUserBelongsTo = arrayOfGroups.find(group => StatsUtil.studentFollowsGroup(student, group))
+        }
+        return groupThatUserBelongsTo
     }
 
 }

@@ -51,7 +51,7 @@ const UserCount = ({fetching, currentUserDataSet, group, totalUsers, timeFrames,
                             color="textPrimary"
                             variant="h3"
                         >
-                            {fetching ? <CircularProgress/> : totalUsers}
+                            {fetching ? <CircularProgress/> : totalUsers || 0}
                         </Typography>
                     </Grid>
                     <Grid item>

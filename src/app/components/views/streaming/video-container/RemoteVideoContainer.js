@@ -91,7 +91,10 @@ function RemoteVideoContainer(props) {
 
     useEffect(() => {
         if (!props.isPlayMode) {
-            props.attachSinkId(videoElement.current, props.speakerSource)
+            let audioElement = document.getElementById(`audio${props.stream.streamId}`)
+            if (audioElement) {
+                props.attachSinkId(audioElement, props.speakerSource)
+            }
         }
     }, [props.speakerSource])
 
@@ -143,7 +146,7 @@ function RemoteVideoContainer(props) {
         }
     }
 
-    const speaker = !isScreenShareVideo ? props.currentLivestream.speakers.find(speaker => speaker.speakerUuid === props.stream.streamId) : null;
+    const speaker = !isScreenShareVideo ? props.currentLivestream.liveSpeakers.find(speaker => speaker.speakerUuid === props.stream.streamId) : null;
 
     return (
         <WhiteTooltip

@@ -161,7 +161,6 @@ const ActionComponent = ({
                                 sm={12}
                                 xs={12}
                                 item
-                                className={classes.actionItems}
                             >
                                 <Button
                                     disabled={isSubmitting}
@@ -191,17 +190,16 @@ const ActionComponent = ({
 };
 
 ActionComponent.propTypes = {
-  email: PropTypes.string.isRequired,
-  firebase: PropTypes.object,
-  hasText: PropTypes.bool.isRequired,
-  livestreamId: PropTypes.string.isRequired,
-  noStars: PropTypes.bool.isRequired,
-  ratingId: PropTypes.string.isRequired
+    email: PropTypes.string.isRequired,
+    firebase: PropTypes.object,
+    hasText: PropTypes.bool.isRequired,
+    livestreamId: PropTypes.string.isRequired,
+    noStars: PropTypes.bool.isRequired,
+    ratingId: PropTypes.string.isRequired
 }
 
 const RatingContainer = ({firebase, livestream, livestreamId}) => {
     const {authenticatedUser} = useAuth();
-
     const classes = useStyles();
     const dispatch = useDispatch()
     const enqueueSnackbar = (...args) => dispatch(actions.enqueueSnackbar(...args))
@@ -312,9 +310,9 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
 };
 
 RatingContainer.propTypes = {
-  firebase: PropTypes.object,
-  livestream: PropTypes.object.isRequired,
-  livestreamId: PropTypes.string.isRequired
+    firebase: PropTypes.object,
+    livestream: PropTypes.object.isRequired,
+    livestreamId: PropTypes.string.isRequired
 }
 
 export default withFirebasePage(RatingContainer);

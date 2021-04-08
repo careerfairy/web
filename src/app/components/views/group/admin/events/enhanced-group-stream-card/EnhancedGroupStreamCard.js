@@ -143,21 +143,25 @@ const EnhancedGroupStreamCard = ({
 
     useEffect(() => {
         if (registeredStudents && registeredStudents.length) {
-            let studentsOfGroup = [];
-            registeredStudents.forEach(registeredStudent => {
-                if (studentBelongsToGroup(registeredStudent)) {
-                    let publishedStudent = StatsUtil.getStudentInGroupDataObject(registeredStudent, group);
-                    studentsOfGroup.push(publishedStudent);
-                }
-            });
-            setRegisteredStudentsFromGroup(studentsOfGroup);
+            let newRegisteredStudentsFromGroup = []
+            if (group.universityCode) {
+                newRegisteredStudentsFromGroup = registeredStudents.filter(student => studentBelongsToGroup(student))
+                    .map(filteredStudent => StatsUtil.getStudentInGroupDataObject(filteredStudent, group))
+            } else {
+                const livestreamGroups = allGroups.filter(group => livestream.groupIds.includes(group.id))
+                newRegisteredStudentsFromGroup = registeredStudents.map(student => {
+                    const livestreamGroupUserBelongsTo = StatsUtil.getFirstGroupThatUserBelongsTo(student, livestreamGroups, group)
+                    return StatsUtil.getStudentInGroupDataObject(student, livestreamGroupUserBelongsTo || {})
+                })
+            }
+            setRegisteredStudentsFromGroup(newRegisteredStudentsFromGroup);
         }
     }, [registeredStudents]);
 
 
     function studentBelongsToGroup(student) {
         if (group.universityCode) {
-            if (student.universityCode === group.universityCode) {
+            if (student.university?.code === group.universityCode) {
                 return student.groupIds && student.groupIds.includes(group.groupId);
             } else {
                 return false;
@@ -325,7 +329,8 @@ const EnhancedGroupStreamCard = ({
                 >
                     Get Streamer Links
                 </Button>}
-                <StreamerLinksDialog livestreamId={livestream.id} openDialog={openStreamerLinksDialog} setOpenDialog={setOpenStreamerLinksDialog}/>
+                <StreamerLinksDialog livestreamId={livestream.id} openDialog={openStreamerLinksDialog}
+                                     setOpenDialog={setOpenStreamerLinksDialog}/>
                 {(isCareerCenter() || userData?.isAdmin) &&
                 <CSVLink data={registeredStudentsFromGroup} separator={";"}
                          filename={'Registered Students ' + livestream.company + ' ' + livestream.id + '.csv'}
@@ -368,16 +373,16 @@ const EnhancedGroupStreamCard = ({
                             <PDFDownloadLink fileName={`General Report ${livestream.company} ${livestream.id}.pdf`}
                                              document={
                                                  <LivestreamPdfReport group={group}
-                                                    livestream={livestream}
-                                                    studentStats={studentStats}
-                                                    speakers={livestream.speakers}
-                                                    overallRating={overallRating}
-                                                    contentRating={contentRating}
-                                                    totalStudentsInTalentPool={talentPoolForReport.length}
-                                                    totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length}
-                                                    totalViewerFromETH={participatingStudentsFromGroup.length}
-                                                    questions={questions} polls={polls}
-                                                    icons={icons}/>}>
+                                                                      livestream={livestream}
+                                                                      studentStats={studentStats}
+                                                                      speakers={livestream.speakers}
+                                                                      overallRating={overallRating}
+                                                                      contentRating={contentRating}
+                                                                      totalStudentsInTalentPool={talentPoolForReport.length}
+                                                                      totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length}
+                                                                      totalViewerFromETH={participatingStudentsFromGroup.length}
+                                                                      questions={questions} polls={polls}
+                                                                      icons={icons}/>}>
                                 {({blob, url, loading, error}) => (
                                     <div>
                                         <Button className={classes.button} fullWidth variant='outlined' color='primary'>Download

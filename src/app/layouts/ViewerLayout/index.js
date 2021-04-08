@@ -153,7 +153,7 @@ const ViewerLayout = (props) => {
             setShowMenu(true);
         }
         setSelectedState(state);
-    },[showMenu])
+    }, [showMenu])
     const showAudience = useCallback(() => {
         setAudienceDrawerOpen(true)
     }, []);
@@ -183,22 +183,22 @@ const ViewerLayout = (props) => {
 
     const handleClap = useCallback(() => {
         postIcon('clapping')
-    }, [])
+    }, [iconsDisabled, livestreamId, authenticatedUser])
 
     const handleLike = useCallback(() => {
         postIcon('like')
-    }, [])
+    }, [iconsDisabled, livestreamId, authenticatedUser])
     const handleHeart = useCallback(() => {
         postIcon('heart')
-    }, [])
+    }, [iconsDisabled, livestreamId, authenticatedUser])
 
-    const postIcon = useCallback((iconName) => {
+    const postIcon = (iconName) => {
         if (!iconsDisabled) {
             dispatch(actions.createEmote(iconName))
             setIconsDisabled(true);
+            firebase.postIcon(livestreamId, iconName, authenticatedUser.email);
         }
-    }, [iconsDisabled])
-
+    }
     const enableIcons = useCallback(() => {
         setIconsDisabled(false)
     }, [])
@@ -228,7 +228,7 @@ const ViewerLayout = (props) => {
 
     return (
         <CurrentStreamContext.Provider value={{currentLivestream}}>
-            <div className={classes.root}>
+            <div className={`${classes.root} notranslate`}>
                 <ViewerTopBar
                     showAudience={showAudience}
                     showMenu={showMenu}

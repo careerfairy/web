@@ -110,6 +110,7 @@ const DraftStreamForm = ({
                          }) => {
     const router = useRouter()
     const {userData} = useAuth()
+    const SPEAKER_LIMIT = userData?.isAdmin ? 15 : 5
     let {
         query: {careerCenterIds, draftStreamId},
         replace,
@@ -517,6 +518,7 @@ const DraftStreamForm = ({
                                 <FormGroup>
                                     <SpeakerForm
                                         key={key}
+                                        speakerLimit={SPEAKER_LIMIT}
                                         handleDeleteSpeaker={handleDeleteSpeaker}
                                         setValues={setValues}
                                         speakerObj={speakerObj}

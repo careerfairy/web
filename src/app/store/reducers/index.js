@@ -7,6 +7,8 @@ import todosReducer from './todosReducer';
 import rtmChannelReducer from "./rtmChannelReducer";
 import emotesReducer from "./emotesReducer";
 import snackbarReducer from "./snackbarReducer";
+import userDataSetReducer from "./userDataSetReducer";
+import currentFilterGroupReducer from "./currentFilterGroupReducer";
 
 export default combineReducers({
     auth: authReducer,
@@ -15,5 +17,7 @@ export default combineReducers({
     firestore: firestoreReducer,
     rtmChannel: rtmChannelReducer,
     emotes: emotesReducer,
-    snackbars: snackbarReducer
+    snackbars: snackbarReducer,
+    userDataSet: userDataSetReducer,
+    currentFilterGroup: currentFilterGroupReducer,
 });

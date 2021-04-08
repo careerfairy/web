@@ -19,6 +19,7 @@ import {
     WhiteTooltip
 } from "../../../../../materialUI/GlobalTooltips";
 import {makeStyles} from "@material-ui/core/styles";
+import PollUtil from "../../../../../data/util/PollUtil";
 
 const useStyles = makeStyles(theme => ({
     pollHeader: {
@@ -36,12 +37,13 @@ const PollCategory = ({firebase, streamer, livestream, selectedState, showMenu, 
     useEffect(() => {
         if (livestream.id) {
             const unsubscribe = firebase.listenToPollEntries(livestream.id, querySnapshot => {
-                var pollEntries = [];
-                querySnapshot.forEach(doc => {
-                    let poll = doc.data();
-                    poll.id = doc.id;
-                    pollEntries.push(poll);
-                });
+                const pollEntries = querySnapshot.docs.map(doc => {
+                    const data = doc.data()
+                    return {
+                        id: doc.id,
+                        ...data,
+                        options: PollUtil.convertPollOptionsObjectToArray(data.options)
+                    }})
                 setPollEntries(pollEntries);
             });
             return () => unsubscribe();
@@ -129,14 +131,14 @@ const PollCategory = ({firebase, streamer, livestream, selectedState, showMenu, 
 }
 
 PollCategory.propTypes = {
-  firebase: PropTypes.object,
-  livestream: PropTypes.object.isRequired,
-  selectedState: PropTypes.string.isRequired,
-  showMenu: PropTypes.bool.isRequired,
-  sliding: PropTypes.bool.isRequired,
-  streamer: PropTypes.bool.isRequired,
-  user: PropTypes.object,
-  userData: PropTypes.object
+    firebase: PropTypes.object,
+    livestream: PropTypes.object.isRequired,
+    selectedState: PropTypes.string.isRequired,
+    showMenu: PropTypes.bool.isRequired,
+    sliding: PropTypes.bool.isRequired,
+    streamer: PropTypes.bool.isRequired,
+    user: PropTypes.object,
+    userData: PropTypes.object
 }
 
 export default withFirebase(PollCategory);
