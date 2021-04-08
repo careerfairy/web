@@ -31,6 +31,7 @@ const livestreams = require('./livestreams')
 const universityEmails = require('./universityEmails')
 const algolia = require('./algolia')
 const analytics = require('./analytics')
+const recording = require('./recording')
 
 // Hosting
 exports.production = hosting.production
@@ -82,4 +83,7 @@ exports.updateStreamIndex = algolia.updateStreamIndex
 exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex
 
 // Analytics
-exports.updateUserDataAnalyticsOnWrite = analytics.updateUserDataAnalyticsOnWrite
+exports.updateUserDataAnalytcicsOnWrite = analytics.updateUserDataAnalyticsOnWrite
+
+//Recording
+exports.startRecordingLivestream = recording.startRecordingLivestream

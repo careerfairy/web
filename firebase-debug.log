@@ -1,99 +1,102 @@
-[debug] [2021-03-14T18:02:47.604Z] ----------------------------------------------------------------------
-[debug] [2021-03-14T18:02:47.606Z] Command:       /Users/mvoss/.nvm/versions/node/v10.19.0/bin/node /Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/.bin/firebase serve --only functions,hosting
-[debug] [2021-03-14T18:02:47.606Z] CLI Version:   7.16.2
-[debug] [2021-03-14T18:02:47.606Z] Platform:      darwin
-[debug] [2021-03-14T18:02:47.606Z] Node Version:  v10.19.0
-[debug] [2021-03-14T18:02:47.607Z] Time:          Sun Mar 14 2021 19:02:47 GMT+0100 (Central European Standard Time)
-[debug] [2021-03-14T18:02:47.607Z] ----------------------------------------------------------------------
-[debug] [2021-03-14T18:02:47.607Z] 
-[debug] [2021-03-14T18:02:47.615Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
-[debug] [2021-03-14T18:02:47.615Z] > authorizing via signed-in user
-[debug] [2021-03-14T18:02:47.615Z] [iam] checking project careerfairy-e1fd9 for permissions ["firebase.projects.get"]
-[debug] [2021-03-14T18:02:47.618Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/careerfairy-e1fd9:testIamPermissions  
+[debug] [2021-04-08T08:54:22.619Z] ----------------------------------------------------------------------
+[debug] [2021-04-08T08:54:22.621Z] Command:       /Users/mvoss/.nvm/versions/node/v10.19.0/bin/node /Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/.bin/firebase serve --only functions,hosting
+[debug] [2021-04-08T08:54:22.621Z] CLI Version:   7.16.2
+[debug] [2021-04-08T08:54:22.621Z] Platform:      darwin
+[debug] [2021-04-08T08:54:22.621Z] Node Version:  v10.19.0
+[debug] [2021-04-08T08:54:22.622Z] Time:          Thu Apr 08 2021 10:54:22 GMT+0200 (Central European Summer Time)
+[debug] [2021-04-08T08:54:22.622Z] ----------------------------------------------------------------------
+[debug] [2021-04-08T08:54:22.622Z] 
+[debug] [2021-04-08T08:54:22.630Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2021-04-08T08:54:22.631Z] > authorizing via signed-in user
+[debug] [2021-04-08T08:54:22.631Z] [iam] checking project careerfairy-e1fd9 for permissions ["firebase.projects.get"]
+[debug] [2021-04-08T08:54:22.633Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/careerfairy-e1fd9:testIamPermissions  
 
-[debug] [2021-03-14T18:02:48.393Z] <<< HTTP RESPONSE 200
-[debug] [2021-03-14T18:02:48.395Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/careerfairy-e1fd9  
+[debug] [2021-04-08T08:54:23.347Z] <<< HTTP RESPONSE 200
+[debug] [2021-04-08T08:54:23.348Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/careerfairy-e1fd9  
  
-[debug] [2021-03-14T18:02:48.590Z] <<< HTTP RESPONSE 200
-[debug] [2021-03-14T18:02:48.593Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/careerfairy-e1fd9/webApps/-/config  
+[debug] [2021-04-08T08:54:23.542Z] <<< HTTP RESPONSE 200
+[debug] [2021-04-08T08:54:23.545Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/careerfairy-e1fd9/webApps/-/config  
  
 [info] ✔  functions: Using node@10 from host.
 [info] ✔  functions: functions emulator started at http://localhost:5001
-[debug] [2021-03-14T18:02:49.205Z] <<< HTTP RESPONSE 200
+[debug] [2021-04-08T08:54:24.138Z] <<< HTTP RESPONSE 200
 [info] i  functions: Watching "/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp" for Cloud Functions...
-[debug] [2021-03-14T18:02:49.252Z] [worker-pool] addWorker(~diagnostic~)
-[debug] [2021-03-14T18:02:49.252Z] [worker-pool] Adding worker with key ~diagnostic~, total=1
-[debug] [2021-03-14T18:02:49.252Z] [worker-pool] submitWork(triggerId=)
-[debug] [2021-03-14T18:02:49.253Z] [worker-~diagnostic~-ea035833-923a-4894-b53e-eeb82ba46ca4]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_56961.sock
-[debug] [2021-03-14T18:02:49.253Z] [worker-~diagnostic~-ea035833-923a-4894-b53e-eeb82ba46ca4]: BUSY
+[debug] [2021-04-08T08:54:24.210Z] [worker-pool] addWorker(~diagnostic~)
+[debug] [2021-04-08T08:54:24.210Z] [worker-pool] Adding worker with key ~diagnostic~, total=1
+[debug] [2021-04-08T08:54:24.210Z] [worker-pool] submitWork(triggerId=)
+[debug] [2021-04-08T08:54:24.211Z] [worker-~diagnostic~-6c4aac8b-e463-455f-84e5-e24d2afd4ee4]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_73667.sock
+[debug] [2021-04-08T08:54:24.211Z] [worker-~diagnostic~-6c4aac8b-e463-455f-84e5-e24d2afd4ee4]: BUSY
 [info] i  hosting[production]: Serving hosting files from: public
 [info] ✔  hosting[production]: Local server: http://localhost:5000
 [info] i  hosting[testing]: Serving hosting files from: public
 [info] ✔  hosting[testing]: Local server: http://localhost:5005
 [info] i  hosting[testing2]: Serving hosting files from: public
 [info] ✔  hosting[testing2]: Local server: http://localhost:5006
-[debug] [2021-03-14T18:02:49.502Z] [runtime-status] [56961] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
-[debug] [2021-03-14T18:02:49.503Z] [runtime-status] [56961] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
-[debug] [2021-03-14T18:02:49.506Z] [runtime-status] [56961] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.13.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
-[debug] [2021-03-14T18:02:49.506Z] [runtime-status] [56961] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.11.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
-[debug] [2021-03-14T18:02:49.515Z] [runtime-status] [56961] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.11.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
-[info] ✔  functions[next]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/next).
-[info] ✔  functions[next2]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/next2).
-[info] ✔  functions[next3]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/next3).
-[info] ✔  functions[resendPostmarkEmailVerificationEmailWithPin]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/resendPostmarkEmailVerificationEmailWithPin).
+[debug] [2021-04-08T08:54:24.475Z] [runtime-status] [73667] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2021-04-08T08:54:24.476Z] [runtime-status] [73667] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2021-04-08T08:54:24.486Z] [runtime-status] [73667] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.13.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2021-04-08T08:54:24.487Z] [runtime-status] [73667] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.13.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2021-04-08T08:54:24.487Z] [runtime-status] [73667] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.13.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[info] >  Loaded env from /Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/.env
+[info] ✔  functions[production]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/production).
+[info] ✔  functions[testing]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/testing).
+[info] ✔  functions[testing2]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/testing2).
+[info] ✔  functions[updateFakeUser]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/updateFakeUser).
 [info] ✔  functions[verifyEmailWithPin]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/verifyEmailWithPin).
 [info] ✔  functions[sendPostmarkResetPasswordEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkResetPasswordEmail).
-[info] ✔  functions[sendLivestreamRegistrationConfirmationEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendLivestreamRegistrationConfirmationEmail).
-[info] ✔  functions[sendPhysicalEventRegistrationConfirmationEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPhysicalEventRegistrationConfirmationEmail).
-[info] ✔  functions[sendDashboardInviteEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendDashboardInviteEmail).
-[info] ✔  functions[sendDraftApprovalRequestEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendDraftApprovalRequestEmail).
-[info] ✔  functions[updateFakeUser]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/updateFakeUser).
 [info] ✔  functions[sendPostmarkEmailUserDataAndUni]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkEmailUserDataAndUni).
 [info] ✔  functions[sendPostmarkEmailUserDataAndUniWithName]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkEmailUserDataAndUniWithName).
-[info] ✔  functions[sendReminderEmailToUserFromUniversity]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendReminderEmailToUserFromUniversity).
+[info] ✔  functions[resendPostmarkEmailVerificationEmailWithPin]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/resendPostmarkEmailVerificationEmailWithPin).
 [info] ✔  functions[generateAgoraToken]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/generateAgoraToken).
-[info] ✔  functions[startRecordingLivestream]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/startRecordingLivestream).
 [info] ✔  functions[generateAgoraTokenSecure]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/generateAgoraTokenSecure).
+[info] ✔  functions[startRecordingLivestream]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/startRecordingLivestream).
+[info] ✔  functions[sendDashboardInviteEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendDashboardInviteEmail).
+[info] ✔  functions[sendDraftApprovalRequestEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendDraftApprovalRequestEmail).
 [info] ✔  functions[sendReminderEmailToRegistrants]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendReminderEmailToRegistrants).
+[info] ✔  functions[sendReminderEmailToUserFromUniversity]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendReminderEmailToUserFromUniversity).
+[info] ✔  functions[sendLivestreamRegistrationConfirmationEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendLivestreamRegistrationConfirmationEmail).
+[info] ✔  functions[sendPhysicalEventRegistrationConfirmationEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPhysicalEventRegistrationConfirmationEmail).
 [info] ✔  functions[sendEmailToStudentOfUniversityAndField]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendEmailToStudentOfUniversityAndField).
-[info] i  functions[addToIndex]: function ignored because the firestore emulator does not exist or is not running.
-[info] i  functions[addToStreamIndex]: function ignored because the firestore emulator does not exist or is not running.
-[info] i  functions[updateIndex]: function ignored because the firestore emulator does not exist or is not running.
-[info] i  functions[updateStreamIndex]: function ignored because the firestore emulator does not exist or is not running.
-[info] i  functions[deleteFromIndex]: function ignored because the firestore emulator does not exist or is not running.
-[info] i  functions[deleteStreamFromIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[exportFirestoreBackup]: function ignored because the pubsub emulator does not exist or is not running.
 [info] i  functions[scheduleReminderEmailSendTestOnRun]: function ignored because the pubsub emulator does not exist or is not running.
 [info] i  functions[sendReminderEmailsWhenLivestreamStarts]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[scheduleTestLivestreamDeletion]: function ignored because the pubsub emulator does not exist or is not running.
 [info] i  functions[assertLivestreamRegistrationWasCompleted]: function ignored because the firestore emulator does not exist or is not running.
 [info] i  functions[assertLivestreamDeregistrationWasCompleted]: function ignored because the firestore emulator does not exist or is not running.
-[info] i  functions[exportFirestoreBackup]: function ignored because the pubsub emulator does not exist or is not running.
-[info] i  functions[scheduleTestLivestreamDeletion]: function ignored because the pubsub emulator does not exist or is not running.
-[debug] [2021-03-14T18:02:49.763Z] [worker-~diagnostic~-ea035833-923a-4894-b53e-eeb82ba46ca4]: IDLE
-[debug] [2021-03-14T18:02:53.598Z] [work-queue] {"queueLength":1,"workRunningCount":0}
-[debug] [2021-03-14T18:02:53.598Z] [work-queue] {"queueLength":0,"workRunningCount":1}
-[debug] [2021-03-14T18:02:53.599Z] Accepted request GET /careerfairy-e1fd9/us-central1/startRecordingLivestream --> startRecordingLivestream
-[debug] [2021-03-14T18:02:53.605Z] [worker-pool] addWorker(startRecordingLivestream)
-[debug] [2021-03-14T18:02:53.605Z] [worker-pool] Adding worker with key startRecordingLivestream, total=1
-[debug] [2021-03-14T18:02:53.605Z] [worker-pool] submitWork(triggerId=startRecordingLivestream)
-[debug] [2021-03-14T18:02:53.605Z] [worker-startRecordingLivestream-f4ce66db-976d-4d3f-860a-7e66ac507c27]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_56962.sock
-[debug] [2021-03-14T18:02:53.605Z] [worker-startRecordingLivestream-f4ce66db-976d-4d3f-860a-7e66ac507c27]: BUSY
-[debug] [2021-03-14T18:02:53.859Z] [runtime-status] [56962] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
-[debug] [2021-03-14T18:02:53.861Z] [runtime-status] [56962] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
-[debug] [2021-03-14T18:02:53.864Z] [runtime-status] [56962] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.13.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
-[debug] [2021-03-14T18:02:53.864Z] [runtime-status] [56962] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.11.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
-[debug] [2021-03-14T18:02:53.865Z] [runtime-status] [56962] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.11.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
-[debug] [2021-03-14T18:02:54.114Z] [runtime-status] [56962] Trigger "startRecordingLivestream" has been found, beginning invocation!
+[info] i  functions[addToIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[updateIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[deleteFromIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[addToStreamIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[updateStreamIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[deleteStreamFromIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[updateUserDataAnalytcicsOnWrite]: function ignored because the firestore emulator does not exist or is not running.
+[debug] [2021-04-08T08:54:24.860Z] [worker-~diagnostic~-6c4aac8b-e463-455f-84e5-e24d2afd4ee4]: IDLE
+[debug] [2021-04-08T08:54:28.189Z] [work-queue] {"queueLength":1,"workRunningCount":0}
+[debug] [2021-04-08T08:54:28.189Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2021-04-08T08:54:28.190Z] Accepted request GET /careerfairy-e1fd9/us-central1/startRecordingLivestream --> startRecordingLivestream
+[debug] [2021-04-08T08:54:28.196Z] [worker-pool] addWorker(startRecordingLivestream)
+[debug] [2021-04-08T08:54:28.196Z] [worker-pool] Adding worker with key startRecordingLivestream, total=1
+[debug] [2021-04-08T08:54:28.196Z] [worker-pool] submitWork(triggerId=startRecordingLivestream)
+[debug] [2021-04-08T08:54:28.197Z] [worker-startRecordingLivestream-ffad9cdc-81f4-4a86-8159-a4dd734f791a]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_73686.sock
+[debug] [2021-04-08T08:54:28.197Z] [worker-startRecordingLivestream-ffad9cdc-81f4-4a86-8159-a4dd734f791a]: BUSY
+[debug] [2021-04-08T08:54:28.457Z] [runtime-status] [73686] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2021-04-08T08:54:28.459Z] [runtime-status] [73686] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2021-04-08T08:54:28.462Z] [runtime-status] [73686] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.13.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2021-04-08T08:54:28.463Z] [runtime-status] [73686] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.13.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2021-04-08T08:54:28.464Z] [runtime-status] [73686] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.13.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[info] >  Loaded env from /Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/.env
+[debug] [2021-04-08T08:54:28.853Z] [runtime-status] [73686] Trigger "startRecordingLivestream" has been found, beginning invocation!
 [info] i  functions: Beginning execution of "startRecordingLivestream"
-[debug] [2021-03-14T18:02:54.116Z] [runtime-status] [56962] triggerDefinition {"httpsTrigger":{},"name":"startRecordingLivestream","entryPoint":"startRecordingLivestream"}
-[debug] [2021-03-14T18:02:54.116Z] [runtime-status] [56962] Running startRecordingLivestream in mode HTTPS
-[debug] [2021-03-14T18:02:54.116Z] [runtime-status] [56962] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_56962.sock
-[debug] [2021-03-14T18:02:54.117Z] [functions] Runtime ready! Sending request!
-[debug] [2021-03-14T18:02:54.126Z] [runtime-status] [56962] Ephemeral server handling GET request
+[debug] [2021-04-08T08:54:28.854Z] [runtime-status] [73686] triggerDefinition {"httpsTrigger":{},"name":"startRecordingLivestream","entryPoint":"startRecordingLivestream"}
+[debug] [2021-04-08T08:54:28.854Z] [runtime-status] [73686] Running startRecordingLivestream in mode HTTPS
+[debug] [2021-04-08T08:54:28.854Z] [runtime-status] [73686] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_73686.sock
+[debug] [2021-04-08T08:54:28.854Z] [functions] Runtime ready! Sending request!
+[debug] [2021-04-08T08:54:28.861Z] [runtime-status] [73686] Ephemeral server handling GET request
 [info] >  We got this far
 [info] >  { resourceId:
-[info] >     'Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8pN1OmYeqQN1kVt1jqAsLainCaRQnRLaOPx6rKXf4FFzf5ACoi_y-1AZsBT1CfMIcrk3RO0mGMemKPwZpE1tYtilkeZZtcJGZMR9PL3wpntkf28oryq0KezIyxl24TTS7d_s6w7XbvBWS0wAroe77BOutHwcjNKoP0JnvGg1Y4MXs_LnCImSMuIpgW60KuS_v-N6aQP_3JIO7WjK7LHoZevPP_6FZukPdz5Y3XPlTIZkpR9tMlruWm57kf1DDVkk7w',
-[info] >    sid: '24974c62fe473521cbc9819c766d60d5' }
-[debug] [2021-03-14T18:02:54.595Z] [runtime-status] [56962] Ephemeral server survived.
+[info] >     'Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8jsW22NtP3TjS587V9rJ49I05PsHaC4Nso7GvAvETlwpgF9Igz6f0ZzVwqoY3GRF3rr2V_m54-8qkG5RT-QSOq3byhHJerbHhFecPOdD11cS2R7ksBvQmbArg227ImEF_9e-k6hHAThV4QTNInhblfrY8kWMp2CYHilLe75XScdq0i_PTZjWLxuxtEBiJjoFTJXV7BRs7GlPo2MX_aX8cBXbibzh7_lDl4X3x-nwxDwO7vPHfILCm6YlyCzETPhp4A',
+[info] >    sid: '45ec2e8c654c2160926e288fbbfee3c2' }
+[debug] [2021-04-08T08:54:29.325Z] [runtime-status] [73686] Ephemeral server survived.
 [info] >  { status: 200,
 [info] >    statusText: 'OK',
 [info] >    headers:
@@ -102,17 +105,17 @@
 [info] >       connection: 'close',
 [info] >       'accept-ranges': 'bytes',
 [info] >       'access-control-allow-origin': '*',
-[info] >       'x-session-id': '24974c62fe473521cbc9819c766d60d5',
-[info] >       'x-request-id': 'cbf6e3bcf52042159a0856bea1fdb7f0',
-[info] >       'x-kong-upstream-latency': '2292',
+[info] >       'x-session-id': '45ec2e8c654c2160926e288fbbfee3c2',
+[info] >       'x-request-id': 'ee209a4173ff4770a231912289e44692',
+[info] >       'x-kong-upstream-latency': '2097',
 [info] >       'x-kong-proxy-latency': '1',
 [info] >       via: 'kong/1.2.1' },
 [info] >    config:
 [info] >     { url:
-[info] >        'https://api.agora.io/v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8pN1OmYeqQN1kVt1jqAsLainCaRQnRLaOPx6rKXf4FFzf5ACoi_y-1AZsBT1CfMIcrk3RO0mGMemKPwZpE1tYtilkeZZtcJGZMR9PL3wpntkf28oryq0KezIyxl24TTS7d_s6w7XbvBWS0wAroe77BOutHwcjNKoP0JnvGg1Y4MXs_LnCImSMuIpgW60KuS_v-N6aQP_3JIO7WjK7LHoZevPP_6FZukPdz5Y3XPlTIZkpR9tMlruWm57kf1DDVkk7w/sid/24974c62fe473521cbc9819c766d60d5/mode/web/stop',
+[info] >        'https://api.agora.io/v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8jsW22NtP3TjS587V9rJ49I05PsHaC4Nso7GvAvETlwpgF9Igz6f0ZzVwqoY3GRF3rr2V_m54-8qkG5RT-QSOq3byhHJerbHhFecPOdD11cS2R7ksBvQmbArg227ImEF_9e-k6hHAThV4QTNInhblfrY8kWMp2CYHilLe75XScdq0i_PTZjWLxuxtEBiJjoFTJXV7BRs7GlPo2MX_aX8cBXbibzh7_lDl4X3x-nwxDwO7vPHfILCm6YlyCzETPhp4A/sid/45ec2e8c654c2160926e288fbbfee3c2/mode/web/stop',
 [info] >       method: 'post',
 [info] >       data:
-[info] >        '{"cname":"bnruMEB6DGte14VNaZ9M","uid":"1234232","clientRequest":{}}',
+[info] >        '{"cname":"sO3s91mjnElrjijgJgEi","uid":"1234232","clientRequest":{}}',
 [info] >       headers:
 [info] >        { Accept: 'application/json, text/plain, */*',
 [info] >          'Content-Type': 'application/json',
@@ -195,7 +198,7 @@
 [info] >          parser: null,
 [info] >          _httpMessage: [Circular],
 [info] >          [Symbol(res)]: [TLSWrap],
-[info] >          [Symbol(asyncId)]: 80,
+[info] >          [Symbol(asyncId)]: 81,
 [info] >          [Symbol(lastWriteQueueSize)]: 0,
 [info] >          [Symbol(timeout)]: null,
 [info] >          [Symbol(kBytesRead)]: 0,
@@ -238,14 +241,14 @@
 [info] >          parser: null,
 [info] >          _httpMessage: [Circular],
 [info] >          [Symbol(res)]: [TLSWrap],
-[info] >          [Symbol(asyncId)]: 80,
+[info] >          [Symbol(asyncId)]: 81,
 [info] >          [Symbol(lastWriteQueueSize)]: 0,
 [info] >          [Symbol(timeout)]: null,
 [info] >          [Symbol(kBytesRead)]: 0,
 [info] >          [Symbol(kBytesWritten)]: 0,
 [info] >          [Symbol(connect-options)]: [Object] },
 [info] >       _header:
-[info] >        'POST /v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8pN1OmYeqQN1kVt1jqAsLainCaRQnRLaOPx6rKXf4FFzf5ACoi_y-1AZsBT1CfMIcrk3RO0mGMemKPwZpE1tYtilkeZZtcJGZMR9PL3wpntkf28oryq0KezIyxl24TTS7d_s6w7XbvBWS0wAroe77BOutHwcjNKoP0JnvGg1Y4MXs_LnCImSMuIpgW60KuS_v-N6aQP_3JIO7WjK7LHoZevPP_6FZukPdz5Y3XPlTIZkpR9tMlruWm57kf1DDVkk7w/sid/24974c62fe473521cbc9819c766d60d5/mode/web/stop HTTP/1.1\r\nAccept: application/json, text/plain, */*\r\nContent-Type: application/json\r\nAuthorization: Basic ZmQ0NWU4NmM2ZmZlNDQ1ZWJiODc1NzEzNDRlOTQ1YjE6M2U1NmVjZjBhNWVmNGVhYWE1ZDI2Y2Y4NTQzOTUyZDA=\r\nUser-Agent: axios/0.19.2\r\nContent-Length: 67\r\nHost: api.agora.io\r\nConnection: close\r\n\r\n',
+[info] >        'POST /v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8jsW22NtP3TjS587V9rJ49I05PsHaC4Nso7GvAvETlwpgF9Igz6f0ZzVwqoY3GRF3rr2V_m54-8qkG5RT-QSOq3byhHJerbHhFecPOdD11cS2R7ksBvQmbArg227ImEF_9e-k6hHAThV4QTNInhblfrY8kWMp2CYHilLe75XScdq0i_PTZjWLxuxtEBiJjoFTJXV7BRs7GlPo2MX_aX8cBXbibzh7_lDl4X3x-nwxDwO7vPHfILCm6YlyCzETPhp4A/sid/45ec2e8c654c2160926e288fbbfee3c2/mode/web/stop HTTP/1.1\r\nAccept: application/json, text/plain, */*\r\nContent-Type: application/json\r\nAuthorization: Basic ZmQ0NWU4NmM2ZmZlNDQ1ZWJiODc1NzEzNDRlOTQ1YjE6M2U1NmVjZjBhNWVmNGVhYWE1ZDI2Y2Y4NTQzOTUyZDA=\r\nUser-Agent: axios/0.19.2\r\nContent-Length: 67\r\nHost: api.agora.io\r\nConnection: close\r\n\r\n',
 [info] >       _onPendingData: [Function: noopPendingOutput],
 [info] >       agent:
 [info] >        Agent {
@@ -269,7 +272,7 @@
 [info] >       method: 'POST',
 [info] >       insecureHTTPParser: undefined,
 [info] >       path:
-[info] >        '/v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8pN1OmYeqQN1kVt1jqAsLainCaRQnRLaOPx6rKXf4FFzf5ACoi_y-1AZsBT1CfMIcrk3RO0mGMemKPwZpE1tYtilkeZZtcJGZMR9PL3wpntkf28oryq0KezIyxl24TTS7d_s6w7XbvBWS0wAroe77BOutHwcjNKoP0JnvGg1Y4MXs_LnCImSMuIpgW60KuS_v-N6aQP_3JIO7WjK7LHoZevPP_6FZukPdz5Y3XPlTIZkpR9tMlruWm57kf1DDVkk7w/sid/24974c62fe473521cbc9819c766d60d5/mode/web/stop',
+[info] >        '/v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8jsW22NtP3TjS587V9rJ49I05PsHaC4Nso7GvAvETlwpgF9Igz6f0ZzVwqoY3GRF3rr2V_m54-8qkG5RT-QSOq3byhHJerbHhFecPOdD11cS2R7ksBvQmbArg227ImEF_9e-k6hHAThV4QTNInhblfrY8kWMp2CYHilLe75XScdq0i_PTZjWLxuxtEBiJjoFTJXV7BRs7GlPo2MX_aX8cBXbibzh7_lDl4X3x-nwxDwO7vPHfILCm6YlyCzETPhp4A/sid/45ec2e8c654c2160926e288fbbfee3c2/mode/web/stop',
 [info] >       _ended: true,
 [info] >       res:
 [info] >        IncomingMessage {
@@ -299,7 +302,7 @@
 [info] >          _dumped: false,
 [info] >          req: [Circular],
 [info] >          responseUrl:
-[info] >           'https://api.agora.io/v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8pN1OmYeqQN1kVt1jqAsLainCaRQnRLaOPx6rKXf4FFzf5ACoi_y-1AZsBT1CfMIcrk3RO0mGMemKPwZpE1tYtilkeZZtcJGZMR9PL3wpntkf28oryq0KezIyxl24TTS7d_s6w7XbvBWS0wAroe77BOutHwcjNKoP0JnvGg1Y4MXs_LnCImSMuIpgW60KuS_v-N6aQP_3JIO7WjK7LHoZevPP_6FZukPdz5Y3XPlTIZkpR9tMlruWm57kf1DDVkk7w/sid/24974c62fe473521cbc9819c766d60d5/mode/web/stop',
+[info] >           'https://api.agora.io/v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8jsW22NtP3TjS587V9rJ49I05PsHaC4Nso7GvAvETlwpgF9Igz6f0ZzVwqoY3GRF3rr2V_m54-8qkG5RT-QSOq3byhHJerbHhFecPOdD11cS2R7ksBvQmbArg227ImEF_9e-k6hHAThV4QTNInhblfrY8kWMp2CYHilLe75XScdq0i_PTZjWLxuxtEBiJjoFTJXV7BRs7GlPo2MX_aX8cBXbibzh7_lDl4X3x-nwxDwO7vPHfILCm6YlyCzETPhp4A/sid/45ec2e8c654c2160926e288fbbfee3c2/mode/web/stop',
 [info] >          redirects: [] },
 [info] >       aborted: undefined,
 [info] >       timeoutCb: null,
@@ -321,7 +324,7 @@
 [info] >          _onNativeResponse: [Function],
 [info] >          _currentRequest: [Circular],
 [info] >          _currentUrl:
-[info] >           'https://api.agora.io/v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8pN1OmYeqQN1kVt1jqAsLainCaRQnRLaOPx6rKXf4FFzf5ACoi_y-1AZsBT1CfMIcrk3RO0mGMemKPwZpE1tYtilkeZZtcJGZMR9PL3wpntkf28oryq0KezIyxl24TTS7d_s6w7XbvBWS0wAroe77BOutHwcjNKoP0JnvGg1Y4MXs_LnCImSMuIpgW60KuS_v-N6aQP_3JIO7WjK7LHoZevPP_6FZukPdz5Y3XPlTIZkpR9tMlruWm57kf1DDVkk7w/sid/24974c62fe473521cbc9819c766d60d5/mode/web/stop' },
+[info] >           'https://api.agora.io/v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8jsW22NtP3TjS587V9rJ49I05PsHaC4Nso7GvAvETlwpgF9Igz6f0ZzVwqoY3GRF3rr2V_m54-8qkG5RT-QSOq3byhHJerbHhFecPOdD11cS2R7ksBvQmbArg227ImEF_9e-k6hHAThV4QTNInhblfrY8kWMp2CYHilLe75XScdq0i_PTZjWLxuxtEBiJjoFTJXV7BRs7GlPo2MX_aX8cBXbibzh7_lDl4X3x-nwxDwO7vPHfILCm6YlyCzETPhp4A/sid/45ec2e8c654c2160926e288fbbfee3c2/mode/web/stop' },
 [info] >       [Symbol(isCorked)]: false,
 [info] >       [Symbol(outHeadersKey)]:
 [info] >        [Object: null prototype] {
@@ -333,7 +336,25 @@
 [info] >          host: [Array] } },
 [info] >    data:
 [info] >     { resourceId:
-[info] >        'Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8pN1OmYeqQN1kVt1jqAsLainCaRQnRLaOPx6rKXf4FFzf5ACoi_y-1AZsBT1CfMIcrk3RO0mGMemKPwZpE1tYtilkeZZtcJGZMR9PL3wpntkf28oryq0KezIyxl24TTS7d_s6w7XbvBWS0wAroe77BOutHwcjNKoP0JnvGg1Y4MXs_LnCImSMuIpgW60KuS_v-N6aQP_3JIO7WjK7LHoZevPP_6FZukPdz5Y3XPlTIZkpR9tMlruWm57kf1DDVkk7w',
-[info] >       sid: '24974c62fe473521cbc9819c766d60d5',
+[info] >        'Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8jsW22NtP3TjS587V9rJ49I05PsHaC4Nso7GvAvETlwpgF9Igz6f0ZzVwqoY3GRF3rr2V_m54-8qkG5RT-QSOq3byhHJerbHhFecPOdD11cS2R7ksBvQmbArg227ImEF_9e-k6hHAThV4QTNInhblfrY8kWMp2CYHilLe75XScdq0i_PTZjWLxuxtEBiJjoFTJXV7BRs7GlPo2MX_aX8cBXbibzh7_lDl4X3x-nwxDwO7vPHfILCm6YlyCzETPhp4A',
+[info] >       sid: '45ec2e8c654c2160926e288fbbfee3c2',
 [info] >       serverResponse: { extensionServiceState: [Array] } } }
-[debug] [2021-03-15T04:04:42.930Z] File /Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/src/app/components/custom-hook/useAgoraAsStreamer.js changed, reloading triggers
+[debug] [2021-04-08T13:22:32.151Z] File /Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/src/functions/universityEmails.js changed, reloading triggers
+[debug] [2021-04-08T13:22:33.165Z] [worker-pool] Shutting down IDLE worker (~diagnostic~)
+[debug] [2021-04-08T13:22:33.166Z] [worker-~diagnostic~-6c4aac8b-e463-455f-84e5-e24d2afd4ee4]: FINISHING
+[debug] [2021-04-08T13:22:33.167Z] [worker-pool] Marking BUSY worker to finish (startRecordingLivestream)
+[debug] [2021-04-08T13:22:33.167Z] [worker-startRecordingLivestream-ffad9cdc-81f4-4a86-8159-a4dd734f791a]: FINISHING
+[debug] [2021-04-08T13:22:33.176Z] [worker-pool] addWorker(~diagnostic~)
+[debug] [2021-04-08T13:22:33.177Z] [worker-pool] Adding worker with key ~diagnostic~, total=2
+[debug] [2021-04-08T13:22:33.177Z] [worker-pool] submitWork(triggerId=)
+[debug] [2021-04-08T13:22:33.177Z] [worker-~diagnostic~-3a3ac721-1eac-4db0-951e-705047a495b9]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_76868.sock
+[debug] [2021-04-08T13:22:33.177Z] [worker-~diagnostic~-3a3ac721-1eac-4db0-951e-705047a495b9]: BUSY
+[debug] [2021-04-08T13:22:33.179Z] [worker-~diagnostic~-6c4aac8b-e463-455f-84e5-e24d2afd4ee4]: exited
+[debug] [2021-04-08T13:22:33.179Z] [worker-~diagnostic~-6c4aac8b-e463-455f-84e5-e24d2afd4ee4]: FINISHED
+[debug] [2021-04-08T13:22:33.727Z] [runtime-status] [76868] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2021-04-08T13:22:33.729Z] [runtime-status] [76868] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2021-04-08T13:22:33.733Z] [runtime-status] [76868] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.13.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2021-04-08T13:22:33.736Z] [runtime-status] [76868] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.13.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2021-04-08T13:22:33.736Z] [runtime-status] [76868] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.13.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[info] >  Loaded env from /Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/.env
+[debug] [2021-04-08T13:22:34.511Z] [worker-~diagnostic~-3a3ac721-1eac-4db0-951e-705047a495b9]: IDLE
