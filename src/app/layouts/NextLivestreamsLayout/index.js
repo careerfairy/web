@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import NavBar from './NavBar';
 import {withFirebase} from "../../context/firebase";
@@ -8,17 +8,14 @@ import TopBar from "./TopBar";
 import Head from "next/head";
 import Footer from "../../components/views/footer/Footer";
 import useGeneralLinks from "../../components/custom-hook/useGeneralLinks";
-import {useFirestoreConnect} from "react-redux-firebase";
-import {useSelector} from "react-redux";
-import {useAuth} from "../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(styles);
 
 const NextLivestreamsLayout = (props) => {
     const {children} = props
     const theme = useTheme()
-    const drawerClosedWidth = theme.spacing(8)
-    const classes = useStyles({drawerClosedWidth});
+    const drawerWidth = 400
+    const classes = useStyles({drawerWidth});
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
 
     const {mainLinks, secondaryLinks} = useGeneralLinks()
@@ -43,7 +40,7 @@ const NextLivestreamsLayout = (props) => {
                     {...props}
                     drawerTopLinks={mainLinks}
                     handleDrawerToggle={handleDrawerToggle}
-                    drawerClosedWidth={drawerClosedWidth}
+                    drawerWidth={drawerWidth}
                     drawerBottomLinks={secondaryLinks}
                     onMobileNavOpen={handleDrawerOpen}
                     onMobileClose={handleDrawerClose}

@@ -1,6 +1,6 @@
 import React, {memo, useContext, useEffect, useState} from 'react';
 import clsx from 'clsx';
-import {makeStyles, useTheme} from '@material-ui/core/styles';
+import {fade, makeStyles, useTheme} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
@@ -12,7 +12,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
-import {Avatar, Collapse, ListItemAvatar, Tooltip} from "@material-ui/core";
+import {Avatar, Box, Collapse, Hidden, ListItemAvatar, Tooltip} from "@material-ui/core";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {useSnackbar} from "notistack";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
@@ -21,74 +21,32 @@ import Link from '../../../materialUI/NextNavLink'
 import {useSelector} from "react-redux";
 import {isEmpty, isLoaded} from "react-redux-firebase";
 import GroupsUtil from "../../../data/util/GroupsUtil";
+import NavItem from "../../../components/views/navbar/NavItem";
+import {LogOut as LogoutIcon} from "react-feather";
 
 
 const useStyles = makeStyles((theme) => ({
-    drawerPaper: {
-        [theme.breakpoints.up('sm')]: {
-            paddingTop:  theme.mixins.toolbar["@media (min-width:600px)"].minHeight
-        },
-        paddingTop: theme.mixins.toolbar.minHeight,
-        transition: theme.transitions.create('paddingTop', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
+    mobileDrawer: {
+        width: props => props.drawerWidth ||256,
     },
-    drawer: {
-        width: ({drawerWidth}) => drawerWidth,
-        position: "absolute",
-        flexShrink: 0,
-        whiteSpace: 'nowrap',
-        "& ::-webkit-scrollbar": {
-            width: "3px",
-            backgroundColor: "transparent"
-        },
-        "& ::-webkit-scrollbar-thumb": {
-            borderRadius: "10px",
-            WebkitBoxShadow: "inset 0 0 6px rgba(0,0,0,.3)",
-            backgroundColor: "#555"
-        },
-
+    desktopDrawer: {
+        width: props => props.drawerWidth ||256,
+        top: 64,
+        height: 'calc(100% - 64px)',
+        boxShadow: theme.shadows[15]
     },
-    drawerOpen: {
-        width: ({drawerWidth}) => drawerWidth,
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
+    background: {
+        borderRight: "none",
+        backgroundSize: "cover",
+        backgroundPosition: "center center",
+        // background: `linear-gradient(0deg, ${fade(theme.palette.common.black, 0.7)}, ${fade(theme.palette.common.black, 0.7)}), url(/sidebar.jpg)`,
     },
-    drawerClose: {
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        overflowX: 'hidden',
-        width: ({drawerClosedWidth}) => drawerClosedWidth,
+    name: {
+        marginTop: theme.spacing(1)
     },
-    toolbar: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
-        ...theme.mixins.toolbar,
+    drawerText: {
+        color: theme.palette.common.white
     },
-    content: {
-        flexGrow: 1,
-        padding: theme.spacing(3),
-    },
-    listItemText: {},
-    groupAvaWrapper: {
-        "& img": {
-            objectFit: "contain"
-        }
-    },
-    logoButton: {
-        padding: theme.spacing(1)
-    },
-    navLink: {
-        color: "inherit"
-    }
 
 }));
 
@@ -99,33 +57,93 @@ const FeedDrawer = memo(({
                              showHeaderLinks,
                              firebase,
                              handleDrawerToggle,
-                             drawerClosedWidth,
                              drawerBottomLinks,
-                             drawerTopLinks
+                             drawerTopLinks,
+                             drawerWidth
 
                          }) => {
     const scrolling = useScrollTrigger()
-    const classes = useStyles({drawerWidth: 270, drawerClosedWidth, scrolling});
+    const classes = useStyles({drawerWidth});
 
     const {userData} = useAuth()
 
 
-    const renderGroups = GroupsUtil.getUniqueGroupsFromArrayOfGroups(userData?.followingGroups).map(({universityName, groupId, logoUrl}, index) => {
-        return (
-            <ListItem component={Link} className={classes.logoButton} href={`/next-livestreams/${groupId}`} button key={groupId}>
-                <ListItemAvatar>
-                    <Avatar className={classes.groupAvaWrapper} alt={universityName} variant="rounded" src={logoUrl}/>
-                </ListItemAvatar>
-                <Tooltip title={universityName}>
-                    <ListItemText
-                        primary={universityName}
-                        primaryTypographyProps={{className: classes.listItemText, noWrap: true}}
-                    >
-                    </ListItemText>
-                </Tooltip>
-            </ListItem>
-        )
-    })
+    const content = (
+        <Box
+            height="100%"
+            display="flex"
+            flexDirection="column"
+        >
+            <Box p={2}>
+                <List>
+                    {GroupsUtil.getUniqueGroupsFromArrayOfGroups(userData?.followingGroups).map(({universityName, groupId, logoUrl}, index) => {
+                        return (
+                            <ListItem component={Link} className={classes.logoButton} href={`/next-livestreams/${groupId}`} button key={groupId}>
+                                <ListItemAvatar>
+                                    <Avatar className={classes.groupAvaWrapper} alt={universityName} variant="rounded" src={logoUrl}/>
+                                </ListItemAvatar>
+                                <Tooltip title={universityName}>
+                                    <ListItemText
+                                        primary={universityName}
+                                        primaryTypographyProps={{className: classes.listItemText, noWrap: true}}
+                                    >
+                                    </ListItemText>
+                                </Tooltip>
+                            </ListItem>
+                        )
+                    })}
+                </List>
+            </Box>
+            <Box flexGrow={1}/>
+            <Box p={2}>
+                <List>
+                    {/*<Hidden lgUp>*/}
+                    {/*    {headerLinks.map((item) => (*/}
+                    {/*        <NavItem*/}
+                    {/*            href={item.href}*/}
+                    {/*            key={item.title}*/}
+                    {/*            title={item.title}*/}
+                    {/*        />*/}
+                    {/*    ))}*/}
+                    {/*</Hidden>*/}
+                    {drawerBottomLinks.map(({title}, index) => (
+                        <ListItem button key={title}>
+                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon/> : <MailIcon/>}</ListItemIcon>
+                            <ListItemText primary={title}/>
+                        </ListItem>
+                    ))}
+                </List>
+            </Box>
+        </Box>
+    );
+
+    return (
+        <>
+            <Hidden lgUp>
+                <Drawer
+                    anchor="left"
+                    classes={{paper: clsx(classes.mobileDrawer, classes.background)}}
+                    className={classes.drawer}
+                    onClose={onMobileClose}
+                    open={openMobile}
+                    variant="temporary"
+                >
+                    {content}
+                </Drawer>
+            </Hidden>
+            <Hidden mdDown>
+                <Drawer
+                    anchor="left"
+                    classes={{paper: clsx(classes.desktopDrawer, classes.background)}}
+                    className={classes.drawer}
+                    open
+                    variant="persistent"
+                >
+                    {content}
+                </Drawer>
+            </Hidden>
+        </>
+    );
 
 
     return (
