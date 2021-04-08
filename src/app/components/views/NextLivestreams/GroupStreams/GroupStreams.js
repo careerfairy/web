@@ -153,8 +153,8 @@ const GroupStreams = ({
                             <Grid sm={12} xs={12} md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
                                 <Typography className={classes.emptyMessage} align="center" variant="h5"
                                             style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :
-                                    <strong>{groupData.universityName} currently has no scheduled live
-                                        streams</strong>}</Typography>
+                                    <strong>{groupData.universityName} currently has
+                                        no {isPastLivestreams ? "past" : "scheduled"} live streams</strong>}</Typography>
                             </Grid>)
                         : null}
                 </Grid>
