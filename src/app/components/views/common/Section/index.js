@@ -34,6 +34,7 @@ const Section = (props) => {
         backgroundColor,
         backgroundImageClassName,
         big,
+        className,
         // Passed to section element
         ...otherProps
     } = props;
@@ -47,7 +48,7 @@ const Section = (props) => {
         <Box
             component="section"
             className={
-                clsx(classes.sectionComponent)
+                clsx(classes.sectionComponent, className)
             }
             {...otherProps}
         >

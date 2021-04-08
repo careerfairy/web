@@ -3,6 +3,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Avatar, Container, Paper} from "@material-ui/core";
 import SectionHeader from "../../../common/SectionHeader";
 import Section from "../../../common/Section";
+import StreamsTab from "../../StreamsTab";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -11,7 +12,7 @@ const useStyles = makeStyles(theme => ({
             position: "relative"
         }
     },
-    logoWrapper:{
+    logoWrapper: {
         maxWidth: 400,
         margin: "auto",
         height: 200,
@@ -19,12 +20,15 @@ const useStyles = makeStyles(theme => ({
         display: "grid",
         placeItems: "center"
     },
-    logo:{
+    logo: {
         width: "90%",
         height: "90%",
-        "& img":{
+        "& img": {
             objectFit: "contain"
         }
+    },
+    section: {
+        paddingBottom: theme.spacing(1)
     }
 }));
 
@@ -34,6 +38,7 @@ const GroupBannerSection = (props) => {
 
     return (
         <Section
+            className={classes.section}
             big={props.big}
             color={props.color}
             backgroundImageClassName={props.backgroundImageClassName}
@@ -54,7 +59,7 @@ const GroupBannerSection = (props) => {
                     title={props.title}
                     subtitle={props.subtitle}
                 />
-
+                <StreamsTab handleChange={props.handleChange} value={props.value}/>
             </Container>
         </Section>
     );

@@ -78,7 +78,7 @@ const GroupStreams = ({
                       }) => {
         const classes = useStyles()
         const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
-        const searchedButNoResults = selectedOptions.length && !searching && !livestreams.length
+        const searchedButNoResults = selectedOptions?.length && !searching && !livestreams?.length
         const [slicedLivestreams, loadMoreLivestreams, hasMoreLivestreams, totalLivestreams] = useInfiniteScrollClient(livestreams, 6, 3);
 
         const handleScroll = () => {

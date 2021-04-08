@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {store} from "../_app";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
@@ -20,8 +20,17 @@ const GroupPage = ({currentGroup, livestreamId}) => {
 
     const classes = useStyles()
     const {palette: {common: {white}, text: {primary}, navyBlue}} = useTheme()
+    const [value, setValue] = useState(0);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const upcomingLivestreams = useGroupUpcomingStreams(livestreamId, currentGroup.groupId, selectedOptions)
+
+    const handleChange = useCallback((event, newValue)=> {
+        setValue(newValue);
+    },[]);
+
+    const handleChangeIndex = useCallback( (index) => {
+        setValue(index);
+    },[]);
 
     return (
         <NextLivestreamsLayout>
@@ -34,6 +43,8 @@ const GroupPage = ({currentGroup, livestreamId}) => {
                 backgroundImageOpacity={0.5}
                 title={currentGroup.universityName}
                 subtitle={currentGroup.description}
+                handleChange={handleChange}
+                value={value}
             />
             {!isLoaded(upcomingLivestreams) ? <CircularProgress/> : (
                 <NextLivestreams
