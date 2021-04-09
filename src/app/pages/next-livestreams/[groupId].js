@@ -3,51 +3,30 @@ import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {store} from "../_app";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
 import GroupBannerSection from "../../components/views/NextLivestreams/group/GroupBannerSection";
-import NextLivestreams from "../../components/views/NextLivestreams/NextLivestreams";
 import useListenToGroupStreams from "../../components/custom-hook/useGroupUpcomingStreams";
-import {isLoaded, useFirestoreConnect} from "react-redux-firebase";
-import {CircularProgress} from "@material-ui/core";
-
-import {SwipeablePanel} from "../../materialUI/GlobalPanels/GlobalPanels";
+import {useFirestoreConnect} from "react-redux-firebase";
 import {PAST_LIVESTREAMS_NAME} from "../../data/constants/streamContants";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
 import {NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL} from "../../constants/routes";
 import {useSelector} from "react-redux";
-
-const useStyles = makeStyles(theme => ({
-    backgroundImage: {
-        // border: "2px solid pink",
-        // backgroundSize: "contain"
-    },
-    swipeableContainer: {
-        "& > div": {
-            border: "2px solid green",
-            minHeight: "50vh",
-        }
-    },
-    loaderWrapper: {
-        display: "grid",
-        width: "100%",
-        height: "40vh",
-        placeItems: "center"
-    }
-}));
+import {StreamsSection} from "../../components/views/NextLivestreams/StreamsSection";
 
 const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
+
 const GroupPage = ({serverSideGroup, livestreamId}) => {
 
     const classes = useStyles()
-    const {palette: {common: {white}, text: {primary}, navyBlue}, direction} = useTheme()
+    const {palette: {common: {white}, navyBlue}} = useTheme()
     const [value, setValue] = useState(0);
 
     const [selectedOptions, setSelectedOptions] = useState([]);
     const currentGroup = useSelector(state => state.firestore.data[`group ${serverSideGroup.groupId}`] || serverSideGroup)
+
     useFirestoreConnect(() => [{
         collection: "careerCenterData",
         doc: currentGroup.groupId,
         storeAs: "currentGroup"
     }])
-
 
     const upcomingLivestreams = useListenToGroupStreams(livestreamId, currentGroup.groupId, selectedOptions)
     const pastLivestreams = useListenToGroupStreams(livestreamId, currentGroup.groupId, selectedOptions, PAST_LIVESTREAMS_NAME)
@@ -55,7 +34,6 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
     const handleChange = useCallback((event, newValue) => {
         setValue(newValue);
     }, []);
-
 
     return (
         <React.Fragment>
@@ -69,7 +47,7 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
                 <div>
                     <GroupBannerSection
                         color={white}
-                        backgroundImageClassName={classes.backgroundImage}
+                        backgroundImageClassName=""
                         backgroundColor={navyBlue.main}
                         groupLogo={currentGroup.logoUrl}
                         backgroundImage={placeholderBanner}
@@ -79,37 +57,15 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
                         handleChange={handleChange}
                         value={value}
                     />
-                    <div>
-                        <SwipeablePanel value={value} index={0} dir={direction}>
-                            {isLoaded(upcomingLivestreams) ? (
-                                <NextLivestreams
+                    <StreamsSection value={value}
+                                    upcomingLivestreams={upcomingLivestreams}
                                     livestreamId={livestreamId}
                                     setSelectedOptions={setSelectedOptions}
                                     selectedOptions={selectedOptions}
-                                    livestreams={upcomingLivestreams || []}
-                                    currentGroup={currentGroup}/>
-                            ) : (
-                                <div className={classes.loaderWrapper}>
-                                    <CircularProgress color="primary"/>
-                                </div>
-                            )}
-                        </SwipeablePanel>
-                        <SwipeablePanel value={value} index={1} dir={direction}>
-                            {isLoaded(pastLivestreams) ? (
-                                <NextLivestreams
-                                    livestreamId={livestreamId}
-                                    setSelectedOptions={setSelectedOptions}
-                                    selectedOptions={selectedOptions}
-                                    isPastLivestreams
-                                    livestreams={pastLivestreams || []}
-                                    currentGroup={currentGroup}/>
-                            ) : (
-                                <div className={classes.loaderWrapper}>
-                                    <CircularProgress color="primary"/>
-                                </div>
-                            )}
-                        </SwipeablePanel>
-                    </div>
+                                    currentGroup={currentGroup}
+                                    classes={classes}
+                                    pastLivestreams={pastLivestreams}
+                    />
                 </div>
             </NextLivestreamsLayout>
         </React.Fragment>
