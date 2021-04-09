@@ -10,6 +10,8 @@ import {CircularProgress} from "@material-ui/core";
 
 import {SwipeablePanel} from "../../materialUI/GlobalPanels/GlobalPanels";
 import {PAST_LIVESTREAMS_NAME} from "../../data/constants/streamContants";
+import HeadWithMeta from "../../components/page/HeadWithMeta";
+import {NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL} from "../../constants/routes";
 
 const useStyles = makeStyles(theme => ({
     backgroundImage: {
@@ -44,6 +46,13 @@ const GroupPage = ({currentGroup, livestreamId}) => {
 
 
     return (
+        <React.Fragment>
+            <HeadWithMeta
+                description={currentGroup.description}
+                title={`CareerFairy | Next Livestreams of ${currentGroup.universityName}`}
+                image={currentGroup.logoUrl}
+                fullPath={`${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}`}
+            />
         <NextLivestreamsLayout>
             <div>
                 <GroupBannerSection
@@ -87,6 +96,7 @@ const GroupPage = ({currentGroup, livestreamId}) => {
                 </div>
             </div>
         </NextLivestreamsLayout>
+        </React.Fragment>
     );
 };
 
