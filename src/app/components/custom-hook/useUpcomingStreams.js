@@ -2,9 +2,9 @@ import React from 'react';
 import {useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 import upcomingLivestreamsSelector from "../selectors/upcomingLivestreamsSelector";
+import {FORTY_FIVE_MINUTES_IN_MILLISECONDS, UPCOMING_LIVESTREAMS_NAME} from "../../data/constants/streamContants";
 
-var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
-const targetTime = new Date(Date.now() - fortyFiveMinutesInMilliseconds)
+const targetTime = new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS)
 
 const useUpcomingStreams = (livestreamId) => {
 
@@ -12,11 +12,11 @@ const useUpcomingStreams = (livestreamId) => {
         collection: "livestreams",
         where: [["start", ">", targetTime], ["test", "==", false]],
         orderBy: ["start", "asc"],
-        storeAs: "upcomingLivestreams"
+        storeAs: UPCOMING_LIVESTREAMS_NAME
     }])
 
     return useSelector(state =>
-        upcomingLivestreamsSelector(state.firestore.ordered["upcomingLivestreams"], {livestreamId})
+        upcomingLivestreamsSelector(state.firestore.ordered[UPCOMING_LIVESTREAMS_NAME], {livestreamId})
     )
 };
 

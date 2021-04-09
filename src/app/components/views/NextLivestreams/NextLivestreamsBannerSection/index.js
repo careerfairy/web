@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types'
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Avatar, Container, Paper} from "@material-ui/core";
-import SectionHeader from "../../../common/SectionHeader";
-import Section from "../../../common/Section";
-import StreamsTab from "../../StreamsTab";
+import Section from "../../common/Section";
+import {Container} from "@material-ui/core";
+import SectionHeader from "../../common/SectionHeader";
+import StreamsTab from "../StreamsTab";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -12,27 +13,12 @@ const useStyles = makeStyles(theme => ({
             position: "relative"
         }
     },
-    logoWrapper: {
-        maxWidth: 400,
-        margin: "auto",
-        height: 200,
-        marginBottom: theme.spacing(2),
-        display: "grid",
-        placeItems: "center"
-    },
-    logo: {
-        width: "90%",
-        height: "90%",
-        "& img": {
-            objectFit: "contain"
-        }
-    },
     section: {
         paddingBottom: theme.spacing(1)
     }
 }));
 
-const GroupBannerSection = (props) => {
+const NextLivestreamsBannerSection = (props) => {
 
     const classes = useStyles()
 
@@ -47,13 +33,6 @@ const GroupBannerSection = (props) => {
             backgroundColor={props.backgroundColor}
         >
             <Container className={classes.container}>
-                <Paper className={classes.logoWrapper}>
-                    <Avatar
-                        variant={"square"}
-                        className={classes.logo}
-                        src={props.groupLogo}
-                    />
-                </Paper>
                 <SectionHeader
                     color={props.color}
                     title={props.title}
@@ -65,4 +44,17 @@ const GroupBannerSection = (props) => {
     );
 };
 
-export default GroupBannerSection;
+export default NextLivestreamsBannerSection;
+
+NextLivestreamsBannerSection.propTypes = {
+  backgroundColor: PropTypes.any,
+  backgroundImage: PropTypes.any,
+  backgroundImageClassName: PropTypes.any,
+  backgroundImageOpacity: PropTypes.any,
+  big: PropTypes.any,
+  color: PropTypes.any,
+  handleChange: PropTypes.any,
+  subtitle: PropTypes.any,
+  title: PropTypes.any,
+  value: PropTypes.any
+}

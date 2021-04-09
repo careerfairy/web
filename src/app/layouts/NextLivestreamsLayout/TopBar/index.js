@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import clsx from 'clsx';
 import {fade, makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -8,13 +8,9 @@ import {withFirebase} from "../../../context/firebase";
 import {Hidden, useMediaQuery} from "@material-ui/core";
 import Zoom from '@material-ui/core/Zoom';
 import Box from "@material-ui/core/Box";
-import GroupAddIcon from '@material-ui/icons/GroupAdd';
-import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
-import ContactsIcon from '@material-ui/icons/Contacts';
 import {useRouter} from "next/router";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import HideOnScroll from "../../../materialUI/Misc";
 import {useAuth} from "../../../HOCs/AuthProvider";
 import {MainLogo, MiniLogo} from "../../../components/logos";
 import Link from "../../../materialUI/NextNavLink";
@@ -156,6 +152,7 @@ const TopBar = ({
                                 return (
                                     <Tab
                                         key={item.title}
+                                        component={Link}
                                         className={classes.navLinks}
                                         label={item.title}
                                         href={item.href}

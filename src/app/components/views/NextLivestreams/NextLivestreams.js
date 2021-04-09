@@ -24,7 +24,7 @@ const NextLivestreams = ({
     const careerCenterId = getServerSideRouterQuery("careerCenterId", router)
 
     const [groupData, setGroupData] = useState({});
-    console.log("groupData", groupData)
+
     useEffect(() => {
         if (currentGroup) {
             setGroupData(currentGroup)

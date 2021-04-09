@@ -12,8 +12,12 @@ const useStyles = makeStyles(theme => ({
         width: "100%",
         height: "40vh",
         placeItems: "center"
+    },
+    wrapper: {
+        minHeight: "80vh",
     }
 }));
+
 export function StreamsSection({
                                    currentGroup,
                                    livestreamId,
@@ -24,7 +28,7 @@ export function StreamsSection({
                                    value
                                }) {
     const classes = useStyles()
-    return <div>
+    return <div className={classes.wrapper}>
         <SwipeablePanel value={value} index={0}>
             {isLoaded(upcomingLivestreams) ? (
                 <NextLivestreams
@@ -65,6 +69,5 @@ StreamsSection.propTypes = {
     setSelectedOptions: PropTypes.func,
     selectedOptions: PropTypes.arrayOf(PropTypes.any),
     currentGroup: PropTypes.any,
-    classes: PropTypes.any,
     pastLivestreams: PropTypes.any
 };

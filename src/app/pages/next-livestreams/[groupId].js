@@ -2,7 +2,7 @@ import React, {useCallback, useState} from 'react';
 import {useTheme} from "@material-ui/core/styles";
 import {store} from "../_app";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
-import GroupBannerSection from "../../components/views/NextLivestreams/group/GroupBannerSection";
+import GroupBannerSection from "../../components/views/NextLivestreams/GroupBannerSection";
 import useListenToGroupStreams from "../../components/custom-hook/useGroupUpcomingStreams";
 import {useFirestoreConnect} from "react-redux-firebase";
 import {PAST_LIVESTREAMS_NAME} from "../../data/constants/streamContants";
@@ -62,7 +62,6 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
                                     setSelectedOptions={setSelectedOptions}
                                     selectedOptions={selectedOptions}
                                     currentGroup={currentGroup}
-                                    classes={classes}
                                     pastLivestreams={pastLivestreams}
                     />
                 </div>
