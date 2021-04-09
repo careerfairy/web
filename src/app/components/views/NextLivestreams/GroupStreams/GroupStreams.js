@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        minHeight: "50vh"
     },
     streamGridItem: {
         height: gridItemHeight,
@@ -144,7 +145,7 @@ const GroupStreams = ({
                 <Grid container spacing={mobile ? 2 : 4}>
                     {groupData.id || listenToUpcoming ? (searching ?
                         <Grid md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
-                            <LinearProgress style={{width: "80%", marginTop: 100}} color="primary"/>
+                            <LinearProgress style={{width: "80%"}} color="primary"/>
                         </Grid>
                         :
                         livestreams.length ?
@@ -153,8 +154,7 @@ const GroupStreams = ({
                             <Grid sm={12} xs={12} md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
                                 <Typography className={classes.emptyMessage} align="center" variant="h5"
                                             style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :
-                                    <strong>{groupData.universityName} currently has
-                                        no {isPastLivestreams ? "past" : "scheduled"} live streams</strong>}</Typography>
+                                    <strong>{groupData.universityName} currently has no {isPastLivestreams ? "past" : "scheduled"} live streams</strong>}</Typography>
                             </Grid>)
                         : null}
                 </Grid>

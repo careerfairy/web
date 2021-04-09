@@ -1,11 +1,7 @@
 import {withFirebase} from "../../context/firebase";
 import NextLivestreams from "../../components/views/NextLivestreams/NextLivestreams";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
-import {isEmpty, isLoaded, useFirestoreConnect} from "react-redux-firebase";
-import {createSelector} from "reselect";
-import {repositionElement, repositionStream} from "../../components/helperFunctions/HelperFunctions";
-import {useSelector} from "react-redux";
-import {store} from "../_app";
+import {isLoaded} from "react-redux-firebase";
 import {CircularProgress} from "@material-ui/core";
 import useUpcomingStreams from "../../components/custom-hook/useUpcomingStreams";
 

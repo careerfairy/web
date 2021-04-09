@@ -98,7 +98,6 @@ const FeedDrawer = memo(({
     const classes = useStyles({drawerWidth});
     const {query: {groupId: groupIdInQuery}} = useRouter()
     const {userData} = useAuth()
-
     const [groups, setGroups] = useState([]);
 
     useEffect(() => {
@@ -115,7 +114,7 @@ const FeedDrawer = memo(({
             setGroups(newGroups)
         }
 
-    }, [groupIdInQuery])
+    }, [groupIdInQuery, userData?.followingGroups])
 
 
     const content = (
@@ -128,7 +127,7 @@ const FeedDrawer = memo(({
                 <List>
                     {groups.map(({universityName, groupId, logoUrl}) => {
                         return (
-                            <ListItemWrapper active={groupIdInQuery === groupId}>
+                            <ListItemWrapper key={groupId} active={groupIdInQuery === groupId}>
                                 <ListItem
                                     component={Link}
                                     href={`/next-livestreams/${groupId}`}

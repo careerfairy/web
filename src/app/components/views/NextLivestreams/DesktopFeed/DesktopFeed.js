@@ -30,15 +30,6 @@ const DesktopFeed = ({
                     spacing={4}
                     style={{margin: theme.spacing(1)}}
                 >
-                    {hasCategories ?
-                        <GroupCategories livestreams={livestreams}
-                                         mobile={mobile}
-                                         user={user}
-                                         hasCategories={hasCategories}
-                                         handleToggleActive={handleToggleActive}
-                                         userData={userData}
-                                         alreadyJoined={alreadyJoined}
-                                         groupData={groupData}/> : null}
                     <GroupStreams
                         user={user}
                         mobile={false}
@@ -55,6 +46,15 @@ const DesktopFeed = ({
                         userData={userData}
                         groupData={groupData}
                     />
+                    {hasCategories ?
+                        <GroupCategories livestreams={livestreams}
+                                         mobile={mobile}
+                                         user={user}
+                                         hasCategories={hasCategories}
+                                         handleToggleActive={handleToggleActive}
+                                         userData={userData}
+                                         alreadyJoined={alreadyJoined}
+                                         groupData={groupData}/> : null}
                 </Grid>
             </Container>
         </Grow>

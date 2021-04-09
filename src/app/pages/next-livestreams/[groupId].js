@@ -25,8 +25,11 @@ const useStyles = makeStyles(theme => ({
             minHeight: "50vh",
         }
     },
-    spinner: {
-        margin: "auto"
+    loaderWrapper: {
+        display: "grid",
+        width: "100%",
+        height: "40vh",
+        placeItems: "center"
     }
 }));
 
@@ -45,7 +48,7 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
         storeAs: "currentGroup"
     }])
 
-    console.log("currentGroup", currentGroup)
+
     const upcomingLivestreams = useListenToGroupStreams(livestreamId, currentGroup.groupId, selectedOptions)
     const pastLivestreams = useListenToGroupStreams(livestreamId, currentGroup.groupId, selectedOptions, PAST_LIVESTREAMS_NAME)
 
@@ -70,13 +73,13 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
                         backgroundColor={navyBlue.main}
                         groupLogo={currentGroup.logoUrl}
                         backgroundImage={placeholderBanner}
-                        backgroundImageOpacity={0.5}
+                        backgroundImageOpacity={0.2}
                         title={currentGroup.universityName}
                         subtitle={currentGroup.description}
                         handleChange={handleChange}
                         value={value}
                     />
-                    <div style={{minHeight: "50vh"}}>
+                    <div>
                         <SwipeablePanel value={value} index={0} dir={direction}>
                             {isLoaded(upcomingLivestreams) ? (
                                 <NextLivestreams
@@ -86,7 +89,9 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
                                     livestreams={upcomingLivestreams || []}
                                     currentGroup={currentGroup}/>
                             ) : (
-                                <CircularProgress className={classes.spinner} color="primary"/>
+                                <div className={classes.loaderWrapper}>
+                                    <CircularProgress color="primary"/>
+                                </div>
                             )}
                         </SwipeablePanel>
                         <SwipeablePanel value={value} index={1} dir={direction}>
@@ -99,7 +104,9 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
                                     livestreams={pastLivestreams || []}
                                     currentGroup={currentGroup}/>
                             ) : (
-                                <CircularProgress className={classes.spinner} color="primary"/>
+                                <div className={classes.loaderWrapper}>
+                                    <CircularProgress color="primary"/>
+                                </div>
                             )}
                         </SwipeablePanel>
                     </div>

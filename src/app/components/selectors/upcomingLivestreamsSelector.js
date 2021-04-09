@@ -1,5 +1,5 @@
 import {createSelector} from "reselect";
-import {repositionStream} from "../helperFunctions/HelperFunctions";
+import {repositionElementInArray} from "../helperFunctions/HelperFunctions";
 
 const upcomingLivestreamsSelector = createSelector(
     livestreams => livestreams,
@@ -14,7 +14,7 @@ const upcomingLivestreamsSelector = createSelector(
                 (el) => el.id === livestreamId
             );
             if (currentIndex > -1) {
-                newLivestreams = repositionStream(newLivestreams, currentIndex, 0)
+                newLivestreams = repositionElementInArray(newLivestreams, currentIndex, 0)
             }
         }
         return newLivestreams.filter(livestream => !livestream.hidden);

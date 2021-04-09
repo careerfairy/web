@@ -8,7 +8,14 @@ import {useRouter} from "next/router";
 import {getServerSideRouterQuery} from "../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../HOCs/AuthProvider";
 
-const NextLivestreams = ({livestreamId, livestreams, currentGroup, selectedOptions, setSelectedOptions, isPastLivestreams}) => {
+const NextLivestreams = ({
+                             livestreamId,
+                             livestreams,
+                             currentGroup,
+                             selectedOptions,
+                             setSelectedOptions,
+                             isPastLivestreams
+                         }) => {
     const {userData, authenticatedUser} = useAuth();
     const theme = useTheme();
     const mobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -17,7 +24,7 @@ const NextLivestreams = ({livestreamId, livestreams, currentGroup, selectedOptio
     const careerCenterId = getServerSideRouterQuery("careerCenterId", router)
 
     const [groupData, setGroupData] = useState({});
-
+    console.log("groupData", groupData)
     useEffect(() => {
         if (currentGroup) {
             setGroupData(currentGroup)
@@ -46,20 +53,22 @@ const NextLivestreams = ({livestreamId, livestreams, currentGroup, selectedOptio
     };
 
 
-    const handleToggleActive = (categoryId, optionId) => {
-        const newGroupData = {...groupData};
-        const targetCategory = newGroupData.categories.find(
-            (category) => category.id === categoryId
-        );
-        const targetOption = targetCategory.options.find(
-            (option) => option.id === optionId
-        );
-        targetOption.active = !targetOption.active;
-        setGroupData(newGroupData);
-        // if (!mobile) {
-        //     scrollToTop();
-        // }
-    };
+    const handleToggleActive = (activeOptions, categoryId) => {
+            const newGroupData = {
+                ...groupData,
+                categories: groupData.categories?.map((category) =>
+                    category.id !== categoryId ?
+                        category : ({
+                            ...category,
+                            options: category.options.map(option => ({
+                                ...option,
+                                active: activeOptions.includes(option.id)
+                            }))
+                        })) || []
+            }
+            setGroupData(newGroupData);
+        }
+    ;
 
 
     const hasCategories = () => {
