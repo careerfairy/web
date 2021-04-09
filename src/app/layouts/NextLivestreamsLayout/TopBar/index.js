@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import {fade, makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -11,7 +11,6 @@ import Box from "@material-ui/core/Box";
 import {useRouter} from "next/router";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import {useAuth} from "../../../HOCs/AuthProvider";
 import {MainLogo, MiniLogo} from "../../../components/logos";
 import Link from "../../../materialUI/NextNavLink";
 import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
@@ -75,12 +74,15 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: 600,
         opacity: 1,
         color: `${theme.palette.primary.contrastText} !important`,
+        "&:hover": {
+            textDecoration: "none !important",
+        },
         "&:before": {
             content: '""',
             position: "absolute",
             width: "100%",
             height: 2,
-            bottom: 4,
+            bottom: 0,
             left: "0",
             backgroundColor: theme.palette.common.white,
             visibility: "hidden",
@@ -88,7 +90,7 @@ const useStyles = makeStyles((theme) => ({
             transform: "scaleX(0)",
             transition: theme.transitions.create(['all'], {
                 easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.complex,
+                duration: theme.transitions.duration.short,
             }),
         },
         "&:hover:before": {
@@ -121,81 +123,70 @@ const TopBar = ({
     const theme = useTheme()
     const showHeaderLinks = useMediaQuery(theme.breakpoints.up('md'))
     const classes = useStyles();
-    const {userData, setUserData} = useAuth()
-    const [value, setValue] = useState(0)
-    const [open, setOpen] = useState(false);
-    const {push, pathname, query: {careerCenterId}} = useRouter()
-
-    const handleDrawerOpen = useCallback(() => {
-        setOpen(true);
-    }, []);
-
-    const handleDrawerClose = useCallback(() => {
-        setOpen(false);
-    }, []);
+    const { pathname} = useRouter()
 
     return (
-            <AppBar elevation={1} className={clsx(classes.root, className)}>
-                <Toolbar className={classes.toolbar}>
-                    <Hidden smDown>
-                        <MainLogo white/>
-                    </Hidden>
-                    <Hidden mdUp>
-                        <MiniLogo/>
-                    </Hidden>
+        <AppBar elevation={1} className={clsx(classes.root, className)}>
+            <Toolbar className={classes.toolbar}>
+                <Hidden smDown>
+                    <MainLogo white/>
+                </Hidden>
+                <Hidden mdUp>
+                    <MiniLogo/>
+                </Hidden>
 
-                    <Zoom unmountOnExit in={showHeaderLinks}>
-                        <Tabs value={false} classes={{indicator: classes.indicator}}>
-                            {links
-                                // .filter(({href}) => href !== "/next-livestreams")
-                                .map((item) => {
+                <Zoom unmountOnExit in={showHeaderLinks}>
+                    <Tabs value={pathname} classes={{indicator: classes.indicator}}>
+                        {links
+                            .map((item) => {
                                 return (
                                     <Tab
                                         key={item.title}
                                         component={Link}
+                                        value={item.href}
                                         className={classes.navLinks}
                                         label={item.title}
                                         href={item.href}
                                     />
                                 )
                             })}
-                        </Tabs>
-                    </Zoom>
-                    {/*<div className={classes.search}>*/}
-                    {/*    <div className={classes.searchIcon}>*/}
-                    {/*        <SearchIcon/>*/}
-                    {/*    </div>*/}
-                    {/*    <form onSubmit={handleSubmitSearch}>*/}
-                    {/*        <InputBase*/}
-                    {/*            onChange={handleChange}*/}
-                    {/*            value={searchParams}*/}
-                    {/*            placeholder="Search…"*/}
-                    {/*            classes={{*/}
-                    {/*                root: classes.inputRoot,*/}
-                    {/*                input: classes.inputInput,*/}
-                    {/*            }}*/}
-                    {/*            inputProps={{'aria-label': 'search'}}*/}
-                    {/*        />*/}
-                    {/*    </form>*/}
-                    {/*</div>*/}
-                    <Box>
-                        <Hidden mdDown>
-                            <IconButton
-                                component={Link}
-                                className={classes.navIconButton}
-                                href="/profile"
-                            >
-                                <AccountCircleOutlinedIcon/>
-                            </IconButton>
-                        </Hidden>
-                        <Hidden lgUp>
-                            <IconButton color="inherit" onClick={onMobileNavOpen}>
-                                <MenuIcon/>
-                            </IconButton>
-                        </Hidden>
-                    </Box>
-                </Toolbar>
-            </AppBar>
+                    </Tabs>
+                </Zoom>
+                {/*<div className={classes.search}>*/}
+                {/*    <div className={classes.searchIcon}>*/}
+                {/*        <SearchIcon/>*/}
+                {/*    </div>*/}
+                {/*    <form onSubmit={handleSubmitSearch}>*/}
+                {/*        <InputBase*/}
+                {/*            onChange={handleChange}*/}
+                {/*            value={searchParams}*/}
+                {/*            placeholder="Search…"*/}
+                {/*            classes={{*/}
+                {/*                root: classes.inputRoot,*/}
+                {/*                input: classes.inputInput,*/}
+                {/*            }}*/}
+                {/*            inputProps={{'aria-label': 'search'}}*/}
+                {/*        />*/}
+                {/*    </form>*/}
+                {/*</div>*/}
+                <Box>
+                    <Hidden mdDown>
+                        <IconButton
+                            component={Link}
+                            className={classes.navIconButton}
+                            href="/profile"
+                        >
+                            <AccountCircleOutlinedIcon/>
+                        </IconButton>
+                    </Hidden>
+                    <Hidden lgUp>
+                        <IconButton color="inherit" onClick={onMobileNavOpen}>
+                            <MenuIcon/>
+                        </IconButton>
+                    </Hidden>
+                </Box>
+            </Toolbar>
+        </AppBar>
     )
 }
 export default withFirebase(TopBar);

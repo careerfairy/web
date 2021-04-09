@@ -1,8 +1,5 @@
 import {withFirebase} from "../../context/firebase";
-import NextLivestreams from "../../components/views/NextLivestreams/NextLivestreams";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
-import {isLoaded} from "react-redux-firebase";
-import {CircularProgress} from "@material-ui/core";
 import useUpcomingStreams from "../../components/custom-hook/useUpcomingStreams";
 import usePastStreams from "../../components/custom-hook/usePastStreams";
 import NextLivestreamsBannerSection from "../../components/views/NextLivestreams/NextLivestreamsBannerSection";
@@ -16,7 +13,6 @@ const nextLivestreamsPage = ({livestreamId}) => {
     const {palette: {common: {white}, navyBlue}} = useTheme()
     const upcomingLivestreams = useUpcomingStreams(livestreamId)
     const pastLivestreams = usePastStreams(livestreamId)
-    console.log("pastLivestreams", pastLivestreams)
     const [value, setValue] = useState(0);
 
     const handleChange = useCallback((event, newValue) => {
