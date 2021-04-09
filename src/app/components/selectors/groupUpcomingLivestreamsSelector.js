@@ -1,5 +1,5 @@
 import {createSelector} from "reselect";
-import {repositionStream} from "../helperFunctions/HelperFunctions";
+import {repositionElementInArray, repositionStream} from "../helperFunctions/HelperFunctions";
 
 const checkIfLivestreamHasAll = (selected, arr) => {
     return selected.some((v) => arr.includes(v)); // switch to selected.includes to make it an AND Operator
@@ -19,7 +19,7 @@ const groupUpcomingLivestreamsSelector = createSelector(
                 (el) => el.id === livestreamId
             );
             if (currentIndex > -1) {
-                newLivestreams = repositionStream(newLivestreams, currentIndex, 0)
+                newLivestreams = repositionElementInArray(newLivestreams, currentIndex, 0)
             }
         }
         return newLivestreams.reduce((accumulator, currentLivestream) => {

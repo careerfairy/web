@@ -5,7 +5,7 @@ import NavBar from './NavBar';
 import {withFirebase} from "../../context/firebase";
 import {useAuth} from "../../HOCs/AuthProvider";
 import TopBar from "./TopBar";
-import styles from "../../materialUI/styles/groupDashboardStyles";
+import styles from "../../materialUI/styles/layoutStyles/groupDashboardStyles";
 import {CircularProgress} from "@material-ui/core";
 import useAdminLinks from "../../components/custom-hook/useAdminLinks";
 import {useRouter} from "next/router";

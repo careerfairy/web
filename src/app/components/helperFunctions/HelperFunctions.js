@@ -99,7 +99,7 @@ export const repositionElement = (arr, fromIndex, toIndex) => {
     arr.splice(toIndex, 0, element);
 };
 
-export const repositionStream = (arr, fromIndex, toIndex) => {
+export const repositionElementInArray = (arr, fromIndex, toIndex) => {
     const newArray = [...arr]
     const element = arr[fromIndex];
     newArray.splice(fromIndex, 1);

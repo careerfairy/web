@@ -13,8 +13,7 @@ const useStyles = makeStyles(styles);
 
 const NextLivestreamsLayout = (props) => {
     const {children} = props
-    const theme = useTheme()
-    const drawerWidth = 400
+    const drawerWidth = 300
     const classes = useStyles({drawerWidth});
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
 
