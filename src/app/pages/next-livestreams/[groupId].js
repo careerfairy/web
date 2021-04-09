@@ -1,5 +1,5 @@
 import React, {useCallback, useState} from 'react';
-import {makeStyles, useTheme} from "@material-ui/core/styles";
+import {useTheme} from "@material-ui/core/styles";
 import {store} from "../_app";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
 import GroupBannerSection from "../../components/views/NextLivestreams/group/GroupBannerSection";
@@ -15,7 +15,6 @@ const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfai
 
 const GroupPage = ({serverSideGroup, livestreamId}) => {
 
-    const classes = useStyles()
     const {palette: {common: {white}, navyBlue}} = useTheme()
     const [value, setValue] = useState(0);
 
