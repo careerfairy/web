@@ -106,24 +106,33 @@ const useStyles = makeStyles((theme) => ({
     navIconButton: {
         color: "white !important"
     },
+    active: {
+        "&:before": {
+            content: '""',
+            position: "absolute",
+            width: "100%",
+            height: 2,
+            bottom: 0,
+            left: "0",
+            backgroundColor: theme.palette.common.white,
+            visibility: "visible",
+            WebkitTransform: "scaleX(1)",
+            transform: "scaleX(1)"
+        },
+    }
 }));
 
 
 const TopBar = ({
-                    firebase,
-                    handleChange,
-                    searchParams,
-                    handleSubmitSearch,
                     links,
                     className,
                     onMobileNavOpen,
-                    onMobileClose,
-                    drawerClosedWidth
                 }) => {
+
     const theme = useTheme()
     const showHeaderLinks = useMediaQuery(theme.breakpoints.up('md'))
     const classes = useStyles();
-    const { pathname} = useRouter()
+    const {pathname} = useRouter()
 
     return (
         <AppBar elevation={1} className={clsx(classes.root, className)}>
@@ -135,40 +144,26 @@ const TopBar = ({
                     <MiniLogo/>
                 </Hidden>
 
-                <Zoom unmountOnExit in={showHeaderLinks}>
-                    <Tabs value={pathname} classes={{indicator: classes.indicator}}>
-                        {links
-                            .map((item) => {
-                                return (
-                                    <Tab
-                                        key={item.title}
-                                        component={Link}
-                                        value={item.href}
-                                        className={classes.navLinks}
-                                        label={item.title}
-                                        href={item.href}
-                                    />
-                                )
-                            })}
-                    </Tabs>
-                </Zoom>
-                {/*<div className={classes.search}>*/}
-                {/*    <div className={classes.searchIcon}>*/}
-                {/*        <SearchIcon/>*/}
-                {/*    </div>*/}
-                {/*    <form onSubmit={handleSubmitSearch}>*/}
-                {/*        <InputBase*/}
-                {/*            onChange={handleChange}*/}
-                {/*            value={searchParams}*/}
-                {/*            placeholder="Search…"*/}
-                {/*            classes={{*/}
-                {/*                root: classes.inputRoot,*/}
-                {/*                input: classes.inputInput,*/}
-                {/*            }}*/}
-                {/*            inputProps={{'aria-label': 'search'}}*/}
-                {/*        />*/}
-                {/*    </form>*/}
-                {/*</div>*/}
+                <Hidden mdDown>
+                    <Zoom unmountOnExit in={showHeaderLinks}>
+                        <Tabs value={false} classes={{indicator: classes.indicator}}>
+                            {links
+                                .map((item) => {
+                                    return (
+                                        <Tab
+                                            key={item.title}
+                                            component={Link}
+                                            className={clsx(classes.navLinks, {
+                                                [classes.active]: pathname === item.href
+                                            })}
+                                            label={item.title}
+                                            href={item.href}
+                                        />
+                                    )
+                                })}
+                        </Tabs>
+                    </Zoom>
+                </Hidden>
                 <Box>
                     <Hidden mdDown>
                         <IconButton
