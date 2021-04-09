@@ -63,7 +63,7 @@ const DELAY = 3000; //3 seconds
 
 const ViewerLayout = (props) => {
     const {children, firebase} = props
-    const {query: {livestreamId}, replace, asPath} = useRouter()
+    const {query: {livestreamId, token}, replace, asPath} = useRouter()
     const {authenticatedUser, userData} = useAuth();
     const dispatch = useDispatch()
     const {breakpoints: {values}} = useTheme()
@@ -76,6 +76,7 @@ const ViewerLayout = (props) => {
     const [showVideoButton, setShowVideoButton] = useState({paused: false, muted: false});
     const [play, setPlay] = useState(false);
     const [unmute, setUnmute] = useState(false);
+    const [isRecording, setIsRecording] = useState(null);
 
     const [showMenu, setShowMenu] = useState(false);
     const [handRaiseActive, setHandRaiseActive] = useState(false);
@@ -110,7 +111,7 @@ const ViewerLayout = (props) => {
         id: livestreamId
     }, shallowEqual)
 
-    const notAuthorized = currentLivestream && !currentLivestream.test && authenticatedUser?.isLoaded && authenticatedUser?.isEmpty
+    const notAuthorized = currentLivestream && !currentLivestream.test && ((authenticatedUser?.isLoaded && authenticatedUser?.isEmpty) || isRecording ) 
 
     useEffect(() => {
         if (mobile) {
@@ -140,12 +141,25 @@ const ViewerLayout = (props) => {
         }
     }, [currentLivestream?.test, currentLivestream?.id, authenticatedUser?.email])
 
-    // if (notAuthorized) {
-    //     replace({
-    //         pathname: `/login`,
-    //         query: {absolutePath: asPath},
-    //     });
-    // }
+    useEffect(() => {
+        if (isLoaded(currentLivestream)) {
+            if (!token) {
+                setIsRecording(false)
+            } else {
+                props.firebase.getLivestreamSecureToken(currentLivestream?.id).then(doc => {
+                    let storedToken = doc.data().value;
+                    setIsRecording( storedToken === token )
+                })              
+            }
+        }   
+    },[token, currentLivestream])
+
+    if (notAuthorized && isRecording === false) {
+        replace({
+            pathname: `/login`,
+            query: {absolutePath: asPath},
+        });
+    }
 
     const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
     const handleStateChange = useCallback((state) => {
