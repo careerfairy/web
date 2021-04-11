@@ -114,7 +114,7 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
                         "secretKey": awsSecretKey,
                         "fileNamePrefix":[
                             "directory1",
-                            "directory2"
+                            "directory3"
                         ]
                     }
                 }

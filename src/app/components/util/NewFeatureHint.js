@@ -2,16 +2,17 @@ import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react';
 import {StyledTooltipWithButton} from "../../materialUI/GlobalTooltips";
 
-const NewFeatureHint = ({children, localStorageKey, tooltipText, buttonText, tooltipTitle, placement, onClick}) => {
+const NewFeatureHint = ({children, localStorageKey, tooltipText, buttonText, tooltipTitle, placement, onClick, isRecording}) => {
 
     const [hasSeenTip, setHasSeenTip] = useState(false);
 
     useEffect(() => {
         const hasSeenDataSetButton = localStorage.getItem(localStorageKey)
-        if (JSON.parse(hasSeenDataSetButton)) {
+        debugger;
+        if (JSON.parse(hasSeenDataSetButton) || isRecording) {
             setHasSeenTip(true)
         }
-    }, [])
+    }, [isRecording])
 
     const markAsSeen = () => {
         localStorage.setItem(localStorageKey, JSON.stringify(true))

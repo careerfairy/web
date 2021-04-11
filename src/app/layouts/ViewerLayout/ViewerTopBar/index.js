@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu}) => {
+const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu, isRecording}) => {
 
     const classes = useStyles()
     const {authenticatedUser, userData} = useAuth();
@@ -130,6 +130,7 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
                         tooltipText="Click here to see who's joined the stream since the start"
                         localStorageKey="hasSeenAudienceDrawer"
                         tooltipTitle="Hint"
+                        isRecording={isRecording}
                     >
                         <Box className={classes.viewCount}>
                             <Tooltip title="See who joined">

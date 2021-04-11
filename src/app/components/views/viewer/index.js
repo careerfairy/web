@@ -84,6 +84,7 @@ const ViewerOverview = ({
                             showAudience,
                             hideAudience,
                             audienceDrawerOpen,
+                            isRecording
                         }) => {
     const {currentLivestream} = useCurrentStream()
 
@@ -104,6 +105,7 @@ const ViewerOverview = ({
                     showMenu={showMenu}
                     isMobile={mobile}
                     handleStateChange={handleStateChange} streamer={false}
+                    isRecording={isRecording}
                 />
                 <ViewerComponent
                     livestreamId={currentLivestream.id} streamerId={streamerId}

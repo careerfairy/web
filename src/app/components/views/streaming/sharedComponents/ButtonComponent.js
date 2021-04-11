@@ -112,7 +112,8 @@ const ButtonComponent =
          isMobile,
          selectedState,
          streamer,
-         setShowMenu
+         setShowMenu,
+         isRecording
      }) => {
         const DELAY = 3000; //3 seconds
         const [hasMounted, setHasMounted] = useState(false)
@@ -124,6 +125,12 @@ const ButtonComponent =
         useEffect(() => {
             setHasMounted(true)
         }, [])
+
+        useEffect(() => {
+            if (isRecording) {
+                setOpen(false)
+            }
+        }, [isRecording])
 
         const tutorialStepActive = () => {
             return Boolean(isOpen(3) || isOpen(8))

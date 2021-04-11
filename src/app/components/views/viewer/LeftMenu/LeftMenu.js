@@ -68,6 +68,7 @@ const LeftMenu =
          showMenu,
          isMobile,
          className,
+         isRecording,
          ...props
      }) => {
         const {userData, authenticatedUser: user} = useAuth()
@@ -78,14 +79,15 @@ const LeftMenu =
         useEffect(() => {
             if (selectedState === "questions") {
                 setValue(0)
-            } else if (selectedState === "polls") {
+            } else if (!isRecording && selectedState === "polls") {
                 setValue(1)
-            } else if (selectedState === "hand") {
+            } else if (!isRecording && selectedState === "hand") {
                 setValue(2)
-            } else if (selectedState === "chat") {
+            } else if (!isRecording && selectedState === "chat") {
                 setValue(3)
             }
         }, [selectedState, showMenu, isMobile])
+
         useEffect(() => {
             if (selectedState === "chat" && showMenu && !isMobile) {
                 setSelectedState("questions")

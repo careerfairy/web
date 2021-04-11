@@ -154,6 +154,12 @@ const ViewerLayout = (props) => {
         }   
     },[token, currentLivestream])
 
+    useEffect(() => {
+        if (isRecording) {
+            setOpen(false)
+        }
+    },[isRecording])
+
     if (notAuthorized && isRecording === false) {
         replace({
             pathname: `/login`,
@@ -248,6 +254,7 @@ const ViewerLayout = (props) => {
                     showMenu={showMenu}
                     numberOfViewers={numberOfViewers}
                     mobile={mobile}
+                    isRecording={isRecording}
                 />
                 <LeftMenu
                     handRaiseActive={handRaiseActive}
@@ -260,6 +267,7 @@ const ViewerLayout = (props) => {
                     showMenu={showMenu}
                     setShowMenu={setShowMenu}
                     isMobile={mobile}
+                    isRecording={isRecording}
                     toggleShowMenu={toggleShowMenu}/>
 
                 <div className={classes.wrapper}>
@@ -294,6 +302,7 @@ const ViewerLayout = (props) => {
                                 handleMouseEnter,
                                 setShowVideoButton,
                                 handleClose,
+                                isRecording,
                                 DELAY
                             })}
                         </div>
