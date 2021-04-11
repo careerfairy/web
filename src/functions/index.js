@@ -87,3 +87,4 @@ exports.updateUserDataAnalytcicsOnWrite = analytics.updateUserDataAnalyticsOnWri
 
 //Recording
 exports.startRecordingLivestream = recording.startRecordingLivestream
+exports.stopRecordingLivestream = recording.stopRecordingLivestream
