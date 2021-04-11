@@ -9,7 +9,6 @@ export function useAgoraToken(roomId, uid, isStreamer, securityToken, isScreenSh
   
     useEffect(() => {
         if (roomId && uid) { 
-            debugger;
             axios({
                 method: 'post',
                 data: {
