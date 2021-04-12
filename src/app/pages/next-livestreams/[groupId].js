@@ -42,7 +42,7 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
                 image={currentGroup.logoUrl}
                 fullPath={`${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}`}
             />
-            <NextLivestreamsLayout>
+            <NextLivestreamsLayout currentGroup={currentGroup}>
                 <div>
                     <GroupBannerSection
                         color={white}

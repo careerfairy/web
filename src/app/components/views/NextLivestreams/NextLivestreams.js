@@ -3,10 +3,10 @@ import {withFirebase} from "../../../context/firebase";
 import {useMediaQuery} from "@material-ui/core";
 import {useTheme} from "@material-ui/core/styles";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
-import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
 import {getServerSideRouterQuery} from "../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../HOCs/AuthProvider";
+import MobileFeed from "./MobileFeed";
 
 const NextLivestreams = ({
                              livestreamId,

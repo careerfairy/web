@@ -1,8 +1,10 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Box, Button, Collapse, Divider, Grid} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import CategoryCard from "./CategoryCard";
 import FilterIcon from '@material-ui/icons/Tune';
+import {useDispatch, useSelector} from "react-redux";
+import * as actions from '../../../../store/actions'
 
 const useStyles = makeStyles((theme) => ({
     actions: {
@@ -17,9 +19,10 @@ const useStyles = makeStyles((theme) => ({
 const GroupCategories = ({groupData, handleToggleActive, hasCategories}) => {
 
     const classes = useStyles();
+    const dispatch = useDispatch()
+    const filterOpen = useSelector(state => state.nextLivestreams.filterOpen)
 
-    const [filterOpen, setFilterOpen] = useState(false);
-    const handleToggleFilter = () => setFilterOpen(!filterOpen)
+    const handleToggleFilter = () => dispatch(actions.toggleNextLivestreamsFilter())
 
     return hasCategories ? (
         <Grid item xs={12}>
@@ -44,7 +47,7 @@ const GroupCategories = ({groupData, handleToggleActive, hasCategories}) => {
             </Collapse>
             <Divider/>
         </Grid>
-    ): null
+    ) : null
 };
 
 export default GroupCategories;

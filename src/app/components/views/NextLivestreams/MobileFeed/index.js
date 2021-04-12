@@ -1,23 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import SwipeableViews from 'react-swipeable-views';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
-import Sticky from 'react-stickynode';
 
-import {Button, Grid, Typography, AppBar, Tabs, Tab, Box} from "@material-ui/core";
-import {withFirebase} from "../../../context/firebase";
-import GroupCategories from "./GroupCategories/GroupCategories";
-import GroupStreams from "./GroupStreams/GroupStreams";
+import {Box, Button, Grid, Typography} from "@material-ui/core";
+import {withFirebase} from "../../../../context/firebase";
+import GroupStreams from "../GroupStreams/GroupStreams";
 import {useRouter} from "next/router";
-import GroupJoinModal from "../profile/GroupJoinModal";
-import {bindKeyboard} from 'react-swipeable-views-utils';
+import GroupJoinModal from "../../profile/GroupJoinModal";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-
-const BindKeyboardSwipeableViews = bindKeyboard(SwipeableViews);
+import FiltersDrawer from "./FiltersDrawer";
 
 
 const useStyles = makeStyles((theme) => ({
     streamsGrid: {
-        // marginBottom: theme.spacing(1)
         height: "100%"
     },
     bar: {
@@ -128,31 +122,7 @@ const MobileFeed = ({
 
 
     return (
-        <>
-            <Sticky
-                innerClass={classes.sticky}
-                top={topOffset}
-            >
-                <AppBar className={classes.bar} color="default">
-                    <Tabs
-                        value={value}
-                        variant="fullWidth"
-                        onChange={handleChange}
-                        indicatorColor="primary"
-                        textColor="primary"
-                        centered
-                    >
-                        <Tab wrapped value={0}  {...a11yProps(0)} fullWidth
-                             label={<Typography variant="h5">Events</Typography>}/>
-                        {hasCategories ?
-                            <Tab value={1} wrapped fullWidth disabled={!groupData.categories}
-                                 {...a11yProps(1)}
-                                 label={<Typography variant="h5">Filter</Typography>}/>
-                            :
-                            null}
-                    </Tabs>
-                </AppBar>
-            </Sticky>
+        <Box p={2}>
             {!userData?.groupIds?.includes(groupData.groupId) && !listenToUpcoming &&
             <>
                 <Button className={classes.followButton} onClick={handleJoin} size="large" variant="contained" fullWidth
@@ -168,39 +138,25 @@ const MobileFeed = ({
                 />
             </>
             }
-            <BindKeyboardSwipeableViews
-                style={{overflowX: "hidden", flex: 1}}
-                disabled={!Boolean(groupData.categories)}
-                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                index={value}
-                slideStyle={{overflow: "hidden", height: "max-content"}}
-                onChangeIndex={handleChangeIndex}>
-                <TabPanel dir={theme.direction}>
-                    <Grid className={classes.streamsGrid} container spacing={2}>
-                        <GroupStreams
-                            mobile={true}
-                            livestreamId={livestreamId}
-                            listenToUpcoming={listenToUpcoming}
-                            careerCenterId={careerCenterId}
-                            isPastLivestreams={isPastLivestreams}
-                            selectedOptions={selectedOptions}
-                            searching={searching}
-                            livestreams={livestreams}
-                            groupData={groupData}
-                        />
-                    </Grid>
-                </TabPanel>
-                <TabPanel dir={theme.direction}>
-                    <Grid className={classes.streamsGrid} container spacing={2}>
-                        <GroupCategories
-                            groupData={groupData}
-                            hasCategories={hasCategories}
-                            handleToggleActive={handleToggleActive}
-                        />
-                    </Grid>
-                </TabPanel>
-            </BindKeyboardSwipeableViews>
-        </>
+            <Grid className={classes.streamsGrid} container spacing={2}>
+                <GroupStreams
+                    mobile={true}
+                    livestreamId={livestreamId}
+                    listenToUpcoming={listenToUpcoming}
+                    careerCenterId={careerCenterId}
+                    isPastLivestreams={isPastLivestreams}
+                    selectedOptions={selectedOptions}
+                    searching={searching}
+                    livestreams={livestreams}
+                    groupData={groupData}
+                />
+            </Grid>
+            <FiltersDrawer
+                groupData={groupData}
+                hasCategories={hasCategories}
+                handleToggleActive={handleToggleActive}
+            />
+        </Box>
     );
 }
 

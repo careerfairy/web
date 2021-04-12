@@ -12,12 +12,11 @@ const useStyles = makeStyles(theme => ({
         justifyContent: "space-between",
         "& .MuiTextField-root": {
             minWidth: 300,
-        borderRadius: theme.spacing(2)
+            borderRadius: theme.spacing(2)
 
         }
     },
-    root: {
-    }
+    root: {}
 }));
 const CategoryCard = ({category, handleToggleActive}) => {
     const classes = useStyles()
@@ -39,7 +38,6 @@ const CategoryCard = ({category, handleToggleActive}) => {
             onChange={(e, value) => handleToggleActive(value, category.id)}
             getOptionLabel={(option) => optionsMap[option]?.name}
             className={classes.root}
-
             filterSelectedOptions
             renderInput={(params) => (
                 <div className={classes.inputWrapper}>

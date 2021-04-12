@@ -12,7 +12,7 @@ import useGeneralLinks from "../../components/custom-hook/useGeneralLinks";
 const useStyles = makeStyles(styles);
 
 const NextLivestreamsLayout = (props) => {
-    const {children} = props
+    const {children, currentGroup} = props
     const drawerWidth = 300
     const classes = useStyles({drawerWidth});
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
@@ -31,12 +31,10 @@ const NextLivestreamsLayout = (props) => {
             <div className={classes.root}>
                 <TopBar
                     links={mainLinks}
+                    currentGroup={currentGroup}
                     onMobileNavOpen={handleDrawerOpen}
-                    onMobileClose={handleDrawerClose}
-                    {...props}
                 />
                 <NavBar
-                    {...props}
                     drawerTopLinks={mainLinks}
                     handleDrawerToggle={handleDrawerToggle}
                     drawerWidth={drawerWidth}
@@ -48,9 +46,10 @@ const NextLivestreamsLayout = (props) => {
                 <div className={classes.wrapper}>
                     <div className={classes.contentContainer}>
                         <div className={classes.content}>
-                            {React.Children.map(children, child => React.cloneElement(child, {
-                                ...props
-                            }))}
+                            {/*{React.Children.map(children, child => React.cloneElement(child, {*/}
+                            {/*    ...props*/}
+                            {/*}))}*/}
+                            {children}
                             <Footer/>
                         </div>
                     </div>

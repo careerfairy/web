@@ -87,8 +87,6 @@ const FeedDrawer = memo(({
                              onMobileNavOpen,
                              onMobileClose,
                              openMobile,
-                             showHeaderLinks,
-                             firebase,
                              handleDrawerToggle,
                              drawerBottomLinks,
                              drawerTopLinks,

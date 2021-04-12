@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import {fade, makeStyles, useTheme} from '@material-ui/core/styles';
+import {makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -15,6 +15,9 @@ import {MainLogo, MiniLogo} from "../../../components/logos";
 import Link from "../../../materialUI/NextNavLink";
 import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
 import MenuIcon from "@material-ui/icons/Menu";
+import FilterIcon from '@material-ui/icons/Tune';
+import {useDispatch} from "react-redux";
+import * as actions from '../../../store/actions'
 
 const useStyles = makeStyles((theme) => ({
 
@@ -30,45 +33,6 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         background: theme.palette.navyBlue.main,
         zIndex: 1201
-    },
-    search: {
-        position: 'relative',
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: fade(theme.palette.common.white, 0.15),
-        '&:hover': {
-            backgroundColor: fade(theme.palette.common.white, 0.25),
-        },
-
-        marginRight: theme.spacing(1),
-
-        [theme.breakpoints.down('sm')]: {
-            marginLeft: "auto",
-        },
-    },
-    searchIcon: {
-        padding: theme.spacing(0, 2),
-        height: '100%',
-        position: 'absolute',
-        pointerEvents: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    inputRoot: {
-        color: 'inherit',
-    },
-    inputInput: {
-        padding: theme.spacing(1, 1, 1, 0),
-        // vertical padding + font size from searchIcon
-        paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            width: '17ch',
-            '&:focus': {
-                width: '20ch',
-            },
-        },
     },
     navLinks: {
         fontWeight: 600,
@@ -127,12 +91,16 @@ const TopBar = ({
                     links,
                     className,
                     onMobileNavOpen,
+                    currentGroup
                 }) => {
 
     const theme = useTheme()
     const showHeaderLinks = useMediaQuery(theme.breakpoints.up('md'))
     const classes = useStyles();
     const {pathname} = useRouter()
+    const dispatch = useDispatch()
+
+    const handleToggleNextLivestreamsFilter = () => dispatch(actions.toggleNextLivestreamsFilter())
 
     return (
         <AppBar elevation={1} className={clsx(classes.root, className)}>
@@ -175,6 +143,10 @@ const TopBar = ({
                         </IconButton>
                     </Hidden>
                     <Hidden lgUp>
+                        {currentGroup?.categories &&
+                        <IconButton color="inherit" onClick={handleToggleNextLivestreamsFilter}>
+                            <FilterIcon/>
+                        </IconButton>}
                         <IconButton color="inherit" onClick={onMobileNavOpen}>
                             <MenuIcon/>
                         </IconButton>
