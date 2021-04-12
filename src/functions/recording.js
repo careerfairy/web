@@ -92,7 +92,7 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
                                 "serviceName":"web_recorder_service",
                                 "errorHandlePolicy": "error_abort",
                                 "serviceParam": {
-                                    "url": `https://careerfairy.io/streaming/${streamId}/viewer?token=${token}`,
+                                    "url": `https://testing2-careerfairy.web.app/streaming/${streamId}/viewer?token=${token}`,
                                     "audioProfile": 0,
                                     "videoWidth": 1280,
                                     "videoHeight": 720,
@@ -144,6 +144,8 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
             sid: sid,
             resourceId: resourceId
         })
+
+    return res.status(200).send()
 });
 
 exports.stopRecordingLivestream = functions.https.onRequest(async (req, res) => {
@@ -203,6 +205,9 @@ exports.stopRecordingLivestream = functions.https.onRequest(async (req, res) => 
             'Authorization': authorizationHeader,
             'Content-Type': 'application/json'
         }
-    }).then((response) => { console.log(response) }).catch( error => console.log("Error in stop", error));
+    }).then((response) => { 
+        console.log(response) 
+        return res.status(200).send()
+    }).catch( error => console.log("Error in stop", error));
 });
 
