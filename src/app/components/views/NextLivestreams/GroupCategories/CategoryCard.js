@@ -19,11 +19,10 @@ const useStyles = makeStyles(theme => ({
     root: {
     }
 }));
-const CategoryCard = ({category, handleToggleActive, mobile, width, groupData}) => {
+const CategoryCard = ({category, handleToggleActive}) => {
     const classes = useStyles()
     const [optionsMap, setOptionsMap] = useState({});
     const [arrayOfOptionIds, setArrayOfOptionIds] = useState([]);
-    const [value, setValue] = useState([]);
 
     useEffect(() => {
         if (category?.options?.length) {

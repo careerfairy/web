@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, Container, Grid, Grow, withWidth} from "@material-ui/core";
+import {Container, Grid, Grow, withWidth} from "@material-ui/core";
 import GroupCategories from "../GroupCategories/GroupCategories";
 import GroupStreams from "../GroupStreams/GroupStreams";
 import {useTheme} from "@material-ui/core/styles";
@@ -30,14 +30,12 @@ const DesktopFeed = ({
                     spacing={4}
                     style={{margin: theme.spacing(1)}}
                 >
-                    <GroupCategories livestreams={livestreams}
-                                     mobile={mobile}
-                                     user={user}
-                                     hasCategories={hasCategories}
-                                     handleToggleActive={handleToggleActive}
-                                     userData={userData}
-                                     alreadyJoined={alreadyJoined}
-                                     groupData={groupData}/>
+                    <GroupCategories
+                        mobile={mobile}
+                        hasCategories={hasCategories}
+                        handleToggleActive={handleToggleActive}
+                        groupData={groupData}
+                    />
                     <GroupStreams
                         user={user}
                         mobile={false}

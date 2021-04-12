@@ -195,14 +195,11 @@ const MobileFeed = ({
                 </TabPanel>
                 <TabPanel dir={theme.direction}>
                     <Grid className={classes.streamsGrid} container spacing={2}>
-                        <GroupCategories alreadyJoined={alreadyJoined}
-                                         groupData={groupData}
-                                         user={user}
-                                         hasCategories={hasCategories}
-                                         livestreams={livestreams}
-                                         userData={userData}
-                                         handleToggleActive={handleToggleActive}
-                                         mobile={true}/>
+                        <GroupCategories
+                            groupData={groupData}
+                            hasCategories={hasCategories}
+                            handleToggleActive={handleToggleActive}
+                        />
                     </Grid>
                 </TabPanel>
             </BindKeyboardSwipeableViews>
