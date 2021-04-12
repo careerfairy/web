@@ -7,18 +7,14 @@ import {useTheme} from "@material-ui/core/styles";
 const DesktopFeed = ({
                          groupData,
                          hasCategories,
-                         userData,
-                         alreadyJoined,
                          handleToggleActive,
                          mobile,
-                         user,
                          livestreams,
                          searching,
                          livestreamId,
                          careerCenterId,
                          listenToUpcoming,
                          selectedOptions,
-                         width,
                          isPastLivestreams,
                      }) => {
     const theme = useTheme()

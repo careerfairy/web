@@ -16,7 +16,7 @@ const NextLivestreams = ({
                              setSelectedOptions,
                              isPastLivestreams
                          }) => {
-    const {userData, authenticatedUser} = useAuth();
+    const {userData} = useAuth();
     const theme = useTheme();
     const mobile = useMediaQuery(theme.breakpoints.down("sm"));
     const router = useRouter();
@@ -97,15 +97,12 @@ const NextLivestreams = ({
         />
     ) : (
         <DesktopFeed
-            alreadyJoined={groupData.alreadyJoined}
             handleToggleActive={handleToggleActive}
-            userData={userData}
             hasCategories={hasCategories()}
             listenToUpcoming
             livestreamId={livestreamId}
             selectedOptions={selectedOptions}
             careerCenterId={careerCenterId}
-            user={authenticatedUser}
             livestreams={livestreams}
             mobile={mobile}
             groupData={groupData}

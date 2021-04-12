@@ -8,8 +8,9 @@ import {useFirestoreConnect} from "react-redux-firebase";
 import {PAST_LIVESTREAMS_NAME} from "../../data/constants/streamContants";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
 import {NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL} from "../../constants/routes";
-import {useSelector} from "react-redux";
 import {StreamsSection} from "../../components/views/NextLivestreams/StreamsSection";
+import {useDispatch, useSelector} from "react-redux";
+import * as actions from '../../store/actions'
 
 const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
 
@@ -20,6 +21,11 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
 
     const [selectedOptions, setSelectedOptions] = useState([]);
     const currentGroup = useSelector(state => state.firestore.data[`group ${serverSideGroup.groupId}`] || serverSideGroup)
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch(actions.closeNextLivestreamsFilter())
+    }, [currentGroup.groupId])
 
     useFirestoreConnect(() => [{
         collection: "careerCenterData",
