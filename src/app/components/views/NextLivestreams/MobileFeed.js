@@ -64,7 +64,6 @@ const MobileFeed = ({
                         groupData,
                         userData,
                         alreadyJoined,
-                        user,
                         livestreams,
                         searching,
                         scrollToTop,

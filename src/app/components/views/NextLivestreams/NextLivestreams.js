@@ -84,7 +84,6 @@ const NextLivestreams = ({
         <MobileFeed
             groupData={groupData}
             hasCategories={hasCategories()}
-            user={authenticatedUser}
             selectedOptions={selectedOptions}
             scrollToTop={scrollToTop}
             livestreams={livestreams}
