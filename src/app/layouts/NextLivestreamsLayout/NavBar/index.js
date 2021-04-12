@@ -1,19 +1,12 @@
 import React, {memo, useEffect, useState} from 'react';
 import clsx from 'clsx';
-import {fade, makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import {
-    Box,
+    Box, Button,
     Card,
     CardActionArea,
     CardContent,
@@ -25,7 +18,6 @@ import {
 } from "@material-ui/core";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {useAuth} from "../../../HOCs/AuthProvider";
-import {isEmpty, isLoaded} from "react-redux-firebase";
 import GroupsUtil from "../../../data/util/GroupsUtil";
 import {useRouter} from "next/router";
 import {repositionElementInArray} from "../../../components/helperFunctions/HelperFunctions";
@@ -36,8 +28,8 @@ import * as actions from "../../../store/actions";
 import GroupNavLink from "./groupNavLink";
 import CardMedia from "@material-ui/core/CardMedia";
 import {searchImage} from "../../../constants/images";
-import Typography from "@material-ui/core/Typography";
-import Link from 'next/link'
+import Link from "../../../materialUI/NextNavLink";
+import * as PropTypes from "prop-types";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -48,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
         width: props => props.drawerWidth || 256,
         top: 64,
         height: 'calc(100% - 64px)',
-        // boxShadow: theme.shadows[15]
+        boxShadow: theme.shadows[1]
     },
     background: {
         borderRight: "none",
@@ -87,12 +79,33 @@ const useStyles = makeStyles((theme) => ({
     },
     subheader: {
         whiteSpace: "pre-wrap"
+    },
+    loginButton: {
+        color: "white !important",
     }
 }));
 
 const ListItemWrapper = ({active, children}) => active ? <Grow in>{children}</Grow> : <>{children}</>
 
 
+function LoginButton(props) {
+    const classes = useStyles()
+    return <ListItem>
+        <Button
+            fullWidth
+            className={classes.loginButton}
+            component={Link}
+            href="/login"
+            style={{textDecoration: "none"}}
+            color="primary"
+            variant="contained"
+        >
+            Login
+        </Button>
+    </ListItem>;
+}
+
+LoginButton.propTypes = {classes: PropTypes.any};
 const FeedDrawer = memo(({
                              onMobileNavOpen,
                              onMobileClose,
@@ -105,7 +118,7 @@ const FeedDrawer = memo(({
                          }) => {
     const classes = useStyles({drawerWidth});
     const {query: {groupId: groupIdInQuery}} = useRouter()
-    const {userData} = useAuth()
+    const {userData, authenticatedUser} = useAuth()
     const [groups, setGroups] = useState(null);
     const dispatch = useDispatch()
     const signOut = () => dispatch(actions.signOut())
@@ -133,9 +146,12 @@ const FeedDrawer = memo(({
             display="flex"
             flexDirection="column"
         >
-            <Collapse in={openMobile}>
+            <Hidden lgUp>
                 <Box p={2}>
                     <List>
+                        {authenticatedUser.isLoaded && authenticatedUser.isEmpty && (
+                            <LoginButton/>
+                        )}
                         {drawerTopLinks.map(({title, href, icon}) => (
                             <NavItem
                                 href={href}
@@ -148,8 +164,7 @@ const FeedDrawer = memo(({
                         <Divider/>
                     </List>
                 </Box>
-            </Collapse>
-            <Box flexGrow={1}/>
+            </Hidden>
             <Box p={2}>
                 {groups?.length ? (
                     <List>
@@ -167,15 +182,14 @@ const FeedDrawer = memo(({
                     </List>
                 ) : (
                     <Card elevation={0}>
-                        <Link href="/groups">
-                            <CardActionArea component="a">
+                            <CardActionArea style={{textDecoration: "none"}} href="/groups" component={Link}>
                                 <CardHeader
                                     centered
                                     align="center"
                                     titleTypographyProps={{
                                         gutterBottom: true
                                     }}
-                                    title="New to here?"
+                                    title="New to CareerFairy?"
                                     subheaderTypographyProps={{
                                         className: classes.subheader
                                     }}
@@ -189,7 +203,6 @@ const FeedDrawer = memo(({
                                     </CardMedia>
                                 </CardContent>
                             </CardActionArea>
-                        </Link>
                     </Card>
                 )}
             </Box>
@@ -207,14 +220,14 @@ const FeedDrawer = memo(({
                             black
                         />
                     ))}
-                    {userData &&
-                    <NavItem
-                        href="#"
-                        onClick={signOut}
-                        icon={LogoutIcon}
-                        title="LOGOUT"
-                        black
-                    />}
+                    {userData && (
+                        <NavItem
+                            href="#"
+                            onClick={signOut}
+                            icon={LogoutIcon}
+                            title="LOGOUT"
+                            black/>
+                    )}
                 </List>
             </Box>
         </Box>
@@ -248,66 +261,6 @@ const FeedDrawer = memo(({
         </>
     );
 
-
-    return (
-        <Drawer
-            // onMouseEnter={onMobileNavOpen}
-            // onMouseLeave={onMobileClose}
-            variant="permanent"
-            className={clsx(classes.drawer, {
-                [classes.drawerOpen]: openMobile,
-                [classes.drawerClose]: !openMobile,
-            })}
-            classes={{
-                paper: clsx(classes.drawerPaper, {
-                    [classes.drawerOpen]: openMobile,
-                    [classes.drawerClose]: !openMobile,
-                }),
-            }}
-        >
-            <div className={classes.toolbar}>
-                <IconButton onClick={handleDrawerToggle}>
-                    {openMobile ? <ChevronLeftIcon/> : <ChevronRightIcon/>}
-                </IconButton>
-            </div>
-            <Divider/>
-            {/*<List>*/}
-            {/*    <Collapse in={!showHeaderLinks}>*/}
-            {/*        <Collapse in={openMobile}>*/}
-            {/*            <ListItem>*/}
-            {/*                <ListItemText primary={"Nav"}/>*/}
-            {/*            </ListItem>*/}
-            {/*        </Collapse>*/}
-            {/*        {drawerTopLinks.map(({title, href, icon}) => (*/}
-            {/*            <Link className={classes.navLink} key={title} href={href}>*/}
-            {/*                <ListItem button>*/}
-            {/*                    <ListItemIcon>*/}
-            {/*                        {icon}*/}
-            {/*                    </ListItemIcon>*/}
-            {/*                    <ListItemText primary={title}/>*/}
-            {/*                </ListItem>*/}
-            {/*            </Link>*/}
-            {/*        ))}*/}
-            {/*        <Divider/>*/}
-            {/*    </Collapse>*/}
-            {/*</List>*/}
-            <Divider/>
-            <List>
-                <Collapse in={openMobile}>
-                    <ListItem>
-                        <ListItemText primary={"Recommended"}/>
-                    </ListItem>
-                </Collapse>
-                {drawerBottomLinks.map(({title}, index) => (
-                    <ListItem button key={title}>
-                        <ListItemIcon>{index % 2 === 0 ? <InboxIcon/> : <MailIcon/>}</ListItemIcon>
-                        <ListItemText primary={title}/>
-                    </ListItem>
-                ))}
-            </List>
-
-        </Drawer>
-    )
 })
 
 const ListSpinner = () => {

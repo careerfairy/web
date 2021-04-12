@@ -9,6 +9,7 @@ import {StreamsSection} from "../../components/views/NextLivestreams/StreamsSect
 import HeadWithMeta from "../../components/page/HeadWithMeta";
 import {store} from "../_app";
 import {NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL} from "../../constants/routes";
+import {getServerSideStream} from "../../util/serverUtil";
 
 const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
 
@@ -33,7 +34,7 @@ const nextLivestreamsPage = ({livestreamId, serverSideStream}) => {
     const metaInfo = useMemo(() => serverSideStream ? ({
         title: `CareerFairy | Live Stream with ${serverSideStream.company}`,
         description: serverSideStream.title,
-        image: serverSideStream.companyLogoUrl,
+        image: serverSideStream.backgroundImageUrl,
         fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}?livestreamId=${serverSideStream.id}`
     }) : ({
         description: "Catch the upcoming streams on CareerFairy.",
@@ -74,20 +75,7 @@ const nextLivestreamsPage = ({livestreamId, serverSideStream}) => {
 };
 
 export async function getServerSideProps({query: {livestreamId}}) {
-    let serverSideStream = null
-    if (livestreamId) {
-        const livestreamSnap = await store.firestore.get({collection: "livestreams", doc: livestreamId})
-        if (livestreamSnap.exists) {
-            const streamData = livestreamSnap.data()
-            serverSideStream = {
-                id: livestreamSnap.id,
-                company: streamData.company,
-                title: streamData.title,
-                companyLogoUrl: streamData.companyLogoUrl
-            }
-        }
-    }
-
+    const serverSideStream = await getServerSideStream(livestreamId)
     return {
         props: {serverSideStream, livestreamId: livestreamId || ""}, // will be passed to the page component as props
     }

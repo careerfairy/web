@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTheme} from "@material-ui/core/styles";
-import {store} from "../_app";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
 import GroupBannerSection from "../../components/views/NextLivestreams/GroupBannerSection";
 import useListenToGroupStreams from "../../components/custom-hook/useGroupUpcomingStreams";
@@ -11,6 +10,7 @@ import {NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL} from "../../constants/routes
 import {StreamsSection} from "../../components/views/NextLivestreams/StreamsSection";
 import {useDispatch, useSelector} from "react-redux";
 import * as actions from '../../store/actions'
+import {getServerSideGroup, getServerSideStream} from "../../util/serverUtil";
 
 const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
 
@@ -98,25 +98,8 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
 };
 
 export async function getServerSideProps({params: {groupId}, query: {livestreamId}}) {
-    let serverSideGroup = {}
-    let serverSideStream = null
-    if (livestreamId) {
-        const livestreamSnap = await store.firestore.get({collection: "livestreams", doc: livestreamId})
-        if (livestreamSnap.exists) {
-            const streamData = livestreamSnap.data()
-            serverSideStream = {
-                id: livestreamSnap.id,
-                company: streamData.company,
-                title: streamData.title,
-                companyLogoUrl: streamData.companyLogoUrl
-            }
-        }
-    }
-    const snap = await store.firestore.get({collection: "careerCenterData", doc: groupId, storeAs: `group ${groupId}`})
-    if (snap.exists) {
-        serverSideGroup = snap.data()
-        serverSideGroup.id = snap.id;
-    }
+    const serverSideStream = await getServerSideStream(livestreamId)
+    const serverSideGroup = await getServerSideGroup(groupId)
     return {
         props: {serverSideGroup, livestreamId: livestreamId || "", serverSideStream}, // will be passed to the page component as props
     }

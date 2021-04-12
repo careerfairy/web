@@ -5,7 +5,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import {withFirebase} from "../../../context/firebase";
-import {Hidden, useMediaQuery} from "@material-ui/core";
+import {Button, Hidden, useMediaQuery} from "@material-ui/core";
 import Zoom from '@material-ui/core/Zoom';
 import Box from "@material-ui/core/Box";
 import {useRouter} from "next/router";
@@ -18,6 +18,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import FilterIcon from '@material-ui/icons/Tune';
 import {useDispatch} from "react-redux";
 import * as actions from '../../../store/actions'
+import {useAuth} from "../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -68,7 +69,10 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.common.white
     },
     navIconButton: {
-        color: "white !important"
+        color: "white !important",
+        "&.MuiLink-underlineHover": {
+            textDecoration: "none !important"
+        }
     },
     active: {
         "&:before": {
@@ -99,6 +103,7 @@ const TopBar = ({
     const classes = useStyles();
     const {pathname} = useRouter()
     const dispatch = useDispatch()
+    const {authenticatedUser} = useAuth()
 
     const handleToggleNextLivestreamsFilter = () => dispatch(actions.toggleNextLivestreamsFilter())
 
@@ -134,13 +139,26 @@ const TopBar = ({
                 </Hidden>
                 <Box>
                     <Hidden mdDown>
-                        <IconButton
-                            component={Link}
-                            className={classes.navIconButton}
-                            href="/profile"
-                        >
-                            <AccountCircleOutlinedIcon/>
-                        </IconButton>
+                        {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
+                                <Button
+                                    component={Link}
+                                    href="/login"
+                                    variant="contained"
+                                    color="primary"
+                                    className={classes.navIconButton}
+
+                                >
+                                    Login
+                                </Button>
+                        ) : (
+                            <IconButton
+                                component={Link}
+                                className={classes.navIconButton}
+                                href="/profile"
+                            >
+                                <AccountCircleOutlinedIcon/>
+                            </IconButton>
+                        )}
                     </Hidden>
                     <Hidden lgUp>
                         {currentGroup?.categories &&
