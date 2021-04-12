@@ -4,7 +4,7 @@ import {useAuth} from "../../HOCs/AuthProvider";
 import NextLivestreamsIcon from '@material-ui/icons/Contacts';
 import PastLivestreamsIcon from '@material-ui/icons/VideoLibrary';
 import FollowGroupIcon from '@material-ui/icons/GroupAdd';
-import WishlistIcon from '@material-ui/icons/WbSunny';
+import WishlistIcon from '@material-ui/icons/Stars';
 
 const initialMainLinks = [
     {

@@ -79,9 +79,6 @@ const useStyles = makeStyles((theme) => ({
 
     },
     media: {
-        // height: 0,
-        // paddingTop: '56.25%', // 16:9
-        // height: 150
         display: "grid",
         placeItems: "center",
         "& img": {
@@ -152,7 +149,7 @@ const FeedDrawer = memo(({
                     </List>
                 </Box>
             </Collapse>
-
+            <Box flexGrow={1}/>
             <Box p={2}>
                 {groups?.length ? (
                     <List>
@@ -182,7 +179,7 @@ const FeedDrawer = memo(({
                                     subheaderTypographyProps={{
                                         className: classes.subheader
                                     }}
-                                    subheader="Click here to discover some groups sdfs dsf sdf"
+                                    subheader="Click here to discover some groups"
                                 />
                                 <CardContent>
                                     <CardMedia
