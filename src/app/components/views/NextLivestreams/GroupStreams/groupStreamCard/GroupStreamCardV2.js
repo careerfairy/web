@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
     main: {
         display: "flex",
         flex: 1,
-        minHeight: 380,
+        minHeight: 340,
         overflow: 'hidden',
         borderTopLeftRadius: '1.5rem',
         borderTopRightRadius: '1.5rem',
