@@ -11,7 +11,7 @@ import { Avatar } from "@material-ui/core";
 import { AvatarGroup } from "@material-ui/lab";
 import { speakerPlaceholder } from "components/util/constants";
 import { LazyLoadComponent } from "react-lazy-load-image-component";
-import { StreamCardPlaceHolder } from "components/views/NextLivestreams/GroupStreams/GroupStreamCard";
+import StreamCardPlaceHolder from "../components/views/NextLivestreams/GroupStreams/groupStreamCard/Spinner";
 
 
 function LandingPage(props) {

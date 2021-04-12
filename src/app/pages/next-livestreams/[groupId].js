@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTheme} from "@material-ui/core/styles";
 import {store} from "../_app";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
@@ -14,7 +14,7 @@ import * as actions from '../../store/actions'
 
 const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
 
-const GroupPage = ({serverSideGroup, livestreamId}) => {
+const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
 
     const {palette: {common: {white}, navyBlue}} = useTheme()
     const [value, setValue] = useState(0);
@@ -47,6 +47,18 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
         return Boolean(streams?.some(stream => stream.id === livestreamId))
     }
 
+    const metaInfo = useMemo(() => serverSideStream ? ({
+        title: `CareerFairy | Live Stream with ${serverSideStream.company}`,
+        description: serverSideStream.title,
+        image: serverSideStream.companyLogoUrl,
+        fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}?livestreamId=${serverSideStream.id}`
+    }) : ({
+        description: currentGroup.description,
+        title: `CareerFairy | Next Livestreams of ${currentGroup.universityName}`,
+        image: currentGroup.logoUrl,
+        fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}`,
+    }), [serverSideStream])
+
 
     const handleChange = useCallback((event, newValue) => {
         setValue(newValue);
@@ -55,10 +67,7 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
     return (
         <React.Fragment>
             <HeadWithMeta
-                description={currentGroup.description}
-                title={`CareerFairy | Next Livestreams of ${currentGroup.universityName}`}
-                image={currentGroup.logoUrl}
-                fullPath={`${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}`}
+                {...metaInfo}
             />
             <NextLivestreamsLayout currentGroup={currentGroup}>
                 <div>
@@ -90,12 +99,26 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
 
 export async function getServerSideProps({params: {groupId}, query: {livestreamId}}) {
     let serverSideGroup = {}
+    let serverSideStream = null
+    if (livestreamId) {
+        const livestreamSnap = await store.firestore.get({collection: "livestreams", doc: livestreamId})
+        if (livestreamSnap.exists) {
+            const streamData = livestreamSnap.data()
+            serverSideStream = {
+                id: livestreamSnap.id,
+                company: streamData.company,
+                title: streamData.title,
+                companyLogoUrl: streamData.companyLogoUrl
+            }
+        }
+    }
     const snap = await store.firestore.get({collection: "careerCenterData", doc: groupId, storeAs: `group ${groupId}`})
     if (snap.exists) {
         serverSideGroup = snap.data()
+        serverSideGroup.id = snap.id;
     }
     return {
-        props: {serverSideGroup, livestreamId: livestreamId || ""}, // will be passed to the page component as props
+        props: {serverSideGroup, livestreamId: livestreamId || "", serverSideStream}, // will be passed to the page component as props
     }
 }
 

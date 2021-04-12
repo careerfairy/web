@@ -3,13 +3,16 @@ import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
 import useUpcomingStreams from "../../components/custom-hook/useUpcomingStreams";
 import usePastStreams from "../../components/custom-hook/usePastStreams";
 import NextLivestreamsBannerSection from "../../components/views/NextLivestreams/NextLivestreamsBannerSection";
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {useTheme} from "@material-ui/core/styles";
 import {StreamsSection} from "../../components/views/NextLivestreams/StreamsSection";
+import HeadWithMeta from "../../components/page/HeadWithMeta";
+import {store} from "../_app";
+import {NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL} from "../../constants/routes";
 
 const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
 
-const nextLivestreamsPage = ({livestreamId}) => {
+const nextLivestreamsPage = ({livestreamId, serverSideStream}) => {
     const {palette: {common: {white}, navyBlue}} = useTheme()
     const upcomingLivestreams = useUpcomingStreams(livestreamId)
     const pastLivestreams = usePastStreams(livestreamId)
@@ -27,38 +30,66 @@ const nextLivestreamsPage = ({livestreamId}) => {
         return Boolean(streams?.some(stream => stream.id === livestreamId))
     }
 
+    const metaInfo = useMemo(() => serverSideStream ? ({
+        title: `CareerFairy | Live Stream with ${serverSideStream.company}`,
+        description: serverSideStream.title,
+        image: serverSideStream.companyLogoUrl,
+        fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}?livestreamId=${serverSideStream.id}`
+    }) : ({
+        description: "Catch the upcoming streams on CareerFairy.",
+        title: `CareerFairy | Upcoming Livestreams`,
+        image: "https://careerfairy.io/logo_teal.png",
+        fullPath: `${PRODUCTION_BASE_URL}}${NEXT_LIVESTREAMS_PATH}`,
+    }), [serverSideStream])
 
     const handleChange = useCallback((event, newValue) => {
         setValue(newValue);
     }, []);
 
     return (
-        <NextLivestreamsLayout>
-            <NextLivestreamsBannerSection
-                color={white}
-                backgroundImageClassName=""
-                backgroundColor={navyBlue.main}
-                backgroundImage={placeholderBanner}
-                backgroundImageOpacity={0.2}
-                title={value === 0 ?"Upcoming Events on CareerFairy": "Past Events on CareerFairy"}
-                subtitle=""
-                handleChange={handleChange}
-                value={value}
+        <React.Fragment>
+            <HeadWithMeta
+                {...metaInfo}
             />
-            <StreamsSection value={value}
-                            upcomingLivestreams={upcomingLivestreams}
-                            livestreamId={livestreamId}
-                            pastLivestreams={pastLivestreams}
-            />
-        </NextLivestreamsLayout>
+            <NextLivestreamsLayout>
+                <NextLivestreamsBannerSection
+                    color={white}
+                    backgroundImageClassName=""
+                    backgroundColor={navyBlue.main}
+                    backgroundImage={placeholderBanner}
+                    backgroundImageOpacity={0.2}
+                    title={value === 0 ? "Upcoming Events on CareerFairy" : "Past Events on CareerFairy"}
+                    subtitle=""
+                    handleChange={handleChange}
+                    value={value}
+                />
+                <StreamsSection value={value}
+                                upcomingLivestreams={upcomingLivestreams}
+                                livestreamId={livestreamId}
+                                pastLivestreams={pastLivestreams}
+                />
+            </NextLivestreamsLayout>
+        </React.Fragment>
     )
 };
 
 export async function getServerSideProps({query: {livestreamId}}) {
-
+    let serverSideStream = null
+    if (livestreamId) {
+        const livestreamSnap = await store.firestore.get({collection: "livestreams", doc: livestreamId})
+        if (livestreamSnap.exists) {
+            const streamData = livestreamSnap.data()
+            serverSideStream = {
+                id: livestreamSnap.id,
+                company: streamData.company,
+                title: streamData.title,
+                companyLogoUrl: streamData.companyLogoUrl
+            }
+        }
+    }
 
     return {
-        props: livestreamId ? {livestreamId} : {}, // will be passed to the page component as props
+        props: {serverSideStream, livestreamId: livestreamId || ""}, // will be passed to the page component as props
     }
 }
 
