@@ -82,7 +82,7 @@ const GroupStreams = ({
         const [slicedLivestreams, loadMoreLivestreams, hasMoreLivestreams, totalLivestreams] = useInfiniteScrollClient(livestreams, 6, 3);
 
         const handleScroll = () => {
-            const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 300
+            const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight * 0.6
             if (bottom && hasMoreLivestreams) {
                 loadMoreLivestreams()
             }
