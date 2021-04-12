@@ -1,6 +1,6 @@
 import React, {memo, useEffect, useState} from 'react';
 import clsx from 'clsx';
-import {makeStyles} from '@material-ui/core/styles';
+import {fade, makeStyles} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
@@ -12,14 +12,32 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
-import {Avatar, Box, Collapse, Grow, Hidden, ListItemAvatar, Tooltip} from "@material-ui/core";
+import {
+    Box,
+    Card,
+    CardActionArea,
+    CardContent,
+    CardHeader,
+    Collapse,
+    Grow,
+    Hidden,
+    ListItemAvatar
+} from "@material-ui/core";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {useAuth} from "../../../HOCs/AuthProvider";
-import Link from '../../../materialUI/NextNavLink'
 import {isEmpty, isLoaded} from "react-redux-firebase";
 import GroupsUtil from "../../../data/util/GroupsUtil";
 import {useRouter} from "next/router";
 import {repositionElementInArray} from "../../../components/helperFunctions/HelperFunctions";
+import NavItem from "../../../components/views/navbar/NavItem";
+import {LogOut as LogoutIcon} from "react-feather";
+import {useDispatch} from "react-redux";
+import * as actions from "../../../store/actions";
+import GroupNavLink from "./groupNavLink";
+import CardMedia from "@material-ui/core/CardMedia";
+import {searchImage} from "../../../constants/images";
+import Typography from "@material-ui/core/Typography";
+import Link from 'next/link'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -36,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
         borderRight: "none",
         backgroundSize: "cover",
         backgroundPosition: "center center",
-        // background: `linear-gradient(0deg, ${fade(theme.palette.common.black, 0.7)}, ${fade(theme.palette.common.black, 0.7)}), url(/sidebar.jpg)`,
+        // background: `linear-gradient(0deg, ${fade(theme.palette.common.black, 0.3)}, ${fade(theme.palette.common.black, 0.3)}), url(/next-livestreams-side.jpg)`,
     },
     name: {
         marginTop: theme.spacing(1)
@@ -44,27 +62,8 @@ const useStyles = makeStyles((theme) => ({
     drawerText: {
         color: theme.palette.common.white
     },
-    logoButton: {
-        padding: theme.spacing(1),
-        color: "inherit",
-        "&:hover": {
-            textDecoration: "none"
-        }
-    },
-    groupAvaWrapper: {
-        "& img": {
-            objectFit: "contain"
-        }
-    },
-    active: {
-        position: "sticky",
-        top: theme.spacing(2),
-        background: `${theme.palette.background.paper} !important`,
-        zIndex: 1,
-        boxShadow: theme.shadows[3],
-        borderRadius: theme.spacing(1),
-        cursor: "default"
-    },
+
+
     drawer: {
         flexShrink: 0,
         whiteSpace: 'nowrap',
@@ -79,10 +78,24 @@ const useStyles = makeStyles((theme) => ({
         },
 
     },
-
+    media: {
+        // height: 0,
+        // paddingTop: '56.25%', // 16:9
+        // height: 150
+        display: "grid",
+        placeItems: "center",
+        "& img": {
+            maxWidth: "60%"
+        },
+    },
+    subheader: {
+        whiteSpace: "pre-wrap"
+    }
 }));
 
-const ListItemWrapper = ({active, children}) => active ? <Grow  in>{children}</Grow> : <>{children}</>
+const ListItemWrapper = ({active, children}) => active ? <Grow in>{children}</Grow> : <>{children}</>
+
+
 const FeedDrawer = memo(({
                              onMobileNavOpen,
                              onMobileClose,
@@ -96,11 +109,13 @@ const FeedDrawer = memo(({
     const classes = useStyles({drawerWidth});
     const {query: {groupId: groupIdInQuery}} = useRouter()
     const {userData} = useAuth()
-    const [groups, setGroups] = useState([]);
+    const [groups, setGroups] = useState(null);
+    const dispatch = useDispatch()
+    const signOut = () => dispatch(actions.signOut())
 
     useEffect(() => {
-        if (userData?.followingGroups) {
-            let newGroups = GroupsUtil.getUniqueGroupsFromArrayOfGroups(userData.followingGroups)
+        if (userData) {
+            let newGroups = userData.followingGroups ? GroupsUtil.getUniqueGroupsFromArrayOfGroups(userData.followingGroups) : []
             if (groupIdInQuery) {
                 const activeGroupIndex = newGroups.findIndex(
                     (el) => el.groupId === groupIdInQuery
@@ -121,58 +136,88 @@ const FeedDrawer = memo(({
             display="flex"
             flexDirection="column"
         >
+            <Collapse in={openMobile}>
+                <Box p={2}>
+                    <List>
+                        {drawerTopLinks.map(({title, href, icon}) => (
+                            <NavItem
+                                href={href}
+                                key={title}
+                                title={title}
+                                icon={icon}
+                                black
+                            />
+                        ))}
+                        <Divider/>
+                    </List>
+                </Box>
+            </Collapse>
+
             <Box p={2}>
-                <List>
-                    {groups.map(({universityName, groupId, logoUrl}) => {
-                        return (
+                {groups?.length ? (
+                    <List>
+                        {groups?.map(({universityName, groupId, logoUrl}) =>
                             <ListItemWrapper key={groupId} active={groupIdInQuery === groupId}>
-                                <ListItem
-                                    component={Link}
-                                    href={`/next-livestreams/${groupId}`}
-                                    button
-                                    onClick={onMobileClose}
+                                <GroupNavLink
                                     key={groupId}
-                                    className={clsx(classes.logoButton, {
-                                        [classes.active]: groupIdInQuery === groupId
-                                    })}
-                                >
-                                    <ListItemAvatar>
-                                        <Avatar className={classes.groupAvaWrapper} alt={universityName}
-                                                variant="rounded"
-                                                src={logoUrl}/>
-                                    </ListItemAvatar>
-                                    <Tooltip title={universityName}>
-                                        <ListItemText
-                                            primary={universityName}
-                                            primaryTypographyProps={{className: classes.listItemText, noWrap: true}}
-                                        >
-                                        </ListItemText>
-                                    </Tooltip>
-                                </ListItem>
-                            </ListItemWrapper>
-                        )
-                    })}
-                </List>
+                                    groupId={groupId}
+                                    onClick={onMobileClose}
+                                    groupIdInQuery={groupIdInQuery}
+                                    alt={universityName}
+                                    src={logoUrl}
+                                />
+                            </ListItemWrapper>)}
+                    </List>
+                ) : (
+                    <Card elevation={0}>
+                        <Link href="/groups">
+                            <CardActionArea component="a">
+                                <CardHeader
+                                    centered
+                                    align="center"
+                                    titleTypographyProps={{
+                                        gutterBottom: true
+                                    }}
+                                    title="New to here?"
+                                    subheaderTypographyProps={{
+                                        className: classes.subheader
+                                    }}
+                                    subheader="Click here to discover some groups sdfs dsf sdf"
+                                />
+                                <CardContent>
+                                    <CardMedia
+                                        className={classes.media}
+                                    >
+                                        <img alt="Find Groups" src={searchImage}/>
+                                    </CardMedia>
+                                </CardContent>
+                            </CardActionArea>
+                        </Link>
+                    </Card>
+                )}
             </Box>
 
             <Box flexGrow={1}/>
             <Box p={2}>
                 <List>
-                    {/*<Hidden lgUp>*/}
-                    {/*    {headerLinks.map((item) => (*/}
-                    {/*        <NavItem*/}
-                    {/*            href={item.href}*/}
-                    {/*            key={item.title}*/}
-                    {/*            title={item.title}*/}
-                    {/*        />*/}
-                    {/*    ))}*/}
-                    {/*</Hidden>*/}
-                    {drawerBottomLinks.map(({title}, index) => (
-                        <ListItem button key={title}>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon/> : <MailIcon/>}</ListItemIcon>
-                            <ListItemText primary={title}/>
-                        </ListItem>
+                    <Divider/>
+                    {drawerBottomLinks.map((item) => (
+                        <NavItem
+                            href={item.href}
+                            key={item.title}
+                            title={item.title}
+                            icon={item.icon}
+                            black
+                        />
                     ))}
+                    {userData &&
+                    <NavItem
+                        href="#"
+                        onClick={signOut}
+                        icon={LogoutIcon}
+                        title="LOGOUT"
+                        black
+                    />}
                 </List>
             </Box>
         </Box>
@@ -229,28 +274,26 @@ const FeedDrawer = memo(({
                 </IconButton>
             </div>
             <Divider/>
-            <List>
-                {/*<Collapse in={!showHeaderLinks}>*/}
-                {/*    <Collapse in={openMobile}>*/}
-                {/*        <ListItem>*/}
-                {/*            <ListItemText primary={"Nav"}/>*/}
-                {/*        </ListItem>*/}
-                {/*    </Collapse>*/}
-                {/*    {drawerTopLinks.map(({title, href, icon}) => (*/}
-                {/*        <Link className={classes.navLink} key={title} href={href}>*/}
-                {/*            <ListItem button>*/}
-                {/*                <ListItemIcon>*/}
-                {/*                    {icon}*/}
-                {/*                </ListItemIcon>*/}
-                {/*                <ListItemText primary={title}/>*/}
-                {/*            </ListItem>*/}
-                {/*        </Link>*/}
-                {/*    ))}*/}
-                {/*    <Divider/>*/}
-                {/*</Collapse>*/}
-                {!isLoaded(userData?.followingGroups) ? <ListSpinner/> : isEmpty(userData?.followingGroups) ?
-                    <div/> : renderGroups}
-            </List>
+            {/*<List>*/}
+            {/*    <Collapse in={!showHeaderLinks}>*/}
+            {/*        <Collapse in={openMobile}>*/}
+            {/*            <ListItem>*/}
+            {/*                <ListItemText primary={"Nav"}/>*/}
+            {/*            </ListItem>*/}
+            {/*        </Collapse>*/}
+            {/*        {drawerTopLinks.map(({title, href, icon}) => (*/}
+            {/*            <Link className={classes.navLink} key={title} href={href}>*/}
+            {/*                <ListItem button>*/}
+            {/*                    <ListItemIcon>*/}
+            {/*                        {icon}*/}
+            {/*                    </ListItemIcon>*/}
+            {/*                    <ListItemText primary={title}/>*/}
+            {/*                </ListItem>*/}
+            {/*            </Link>*/}
+            {/*        ))}*/}
+            {/*        <Divider/>*/}
+            {/*    </Collapse>*/}
+            {/*</List>*/}
             <Divider/>
             <List>
                 <Collapse in={openMobile}>

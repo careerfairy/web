@@ -11,19 +11,19 @@ const initialMainLinks = [
         href: `/next-livestreams`,
         title: 'NEXT LIVE STREAMS',
         basePath: '/next-livestreams',
-        icon:<NextLivestreamsIcon/>
+        icon: NextLivestreamsIcon
     },
     {
         href: `/discover`,
         title: 'PAST LIVE STREAMS',
         basePath: '/discover',
-        icon: <PastLivestreamsIcon/>
+        icon: PastLivestreamsIcon
     },
     {
         href: `/wishlist`,
         title: 'WISHLIST',
         basePath: '/wishlist',
-        icon: <WishlistIcon/>
+        icon: WishlistIcon
     }
 ]
 const initialSecondaryLinks = [
@@ -52,7 +52,7 @@ const useGeneralLinks = () => {
                 href: `/groups`,
                 title: 'FOLLOW GROUPS',
                 basePath: '/groups',
-                icon:  <FollowGroupIcon/>
+                icon: FollowGroupIcon
             }])
 
             setSecondaryLinks([...initialSecondaryLinks, {
