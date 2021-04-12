@@ -17,7 +17,7 @@ dayjs.extend(relativeTime)
 
 export const uploadLogo = (location, fileObject, firebase, callback) => {
     var storageRef = firebase.getStorageRef();
-    let fullPath = `${location}/${uuidv4()}_${fileObject.name}`;
+    let fullPath = `${location}/${uuidv4()}_${fileObject.name.split(' ').join('_')}`;
     let companyLogoRef = storageRef.child(fullPath);
     var uploadTask = companyLogoRef.put(fileObject);
 
