@@ -254,9 +254,12 @@ const GroupStreamCardV2 = memo(({
                                 }) => {
     const mediaStyles = useCoverCardMediaStyles();
     const classes = useStyles()
-    const router = useRouter();
-    const absolutePath = router.asPath
-    const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
+    const {pathname, absolutePath} = useRouter();
+    const linkToStream = useMemo(() => pathname === "/next-livestreams/[groupId]" ?
+        `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}` :
+        `/next-livestreams?livestreamId=${livestream.id}`,
+        [pathname, livestream?.id, groupData?.groupId]
+    )
 
     function userIsRegistered() {
         if (user.isLoaded && user.isEmpty || !livestream.registeredUsers || isAdmin) {
