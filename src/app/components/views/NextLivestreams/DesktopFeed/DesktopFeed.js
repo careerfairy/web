@@ -30,15 +30,14 @@ const DesktopFeed = ({
                     spacing={4}
                     style={{margin: theme.spacing(1)}}
                 >
-                    {hasCategories ?
-                        <GroupCategories livestreams={livestreams}
-                                         mobile={mobile}
-                                         user={user}
-                                         hasCategories={hasCategories}
-                                         handleToggleActive={handleToggleActive}
-                                         userData={userData}
-                                         alreadyJoined={alreadyJoined}
-                                         groupData={groupData}/> : null}
+                    <GroupCategories livestreams={livestreams}
+                                     mobile={mobile}
+                                     user={user}
+                                     hasCategories={hasCategories}
+                                     handleToggleActive={handleToggleActive}
+                                     userData={userData}
+                                     alreadyJoined={alreadyJoined}
+                                     groupData={groupData}/>
                     <GroupStreams
                         user={user}
                         mobile={false}
