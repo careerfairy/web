@@ -37,19 +37,14 @@ const DesktopFeed = ({
                         groupData={groupData}
                     />
                     <GroupStreams
-                        user={user}
                         mobile={false}
                         isPastLivestreams={isPastLivestreams}
-                        width={width}
-                        hasCategories={hasCategories}
                         livestreamId={livestreamId}
                         listenToUpcoming={listenToUpcoming}
                         careerCenterId={careerCenterId}
                         selectedOptions={selectedOptions}
                         searching={searching}
-                        alreadyJoined={alreadyJoined}
                         livestreams={livestreams}
-                        userData={userData}
                         groupData={groupData}
                     />
                 </Grid>

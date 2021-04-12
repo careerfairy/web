@@ -7,6 +7,7 @@ import LazyLoad from 'react-lazyload'
 import Spinner from "./groupStreamCard/Spinner";
 import useInfiniteScrollClient from "../../../custom-hook/useInfiniteScrollClient";
 import clsx from "clsx";
+import {useAuth} from "../../../../HOCs/AuthProvider";
 
 const gridItemHeight = 530
 const useStyles = makeStyles((theme) => ({
@@ -60,25 +61,21 @@ const Wrapper = ({children, index, streamId}) => {
             {children}
         </LazyLoad>
     )
-
 }
+
 const GroupStreams = ({
                           groupData,
-                          userData,
-                          user,
                           livestreams,
                           mobile,
                           searching,
                           livestreamId,
                           careerCenterId,
-                          alreadyJoined,
                           listenToUpcoming,
                           selectedOptions,
-                          hasCategories,
                           isPastLivestreams,
-                          width
                       }) => {
         const classes = useStyles()
+        const {userData, authenticatedUser: user} = useAuth()
         const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
         const searchedButNoResults = selectedOptions?.length && !searching && !livestreams?.length
         const [slicedLivestreams, loadMoreLivestreams, hasMoreLivestreams, totalLivestreams] = useInfiniteScrollClient(livestreams, 6, 3);
@@ -115,7 +112,7 @@ const GroupStreams = ({
                             [classes.dynamicHeight]: mobile
                         })}
                         key={livestream.id} xs={12} sm={12} md={6}
-                        lg={4} xl={ 4} item>
+                        lg={4} xl={4} item>
                         <Wrapper
                             index={index}
                             streamId={livestream.id}
@@ -154,7 +151,8 @@ const GroupStreams = ({
                             <Grid sm={12} xs={12} md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
                                 <Typography className={classes.emptyMessage} align="center" variant="h5"
                                             style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :
-                                    <strong>{groupData.universityName} currently has no {isPastLivestreams ? "past" : "scheduled"} live streams</strong>}</Typography>
+                                    <strong>{groupData.universityName} currently has
+                                        no {isPastLivestreams ? "past" : "scheduled"} live streams</strong>}</Typography>
                             </Grid>)
                         : null}
                 </Grid>

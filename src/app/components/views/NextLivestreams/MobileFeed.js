@@ -178,19 +178,17 @@ const MobileFeed = ({
                 onChangeIndex={handleChangeIndex}>
                 <TabPanel dir={theme.direction}>
                     <Grid className={classes.streamsGrid} container spacing={2}>
-                        <GroupStreams user={user}
-                                      mobile={true}
-                                      hasCategories={hasCategories}
-                                      livestreamId={livestreamId}
-                                      listenToUpcoming={listenToUpcoming}
-                                      careerCenterId={careerCenterId}
-                                      isPastLivestreams={isPastLivestreams}
-                                      selectedOptions={selectedOptions}
-                                      searching={searching}
-                                      alreadyJoined={alreadyJoined}
-                                      livestreams={livestreams}
-                                      userData={userData}
-                                      groupData={groupData}/>
+                        <GroupStreams
+                            mobile={true}
+                            livestreamId={livestreamId}
+                            listenToUpcoming={listenToUpcoming}
+                            careerCenterId={careerCenterId}
+                            isPastLivestreams={isPastLivestreams}
+                            selectedOptions={selectedOptions}
+                            searching={searching}
+                            livestreams={livestreams}
+                            groupData={groupData}
+                        />
                     </Grid>
                 </TabPanel>
                 <TabPanel dir={theme.direction}>

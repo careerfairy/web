@@ -22,7 +22,7 @@ const GroupCategories = ({groupData, handleToggleActive, hasCategories}) => {
     const handleToggleFilter = () => setFilterOpen(!filterOpen)
 
     return hasCategories ? (
-        <Grid item xs={12} className={classes.root}>
+        <Grid item xs={12}>
             <Button
                 size="large"
                 color={filterOpen ? "primary" : "default"}
