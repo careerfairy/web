@@ -50,7 +50,7 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
     const metaInfo = useMemo(() => serverSideStream ? ({
         title: `CareerFairy | Live Stream with ${serverSideStream.company}`,
         description: serverSideStream.title,
-        image: serverSideStream.companyLogoUrl,
+        image: serverSideStream.backgroundImageUrl,
         fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}?livestreamId=${serverSideStream.id}`
     }) : ({
         description: currentGroup.description,

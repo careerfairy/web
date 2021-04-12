@@ -55,6 +55,7 @@ const NavItem = ({
                      icon: Icon,
                      title,
                      svgIcon,
+                     onClick,
                      ...rest
                  }) => {
     const classes = useStyles({black});
@@ -67,8 +68,9 @@ const NavItem = ({
             {...rest}
         >
             <Button
-                href={href}
-                component={Link}
+                href={onClick ? undefined : href}
+                onClick={onClick}
+                component={onClick ? "button" : Link}
                 className={clsx(classes.button, {
                     ["active"]: basePath === pathname
                 })}

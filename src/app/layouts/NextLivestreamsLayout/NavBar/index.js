@@ -6,12 +6,12 @@ import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import {
-    Box, Button,
+    Box,
+    Button,
     Card,
     CardActionArea,
     CardContent,
     CardHeader,
-    Collapse,
     Grow,
     Hidden,
     ListItemAvatar
@@ -88,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
 const ListItemWrapper = ({active, children}) => active ? <Grow in>{children}</Grow> : <>{children}</>
 
 
-function LoginButton(props) {
+function LoginButton() {
     const classes = useStyles()
     return <ListItem>
         <Button
@@ -184,7 +184,6 @@ const FeedDrawer = memo(({
                     <Card elevation={0}>
                             <CardActionArea style={{textDecoration: "none"}} href="/groups" component={Link}>
                                 <CardHeader
-                                    centered
                                     align="center"
                                     titleTypographyProps={{
                                         gutterBottom: true
@@ -263,15 +262,5 @@ const FeedDrawer = memo(({
 
 })
 
-const ListSpinner = () => {
-
-    return (
-        <ListItem>
-            <ListItemAvatar>
-                <CircularProgress size={20}/>
-            </ListItemAvatar>
-        </ListItem>
-    )
-}
 
 export default FeedDrawer
