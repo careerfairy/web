@@ -18,7 +18,7 @@ import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
 import Wave from "./Wave";
 import LogoElement from "../LogoElement";
-import TargetOptions from "../../GroupsCarousel/TargetOptions";
+import TargetOptions from "../../../common/TargetOptions";
 import UserUtil from "../../../../../data/util/UserUtil";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import {useRouter} from "next/router";

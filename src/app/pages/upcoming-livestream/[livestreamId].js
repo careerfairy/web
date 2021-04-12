@@ -17,7 +17,7 @@ import ClearIcon from '@material-ui/icons/Clear';
 import Head from "next/head";
 import UserUtil from "../../data/util/UserUtil";
 import MulitLineText from "../../components/views/common/MultiLineText";
-import TargetOptions from "../../components/views/NextLivestreams/GroupsCarousel/TargetOptions";
+import TargetOptions from "../../components/views/common/TargetOptions";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import DataAccessUtil from "util/DataAccessUtil";
 import HowToRegRoundedIcon from '@material-ui/icons/HowToRegRounded';
@@ -28,6 +28,7 @@ import {useAuth} from "../../HOCs/AuthProvider";
 import GroupsUtil from "../../data/util/GroupsUtil";
 import {store} from '../_app'
 import {Paper, Avatar, Box} from '@material-ui/core';
+import {companyLogoPlaceholder} from "../../constants/images";
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
@@ -761,7 +762,7 @@ function UpcomingLivestream(props) {
                                         src={
                                             currentLivestream.companyLogoUrl
                                                 ? currentLivestream.companyLogoUrl
-                                                : "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media"
+                                                : companyLogoPlaceholder
                                         }
                                         style={{
                                             margin: "0 auto",
