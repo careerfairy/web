@@ -40,7 +40,7 @@ const nextLivestreamsPage = ({livestreamId}) => {
                 backgroundColor={navyBlue.main}
                 backgroundImage={placeholderBanner}
                 backgroundImageOpacity={0.2}
-                title={"Upcoming Streams on CareerFairy"}
+                title={value === 0 ?"Upcoming Events on CareerFairy": "Past Events on CareerFairy"}
                 subtitle=""
                 handleChange={handleChange}
                 value={value}
