@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
         width: props => props.drawerWidth || 256,
         top: 64,
         height: 'calc(100% - 64px)',
-        boxShadow: theme.shadows[15]
+        // boxShadow: theme.shadows[15]
     },
     background: {
         borderRight: "none",

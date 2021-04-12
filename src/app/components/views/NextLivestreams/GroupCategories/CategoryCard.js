@@ -12,7 +12,6 @@ const useStyles = makeStyles(theme => ({
         "& .MuiTextField-root": {
             minWidth: 300,
             borderRadius: theme.spacing(2)
-
         }
     },
     root: {}

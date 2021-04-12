@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useTheme} from "@material-ui/core/styles";
 import {store} from "../_app";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
@@ -26,9 +26,21 @@ const GroupPage = ({serverSideGroup, livestreamId}) => {
         doc: currentGroup.groupId,
         storeAs: "currentGroup"
     }])
-
     const upcomingLivestreams = useListenToGroupStreams(livestreamId, currentGroup.groupId, selectedOptions)
     const pastLivestreams = useListenToGroupStreams(livestreamId, currentGroup.groupId, selectedOptions, PAST_LIVESTREAMS_NAME)
+
+    useEffect(() => {
+        if (livestreamIdIsIn(upcomingLivestreams)) {
+            setValue(0)
+        } else if (livestreamIdIsIn(pastLivestreams)) {
+            setValue(1)
+        }
+    }, [livestreamId, Boolean(upcomingLivestreams), Boolean(pastLivestreams)]);
+
+    const livestreamIdIsIn = (streams) => {
+        return Boolean(streams?.some(stream => stream.id === livestreamId))
+    }
+
 
     const handleChange = useCallback((event, newValue) => {
         setValue(newValue);

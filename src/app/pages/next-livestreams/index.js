@@ -3,7 +3,7 @@ import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
 import useUpcomingStreams from "../../components/custom-hook/useUpcomingStreams";
 import usePastStreams from "../../components/custom-hook/usePastStreams";
 import NextLivestreamsBannerSection from "../../components/views/NextLivestreams/NextLivestreamsBannerSection";
-import React, {useCallback, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {useTheme} from "@material-ui/core/styles";
 import {StreamsSection} from "../../components/views/NextLivestreams/StreamsSection";
 
@@ -14,6 +14,19 @@ const nextLivestreamsPage = ({livestreamId}) => {
     const upcomingLivestreams = useUpcomingStreams(livestreamId)
     const pastLivestreams = usePastStreams(livestreamId)
     const [value, setValue] = useState(0);
+
+    useEffect(() => {
+        if (livestreamIdIsIn(upcomingLivestreams)) {
+            setValue(0)
+        } else if (livestreamIdIsIn(pastLivestreams)) {
+            setValue(1)
+        }
+    }, [livestreamId, Boolean(upcomingLivestreams), Boolean(pastLivestreams)]);
+
+    const livestreamIdIsIn = (streams) => {
+        return Boolean(streams?.some(stream => stream.id === livestreamId))
+    }
+
 
     const handleChange = useCallback((event, newValue) => {
         setValue(newValue);

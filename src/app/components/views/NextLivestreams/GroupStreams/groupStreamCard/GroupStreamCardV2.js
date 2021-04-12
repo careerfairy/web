@@ -558,8 +558,8 @@ const GroupStreamCardV2 = memo(({
                     <Row
                         className={classes.author}
                         m={0}
-                        p={mobile ? 1 : 3}
-                        py={2}
+                        p={1}
+                        py={1}
                         gap={mobile ? 1 : 2}
                         bgcolor={'common.white'}
                     >
