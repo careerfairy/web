@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Chip, Typography, Tooltip, TextField, IconButton} from "@material-ui/core";
+import {Chip, TextField} from "@material-ui/core";
 import {Autocomplete} from "@material-ui/lab";
-import CancelSharpIcon from "@material-ui/icons/CancelSharp";
 import {convertArrayOfObjectsToDictionaryByProp} from "../../../../data/util/AnalyticsUtil";
 import {makeStyles} from "@material-ui/core/styles";
 
@@ -19,11 +18,14 @@ const useStyles = makeStyles(theme => ({
     root: {}
 }));
 const CategoryCard = ({category, handleToggleActive}) => {
+
     const classes = useStyles()
     const [optionsMap, setOptionsMap] = useState({});
     const [arrayOfOptionIds, setArrayOfOptionIds] = useState([]);
+    const [value, setValue] = useState([]);
 
     useEffect(() => {
+        handleSetActiveOptions()
         if (category?.options?.length) {
             const newOptionsMap = convertArrayOfObjectsToDictionaryByProp(category.options, "id")
             setArrayOfOptionIds(category.options.map(({id}) => id))
@@ -31,10 +33,16 @@ const CategoryCard = ({category, handleToggleActive}) => {
         }
     }, [category?.options])
 
+    const handleSetActiveOptions = () => {
+        const activeOptions = category?.options?.filter(option => option.active).map(option => option.id) || []
+        setValue(activeOptions)
+    }
+
     return (
         <Autocomplete
             multiple
             options={arrayOfOptionIds}
+            value={value}
             onChange={(e, value) => handleToggleActive(value, category.id)}
             getOptionLabel={(option) => optionsMap[option]?.name}
             className={classes.root}
@@ -58,15 +66,6 @@ const CategoryCard = ({category, handleToggleActive}) => {
             }
         />
     )
-
-    return (
-        <>
-            <Typography align="center" variant="h6">{category.name}</Typography>
-            <Box display="flex" justifyContent="center" flexWrap="wrap">
-                {renderOptions}
-            </Box>
-        </>
-    );
 };
 
 export default CategoryCard;
