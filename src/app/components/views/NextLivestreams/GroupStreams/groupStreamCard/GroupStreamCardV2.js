@@ -31,7 +31,7 @@ import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 
 const useStyles = makeStyles(theme => ({
     cardHovered: {
-        height: "max-content",
+        // height: "fit-content",
         transform: 'translateY(-2px)',
         '& $shadow': {
             bottom: '-1.5rem',
@@ -141,7 +141,10 @@ const useStyles = makeStyles(theme => ({
         borderBottomLeftRadius: '1.5rem',
         borderBottomRightRadius: '1.5rem',
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
+    },
+    authorHovered: {
+        boxShadow: theme.shadows[3]
     },
     shadow: {
         transition: '0.2s',
@@ -341,7 +344,7 @@ const GroupStreamCardV2 = memo(({
         if (isTargetDraft) return true
         if ((careerCenterId) && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
             return true
-        } else return livestreamId && !careerCenterId && !groupData.id && livestreamId === id;
+        } else return livestreamId && !careerCenterId && livestreamId === id;
     }
 
     const checkIfUserFollows = (careerCenter) => {
@@ -559,7 +562,9 @@ const GroupStreamCardV2 = memo(({
                         </div>
                     </Box>
                     <Row
-                        className={classes.author}
+                        className={clsx(classes.author,{
+                            [classes.authorHovered]: cardHovered
+                        })}
                         m={0}
                         p={1}
                         py={1}

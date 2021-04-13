@@ -103,7 +103,6 @@ const GroupStreams = ({
             }
         }, [groupData])
 
-
         const renderStreamCards = slicedLivestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
