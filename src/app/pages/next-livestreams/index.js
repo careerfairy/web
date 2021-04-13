@@ -74,7 +74,17 @@ const nextLivestreamsPage = ({livestreamId, serverSideStream}) => {
     )
 };
 
-export async function getServerSideProps({query: {livestreamId}}) {
+export async function getServerSideProps({query: {livestreamId, careerCenterId}}) {
+    if (careerCenterId) {
+        let destination = livestreamId ? `/next-livestreams/${careerCenterId}?livestreamId=${livestreamId}` : `/next-livestreams/${careerCenterId}`
+        return {
+            props: {},
+            redirect: {
+                destination: destination,
+                permanent: false,
+            },
+        }
+    }
     const serverSideStream = await getServerSideStream(livestreamId)
     return {
         props: {serverSideStream, livestreamId: livestreamId || ""}, // will be passed to the page component as props
