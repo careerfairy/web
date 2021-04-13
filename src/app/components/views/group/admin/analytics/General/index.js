@@ -224,7 +224,7 @@ const General = ({
                         </Tooltip>
                         {(mediumScreen && !group.universityCode) &&
                         <Tooltip arrow
-                                 title={`11111This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}>
+                                 title={`This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}>
                             <Grid item xs={12} md={12} sm={12}>
                                 <TotalUniqueParticipatingStudents
                                     fetchingStreams={loading}
@@ -262,7 +262,7 @@ const General = ({
                     <Grid container spacing={3}>
                         {(!mediumScreen && !group.universityCode) &&
                         <Tooltip arrow
-                                 title={`22222This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}>
+                                 title={`This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}>
                             <Grid xs={12} item>
                                 <TotalUniqueParticipatingStudents
                                     fetchingStreams={loading}
