@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => {
                 },
                 '& $imageTitle': {
 
-                    marginTop: "10%"
+                    marginTop: "-5%"
                 },
             },
         },
@@ -90,15 +90,19 @@ const useStyles = makeStyles((theme) => {
             opacity: 0.6,
         },
         imageTitle: {
-            position: 'relative',
-            marginTop: "30%",
+            position: 'absolute',
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
             transition: customTransition,
             padding: theme.spacing(1, 2, 0, 2)
         },
         buttonText: {
             transition: customTransition,
             opacity: 0,
-            padding: theme.spacing(1)
+            padding: theme.spacing(1),
+            paddingBottom: "-5%",
+            marginTop: "auto"
         },
         underline: {
             height: 3,

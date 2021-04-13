@@ -62,7 +62,6 @@ const StreamerLayout = (props) => {
     const {query: {token, livestreamId}, pathname} = useRouter()
     const router = useRouter();
     const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-    console.log("smallScreen", smallScreen)
 
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [newNotification, setNewNotification] = useState(null);
@@ -104,9 +103,6 @@ const StreamerLayout = (props) => {
         ...populate(firestore, "currentLivestream", populates),
         id: livestreamId
     }, shallowEqual)
-
-    // const firestore = useSelector(({firestore}) => firestore)
-    // console.log("-> firestore", firestore);
 
     const classes = useStyles({
         showMenu,
@@ -159,6 +155,12 @@ const StreamerLayout = (props) => {
             setNotifications([...notifications, newNotification]);
         }
     }, [newNotification]);
+
+    useEffect(() => {
+        if(smallScreen && showMenu){
+            setShowMenu(false)
+        }
+    },[smallScreen])
 
     useEffect(() => {
         if (notificationToRemove) {

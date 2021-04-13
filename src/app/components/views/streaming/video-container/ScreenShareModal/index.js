@@ -90,8 +90,7 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare, smallScreen}) =
     return (
         <GlassDialog fullScreen={smallScreen} fullWidth maxWidth="sm" onClose={closeScreenShareModal} open={open}>
             {showShareAudioHint ?
-                <Grow in>
-                    <div>
+                <React.Fragment>
                         <DialogTitle>
                             <Typography align="center" variant="h4">
                                 When Sharing a video
@@ -140,11 +139,9 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare, smallScreen}) =
                                 Proceed
                             </Button>
                         </DialogActions>
-                    </div>
-                </Grow>
+                </React.Fragment>
                 :
-                <Grow in>
-                    <div>
+                <React.Fragment>
                         <DialogTitle>
                             <Typography align="center" variant="h4">
                                 Would you like to share
@@ -181,8 +178,7 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare, smallScreen}) =
                                 Close
                             </Button>
                         </DialogActions>
-                    </div>
-                </Grow>
+                </React.Fragment>
             }
         </GlassDialog>
     );
