@@ -5,7 +5,7 @@ import {isEmpty} from 'lodash/fp'
 import {
     Button,
     CircularProgress,
-    Collapse,
+    Collapse, Container,
     FormControl,
     FormControlLabel,
     FormGroup,
@@ -22,17 +22,19 @@ import {URL_REGEX} from 'components/util/constants';
 
 const useStyles = makeStyles((theme) => ({
     background: {
-        width: "100%",
+        // width: "100%",
         height: "100vh",
         backgroundColor: theme.palette.primary.main,
-        color: "white"
+        color: "white",
+        display: "grid",
+        placeItems: "center",
     },
     centered: {
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%,-50%)",
-        minWidth: 400
+        // position: "absolute",
+        // top: "50%",
+        // left: "50%",
+        // transform: "translate(-50%,-50%)",
+        // minWidth: 400
     },
     speakerTitle: {
         fontSize: "1rem",
@@ -172,7 +174,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
     }
 
     return (
-        <div className={classes.background}>
+        <Container maxWidth={false} className={classes.background}>
             <form onSubmit={joinStream} className={classes.centered}>
                 <Typography variant="h5" className={classes.title}>Welcome to your stream</Typography>
                 <Typography variant="h4">{livestream.title}</Typography>
@@ -247,7 +249,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                 <Button variant='contained' type="submit" size='large' onClick={joinStream} disabled={loading}
                         startIcon={loading && <CircularProgress size="small"/>}>Join now</Button>
             </form>
-        </div>
+        </Container>
     )
 }
 

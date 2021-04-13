@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
         // top: 55,
         // right: 0,
         // left:0,
-        minWidth: 400,
+        minWidth: 345,
         // height: "calc(100% - 55px)",
         zIndex: 10,
         backgroundColor: "black",
@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
     miniChatContainer: {
         position: "absolute",
         bottom: 0,
-        right: 120,
+        right: 90,
         width: "20%",
         minWidth: 250,
         zIndex: 100
@@ -43,7 +43,21 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const StreamerOverview = ({isStreamer, showAudience,setSliding, selectedState,handleStateChange, setNumberOfViewers, setShowMenu, showMenu, notifications, streamerId, hideAudience, audienceDrawerOpen}) => {
+const StreamerOverview = ({
+                              isStreamer,
+                              showAudience,
+                              setSliding,
+                              selectedState,
+                              handleStateChange,
+                              setNumberOfViewers,
+                              setShowMenu,
+                              showMenu,
+                              notifications,
+                              streamerId,
+                              smallScreen,
+                              hideAudience,
+                              audienceDrawerOpen
+                          }) => {
     const {currentLivestream} = useCurrentStream()
     const classes = useStyles()
 
@@ -54,6 +68,7 @@ const StreamerOverview = ({isStreamer, showAudience,setSliding, selectedState,ha
             >
                 <VideoContainer currentLivestream={currentLivestream}
                                 streamerId={streamerId}
+                                smallScreen={smallScreen}
                                 setNumberOfViewers={setNumberOfViewers}
                                 showMenu={showMenu} viewer={false}
                 />

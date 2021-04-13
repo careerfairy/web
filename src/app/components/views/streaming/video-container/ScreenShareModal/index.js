@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
+const ScreenShareModal = ({open, handleClose, handleScreenShare, smallScreen}) => {
 
     const [showShareAudioHint, setShowShareAudioHint] = useState(false);
     const [hasSeenShareAudioTip, setHasSeenShareAudioTip] = useState(false);
@@ -88,7 +88,7 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
     }
 
     return (
-        <GlassDialog fullWidth maxWidth="sm" onClose={closeScreenShareModal} open={open}>
+        <GlassDialog fullScreen={smallScreen} fullWidth maxWidth="sm" onClose={closeScreenShareModal} open={open}>
             {showShareAudioHint ?
                 <Grow in>
                     <div>
