@@ -31,7 +31,7 @@ import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 
 const useStyles = makeStyles(theme => ({
     cardHovered: {
-        // height: "fit-content",
+        height: "fit-content",
         transform: 'translateY(-2px)',
         '& $shadow': {
             bottom: '-1.5rem',
@@ -124,16 +124,15 @@ const useStyles = makeStyles(theme => ({
     title: {
         fontSize: '2rem',
         fontWeight: 800,
-        color: '#fff',
-        display: "-webkit-box",
+        color: theme.palette.common.white,
         overflow: "hidden",
-        wordBreak: "break-word",
         textOverflow: "ellipsis",
-        WebkitBoxOrient: "vertical",
-        animation: "$close 0.1s linear 0.1s forwards",
+        display: "-webkit-box",
+        WebkitLineClamp: "2",
+        WebkitBoxOrient: "vertical"
     },
-    titleHovered: {
-        animation: "$open 0.1s linear 0s forwards"
+    titleHovered:{
+        WebkitLineClamp: "inherit",
     },
     author: {
         zIndex: 1,
@@ -194,14 +193,6 @@ const useStyles = makeStyles(theme => ({
             maxWidth: "90%",
             maxHeight: "90%"
         }
-    },
-    "@keyframes open": {
-        from: {lineClamp: 2, WebkitLineClamp: "2"},
-        to: {lineClamp: "initial", WebkitLineClamp: "initial"}
-    },
-    "@keyframes close": {
-        from: {lineClamp: "initial", WebkitLineClamp: "initial"},
-        to: {lineClamp: 2, WebkitLineClamp: "2"}
     },
     pulseAnimate: {
         animation: `$pulse 1.2s infinite`
@@ -522,6 +513,7 @@ const GroupStreamCardV2 = memo(({
                                         value={linkToStream}/>
                                 }
                             />
+                            <Collapse collapsedHeight={80} in={cardHovered}>
                             <Typography
                                 variant={'h2'}
                                 className={clsx(classes.title, {
@@ -530,7 +522,8 @@ const GroupStreamCardV2 = memo(({
                             >
                                 {livestream.title}
                             </Typography>
-                            <Box style={{maxHeight: 140, overflow: "auto", overflowX: "hidden"}}>
+                            </Collapse>
+                            <Box style={{maxHeight: 165, overflow: "auto", overflowX: "hidden"}}>
                                 {targetOptions.slice(0, cardHovered ? -1 : maxOptions).map(option =>
                                     <Tag option={option}/>
                                 )}
