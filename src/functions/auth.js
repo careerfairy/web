@@ -15,6 +15,55 @@ const getRandomInt = (max) => {
 }
 
 
+exports.createNewUserAccount = functions.https.onRequest(async (req, res) => {
+
+    setHeaders(req, res)
+
+    const recipient_email = req.body.recipientEmail;
+    const recipient_password = req.body.recipientPassword;
+    const recipient_first_name = req.body.firstName;
+    const recipient_last_name = req.body.lastName;
+    const recipient_university = req.body.universityCode;
+    const recipient_university_country_code = req.body.universityCountryCode;
+    const pinCode = getRandomInt(9999);
+
+    admin.auth().createUserWithEmailAndPassword(recipient_email, recipient_password)
+        .then( user => {
+            admin.firestore().collection("userData").doc(recipient_email).set(
+                {
+                    id: recipient_email,
+                    validationPin: pinCode,
+                    firstName: recipient_first_name,
+                    lastName: recipient_last_name,
+                    userEmail: recipient_email,
+                    universityCode: recipient_university,
+                    universityCountryCode: recipient_university_country_code,
+                }).then(() => {
+                    const email = {
+                        "TemplateId": 17669843,
+                        "From": 'CareerFairy <noreply@careerfairy.io>',
+                        "To": recipient_email,
+                        "TemplateModel": {pinCode: pinCode}
+                    };    
+                    return client.sendEmailWithTemplate(email).then(response => {
+                        console.log(`Successfully sent PIN email to ${recipient_email}`);
+                        res.sendStatus(200);
+                    }, error => {
+                        console.error(`Error sending PIN email to ${recipient_email}`, error);
+                        user.delete()
+                        res.sendStatus(500);
+                    });
+            }).catch((error) => {
+                console.error(`Error creating user ${recipient_email} in firestore`, error);
+                user.delete()
+                res.sendStatus(500);
+            });
+        }).catch((error) => {
+            console.error(`Error creating user ${recipient_email} in auth`, error);
+            res.sendStatus(500);
+        });
+})
+
 
 exports.resendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(async (req, res) => {
 
