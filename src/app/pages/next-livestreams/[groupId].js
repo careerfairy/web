@@ -36,20 +36,25 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
     const pastLivestreams = useListenToGroupStreams(livestreamId, currentGroup.groupId, selectedOptions, PAST_LIVESTREAMS_NAME)
 
     useEffect(() => {
-        if (livestreamIdIsIn(upcomingLivestreams)) {
-            setValue(0)
-        } else if (livestreamIdIsIn(pastLivestreams)) {
-            setValue(1)
-        }
+        (function handleFindHighlightedStreamTab() {
+            if (livestreamIdIsIn(upcomingLivestreams)) {
+                setValue(0)
+            } else if (livestreamIdIsIn(pastLivestreams)) {
+                setValue(1)
+            }
+        })()
     }, [livestreamId, Boolean(upcomingLivestreams), Boolean(pastLivestreams)]);
 
     useEffect(() => {
-        if(!upcomingLivestreams?.length && pastLivestreams?.length){
-            setValue(1)
-        } else {
-            setValue(0)
+        if (!livestreamId) { // Only find tab with streams if there isn't a livestreamId in query
+            (function handleFindTabWithStreams() {
+                if (!upcomingLivestreams?.length && pastLivestreams?.length) {
+                    setValue(1)
+                } else {
+                    setValue(0)
+                }
+            })()
         }
-
     },[Boolean(upcomingLivestreams), Boolean(pastLivestreams), currentGroup.groupId])
 
     const livestreamIdIsIn = (streams) => {
