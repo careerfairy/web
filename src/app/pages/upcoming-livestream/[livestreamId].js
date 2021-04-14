@@ -493,7 +493,7 @@ function UpcomingLivestream(props) {
                     <meta property="og:description"
                           content={currentLivestream.title}/>
                     <meta property="og:image"
-                          content={currentLivestream.companyLogoUrl}/>
+                          content={currentLivestream.backgroundImageUrl}/>
 
                     {/*Twitter*/}
                     <meta property="twitter:card" content="summary_large_image"/>
@@ -504,7 +504,7 @@ function UpcomingLivestream(props) {
                     <meta property="twitter:description"
                           content={currentLivestream.title}/>
                     <meta property="twitter:image"
-                          content={currentLivestream.companyLogoUrl}/>
+                          content={currentLivestream.backgroundImageUrl}/>
                 </Head>
                 <Header color="white"/>
                 <div

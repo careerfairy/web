@@ -43,6 +43,15 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
         }
     }, [livestreamId, Boolean(upcomingLivestreams), Boolean(pastLivestreams)]);
 
+    useEffect(() => {
+        if(!upcomingLivestreams?.length && pastLivestreams?.length){
+            setValue(1)
+        } else {
+            setValue(0)
+        }
+
+    },[Boolean(upcomingLivestreams), Boolean(pastLivestreams), currentGroup.groupId])
+
     const livestreamIdIsIn = (streams) => {
         return Boolean(streams?.some(stream => stream.id === livestreamId))
     }
