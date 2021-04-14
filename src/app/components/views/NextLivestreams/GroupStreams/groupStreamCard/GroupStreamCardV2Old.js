@@ -35,6 +35,7 @@ import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
 
 import clsx from "clsx";
+import {Row} from "@mui-treasury/components/flex";
 
 const useStyles = makeStyles((theme) => {
     const paperColor = theme.palette.background.paper
@@ -336,6 +337,22 @@ const useStyles = makeStyles((theme) => {
             opacity: 0.8
         },
 
+        groupLogo: {
+            width: 75,
+            height: 75,
+            background: theme.palette.common.white,
+            "& img": {
+                objectFit: "contain",
+                maxWidth: "90%",
+                maxHeight: "90%"
+            }
+        },
+        groupLogos: {
+            justifyContent: "space-evenly",
+            display: "flex",
+            flexWrap: "wrap",
+        },
+
         pulseAnimate: {
             animation: `$pulse 1s infinite`
         },
@@ -360,30 +377,30 @@ const useStyles = makeStyles((theme) => {
 })
 
 const GroupStreamCardV2Old = memo(({
-                                    livestream,
-                                    user,
-                                    mobile,
-                                    userData,
-                                    firebase,
-                                    livestreamId,
-                                    id,
-                                    careerCenterId,
-                                    groupData,
-                                    listenToUpcoming,
-                                    hasCategories,
-                                    className,
-                                    index,
-                                    isTargetDraft,
-                                    width,
-                                    setGlobalCardHighlighted,
-                                    globalCardHighlighted,
-                                    isAdmin,
-                                    isPastLivestream,
-                                    hideActions,
-                                    isDraft,
-                                    switchToNextLivestreamsTab,
-                                    handleEditStream
-                                }) => {
+                                       livestream,
+                                       user,
+                                       mobile,
+                                       userData,
+                                       firebase,
+                                       livestreamId,
+                                       id,
+                                       careerCenterId,
+                                       groupData,
+                                       listenToUpcoming,
+                                       hasCategories,
+                                       className,
+                                       index,
+                                       isTargetDraft,
+                                       width,
+                                       setGlobalCardHighlighted,
+                                       globalCardHighlighted,
+                                       isAdmin,
+                                       isPastLivestream,
+                                       hideActions,
+                                       isDraft,
+                                       switchToNextLivestreamsTab,
+                                       handleEditStream
+                                   }) => {
 
     const router = useRouter();
     const absolutePath = router.asPath
@@ -632,18 +649,15 @@ const GroupStreamCardV2Old = memo(({
     const shouldPulseBackground = () => isHighlighted && cardHovered
     const shouldPulseForeground = () => isHighlighted && !cardHovered
 
-
-    let logoElements = careerCenters.map(careerCenter => {
-        return (
-            <div className={classes.logoElement} key={careerCenter.groupId}>
-                <LogoElement hideFollow={(!cardHovered && !mobile) || isAdmin} key={careerCenter.groupId}
-                             livestreamId={livestream.id}
-                             userFollows={checkIfUserFollows(careerCenter)}
-                             careerCenter={careerCenter} userData={userData} user={user}
-                />
-            </div>
-        );
-    })
+    const logoElements = careerCenters.map(careerCenter => (
+        <LogoElement
+            className={classes.groupLogo}
+            hideFollow={(!cardHovered && !mobile) || isAdmin} key={careerCenter.groupId}
+            livestreamId={livestream.id}
+            userFollows={checkIfUserFollows(careerCenter)}
+            careerCenter={careerCenter} userData={userData} user={user}
+        />
+    ))
 
     let speakerElements = livestream.speakers?.map(speaker => {
         return (<Avatar
@@ -686,8 +700,8 @@ const GroupStreamCardV2Old = memo(({
                                       </Typography>
                                   }/>}
                             {!cardHovered &&
-                                <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
-                                     alt="background"/>
+                            <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
+                                 alt="background"/>
                             }
                             <div className={classes.dateTimeWrapper}>
                                 <div className={classes.dynamicMargin}>
@@ -777,12 +791,15 @@ const GroupStreamCardV2Old = memo(({
                                                 </div>}
                                             </Collapse>
                                         </div>}
-                                        <Fade in={Boolean(logoElements.length)}>
+                                        <Fade in={Boolean(careerCenters.length)}>
                                             <div className={classes.companyLogosFrontWrapper}>
                                                 <div className={classes.logosFrontInnerWrapper}>
-                                                    {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
+                                                    <Row p={1} style={{width: "100%"}} className={classes.groupLogos}>
+                                                        {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
+                                                    </Row>
                                                 </div>
                                             </div>
+
                                         </Fade>
                                     </>
                                     }
@@ -824,10 +841,13 @@ const GroupStreamCardV2Old = memo(({
                                     </div>}
                                 </div>
                                 <div className={classes.logosBackWrapper}>
-                                    {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
+                                    {fetchingCareerCenters ? <LogosPlaceHolder/> : (
+                                        <Row p={1} style={{width: "100%"}} className={classes.groupLogos}>
+                                            {logoElements}
+                                        </Row>
+                                    )}
                                 </div>
                             </Box>
-
                         </ClickAwayListener>
                     </Box>
                 </div>

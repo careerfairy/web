@@ -21,3 +21,9 @@ exports.testing2 = functions.https.onRequest(async (req, res) => {
         return handler(req, res);
     });
 });
+
+exports.personalHabib = functions.https.onRequest(async (req, res) => {
+    await app.prepare().then(() => {
+        return handler(req, res);
+    });
+});

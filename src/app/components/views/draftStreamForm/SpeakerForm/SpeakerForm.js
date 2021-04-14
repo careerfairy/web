@@ -48,7 +48,8 @@ const SpeakerForm = (
         index,
         values,
         handleAddSpeaker,
-        speakerObj
+        speakerObj,
+        speakerLimit
     }) => {
     const classes = useStyles()
 
@@ -144,10 +145,10 @@ const SpeakerForm = (
             {isLast &&
             <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                 <Button startIcon={<PersonAddIcon/>}
-                        disabled={Object.keys(values.speakers).length >= 3 || isSubmitting}
+                        disabled={Object.keys(values.speakers).length >= speakerLimit || isSubmitting}
                         onClick={() => handleAddSpeaker(values, setValues, speakerObj)}
                         type="button" color="primary" variant="contained" fullWidth>
-                    {Object.keys(values.speakers).length >= 3 ? "3 Speakers Maximum" : "Add a Speaker"}
+                    {Object.keys(values.speakers).length >= speakerLimit ? `${speakerLimit} Speakers Maximum` : "Add a Speaker"}
                 </Button>
             </Grid>}
         </Fragment>
