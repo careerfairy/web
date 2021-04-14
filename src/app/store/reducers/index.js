@@ -9,6 +9,7 @@ import emotesReducer from "./emotesReducer";
 import snackbarReducer from "./snackbarReducer";
 import userDataSetReducer from "./userDataSetReducer";
 import currentFilterGroupReducer from "./currentFilterGroupReducer";
+import nextLivestreamsReducer from "./nextLivestreamsReducer";
 
 export default combineReducers({
     auth: authReducer,
@@ -20,4 +21,5 @@ export default combineReducers({
     snackbars: snackbarReducer,
     userDataSet: userDataSetReducer,
     currentFilterGroup: currentFilterGroupReducer,
+    nextLivestreams: nextLivestreamsReducer
 });

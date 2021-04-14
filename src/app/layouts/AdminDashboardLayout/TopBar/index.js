@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
             transform: "scaleX(0)",
             transition: theme.transitions.create(['all'], {
                 easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.complex,
+                duration: theme.transitions.duration.short,
             }),
         },
         "&:hover:before": {

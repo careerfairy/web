@@ -5,7 +5,7 @@ import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({}));
 
-const HeadWithMetaData = ({title, description, image, fullPath, twitterCardType}) => {
+const HeadWithMetaData = ({title, description, image, fullPath, twitterCardType, author}) => {
 
     const classes = useStyles()
 
@@ -32,6 +32,7 @@ const HeadWithMetaData = ({title, description, image, fullPath, twitterCardType}
             <meta property="twitter:title" content={title}/>
             <meta property="twitter:description" content={description}/>
             {image && <meta property="twitter:image" content={image}/>}
+            {author && <meta name="author" content={author}/>}
 
         </Head>
     );
@@ -42,11 +43,13 @@ HeadWithMetaData.propTypes = {
     fullPath: PropTypes.string.isRequired,
     image: PropTypes.string,
     title: PropTypes.string.isRequired,
+    author: PropTypes.string,
     twitterCardType: PropTypes.oneOf(["summary_large_image", "app", "player"])
 }
 
 HeadWithMetaData.defaultProps = {
-    twitterCardType: "summary_large_image"
+    twitterCardType: "summary_large_image",
+    author: ""
 }
 export default HeadWithMetaData;
 

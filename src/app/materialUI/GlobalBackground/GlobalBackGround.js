@@ -46,6 +46,13 @@ const useStyles = makeStyles(theme => ({
         padding: "0 0 40px 0",
         display: "flex",
         flexDirection: "column"
+    },
+    paperBackground: {
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: theme.palette.background.paper,
+        height: "100%",
     }
 }))
 
@@ -78,6 +85,10 @@ export const DarkThemedBackground = ({...props}) => {
     return <Box className={classes.darkThemedBackgroundStyles} {...props}/>
 }
 
+export const PaperBackground = ({...props}) => {
+    const classes = useStyles()
+    return <Box classes={{root:classes.paperBackground}} {...props}/>
+}
 
 
 
