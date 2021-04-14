@@ -124,7 +124,6 @@ const NavBar = ({
                 <Drawer
                     anchor="left"
                     classes={{paper: clsx(classes.mobileDrawer, classes.background)}}
-                    className={classes.drawer}
                     onClose={onMobileClose}
                     open={openMobile}
                     variant="temporary"
@@ -136,7 +135,6 @@ const NavBar = ({
                 <Drawer
                     anchor="left"
                     classes={{paper: clsx(classes.desktopDrawer, classes.background)}}
-                    className={classes.drawer}
                     open
                     variant="persistent"
                 >

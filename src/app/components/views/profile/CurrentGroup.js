@@ -194,15 +194,15 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                         </IconButton>
                         <CardActions>
                             {!isAdmin &&
-                            <Link href={`next-livestreams?careerCenterId=${localGroup.groupId}`}>
-                                <Button fullWidth size="large" color="primary">
+                            <Link href={`next-livestreams/${localGroup.groupId}`}>
+                                <Button component="a" fullWidth size="large" color="primary">
                                     View Calendar
                                 </Button>
                             </Link>
                             }
                             {isAdmin &&
                             <Link href={`/group/${localGroup.id}/admin`}>
-                                <Button fullWidth size="large" color="primary">
+                                <Button component="a" fullWidth size="large" color="primary">
                                     View Admin Page
                                 </Button>
                             </Link>
