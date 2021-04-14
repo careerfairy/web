@@ -165,6 +165,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
         errors.firstName = isEmpty(speaker.firstName.trim())
         errors.lastName = isEmpty(speaker.lastName.trim())
         errors.position = isEmpty(speaker.position.trim())
+        console.log("-> errors", errors);
         setFormErrors(errors)
         return Object.keys(errors).some(key => errors[key] === true);
     }

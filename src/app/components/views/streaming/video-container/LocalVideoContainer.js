@@ -5,6 +5,7 @@ import React, {useEffect, useRef} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import SpeakerInfoOverlay from './SpeakerInfoOverlay';
 
+const mutedOverlayZIndex = 9901
 const useStyles = makeStyles(theme => ({
     companyIcon: {
         maxWidth: "75%",
@@ -25,13 +26,13 @@ const useStyles = makeStyles(theme => ({
         width: "100%",
         height: "100%",
         backgroundColor: "white",
-        zIndex: 9901
+        zIndex: mutedOverlayZIndex
     },
     audioMuted: {
         position: "absolute",
         bottom: 10,
         right: 10,
-        zIndex: 9902
+        zIndex: mutedOverlayZIndex + 1
     },
     mutedOverlayContent: {
         position: "absolute",
@@ -63,46 +64,45 @@ const useStyles = makeStyles(theme => ({
     },
 }))
 
-function LocalVideoContainer(props) {
+const LocalVideoContainer = ({currentLivestream, height, localSpeaker, localStream, small}) => {
 
     const classes = useStyles()
 
     useEffect(() => {
-        console.log(props.localStream);
-    },[props.localStream]);
+        console.log(localStream);
+    }, [localStream]);
 
-    
 
     return (
-            <div className={classes.localVideoContainer} style={{ height: props.height }}>
-                <div id="localVideo" style={{width: '100%', height: '100%'}}/>
-                {
-                    props.localSpeaker && 
-                    <SpeakerInfoOverlay speaker={props.localSpeaker} small={ props.small }/>
-                }
-                {
-                    props.localStream?.videoMuted &&
-                    <div className={classes.mutedOverlay}>
-                        <div className={classes.mutedOverlayContent}>
-                            <div>
-                                <img src={props.currentLivestream.companyLogoUrl} className={classes.companyIcon}/>
-                            </div>
-                            <Tooltip title={'The streamer has turned the camera off'}>
-                                <VideocamOffIcon fontSize='large' color='error'/>
-                            </Tooltip>
+        <div className={classes.localVideoContainer} style={{height: height}}>
+            <div id="localVideo" style={{width: '100%', height: '100%'}}/>
+            {
+                localSpeaker &&
+                <SpeakerInfoOverlay zIndex={mutedOverlayZIndex + 1} speaker={localSpeaker} small={small}/>
+            }
+            {
+                localStream?.videoMuted &&
+                <div className={classes.mutedOverlay}>
+                    <div className={classes.mutedOverlayContent}>
+                        <div>
+                            <img src={currentLivestream.companyLogoUrl} className={classes.companyIcon}/>
                         </div>
-                    </div>
-                }
-                {
-                    props.localStream?.audioMuted &&
-                    <div className={classes.audioMuted}>
-                        <Tooltip title={'The streamer has muted his microphone'}>
-                            <VolumeOffIcon fontSize='large' color='error'/>
+                        <Tooltip title={'The streamer has turned the camera off'}>
+                            <VideocamOffIcon fontSize='large' color='error'/>
                         </Tooltip>
                     </div>
-                }
-            </div>
+                </div>
+            }
+            {
+                localStream?.audioMuted &&
+                <div className={classes.audioMuted}>
+                    <Tooltip title={'The streamer has muted his microphone'}>
+                        <VolumeOffIcon fontSize='large' color='error'/>
+                    </Tooltip>
+                </div>
+            }
+        </div>
     );
-}
+};
 
 export default LocalVideoContainer;
