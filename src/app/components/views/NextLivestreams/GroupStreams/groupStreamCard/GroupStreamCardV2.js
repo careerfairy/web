@@ -525,7 +525,7 @@ const GroupStreamCardV2 = memo(({
                             </Collapse>
                             <Box style={{maxHeight: 165, overflow: "auto", overflowX: "hidden"}}>
                                 {targetOptions.slice(0, cardHovered ? -1 : maxOptions).map(option =>
-                                    <Tag option={option}/>
+                                    <Tag key={option.id} option={option}/>
                                 )}
                                 {(targetOptions.length > maxOptions && !cardHovered) &&
                                 <Tag option={{id: "hasMore", name: "..."}}/>}

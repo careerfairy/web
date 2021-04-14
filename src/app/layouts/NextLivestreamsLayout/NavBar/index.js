@@ -5,18 +5,7 @@ import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
-import {
-    Box,
-    Button,
-    Card,
-    CardActionArea,
-    CardContent,
-    CardHeader,
-    Grow,
-    Hidden,
-    ListItemAvatar
-} from "@material-ui/core";
-import CircularProgress from '@material-ui/core/CircularProgress';
+import {Box, Button, Grow, Hidden} from "@material-ui/core";
 import {useAuth} from "../../../HOCs/AuthProvider";
 import GroupsUtil from "../../../data/util/GroupsUtil";
 import {useRouter} from "next/router";
@@ -26,10 +15,9 @@ import {LogOut as LogoutIcon} from "react-feather";
 import {useDispatch} from "react-redux";
 import * as actions from "../../../store/actions";
 import GroupNavLink from "./groupNavLink";
-import CardMedia from "@material-ui/core/CardMedia";
-import {searchImage} from "../../../constants/images";
 import Link from "../../../materialUI/NextNavLink";
-import * as PropTypes from "prop-types";
+import NavPrompt from "./navPrompt";
+import {signInImage} from "../../../constants/images";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -70,16 +58,7 @@ const useStyles = makeStyles((theme) => ({
         },
 
     },
-    media: {
-        display: "grid",
-        placeItems: "center",
-        "& img": {
-            maxWidth: "60%"
-        },
-    },
-    subheader: {
-        whiteSpace: "pre-wrap"
-    },
+
     loginButton: {
         color: "white !important",
     }
@@ -105,7 +84,6 @@ function LoginButton() {
     </ListItem>;
 }
 
-LoginButton.propTypes = {classes: PropTypes.any};
 const FeedDrawer = memo(({
                              onMobileNavOpen,
                              onMobileClose,
@@ -117,12 +95,11 @@ const FeedDrawer = memo(({
 
                          }) => {
     const classes = useStyles({drawerWidth});
-    const {query: {groupId: groupIdInQuery}} = useRouter()
+    const {query: {groupId: groupIdInQuery}, asPath} = useRouter()
     const {userData, authenticatedUser} = useAuth()
     const [groups, setGroups] = useState(null);
     const dispatch = useDispatch()
     const signOut = () => dispatch(actions.signOut())
-
     useEffect(() => {
         if (userData) {
             let newGroups = userData.followingGroups ? GroupsUtil.getUniqueGroupsFromArrayOfGroups(userData.followingGroups) : []
@@ -166,7 +143,14 @@ const FeedDrawer = memo(({
                 </Box>
             </Hidden>
             <Box p={2}>
-                {groups?.length ? (
+                {(authenticatedUser.isLoaded && authenticatedUser.isEmpty) ? (
+                    <NavPrompt
+                        title="Don't have an account?"
+                        subheader="Click here to register"
+                        href={`/signup?absolutePath=${asPath}`}
+                        imageSrc={signInImage}
+                    />
+                ) : groups?.length ? (
                     <List>
                         {groups?.map(({universityName, groupId, logoUrl}) =>
                             <ListItemWrapper key={groupId} active={groupIdInQuery === groupId}>
@@ -181,31 +165,9 @@ const FeedDrawer = memo(({
                             </ListItemWrapper>)}
                     </List>
                 ) : (
-                    <Card elevation={0}>
-                            <CardActionArea style={{textDecoration: "none"}} href="/groups" component={Link}>
-                                <CardHeader
-                                    align="center"
-                                    titleTypographyProps={{
-                                        gutterBottom: true
-                                    }}
-                                    title="New to CareerFairy?"
-                                    subheaderTypographyProps={{
-                                        className: classes.subheader
-                                    }}
-                                    subheader="Click here to discover some groups"
-                                />
-                                <CardContent>
-                                    <CardMedia
-                                        className={classes.media}
-                                    >
-                                        <img alt="Find Groups" src={searchImage}/>
-                                    </CardMedia>
-                                </CardContent>
-                            </CardActionArea>
-                    </Card>
+                    <NavPrompt/>
                 )}
             </Box>
-
             <Box flexGrow={1}/>
             <Box p={2}>
                 <List>
