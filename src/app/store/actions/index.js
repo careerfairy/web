@@ -38,3 +38,7 @@ export {
     handleChangeFilterLabel,
     createFilterGroup
 } from './filterActions.js'
+
+export {
+    toggleNextLivestreamsFilter, closeNextLivestreamsFilter, openNextLivestreamsFilter
+} from './nextLivestreamsActions'

@@ -7,6 +7,7 @@ import LazyLoad from 'react-lazyload'
 import Spinner from "./groupStreamCard/Spinner";
 import useInfiniteScrollClient from "../../../custom-hook/useInfiniteScrollClient";
 import clsx from "clsx";
+import {useAuth} from "../../../../HOCs/AuthProvider";
 
 const gridItemHeight = 530
 const useStyles = makeStyles((theme) => ({
@@ -31,12 +32,13 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        minHeight: "50vh"
     },
     streamGridItem: {
         height: gridItemHeight,
         display: "flex"
     },
-    dynamicHeight:{
+    dynamicHeight: {
         height: "auto"
     }
 }));
@@ -59,30 +61,27 @@ const Wrapper = ({children, index, streamId}) => {
             {children}
         </LazyLoad>
     )
-
 }
+
 const GroupStreams = ({
                           groupData,
-                          userData,
-                          user,
                           livestreams,
                           mobile,
                           searching,
                           livestreamId,
                           careerCenterId,
-                          alreadyJoined,
                           listenToUpcoming,
                           selectedOptions,
-                          hasCategories,
-                          width
+                          isPastLivestreams,
                       }) => {
         const classes = useStyles()
+        const {userData, authenticatedUser: user} = useAuth()
         const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
-        const searchedButNoResults = selectedOptions.length && !searching && !livestreams.length
+        const searchedButNoResults = selectedOptions?.length && !searching && !livestreams?.length
         const [slicedLivestreams, loadMoreLivestreams, hasMoreLivestreams, totalLivestreams] = useInfiniteScrollClient(livestreams, 6, 3);
 
         const handleScroll = () => {
-            const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 300
+            const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight * 0.6
             if (bottom && hasMoreLivestreams) {
                 loadMoreLivestreams()
             }
@@ -104,22 +103,22 @@ const GroupStreams = ({
             }
         }, [groupData])
 
-
-        const renderStreamCards = slicedLivestreams?.map((livestream, index, array) => {
+        const renderStreamCards = slicedLivestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
                     <Grid
                         className={clsx(classes.streamGridItem, {
-                            [classes.dynamicHeight]: mobile && (index >= array.length - 2)
+                            [classes.dynamicHeight]: mobile
                         })}
-                        key={livestream.id} xs={12} sm={12} md={hasCategories? 12:6}
-                        lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
+                        key={livestream.id} xs={12} sm={12} md={6}
+                        lg={4} xl={4} item>
                         <Wrapper
                             index={index}
                             streamId={livestream.id}
                         >
                             <GroupStreamCardV2
                                 mobile={mobile}
+                                isPastLivestreams={isPastLivestreams}
                                 setGlobalCardHighlighted={setGlobalCardHighlighted}
                                 globalCardHighlighted={globalCardHighlighted}
                                 groupData={groupData}
@@ -138,11 +137,11 @@ const GroupStreams = ({
         })
 
         return (
-            <Grid item xs={12} sm={12} md={hasCategories ? 8 : 12} lg={hasCategories ? 8 : 12} xl={hasCategories ? 8 : 12}>
+            <Grid item xs={12}>
                 <Grid container spacing={mobile ? 2 : 4}>
                     {groupData.id || listenToUpcoming ? (searching ?
                         <Grid md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
-                            <LinearProgress style={{width: "80%", marginTop: 100}} color="primary"/>
+                            <LinearProgress style={{width: "80%"}} color="primary"/>
                         </Grid>
                         :
                         livestreams.length ?
@@ -151,8 +150,8 @@ const GroupStreams = ({
                             <Grid sm={12} xs={12} md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
                                 <Typography className={classes.emptyMessage} align="center" variant="h5"
                                             style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :
-                                    <strong>{groupData.universityName} currently has no scheduled live
-                                        streams</strong>}</Typography>
+                                    <strong>{groupData.universityName} currently has
+                                        no {isPastLivestreams ? "past" : "scheduled"} live streams</strong>}</Typography>
                             </Grid>)
                         : null}
                 </Grid>

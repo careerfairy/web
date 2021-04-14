@@ -1,5 +1,6 @@
 import firebase from '../../Firebase/Firebase';
 import {v4 as uuidv4} from 'uuid';
+import {FORTY_FIVE_MINUTES_IN_MILLISECONDS, START_DATE_FOR_REPORTED_EVENTS} from "../constants/streamContants";
 
 // import firebase from "firebase/app";
 // import "firebase/auth";
@@ -737,13 +738,11 @@ class Firebase {
     }
 
     listenToPastLiveStreamsByGroupId = (groupId, callback) => {
-        let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
-        const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
         let ref = this.firestore
             .collection("livestreams")
             .where("test", "==", false)
             .where("groupIds", "array-contains", groupId)
-            .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
+            .where("start", "<", new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
             .orderBy("start", "desc")
         return ref.onSnapshot(callback)

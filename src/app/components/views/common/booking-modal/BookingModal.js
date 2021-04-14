@@ -73,9 +73,9 @@ function BookingModal({modalOpen, user, careerCenters, livestream, registration,
     function handleUrl() {
         let url = "/next-livestreams"
         if (groupId) {
-            url = `/next-livestreams?careerCenterId=${groupId}&livestreamId=${livestream.id}`
+            url = `/next-livestreams/${groupId}?livestreamId=${livestream.id}`
         } else if (careerCenters && careerCenters.length && careerCenters.length === 1) {// If there's only one group, please send me to that groups page
-            url = `/next-livestreams?careerCenterId=${careerCenters[0].id}&livestreamId=${livestream.id}`
+            url = `/next-livestreams/${careerCenters[0].id}?livestreamId=${livestream.id}`
         }
         return url
     }
