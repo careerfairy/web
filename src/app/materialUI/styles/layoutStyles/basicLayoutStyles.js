@@ -1,4 +1,4 @@
-const groupDashboardStyles = (theme) => ({
+const basicLayoutStyles = (theme) => ({
     root: {
         backgroundColor: theme.palette.background.dark,
         display: 'flex',
@@ -32,4 +32,4 @@ const groupDashboardStyles = (theme) => ({
     }
 })
 
-export default groupDashboardStyles
+export default basicLayoutStyles

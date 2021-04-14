@@ -52,7 +52,7 @@
     "material-table": "^1.69.2",
     "memoize-one": "^5.1.1",
     "moment": "^2.29.1",
-    "next": "^9.2.0",
+    "next": "^10.1.3",
     "next-redux-wrapper": "^6.0.2",
     "notistack": "^1.0.1",
     "react": "^16.14.0",
@@ -114,6 +114,7 @@
     "prop-types": "^15.7.2",
     "react-perfect-scrollbar": "^1.5.8",
     "styled-jsx-plugin-sass": "^1.0.0",
+    "webpack": "^5.32.0",
     "webpack-bundle-analyzer": "^4.4.0"
   }
 }

@@ -7,7 +7,6 @@ import {SwipeablePanel} from "../../../../../materialUI/GlobalPanels/GlobalPanel
 import Audience from "./Audience";
 import Title from "./Title";
 import Feedback from "./Feedback";
-import {universityCountriesMap} from "../../../../util/constants";
 import {isEmpty, isLoaded, useFirestoreConnect, withFirestore} from "react-redux-firebase";
 import {useDispatch, useSelector} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
@@ -24,7 +23,6 @@ import useTimeFrames from "../../../../custom-hook/useTimeFrames";
 import useUserDataSet from "../../../../custom-hook/useUserDataSet";
 import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDictionary";
 import {repositionElement} from "../../../../helperFunctions/HelperFunctions";
-import HideOnScroll from "../../../common/HideOnScroll";
 
 const useStyles = makeStyles((theme) => ({
 

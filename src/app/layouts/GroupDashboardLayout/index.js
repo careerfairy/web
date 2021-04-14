@@ -8,7 +8,7 @@ import {useAuth} from "../../HOCs/AuthProvider";
 import {isEmpty, isLoaded} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 import TopBar from "./TopBar";
-import styles from "../../materialUI/styles/groupDashboardStyles";
+import styles from "../../materialUI/styles/layoutStyles/groupDashboardStyles";
 import useDashboardRedirect from "../../components/custom-hook/useDashboardRedirect";
 import useAdminGroup from "../../components/custom-hook/useAdminGroup";
 import useDashboardLinks from "../../components/custom-hook/useDashboardLinks";
