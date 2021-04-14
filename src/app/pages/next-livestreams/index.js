@@ -7,7 +7,6 @@ import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {useTheme} from "@material-ui/core/styles";
 import {StreamsSection} from "../../components/views/NextLivestreams/StreamsSection";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
-import {store} from "../_app";
 import {NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL} from "../../constants/routes";
 import {getServerSideStream} from "../../util/serverUtil";
 
