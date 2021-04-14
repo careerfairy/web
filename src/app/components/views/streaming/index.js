@@ -11,14 +11,18 @@ import ButtonComponent from "./sharedComponents/ButtonComponent";
 
 const useStyles = makeStyles(theme => ({
     blackFrame: {
+        position: "absolute",
+        left: "0",
+        right: "0",
+        bottom: "0",
         // left: ({showMenu}) => showMenu ? 280 : 0,
         // transition: "left 0.3s",
         transitionTimingFunction: theme.transitions.easeInOut,
-        position: "relative",
+        // position: "relative",
         // top: 55,
         // right: 0,
         // left:0,
-        minWidth: 345,
+        // minWidth: 345,
         // height: "calc(100% - 55px)",
         zIndex: 10,
         backgroundColor: "black",
@@ -29,7 +33,7 @@ const useStyles = makeStyles(theme => ({
     miniChatContainer: {
         position: "absolute",
         bottom: 0,
-        right: 90,
+        right: 40,
         width: "20%",
         minWidth: 250,
         zIndex: 100

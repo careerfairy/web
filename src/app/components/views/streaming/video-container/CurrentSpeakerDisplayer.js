@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => ({
         verticalAlign: "top",
         margin: "0",
         [theme.breakpoints.down("sm")]: {
-            width: 190
+            minWidth: 190,
         },
     },
     localSpeakerVideo: {

@@ -160,11 +160,11 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
     const formHasErrors = () => {
         let errors = {};
         if (showLinkedIn) {
-            errors.linkedInUrl = isEmpty(linkedInUrl.trim()) || !isValidUrl(linkedInUrl)
+            errors.linkedInUrl = isEmpty(linkedInUrl?.trim()) || !isValidUrl(linkedInUrl)
         }
-        errors.firstName = isEmpty(speaker.firstName.trim())
-        errors.lastName = isEmpty(speaker.lastName.trim())
-        errors.position = isEmpty(speaker.position.trim())
+        errors.firstName = isEmpty(speaker.firstName?.trim())
+        errors.lastName = isEmpty(speaker.lastName?.trim())
+        errors.position = isEmpty(speaker.position?.trim())
         setFormErrors(errors)
         return Object.keys(errors).some(key => errors[key] === true);
     }
@@ -184,7 +184,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                     <FormGroup>
                         <FormGroup>
                             <FormControl className={classes.marginTop}>
-                                <TextField error={formErrors.firstName && isEmpty(speaker.firstName.trim())}
+                                <TextField error={formErrors.firstName && isEmpty(speaker.firstName?.trim())}
                                             helperText={formErrors.firstName && "Required"} id="outlined-basic"
                                             label="First Name" variant="outlined"
                                             name="firstName"
@@ -195,7 +195,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                                             })}/>
                             </FormControl>
                             <FormControl className={classes.marginTop}>
-                                <TextField error={formErrors.lastName && isEmpty(speaker.lastName.trim())}
+                                <TextField error={formErrors.lastName && isEmpty(speaker.lastName?.trim())}
                                             helperText={formErrors.lastName && "Required"} id="outlined-basic"
                                             label="Last Name" variant="outlined"
                                             name="lastName"
@@ -206,7 +206,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                                             })}/>
                             </FormControl>
                             <FormControl className={classes.marginTop}>
-                                <TextField error={formErrors.position && isEmpty(speaker.position.trim())}
+                                <TextField error={formErrors.position && isEmpty(speaker.position?.trim())}
                                             helperText={formErrors.position && "Required"} id="outlined-basic"
                                             label="Occupation" placeholder="Lead Engineer"
                                             name="jobTitle"

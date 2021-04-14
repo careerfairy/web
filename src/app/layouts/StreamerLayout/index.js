@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {makeStyles, useTheme} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {withFirebase} from "../../context/firebase";
 import StreamerTopBar from "./StreamerTopBar";
 import PreparationOverlay from "../../components/views/streaming/preparation-overlay/PreparationOverlay";
@@ -16,11 +16,16 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        position: "relative",
+        // minHeight: "100vh",
+        height: "100vh",
+        width: "100%",
+        touchAction: "manipulation",
+        // border: "6px solid pink",
         backgroundColor: theme.palette.background.dark,
         display: 'flex',
-        height: '100vh',
+        // height: '100vh',
         overflow: 'hidden',
-        width: '100%'
     },
     wrapper: {
         display: 'flex',
@@ -41,6 +46,8 @@ const useStyles = makeStyles((theme) => ({
     content: {
         flex: '1 1 auto',
         height: '100%',
+        background: theme.palette.common.black,
+        position: "relative"
         // overflow: 'auto'
     },
     menuLeft: {
@@ -58,10 +65,9 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamerLayout = (props) => {
     const {children, firebase} = props
-    const theme = useTheme()
     const {query: {token, livestreamId}, pathname} = useRouter()
     const router = useRouter();
-    const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    const smallScreen = useMediaQuery('(max-width:700px)');
 
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [newNotification, setNewNotification] = useState(null);
