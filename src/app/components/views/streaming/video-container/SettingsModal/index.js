@@ -54,7 +54,8 @@ function SettingsModal({ open,
                         updateAudioSource,
                         videoSource,
                         updateVideoSource,
-                        speakerSource, 
+                        speakerSource,
+                           smallScreen,
                         setSpeakerSource, 
                         attachSinkId,
                         audioLevel
@@ -68,7 +69,7 @@ function SettingsModal({ open,
     };
 
     return (
-        <GlassDialog fullScreen={false} fullWidth maxWidth="sm" open={open} PaperProps={{ style: { minHeight: 500 }}}>
+        <GlassDialog fullScreen={smallScreen} fullWidth maxWidth="sm" open={open} >
             <DialogTitle>
                 <div style={{ color: 'lightgrey'}}>
                     <SettingsIcon style={{ verticalAlign: "middle", marginRight: "10px" }}/>

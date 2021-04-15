@@ -4,11 +4,12 @@ import ButtonComponent from "../sharedComponents/ButtonComponent";
 import PollCategory from "./categories/PollCategory";
 import HandRaiseCategory from "./categories/HandRaiseCategory";
 import QuestionCategory from "../sharedComponents/QuestionCategory";
-import {makeStyles, useTheme} from "@material-ui/core/styles";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import SwipeableViews from "react-swipeable-views";
 import clsx from "clsx";
-import {Drawer} from "@material-ui/core";
+import {Drawer, Fab} from "@material-ui/core";
+import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
 
 const useStyles = makeStyles(theme => ({
     root: {},
@@ -40,7 +41,25 @@ const useStyles = makeStyles(theme => ({
         zIndex: 20,
         background: theme.palette.background.default
     },
-
+    drawerSmallScreen: {
+        width: "100%",
+        top: 0,
+        height: "100%",
+        backgroundColor: fade(theme.palette.common.black, 0.2),
+        backdropFilter: "blur(5px)",
+    },
+    closeBtnSmallScreen: {
+        position: "fixed",
+        top: 10,
+        right: 10,
+        textAlign: "center",
+        zIndex: 9100,
+        background: theme.palette.type === "dark" && theme.palette.background.paper,
+        "&:hover": {
+            background: theme.palette.type === "dark" && theme.palette.background.default,
+        },
+        color: theme.palette.type === "dark" && theme.palette.secondary.main
+    },
 }))
 
 
@@ -55,8 +74,8 @@ const LeftMenu = ({
                       selectedState,
                       setSelectedState,
                       setShowMenu,
+                      smallScreen,
                       toggleShowMenu,
-                      className,
                   }) => {
     const theme = useTheme()
     const classes = useStyles()
@@ -95,7 +114,7 @@ const LeftMenu = ({
     const handleChange = (event) => {
         setSliding(true)
         setValue(event);
-        setSelectedState(states[event])
+        setSelectedState?.(states[event])
     }
 
     const views = [
@@ -122,15 +141,24 @@ const LeftMenu = ({
     return (
         <Drawer
             anchor="left"
-            classes={{paper: clsx(classes.desktopDrawer)}}
+            classes={{
+                paper: clsx(classes.desktopDrawer, {
+                    [classes.drawerSmallScreen]: (showMenu && smallScreen)
+                })
+            }}
             open={showMenu}
-            variant="persistent"
+            variant={smallScreen ? "temporary" : "persistent"}
         >
+            {(showMenu && smallScreen) && (
+                <Fab className={classes.closeBtn} size='large' color='secondary' onClick={toggleShowMenu}>
+                    <ChevronLeftRoundedIcon/>
+                </Fab>
+            )}
             <SwipeableViews
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
-                slideStyle={{ overflowX: "hidden"}}
+                slideStyle={{overflowX: "hidden"}}
                 onTransitionEnd={() => setSliding(false)}
                 className={classes.viewRoot}
                 onChangeIndex={handleChange}>
