@@ -127,9 +127,8 @@ const StreamsToolbar = ({
 
     const handleOpenStudentView = () => {
         const baseUrl = getBaseUrl()
-        const studentPage = `${baseUrl}/next-livestreams?careerCenterId=${group.id}`
+        const studentPage = `${baseUrl}/next-livestreams/${group.id}`
         window?.open?.(studentPage, '_blank');
-
     }
 
     const buttonOptions = [

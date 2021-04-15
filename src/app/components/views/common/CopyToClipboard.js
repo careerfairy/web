@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react"
-import { IconButton, Tooltip} from "@material-ui/core";
+import {IconButton, Tooltip} from "@material-ui/core";
 import ShareIcon from '@material-ui/icons/Share';
+import {getBaseUrl} from "../../helperFunctions/HelperFunctions";
 
 const CopyToClipboard = ({value, color, children, ...props}) => {
 
@@ -9,11 +10,7 @@ const CopyToClipboard = ({value, color, children, ...props}) => {
 
     useEffect(() => {
         if (value && value.length) {
-            if (isLocalhost) {
-                setUrl(`http://localhost:3000${value}`)
-            } else {
-                setUrl(`https://careerfairy.io${value}`)
-            }
+            setUrl(`${getBaseUrl()}${value}`)
         }
     }, [value])
 
@@ -24,7 +21,6 @@ const CopyToClipboard = ({value, color, children, ...props}) => {
             }, 2000);
         }
     }, [copySuccess])
-
 
     const isLocalhost = Boolean(
         window.location.hostname === 'localhost' ||

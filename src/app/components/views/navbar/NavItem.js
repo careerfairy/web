@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: 0,
     },
     button: {
-        color: theme.palette.common.white,
+        color: props => props.black ? theme.palette.text.secondary : theme.palette.common.white,
         fontWeight: theme.typography.fontWeightLight,
         justifyContent: 'flex-start',
         letterSpacing: 0,
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         textDecoration: "none !important",
         "&:hover": {
-            color: theme.palette.common.white,
+            color: props => props.black ? theme.palette.text.secondary : theme.palette.common.white,
         },
         "&.active": {
             background: theme.palette.common.white,
@@ -50,13 +50,15 @@ const useStyles = makeStyles((theme) => ({
 const NavItem = ({
                      className,
                      basePath,
+                     black,
                      href,
                      icon: Icon,
                      title,
                      svgIcon,
+                     onClick,
                      ...rest
                  }) => {
-    const classes = useStyles();
+    const classes = useStyles({black});
     const {pathname} = useRouter()
 
     return (
@@ -66,8 +68,9 @@ const NavItem = ({
             {...rest}
         >
             <Button
-                href={href}
-                component={Link}
+                href={onClick ? undefined : href}
+                onClick={onClick}
+                component={onClick ? "button" : Link}
                 className={clsx(classes.button, {
                     ["active"]: basePath === pathname
                 })}

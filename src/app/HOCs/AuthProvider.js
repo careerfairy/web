@@ -7,7 +7,7 @@ const Loader = dynamic(
     {ssr: false}
 )
 import {useSelector} from "react-redux";
-import {useFirestoreConnect} from 'react-redux-firebase'
+import {populate, useFirestoreConnect} from 'react-redux-firebase'
 
 const AuthContext = createContext({authenticatedUser: undefined, userData: undefined});
 
@@ -27,6 +27,10 @@ const adminPaths = [
     "/group/create",
     "/new-livestream"
 ];
+
+const populates = [
+    {child: 'groupIds', root: 'careerCenterData', childAlias: "followingGroups"},
+]
 const AuthProvider = ({children}) => {
 
     const auth = useSelector((state) => state.firebase.auth)
@@ -37,12 +41,13 @@ const AuthProvider = ({children}) => {
         {
             collection: 'userData', doc: auth.email,  // or `userData/${auth.email}`
             storeAs: "userProfile",
+            populates
         }
     ] : [], [auth?.email])
 
     useFirestoreConnect(query)
 
-    const userData = useSelector(({firestore}) => auth.email ? firestore.data.userProfile : null)
+    const userData = useSelector(({firestore}) => auth.email ? populate(firestore, "userProfile", populates) : null)
 
     useEffect(() => {
         // Check that initial route is OK
