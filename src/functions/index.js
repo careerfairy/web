@@ -39,6 +39,7 @@ exports.testing2 = hosting.testing2
 exports.personalHabib = hosting.personalHabib
 
 // Auth
+exports.createNewUserAccount = auth.createNewUserAccount
 exports.updateFakeUser = auth.updateFakeUser
 exports.verifyEmailWithPin = auth.verifyEmailWithPin
 exports.sendPostmarkResetPasswordEmail = auth.sendPostmarkResetPasswordEmail
