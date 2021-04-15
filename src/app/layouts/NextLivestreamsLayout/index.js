@@ -24,33 +24,35 @@ const NextLivestreamsLayout = (props) => {
     const handleDrawerToggle = () => setMobileNavOpen(!isMobileNavOpen)
 
     return (
-        <div className={classes.root}>
-            <TopBar
-                links={mainLinks}
-                currentGroup={currentGroup}
-                onMobileNavOpen={handleDrawerOpen}
-            />
-            <NavBar
-                drawerTopLinks={mainLinks}
-                handleDrawerToggle={handleDrawerToggle}
-                drawerWidth={drawerWidth}
-                drawerBottomLinks={secondaryLinks}
-                onMobileNavOpen={handleDrawerOpen}
-                onMobileClose={handleDrawerClose}
-                openMobile={isMobileNavOpen}
-            />
-            <div className={classes.wrapper}>
-                <div className={classes.contentContainer}>
-                    <div className={classes.content}>
-                        {/*{React.Children.map(children, child => React.cloneElement(child, {*/}
-                        {/*    ...props*/}
-                        {/*}))}*/}
-                        {children}
-                        <Footer/>
+        <React.Fragment>
+            <div className={classes.root}>
+                <TopBar
+                    links={mainLinks}
+                    currentGroup={currentGroup}
+                    onMobileNavOpen={handleDrawerOpen}
+                />
+                <NavBar
+                    drawerTopLinks={mainLinks}
+                    handleDrawerToggle={handleDrawerToggle}
+                    drawerWidth={drawerWidth}
+                    drawerBottomLinks={secondaryLinks}
+                    onMobileNavOpen={handleDrawerOpen}
+                    onMobileClose={handleDrawerClose}
+                    openMobile={isMobileNavOpen}
+                />
+                <div className={classes.wrapper}>
+                    <div className={classes.contentContainer}>
+                        <div className={classes.content}>
+                            {/*{React.Children.map(children, child => React.cloneElement(child, {*/}
+                            {/*    ...props*/}
+                            {/*}))}*/}
+                            {children}
+                            <Footer/>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </React.Fragment>
     );
 };
 

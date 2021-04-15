@@ -25,6 +25,7 @@ export function StreamsSection({
                                    selectedOptions,
                                    setSelectedOptions,
                                    upcomingLivestreams,
+                                   listenToUpcoming,
                                    value
                                }) {
     const classes = useStyles()
@@ -35,6 +36,7 @@ export function StreamsSection({
                     livestreamId={livestreamId}
                     setSelectedOptions={setSelectedOptions}
                     selectedOptions={selectedOptions}
+                    listenToUpcoming={listenToUpcoming}
                     livestreams={upcomingLivestreams || []}
                     currentGroup={currentGroup}/>
             ) : (
@@ -49,6 +51,7 @@ export function StreamsSection({
                     livestreamId={livestreamId}
                     setSelectedOptions={setSelectedOptions}
                     selectedOptions={selectedOptions}
+                    listenToUpcoming={listenToUpcoming}
                     isPastLivestreams
                     livestreams={pastLivestreams || []}
                     currentGroup={currentGroup}/>
