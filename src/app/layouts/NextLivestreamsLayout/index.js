@@ -25,9 +25,6 @@ const NextLivestreamsLayout = (props) => {
 
     return (
         <React.Fragment>
-            <Head>
-                <title key="title">CareerFairy | Next Live Streams</title>
-            </Head>
             <div className={classes.root}>
                 <TopBar
                     links={mainLinks}
