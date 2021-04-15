@@ -1,9 +1,9 @@
 import {Tooltip} from '@material-ui/core';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
-import VolumeOffIcon from '@material-ui/icons/VolumeOff';
 import React, {useEffect, useRef} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import SpeakerInfoOverlay from './SpeakerInfoOverlay';
+import VolumeOffIcon from '@material-ui/icons/MicOff';
 
 const mutedOverlayZIndex = 9901
 const useStyles = makeStyles(theme => ({
@@ -62,6 +62,9 @@ const useStyles = makeStyles(theme => ({
             // objectFit: "contain !important",
         }
     },
+    svgShadow: {
+        filter: `drop-shadow(0px 0px 2px rgba(0,0,0,0.4))`
+    },
 }))
 
 const LocalVideoContainer = ({currentLivestream, height, localSpeaker, localStream, small}) => {
@@ -88,7 +91,7 @@ const LocalVideoContainer = ({currentLivestream, height, localSpeaker, localStre
                             <img src={currentLivestream.companyLogoUrl} className={classes.companyIcon}/>
                         </div>
                         <Tooltip title={'The streamer has turned the camera off'}>
-                            <VideocamOffIcon fontSize='large' color='error'/>
+                            <VideocamOffIcon className={classes.svgShadow} fontSize='large' color='error'/>
                         </Tooltip>
                     </div>
                 </div>
@@ -97,7 +100,7 @@ const LocalVideoContainer = ({currentLivestream, height, localSpeaker, localStre
                 localStream?.audioMuted &&
                 <div className={classes.audioMuted}>
                     <Tooltip title={'The streamer has muted his microphone'}>
-                        <VolumeOffIcon fontSize='large' color='error'/>
+                        <VolumeOffIcon className={classes.svgShadow} fontSize='large' color='error'/>
                     </Tooltip>
                 </div>
             }

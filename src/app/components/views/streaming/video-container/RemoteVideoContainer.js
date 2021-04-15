@@ -1,6 +1,6 @@
 import {Tooltip} from '@material-ui/core';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
-import VolumeOffIcon from '@material-ui/icons/VolumeOff';
+import VolumeOffIcon from '@material-ui/icons/MicOff';
 import SignalCellularConnectedNoInternet2BarIcon from '@material-ui/icons/SignalCellularConnectedNoInternet2Bar';
 import React, {useEffect, useRef, useContext} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
@@ -64,7 +64,10 @@ const useStyles = makeStyles(theme => ({
             //     objectPosition: props => props.isScreenShareVideo ? "top" : "center",
             // }
         },
-    }
+    },
+    svgShadow: {
+        filter: `drop-shadow(0px 0px 2px rgba(0,0,0,0.4))`
+    },
 }))
 
 const RemoteVideoContainer = ({
@@ -194,7 +197,7 @@ const RemoteVideoContainer = ({
                                 <img src={currentLivestream.companyLogoUrl} className={classes.companyIcon}/>
                             </div>
                             <Tooltip title={'The streamer has turned the camera off'}>
-                                <VideocamOffIcon fontSize='large' color='error'/>
+                                <VideocamOffIcon className={classes.svgShadow} fontSize='large' color='error'/>
                             </Tooltip>
                         </div>
                     </div>
@@ -203,7 +206,7 @@ const RemoteVideoContainer = ({
                     stream.audioMuted &&
                     <div className={classes.audioMuted}>
                         <Tooltip title={'The streamer has muted his microphone'}>
-                            <VolumeOffIcon fontSize='large' color='error'/>
+                            <VolumeOffIcon className={classes.svgShadow} fontSize='large' color='error'/>
                         </Tooltip>
                     </div>
                 }
