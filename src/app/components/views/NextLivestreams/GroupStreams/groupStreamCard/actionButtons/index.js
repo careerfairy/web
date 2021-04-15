@@ -35,7 +35,7 @@ export const DetailsButton = ({listenToUpcoming, mobile, livestream, groupData, 
             prefetch={false}
             href={{
                 pathname: `/upcoming-livestream/${livestream.id}`,
-                query: listenToUpcoming ? null : {groupId: groupData.groupId}
+                query: listenToUpcoming ? null : {groupId: groupData.groupId},
             }}>
             <a>
                 <Button
