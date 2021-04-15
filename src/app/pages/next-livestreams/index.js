@@ -81,6 +81,7 @@ const nextLivestreamsPage = ({livestreamId, serverSideStream}) => {
                 <StreamsSection value={value}
                                 upcomingLivestreams={upcomingLivestreams}
                                 livestreamId={livestreamId}
+                                listenToUpcoming
                                 pastLivestreams={pastLivestreams}
                 />
             </NextLivestreamsLayout>

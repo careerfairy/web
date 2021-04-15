@@ -56,7 +56,8 @@ const useStyles = makeStyles(theme => ({
 
     },
     emptyMessage: {
-        margin: "auto !important"
+        margin: "auto !important",
+        padding: theme.spacing(0,1)
     },
     viewPanel: {
         display: "flex",

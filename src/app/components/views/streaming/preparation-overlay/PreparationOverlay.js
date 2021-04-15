@@ -5,7 +5,7 @@ import {isEmpty} from 'lodash/fp'
 import {
     Button,
     CircularProgress,
-    Collapse,
+    Collapse, Container,
     FormControl,
     FormControlLabel,
     FormGroup,
@@ -22,17 +22,19 @@ import {URL_REGEX} from 'components/util/constants';
 
 const useStyles = makeStyles((theme) => ({
     background: {
-        width: "100%",
+        // width: "100%",
         height: "100vh",
         backgroundColor: theme.palette.primary.main,
-        color: "white"
+        color: "white",
+        display: "grid",
+        placeItems: "center",
     },
     centered: {
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%,-50%)",
-        minWidth: 400
+        // position: "absolute",
+        // top: "50%",
+        // left: "50%",
+        // transform: "translate(-50%,-50%)",
+        // minWidth: 400
     },
     speakerTitle: {
         fontSize: "1rem",
@@ -158,11 +160,11 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
     const formHasErrors = () => {
         let errors = {};
         if (showLinkedIn) {
-            errors.linkedInUrl = isEmpty(linkedInUrl.trim()) || !isValidUrl(linkedInUrl)
+            errors.linkedInUrl = isEmpty(linkedInUrl?.trim()) || !isValidUrl(linkedInUrl)
         }
-        errors.firstName = isEmpty(speaker.firstName.trim())
-        errors.lastName = isEmpty(speaker.lastName.trim())
-        errors.position = isEmpty(speaker.position.trim())
+        errors.firstName = isEmpty(speaker.firstName?.trim())
+        errors.lastName = isEmpty(speaker.lastName?.trim())
+        errors.position = isEmpty(speaker.position?.trim())
         setFormErrors(errors)
         return Object.keys(errors).some(key => errors[key] === true);
     }
@@ -172,7 +174,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
     }
 
     return (
-        <div className={classes.background}>
+        <Container maxWidth={false} className={classes.background}>
             <form onSubmit={joinStream} className={classes.centered}>
                 <Typography variant="h5" className={classes.title}>Welcome to your stream</Typography>
                 <Typography variant="h4">{livestream.title}</Typography>
@@ -182,7 +184,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                     <FormGroup>
                         <FormGroup>
                             <FormControl className={classes.marginTop}>
-                                <TextField error={formErrors.firstName && isEmpty(speaker.firstName.trim())}
+                                <TextField error={formErrors.firstName && isEmpty(speaker.firstName?.trim())}
                                             helperText={formErrors.firstName && "Required"} id="outlined-basic"
                                             label="First Name" variant="outlined"
                                             name="firstName"
@@ -193,7 +195,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                                             })}/>
                             </FormControl>
                             <FormControl className={classes.marginTop}>
-                                <TextField error={formErrors.lastName && isEmpty(speaker.lastName.trim())}
+                                <TextField error={formErrors.lastName && isEmpty(speaker.lastName?.trim())}
                                             helperText={formErrors.lastName && "Required"} id="outlined-basic"
                                             label="Last Name" variant="outlined"
                                             name="lastName"
@@ -204,7 +206,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                                             })}/>
                             </FormControl>
                             <FormControl className={classes.marginTop}>
-                                <TextField error={formErrors.position && isEmpty(speaker.position.trim())}
+                                <TextField error={formErrors.position && isEmpty(speaker.position?.trim())}
                                             helperText={formErrors.position && "Required"} id="outlined-basic"
                                             label="Occupation" placeholder="Lead Engineer"
                                             name="jobTitle"
@@ -247,7 +249,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                 <Button variant='contained' type="submit" size='large' onClick={joinStream} disabled={loading}
                         startIcon={loading && <CircularProgress size="small"/>}>Join now</Button>
             </form>
-        </div>
+        </Container>
     )
 }
 
