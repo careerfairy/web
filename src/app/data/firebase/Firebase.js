@@ -41,6 +41,11 @@ class Firebase {
         return await getGroupsAndTheirFollowers({requestingGroup, groups, streams, currentUserDataSet})
     }
 
+    createUserInAuthAndFirebase = async (userData) => {
+        const createUserInAuthAndFirebase = this.functions.httpsCallable("createNewUserAccount")
+        return createUserInAuthAndFirebase({ userData })
+    }
+
     // *** Auth API ***
 
     createUserWithEmailAndPassword = (email, password) => {
