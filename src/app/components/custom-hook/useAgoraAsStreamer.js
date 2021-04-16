@@ -155,18 +155,21 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                     })
 
                     localStream.play(videoId);
-                    rtcClient.publish(localStream, handleStreamPublishingError);
-                    rtcClient.enableDualStream(() => {
-                    }, function (err) {
-                        setAgoraRtcStatus({
-                            type: "WARN",
-                            msg: "RTC_DUAL_STREAM_INACTIVE"
-                        })
-                    });
+                    rtcClient.publish(localStream, handleStreamPublishingError)
                     setLocalMediaStream(localStream);
                     // Publish the local stream
                 }, handleStreamInitializationError);
             }, handleClientJoinChannelError);
+
+            rtcClient.enableDualStream(() => {
+                console.log("-> dualStream enabled on rtc client");
+            }, function (err) {
+                console.log("-> dualStream failed on rtc client", err);
+                setAgoraRtcStatus({
+                    type: "WARN",
+                    msg: "RTC_DUAL_STREAM_INACTIVE"
+                })
+            });
         } else {
             rtcClient.setClientRole("audience");
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
@@ -177,6 +180,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             }, handleClientJoinChannelError);
         }
         rtcClient.enableAudioVolumeIndicator()
+
 
         rtcClient.on("stream-published", function (evt) {
             setAgoraRtcStatus({
@@ -419,6 +423,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                     screenShareClient.init(AGORA_APP_ID, () => {
                         publishScreenShareStream(screenShareClient)
                     });
+
+
                     setScreenShareRtcClient(screenShareClient);
                 } else {
                     publishScreenShareStream(screenShareRtcClient)
@@ -450,6 +456,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
             if (screenSharingMode === 'motion') {
                 screenShareStream.setScreenProfile("720p_2")
+
             } else {
                 screenShareStream.setVideoProfile("480p_9");
             }
@@ -457,6 +464,10 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 type: "INFO",
                 msg: "RTC_SCREEN_SHARE_STARTED"
             })
+
+
+            // client.on("stream-published", function (evt) {
+            // })
 
             screenShareStream.init(() => {
                 screenShareStream.play("Screen");
@@ -486,6 +497,14 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 })
             });
         }, handleClientJoinChannelError);
+
+        client.enableDualStream(() => {
+        }, function (err) {
+            setAgoraRtcStatus({
+                type: "WARN",
+                msg: "RTC_DUAL_STREAM_INACTIVE"
+            })
+        });
     }
 
     useEffect(() => {
