@@ -23,7 +23,6 @@ const groupUpcomingLivestreamsSelector = createSelector(
             }
         }
         return newLivestreams.reduce((accumulator, currentLivestream) => {
-            if (currentLivestream.hidden) return accumulator
             if (currentLivestream.targetCategories) {
                 const livestreamCategories =
                     currentLivestream.targetCategories[groupId];

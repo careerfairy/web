@@ -41,6 +41,11 @@ class Firebase {
         return await getGroupsAndTheirFollowers({requestingGroup, groups, streams, currentUserDataSet})
     }
 
+    createUserInAuthAndFirebase = async (userData) => {
+        const createUserInAuthAndFirebase = this.functions.httpsCallable("createNewUserAccount")
+        return createUserInAuthAndFirebase({ userData })
+    }
+
     // *** Auth API ***
 
     createUserWithEmailAndPassword = (email, password) => {
@@ -1062,6 +1067,14 @@ class Firebase {
             .where("joined", ">", now)
             .orderBy("joined", "asc")
             .limit(1)
+        return ref.onSnapshot(callback);
+    }
+
+    listenToAllLivestreamParticipatingStudents = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("participatingStudents")
         return ref.onSnapshot(callback);
     }
 

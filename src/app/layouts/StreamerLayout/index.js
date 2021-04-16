@@ -12,21 +12,27 @@ import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import {v4 as uuidv4} from "uuid";
 import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
 import {shallowEqual, useSelector} from "react-redux";
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        position: "relative",
+        // minHeight: "100vh",
+        height: "100vh",
+        width: "100%",
+        touchAction: "manipulation",
+        // border: "6px solid pink",
         backgroundColor: theme.palette.background.dark,
         display: 'flex',
-        height: '100vh',
+        // height: '100vh',
         overflow: 'hidden',
-        width: '100%'
     },
     wrapper: {
         display: 'flex',
         flex: '1 1 auto',
         overflow: 'hidden',
         paddingTop: 55,
-        paddingLeft: ({showMenu}) => showMenu ? 280 : 0,
+        paddingLeft: ({showMenu, smallScreen}) => (showMenu && !smallScreen) ? 280 : 0,
         transition: theme.transitions.create("padding-left", {
             duration: theme.transitions.duration.standard,
             easing: theme.transitions.easing.easeInOut
@@ -40,6 +46,8 @@ const useStyles = makeStyles((theme) => ({
     content: {
         flex: '1 1 auto',
         height: '100%',
+        background: theme.palette.common.black,
+        position: "relative"
         // overflow: 'auto'
     },
     menuLeft: {
@@ -57,9 +65,10 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamerLayout = (props) => {
     const {children, firebase} = props
-
     const {query: {token, livestreamId}, pathname} = useRouter()
     const router = useRouter();
+    const smallScreen = useMediaQuery('(max-width:700px)');
+
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [newNotification, setNewNotification] = useState(null);
     const [notificationToRemove, setNotificationToRemove] = useState(null);
@@ -83,16 +92,6 @@ const StreamerLayout = (props) => {
             doc: livestreamId,
             storeAs: "currentLivestream",
             populates
-        },
-        {
-            collection: "livestreams",
-            doc: livestreamId,
-            subcollections: [
-                {
-                    collection: "participatingStudents",
-                }
-            ],
-            storeAs: "audience"
         }
     ] : [], [livestreamId])
 
@@ -101,12 +100,10 @@ const StreamerLayout = (props) => {
         id: livestreamId
     }, shallowEqual)
 
-    // const firestore = useSelector(({firestore}) => firestore)
-    // console.log("-> firestore", firestore);
-
     const classes = useStyles({
         showMenu,
-        hasStarted: currentLivestream?.hasStarted
+        hasStarted: currentLivestream?.hasStarted,
+        smallScreen
     });
 
 
@@ -154,6 +151,12 @@ const StreamerLayout = (props) => {
             setNotifications([...notifications, newNotification]);
         }
     }, [newNotification]);
+
+    useEffect(() => {
+        if (smallScreen && showMenu) {
+            setShowMenu(false)
+        }
+    }, [smallScreen])
 
     useEffect(() => {
         if (notificationToRemove) {
@@ -218,7 +221,7 @@ const StreamerLayout = (props) => {
                     <LeftMenu
                         handleStateChange={handleStateChange}
                         selectedState={selectedState}
-                        className={classes.menuLeft}
+                        smallScreen={smallScreen}
                         streamer={true}
                         sliding={sliding}
                         setSliding={setSliding}
@@ -239,6 +242,7 @@ const StreamerLayout = (props) => {
                                     audienceDrawerOpen,
                                     setShowMenu,
                                     setSliding,
+                                    smallScreen,
                                     selectedState,
                                     handleStateChange,
                                     showAudience,
@@ -257,8 +261,8 @@ const StreamerLayout = (props) => {
 };
 
 StreamerLayout.propTypes = {
-  children: PropTypes.node.isRequired,
-  firebase: PropTypes.object
+    children: PropTypes.node.isRequired,
+    firebase: PropTypes.object
 }
 export default withFirebase(StreamerLayout);
 

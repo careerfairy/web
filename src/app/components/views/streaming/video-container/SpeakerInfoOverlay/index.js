@@ -2,7 +2,8 @@ import React from 'react';
 import {fade, makeStyles} from "@material-ui/core/styles";
 import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import PropTypes from 'prop-types';
-import { IconButton, Tooltip } from '@material-ui/core';
+import {IconButton, Tooltip} from '@material-ui/core';
+import Link from 'next/link'
 
 const useStyles = makeStyles(theme => ({
     speakerInformation: {
@@ -20,6 +21,7 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "row",
         alignItems: "center",
         maxWidth: props => props.small ? "230px" : "100%",
+        zIndex: props => props.zIndex
     },
     speakerName: {
         fontSize: props => props.small ? "0.7rem" : "1rem",
@@ -27,7 +29,7 @@ const useStyles = makeStyles(theme => ({
     },
     speakerData: {
         maxWidth: props => props.small ? "180px" : "100%",
-        
+
     },
     speakerPosition: {
         fontWeight: "normal",
@@ -45,15 +47,19 @@ const useStyles = makeStyles(theme => ({
     },
     speakerLinkedInButton: {
         color: theme.palette.common.white,
-        fontSize:  props => props.small ? 20 : 30,
+        fontSize: props => props.small ? 20 : 30,
     },
 }));
 
-const SpeakerInfoOverlay = ({ speaker, small }) => {
-    const classes = useStyles({ small: small })
+const SpeakerInfoOverlay = ({speaker, small, zIndex}) => {
+    const classes = useStyles({small: small, zIndex})
 
     const handleClick = () => {
-        window.open( speaker.linkedIn, '_blank' )
+        let url = speaker.linkedIn
+        if (!url.match(/^[a-zA-Z]+:\/\//)) {
+            url = 'https://' + url;
+        }
+        window.open(url, '_blank')
     }
 
     if (small) {
@@ -66,17 +72,17 @@ const SpeakerInfoOverlay = ({ speaker, small }) => {
                     <div>
                         <h5 className={classes.speakerPosition}>{`${speaker.position}`}</h5>
                     </div>
-                </div> 
-                { 
-                    speaker.showLinkedIn && 
-                    <div className={ classes.speakerLinkedIn }>
+                </div>
+                {
+                    speaker.showLinkedIn &&
+                    <div className={classes.speakerLinkedIn}>
                         <Tooltip title={`Open ${speaker.firstName}'s LinkedIn profile in a new tab`}>
                             <IconButton className={classes.speakerLinkedInIconButton} onClick={handleClick}>
                                 <LinkedInIcon className={classes.speakerLinkedInButton}/>
                             </IconButton>
-                        </Tooltip>         
-                    </div>    
-                }        
+                        </Tooltip>
+                    </div>
+                }
             </div>
         );
     } else {
@@ -89,23 +95,24 @@ const SpeakerInfoOverlay = ({ speaker, small }) => {
                     <div>
                         <h4 className={classes.speakerPosition}>{`${speaker.position}`}</h4>
                     </div>
-                </div> 
-                { 
-                    speaker.showLinkedIn && 
-                    <div className={ classes.speakerLinkedIn }>
+                </div>
+                {
+                    speaker.showLinkedIn &&
+                    <div className={classes.speakerLinkedIn}>
                         <Tooltip title={`Open ${speaker.firstName}'s LinkedIn profile in a new tab`}>
                             <IconButton className={classes.speakerLinkedInIconButton} onClick={handleClick}>
                                 <LinkedInIcon className={classes.speakerLinkedInButton}/>
                             </IconButton>
-                        </Tooltip>         
-                    </div>   
-                }     
+                        </Tooltip>
+                    </div>
+                }
             </div>
         );
-    }    
+    }
 };
 SpeakerInfoOverlay.prototypes = {
     speaker: PropTypes.string.isRequired,
-    small: PropTypes.bool.isRequired
+    small: PropTypes.bool.isRequired,
+    zIndex: PropTypes.number,
 }
 export default SpeakerInfoOverlay;

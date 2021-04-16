@@ -14,7 +14,8 @@ const NextLivestreams = ({
                              currentGroup,
                              selectedOptions,
                              setSelectedOptions,
-                             isPastLivestreams
+                             isPastLivestreams,
+                             listenToUpcoming
                          }) => {
     const {userData} = useAuth();
     const theme = useTheme();
@@ -87,7 +88,7 @@ const NextLivestreams = ({
             selectedOptions={selectedOptions}
             scrollToTop={scrollToTop}
             livestreams={livestreams}
-            listenToUpcoming
+            listenToUpcoming={listenToUpcoming}
             careerCenterId={careerCenterId}
             livestreamId={livestreamId}
             alreadyJoined={groupData.alreadyJoined}
@@ -99,7 +100,7 @@ const NextLivestreams = ({
         <DesktopFeed
             handleToggleActive={handleToggleActive}
             hasCategories={hasCategories()}
-            listenToUpcoming
+            listenToUpcoming={listenToUpcoming}
             livestreamId={livestreamId}
             selectedOptions={selectedOptions}
             careerCenterId={careerCenterId}

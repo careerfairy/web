@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
+const ScreenShareModal = ({open, handleClose, handleScreenShare, smallScreen}) => {
 
     const [showShareAudioHint, setShowShareAudioHint] = useState(false);
     const [hasSeenShareAudioTip, setHasSeenShareAudioTip] = useState(false);
@@ -88,10 +88,9 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
     }
 
     return (
-        <GlassDialog fullWidth maxWidth="sm" onClose={closeScreenShareModal} open={open}>
+        <GlassDialog fullScreen={smallScreen} fullWidth maxWidth="sm" onClose={closeScreenShareModal} open={open}>
             {showShareAudioHint ?
-                <Grow in>
-                    <div>
+                <React.Fragment>
                         <DialogTitle>
                             <Typography align="center" variant="h4">
                                 When Sharing a video
@@ -140,11 +139,9 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
                                 Proceed
                             </Button>
                         </DialogActions>
-                    </div>
-                </Grow>
+                </React.Fragment>
                 :
-                <Grow in>
-                    <div>
+                <React.Fragment>
                         <DialogTitle>
                             <Typography align="center" variant="h4">
                                 Would you like to share
@@ -181,8 +178,7 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
                                 Close
                             </Button>
                         </DialogActions>
-                    </div>
-                </Grow>
+                </React.Fragment>
             }
         </GlassDialog>
     );
