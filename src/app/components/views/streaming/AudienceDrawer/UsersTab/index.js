@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {FormControl, Grid, InputLabel, MenuItem, Select, TextField} from "@material-ui/core";
 import UserList from "./UserList";
@@ -21,7 +21,7 @@ const options = [
     TALENT_POOL_OPTION
 ]
 
-const UsersTab = ({isStreamer}) => {
+const UsersTab = ({isStreamer, participatingStudents}) => {
 
 
     const classes = useStyles()
@@ -29,6 +29,8 @@ const UsersTab = ({isStreamer}) => {
 
     const [searchParams, setSearchParams] = useState("");
     const [currentOption, setCurrentOption] = useState(options[0]);
+
+    const [filteredAudience, setFilteredAudience] = useState(undefined);
 
     const handleFilter = (arrayOfUserObjects) => {
         let filtered = arrayOfUserObjects.filter(user =>
@@ -39,10 +41,14 @@ const UsersTab = ({isStreamer}) => {
         if (currentOption === TALENT_POOL_OPTION) {
             filtered = filtered.filter(user => talentPool?.includes(user.id))
         }
-        return filtered.map(user => ({...user, inTalentPool: talentPool?.includes(user.id)}))
+        return filtered
     }
 
-    const audience = useSelector(({firestore: {ordered: {audience}}}) => audience && handleFilter(audience))
+    useEffect(() => {
+        const newFilteredAudience = handleFilter(participatingStudents)
+        setFilteredAudience(newFilteredAudience)
+    }, [participatingStudents, searchParams, currentOption])
+
 
     const handleSearch = (e) => {
         setSearchParams(e.currentTarget.value.toLowerCase())
@@ -78,11 +84,11 @@ const UsersTab = ({isStreamer}) => {
                     </FormControl>
                 </Grid>}
             </Grid>
-            {!isLoaded(audience) ?
+            {!isLoaded(filteredAudience) ?
                 <LoadingDisplay/> :
-                isEmpty(audience) ?
+                isEmpty(filteredAudience) ?
                     <EmptyDisplay text="Not enough data"/> :
-                    <UserList isStreamer={isStreamer} audience={audience}/>}
+                    <UserList isStreamer={isStreamer} audience={filteredAudience}/>}
         </Fragment>
     );
 };

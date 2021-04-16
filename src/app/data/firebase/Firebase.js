@@ -1070,6 +1070,14 @@ class Firebase {
         return ref.onSnapshot(callback);
     }
 
+    listenToAllLivestreamParticipatingStudents = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("participatingStudents")
+        return ref.onSnapshot(callback);
+    }
+
     getLivestreamTalentPoolMembers = (companyId) => {
         let ref = this.firestore
             .collection("userData")

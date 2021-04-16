@@ -15,16 +15,10 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const BreakdownTab = ({}) => {
+const BreakdownTab = ({audience}) => {
 
     const classes = useStyles()
     const {currentLivestream: {talentPool}} = useCurrentStream()
-
-    const handleMap = (arrayOfUsers) => {
-        return arrayOfUsers.map(user => ({...user, inTalentPool: talentPool?.includes(user.id)}))
-    }
-
-    const audience = useSelector(({firestore: {ordered: {audience}}}) => audience && handleMap(audience))
 
     const talentPoolPercentage = useMemo(() => {
         const totalCount = audience.length

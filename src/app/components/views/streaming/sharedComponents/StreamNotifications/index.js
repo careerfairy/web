@@ -23,7 +23,7 @@ const StreamNotifications = ({isStreamer, firebase}) => {
 
     useEffect(() => {
         if (currentLivestream?.id && (userData || isStreamer)) {
-            firebase.listenToLivestreamParticipatingStudents(currentLivestream.id, querySnapshot => {
+            const unsubscribe = firebase.listenToLivestreamParticipatingStudents(currentLivestream.id, querySnapshot => {
                 querySnapshot.docChanges().forEach((change, index) => {
                     if (change.type === "added") {
                         if (change.doc.exists) {
@@ -35,6 +35,7 @@ const StreamNotifications = ({isStreamer, firebase}) => {
                     }
                 })
             })
+            return () => unsubscribe()
         }
     }, [currentLivestream?.id, userData?.userEmail])
 
