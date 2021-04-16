@@ -84,11 +84,11 @@ const UsersTab = ({isStreamer, participatingStudents}) => {
                     </FormControl>
                 </Grid>}
             </Grid>
-            {!isLoaded(filteredAudience) ?
+            {!isLoaded(participatingStudents) ?
                 <LoadingDisplay/> :
-                isEmpty(filteredAudience) ?
+                isEmpty(participatingStudents) ?
                     <EmptyDisplay text="Not enough data"/> :
-                    <UserList isStreamer={isStreamer} audience={filteredAudience}/>}
+                    <UserList isStreamer={isStreamer} audience={handleFilter(participatingStudents)}/>}
         </Fragment>
     );
 };
