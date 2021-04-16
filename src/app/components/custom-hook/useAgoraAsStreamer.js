@@ -458,9 +458,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
             if (screenSharingMode === 'motion') {
                 screenShareStream.setScreenProfile("720p_2")
-
             } else {
-                screenShareStream.setVideoProfile("480p_9");
+                screenShareStream.setScreenProfile("1080p_1");
             }
             setAgoraRtcStatus({
                 type: "INFO",
