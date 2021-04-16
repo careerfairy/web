@@ -161,15 +161,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 }, handleStreamInitializationError);
             }, handleClientJoinChannelError);
 
-            rtcClient.enableDualStream(() => {
-                console.log("-> dualStream enabled on rtc client");
-            }, function (err) {
-                console.log("-> dualStream failed on rtc client", err);
-                setAgoraRtcStatus({
-                    type: "WARN",
-                    msg: "RTC_DUAL_STREAM_INACTIVE"
-                })
-            });
+
         } else {
             rtcClient.setClientRole("audience");
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
@@ -183,6 +175,16 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
 
         rtcClient.on("stream-published", function (evt) {
+            rtcClient.enableDualStream(() => {
+                console.log("-> dualStream enabled on rtc client");
+            }, function (err) {
+                console.log("-> dualStream failed on rtc client", err);
+                setAgoraRtcStatus({
+                    type: "WARN",
+                    msg: "RTC_DUAL_STREAM_INACTIVE"
+                })
+            });
+
             setAgoraRtcStatus({
                 type: "INFO",
                 msg: "RTC_STREAM_PUBLISHED"
@@ -465,10 +467,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 msg: "RTC_SCREEN_SHARE_STARTED"
             })
 
-
-            // client.on("stream-published", function (evt) {
-            // })
-
             screenShareStream.init(() => {
                 screenShareStream.play("Screen");
                 client.publish(screenShareStream, handleStreamPublishingError);
@@ -498,13 +496,16 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             });
         }, handleClientJoinChannelError);
 
-        client.enableDualStream(() => {
-        }, function (err) {
-            setAgoraRtcStatus({
-                type: "WARN",
-                msg: "RTC_DUAL_STREAM_INACTIVE"
-            })
-        });
+        // DUAL STREAM MAYBE NOT SUPPORT FOR SCREEN SHARE?!
+        // client.enableDualStream(() => {
+        //     console.log("-> screenShareDualStream enabled ");
+        // }, function (err) {
+        //     console.log("-> screenShareDualStream failed ", err);
+        //     setAgoraRtcStatus({
+        //         type: "WARN",
+        //         msg: "RTC_DUAL_STREAM_INACTIVE"
+        //     })
+        // });
     }
 
     useEffect(() => {
