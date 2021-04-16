@@ -23,18 +23,19 @@ const StreamNotifications = ({isStreamer, firebase}) => {
 
     useEffect(() => {
         if (currentLivestream?.id && (userData || isStreamer)) {
-            firebase.listenToLivestreamParticipatingStudents(currentLivestream.id, querySnapshot => {
-                querySnapshot.docChanges().forEach((change, index) => {
-                    if (change.type === "added") {
-                        if (change.doc.exists) {
-                            const docData = change.doc.data()
-                            if (userData?.userEmail !== docData?.userEmail) { // make sure you dont get notified of your self joining
-                                sendJoinMessage(docData, change.type === "modified")
-                            }
-                        }
-                    }
-                })
-            })
+            // const unsubscribe = firebase.listenToLivestreamParticipatingStudents(currentLivestream.id, querySnapshot => {
+            //     querySnapshot.docChanges().forEach((change, index) => {
+            //         if (change.type === "added") {
+            //             if (change.doc.exists) {
+            //                 const docData = change.doc.data()
+            //                 if (userData?.userEmail !== docData?.userEmail) { // make sure you dont get notified of your self joining
+            //                     sendJoinMessage(docData, change.type === "modified")
+            //                 }
+            //             }
+            //         }
+            //     })
+            // })
+            // return () => unsubscribe()
         }
     }, [currentLivestream?.id, userData?.userEmail])
 

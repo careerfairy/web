@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
         flex: '1 1 auto',
         overflow: 'hidden',
         paddingTop: 55,
-        paddingLeft: ({showMenu, smallScreen}) => (showMenu && !smallScreen)  ? 280 : 0,
+        paddingLeft: ({showMenu, smallScreen}) => (showMenu && !smallScreen) ? 280 : 0,
         transition: theme.transitions.create("padding-left", {
             duration: theme.transitions.duration.standard,
             easing: theme.transitions.easing.easeInOut
@@ -92,16 +92,6 @@ const StreamerLayout = (props) => {
             doc: livestreamId,
             storeAs: "currentLivestream",
             populates
-        },
-        {
-            collection: "livestreams",
-            doc: livestreamId,
-            subcollections: [
-                {
-                    collection: "participatingStudents",
-                }
-            ],
-            storeAs: "audience"
         }
     ] : [], [livestreamId])
 
@@ -163,10 +153,10 @@ const StreamerLayout = (props) => {
     }, [newNotification]);
 
     useEffect(() => {
-        if(smallScreen && showMenu){
+        if (smallScreen && showMenu) {
             setShowMenu(false)
         }
-    },[smallScreen])
+    }, [smallScreen])
 
     useEffect(() => {
         if (notificationToRemove) {
