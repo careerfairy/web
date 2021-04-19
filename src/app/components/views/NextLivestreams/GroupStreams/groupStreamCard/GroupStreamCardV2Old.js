@@ -36,6 +36,7 @@ import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
 
 import clsx from "clsx";
 import {Row} from "@mui-treasury/components/flex";
+import {companyLogoPlaceholder} from "../../../../../constants/images";
 
 const useStyles = makeStyles((theme) => {
     const paperColor = theme.palette.background.paper
@@ -427,7 +428,7 @@ const GroupStreamCardV2Old = memo(({
     const [levelOfStudyModalOpen, setLevelOfStudyModalOpen] = useState(false);
     const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false);
     const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
-
+    const [backgroundError, setBackgroundError] = useState(false);
     const classes = useStyles({
         hideActions,
         isHighlighted,
@@ -675,6 +676,12 @@ const GroupStreamCardV2Old = memo(({
         }
     }
 
+    const handleBackgroundImageError = () => {
+        setBackgroundError(true)
+    }
+
+    const backgroundSrc = backgroundError ? companyLogoPlaceholder: `${livestream.backgroundImageUrl}_400x400`
+
     return (
         <Fragment>
             <ClickAwayListener onClickAway={handleClickAwayDetails}>
@@ -700,8 +707,12 @@ const GroupStreamCardV2Old = memo(({
                                       </Typography>
                                   }/>}
                             {!cardHovered &&
-                            <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
-                                 alt="background"/>
+                            <img
+                                // onError={companyLogoPlaceholder}
+                                onError={handleBackgroundImageError}
+                                className={classes.lowerFrontBackgroundImage}
+                                src={backgroundSrc}
+                                alt="background"/>
                             }
                             <div className={classes.dateTimeWrapper}>
                                 <div className={classes.dynamicMargin}>
