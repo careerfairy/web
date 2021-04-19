@@ -680,7 +680,14 @@ const GroupStreamCardV2Old = memo(({
         setBackgroundError(true)
     }
 
-    const backgroundSrc = backgroundError ? companyLogoPlaceholder: `${livestream.backgroundImageUrl}_400x400`
+    // const resizedUrl = livestream.backgroundImageUrl.replace(".", "_400x400.")
+    const resizedUrl = livestream.backgroundImageUrl.replace(/.(?=[^.]*$)/, "_400x400.")
+    if (livestream.id === "uzV5jj2AYogBlemIVcr8") {
+        console.log("-> resizedUrl", resizedUrl);
+        console.log("-> livestream.backgroundImageUrl", livestream.backgroundImageUrl);
+    }
+    const backgroundSrc = backgroundError ? companyLogoPlaceholder : resizedUrl
+    // console.log("-> backgroundSrc", backgroundSrc);
 
     return (
         <Fragment>

@@ -51,7 +51,7 @@ const Wrapper = ({children, streamId}) => {
             style={{flex: 1, display: "flex", width: "-webkit-fill-available"}}
             key={streamId}
             height={gridItemHeight}
-            unmountIfInvisible
+            // unmountIfInvisible
             offset={[0, 0]}
             placeholder={<Spinner/>}>
             {children}
