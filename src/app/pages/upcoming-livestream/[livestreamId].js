@@ -29,6 +29,8 @@ import GroupsUtil from "../../data/util/GroupsUtil";
 import {store} from '../_app'
 import {Paper, Avatar, Box} from '@material-ui/core';
 import {companyLogoPlaceholder} from "../../constants/images";
+import {getResizedUrl} from "../../components/helperFunctions/HelperFunctions";
+import HeadWithMeta from "../../components/page/HeadWithMeta";
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
@@ -62,17 +64,17 @@ const parseDates = (stream) => {
     return stream
 }
 
-function UpcomingLivestream(props) {
+function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
     // console.log("-> UpcomingLivestream props", props);
     const classes = useStyles()
     const router = useRouter();
-    const {livestreamId, groupId} = router.query;
+    const {livestreamId} = router.query;
     const absolutePath = router.asPath;
 
     const {userData, authenticatedUser: user} = useAuth();
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
-    const [currentLivestream, setCurrentLivestream] = useState(parseDates(props.currentLivestream));
+    const [currentLivestream, setCurrentLivestream] = useState(parseDates(serverSideLivestream));
     const [registration, setRegistration] = useState(false);
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
@@ -88,7 +90,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (livestreamId) {
-            const unsubscribe = props.firebase.listenToLivestreamQuestions(
+            const unsubscribe = firebase.listenToLivestreamQuestions(
                 livestreamId,
                 (querySnapshot) => {
                     var questionsList = [];
@@ -106,7 +108,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (groupId) {
-            const unsubscribe = props.firebase.listenToCareerCenterById(
+            const unsubscribe = firebase.listenToCareerCenterById(
                 groupId,
                 (querySnapshot) => {
                     let group = querySnapshot.data();
@@ -120,7 +122,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (livestreamId) {
-            const unsubscribe = props.firebase.listenToScheduledLivestreamById(
+            const unsubscribe = firebase.listenToScheduledLivestreamById(
                 livestreamId,
                 (querySnapshot) => {
                     if (querySnapshot.data()) {
@@ -170,7 +172,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (currentLivestream && currentLivestream.groupIds && currentLivestream.groupIds.length) {
-            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.groupIds)
+            firebase.getDetailLivestreamCareerCenters(currentLivestream.groupIds)
                 .then((querySnapshot) => {
                     let groupList = [];
                     querySnapshot.forEach((doc) => {
@@ -215,7 +217,7 @@ function UpcomingLivestream(props) {
             return router.push("/profile");
         }
 
-        props.firebase.deregisterFromLivestream(currentLivestream.id, user.email);
+        firebase.deregisterFromLivestream(currentLivestream.id, user.email);
     }
 
     function joinTalentPool() {
@@ -227,7 +229,7 @@ function UpcomingLivestream(props) {
             return router.push("/profile");
         }
 
-        props.firebase.joinCompanyTalentPool(
+        firebase.joinCompanyTalentPool(
             currentLivestream.companyId,
             user.email,
             currentLivestream.id
@@ -243,7 +245,7 @@ function UpcomingLivestream(props) {
             return router.push("/profile");
         }
 
-        props.firebase.leaveCompanyTalentPool(
+        firebase.leaveCompanyTalentPool(
             currentLivestream.companyId,
             user.email,
             currentLivestream.id
@@ -288,7 +290,7 @@ function UpcomingLivestream(props) {
         const {
             hasAgreedToAll,
             groupsWithPolicies
-        } = await GroupsUtil.getPolicyStatus(careerCenters, user.email, props.firebase)
+        } = await GroupsUtil.getPolicyStatus(careerCenters, user.email, firebase)
         if (!hasAgreedToAll) {
             setOpenJoinModal(true)
             setGroupsWithPolicies(groupsWithPolicies)
@@ -297,7 +299,7 @@ function UpcomingLivestream(props) {
         } else {
             setBookingModalOpen(true);
             setRegistration(true);
-            props.firebase
+            firebase
                 .registerToLivestream(currentLivestream.id, user.email, groupsWithPolicies)
                 .then(() => {
                     sendEmailRegistrationConfirmation();
@@ -307,7 +309,7 @@ function UpcomingLivestream(props) {
     }
 
     function completeRegistrationProcess() {
-        props.firebase.registerToLivestream(currentLivestream.id, user.email, groupsWithPolicies).then(() => {
+        firebase.registerToLivestream(currentLivestream.id, user.email, groupsWithPolicies).then(() => {
             setBookingModalOpen(true);
             sendEmailRegistrationConfirmation();
         })
@@ -326,7 +328,7 @@ function UpcomingLivestream(props) {
             return router.push("/profile");
         }
 
-        props.firebase.deregisterFromLivestream(livestreamId, user.email);
+        firebase.deregisterFromLivestream(livestreamId, user.email);
     }
 
     function dateIsInUnder24Hours(date) {
@@ -352,7 +354,7 @@ function UpcomingLivestream(props) {
             author: user.email,
         };
 
-        props.firebase
+        firebase
             .putLivestreamQuestion(currentLivestream.id, newQuestion)
             .then(
                 () => {
@@ -376,7 +378,7 @@ function UpcomingLivestream(props) {
                 key={speaker.id}
             >
                 <div className="livestream-speaker-avatar-capsule">
-                    <Avatar src={speaker?.avatar?.length ? speaker.avatar : speakerPlaceholder}
+                    <Avatar src={speaker?.avatar?.length ? getResizedUrl(speaker.avatar, "sm") : speakerPlaceholder}
                             className={classes.speakerAvatar}/>
                 </div>
                 <div className="livestream-speaker-description">
@@ -459,7 +461,7 @@ function UpcomingLivestream(props) {
             <Grid.Column key={careerCenter.groupId} mobile="6" computer="4">
                 <Paper className={classes.logoWrapper}>
                     <Image
-                        src={careerCenter.logoUrl}
+                        src={getResizedUrl(careerCenter.logoUrl, "md")}
                         style={{
                             maxHeight: "60px",
                             margin: "10px auto 5px auto",
@@ -477,41 +479,18 @@ function UpcomingLivestream(props) {
     return (
         <div>
             <div className="topLevelContainer">
-                <Head>
-                    {/*Primary Meta Tags */}
-                    <title>CareerFairy | Live Stream with {currentLivestream.company}</title>
-                    <meta name="title" content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
-                    <meta name="description"
-                          content={currentLivestream.title}/>
-
-                    {/*Open Graph / Facebook */}
-                    <meta property="og:type" content="website"/>
-                    <meta property="og:url" content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
-                    <meta property="og:title" key="title"
-                          content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
-                    <meta property="og:site_name" content="CareerFairy"/>
-                    <meta property="og:description"
-                          content={currentLivestream.title}/>
-                    <meta property="og:image"
-                          content={currentLivestream.backgroundImageUrl}/>
-
-                    {/*Twitter*/}
-                    <meta property="twitter:card" content="summary_large_image"/>
-                    <meta property="twitter:url"
-                          content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
-                    <meta property="twitter:title"
-                          content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
-                    <meta property="twitter:description"
-                          content={currentLivestream.title}/>
-                    <meta property="twitter:image"
-                          content={currentLivestream.backgroundImageUrl}/>
-                </Head>
+                <HeadWithMeta
+                    title={`CareerFairy | Live Stream with ${currentLivestream.company}`}
+                    fullPath={groupId ? `https://careerfairy.io/upcoming-livestream/${livestreamId}?groupId=${groupId}` : `https://careerfairy.io/upcoming-livestream/${livestreamId}`}
+                    image={getResizedUrl(currentLivestream.backgroundImageUrl, "sm")}
+                    description={currentLivestream.title}
+                />
                 <Header color="white"/>
                 <div
                     className="video-mask"
                     style={{
                         backgroundImage:
-                            "url(" + currentLivestream.backgroundImageUrl + ")",
+                            "url(" + getResizedUrl(currentLivestream.backgroundImageUrl, "lg") + ")",
                     }}
                 >
                     <div
@@ -588,7 +567,7 @@ function UpcomingLivestream(props) {
                                         <Box>
                                             <Paper className={classes.logoWrapper}>
                                                 <Image
-                                                    src={currentLivestream.companyLogoUrl}
+                                                    src={getResizedUrl(currentLivestream.companyLogoUrl, "md")}
                                                     style={{
                                                         maxWidth: "230px",
                                                         maxHeight: "140px",
@@ -761,7 +740,7 @@ function UpcomingLivestream(props) {
                                     <Image
                                         src={
                                             currentLivestream.companyLogoUrl
-                                                ? currentLivestream.companyLogoUrl
+                                                ? getResizedUrl(currentLivestream.companyLogoUrl, "md")
                                                 : companyLogoPlaceholder
                                         }
                                         style={{
@@ -1104,31 +1083,31 @@ function UpcomingLivestream(props) {
     );
 }
 
-export async function getServerSideProps({params: {livestreamId}}) {
-    let currentLivestream = {}
+export async function getServerSideProps({params: {livestreamId, groupId}}) {
+    let serverSideLivestream = {}
     const snap = await store.firestore.get({collection: "livestreams", doc: livestreamId})
     if (snap.exists) {
-        currentLivestream = snap.data()
+        serverSideLivestream = snap.data()
         // Clear out sensitive data for initial props
-        delete currentLivestream.registeredUsers
-        delete currentLivestream.talentPool
-        delete currentLivestream.adminEmails
-        delete currentLivestream.adminEmail
-        delete currentLivestream.author
-        delete currentLivestream.status
+        delete serverSideLivestream.registeredUsers
+        delete serverSideLivestream.talentPool
+        delete serverSideLivestream.adminEmails
+        delete serverSideLivestream.adminEmail
+        delete serverSideLivestream.author
+        delete serverSideLivestream.status
 
-        currentLivestream.id = snap.id
-        currentLivestream.createdDateString = currentLivestream.created?.toDate?.().toString()
-        currentLivestream.lastUpdatedDateString = currentLivestream.lastUpdated?.toDate?.().toString()
-        currentLivestream.startDateString = currentLivestream.start?.toDate?.().toString()
+        serverSideLivestream.id = snap.id
+        serverSideLivestream.createdDateString = serverSideLivestream.created?.toDate?.().toString()
+        serverSideLivestream.lastUpdatedDateString = serverSideLivestream.lastUpdated?.toDate?.().toString()
+        serverSideLivestream.startDateString = serverSideLivestream.start?.toDate?.().toString()
 
         // Clear out props that have methods of which the server can't parse
-        delete currentLivestream.created
-        delete currentLivestream.lastUpdated
-        delete currentLivestream.start
+        delete serverSideLivestream.created
+        delete serverSideLivestream.lastUpdated
+        delete serverSideLivestream.start
     }
     return {
-        props: {currentLivestream}, // will be passed to the page component as props
+        props: {serverSideLivestream, groupId: groupId || null}, // will be passed to the page component as props
     }
 }
 
