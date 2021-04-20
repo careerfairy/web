@@ -86,7 +86,7 @@ const StreamerLayout = (props) => {
     const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
     const isMainStreamer = useMemo(() => pathname === "/streaming/[livestreamId]/main-streamer", [pathname])
     const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'careerCenters'}]
-    useFirestoreConnect(() => livestreamId ? [
+    const query = useMemo(() => livestreamId ? [
         {
             collection: "livestreams",
             doc: livestreamId,
@@ -94,6 +94,8 @@ const StreamerLayout = (props) => {
             populates
         }
     ] : [], [livestreamId])
+
+    useFirestoreConnect(query)
 
     const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
         ...populate(firestore, "currentLivestream", populates),
