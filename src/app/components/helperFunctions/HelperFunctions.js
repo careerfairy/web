@@ -306,6 +306,12 @@ export const getRandomColor = () => {
     return '#' + Math.round(Math.random() * max).toString(16);
 }
 
+/**
+ * Get Resized Url.
+ * @param {string} url – original url of image
+ * @param {('xs'|'sm'|'md'|'lg')} size – size of the image
+ * @return {string} Returns the image url with the correct size appended to it.
+ */
 export const getResizedUrl = (url, size = "sm") => {
     const imageSizes = {
         xs: "200x200",
@@ -314,9 +320,9 @@ export const getResizedUrl = (url, size = "sm") => {
         lg: "1200x900"
     }
 
-    if(!url){
-        console.error("Invalid url provided")
-        return false
+    if (typeof url !== 'string') {
+        console.warn("Invalid url provided:");
+        return ""
     }
 
     const targetSize = imageSizes[size]

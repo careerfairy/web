@@ -9,7 +9,7 @@ import {Box, Button, Grow, Hidden} from "@material-ui/core";
 import {useAuth} from "../../../HOCs/AuthProvider";
 import GroupsUtil from "../../../data/util/GroupsUtil";
 import {useRouter} from "next/router";
-import {repositionElementInArray} from "../../../components/helperFunctions/HelperFunctions";
+import {getResizedUrl, repositionElementInArray} from "../../../components/helperFunctions/HelperFunctions";
 import NavItem from "../../../components/views/navbar/NavItem";
 import {LogOut as LogoutIcon} from "react-feather";
 import {useDispatch} from "react-redux";
@@ -160,7 +160,7 @@ const FeedDrawer = memo(({
                                     onClick={onMobileClose}
                                     groupIdInQuery={groupIdInQuery}
                                     alt={universityName}
-                                    src={logoUrl}
+                                    src={getResizedUrl(logoUrl, "xs")}
                                 />
                             </ListItemWrapper>)}
                     </List>

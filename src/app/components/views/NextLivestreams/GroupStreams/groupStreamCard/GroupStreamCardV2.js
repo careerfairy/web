@@ -491,7 +491,7 @@ const GroupStreamCardV2 = memo(({
 
                         <CardMedia
                             classes={mediaStyles}
-                            image={getResizedUrl(livestream.backgroundImageUrl)}
+                            image={getResizedUrl(livestream.backgroundImageUrl, "md")}
                         />
                         <div className={classes.content}>
                             <CardHeader
@@ -586,7 +586,7 @@ const GroupStreamCardV2 = memo(({
                                                     variant="rounded"
                                                     key={careerCenter.id}
                                                     className={clsx(classes.groupLogo, classes.groupLogoStacked)}
-                                                    src={getResizedUrl(careerCenter.logoUrl)}
+                                                    src={getResizedUrl(careerCenter.logoUrl, "xs")}
                                                     alt={careerCenter.universityName}
                                                 />
                                             ))}
@@ -603,7 +603,7 @@ const GroupStreamCardV2 = memo(({
                                             <Avatar
 
                                                 className={classes.avatar}
-                                                src={getResizedUrl(speaker.avatar) || speakerPlaceholder}
+                                                src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
                                                 alt={speaker.firstName}
                                             />
                                         </Item>

@@ -363,7 +363,6 @@ const DraftStreamForm = ({
                   validateForm,
                   /* and other goodies */
               }) => {
-                console.log("-> values", values);
                 return (<form onSubmit={async (event) => {
                     event.preventDefault()
                     const error = await validateForm()

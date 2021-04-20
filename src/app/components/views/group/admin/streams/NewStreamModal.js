@@ -163,6 +163,8 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                         email: authenticatedUser.email
                     }
                 }
+                console.log("-> targetCollection", targetCollection);
+                console.log("-> livestream", livestream);
                 await firebase.updateLivestream(livestream, targetCollection)
                 console.log(`-> ${!isActualLivestream() && "Draft "}livestream was updated with id`, id);
             } else {
