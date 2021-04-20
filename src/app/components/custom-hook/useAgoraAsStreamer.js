@@ -121,7 +121,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             codec: "vp8",
         });
         rtcClient.init(AGORA_APP_ID);
-        //rtcClient.startProxyServer(3);
+        rtcClient.startProxyServer(3);
 
         setAgoraRtcStatus({
             type: "INFO",
@@ -420,7 +420,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                         codec: "vp8",
                     });
                     screenShareClient.setClientRole('host')
-                    //screenShareClient.startProxyServer(3);
+                    screenShareClient.startProxyServer(3);
 
                     screenShareClient.init(AGORA_APP_ID, () => {
                         publishScreenShareStream(screenShareClient)
