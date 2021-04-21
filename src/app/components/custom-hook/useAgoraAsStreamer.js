@@ -121,6 +121,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             codec: "vp8",
         });
         rtcClient.init(AGORA_APP_ID);
+        AgoraRTC.Logger.setLogLevel(AgoraRTC.Logger.ERROR)
         //rtcClient.startProxyServer(3);
 
         setAgoraRtcStatus({
@@ -355,7 +356,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
         let AgoraRTM = require('agora-rtm-sdk');
 
-        let rtmClient = AgoraRTM.createInstance(AGORA_APP_ID)
+        let rtmClient = AgoraRTM.createInstance(AGORA_APP_ID, {logFilter: AgoraRTM.LOG_FILTER_ERROR})
 
         rtmClient.on('ConnectionStateChanged', (newState, reason) => {
             if (newState === "DISCONNECTED") {

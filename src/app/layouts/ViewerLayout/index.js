@@ -117,7 +117,7 @@ const ViewerLayout = (props) => {
         if (userData?.userEmail && livestreamId) {
             firebase.setUserIsParticipating(livestreamId, userData);
         }
-    }, [livestreamId, userData]);
+    }, [livestreamId, userData?.email, userData?.linkedinUrl, userData?.firstName, userData?.lastName]);
 
     useEffect(() => {
         if (currentLivestream && !streamerId) {
