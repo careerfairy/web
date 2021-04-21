@@ -19,8 +19,7 @@ import ErrorModal from '../modal/ErrorModal';
 import SettingsModal from "./SettingsModal";
 import ScreenShareModal from "./ScreenShareModal";
 
-const useStyles = makeStyles((theme) => ({
-}));
+const useStyles = makeStyles((theme) => ({}));
 
 function VideoContainer(props) {
     const {
@@ -347,20 +346,20 @@ function VideoContainer(props) {
                            speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                            attachSinkId={attachSinkId}/>
             <StreamPreparationModalV2 readyToConnect={Boolean(props.currentLivestream && props.currentLivestream.id)}
-                audioSource={audioSource} updateAudioSource={updateAudioSource}
-                videoSource={videoSource} updateVideoSource={updateVideoSource}
-                speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                audioLevel={audioLevel} streamerConnected={streamerConnected}
-                streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                localStream={displayableMediaStream}
-                connectionEstablished={connectionEstablished}
-                isTest={props.currentLivestream.test} viewer={props.viewer}
-                handleOpenDemoIntroModal={handleOpenDemoIntroModal}
-                attachSinkId={attachSinkId} devices={devices}
-                setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                isStreaming={isStreaming}/>
-            <LoadingModal agoraRtcStatus={agoraRtcStatus} />
-            <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus} />
+                                      audioSource={audioSource} updateAudioSource={updateAudioSource}
+                                      videoSource={videoSource} updateVideoSource={updateVideoSource}
+                                      speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
+                                      audioLevel={audioLevel} streamerConnected={streamerConnected}
+                                      streamerReady={streamerReady} setStreamerReady={setStreamerReady}
+                                      localStream={displayableMediaStream}
+                                      connectionEstablished={connectionEstablished}
+                                      isTest={props.currentLivestream.test} viewer={props.viewer}
+                                      handleOpenDemoIntroModal={handleOpenDemoIntroModal}
+                                      attachSinkId={attachSinkId} devices={devices}
+                                      setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
+                                      isStreaming={isStreaming}/>
+            <LoadingModal agoraRtcStatus={agoraRtcStatus}/>
+            <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus}/>
             <ScreenShareModal
                 open={showScreenShareModal}
                 smallScreen={props.smallScreen}
