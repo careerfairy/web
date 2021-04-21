@@ -1,9 +1,10 @@
 import React from 'react';
-import {makeStyles} from "@material-ui/core/styles";
 import {Avatar, Container, Paper} from "@material-ui/core";
 import SectionHeader from "../../common/SectionHeader";
 import Section from "../../common/Section";
 import StreamsTab from "../StreamsTab";
+import GroupBio from "./groupBio";
+import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -29,7 +30,7 @@ const useStyles = makeStyles(theme => ({
     },
     section: {
         paddingBottom: theme.spacing(1)
-    }
+    },
 }));
 
 const GroupBannerSection = (props) => {
@@ -59,6 +60,7 @@ const GroupBannerSection = (props) => {
                     title={props.title}
                     subtitle={props.subtitle}
                 />
+                {props.groupBio && <GroupBio groupBio={props.groupBio}/>}
                 <StreamsTab handleChange={props.handleChange} value={props.value}/>
             </Container>
         </Section>
