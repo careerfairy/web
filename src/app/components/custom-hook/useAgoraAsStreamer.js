@@ -76,10 +76,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     }, [updatedStream]);
 
     useEffect(() => {
-        // console.log("externalMediaStreams", externalMediaStreams);
-    }, [externalMediaStreams])
-
-    useEffect(() => {
         if (removedStream) {
             let cleanedExternalMediaStreams = removeStreamFromList(removedStream, externalMediaStreams)
             setExternalMediaStreams([...cleanedExternalMediaStreams]);
@@ -165,6 +161,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                     msg: "RTC_DUAL_STREAM_INACTIVE"
                 })
                 setLocalMediaStream({
+                    streamId: userUid,
                     videoTrack: localVideo,
                     audioTrack: localAudio
                 });
@@ -181,12 +178,15 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             }
         }
         rtcClient.on("user-published", async (remoteUser, mediaType) => {
+            debugger;
             await rtcClient.subscribe(remoteUser, mediaType);
             if (mediaType === "video") {
               console.log("subscribe video success");
               setAddedStream({
-                streamId: streamId,
-                stream: stream,
+                streamId: remoteUser.uid,
+                stream: {
+                    videoTrack: remoteUser.videoTrack,
+                },
                 streamQuality: 'high',
                 videoMuted: false,
                 audioMuted: false,
@@ -200,14 +200,10 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         });
 
         rtcClient.on("user-unpublished", async (remoteUser, mediaType) => {
-            await rtcClient.subscribe(remoteUser, mediaType);
+            await rtcClient.unsubscribe(remoteUser, mediaType);
             if (mediaType === "video") {
-                console.log("subscribe video success");
-                setRemovedStream(streamId);
-            }
-            if (mediaType === "audio") {
-                console.log("subscribe audio success");
-                remoteUser.audioTrack.play();
+                console.log("unsubscribe video success");
+                setRemovedStream(remoteUser.uid);
             }
         });
 
