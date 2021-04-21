@@ -61,10 +61,6 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
     const livestreamIdIsIn = (streams) => {
         return Boolean(streams?.some(stream => stream.id === livestreamId))
     }
-    if (serverSideStream) {
-        // console.log("-> serverSideStream", serverSideStream);
-        // console.log("-> getResizedUrl(serverSideStream.backgroundImageUrl)", getResizedUrl(serverSideStream.backgroundImageUrl, "md"));
-    }
 
     const metaInfo = useMemo(() => serverSideStream ? ({
         title: `CareerFairy | Live Stream with ${serverSideStream.company}`,
