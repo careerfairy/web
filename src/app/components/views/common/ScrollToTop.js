@@ -23,10 +23,8 @@ const ScrollToTop = () => {
     const [showScroll, setShowScroll] = useState(false)
 
     useEffect(() => {
-        if (window) {
-            window.addEventListener('scroll', checkScrollTop)
-            return () => window.removeEventListener('scroll', checkScrollTop)
-        }
+        window.addEventListener('scroll', checkScrollTop)
+        return () => window.removeEventListener('scroll', checkScrollTop)
     }, []);
 
 
