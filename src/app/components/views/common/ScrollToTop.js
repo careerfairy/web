@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
 
     },
 }));
-const ScrollArrow = () => {
+const ScrollToTop = () => {
     const classes = useStyles()
     const [showScroll, setShowScroll] = useState(false)
 
@@ -48,4 +48,4 @@ const ScrollArrow = () => {
     );
 }
 
-export default ScrollArrow;
+export default ScrollToTop;
