@@ -49,22 +49,6 @@ const useStyles = makeStyles(theme => ({
         left: "50%",
         transform: "translate(-50%, -50%)"
     },
-    videoWrapper: {
-        "& video": {
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            maxHeight: "100%",
-            maxWidth: "100%",
-            // zIndex: 9900,
-            backgroundColor: "black",
-            // objectFit: "contain !important",
-            // [theme.breakpoints.down("xs")]: {
-            //     objectPosition: props => props.isScreenShareVideo ? "top" : "center",
-            // }
-        },
-    },
     svgShadow: {
         filter: `drop-shadow(0px 0px 2px rgba(0,0,0,0.4))`
     },
@@ -97,12 +81,10 @@ const RemoteVideoContainer = ({
         if (stream.streamId === 'demoStream') {
             generateDemoHandRaiser()
         } else {
-            if (!stream.stream.isPlaying()) {
-                stream.stream.play(stream.streamId, {fit: isScreenShareVideo ? 'contain' : 'cover'}, err => {
-                    if (err) {
-                        setShowVideoButton({paused: false, muted: true});
-                    }
-                });
+            if (!stream.stream.videoTrack.isPlaying) {
+                debugger;
+                stream.stream.videoTrack?.play(stream.streamId, {fit: isScreenShareVideo ? 'contain' : 'cover'});
+                stream.stream.audioTrack?.play();
             }
         }
     }, [stream.streamId]);
@@ -118,7 +100,7 @@ const RemoteVideoContainer = ({
 
     useEffect(() => {
         if (unmute) {
-            stream.stream.play(stream.streamId, {muted: false});
+            stream.stream.audioTrack.play();
         }
     }, [unmute])
 
@@ -130,9 +112,9 @@ const RemoteVideoContainer = ({
 
     useEffect(() => {
         if (muted) {
-            stream?.stream?.muteAudio()
+            stream?.stream?.audioTrack?.stop()
         } else {
-            stream?.stream?.unmuteAudio()
+            stream?.stream?.audioTrack?.play()
         }
     }, [muted])
 
@@ -153,15 +135,11 @@ const RemoteVideoContainer = ({
 
     function playVideo() {
         if (!stream.stream.isPlaying()) {
-            stream.stream.play(stream.streamId, {
+            stream.stream.videoTrack.play(stream.streamId, {
                 fit: isScreenShareVideo ? 'contain' : 'cover',
-                muted: true
-            }, err => {
-                if (err) {
-                    setShowVideoButton({paused: false, muted: true});
-                }
             });
         }
+        stream.stream.audioTrack.stop()
     }
 
     const speaker = !isScreenShareVideo ? currentLivestream.liveSpeakers.find(speaker => speaker.speakerUuid === stream.streamId) : null;

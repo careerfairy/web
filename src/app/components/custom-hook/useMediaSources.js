@@ -16,8 +16,8 @@ export default function useMediaSources(devices, streamId, localStream, showSoun
     useEffect(() => {
         if (localStream) {
             const mediaStream = new MediaStream();
-            mediaStream.addTrack(localStream.getAudioTrack());
-            mediaStream.addTrack(localStream.getVideoTrack());
+            mediaStream.addTrack(localStream.audioTrack.getMediaStreamTrack());
+            mediaStream.addTrack(localStream.videoTrack.getMediaStreamTrack());
             setLocalMediaStream(mediaStream);
         }
     }, [localStream, audioSource, videoSource])

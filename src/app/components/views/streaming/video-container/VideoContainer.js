@@ -94,7 +94,7 @@ function VideoContainer(props) {
                     if (stream.streamId !== 'demoStream') {
                         return {
                             streamId: stream.streamId,
-                            audioLevel: stream.stream.getAudioLevel()
+                            audioLevel: stream.stream.audioTrack.getVolumeLevel()
                         }
                     } else {
                         return {
@@ -105,8 +105,8 @@ function VideoContainer(props) {
                 });
                 if (localMediaStream) {
                     audioLevels.push({
-                        streamId: localMediaStream.getId(),
-                        audioLevel: localMediaStream.getAudioLevel()
+                        streamId: localMediaStream.streamId,
+                        audioLevel: localMediaStream.audioTrack.getVolumeLevel()
                     });
                 }
                 if (audioLevels && audioLevels.length > 1) {
@@ -161,6 +161,10 @@ function VideoContainer(props) {
     const [timeoutState, setTimeoutState] = useState(null);
 
     useEffect(() => {
+        dynamicallyUpdateVideoProfile()
+    }, [localMediaStream, externalMediaStreams, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
+
+    const dynamicallyUpdateVideoProfile = async () => {
         if (localMediaStream && externalMediaStreams) {
             if (externalMediaStreams.length > 3) {
                 if (props.streamerId === props.currentLivestream.currentSpeakerId && props.currentLivestream.mode !== "desktop" && props.currentLivestream.mode !== "presentation") {
@@ -168,7 +172,7 @@ function VideoContainer(props) {
                         clearTimeout(timeoutState);
                     }
                     let newTimeout = setTimeout(() => {
-                        localMediaStream.setVideoProfile("480p_9")
+                        localMediaStream.videoTrack.setEncoderConfiguration("480p_9")
                     }, 20000);
                     setTimeoutState(newTimeout)
                 } else {
@@ -176,15 +180,15 @@ function VideoContainer(props) {
                         clearTimeout(timeoutState);
                     }
                     let newTimeout = setTimeout(() => {
-                        localMediaStream.setVideoProfile("180p")
+                        localMediaStream.videoTrack.setEncoderConfiguration("180p")
                     }, 20000);
                     setTimeoutState(newTimeout)
                 }
             } else {
-                localMediaStream.setVideoProfile("480p_9")
+                localMediaStream.videoTrack.setEncoderConfiguration("480p_9")
             }
         }
-    }, [localMediaStream, externalMediaStreams, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
+    }
 
     useEffect(() => {
         if (numberOfViewers && props.currentLivestream.hasStarted) {
