@@ -180,11 +180,12 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
 
     function studentBelongsToGroup(student) {
         if (group.universityCode) {
-            if (student.university?.code === group.universityCode) {
-                return student.groupIds && student.groupIds.includes(group.groupId);
-            } else {
-                return false;
-            }
+            // if (student.university?.code === group.universityCode) {
+            return student.university?.code === group.universityCode
+                // return student.groupIds && student.groupIds.includes(group.groupId);
+            // } else {
+            //     return false;
+            // }
         } else {
             return student.groupIds && student.groupIds.includes(group.groupId);
         }

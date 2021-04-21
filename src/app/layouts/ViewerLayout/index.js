@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import {withFirebase} from "../../context/firebase";
 import {useRouter} from "next/router";
@@ -86,7 +86,8 @@ const ViewerLayout = (props) => {
 
 
     const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'careerCenters'}]
-    useFirestoreConnect(() => livestreamId ? [
+
+    const query = useMemo(() => livestreamId ? [
         {
             collection: "livestreams",
             doc: livestreamId,
@@ -94,6 +95,8 @@ const ViewerLayout = (props) => {
             populates
         }
     ] : [], [livestreamId])
+
+    useFirestoreConnect(query)
 
     const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
         ...populate(firestore, "currentLivestream", populates),

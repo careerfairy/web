@@ -209,7 +209,8 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
                 try {
                     await firestore.get({
                         collection: "userData",
-                        where: [["university.code", "==", group.universityCode], ["groupIds", "array-contains", group.id]],
+                        where: [["university.code", "==", group.universityCode]],
+                        // where: [["university.code", "==", group.universityCode], ["groupIds", "array-contains", group.id]],
                         storeAs: "groupUniversityStudents",
                     })
                 } catch (e) {

@@ -145,8 +145,8 @@ export default class StatsUtil {
         });
         registeredStudentsFromGroup.forEach(student => {
             let registeredGroup = StatsUtil.getRegisteredGroupById(student, group.groupId);
-            let fieldOfStudyOptionId = registeredGroup.categories.find(category => category.id === fieldOfStudyCategory.id)?.selectedValueId;
-            let levelOfStudyOptionId = registeredGroup.categories.find(category => category.id === levelOfStudyCategory.id)?.selectedValueId;
+            let fieldOfStudyOptionId = registeredGroup?.categories.find(category => category.id === fieldOfStudyCategory.id)?.selectedValueId;
+            let levelOfStudyOptionId = registeredGroup?.categories.find(category => category.id === levelOfStudyCategory.id)?.selectedValueId;
             if (categoryStats.options[fieldOfStudyOptionId] && categoryStats.options[fieldOfStudyOptionId].subOptions[levelOfStudyOptionId]) {
                 categoryStats.options[fieldOfStudyOptionId].entries = categoryStats.options[fieldOfStudyOptionId].entries + 1;
                 categoryStats.options[fieldOfStudyOptionId].subOptions[levelOfStudyOptionId].entries = categoryStats.options[fieldOfStudyOptionId].subOptions[levelOfStudyOptionId].entries + 1;
