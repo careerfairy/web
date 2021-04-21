@@ -2,6 +2,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../../util/constants";
 import React from "react";
 import { Avatar, Typography } from "@material-ui/core";
+import {getResizedUrl} from "../../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(theme => ({
     streamers: {
@@ -55,7 +56,7 @@ const Streamers = ({speakers, cardHovered}) => {
                     <div key={speaker.id} className={classes.streamer}>
                         <Avatar
                             className={classes.avatar}
-                            src={speaker.avatar || speakerPlaceholder}
+                            src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
                             alt={speaker.firstName}/>
                         <Typography noWrap className={classes.name}>
                             {`${speaker.firstName} ${speaker.lastName}`}

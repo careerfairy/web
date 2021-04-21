@@ -266,6 +266,7 @@ const DraftStreamForm = ({
     }
 
     const getDownloadUrl = (fileElement) => {
+        console.log("-> fileElement", fileElement);
         if (fileElement) {
             return 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/' + fileElement.replace('/', '%2F') + '?alt=media';
         } else {
