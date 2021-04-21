@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Fab, Grow} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import ScrollToTopIcon from '@material-ui/icons/ExpandLessRounded';
+
 const useStyles = makeStyles(theme => ({
     scrollTop: {
         position: "fixed",
@@ -21,6 +22,14 @@ const ScrollToTop = () => {
     const classes = useStyles()
     const [showScroll, setShowScroll] = useState(false)
 
+    useEffect(() => {
+        if (window) {
+            window.addEventListener('scroll', checkScrollTop)
+            return () => window.removeEventListener('scroll', checkScrollTop)
+        }
+    }, []);
+
+
     const checkScrollTop = () => {
         if (!showScroll && window.pageYOffset > 400) {
             setShowScroll(true)
@@ -33,7 +42,6 @@ const ScrollToTop = () => {
         window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
-    window.addEventListener('scroll', checkScrollTop)
 
     return (
         <Grow in={showScroll}>
