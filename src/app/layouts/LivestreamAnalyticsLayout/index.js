@@ -39,8 +39,6 @@ const LivestreamAnalyticsLayout = ({}) => {
     ])
 
     const currentLivestream = useSelector(({firestore:{data}}) => data.currentLivestream )
-    console.log("-> currentLivestream", currentLivestream);
-    console.log("-> livestreamId", livestreamId);
 
     return (
         <div className={classes.root}>
