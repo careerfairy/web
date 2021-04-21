@@ -25,7 +25,7 @@ const ScrollToTop = () => {
     useEffect(() => {
         window.addEventListener('scroll', checkScrollTop)
         return () => window.removeEventListener('scroll', checkScrollTop)
-    }, []);
+    }, [showScroll]);
 
 
     const checkScrollTop = () => {
@@ -47,6 +47,7 @@ const ScrollToTop = () => {
                 className={classes.scrollTop}
                 onClick={scrollTop}
                 color="primary"
+                aria-label="scroll-to-top"
             >
                 <ScrollToTopIcon fontSize="large"/>
             </Fab>
