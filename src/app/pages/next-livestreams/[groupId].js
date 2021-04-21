@@ -12,6 +12,7 @@ import {useDispatch, useSelector} from "react-redux";
 import * as actions from '../../store/actions'
 import {getServerSideGroup, getServerSideStream} from "../../util/serverUtil";
 import {getResizedUrl} from "../../components/helperFunctions/HelperFunctions";
+import ScrollToTop from "../../components/views/common/ScrollToTop";
 
 const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
 
@@ -74,7 +75,6 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
         fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}`,
     }), [serverSideStream])
 
-
     const handleChange = useCallback((event, newValue) => {
         setValue(newValue);
     }, []);
@@ -92,6 +92,7 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
                         backgroundColor={navyBlue.main}
                         groupLogo={currentGroup.logoUrl}
                         backgroundImage={placeholderBanner}
+                        groupBio={currentGroup.extraInfo}
                         backgroundImageOpacity={0.2}
                         title={currentGroup.universityName}
                         subtitle={currentGroup.description}
@@ -109,6 +110,7 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
                     />
                 </div>
             </NextLivestreamsLayout>
+            <ScrollToTop/>
         </React.Fragment>
     );
 };
