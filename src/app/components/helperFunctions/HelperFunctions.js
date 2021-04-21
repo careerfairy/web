@@ -319,7 +319,7 @@ export const getResizedUrl = (url, size = "sm") => {
     }
 
     if (typeof url !== 'string') {
-        console.warn("Invalid url provided:");
+        console.warn("Invalid url provided");
         return ""
     }
 
@@ -330,4 +330,17 @@ export const getResizedUrl = (url, size = "sm") => {
         return url
     }
     return url.replace(/.(?=[^.]*$)/, `_${targetSize}.`)
+}
+
+/**
+ * Get Responsive Resized Url.
+ * @param {string} url – original url of image
+ * @param {boolean} isMobile – size of the image
+ * @param {('xs'|'sm'|'md'|'lg')} mobileSize – size of the image on when mobile
+ * @param {('xs'|'sm'|'md'|'lg')} desktopSize – size of the image on desktop
+ * @return {string} Returns the image url with the correct size appended to it.
+ */
+
+export const getResponsiveResizedUrl = (url, isMobile, mobileSize = "sm", desktopSize = "lg") => {
+    return getResizedUrl(url, isMobile ? mobileSize : desktopSize)
 }

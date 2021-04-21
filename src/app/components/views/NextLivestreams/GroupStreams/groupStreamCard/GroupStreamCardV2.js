@@ -8,7 +8,7 @@ import {useRouter} from "next/router";
 import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
-import {dynamicSort, getResizedUrl} from "../../../../helperFunctions/HelperFunctions";
+import {dynamicSort, getResizedUrl, getResponsiveResizedUrl} from "../../../../helperFunctions/HelperFunctions";
 import {Card, CardHeader, ClickAwayListener, Collapse, Grow} from "@material-ui/core";
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
@@ -491,7 +491,7 @@ const GroupStreamCardV2 = memo(({
 
                         <CardMedia
                             classes={mediaStyles}
-                            image={getResizedUrl(livestream.backgroundImageUrl, "md")}
+                            image={getResponsiveResizedUrl(livestream.backgroundImageUrl, mobile, "sm", "md")}
                         />
                         <div className={classes.content}>
                             <CardHeader
@@ -573,7 +573,7 @@ const GroupStreamCardV2 = memo(({
                                                 <Avatar
                                                     key={speaker.id}
                                                     className={classes.avatar}
-                                                    src={getResizedUrl(speaker.avatar) || speakerPlaceholder}
+                                                    src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
                                                     alt={speaker.firstName}
                                                 />
                                             ))}

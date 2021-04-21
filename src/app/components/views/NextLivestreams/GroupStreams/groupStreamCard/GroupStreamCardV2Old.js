@@ -32,11 +32,10 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import CopyToClipboard from "../../../common/CopyToClipboard";
 import LogosPlaceHolder from "./LogosPlaceholder";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
-import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
+import {dynamicSort, getResizedUrl, getResponsiveResizedUrl} from "../../../../helperFunctions/HelperFunctions";
 
 import clsx from "clsx";
 import {Row} from "@mui-treasury/components/flex";
-import {companyLogoPlaceholder} from "../../../../../constants/images";
 
 const useStyles = makeStyles((theme) => {
     const paperColor = theme.palette.background.paper
@@ -428,7 +427,7 @@ const GroupStreamCardV2Old = memo(({
     const [levelOfStudyModalOpen, setLevelOfStudyModalOpen] = useState(false);
     const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false);
     const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
-    const [backgroundError, setBackgroundError] = useState(false);
+
     const classes = useStyles({
         hideActions,
         isHighlighted,
@@ -663,7 +662,7 @@ const GroupStreamCardV2Old = memo(({
     let speakerElements = livestream.speakers?.map(speaker => {
         return (<Avatar
             key={speaker.id}
-            src={speaker.avatar || speakerPlaceholder}
+            src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
             alt={speaker.firstName}/>)
     })
 
@@ -675,19 +674,6 @@ const GroupStreamCardV2Old = memo(({
             setCardHovered(false)
         }
     }
-
-    const handleBackgroundImageError = () => {
-        setBackgroundError(true)
-    }
-
-    // const resizedUrl = livestream.backgroundImageUrl.replace(".", "_400x400.")
-    const resizedUrl = livestream.backgroundImageUrl.replace(/.(?=[^.]*$)/, "_400x400.")
-    if (livestream.id === "uzV5jj2AYogBlemIVcr8") {
-        console.log("-> resizedUrl", resizedUrl);
-        console.log("-> livestream.backgroundImageUrl", livestream.backgroundImageUrl);
-    }
-    const backgroundSrc = backgroundError ? companyLogoPlaceholder : resizedUrl
-    // console.log("-> backgroundSrc", backgroundSrc);
 
     return (
         <Fragment>
@@ -714,12 +700,8 @@ const GroupStreamCardV2Old = memo(({
                                       </Typography>
                                   }/>}
                             {!cardHovered &&
-                            <img
-                                // onError={companyLogoPlaceholder}
-                                onError={handleBackgroundImageError}
-                                className={classes.lowerFrontBackgroundImage}
-                                src={backgroundSrc}
-                                alt="background"/>
+                            <img className={classes.lowerFrontBackgroundImage} src={getResizedUrl(livestream.backgroundImageUrl)}
+                                 alt="background"/>
                             }
                             <div className={classes.dateTimeWrapper}>
                                 <div className={classes.dynamicMargin}>
@@ -832,7 +814,7 @@ const GroupStreamCardV2Old = memo(({
                                         [classes.pulseAnimate]: shouldPulseBackground()
                                     })
                                 }}>
-                                <img className={classes.backgroundImage} src={livestream.backgroundImageUrl}
+                                <img className={classes.backgroundImage} src={getResponsiveResizedUrl(livestream.backgroundImageUrl, mobile, "sm", "md")}
                                      alt="background"/>
                                 {!isDraft &&
                                 <CopyToClipboard

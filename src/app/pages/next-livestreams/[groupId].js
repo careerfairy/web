@@ -56,12 +56,12 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
                 }
             })()
         }
-    },[Boolean(upcomingLivestreams), Boolean(pastLivestreams), currentGroup.groupId])
+    }, [Boolean(upcomingLivestreams), Boolean(pastLivestreams), currentGroup.groupId])
 
     const livestreamIdIsIn = (streams) => {
         return Boolean(streams?.some(stream => stream.id === livestreamId))
     }
-    if(serverSideStream){
+    if (serverSideStream) {
         // console.log("-> serverSideStream", serverSideStream);
         // console.log("-> getResizedUrl(serverSideStream.backgroundImageUrl)", getResizedUrl(serverSideStream.backgroundImageUrl, "md"));
     }
@@ -102,13 +102,14 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
                         handleChange={handleChange}
                         value={value}
                     />
-                    <StreamsSection value={value}
-                                    upcomingLivestreams={upcomingLivestreams}
-                                    livestreamId={livestreamId}
-                                    setSelectedOptions={setSelectedOptions}
-                                    selectedOptions={selectedOptions}
-                                    currentGroup={currentGroup}
-                                    pastLivestreams={pastLivestreams}
+                    <StreamsSection
+                        value={value}
+                        upcomingLivestreams={upcomingLivestreams}
+                        livestreamId={livestreamId}
+                        setSelectedOptions={setSelectedOptions}
+                        selectedOptions={selectedOptions}
+                        currentGroup={currentGroup}
+                        pastLivestreams={pastLivestreams}
                     />
                 </div>
             </NextLivestreamsLayout>

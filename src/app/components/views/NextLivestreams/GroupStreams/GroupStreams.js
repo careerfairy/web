@@ -52,6 +52,7 @@ const Wrapper = ({children, streamId}) => {
             key={streamId}
             height={gridItemHeight}
             // unmountIfInvisible
+            scroll
             offset={[0, 0]}
             placeholder={<Spinner/>}>
             {children}

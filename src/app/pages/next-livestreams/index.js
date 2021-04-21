@@ -79,11 +79,12 @@ const nextLivestreamsPage = ({livestreamId, serverSideStream}) => {
                     handleChange={handleChange}
                     value={value}
                 />
-                <StreamsSection value={value}
-                                upcomingLivestreams={upcomingLivestreams}
-                                livestreamId={livestreamId}
-                                listenToUpcoming
-                                pastLivestreams={pastLivestreams}
+                <StreamsSection
+                    value={value}
+                    upcomingLivestreams={upcomingLivestreams}
+                    livestreamId={livestreamId}
+                    listenToUpcoming
+                    pastLivestreams={pastLivestreams}
                 />
             </NextLivestreamsLayout>
         </React.Fragment>
