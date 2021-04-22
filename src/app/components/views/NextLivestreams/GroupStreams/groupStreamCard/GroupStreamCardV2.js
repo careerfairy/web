@@ -31,7 +31,7 @@ import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 
 const useStyles = makeStyles(theme => ({
     cardHovered: {
-        height: "max-content",
+        height: "fit-content",
         transform: 'translateY(-2px)',
         '& $shadow': {
             bottom: '-1.5rem',
@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
     main: {
         display: "flex",
         flex: 1,
-        minHeight: 380,
+        minHeight: 340,
         overflow: 'hidden',
         borderTopLeftRadius: '1.5rem',
         borderTopRightRadius: '1.5rem',
@@ -124,16 +124,15 @@ const useStyles = makeStyles(theme => ({
     title: {
         fontSize: '2rem',
         fontWeight: 800,
-        color: '#fff',
-        display: "-webkit-box",
+        color: theme.palette.common.white,
         overflow: "hidden",
-        wordBreak: "break-word",
         textOverflow: "ellipsis",
-        WebkitBoxOrient: "vertical",
-        animation: "$close 0.1s linear 0.1s forwards",
+        display: "-webkit-box",
+        WebkitLineClamp: "2",
+        WebkitBoxOrient: "vertical"
     },
-    titleHovered: {
-        animation: "$open 0.1s linear 0s forwards"
+    titleHovered:{
+        WebkitLineClamp: "inherit",
     },
     author: {
         zIndex: 1,
@@ -141,7 +140,10 @@ const useStyles = makeStyles(theme => ({
         borderBottomLeftRadius: '1.5rem',
         borderBottomRightRadius: '1.5rem',
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
+    },
+    authorHovered: {
+        boxShadow: theme.shadows[3]
     },
     shadow: {
         transition: '0.2s',
@@ -192,14 +194,6 @@ const useStyles = makeStyles(theme => ({
             maxHeight: "90%"
         }
     },
-    "@keyframes open": {
-        from: {lineClamp: 2, WebkitLineClamp: "2"},
-        to: {lineClamp: "initial", WebkitLineClamp: "initial"}
-    },
-    "@keyframes close": {
-        from: {lineClamp: "initial", WebkitLineClamp: "initial"},
-        to: {lineClamp: 2, WebkitLineClamp: "2"}
-    },
     pulseAnimate: {
         animation: `$pulse 1.2s infinite`
     },
@@ -248,14 +242,18 @@ const GroupStreamCardV2 = memo(({
                                     listenToUpcoming,
                                     isTargetDraft,
                                     setGlobalCardHighlighted,
+                                    isPastLivestreams,
                                     globalCardHighlighted,
                                     isAdmin,
                                 }) => {
     const mediaStyles = useCoverCardMediaStyles();
     const classes = useStyles()
-    const router = useRouter();
-    const absolutePath = router.asPath
-    const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
+    const {pathname, absolutePath} = useRouter();
+    const linkToStream = useMemo(() => pathname === "/next-livestreams/[groupId]" ?
+        `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}` :
+        `/next-livestreams?livestreamId=${livestream.id}`,
+        [pathname, livestream?.id, groupData?.groupId]
+    )
 
     function userIsRegistered() {
         if (user.isLoaded && user.isEmpty || !livestream.registeredUsers || isAdmin) {
@@ -337,7 +335,7 @@ const GroupStreamCardV2 = memo(({
         if (isTargetDraft) return true
         if ((careerCenterId) && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
             return true
-        } else return livestreamId && !careerCenterId && !groupData.id && livestreamId === id;
+        } else return livestreamId && !careerCenterId && livestreamId === id;
     }
 
     const checkIfUserFollows = (careerCenter) => {
@@ -515,6 +513,7 @@ const GroupStreamCardV2 = memo(({
                                         value={linkToStream}/>
                                 }
                             />
+                            <Collapse collapsedHeight={80} in={cardHovered}>
                             <Typography
                                 variant={'h2'}
                                 className={clsx(classes.title, {
@@ -523,14 +522,15 @@ const GroupStreamCardV2 = memo(({
                             >
                                 {livestream.title}
                             </Typography>
-                            <Box style={{maxHeight: 140, overflow: "auto", overflowX: "hidden"}}>
+                            </Collapse>
+                            <Box style={{maxHeight: 165, overflow: "auto", overflowX: "hidden"}}>
                                 {targetOptions.slice(0, cardHovered ? -1 : maxOptions).map(option =>
-                                    <Tag option={option}/>
+                                    <Tag key={option.id} option={option}/>
                                 )}
                                 {(targetOptions.length > maxOptions && !cardHovered) &&
                                 <Tag option={{id: "hasMore", name: "..."}}/>}
                             </Box>
-                            <Box marginTop={1}>
+                            {!isPastLivestreams ? (<Box marginTop={1}>
                                 <DetailsButton
                                     size="small"
                                     mobile={mobile}
@@ -551,14 +551,16 @@ const GroupStreamCardV2 = memo(({
                                         </Typography>
                                     </div>
                                 </Grow>
-                            </Box>
+                            </Box>) : null}
                         </div>
                     </Box>
                     <Row
-                        className={classes.author}
+                        className={clsx(classes.author,{
+                            [classes.authorHovered]: cardHovered
+                        })}
                         m={0}
-                        p={mobile ? 1 : 3}
-                        py={2}
+                        p={1}
+                        py={1}
                         gap={mobile ? 1 : 2}
                         bgcolor={'common.white'}
                     >
@@ -660,7 +662,8 @@ GroupStreamCardV2.propTypes = {
     mobile: PropTypes.bool,
     setGlobalCardHighlighted: PropTypes.func,
     user: PropTypes.object,
-    userData: PropTypes.object
+    userData: PropTypes.object,
+    isPastLivestreams: PropTypes.bool,
 }
 
 export default withFirebase(GroupStreamCardV2);

@@ -148,7 +148,7 @@ function ViewerComponent(props) {
                                      streams={externalMediaStreams} localId={props.streamerId}
                                      isViewer={true}
                                      currentSpeaker={props.currentLivestream.currentSpeakerId}
-                                     muted={!props.currentLivestream.hasStarted} {...props}/>
+                                     muted={false} {...props}/>
             {shareDesktopOrSlides() &&
             <SmallStreamerVideoDisplayer
                 livestreamId={props.currentLivestream.id}
@@ -190,13 +190,13 @@ function ViewerComponent(props) {
                 <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus} />
             </Fragment>
             }
-
+            {/* {!props.currentLivestream.hasStarted &&
             {!props.currentLivestream.hasStarted &&
             <div className={classes.waitingOverlay}>
                 <Typography className={classes.waitingText}>
                     {props.currentLivestream.test ? 'The streamer has to press Start Streaming to be visible to students' : 'Thank you for joining!'}
                 </Typography>
-            </div>}
+            </div>} */}
         </div>
     );
 }

@@ -18,7 +18,7 @@ import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
 import Wave from "./Wave";
 import LogoElement from "../LogoElement";
-import TargetOptions from "../../GroupsCarousel/TargetOptions";
+import TargetOptions from "../../../common/TargetOptions";
 import UserUtil from "../../../../../data/util/UserUtil";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import {useRouter} from "next/router";
@@ -404,7 +404,7 @@ const GroupStreamCardV2Old = memo(({
 
     const router = useRouter();
     const absolutePath = router.asPath
-    const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
+    const linkToStream = `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}`
 
     function userIsRegistered() {
         if (user.isLoaded && user.isEmpty || !livestream.registeredUsers || isAdmin) {

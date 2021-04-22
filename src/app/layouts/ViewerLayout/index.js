@@ -93,16 +93,6 @@ const ViewerLayout = (props) => {
             doc: livestreamId,
             storeAs: "currentLivestream",
             populates
-        },
-        {
-            collection: "livestreams",
-            doc: livestreamId,
-            subcollections: [
-                {
-                    collection: "participatingStudents",
-                }
-            ],
-            storeAs: "audience"
         }
     ] : [], [livestreamId])
 

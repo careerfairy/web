@@ -189,40 +189,10 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
     const classes = useStyles()
 
     const [emailSent, setEmailSent] = useState(false);
-    const [errorMessageShown, setErrorMessageShown] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(null);
     const [generalLoading, setGeneralLoading] = useState(false);
     const [formData, setFormData] = useState({})
     const [open, setOpen] = React.useState(false);
-
-    useEffect(() => {
-        if (emailSent && user.isLoaded && !user.isEmpty && !emailVerificationSent) {
-            axios({
-                method: 'post',
-                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailUserDataAndUniWithName',
-                data: {
-                    recipientEmail: user.email,
-                    firstName: formData.firstName,
-                    lastName: formData.lastName,
-                    linkedinUrl: formData.linkedinUrl,
-                    universityCode: formData.university.code,
-                    universityName: formData.university.name,
-                    universityCountryCode: formData.universityCountryCode,
-                }
-            }).then(response => {
-                if (response.status === 200) {
-                    setEmailVerificationSent(true);
-                    setGeneralLoading(false);
-                    setActiveStep(1)
-                } else {
-                    setErrorMessageShown(true);
-                    setGeneralLoading(false);
-                }    
-            }).catch(error => {
-                console.log("error in signup base", error);
-                setGeneralLoading(false);
-            });
-        }
-    }, [user, emailSent]);
 
     const submitting = (isSubmitting) => {
         return isSubmitting || emailSent || generalLoading
@@ -289,24 +259,22 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                     return errors;
                 }}
                 onSubmit={(values, {setSubmitting}) => {
-                    setFormData(values)
-                    setErrorMessageShown(false);
+                    setErrorMessage(null);
                     setEmailSent(false);
                     setGeneralLoading(true);
-                    firebase.createUserWithEmailAndPassword(values.email, values.password)
-                        .then(() => {
-                            setSubmitting(false);
-                            setEmailSent(true);
-                        }).catch(error => {
-                            if (error.code === 'auth/email-already-in-use' && user && !user.emailVerified && !userData) {
-                                //This error case accounts for the edge case when user was created by subsequent call to create userData failed
-                                setSubmitting(false);
-                                setEmailSent(true);
-                            } else {
-                                setErrorMessageShown(true);
-                                setSubmitting(false);
-                                setGeneralLoading(false);
-                            }                       
+                    firebase.createUserInAuthAndFirebase(values).then(() => {                  
+                        firebase.signInWithEmailAndPassword(values.email, values.password).then(() => {
+                            setEmailVerificationSent(true);
+                            setSubmitting(false)
+                            setGeneralLoading(false);
+                            setActiveStep(1)
+                        }).catch(() => {
+                            router.push('/login')
+                        })
+                    }).catch((error) => {
+                        setErrorMessage(error);
+                        setGeneralLoading(false);
+                        setSubmitting(false)
                     })
                 }}
             >
@@ -506,8 +474,8 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                                 style={{marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us
                                 know</a></div>
                         </div>
-                        <FormHelperText error hidden={!errorMessageShown}>
-                            An error occurred while creating to your account
+                        <FormHelperText error hidden={!errorMessage}>
+                            { errorMessage?.message }
                         </FormHelperText>
                     </form>
                 )}
@@ -565,8 +533,15 @@ function SignUpFormValidate({user, firebase: { reloadAuth }, setEmailVerificatio
                             pinCode: parseInt(values.pinCode)
                         }
                     }).then(response => {
-                        absolutePath ? router.push(absolutePath) : setActiveStep(2);
-                        reloadAuth();
+                        reloadAuth().then(() => {
+                            if (absolutePath) {
+                                router.push(absolutePath)
+                            } else {
+                                setActiveStep(2)
+                            }
+                        }).catch(error => {
+                            router.push('/login')
+                        })        
                     }).catch(error => {
                         console.log("error", error);
                         setIncorrectPin(true);

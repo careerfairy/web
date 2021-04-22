@@ -339,6 +339,7 @@ function VideoContainer(props) {
             </div>
             <SettingsModal open={showSettings} close={() => setShowSettings(false)}
                            streamId={props.streamerId}
+                           smallScreen={props.smallScreen}
                            devices={devices} localStream={localMediaStream}
                            displayableMediaStream={displayableMediaStream}
                            audioSource={audioSource} updateAudioSource={updateAudioSource}
@@ -362,6 +363,7 @@ function VideoContainer(props) {
             <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus} />
             <ScreenShareModal
                 open={showScreenShareModal}
+                smallScreen={props.smallScreen}
                 handleClose={handleCloseScreenShareModal}
                 handleScreenShare={handleScreenShare}
             />

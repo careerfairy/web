@@ -15,6 +15,57 @@ const getRandomInt = (max) => {
 }
 
 
+exports.createNewUserAccount = functions.https.onCall( async (data, context) => {
+
+    if (context.auth) {
+        // Throwing an HttpsError so that the client gets the error details.
+        throw new functions.https.HttpsError('failed-precondition', 'The function must be called while logged out.');
+    }
+
+    const userData = data.userData;
+    const recipient_email = data.userData.email;
+    const pinCode = getRandomInt(9999);
+
+    await admin.auth().createUser({ email: userData.email, password: userData.password })
+        .then( async (user) => {
+            await admin.firestore().collection("userData").doc(recipient_email).set(
+                {
+                    id: userData.email,
+                    validationPin: pinCode,
+                    firstName: userData.firstName,
+                    lastName: userData.lastName,
+                    userEmail: userData.email,
+                    university: userData.university,
+                    universityCountryCode: userData.universityCountryCode,
+                }).then( async () => {
+                    const email = {
+                        "TemplateId": 17669843,
+                        "From": 'CareerFairy <noreply@careerfairy.io>',
+                        "To": recipient_email,
+                        "TemplateModel": { pinCode: pinCode }
+                    };
+                    try {
+                        let response = await client.sendEmailWithTemplate(email)
+                        return response;
+                    } catch (error) {
+                        console.error(`Error sending PIN email to ${recipient_email}`, error);
+                        await admin.auth().deleteUser(user.uid)
+                        await admin.firestore().collection("userData").doc(recipient_email).delete()
+                        throw new functions.https.HttpsError('resource-exhausted', 'Error sending out PIN email');
+                    }
+            }).catch( async (error) => {
+                if (error.code !== 'resource-exhausted') {
+                    console.error(`Error creating user ${recipient_email} in firestore`, error);
+                    await admin.auth().deleteUser(user.uid)
+                }     
+                throw new functions.https.HttpsError('internal', error);
+            });
+        }).catch( async (error) => {
+            console.error(`Error creating user ${recipient_email} in firebase auth`, error);
+            throw new functions.https.HttpsError('internal', error);
+        });
+})
+
 
 exports.resendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(async (req, res) => {
 
