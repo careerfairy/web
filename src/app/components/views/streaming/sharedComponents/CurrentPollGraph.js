@@ -88,7 +88,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
             labels: options.map(option => option),
             datasets: [{
                 label: question,
-                data: options.map(() => 0),
+                data: options.map((option) => option?.votes || 0),
                 backgroundColor: options.map((option, index) => colorsArray[index]),
                 hoverBackgroundColor: options.map((option, index) => colorsArray[index]),
                 borderColor: theme.palette.background.paper
@@ -127,7 +127,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
 
 
     const getTotalVotes = () => {
-        return chartData.datasets[0].data.reduce((acc, numVotes) => acc + numVotes, 0)
+        return chartData?.datasets?.[0]?.data.reduce((acc, numVotes) => acc + numVotes, 0) || 0
     }
 
     const handleClickLegend = (e, legendItem) => {
@@ -158,7 +158,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
                         checked={!legendLabels[item.index].hidden}
                     />
                 </ListItemIcon>
-                <ListItemText>
+                <ListItemText style={{wordBreak: "break-word"}}>
                     {item.text} <br/><strong>[{votesNum} Vote{votesNum !== 1 && "s"}]</strong>
                 </ListItemText>
             </ListItem>

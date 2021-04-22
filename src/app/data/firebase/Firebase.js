@@ -1407,18 +1407,25 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    voteForPollOption = (livestreamId, pollId, userEmail, optionIndex) => {
+    voteForPollOption = (livestreamId, pollId, userEmail, option) => {
         let pollRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("polls")
-            .doc(pollId);
+            .doc(pollId)
+            .collection("voters")
+            .doc(userEmail)
 
-        return pollRef.update({
-            [`options.${optionIndex}.votes`]: firebase.firestore.FieldValue.increment(1),
-            [`options.${optionIndex}.voters`]: firebase.firestore.FieldValue.arrayUnion(userEmail),
-            voters: firebase.firestore.FieldValue.arrayUnion(userEmail)
+        return pollRef.set({
+            option,
+            timestamp: this.getServerTimestamp()
         })
+
+        // return pollRef.update({
+        //     [`options.${optionIndex}.votes`]: firebase.firestore.FieldValue.increment(1),
+        //     [`options.${optionIndex}.voters`]: firebase.firestore.FieldValue.arrayUnion(userEmail),
+        //     voters: firebase.firestore.FieldValue.arrayUnion(userEmail)
+        // })
     };
 
     setPollState = (livestreamId, pollId, state) => {

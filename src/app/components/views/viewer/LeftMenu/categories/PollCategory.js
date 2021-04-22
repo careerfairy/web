@@ -11,6 +11,7 @@ import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import PollUtil from "../../../../../data/util/PollUtil";
 import {isServer} from "../../../../helperFunctions/HelperFunctions";
+import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 
 const usePollWrapperStyles = makeStyles(theme => ({
     root: {
@@ -51,6 +52,7 @@ const useStyles = makeStyles(theme => ({
 const PollOptionsDisplay = ({currentPoll, voting, voteForPollOption}) => {
     const theme = useTheme()
     const classes = useStyles()
+    console.log("-> currentPoll", currentPoll);
     return (
         <CategoryContainerCentered>
             <PollWrapper style={{padding: theme.spacing(2)}}>
@@ -58,20 +60,21 @@ const PollOptionsDisplay = ({currentPoll, voting, voteForPollOption}) => {
                     {currentPoll?.question}
                 </PollQuestion>
                 <div>
-                    {currentPoll?.options?.map((option) => {
+                    {currentPoll?.options?.map((option, index) => {
+                        console.log("-> option", option);
                         return (
                             <DynamicColorButton
-                                key={option.index}
+                                key={option}
                                 variant="contained"
                                 loading={voting}
                                 className={classes.pollButton}
-                                color={colorsArray[option.index]}
+                                color={colorsArray[index]}
                                 fullWidth
                                 disabled={voting}
-                                onClick={() => voteForPollOption(option.index)}
+                                onClick={() => voteForPollOption(option)}
                                 size='small'>
-                                <span key={`${option.index}-span`}>
-                                {option.name}
+                                <span key={`${option}-span`}>
+                                {option}
                                 </span>
                             </DynamicColorButton>
                         );
@@ -114,9 +117,22 @@ const NoPollDisplay = () => {
 }
 const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => {
     const {authenticatedUser} = useAuth();
+    const {currentLivestream} = useCurrentStream()
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentPollId, setCurrentPollId] = useState(null);
     const [voting, setVoting] = useState(false);
+    const [totalVoters, setTotalVoters] = useState([]);
+
+    useEffect(() => {
+        if(currentPoll?.id){
+            const unsubscribe = firebase.listenToPollVoters(currentLivestream.id, currentPoll.id, querySnapshot => {
+                setTotalVoters(querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()})))
+            })
+            return () => unsubscribe()
+        } else {
+            setTotalVoters([])
+        }
+    },[currentPoll?.id])
 
     useEffect(() => {
         if (livestream) {
@@ -124,7 +140,6 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
                 let pollSwitch = null;
                 querySnapshot.forEach(doc => {
                     let poll = doc.data();
-                    poll.options = PollUtil.convertPollOptionsObjectToArray(poll.options)
                     if (poll.state === 'current') {
                         poll.id = doc.id;
                         pollSwitch = poll;
@@ -143,17 +158,18 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
         }
     }, [currentPoll]);
 
-    const voteForPollOption = async (index) => {
+    const voteForPollOption = async (option) => {
         let authEmail = livestream.test ? 'streamerEmail' : authenticatedUser.email;
         if (authEmail) {
             setVoting(true)
-            await firebase.voteForPollOption(livestream.id, currentPoll.id, authEmail, index);
+            await firebase.voteForPollOption(livestream.id, currentPoll.id, authEmail, option);
             setVoting(false)
         }
     }
 
     let authEmail = (authenticatedUser && authenticatedUser.email && !livestream.test) ? authenticatedUser.email : 'streamerEmail';
-    const hasVoted = useMemo(() => currentPoll?.voters?.indexOf(authEmail) > -1, [authEmail, currentPoll?.voters])
+    const hasVoted = useMemo(() => totalVoters.some(voter => voter.id === authEmail), [authEmail, totalVoters])
+    console.log("-> hasVoted", hasVoted);
 
     const renderPollComponent = () => {
         switch (true) {
