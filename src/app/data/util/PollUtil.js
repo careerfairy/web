@@ -1,5 +1,5 @@
 export default class PollUtil {
-    static convertPollOptionsObjectToArray(pollOptionsObject = {}) {
+static convertPollOptionsObjectToArray(pollOptionsObject = {}) {
         return Object.keys(pollOptionsObject).map((key) => ({
             ...pollOptionsObject[key],
             index: key

@@ -1,10 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Doughnut} from "react-chartjs-2";
 import 'chartjs-plugin-labels'
-import { Box, Checkbox, List, ListItem, Typography, ListItemIcon, ListItemText } from "@material-ui/core";
+import {Box, Checkbox, List, ListItem, Typography, ListItemIcon, ListItemText} from "@material-ui/core";
 import {PollQuestion} from "../../../../materialUI/GlobalTitles";
 import {colorsArray} from "../../../util/colors";
-import { useTheme, withStyles} from "@material-ui/core/styles";
+import {useTheme, withStyles} from "@material-ui/core/styles";
+import {withFirebase} from "../../../../context/firebase";
+import {useCurrentStream} from "../../../../context/stream/StreamContext";
+import PollUtil from "../../../../data/util/PollUtil";
 
 const GraphWrapper = withStyles(theme => ({
     root: {
@@ -26,15 +29,17 @@ const CountWrapper = withStyles(theme => ({
     },
 }))(Box);
 
-const CurrentPollGraph = ({currentPoll: {options, question}}) => {
+const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebase}) => {
     const chartRef = useRef()
     const theme = useTheme()
+    const {currentLivestream} = useCurrentStream()
     const [legendElements, setLegendElements] = useState([])
     const [legendLabels, setLegendLabels] = useState([])
     const [chartData, setChartData] = useState({
         labels: [],
         datasets: [],
     })
+    console.log("-> chartData", chartData);
     const [optionsObj, setOptionsObj] = useState({
         maintainAspectRatio: true,
         legend: {
@@ -80,10 +85,10 @@ const CurrentPollGraph = ({currentPoll: {options, question}}) => {
 
     useEffect(() => {
         setChartData({
-            labels: options.map(option => option.name),
+            labels: options.map(option => option),
             datasets: [{
                 label: question,
-                data: options.map(option => option.votes),
+                data: options.map(() => 0),
                 backgroundColor: options.map((option, index) => colorsArray[index]),
                 hoverBackgroundColor: options.map((option, index) => colorsArray[index]),
                 borderColor: theme.palette.background.paper
@@ -98,8 +103,31 @@ const CurrentPollGraph = ({currentPoll: {options, question}}) => {
 
     }, [chartRef.current])
 
-    const getTotalVotes = (arr) => {
-        return arr.reduce((acc, obj) => acc + obj.votes, 0); // 7
+    useEffect(() => {
+        // listen to option data
+        if (pollId) {
+            const unsubscribe = firebase.listenToPollVoters(currentLivestream.id, pollId, querySnapshot => {
+                const totalVoters = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                setChartData(prevState => {
+                    const newData = prevState.labels.map(option => {
+                        return totalVoters.filter(voter => voter?.option === option).length
+                    })
+                    return {
+                        ...prevState,
+                        datasets: prevState.datasets.map(dataset => ({
+                            ...dataset,
+                            data: newData
+                        }))
+                    }
+                })
+            })
+            return () => unsubscribe()
+        }
+    }, [pollId])
+
+
+    const getTotalVotes = () => {
+        return chartData.datasets[0].data.reduce((acc, numVotes) => acc + numVotes, 0)
     }
 
     const handleClickLegend = (e, legendItem) => {
@@ -154,8 +182,8 @@ const CurrentPollGraph = ({currentPoll: {options, question}}) => {
                     options={optionsObj}/>
                 <CountWrapper>
                     <Typography variant="h3" style={{fontWeight: 500, lineHeight: 0.6, marginBottom: "10px"}}
-                                align="center">{getTotalVotes(options)}</Typography>
-                    <Typography variant="h6" align="center">vote{getTotalVotes(options) !== 1 && "s"}</Typography>
+                                align="center">{getTotalVotes()}</Typography>
+                    <Typography variant="h6" align="center">vote{getTotalVotes() !== 1 && "s"}</Typography>
                 </CountWrapper>
             </div>
         </GraphWrapper>
@@ -163,4 +191,4 @@ const CurrentPollGraph = ({currentPoll: {options, question}}) => {
 }
 
 
-export default CurrentPollGraph;
+export default withFirebase(CurrentPollGraph);

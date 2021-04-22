@@ -42,7 +42,7 @@ const PollCategory = ({firebase, streamer, livestream, selectedState, showMenu, 
                     return {
                         id: doc.id,
                         ...data,
-                        options: PollUtil.convertPollOptionsObjectToArray(data.options)
+                        // options: PollUtil.convertPollOptionsObjectToArray(data.options)
                     }})
                 setPollEntries(pollEntries);
             });

@@ -43,7 +43,7 @@ class Firebase {
 
     createUserInAuthAndFirebase = async (userData) => {
         const createUserInAuthAndFirebase = this.functions.httpsCallable("createNewUserAccount")
-        return createUserInAuthAndFirebase({ userData })
+        return createUserInAuthAndFirebase({userData})
     }
 
     // *** Auth API ***
@@ -1367,6 +1367,16 @@ class Firebase {
         };
         return ref.update(pollObject);
     };
+
+    listenToPollVoters = (livestreamId, pollId, callback) => {
+        const pollVotersRef =  this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId)
+            .collection("voters")
+        return pollVotersRef.onSnapshot(callback);
+    }
 
     deleteLivestreamPoll = (livestreamId, pollId) => {
         let ref = this.firestore

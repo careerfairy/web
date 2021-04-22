@@ -131,7 +131,7 @@ function CurrentPollStreamer({setDemoPolls, demoPolls, sliding, firebase, livest
                             <React.Fragment>
                                 <TooltipTitle>Polls (4/4)</TooltipTitle>
                                 <TooltipText>
-                                    One your audience has voted you can now close the poll.
+                                    Once your audience has voted you can now close the poll.
                                 </TooltipText>
                                 <TooltipButtonComponent onConfirm={() => {
                                     setPollState('closed')

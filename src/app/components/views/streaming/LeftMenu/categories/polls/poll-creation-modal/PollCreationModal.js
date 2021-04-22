@@ -30,7 +30,7 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
     useEffect(() => {
         if (initialPoll) {
             setQuestion(initialPoll.question);
-            setOptions(initialPoll.options.map(option => option.name));
+            setOptions(initialPoll.options.map(option => option));
         }
     }, [initialPoll, open]);
 
@@ -64,9 +64,9 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
         }
 
         setLoading(true);
-        const optionsObject = PollUtil.convertPollOptionNamesArrayToObject(options)
+        // const optionsObject = PollUtil.convertPollOptionNamesArrayToObject(options)
         if (initialPoll) {
-            firebase.updateLivestreamPoll(livestreamId, initialPoll.id, question, optionsObject).then(() => {
+            firebase.updateLivestreamPoll(livestreamId, initialPoll.id, question, options).then(() => {
                 handleClose();
                 setError(false);
                 setQuestion('');
@@ -74,7 +74,7 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
                 return setLoading(false);
             });
         } else {
-            firebase.createLivestreamPoll(livestreamId, question, optionsObject).then(() => {
+            firebase.createLivestreamPoll(livestreamId, question, options).then(() => {
                 handleClose();
                 setError(false);
                 setQuestion('');
@@ -90,9 +90,9 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
                     <TextField
                         key={index}
                         value={option}
-                        error={(option.trim() === '') && (error)}
+                        error={(option?.trim() === '') && (error)}
                         label={`Option ${index + 1}`}
-                        helperText={(option.trim() === '') && (error) && "Please fill or remove"}
+                        helperText={(option?.trim() === '') && (error) && "Please fill or remove"}
                         variant="outlined"
                         margin="dense"
                         fullWidth
