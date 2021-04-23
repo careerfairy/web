@@ -122,7 +122,7 @@ const PollCategory = ({firebase, streamer, livestream, selectedState, showMenu, 
                             }} variant="contained" color="primary"/>
                 </WhiteTooltip>
             </QuestionContainerHeader>
-            <div style={{width: "100%", overFlow: "auto"}}>
+            <div style={{width: "100%", overflow: "auto"}}>
                 {pollElements}
             </div>
             <PollCreationModal livestreamId={livestream.id} open={addNewPoll} initialPoll={null}

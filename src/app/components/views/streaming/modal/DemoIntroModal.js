@@ -62,7 +62,6 @@ const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
                 }
             ],
             timestamp: firebase.getFirebaseTimestamp('March 17, 2020 03:24:00'),
-            voters: []
         }];
         try {
             setLoading(true);

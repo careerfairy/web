@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React, {useEffect, useMemo, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
-import {Paper} from "@material-ui/core";
+import {Grow, Paper} from "@material-ui/core";
 import {GreyPermanentMarker, PollQuestion} from "../../../../../materialUI/GlobalTitles";
 import {CategoryContainerCentered} from "../../../../../materialUI/GlobalContainers";
 import {colorsArray} from "../../../../util/colors";
@@ -13,6 +13,7 @@ import PollUtil, {getCorrectPollOptionData} from "../../../../../data/util/PollU
 import {getRandomInt, getRandomWeightedInt, isServer} from "../../../../helperFunctions/HelperFunctions";
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 import {v4 as uuidv4} from 'uuid'
+import Zoom from 'react-reveal/Zoom';
 
 
 const usePollWrapperStyles = makeStyles(theme => ({
@@ -120,8 +121,8 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentPollId, setCurrentPollId] = useState(null);
     const [voting, setVoting] = useState(false);
-    const [stopVoting, setStopVoting] = useState(false);
     const [hasVoted, setHasVoted] = useState(false);
+    const [value        , setValue] = useState(0);
     let authEmail = (authenticatedUser && authenticatedUser.email && !livestream.test) ? authenticatedUser.email : 'streamerEmail';
 
     useEffect(() => {
@@ -159,21 +160,34 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
     }, [currentPoll?.id, authEmail]);
 
     useEffect(() => {
-        if (currentPoll?.id && !stopVoting && authenticatedUser?.email === "kadirit@hotmail.com") {
-            const maxVotes = 100
-            let numberOfVotes = 0
-            const interval = setInterval(() => {
-                if (numberOfVotes >= maxVotes) {
-                    setStopVoting(true)
-                } else {
-                    numberOfVotes += 1
-                    spamRandomVotes()
-                }
-            }, [50])
-
-            return () => clearInterval(interval)
+        if(!Boolean(currentPoll && authEmail)){
+            setValue(0)
+        } else if(!hasVoted){
+            setValue(1)
+        } else if(hasVoted){
+            setValue(2)
+        } else {
+            setValue(0)
         }
-    }, [currentPoll?.id, stopVoting, authenticatedUser?.email]);
+
+    },[currentPoll, authEmail, hasVoted])
+
+    // useEffect(() => {
+    //     if (currentPoll?.id && !stopVoting && authenticatedUser?.email === "kadirit@hotmail.com") {
+    //         const maxVotes = 100
+    //         let numberOfVotes = 0
+    //         const interval = setInterval(() => {
+    //             if (numberOfVotes >= maxVotes) {
+    //                 setStopVoting(true)
+    //             } else {
+    //                 numberOfVotes += 1
+    //                 spamRandomVotes()
+    //             }
+    //         }, [50])
+    //
+    //         return () => clearInterval(interval)
+    //     }
+    // }, [currentPoll?.id, stopVoting, authenticatedUser?.email]);
 
 
     /**
@@ -188,32 +202,42 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
         }
     }
 
-    const spamRandomVotes = () => {
-        let randomEmail = uuidv4()
-        const options = currentPoll.options
-        const randomNum = getRandomInt(0, options.length - 1)
-        const randomWeightedIndex = getRandomWeightedInt(0, options.length - 1, randomNum)
-        firebase.voteForPollOption(livestream.id, currentPoll.id, randomEmail, options[randomWeightedIndex].id)
-    }
+    // const spamRandomVotes = () => {
+    //     let randomEmail = uuidv4()
+    //     const options = currentPoll.options
+    //     const randomNum = getRandomInt(0, options.length - 1)
+    //     const randomWeightedIndex = getRandomWeightedInt(0, options.length - 1, randomNum)
+    //     firebase.voteForPollOption(livestream.id, currentPoll.id, randomEmail, options[randomWeightedIndex].id)
+    // }
 
 
-    const renderPollComponent = () => {
-        switch (true) {
-            case !Boolean(currentPoll && authEmail) :
-                return <NoPollDisplay/>
-            case !hasVoted:
-                return (<PollOptionsDisplay
-                    currentPoll={currentPoll}
-                    voteForPollOption={voteForPollOption}
-                    voting={voting}
-                />)
-            case hasVoted:
-                return (<PollDisplay currentPoll={currentPoll}/>)
-            default:
-                return <NoPollDisplay/>;
-        }
-    }
 
+
+    const views = [
+        <Grow unmountOnExit
+              style={{ transitionDelay: value === 0 ? '500ms' : '0ms' }}
+              key={0} in={value === 0}>
+            <NoPollDisplay/>
+        </Grow>,
+        <Grow unmountOnExit
+              style={{ transitionDelay: value === 1 ? '500ms' : '0ms' }}
+              key={1} in={value === 1}>
+            <PollOptionsDisplay
+                currentPoll={currentPoll}
+                voteForPollOption={voteForPollOption}
+                voting={voting}
+            />
+        </Grow>,
+        <Grow  unmountOnExit
+               style={{ transitionDelay: value === 2 ? '500ms' : '0ms' }}
+               key={2} in={value === 2}>
+            <PollDisplay currentPoll={currentPoll}/>
+        </Grow>
+    ]
+
+    return (<React.Fragment>
+        {views}
+    </React.Fragment>)
 
     return (
         <>

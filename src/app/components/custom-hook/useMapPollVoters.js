@@ -2,7 +2,6 @@ import React, {useEffect} from 'react';
 
 /**
  * The callback function that is used to set the chart data for the graph
- *
  * @callback setChartDataCallback
  * @param {*} prevState
  */

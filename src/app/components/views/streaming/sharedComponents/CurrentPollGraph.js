@@ -39,7 +39,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
         labels: [],
         datasets: [],
     })
-    // console.log("-> chartData", chartData);
+
     const [optionsObj, setOptionsObj] = useState({
         maintainAspectRatio: true,
         legend: {
@@ -105,29 +105,6 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
         }
 
     }, [chartRef.current])
-
-    // useEffect(() => {
-    //     // listen to option data
-    //     if (pollId && currentLivestream?.id) {
-    //         const unsubscribe = firebase.listenToPollVoters(currentLivestream.id, pollId, querySnapshot => {
-    //             const totalVotes = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
-    //             setChartData(prevState => {
-    //                 const newData = prevState.ids.map(optionId => {
-    //                     return totalVotes.filter(vote => vote?.optionId === optionId).length
-    //                 })
-    //                 return {
-    //                     ...prevState,
-    //                     datasets: prevState.datasets.map(dataset => ({
-    //                         ...dataset,
-    //                         data: newData
-    //                     }))
-    //                 }
-    //             })
-    //         })
-    //         return () => unsubscribe()
-    //     }
-    // }, [pollId, currentLivestream?.id])
-
 
     const getTotalVotes = () => {
         return chartData?.datasets?.[0]?.data.reduce((acc, numVotes) => acc + numVotes, 0) || 0
