@@ -150,14 +150,13 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
     }, [currentPoll]);
 
     useEffect(() => {
-        if (!hasVoted && currentPoll?.id) {
+        if (currentPoll?.id) {
             const unsubscribe = firebase.listenToVoteOnPoll(livestream.id, currentPoll.id, authEmail, querySnapshot => {
                 setHasVoted(querySnapshot.exists)
             })
             return () => unsubscribe()
         }
-    }, [hasVoted, currentPoll?.id, authEmail]);
-
+    }, [currentPoll?.id, authEmail]);
 
     useEffect(() => {
         if (currentPoll?.id && !stopVoting && authenticatedUser?.email === "kadirit@hotmail.com") {

@@ -1,11 +1,12 @@
 import {v4 as uuidv4} from 'uuid'
 
+
 /**
  * Convert Poll Options Object To An Array of options
  * @param {object} pollOptionsObject - Takes in an options dictionary
  * @return {array} Return the converted dictionary into an array of objects
  */
-export const convertPollOptionsObjectToArray = (pollOptionsObject ) => {
+export const convertPollOptionsObjectToArray = (pollOptionsObject) => {
     return Object.keys(pollOptionsObject).map((key) => ({
         ...pollOptionsObject[key],
         index: key
@@ -36,4 +37,10 @@ export const convertPollOptionNamesArrayToObject = (arrayOfPollOptionNames = [])
  */
 export const getCorrectPollOptionData = (pollData) => {
     return pollData.options.length ? pollData.options : []
+}
+
+export default {
+    getCorrectPollOptionData,
+    convertPollOptionsObjectToArray,
+    convertPollOptionNamesArrayToObject
 }

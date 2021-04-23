@@ -7,6 +7,7 @@ import {colorsArray} from "../../../util/colors";
 import {useTheme, withStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
 import {useCurrentStream} from "../../../../context/stream/StreamContext";
+import useMapPollVoters from "../../../custom-hook/useMapPollVoters";
 
 const GraphWrapper = withStyles(theme => ({
     root: {
@@ -64,6 +65,8 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
         }
     })
 
+    useMapPollVoters(pollId, currentLivestream.id, setChartData, firebase)
+
     useEffect(() => {
         setOptionsObj({
             ...optionsObj,
@@ -88,7 +91,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
             ids: options.map(option => option.id),
             datasets: [{
                 label: question,
-                data: options.map((option) => option?.votes || 0),
+                data: options.map(() => 0),
                 backgroundColor: options.map((option, index) => colorsArray[index]),
                 hoverBackgroundColor: options.map((option, index) => colorsArray[index]),
                 borderColor: theme.palette.background.paper
@@ -103,27 +106,27 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
 
     }, [chartRef.current])
 
-    useEffect(() => {
-        // listen to option data
-        if (pollId && currentLivestream?.id) {
-            const unsubscribe = firebase.listenToPollVoters(currentLivestream.id, pollId, querySnapshot => {
-                const totalVotes = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
-                setChartData(prevState => {
-                    const newData = prevState.ids.map(optionId => {
-                        return totalVotes.filter(vote => vote?.optionId === optionId).length
-                    })
-                    return {
-                        ...prevState,
-                        datasets: prevState.datasets.map(dataset => ({
-                            ...dataset,
-                            data: newData
-                        }))
-                    }
-                })
-            })
-            return () => unsubscribe()
-        }
-    }, [pollId, currentLivestream?.id])
+    // useEffect(() => {
+    //     // listen to option data
+    //     if (pollId && currentLivestream?.id) {
+    //         const unsubscribe = firebase.listenToPollVoters(currentLivestream.id, pollId, querySnapshot => {
+    //             const totalVotes = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+    //             setChartData(prevState => {
+    //                 const newData = prevState.ids.map(optionId => {
+    //                     return totalVotes.filter(vote => vote?.optionId === optionId).length
+    //                 })
+    //                 return {
+    //                     ...prevState,
+    //                     datasets: prevState.datasets.map(dataset => ({
+    //                         ...dataset,
+    //                         data: newData
+    //                     }))
+    //                 }
+    //             })
+    //         })
+    //         return () => unsubscribe()
+    //     }
+    // }, [pollId, currentLivestream?.id])
 
 
     const getTotalVotes = () => {

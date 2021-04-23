@@ -58,14 +58,15 @@ const FeedbackGraph = ({
             setData({
                 datasets: [
                     {
-                        data: currentPoll.options.map(option => option.votes),
+                        data: currentPoll.options.map(() => 0),
                         backgroundColor: localColors,
                         borderWidth: 8,
                         borderColor: theme.palette.common.white,
                         hoverBorderColor: theme.palette.common.white
                     }
                 ],
-                labels: currentPoll.options.map(option => convertStringToArray(option.name))
+                ids:  currentPoll.options.map(option => option.id),
+                labels: currentPoll.options.map(option => convertStringToArray(option.text))
             })
         } else {
             setData(initialData)
