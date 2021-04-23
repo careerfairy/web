@@ -1430,7 +1430,7 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    voteForPollOption = (livestreamId, pollId, userEmail, option) => {
+    voteForPollOption = (livestreamId, pollId, userEmail, optionId) => {
         let pollRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
@@ -1439,7 +1439,7 @@ class Firebase {
             .collection("voters")
             .doc(userEmail)
         return pollRef.set({
-            option,
+            optionId: optionId,
             timestamp: this.getServerTimestamp()
         })
 

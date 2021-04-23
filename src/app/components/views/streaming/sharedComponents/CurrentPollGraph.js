@@ -79,12 +79,13 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
     }, [])
 
     useEffect(() => {
-        setLegendLabels(options.map(option => ({name: option.name, hidden: false})))
+        setLegendLabels(options.map(option => ({name: option.text, hidden: false, id: option.id})))
     }, [question])
 
     useEffect(() => {
         setChartData({
-            labels: options.map(option => option),
+            labels: options.map(option => option.text),
+            ids: options.map(option => option.id),
             datasets: [{
                 label: question,
                 data: options.map((option) => option?.votes || 0),
@@ -101,17 +102,16 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
         }
 
     }, [chartRef.current])
-//
+
     useEffect(() => {
         // listen to option data
         if (pollId && currentLivestream?.id) {
             const unsubscribe = firebase.listenToPollVoters(currentLivestream.id, pollId, querySnapshot => {
-                const totalVoters = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                const totalVotes = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
                 setChartData(prevState => {
-                    const newData = prevState.labels.map(option => {
-                        return totalVoters.filter(voter => voter?.option === option).length
+                    const newData = prevState.ids.map(optionId => {
+                        return totalVotes.filter(vote => vote?.optionId === optionId).length
                     })
-                    console.log("-> newData", newData);
                     return {
                         ...prevState,
                         datasets: prevState.datasets.map(dataset => ({

@@ -18,19 +18,19 @@ import {
 } from '@material-ui/core';
 import {BarChart} from "@material-ui/icons";
 import {GlassDialog} from "../../../../../../../materialUI/GlobalModals";
-import PollUtil from "../../../../../../../data/util/PollUtil";
 import {v4 as uuidv4} from "uuid";
+
 /**
  * Create Empty Option.
  * @return {({id: string, text: string})} Returns a newly generated empty option.
  */
 const createEmptyOption = () => ({id: uuidv4(), text: ''})
 const getInitialOptions = () => [createEmptyOption(), createEmptyOption()]
+
 function PollCreationModal({open, handleClose, livestreamId, initialOptions, initialPoll, firebase}) {
 
     const [question, setQuestion] = useState('');
     const [options, setOptions] = useState(getInitialOptions());
-    console.log("-> options", options);
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -48,7 +48,6 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
         }
         setOptions([...options, createEmptyOption()]);
     }
-
 
 
     /**
@@ -99,10 +98,8 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
             });
         }
     }
-    console.log("-> options", options);
-    const optionElements = options.map(({id,text}, index) => {
-            console.log("-> text", text);
-            console.log("-> id", id);
+
+    const optionElements = options.map(({id, text}, index) => {
             return (
                 <Grow key={id} in>
                     <TextField
@@ -129,7 +126,6 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
         }
         )
     ;
-
 
 
     return (

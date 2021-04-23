@@ -9,7 +9,7 @@ import {colorsArray} from "../../../../util/colors";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
-import PollUtil from "../../../../../data/util/PollUtil";
+import PollUtil, {getCorrectPollOptionData} from "../../../../../data/util/PollUtil";
 import {getRandomInt, getRandomWeightedInt, isServer} from "../../../../helperFunctions/HelperFunctions";
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 import {v4 as uuidv4} from 'uuid'
@@ -62,20 +62,19 @@ const PollOptionsDisplay = ({currentPoll, voting, voteForPollOption}) => {
                 </PollQuestion>
                 <div>
                     {currentPoll?.options?.map((option, index) => {
-                        console.log("-> option", option);
                         return (
                             <DynamicColorButton
-                                key={option}
+                                key={option.id}
                                 variant="contained"
                                 loading={voting}
                                 className={classes.pollButton}
                                 color={colorsArray[index]}
                                 fullWidth
                                 disabled={voting}
-                                onClick={() => voteForPollOption(option)}
+                                onClick={() => voteForPollOption(option.id)}
                                 size='small'>
-                                <span key={`${option}-span`}>
-                                {option}
+                                <span key={`${option.text}-span`}>
+                                {option.text}
                                 </span>
                             </DynamicColorButton>
                         );
@@ -118,7 +117,6 @@ const NoPollDisplay = () => {
 }
 const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => {
     const {authenticatedUser} = useAuth();
-    console.count("-> PollCategory");
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentPollId, setCurrentPollId] = useState(null);
     const [voting, setVoting] = useState(false);
@@ -132,6 +130,7 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
                 let pollSwitch = null;
                 querySnapshot.forEach(doc => {
                     let poll = doc.data();
+                    poll.options = getCorrectPollOptionData(poll)
                     if (poll.state === 'current') {
                         poll.id = doc.id;
                         pollSwitch = poll;
@@ -160,29 +159,32 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
     }, [hasVoted, currentPoll?.id, authEmail]);
 
 
-    // useEffect(() => {
-    //     if (currentPoll?.id && !stopVoting && authenticatedUser?.email === "kadirit@hotmail.com") {
-    //         const maxVotes = 100
-    //         let numberOfVotes = 0
-    //         const interval = setInterval(() => {
-    //             if (numberOfVotes >= maxVotes) {
-    //                 setStopVoting(true)
-    //             } else {
-    //                 numberOfVotes += 1
-    //                 spamRandomVotes()
-    //             }
-    //         }, [50])
-    //
-    //         return () => clearInterval(interval)
-    //     }
-    // }, [currentPoll?.id, stopVoting, authenticatedUser?.email]);
+    useEffect(() => {
+        if (currentPoll?.id && !stopVoting && authenticatedUser?.email === "kadirit@hotmail.com") {
+            const maxVotes = 100
+            let numberOfVotes = 0
+            const interval = setInterval(() => {
+                if (numberOfVotes >= maxVotes) {
+                    setStopVoting(true)
+                } else {
+                    numberOfVotes += 1
+                    spamRandomVotes()
+                }
+            }, [50])
+
+            return () => clearInterval(interval)
+        }
+    }, [currentPoll?.id, stopVoting, authenticatedUser?.email]);
 
 
-    const voteForPollOption = async (option) => {
+    /**
+     * @param {string} optionId - Id of the option you wish to vote for
+     */
+    const voteForPollOption = async (optionId) => {
         let authEmail = livestream.test ? 'streamerEmail' : authenticatedUser.email;
         if (authEmail) {
             setVoting(true)
-            await firebase.voteForPollOption(livestream.id, currentPoll.id, authEmail, option);
+            await firebase.voteForPollOption(livestream.id, currentPoll.id, authEmail, optionId);
             setVoting(false)
         }
     }
@@ -192,7 +194,7 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
         const options = currentPoll.options
         const randomNum = getRandomInt(0, options.length - 1)
         const randomWeightedIndex = getRandomWeightedInt(0, options.length - 1, randomNum)
-        firebase.voteForPollOption(livestream.id, currentPoll.id, randomEmail, options[randomWeightedIndex])
+        firebase.voteForPollOption(livestream.id, currentPoll.id, randomEmail, options[randomWeightedIndex].id)
     }
 
 
