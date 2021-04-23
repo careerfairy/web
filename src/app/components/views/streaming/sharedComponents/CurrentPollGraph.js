@@ -1,13 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Doughnut} from "react-chartjs-2";
 import 'chartjs-plugin-labels'
-import {Box, Checkbox, List, ListItem, Typography, ListItemIcon, ListItemText} from "@material-ui/core";
+import {Box, Checkbox, List, ListItem, ListItemIcon, ListItemText, Typography} from "@material-ui/core";
 import {PollQuestion} from "../../../../materialUI/GlobalTitles";
 import {colorsArray} from "../../../util/colors";
 import {useTheme, withStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
 import {useCurrentStream} from "../../../../context/stream/StreamContext";
-import PollUtil from "../../../../data/util/PollUtil";
 
 const GraphWrapper = withStyles(theme => ({
     root: {
@@ -39,7 +38,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
         labels: [],
         datasets: [],
     })
-    console.log("-> chartData", chartData);
+    // console.log("-> chartData", chartData);
     const [optionsObj, setOptionsObj] = useState({
         maintainAspectRatio: true,
         legend: {
@@ -94,7 +93,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
                 borderColor: theme.palette.background.paper
             }],
         })
-    }, [options, theme.palette.type])
+    }, [pollId, theme.palette.type])
 
     useEffect(() => {
         if (chartRef.current) {
@@ -102,16 +101,17 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
         }
 
     }, [chartRef.current])
-
+//
     useEffect(() => {
         // listen to option data
-        if (pollId) {
+        if (pollId && currentLivestream?.id) {
             const unsubscribe = firebase.listenToPollVoters(currentLivestream.id, pollId, querySnapshot => {
                 const totalVoters = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
                 setChartData(prevState => {
                     const newData = prevState.labels.map(option => {
                         return totalVoters.filter(voter => voter?.option === option).length
                     })
+                    console.log("-> newData", newData);
                     return {
                         ...prevState,
                         datasets: prevState.datasets.map(dataset => ({
@@ -123,7 +123,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
             })
             return () => unsubscribe()
         }
-    }, [pollId])
+    }, [pollId, currentLivestream?.id])
 
 
     const getTotalVotes = () => {

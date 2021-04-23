@@ -42,8 +42,10 @@ const PollCategory = ({firebase, streamer, livestream, selectedState, showMenu, 
                     return {
                         id: doc.id,
                         ...data,
+                        options: data.options.length ? data.options : []
                         // options: PollUtil.convertPollOptionsObjectToArray(data.options)
-                    }})
+                    }
+                })
                 setPollEntries(pollEntries);
             });
             return () => unsubscribe();

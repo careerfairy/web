@@ -19,15 +19,23 @@ import {
 import {BarChart} from "@material-ui/icons";
 import {GlassDialog} from "../../../../../../../materialUI/GlobalModals";
 import PollUtil from "../../../../../../../data/util/PollUtil";
-
+import {v4 as uuidv4} from "uuid";
+/**
+ * Create Empty Option.
+ * @return {({id: string, text: string})} Returns a newly generated empty option.
+ */
+const createEmptyOption = () => ({id: uuidv4(), text: ''})
+const getInitialOptions = () => [createEmptyOption(), createEmptyOption()]
 function PollCreationModal({open, handleClose, livestreamId, initialOptions, initialPoll, firebase}) {
 
     const [question, setQuestion] = useState('');
-    const [options, setOptions] = useState(['', '']);
+    const [options, setOptions] = useState(getInitialOptions());
+    console.log("-> options", options);
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        // console.log("-> initialPoll", initialPoll);
         if (initialPoll) {
             setQuestion(initialPoll.question);
             setOptions(initialPoll.options.map(option => option));
@@ -38,27 +46,43 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
         if (options.length > 3) {
             return;
         }
-        setOptions([...options, '']);
+        setOptions([...options, createEmptyOption()]);
     }
 
-    function updateOption(indexToUpdate, newValue) {
-        const updatedOptions = options.map((value, index) => {
-            if (index === indexToUpdate) {
-                return newValue;
-            } else {
-                return value;
+
+
+    /**
+     * @param {string} idToUpdate - Id of the option you with to update
+     * @param {string} newValue - New text value of the option you wish to update
+     */
+    function updateOption(idToUpdate, newValue) {
+        const updatedOptions = options.map(option => {
+            if (option.id === idToUpdate) {
+                return {...option, text: newValue};
             }
+            return option;
         });
         setOptions(updatedOptions);
     }
 
-    function removeOption(indexToRemove) {
-        const updatedOptions = options.filter((value, index) => indexToRemove !== index);
+    /**
+     * @param {string} idToRemove - The id of the option you wish to remove
+     */
+    const removeOption = (idToRemove) => {
+        const updatedOptions = options.filter((option) => idToRemove !== option.id);
         setOptions(updatedOptions);
-    }
+    };
+
+    const resetForm = () => {
+        handleClose();
+        setError(false);
+        setQuestion('');
+        setOptions(getInitialOptions());
+        return setLoading(false);
+    };
 
     function savePoll() {
-        let emptyOption = options.some(option => option.trim() === '');
+        let emptyOption = options.some(option => option.text.trim() === '');
         if (emptyOption) {
             return setError(true);
         }
@@ -67,40 +91,34 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
         // const optionsObject = PollUtil.convertPollOptionNamesArrayToObject(options)
         if (initialPoll) {
             firebase.updateLivestreamPoll(livestreamId, initialPoll.id, question, options).then(() => {
-                handleClose();
-                setError(false);
-                setQuestion('');
-                setOptions(['', '']);
-                return setLoading(false);
+                resetForm()
             });
         } else {
             firebase.createLivestreamPoll(livestreamId, question, options).then(() => {
-                handleClose();
-                setError(false);
-                setQuestion('');
-                setOptions(['', '']);
-                return setLoading(false);
+                resetForm()
             });
         }
     }
-
-    const optionElements = options.map((option, index) => {
+    console.log("-> options", options);
+    const optionElements = options.map(({id,text}, index) => {
+            console.log("-> text", text);
+            console.log("-> id", id);
             return (
-                <Grow key={index} in>
+                <Grow key={id} in>
                     <TextField
-                        key={index}
-                        value={option}
-                        error={(option?.trim() === '') && (error)}
+                        key={id}
+                        value={text}
+                        error={(text?.trim() === '') && (error)}
                         label={`Option ${index + 1}`}
-                        helperText={(option?.trim() === '') && (error) && "Please fill or remove"}
+                        helperText={(text?.trim() === '') && (error) && "Please fill or remove"}
                         variant="outlined"
                         margin="dense"
                         fullWidth
-                        onChange={({currentTarget: {value}}) => updateOption(index, value)}
+                        onChange={({currentTarget: {value}}) => updateOption(id, value)}
                         placeholder='Write down your option'
                         InputProps={options.length >= 3 ? {
                             endAdornment: <Box p={1}>
-                                <Fab onClick={() => removeOption(index)} size="small" color="primary"
+                                <Fab onClick={() => removeOption(id)} size="small" color="primary"
                                      style={{background: "red", width: 36, height: 36}}>
                                     <DeleteForeverIcon/>
                                 </Fab>
@@ -111,6 +129,8 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
         }
         )
     ;
+
+
 
     return (
         <GlassDialog TransitionComponent={Slide} maxWidth="sm" fullWidth open={open} onClose={handleClose}>

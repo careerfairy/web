@@ -1369,13 +1369,36 @@ class Firebase {
     };
 
     listenToPollVoters = (livestreamId, pollId, callback) => {
-        const pollVotersRef =  this.firestore
+        const pollVotersRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("polls")
             .doc(pollId)
             .collection("voters")
         return pollVotersRef.onSnapshot(callback);
+    }
+
+    listenToVoteOnPoll = (livestreamId, pollId, authEmail, callback) => {
+        const pollVotersRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId)
+            .collection("voters")
+            .doc(authEmail)
+        return pollVotersRef.onSnapshot(callback);
+    }
+
+    checkIfHasVotedOnPoll = async (livestreamId, pollId, authEmail) => {
+        const pollVoterRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId)
+            .collection("voters")
+            .doc(authEmail)
+        const voterSnap = await pollVoterRef.get()
+        return voterSnap.exists
     }
 
     deleteLivestreamPoll = (livestreamId, pollId) => {
@@ -1415,7 +1438,6 @@ class Firebase {
             .doc(pollId)
             .collection("voters")
             .doc(userEmail)
-
         return pollRef.set({
             option,
             timestamp: this.getServerTimestamp()

@@ -145,7 +145,7 @@ function UpcomingPollStreamer({
     }
 
 
-    const optionElements = poll.options.map((option, index) => {
+    const optionElements = poll?.options?.map((option, index) => {
         return (
             <ListItem disableGutters dense key={option}>
                 <ListItemIcon>
