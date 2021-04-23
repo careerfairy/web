@@ -18,7 +18,7 @@ import AnalyticsUtil, {
 } from "../../../../../data/util/AnalyticsUtil";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import {createSelector} from 'reselect'
-import PollUtil from "../../../../../data/util/PollUtil";
+import PollUtil, {getCorrectPollOptionData} from "../../../../../data/util/PollUtil";
 import useTimeFrames from "../../../../custom-hook/useTimeFrames";
 import useUserDataSet from "../../../../custom-hook/useUserDataSet";
 import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDictionary";
@@ -276,8 +276,8 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
                         ...data,
                         id: doc.id,
                         date: data.timestamp?.toDate(),
-                        votes: data.voters?.length || 0,
-                        options: PollUtil.convertPollOptionsObjectToArray(data.options),
+                        // votes: data.voters?.length || 0,
+                        options: getCorrectPollOptionData(data),
                     }
                 })
                 setCurrentStream(prevState => ({...prevState, pollEntries}));

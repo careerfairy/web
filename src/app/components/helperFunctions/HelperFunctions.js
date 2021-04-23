@@ -304,6 +304,18 @@ export const getRandomColor = () => {
     return '#' + Math.round(Math.random() * max).toString(16);
 }
 
+export const getRandomInt =(min, max) =>{
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export const getRandomWeightedInt = (min, max, index) => {
+    return (Math.floor((Math.random() * (max - min + 1) + min) / (index + 1)));
+}
+
+
+
 /**
  * Get Resized Url.
  * @param {string} url – original url of image
