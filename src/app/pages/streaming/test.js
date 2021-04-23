@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 
 import {withFirebasePage} from 'context/firebase';
+import {v4 as uuid} from "uuid";
 
 import {useRouter} from 'next/router';
 import Head from 'next/head';
@@ -46,25 +47,21 @@ function TestStreamingPage(props) {
         const testPolls = [{
             question: 'What should we discuss next?',
             state: 'upcoming',
-            options: {
-                "0": {
-                    index: 0,
-                    name: 'Our next product',
-                    votes: 0
+            options:[
+                {
+                    id: uuid(),
+                    text: 'Our next product',
                 },
-                "1": {
-                    index: 1,
-                    name: 'What our internships look like',
-                    votes: 0
+                {
+                    id: uuid(),
+                    text: 'What our internships look like',
                 },
-                "2": {
-                    index: 2,
-                    name: 'Our personal story',
-                    votes: 0
+                {
+                    id: uuid(),
+                    text: 'Our personal story',
                 }
-            },
+            ],
             timestamp: props.firebase.getFirebaseTimestamp('March 17, 2020 03:24:00'),
-            voters: []
         }];
         try {
             setLoading(true);

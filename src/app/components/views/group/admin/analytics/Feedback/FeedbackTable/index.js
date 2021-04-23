@@ -221,11 +221,11 @@ const FeedbackTable = ({
             type: "numeric",
             render: renderAppearAfter
         },
-        {
-            field: "votes",
-            title: "Votes",
-            type: "numeric",
-        },
+        // {
+        //     field: "votes",
+        //     title: "Votes",
+        //     type: "numeric",
+        // },
         {
             field: "options",
             title: "Breakdown",
