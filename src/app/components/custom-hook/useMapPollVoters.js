@@ -1,5 +1,19 @@
 import React, {useEffect} from 'react';
 
+/**
+ * The callback function that is used to set the chart data for the graph
+ *
+ * @callback setChartDataCallback
+ * @param {*} prevState
+ */
+
+/**
+ * Map the poll voters to the Chart data state
+ * @param {string} pollId - The id of the poll you wish to get votes from
+ * @param {string} livestreamId - The id of the livestream the poll belongs to
+ * @param {setChartDataCallback} setChartData - The callback function that is used to set the chart data for the graph
+ * @param {({listenToPollVoters: function})} firebase - The firebase object containing the method for listening to poll voters
+ */
 const useMapPollVoters = (pollId, livestreamId, setChartData, firebase) => {
 
     useEffect(() => {
