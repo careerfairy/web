@@ -31,6 +31,7 @@ import {Paper, Avatar, Box} from '@material-ui/core';
 import {companyLogoPlaceholder} from "../../constants/images";
 import {getResizedUrl} from "../../components/helperFunctions/HelperFunctions";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
@@ -127,9 +128,9 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                 (querySnapshot) => {
                     if (querySnapshot.data()) {
                         let livestream = querySnapshot.data();
-                        livestream.createdDate = livestream.created.toDate?.()
-                        livestream.lastUpdatedDate = livestream.lastUpdated.toDate?.()
-                        livestream.startDate = livestream.start.toDate?.()
+                        livestream.createdDate = livestream.created?.toDate?.()
+                        livestream.lastUpdatedDate = livestream.lastUpdated?.toDate?.()
+                        livestream.startDate = livestream.start?.toDate?.()
                         livestream.id = querySnapshot.id;
                         setCurrentLivestream(livestream);
                     }
@@ -663,7 +664,10 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                             margin: "0 auto",
                         }}
                     >
-                        <MulitLineText text={currentLivestream.summary}/>
+                        <Typography style={{whiteSpace: "pre-line"}}>
+                            {currentLivestream.summary}
+                        </Typography>
+                        {/*<MulitLineText text={currentLivestream.summary}/>*/}
                     </div>
                 </Container>
             </div>
@@ -1097,9 +1101,9 @@ export async function getServerSideProps({params: {livestreamId, groupId}}) {
         delete serverSideLivestream.status
 
         serverSideLivestream.id = snap.id
-        serverSideLivestream.createdDateString = serverSideLivestream.created?.toDate?.().toString()
-        serverSideLivestream.lastUpdatedDateString = serverSideLivestream.lastUpdated?.toDate?.().toString()
-        serverSideLivestream.startDateString = serverSideLivestream.start?.toDate?.().toString()
+        serverSideLivestream.createdDateString = serverSideLivestream.created?.toDate?.().toString() || null
+        serverSideLivestream.lastUpdatedDateString = serverSideLivestream.lastUpdated?.toDate?.().toString() || null
+        serverSideLivestream.startDateString = serverSideLivestream.start?.toDate?.().toString() || null
 
         // Clear out props that have methods of which the server can't parse
         delete serverSideLivestream.created
