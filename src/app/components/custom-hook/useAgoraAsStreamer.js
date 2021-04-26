@@ -383,11 +383,13 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             uid: userUid
         }
 
+
         rtmClient.login(rtmCredentials).then(() => {
 
             const channel = rtmClient.createChannel(roomId);
 
-            dispatch(actions.setRtmChannelObj(channel))
+
+
 
             channel.on('ChannelMessage', (message, memberId) => {
                 if (message.messageType === "TEXT") {
@@ -399,7 +401,12 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             });
 
             channel.join().then(() => {
+
+                dispatch(actions.setRtmChannelObj(channel))
                 console.log('Joined channel');
+                // channel.getMembers().then(result => {
+                //     console.log("-> getMembers result", result);
+                // })
                 setRtmChannel(channel);
             }).catch(error => {
                 console.error(error);
@@ -521,6 +528,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     useEffect(() => {
         if (rtmChannel) {
             let interval = setInterval(() => {
+
                 rtmClient.getChannelMemberCount([roomId]).then(result => {
                     setNumberOfViewers(result[roomId])
                     // console.log(result)
