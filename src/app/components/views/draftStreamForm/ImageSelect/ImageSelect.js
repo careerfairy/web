@@ -119,7 +119,7 @@ const ImageSelect =
             {renderImage}
             <FilePickerContainer
                 extensions={['jpg', 'jpeg', 'png']}
-                maxSize={20}
+                maxSize={10}
                 onError={errMsg => (setFilePickerError(errMsg))}
                 onChange={fileObject => {
                     uploadLogo(path, fileObject, firebase, (newUrl, fullPath) => {

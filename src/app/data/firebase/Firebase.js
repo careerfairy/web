@@ -43,7 +43,7 @@ class Firebase {
 
     createUserInAuthAndFirebase = async (userData) => {
         const createUserInAuthAndFirebase = this.functions.httpsCallable("createNewUserAccount")
-        return createUserInAuthAndFirebase({ userData })
+        return createUserInAuthAndFirebase({userData})
     }
 
     // *** Auth API ***
@@ -1070,6 +1070,14 @@ class Firebase {
         return ref.onSnapshot(callback);
     }
 
+    listenToAllLivestreamParticipatingStudents = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("participatingStudents")
+        return ref.onSnapshot(callback);
+    }
+
     getLivestreamTalentPoolMembers = (companyId) => {
         let ref = this.firestore
             .collection("userData")
@@ -1360,6 +1368,39 @@ class Firebase {
         return ref.update(pollObject);
     };
 
+    listenToPollVoters = (livestreamId, pollId, callback) => {
+        const pollVotersRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId)
+            .collection("voters")
+        return pollVotersRef.onSnapshot(callback);
+    }
+
+    listenToVoteOnPoll = (livestreamId, pollId, authEmail, callback) => {
+        const pollVotersRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId)
+            .collection("voters")
+            .doc(authEmail)
+        return pollVotersRef.onSnapshot(callback);
+    }
+
+    checkIfHasVotedOnPoll = async (livestreamId, pollId, authEmail) => {
+        const pollVoterRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId)
+            .collection("voters")
+            .doc(authEmail)
+        const voterSnap = await pollVoterRef.get()
+        return voterSnap.exists
+    }
+
     deleteLivestreamPoll = (livestreamId, pollId) => {
         let ref = this.firestore
             .collection("livestreams")
@@ -1389,18 +1430,24 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    voteForPollOption = (livestreamId, pollId, userEmail, optionIndex) => {
+    voteForPollOption = (livestreamId, pollId, userEmail, optionId) => {
         let pollRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("polls")
-            .doc(pollId);
-
-        return pollRef.update({
-            [`options.${optionIndex}.votes`]: firebase.firestore.FieldValue.increment(1),
-            [`options.${optionIndex}.voters`]: firebase.firestore.FieldValue.arrayUnion(userEmail),
-            voters: firebase.firestore.FieldValue.arrayUnion(userEmail)
+            .doc(pollId)
+            .collection("voters")
+            .doc(userEmail)
+        return pollRef.set({
+            optionId: optionId,
+            timestamp: this.getServerTimestamp()
         })
+
+        // return pollRef.update({
+        //     [`options.${optionIndex}.votes`]: firebase.firestore.FieldValue.increment(1),
+        //     [`options.${optionIndex}.voters`]: firebase.firestore.FieldValue.arrayUnion(userEmail),
+        //     voters: firebase.firestore.FieldValue.arrayUnion(userEmail)
+        // })
     };
 
     setPollState = (livestreamId, pollId, state) => {

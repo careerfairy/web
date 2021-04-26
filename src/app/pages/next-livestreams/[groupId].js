@@ -11,6 +11,8 @@ import {StreamsSection} from "../../components/views/NextLivestreams/StreamsSect
 import {useDispatch, useSelector} from "react-redux";
 import * as actions from '../../store/actions'
 import {getServerSideGroup, getServerSideStream} from "../../util/serverUtil";
+import {getResizedUrl} from "../../components/helperFunctions/HelperFunctions";
+import ScrollToTop from "../../components/views/common/ScrollToTop";
 
 const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
 
@@ -55,7 +57,7 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
                 }
             })()
         }
-    },[Boolean(upcomingLivestreams), Boolean(pastLivestreams), currentGroup.groupId])
+    }, [Boolean(upcomingLivestreams), Boolean(pastLivestreams), currentGroup.groupId])
 
     const livestreamIdIsIn = (streams) => {
         return Boolean(streams?.some(stream => stream.id === livestreamId))
@@ -64,15 +66,14 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
     const metaInfo = useMemo(() => serverSideStream ? ({
         title: `CareerFairy | Live Stream with ${serverSideStream.company}`,
         description: serverSideStream.title,
-        image: serverSideStream.backgroundImageUrl,
+        image: getResizedUrl(serverSideStream.backgroundImageUrl, "md"),
         fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}?livestreamId=${serverSideStream.id}`
     }) : ({
         description: currentGroup.description,
         title: `CareerFairy | Next Livestreams of ${currentGroup.universityName}`,
-        image: currentGroup.logoUrl,
+        image: getResizedUrl(currentGroup.logoUrl, "md"),
         fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}`,
     }), [serverSideStream])
-
 
     const handleChange = useCallback((event, newValue) => {
         setValue(newValue);
@@ -91,22 +92,25 @@ const GroupPage = ({serverSideGroup, livestreamId, serverSideStream}) => {
                         backgroundColor={navyBlue.main}
                         groupLogo={currentGroup.logoUrl}
                         backgroundImage={placeholderBanner}
+                        groupBio={currentGroup.extraInfo}
                         backgroundImageOpacity={0.2}
                         title={currentGroup.universityName}
                         subtitle={currentGroup.description}
                         handleChange={handleChange}
                         value={value}
                     />
-                    <StreamsSection value={value}
-                                    upcomingLivestreams={upcomingLivestreams}
-                                    livestreamId={livestreamId}
-                                    setSelectedOptions={setSelectedOptions}
-                                    selectedOptions={selectedOptions}
-                                    currentGroup={currentGroup}
-                                    pastLivestreams={pastLivestreams}
+                    <StreamsSection
+                        value={value}
+                        upcomingLivestreams={upcomingLivestreams}
+                        livestreamId={livestreamId}
+                        setSelectedOptions={setSelectedOptions}
+                        selectedOptions={selectedOptions}
+                        currentGroup={currentGroup}
+                        pastLivestreams={pastLivestreams}
                     />
                 </div>
             </NextLivestreamsLayout>
+            <ScrollToTop/>
         </React.Fragment>
     );
 };

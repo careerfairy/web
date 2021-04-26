@@ -9,6 +9,8 @@ import {StreamsSection} from "../../components/views/NextLivestreams/StreamsSect
 import HeadWithMeta from "../../components/page/HeadWithMeta";
 import {NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL} from "../../constants/routes";
 import {getServerSideStream} from "../../util/serverUtil";
+import {getResizedUrl} from "../../components/helperFunctions/HelperFunctions";
+import ScrollToTop from "../../components/views/common/ScrollToTop";
 
 const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
 
@@ -48,7 +50,7 @@ const nextLivestreamsPage = ({livestreamId, serverSideStream}) => {
     const metaInfo = useMemo(() => serverSideStream ? ({
         title: `CareerFairy | Live Stream with ${serverSideStream.company}`,
         description: serverSideStream.title,
-        image: serverSideStream.backgroundImageUrl,
+        image: getResizedUrl(serverSideStream.backgroundImageUrl, "md"),
         fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}?livestreamId=${serverSideStream.id}`
     }) : ({
         description: "Catch the upcoming streams on CareerFairy.",
@@ -78,13 +80,15 @@ const nextLivestreamsPage = ({livestreamId, serverSideStream}) => {
                     handleChange={handleChange}
                     value={value}
                 />
-                <StreamsSection value={value}
-                                upcomingLivestreams={upcomingLivestreams}
-                                livestreamId={livestreamId}
-                                listenToUpcoming
-                                pastLivestreams={pastLivestreams}
+                <StreamsSection
+                    value={value}
+                    upcomingLivestreams={upcomingLivestreams}
+                    livestreamId={livestreamId}
+                    listenToUpcoming
+                    pastLivestreams={pastLivestreams}
                 />
             </NextLivestreamsLayout>
+            <ScrollToTop/>
         </React.Fragment>
     )
 };

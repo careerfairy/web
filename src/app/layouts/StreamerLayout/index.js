@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
         flex: '1 1 auto',
         overflow: 'hidden',
         paddingTop: 55,
-        paddingLeft: ({showMenu, smallScreen}) => (showMenu && !smallScreen)  ? 280 : 0,
+        paddingLeft: ({showMenu, smallScreen}) => (showMenu && !smallScreen) ? 280 : 0,
         transition: theme.transitions.create("padding-left", {
             duration: theme.transitions.duration.standard,
             easing: theme.transitions.easing.easeInOut
@@ -86,24 +86,16 @@ const StreamerLayout = (props) => {
     const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
     const isMainStreamer = useMemo(() => pathname === "/streaming/[livestreamId]/main-streamer", [pathname])
     const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'careerCenters'}]
-    useFirestoreConnect(() => livestreamId ? [
+    const query = useMemo(() => livestreamId ? [
         {
             collection: "livestreams",
             doc: livestreamId,
             storeAs: "currentLivestream",
             populates
-        },
-        {
-            collection: "livestreams",
-            doc: livestreamId,
-            subcollections: [
-                {
-                    collection: "participatingStudents",
-                }
-            ],
-            storeAs: "audience"
         }
     ] : [], [livestreamId])
+
+    useFirestoreConnect(query)
 
     const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
         ...populate(firestore, "currentLivestream", populates),
@@ -163,10 +155,10 @@ const StreamerLayout = (props) => {
     }, [newNotification]);
 
     useEffect(() => {
-        if(smallScreen && showMenu){
+        if (smallScreen && showMenu) {
             setShowMenu(false)
         }
-    },[smallScreen])
+    }, [smallScreen])
 
     useEffect(() => {
         if (notificationToRemove) {

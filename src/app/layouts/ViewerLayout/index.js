@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import {withFirebase} from "../../context/firebase";
 import {useRouter} from "next/router";
@@ -86,24 +86,17 @@ const ViewerLayout = (props) => {
 
 
     const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'careerCenters'}]
-    useFirestoreConnect(() => livestreamId ? [
+
+    const query = useMemo(() => livestreamId ? [
         {
             collection: "livestreams",
             doc: livestreamId,
             storeAs: "currentLivestream",
             populates
-        },
-        {
-            collection: "livestreams",
-            doc: livestreamId,
-            subcollections: [
-                {
-                    collection: "participatingStudents",
-                }
-            ],
-            storeAs: "audience"
         }
     ] : [], [livestreamId])
+
+    useFirestoreConnect(query)
 
     const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
         ...populate(firestore, "currentLivestream", populates),
@@ -124,7 +117,7 @@ const ViewerLayout = (props) => {
         if (userData?.userEmail && livestreamId) {
             firebase.setUserIsParticipating(livestreamId, userData);
         }
-    }, [livestreamId, userData]);
+    }, [livestreamId, userData?.email, userData?.linkedinUrl, userData?.firstName, userData?.lastName]);
 
     useEffect(() => {
         if (currentLivestream && !streamerId) {

@@ -54,6 +54,7 @@ export const uploadLogo = (location, fileObject, firebase, callback) => {
         }, function () {
             // Upload completed successfully, now we can get the download URL
             uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+                console.log("-> downloadURL", downloadURL);
                 callback(downloadURL, fullPath);
                 console.log('File available at', downloadURL);
             });
@@ -269,14 +270,14 @@ export const getMinutesPassed = (livestream) => {
     }
 };
 
-export const  addMinutes = (date, minutes) => {
+export const addMinutes = (date, minutes) => {
     return new Date(date.getTime() + minutes * 60000);
 }
 
-export const toTitleCase =(str) => {
+export const toTitleCase = (str) => {
     return str.replace(
         /\w\S*/g,
-        function(txt) {
+        function (txt) {
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
         }
     );
@@ -286,11 +287,11 @@ export const makeExternalLink = (url) => {
     const urlPattern = new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/);
     let string = url
 
-    if(urlPattern.test(string)){
+    if (urlPattern.test(string)) {
         //string is url
 
         ///clear http && https from string
-        string = string.replace("https://","").replace("http://","");
+        string = string.replace("https://", "").replace("http://", "");
 
         //add https to string
         string = `https://${string}`;
@@ -301,4 +302,57 @@ export const makeExternalLink = (url) => {
 export const getRandomColor = () => {
     const max = 0xffffff;
     return '#' + Math.round(Math.random() * max).toString(16);
+}
+
+export const getRandomInt =(min, max) =>{
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export const getRandomWeightedInt = (min, max, index) => {
+    return (Math.floor((Math.random() * (max - min + 1) + min) / (index + 1)));
+}
+
+
+
+/**
+ * Get Resized Url.
+ * @param {string} url – original url of image
+ * @param {('xs'|'sm'|'md'|'lg')} size – size of the image
+ * @return {string} Returns the image url with the correct size appended to it.
+ */
+export const getResizedUrl = (url, size = "sm") => {
+    const imageSizes = {
+        xs: "200x200",
+        sm: "400x400",
+        md: "680x680",
+        lg: "1200x900"
+    }
+
+    if (typeof url !== 'string') {
+        console.warn("Invalid url provided");
+        return ""
+    }
+
+    const targetSize = imageSizes[size]
+
+    if (!targetSize) {
+        console.warn("provided wrong size, must be one of [xs, sm, md, lg]")
+        return url
+    }
+    return url.replace(/.(?=[^.]*$)/, `_${targetSize}.`)
+}
+
+/**
+ * Get Responsive Resized Url.
+ * @param {string} url – original url of image
+ * @param {boolean} isMobile – size of the image
+ * @param {('xs'|'sm'|'md'|'lg')} mobileSize – size of the image on when mobile
+ * @param {('xs'|'sm'|'md'|'lg')} desktopSize – size of the image on desktop
+ * @return {string} Returns the image url with the correct size appended to it.
+ */
+
+export const getResponsiveResizedUrl = (url, isMobile, mobileSize = "sm", desktopSize = "lg") => {
+    return getResizedUrl(url, isMobile ? mobileSize : desktopSize)
 }

@@ -145,16 +145,16 @@ function UpcomingPollStreamer({
     }
 
 
-    const optionElements = poll.options.map((option, index) => {
+    const optionElements = poll?.options?.map(({id, text}, index) => {
         return (
-            <ListItem disableGutters dense key={option.index}>
+            <ListItem disableGutters dense key={id}>
                 <ListItemIcon>
                     <ListNumber style={{backgroundColor: colorsArray[index]}}>
                         {index + 1}
                     </ListNumber>
                 </ListItemIcon>
                 <ListItemText>
-                    {option.name}
+                    {text}
                 </ListItemText>
             </ListItem>
         )

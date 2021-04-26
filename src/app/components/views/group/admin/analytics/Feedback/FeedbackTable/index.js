@@ -157,11 +157,11 @@ const FeedbackTable = ({
             title: "Question",
             width: 300
         },
-        {
-            title: "Votes",
-            type: 'numeric',
-            field: "votes",
-        },
+        // {
+        //     title: "Votes",
+        //     type: 'numeric',
+        //     field: "votes",
+        // },
         {
             field: "state",
             title: "Status",

@@ -32,7 +32,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import CopyToClipboard from "../../../common/CopyToClipboard";
 import LogosPlaceHolder from "./LogosPlaceholder";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
-import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
+import {dynamicSort, getResizedUrl, getResponsiveResizedUrl} from "../../../../helperFunctions/HelperFunctions";
 
 import clsx from "clsx";
 import {Row} from "@mui-treasury/components/flex";
@@ -662,7 +662,7 @@ const GroupStreamCardV2Old = memo(({
     let speakerElements = livestream.speakers?.map(speaker => {
         return (<Avatar
             key={speaker.id}
-            src={speaker.avatar || speakerPlaceholder}
+            src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
             alt={speaker.firstName}/>)
     })
 
@@ -700,7 +700,7 @@ const GroupStreamCardV2Old = memo(({
                                       </Typography>
                                   }/>}
                             {!cardHovered &&
-                            <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
+                            <img className={classes.lowerFrontBackgroundImage} src={getResizedUrl(livestream.backgroundImageUrl)}
                                  alt="background"/>
                             }
                             <div className={classes.dateTimeWrapper}>
@@ -814,7 +814,7 @@ const GroupStreamCardV2Old = memo(({
                                         [classes.pulseAnimate]: shouldPulseBackground()
                                     })
                                 }}>
-                                <img className={classes.backgroundImage} src={livestream.backgroundImageUrl}
+                                <img className={classes.backgroundImage} src={getResponsiveResizedUrl(livestream.backgroundImageUrl, mobile, "sm", "md")}
                                      alt="background"/>
                                 {!isDraft &&
                                 <CopyToClipboard

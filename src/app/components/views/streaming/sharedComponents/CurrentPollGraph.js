@@ -1,10 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Doughnut} from "react-chartjs-2";
 import 'chartjs-plugin-labels'
-import { Box, Checkbox, List, ListItem, Typography, ListItemIcon, ListItemText } from "@material-ui/core";
+import {Box, Checkbox, List, ListItem, ListItemIcon, ListItemText, Typography} from "@material-ui/core";
 import {PollQuestion} from "../../../../materialUI/GlobalTitles";
 import {colorsArray} from "../../../util/colors";
-import { useTheme, withStyles} from "@material-ui/core/styles";
+import {useTheme, withStyles} from "@material-ui/core/styles";
+import {withFirebase} from "../../../../context/firebase";
+import {useCurrentStream} from "../../../../context/stream/StreamContext";
+import useMapPollVoters from "../../../custom-hook/useMapPollVoters";
 
 const GraphWrapper = withStyles(theme => ({
     root: {
@@ -26,15 +29,17 @@ const CountWrapper = withStyles(theme => ({
     },
 }))(Box);
 
-const CurrentPollGraph = ({currentPoll: {options, question}}) => {
+const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebase}) => {
     const chartRef = useRef()
     const theme = useTheme()
+    const {currentLivestream} = useCurrentStream()
     const [legendElements, setLegendElements] = useState([])
     const [legendLabels, setLegendLabels] = useState([])
     const [chartData, setChartData] = useState({
         labels: [],
         datasets: [],
     })
+
     const [optionsObj, setOptionsObj] = useState({
         maintainAspectRatio: true,
         legend: {
@@ -60,6 +65,8 @@ const CurrentPollGraph = ({currentPoll: {options, question}}) => {
         }
     })
 
+    useMapPollVoters(pollId, currentLivestream.id, setChartData, firebase)
+
     useEffect(() => {
         setOptionsObj({
             ...optionsObj,
@@ -75,21 +82,22 @@ const CurrentPollGraph = ({currentPoll: {options, question}}) => {
     }, [])
 
     useEffect(() => {
-        setLegendLabels(options.map(option => ({name: option.name, hidden: false})))
+        setLegendLabels(options.map(option => ({name: option.text, hidden: false, id: option.id})))
     }, [question])
 
     useEffect(() => {
         setChartData({
-            labels: options.map(option => option.name),
+            labels: options.map(option => option.text),
+            ids: options.map(option => option.id),
             datasets: [{
                 label: question,
-                data: options.map(option => option.votes),
+                data: options.map(() => 0),
                 backgroundColor: options.map((option, index) => colorsArray[index]),
                 hoverBackgroundColor: options.map((option, index) => colorsArray[index]),
                 borderColor: theme.palette.background.paper
             }],
         })
-    }, [options, theme.palette.type])
+    }, [pollId, theme.palette.type])
 
     useEffect(() => {
         if (chartRef.current) {
@@ -98,8 +106,8 @@ const CurrentPollGraph = ({currentPoll: {options, question}}) => {
 
     }, [chartRef.current])
 
-    const getTotalVotes = (arr) => {
-        return arr.reduce((acc, obj) => acc + obj.votes, 0); // 7
+    const getTotalVotes = () => {
+        return chartData?.datasets?.[0]?.data.reduce((acc, numVotes) => acc + numVotes, 0) || 0
     }
 
     const handleClickLegend = (e, legendItem) => {
@@ -130,7 +138,7 @@ const CurrentPollGraph = ({currentPoll: {options, question}}) => {
                         checked={!legendLabels[item.index].hidden}
                     />
                 </ListItemIcon>
-                <ListItemText>
+                <ListItemText style={{wordBreak: "break-word"}}>
                     {item.text} <br/><strong>[{votesNum} Vote{votesNum !== 1 && "s"}]</strong>
                 </ListItemText>
             </ListItem>
@@ -154,8 +162,8 @@ const CurrentPollGraph = ({currentPoll: {options, question}}) => {
                     options={optionsObj}/>
                 <CountWrapper>
                     <Typography variant="h3" style={{fontWeight: 500, lineHeight: 0.6, marginBottom: "10px"}}
-                                align="center">{getTotalVotes(options)}</Typography>
-                    <Typography variant="h6" align="center">vote{getTotalVotes(options) !== 1 && "s"}</Typography>
+                                align="center">{getTotalVotes()}</Typography>
+                    <Typography variant="h6" align="center">vote{getTotalVotes() !== 1 && "s"}</Typography>
                 </CountWrapper>
             </div>
         </GraphWrapper>
@@ -163,4 +171,4 @@ const CurrentPollGraph = ({currentPoll: {options, question}}) => {
 }
 
 
-export default CurrentPollGraph;
+export default withFirebase(CurrentPollGraph);
