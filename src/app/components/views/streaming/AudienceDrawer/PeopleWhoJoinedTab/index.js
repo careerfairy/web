@@ -21,8 +21,7 @@ const options = [
     TALENT_POOL_OPTION
 ]
 
-const UsersTab = ({isStreamer, participatingStudents}) => {
-
+const PeopleWhoJoinedTab = ({isStreamer, participatingStudents}) => {
 
     const classes = useStyles()
     const {currentLivestream: {talentPool}} = useCurrentStream()
@@ -33,6 +32,7 @@ const UsersTab = ({isStreamer, participatingStudents}) => {
     const [filteredAudience, setFilteredAudience] = useState(undefined);
 
     const handleFilter = (arrayOfUserObjects) => {
+        if(!arrayOfUserObjects) return arrayOfUserObjects
         let filtered = arrayOfUserObjects.filter(user =>
             user.firstName?.toLowerCase().includes(searchParams)
             || user.lastName?.toLowerCase().includes(searchParams)
@@ -45,8 +45,7 @@ const UsersTab = ({isStreamer, participatingStudents}) => {
     }
 
     useEffect(() => {
-        const newFilteredAudience = handleFilter(participatingStudents)
-        setFilteredAudience(newFilteredAudience)
+        setFilteredAudience(handleFilter(participatingStudents))
     }, [participatingStudents, searchParams, currentOption])
 
 
@@ -88,14 +87,14 @@ const UsersTab = ({isStreamer, participatingStudents}) => {
                 <LoadingDisplay/> :
                 isEmpty(participatingStudents) ?
                     <EmptyDisplay text="Not enough data"/> :
-                    <UserList isStreamer={isStreamer} audience={handleFilter(participatingStudents)}/>}
+                    <UserList isStreamer={isStreamer} audience={filteredAudience}/>}
         </Fragment>
     );
 };
 
-UsersTab.propTypes = {
+PeopleWhoJoinedTab.propTypes = {
     isStreamer: PropTypes.bool.isRequired
 }
 
-export default UsersTab;
+export default PeopleWhoJoinedTab;
 
