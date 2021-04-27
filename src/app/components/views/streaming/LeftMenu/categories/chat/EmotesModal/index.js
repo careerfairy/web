@@ -29,7 +29,7 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
     const classes = useStyles()
     const streamRef = useStreamRef();
     const dispatch = useDispatch()
-    const {currentLivestream: {id}} = useCurrentStream()
+    const {currentLivestream: {id, test}} = useCurrentStream()
     const [value, setValue] = React.useState(0);
     const [loading, setLoading] = React.useState(false);
 
@@ -52,7 +52,7 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
         if (firstName && lastName) {
             displayName = `${firstName} ${lastName[0]}`
         } else if (id === TEST_EMAIL) {
-            displayName = "Test user"
+            displayName = test ? "Test user" : "Streamer"
         }
         return displayName
     }
