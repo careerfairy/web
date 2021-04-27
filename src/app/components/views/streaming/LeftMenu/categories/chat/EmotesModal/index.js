@@ -7,7 +7,7 @@ import {Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Lis
 import * as actions from '../../../../../../../store/actions'
 import {GlassDialog} from "../../../../../../../materialUI/GlobalModals";
 import {SwipeablePanel} from "../../../../../../../materialUI/GlobalPanels/GlobalPanels";
-import {withFirebase} from "../../../../../../../context/firebase";
+import {withFirebase} from "context/firebase";
 import {useCurrentStream} from "../../../../../../../context/stream/StreamContext";
 
 import PanelDisplay from "./PanelDisplay";
@@ -15,6 +15,8 @@ import EmotesModalUser from "./EmotesModalUser";
 import {TEST_EMAIL} from "./utils";
 import {populate, useFirestoreConnect, isLoaded} from "react-redux-firebase";
 import {makeStyles} from "@material-ui/core/styles";
+import useStreamRef from "../../../../../../custom-hook/useStreamRef";
+import usePopulatedChatEntry from "../../../../../../custom-hook/usePopulatedChatEntry";
 
 const useStyles = makeStyles(theme => ({
     loaderContent: {
@@ -25,31 +27,13 @@ const useStyles = makeStyles(theme => ({
 }))
 const EmotesModal = ({onClose, chatEntry, firebase}) => {
     const classes = useStyles()
+    const streamRef = useStreamRef();
     const dispatch = useDispatch()
     const {currentLivestream: {id}} = useCurrentStream()
     const [value, setValue] = React.useState(0);
     const [loading, setLoading] = React.useState(false);
-    const populates = [
-        {child: 'wow', root: 'userData'},
-        {child: 'heart', root: 'userData',},
-        {child: 'laughing', root: 'userData'},
-        {child: 'thumbsUp', root: 'userData'},
-    ]
 
-    useFirestoreConnect(() => chatEntry?.id ? [
-        {
-            collection: "livestreams",
-            doc: id,
-            subcollections: [{
-                collection: "chatEntries",
-                doc: chatEntry.id,
-            }],
-            populates,
-            storeAs: "currentChatEntry"
-        }
-    ] : [])
-
-    const populatedChatEntry = useSelector(({firestore}) => populate(firestore, "currentChatEntry", populates), shallowEqual)
+    const populatedChatEntry = usePopulatedChatEntry(chatEntry)
 
     const getInitials = (userObj) => {
         const {firstName, lastName} = userObj
@@ -117,7 +101,7 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
     const handleUnEmote = useCallback(async (emoteProp, emoteEmail) => {
         try {
             setLoading(true)
-            await firebase.unEmoteComment(id, chatEntry.id, emoteProp, emoteEmail)
+            await firebase.unEmoteComment(streamRef, chatEntry.id, emoteProp, emoteEmail)
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
         }
@@ -160,7 +144,6 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
                                                  loading={loading}
                                                  prop={prop}
                                                  handleUnEmote={handleUnEmote}
-                                                 firebase={firebase}
                                                  emojiAlt={emojiAlt}
                                                  emojiSrc={emojiSrc}
                                                  initials={initials}
@@ -178,7 +161,6 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
                                         prop={prop}
                                         email={email}
                                         loading={loading}
-                                        firebase={firebase}
                                         emojiSrc={emojiSrc}
                                         handleUnEmote={handleUnEmote}
                                         emojiAlt={emojiAlt}

@@ -7,6 +7,7 @@ import {useDispatch} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import {addMinutes, getMinutesPassed} from "../../../../helperFunctions/HelperFunctions";
 import {makeStyles} from "@material-ui/core/styles";
+import useStreamRef from "../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     snackBar: {
@@ -16,6 +17,7 @@ const useStyles = makeStyles(theme => ({
 const StreamNotifications = ({isStreamer, firebase}) => {
     const classes = useStyles()
     const dispatch = useDispatch()
+    const streamRef = useStreamRef();
     const {userData} = useAuth()
     const {currentLivestream} = useCurrentStream()
     const [feedbackQuestions, setFeedbackQuestions] = useState([]);
@@ -41,8 +43,8 @@ const StreamNotifications = ({isStreamer, firebase}) => {
 
     useEffect(() => {
         if (currentLivestream?.id && isStreamer) {
-            const unsubscribeRatings = firebase.listenToLivestreamRatings(
-                currentLivestream.id,
+            const unsubscribeRatings = firebase.listenToLivestreamRatingsWithStreamRef(
+                streamRef,
                 async (querySnapshot) => {
                     setFeedbackQuestions(prevState => {
                         return querySnapshot.docs.map((doc) => {

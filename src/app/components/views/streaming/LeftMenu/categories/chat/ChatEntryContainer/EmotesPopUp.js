@@ -8,7 +8,8 @@ import React, {Fragment} from "react";
 import {IconButton} from "@material-ui/core";
 import clsx from "clsx";
 import {makeStyles} from "@material-ui/core/styles";
-import {withFirebase} from "../../../../../../../context/firebase";
+import {withFirebase} from "context/firebase";
+import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     emoteImg: {
@@ -31,6 +32,7 @@ const useStyles = makeStyles(theme => ({
 const EmotesPopUp = ({handleCloseEmotesMenu, firebase, chatEntry: {id: chatEntryId, wow, heart, thumbsUp, laughing}}) => {
 
     const classes = useStyles()
+    const streamRef = useStreamRef();
     const {currentLivestream: {id}} = useCurrentStream()
     const {userData} = useAuth()
     const dispatch = useDispatch()
@@ -38,10 +40,10 @@ const EmotesPopUp = ({handleCloseEmotesMenu, firebase, chatEntry: {id: chatEntry
     const handleEmote = async (emoteProp, active) => {
         try {
             if (active && userData?.userEmail) {
-                await firebase.unEmoteComment(id, chatEntryId, emoteProp, userData.userEmail)
+                await firebase.unEmoteComment(streamRef, chatEntryId, emoteProp, userData.userEmail)
             } else {
                 const userEmail = userData?.userEmail || TEST_EMAIL
-                await firebase.emoteComment(id, chatEntryId, emoteProp, userEmail)
+                await firebase.emoteComment(streamRef, chatEntryId, emoteProp, userEmail)
             }
         } catch (e) {
             dispatch(actions.sendGeneralError(e))

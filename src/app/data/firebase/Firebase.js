@@ -930,17 +930,15 @@ class Firebase {
         return ref.add(comment);
     };
 
-    listenToChatEntries = (livestreamId, limit, callback) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    listenToChatEntries = (streamRef, limit, callback) => {
+        let ref = streamRef
             .collection("chatEntries")
             .limit(limit)
             .orderBy("timestamp", "desc")
         return ref.onSnapshot(callback);
     }
 
-    putChatEntry = (livestreamId, chatEntry) => {
+    putChatEntry = (streamRef, chatEntry) => {
         chatEntry.timestamp = this.getServerTimestamp()
         const newChatEntry = {
             ...chatEntry,
@@ -949,18 +947,14 @@ class Firebase {
             heart: [],
             thumbsUp: []
         }
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+        let ref = streamRef
             .collection("chatEntries");
         return ref.add(newChatEntry);
     }
 
-    emoteComment = (livestreamId, chatEntryId, fieldProp, userEmail) => {
+    emoteComment = (streamRef, chatEntryId, fieldProp, userEmail) => {
         const otherProps = ["wow", "laughing", "heart", "thumbsUp"].filter(prop => prop !== fieldProp)
-        const chatEntryRef = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+        const chatEntryRef = streamRef
             .collection("chatEntries")
             .doc(chatEntryId)
         const data = {
@@ -971,10 +965,8 @@ class Firebase {
         })
         return chatEntryRef.update(data)
     }
-    unEmoteComment = (livestreamId, chatEntryId, fieldProp, userEmail) => {
-        const chatEntryRef = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    unEmoteComment = (streamRef, chatEntryId, fieldProp, userEmail) => {
+        const chatEntryRef = streamRef
             .collection("chatEntries")
             .doc(chatEntryId)
         return chatEntryRef.update({
@@ -1770,6 +1762,11 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
+            .collection("rating")
+        return ref.onSnapshot(callback)
+    };
+    listenToLivestreamRatingsWithStreamRef = (streamRef, callback) => {
+        let ref = streamRef
             .collection("rating")
         return ref.onSnapshot(callback)
     };

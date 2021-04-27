@@ -27,6 +27,7 @@ import CustomScrollToBottom from "../../../../../util/CustomScrollToBottom";
 import {useAuth} from "../../../../../../HOCs/AuthProvider";
 import clsx from "clsx";
 import EmotesModal from "./EmotesModal";
+import useStreamRef from "../../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     root: {},
@@ -92,7 +93,7 @@ const useStyles = makeStyles(theme => ({
 function MiniChatContainer({isStreamer, livestream, firebase, className}) {
     const {authenticatedUser, userData} = useAuth();
     const {tutorialSteps, setTutorialSteps, handleConfirmStep} = useContext(TutorialContext);
-
+    const streamRef = useStreamRef();
     const [chatEntries, setChatEntries] = useState([]);
     const [focused, setFocused] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -108,7 +109,7 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
 
     useEffect(() => {
         if (livestream.id) {
-            const unsubscribe = firebase.listenToChatEntries(livestream.id, 150, querySnapshot => {
+            const unsubscribe = firebase.listenToChatEntries(streamRef, 150, querySnapshot => {
                 const newEntries = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()})).reverse()
                 setChatEntries(newEntries);
                 if (!open) {
@@ -173,7 +174,7 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
         }
 
         isOpen(15) && handleConfirmStep(15)
-        firebase.putChatEntry(livestream.id, newChatEntryObject)
+        firebase.putChatEntry(streamRef, newChatEntryObject)
             .then(() => {
                 setSubmitting(false)
                 setNewChatEntry('');

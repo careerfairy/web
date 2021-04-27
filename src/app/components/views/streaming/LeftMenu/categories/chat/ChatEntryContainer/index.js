@@ -5,7 +5,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Box, Card, IconButton, Popover, Slide, Typography} from "@material-ui/core";
 import {getTimeFromNow} from "../../../../../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
-import {withFirebase} from "../../../../../../../context/firebase";
+import {withFirebase} from "context/firebase";
 import EmojiEmotionsOutlinedIcon from '@material-ui/icons/EmojiEmotionsOutlined';
 import EmotesPreview from "./EmotesPreview";
 import EmotesPopUp from "./EmotesPopUp";
