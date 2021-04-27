@@ -17,10 +17,6 @@ import {FORTY_FIVE_MINUTES_IN_MILLISECONDS, START_DATE_FOR_REPORTED_EVENTS} from
 // };
 
 class Firebase {
-    getFirebaseTimestamp = (dateString) => {
-        return firebase.firestore.Timestamp.fromDate(new Date(dateString));
-    };
-
     constructor() {
         // if (!firebase.apps.length) {
         //     firebase.initializeApp(config);
@@ -33,6 +29,10 @@ class Firebase {
         //     this.functions.useFunctionsEmulator('http://localhost:5001');
         // }
     }
+
+    getFirebaseTimestamp = (dateString) => {
+        return firebase.firestore.Timestamp.fromDate(new Date(dateString));
+    };
 
     // *** Functions Api ***
 
@@ -63,12 +63,22 @@ class Firebase {
         return ref.get()
     }
 
-    getUniversitiesFromCountryCode = (countryCode) => {
-        let ref = this.firestore.collection("universitiesByCountry").doc(countryCode)
-        return ref.get()
+    // *** Firestore API ***
+
+    getStreamRef = (router) => {
+        const {query: {breakoutRoomId, livestreamId}} = router
+        let ref = this.firestore.collection("livestreams")
+            .doc(livestreamId)
+        if (breakoutRoomId) {
+            ref = ref.collection("breakoutRooms")
+                .doc(breakoutRoomId)
+        }
+        return ref
     }
 
-    // *** Firestore API ***
+    getBreakoutRoomRef = () => {
+
+    }
 
     // USER
 
@@ -816,12 +826,9 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    updateSpeakersInLivestream = (livestream, speaker) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestream.id);
+    updateSpeakersInLivestream = (livestreamRef, speaker) => {
         return this.firestore.runTransaction((transaction) => {
-            return transaction.get(ref).then((livestreamDoc) => {
+            return transaction.get(livestreamRef).then((livestreamDoc) => {
                 let livestream = livestreamDoc.data()
                 let updatedSpeakers = livestream.liveSpeakers?.filter(existingSpeaker => existingSpeaker.id !== speaker.id) || [];
                 if (updatedSpeakers && updatedSpeakers.length > 0) {
@@ -832,21 +839,18 @@ class Firebase {
                     });
                 }
                 updatedSpeakers.push(speaker)
-                transaction.update(ref, {
+                transaction.update(livestreamRef, {
                     liveSpeakers: updatedSpeakers
                 });
             });
         });
     }
 
-    addSpeakerInLivestream = (livestream, speaker) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestream.id);
+    addSpeakerInLivestream = (livestreamRef, speaker) => {
         return this.firestore.runTransaction((transaction) => {
-            return transaction.get(ref).then((livestreamDoc) => {
+            return transaction.get(livestreamRef).then((livestreamDoc) => {
                 let livestream = livestreamDoc.data()
-                let speakerRef = this.firestore.collection("livestreams").doc(livestreamDoc.id).collection("speakers").doc();
+                let speakerRef = livestreamRef.collection("speakers").doc();
                 speaker.id = speakerRef.id;
                 let updatedSpeakers = livestream.liveSpeakers ? [...livestream.liveSpeakers] : []
                 updatedSpeakers.forEach(existingSpeaker => {
@@ -855,7 +859,7 @@ class Firebase {
                     }
                 });
                 updatedSpeakers.push(speaker)
-                transaction.update(ref, {
+                transaction.update(livestreamRef, {
                     liveSpeakers: updatedSpeakers
                 });
             });

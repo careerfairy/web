@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 
 const FirebaseContext = React.createContext(null)
 
@@ -21,5 +21,7 @@ export const withFirebasePage = Page => {
     }
     return element;
 }
+
+export const useFirebase = () => useContext(FirebaseContext);
 
 export default FirebaseContext;

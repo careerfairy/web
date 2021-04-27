@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 
-const CurrentStreamContext = React.createContext({currentLivestream: false});
+const CurrentStreamContext = React.createContext({currentLivestream: false, isBreakout: false});
 
 const useCurrentStream = () => useContext(CurrentStreamContext);
 

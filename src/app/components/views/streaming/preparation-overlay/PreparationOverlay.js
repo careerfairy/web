@@ -1,24 +1,21 @@
 import React, {useEffect, useState} from 'react';
-import {withFirebase} from 'context/firebase';
 import {makeStyles} from "@material-ui/core/styles";
 import {isEmpty} from 'lodash/fp'
 import {
     Button,
     CircularProgress,
-    Collapse, Container,
+    Collapse,
+    Container,
     FormControl,
     FormControlLabel,
     FormGroup,
-    InputLabel,
-    MenuItem,
     Paper,
-    Select,
     Switch,
     TextField,
     Typography
 } from "@material-ui/core";
-import {ControlPoint} from '@material-ui/icons';
 import {URL_REGEX} from 'components/util/constants';
+import usePreparationOverlay from "../../../custom-hook/usePreparationOverlay";
 
 const useStyles = makeStyles((theme) => ({
     background: {
@@ -95,13 +92,13 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebase}) {
+function PreparationOverlay({livestream, streamerUuid, setStreamerReady}) {
 
     const classes = useStyles();
+    const {updateSpeaker, addSpeaker} = usePreparationOverlay()
     const [speaker, setSpeaker] = useState({});
     const [showLinkedIn, setShowLinkedIn] = useState(false);
     const [linkedInUrl, setLinkedInUrl] = useState("");
-
     const [formErrors, setFormErrors] = useState({});
     const [loading, setLoading] = useState(false)
 
@@ -110,7 +107,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
         if (storedSpeakerString) {
             if (livestream.liveSpeakers?.length > 0) {
                 let storedSpeaker = JSON.parse(storedSpeakerString);
-                let savedSpeaker = livestream.liveSpeakers?.find( liveSpeaker => {
+                let savedSpeaker = livestream.liveSpeakers?.find(liveSpeaker => {
                     return liveSpeaker.firstName === storedSpeaker.firstName &&
                         liveSpeaker.lastName === storedSpeaker.lastName &&
                         liveSpeaker.position === storedSpeaker.position
@@ -124,8 +121,8 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                 let storedSpeaker = JSON.parse(storedSpeakerString);
                 setSpeaker(storedSpeaker)
             }
-        }   
-    },[livestream.liveSpeakers])
+        }
+    }, [livestream.liveSpeakers])
 
     const handleChangeLinkedInShare = (event) => {
         setShowLinkedIn(!showLinkedIn);
@@ -141,12 +138,12 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
             newSpeaker.linkedIn = linkedInUrl;
 
             if (newSpeaker.id) {
-                firebase.updateSpeakersInLivestream(livestream, newSpeaker).then(() => {
+                updateSpeaker(newSpeaker).then(() => {
                     setStreamerReady(true)
                     setLoading(false)
                 })
             } else {
-                firebase.addSpeakerInLivestream(livestream, newSpeaker).then(() => {
+                addSpeaker(newSpeaker).then(() => {
                     setStreamerReady(true)
                     setLoading(false)
                 })
@@ -185,36 +182,36 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                         <FormGroup>
                             <FormControl className={classes.marginTop}>
                                 <TextField error={formErrors.firstName && isEmpty(speaker.firstName?.trim())}
-                                            helperText={formErrors.firstName && "Required"} id="outlined-basic"
-                                            label="First Name" variant="outlined"
-                                            name="firstName"
-                                            value={speaker.firstName}
-                                            onChange={(event) => setSpeaker({
-                                                ...speaker,
-                                                firstName: event.target.value
-                                            })}/>
+                                           helperText={formErrors.firstName && "Required"} id="outlined-basic"
+                                           label="First Name" variant="outlined"
+                                           name="firstName"
+                                           value={speaker.firstName}
+                                           onChange={(event) => setSpeaker({
+                                               ...speaker,
+                                               firstName: event.target.value
+                                           })}/>
                             </FormControl>
                             <FormControl className={classes.marginTop}>
                                 <TextField error={formErrors.lastName && isEmpty(speaker.lastName?.trim())}
-                                            helperText={formErrors.lastName && "Required"} id="outlined-basic"
-                                            label="Last Name" variant="outlined"
-                                            name="lastName"
-                                            value={speaker.lastName}
-                                            onChange={(event) => setSpeaker({
-                                                ...speaker,
-                                                lastName: event.target.value
-                                            })}/>
+                                           helperText={formErrors.lastName && "Required"} id="outlined-basic"
+                                           label="Last Name" variant="outlined"
+                                           name="lastName"
+                                           value={speaker.lastName}
+                                           onChange={(event) => setSpeaker({
+                                               ...speaker,
+                                               lastName: event.target.value
+                                           })}/>
                             </FormControl>
                             <FormControl className={classes.marginTop}>
                                 <TextField error={formErrors.position && isEmpty(speaker.position?.trim())}
-                                            helperText={formErrors.position && "Required"} id="outlined-basic"
-                                            label="Occupation" placeholder="Lead Engineer"
-                                            name="jobTitle"
-                                            value={speaker.position} variant="outlined"
-                                            onChange={(event) => setSpeaker({
-                                                ...speaker,
-                                                position: event.target.value
-                                            })}/>
+                                           helperText={formErrors.position && "Required"} id="outlined-basic"
+                                           label="Occupation" placeholder="Lead Engineer"
+                                           name="jobTitle"
+                                           value={speaker.position} variant="outlined"
+                                           onChange={(event) => setSpeaker({
+                                               ...speaker,
+                                               position: event.target.value
+                                           })}/>
                             </FormControl>
                         </FormGroup>
                         <FormControlLabel
@@ -253,4 +250,4 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
     )
 }
 
-export default withFirebase(PreparationOverlay);
+export default PreparationOverlay;

@@ -13,6 +13,7 @@ import {v4 as uuidv4} from "uuid";
 import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
 import {shallowEqual, useSelector} from "react-redux";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -64,8 +65,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const StreamerLayout = (props) => {
-    const {children, firebase} = props
-    const {query: {token, livestreamId}, pathname} = useRouter()
+    const {children, firebase, isBreakout} = props
+    const {query: {token, livestreamId, breakoutRoomId}, pathname} = useRouter()
     const router = useRouter();
     const smallScreen = useMediaQuery('(max-width:700px)');
 
@@ -85,22 +86,8 @@ const StreamerLayout = (props) => {
 
     const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
     const isMainStreamer = useMemo(() => pathname === "/streaming/[livestreamId]/main-streamer", [pathname])
-    const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'careerCenters'}]
-    const query = useMemo(() => livestreamId ? [
-        {
-            collection: "livestreams",
-            doc: livestreamId,
-            storeAs: "currentLivestream",
-            populates
-        }
-    ] : [], [livestreamId])
 
-    useFirestoreConnect(query)
-
-    const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
-        ...populate(firestore, "currentLivestream", populates),
-        id: livestreamId
-    }, shallowEqual)
+    const currentLivestream = useStreamConnect()
 
     const classes = useStyles({
         showMenu,
@@ -110,7 +97,10 @@ const StreamerLayout = (props) => {
 
 
     useEffect(() => {
-        if (router && router.query && currentLivestream && !currentLivestream.test) {
+        if (router && router.query && currentLivestream && !currentLivestream.test
+        // Absolving breakout rooms from token auth
+            && !isBreakout
+        ) {
             if (!token) {
                 router.push('/streaming/error')
 
@@ -185,7 +175,8 @@ const StreamerLayout = (props) => {
     }, [showMenu])
 
     const tokenIsValidated = () => {
-        if (currentLivestream.test) {
+        // Absolving breakout room from token auth
+        if (currentLivestream.test || isBreakout) {
             return true;
         } else {
             return tokenChecked;
@@ -212,7 +203,7 @@ const StreamerLayout = (props) => {
 
     return (
         <NotificationsContext.Provider value={{setNewNotification, setNotificationToRemove}}>
-            <CurrentStreamContext.Provider value={{currentLivestream}}>
+            <CurrentStreamContext.Provider value={{currentLivestream, isBreakout}}>
                 <div className={classes.root}>
                     <StreamerTopBar
                         firebase={firebase}

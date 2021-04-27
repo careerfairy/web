@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
 const DELAY = 3000; //3 seconds
 
 const ViewerLayout = (props) => {
-    const {children, firebase} = props
+    const {children, firebase, isBreakout} = props
     const {query: {livestreamId}, replace, asPath} = useRouter()
     const {authenticatedUser, userData} = useAuth();
     const dispatch = useDispatch()
@@ -218,7 +218,7 @@ const ViewerLayout = (props) => {
 
 
     return (
-        <CurrentStreamContext.Provider value={{currentLivestream}}>
+        <CurrentStreamContext.Provider value={{currentLivestream, isBreakout}}>
             <div className={`${classes.root} notranslate`}>
                 <ViewerTopBar
                     showAudience={showAudience}
