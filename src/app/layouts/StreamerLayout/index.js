@@ -64,6 +64,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const MAIN_STREAMER_PATHS = ["/streaming/[livestreamId]/breakout-room/[breakoutRoomId]/main-streamer", "/streaming/[livestreamId]/main-streamer"]
+
 const StreamerLayout = (props) => {
     const {children, firebase, isBreakout} = props
     const {query: {token, livestreamId, breakoutRoomId}, pathname} = useRouter()
@@ -85,7 +87,7 @@ const StreamerLayout = (props) => {
 
 
     const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
-    const isMainStreamer = useMemo(() => pathname === "/streaming/[livestreamId]/main-streamer", [pathname])
+    const isMainStreamer = useMemo(() => MAIN_STREAMER_PATHS.includes(pathname), [pathname])
 
     const currentLivestream = useStreamConnect()
 

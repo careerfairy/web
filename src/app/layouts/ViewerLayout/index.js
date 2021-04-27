@@ -13,6 +13,7 @@ import {v4 as uuidv4} from "uuid";
 
 import * as actions from "../../store/actions";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
+import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -85,23 +86,8 @@ const ViewerLayout = (props) => {
     const [selectedState, setSelectedState] = useState("questions");
 
 
-    const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'careerCenters'}]
+    const currentLivestream = useStreamConnect()
 
-    const query = useMemo(() => livestreamId ? [
-        {
-            collection: "livestreams",
-            doc: livestreamId,
-            storeAs: "currentLivestream",
-            populates
-        }
-    ] : [], [livestreamId])
-
-    useFirestoreConnect(query)
-
-    const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
-        ...populate(firestore, "currentLivestream", populates),
-        id: livestreamId
-    }, shallowEqual)
 
     const notAuthorized = currentLivestream && !currentLivestream.test && authenticatedUser?.isLoaded && authenticatedUser?.isEmpty
 

@@ -28,6 +28,8 @@ import {useRouter} from "next/router";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import {maybePluralize} from "../../../components/helperFunctions/HelperFunctions";
 import NewFeatureHint from "../../../components/util/NewFeatureHint";
+import useStreamToken from "../../../components/custom-hook/useStreamToken";
+import useStreamRef from "../../../components/custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     toolbar: {
@@ -56,29 +58,17 @@ const useStyles = makeStyles(theme => ({
 
 const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience}) => {
     const {currentLivestream} = useCurrentStream()
-
+    const streamRef = useStreamRef();
     const classes = useStyles({hasStarted: currentLivestream?.hasStarted})
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('md'))
-    const {query: {livestreamId}} = useRouter()
     const {toggleTheme, themeMode} = useThemeToggle()
 
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [hideTooltip, setHideTooltip] = useState(false);
-    const [joiningStreamerLink, setJoiningStreamerLink] = useState("")
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
+    const {joiningStreamerLink,viewerLink} = useStreamToken()
 
-
-    useEffect(() => {
-        if (livestreamId) {
-            let baseUrl = "https://careerfairy.io"
-            if (window?.location?.origin) {
-                baseUrl = window.location.origin
-            }
-            const link = `${baseUrl}/streaming/${livestreamId}/joining-streamer?pwd=qdhwuiehd7qw789d79w8e8dheiuhiqwdu`;
-            setJoiningStreamerLink(link)
-        }
-    }, [livestreamId])
 
     useEffect(() => {
         if (currentLivestream.start) {
@@ -96,7 +86,7 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
     }
 
     function setStreamingStarted(started) {
-        firebase.setLivestreamHasStarted(started, currentLivestream.id);
+        firebase.setLivestreamHasStarted(started, streamRef);
 
 
     }
@@ -182,13 +172,13 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
                     <Fragment>
                         {mobile ?
                             <Tooltip title="Open Student View">
-                                <IconButton target="_blank" href={`/streaming/${currentLivestream.id}/viewer`}>
+                                <IconButton target="_blank" href={viewerLink}>
                                     <OpenInBrowserIcon color="inherit"/>
                                 </IconButton>
                             </Tooltip>
                             :
                             <Button
-                                href={`/streaming/${currentLivestream.id}/viewer`}
+                                href={viewerLink}
                                 target="_blank"
                                 children="Open Student View"
                                 startIcon={<OpenInBrowserIcon color="inherit"/>}
