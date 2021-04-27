@@ -29,7 +29,7 @@ const CountWrapper = withStyles(theme => ({
     },
 }))(Box);
 
-const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebase}) => {
+const CurrentPollGraph = ({currentPoll: {options, question, id: pollId, demoVotes}, firebase}) => {
     const chartRef = useRef()
     const theme = useTheme()
     const {currentLivestream} = useCurrentStream()
@@ -65,7 +65,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId}, firebas
         }
     })
 
-    useMapPollVoters(pollId, currentLivestream.id, setChartData, firebase)
+    useMapPollVoters(pollId, currentLivestream.id, setChartData, firebase, demoVotes)
 
     useEffect(() => {
         setOptionsObj({

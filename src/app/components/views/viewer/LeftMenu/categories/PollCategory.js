@@ -122,7 +122,7 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
     const [currentPollId, setCurrentPollId] = useState(null);
     const [voting, setVoting] = useState(false);
     const [hasVoted, setHasVoted] = useState(false);
-    const [value        , setValue] = useState(0);
+    const [value, setValue] = useState(0);
     let authEmail = (authenticatedUser && authenticatedUser.email && !livestream.test) ? authenticatedUser.email : 'streamerEmail';
 
     useEffect(() => {
@@ -156,21 +156,23 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
                 setHasVoted(querySnapshot.exists)
             })
             return () => unsubscribe()
+        } else {
+            setHasVoted(false)
         }
     }, [currentPoll?.id, authEmail]);
 
     useEffect(() => {
-        if(!Boolean(currentPoll && authEmail)){
+        if (!Boolean(currentPoll && authEmail)) {
             setValue(0)
-        } else if(!hasVoted){
+        } else if (!hasVoted) {
             setValue(1)
-        } else if(hasVoted){
+        } else if (hasVoted) {
             setValue(2)
         } else {
             setValue(0)
         }
 
-    },[currentPoll, authEmail, hasVoted])
+    }, [currentPoll, authEmail, hasVoted])
 
     // useEffect(() => {
     //     if (currentPoll?.id && !stopVoting && authenticatedUser?.email === "kadirit@hotmail.com") {
@@ -202,49 +204,29 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
         }
     }
 
-    // const spamRandomVotes = () => {
-    //     let randomEmail = uuidv4()
-    //     const options = currentPoll.options
-    //     const randomNum = getRandomInt(0, options.length - 1)
-    //     const randomWeightedIndex = getRandomWeightedInt(0, options.length - 1, randomNum)
-    //     firebase.voteForPollOption(livestream.id, currentPoll.id, randomEmail, options[randomWeightedIndex].id)
-    // }
 
-
-
-
-    const views = [
-        <Grow unmountOnExit
-              style={{ transitionDelay: value === 0 ? '500ms' : '0ms' }}
-              key={0} in={value === 0}>
-            <NoPollDisplay/>
-        </Grow>,
-        <Grow unmountOnExit
-              style={{ transitionDelay: value === 1 ? '500ms' : '0ms' }}
-              key={1} in={value === 1}>
-            <PollOptionsDisplay
-                currentPoll={currentPoll}
-                voteForPollOption={voteForPollOption}
-                voting={voting}
-            />
-        </Grow>,
-        <Grow  unmountOnExit
-               style={{ transitionDelay: value === 2 ? '500ms' : '0ms' }}
-               key={2} in={value === 2}>
-            <PollDisplay currentPoll={currentPoll}/>
-        </Grow>
-    ]
+    const renderPollView = (value) => {
+        switch (value) {
+            case 0:
+                return <NoPollDisplay/>;
+            case 1:
+                return <PollOptionsDisplay
+                    currentPoll={currentPoll}
+                    voteForPollOption={voteForPollOption}
+                    voting={voting}
+                />;
+            case 2:
+                return <PollDisplay currentPoll={currentPoll}/>;
+            default:
+                return <NoPollDisplay/>;
+        }
+    }
 
     return (<React.Fragment>
-        {views}
+        {renderPollView(value)}
     </React.Fragment>)
-
-    return (
-        <>
-            {renderPollComponent()}
-        </>
-    )
 }
+
 PollCategory.propTypes = {
     firebase: PropTypes.any,
     livestream: PropTypes.object.isRequired,

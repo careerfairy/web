@@ -10,11 +10,11 @@ import {
     TooltipTitle,
     WhiteTooltip
 } from "../../../../../../../../materialUI/GlobalTooltips";
-import {isServer} from "../../../../../../../helperFunctions/HelperFunctions";
+import {getRandomInt, getRandomWeightedInt, isServer} from "../../../../../../../helperFunctions/HelperFunctions";
 
-function getRandomInt(min, max, index) {
-    return (Math.floor((Math.random() * (max - min + 1) + min) / (index + 1)));
-}
+// function getRandomInt(min, max, index) {
+//     return (Math.floor((Math.random() * (max - min + 1) + min) / (index + 1)));
+// }
 
 const useStyles = makeStyles(theme => ({
     demoFab: {
@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
     demoIcon: {
         color: ({demoMode}) => demoMode ? theme.palette.secondary.main : "white"
     },
-    pollContainer:{
+    pollContainer: {
         borderRadius: theme.spacing(2),
         boxShadow: theme.shadows[10],
         margin: "10px 10px 0 10px",
@@ -37,7 +37,7 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: theme.palette.background.paper,
         position: "relative"
     },
-    pollLabel:{
+    pollLabel: {
         color: "grey",
         fontWeight: 700,
         textAlign: "center",
@@ -46,7 +46,18 @@ const useStyles = makeStyles(theme => ({
 
 }))
 
-function CurrentPollStreamer({setDemoPolls, demoPolls, sliding, firebase, livestream, showMenu, selectedState, addNewPoll, poll, index}) {
+function CurrentPollStreamer({
+                                 setDemoPolls,
+                                 demoPolls,
+                                 sliding,
+                                 firebase,
+                                 livestream,
+                                 showMenu,
+                                 selectedState,
+                                 addNewPoll,
+                                 poll,
+                                 index
+                             }) {
     const [currentPoll, setCurrentPoll] = useState(null)
     const [demoMode, setDemoMode] = useState(false)
     const [numberOfTimes, setNumberOfTimes] = useState(0)
@@ -98,7 +109,9 @@ function CurrentPollStreamer({setDemoPolls, demoPolls, sliding, firebase, livest
             const interval = setInterval(() => {
                 simulatePollVotes()
             }, 100);
-            return () => clearInterval(interval)
+            return () => {
+                clearInterval(interval)
+            }
         }
     }, [demoMode])
 
@@ -110,13 +123,24 @@ function CurrentPollStreamer({setDemoPolls, demoPolls, sliding, firebase, livest
     poll.options.forEach(option => totalVotes += option.votes);
 
     const simulatePollVotes = () => {
-        const newCurrentPoll = {...currentPoll}
-        newCurrentPoll.options = newCurrentPoll.options.map((option, index) => ({
-            ...option,
-            votes: option.votes += getRandomInt(1, 4, index)
-        }))
+
         setNumberOfTimes(count => count + 1)
-        setCurrentPoll(newCurrentPoll)
+        setCurrentPoll(prevState => {
+            const newCurrentPoll = {...prevState}
+            const prevDemoVotes = newCurrentPoll.demoVotes || []
+            newCurrentPoll.demoVotes = [...prevDemoVotes, spamRandomVote(currentPoll)]
+            return newCurrentPoll
+        })
+    }
+
+    const spamRandomVote = (currentPoll) => {
+        const options = currentPoll.options
+        const randomNum = getRandomInt(0, options.length - 1)
+        const randomWeightedIndex = getRandomWeightedInt(0, options.length - 1, randomNum)
+        return {
+            optionId: options[randomWeightedIndex].id,
+            timestamp: new Date()
+        }
     }
 
     return (
@@ -124,7 +148,7 @@ function CurrentPollStreamer({setDemoPolls, demoPolls, sliding, firebase, livest
             <div>
                 <div className={classes.pollContainer}>
                     <div className={classes.pollLabel}>ACTIVE POLL</div>
-                    {(currentPoll && !isServer() )&& <CurrentPollGraph currentPoll={currentPoll}/>}
+                    {(currentPoll && !isServer()) && <CurrentPollGraph currentPoll={currentPoll}/>}
                     <WhiteTooltip
                         placement="right-end"
                         title={
