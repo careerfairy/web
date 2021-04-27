@@ -11,6 +11,7 @@ import {PlayIconButton} from "materialUI/GlobalButtons/GlobalButtons";
 import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "materialUI/GlobalTooltips";
 import TutorialContext from "context/tutorials/TutorialContext";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
+import useStreamRef from "../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
@@ -101,6 +102,7 @@ const QuestionContainer = memo(({
                                     goToThisQuestion,
                                     showMenu
                                 }) => {
+    const streamRef = useStreamRef()
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
@@ -115,7 +117,7 @@ const QuestionContainer = memo(({
 
     useEffect(() => {
         if (livestream.id && question.id) {
-            const unsubscribe = firebase.listenToQuestionComments(livestream.id, question.id, querySnapshot => {
+            const unsubscribe = firebase.listenToQuestionComments(streamRef, question.id, querySnapshot => {
                 var commentsList = [];
                 querySnapshot.forEach(doc => {
                     let comment = doc.data();
@@ -148,7 +150,7 @@ const QuestionContainer = memo(({
             author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous'
         }
 
-        firebase.putQuestionComment(livestream.id, question.id, newComment)
+        firebase.putQuestionComment(streamRef, question.id, newComment)
             .then(() => {
                 setNewCommentTitle("");
                 setShowAllReactions(true);
@@ -166,7 +168,7 @@ const QuestionContainer = memo(({
 
     function upvoteLivestreamQuestion() {
         let authEmail = livestream.test ? 'streamerEmail' : authenticatedUser.email;
-        firebase.upvoteLivestreamQuestion(livestream.id, question, authEmail);
+        firebase.upvoteLivestreamQuestionWithRef(streamRef, question, authEmail);
     }
 
     const isOpen = (property) => {

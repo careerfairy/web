@@ -1,5 +1,5 @@
 import React from 'react';
-import {useFirebase} from "../../context/firebase/FirebaseContext";
+import {useFirebase} from "context/firebase";
 import useStreamRef from "./useStreamRef";
 
 const usePreparationOverlay = () => {

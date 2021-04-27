@@ -7,7 +7,8 @@ import {fade, makeStyles} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
 import ExpandLessRoundedIcon from "@material-ui/icons/ExpandLessRounded";
 import ExpandMoreRoundedIcon from "@material-ui/icons/ExpandMoreRounded";
-import { Typography } from '@material-ui/core';
+import {Typography} from '@material-ui/core';
+import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -44,13 +45,13 @@ function QuestionContainer(props) {
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
-
+    const streamRef = useStreamRef()
     const isEmpty = !(newCommentTitle.trim())
     const classes = useStyles({isEmpty})
 
     useEffect(() => {
         if (props.livestream.id, props.question.id) {
-            const unsubscribe = props.firebase.listenToQuestionComments(props.livestream.id, props.question.id, querySnapshot => {
+            const unsubscribe = props.firebase.listenToQuestionComments(streamRef, props.question.id, querySnapshot => {
                 var commentsList = [];
                 querySnapshot.forEach(doc => {
                     let comment = doc.data();
@@ -66,9 +67,9 @@ function QuestionContainer(props) {
     function goToThisQuestion(nextQuestionId) {
         const currentQuestion = props.questions.find(question => question.type === 'current');
         if (currentQuestion) {
-            props.firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, props.livestream.id);
+            props.firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, streamRef);
         } else {
-            props.firebase.goToNextLivestreamQuestion(null, nextQuestionId, props.livestream.id);
+            props.firebase.goToNextLivestreamQuestion(null, nextQuestionId, streamRef);
         }
     }
 
@@ -81,7 +82,7 @@ function QuestionContainer(props) {
             title: newCommentTitle,
             author: 'Streamer',
         }
-        props.firebase.putQuestionComment(props.livestream.id, props.question.id, newComment)
+        props.firebase.putQuestionComment(streamRef, props.question.id, newComment)
             .then(() => {
                 setNewCommentTitle("");
                 setShowAllReactions(true);
@@ -117,25 +118,25 @@ function QuestionContainer(props) {
                     </div>
                 </div>
                 <style jsx>{`
-                    .questionContainer {
-                        position: relative;
-                        padding: 10px;
-                        margin: 6px 0 3px 0;
-                        background-color: white;
-                        color: black;
-                        border-radius: 10px;
-                        box-shadow: 0 0 5px rgb(180,180,180);
-                        font-size: 0.9em;
-                    }
+                  .questionContainer {
+                    position: relative;
+                    padding: 10px;
+                    margin: 6px 0 3px 0;
+                    background-color: white;
+                    color: black;
+                    border-radius: 10px;
+                    box-shadow: 0 0 5px rgb(180, 180, 180);
+                    font-size: 0.9em;
+                  }
 
-                    .questionTitle {
-                        word-break: break-word;
-                    }
+                  .questionTitle {
+                    word-break: break-word;
+                  }
 
-                    .questionAuthor {
-                        font-size: 0.8em;
-                        color: rgb(160,160,160);
-                    }
+                  .questionAuthor {
+                    font-size: 0.8em;
+                    color: rgb(160, 160, 160);
+                  }
                 `}</style>
             </div>
         );
@@ -160,14 +161,14 @@ function QuestionContainer(props) {
                     fontWeight: 500
                 }}>{showAllReactions ? 'Hide' : 'Show all reactions'}</Typography>
                 <style jsx>{`
-                    .reactions-toggle {
-                         margin: 5px 0 0 0;
-                        text-transform: uppercase;
-                        cursor: pointer;
-                        color: rgb(210,210,210);
-                        display: flex;
-                        align-items: center;
-                    }
+                  .reactions-toggle {
+                    margin: 5px 0 0 0;
+                    text-transform: uppercase;
+                    cursor: pointer;
+                    color: rgb(210, 210, 210);
+                    display: flex;
+                    align-items: center;
+                  }
                 `}</style>
             </div>
         )
@@ -211,100 +212,100 @@ function QuestionContainer(props) {
                     disabled={props.question.type !== 'new'}/>
 
             <style jsx>{`
-                    .questionContainer {
-                        position: relative;
-                        padding: 20px 20px 60px 20px;
-                        margin: 10px 10px 0 10px;
-                        background-color: rgb(250,250,250);
-                        border-top-left-radius: 5px;
-                        border-top-right-radius: 5px;
-                        box-shadow: 0 0 5px rgb(180,180,180);
-                    }
+              .questionContainer {
+                position: relative;
+                padding: 20px 20px 60px 20px;
+                margin: 10px 10px 0 10px;
+                background-color: rgb(250, 250, 250);
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+                box-shadow: 0 0 5px rgb(180, 180, 180);
+              }
 
-                    .questionContainer.active {
-                        background-color: rgb(0, 210, 170);
-                        color: white;
-                    }
+              .questionContainer.active {
+                background-color: rgb(0, 210, 170);
+                color: white;
+              }
 
-                    .questionContainer.past {
-                        opacity: 0.6;
-                    }
+              .questionContainer.past {
+                opacity: 0.6;
+              }
 
-                    .questionTitle {
-                        font-weight: 700;
-                        font-size: 1.1em;
-                        line-height: 1.2em;
-                        color: rgb(50,50,50);
-                        margin: 15px 0 5px 0;
-                        width: 100%;
-                        word-break: break-word;
-                    }
+              .questionTitle {
+                font-weight: 700;
+                font-size: 1.1em;
+                line-height: 1.2em;
+                color: rgb(50, 50, 50);
+                margin: 15px 0 5px 0;
+                width: 100%;
+                word-break: break-word;
+              }
 
-                    .questionContainer.active .questionTitle {
-                        color: white;
-                    }
+              .questionContainer.active .questionTitle {
+                color: white;
+              }
 
-                    .questionAuthor {
-                        font-size: 0.8em;
-                        color: rgb(130,130,130);
-                    }
+              .questionAuthor {
+                font-size: 0.8em;
+                color: rgb(130, 130, 130);
+              }
 
-                    .questionContainer.active .questionAuthor {
-                        color: white;
-                    }
+              .questionContainer.active .questionAuthor {
+                color: white;
+              }
 
-                    .bottom-element {
-                        margin-top: 5px;
-                        color: rgb(200,200,200);
-                        font-size: 0.9em;  
-                        font-weight: 700; 
-                    }
+              .bottom-element {
+                margin-top: 5px;
+                color: rgb(200, 200, 200);
+                font-size: 0.9em;
+                font-weight: 700;
+              }
 
-                    .questionContainer.active .bottom-element {
-                        color: white;
-                    }
+              .questionContainer.active .bottom-element {
+                color: white;
+              }
 
-                    .comments {
-                        font-size: 1em;     
-                        display: inline-block;
-                        text-transform: uppercase;
-                    }
+              .comments {
+                font-size: 1em;
+                display: inline-block;
+                text-transform: uppercase;
+              }
 
-                    .comments-number {
-                        font-size: 1em;    
-                        vertical-align: middle;
-                        margin: 0;
-                    }
+              .comments-number {
+                font-size: 1em;
+                vertical-align: middle;
+                margin: 0;
+              }
 
-                    .comments-add {
-                        font-size: 0.9em;    
-                        margin: 0;
-                        color: rgb(0, 210, 170);
-                        cursor: pointer;
-                    }
+              .comments-add {
+                font-size: 0.9em;
+                margin: 0;
+                color: rgb(0, 210, 170);
+                cursor: pointer;
+              }
 
-                    .upvotes {
-                        position: absolute;
-                        top: 10px;
-                        right: 10px;
-                        font-size: 1.2em;
-                        display: inline-block;
-                        margin: 0 0 0 30px;
-                        font-weight: 700; 
-                        color: rgba(0, 210, 170, 1);
-                    }
+              .upvotes {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                font-size: 1.2em;
+                display: inline-block;
+                margin: 0 0 0 30px;
+                font-weight: 700;
+                color: rgba(0, 210, 170, 1);
+              }
 
-                    .upvotes.active {
-                        color: white;
-                    }
+              .upvotes.active {
+                color: white;
+              }
 
-                    .comment-input {
-                        position: absolute;
-                        bottom: 5px;
-                        left: 5px;
-                        right: 5px;
-                    }
-                `}</style>
+              .comment-input {
+                position: absolute;
+                bottom: 5px;
+                left: 5px;
+                right: 5px;
+              }
+            `}</style>
         </div>
     );
 }

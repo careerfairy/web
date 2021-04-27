@@ -36,6 +36,7 @@ import {GreyPermanentMarker} from "../../../../materialUI/GlobalTitles";
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import {useDispatch} from "react-redux";
 import {truncate} from "../../../helperFunctions/HelperFunctions";
+import useStreamRef from "../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     view: {
@@ -100,6 +101,9 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
         return null
     }
     const theme = useTheme()
+
+    const streamRef = useStreamRef()
+
     const classes = useStyles({isMobile})
     const dispatch = useDispatch()
     const [showQuestionModal, setShowQuestionModal] = useState(false);
@@ -116,11 +120,11 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
 
 
     const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming, totalUpcoming] = useInfiniteScroll(
-        firebase.listenToUpcomingLivestreamQuestions(livestream.id), 10
+        firebase.listenToUpcomingLivestreamQuestions(streamRef), 10
     );
 
     const [itemsPast, loadMorePast, hasMorePast] = useInfiniteScroll(
-        firebase.listenToPastLivestreamQuestions(livestream.id), 10
+        firebase.listenToPastLivestreamQuestions(streamRef), 10
     );
 
     useEffect(() => {
@@ -184,9 +188,9 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
             setGoingToQuestion(true)
             const currentQuestion = itemsUpcoming.find(question => question.type === 'current');
             if (currentQuestion) {
-                await firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, livestream.id);
+                await firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, streamRef);
             } else {
-                await firebase.goToNextLivestreamQuestion(null, nextQuestionId, livestream.id);
+                await firebase.goToNextLivestreamQuestion(null, nextQuestionId, streamRef);
             }
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
@@ -209,7 +213,7 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
                 author: !livestream.test ? authenticatedUser.email : 'test@careerfairy.io',
                 displayName: !livestream.test ? `${userData.firstName} ${userData.lastName}` : 'A viewer'
             }
-            await firebase.putLivestreamQuestion(livestream.id, newQuestion)
+            await firebase.addLivestreamQuestion(streamRef, newQuestion)
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
         }

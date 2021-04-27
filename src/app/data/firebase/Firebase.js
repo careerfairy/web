@@ -787,10 +787,8 @@ class Firebase {
         return ref.get();
     };
 
-    listenToUpcomingLivestreamQuestions = (livestreamId) => {
-        return this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    listenToUpcomingLivestreamQuestions = (streamRef) => {
+        return streamRef
             .collection("questions")
             .orderBy("type", "asc")
             .orderBy("votes", "desc")
@@ -798,10 +796,8 @@ class Firebase {
             .where("type", "!=", 'done')
     };
 
-    listenToPastLivestreamQuestions = (livestreamId) => {
-        return this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    listenToPastLivestreamQuestions = (streamRef) => {
+        return streamRef
             .collection("questions")
             .where("type", "==", 'done')
     };
@@ -815,10 +811,8 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    listenToQuestionComments = (livestreamId, questionId, callback) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    listenToQuestionComments = (streamRef, questionId, callback) => {
+        let ref = streamRef
             .collection("questions")
             .doc(questionId)
             .collection("comments")
@@ -866,11 +860,9 @@ class Firebase {
         });
     }
 
-    putQuestionComment = (livestreamId, questionId, comment) => {
+    putQuestionComment = (streamRef, questionId, comment) => {
         comment.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+        let ref = streamRef
             .collection("questions")
             .doc(questionId)
             .collection("comments");
@@ -886,7 +878,15 @@ class Firebase {
         return ref.add(question);
     };
 
+    addLivestreamQuestion = (streamRef, question) => {
+        question.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+        let ref = streamRef
+            .collection("questions");
+        return ref.add(question);
+    };
+
     upvoteLivestreamQuestion = (livestreamId, question, userEmail) => {
+
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
@@ -900,6 +900,16 @@ class Firebase {
                 });
             });
         });
+    };
+
+    upvoteLivestreamQuestionWithRef = (streamRef, question, userEmail) => {
+        let ref = streamRef
+            .collection("questions")
+            .doc(question.id);
+        return ref.update({
+            votes: firebase.firestore.FieldValue.increment(1),
+            emailOfVoters: firebase.firestore.FieldValue.arrayUnion(userEmail),
+        })
     };
 
     listenToLivestreamCurrentQuestion = (livestreamId, callback) => {
@@ -1012,24 +1022,20 @@ class Firebase {
     goToNextLivestreamQuestion = (
         previousCurrentQuestionId,
         newCurrentQuestionId,
-        livestreamId
+        streamRef
     ) => {
         let batch = this.firestore.batch();
         if (previousCurrentQuestionId) {
-            let ref = this.firestore
-                .collection("livestreams")
-                .doc(livestreamId)
+            let ref = streamRef
                 .collection("questions")
                 .doc(previousCurrentQuestionId);
             batch.update(ref, {type: "done"});
         }
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+        let ref = streamRef
             .collection("questions")
             .doc(newCurrentQuestionId);
         batch.update(ref, {type: "current"});
-        batch.commit();
+        return batch.commit();
     };
 
     removeLivestreamQuestion = (livestreamId, question) => {
@@ -1343,10 +1349,8 @@ class Firebase {
 
     }
 
-    createLivestreamPoll = (livestreamId, pollQuestion, pollOptions) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    createLivestreamPoll = (streamRef, pollQuestion, pollOptions) => {
+        let ref = streamRef
             .collection("polls");
         let pollObject = {
             timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
@@ -1359,10 +1363,8 @@ class Firebase {
         return ref.add(pollObject);
     };
 
-    updateLivestreamPoll = (livestreamId, pollId, pollQuestion, pollOptions) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    updateLivestreamPoll = (streamRef, pollId, pollQuestion, pollOptions) => {
+        let ref = streamRef
             .collection("polls")
             .doc(pollId);
         let pollObject = {
@@ -1405,10 +1407,8 @@ class Firebase {
         return voterSnap.exists
     }
 
-    deleteLivestreamPoll = (livestreamId, pollId) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    deleteLivestreamPoll = (streamRef, pollId) => {
+        let ref = streamRef
             .collection("polls")
             .doc(pollId);
         return ref.delete();
@@ -1418,6 +1418,12 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
+            .collection("polls")
+            .orderBy("timestamp", "asc");
+        return ref.onSnapshot(callback);
+    };
+    listenToPollEntriesWithStreamRef = (streamRef, callback) => {
+        let ref = streamRef
             .collection("polls")
             .orderBy("timestamp", "asc");
         return ref.onSnapshot(callback);
@@ -1454,10 +1460,8 @@ class Firebase {
         // })
     };
 
-    setPollState = (livestreamId, pollId, state) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    setPollState = (streamRef, pollId, state) => {
+        let ref = streamRef
             .collection("polls")
             .doc(pollId);
         return ref.update({state: state});
