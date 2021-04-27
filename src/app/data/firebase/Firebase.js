@@ -1467,34 +1467,27 @@ class Firebase {
         return ref.update({state: state});
     };
 
-    listenToHandRaiseState = (livestreamId, userEmail, callback) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    listenToHandRaiseState = (streamRef, userEmail, callback) => {
+        let ref = streamRef
             .collection("handRaises")
             .doc(userEmail);
         return ref.onSnapshot(callback);
     };
 
-    listenToHandRaises = (livestreamId, callback) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    listenToHandRaises = (streamRef, callback) => {
+        let ref = streamRef
             .collection("handRaises");
         return ref.onSnapshot(callback);
     };
 
-    setHandRaiseMode = (livestreamId, mode) => {
-        let ref = this.firestore.collection("livestreams").doc(livestreamId);
-        return ref.update({
+    setHandRaiseMode = (streamRef, mode) => {
+        return streamRef.update({
             handRaiseActive: mode,
         });
     };
 
-    createHandRaiseRequest = (livestreamId, userEmail, userData) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    createHandRaiseRequest = (streamRef, userEmail, userData) => {
+        let ref = streamRef
             .collection("handRaises")
             .doc(userEmail);
         return ref.set({
@@ -1504,10 +1497,8 @@ class Firebase {
         });
     };
 
-    updateHandRaiseRequest = (livestreamId, userEmail, state) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    updateHandRaiseRequest = (streamRef, userEmail, state) => {
+        let ref = streamRef
             .collection("handRaises")
             .doc(userEmail);
         return ref.update({

@@ -10,17 +10,19 @@ import { Button, Typography, DialogActions, DialogContent } from "@material-ui/c
 import {useTheme} from "@material-ui/core/styles";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import {GlassDialog} from "../../../../../materialUI/GlobalModals";
+import useStreamRef from "../../../../custom-hook/useStreamRef";
 
 function HandRaiseCategory(props) {
     const theme = useTheme()
     const {authenticatedUser, userData} = useAuth();
     const [handRaiseState, setHandRaiseState] = useState(null);
+    const streamRef = useStreamRef();
 
     useEffect(() => {
         if (props.livestream.test || authenticatedUser) {
             let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
             if (props.livestream && authEmail) {
-                props.firebase.listenToHandRaiseState(props.livestream.id, authEmail, querySnapshot => {
+                props.firebase.listenToHandRaiseState(streamRef, authEmail, querySnapshot => {
                     if (querySnapshot.exists) {
                         let request = querySnapshot.data();
                         setHandRaiseState(request);
@@ -43,9 +45,9 @@ function HandRaiseCategory(props) {
             let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
             let checkedUserData = props.livestream.test ? {firstName: 'Test', lastName: 'Streamer'} : userData;
             if (handRaiseState) {
-                props.firebase.updateHandRaiseRequest(props.livestream.id, authEmail, state);
+                props.firebase.updateHandRaiseRequest(streamRef, authEmail, state);
             } else {
-                props.firebase.createHandRaiseRequest(props.livestream.id, authEmail, checkedUserData);
+                props.firebase.createHandRaiseRequest(streamRef, authEmail, checkedUserData);
             }
         }
     }

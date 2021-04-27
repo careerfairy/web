@@ -17,6 +17,7 @@ import {
 } from "../../../../../../../materialUI/GlobalTooltips";
 import {makeStyles} from "@material-ui/core/styles";
 import {useSnackbar} from "notistack";
+import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     activeHandRaiseContainer: {
@@ -26,6 +27,7 @@ const useStyles = makeStyles(theme => ({
 
 function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding}) {
     const classes = useStyles()
+    const streamRef = useStreamRef();
     const {closeSnackbar} = useSnackbar()
     const {setNewNotification, setNotificationToRemove} = useContext(NotificationsContext);
     const {tutorialSteps, setTutorialSteps, getActiveTutorialStepKey, isOpen: isStepOpen} = useContext(TutorialContext);
@@ -36,7 +38,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
 
     useEffect(() => {
         if (livestream) {
-            firebase.listenToHandRaises(livestream.id, querySnapshot => {
+            firebase.listenToHandRaises(streamRef, querySnapshot => {
                 var handRaiseList = [];
                 querySnapshot.forEach(doc => {
                     let handRaise = doc.data();
@@ -70,11 +72,11 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
 
 
     function setHandRaiseModeInactive() {
-        firebase.setHandRaiseMode(livestream.id, false);
+        firebase.setHandRaiseMode(streamRef, false);
     }
 
     function updateHandRaiseRequest(handRaiseId, state) {
-        firebase.updateHandRaiseRequest(livestream.id, handRaiseId, state);
+        firebase.updateHandRaiseRequest(streamRef, handRaiseId, state);
     }
 
     let handRaiseElements = handRaises.filter(handRaise => (handRaise.state !== 'unrequested' && handRaise.state !== 'denied')).map(handRaise => {

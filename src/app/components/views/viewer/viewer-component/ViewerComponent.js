@@ -13,6 +13,7 @@ import {Typography} from '@material-ui/core';
 import ScreenShareModal from "../../streaming/video-container/ScreenShareModal";
 import LoadingModal from 'components/views/streaming/modal/LoadingModal';
 import ErrorModal from 'components/views/streaming/modal/ErrorModal';
+import useStreamRef from "../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     waitingOverlay: {
@@ -41,7 +42,7 @@ function ViewerComponent(props) {
     const [showSettings, setShowSettings] = useState(false);
     const [showScreenShareModal, setShowScreenShareModal] = useState(false);
     const [optimizationMode, setOptimizationMode] = useState("detail");
-
+    const streamRef = useStreamRef();
     const {authenticatedUser} = useAuth();
 
     const streamerReady = true;
@@ -77,9 +78,9 @@ function ViewerComponent(props) {
         if (props.handRaiseActive && agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
             if (props.currentLivestream) {
                 if (props.currentLivestream.test) {
-                    props.firebase.updateHandRaiseRequest(props.currentLivestream.id, 'streamerEmail', "connected");
+                    props.firebase.updateHandRaiseRequest(streamRef, 'streamerEmail', "connected");
                 } else {
-                    props.firebase.updateHandRaiseRequest(props.currentLivestream.id, authenticatedUser.email, "connected");
+                    props.firebase.updateHandRaiseRequest(streamRef, authenticatedUser.email, "connected");
                 }
             }
         }
