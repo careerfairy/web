@@ -490,8 +490,7 @@ const DraftStreamForm = ({
                                     multiline
                                     id="summary"
                                     label="Summary"
-                                    rows={2}
-                                    rowsMax={7}
+                                    rowsMax={10}
                                     inputProps={{maxLength: 5000}}
                                     onBlur={handleBlur}
                                     value={values.summary}

@@ -50,7 +50,7 @@ const nextLivestreamsPage = ({livestreamId, serverSideStream}) => {
     const metaInfo = useMemo(() => serverSideStream ? ({
         title: `CareerFairy | Live Stream with ${serverSideStream.company}`,
         description: serverSideStream.title,
-        image: getResizedUrl(serverSideStream.backgroundImageUrl, "md"),
+        image: getResizedUrl(serverSideStream.backgroundImageUrl, "lg"),
         fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}?livestreamId=${serverSideStream.id}`
     }) : ({
         description: "Catch the upcoming streams on CareerFairy.",
