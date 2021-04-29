@@ -110,9 +110,11 @@ exports.setFirstCommentOfQuestionOnCreate = functions.firestore.document('livest
                 const successMessage = questionData.firstComment ?
                     "Question already has first comment, only increment" :
                     `Updated question doc (${questionRef.path}) with new first comment`
+                await questionRef.update(questionDataToUpdate)
                 functions.logger.log(successMessage)
+            } else {
+                functions.logger.warn(`The question (${questionRef.path}) does not exist for comment ${commentSnap.ref.path}`)
             }
-            functions.logger.warn(`The question (${questionRef.path}) does not exist for comment ${commentSnap.ref.path}`)
         } catch (e) {
             functions.logger.error("error in setFirstCommentOfQuestionOnCreate", e)
         }
