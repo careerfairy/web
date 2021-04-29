@@ -111,10 +111,10 @@ const QuestionContainer = memo(({
     const old = question?.type !== 'new'
     const upvoted = (!user && !livestream?.test) || (question?.emailOfVoters ? question?.emailOfVoters.indexOf(livestream?.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
     const classes = useStyles({active})
-
+    // console.log("-> question", question);
 
     useEffect(() => {
-        if (livestream.id && question.id) {
+        if (livestream.id && question.id && showAllReactions) {
             const unsubscribe = firebase.listenToQuestionComments(livestream.id, question.id, querySnapshot => {
                 var commentsList = [];
                 querySnapshot.forEach(doc => {
@@ -125,8 +125,12 @@ const QuestionContainer = memo(({
                 setComments(commentsList);
             });
             return () => unsubscribe();
+        } else if (livestream.id && question.id && !showAllReactions) {
+            if (question.firstComment) {
+                setComments([question.firstComment])
+            }
         }
-    }, [livestream.id, question.id]);
+    }, [livestream.id, question.id, showAllReactions]);
 
     useEffect(() => {
         if (active && !showAllReactions) {
@@ -244,13 +248,13 @@ const QuestionContainer = memo(({
                             color: active ? "white" : "rgb(200,200,200)",
                             marginBottom: "1rem"
                         }}>
-                            {comments.length} reaction{comments.length !== 1 && <span>s</span>}
+                            {question.numberOfComments || 0} reaction{question.numberOfComments !== 1 && <span>s</span>}
                         </Typography>
                         {commentsElements[0]}
                         <Collapse style={{width: "100%"}} in={showAllReactions}>
                             {commentsElements.slice(1)}
                         </Collapse>
-                        {comments.length > 1 && <ReactionsToggle
+                        {question.numberOfComments > 1 && <ReactionsToggle
                             setShowAllReactions={setShowAllReactions}
                             showAllReactions={showAllReactions}/>}
                     </div>

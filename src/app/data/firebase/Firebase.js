@@ -17,10 +17,6 @@ import {FORTY_FIVE_MINUTES_IN_MILLISECONDS, START_DATE_FOR_REPORTED_EVENTS} from
 // };
 
 class Firebase {
-    getFirebaseTimestamp = (dateString) => {
-        return firebase.firestore.Timestamp.fromDate(new Date(dateString));
-    };
-
     constructor() {
         // if (!firebase.apps.length) {
         //     firebase.initializeApp(config);
@@ -33,6 +29,10 @@ class Firebase {
         //     this.functions.useFunctionsEmulator('http://localhost:5001');
         // }
     }
+
+    getFirebaseTimestamp = (dateString) => {
+        return firebase.firestore.Timestamp.fromDate(new Date(dateString));
+    };
 
     // *** Functions Api ***
 
@@ -863,14 +863,13 @@ class Firebase {
     }
 
     putQuestionComment = (livestreamId, questionId, comment) => {
-        comment.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
             .doc(questionId)
             .collection("comments");
-        return ref.add(comment);
+        return ref.add({...comment, timestamp: this.getServerTimestamp()});
     };
 
     putLivestreamQuestion = (livestreamId, question) => {
