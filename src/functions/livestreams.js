@@ -93,8 +93,8 @@ exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onReque
     });
 });
 
-exports.setFirstCommentOfQuestionOnCreate = functions.firestore.document('livestreams/{livestream}/questions/{question}/comments')
-    .onCreate(async (commentSnap, context) => {
+exports.setFirstCommentOfQuestionOnCreate = functions.firestore.document('livestreams/{livestream}/questions/{question}/comments/{comment}')
+    .onCreate(async commentSnap => {
         try {
             const commentData = commentSnap.data()
             const questionRef = commentSnap.ref.parent.parent
