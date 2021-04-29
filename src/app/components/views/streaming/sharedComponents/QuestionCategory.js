@@ -109,6 +109,7 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
     const [submittingQuestion, setSubmittingQuestion] = useState(false);
     const [goingToQuestion, setGoingToQuestion] = useState(false);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
+    const [openQuestionId, setOpenQuestionId] = useState("");
 
     const {authenticatedUser, userData} = useAuth();
 
@@ -224,8 +225,10 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
                                   goToThisQuestion={goToThisQuestion}
                                   isNextQuestions={value === 0}
                                   livestream={livestream}
+                                  setOpenQuestionId={setOpenQuestionId}
                                   index={index} sliding={sliding}
                                   showMenu={showMenu}
+                                  openQuestionId={openQuestionId}
                                   selectedState={selectedState}
                                   question={question} user={authenticatedUser}
                                   userData={userData}/>
@@ -237,7 +240,9 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
                                   isNextQuestions={value === 1}
                                   livestream={livestream}
                                   index={index}
+                                  openQuestionId={openQuestionId}
                                   sliding={sliding}
+                                  setOpenQuestionId={setOpenQuestionId}
                                   showMenu={showMenu}
                                   goToThisQuestion={goToThisQuestion}
                                   selectedState={selectedState}
