@@ -862,34 +862,14 @@ class Firebase {
         });
     }
 
-    putQuestionComment = async (livestreamId, questionId, comment) => {
-        const livestreamRef = this.firestore
+    putQuestionComment = (livestreamId, questionId, comment) => {
+        let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
-        let questionRef = livestreamRef
-            .collection("questions")
-            .doc(questionId);
-        let commentRef = livestreamRef
             .collection("questions")
             .doc(questionId)
-            .collection("comments")
-            .doc()
-        const newComment = {...comment, id: commentRef.id, timestamp: this.getServerTimestamp()}
-
-        return this.firestore.runTransaction((transaction) => {
-            return transaction.get(questionRef).then((question) => {
-                if (question.exists) {
-                    const questionData = question.data()
-                    if (!questionData.firstComment) {
-                        transaction.update(questionRef, {
-                            firstComment: newComment,
-                            numberOfComments: firebase.firestore.FieldValue.increment(1),
-                        });
-                    }
-                    transaction.set(commentRef, newComment)
-                }
-            });
-        });
+            .collection("comments");
+        return ref.add({...comment, timestamp: this.getServerTimestamp()});
     };
 
     putLivestreamQuestion = (livestreamId, question) => {
