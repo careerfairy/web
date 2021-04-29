@@ -5,6 +5,11 @@ import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutline
 import {makeStyles, fade} from "@material-ui/core/styles";
 import {amber, deepOrange, grey, red} from "@material-ui/core/colors";
 import ClappingSVG from "../../util/CustomSVGs";
+import * as actions from "../../../store/actions";
+import {useDispatch} from "react-redux";
+import {useCurrentStream} from "../../../context/stream/StreamContext";
+import {useAuth} from "../../../HOCs/AuthProvider";
+import {withFirebase} from "context/firebase";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -134,28 +139,21 @@ const useStyles = makeStyles((theme) => ({
     },
 
 }));
-
+const delay = 3000; //3 seconds
+const smoothness = 2
 const EmoteButtons =
-    ({
-         handRaiseActive,
-         handleClose,
-         handleMouseEnter,
-         handleMouseLeave,
-         handleLike,
-         iconsDisabled,
-         handleClap,
-         handleHeart,
-         open,
-         delay,
-         smoothness,
-         enableIcons
-     }) => {
-        const classes = useStyles({handRaiseActive});
+    () => {
+        const dispatch = useDispatch()
+        const {currentLivestream:{id:livestreamId}} = useCurrentStream()
+        const {authenticatedUser} = useAuth()
+        const classes = useStyles({handRaiseActive: false});
         const SPEED = isNaN(smoothness) ? 2 : smoothness
         const DELAY = isNaN(delay) ? 3000 : delay
         const INTERVAL = 10 / SPEED
         const TICK_RATE = (DELAY / (INTERVAL * SPEED)) / SPEED
-
+        const [open, setOpen] = React.useState(true);
+        const [delayHandler, setDelayHandler] = useState(null)
+        const [iconsDisabled, setIconsDisabled] = useState(false);
         const [progress, setProgress] = useState(INTERVAL);
 
         useEffect(() => {
@@ -173,6 +171,48 @@ const EmoteButtons =
                 };
             }
         }, [iconsDisabled]);
+
+
+        const handleOpen = useCallback(() => {
+            setOpen(true);
+        }, []);
+
+        const handleClose = useCallback(() => {
+            setOpen(false);
+        }, []);
+
+        const handleMouseEnter = useCallback((event) => {
+            clearTimeout(delayHandler)
+            handleOpen()
+        }, [delayHandler])
+
+        const handleMouseLeave = useCallback(() => {
+            setDelayHandler(setTimeout(() => {
+                handleClose()
+            }, DELAY))
+        }, [delayHandler])
+
+        const handleClap = useCallback(() => {
+            postIcon('clapping')
+        }, [iconsDisabled, livestreamId, authenticatedUser])
+
+        const handleLike = useCallback(() => {
+            postIcon('like')
+        }, [iconsDisabled, livestreamId, authenticatedUser])
+        const handleHeart = useCallback(() => {
+            postIcon('heart')
+        }, [iconsDisabled, livestreamId, authenticatedUser])
+
+        const postIcon = (iconName) => {
+            if (!iconsDisabled) {
+                dispatch(actions.createEmote(iconName))
+                // setIconsDisabled(true);
+                // firebase.postIcon(livestreamId, iconName, authenticatedUser.email);
+            }
+        }
+        const enableIcons = useCallback(() => {
+            setIconsDisabled(false)
+        }, [])
 
         return (
             <ClickAwayListener onClickAway={handleClose}>
@@ -208,4 +248,4 @@ const EmoteButtons =
         );
     };
 
-export default EmoteButtons;
+export default withFirebase(EmoteButtons);

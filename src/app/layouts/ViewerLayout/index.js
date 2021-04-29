@@ -13,6 +13,8 @@ import {v4 as uuidv4} from "uuid";
 
 import * as actions from "../../store/actions";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
+import useTraceUpdate from "../../components/custom-hook/useTraceUpdate";
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -59,18 +61,15 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const DELAY = 3000; //3 seconds
 
 const ViewerLayout = (props) => {
+    console.log("-> ViewerLayout");
     const {children, firebase} = props
     const {query: {livestreamId}, replace, asPath} = useRouter()
     const {authenticatedUser, userData} = useAuth();
-    const dispatch = useDispatch()
     const {breakpoints: {values}} = useTheme()
     const mobile = useMediaQuery(`(max-width:${values.mobile}px)`)
-    const [open, setOpen] = React.useState(true);
-    const [delayHandler, setDelayHandler] = useState(null)
-    const [iconsDisabled, setIconsDisabled] = useState(false);
+
     const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [showVideoButton, setShowVideoButton] = useState({paused: false, muted: false});
@@ -81,7 +80,6 @@ const ViewerLayout = (props) => {
     const [handRaiseActive, setHandRaiseActive] = useState(false);
     const [streamerId, setStreamerId] = useState(null);
     const classes = useStyles({showMenu, mobile})
-
     const [selectedState, setSelectedState] = useState("questions");
 
 
@@ -98,10 +96,8 @@ const ViewerLayout = (props) => {
 
     useFirestoreConnect(query)
 
-    const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
-        ...populate(firestore, "currentLivestream", populates),
-        id: livestreamId
-    }, shallowEqual)
+    const currentLivestream = useSelector(({firestore}) =>
+        populate(firestore, "currentLivestream", populates), shallowEqual)
 
     const notAuthorized = currentLivestream && !currentLivestream.test && authenticatedUser?.isLoaded && authenticatedUser?.isEmpty
 
@@ -153,46 +149,6 @@ const ViewerLayout = (props) => {
         setAudienceDrawerOpen(false)
     }, []);
 
-    const handleOpen = useCallback(() => {
-        setOpen(true);
-    }, []);
-
-    const handleClose = useCallback(() => {
-        setOpen(false);
-    }, []);
-
-    const handleMouseEnter = useCallback((event) => {
-        clearTimeout(delayHandler)
-        handleOpen()
-    }, [delayHandler])
-
-    const handleMouseLeave = useCallback(() => {
-        setDelayHandler(setTimeout(() => {
-            handleClose()
-        }, DELAY))
-    }, [delayHandler])
-
-    const handleClap = useCallback(() => {
-        postIcon('clapping')
-    }, [iconsDisabled, livestreamId, authenticatedUser])
-
-    const handleLike = useCallback(() => {
-        postIcon('like')
-    }, [iconsDisabled, livestreamId, authenticatedUser])
-    const handleHeart = useCallback(() => {
-        postIcon('heart')
-    }, [iconsDisabled, livestreamId, authenticatedUser])
-
-    const postIcon = (iconName) => {
-        if (!iconsDisabled) {
-            dispatch(actions.createEmote(iconName))
-            setIconsDisabled(true);
-            firebase.postIcon(livestreamId, iconName, authenticatedUser.email);
-        }
-    }
-    const enableIcons = useCallback(() => {
-        setIconsDisabled(false)
-    }, [])
 
     const unmuteVideos = useCallback(() => {
         setShowVideoButton(prevState => {
@@ -243,7 +199,6 @@ const ViewerLayout = (props) => {
                     <div className={classes.contentContainer}>
                         <div className={classes.content}>
                             {React.cloneElement(children, {
-                                ...props,
                                 playVideos,
                                 handRaiseActive,
                                 unmuteVideos,
@@ -257,21 +212,11 @@ const ViewerLayout = (props) => {
                                 setShowMenu,
                                 streamerId,
                                 mobile,
-                                open,
-                                handleHeart,
-                                handleLike,
-                                handleClap,
-                                enableIcons,
                                 showAudience,
                                 setNumberOfViewers: handleSetNumberOfViewers,
                                 hideAudience,
                                 audienceDrawerOpen,
-                                handleMouseLeave,
-                                iconsDisabled,
-                                handleMouseEnter,
                                 setShowVideoButton,
-                                handleClose,
-                                DELAY
                             })}
                         </div>
                     </div>
@@ -280,5 +225,10 @@ const ViewerLayout = (props) => {
         </CurrentStreamContext.Provider>
     );
 };
+
+ViewerLayout.propTypes = {
+    children: PropTypes.node.isRequired,
+    firebase: PropTypes.object
+}
 
 export default withFirebase(ViewerLayout);

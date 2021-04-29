@@ -59,29 +59,17 @@ const ViewerOverview = ({
                             handRaiseActive,
                             streamerId,
                             showVideoButton,
-                            handleClap,
                             unmute,
                             play,
-                            open,
-                            handleHeart,
-                            handleLike,
-                            handleMouseEnter,
                             playVideos,
-                            enableIcons,
-                            handleMouseLeave,
-                            iconsDisabled,
                             mobile,
                             unmuteVideos,
                             setShowMenu,
                             handleStateChange,
                             selectedState,
-                            setSelectedState,
                             showMenu,
                             setNumberOfViewers,
-                            DELAY,
                             setShowVideoButton,
-                            handleClose,
-                            showAudience,
                             hideAudience,
                             audienceDrawerOpen,
                         }) => {
@@ -118,18 +106,6 @@ const ViewerOverview = ({
                                    isStreamer={false}/>}
 
                 <EmoteButtons
-                    handRaiseActive={handRaiseActive}
-                    handleClose={handleClose}
-                    handleClap={handleClap}
-                    handleHeart={handleHeart}
-                    handleLike={handleLike}
-                    handleMouseEnter={handleMouseEnter}
-                    handleMouseLeave={handleMouseLeave}
-                    iconsDisabled={iconsDisabled}
-                    enableIcons={enableIcons}
-                    delay={DELAY}
-                    smoothness={2}
-                    open={open}
                 />
             </div>
             <IconsContainer className={classes.iconsContainer}
