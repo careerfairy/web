@@ -81,7 +81,7 @@ const nextLivestreamsPage = ({livestreamId, serverSideStream, initialTabValue}) 
                     backgroundColor={navyBlue.main}
                     backgroundImage={placeholderBanner}
                     backgroundImageOpacity={0.2}
-                    title={value === 0 ? "Upcoming Events on CareerFairy" : "Past Events on CareerFairy"}
+                    title={value === "upcomingEvents" ? "Upcoming Events on CareerFairy" : "Past Events on CareerFairy"}
                     subtitle=""
                     handleChange={handleChange}
                     value={value}
