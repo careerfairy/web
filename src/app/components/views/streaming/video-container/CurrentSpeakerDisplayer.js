@@ -175,17 +175,18 @@ function CurrentSpeakerDisplayer(props) {
         }
     }
 
-    let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
-        const videoClass = getVideoContainerClass(stream.streamId, "external");
+    let externalVideoElements = props.streams.filter(stream => !stream.uid.includes("screen")).map((stream, index) => {
+        const videoClass = getVideoContainerClass(stream.uid, "external");
         return (
-            <div key={stream.streamId} className={classes[videoClass]}
-                 style={{padding: 0}}>
+            <div key={stream.uid} className={classes[videoClass]}
+                    style={{padding: 0}}>
                 <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream}
-                                      height={getVideoContainerHeight(stream.streamId)}
-                                      small={videoClass.includes("QuarterWidth")} index={index}/>
+                                        height={getVideoContainerHeight(stream.uid)}
+                                        small={videoClass.includes("QuarterWidth")} index={index}/>
             </div>
         );
     });
+    
 
     if (!props.isPlayMode) {
         const localVideoClass = getVideoContainerClass(props.localId, "local");

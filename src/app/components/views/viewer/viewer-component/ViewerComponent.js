@@ -49,7 +49,7 @@ function ViewerComponent(props) {
     const screenSharingMode = (props.currentLivestream.screenSharerId === authenticatedUser?.email &&
         props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
 
-    const {externalMediaStreams,numberOfViewers, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus} =
+    const {externalUsers,numberOfViewers, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus} =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
@@ -145,7 +145,7 @@ function ViewerComponent(props) {
             <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive}
                                      smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}
                                      speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
-                                     streams={externalMediaStreams} localId={props.streamerId}
+                                     streams={externalUsers} localId={props.streamerId}
                                      isViewer={true}
                                      currentSpeaker={props.currentLivestream.currentSpeakerId}
                                      muted={!props.currentLivestream.hasStarted} {...props}/>
@@ -155,7 +155,7 @@ function ViewerComponent(props) {
                 presentation={props.currentLivestream.mode === 'presentation'}
                 showMenu={props.showMenu}
                 isStreamer={true}
-                externalMediaStreams={externalMediaStreams}
+                externalMediaStreams={externalUsers}
                 isLocalScreen={false}
                 attachSinkId={attachSinkId}
                 {...props}

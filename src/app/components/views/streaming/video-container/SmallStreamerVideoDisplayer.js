@@ -19,7 +19,7 @@ function SmallStreamerVideoDisplayer(props) {
 
 const SharedScreenViewer = (props) => {
     const windowSize = useWindowSize();
-    const screenShareStream = props.externalMediaStreams?.find(stream => stream.streamId.includes("screen"));
+    const screenShareStream = props.externalMediaStreams?.find(stream => stream.uid.includes("screen"));
 
     return (
         <Fragment>

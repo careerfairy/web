@@ -73,21 +73,20 @@ const RemoteVideoContainer = ({
     const activeStep = getActiveTutorialStepKey();
     const videoElement = useRef({current: {}});
 
-    const isScreenShareVideo = stream.streamId.includes("screen");
+    const isScreenShareVideo = stream.uid.includes("screen");
     const classes = useStyles({isScreenShareVideo})
 
 
     useEffect(() => {
-        if (stream.streamId === 'demoStream') {
+        if (stream.uid === 'demoStream') {
             generateDemoHandRaiser()
         } else {
-            if (!stream.stream.videoTrack.isPlaying) {
-                debugger;
-                stream.stream.videoTrack?.play(stream.streamId, {fit: isScreenShareVideo ? 'contain' : 'cover'});
-                stream.stream.audioTrack?.play();
+            if (stream.videoTrack && !stream.videoTrack.isPlaying) {
+                stream.videoTrack?.play(stream.uid, {fit: isScreenShareVideo ? 'contain' : 'cover'});
+                // stream.stream.audioTrack?.play();
             }
         }
-    }, [stream.streamId]);
+    }, [stream.uid, stream.videoTrack]);
 
     useEffect(() => {
         if (!isPlayMode) {
@@ -133,17 +132,7 @@ const RemoteVideoContainer = ({
         video.play();
     }
 
-    function playVideo() {
-        if (!stream.stream.isPlaying()) {
-            stream.stream.videoTrack.play(stream.streamId, {
-                fit: isScreenShareVideo ? 'contain' : 'cover',
-            });
-        }
-        stream.stream.audioTrack.stop()
-    }
-
     const speaker = !isScreenShareVideo ? currentLivestream.liveSpeakers.find(speaker => speaker.speakerUuid === stream.streamId) : null;
-
 
     return (
         <WhiteTooltip
@@ -159,20 +148,20 @@ const RemoteVideoContainer = ({
                     }} buttonText="Ok"/>}
                 </React.Fragment>
             }
-            open={activeStep === 11 && stream.streamId === 'demoStream'}>
+            open={activeStep === 11 && stream.uid === 'demoStream'}>
             <div className={classes.videoContainer} style={{height: height}}>
-                <div ref={videoElement} id={stream.streamId} className={classes.videoWrapper}
+                <div ref={videoElement} id={stream.uid} className={classes.videoWrapper}
                      style={{width: '100%', height: '100%'}}/>
                 {
                     speaker &&
                     <SpeakerInfoOverlay zIndex={mutedOverlayZIndex + 1} speaker={speaker} small={small}/>
                 }
                 {
-                    stream.videoMuted &&
+                    !stream.videoTrack &&
                     <div className={classes.mutedOverlay}>
                         <div className={classes.mutedOverlayContent}>
                             <div>
-                                <img src={currentLivestream.companyLogoUrl} className={classes.companyIcon}/>
+                                <img src={currentLivestream?.companyLogoUrl} className={classes.companyIcon}/>
                             </div>
                             <Tooltip title={'The streamer has turned the camera off'}>
                                 <VideocamOffIcon className={classes.svgShadow} fontSize='large' color='error'/>
@@ -181,7 +170,7 @@ const RemoteVideoContainer = ({
                     </div>
                 }
                 {
-                    stream.audioMuted &&
+                    !stream.audioTrack &&
                     <div className={classes.audioMuted}>
                         <Tooltip title={'The streamer has muted his microphone'}>
                             <VolumeOffIcon className={classes.svgShadow} fontSize='large' color='error'/>
@@ -193,7 +182,7 @@ const RemoteVideoContainer = ({
                     <div className={classes.mutedOverlay}>
                         <div className={classes.mutedOverlayContent}>
                             <div>
-                                <img src={currentLivestream.companyLogoUrl} className={classes.companyIcon}/>
+                                <img src={currentLivestream?.companyLogoUrl} className={classes.companyIcon}/>
                             </div>
                             <Tooltip title={'Your connection is currently too weak to stream this video'}>
                                 <SignalCellularConnectedNoInternet2BarIcon fontSize='large' color='error'/>

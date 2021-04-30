@@ -135,12 +135,12 @@ function VideoControlsContainer({
 
     function toggleMicrophone() {
         if (isLocalMicMuted) {
-            localMediaStream.unmuteAudio()
+            localMediaStream.audioTrack.setEnabled(true)
             let localMediaStreamCopy = { ...localMediaStream }
             localMediaStreamCopy.audioMuted = false;
             setLocalMediaStream(localMediaStreamCopy)
         } else {
-            localMediaStream.muteAudio()
+            localMediaStream.audioTrack.setEnabled(false)
             let localMediaStreamCopy = { ...localMediaStream }
             localMediaStreamCopy.audioMuted = true;
             setLocalMediaStream(localMediaStreamCopy)
@@ -150,12 +150,13 @@ function VideoControlsContainer({
 
     function toggleVideo() {
         if (isVideoInactive) {
-            localMediaStream.unmuteVideo()
+            debugger;
+            localMediaStream.videoTrack.setEnabled(true)
             let localMediaStreamCopy = { ...localMediaStream }
             localMediaStreamCopy.videoMuted = false;
             setLocalMediaStream(localMediaStreamCopy)
         } else {
-            localMediaStream.muteVideo()
+            localMediaStream.videoTrack.setEnabled(false)
             let localMediaStreamCopy = { ...localMediaStream }
             localMediaStreamCopy.videoMuted = true;
             setLocalMediaStream(localMediaStreamCopy)

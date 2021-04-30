@@ -55,7 +55,7 @@ function VideoContainer(props) {
     const {
         localMediaStream,
         setLocalMediaStream,
-        externalMediaStreams,
+        externalUsers,
         agoraRtcStatus,
         agoraRtmStatus,
         networkQuality,
@@ -89,15 +89,15 @@ function VideoContainer(props) {
     useEffect(() => {
         if (isMainStreamer && props.currentLivestream.mode !== 'desktop' && props.currentLivestream.speakerSwitchMode !== 'manual') {
             let timeout = setTimeout(() => {
-                let audioLevels = externalMediaStreams.map(stream => {
-                    if (stream.streamId !== 'demoStream') {
+                let audioLevels = externalUsers.map(user => {
+                    if (user.uid !== 'demoStream' && user.audioTrack) {
                         return {
-                            streamId: stream.streamId,
-                            audioLevel: stream.stream.audioTrack.getVolumeLevel()
+                            streamId: user.uid,
+                            audioLevel: user.audioTrack.getVolumeLevel()
                         }
                     } else {
                         return {
-                            streamId: stream.streamId,
+                            streamId: user.uid,
                             audioLevel: 0
                         }
                     }
@@ -120,7 +120,7 @@ function VideoContainer(props) {
             }, 2500);
             return () => clearTimeout(timeout);
         }
-    }, [audioCounter, props.currentLivestream.mode]);
+    }, [audioCounter, props.currentLivestream.mode, externalUsers.length]);
 
     useEffect(() => {
         if (agoraRtcStatus && agoraRtcStatus.type === "INFO" && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
@@ -149,23 +149,23 @@ function VideoContainer(props) {
     }, [props.streamerId, props.currentLivestream.id])
 
     useEffect(() => {
-        if (externalMediaStreams && props.currentLivestream.currentSpeakerId && isMainStreamer) {
-            let existingCurrentSpeaker = externalMediaStreams.find(stream => stream.streamId === props.currentLivestream.currentSpeakerId)
+        if (externalUsers && props.currentLivestream.currentSpeakerId && isMainStreamer) {
+            let existingCurrentSpeaker = externalUsers.find(stream => stream.uid === props.currentLivestream.currentSpeakerId)
             if (!existingCurrentSpeaker) {
                 setLivestreamCurrentSpeakerId(props.currentLivestream.id);
             }
         }
-    }, [externalMediaStreams])
+    }, [externalUsers])
 
     const [timeoutState, setTimeoutState] = useState(null);
 
     useEffect(() => {
         dynamicallyUpdateVideoProfile()
-    }, [localMediaStream, externalMediaStreams, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
+    }, [localMediaStream, externalUsers, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
 
     const dynamicallyUpdateVideoProfile = async () => {
-        if (localMediaStream && externalMediaStreams) {
-            if (externalMediaStreams.length > 3) {
+        if (localMediaStream && externalUsers) {
+            if (externalUsers.length > 3) {
                 if (props.streamerId === props.currentLivestream.currentSpeakerId && props.currentLivestream.mode !== "desktop" && props.currentLivestream.mode !== "presentation") {
                     if (timeoutState) {
                         clearTimeout(timeoutState);
@@ -234,7 +234,7 @@ function VideoContainer(props) {
         const activeStep = getActiveTutorialStepKey();
         if (localMediaStream && activeStep > 0) {
             if (activeStep > 10 && activeStep < 13) {
-                if (!externalMediaStreams.some(stream => stream.streamId === 'demoStream')) {
+                if (!externalUsers.some(stream => stream.streamId === 'demoStream')) {
                     setAddedStream({
                         streamId: "demoStream",
                         url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media"
@@ -307,7 +307,7 @@ function VideoContainer(props) {
                         localStream={localMediaStream}
                         speakerSource={speakerSource}
                         attachSinkId={attachSinkId}
-                        streams={externalMediaStreams}
+                        streams={externalUsers}
                         currentSpeaker={props.currentLivestream.currentSpeakerId}
                         setRemovedStream={setRemovedStream}
                         {...props}
@@ -319,7 +319,7 @@ function VideoContainer(props) {
                     livestreamId={props.currentLivestream.id}
                     presentation={props.currentLivestream.mode === 'presentation'}
                     showMenu={props.showMenu}
-                    externalMediaStreams={externalMediaStreams}
+                    externalMediaStreams={externalUsers}
                     isLocalScreen={screenSharingMode}
                     attachSinkId={attachSinkId}
                     presenter={true}/>}

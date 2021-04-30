@@ -143,9 +143,7 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare, smallScreen}) =
                 :
                 <React.Fragment>
                         <DialogTitle>
-                            <Typography align="center" variant="h4">
-                                Would you like to share
-                            </Typography>
+                            Would you like to share
                         </DialogTitle>
                         <DialogContent>
                             <Grid container spacing={1}>
