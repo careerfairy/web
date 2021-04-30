@@ -123,7 +123,6 @@ const LeftMenu = ({
                 sliding={sliding}
                 showMenu={showMenu}
                 streamer={streamer}
-                isMobile={false}
                 livestream={livestream}
                 selectedState={selectedState}
             />

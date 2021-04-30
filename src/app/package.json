@@ -72,7 +72,7 @@
     "react-linkify": "^1.0.0-alpha",
     "react-pdf": "^4.1.0",
     "react-player": "^1.14.2",
-    "react-redux": "^7.2.2",
+    "react-redux": "^7.2.3",
     "react-redux-firebase": "^3.10.0",
     "react-responsive-masonry": "^2.1.1",
     "react-reveal": "^1.2.2",

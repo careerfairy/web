@@ -191,9 +191,9 @@ const StreamerLayout = (props) => {
             return tokenChecked;
         }
     }
-    const toggleShowMenu = () => {
+    const toggleShowMenu = useCallback( () => {
         setShowMenu(!showMenu)
-    }
+    },[showMenu])
 
     if (!isLoaded(currentLivestream) || !tokenIsValidated()) {
         return <Loader/>
