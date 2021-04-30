@@ -43,8 +43,6 @@ const NonAuthenticatedHeader = (props) => {
                     <li className={`${props.page === 'next-livestreams' ? 'active' : ''}`}>
                         <Link  href='/next-livestreams'><a className={classes.nextLink}>Next
                             Live Streams</a></Link></li>
-                    <li className={props.page === 'discover' ? 'active' : ''}><Link href='/discover'><a>Past Live
-                        Streams</a></Link></li>
                     <li className={props.page === 'wishlist' ? 'active' : ''}><Link
                         href='/wishlist'><a>Wishlist</a></Link></li>
                 </ul>

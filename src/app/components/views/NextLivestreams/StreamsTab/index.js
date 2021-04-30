@@ -34,8 +34,8 @@ const StreamsTab = ({handleChange, value}) => {
                 variant="fullWidth"
                 aria-label="full width tabs example"
             >
-                <SimpleTab classes={{root: classes.tab}} label="Upcoming Events" index={0}/>
-                <SimpleTab classes={{root: classes.tab}} label="Past Events" index={1}/>
+                <SimpleTab classes={{root: classes.tab}} label="Upcoming Events" value="upcomingEvents" index={0}/>
+                <SimpleTab classes={{root: classes.tab}} label="Past Events" value="pastEvents" index={1}/>
             </Tabs>
         </AppBar>
     );

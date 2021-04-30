@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {User as ProfileIcon} from "react-feather";
 import {useAuth} from "../../HOCs/AuthProvider";
 import NextLivestreamsIcon from '@material-ui/icons/Contacts';
-import PastLivestreamsIcon from '@material-ui/icons/VideoLibrary';
 import FollowGroupIcon from '@material-ui/icons/GroupAdd';
 import WishlistIcon from '@material-ui/icons/Stars';
 
@@ -14,16 +13,16 @@ const initialMainLinks = [
         icon: NextLivestreamsIcon
     },
     {
-        href: `/discover`,
-        title: 'PAST LIVE STREAMS',
-        basePath: '/discover',
-        icon: PastLivestreamsIcon
-    },
-    {
         href: `/wishlist`,
         title: 'WISHLIST',
         basePath: '/wishlist',
         icon: WishlistIcon
+    },
+    {
+        href: `/groups`,
+        title: 'FOLLOW GROUPS',
+        basePath: '/groups',
+        icon: FollowGroupIcon
     }
 ]
 const initialSecondaryLinks = [
@@ -42,19 +41,11 @@ const initialSecondaryLinks = [
 const useGeneralLinks = () => {
     const {authenticatedUser} = useAuth()
 
-    const [mainLinks, setMainLinks] = useState(initialMainLinks);
+    const [mainLinks] = useState(initialMainLinks);
     const [secondaryLinks, setSecondaryLinks] = useState(initialSecondaryLinks);
 
     useEffect(() => {
         if (authenticatedUser?.emailVerified) {
-
-            setMainLinks([...initialMainLinks, {
-                href: `/groups`,
-                title: 'FOLLOW GROUPS',
-                basePath: '/groups',
-                icon: FollowGroupIcon
-            }])
-
             setSecondaryLinks([...initialSecondaryLinks, {
                 href: `/profile`,
                 title: 'PROFILE',
