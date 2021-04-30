@@ -77,6 +77,7 @@ const LeftMenu = ({
                       smallScreen,
                       toggleShowMenu,
                   }) => {
+    console.log("-> LeftMenu");
     const theme = useTheme()
     const classes = useStyles()
     const [value, setValue] = useState(0);
@@ -123,7 +124,6 @@ const LeftMenu = ({
                 sliding={sliding}
                 showMenu={showMenu}
                 streamer={streamer}
-                isMobile={false}
                 livestream={livestream}
                 selectedState={selectedState}
             />

@@ -108,7 +108,7 @@ function MyApp({Component, pageProps}) {
             <Provider store={store}>
                 <ReactReduxFirebaseProvider {...rrfProps}>
                     <ThemeProviderWrapper>
-                        <AuthProvider firebase={firebase}>
+                        <AuthProvider>
                             <FirebaseContext.Provider value={firebase}>
                                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
 

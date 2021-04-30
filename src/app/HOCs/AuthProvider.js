@@ -47,7 +47,7 @@ const AuthProvider = ({children}) => {
 
     useFirestoreConnect(query)
 
-    const userData = useSelector(({firestore}) => auth.email ? populate(firestore, "userProfile", populates) : null)
+    const userData = useSelector(({firestore}) => firestore.data.userProfile)
 
     useEffect(() => {
         // Check that initial route is OK

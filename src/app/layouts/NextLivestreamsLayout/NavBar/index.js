@@ -18,6 +18,8 @@ import GroupNavLink from "./groupNavLink";
 import Link from "../../../materialUI/NextNavLink";
 import NavPrompt from "./navPrompt";
 import {signInImage} from "../../../constants/images";
+import {withFirebase} from "context/firebase";
+import useFollowingGroups from "../../../components/custom-hook/useFollowingGroups";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -91,8 +93,8 @@ const FeedDrawer = memo(({
                              handleDrawerToggle,
                              drawerBottomLinks,
                              drawerTopLinks,
-                             drawerWidth
-
+                             drawerWidth,
+                             firebase
                          }) => {
     const classes = useStyles({drawerWidth});
     const {query: {groupId: groupIdInQuery}, asPath} = useRouter()
@@ -100,9 +102,10 @@ const FeedDrawer = memo(({
     const [groups, setGroups] = useState(null);
     const dispatch = useDispatch()
     const signOut = () => dispatch(actions.signOut())
+    const [followingGroups] = useFollowingGroups(firebase)
     useEffect(() => {
         if (userData) {
-            let newGroups = userData.followingGroups ? GroupsUtil.getUniqueGroupsFromArrayOfGroups(userData.followingGroups) : []
+            let newGroups = followingGroups
             if (groupIdInQuery) {
                 const activeGroupIndex = newGroups.findIndex(
                     (el) => el.groupId === groupIdInQuery
@@ -114,7 +117,7 @@ const FeedDrawer = memo(({
             setGroups(newGroups)
         }
 
-    }, [groupIdInQuery, userData?.followingGroups])
+    }, [groupIdInQuery, followingGroups])
 
 
     const content = (
@@ -225,4 +228,4 @@ const FeedDrawer = memo(({
 })
 
 
-export default FeedDrawer
+export default withFirebase(FeedDrawer)

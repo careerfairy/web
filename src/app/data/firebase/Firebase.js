@@ -1171,6 +1171,12 @@ class Firebase {
         return totalUsers
     };
 
+    getFollowingGroups = async (groupIds = []) => {
+        const uniqueGroupIds = [...new Set(groupIds)]
+        const groupSnaps = await Promise.all(uniqueGroupIds.map(groupId => this.firestore.collection("careerCenterData").doc(groupId).get()))
+        return groupSnaps.filter(doc => doc.exists).map(doc => ({id: doc.id, ...doc.data()}))
+    }
+
 
     listenCareerCentersByAdminEmail = (email, callback) => {
         let ref = this.firestore

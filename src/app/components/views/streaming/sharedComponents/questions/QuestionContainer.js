@@ -22,6 +22,7 @@ import {PlayIconButton} from "materialUI/GlobalButtons/GlobalButtons";
 import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "materialUI/GlobalTooltips";
 import TutorialContext from "context/tutorials/TutorialContext";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
+import {compose} from "redux"
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
@@ -119,6 +120,7 @@ const QuestionContainer = memo(({
                                     openQuestionId,
                                     showMenu
                                 }) => {
+    // console.log("-> QuestionContainer");
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
@@ -130,7 +132,7 @@ const QuestionContainer = memo(({
     const old = question?.type !== 'new'
     const upvoted = (!user && !livestream?.test) || (question?.emailOfVoters ? question?.emailOfVoters.indexOf(livestream?.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
     const classes = useStyles({active})
-    console.log("-> question", question);
+
     useEffect(() => {
         if (livestream.id && question.id && showAllReactions) {
             setLoading(true)
@@ -139,12 +141,17 @@ const QuestionContainer = memo(({
                 setLoading(false)
             });
             return () => unsubscribe();
-        } else if (livestream.id && question.id && !showAllReactions) {
+        }
+    }, [livestream.id, question.id, showAllReactions]);
+
+    useEffect(() => {
+        if (livestream.id && question.id && !showAllReactions) {
             if (question.firstComment) {
                 setComments([question.firstComment])
             }
         }
-    }, [livestream.id, question.id, showAllReactions]);
+    }, [question.firstComment, showAllReactions]);
+
 
     useEffect(() => {
         if (active && !showAllReactions) {
@@ -196,10 +203,6 @@ const QuestionContainer = memo(({
             && isNextQuestions
             && selectedState === "questions"
             && !sliding)
-    }
-
-    const handleClickAway = () => {
-        return !active && setShowAllReactions(false)
     }
 
     const componentDecorator = (href, text, key) => (
@@ -261,7 +264,6 @@ const QuestionContainer = memo(({
                         <TooltipButtonComponent onConfirm={() => handleConfirmStep(0)} buttonText="Ok"/>
                     </React.Fragment>
                 } open={isOpen(0)}>
-                {/*<ClickAwayListener onClickAway={handleClickAway}>*/}
                 <Paper elevation={4} className={classes.questionContainer}>
                     <div style={{padding: "20px 20px 5px 20px"}}>
                         <div className={classes.upVotes}>
@@ -393,7 +395,6 @@ const QuestionContainer = memo(({
                             }
                         </Button>}
                 </Paper>
-                {/*</ClickAwayListener>*/}
             </WhiteTooltip>
         </Grow>
     );
@@ -414,5 +415,7 @@ QuestionContainer.propTypes = {
     openQuestionId: PropTypes.string
 }
 
-export default withFirebase(QuestionContainer);
+export default compose(
+    withFirebase,
+)(QuestionContainer)
 

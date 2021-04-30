@@ -63,7 +63,6 @@ const useStyles = makeStyles((theme) => ({
 
 
 const ViewerLayout = (props) => {
-    console.log("-> ViewerLayout");
     const {children, firebase} = props
     const {query: {livestreamId}, replace, asPath} = useRouter()
     const {authenticatedUser, userData} = useAuth();
@@ -80,6 +79,7 @@ const ViewerLayout = (props) => {
     const [handRaiseActive, setHandRaiseActive] = useState(false);
     const [streamerId, setStreamerId] = useState(null);
     const classes = useStyles({showMenu, mobile})
+
     const [selectedState, setSelectedState] = useState("questions");
 
 
@@ -96,8 +96,10 @@ const ViewerLayout = (props) => {
 
     useFirestoreConnect(query)
 
-    const currentLivestream = useSelector(({firestore}) =>
-        populate(firestore, "currentLivestream", populates), shallowEqual)
+    const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
+        ...populate(firestore, "currentLivestream", populates),
+        id: livestreamId
+    }, shallowEqual)
 
     const notAuthorized = currentLivestream && !currentLivestream.test && authenticatedUser?.isLoaded && authenticatedUser?.isEmpty
 

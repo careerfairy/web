@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {useLayoutEffect, useRef, useState, useEffect, useCallback} from 'react';
+import React, {useLayoutEffect, useRef, useState, useEffect, useCallback, memo} from 'react';
 import {
     Badge,
     Button,
@@ -34,8 +34,12 @@ import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import {useAuth} from "../../../../HOCs/AuthProvider";
 import {GreyPermanentMarker} from "../../../../materialUI/GlobalTitles";
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {truncate} from "../../../helperFunctions/HelperFunctions";
+import {compose} from "redux"
+import useTraceUpdate from "../../../custom-hook/useTraceUpdate";
+import {useCurrentStream} from "../../../../context/stream/StreamContext";
+import useAuthentication from "../../../custom-hook/useAuthentication";
 
 const useStyles = makeStyles(theme => ({
     view: {
@@ -57,7 +61,7 @@ const useStyles = makeStyles(theme => ({
     },
     emptyMessage: {
         margin: "auto !important",
-        padding: theme.spacing(0,1)
+        padding: theme.spacing(0, 1)
     },
     viewPanel: {
         display: "flex",
@@ -95,10 +99,10 @@ const EmptyList = ({isUpcoming}) => {
 
 const now = new Date()
 
-const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebase, showMenu, isMobile}) => {
-    if (!livestream?.id) {
-        return null
-    }
+const QuestionCategory = (props) => {
+    const {selectedState, sliding, streamer, firebase, showMenu, isMobile} = props
+    const {currentLivestream: livestream} = useCurrentStream()
+    console.log("-> QuestionCategory");
     const theme = useTheme()
     const classes = useStyles({isMobile})
     const dispatch = useDispatch()
@@ -110,8 +114,9 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
     const [goingToQuestion, setGoingToQuestion] = useState(false);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
     const [openQuestionId, setOpenQuestionId] = useState("");
-
-    const {authenticatedUser, userData} = useAuth();
+    // const authenticatedUser = undefined
+    // const userData = undefined
+    const {authenticatedUser, userData} = useAuthentication();
 
     const parentRef = useRef()
 
@@ -220,34 +225,40 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
     }
 
     let upcomingQuestionsElements = itemsUpcoming.map((question, index) => {
-        return <QuestionContainer key={question.id}
-                                  streamer={streamer}
-                                  goToThisQuestion={goToThisQuestion}
-                                  isNextQuestions={value === 0}
-                                  livestream={livestream}
-                                  setOpenQuestionId={setOpenQuestionId}
-                                  index={index} sliding={sliding}
-                                  showMenu={showMenu}
-                                  openQuestionId={openQuestionId}
-                                  selectedState={selectedState}
-                                  question={question} user={authenticatedUser}
-                                  userData={userData}/>
+        return <QuestionContainer
+            key={question.id}
+            streamer={streamer}
+            goToThisQuestion={goToThisQuestion}
+            isNextQuestions={value === 0}
+            livestream={livestream}
+            setOpenQuestionId={setOpenQuestionId}
+            index={index} sliding={sliding}
+            showMenu={showMenu}
+            openQuestionId={openQuestionId}
+            selectedState={selectedState}
+            question={question}
+            user={authenticatedUser}
+            userData={userData}
+        />
 
     });
 
     let pastQuestionsElements = itemsPast.map((question, index) => {
-        return <QuestionContainer key={question.id} streamer={streamer}
-                                  isNextQuestions={value === 1}
-                                  livestream={livestream}
-                                  index={index}
-                                  openQuestionId={openQuestionId}
-                                  sliding={sliding}
-                                  setOpenQuestionId={setOpenQuestionId}
-                                  showMenu={showMenu}
-                                  goToThisQuestion={goToThisQuestion}
-                                  selectedState={selectedState}
-                                  question={question} user={authenticatedUser}
-                                  userData={userData}/>
+        return <QuestionContainer
+            key={question.id}
+            streamer={streamer}
+            isNextQuestions={value === 1}
+            livestream={livestream}
+            index={index}
+            openQuestionId={openQuestionId}
+            sliding={sliding}
+            setOpenQuestionId={setOpenQuestionId}
+            showMenu={showMenu}
+            goToThisQuestion={goToThisQuestion}
+            selectedState={selectedState}
+            question={question} user={authenticatedUser}
+            userData={userData}
+        />
     });
     const getCount = (isUpcoming) => {
         const elements = isUpcoming ? upcomingQuestionsElements : pastQuestionsElements
@@ -330,7 +341,8 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
                         <EmptyList/>}
                 </TabPanel>
             </SwipeableViews>
-            <Dialog TransitionComponent={Slide} PaperProps={{className: `${classes.dialog} notranslate`}} fullWidth onClose={handleClose}
+            <Dialog TransitionComponent={Slide} PaperProps={{className: `${classes.dialog} notranslate`}} fullWidth
+                    onClose={handleClose}
                     open={showQuestionModal}>
                 <DialogTitle style={{color: "white"}}>
                     Add a Question
@@ -366,14 +378,17 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
     );
 }
 QuestionCategory.propTypes = {
-  firebase: PropTypes.object,
-  isMobile: PropTypes.bool.isRequired,
-  livestream: PropTypes.object.isRequired,
-  selectedState: PropTypes.string.isRequired,
-  showMenu: PropTypes.bool.isRequired,
-  sliding: PropTypes.bool,
-  streamer: PropTypes.bool
+    firebase: PropTypes.object,
+    isMobile: PropTypes.bool,
+    livestream: PropTypes.object.isRequired,
+    selectedState: PropTypes.string.isRequired,
+    showMenu: PropTypes.bool.isRequired,
+    sliding: PropTypes.bool,
+    streamer: PropTypes.bool
 }
 
-export default withFirebase(QuestionCategory);
+export default compose(
+    withFirebase,
+    memo
+)(QuestionCategory)
 
