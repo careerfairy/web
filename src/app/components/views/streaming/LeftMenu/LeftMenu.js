@@ -77,7 +77,6 @@ const LeftMenu = ({
                       smallScreen,
                       toggleShowMenu,
                   }) => {
-    console.log("-> LeftMenu");
     const theme = useTheme()
     const classes = useStyles()
     const [value, setValue] = useState(0);

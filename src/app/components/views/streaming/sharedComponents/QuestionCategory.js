@@ -1,20 +1,20 @@
 import PropTypes from 'prop-types'
-import React, {useLayoutEffect, useRef, useState, useEffect, useCallback, memo} from 'react';
+import React, {memo, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {
     Badge,
     Button,
     CircularProgress,
     Collapse,
-    TextField,
-    Typography,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
     Fab,
-    Tabs,
-    Tab,
     Slide,
+    Tab,
+    Tabs,
+    TextField,
+    Typography,
 } from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
 import HelpIcon from '@material-ui/icons/Help';
@@ -34,12 +34,9 @@ import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import {useAuth} from "../../../../HOCs/AuthProvider";
 import {GreyPermanentMarker} from "../../../../materialUI/GlobalTitles";
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import {useDispatch, useSelector} from "react-redux";
-import {truncate} from "../../../helperFunctions/HelperFunctions";
+import {useDispatch} from "react-redux";
 import {compose} from "redux"
-import useTraceUpdate from "../../../custom-hook/useTraceUpdate";
 import {useCurrentStream} from "../../../../context/stream/StreamContext";
-import useAuthentication from "../../../custom-hook/useAuthentication";
 
 const useStyles = makeStyles(theme => ({
     view: {
@@ -102,7 +99,6 @@ const now = new Date()
 const QuestionCategory = (props) => {
     const {selectedState, sliding, streamer, firebase, showMenu, isMobile} = props
     const {currentLivestream: livestream} = useCurrentStream()
-    console.log("-> QuestionCategory");
     const theme = useTheme()
     const classes = useStyles({isMobile})
     const dispatch = useDispatch()
@@ -114,9 +110,7 @@ const QuestionCategory = (props) => {
     const [goingToQuestion, setGoingToQuestion] = useState(false);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
     const [openQuestionId, setOpenQuestionId] = useState("");
-    // const authenticatedUser = undefined
-    // const userData = undefined
-    const {authenticatedUser, userData} = useAuthentication();
+    const {authenticatedUser, userData} = useAuth();
 
     const parentRef = useRef()
 

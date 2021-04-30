@@ -5,9 +5,8 @@ import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
-import {Box, Button, Grow, Hidden} from "@material-ui/core";
+import {Box, Button, CircularProgress, Grow, Hidden} from "@material-ui/core";
 import {useAuth} from "../../../HOCs/AuthProvider";
-import GroupsUtil from "../../../data/util/GroupsUtil";
 import {useRouter} from "next/router";
 import {getResizedUrl, repositionElementInArray} from "../../../components/helperFunctions/HelperFunctions";
 import NavItem from "../../../components/views/navbar/NavItem";
@@ -102,10 +101,11 @@ const FeedDrawer = memo(({
     const [groups, setGroups] = useState(null);
     const dispatch = useDispatch()
     const signOut = () => dispatch(actions.signOut())
-    const [followingGroups] = useFollowingGroups(firebase)
+    const [followingGroups, loading] = useFollowingGroups(firebase)
+
     useEffect(() => {
         if (userData) {
-            let newGroups = followingGroups
+            let newGroups = [...followingGroups]
             if (groupIdInQuery) {
                 const activeGroupIndex = newGroups.findIndex(
                     (el) => el.groupId === groupIdInQuery
@@ -145,8 +145,10 @@ const FeedDrawer = memo(({
                     </List>
                 </Box>
             </Hidden>
-            <Box p={2}>
-                {(authenticatedUser.isLoaded && authenticatedUser.isEmpty) ? (
+            <Box display="flex" flexDirection="column" p={2}>
+                {loading ? (
+                    <CircularProgress style={{margin: "auto"}}/>
+                ) : (authenticatedUser.isLoaded && authenticatedUser.isEmpty) ? (
                     <NavPrompt
                         title="Don't have an account?"
                         subheader="Click here to register"

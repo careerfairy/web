@@ -4,16 +4,13 @@ import {withFirebase} from "../../context/firebase";
 import {useRouter} from "next/router";
 import ViewerTopBar from "./ViewerTopBar";
 import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
-import {useDispatch, useSelector, shallowEqual} from "react-redux";
+import {shallowEqual, useSelector} from "react-redux";
 import {useAuth} from "../../HOCs/AuthProvider";
 import Loader from "../../components/views/loader/Loader";
 import {useMediaQuery} from "@material-ui/core";
 import LeftMenu from "../../components/views/viewer/LeftMenu/LeftMenu";
 import {v4 as uuidv4} from "uuid";
-
-import * as actions from "../../store/actions";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
-import useTraceUpdate from "../../components/custom-hook/useTraceUpdate";
 import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme) => ({
