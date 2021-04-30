@@ -34,7 +34,7 @@ export function StreamsSection({
         forceCheck()
     },[value])
     return <div className={classes.wrapper}>
-        <SwipeablePanel value={value} index={0}>
+        <SwipeablePanel value={value} index={"upcomingEvents"}>
             {isLoaded(upcomingLivestreams) ? (
                 <NextLivestreams
                     livestreamId={livestreamId}
@@ -49,7 +49,7 @@ export function StreamsSection({
                 </div>
             )}
         </SwipeablePanel>
-        <SwipeablePanel value={value} index={1}>
+        <SwipeablePanel value={value} index={"pastEvents"}>
             {isLoaded(pastLivestreams) ? (
                 <NextLivestreams
                     livestreamId={livestreamId}
@@ -69,7 +69,7 @@ export function StreamsSection({
 }
 
 StreamsSection.propTypes = {
-    value: PropTypes.number,
+    value: PropTypes.string.isRequired,
     dir: PropTypes.any,
     upcomingLivestreams: PropTypes.arrayOf(PropTypes.any),
     livestreamId: PropTypes.any,
