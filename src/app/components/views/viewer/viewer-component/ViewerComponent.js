@@ -116,7 +116,7 @@ function ViewerComponent(props) {
 
     const setDesktopMode = async (mode, initiatorId) => {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;
-        await props.firebase.setDesktopMode(props.currentLivestream.id, mode, screenSharerId);
+        await props.firebase.setDesktopMode(streamRef, mode, screenSharerId);
     }
 
     const shareDesktopOrSlides = () => (props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop')

@@ -18,6 +18,7 @@ import LoadingModal from '../modal/LoadingModal';
 import ErrorModal from '../modal/ErrorModal';
 import SettingsModal from "./SettingsModal";
 import ScreenShareModal from "./ScreenShareModal";
+import useStreamRef from "../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -33,7 +34,7 @@ function VideoContainer(props) {
     const classes = useStyles();
     const localVideoId = 'localVideo';
     const isMainStreamer = props.streamerId === props.currentLivestream.id;
-
+    const streamRef = useStreamRef();
     const [errorMessage, setErrorMessage] = useState(null);
     const [screenSharePermissionDenied, setScreenSharePermissionDenied] = useState(false);
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
@@ -195,7 +196,7 @@ function VideoContainer(props) {
 
     const setDesktopMode = async (mode, initiatorId) => {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;
-        await props.firebase.setDesktopMode(props.currentLivestream.id, mode, screenSharerId);
+        await props.firebase.setDesktopMode(streamRef, mode, screenSharerId);
     }
 
 

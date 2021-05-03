@@ -13,6 +13,7 @@ import {v4 as uuidv4} from "uuid";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 import PropTypes from "prop-types";
+import useStreamRef from "../../components/custom-hook/useStreamRef";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -62,11 +63,11 @@ const useStyles = makeStyles((theme) => ({
 
 const ViewerLayout = (props) => {
     const {children, firebase, isBreakout} = props
-    const {query: {livestreamId}, replace, asPath} = useRouter()
+    const {query: {livestreamId, breakoutRoomId}, replace, asPath} = useRouter()
     const {authenticatedUser, userData} = useAuth();
     const {breakpoints: {values}} = useTheme()
     const mobile = useMediaQuery(`(max-width:${values.mobile}px)`)
-
+    const streamRef = useStreamRef();
     const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [showVideoButton, setShowVideoButton] = useState({paused: false, muted: false});
@@ -95,10 +96,16 @@ const ViewerLayout = (props) => {
     }, [mobile]);
 
     useEffect(() => {
-        if (userData?.userEmail && livestreamId) {
-            firebase.setUserIsParticipating(livestreamId, userData);
+        if (userData?.userEmail) {
+            if (livestreamId) {
+                firebase.setUserIsParticipating(livestreamId, userData);
+            }
+            if (breakoutRoomId) {
+                firebase.setUserIsParticipatingWithRef(streamRef, userData);
+            }
+
         }
-    }, [livestreamId, userData?.email, userData?.linkedinUrl, userData?.firstName, userData?.lastName]);
+    }, [livestreamId, userData?.email, userData?.linkedinUrl, userData?.firstName, userData?.lastName, breakoutRoomId]);
 
     useEffect(() => {
         if (currentLivestream && !streamerId) {

@@ -67,6 +67,7 @@ class Firebase {
 
     getStreamRef = (router) => {
         const {query: {breakoutRoomId, livestreamId}} = router
+        if(!livestreamId) return {}
         let ref = this.firestore.collection("livestreams")
             .doc(livestreamId)
         if (breakoutRoomId) {
@@ -576,16 +577,14 @@ class Firebase {
         });
     };
 
-    setLivestreamMode = (livestreamId, mode) => {
-        let ref = this.firestore.collection("livestreams").doc(livestreamId);
-        return ref.update({
+    setLivestreamMode = (streamRef, mode) => {
+        return streamRef.update({
             mode: mode,
         });
     };
 
-    setDesktopMode = (livestreamId, mode, screenSharerId) => {
-        let ref = this.firestore.collection("livestreams").doc(livestreamId);
-        return ref.update({
+    setDesktopMode = (streamRef, mode, screenSharerId) => {
+        return streamRef.update({
             mode,
             screenSharerId
         });
@@ -1098,10 +1097,8 @@ class Firebase {
         return ref.onSnapshot(callback);
     }
 
-    listenToAllLivestreamParticipatingStudents = (livestreamId, callback) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    listenToAllLivestreamParticipatingStudents = (streamRef, callback) => {
+        let ref = streamRef
             .collection("participatingStudents")
         return ref.onSnapshot(callback);
     }
@@ -1694,6 +1691,21 @@ class Firebase {
             participatingStudents: firebase.firestore.FieldValue.arrayUnion(userData.userEmail),
         })
 
+        return batch.commit();
+    }
+    setUserIsParticipatingWithRef = (streamRef, userData) => {
+        let batch = this.firestore.batch()
+        let participantsRef = streamRef
+            .collection("participatingStudents")
+            .doc(userData.userEmail)
+
+        batch.set(participantsRef, {
+            ...userData,
+            joined: this.getServerTimestamp()
+        })
+        batch.update(streamRef, {
+            participatingStudents: firebase.firestore.FieldValue.arrayUnion(userData.userEmail),
+        })
         return batch.commit();
     }
 

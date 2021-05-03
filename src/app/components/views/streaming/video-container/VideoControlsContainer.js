@@ -15,6 +15,7 @@ import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import TutorialContext from 'context/tutorials/TutorialContext';
 import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "../../../../materialUI/GlobalTooltips";
 import PropTypes from "prop-types";
+import useStreamRef from "../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -75,6 +76,7 @@ function VideoControlsContainer({
                                     localMediaStream,
                                     setLocalMediaStream
                                 }) {
+    const streamRef = useStreamRef();
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
     const theme = useTheme();
     const DELAY = 3000; //3 seconds
@@ -164,7 +166,7 @@ function VideoControlsContainer({
     }
 
     function setLivestreamMode(mode) {
-        firebase.setLivestreamMode(id, mode);
+        firebase.setLivestreamMode(streamRef, mode);
     }
 
     const showShareDesktopButton = () => {

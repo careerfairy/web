@@ -94,7 +94,7 @@ PollOptionsDisplay.propTypes = {
 }
 
 const PollDisplay = ({currentPoll}) => {
-console.log("-> PollDisplay",);
+
     return (
         <CategoryContainerCentered>
             <PollWrapper>
