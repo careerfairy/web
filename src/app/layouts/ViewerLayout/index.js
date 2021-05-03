@@ -1,10 +1,9 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import {withFirebase} from "../../context/firebase";
 import {useRouter} from "next/router";
 import ViewerTopBar from "./ViewerTopBar";
-import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
-import {shallowEqual, useSelector} from "react-redux";
+import {isLoaded} from "react-redux-firebase";
 import {useAuth} from "../../HOCs/AuthProvider";
 import Loader from "../../components/views/loader/Loader";
 import {useMediaQuery} from "@material-ui/core";
