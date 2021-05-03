@@ -10,6 +10,7 @@ import {useRouter} from "next/router";
  * get: function,
  * update: function,
  * delete: function,
+ * path: string
  * })} - firestore document reference
  */
 const useStreamRef = () => {

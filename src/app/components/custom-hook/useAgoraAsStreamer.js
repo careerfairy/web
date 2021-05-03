@@ -5,10 +5,12 @@ import {useDispatch} from "react-redux";
 import {EMOTE_MESSAGE_TEXT_TYPE} from "../util/constants";
 import * as actions from '../../store/actions'
 import {useRouter} from 'next/router';
+import useStreamRef from "./useStreamRef";
 
 export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer, optimizationMode) {
 
     const dispatch = useDispatch()
+    const {path} = useStreamRef();
     const [localMediaStream, setLocalMediaStream] = useState(null);
     const [addedStream, setAddedStream] = useState(null);
     const [updatedStream, setUpdatedStream] = useState(null);
@@ -42,11 +44,9 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         type: "INFO",
         msg: "RTM_INITIAL"
     });
-console.log("-> token", token);
-console.log("-> roomId", roomId);
-console.log("-> userUid", userUid);
-    const agoraToken = useAgoraToken(roomId, userUid, !isViewer, token, false);
-    const agoraScreenShareToken = useAgoraToken(roomId, userUid, !isViewer, token, true);
+
+    const agoraToken = useAgoraToken(roomId, userUid, !isViewer, token, false, path);
+    const agoraScreenShareToken = useAgoraToken(roomId, userUid, !isViewer, token, true, path);
 
     const AGORA_APP_ID = "53675bc6d3884026a72ecb1de3d19eb1";
 

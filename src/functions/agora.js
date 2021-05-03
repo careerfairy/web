@@ -72,6 +72,7 @@ exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) =>
     setHeaders(req, res)
 
     const channelName = req.body.channel;
+    const streamDocumentPath = req.body.streamDocumentPath;
     const sentToken = req.body.token;
     const rtcRole = req.body.isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
     const rtmRole = 0;
@@ -82,12 +83,12 @@ exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) =>
 
     // Build token with uid
     if (rtcRole === RtcRole.PUBLISHER) {
-        let livestreamDoc = await admin.firestore().collection('/livestreams/FekQ2hHMxI2O8LMB54Lx/breakoutRooms').doc(channelName).get();
+        let livestreamDoc = await admin.firestore().doc(streamDocumentPath).get();
         let livestream = livestreamDoc.data();
         console.log("-> livestream", livestream);
 
         if (!livestream.test) {
-            let storedTokenDoc = await admin.firestore().collection('livestreams').doc(channelName).collection('tokens').doc('secureToken').get();
+            let storedTokenDoc = await admin.firestore().doc(streamDocumentPath).collection('tokens').doc('secureToken').get();
             let storedToken = storedTokenDoc.data().value;
             if (storedToken !== sentToken) {
                 return res.status(401).send();

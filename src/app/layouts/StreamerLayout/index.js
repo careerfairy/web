@@ -68,7 +68,8 @@ const MAIN_STREAMER_PATHS = ["/streaming/[livestreamId]/breakout-room/[breakoutR
 
 const StreamerLayout = (props) => {
     const {children, firebase, isBreakout} = props
-    const {query: {token, livestreamId, breakoutRoomId}, pathname} = useRouter()
+    const {query: {token, livestreamId:baseStreamId, breakoutRoomId}, pathname} = useRouter()
+    const livestreamId = breakoutRoomId || baseStreamId
     const router = useRouter();
     const smallScreen = useMediaQuery('(max-width:700px)');
 
@@ -77,6 +78,7 @@ const StreamerLayout = (props) => {
     const [notificationToRemove, setNotificationToRemove] = useState(null);
     const [notifications, setNotifications] = useState([]);
     const [streamerId, setStreamerId] = useState(null);
+    console.log("-> streamerId", streamerId);
 
     const [streamerReady, setStreamerReady] = useState(false);
     const [tokenChecked, setTokenChecked] = useState(false);
