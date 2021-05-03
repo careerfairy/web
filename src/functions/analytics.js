@@ -8,6 +8,8 @@ exports.updateUserDataAnalyticsOnWrite = functions.firestore.document('userData/
         const previousValue = change.before.data();
         const oldUniCountryCode = (previousValue && previousValue.universityCountryCode) || null
         const newUniCountryCode = (newValue && newValue.universityCountryCode) || null
+        functions.logger.log("oldUniCountryCode:", oldUniCountryCode)
+        functions.logger.log("newUniCountryCode:", newUniCountryCode)
         try {
             const universityCountryCodeHasChanged = newUniCountryCode !==  oldUniCountryCode
             if (universityCountryCodeHasChanged) {
