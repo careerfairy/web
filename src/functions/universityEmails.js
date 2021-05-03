@@ -40,7 +40,7 @@ exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(async
     let templates = []
     recipients.forEach(recipient => {
         const email = {
-            "TemplateId": 23147847,
+            "TemplateId": 22748248,
             "From": 'CareerFairy <noreply@careerfairy.io>',
             "To": recipient,
             "TemplateModel": {

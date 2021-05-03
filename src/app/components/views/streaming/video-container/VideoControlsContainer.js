@@ -150,7 +150,6 @@ function VideoControlsContainer({
 
     function toggleVideo() {
         if (isVideoInactive) {
-            debugger;
             localMediaStream.videoTrack.setEnabled(true)
             let localMediaStreamCopy = { ...localMediaStream }
             localMediaStreamCopy.videoMuted = false;

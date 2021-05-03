@@ -88,11 +88,11 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
         let AgoraRTC = require('agora-rtc-sdk-ng');
         setAgoraRTC(AgoraRTC);
-        AgoraRTC.Logger.setLogLevel(AgoraRTC.Logger.INFO);
         let rtcClient = AgoraRTC.createClient({
             mode: "live",
             codec: "vp8",
         });
+        rtcClient.startProxyServer(4);
         setAgoraRtcStatus({
             type: "INFO",
             msg: "RTC_JOINING_CHANNEL"
@@ -100,6 +100,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
         if (!isViewer) {
             rtcClient.setClientRole("host")
+            rtcClient.setPr
             rtcClient.join( AGORA_APP_ID, roomId, agoraToken.rtcToken, userUid).then( async (uid) => {
                 setAgoraRtcStatus({
                     type: "INFO",
@@ -157,7 +158,9 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             updateExternalUsers([...cleanedExternalUsers])
         })
         rtcClient.on("user-published", async (remoteUser, mediaType) => {
-            debugger;
+            if (remoteUser.uid === `${userUid}screen`) {
+                return
+            }
             await rtcClient.subscribe(remoteUser, mediaType);
             let externalUsers = [...externalUsersRef.current]
             externalUsers.forEach( user => {
@@ -265,13 +268,9 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             uid: userUid
         }
 
-
         rtmClient.login(rtmCredentials).then(() => {
 
             const channel = rtmClient.createChannel(roomId);
-
-
-
 
             channel.on('ChannelMessage', (message, memberId) => {
                 if (message.messageType === "TEXT") {
@@ -286,9 +285,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
                 dispatch(actions.setRtmChannelObj(channel))
                 console.log('Joined channel');
-                // channel.getMembers().then(result => {
-                //     console.log("-> getMembers result", result);
-                // })
+
                 setRtmChannel(channel);
             }).catch(error => {
                 console.error(error);
@@ -309,7 +306,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                         mode: "live",
                         codec: "vp8",
                     });
-                    //screenShareClient.startProxyServer(3);
+                    screenShareClient.startProxyServer(4);
                     publishScreenShareStream(screenShareClient)
                     setScreenShareRtcClient(screenShareClient);
                 } else {
@@ -331,24 +328,34 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const publishScreenShareStream = (client) => {
         client.join(AGORA_APP_ID, roomId, agoraScreenShareToken.rtcToken, userUid + 'screen').then(async (uid) => {
 
-            const screenLocalTrack = await agoraRTC.createScreenVideoTrack({
-                encoderConfig: screenSharingMode === 'motion' ? "720p_2" : "1080p_1"
-            });
-
-            setAgoraRtcStatus({
-                type: "INFO",
-                msg: "RTC_SCREEN_SHARE_STARTED"
-            })
-            screenLocalTrack.play("Screen", {fit: 'contain'});
-            await client.setClientRole("host")
-            await client.publish(screenLocalTrack);
-
-            screenLocalTrack.on("track-ended", function (evt) {
+            let screenShareVideoResolution = screenSharingMode === 'motion' ? "720p_2" : "1080p_1";
+            try {
+                const [screenVideoTrack, screenAudioTrack] = await agoraRTC.createScreenVideoTrack({
+                    encoderConfig: screenShareVideoResolution
+                }, "enable");
                 setAgoraRtcStatus({
                     type: "INFO",
-                    msg: "RTC_SCREEN_SHARE_STOPPED"
+                    msg: "RTC_SCREEN_SHARE_STARTED"
                 })
-            });
+                screenVideoTrack.play("Screen", {fit: 'contain'});
+                await client.setClientRole("host")
+                await client.publish([screenVideoTrack, screenAudioTrack]);
+    
+                screenVideoTrack.on("track-ended", function (evt) {
+                    setAgoraRtcStatus({
+                        type: "INFO",
+                        msg: "RTC_SCREEN_SHARE_STOPPED"
+                    })
+                });
+            } catch (error) {
+                if (error.code === "PERMISSION_DENIED") {
+                    setAgoraRtcStatus({
+                        type: "INFO",
+                        msg: "RTC_SCREEN_SHARE_STOPPED"
+                    })
+                }
+            }
+                        
         }).catch( error => handleClientJoinChannelError(error));
     }
 

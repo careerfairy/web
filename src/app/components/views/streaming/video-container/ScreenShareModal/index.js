@@ -92,27 +92,23 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare, smallScreen}) =
             {showShareAudioHint ?
                 <React.Fragment>
                         <DialogTitle>
-                            <Typography align="center" variant="h4">
-                                When Sharing a video
-                            </Typography>
+                            When Sharing a video
                         </DialogTitle>
                         <DialogContent>
-                            <DialogContentText color="textPrimary">
-                                <ol className={classes.shareAudioList}>
-                                    <li>
-                                        After clicking "Proceed", please click "Chrome Tabs"
-                                    </li>
-                                    <li>
-                                        Select the tab with the video
-                                    </li>
-                                    <li>
-                                        Make sure the share audio checkbox is checked
-                                    </li>
-                                    <li>
-                                        Click share!
-                                    </li>
-                                </ol>
-                            </DialogContentText>
+                            <ol className={classes.shareAudioList}>
+                                <li>
+                                    After clicking "Proceed", please click "Chrome Tabs"
+                                </li>
+                                <li>
+                                    Select the tab with the video
+                                </li>
+                                <li>
+                                    Make sure the share audio checkbox is checked
+                                </li>
+                                <li>
+                                    Click share!
+                                </li>
+                            </ol>
                             <Grid container spacing={1}>
                                 <Grid item xs={12} sm={12}>
                                     <video
@@ -143,7 +139,7 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare, smallScreen}) =
                 :
                 <React.Fragment>
                         <DialogTitle>
-                            Would you like to share
+                            What would you like to share?
                         </DialogTitle>
                         <DialogContent>
                             <Grid container spacing={1}>
