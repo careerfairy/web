@@ -1593,28 +1593,47 @@ class Firebase {
     };
 
     joinCompanyTalentPool = (companyId, userId, livestreamId) => {
-        let batch = this.firestore.batch();
         let userRef = this.firestore.collection("userData").doc(userId);
         let streamRef = this.firestore.collection("livestreams").doc(livestreamId)
-        batch.update(userRef, {
-            talentPools: firebase.firestore.FieldValue.arrayUnion(companyId),
+        let userInTalentPoolCollectionRef = this.firestore.collection("livestreams")
+            .doc(livestreamId)
+            .collection("talentPool")
+            .doc(userId)
+
+        return this.firestore.runTransaction((transaction) => {
+            return transaction.get(userRef).then((userSnap) => {
+                if (userSnap.exists) {
+                    const userData = userSnap.data()
+                    transaction.update(userRef, {
+                        talentPools: firebase.firestore.FieldValue.arrayUnion(companyId),
+                    });
+                    transaction.update(streamRef, {
+                        talentPool: firebase.firestore.FieldValue.arrayUnion(userId),
+                    });
+                    transaction.set(userInTalentPoolCollectionRef, userData)
+                }
+            });
         });
-        batch.update(streamRef, {
-            talentPool: firebase.firestore.FieldValue.arrayUnion(userId),
-        });
-        return batch.commit()
     };
+
 
     leaveCompanyTalentPool = (companyId, userId, livestreamId) => {
         let batch = this.firestore.batch();
         let userRef = this.firestore.collection("userData").doc(userId);
         let streamRef = this.firestore.collection("livestreams").doc(livestreamId)
+        let userInTalentPoolCollectionRef = this.firestore.collection("livestreams")
+            .doc(livestreamId)
+            .collection("talentPool")
+            .doc(userId)
         batch.update(userRef, {
             talentPools: firebase.firestore.FieldValue.arrayRemove(companyId),
         });
         batch.update(streamRef, {
             talentPool: firebase.firestore.FieldValue.arrayRemove(userId),
         });
+
+        batch.delete(userInTalentPoolCollectionRef)
+
         return batch.commit()
     };
 
