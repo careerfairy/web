@@ -6,14 +6,15 @@ exports.updateUserDataAnalyticsOnWrite = functions.firestore.document('userData/
     .onWrite(async (change, context) => {
         const newValue = change.after.data();
         const previousValue = change.before.data();
+        const oldUniCountryCode = (previousValue && previousValue.universityCountryCode) || null
+        const newUniCountryCode = (newValue && newValue.universityCountryCode) || null
         try {
-            const universityCountryCodeHasChanged = newValue.universityCountryCode !== previousValue.universityCountryCode
+            const universityCountryCodeHasChanged = newUniCountryCode !==  oldUniCountryCode
             if (universityCountryCodeHasChanged) {
                 let newData = {}
+
                 const analyticsUserDataRef = admin.firestore().collection("analytics")
                     .doc("userData")
-                const oldUniCountryCode = previousValue.universityCountryCode || null
-                const newUniCountryCode = newValue.universityCountryCode || null
                 if (oldUniCountryCode) {
                     // Decrement previous university country count in db
                     newData = {
