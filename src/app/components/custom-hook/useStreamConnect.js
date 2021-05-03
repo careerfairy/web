@@ -36,7 +36,7 @@ const useStreamConnect = () => {
         }
         return query
     }, [livestreamId, breakoutRoomId])
-    console.log("-> query", query);
+    // console.log("-> query", query);
 
 
     useFirestoreConnect(query)
@@ -46,7 +46,7 @@ const useStreamConnect = () => {
         id: livestreamId
     }, shallowEqual)
 
-    console.log("-> currentLivestream", currentLivestream);
+    // console.log("-> currentLivestream", currentLivestream);
 
     return currentLivestream
 }

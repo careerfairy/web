@@ -229,7 +229,6 @@ const QuestionCategory = (props) => {
             streamer={streamer}
             goToThisQuestion={goToThisQuestion}
             isNextQuestions={value === 0}
-            livestream={livestream}
             setOpenQuestionId={setOpenQuestionId}
             index={index} sliding={sliding}
             showMenu={showMenu}
@@ -247,7 +246,6 @@ const QuestionCategory = (props) => {
             key={question.id}
             streamer={streamer}
             isNextQuestions={value === 1}
-            livestream={livestream}
             index={index}
             openQuestionId={openQuestionId}
             sliding={sliding}

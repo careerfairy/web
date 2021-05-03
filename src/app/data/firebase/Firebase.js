@@ -868,6 +868,34 @@ class Firebase {
         return ref.add({...comment, timestamp: this.getServerTimestamp()});
     };
 
+    putQuestionCommentWithTransaction = async (livestreamRef, questionId, comment) => {
+        let questionRef = livestreamRef
+            .collection("questions")
+            .doc(questionId);
+        let commentRef = livestreamRef
+            .collection("questions")
+            .doc(questionId)
+            .collection("comments")
+            .doc()
+        const newComment = {...comment, id: commentRef.id, timestamp: this.getServerTimestamp()}
+
+        return this.firestore.runTransaction((transaction) => {
+            return transaction.get(questionRef).then((question) => {
+                if (question.exists) {
+                    const questionData = question.data()
+                    const questionDataToUpdate = {
+                        numberOfComments: firebase.firestore.FieldValue.increment(1),
+                    }
+                    if (!questionData.firstComment) {
+                        questionDataToUpdate.firstComment = newComment
+                    }
+                    transaction.update(questionRef, questionDataToUpdate);
+                    transaction.set(commentRef, newComment)
+                }
+            });
+        });
+    };
+
     putLivestreamQuestion = (livestreamId, question) => {
         question.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
         let ref = this.firestore
