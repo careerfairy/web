@@ -42,7 +42,9 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         type: "INFO",
         msg: "RTM_INITIAL"
     });
-
+console.log("-> token", token);
+console.log("-> roomId", roomId);
+console.log("-> userUid", userUid);
     const agoraToken = useAgoraToken(roomId, userUid, !isViewer, token, false);
     const agoraScreenShareToken = useAgoraToken(roomId, userUid, !isViewer, token, true);
 

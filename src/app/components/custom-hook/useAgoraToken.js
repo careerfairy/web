@@ -17,8 +17,9 @@ export function useAgoraToken(roomId, uid, isStreamer, securityToken, isScreenSh
                     token: securityToken,
                     channel: roomId
                 },
-                url: `https://us-central1-careerfairy-e1fd9.cloudfunctions.net/generateAgoraTokenSecure`,
-            }).then( response => { 
+                url: `http://localhost:5001/careerfairy-e1fd9/us-central1/generateAgoraTokenSecure`,
+                // url: `https://us-central1-careerfairy-e1fd9.cloudfunctions.net/generateAgoraTokenSecure`,
+            }).then( response => {
                     console.log(response);
                     if (response.data) {
                         setAgoraToken(response.data);

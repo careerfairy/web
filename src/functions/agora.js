@@ -82,8 +82,9 @@ exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) =>
 
     // Build token with uid
     if (rtcRole === RtcRole.PUBLISHER) {
-        let livestreamDoc = await admin.firestore().collection('livestreams').doc(channelName).get();
+        let livestreamDoc = await admin.firestore().collection('/livestreams/FekQ2hHMxI2O8LMB54Lx/breakoutRooms').doc(channelName).get();
         let livestream = livestreamDoc.data();
+        console.log("-> livestream", livestream);
 
         if (!livestream.test) {
             let storedTokenDoc = await admin.firestore().collection('livestreams').doc(channelName).collection('tokens').doc('secureToken').get();

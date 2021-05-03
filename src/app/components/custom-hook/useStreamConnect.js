@@ -43,7 +43,7 @@ const useStreamConnect = () => {
 
     const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
         ...populate(firestore, "currentLivestream", populates),
-        id: livestreamId
+        id: breakoutRoomId || livestreamId
     }, shallowEqual)
 
     // console.log("-> currentLivestream", currentLivestream);
