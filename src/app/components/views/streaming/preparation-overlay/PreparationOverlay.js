@@ -96,7 +96,11 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady}) {
 
     const classes = useStyles();
     const {updateSpeaker, addSpeaker} = usePreparationOverlay()
-    const [speaker, setSpeaker] = useState({});
+    const [speaker, setSpeaker] = useState({
+        firstName: "",
+        lastName: "",
+        position: ""
+    });
     const [showLinkedIn, setShowLinkedIn] = useState(false);
     const [linkedInUrl, setLinkedInUrl] = useState("");
     const [formErrors, setFormErrors] = useState({});
@@ -185,7 +189,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady}) {
                                            helperText={formErrors.firstName && "Required"} id="outlined-basic"
                                            label="First Name" variant="outlined"
                                            name="firstName"
-                                           value={speaker.firstName}
+                                           value={speaker.firstName || ""}
                                            onChange={(event) => setSpeaker({
                                                ...speaker,
                                                firstName: event.target.value
@@ -196,7 +200,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady}) {
                                            helperText={formErrors.lastName && "Required"} id="outlined-basic"
                                            label="Last Name" variant="outlined"
                                            name="lastName"
-                                           value={speaker.lastName}
+                                           value={speaker.lastName || ""}
                                            onChange={(event) => setSpeaker({
                                                ...speaker,
                                                lastName: event.target.value
@@ -207,7 +211,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady}) {
                                            helperText={formErrors.position && "Required"} id="outlined-basic"
                                            label="Occupation" placeholder="Lead Engineer"
                                            name="jobTitle"
-                                           value={speaker.position} variant="outlined"
+                                           value={speaker.position || ""} variant="outlined"
                                            onChange={(event) => setSpeaker({
                                                ...speaker,
                                                position: event.target.value
@@ -233,7 +237,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady}) {
                                     label="LinkedIn Profile URL"
                                     name="linkedInUrl"
                                     placeholder="https://linkedin.com/in/your-profile"
-                                    value={linkedInUrl}
+                                    value={linkedInUrl || ""}
                                     helperText={formErrors.linkedInUrl && "Please enter a valid URL"}
                                     error={formErrors.linkedInUrl && !isValidUrl(linkedInUrl)}
                                     onChange={(event) => setLinkedInUrl(event.target.value)}

@@ -1407,11 +1407,16 @@ class Firebase {
             .collection("voters")
         return pollVotersRef.onSnapshot(callback);
     }
+    listenToPollVotersWithStreamRef = (streamRef, pollId, callback) => {
+        const pollVotersRef = streamRef
+            .collection("polls")
+            .doc(pollId)
+            .collection("voters")
+        return pollVotersRef.onSnapshot(callback);
+    }
 
-    listenToVoteOnPoll = (livestreamId, pollId, authEmail, callback) => {
-        const pollVotersRef = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    listenToVoteOnPoll = (streamRef, pollId, authEmail, callback) => {
+        const pollVotersRef = streamRef
             .collection("polls")
             .doc(pollId)
             .collection("voters")
@@ -1464,10 +1469,8 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    voteForPollOption = (livestreamId, pollId, userEmail, optionId) => {
-        let pollRef = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    voteForPollOption = (streamRef, pollId, userEmail, optionId) => {
+        let pollRef = streamRef
             .collection("polls")
             .doc(pollId)
             .collection("voters")
@@ -1531,10 +1534,8 @@ class Firebase {
         });
     };
 
-    listenToPolls = (livestreamId, callback) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
+    listenToPolls = (streamRef, callback) => {
+        let ref = streamRef
             .collection("polls");
         return ref.onSnapshot(callback);
     };

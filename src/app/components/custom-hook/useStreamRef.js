@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {useFirebase} from "context/firebase";
 import {useRouter} from "next/router";
 
@@ -15,7 +15,7 @@ import {useRouter} from "next/router";
 const useStreamRef = () => {
     const router = useRouter()
     const {getStreamRef} = useFirebase()
-    return getStreamRef(router)
+    return useMemo(() => getStreamRef(router), [router])
 };
 
 export default useStreamRef;

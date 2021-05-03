@@ -14,6 +14,7 @@ import {getRandomInt, getRandomWeightedInt, isServer} from "../../../../helperFu
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 import {v4 as uuidv4} from 'uuid'
 import Zoom from 'react-reveal/Zoom';
+import useStreamRef from "../../../../custom-hook/useStreamRef";
 
 
 const usePollWrapperStyles = makeStyles(theme => ({
@@ -41,7 +42,7 @@ const PollWrapper = ({children, ...rest}) => {
 }
 
 PollWrapper.propTypes = {
-    children: PropTypes.node.isRequired,
+    children: PropTypes.node,
     style: PropTypes.object
 }
 
@@ -93,7 +94,7 @@ PollOptionsDisplay.propTypes = {
 }
 
 const PollDisplay = ({currentPoll}) => {
-
+console.log("-> PollDisplay",);
     return (
         <CategoryContainerCentered>
             <PollWrapper>
@@ -118,6 +119,7 @@ const NoPollDisplay = () => {
 }
 const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => {
     const {authenticatedUser} = useAuth();
+    const streamRef = useStreamRef();
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentPollId, setCurrentPollId] = useState(null);
     const [voting, setVoting] = useState(false);
@@ -126,8 +128,8 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
     let authEmail = (authenticatedUser && authenticatedUser.email && !livestream.test) ? authenticatedUser.email : 'streamerEmail';
 
     useEffect(() => {
-        if (livestream) {
-            firebase.listenToPolls(livestream.id, querySnapshot => {
+        if (streamRef) {
+            firebase.listenToPolls(streamRef, querySnapshot => {
                 let pollSwitch = null;
                 querySnapshot.forEach(doc => {
                     let poll = doc.data();
@@ -140,7 +142,7 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
                 return setCurrentPoll(pollSwitch);
             });
         }
-    }, [livestream]);
+    }, [streamRef]);
 
     useEffect(() => {
         if (currentPoll && currentPoll.id !== currentPollId) {
@@ -152,7 +154,7 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
 
     useEffect(() => {
         if (currentPoll?.id) {
-            const unsubscribe = firebase.listenToVoteOnPoll(livestream.id, currentPoll.id, authEmail, querySnapshot => {
+            const unsubscribe = firebase.listenToVoteOnPoll(streamRef, currentPoll.id, authEmail, querySnapshot => {
                 setHasVoted(querySnapshot.exists)
             })
             return () => unsubscribe()
@@ -199,7 +201,7 @@ const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => 
         let authEmail = livestream.test ? 'streamerEmail' : authenticatedUser.email;
         if (authEmail) {
             setVoting(true)
-            await firebase.voteForPollOption(livestream.id, currentPoll.id, authEmail, optionId);
+            await firebase.voteForPollOption(streamRef, currentPoll.id, authEmail, optionId);
             setVoting(false)
         }
     }
