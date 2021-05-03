@@ -13,6 +13,7 @@ import {useCurrentStream} from "../../../context/stream/StreamContext";
 import PeopleIcon from "@material-ui/icons/People";
 import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
 import NewFeatureHint from "../../../components/util/NewFeatureHint";
+import useJoinTalentPool from "../../../components/custom-hook/useJoinTalentPool";
 
 const useStyles = makeStyles(theme => ({
     joinButton: {
@@ -46,32 +47,9 @@ const useStyles = makeStyles(theme => ({
 const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu}) => {
 
     const classes = useStyles()
-    const {authenticatedUser, userData} = useAuth();
     const {toggleTheme, themeMode} = useThemeToggle()
-    const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const {currentLivestream} = useCurrentStream()
-
-    useEffect(() => {
-        if (userData?.talentPools && currentLivestream && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
-            setUserIsInTalentPool(true);
-        } else {
-            setUserIsInTalentPool(false);
-        }
-    }, [currentLivestream, userData]);
-
-    function joinTalentPool() {
-        if (!authenticatedUser) {
-            return router.replace('/signup');
-        }
-        firebase.joinCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email, currentLivestream.id);
-    }
-
-    function leaveTalentPool() {
-        if (!authenticatedUser) {
-            return router.replace('/signup');
-        }
-        firebase.leaveCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email, currentLivestream.id);
-    }
+    const {userIsInTalentPool, handlers:{joinTalentPool,leaveTalentPool}} = useJoinTalentPool()
 
 
     if (mobile && !showMenu) {

@@ -1634,6 +1634,17 @@ class Firebase {
         });
     };
 
+    getLivestreamCompanyId = async (livestreamId) => {
+        const livestreamRef = this.firestore.collection("livestreams")
+            .doc(livestreamId)
+        const streamSnap = await livestreamRef.get()
+        if (!streamSnap.exists) {
+            return ""
+        }
+        const streamData = streamSnap.data()
+        return streamData.companyId
+
+    }
 
     leaveCompanyTalentPool = (companyId, userId, livestreamId) => {
         let batch = this.firestore.batch();
@@ -1654,6 +1665,14 @@ class Firebase {
 
         return batch.commit()
     };
+
+    listenToUserInTalentPool = (livestreamId, userId, callback) => {
+        const userTalentPoolRef = this.firestore.collection("livestreams")
+            .doc(livestreamId)
+            .collection("talentPool")
+            .doc(userId)
+        return userTalentPoolRef.onSnapshot(callback)
+    }
 
     setUserIsParticipating = (livestreamId, userData) => {
         let batch = this.firestore.batch()
