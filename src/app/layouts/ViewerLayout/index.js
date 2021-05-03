@@ -126,6 +126,7 @@ const ViewerLayout = (props) => {
         }
         setSelectedState(state);
     }, [showMenu])
+
     const showAudience = useCallback(() => {
         setAudienceDrawerOpen(true)
     }, []);
