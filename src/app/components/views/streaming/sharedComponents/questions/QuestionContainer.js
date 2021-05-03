@@ -5,13 +5,25 @@ import Linkify from 'react-linkify';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
 import {withFirebase} from 'context/firebase';
-import {Box, Button, Card, Collapse, Grow, Paper, Slide, TextField, Typography} from "@material-ui/core";
+import {
+    Box,
+    Button,
+    Card,
+    CircularProgress, ClickAwayListener,
+    Collapse,
+    Grow,
+    Paper,
+    Slide,
+    TextField,
+    Typography
+} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {PlayIconButton} from "materialUI/GlobalButtons/GlobalButtons";
 import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "materialUI/GlobalTooltips";
 import TutorialContext from "context/tutorials/TutorialContext";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
+import {compose} from "redux"
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
@@ -77,12 +89,17 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
-    const classes = useStyles()
-    return (
-        <div className={classes.reactionsToggle} onClick={() => setShowAllReactions(!showAllReactions)}>
-            {showAllReactions ? <ExpandLessRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/> :
-                <ExpandMoreRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/>}
+const ReactionsToggle = ({handleToggle, showAllReactions, loading, active}) => {
+    const classes = useStyles({active})
+
+    return loading ? (
+        <CircularProgress/>
+    ) : (
+        <div className={classes.reactionsToggle} onClick={handleToggle}>
+            {showAllReactions ? (
+                <ExpandLessRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/>
+            ) : (
+                <ExpandMoreRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/>)}
             <Typography className={classes.showText}>{showAllReactions ? 'Hide' : 'Show all reactions'}</Typography>
         </div>
     )
@@ -100,39 +117,47 @@ const QuestionContainer = memo(({
                                     isNextQuestions,
                                     selectedState,
                                     goToThisQuestion,
+                                    setOpenQuestionId,
+                                    openQuestionId,
                                     showMenu
                                 }) => {
     const streamRef = useStreamRef()
+
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
     const {authenticatedUser, userData} = useAuth();
     const {tutorialSteps, handleConfirmStep} = useContext(TutorialContext);
+    const [loading, setLoading] = useState(false);
     const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream?.test)
     const active = question?.type === 'current'
     const old = question?.type !== 'new'
     const upvoted = (!user && !livestream?.test) || (question?.emailOfVoters ? question?.emailOfVoters.indexOf(livestream?.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
     const classes = useStyles({active})
 
-
     useEffect(() => {
-        if (livestream.id && question.id) {
+        if (livestream.id && question.id && showAllReactions) {
+            setLoading(true)
             const unsubscribe = firebase.listenToQuestionComments(streamRef, question.id, querySnapshot => {
-                var commentsList = [];
-                querySnapshot.forEach(doc => {
-                    let comment = doc.data();
-                    comment.id = doc.id;
-                    commentsList.push(comment);
-                });
-                setComments(commentsList);
+                setComments(querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()})));
+                setLoading(false)
             });
             return () => unsubscribe();
         }
-    }, [livestream.id, question.id]);
+    }, [livestream.id, question.id, showAllReactions]);
+
+    useEffect(() => {
+        if (livestream.id && question.id && !showAllReactions) {
+            if (question.firstComment) {
+                setComments([question.firstComment])
+            }
+        }
+    }, [question.firstComment, showAllReactions]);
+
 
     useEffect(() => {
         if (active && !showAllReactions) {
-            setShowAllReactions(true)
+            makeGloballyActive()
         }
     }, [active, question.type])
 
@@ -153,7 +178,7 @@ const QuestionContainer = memo(({
         firebase.putQuestionComment(streamRef, question.id, newComment)
             .then(() => {
                 setNewCommentTitle("");
-                setShowAllReactions(true);
+                makeGloballyActive()
             }, error => {
                 console.log("Error: " + error);
             })
@@ -188,11 +213,28 @@ const QuestionContainer = memo(({
         </a>
     );
 
+    const makeGloballyActive = () => {
+        setOpenQuestionId(question.id)
+        setShowAllReactions(true)
+    }
+    const clearGloballyActive = () => {
+        setOpenQuestionId("")
+        setShowAllReactions(false)
+    }
+
+    const handleToggle = () => {
+        if (showAllReactions) {
+            clearGloballyActive()
+        } else {
+            makeGloballyActive()
+        }
+    }
 
     let commentsElements = comments.map(comment => {
         return (
             <Slide key={comment.id} in direction="right">
-                <Box className={classes.questionComment} borderRadius={8} mb={1} p={1} component={Card}>
+                <Box key={comment.id} className={classes.questionComment} borderRadius={8} mb={1} p={1}
+                     component={Card}>
                     <div style={{wordBreak: "break-word"}}>
                         <Linkify componentDecorator={componentDecorator}>
                             <span>
@@ -246,15 +288,21 @@ const QuestionContainer = memo(({
                             color: active ? "white" : "rgb(200,200,200)",
                             marginBottom: "1rem"
                         }}>
-                            {comments.length} reaction{comments.length !== 1 && <span>s</span>}
+                            {question.numberOfComments || 0} reaction{question.numberOfComments !== 1 &&
+                        <span>s</span>}
                         </Typography>
                         {commentsElements[0]}
-                        <Collapse style={{width: "100%"}} in={showAllReactions}>
+                        <Collapse style={{width: "100%"}}
+                                  in={showAllReactions && !loading && question.id === openQuestionId}>
                             {commentsElements.slice(1)}
                         </Collapse>
-                        {comments.length > 1 && <ReactionsToggle
-                            setShowAllReactions={setShowAllReactions}
-                            showAllReactions={showAllReactions}/>}
+                        {question.numberOfComments > 1 &&
+                        <ReactionsToggle
+                            handleToggle={handleToggle}
+                            active={active}
+                            showAllReactions={showAllReactions}
+                            loading={loading}
+                        />}
                     </div>
                     <WhiteTooltip
                         placement="right-start"
@@ -364,8 +412,12 @@ QuestionContainer.propTypes = {
     showMenu: PropTypes.bool,
     sliding: PropTypes.bool,
     streamer: PropTypes.bool,
-    user: PropTypes.object
+    user: PropTypes.object,
+    setOpenQuestionId: PropTypes.func.isRequired,
+    openQuestionId: PropTypes.string
 }
 
-export default withFirebase(QuestionContainer);
+export default compose(
+    withFirebase,
+)(QuestionContainer)
 

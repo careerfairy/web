@@ -861,12 +861,11 @@ class Firebase {
     }
 
     putQuestionComment = (streamRef, questionId, comment) => {
-        comment.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
         let ref = streamRef
             .collection("questions")
             .doc(questionId)
             .collection("comments");
-        return ref.add(comment);
+        return ref.add({...comment, timestamp: this.getServerTimestamp()});
     };
 
     putLivestreamQuestion = (livestreamId, question) => {
@@ -1172,6 +1171,12 @@ class Firebase {
         }
         return totalUsers
     };
+
+    getFollowingGroups = async (groupIds = []) => {
+        const uniqueGroupIds = [...new Set(groupIds)]
+        const groupSnaps = await Promise.all(uniqueGroupIds.map(groupId => this.firestore.collection("careerCenterData").doc(groupId).get()))
+        return groupSnaps.filter(doc => doc.exists).map(doc => ({id: doc.id, ...doc.data()}))
+    }
 
 
     listenCareerCentersByAdminEmail = (email, callback) => {
