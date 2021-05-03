@@ -37,22 +37,22 @@ export default function useMediaSources(devices, streamId, localStream, showSoun
     },[devices, localStream]);
 
     const initalizeAudioAndVideoSources = (audioDeviceId, videoDeviceId) => {
-        localStream.switchDevice("audio", audioDeviceId, () => {
+        localStream.audioTrack.setDevice(audioDeviceId).then(() => {
             setAudioSource(audioDeviceId);
-            localStream.switchDevice("video", videoDeviceId, () => {
+            localStream.videoTrack.setDevice(videoDeviceId).then(() => {
                 setVideoSource(videoDeviceId);
             })
         })
     }
 
     function updateAudioSource(deviceId) {
-        localStream.switchDevice("audio", deviceId, () => {
+        localStream.audioTrack.setDevice(deviceId).then(() => {
             setAudioSource(deviceId);
         })
     }
 
     function updateVideoSource(deviceId) {
-        localStream.switchDevice("video", deviceId, () => {
+        localStream.videoTrack.setDevice(deviceId).then(() => {
             setVideoSource(deviceId);
         })
     }

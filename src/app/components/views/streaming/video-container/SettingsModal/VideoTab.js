@@ -26,7 +26,7 @@ const useStyles = makeStyles(theme => ({
 
 }))
 
-const VideoTab = ({videoSource, devices, setVideoSource, playSound, handleMarkComplete, handleMarkIncomplete, displayableMediaStream, isCompleted}) => {
+const VideoTab = ({videoSource, devices, setVideoSource, displayableMediaStream }) => {
     const classes = useStyles()
 
     const testVideoRef = useRef(null);

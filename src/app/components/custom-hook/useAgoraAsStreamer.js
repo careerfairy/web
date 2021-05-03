@@ -100,7 +100,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
         if (!isViewer) {
             rtcClient.setClientRole("host")
-            rtcClient.setPr
             rtcClient.join( AGORA_APP_ID, roomId, agoraToken.rtcToken, userUid).then( async (uid) => {
                 setAgoraRtcStatus({
                     type: "INFO",
@@ -129,8 +128,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                     await rtcClient.enableDualStream();
                     rtcClient.enableAudioVolumeIndicator()
                     setAgoraRtcStatus({
-                        type: "WARN",
-                        msg: "RTC_DUAL_STREAM_INACTIVE"
+                        type: "INFO",
+                        msg: "RTC_STREAM_PUBLISHED"
                     })
                     setLocalMediaStream({
                         streamId: userUid,
@@ -190,31 +189,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             });
             updateExternalUsers(externalUsers)
         });
-
-        let localStream = null;
-        rtcClient.on("client-role-changed", function (evt) {
-            let role = evt.role;
-            if (role === 'host') {
-                localStream = AgoraRTC.createStream({
-                    audio: true,
-                    video: true
-                });
-                localStream.setVideoProfile("480p_9");
-                localStream.init(() => {
-                    localStream.play(videoId);
-                    rtcClient.publish(localStream, handleError);
-                    setLocalMediaStream(localStream);
-                }, handleStreamInitializationError);
-            }
-            if (role === 'audience') {
-                if (localStream) {
-                    rtcClient.unpublish(localStream, handleError);
-                    localStream.close();
-                    setLocalMediaStream(null);
-                }
-            }
-        });
-
 
         rtcClient.on("network-quality", function (networkStats) {
             // NETWORK QUALITY
@@ -367,7 +341,45 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         if (isViewer && agoraRTC && rtcClient) {
             if (!isPlayMode) {
                 await rtcClient.setClientRole("host");
+                setAgoraRtcStatus({
+                    type: "INFO",
+                    msg: "RTC_JOINED_CHANNEL"
+                })
+    
+                const localAudio = await agoraRTC.createMicrophoneAudioTrack();
+                const localVideo = await agoraRTC.createCameraVideoTrack({
+                    encoderConfig: "480p_9",
+                  });
+    
+                setAgoraRtcStatus({
+                    type: "INFO",
+                    msg: "RTC_REQUEST_MEDIA_ACCESS"
+                })
+    
+                try {
+                    setAgoraRtcStatus({
+                        type: "INFO",
+                        msg: "RTC_PUBLISH_STREAM"
+                    })
+        
+                    localVideo.play(videoId);
+                    await rtcClient.publish([localAudio, localVideo]);
+                    await rtcClient.enableDualStream();
+                    setAgoraRtcStatus({
+                        type: "INFO",
+                        msg: "RTC_STREAM_PUBLISHED"
+                    })
+                    setLocalMediaStream({
+                        streamId: userUid,
+                        videoTrack: localVideo,
+                        audioTrack: localAudio
+                    });
+                } catch (error) {
+                    handleStreamPublishingError(error)
+                }
             } else {
+                await rtcClient.disableDualStream();
+                await rtcClient.unpublish([localMediaStream.audioTrack, localMediaStream.videoTrack]);
                 await rtcClient.setClientRole("audience");
             }
         }
