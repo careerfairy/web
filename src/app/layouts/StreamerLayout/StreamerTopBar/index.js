@@ -31,7 +31,6 @@ import {maybePluralize} from "../../../components/helperFunctions/HelperFunction
 import NewFeatureHint from "../../../components/util/NewFeatureHint";
 import useStreamToken from "../../../components/custom-hook/useStreamToken";
 import useStreamRef from "../../../components/custom-hook/useStreamRef";
-import * as PropTypes from "prop-types";
 import {BreakoutRoomManagementModal} from "./BreakoutRoomManagementModal";
 
 const useStyles = makeStyles(theme => ({

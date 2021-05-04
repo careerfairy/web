@@ -1,9 +1,11 @@
-import React, {useMemo, useState} from 'react'
-import PropTypes from 'prop-types'
+import {useDispatch} from "react-redux";
+import {useRouter} from "next/router";
+import React, {useState} from "react";
+import {useFirebase} from "context/firebase";
+import * as actions from "store/actions";
+
 import {
     Button,
-    CircularProgress,
-    Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
@@ -18,20 +20,13 @@ import {
     Select,
     Typography
 } from "@material-ui/core";
-import {useFirebase} from "../../../context/firebase";
-import {useCurrentStream} from "../../../context/stream/StreamContext";
-import {useRouter} from "next/router";
-import {isEmpty, isLoaded, useFirestoreConnect} from "react-redux-firebase";
-import {useDispatch, useSelector} from "react-redux";
-import {streamType} from "../../../types";
 import Box from "@material-ui/core/Box";
 import List from "@material-ui/core/List";
-import * as actions from '../../../store/actions'
-import {DynamicColorButton} from "../../../materialUI/GlobalButtons/GlobalButtons";
+import {DynamicColorButton} from "materialUI/GlobalButtons/GlobalButtons";
 
 const MAX_ROOMS = 10
 const options = Array.from({length: MAX_ROOMS}, (_, i) => i + 1)
-const CreateBreakoutRoomsView = ({handleClose}) => {
+ const CreateBreakoutRoomsView = ({handleClose}) => {
     const dispatch = useDispatch()
     const {query: {livestreamId}} = useRouter()
     const [numberOfRooms, setNumberOfRooms] = useState(1);
@@ -149,80 +144,4 @@ const CreateBreakoutRoomsView = ({handleClose}) => {
     )
 }
 
-const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
-
-
-    return (
-        <React.Fragment>
-            <DialogTitle>
-                Manage Breakout Rooms - {breakoutRooms.length}
-            </DialogTitle>
-            <DialogContent dividers>
-
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleClose}>
-                    Cancel
-                </Button>
-            </DialogActions>
-        </React.Fragment>
-    )
-}
-
-ManageBreakoutRoomsView.propTypes = {
-    breakoutRooms: PropTypes.arrayOf(streamType).isRequired
-}
-
-const Content = ({handleClose}) => {
-
-    const {query: {livestreamId}} = useRouter()
-    const {} = useFirebase()
-    const {isMainStreamer} = useCurrentStream()
-
-    const query = useMemo(() => livestreamId ? [{
-        collection: "livestreams",
-        doc: livestreamId,
-        subcollections: [{
-            collection: "breakoutRooms",
-        }],
-        storeAs: `breakoutRooms of ${livestreamId}`,
-    }] : [], [livestreamId]);
-
-    useFirestoreConnect(query)
-
-    const breakoutRooms = useSelector(state => state.firestore.ordered[`breakoutRooms of ${livestreamId}`])
-
-    if (!isLoaded(breakoutRooms)) {
-        return (
-            <React.Fragment>
-                <DialogContent style={{minHeight: "40vh", display: "grid", placeItems: "center"}}>
-                    <CircularProgress/>
-                </DialogContent>
-            </React.Fragment>
-        )
-    }
-
-    if (isEmpty(breakoutRooms)) {
-        return <CreateBreakoutRoomsView handleClose={handleClose}/>
-    }
-
-    return <ManageBreakoutRoomsView handleClose={handleClose} breakoutRooms={breakoutRooms}/>
-}
-export const BreakoutRoomManagementModal = ({open, onClose}) => {
-
-    const handleClose = () => {
-        onClose()
-    }
-
-    return (
-        <Dialog maxWidth="md" fullWidth open={open} onClose={handleClose}>
-            <Content handleClose={handleClose}/>
-        </Dialog>
-    )
-};
-
-BreakoutRoomManagementModal.propTypes = {
-    onClose: PropTypes.func,
-    open: PropTypes.bool
-}
-
+export default CreateBreakoutRoomsView
