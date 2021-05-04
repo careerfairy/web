@@ -57,6 +57,13 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     }, [streamId])
 
     useEffect(() => {
+        return ()=> {
+            dispatch(actions.removeRtmClient())
+        }
+    }, []);
+
+
+    useEffect(() => {
         if (addedStream) {
             let cleanedExternalMediaStreams = removeStreamFromList(addedStream.streamId, externalMediaStreams)
             setExternalMediaStreams([...cleanedExternalMediaStreams, addedStream]);
@@ -390,7 +397,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
             const channel = rtmClient.createChannel(roomId);
 
-
+            dispatch(actions.setRtmClientObj(rtmClient))
 
 
             channel.on('ChannelMessage', (message, memberId) => {
@@ -401,6 +408,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                     }
                 }
             });
+
 
             channel.join().then(() => {
 

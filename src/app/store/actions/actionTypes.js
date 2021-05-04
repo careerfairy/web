@@ -25,8 +25,13 @@ export const ADD_TODO_START = 'ADD_TODO_START';
 export const ADD_TODO_SUCCESS = 'ADD_TODO_SUCCESS';
 export const ADD_TODO_FAIL = 'ADD_TODO_FAIL';
 
+// RTM channel Actions
 export const SET_RTM_CHANNEL = 'SET_RTM_CHANNEL';
 export const REMOVE_RTM_CHANNEL = 'REMOVE_RTM_CHANNEL';
+
+// RTM client Actions
+export const SET_RTM_CLIENT = 'SET_RTM_CLIENT';
+export const REMOVE_RTM_CLIENT = 'REMOVE_RTM_CLIENT';
 
 
 export const ADD_EMOTE = "ADD_EMOTE"

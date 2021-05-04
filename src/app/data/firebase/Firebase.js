@@ -2111,14 +2111,16 @@ class Firebase {
 
     // Breakout Rooms
 
-    buildBreakoutRoom = (breakoutRoomId, test, title, companyLogo) => {
+    buildBreakoutRoom = (breakoutRoomId, test, title, companyLogo, index) => {
         return {
             start: this.getServerTimestamp(),
+            open: false,
             id: breakoutRoomId,
             hasStarted: false,
             test,
             companyLogo,
-            title
+            title,
+            index
         }
     }
 
@@ -2131,7 +2133,7 @@ class Firebase {
                 const companyLogo = livestreamData.companyLogoUrl || ""
                 for (let i = 1; i <= numberOfRooms; i++) {
                     const breakoutRoomRef = livestreamRef.collection("breakoutRooms").doc()
-                    const newBreakoutRoom = this.buildBreakoutRoom(breakoutRoomRef.id, isTestStream, `Breakout Room ${i}`, companyLogo)
+                    const newBreakoutRoom = this.buildBreakoutRoom(breakoutRoomRef.id, isTestStream, `Breakout Room ${i}`, companyLogo, i)
                     transaction.set(breakoutRoomRef, newBreakoutRoom)
                 }
             });
