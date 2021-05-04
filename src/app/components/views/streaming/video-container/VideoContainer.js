@@ -201,7 +201,7 @@ function VideoContainer(props) {
 
 
     const setLivestreamCurrentSpeakerId = (id) => {
-        props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);
+        props.firebase.setLivestreamCurrentSpeakerId(streamRef, id);
     }
 
     const reloadPage = () => {

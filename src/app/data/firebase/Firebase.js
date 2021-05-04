@@ -41,6 +41,30 @@ class Firebase {
         return await getGroupsAndTheirFollowers({requestingGroup, groups, streams, currentUserDataSet})
     }
 
+    /**
+     * Returns a promise containing the agora token object
+     * @promise AgoraTokenPromise
+     * @fulfill {({rtcToken: string, rtmToken: string})} A project object with the format {name: String, data: Object}
+     * @reject {Error}
+     * @returns fPromise
+     */
+
+    /**
+     * Call an on call cloud function to generate a secure agora token.
+     * @param {({
+     * isStreamer: string,
+     * uid: string,
+     * sentToken: string,
+     * channel: string,
+     * streamDocumentPath: string,
+     * })} data
+     * @return {Promise<firebase.functions.HttpsCallableResult>}
+     */
+    getSecureAgoraToken = async (data ) => {
+        const getSecureAgoraToken = this.functions.httpsCallable("generateAgoraTokenSecureOnCall")
+        return await getSecureAgoraToken(data)
+    }
+
     createUserInAuthAndFirebase = async (userData) => {
         const createUserInAuthAndFirebase = this.functions.httpsCallable("createNewUserAccount")
         return createUserInAuthAndFirebase({userData})
@@ -597,9 +621,8 @@ class Firebase {
         });
     };
 
-    setLivestreamCurrentSpeakerId = (livestreamId, id) => {
-        let ref = this.firestore.collection("livestreams").doc(livestreamId);
-        return ref.update({
+    setLivestreamCurrentSpeakerId = (streamRef, id) => {
+        return streamRef.update({
             currentSpeakerId: id,
         });
     };

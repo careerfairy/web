@@ -78,7 +78,6 @@ const StreamerLayout = (props) => {
     const [notificationToRemove, setNotificationToRemove] = useState(null);
     const [notifications, setNotifications] = useState([]);
     const [streamerId, setStreamerId] = useState(null);
-    console.log("-> streamerId", streamerId);
 
     const [streamerReady, setStreamerReady] = useState(false);
     const [tokenChecked, setTokenChecked] = useState(false);

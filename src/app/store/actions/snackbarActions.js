@@ -35,3 +35,19 @@ export const sendGeneralError = (error = "") => async (dispatch) => {
     }))
 }
 
+/**
+ * Call an on call cloud function to generate a secure agora token.
+ * @param {{options: {anchorOrigin: {horizontal: string, vertical: string}, key: string}, message: string}} data
+ */
+export const sendCustomError = (data = {}) => async (dispatch) => {
+    console.error("error", data.message)
+    dispatch(enqueueSnackbar({
+        message: data.message,
+        options: {
+            variant: "error",
+            preventDuplicate: true,
+            ...data.options,
+        }
+    }))
+}
+
