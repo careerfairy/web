@@ -2,7 +2,6 @@ import React, {useMemo, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
     Button,
-    Checkbox,
     CircularProgress,
     Dialog,
     DialogActions,
@@ -11,12 +10,10 @@ import {
     DialogTitle,
     Divider,
     FormControl,
-    InputLabel,
     ListItem,
     ListItemIcon,
     ListItemText,
     MenuItem,
-    OutlinedInput,
     Radio,
     Select,
     Typography
@@ -25,16 +22,22 @@ import {useFirebase} from "../../../context/firebase";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import {useRouter} from "next/router";
 import {isEmpty, isLoaded, useFirestoreConnect} from "react-redux-firebase";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {streamType} from "../../../types";
 import Box from "@material-ui/core/Box";
 import List from "@material-ui/core/List";
+import * as actions from '../../../store/actions'
+import {DynamicColorButton} from "../../../materialUI/GlobalButtons/GlobalButtons";
 
 const MAX_ROOMS = 10
 const options = Array.from({length: MAX_ROOMS}, (_, i) => i + 1)
 const CreateBreakoutRoomsView = ({handleClose}) => {
+    const dispatch = useDispatch()
+    const {query: {livestreamId}} = useRouter()
     const [numberOfRooms, setNumberOfRooms] = useState(1);
     const [assignType, setAssignType] = useState("manually");
+    const [loading, setLoading] = useState(false);
+    const {createMultipleBreakoutRooms} = useFirebase()
 
     const handleChangeNumberOfRooms = (event) => {
         setNumberOfRooms(event.target.value)
@@ -43,8 +46,14 @@ const CreateBreakoutRoomsView = ({handleClose}) => {
         setAssignType(value);
     };
 
-    const handleCreateRooms = () => {
-
+    const handleCreateRooms = async () => {
+        try {
+            setLoading(true)
+            await createMultipleBreakoutRooms(livestreamId, numberOfRooms)
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
+        setLoading(false)
     }
 
     const assignOptions = [
@@ -69,67 +78,72 @@ const CreateBreakoutRoomsView = ({handleClose}) => {
             </DialogTitle>
             <DialogContent dividers>
                 <Box p={1}>
-                <Typography variant="h6">
-                    Rooms
-                </Typography>
-                <Box display="flex" justifyContent="space-between">
-                    <DialogContentText>
-                        How many breakout rooms do you need?
-                    </DialogContentText>
-                    <FormControl>
-                        <Select
-                            labelId="number-of-rooms-select"
-                            id="number-of-rooms-select"
-                            value={numberOfRooms}
-                            onChange={handleChangeNumberOfRooms}
-                            // input={<OutlinedInput label="Age"/>}
-                        >
-                            {options.map(value =>
-                                <MenuItem key={value} value={value}>
-                                    {value}
-                                </MenuItem>)}
-                        </Select>
-                    </FormControl>
-                </Box>
+                    <Typography variant="h6">
+                        Rooms
+                    </Typography>
+                    <Box display="flex" justifyContent="space-between">
+                        <DialogContentText>
+                            How many breakout rooms do you need?
+                        </DialogContentText>
+                        <FormControl>
+                            <Select
+                                labelId="number-of-rooms-select"
+                                id="number-of-rooms-select"
+                                value={numberOfRooms}
+                                onChange={handleChangeNumberOfRooms}
+                                // input={<OutlinedInput label="Age"/>}
+                            >
+                                {options.map(value =>
+                                    <MenuItem key={value} value={value}>
+                                        {value}
+                                    </MenuItem>)}
+                            </Select>
+                        </FormControl>
+                    </Box>
                 </Box>
                 <Divider/>
                 <Box p={1}>
-                <Typography variant="h6">
-                    Participants
-                </Typography>
-                <DialogContentText>
-                    How do you want to assign people to rooms?
-                </DialogContentText>
-                <List>
-                    {assignOptions.map(({value,secondaryText, primaryText,onClick}) => (
-                        <ListItem key={value}
-                                  onClick={onClick}
-                                  selected={assignType === value}
-                                  button>
-                            <ListItemText
-                                primary={primaryText}
-                                secondary={secondaryText}
-                            />
-                            <ListItemIcon style={{minWidth: 0}}>
-                                <Radio
-                                    checked={assignType === value}
-                                    value={value}
-                                    name="radio-buttons"
-                                    inputProps={{'aria-label': 'A'}}
+                    <Typography variant="h6">
+                        Participants
+                    </Typography>
+                    <DialogContentText>
+                        How do you want to assign people to rooms?
+                    </DialogContentText>
+                    <List>
+                        {assignOptions.map(({value, secondaryText, primaryText, onClick}) => (
+                            <ListItem key={value}
+                                      onClick={onClick}
+                                      selected={assignType === value}
+                                      button>
+                                <ListItemText
+                                    primary={primaryText}
+                                    secondary={secondaryText}
                                 />
-                            </ListItemIcon>
-                        </ListItem>
-                    ))}
-                </List>
+                                <ListItemIcon style={{minWidth: 0}}>
+                                    <Radio
+                                        checked={assignType === value}
+                                        value={value}
+                                        name="radio-buttons"
+                                        inputProps={{'aria-label': 'A'}}
+                                    />
+                                </ListItemIcon>
+                            </ListItem>
+                        ))}
+                    </List>
                 </Box>
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>
                     Cancel
                 </Button>
-                <Button color="primary" variant="contained" onClick={handleCreateRooms}>
+                <DynamicColorButton
+                    color="primary"
+                    loading={loading}
+                    variant="contained"
+                    onClick={handleCreateRooms}
+                >
                     Create Rooms
-                </Button>
+                </DynamicColorButton>
             </DialogActions>
         </React.Fragment>
     )

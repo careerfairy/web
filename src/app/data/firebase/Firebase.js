@@ -60,7 +60,7 @@ class Firebase {
      * })} data
      * @return {Promise<firebase.functions.HttpsCallableResult>}
      */
-    getSecureAgoraToken = async (data ) => {
+    getSecureAgoraToken = async (data) => {
         const getSecureAgoraToken = this.functions.httpsCallable("generateAgoraTokenSecureOnCall")
         return await getSecureAgoraToken(data)
     }
@@ -91,7 +91,7 @@ class Firebase {
 
     getStreamRef = (router) => {
         const {query: {breakoutRoomId, livestreamId}} = router
-        if(!livestreamId) return {}
+        if (!livestreamId) return {}
         let ref = this.firestore.collection("livestreams")
             .doc(livestreamId)
         if (breakoutRoomId) {
@@ -2107,6 +2107,35 @@ class Firebase {
             .limit(1)
 
         return query.get()
+    }
+
+    // Breakout Rooms
+
+    buildBreakoutRoom = (breakoutRoomId, test, title, companyLogo) => {
+        return {
+            start: this.getServerTimestamp(),
+            id: breakoutRoomId,
+            hasStarted: false,
+            test,
+            companyLogo,
+            title
+        }
+    }
+
+    createMultipleBreakoutRooms = async (livestreamId = "", numberOfRooms = 0, assignType) => {
+        const livestreamRef = this.firestore.collection("livestreams").doc(livestreamId)
+        return this.firestore.runTransaction((transaction) => {
+            return transaction.get(livestreamRef).then((livestreamSnap) => {
+                const livestreamData = livestreamSnap.data()
+                const isTestStream = livestreamData.test
+                const companyLogo = livestreamData.companyLogoUrl || ""
+                for (let i = 1; i <= numberOfRooms; i++) {
+                    const breakoutRoomRef = livestreamRef.collection("breakoutRooms").doc()
+                    const newBreakoutRoom = this.buildBreakoutRoom(breakoutRoomRef.id, isTestStream, `Breakout Room ${i}`, companyLogo)
+                    transaction.set(breakoutRoomRef, newBreakoutRoom)
+                }
+            });
+        });
     }
 
     // DB functions
