@@ -397,6 +397,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
             const channel = rtmClient.createChannel(roomId);
 
+
             dispatch(actions.setRtmClientObj(rtmClient))
 
 

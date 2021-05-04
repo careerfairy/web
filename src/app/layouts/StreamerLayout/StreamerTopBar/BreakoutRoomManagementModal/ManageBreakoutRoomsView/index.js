@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {
     Accordion,
     AccordionDetails,
@@ -24,13 +24,12 @@ const useStyles = makeStyles(theme => ({
         background: theme.palette.background.default
     }
 }));
-const BreakoutRoom = ({breakoutRoom: {title, id}, index}) => {
-    const theme = useTheme()
+
+const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient}) => {
+    // console.log("-> roomId", roomId);
     const {currentLivestream: {id: livestreamId}} = useCurrentStream()
     const [breakoutRoomChannel, setBreakoutRoomChannel] = useState(null);
-    const [memberCount, setMemberCount] = useState(0);
     const [channelMembers, setChannelMembers] = useState([]);
-    const rtmClient = useSelector(state => state.rtmClient)
     const rtmChannel = useSelector(state => state.rtmChannel)
 
     useEffect(() => {
@@ -40,10 +39,16 @@ const BreakoutRoom = ({breakoutRoom: {title, id}, index}) => {
         return () => leaveChannel()
     }, [Boolean(rtmClient), Boolean(breakoutRoomChannel)]);
 
+    useEffect(() => {
+        if (breakoutRoomChannel) {
+            // breakoutRoomChannel.on("")
+        }
+    }, [Boolean(breakoutRoomChannel)])
+
 
     useEffect(() => {
         getMemberCount()
-    }, [id])
+    }, [roomId])
 
     const leaveChannel = () => {
         if (breakoutRoomChannel) {
@@ -53,10 +58,10 @@ const BreakoutRoom = ({breakoutRoom: {title, id}, index}) => {
 
     const connectToChannel = async () => {
         let channel
-        if (id === livestreamId) {
+        if (roomId === livestreamId) {
             channel = rtmChannel
         } else {
-            channel = rtmClient.createChannel(id)
+            channel = rtmClient.createChannel(roomId)
             await channel.join()
         }
         const members = await channel.getMembers() || []
@@ -65,13 +70,47 @@ const BreakoutRoom = ({breakoutRoom: {title, id}, index}) => {
     }
 
     const getMemberCount = async () => {
-        const channelMemberCountObj = await rtmClient.getChannelMemberCount([id])
-        const memberCount = channelMemberCountObj[id]
-        setMemberCount(memberCount)
+        const channelMemberCountObj = await rtmClient.getChannelMemberCount([roomId])
+        const memberCount = channelMemberCountObj[roomId]
+        updateMemberCount(roomId, memberCount)
     }
 
     return (
-        <Accordion defaultExpanded={index === 0}>
+        <React.Fragment>
+
+            <AccordionDetails>
+                <Typography color="textSecondary">
+                    The click event of the nested action will propagate up and expand the accordion unless
+                    you explicitly stop it.
+                </Typography>
+            </AccordionDetails>
+        </React.Fragment>
+    );
+};
+
+BreakoutRoomAccordionContent.propTypes = {
+    roomId: PropTypes.string.isRequired,
+};
+const BreakoutRoom = ({
+                          breakoutRoom: {title, id},
+                          openRoom,
+                          rtmClient,
+                          memberCount,
+                          updateMemberCount,
+                          handleOpenAccordion
+                      }) => {
+    const theme = useTheme()
+
+    const handleChange = (panel) => (event, isExpanded) => {
+        handleOpenAccordion(isExpanded ? panel : "");
+    };
+
+    return (
+        <Accordion
+            onChange={handleChange(id)}
+            expanded={openRoom === id}
+            TransitionProps={{unmountOnExit: true}}
+        >
             <AccordionSummary
                 expandIcon={<ExpandMoreIcon/>}
                 aria-label="Expand"
@@ -83,7 +122,6 @@ const BreakoutRoom = ({breakoutRoom: {title, id}, index}) => {
                         {title}
                     </Typography>
                     <Button
-                        color=""
                         startIcon={<RenameRoomIcon/>}
                     >
                         Rename
@@ -94,16 +132,15 @@ const BreakoutRoom = ({breakoutRoom: {title, id}, index}) => {
                         Delete
                     </Button>
                     <Typography variant="h6">
-                        {channelMembers.length}
+                        {memberCount}
                     </Typography>
                 </Box>
             </AccordionSummary>
-            <AccordionDetails>
-                <Typography color="textSecondary">
-                    The click event of the nested action will propagate up and expand the accordion unless
-                    you explicitly stop it.
-                </Typography>
-            </AccordionDetails>
+            <BreakoutRoomAccordionContent
+                roomId={id}
+                rtmClient={rtmClient}
+                updateMemberCount={updateMemberCount}
+            />
         </Accordion>
     )
 }
@@ -111,6 +148,33 @@ const BreakoutRoom = ({breakoutRoom: {title, id}, index}) => {
 
 const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const classes = useStyles()
+    const rtmClient = useSelector(state => state.rtmClient)
+    const [memberCounts, setMemberCounts] = useState({});
+    // console.log("-> memberCounts", memberCounts);
+    const [openRoom, setOpenRoom] = useState(breakoutRooms[0].id);
+    useEffect(() => {
+        getAllMemberCounts()
+    }, [breakoutRooms])
+
+    // console.log("-> channelMemberCountObj in body", memberCounts);
+    const getAllMemberCounts = async () => {
+        const breakoutRoomIds = breakoutRooms.map(room => room.id)
+        // console.log("-> breakoutRoomIds", breakoutRoomIds);
+        const channelMemberCountObj = await rtmClient.getChannelMemberCount(breakoutRoomIds)
+        // console.log("-> channelMemberCountObj in fn", channelMemberCountObj);
+        setMemberCounts(channelMemberCountObj)
+    }
+
+    const updateMemberCount = useCallback((roomId, newCount) => {
+        setMemberCounts(prevState => ({
+            ...prevState,
+            [roomId]: newCount
+        }))
+    }, [])
+
+    const handleOpenAccordion = useCallback((roomId) => {
+        setOpenRoom(roomId)
+    }, [])
 
     return (
         <React.Fragment>
@@ -119,7 +183,10 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
             </DialogTitle>
             <DialogContent className={classes.breakoutRoomsContent} dividers>
                 {breakoutRooms.map((room, index) => (
-                    <BreakoutRoom index={index} key={room.id} breakoutRoom={room}/>
+                    <BreakoutRoom updateMemberCount={updateMemberCount} rtmClient={rtmClient} index={index}
+                                  openRoom={openRoom}
+                                  handleOpenAccordion={handleOpenAccordion}
+                                  key={room.id} memberCount={memberCounts[room.id]} breakoutRoom={room}/>
                 ))}
             </DialogContent>
             <DialogActions>
