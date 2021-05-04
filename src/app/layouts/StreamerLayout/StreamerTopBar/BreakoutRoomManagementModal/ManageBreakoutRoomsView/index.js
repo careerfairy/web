@@ -42,17 +42,34 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient}) =>
 
     useEffect(() => {
         if (breakoutRoomChannel) {
-            // breakoutRoomChannel.on("")
+            breakoutRoomChannel.on("MemberJoined", joinerId => {
+                handleMemberJoined(joinerId)
+            })
+            breakoutRoomChannel.on("MemberLeft", leaverId => {
+                console.log("-> MemberLeft", leaverId);
+                handleMemberLeft(leaverId)
+            })
+            breakoutRoomChannel.on("MemberCountUpdated", newCount => {
+                console.log("-> newCount", newCount);
+                updateMemberCount(roomId, newCount)
+            })
         }
     }, [Boolean(breakoutRoomChannel)])
 
+    const handleMemberJoined = (joinerId) => {
+        setChannelMembers(prevState => [...prevState, joinerId])
+    }
+
+    const handleMemberLeft = (leaverId) => {
+        setChannelMembers(prevState => prevState.filter(memberId => memberId !== leaverId))
+    }
 
     useEffect(() => {
         getMemberCount()
     }, [roomId])
 
     const leaveChannel = () => {
-        if (breakoutRoomChannel) {
+        if (breakoutRoomChannel && (roomId !== livestreamId)) {
             breakoutRoomChannel.leave()
         }
     }
@@ -61,6 +78,7 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient}) =>
         let channel
         if (roomId === livestreamId) {
             channel = rtmChannel
+            console.log("-> rtmChannel", rtmChannel);
         } else {
             channel = rtmClient.createChannel(roomId)
             await channel.join()
@@ -159,6 +177,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const [memberCounts, setMemberCounts] = useState({});
     // console.log("-> memberCounts", memberCounts);
     const [openRoom, setOpenRoom] = useState(breakoutRooms[0].id);
+
     useEffect(() => {
         getAllMemberCounts()
     }, [breakoutRooms])

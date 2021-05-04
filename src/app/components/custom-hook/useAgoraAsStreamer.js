@@ -400,7 +400,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
             dispatch(actions.setRtmClientObj(rtmClient))
 
-
             channel.on('ChannelMessage', (message, memberId) => {
                 if (message.messageType === "TEXT") {
                     const messageData = JSON.parse(message.text)
