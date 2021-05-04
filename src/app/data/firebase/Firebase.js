@@ -2124,6 +2124,35 @@ class Firebase {
         }
     }
 
+    getUsersByIdsWithCache = async (arrayOfUserIds = []) => {
+        const getOptions = {
+            source: 'cache'
+        };
+        let totalUsers = []
+        let i, j, tempArray, chunk = 800;
+        for (i = 0, j = arrayOfUserIds.length; i < j; i += chunk) {
+            tempArray = arrayOfUserIds.slice(i, i + chunk);
+            const userSnaps = await Promise.all(tempArray.map(email => this.firestore.collection("userData").doc(email).get(getOptions)))
+            const arrayOfIdsToCheckOnline = []
+            let newUserData = []
+            for (const cachedUserSnap of userSnaps) {
+                if (!cachedUserSnap.exists) {
+                    arrayOfIdsToCheckOnline.push(cachedUserSnap.id)
+                } else {
+                    newUserData.push({id: cachedUserSnap.id, ...cachedUserSnap.data()})
+                }
+            }
+            if (arrayOfIdsToCheckOnline.length) {
+                const userSnaps = await Promise.all(arrayOfIdsToCheckOnline.map(email => this.firestore.collection("userData").doc(email).get(getOptions)))
+                const newUsers = userSnaps.filter(doc => doc.exists).map(doc => ({id: doc.id, ...doc.data()}))
+                newUserData = [...newUserData, ...newUsers]
+
+            }
+            totalUsers = [...totalUsers, ...newUserData]
+        }
+        return totalUsers
+    }
+
     createMultipleBreakoutRooms = async (livestreamId = "", numberOfRooms = 0, assignType) => {
         const livestreamRef = this.firestore.collection("livestreams").doc(livestreamId)
         return this.firestore.runTransaction((transaction) => {

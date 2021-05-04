@@ -3,10 +3,14 @@ import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
+    Avatar,
     Button,
     DialogActions,
     DialogContent,
-    DialogTitle
+    DialogTitle,
+    ListItem,
+    ListItemAvatar,
+    ListItemText
 } from "@material-ui/core";
 import PropTypes from "prop-types";
 import {streamShape} from "types";
@@ -18,20 +22,106 @@ import DeleteRoomIcon from '@material-ui/icons/Close';
 import Box from "@material-ui/core/Box";
 import {useSelector} from "react-redux";
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
+import AutoSizer from "react-virtualized-auto-sizer";
+import {FixedSizeList} from "react-window";
+import {useFirebase} from "../../../../../context/firebase";
 
 const useStyles = makeStyles(theme => ({
     breakoutRoomsContent: {
         background: theme.palette.background.default
+    },
+    listWrapper: {
+        display: "flex",
+        flexDirection: "column",
+        height: "30vh",
+        minHeight: 200,
+        width: "100%",
+        overflowX: "hidden",
     }
 }));
 
-const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient}) => {
-    // console.log("-> roomId", roomId);
+const ChannelMember = ({memberId, channelMemberDictionary, style}) => {
+
+    return(
+        <ListItem
+            style={style}
+            button
+            alignItems="flex-start">
+            <ListItemAvatar>
+                <Avatar alt={"A G"}
+                    // src={"avatarUrl"}
+                >
+                    {/*{firstName ? `${firstName[0] + lastName[0]}` : ""}*/}
+                    A G
+                </Avatar>
+            </ListItemAvatar>
+            <ListItemText
+                disableTypography
+                primary={
+                    <Typography
+                        noWrap
+                        variant="body1"
+                    >
+                        {/*{inTalentPool ? `${firstName} ${lastName}` : `${firstName} ${lastName?.[0]}`}*/}
+                        A G
+                    </Typography>
+                }
+            />
+        </ListItem>
+    )
+
+}
+
+const UserList = ({members, channelMemberDictionary}) => {
+
+    return (
+        <div style={{flex: '1 1 auto'}}>
+            <AutoSizer>
+                {({height, width}) => (
+                    <FixedSizeList
+                        itemSize={70}
+                        itemCount={members.length} height={height} width={width}
+                    >
+                        {({style, index}) => <ChannelMember memberId={members[index]} style={style}/>}
+                    </FixedSizeList>
+                )}
+            </AutoSizer>
+        </div>
+    );
+};
+const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liveSpeakers}) => {
     const {currentLivestream: {id: livestreamId}} = useCurrentStream()
+    const {getUsersByIdsWithCache} = useFirebase()
     const [breakoutRoomChannel, setBreakoutRoomChannel] = useState(null);
     const [channelMembers, setChannelMembers] = useState([]);
-    console.log("-> channelMembers", channelMembers);
+    const [channelMemberDictionary, setChannelMemberDictionary] = useState({});
+    // console.log("-> channelMemberDictionary", channelMemberDictionary);
+    // console.log("-> channelMembers", channelMembers);
+    // console.log("-> liveSpeakers", liveSpeakers);
     const rtmChannel = useSelector(state => state.rtmChannel)
+    const classes = useStyles()
+
+    useEffect(() => {
+        if (liveSpeakers?.length) {
+            setChannelMemberDictionary(prevState => {
+                const newState = {...prevState}
+                liveSpeakers.forEach(({speakerUuid, firstName, lastName}) => {
+                    if (speakerUuid) {
+                        newState[speakerUuid] = getDisplayName(firstName, lastName)
+                    }
+                })
+                return newState
+            })
+        }
+    }, [liveSpeakers])
+
+    useEffect(() => {
+        (async function fetchMemberData() {
+            const membersToFetch = channelMembers.filter(member => !channelMemberDictionary[member]).map(member => member.replace(roomId, ''))
+            const arrayOfUserObjects = await getUsersByIdsWithCache(membersToFetch)
+            console.log("-> arrayOfUserObjects", arrayOfUserObjects);
+        })()
+    }, [channelMembers])
 
     useEffect(() => {
         if (rtmClient && !breakoutRoomChannel) {
@@ -42,19 +132,17 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient}) =>
 
     useEffect(() => {
         if (breakoutRoomChannel) {
-            breakoutRoomChannel.on("MemberJoined", joinerId => {
-                handleMemberJoined(joinerId)
-            })
-            breakoutRoomChannel.on("MemberLeft", leaverId => {
-                console.log("-> MemberLeft", leaverId);
-                handleMemberLeft(leaverId)
-            })
+            breakoutRoomChannel.on("MemberJoined", handleMemberJoined)
+            breakoutRoomChannel.on("MemberLeft", handleMemberLeft)
             breakoutRoomChannel.on("MemberCountUpdated", newCount => {
-                console.log("-> newCount", newCount);
                 updateMemberCount(roomId, newCount)
             })
         }
     }, [Boolean(breakoutRoomChannel)])
+
+    const getDisplayName = (firstName, lastName) => {
+        return `${firstName} ${lastName?.[0]}`
+    }
 
     const handleMemberJoined = (joinerId) => {
         setChannelMembers(prevState => [...prevState, joinerId])
@@ -78,7 +166,6 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient}) =>
         let channel
         if (roomId === livestreamId) {
             channel = rtmChannel
-            console.log("-> rtmChannel", rtmChannel);
         } else {
             channel = rtmClient.createChannel(roomId)
             await channel.join()
@@ -96,19 +183,22 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient}) =>
 
     return (
         <AccordionDetails>
-            <Typography color="textSecondary">
-                The click event of the nested action will propagate up and expand the accordion unless
-                you explicitly stop it.
-            </Typography>
+            <div className={classes.listWrapper}>
+                <UserList
+                    channelMemberDictionary={channelMemberDictionary}
+                          members={channelMembers}
+                />
+            </div>
         </AccordionDetails>
     );
 };
 
 BreakoutRoomAccordionContent.propTypes = {
     roomId: PropTypes.string.isRequired,
+    liveSpeakers: PropTypes.array
 };
 const BreakoutRoom = ({
-                          breakoutRoom: {title, id},
+                          breakoutRoom: {title, id, liveSpeakers},
                           openRoom,
                           rtmClient,
                           memberCount,
@@ -164,6 +254,7 @@ const BreakoutRoom = ({
             <BreakoutRoomAccordionContent
                 roomId={id}
                 rtmClient={rtmClient}
+                liveSpeakers={liveSpeakers}
                 updateMemberCount={updateMemberCount}
             />
         </Accordion>

@@ -108,7 +108,9 @@ const ViewerLayout = (props) => {
 
     useEffect(() => {
         if (currentLivestream && !streamerId) {
-            if (currentLivestream.test) {
+            if (currentLivestream.test && authenticatedUser?.email) {
+                setStreamerId(currentLivestream.id + authenticatedUser.email)
+            } else if (currentLivestream.test) {
                 let uuid = uuidv4()
                 let joiningId = uuid.replace(/-/g, '')
                 setStreamerId(currentLivestream.id + joiningId)
