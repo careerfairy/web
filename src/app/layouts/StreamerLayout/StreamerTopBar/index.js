@@ -1,4 +1,4 @@
-import React, {useState, Fragment, useEffect} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {
     AppBar,
@@ -10,7 +10,8 @@ import {
     IconButton,
     Toolbar,
     Tooltip,
-    Typography, useMediaQuery
+    Typography,
+    useMediaQuery
 } from "@material-ui/core";
 import {MainLogo, MiniLogo} from "../../../components/logos";
 import {StandartTooltip, TooltipButtonComponent, TooltipText, TooltipTitle} from "../../../materialUI/GlobalTooltips";
@@ -21,15 +22,17 @@ import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import OpenInBrowserIcon from "@material-ui/icons/OpenInBrowser";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
+import BreakoutRoomIcon from '@material-ui/icons/Widgets';
 import PeopleIcon from "@material-ui/icons/People";
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
 import SpeakerManagementModal from "../../../components/views/streaming/modal/SpeakerManagementModal";
-import {useRouter} from "next/router";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import {maybePluralize} from "../../../components/helperFunctions/HelperFunctions";
 import NewFeatureHint from "../../../components/util/NewFeatureHint";
 import useStreamToken from "../../../components/custom-hook/useStreamToken";
 import useStreamRef from "../../../components/custom-hook/useStreamRef";
+import * as PropTypes from "prop-types";
+import {BreakoutRoomManagementModal} from "./BreakoutRoomManagementModal";
 
 const useStyles = makeStyles(theme => ({
     toolbar: {
@@ -56,6 +59,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+
 const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience}) => {
     const {currentLivestream} = useCurrentStream()
     const streamRef = useStreamRef();
@@ -67,7 +71,8 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [hideTooltip, setHideTooltip] = useState(false);
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
-    const {joiningStreamerLink,viewerLink} = useStreamToken()
+    const [openStreamerBreakoutRoomModal, setOpenStreamerBreakoutRoomModal] = useState(false);
+    const {joiningStreamerLink, viewerLink} = useStreamToken()
 
 
     useEffect(() => {
@@ -87,8 +92,13 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
 
     function setStreamingStarted(started) {
         firebase.setLivestreamHasStarted(started, streamRef);
+    }
 
-
+    const handleOpenBreakoutRoomModal = () => {
+        setOpenStreamerBreakoutRoomModal(true)
+    }
+    const handleCloseBreakoutRoomModal = () => {
+        setOpenStreamerBreakoutRoomModal(false)
     }
 
     return (
@@ -186,6 +196,11 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
                         }
                     </Fragment>}
                     <Box display="flex" alignItems="center">
+                        <Tooltip title="Manage breakout rooms">
+                            <IconButton disabled={openStreamerBreakoutRoomModal} onClick={handleOpenBreakoutRoomModal}>
+                                <BreakoutRoomIcon/>
+                            </IconButton>
+                        </Tooltip>
                         <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
                             <Checkbox
                                 checked={themeMode === "dark"}
@@ -237,6 +252,10 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
                 open={speakerManagementOpen}
                 joiningStreamerLink={joiningStreamerLink}
                 setOpen={setSpeakerManagementOpen}
+            />
+            <BreakoutRoomManagementModal
+                open={openStreamerBreakoutRoomModal}
+                onClose={handleCloseBreakoutRoomModal}
             />
         </Fragment>
     );
