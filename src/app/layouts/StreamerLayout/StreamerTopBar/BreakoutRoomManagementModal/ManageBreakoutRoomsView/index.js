@@ -30,6 +30,7 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient}) =>
     const {currentLivestream: {id: livestreamId}} = useCurrentStream()
     const [breakoutRoomChannel, setBreakoutRoomChannel] = useState(null);
     const [channelMembers, setChannelMembers] = useState([]);
+    console.log("-> channelMembers", channelMembers);
     const rtmChannel = useSelector(state => state.rtmChannel)
 
     useEffect(() => {
@@ -76,15 +77,12 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient}) =>
     }
 
     return (
-        <React.Fragment>
-
-            <AccordionDetails>
-                <Typography color="textSecondary">
-                    The click event of the nested action will propagate up and expand the accordion unless
-                    you explicitly stop it.
-                </Typography>
-            </AccordionDetails>
-        </React.Fragment>
+        <AccordionDetails>
+            <Typography color="textSecondary">
+                The click event of the nested action will propagate up and expand the accordion unless
+                you explicitly stop it.
+            </Typography>
+        </AccordionDetails>
     );
 };
 
@@ -105,6 +103,13 @@ const BreakoutRoom = ({
         handleOpenAccordion(isExpanded ? panel : "");
     };
 
+    const handleClickRename = (event) => {
+        event.stopPropagation()
+    }
+
+    const handleClickDelete = (event) => {
+        event.stopPropagation()
+    }
     return (
         <Accordion
             onChange={handleChange(id)}
@@ -122,11 +127,13 @@ const BreakoutRoom = ({
                         {title}
                     </Typography>
                     <Button
+                        onClick={handleClickRename}
                         startIcon={<RenameRoomIcon/>}
                     >
                         Rename
                     </Button>
                     <Button
+                        onClick={handleClickDelete}
                         startIcon={<DeleteRoomIcon htmlColor={theme.palette.error.main}/>}
                     >
                         Delete
