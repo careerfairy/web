@@ -67,8 +67,8 @@ const useStyles = makeStyles((theme) => ({
 const MAIN_STREAMER_PATHS = ["/streaming/[livestreamId]/breakout-room/[breakoutRoomId]/main-streamer", "/streaming/[livestreamId]/main-streamer"]
 
 const StreamerLayout = (props) => {
-    const {children, firebase, isBreakout} = props
-    const {query: {token, livestreamId:baseStreamId, breakoutRoomId}, pathname} = useRouter()
+    const {children, firebase, isBreakout, isMainStreamer} = props
+    const {query: {token, livestreamId: baseStreamId, breakoutRoomId}, pathname} = useRouter()
     const livestreamId = breakoutRoomId || baseStreamId
     const router = useRouter();
     const smallScreen = useMediaQuery('(max-width:700px)');
@@ -88,7 +88,6 @@ const StreamerLayout = (props) => {
 
 
     const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
-    const isMainStreamer = useMemo(() => MAIN_STREAMER_PATHS.includes(pathname), [pathname])
 
     const currentLivestream = useStreamConnect()
 
@@ -101,7 +100,7 @@ const StreamerLayout = (props) => {
 
     useEffect(() => {
         if (router && router.query && currentLivestream && !currentLivestream.test
-        // Absolving breakout rooms from token auth
+            // Absolving breakout rooms from token auth
             && !isBreakout
         ) {
             if (!token) {
@@ -185,9 +184,9 @@ const StreamerLayout = (props) => {
             return tokenChecked;
         }
     }
-    const toggleShowMenu = useCallback( () => {
+    const toggleShowMenu = useCallback(() => {
         setShowMenu(!showMenu)
-    },[showMenu])
+    }, [showMenu])
 
     if (!isLoaded(currentLivestream) || !tokenIsValidated()) {
         return <Loader/>
@@ -206,7 +205,7 @@ const StreamerLayout = (props) => {
 
     return (
         <NotificationsContext.Provider value={{setNewNotification, setNotificationToRemove}}>
-            <CurrentStreamContext.Provider value={{currentLivestream, isBreakout}}>
+            <CurrentStreamContext.Provider value={{currentLivestream, isBreakout, isMainStreamer, isStreamer: true}}>
                 <div className={classes.root}>
                     <StreamerTopBar
                         firebase={firebase}
