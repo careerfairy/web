@@ -1211,8 +1211,8 @@ class Firebase {
     /**
      * Get firestore users from an array of emails.
      * @param {Array<string>} arrayOfEmails – Array of email strings
-     * @param {({withEmpty: boolean})} options – size of the image
-     * @return {string} Returns the image url with the correct size appended to it.
+     * @param {({withEmpty: boolean})} options – Config object for the method
+     * @return {Array<Object>} Returns the image url with the correct size appended to it.
      */
     getUsersByEmail = async (arrayOfEmails = [], options = {withEmpty: false}) => {
         let totalUsers = []

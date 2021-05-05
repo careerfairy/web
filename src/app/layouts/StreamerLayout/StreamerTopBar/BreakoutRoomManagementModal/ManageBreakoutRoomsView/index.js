@@ -4,7 +4,7 @@ import {
     AccordionDetails,
     AccordionSummary,
     Avatar,
-    Button,
+    Button, CircularProgress,
     DialogActions,
     DialogContent,
     DialogTitle,
@@ -42,17 +42,25 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ChannelMember = ({memberData:{avatarUrl, firstName, lastName, displayName}, channelMemberDictionary, style}) => {
-    return (
-        <ListItem
-            style={style}
-            button
-            alignItems="flex-start">
+const ChannelMember = (
+    {
+        memberData,
+        index,
+        members,
+        style
+    }) => {
+
+    const itemLoading = index === members.length;
+
+    const content = itemLoading ? (
+        <CircularProgress/>
+    ) : (
+        <React.Fragment>
             <ListItemAvatar>
                 <Avatar alt={"A G"}
-                    src={avatarUrl}
+                        src={memberData.avatarUrl}
                 >
-                    {firstName ? `${firstName[0] + lastName[0]}` : ""}
+                    {memberData.firstName ? `${memberData.firstName[0] + memberData.lastName[0]}` : ""}
                 </Avatar>
             </ListItemAvatar>
             <ListItemText
@@ -62,20 +70,26 @@ const ChannelMember = ({memberData:{avatarUrl, firstName, lastName, displayName}
                         noWrap
                         variant="body1"
                     >
-                        {/*{inTalentPool ? `${firstName} ${lastName}` : `${firstName} ${lastName?.[0]}`}*/}
-                        {displayName}
+                        {memberData.displayName}
                     </Typography>
                 }
+                secondary={memberData.speakerUuid ? "Streamer" : "Viewer"}
             />
+        </React.Fragment>
+    )
+    return (
+        <ListItem
+            style={style}
+            button
+            alignItems="flex-start">
+            {content}
         </ListItem>
     )
 
 }
 
-const UserList = ({members, loadMore, hasMore, channelMemberDictionary}) => {
-    console.log("-> members", members);
+const UserList = ({members, loadMore, hasMore}) => {
     const itemCount = hasMore ? members.length + 1 : members.length;
-
     return (
         <div style={{flex: '1 1 auto'}}>
             <InfiniteLoader
@@ -94,7 +108,8 @@ const UserList = ({members, loadMore, hasMore, channelMemberDictionary}) => {
                                 height={height}
                                 width={width}
                             >
-                                {({style, index}) => <ChannelMember memberData={members[index]} style={style}/>}
+                                {({style, index}) => <ChannelMember members={members} index={index}
+                                                                    memberData={members[index]} style={style}/>}
                             </FixedSizeList>
                         )}
                     </AutoSizer>
@@ -114,10 +129,7 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
         getMorePaginatedChannelMembers,
         hasMorePaginatedChannelMembers
     ] = useInfiniteScrollClient(channelMembers, 5)
-    console.log("-> hasMorePaginatedChannelMembers", hasMorePaginatedChannelMembers);
-    // console.log("-> paginatedChannelMembers", paginatedChannelMembers);
     const [channelMemberDictionary, setChannelMemberDictionary] = useState({});
-    console.log("-> channelMemberDictionary", channelMemberDictionary);
     const rtmChannel = useSelector(state => state.rtmChannel)
     const classes = useStyles()
 
@@ -125,9 +137,9 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
         if (liveSpeakers?.length) {
             setChannelMemberDictionary(prevState => {
                 const newState = {...prevState}
-                liveSpeakers.forEach(({speakerUuid, firstName, lastName}) => {
-                    if (speakerUuid) {
-                        newState[speakerUuid] = getDisplayName(firstName, lastName)
+                liveSpeakers.forEach(speakerData => {
+                    if (speakerData.speakerUuid) {
+                        newState[speakerData.speakerUuid] = getDisplayData(speakerData)
                     }
                 })
                 return newState
@@ -143,9 +155,8 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
                 setChannelMemberDictionary(prevState => {
                     const newState = {...prevState}
                     arrayOfUserObjects.forEach(userObj => {
-                        newState[roomId + userObj.id] = userObj
+                        newState[roomId + userObj.id] = getDisplayData(userObj)
                     })
-                    console.log("-> newState", newState);
                     return newState
                 })
             }
@@ -169,11 +180,12 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
         }
     }, [Boolean(breakoutRoomChannel)])
 
-    const getDisplayName = (firstName, lastName) => {
+    const getDisplayData = (userInfo) => {
         return {
-            displayName: `${firstName} ${lastName?.[0]}`,
-            firstName,
-            lastName
+            displayName: `${userInfo.firstName} ${userInfo.lastName?.[0]}`,
+            firstName: userInfo.firstName,
+            lastName: userInfo.lastName,
+            speakerUuid: userInfo.speakerUuid
         }
     }
 
