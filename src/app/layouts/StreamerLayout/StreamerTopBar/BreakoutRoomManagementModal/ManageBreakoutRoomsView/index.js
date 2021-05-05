@@ -25,6 +25,8 @@ import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 import AutoSizer from "react-virtualized-auto-sizer";
 import {FixedSizeList} from "react-window";
 import {useFirebase} from "../../../../../context/firebase";
+import useInfiniteScrollClient from "../../../../../components/custom-hook/useInfiniteScrollClient";
+import InfiniteLoader from "react-window-infinite-loader";
 
 const useStyles = makeStyles(theme => ({
     breakoutRoomsContent: {
@@ -42,7 +44,7 @@ const useStyles = makeStyles(theme => ({
 
 const ChannelMember = ({memberId, channelMemberDictionary, style}) => {
 
-    return(
+    return (
         <ListItem
             style={style}
             button
@@ -72,32 +74,52 @@ const ChannelMember = ({memberId, channelMemberDictionary, style}) => {
 
 }
 
-const UserList = ({members, channelMemberDictionary}) => {
+const UserList = ({members, loadMore, hasMore, channelMemberDictionary}) => {
+    console.log("-> members", members);
+    const itemCount = hasMore ? members.length + 1 : members.length;
 
     return (
         <div style={{flex: '1 1 auto'}}>
-            <AutoSizer>
-                {({height, width}) => (
-                    <FixedSizeList
-                        itemSize={70}
-                        itemCount={members.length} height={height} width={width}
-                    >
-                        {({style, index}) => <ChannelMember memberId={members[index]} style={style}/>}
-                    </FixedSizeList>
+            <InfiniteLoader
+                isItemLoaded={index => index < members.length}
+                itemCount={itemCount}
+                loadMoreItems={loadMore}
+            >
+                {({onItemsRendered, ref}) => (
+                    <AutoSizer>
+                        {({height, width}) => (
+                            <FixedSizeList
+                                itemSize={70}
+                                ref={ref}
+                                onItemsRendered={onItemsRendered}
+                                itemCount={itemCount}
+                                height={height}
+                                width={width}
+                            >
+                                {({style, index}) => <ChannelMember memberId={members[index]} style={style}/>}
+                            </FixedSizeList>
+                        )}
+                    </AutoSizer>
                 )}
-            </AutoSizer>
+            </InfiniteLoader>
         </div>
     );
 };
 const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liveSpeakers}) => {
     const {currentLivestream: {id: livestreamId}} = useCurrentStream()
-    const {getUsersByIdsWithCache} = useFirebase()
+    const {getUsersByEmail} = useFirebase()
     const [breakoutRoomChannel, setBreakoutRoomChannel] = useState(null);
     const [channelMembers, setChannelMembers] = useState([]);
-    const [channelMemberDictionary, setChannelMemberDictionary] = useState({});
-    // console.log("-> channelMemberDictionary", channelMemberDictionary);
     // console.log("-> channelMembers", channelMembers);
-    // console.log("-> liveSpeakers", liveSpeakers);
+    const [
+        paginatedChannelMembers,
+        getMorePaginatedChannelMembers,
+        hasMorePaginatedChannelMembers
+    ] = useInfiniteScrollClient(channelMembers, 5)
+    console.log("-> hasMorePaginatedChannelMembers", hasMorePaginatedChannelMembers);
+    // console.log("-> paginatedChannelMembers", paginatedChannelMembers);
+    const [channelMemberDictionary, setChannelMemberDictionary] = useState({});
+    console.log("-> channelMemberDictionary", channelMemberDictionary);
     const rtmChannel = useSelector(state => state.rtmChannel)
     const classes = useStyles()
 
@@ -117,11 +139,20 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
 
     useEffect(() => {
         (async function fetchMemberData() {
-            const membersToFetch = channelMembers.filter(member => !channelMemberDictionary[member]).map(member => member.replace(roomId, ''))
-            const arrayOfUserObjects = await getUsersByIdsWithCache(membersToFetch)
-            console.log("-> arrayOfUserObjects", arrayOfUserObjects);
+            const membersToFetch = paginatedChannelMembers.filter(member => !channelMemberDictionary[member]).map(member => member.replace(roomId, ''))
+            if (membersToFetch?.length) {
+                const arrayOfUserObjects = await getUsersByEmail(membersToFetch, {withEmpty: true})
+                setChannelMemberDictionary(prevState => {
+                    const newState = {...prevState}
+                    arrayOfUserObjects.forEach(userObj => {
+                        newState[roomId + userObj.id] = userObj
+                    })
+                    console.log("-> newState", newState);
+                    return newState
+                })
+            }
         })()
-    }, [channelMembers])
+    }, [paginatedChannelMembers])
 
     useEffect(() => {
         if (rtmClient && !breakoutRoomChannel) {
@@ -141,7 +172,11 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
     }, [Boolean(breakoutRoomChannel)])
 
     const getDisplayName = (firstName, lastName) => {
-        return `${firstName} ${lastName?.[0]}`
+        return {
+            displayName: `${firstName} ${lastName?.[0]}`,
+            firstName,
+            lastName
+        }
     }
 
     const handleMemberJoined = (joinerId) => {
@@ -185,8 +220,10 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
         <AccordionDetails>
             <div className={classes.listWrapper}>
                 <UserList
+                    hasMore={hasMorePaginatedChannelMembers}
+                    loadMore={getMorePaginatedChannelMembers}
                     channelMemberDictionary={channelMemberDictionary}
-                          members={channelMembers}
+                    members={paginatedChannelMembers.filter(memberId => channelMemberDictionary[memberId]).map(memberId => channelMemberDictionary[memberId])}
                 />
             </div>
         </AccordionDetails>

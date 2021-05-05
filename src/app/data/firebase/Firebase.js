@@ -1208,13 +1208,24 @@ class Firebase {
         return totalUsers;
     };
 
-    getUsersByEmail = async (arrayOfEmails = [""]) => {
+    /**
+     * Get firestore users from an array of emails.
+     * @param {Array<string>} arrayOfEmails – Array of email strings
+     * @param {({withEmpty: boolean})} options – size of the image
+     * @return {string} Returns the image url with the correct size appended to it.
+     */
+    getUsersByEmail = async (arrayOfEmails = [], options = {withEmpty: false}) => {
         let totalUsers = []
-        let i, j, temparray, chunk = 800;
+        let i, j, tempArray, chunk = 800;
         for (i = 0, j = arrayOfEmails.length; i < j; i += chunk) {
-            temparray = arrayOfEmails.slice(i, i + chunk);
-            const userSnaps = await Promise.all(temparray.map(email => this.firestore.collection("userData").doc(email).get()))
-            const newUsers = userSnaps.filter(doc => doc.exists).map(doc => ({id: doc.id, ...doc.data()}))
+            tempArray = arrayOfEmails.slice(i, i + chunk);
+            const userSnaps = await Promise.all(tempArray.map(email => this.firestore.collection("userData").doc(email).get()))
+            let newUsers;
+            if (options.withEmpty) {
+                newUsers = userSnaps.map(doc => ({id: doc.id, ...doc.data()}))
+            } else {
+                newUsers = userSnaps.filter(doc => doc.exists).map(doc => ({id: doc.id, ...doc.data()}))
+            }
             totalUsers = [...totalUsers, ...newUsers]
         }
         return totalUsers
@@ -2143,7 +2154,7 @@ class Firebase {
                 }
             }
             if (arrayOfIdsToCheckOnline.length) {
-                const userSnaps = await Promise.all(arrayOfIdsToCheckOnline.map(email => this.firestore.collection("userData").doc(email).get(getOptions)))
+                const userSnaps = await Promise.all(arrayOfIdsToCheckOnline.map(email => this.firestore.collection("userData").doc(email).get()))
                 const newUsers = userSnaps.filter(doc => doc.exists).map(doc => ({id: doc.id, ...doc.data()}))
                 newUserData = [...newUserData, ...newUsers]
 
