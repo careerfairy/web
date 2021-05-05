@@ -1,54 +1,76 @@
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../../util/constants";
 import React from "react";
-import { Avatar, Typography } from "@material-ui/core";
+import {Avatar, Typography} from "@material-ui/core";
 import {getResizedUrl} from "../../../../../helperFunctions/HelperFunctions";
+import {Item, Row} from "@mui-treasury/components/flex";
+import {Info, InfoSubtitle, InfoTitle} from "@mui-treasury/components/info";
+import {useNewsInfoStyles} from "@mui-treasury/styles/info/news";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
-    streamers: {
-        width: ({cardHovered}) => cardHovered && "100%",
-        justifyContent: ({cardHovered}) => cardHovered && "space-between",
-        display: 'flex',
-        textAlign: 'center',
-        // overflowX: "auto",
+    previewRow: {
+        width: "100%",
+        justifyContent: "space-evenly"
     },
-    streamer: {
+    avaLogoWrapper: {
         display: "flex",
-        flex: 1,
-        minWidth: 95,
-        flexDirection: "column",
-        alignItems: "center",
-        padding: theme.spacing(0.5),
-    },
-    name: {
-        marginTop: theme.spacing(1) ,
-        textAlign: 'center',
-        fontSize: "0.8em",
-        fontWeight: "bold",
-        width: "100%"
-
+        // flexDirection: "column",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        alignItems: "center"
     },
     avatar: {
-        width: '2em',
-        height: '2em',
-        // borderRadius: '50%',
+        width: 48,
+        height: 48,
     },
-    streamerPosition: {
-        margin: "0 0 0 0",
-        fontSize: "0.8em",
-        lineHeight: "1.2em",
-        color: "grey",
-        fontWeight: 300,
-        overflowWrap: "break-word",
-        wordWrap: "break-word",
-        hyphens: "auto",
-        width: "100%"
+    author: {
+        zIndex: 1,
+        position: 'relative',
+        display: "flex",
+        flexDirection: "column",
+    },
+    authorHovered: {
+        // boxShadow: theme.shadows[3]
     },
 }))
 //
-const Streamers = ({speakers, cardHovered}) => {
+const Streamers = ({speakers, cardHovered, mobile}) => {
 
     const classes = useStyles({cardHovered})
+    const theme = useTheme()
+    return (
+        <Row
+            className={clsx(classes.author, {
+                [classes.authorHovered]: cardHovered
+            })}
+            m={0}
+            width="100%"
+            p={1}
+            py={1}
+            gap={3}
+            bgcolor={theme.palette.navyBlue.main}
+        >
+            <div className={classes.avaLogoWrapper}>
+                {speakers?.map(speaker => (
+                    <Row className={classes.previewRow} key={speaker.id}>
+                        <Item>
+                            <Avatar
+
+                                className={classes.avatar}
+                                src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
+                                alt={speaker.firstName}
+                            />
+                        </Item>
+                        <Info style={{marginRight: "auto", color: theme.palette.common.white}} useStyles={useNewsInfoStyles}>
+                            <InfoTitle>{`${speaker.firstName} ${speaker.lastName}`}</InfoTitle>
+                            <InfoSubtitle>{speaker.position}</InfoSubtitle>
+                        </Info>
+                    </Row>
+                ))}
+            </div>
+        </Row>
+    )
     return (
         <div className={classes.streamers}>
             {speakers.map(speaker => {
