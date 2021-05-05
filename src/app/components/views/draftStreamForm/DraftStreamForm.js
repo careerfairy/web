@@ -111,8 +111,7 @@ const DraftStreamForm = ({
     const router = useRouter()
     const {userData} = useAuth()
     const SPEAKER_LIMIT = userData?.isAdmin ? 15 : 10
-    console.log("-> userData", userData);
-    console.log("-> SPEAKER_LIMIT", SPEAKER_LIMIT);
+
     let {
         query: {careerCenterIds, draftStreamId},
         replace,
