@@ -733,7 +733,8 @@ const GroupStreamCardV2Old = memo(({
                             <div className={classes.lowerFrontContent}>
                                 <div className={classes.speakersAndLogosWrapper}>
                                     <div className={classes.titleAndSpeakersWrapper}>
-                                        <Row justifyContent="center" width="100%">
+                                        <Row justifyContent="center"
+                                             width="100%">
                                             <Typography variant={mobile ? "h6" : cardHovered ? "h4" : "h5"}
                                                         align="center"
                                                         className={classes.companyName}>

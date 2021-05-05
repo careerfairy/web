@@ -45,11 +45,11 @@ const Streamers = ({speakers, cardHovered, mobile}) => {
                 [classes.authorHovered]: cardHovered
             })}
             m={0}
+            width="100%"
             p={1}
             py={1}
             gap={3}
             bgcolor={theme.palette.navyBlue.main}
-            // bgcolor={theme.palette.navyBlue.main}
         >
             <div className={classes.avaLogoWrapper}>
                 {speakers?.map(speaker => (
