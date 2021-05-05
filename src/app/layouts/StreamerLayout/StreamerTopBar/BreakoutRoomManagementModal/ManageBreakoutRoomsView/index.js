@@ -42,8 +42,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ChannelMember = ({memberId, channelMemberDictionary, style}) => {
-
+const ChannelMember = ({memberData:{avatarUrl, firstName, lastName, displayName}, channelMemberDictionary, style}) => {
     return (
         <ListItem
             style={style}
@@ -51,10 +50,9 @@ const ChannelMember = ({memberId, channelMemberDictionary, style}) => {
             alignItems="flex-start">
             <ListItemAvatar>
                 <Avatar alt={"A G"}
-                    // src={"avatarUrl"}
+                    src={avatarUrl}
                 >
-                    {/*{firstName ? `${firstName[0] + lastName[0]}` : ""}*/}
-                    A G
+                    {firstName ? `${firstName[0] + lastName[0]}` : ""}
                 </Avatar>
             </ListItemAvatar>
             <ListItemText
@@ -65,7 +63,7 @@ const ChannelMember = ({memberId, channelMemberDictionary, style}) => {
                         variant="body1"
                     >
                         {/*{inTalentPool ? `${firstName} ${lastName}` : `${firstName} ${lastName?.[0]}`}*/}
-                        A G
+                        {displayName}
                     </Typography>
                 }
             />
@@ -96,7 +94,7 @@ const UserList = ({members, loadMore, hasMore, channelMemberDictionary}) => {
                                 height={height}
                                 width={width}
                             >
-                                {({style, index}) => <ChannelMember memberId={members[index]} style={style}/>}
+                                {({style, index}) => <ChannelMember memberData={members[index]} style={style}/>}
                             </FixedSizeList>
                         )}
                     </AutoSizer>
