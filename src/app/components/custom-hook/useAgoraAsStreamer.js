@@ -8,6 +8,7 @@ import {useRouter} from 'next/router';
 import useStreamRef from "./useStreamRef";
 
 export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer, optimizationMode) {
+    console.count("-> useAgoraAsStreamer");
 
     const dispatch = useDispatch()
     const {path} = useStreamRef();
@@ -36,6 +37,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const [userUid, setUserUid] = useState(null);
     const [readyToConnect, setReadyToConnect] = useState(false);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
+    const [connected, setConnected] = useState(false);
     const [agoraRtcStatus, setAgoraRtcStatus] = useState({
         type: "INFO",
         msg: "RTC_INITIAL"
@@ -57,7 +59,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     }, [streamId])
 
     useEffect(() => {
-        return ()=> {
+        return () => {
             dispatch(actions.removeRtmClient())
         }
     }, []);
@@ -110,11 +112,36 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     }, [window, userUid, streamerReady, roomId, streamId, agoraToken, agoraScreenShareToken, document])
 
     useEffect(() => {
-        if (readyToConnect) {
+        if (readyToConnect && !connected) {
             connectAgoraRTC()
             connectAgoraRTM()
+            setConnected(true)
         }
-    }, [readyToConnect])
+    }, [readyToConnect, connected])
+
+    useEffect(() => {
+        if (agoraToken && connected) {
+            handleSwitchRooms()
+        }
+    }, [agoraToken]);
+
+    const handleSwitchRooms = async () => {
+        if (rtcClient) {
+            await rtcClient.leave()
+        }
+        if (rtmChannel) {
+            rtmChannel.removeAllListeners()
+            await rtmChannel.leave()
+        }
+        if (rtmClient) {
+            rtmClient.removeAllListeners()
+            await rtmClient.logout()
+        }
+
+        // connectAgoraRTC()
+        // connectAgoraRTM()
+        setConnected(false)
+    }
 
     const connectAgoraRTC = () => {
 
@@ -366,6 +393,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         let AgoraRTM = require('agora-rtm-sdk');
 
         let rtmClient = AgoraRTM.createInstance(AGORA_APP_ID, {logFilter: AgoraRTM.LOG_FILTER_ERROR})
+
 
         rtmClient.on('ConnectionStateChanged', (newState, reason) => {
             if (newState === "DISCONNECTED") {

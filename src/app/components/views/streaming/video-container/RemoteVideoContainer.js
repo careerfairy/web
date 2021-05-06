@@ -164,7 +164,7 @@ const RemoteVideoContainer = ({
         }
     }
 
-    const speaker = !isScreenShareVideo ? currentLivestream.liveSpeakers.find(speaker => speaker.speakerUuid === stream.streamId) : null;
+    const speaker = !isScreenShareVideo ? currentLivestream.liveSpeakers?.find(speaker => speaker.speakerUuid === stream.streamId) : null;
 
 
     return (

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import {useTheme} from "@material-ui/core/styles";
 import {Accordion, AccordionSummary, Button} from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -6,29 +7,106 @@ import Typography from "@material-ui/core/Typography";
 import RenameRoomIcon from "@material-ui/icons/Edit";
 import DeleteRoomIcon from "@material-ui/icons/Close";
 import BreakoutRoomAccordionContent from './BreakoutRoomAccordionContent'
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import EditRoomNameModal from "./EditRoomNameModal";
 import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal";
 import {useFirebase} from "context/firebase";
 import {useRouter} from "next/router";
 import * as actions from 'store/actions'
 import {useDispatch} from "react-redux";
+import Link from 'materialUI/NextNavLink'
+import {useCurrentStream} from "../../../../../../context/stream/StreamContext";
+import useStreamToken from "../../../../../../components/custom-hook/useStreamToken";
 
+const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom, loading}) => {
+    const theme = useTheme()
+    return <React.Fragment>
+        <Button
+            onClick={handleOpenRoom}
+            disabled={loading}
+            // startIcon={<RenameRoomIcon/>}
+        >
+            Open
+        </Button>
+        <Button
+            onClick={handleClickRename}
+            disabled={loading}
+            startIcon={<RenameRoomIcon/>}
+        >
+            Rename
+        </Button>
+        <Button
+            onClick={handleClickDelete}
+            disabled={loading}
+            startIcon={<DeleteRoomIcon htmlColor={theme.palette.error.main}/>}
+        >
+            Delete
+        </Button>
+    </React.Fragment>;
+};
+const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, handleCloseRoom, breakoutRoomLink}) => {
+    const theme = useTheme()
+
+    const {query: {breakoutRoomId}} = useRouter()
+
+    return <React.Fragment>
+        {roomId !== breakoutRoomId && (
+            <Button
+                onClick={handleJoinRoom}
+                disabled={loading}
+                href={breakoutRoomLink}
+                // component="a"
+                component={Link}
+            >
+                Join Room
+            </Button>
+        )}
+        <Button
+            onClick={handleClickRename}
+            disabled={loading}
+            startIcon={<RenameRoomIcon/>}
+        >
+            Rename
+        </Button>
+        <Button
+            onClick={handleCloseRoom}
+            disabled={loading}
+            // startIcon={<RenameRoomIcon/>}
+        >
+            Close Room
+        </Button>
+    </React.Fragment>;
+};
+
+RoomClosedActions.propTypes = {
+    handleClickDelete: PropTypes.func.isRequired,
+    handleClickRename: PropTypes.func.isRequired,
+    handleOpenRoom: PropTypes.func.isRequired,
+    loading: PropTypes.bool,
+}
 const BreakoutRoom = ({
-                          breakoutRoom: {title, id, liveSpeakers},
+                          breakoutRoom: {title, id, liveSpeakers, open},
                           openRoom,
                           rtmClient,
                           memberCount,
                           updateMemberCount,
-                          handleOpenAccordion
+                          handleOpenAccordion,
+                          handleClose
                       }) => {
-    const theme = useTheme()
     const dispatch = useDispatch()
-    const {deleteBreakoutRoom} = useFirebase()
-    const {query: {livestreamId}} = useRouter()
+    const links = useStreamToken({forStreamType: "breakoutRoom", targetBreakoutRoomId: id})
+    const {isStreamer, isMainStreamer} = useCurrentStream()
+    const {deleteBreakoutRoom, updateBreakoutRoom} = useFirebase()
+    const {query: {livestreamId}, push} = useRouter()
     const [editRoomNameModalOpen, setEditRoomNameModalOpen] = useState(false);
-    const [deleting, setDeleting] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [deleteBreakoutRoomModalOpen, setDeleteBreakoutRoomModalOpen] = useState(false);
+    const [breakoutRoomLink, setBreakoutRoomLink] = useState("");
+
+    useEffect(() => {
+        const newBreakoutRoomLink = isMainStreamer ? links.mainStreamerLink : isStreamer ? links.joiningStreamerLink : links.viewerLink
+        setBreakoutRoomLink(newBreakoutRoomLink)
+    }, [links, isStreamer, isMainStreamer])
     const closeEditRoomNameModal = () => setEditRoomNameModalOpen(false)
     const closeDeleteBreakoutRoomModal = () => setDeleteBreakoutRoomModalOpen(false)
 
@@ -46,14 +124,31 @@ const BreakoutRoom = ({
         setDeleteBreakoutRoomModalOpen(true)
     }
 
+    const handleOpenRoom = async (event) => {
+        event.stopPropagation()
+        try {
+            setLoading(true)
+            await updateBreakoutRoom({open: true}, id, livestreamId)
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
+        setLoading(false)
+    }
+
     const handleDeleteBreakoutRoom = async () => {
-        setDeleting(true)
+        setLoading(true)
         try {
             await deleteBreakoutRoom(id, livestreamId)
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
         }
-        setDeleting(false)
+        setLoading(false)
+    }
+
+    const handleJoinRoom = (event) => {
+        event.stopPropagation()
+        // handleClose()
+
     }
     return (
         <React.Fragment>
@@ -72,24 +167,29 @@ const BreakoutRoom = ({
                         <Typography variant="h6">
                             {title}
                         </Typography>
-                        <Button
-                            onClick={handleClickRename}
-                            startIcon={<RenameRoomIcon/>}
-                        >
-                            Rename
-                        </Button>
-                        <Button
-                            onClick={handleClickDelete}
-                            startIcon={<DeleteRoomIcon htmlColor={theme.palette.error.main}/>}
-                        >
-                            Delete
-                        </Button>
+                        {open ? (
+                            <RoomOpenedActions
+                                loading={loading}
+                                roomId={id}
+                                handleJoinRoom={handleJoinRoom}
+                                handleClickRename={handleClickRename}
+                                breakoutRoomLink={breakoutRoomLink}
+                            />
+                        ) : (
+                            <RoomClosedActions
+                                loading={loading}
+                                handleClickRename={handleClickRename}
+                                handleOpenRoom={handleOpenRoom}
+                                handleClickDelete={handleClickDelete}
+                            />
+                        )}
                         <Typography variant="h6">
                             {memberCount}
                         </Typography>
                     </Box>
                 </AccordionSummary>
                 <BreakoutRoomAccordionContent
+                    openRoom={openRoom}
                     roomId={id}
                     rtmClient={rtmClient}
                     liveSpeakers={liveSpeakers}
@@ -106,9 +206,8 @@ const BreakoutRoom = ({
                 handleClose={closeDeleteBreakoutRoomModal}
                 open={deleteBreakoutRoomModalOpen}
                 handleConfirm={handleDeleteBreakoutRoom}
-                loading={deleting}
+                loading={loading}
                 message="Are you sure that you want to delete this breakout room? The room will be deleted permanently"
-
             />
         </React.Fragment>
     )

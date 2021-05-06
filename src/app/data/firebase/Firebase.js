@@ -802,6 +802,17 @@ class Firebase {
         return ref.get();
     }
 
+    getBreakoutRoomSecureToken = (livestreamId, breakoutRoomId) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("breakoutRooms")
+            .doc(breakoutRoomId)
+            .collection("tokens")
+            .doc("secureToken");
+        return ref.get();
+    }
+
     getLegacyScheduledLivestreamById = (livestreamId) => {
         let ref = this.firestore
             .collection("scheduledLivestreams")
@@ -2118,6 +2129,12 @@ class Firebase {
             .limit(1)
 
         return query.get()
+    }
+
+    getStreamTokenWithRef = (streamRef) => {
+        return streamRef.collection('tokens')
+            .doc('secureToken')
+            .get()
     }
 
     // Breakout Rooms

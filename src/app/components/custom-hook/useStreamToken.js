@@ -1,11 +1,18 @@
 import {useEffect, useState} from "react";
 import {getBaseUrl} from "../helperFunctions/HelperFunctions";
-import {useFirestore} from "react-redux-firebase";
 import {useRouter} from "next/router";
+import {useFirebase} from "context/firebase";
+import useStreamRef from "./useStreamRef";
 
-const useStreamToken = () => {
+/**
+ * @param {({forStreamType: (''| 'breakoutRoom'|'mainLivestream' ), targetBreakoutRoomId: string})} options Object
+ * @returns {({streamToken: string, mainStreamerLink: string, joiningStreamerLink: string, viewerLink: string})} Returns the 3 stream link types
+ */
+
+const useStreamToken = (options = {forStreamType: "", targetBreakoutRoomId:""}) => {
     const {query: {livestreamId, breakoutRoomId}} = useRouter()
-    const firestore = useFirestore()
+    const streamRef = useStreamRef();
+    const {getStreamTokenWithRef, getLivestreamSecureToken, getBreakoutRoomSecureToken} = useFirebase()
     const [streamToken, setStreamToken] = useState("");
     const [mainStreamerLink, setMainStreamerLink] = useState("");
     const [joiningStreamerLink, setJoiningStreamerLink] = useState("");
@@ -14,26 +21,29 @@ const useStreamToken = () => {
     useEffect(() => {
         if (livestreamId) {
             (async function getToken() {
-                const tokenDoc = await firestore.get({
-                    collection: "livestreams",
-                    doc: livestreamId,
-                    subcollections: [{
-                        collection: "tokens",
-                        doc: "secureToken",
-                    }]
-                })
+                let tokenDoc
+                let breakoutRoomPath
+                if (options.forStreamType === "breakoutRoom" && options.targetBreakoutRoomId) {
+                    tokenDoc = await getBreakoutRoomSecureToken(livestreamId, options.targetBreakoutRoomId)
+                    breakoutRoomPath = `breakout-room/${options.targetBreakoutRoomId}/`
+                } else if (options.forStreamType === "mainLivestream") {
+                    tokenDoc = await getLivestreamSecureToken(livestreamId)
+                    breakoutRoomPath = ""
+                } else {
+                    tokenDoc = await getStreamTokenWithRef(streamRef)
+                    breakoutRoomPath = breakoutRoomId ? `breakout-room/${breakoutRoomId}/` : ``
+                }
                 const secureToken = tokenDoc.data?.()?.value || ""
                 const tokenPath = secureToken ? `?token=${secureToken}` : ""
                 setStreamToken(secureToken);
                 const baseUrl = getBaseUrl()
-                let breakoutRoomPath = breakoutRoomId ? `breakout-room/${breakoutRoomId}/` : ``
                 setMainStreamerLink(`${baseUrl}/streaming/${livestreamId}/${breakoutRoomPath}main-streamer${tokenPath}`)
                 setJoiningStreamerLink(`${baseUrl}/streaming/${livestreamId}/${breakoutRoomPath}joining-streamer${tokenPath}`)
                 setViewerLink(`${baseUrl}/streaming/${livestreamId}/${breakoutRoomPath}viewer`)
             })()
         }
 
-    }, [livestreamId, breakoutRoomId])
+    }, [livestreamId, breakoutRoomId, options.forStreamType])
 
     return {streamToken, mainStreamerLink, joiningStreamerLink, viewerLink}
 }

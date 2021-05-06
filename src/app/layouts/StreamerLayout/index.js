@@ -72,7 +72,7 @@ const StreamerLayout = (props) => {
     const livestreamId = breakoutRoomId || baseStreamId
     const router = useRouter();
     const smallScreen = useMediaQuery('(max-width:700px)');
-
+console.count("-> StreamerLayout");
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [newNotification, setNewNotification] = useState(null);
     const [notificationToRemove, setNotificationToRemove] = useState(null);
@@ -151,6 +151,7 @@ const StreamerLayout = (props) => {
             setShowMenu(false)
         }
     }, [smallScreen])
+
 
     useEffect(() => {
         if (notificationToRemove) {

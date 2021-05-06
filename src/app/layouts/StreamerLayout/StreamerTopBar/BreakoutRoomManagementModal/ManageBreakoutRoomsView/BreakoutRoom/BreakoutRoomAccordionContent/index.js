@@ -17,6 +17,7 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "column",
         // height: "30vh",
         maxHeight: 200,
+        minHeight: 75,
         width: "100%",
         overflowX: "hidden",
     },
@@ -25,7 +26,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liveSpeakers}) => {
+const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liveSpeakers, openRoom}) => {
     const {currentLivestream: {id: livestreamId}} = useCurrentStream()
     const {getUsersByEmail} = useFirebase()
     const [breakoutRoomChannel, setBreakoutRoomChannel] = useState(null);
@@ -84,10 +85,15 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
             breakoutRoomChannel.on("MemberJoined", handleMemberJoined)
             breakoutRoomChannel.on("MemberLeft", handleMemberLeft)
             breakoutRoomChannel.on("MemberCountUpdated", newCount => {
-                updateMemberCount(roomId, newCount)
+                updateMemberCount(roomId, newCount -1)
             })
+            return () => leaveChannel()
         }
     }, [Boolean(breakoutRoomChannel)])
+
+    useEffect(() => {
+        getMemberCount()
+    }, [roomId])
 
     const getDisplayData = (userInfo) => {
         const isVisitor = !userInfo.firstName && !userInfo.lastName
@@ -112,13 +118,14 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
         setChannelMemberIds(prevState => prevState.filter(memberId => memberId !== leaverId))
     }
 
-    useEffect(() => {
-        getMemberCount()
-    }, [roomId])
 
-    const leaveChannel = () => {
+    const leaveChannel = async () => {
         if (breakoutRoomChannel && (roomId !== livestreamId)) {
-            breakoutRoomChannel.leave()
+            try {
+                breakoutRoomChannel.removeAllListeners()
+                breakoutRoomChannel.leave()
+            } catch (e) {
+            }
         }
     }
 
@@ -138,7 +145,7 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
     const getMemberCount = async () => {
         const channelMemberCountObj = await rtmClient.getChannelMemberCount([roomId])
         const memberCount = channelMemberCountObj[roomId]
-        updateMemberCount(roomId, memberCount)
+        updateMemberCount(roomId, memberCount -1)
     }
     return (
         <AccordionDetails>

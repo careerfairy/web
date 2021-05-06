@@ -16,7 +16,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const classes = useStyles()
     const rtmClient = useSelector(state => state.rtmClient)
     const [memberCounts, setMemberCounts] = useState({});
-    const [openRoom, setOpenRoom] = useState(breakoutRooms[0].id);
+    const [openRoom, setOpenRoom] = useState("");
 
     useEffect(() => {
         getAllMemberCounts()
@@ -51,6 +51,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                         rtmClient={rtmClient}
                         index={index}
                         openRoom={openRoom}
+                        handleClose={handleClose}
                         handleOpenAccordion={handleOpenAccordion}
                         key={room.id}
                         memberCount={memberCounts[room.id]}
