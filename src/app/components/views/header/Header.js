@@ -51,7 +51,6 @@ function Header(props) {
                     <li><Link className={`${isHighlighted ? "highlighted" : ""}`} href='/next-livestreams'><a
                         className={classes.nextLink}>Next Live
                         Streams</a></Link></li>
-                    <li><Link href='/discover'><a>Past Live Streams</a></Link></li>
                     <li><Link href='/companies'><a>Companies</a></Link></li>
                     <li><Link href='/wishlist'><a>Wishlist</a></Link></li>
                     <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>
@@ -168,7 +167,6 @@ function Header(props) {
                         Live Streams</a></Link>
                     </li>
                     {authenticated && <li><a onClick={toggleSideBar} href='/groups'>Follow Groups</a></li>}
-                    <li><Link href='/discover'><a onClick={toggleSideBar}>Past Live Streams</a></Link></li>
                     <li><Link href='/companies'><a onClick={toggleSideBar}>Companies</a></Link></li>
                     <li><Link href='/wishlist'><a onClick={toggleSideBar}>Wishlist</a></Link></li>
                     <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>

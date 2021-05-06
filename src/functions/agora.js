@@ -102,3 +102,37 @@ exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) =>
         return res.status(200).send({rtcToken: rtcToken, rtmToken: rtmToken});
     }
 })
+
+
+exports.generateAgoraTokenSecureOnCall = functions.https.onCall(async (data, context) => {
+    const {isStreamer, uid, sentToken, channelName, streamDocumentPath} = data
+    const rtcRole = isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
+    const rtmRole = 0;
+    const expirationTimeInSeconds = 21600
+    const currentTimestamp = Math.floor(Date.now() / 1000)
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+
+    // Build token with uid
+    if (rtcRole === RtcRole.PUBLISHER) {
+        let livestreamDoc = await admin.firestore().doc(streamDocumentPath).get();
+        let livestream = livestreamDoc.data();
+
+        if (!livestream.test) {
+            let storedTokenDoc = await admin.firestore().doc(streamDocumentPath).collection('tokens').doc('secureToken').get();
+            let storedToken = storedTokenDoc.data().value;
+            console.log("-> storedToken", storedToken);
+            console.log("-> sentToken", sentToken);
+            if (storedToken !== sentToken) {
+                return {status: 400, message: "Invalid token"};
+            }
+        }
+        const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
+        const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
+        return {status: 200, token: {rtcToken: rtcToken, rtmToken: rtmToken}}
+    } else {
+        const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
+        const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
+
+        return {status: 200, token: {rtcToken: rtcToken, rtmToken: rtmToken}};
+    }
+})

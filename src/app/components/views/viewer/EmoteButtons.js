@@ -1,10 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Box, ClickAwayListener, Fab, CircularProgress} from "@material-ui/core";
 import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import {makeStyles, fade} from "@material-ui/core/styles";
 import {amber, deepOrange, grey, red} from "@material-ui/core/colors";
 import ClappingSVG from "../../util/CustomSVGs";
+import * as actions from "../../../store/actions";
+import {useDispatch} from "react-redux";
+import {useCurrentStream} from "../../../context/stream/StreamContext";
+import {useAuth} from "../../../HOCs/AuthProvider";
+import {withFirebase} from "context/firebase";
+import {TEST_EMAIL} from "../streaming/LeftMenu/categories/chat/EmotesModal/utils";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -134,78 +140,112 @@ const useStyles = makeStyles((theme) => ({
     },
 
 }));
+const delay = 3000; //3 seconds
+const smoothness = 2
+const EmoteButtons = ({firebase}) => {
+    const dispatch = useDispatch()
+    const {currentLivestream: {id: livestreamId}} = useCurrentStream()
+    const {authenticatedUser} = useAuth()
+    const classes = useStyles({handRaiseActive: false});
+    const SPEED = isNaN(smoothness) ? 2 : smoothness
+    const DELAY = isNaN(delay) ? 3000 : delay
+    const INTERVAL = 10 / SPEED
+    const TICK_RATE = (DELAY / (INTERVAL * SPEED)) / SPEED
+    const [open, setOpen] = React.useState(true);
+    const [delayHandler, setDelayHandler] = useState(null)
+    const [iconsDisabled, setIconsDisabled] = useState(false);
+    const [progress, setProgress] = useState(INTERVAL);
 
-const EmoteButtons =
-    ({
-         handRaiseActive,
-         handleClose,
-         handleMouseEnter,
-         handleMouseLeave,
-         handleLike,
-         iconsDisabled,
-         handleClap,
-         handleHeart,
-         open,
-         delay,
-         smoothness,
-         enableIcons
-     }) => {
-        const classes = useStyles({handRaiseActive});
-        const SPEED = isNaN(smoothness) ? 2 : smoothness
-        const DELAY = isNaN(delay) ? 3000 : delay
-        const INTERVAL = 10 / SPEED
-        const TICK_RATE = (DELAY / (INTERVAL * SPEED)) / SPEED
+    useEffect(() => {
+        if (iconsDisabled) {
+            setProgress(INTERVAL)
+            const timer = setInterval(() => {
+                setProgress((prevProgress) => (prevProgress >= 100 ? INTERVAL : prevProgress + INTERVAL));
+            }, TICK_RATE);
+            const timeout = setTimeout(() => {
+                enableIcons();
+            }, DELAY);
+            return () => {
+                clearTimeout(timeout)
+                clearInterval(timer)
+            };
+        }
+    }, [iconsDisabled]);
 
-        const [progress, setProgress] = useState(INTERVAL);
 
-        useEffect(() => {
-            if (iconsDisabled) {
-                setProgress(INTERVAL)
-                const timer = setInterval(() => {
-                    setProgress((prevProgress) => (prevProgress >= 100 ? INTERVAL : prevProgress + INTERVAL));
-                }, TICK_RATE);
-                const timeout = setTimeout(() => {
-                    enableIcons();
-                }, DELAY);
-                return () => {
-                    clearTimeout(timeout)
-                    clearInterval(timer)
-                };
-            }
-        }, [iconsDisabled]);
+    const handleOpen = useCallback(() => {
+        setOpen(true);
+    }, []);
 
-        return (
-            <ClickAwayListener onClickAway={handleClose}>
-                <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.actionArea}>
-                    <Box className={classes.miniButtons} classes={{root: open ? classes.cardHovered : ""}}>
-                        <div className={classes.wrapper}>
-                            <Fab disabled={iconsDisabled} onClick={handleLike} className={classes.miniLike}
-                                 aria-label="like">
-                                <ThumbUpAltOutlinedIcon fontSize="default"/>
-                            </Fab>
-                            {iconsDisabled &&
-                            <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
-                        </div>
-                        <div className={classes.wrapper}>
-                            <Fab disabled={iconsDisabled} onClick={handleClap} className={classes.miniClap}
-                                 aria-label="clap">
-                                <ClappingSVG style={{width: 21, height: 21}} fontSize="default"/>
-                            </Fab>
-                            {iconsDisabled &&
-                            <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
-                        </div>
-                        <div className={classes.wrapper}>
-                            <Fab disabled={iconsDisabled} onClick={handleHeart} className={classes.miniHeart}
-                                 aria-label="heart">
-                                <FavoriteBorderOutlinedIcon fontSize="default"/>
-                            </Fab>
-                            {iconsDisabled &&
-                            <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
-                        </div>
-                    </Box>
-                </div>
-            </ClickAwayListener>
-        );
-    };
+    const handleClose = useCallback(() => {
+        setOpen(false);
+    }, []);
 
-export default EmoteButtons;
+    const handleMouseEnter = useCallback((event) => {
+        clearTimeout(delayHandler)
+        handleOpen()
+    }, [delayHandler])
+
+    const handleMouseLeave = useCallback(() => {
+        setDelayHandler(setTimeout(() => {
+            handleClose()
+        }, DELAY))
+    }, [delayHandler])
+
+    const handleClap = useCallback(() => {
+        postIcon('clapping')
+    }, [iconsDisabled, livestreamId, authenticatedUser])
+
+    const handleLike = useCallback(() => {
+        postIcon('like')
+    }, [iconsDisabled, livestreamId, authenticatedUser])
+    const handleHeart = useCallback(() => {
+        postIcon('heart')
+    }, [iconsDisabled, livestreamId, authenticatedUser])
+
+    const postIcon = (iconName) => {
+        if (!iconsDisabled) {
+            dispatch(actions.createEmote(iconName))
+            setIconsDisabled(true);
+            firebase.postIcon(livestreamId, iconName, authenticatedUser.email || TEST_EMAIL);
+        }
+    }
+    const enableIcons = useCallback(() => {
+        setIconsDisabled(false)
+    }, [])
+
+    return (
+        <ClickAwayListener onClickAway={handleClose}>
+            <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.actionArea}>
+                <Box className={classes.miniButtons} classes={{root: open ? classes.cardHovered : ""}}>
+                    <div className={classes.wrapper}>
+                        <Fab disabled={iconsDisabled} onClick={handleLike} className={classes.miniLike}
+                             aria-label="like">
+                            <ThumbUpAltOutlinedIcon fontSize="default"/>
+                        </Fab>
+                        {iconsDisabled &&
+                        <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
+                    </div>
+                    <div className={classes.wrapper}>
+                        <Fab disabled={iconsDisabled} onClick={handleClap} className={classes.miniClap}
+                             aria-label="clap">
+                            <ClappingSVG style={{width: 21, height: 21}} fontSize="default"/>
+                        </Fab>
+                        {iconsDisabled &&
+                        <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
+                    </div>
+                    <div className={classes.wrapper}>
+                        <Fab disabled={iconsDisabled} onClick={handleHeart} className={classes.miniHeart}
+                             aria-label="heart">
+                            <FavoriteBorderOutlinedIcon fontSize="default"/>
+                        </Fab>
+                        {iconsDisabled &&
+                        <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
+                    </div>
+                </Box>
+            </div>
+        </ClickAwayListener>
+    );
+};
+
+export default withFirebase(EmoteButtons);

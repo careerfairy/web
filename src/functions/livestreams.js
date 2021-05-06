@@ -92,3 +92,30 @@ exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onReque
         return res.status(400).send(error);
     });
 });
+
+exports.setFirstCommentOfQuestionOnCreate = functions.firestore.document('livestreams/{livestream}/questions/{question}/comments/{comment}')
+    .onCreate(async commentSnap => {
+        try {
+            const commentData = commentSnap.data()
+            const questionRef = commentSnap.ref.parent.parent
+            const questionSnap = await questionRef.get()
+            if (questionSnap.exists) {
+                const questionData = questionSnap.data()
+                let questionDataToUpdate = {
+                    numberOfComments: admin.firestore.FieldValue.increment(1)
+                }
+                if (!questionData.firstComment) {
+                    questionDataToUpdate.firstComment = commentData
+                }
+                const successMessage = questionData.firstComment ?
+                    "Question already has first comment, only increment" :
+                    `Updated question doc (${questionRef.path}) with new first comment`
+                await questionRef.update(questionDataToUpdate)
+                functions.logger.log(successMessage)
+            } else {
+                functions.logger.warn(`The question (${questionRef.path}) does not exist for comment ${commentSnap.ref.path}`)
+            }
+        } catch (e) {
+            functions.logger.error("error in setFirstCommentOfQuestionOnCreate", e)
+        }
+    })
