@@ -8,7 +8,7 @@ import BreakoutRoom from "./BreakoutRoom";
 
 const useStyles = makeStyles(theme => ({
     breakoutRoomsContent: {
-        background: theme.palette.background.default
+        // background: theme.palette.background.default
     },
 }));
 

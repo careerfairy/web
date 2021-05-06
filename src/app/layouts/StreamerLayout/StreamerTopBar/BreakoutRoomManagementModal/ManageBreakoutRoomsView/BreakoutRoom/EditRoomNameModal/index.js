@@ -65,6 +65,7 @@ const ModalContent = ({handleClose, roomTitle, roomId}) => {
                     id="newTitle"
                     helperText={touched.newTitle && errors.newTitle}
                     type="text"
+                    autoFocus
                     name="newTitle"
                     defaultValue={values.newTitle}
                     onChange={handleChange}
@@ -92,8 +93,6 @@ const ModalContent = ({handleClose, roomTitle, roomId}) => {
 }
 
 const EditRoomNameModal = ({open, onClose, roomTitle, roomId}) => {
-
-    const classes = useStyles()
 
     const handleClose = () => {
         onClose();

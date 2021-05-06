@@ -8,6 +8,7 @@ import {isEmpty, isLoaded, useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 import CreateBreakoutRoomsView from "./CreateBreakoutRoomsView";
 import ManageBreakoutRoomsView from "./ManageBreakoutRoomsView";
+import {GlassDialog} from "materialUI/GlobalModals";
 
 
 const Content = ({handleClose}) => {
@@ -53,9 +54,9 @@ export const BreakoutRoomManagementModal = ({open, onClose}) => {
     }
 
     return (
-        <Dialog maxWidth="md" fullWidth open={open} onClose={handleClose}>
+        <GlassDialog maxWidth="md" fullWidth open={open} onClose={handleClose}>
             <Content handleClose={handleClose}/>
-        </Dialog>
+        </GlassDialog>
     )
 };
 
