@@ -4,21 +4,13 @@ import PropTypes from "prop-types";
 import {streamShape} from "types";
 import {makeStyles} from "@material-ui/core/styles";
 import {useSelector} from "react-redux";
-import AutoSizer from "react-virtualized-auto-sizer";
-import {FixedSizeList} from "react-window";
-import InfiniteLoader from "react-window-infinite-loader";
 import BreakoutRoom from "./BreakoutRoom";
-import {ChannelMember} from "./BreakoutRoom/BreakoutRoomAccordionContent";
 
 const useStyles = makeStyles(theme => ({
     breakoutRoomsContent: {
         background: theme.palette.background.default
     },
-
-
 }));
-
-
 
 const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const classes = useStyles()
@@ -54,10 +46,16 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
             </DialogTitle>
             <DialogContent className={classes.breakoutRoomsContent} dividers>
                 {breakoutRooms.map((room, index) => (
-                    <BreakoutRoom updateMemberCount={updateMemberCount} rtmClient={rtmClient} index={index}
-                                  openRoom={openRoom}
-                                  handleOpenAccordion={handleOpenAccordion}
-                                  key={room.id} memberCount={memberCounts[room.id]} breakoutRoom={room}/>
+                    <BreakoutRoom
+                        updateMemberCount={updateMemberCount}
+                        rtmClient={rtmClient}
+                        index={index}
+                        openRoom={openRoom}
+                        handleOpenAccordion={handleOpenAccordion}
+                        key={room.id}
+                        memberCount={memberCounts[room.id]}
+                        breakoutRoom={room}
+                    />
                 ))}
             </DialogContent>
             <DialogActions>

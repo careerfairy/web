@@ -6,17 +6,20 @@ import Typography from "@material-ui/core/Typography";
 import RenameRoomIcon from "@material-ui/icons/Edit";
 import DeleteRoomIcon from "@material-ui/icons/Close";
 import BreakoutRoomAccordionContent from './BreakoutRoomAccordionContent'
-import React from "react";
+import React, {useState} from "react";
+import EditRoomNameModal from "./EditRoomNameModal";
 
- const BreakoutRoom = ({
-                                 breakoutRoom: {title, id, liveSpeakers},
-                                 openRoom,
-                                 rtmClient,
-                                 memberCount,
-                                 updateMemberCount,
-                                 handleOpenAccordion
-                             }) => {
+const BreakoutRoom = ({
+                          breakoutRoom: {title, id, liveSpeakers},
+                          openRoom,
+                          rtmClient,
+                          memberCount,
+                          updateMemberCount,
+                          handleOpenAccordion
+                      }) => {
     const theme = useTheme()
+    const [editRoomNameModalOpen, setEditRoomNameModalOpen] = useState(false);
+    const closeEditRoomNameModal = () => setEditRoomNameModalOpen(false)
 
     const handleChange = (panel) => (event, isExpanded) => {
         handleOpenAccordion(isExpanded ? panel : "");
@@ -24,51 +27,60 @@ import React from "react";
 
     const handleClickRename = (event) => {
         event.stopPropagation()
+        setEditRoomNameModalOpen(true)
     }
 
     const handleClickDelete = (event) => {
         event.stopPropagation()
     }
     return (
-        <Accordion
-            onChange={handleChange(id)}
-            expanded={openRoom === id}
-            TransitionProps={{unmountOnExit: true}}
-        >
-            <AccordionSummary
-                expandIcon={<ExpandMoreIcon/>}
-                aria-label="Expand"
-                aria-controls="additional-actions1-content"
-                id="additional-actions1-header"
+        <React.Fragment>
+            <Accordion
+                onChange={handleChange(id)}
+                expanded={openRoom === id}
+                TransitionProps={{unmountOnExit: true}}
             >
-                <Box display="flex" width="100%" alignItems="center" justifyContent="space-between">
-                    <Typography variant="h6">
-                        {title}
-                    </Typography>
-                    <Button
-                        onClick={handleClickRename}
-                        startIcon={<RenameRoomIcon/>}
-                    >
-                        Rename
-                    </Button>
-                    <Button
-                        onClick={handleClickDelete}
-                        startIcon={<DeleteRoomIcon htmlColor={theme.palette.error.main}/>}
-                    >
-                        Delete
-                    </Button>
-                    <Typography variant="h6">
-                        {memberCount}
-                    </Typography>
-                </Box>
-            </AccordionSummary>
-            <BreakoutRoomAccordionContent
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon/>}
+                    aria-label="Expand"
+                    aria-controls="additional-actions1-content"
+                    id="additional-actions1-header"
+                >
+                    <Box display="flex" width="100%" alignItems="center" justifyContent="space-between">
+                        <Typography variant="h6">
+                            {title}
+                        </Typography>
+                        <Button
+                            onClick={handleClickRename}
+                            startIcon={<RenameRoomIcon/>}
+                        >
+                            Rename
+                        </Button>
+                        <Button
+                            onClick={handleClickDelete}
+                            startIcon={<DeleteRoomIcon htmlColor={theme.palette.error.main}/>}
+                        >
+                            Delete
+                        </Button>
+                        <Typography variant="h6">
+                            {memberCount}
+                        </Typography>
+                    </Box>
+                </AccordionSummary>
+                <BreakoutRoomAccordionContent
+                    roomId={id}
+                    rtmClient={rtmClient}
+                    liveSpeakers={liveSpeakers}
+                    updateMemberCount={updateMemberCount}
+                />
+            </Accordion>
+            <EditRoomNameModal
                 roomId={id}
-                rtmClient={rtmClient}
-                liveSpeakers={liveSpeakers}
-                updateMemberCount={updateMemberCount}
+                open={editRoomNameModalOpen}
+                onClose={closeEditRoomNameModal}
+                roomTitle={title}
             />
-        </Accordion>
+        </React.Fragment>
     )
 }
 
