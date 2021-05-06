@@ -8,6 +8,11 @@ import DeleteRoomIcon from "@material-ui/icons/Close";
 import BreakoutRoomAccordionContent from './BreakoutRoomAccordionContent'
 import React, {useState} from "react";
 import EditRoomNameModal from "./EditRoomNameModal";
+import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal";
+import {useFirebase} from "context/firebase";
+import {useRouter} from "next/router";
+import * as actions from 'store/actions'
+import {useDispatch} from "react-redux";
 
 const BreakoutRoom = ({
                           breakoutRoom: {title, id, liveSpeakers},
@@ -18,8 +23,14 @@ const BreakoutRoom = ({
                           handleOpenAccordion
                       }) => {
     const theme = useTheme()
+    const dispatch = useDispatch()
+    const {deleteBreakoutRoom} = useFirebase()
+    const {query: {livestreamId}} = useRouter()
     const [editRoomNameModalOpen, setEditRoomNameModalOpen] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteBreakoutRoomModalOpen, setDeleteBreakoutRoomModalOpen] = useState(false);
     const closeEditRoomNameModal = () => setEditRoomNameModalOpen(false)
+    const closeDeleteBreakoutRoomModal = () => setDeleteBreakoutRoomModalOpen(false)
 
     const handleChange = (panel) => (event, isExpanded) => {
         handleOpenAccordion(isExpanded ? panel : "");
@@ -32,6 +43,17 @@ const BreakoutRoom = ({
 
     const handleClickDelete = (event) => {
         event.stopPropagation()
+        setDeleteBreakoutRoomModalOpen(true)
+    }
+
+    const handleDeleteBreakoutRoom = async () => {
+        setDeleting(true)
+        try {
+            await deleteBreakoutRoom(id, livestreamId)
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
+        setDeleting(false)
     }
     return (
         <React.Fragment>
@@ -79,6 +101,14 @@ const BreakoutRoom = ({
                 open={editRoomNameModalOpen}
                 onClose={closeEditRoomNameModal}
                 roomTitle={title}
+            />
+            <AreYouSureModal
+                handleClose={closeDeleteBreakoutRoomModal}
+                open={deleteBreakoutRoomModalOpen}
+                handleConfirm={handleDeleteBreakoutRoom}
+                loading={deleting}
+                message="Are you sure that you want to delete this breakout room? The room will be deleted permanently"
+
             />
         </React.Fragment>
     )

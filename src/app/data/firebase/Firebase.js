@@ -2135,6 +2135,18 @@ class Firebase {
         return breakoutRoomRef.update(newData)
     }
 
+    /**
+     * @param {string} roomId
+     * @param {string} mainStreamId
+     */
+    deleteBreakoutRoom = (roomId, mainStreamId) => {
+        const breakoutRoomRef = this.firestore.collection("livestreams")
+            .doc(mainStreamId)
+            .collection("breakoutRooms")
+            .doc(roomId)
+        return breakoutRoomRef.delete()
+    }
+
     buildBreakoutRoom = (breakoutRoomId, test, title, companyLogo, index) => {
         return {
             start: this.getServerTimestamp(),

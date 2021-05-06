@@ -8,9 +8,8 @@ import {useDispatch} from "react-redux";
 import * as actions from "store/actions"
 import {useFormik} from 'formik';
 
-
-const useStyles = makeStyles(theme => ({}));
 const minTitleLength = 5
+
 const ModalContent = ({handleClose, roomTitle, roomId}) => {
     const {query: {livestreamId}} = useRouter()
     const {updateBreakoutRoom} = useFirebase()
