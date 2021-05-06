@@ -22,7 +22,6 @@ const useInfiniteScrollClient = (data = [], limit = 3, loadAdditional = 0) => {
     }, [data])
 
     const getMore = () => {
-        console.log("-> getting more");
         const stillMore = Boolean(totalItems.length > items.length)
         if (stillMore) {
             setEnd(prevState => prevState + (limit + loadAdditional))

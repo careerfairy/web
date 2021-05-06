@@ -57,10 +57,10 @@ const ChannelMember = (
     ) : (
         <React.Fragment>
             <ListItemAvatar>
-                <Avatar alt={"A G"}
+                <Avatar alt={memberData.initials}
                         src={memberData.avatarUrl}
                 >
-                    {memberData.firstName ? `${memberData.firstName[0] + memberData.lastName[0]}` : ""}
+                    {memberData.initials}
                 </Avatar>
             </ListItemAvatar>
             <ListItemText
@@ -122,13 +122,14 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
     const {currentLivestream: {id: livestreamId}} = useCurrentStream()
     const {getUsersByEmail} = useFirebase()
     const [breakoutRoomChannel, setBreakoutRoomChannel] = useState(null);
+    const [channelMemberIds, setChannelMemberIds] = useState([]);
     const [channelMembers, setChannelMembers] = useState([]);
-    // console.log("-> channelMembers", channelMembers);
+
     const [
         paginatedChannelMembers,
         getMorePaginatedChannelMembers,
         hasMorePaginatedChannelMembers
-    ] = useInfiniteScrollClient(channelMembers, 5)
+    ] = useInfiniteScrollClient(channelMemberIds, 5)
     const [channelMemberDictionary, setChannelMemberDictionary] = useState({});
     const rtmChannel = useSelector(state => state.rtmChannel)
     const classes = useStyles()
@@ -160,6 +161,7 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
                     return newState
                 })
             }
+            setChannelMembers(paginatedChannelMembers.filter(memberId => channelMemberDictionary[memberId]).map(memberId => channelMemberDictionary[memberId]))
         })()
     }, [paginatedChannelMembers])
 
@@ -181,20 +183,26 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
     }, [Boolean(breakoutRoomChannel)])
 
     const getDisplayData = (userInfo) => {
-        return {
-            displayName: `${userInfo.firstName} ${userInfo.lastName?.[0]}`,
-            firstName: userInfo.firstName,
-            lastName: userInfo.lastName,
-            speakerUuid: userInfo.speakerUuid
+        const isVisitor = !userInfo.firstName && !userInfo.lastName
+        return isVisitor ? {
+            displayName: "Visitor",
+            firstName: "Visitor",
+            initials: "V"
+        } : {
+            displayName: `${userInfo.firstName || ""} ${userInfo.lastName?.[0] || ""}`,
+            firstName: userInfo.firstName || "",
+            lastName: userInfo.lastName || "",
+            speakerUuid: userInfo.speakerUuid,
+            initials:  `${userInfo.firstName?.[0] || ""} ${userInfo.lastName?.[0] || ""}`
         }
     }
 
     const handleMemberJoined = (joinerId) => {
-        setChannelMembers(prevState => [...prevState, joinerId])
+        setChannelMemberIds(prevState => [...new Set([...prevState, joinerId])])
     }
 
     const handleMemberLeft = (leaverId) => {
-        setChannelMembers(prevState => prevState.filter(memberId => memberId !== leaverId))
+        setChannelMemberIds(prevState => prevState.filter(memberId => memberId !== leaverId))
     }
 
     useEffect(() => {
@@ -216,7 +224,7 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
             await channel.join()
         }
         const members = await channel.getMembers() || []
-        setChannelMembers(members)
+        setChannelMemberIds(members)
         setBreakoutRoomChannel(channel)
     }
 
@@ -225,7 +233,6 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
         const memberCount = channelMemberCountObj[roomId]
         updateMemberCount(roomId, memberCount)
     }
-
     return (
         <AccordionDetails>
             <div className={classes.listWrapper}>
@@ -233,7 +240,7 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
                     hasMore={hasMorePaginatedChannelMembers}
                     loadMore={getMorePaginatedChannelMembers}
                     channelMemberDictionary={channelMemberDictionary}
-                    members={paginatedChannelMembers.filter(memberId => channelMemberDictionary[memberId]).map(memberId => channelMemberDictionary[memberId])}
+                    members={channelMembers}
                 />
             </div>
         </AccordionDetails>
@@ -313,19 +320,15 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const classes = useStyles()
     const rtmClient = useSelector(state => state.rtmClient)
     const [memberCounts, setMemberCounts] = useState({});
-    // console.log("-> memberCounts", memberCounts);
     const [openRoom, setOpenRoom] = useState(breakoutRooms[0].id);
 
     useEffect(() => {
         getAllMemberCounts()
     }, [breakoutRooms])
 
-    // console.log("-> channelMemberCountObj in body", memberCounts);
     const getAllMemberCounts = async () => {
         const breakoutRoomIds = breakoutRooms.map(room => room.id)
-        // console.log("-> breakoutRoomIds", breakoutRoomIds);
         const channelMemberCountObj = await rtmClient.getChannelMemberCount(breakoutRoomIds)
-        // console.log("-> channelMemberCountObj in fn", channelMemberCountObj);
         setMemberCounts(channelMemberCountObj)
     }
 
