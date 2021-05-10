@@ -24,7 +24,7 @@ const usePastStreams = (livestreamId) => {
     useFirestoreConnect(() => [{
         collection: "livestreams",
         where: pastLivestreamsQuery,
-        orderBy: ["start", "asc"],
+        orderBy: ["start", "desc"],
         storeAs: PAST_LIVESTREAMS_NAME
     }])
 
