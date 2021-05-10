@@ -6,9 +6,10 @@ import {EMOTE_MESSAGE_TEXT_TYPE} from "../util/constants";
 import * as actions from '../../store/actions'
 import {useRouter} from 'next/router';
 import useStreamRef from "./useStreamRef";
+import {removeRtmChannel} from "../../store/actions";
 
-export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer, optimizationMode) {
-    console.count("-> useAgoraAsStreamer");
+export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer) {
+    // console.count("-> useAgoraAsStreamer");
 
     const dispatch = useDispatch()
     const {path} = useStreamRef();
@@ -17,6 +18,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const [updatedStream, setUpdatedStream] = useState(null);
     const [removedStream, setRemovedStream] = useState(null);
     const [externalMediaStreams, setExternalMediaStreams] = useState([]);
+
     const [networkQuality, setNetworkQuality] = useState({
         downlinkNetworkQuality: 0,
         type: "network-quality",
@@ -60,9 +62,10 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
     useEffect(() => {
         return () => {
-            dispatch(actions.removeRtmClient())
+            removeClientsFromRedux()
         }
     }, []);
+
 
 
     useEffect(() => {
@@ -125,6 +128,11 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         }
     }, [agoraToken]);
 
+    const removeClientsFromRedux = () => {
+        dispatch(actions.removeRtmClient())
+        dispatch(actions.removeRtmChannel())
+    }
+
     const handleSwitchRooms = async () => {
         if (rtcClient) {
             await rtcClient.leave()
@@ -137,10 +145,19 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             rtmClient.removeAllListeners()
             await rtmClient.logout()
         }
-
-        // connectAgoraRTC()
-        // connectAgoraRTM()
+        removeAllClients()
+        removeClientsFromRedux()
+        setExternalMediaStreams([])
         setConnected(false)
+    }
+
+    const removeAllClients = () => {
+        setAgoraRTC(null)
+        setRtcClient(null)
+        setScreenShareRtcClient(null)
+        setScreenShareRtcStream(null)
+        setRtmClient(null)
+        setRtmChannel(null)
     }
 
     const connectAgoraRTC = () => {
@@ -168,7 +185,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         if (!isViewer) {
             rtcClient.setClientRole("host")
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
-
                 setAgoraRtcStatus({
                     type: "INFO",
                     msg: "RTC_JOINED_CHANNEL"
@@ -426,7 +442,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             const channel = rtmClient.createChannel(roomId);
 
 
-            dispatch(actions.setRtmClientObj(rtmClient))
+            // dispatch(actions.setRtmClientObj(rtmClient))
 
             channel.on('ChannelMessage', (message, memberId) => {
                 if (message.messageType === "TEXT") {
@@ -439,12 +455,12 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
 
             channel.join().then(() => {
-
-                dispatch(actions.setRtmChannelObj(channel))
+                // dispatch(actions.setRtmChannelObj(channel))
                 console.log('Joined channel');
                 // channel.getMembers().then(result => {
                 //     console.log("-> getMembers result", result);
                 // })
+
                 setRtmChannel(channel);
             }).catch(error => {
                 console.error(error);
@@ -565,14 +581,14 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
     useEffect(() => {
         if (rtmChannel) {
-            let interval = setInterval(() => {
-
-                rtmClient.getChannelMemberCount([roomId]).then(result => {
-                    setNumberOfViewers(result[roomId])
-                    // console.log(result)
-                })
-            }, 5000)
-            return () => clearInterval(interval);
+            // let interval = setInterval(() => {
+            //
+            //     rtmClient.getChannelMemberCount([roomId]).then(result => {
+            //         setNumberOfViewers(result[roomId])
+            //         // console.log(result)
+            //     })
+            // }, 5000)
+            // return () => clearInterval(interval);
         }
     }, [rtmChannel])
 

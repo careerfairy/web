@@ -46,7 +46,6 @@ function VideoContainer(props) {
     const [isStreaming, setIsStreaming] = useState(false);
     const [showScreenShareModal, setShowScreenShareModal] = useState(false);
     const [optimizationMode, setOptimizationMode] = useState("detail");
-
     const [audioCounter, setAudioCounter] = useState(0);
     const [showSettings, setShowSettings] = useState(false);
 
@@ -150,7 +149,7 @@ function VideoContainer(props) {
     }, [props.streamerId, props.currentLivestream.id])
 
     useEffect(() => {
-        if (externalMediaStreams && props.currentLivestream.currentSpeakerId && isMainStreamer) {
+        if (externalMediaStreams && props.currentLivestream.currentSpeakerId) {
             let existingCurrentSpeaker = externalMediaStreams.find(stream => stream.streamId === props.currentLivestream.currentSpeakerId)
             if (!existingCurrentSpeaker) {
                 setLivestreamCurrentSpeakerId(props.currentLivestream.id);

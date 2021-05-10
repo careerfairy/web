@@ -32,6 +32,7 @@ import NewFeatureHint from "../../../components/util/NewFeatureHint";
 import useStreamToken from "../../../components/custom-hook/useStreamToken";
 import useStreamRef from "../../../components/custom-hook/useStreamRef";
 import {BreakoutRoomManagementModal} from "./BreakoutRoomManagementModal";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     toolbar: {
@@ -59,13 +60,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience}) => {
+const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
     const {currentLivestream} = useCurrentStream()
     const streamRef = useStreamRef();
     const classes = useStyles({hasStarted: currentLivestream?.hasStarted})
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('md'))
     const {toggleTheme, themeMode} = useThemeToggle()
+    const [numberOfViewers, setNumberOfViewers] = useState(0);
+    // const rtmChannel = useSelector(state => state.rtmChannel)
 
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [hideTooltip, setHideTooltip] = useState(false);
@@ -73,6 +76,15 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
     const [openStreamerBreakoutRoomModal, setOpenStreamerBreakoutRoomModal] = useState(false);
     const {joiningStreamerLink, viewerLink} = useStreamToken()
 
+    // useEffect(() => {
+    //     if (rtmChannel) {
+            // console.log("-> rtmChannel", rtmChannel);
+            // rtmChannel.on("MemberCountUpdated", memberCount => {
+            //     console.log("-> MemberCount", memberCount);
+            //     setNumberOfViewers(memberCount)
+            // })
+    //     }
+    // }, [rtmChannel?.channelId]);
 
     useEffect(() => {
         if (currentLivestream.start) {

@@ -23,9 +23,11 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     }, [breakoutRooms])
 
     const getAllMemberCounts = async () => {
-        const breakoutRoomIds = breakoutRooms.map(room => room.id)
-        const channelMemberCountObj = await rtmClient.getChannelMemberCount(breakoutRoomIds)
-        setMemberCounts(channelMemberCountObj)
+        if (rtmClient) {
+            const breakoutRoomIds = breakoutRooms.map(room => room.id)
+            const channelMemberCountObj = await rtmClient.getChannelMemberCount(breakoutRoomIds)
+            setMemberCounts(channelMemberCountObj)
+        }
     }
 
     const updateMemberCount = useCallback((roomId, newCount) => {

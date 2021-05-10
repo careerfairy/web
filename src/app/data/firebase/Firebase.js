@@ -52,7 +52,7 @@ class Firebase {
     /**
      * Call an on call cloud function to generate a secure agora token.
      * @param {({
-     * isStreamer: string,
+     * isStreamer: boolean,
      * uid: string,
      * sentToken: string,
      * channel: string,
