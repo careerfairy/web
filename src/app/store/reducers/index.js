@@ -4,7 +4,9 @@ import { firestoreReducer } from 'redux-firestore';
 
 import authReducer from './authReducer';
 import todosReducer from './todosReducer';
+import rtcClientReducer from './rtcClientReducer';
 import rtmChannelReducer from "./rtmChannelReducer";
+import externalTracksReducer from './externalTracksReducer';
 import emotesReducer from "./emotesReducer";
 import snackbarReducer from "./snackbarReducer";
 import userDataSetReducer from "./userDataSetReducer";
@@ -16,7 +18,9 @@ export default combineReducers({
     todos: todosReducer,
     firebase: firebaseReducer,
     firestore: firestoreReducer,
+    rtcClient: rtcClientReducer,
     rtmChannel: rtmChannelReducer,
+    externalMediaStreams: externalTracksReducer,
     emotes: emotesReducer,
     snackbars: snackbarReducer,
     userDataSet: userDataSetReducer,

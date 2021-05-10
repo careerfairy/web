@@ -21,6 +21,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function LoadingModal({ agoraRtcStatus }) {
+    
+    const [connectingTimeout, setConnectingTimeout] = useState(false);
+    const [timeoutNumber, setTimeoutNumber] = useState(null);
+
+    useEffect(() => {
+        if (timeoutNumber) {
+            clearTimeout(timeoutNumber)
+        }
+        if (agoraRtcStatus.msg === "RTC_JOINING_CHANNEL") {
+            let number = setTimeout(() => {
+                setConnectingTimeout(true)
+            }, 15000);
+            setTimeoutNumber(number)
+        }   
+    }, [agoraRtcStatus])
 
     const classes = useStyles();
 
@@ -41,9 +56,18 @@ function LoadingModal({ agoraRtcStatus }) {
                 <div className={classes.container}>
                     <div className={classes.content}>
                         <CircularProgress />
-                        <div className={classes.text}>
-                            { 'Connecting...' }
-                        </div>
+                        {
+                            !connectingTimeout &&
+                            <div className={classes.text}>
+                                { 'Connecting...' }
+                            </div>
+                        }
+                        {
+                            connectingTimeout &&
+                            <div className={classes.text}>
+                                { 'Connection seems to be blocked, attempting to connect via cloud proxy...' }
+                            </div>
+                        }
                     </div>
                 </div>
             </DialogContent>

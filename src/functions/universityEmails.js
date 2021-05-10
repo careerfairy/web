@@ -36,7 +36,7 @@ exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(async
         })
     })
     console.log(recipients.size)
-    let testEmails = ["maximilian@careerfairy.io"]
+    let testEmails = ["mvoss@ethz.ch"]
     let templates = []
     recipients.forEach(recipient => {
         const email = {

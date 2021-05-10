@@ -62,7 +62,6 @@ const RemoteVideoContainer = ({
                                   muted,
                                   play,
                                   setRemovedStream,
-                                  setShowVideoButton,
                                   small,
                                   speakerSource,
                                   stream,
