@@ -6,11 +6,11 @@ import {Doughnut} from "react-chartjs-2";
 import {doughnutOptions, exportChartDataToCsv, randomColor} from "../../../../util/chartUtils";
 import CustomLegend from "../../../../../materialUI/Legends";
 import {createSelector} from "reselect";
-import {universityCountriesMap} from "../../../../util/constants";
 import {convertStringToArray} from "../../../../helperFunctions/HelperFunctions";
 import {colorsArray} from "../../../../util/colors";
 import Chart from "chart.js";
 import ExportCSVIcon from '@material-ui/icons/GetApp';
+import {universityCountriesMap} from "../../../../util/constants/universityCountries";
 
 Chart.defaults.global.plugins.labels = false;
 const useStyles = makeStyles(theme => ({}));

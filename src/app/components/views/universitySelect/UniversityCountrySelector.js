@@ -1,56 +1,96 @@
 import React from 'react';
-import {FormControl, FormHelperText, InputLabel, MenuItem, Select, Collapse} from "@material-ui/core";
+import {Collapse, FormControl, FormHelperText, TextField} from "@material-ui/core";
+import {universityCountries} from "../../util/constants/universityCountries";
+import Autocomplete from "@material-ui/lab/Autocomplete";
+import match from "autosuggest-highlight/match";
+import parse from "autosuggest-highlight/parse";
 
-const UniversityCountrySelector = ({handleClose, handleOpen, open, value, handleChange, submitting, handleBlur, error}) => {
+const otherObj = {code: "OTHER", name: "Other"}
+
+const UniversityCountrySelector = ({
+                                       handleClose,
+                                       handleOpen,
+                                       open,
+                                       value,
+                                       setFieldValue,
+                                       submitting,
+                                       handleBlur,
+                                       error
+                                   }) => {
+
+    const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
+        const item = universityCountries.find((country) => country.code === value)
+        return item || otherObj
+    }
+
     return (
-        <FormControl disabled={submitting} fullWidth variant="outlined">
-            <InputLabel id="universityCountryCode">Select Country of University</InputLabel>
-            <Select
-                id="universityCountryCode"
-                labelId="universityCountryCode"
-                name="universityCountryCode"
-                label="Select Country of University"
-                open={open}
-                variant="outlined"
-                fullWidth
-                error={Boolean(error)}
-                disabled={submitting}
-                onClose={handleClose}
-                onOpen={handleOpen}
-                value={value}
-                onChange={handleChange}
-            >
-                <MenuItem value="OTHER">
-                    Other
-                </MenuItem>
-                <MenuItem value={"CH"}>Switzerland</MenuItem>
-                <MenuItem value={"AT"}>Austria</MenuItem>
-                <MenuItem value={"US"}>United States</MenuItem>
-                <MenuItem value={"DE"}>Germany</MenuItem>
-                <MenuItem value={"ES"}>Spain</MenuItem>
-                <MenuItem value={"FI"}>Finland</MenuItem>
-                <MenuItem value={"FR"}>France</MenuItem>
-                <MenuItem value={"GB"}>United Kingdom</MenuItem>
-                <MenuItem value={"IT"}>Italy</MenuItem>
-                <MenuItem value={"NL"}>Netherlands</MenuItem>
-                <MenuItem value={"NO"}>Norway</MenuItem>
-                <MenuItem value={"SE"}>Sweden</MenuItem>
-                <MenuItem value={"BE"}>Belgium</MenuItem>
-                <MenuItem value={"IE"}>Ireland</MenuItem>
-                <MenuItem value={"BG"}>Bulgaria</MenuItem>
-                <MenuItem value={"EE"}>Estonia</MenuItem>
-                <MenuItem value={"HU"}>Hungary</MenuItem>
-                <MenuItem value={"PL"}>Poland</MenuItem>
-                <MenuItem value={"PT"}>Portugal</MenuItem>
-                <MenuItem value={"SK"}>Slovakia</MenuItem>
-                <MenuItem value={"SI"}>Slovenia</MenuItem>
-            </Select>
-            <Collapse in={Boolean(error)}>
-                <FormHelperText error={Boolean(error)}>
-                    {error}
-                </FormHelperText>
-            </Collapse>
-        </FormControl>
+        <Autocomplete
+            id="universityCountryCode"
+            name="universityCountryCode"
+            fullWidth
+            disabled={submitting}
+            selectOnFocus
+            onBlur={handleBlur}
+            autoHighlight
+            autoComplete={false}
+            onChange={(e, value) => {
+                setFieldValue("universityCountryCode", value?.code || otherObj.code)
+            }}
+            open={open}
+            onOpen={handleOpen}
+            onClose={handleClose}
+            getOptionLabel={(option) => option.name || ""}
+            value={getSelectedItem()}
+            getOptionSelected={(option, value) => option.code === value.code}
+            options={universityCountries}
+            renderInput={(params) => {
+                const inputProps = params.inputProps;
+                inputProps.autoComplete = "new-password";
+                return (
+                    <FormControl error={Boolean(error)} fullWidth>
+                        <TextField
+                            {...params}
+                            inputProps={inputProps}
+                            error={Boolean(error)}
+                            autoComplete='none'
+                            id="universityCountryCode"
+                            name="universityCountryCode"
+                            onBlur={handleBlur}
+                            label="Select Country of University"
+                            disabled={submitting}
+                            variant="outlined"
+                            InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                    <React.Fragment>
+                                        {params.InputProps.endAdornment}
+                                    </React.Fragment>
+                                ),
+                                autoComplete: 'new-password',
+                                form: {
+                                    autoComplete: 'new-password',
+                                },
+                            }}
+                        />
+                        <Collapse
+                            in={Boolean(error)}>
+                            <FormHelperText>
+                                {error}
+                            </FormHelperText>
+                        </Collapse>
+                    </FormControl>
+                );
+            }}
+            renderOption={(option, {inputValue}) => {
+                const matches = match(option.name, inputValue);
+                const parts = parse(option.name, matches);
+                return (<div>
+                        {parts.map((part, index) => (
+                            <span key={index} style={{fontWeight: part.highlight ? 700 : 400}}>{part.text}</span>))}
+                    </div>
+                );
+            }}
+        />
     );
 };
 
