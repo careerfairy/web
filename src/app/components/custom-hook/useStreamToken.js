@@ -5,7 +5,7 @@ import {useFirebase} from "context/firebase";
 import useStreamRef from "./useStreamRef";
 
 /**
- * @param {({forStreamType: (''| 'breakoutRoom'|'mainLivestream' ), targetBreakoutRoomId: string})} options Object
+ * @param {({forStreamType: (''|'breakoutRoom'|'mainLivestream' ), targetBreakoutRoomId: string})} options Object
  * @returns {({streamToken: string, mainStreamerLink: string, joiningStreamerLink: string, viewerLink: string})} Returns the 3 stream link types
  */
 

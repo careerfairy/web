@@ -4,10 +4,14 @@ import PropTypes from "prop-types";
 import {streamShape} from "types";
 import {makeStyles} from "@material-ui/core/styles";
 import {useDispatch, useSelector} from "react-redux";
+import BackToMainRoomIcon from '@material-ui/icons/KeyboardBackspace';
 import BreakoutRoom from "./BreakoutRoom";
 import {useFirebase} from "context/firebase";
 import {useRouter} from "next/router";
 import * as actions from 'store/actions'
+import Box from "@material-ui/core/Box";
+import useStreamToken from "../../../../../components/custom-hook/useStreamToken";
+import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 
 const useStyles = makeStyles(theme => ({
     breakoutRoomsContent: {
@@ -17,8 +21,10 @@ const useStyles = makeStyles(theme => ({
 
 const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const classes = useStyles()
+    const {isMainStreamer} = useCurrentStream()
+    const links = useStreamToken({forStreamType: "mainLivestream"})
     const {openAllBreakoutRooms, closeAllBreakoutRooms} = useFirebase()
-    const {query: {livestreamId}} = useRouter()
+    const {query: {livestreamId, breakoutRoomId}, push} = useRouter()
     const dispatch = useDispatch()
     const rtmClient = useSelector(state => state.rtmClient)
     const [memberCounts, setMemberCounts] = useState({});
@@ -75,11 +81,30 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
         setClosing(false)
     }
 
+    const handleBackToMainRoom = async () => {
+        const targetPath = isMainStreamer ? links.mainStreamerLink : links.joiningStreamerLink
+        await push(targetPath)
+        handleClose()
+    }
+
     return (
         <React.Fragment>
-            <DialogTitle>
-                Manage Breakout Rooms - {breakoutRooms.length}
-            </DialogTitle>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+                <DialogTitle>
+                    Manage Breakout Rooms
+                    {/*- {breakoutRooms.length}*/}
+                </DialogTitle>
+                {breakoutRoomId &&
+                (<Box py={2} px={1.5}>
+                    <Button
+                        onClick={handleBackToMainRoom}
+                        startIcon={<BackToMainRoomIcon/>}
+                    >
+                        Back to main Room
+                    </Button>
+                </Box>)
+                }
+            </Box>
             <DialogContent className={classes.breakoutRoomsContent} dividers>
                 {breakoutRooms.map((room, index) => (
                     <BreakoutRoom

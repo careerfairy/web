@@ -58,7 +58,9 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
 
     useEffect(() => {
         (async function fetchMemberData() {
-            const membersToFetch = paginatedChannelMembers.filter(member => !channelMemberDictionary[member]).map(member => member.replace(roomId, ''))
+            const membersToFetch = paginatedChannelMembers.filter(member => !channelMemberDictionary[member])
+                .map(member => member.replace(roomId, ''))
+                .filter(member => member)
             if (membersToFetch?.length) {
                 const arrayOfUserObjects = await getUsersByEmail(membersToFetch, {withEmpty: true})
                 setChannelMemberDictionary(prevState => {
@@ -69,9 +71,10 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
                     return newState
                 })
             }
-            setChannelMembers(paginatedChannelMembers.filter(memberId => channelMemberDictionary[memberId]).map(memberId => channelMemberDictionary[memberId]))
+            const newChannelMembers = paginatedChannelMembers.filter(memberId => channelMemberDictionary[memberId]).map(memberId => channelMemberDictionary[memberId])
+            setChannelMembers(newChannelMembers)
         })()
-    }, [paginatedChannelMembers])
+    }, [paginatedChannelMembers, channelMemberDictionary])
 
     useEffect(() => {
         if (rtmClient && !breakoutRoomChannel) {
@@ -85,7 +88,7 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
             breakoutRoomChannel.on("MemberJoined", handleMemberJoined)
             breakoutRoomChannel.on("MemberLeft", handleMemberLeft)
             breakoutRoomChannel.on("MemberCountUpdated", newCount => {
-                updateMemberCount(roomId, newCount -1)
+                updateMemberCount(roomId, newCount - 1)
             })
             return () => leaveChannel()
         }
@@ -145,7 +148,7 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
     const getMemberCount = async () => {
         const channelMemberCountObj = await rtmClient.getChannelMemberCount([roomId])
         const memberCount = channelMemberCountObj[roomId]
-        updateMemberCount(roomId, memberCount -1)
+        updateMemberCount(roomId, memberCount - 1)
     }
     return (
         <AccordionDetails>

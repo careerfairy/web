@@ -168,8 +168,7 @@ const BreakoutRoom = ({
 
     const handleJoinRoom = (event) => {
         event.stopPropagation()
-        // handleClose()
-
+        handleClose()
     }
     return (
         <React.Fragment>
@@ -184,35 +183,37 @@ const BreakoutRoom = ({
                     aria-controls="additional-actions1-content"
                     id="additional-actions1-header"
                 >
-                    <Box display="flex" width="100%" alignItems="center" justifyContent="space-between">
+                    <Box display="flex" width="100%"  alignItems="center" justifyContent="space-between">
                         <Typography variant="h6">
                             {title}
                         </Typography>
-                        <Chip
-                            title={hasStarted ? "OPEN" : "CLOSED"}
-                            label={hasStarted ? "OPEN" : "CLOSED"}
-                            color={hasStarted ? "primary" : "secondary"}
-                        />
-                        {hasStarted ? (
-                            <RoomOpenedActions
-                                loading={loading}
-                                roomId={id}
-                                handleJoinRoom={handleJoinRoom}
-                                handleCloseRoom={handleCloseRoom}
-                                handleClickRename={handleClickRename}
-                                breakoutRoomLink={breakoutRoomLink}
+                        <Box flex={1} display="flex" marginLeft={3} alignItems="center" justifyContent="space-between">
+                            <Chip
+                                title={hasStarted ? "OPEN" : "CLOSED"}
+                                label={hasStarted ? "OPEN" : "CLOSED"}
+                                color={hasStarted ? "primary" : "secondary"}
                             />
-                        ) : (
-                            <RoomClosedActions
-                                loading={loading}
-                                handleClickRename={handleClickRename}
-                                handleOpenRoom={handleOpenRoom}
-                                handleClickDelete={handleClickDelete}
-                            />
-                        )}
-                        <Typography variant="h6">
-                            {memberCount}
-                        </Typography>
+                            {hasStarted ? (
+                                <RoomOpenedActions
+                                    loading={loading}
+                                    roomId={id}
+                                    handleJoinRoom={handleJoinRoom}
+                                    handleCloseRoom={handleCloseRoom}
+                                    handleClickRename={handleClickRename}
+                                    breakoutRoomLink={breakoutRoomLink}
+                                />
+                            ) : (
+                                <RoomClosedActions
+                                    loading={loading}
+                                    handleClickRename={handleClickRename}
+                                    handleOpenRoom={handleOpenRoom}
+                                    handleClickDelete={handleClickDelete}
+                                />
+                            )}
+                            <Typography variant="h6">
+                                {memberCount}
+                            </Typography>
+                        </Box>
                     </Box>
                 </AccordionSummary>
                 <BreakoutRoomAccordionContent
