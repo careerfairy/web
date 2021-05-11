@@ -14,7 +14,7 @@ import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil";
 import {useSelector} from "react-redux";
 import StatsUtil from "../../../../../../../data/util/StatsUtil";
 import GroupsUtil from "../../../../../../../data/util/GroupsUtil";
-import {universityCountriesMap} from "../../../../../../util/constants";
+import {universityCountriesMap} from "../../../../../../util/constants/universityCountries";
 
 const customTableOptions = {...defaultTableOptions}
 const useStyles = makeStyles((theme) => ({
