@@ -69,7 +69,7 @@ const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
     const {toggleTheme, themeMode} = useThemeToggle()
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     // const rtmChannel = useSelector(state => state.rtmChannel)
-    console.count("-> StreamerTopBar");
+    // console.count("-> StreamerTopBar");
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [hideTooltip, setHideTooltip] = useState(false);
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
@@ -95,7 +95,7 @@ const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
                 }
             }, 1000)
         }
-    }, [currentLivestream.start]);
+    }, [currentLivestream?.start]);
 
     function dateIsInUnder2Minutes(date) {
         return new Date(date).getTime() - Date.now() < 1000 * 60 * 2 || Date.now() > new Date(date).getTime();

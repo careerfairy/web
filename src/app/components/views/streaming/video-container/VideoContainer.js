@@ -38,7 +38,7 @@ function VideoContainer(props) {
     const [errorMessage, setErrorMessage] = useState(null);
     const [screenSharePermissionDenied, setScreenSharePermissionDenied] = useState(false);
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
-    console.count("-> VideoContainer");
+    // console.count("-> VideoContainer");
     const [streamerConnected, setStreamerConnected] = useState(false);
     const [streamerReady, setStreamerReady] = useState(false);
 

@@ -10,7 +10,7 @@ import {useRouter} from "next/router";
 import NotificationsContext from "../../context/notifications/NotificationsContext";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import {v4 as uuidv4} from "uuid";
-import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
+import {isEmpty, isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
 import {shallowEqual, useSelector} from "react-redux";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
@@ -68,11 +68,11 @@ const MAIN_STREAMER_PATHS = ["/streaming/[livestreamId]/breakout-room/[breakoutR
 
 const StreamerLayout = (props) => {
     const {children, firebase, isBreakout, isMainStreamer} = props
-    const {query: {token, livestreamId: baseStreamId, breakoutRoomId}, pathname} = useRouter()
+    const {query: {token, livestreamId: baseStreamId, breakoutRoomId}, pathname, asPath} = useRouter()
     const livestreamId = breakoutRoomId || baseStreamId
     const router = useRouter();
     const smallScreen = useMediaQuery('(max-width:700px)');
-console.count("-> StreamerLayout");
+// console.count("-> StreamerLayout");
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [newNotification, setNewNotification] = useState(null);
     const [notificationToRemove, setNotificationToRemove] = useState(null);
@@ -179,7 +179,7 @@ console.count("-> StreamerLayout");
 
     const tokenIsValidated = () => {
         // Absolving breakout room from token auth
-        if (currentLivestream.test || isBreakout) {
+        if (currentLivestream?.test || isBreakout) {
             return true;
         } else {
             return tokenChecked;
@@ -189,7 +189,7 @@ console.count("-> StreamerLayout");
         setShowMenu(!showMenu)
     }, [showMenu])
 
-    if (!isLoaded(currentLivestream) || !tokenIsValidated()) {
+    if (!isLoaded(currentLivestream) || !tokenIsValidated() || isEmpty(currentLivestream)) {
         return <Loader/>
     }
 
@@ -205,7 +205,7 @@ console.count("-> StreamerLayout");
 
 
     return (
-        <NotificationsContext.Provider value={{setNewNotification, setNotificationToRemove}}>
+        <NotificationsContext.Provider value={{setNewNotification, setNotificationToRemove}} key={asPath}>
             <CurrentStreamContext.Provider value={{currentLivestream, isBreakout, isMainStreamer, isStreamer: true}}>
                 <div className={classes.root}>
                     <StreamerTopBar

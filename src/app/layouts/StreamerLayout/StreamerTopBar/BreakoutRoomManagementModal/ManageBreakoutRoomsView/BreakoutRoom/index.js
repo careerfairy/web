@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import {makeStyles, useTheme} from "@material-ui/core/styles";
+import {useTheme} from "@material-ui/core/styles";
 import {Accordion, AccordionSummary, Button, Chip} from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Box from "@material-ui/core/Box";
@@ -14,18 +14,8 @@ import {useFirebase} from "context/firebase";
 import {useRouter} from "next/router";
 import * as actions from 'store/actions'
 import {useDispatch} from "react-redux";
-import Link from 'materialUI/NextNavLink'
 import {useCurrentStream} from "../../../../../../context/stream/StreamContext";
 import useStreamToken from "../../../../../../components/custom-hook/useStreamToken";
-
-const useStyles = makeStyles(theme => ({
-    linkButton: {
-        "&:hover": {
-            textDecoration: "none !important",
-            color: theme.palette.common.white
-        }
-    }
-}));
 
 const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom, loading}) => {
     const theme = useTheme()
@@ -56,9 +46,8 @@ const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom
 
 const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, breakoutRoomLink, handleCloseRoom}) => {
     const theme = useTheme()
-    const classes = useStyles()
 
-    const {query: {breakoutRoomId}} = useRouter()
+    const {query: {breakoutRoomId}, push} = useRouter()
 
     return <React.Fragment>
         <Button
@@ -71,10 +60,9 @@ const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, 
             <Button
                 onClick={handleJoinRoom}
                 disabled={loading}
-                className={classes.linkButton}
-                href={breakoutRoomLink}
+                // href={breakoutRoomLink}
                 // component="a"
-                component={Link}
+                // component={Link}
             >
                 Join Room
             </Button>
@@ -166,9 +154,10 @@ const BreakoutRoom = ({
         setLoading(false)
     }
 
-    const handleJoinRoom = (event) => {
+    const handleJoinRoom = async (event) => {
         event.stopPropagation()
         handleClose()
+        await push({pathname: breakoutRoomLink, query: {auto: true}}, undefined, { shallow: false })
     }
     return (
         <React.Fragment>
@@ -217,7 +206,6 @@ const BreakoutRoom = ({
                     </Box>
                 </AccordionSummary>
                 <BreakoutRoomAccordionContent
-                    openRoom={openRoom}
                     roomId={id}
                     rtmClient={rtmClient}
                     liveSpeakers={liveSpeakers}

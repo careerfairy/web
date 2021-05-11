@@ -3,6 +3,7 @@ import * as actions from "../../store/actions"
 import {useDispatch} from "react-redux";
 import {useFirebase} from "../../context/firebase";
 import {GENERAL_ERROR} from "../util/constants";
+import {useRouter} from "next/router";
 
 
 /**
@@ -15,6 +16,7 @@ import {GENERAL_ERROR} from "../util/constants";
  * @returns {(null|({rtcToken: string, rtmToken:string}))} Returns either null or an agora token object
  */
 export function useAgoraToken(roomId, uid, isStreamer, securityToken, isScreenShareToken, streamDocumentPath) {
+    const {asPath} = useRouter();
 
     const [agoraToken, setAgoraToken] = useState(null);
     const {getSecureAgoraToken} = useFirebase()
@@ -31,11 +33,16 @@ export function useAgoraToken(roomId, uid, isStreamer, securityToken, isScreenSh
     }))
 
     useEffect(() => {
+        setAgoraToken(null)
+    }, [asPath]);
+
+
+    useEffect(() => {
         if (roomId && uid) {
             (async function getSecureToken() {
-                if (!isScreenShareToken) {
-                    console.log("-> uid", uid);
-                }
+                // if (!isScreenShareToken) {
+                //     console.log("-> uid", uid);
+                // }
                 try {
                     const response = await getSecureAgoraToken({
                         isStreamer,

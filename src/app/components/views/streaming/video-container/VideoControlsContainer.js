@@ -76,7 +76,7 @@ function VideoControlsContainer({
                                     localMediaStream,
                                     setLocalMediaStream
                                 }) {
-    console.count("-> VideoControlsContainer");
+    // console.count("-> VideoControlsContainer");
     const streamRef = useStreamRef();
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
     const theme = useTheme();

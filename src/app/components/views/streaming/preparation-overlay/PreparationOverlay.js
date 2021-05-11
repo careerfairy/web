@@ -16,6 +16,7 @@ import {
 } from "@material-ui/core";
 import {URL_REGEX} from 'components/util/constants';
 import usePreparationOverlay from "../../../custom-hook/usePreparationOverlay";
+import {useRouter} from "next/router";
 
 const useStyles = makeStyles((theme) => ({
     background: {
@@ -96,6 +97,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady}) {
 
     const classes = useStyles();
     const {updateSpeaker, addSpeaker} = usePreparationOverlay()
+    const {query:{auto}} = useRouter()
     const [speaker, setSpeaker] = useState({
         firstName: "",
         lastName: "",

@@ -60,12 +60,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         }
     }, [streamId])
 
-    useEffect(() => {
-        return () => {
-            removeClientsFromRedux()
-        }
-    }, []);
-
 
 
     useEffect(() => {
@@ -102,38 +96,51 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     }, [removedStream]);
 
     useEffect(() => {
-        if (window &&
-            userUid &&
-            streamerReady &&
-            roomId &&
-            streamId &&
-            agoraToken &&
-            agoraScreenShareToken &&
-            document) {
-            setReadyToConnect(true);
-        }
-    }, [window, userUid, streamerReady, roomId, streamId, agoraToken, agoraScreenShareToken, document])
+        setReadyToConnect(
+            Boolean(
+                window &&
+                userUid &&
+                streamerReady &&
+                roomId &&
+                streamId &&
+                agoraToken &&
+                agoraScreenShareToken &&
+                document
+            ));
+    }, [window, userUid, streamerReady, roomId, streamId, agoraToken, agoraScreenShareToken, document, router.asPath])
 
     useEffect(() => {
-        if (readyToConnect && !connected) {
-            connectAgoraRTC()
-            connectAgoraRTM()
-            setConnected(true)
+        if (readyToConnect) {
+            handleConnectClients()
         }
-    }, [readyToConnect, connected])
+    }, [readyToConnect])
 
     useEffect(() => {
-        if (agoraToken && connected) {
+        if (rtcClient || rtmClient || rtmChannel) {
             handleSwitchRooms()
         }
-    }, [agoraToken]);
+    }, [router.asPath])
+
+    // useEffect(() => {
+    //
+    //     return () => {
+    //         console.log("-> DESTROYING CONNECTIONS");
+    //         handleSwitchRooms()
+    //     }
+    // },[router.asPath])
 
     const removeClientsFromRedux = () => {
         dispatch(actions.removeRtmClient())
         dispatch(actions.removeRtmChannel())
     }
 
+    const handleConnectClients = () => {
+        console.log("-> Connecting Clients");
+        connectAgoraRTC()
+        connectAgoraRTM()
+    }
     const handleSwitchRooms = async () => {
+        console.log("-> CLOSING CONNECTIONS");
         if (rtcClient) {
             await rtcClient.leave()
         }
@@ -148,7 +155,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         removeAllClients()
         removeClientsFromRedux()
         setExternalMediaStreams([])
-        setConnected(false)
+        console.log("-> CLOSING CONNECTIONS FINISHED");
     }
 
     const removeAllClients = () => {
@@ -409,7 +416,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         let AgoraRTM = require('agora-rtm-sdk');
 
         let rtmClient = AgoraRTM.createInstance(AGORA_APP_ID, {logFilter: AgoraRTM.LOG_FILTER_ERROR})
-
 
         rtmClient.on('ConnectionStateChanged', (newState, reason) => {
             if (newState === "DISCONNECTED") {

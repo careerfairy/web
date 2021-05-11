@@ -27,6 +27,8 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const {query: {livestreamId, breakoutRoomId}, push} = useRouter()
     const dispatch = useDispatch()
     const rtmClient = useSelector(state => state.rtmClient)
+    const rtmChannel = useSelector(state => state.rtmChannel)
+
     const [memberCounts, setMemberCounts] = useState({});
     const [allRoomsOpen, setAllRoomsOpen] = useState(false);
     const [allRoomsClosed, setAllRoomsClosed] = useState(false);
@@ -82,6 +84,14 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     }
 
     const handleBackToMainRoom = async () => {
+        if(rtmChannel){
+            await rtmChannel.leave()
+        }
+        if(rtmClient){
+            console.log("-> rtmClient", rtmClient);
+            await rtmClient.logout()
+            dispatch(actions.removeRtmClient())
+        }
         const targetPath = isMainStreamer ? links.mainStreamerLink : links.joiningStreamerLink
         await push(targetPath)
         handleClose()
