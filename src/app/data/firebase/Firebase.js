@@ -2165,6 +2165,44 @@ class Firebase {
         return breakoutRoomRef.delete()
     }
 
+    /**
+     * @param {string} mainStreamId
+     */
+    openAllBreakoutRooms = async (mainStreamId) => {
+        const batch = this.firestore.batch()
+        const breakoutRoomsSnaps = await this.firestore.collection("livestreams")
+            .doc(mainStreamId)
+            .collection("breakoutRooms").get()
+        for (const breakoutRoomSnap of breakoutRoomsSnaps.docs) {
+            if (breakoutRoomSnap.exists) {
+                const roomRef = breakoutRoomSnap.ref
+                batch.update(roomRef, {
+                    open: true
+                })
+            }
+        }
+        return await batch.commit()
+    }
+
+    /**
+     * @param {string} mainStreamId
+     */
+    closeAllBreakoutRooms = async (mainStreamId) => {
+        const batch = this.firestore.batch()
+        const breakoutRoomsSnaps = await this.firestore.collection("livestreams")
+            .doc(mainStreamId)
+            .collection("breakoutRooms").get()
+        for (const breakoutRoomSnap of breakoutRoomsSnaps.docs) {
+            if (breakoutRoomSnap.exists) {
+                const roomRef = breakoutRoomSnap.ref
+                batch.update(roomRef, {
+                    open: false
+                })
+            }
+        }
+        return await batch.commit()
+    }
+
     buildBreakoutRoom = (breakoutRoomId, test, title, companyLogo, index) => {
         return {
             start: this.getServerTimestamp(),

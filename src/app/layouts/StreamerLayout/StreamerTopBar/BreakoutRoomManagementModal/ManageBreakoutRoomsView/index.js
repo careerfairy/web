@@ -3,8 +3,11 @@ import {Button, DialogActions, DialogContent, DialogTitle} from "@material-ui/co
 import PropTypes from "prop-types";
 import {streamShape} from "types";
 import {makeStyles} from "@material-ui/core/styles";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import BreakoutRoom from "./BreakoutRoom";
+import {useFirebase} from "context/firebase";
+import {useRouter} from "next/router";
+import * as actions from 'store/actions'
 
 const useStyles = makeStyles(theme => ({
     breakoutRoomsContent: {
@@ -14,12 +17,24 @@ const useStyles = makeStyles(theme => ({
 
 const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const classes = useStyles()
+    const {openAllBreakoutRooms, closeAllBreakoutRooms} = useFirebase()
+    const {query: {livestreamId}} = useRouter()
+    const dispatch = useDispatch()
     const rtmClient = useSelector(state => state.rtmClient)
     const [memberCounts, setMemberCounts] = useState({});
+    const [allRoomsOpen, setAllRoomsOpen] = useState(false);
+    const [allRoomsClosed, setAllRoomsClosed] = useState(false);
     const [openRoom, setOpenRoom] = useState("");
+    const [opening, setOpening] = useState(false);
+    const [closing, setClosing] = useState(false);
 
     useEffect(() => {
         getAllMemberCounts()
+    }, [breakoutRooms])
+
+    useEffect(() => {
+        setAllRoomsOpen(breakoutRooms.every(room => room.open))
+        setAllRoomsClosed(breakoutRooms.every(room => !room.open))
     }, [breakoutRooms])
 
     const getAllMemberCounts = async () => {
@@ -40,6 +55,25 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const handleOpenAccordion = useCallback((roomId) => {
         setOpenRoom(roomId)
     }, [])
+
+    const handleOpenAllRooms = async () => {
+        try {
+            setOpening(true)
+            await openAllBreakoutRooms(livestreamId)
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
+        setOpening(false)
+    }
+    const handleCloseAllRooms = async () => {
+        try {
+            setClosing(true)
+            await closeAllBreakoutRooms(livestreamId)
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
+        setClosing(false)
+    }
 
     return (
         <React.Fragment>
@@ -65,6 +99,25 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                 <Button onClick={handleClose}>
                     Cancel
                 </Button>
+                {!allRoomsOpen &&
+                <Button
+                    disabled={closing || opening}
+                    variant="contained"
+                    color="primary"
+                    onClick={handleOpenAllRooms}
+                >
+                    Open All Rooms
+                </Button>}
+                {!allRoomsClosed &&
+                <Button
+                    disabled={closing || opening}
+                    variant="contained"
+                    color="primary"
+                    onClick={handleCloseAllRooms}
+                >
+                    Close All Rooms
+                </Button>}
+
             </DialogActions>
         </React.Fragment>
     )
