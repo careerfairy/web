@@ -57,7 +57,14 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
     }, [liveSpeakers])
 
     useEffect(() => {
-        (async function fetchMemberData() {
+        (function setNewChannelMembers() {
+            const newChannelMembers = paginatedChannelMembers.filter(memberId => channelMemberDictionary[memberId]).map(memberId => channelMemberDictionary[memberId])
+            setChannelMembers(newChannelMembers)
+        })()
+    }, [channelMemberDictionary])
+
+    useEffect(() => {
+        (async function fetchAndMapMemberData() {
             const membersToFetch = paginatedChannelMembers.filter(member => !channelMemberDictionary[member])
                 .map(member => member.replace(roomId, ''))
                 .filter(member => member)
@@ -71,10 +78,8 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
                     return newState
                 })
             }
-            const newChannelMembers = paginatedChannelMembers.filter(memberId => channelMemberDictionary[memberId]).map(memberId => channelMemberDictionary[memberId])
-            setChannelMembers(newChannelMembers)
         })()
-    }, [paginatedChannelMembers, channelMemberDictionary])
+    }, [paginatedChannelMembers])
 
     useEffect(() => {
         if (rtmClient && !breakoutRoomChannel) {
