@@ -1,7 +1,6 @@
 import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {CircularProgress, Dialog, DialogContent} from "@material-ui/core";
-import {useFirebase} from "context/firebase";
+import {CircularProgress, DialogContent, Slide} from "@material-ui/core";
 import {useCurrentStream} from "../../../../context/stream/StreamContext";
 import {useRouter} from "next/router";
 import {isEmpty, isLoaded, useFirestoreConnect} from "react-redux-firebase";
@@ -9,12 +8,13 @@ import {useSelector} from "react-redux";
 import CreateBreakoutRoomsView from "./CreateBreakoutRoomsView";
 import ManageBreakoutRoomsView from "./ManageBreakoutRoomsView";
 import {GlassDialog} from "materialUI/GlobalModals";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import {useTheme} from "@material-ui/core/styles";
 
 
 const Content = ({handleClose}) => {
 
     const {query: {livestreamId}} = useRouter()
-    const {} = useFirebase()
     const {isMainStreamer} = useCurrentStream()
 
     const query = useMemo(() => livestreamId ? [{
@@ -48,13 +48,15 @@ const Content = ({handleClose}) => {
     return <ManageBreakoutRoomsView handleClose={handleClose} breakoutRooms={breakoutRooms}/>
 }
 export const BreakoutRoomManagementModal = ({open, onClose}) => {
-
+    const theme = useTheme()
+    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
     const handleClose = () => {
         onClose()
     }
 
     return (
-        <GlassDialog maxWidth="md" fullWidth open={open} onClose={handleClose}>
+        <GlassDialog TransitionComponent={Slide} fullScreen={mobile} maxWidth="md" fullWidth open={open}
+                     onClose={handleClose}>
             <Content handleClose={handleClose}/>
         </GlassDialog>
     )

@@ -41,12 +41,11 @@ const useJoinTalentPool = () => {
         joinTalentPool: async () => {
             try {
                 if (!userData) {
-                    return push({query: {absolutePath: asPath}, path: "/login"});
+                    return push({query: {absolutePath: asPath}, pathname: "/login"});
                 }
                 setLoading(true)
-                console.log("-> userData.userEmail", userData.userEmail);
                 const companyId = await getCompanyId(isBreakout, livestreamId, currentLivestream)
-                await joinCompanyTalentPool(companyId, userData.userEmail, currentLivestream.id);
+                await joinCompanyTalentPool(companyId, userData.userEmail, livestreamId);
             } catch (e) {
                 dispatch(actions.sendGeneralError(e))
             }
@@ -56,12 +55,12 @@ const useJoinTalentPool = () => {
         leaveTalentPool: async () => {
             try {
                 if (!userData) {
-                    return push({query: {absolutePath: asPath}, path: "/login"});
+                    return push({query: {absolutePath: asPath}, pathname: "/login"});
                 }
                 setLoading(true)
                 const companyId = await getCompanyId(isBreakout, livestreamId, currentLivestream)
 
-                await leaveCompanyTalentPool(companyId, userData.userEmail, currentLivestream.id);
+                await leaveCompanyTalentPool(companyId, userData.userEmail, livestreamId);
             } catch (e) {
                 dispatch(actions.sendGeneralError(e))
             }

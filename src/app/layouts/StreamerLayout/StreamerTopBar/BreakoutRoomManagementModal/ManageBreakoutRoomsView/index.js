@@ -33,8 +33,8 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     }, [breakoutRooms])
 
     useEffect(() => {
-        setAllRoomsOpen(breakoutRooms.every(room => room.open))
-        setAllRoomsClosed(breakoutRooms.every(room => !room.open))
+        setAllRoomsOpen(breakoutRooms.every(room => room.hasStarted))
+        setAllRoomsClosed(breakoutRooms.every(room => !room.hasStarted))
     }, [breakoutRooms])
 
     const getAllMemberCounts = async () => {
@@ -115,7 +115,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                     color="primary"
                     onClick={handleOpenAllRooms}
                 >
-                    Open All Rooms
+                    Start All Rooms
                 </Button>}
 
             </DialogActions>

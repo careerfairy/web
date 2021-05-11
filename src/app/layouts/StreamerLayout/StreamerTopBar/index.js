@@ -189,23 +189,20 @@ const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
                             </Typography>
                             {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                         </Box>}
-                    {isMainStreamer &&
-                    <Fragment>
-                        {mobile ?
-                            <Tooltip title="Open Student View">
-                                <IconButton target="_blank" href={viewerLink}>
-                                    <OpenInBrowserIcon color="inherit"/>
-                                </IconButton>
-                            </Tooltip>
-                            :
-                            <Button
-                                href={viewerLink}
-                                target="_blank"
-                                children="Open Student View"
-                                startIcon={<OpenInBrowserIcon color="inherit"/>}
-                            />
-                        }
-                    </Fragment>}
+                    {mobile ?
+                        <Tooltip title="Open Student View">
+                            <IconButton target="_blank" href={viewerLink}>
+                                <OpenInBrowserIcon color="inherit"/>
+                            </IconButton>
+                        </Tooltip>
+                        :
+                        <Button
+                            href={viewerLink}
+                            target="_blank"
+                            children="Open Student View"
+                            startIcon={<OpenInBrowserIcon color="inherit"/>}
+                        />
+                    }
                     <Box display="flex" alignItems="center">
                         <Tooltip title="Manage breakout rooms">
                             <IconButton disabled={openStreamerBreakoutRoomModal} onClick={handleOpenBreakoutRoomModal}>

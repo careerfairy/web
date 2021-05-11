@@ -1654,11 +1654,11 @@ class Firebase {
         return batch.commit();
     };
 
-    joinCompanyTalentPool = (companyId, userId, livestreamId) => {
+    joinCompanyTalentPool = (companyId, userId, mainStreamId) => {
         let userRef = this.firestore.collection("userData").doc(userId);
-        let streamRef = this.firestore.collection("livestreams").doc(livestreamId)
+        let streamRef = this.firestore.collection("livestreams").doc(mainStreamId)
         let userInTalentPoolCollectionRef = this.firestore.collection("livestreams")
-            .doc(livestreamId)
+            .doc(mainStreamId)
             .collection("talentPool")
             .doc(userId)
 
@@ -2177,7 +2177,7 @@ class Firebase {
             if (breakoutRoomSnap.exists) {
                 const roomRef = breakoutRoomSnap.ref
                 batch.update(roomRef, {
-                    open: true
+                    hasStarted: true
                 })
             }
         }
@@ -2196,7 +2196,7 @@ class Firebase {
             if (breakoutRoomSnap.exists) {
                 const roomRef = breakoutRoomSnap.ref
                 batch.update(roomRef, {
-                    open: false
+                    hasStarted: false
                 })
             }
         }
@@ -2206,7 +2206,6 @@ class Firebase {
     buildBreakoutRoom = (breakoutRoomId, test, title, companyLogo, index) => {
         return {
             start: this.getServerTimestamp(),
-            open: false,
             id: breakoutRoomId,
             hasStarted: false,
             test,

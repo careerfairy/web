@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
-import {useTheme} from "@material-ui/core/styles";
-import {Accordion, AccordionSummary, Button} from "@material-ui/core";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
+import {Accordion, AccordionSummary, Button, Chip} from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
@@ -17,6 +17,15 @@ import {useDispatch} from "react-redux";
 import Link from 'materialUI/NextNavLink'
 import {useCurrentStream} from "../../../../../../context/stream/StreamContext";
 import useStreamToken from "../../../../../../components/custom-hook/useStreamToken";
+
+const useStyles = makeStyles(theme => ({
+    linkButton: {
+        "&:hover": {
+            textDecoration: "none !important",
+            color: theme.palette.common.white
+        }
+    }
+}));
 
 const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom, loading}) => {
     const theme = useTheme()
@@ -44,8 +53,10 @@ const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom
         </Button>
     </React.Fragment>;
 };
+
 const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, breakoutRoomLink, handleCloseRoom}) => {
     const theme = useTheme()
+    const classes = useStyles()
 
     const {query: {breakoutRoomId}} = useRouter()
 
@@ -60,6 +71,7 @@ const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, 
             <Button
                 onClick={handleJoinRoom}
                 disabled={loading}
+                className={classes.linkButton}
                 href={breakoutRoomLink}
                 // component="a"
                 component={Link}
@@ -84,7 +96,7 @@ RoomClosedActions.propTypes = {
     loading: PropTypes.bool,
 }
 const BreakoutRoom = ({
-                          breakoutRoom: {title, id, liveSpeakers, open},
+                          breakoutRoom: {title, id, liveSpeakers, hasStarted},
                           openRoom,
                           rtmClient,
                           memberCount,
@@ -127,7 +139,7 @@ const BreakoutRoom = ({
         event.stopPropagation()
         try {
             setLoading(true)
-            await updateBreakoutRoom({open: true}, id, livestreamId)
+            await updateBreakoutRoom({hasStarted: true}, id, livestreamId)
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
         }
@@ -137,7 +149,7 @@ const BreakoutRoom = ({
         event.stopPropagation()
         try {
             setLoading(true)
-            await updateBreakoutRoom({open: false}, id, livestreamId)
+            await updateBreakoutRoom({hasStarted: false}, id, livestreamId)
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
         }
@@ -176,7 +188,12 @@ const BreakoutRoom = ({
                         <Typography variant="h6">
                             {title}
                         </Typography>
-                        {open ? (
+                        <Chip
+                            title={hasStarted ? "OPEN" : "CLOSED"}
+                            label={hasStarted ? "OPEN" : "CLOSED"}
+                            color={hasStarted ? "primary" : "secondary"}
+                        />
+                        {hasStarted ? (
                             <RoomOpenedActions
                                 loading={loading}
                                 roomId={id}
