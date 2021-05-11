@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
     listWrapper: {
         display: "flex",
         flexDirection: "column",
-        // height: "30vh",
+        height: "30vh",
         maxHeight: 200,
         minHeight: 75,
         width: "100%",

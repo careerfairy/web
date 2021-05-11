@@ -7,7 +7,6 @@ import ChannelMember from "./ChannelMember";
 const UserList = ({members, loadMore, hasMore}) => {
     const itemCount = hasMore ? members.length + 1 : members.length;
     return (
-        <div style={{flex: '1 1 auto'}}>
             <InfiniteLoader
                 isItemLoaded={index => index < members.length}
                 itemCount={itemCount}
@@ -31,7 +30,6 @@ const UserList = ({members, loadMore, hasMore}) => {
                     </AutoSizer>
                 )}
             </InfiniteLoader>
-        </div>
     );
 };
 

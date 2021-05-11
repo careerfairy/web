@@ -40,7 +40,7 @@ import Typography from "@material-ui/core/Typography";
     return (
         <ListItem
             style={style}
-            button
+            // button
             alignItems="flex-start">
             {content}
         </ListItem>

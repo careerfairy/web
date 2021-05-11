@@ -104,7 +104,7 @@ const useStyles = makeStyles(theme => ({
 function CurrentSpeakerDisplayer(props) {
     const classes = useStyles()
     const windowSize = useWindowSize();
-
+console.count("-> CurrentSpeakerDisplayer");
     function getVideoContainerHeight(streamId) {
         if (props.isPlayMode) {
             if (props.smallScreenMode) {

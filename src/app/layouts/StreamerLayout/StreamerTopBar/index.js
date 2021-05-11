@@ -69,7 +69,7 @@ const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
     const {toggleTheme, themeMode} = useThemeToggle()
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     // const rtmChannel = useSelector(state => state.rtmChannel)
-
+    console.count("-> StreamerTopBar");
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [hideTooltip, setHideTooltip] = useState(false);
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
@@ -78,11 +78,11 @@ const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
 
     // useEffect(() => {
     //     if (rtmChannel) {
-            // console.log("-> rtmChannel", rtmChannel);
-            // rtmChannel.on("MemberCountUpdated", memberCount => {
-            //     console.log("-> MemberCount", memberCount);
-            //     setNumberOfViewers(memberCount)
-            // })
+    // console.log("-> rtmChannel", rtmChannel);
+    // rtmChannel.on("MemberCountUpdated", memberCount => {
+    //     console.log("-> MemberCount", memberCount);
+    //     setNumberOfViewers(memberCount)
+    // })
     //     }
     // }, [rtmChannel?.channelId]);
 

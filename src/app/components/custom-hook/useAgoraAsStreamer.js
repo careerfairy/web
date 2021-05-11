@@ -442,7 +442,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             const channel = rtmClient.createChannel(roomId);
 
 
-            // dispatch(actions.setRtmClientObj(rtmClient))
+            dispatch(actions.setRtmClientObj(rtmClient))
 
             channel.on('ChannelMessage', (message, memberId) => {
                 if (message.messageType === "TEXT") {
@@ -455,7 +455,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
 
             channel.join().then(() => {
-                // dispatch(actions.setRtmChannelObj(channel))
+                dispatch(actions.setRtmChannelObj(channel))
                 console.log('Joined channel');
                 // channel.getMembers().then(result => {
                 //     console.log("-> getMembers result", result);
