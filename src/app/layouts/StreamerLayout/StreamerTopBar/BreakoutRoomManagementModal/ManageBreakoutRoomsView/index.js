@@ -99,6 +99,15 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                 <Button onClick={handleClose}>
                     Cancel
                 </Button>
+                {!allRoomsClosed &&
+                <Button
+                    disabled={closing || opening}
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleCloseAllRooms}
+                >
+                    Close All Rooms
+                </Button>}
                 {!allRoomsOpen &&
                 <Button
                     disabled={closing || opening}
@@ -107,15 +116,6 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                     onClick={handleOpenAllRooms}
                 >
                     Open All Rooms
-                </Button>}
-                {!allRoomsClosed &&
-                <Button
-                    disabled={closing || opening}
-                    variant="contained"
-                    color="primary"
-                    onClick={handleCloseAllRooms}
-                >
-                    Close All Rooms
                 </Button>}
 
             </DialogActions>

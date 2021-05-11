@@ -44,12 +44,18 @@ const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom
         </Button>
     </React.Fragment>;
 };
-const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, handleCloseRoom, breakoutRoomLink}) => {
+const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, breakoutRoomLink, handleCloseRoom}) => {
     const theme = useTheme()
 
     const {query: {breakoutRoomId}} = useRouter()
 
     return <React.Fragment>
+        <Button
+            onClick={handleCloseRoom}
+            disabled={loading}
+        >
+            Close Room
+        </Button>
         {roomId !== breakoutRoomId && (
             <Button
                 onClick={handleJoinRoom}
@@ -67,13 +73,6 @@ const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, 
             startIcon={<RenameRoomIcon/>}
         >
             Rename
-        </Button>
-        <Button
-            onClick={handleCloseRoom}
-            disabled={loading}
-            // startIcon={<RenameRoomIcon/>}
-        >
-            Close Room
         </Button>
     </React.Fragment>;
 };
@@ -134,6 +133,16 @@ const BreakoutRoom = ({
         }
         setLoading(false)
     }
+    const handleCloseRoom = async (event) => {
+        event.stopPropagation()
+        try {
+            setLoading(true)
+            await updateBreakoutRoom({open: false}, id, livestreamId)
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
+        setLoading(false)
+    }
 
     const handleDeleteBreakoutRoom = async () => {
         setLoading(true)
@@ -172,6 +181,7 @@ const BreakoutRoom = ({
                                 loading={loading}
                                 roomId={id}
                                 handleJoinRoom={handleJoinRoom}
+                                handleCloseRoom={handleCloseRoom}
                                 handleClickRename={handleClickRename}
                                 breakoutRoomLink={breakoutRoomLink}
                             />
