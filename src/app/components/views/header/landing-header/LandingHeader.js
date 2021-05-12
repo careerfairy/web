@@ -1,9 +1,9 @@
 import React, {Fragment} from 'react'
-import {Image, Icon} from "semantic-ui-react";
+import MenuIcon from '@material-ui/icons/Menu';
 
 import Link from 'next/link';
 import {useRouter} from 'next/router';
-import {Button} from "@material-ui/core";
+import {Button, IconButton} from "@material-ui/core";
 
 const LandingHeader = (props) => {
 
@@ -17,9 +17,12 @@ const LandingHeader = (props) => {
         <Fragment>
             <header id='main-header'>
                 <ul id='left-menu' className='float-left'>
-                    <li><Icon id='sidebar-toggle' style={{display: 'inline-block', cursor: 'pointer'}} name='bars'
-                              size='big' onClick={props.toggleSideBar}/></li>
-                    <li><Link href='/'><a><Image src='/logo_white.png' style={{
+                    <li>
+                        <IconButton onClick={props.toggleSideBar}>
+                            <MenuIcon id='sidebar-toggle' fontSize='large' style={{ color:'white' }}/>
+                        </IconButton>
+                    </li>
+                    <li><Link href='/'><a><img src='/logo_white.png' style={{
                         width: '150px',
                         display: 'inline-block',
                         marginTop: '10px',
@@ -39,6 +42,10 @@ const LandingHeader = (props) => {
                 </div>
             </header>
             <style jsx>{`
+                a {
+                    text-decoration: none
+                }
+                
                 #main-header {
                     width: 100%;
                     height: 60px;
@@ -65,6 +72,7 @@ const LandingHeader = (props) => {
                 #left-menu li{
                     margin: 0;
                     display: inline;
+                    vertical-align: middle;
                 }
 
                 #right-menu {

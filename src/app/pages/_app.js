@@ -1,5 +1,4 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import 'semantic/dist/semantic.min.css';
 import 'styles.css';
 import FirebaseContext from 'context/firebase/FirebaseContext';
 import Firebase from 'context/firebase';

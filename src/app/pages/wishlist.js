@@ -1,12 +1,11 @@
 import {useState, useEffect} from 'react';
-import {Button, Container, Header as SemanticHeader, Input} from "semantic-ui-react";
 
 import { withFirebase } from '../context/firebase';
 import Header from '../components/views/header/Header';
 import Footer from '../components/views/footer/Footer';
-import { useRouter } from 'next/router';
 
 import Head from 'next/head';
+import { Button, Container, TextField, Typography } from '@material-ui/core';
 
 function WishFactoryPlay(props) {
 
@@ -24,9 +23,9 @@ function WishFactoryPlay(props) {
     const fulfilledWishList = latestFulfilledWishes.map((wish, index) => {
         return(
             <div className='wishContainer fulfilled' key={index}>
-                <SemanticHeader as='h5' style={{ margin: '10px 0', fontWeight: '400', fontSize: '1.8em'}}>{wish.wish}</SemanticHeader>
+                <Typography variant='h5' style={{ margin: '10px 0', fontWeight: '400', fontSize: '1.8em'}}>{wish.wish}</Typography>
                 <div className='fulfilledWishSubcontent'>
-                    <Button color='teal' onClick={() => goToProfile(wish.companyId)} content='CareerFairy granted this wish!' icon='magic'/>
+                    <Button color='primary' onClick={() => goToProfile(wish.companyId)}>CareerFairy granted this wish!</Button>
                 </div>
                 <style jsx>{`
                     .wishContainer {
@@ -51,9 +50,9 @@ function WishFactoryPlay(props) {
     const wishList = wishes.map((wish, index) => {
         return(
             <div className='wishContainer' key={index}>
-                <SemanticHeader as='h5'  style={{ margin: '10px 0', fontWeight: '400', fontSize: '1.8em'}}>{wish.wish}</SemanticHeader>
+                <Typography variant='h5'  style={{ margin: '10px 0', fontWeight: '400', fontSize: '1.8em'}}>{wish.wish}</Typography>
                 <div className='ranking'>
-                    <Button primary icon='like' content='Upvote' onClick={() => addVoteToWish(wish)}/>
+                    <Button color='primary' onClick={() => addVoteToWish(wish)}>Upvote</Button>
                     <p>Upvoted {wish.vote} times</p>
                 </div>
                 <style jsx>{`
@@ -148,14 +147,12 @@ function WishFactoryPlay(props) {
             </Head>
             <Header classElement='relative white-background'  page='wishlist'/>
             <Container>
-                <SemanticHeader textAlign='center' as='h1' style={{ margin: '30px 0', fontSize: '2.8em'}}>
+                <Typography textAlign='center' variant='h1' style={{ margin: '30px 0', fontSize: '2.8em'}}>
                     <span>wish a company</span>
-                </SemanticHeader>
+                </Typography>
                 <div className='wishListHeader'>
-                    <Input id='add-new-wish' type='text' value={newWish} onChange={(event) => setNewWish(event.target.value)} fluid placeholder='Tell us your wish today!' action>
-                        <input />
-                        <Button loading={newWishLoading} primary onClick={() => addNewWish()}>Add Your Wish</Button>
-                    </Input>
+                    <TextField id='add-new-wish' value={newWish} onChange={(event) => setNewWish(event.target.value)} fullWidth={true} placeholder='Tell us your wish today!'/>
+                    <Button color='primary' onClick={() => addNewWish()}>Add Your Wish</Button>
                 </div>
                 <div className='wishListContent'>
                     {fulfilledWishList}

@@ -1,13 +1,13 @@
 import {Fragment, useEffect, useRef, useState} from "react";
-import {Container, Grid, Image, Icon} from "semantic-ui-react";
 
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import {withFirebase} from '../context/firebase/FirebaseContext';
 import {useRouter} from 'next/router';
 import Link from 'next/link';
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 import {makeStyles} from "@material-ui/core/styles";
-import { Avatar, Button } from "@material-ui/core";
+import { Avatar, Button, Container, Grid } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     videoContainer: {
@@ -76,7 +76,6 @@ function LandingPage(props) {
 
     const myRef = useRef(null);
     const topSpeakersRef = useRef(null);
-    const bottomSpeakersRef = useRef(null);
 
     const router = useRouter();
 
@@ -137,10 +136,10 @@ function LandingPage(props) {
 
     let companyPreviewElements = companies.filter(company => company.rank === 1).map((company, index) => {
         return (
-            <Grid.Column computer='2' mobile='3' key={index}>
+            <Grid item xs={3} lg={2} key={index}>
                 <div className='overviewPreviewLogoContainer'>
                     <div>
-                        <Image style={{maxHeight: '40px', filter: 'brightness(0) invert(0.9)', margin: '0 auto'}}
+                        <img style={{maxHeight: '40px', filter: 'brightness(0) invert(0.9)', margin: '0 auto'}}
                                src={company.logoUrl}/>
                     </div>
                     <style jsx>{`
@@ -152,26 +151,26 @@ function LandingPage(props) {
                       }
                     `}</style>
                 </div>
-            </Grid.Column>
+            </Grid>
         );
     })
 
     let companyElements = companies.map((company, index) => {
         return (
-            <Grid.Column computer='3' tablet='5' mobile='8' key={index}>
+            <Grid item lg={3} sm={4} xs={6} key={index}>
                 <div className='overviewLogoContainer'>
                     <div className={classes.companyImageWrapper}>
-                        <Image className={classes.companyImage}
+                        <img style={{ maxWidth: '120px', maxHeight: '50px' }}
                                src={company.logoUrl}/>
                     </div>
                 </div>
-            </Grid.Column>
+            </Grid>
         );
     })
 
     let introElements = mentors.map((mentor, index) => {
         return (
-            <Grid.Column computer={3} tablet={4} mobile={6} key={index}>
+            <Grid item lg={3} sm={4} xs={6} key={index}>
                 <div className={classes.stepContainer}>
                     <div className='stepImageContainer'>
                         <Avatar
@@ -181,12 +180,13 @@ function LandingPage(props) {
                         />
                     </div>
                     <div className={classes.companyLogoContainer}>
-                        <Image className='companyLogo' style={{
+                        <img className='companyLogo' style={{
                             position: 'absolute',
                             top: '50%',
                             left: '50%',
                             transform: 'translate(-50%, -50%)',
-                            maxHeight: '40px'
+                            maxHeight: '40px',
+                            maxWidth: '80px'
                         }} src={mentor.companyLogoUrl}/>
                     </div>
                     <style jsx>{`
@@ -222,17 +222,9 @@ function LandingPage(props) {
                       }
                     `}</style>
                 </div>
-            </Grid.Column>
+            </Grid>
         );
     })
-
-    function goToRoute(route) {
-        router.push(route);
-    }
-
-    function goToPastLivestream(livestreamId) {
-        router.push(`/past-livestream?id=${livestreamId}`, `/past-livestream/${livestreamId}`);
-    }
 
     return (
         <Fragment>
@@ -250,12 +242,9 @@ function LandingPage(props) {
                                 </div>
                             </div>
                             <div className='previewLogos'>
-                                <Grid centered className='middle aligned'>
-                                    {companyPreviewElements}
-                                </Grid>
                                 <div onClick={() => scrollToRef(myRef)} style={{cursor: 'pointer'}}>
-                                    <div>see all companies</div>
-                                    <Icon name='angle down' size='big'/>
+                                    <div>see our companies</div>
+                                    <KeyboardArrowDownIcon fontSize='large'/>
                                 </div>
                             </div>
                         </Container>
@@ -265,22 +254,20 @@ function LandingPage(props) {
                     </div>
                 </div>
                 <div className='top-icons'>
-                    <Container>
+                    <Container style={{ textAlign: 'center' }}>
                         <div className='company-icons-label'>What is CareerFairy?</div>
                         <div className='company-icons-sublabel'>From your laptop or smartphone, meet employees at small
                             &
                             large companies who share your background. Ask any question about them, their job or their
                             employer and get the answer during the livestream!
                         </div>
-                        <Image id='meet-companies-image'
+                        <img id='meet-companies-image'
                                style={{width: '80%', maxWidth: '900px', margin: '0 auto 50px auto'}}
                                src={secondPicture}/>
                         <div className='company-icons-sublabel'>Discover their work, see their office, get answers to
                             all
                             your questions and find out how you could join them in the future.
                         </div>
-                        <Grid centered textAlign='center'>
-                        </Grid>
                     </Container>
                 </div>
                 <div className='top-icons'>
@@ -291,7 +278,7 @@ function LandingPage(props) {
                             directly with the people you could work with, allowing you to ask your questions at the very
                             source.
                         </div>
-                        <Grid centered textAlign='center'>
+                        <Grid container style={{ textAlign: 'center' }}>
                             {introElements}
                         </Grid>
                     </Container>
@@ -303,7 +290,7 @@ function LandingPage(props) {
                             organisations
                             on the planet, giving you access to world-class workplaces.
                         </div>
-                        <Grid className='middle aligned' centered textAlign='center' style={{marginBottom: '50px'}}>
+                        <Grid container spacing={4} justify="center" alignItems="center" style={{ textAlign: 'center', marginBottom: '50px' }}>
                             {companyElements}
                         </Grid>
                         <div>
@@ -485,6 +472,10 @@ function LandingPage(props) {
 
               .hidden {
                 display: none
+              }
+
+              a {
+                  text-decoration: none
               }
             `}</style>
             <Footer/>

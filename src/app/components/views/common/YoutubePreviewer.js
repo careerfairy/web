@@ -1,4 +1,4 @@
-import { Image, Grid, Icon } from "semantic-ui-react";
+import { Grid } from "@material-ui/core";
 
 function YoutubePreviewer(props) {
 
@@ -7,20 +7,17 @@ function YoutubePreviewer(props) {
     return (
         <div className='react-player-thumbnail-container' onClick={() => props.showVideo()}>
             <div className='react-player-thumbnail-container'>
-                <Image className='react-player-thumbnail' src={thumbnailUrl}/>
-                <Icon style={{ position: 'absolute', top: '42%', left: '45%', color: 'rgb(245,245,245)', fontSize: '3em' }} name='play circle outline' size='big'/>
+                <img className='react-player-thumbnail' src={thumbnailUrl}/>
             </div>
             <div className='react-player-description-overlay'>
-                <Grid>
-                    <Grid.Row>
-                        <Grid.Column width={4}>
-                            <Image style={{ margin: '12px 10px 0 10px' }} src={ props.video.companyLogoUrl } size='small'/>
-                        </Grid.Column>  
-                        <Grid.Column width={12}>
-                            <div className='react-player-description-title'>{ props.video.title }</div>
-                            <div className='react-player-description-speaker'>{ props.video.speaker }</div>
-                        </Grid.Column>  
-                    </Grid.Row> 
+                <Grid container>
+                    <Grid item xs={3}>
+                        <img style={{ margin: '12px 10px 0 10px' }} src={ props.video.companyLogoUrl } style={{ maxWidth: "100%", maxHeight: "100px"}}/>
+                    </Grid>  
+                    <Grid item xs={9}>
+                        <div className='react-player-description-title'>{ props.video.title }</div>
+                        <div className='react-player-description-speaker'>{ props.video.speaker }</div>
+                    </Grid>  
                 </Grid>    
             </div>
             <style jsx>{`

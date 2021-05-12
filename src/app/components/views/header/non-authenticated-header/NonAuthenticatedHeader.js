@@ -1,9 +1,10 @@
-import {Fragment, useEffect, useState} from 'react';
-import {Image, Icon} from "semantic-ui-react";
+import {Fragment} from 'react';
 
 import Link from 'next/link';
 import {useRouter} from 'next/router';
-import {Button} from "@material-ui/core";
+import {Button, IconButton} from "@material-ui/core";
+import MenuIcon from '@material-ui/icons/Menu';
+
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -28,9 +29,12 @@ const NonAuthenticatedHeader = (props) => {
         <Fragment>
             <header id='main-header'>
                 <ul id='left-menu'>
-                    <li><Icon id='sidebar-toggle' style={{cursor: 'pointer'}} name='bars' size='big'
-                              color={props.color === "white" ? null : 'teal'} onClick={props.toggleSideBar}/></li>
-                    <li><Link href='/'><a><Image src={props.color === "white" ? '/logo_white.png' : '/logo_teal.png'}
+                    <li>
+                        <IconButton onClick={props.toggleSideBar}>
+                            <MenuIcon id='sidebar-toggle' fontSize='large'  style={{ color: props.color === "white" ? 'white' : 'rgba(0, 210, 170)' }}/>
+                        </IconButton>
+                    </li>
+                    <li><Link href='/'><a><img src={props.color === "white" ? '/logo_white.png' : '/logo_teal.png'}
                                                  style={{
                                                      cursor: 'pointer',
                                                      width: '150px',
@@ -53,6 +57,10 @@ const NonAuthenticatedHeader = (props) => {
                 </div>
             </header>
             <style jsx>{`
+                a {
+                    text-decoration: none
+                }
+                
                 #main-header {
                     width: 100%;
                     height: 80px;
@@ -79,6 +87,7 @@ const NonAuthenticatedHeader = (props) => {
                 #left-menu li{
                     margin: 0;
                     display: inline;
+                    vertical-align: middle;
                 }
 
                 #right-menu {

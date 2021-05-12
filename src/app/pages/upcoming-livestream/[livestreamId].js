@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Container, Grid, Icon, Image, Input} from "semantic-ui-react";
-import {Button, TextField} from '@material-ui/core'
+import {Button, Container, TextField, Grid} from '@material-ui/core'
 import Header from "../../components/views/header/Header";
 import SettingsIcon from '@material-ui/icons/Settings';
 import {withFirebasePage} from "context/firebase";
@@ -14,14 +13,15 @@ import BookingModal from "../../components/views/common/booking-modal/BookingMod
 import QuestionVotingBox from "../../components/views/question-voting-box/QuestionVotingBox";
 import StringUtils from "../../util/StringUtils";
 import ClearIcon from '@material-ui/icons/Clear';
-import Head from "next/head";
 import UserUtil from "../../data/util/UserUtil";
-import MulitLineText from "../../components/views/common/MultiLineText";
 import TargetOptions from "../../components/views/common/TargetOptions";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import DataAccessUtil from "util/DataAccessUtil";
 import HowToRegRoundedIcon from '@material-ui/icons/HowToRegRounded';
 import EmailIcon from '@material-ui/icons/Email';
+import RssFeedIcon from '@material-ui/icons/RssFeed';
+import DateRangeIcon from '@material-ui/icons/DateRange';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../components/util/constants";
 import {useAuth} from "../../HOCs/AuthProvider";
@@ -369,13 +369,8 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
 
     let speakerElements = currentLivestream?.speakers?.map((speaker, index) => {
         return (
-            <Grid.Column
+            <Grid item xs={12} sm={8} md={4}
                 className={classes.speakerWrapper}
-                verticalAlign="middle"
-                textAlign="center"
-                mobile="16"
-                tablet="8"
-                computer="5"
                 key={speaker.id}
             >
                 <div className="livestream-speaker-avatar-capsule">
@@ -441,35 +436,36 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                     margin: 0 0 0 10px;
                   }
                 `}</style>
-            </Grid.Column>
+            </Grid>
         );
     });
 
     let questionElements = upcomingQuestions.map((question, index) => {
         return (
-            <Grid.Column key={question.id || index}>
+            <Grid item xs={12} sm={6} md={4} key={question.id || index}>
                 <QuestionVotingBox
                     question={question}
                     user={user}
                     livestream={currentLivestream}
                 />
-            </Grid.Column>
+            </Grid>
         );
     });
 
     let logoElements = careerCenters.map((careerCenter, index) => {
         return (
-            <Grid.Column key={careerCenter.groupId} mobile="6" computer="4">
-                <Paper className={classes.logoWrapper}>
-                    <Image
+            <Grid item xs={4} md={3} key={careerCenter.groupId}>
+                <Paper className={classes.logoWrapper} justify="center" style={{ textAlign: "center" }}>
+                    <img
                         src={getResizedUrl(careerCenter.logoUrl, "md")}
                         style={{
                             maxHeight: "60px",
+                            maxWidth: "250px",
                             margin: "10px auto 5px auto",
                         }}
                     />
                 </Paper>
-            </Grid.Column>
+            </Grid>
         );
     });
 
@@ -510,8 +506,8 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                                     border: userIsRegistered() ? "2px solid white" : "",
                                 }}
                             >
-                                <Icon name="rss"/>
-                                Live stream
+                                <RssFeedIcon style={{ verticalAlign: "middle", marginRight: 5 }}/>
+                                <span style={{ verticalAlign: "middle" }}>Live stream</span>
                             </div>
                             <div
                                 className="livestream-title"
@@ -524,7 +520,7 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                                 style={{color: userIsRegistered() ? "white" : ""}}
                             >
                 <span>
-                  <Icon name="calendar outline alternate"/>
+                  <DateRangeIcon style={{ marginRight: 5 }}/>
                     {DateUtil.getPrettyDate(currentLivestream.startDate)}
                 </span>
                             </div>
@@ -562,23 +558,21 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                                     </Countdown>
                                 </div>
                             </div>
-                            <div style={{margin: "30px 0"}}>
-                                <Grid className="middle aligned" centered>
-                                    <Grid.Row>
-                                        <Box>
-                                            <Paper className={classes.logoWrapper}>
-                                                <Image
-                                                    src={getResizedUrl(currentLivestream.companyLogoUrl, "md")}
-                                                    style={{
-                                                        maxWidth: "230px",
-                                                        maxHeight: "140px",
-                                                        margin: "10px auto 5px auto",
-                                                    }}
-                                                />
-                                            </Paper>
-                                        </Box>
-                                    </Grid.Row>
-                                    <Grid.Row>{speakerElements}</Grid.Row>
+                            <div style={{margin: "50px 0" }}>
+                                <Box>
+                                    <Paper className={classes.logoWrapper} style={{ maxWidth: 300, margin: '0 auto' }}>
+                                        <img
+                                            src={getResizedUrl(currentLivestream.companyLogoUrl, "md")}
+                                            style={{
+                                                maxWidth: "230px",
+                                                maxHeight: "140px",
+                                                margin: "10px auto 5px auto",
+                                            }}
+                                        />
+                                    </Paper>
+                                </Box>
+                                <Grid container justify="center" align="center">                                        
+                                    {speakerElements}
                                 </Grid>
                             </div>
                             <div style={{margin: "40px 0", width: "100%"}}>
@@ -614,7 +608,7 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                                 <TargetOptions options={targetOptions}/>
                             </div>
                             <div style={{textAlign: "center", marginBottom: "20px"}}>
-                                <Grid centered className="middle aligned">
+                                <Grid container justify="center" alignItems="center">
                                     {logoElements}
                                 </Grid>
                             </div>
@@ -644,10 +638,9 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                             </div>
                         </Container>
                         <div className="bottom-icon">
-                            <Icon
+                            <KeyboardArrowDownIcon
                                 style={{color: "rgb(44, 66, 81)"}}
-                                name="angle down"
-                                size="big"
+                                fontSize="large"
                             />
                         </div>
                     </div>
@@ -703,7 +696,7 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                     >
                         Upvote questions from your peers
                     </div>
-                    <Grid stackable columns={3} style={{margin: "5px 0 30px 0"}}>
+                    <Grid container spacing={3} style={{margin: "5px 0 30px 0"}}>
                         {questionElements}
                     </Grid>
                     <div
@@ -733,31 +726,31 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                             ? "You are part of the talent pool"
                             : "Join the Talent Pool and Get Hired"}
                     </div>
+                    <div>
+                        <Box>
+                            <Paper style={{maxWidth: 300, margin: '0 auto'}} className={classes.logoWrapper}>
+                                <img
+                                    src={
+                                        currentLivestream.companyLogoUrl
+                                            ? getResizedUrl(currentLivestream.companyLogoUrl, "md")
+                                            : companyLogoPlaceholder
+                                    }
+                                    style={{
+                                        margin: "0 auto",
+                                        maxHeight: "100px",
+                                        maxWidth: "280px"
+                                    }}
+                                />
+                            </Paper>
+                        </Box>
+                    </div>
                     <Grid
+                        container
+                        justify="center"
+                        alignItems="center"
                         style={{margin: "50px 0 0 0"}}
-                        className="middle aligned"
-                        centered
                     >
-                        <div>
-                            <Box>
-                                <Paper style={{maxWidth: 300}} className={classes.logoWrapper}>
-                                    <Image
-                                        src={
-                                            currentLivestream.companyLogoUrl
-                                                ? getResizedUrl(currentLivestream.companyLogoUrl, "md")
-                                                : companyLogoPlaceholder
-                                        }
-                                        style={{
-                                            margin: "0 auto",
-                                            maxHeight: "100px",
-                                        }}
-                                    />
-                                </Paper>
-                            </Box>
-                        </div>
-                        <Grid.Column
-                            computer="8"
-                            mobile="16"
+                        <Grid item xs={12} md={6}
                             style={{textAlign: "center"}}
                         >
                             <Button
@@ -774,8 +767,8 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                                 }
                                 color={userIsInTalentPool ? "default" : "primary"}
                             />
-                        </Grid.Column>
-                        <Grid.Column width={16}>
+                        </Grid>
+                        <Grid item xs={12}>
                             <div
                                 style={{
                                     margin: "20px 0",
@@ -793,7 +786,7 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                                 the company can contact you at any time with a relevant
                                 opportunity.
                             </div>
-                        </Grid.Column>
+                        </Grid>
                     </Grid>
                 </Container>
             </div>
@@ -807,11 +800,8 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                     Any problem or question ? We want to hear from you
                 </div>
                 <Container>
-                    <Grid.Column width={16} style={{textAlign: "center"}}>
-                        <a
-                            className="aboutContentContactButton"
-                            href="mailto:thomas@careerfairy.io"
-                        >
+                    <div style={{textAlign: "center"}}>
+                        <a className="aboutContentContactButton" href="mailto:thomas@careerfairy.io">
                             <Button
                                 size="large"
                                 children="Contact CareerFairy"
@@ -820,7 +810,7 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                                 style={{margin: "30px 0 0 0"}}
                             />
                         </a>
-                    </Grid.Column>
+                    </div>
                 </Container>
             </div>
             <Footer/>
