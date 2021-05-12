@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
     main: {
         display: "flex",
         flex: 1,
-        minHeight: 390,
+        minHeight: 406,
         overflow: 'hidden',
         borderTopLeftRadius: '1.5rem',
         borderTopRightRadius: '1.5rem',
@@ -168,9 +168,12 @@ const useStyles = makeStyles(theme => ({
     avaLogoWrapper: {
         display: "flex",
         // flexDirection: "column",
-        flexWrap: "wrap",
         justifyContent: "center",
+        flexWrap: "inherit",
         alignItems: "center"
+    },
+    avaLogoWrapperHovered:{
+        flexWrap: "wrap",
     },
     top: {
         zIndex: 995
@@ -565,7 +568,9 @@ const GroupStreamCardV2 = memo(({
                     >
                         <Collapse unmountOnExit in={!cardHovered}>
                             <Fade timeout={300} unmountOnExit in={!cardHovered}>
-                                <Row style={{justifyContent: "space-evenly"}} className={classes.avaLogoWrapper}>
+                                <Row style={{justifyContent: "space-evenly"}}
+                                     className={classes.avaLogoWrapper}
+                                >
                                     <Item>
                                         <AvatarGroup>
                                             {livestream.speakers?.map(speaker => (
@@ -595,7 +600,11 @@ const GroupStreamCardV2 = memo(({
                             </Fade>
                         </Collapse>
                         <Collapse unmountOnExit in={cardHovered}>
-                            <div className={classes.avaLogoWrapper}>
+                            <div
+                                className={clsx(classes.avaLogoWrapper,{
+                                    [classes.avaLogoWrapperHovered]: cardHovered
+                                })}
+                            >
                                 {livestream.speakers?.map(speaker => (
                                     <Row className={classes.previewRow} key={speaker.id}>
                                         <Item>
