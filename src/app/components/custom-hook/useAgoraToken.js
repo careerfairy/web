@@ -40,9 +40,6 @@ export function useAgoraToken(roomId, uid, isStreamer, securityToken, isScreenSh
     useEffect(() => {
         if (roomId && uid) {
             (async function getSecureToken() {
-                // if (!isScreenShareToken) {
-                //     console.log("-> uid", uid);
-                // }
                 try {
                     const response = await getSecureAgoraToken({
                         isStreamer,

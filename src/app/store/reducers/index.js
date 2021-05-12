@@ -11,6 +11,7 @@ import snackbarReducer from "./snackbarReducer";
 import userDataSetReducer from "./userDataSetReducer";
 import currentFilterGroupReducer from "./currentFilterGroupReducer";
 import nextLivestreamsReducer from "./nextLivestreamsReducer";
+import rtcClientReducer from "./rtcClientReducer";
 
 export default combineReducers({
     auth: authReducer,
@@ -18,6 +19,7 @@ export default combineReducers({
     firebase: firebaseReducer,
     firestore: firestoreReducer,
     rtmChannel: rtmChannelReducer,
+    rtcClient: rtcClientReducer,
     rtmClient: rtmClientReducer,
     emotes: emotesReducer,
     snackbars: snackbarReducer,

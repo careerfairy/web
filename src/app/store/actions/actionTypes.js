@@ -33,6 +33,9 @@ export const REMOVE_RTM_CHANNEL = 'REMOVE_RTM_CHANNEL';
 export const SET_RTM_CLIENT = 'SET_RTM_CLIENT';
 export const REMOVE_RTM_CLIENT = 'REMOVE_RTM_CLIENT';
 
+// RTC client Actions
+export const SET_RTC_CLIENT = 'SET_RTC_CLIENT';
+export const REMOVE_RTC_CLIENT = 'REMOVE_RTC_CLIENT';
 
 export const ADD_EMOTE = "ADD_EMOTE"
 export const SEND_EMOTE_SUCCESS = "SEND_EMOTE_SUCCESS"

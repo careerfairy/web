@@ -13,7 +13,7 @@ import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal";
 import {useFirebase} from "context/firebase";
 import {useRouter} from "next/router";
 import * as actions from 'store/actions'
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useCurrentStream} from "../../../../../../context/stream/StreamContext";
 import useStreamToken from "../../../../../../components/custom-hook/useStreamToken";
 
@@ -90,13 +90,14 @@ const BreakoutRoom = ({
                           memberCount,
                           updateMemberCount,
                           handleOpenAccordion,
+                          handleDisconnect,
                           handleClose
                       }) => {
     const dispatch = useDispatch()
     const links = useStreamToken({forStreamType: "breakoutRoom", targetBreakoutRoomId: id})
-    const {isStreamer, isMainStreamer} = useCurrentStream()
+    const {isStreamer, isMainStreamer,isBreakout} = useCurrentStream()
     const {deleteBreakoutRoom, updateBreakoutRoom} = useFirebase()
-    const {query: {livestreamId}, push} = useRouter()
+    const {query: {livestreamId}, push, reload} = useRouter()
     const [editRoomNameModalOpen, setEditRoomNameModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [deleteBreakoutRoomModalOpen, setDeleteBreakoutRoomModalOpen] = useState(false);
@@ -156,8 +157,12 @@ const BreakoutRoom = ({
 
     const handleJoinRoom = async (event) => {
         event.stopPropagation()
+        // if(!isBreakout){
+            await handleDisconnect()
+        // }
         handleClose()
-        await push({pathname: breakoutRoomLink, query: {auto: true}}, undefined, { shallow: false })
+        // window.location.href = breakoutRoomLink
+        await push({pathname: breakoutRoomLink, query: {auto: true}}, undefined, {shallow: false})
     }
     return (
         <React.Fragment>
@@ -172,7 +177,7 @@ const BreakoutRoom = ({
                     aria-controls="additional-actions1-content"
                     id="additional-actions1-header"
                 >
-                    <Box display="flex" width="100%"  alignItems="center" justifyContent="space-between">
+                    <Box display="flex" width="100%" alignItems="center" justifyContent="space-between">
                         <Typography variant="h6">
                             {title}
                         </Typography>

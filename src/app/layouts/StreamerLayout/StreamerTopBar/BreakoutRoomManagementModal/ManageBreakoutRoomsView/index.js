@@ -28,6 +28,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const dispatch = useDispatch()
     const rtmClient = useSelector(state => state.rtmClient)
     const rtmChannel = useSelector(state => state.rtmChannel)
+    const rtcClient = useSelector(state => state.rtcClient)
 
     const [memberCounts, setMemberCounts] = useState({});
     const [allRoomsOpen, setAllRoomsOpen] = useState(false);
@@ -83,18 +84,25 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
         setClosing(false)
     }
 
-    const handleBackToMainRoom = async () => {
-        if(rtmChannel){
+    const handleDisconnect = async () => {
+        if (rtmChannel) {
+            rtmChannel.removeAllListeners()
             await rtmChannel.leave()
         }
-        if(rtmClient){
-            console.log("-> rtmClient", rtmClient);
+        if (rtmClient) {
+            rtmClient.removeAllListeners()
             await rtmClient.logout()
-            dispatch(actions.removeRtmClient())
         }
-        const targetPath = isMainStreamer ? links.mainStreamerLink : links.joiningStreamerLink
-        await push(targetPath)
+        if (rtcClient) {
+            await rtcClient.leave()
+        }
+    }
+
+    const handleBackToMainRoom = async () => {
+        await handleDisconnect()
         handleClose()
+        const targetPath = isMainStreamer ? links.mainStreamerLink : links.joiningStreamerLink
+        await push({pathname: targetPath, query: {auto: true}}, undefined, {shallow: false})
     }
 
     return (
@@ -122,6 +130,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                         rtmClient={rtmClient}
                         index={index}
                         openRoom={openRoom}
+                        handleDisconnect={handleDisconnect}
                         handleClose={handleClose}
                         handleOpenAccordion={handleOpenAccordion}
                         key={room.id}
