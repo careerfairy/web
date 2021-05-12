@@ -1,182 +1,63 @@
-import React, {useEffect, useState} from 'react';
+import PropTypes from 'prop-types'
+import React, {useMemo, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import NavBar from './NavBar';
-import TopBar from './TopBar';
 import {useRouter} from "next/router";
 import {withFirebase} from "../../context/firebase";
-import {isEmptyObject} from "../../components/helperFunctions/HelperFunctions";
 import {useAuth} from "../../HOCs/AuthProvider";
-import {
-    Archive as PastStreamIcon,
-    Edit as EditGroupIcon,
-    FileText as DraftStreamIcon,
-    Film as StreamIcon,
-    Settings as SettingsIcon,
-    User as ProfileIcon,
-    BarChart2 as AnalyticsIcon
-} from "react-feather";
+import {isEmpty, isLoaded} from "react-redux-firebase";
+import {useSelector} from "react-redux";
+import TopBar from "./TopBar";
+import styles from "../../materialUI/styles/layoutStyles/groupDashboardStyles";
+import useDashboardRedirect from "../../components/custom-hook/useDashboardRedirect";
+import useAdminGroup from "../../components/custom-hook/useAdminGroup";
+import useDashboardLinks from "../../components/custom-hook/useDashboardLinks";
+import {CircularProgress} from "@material-ui/core";
 
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        backgroundColor: theme.palette.background.dark,
-        display: 'flex',
-        height: '100vh',
-        overflow: 'hidden',
-        width: '100%'
-    },
-    wrapper: {
-        display: 'flex',
-        flex: '1 1 auto',
-        overflow: 'hidden',
-        paddingTop: 64,
-        [theme.breakpoints.up('lg')]: {
-            paddingLeft: 256
-        },
-        [theme.breakpoints.down('xs')]: {
-            paddingTop: 56
-        },
-    },
-    contentContainer: {
-        display: 'flex',
-        flex: '1 1 auto',
-        overflow: 'hidden',
-    },
-    content: {
-        flex: '1 1 auto',
-        height: '100%',
-        overflow: 'auto'
-    }
-}));
+const useStyles = makeStyles(styles);
 
 const GroupDashboardLayout = (props) => {
     const {children, firebase} = props
     const classes = useStyles();
-    const {query: {groupId, careerCenterId}, replace} = useRouter()
-    const [notifications, setNotifications] = useState([]);
+    const {query: {groupId}} = useRouter()
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
-    const [group, setGroup] = useState({});
     const {userData, authenticatedUser} = useAuth()
+    const notifications = useSelector(({firestore}) => firestore.ordered.notifications || [])
 
-    useEffect(() => {
-        if (groupId || careerCenterId) {
-            const targetGroupId = groupId || careerCenterId
-            const unsubscribe = firebase.listenToCareerCenterById(
-                targetGroupId,
-                (querySnapshot) => {
-                    let careerCenter = querySnapshot.data();
-                    careerCenter.id = querySnapshot.id;
-                    setGroup(careerCenter);
-                }
-            );
-            return () => unsubscribe();
-        }
-    }, [groupId, careerCenterId]);
+    const group = useAdminGroup(groupId)
+    useDashboardRedirect(group, firebase)
 
-    useEffect(() => {
-        if (unAuthorized()) {
-            replace("/");
-        }
-    }, [group, authenticatedUser, userData]);
+    const {headerLinks, drawerTopLinks, drawerBottomLinks} = useDashboardLinks(group)
 
-    const unAuthorized = () => {
-        return Boolean(
-            (!isEmptyObject(group) && authenticatedUser && userData)
-            && (authenticatedUser.email !== group.adminEmail) && !userData.isAdmin
-        )
-    }
-
-
-    const headerLinks = [
-        {
-            href: `/next-livestreams`,
-            title: 'NEXT LIVE STREAMS'
-        },
-        {
-            href: `/discover`,
-            title: 'PAST LIVE STREAMS'
-        },
-        {
-            href: `/wishlist`,
-            title: 'WISHLIST'
-        }
-    ]
-
-    const drawerBottomLinks = [
-        {
-            href: `https://corporate.careerfairy.io/companies`,
-            title: 'FOR COMPANIES'
-        },
-        {
-            href: `https://corporate.careerfairy.io/career-center`,
-            title: 'FOR CAREER CENTERS'
-        }
-    ]
-
-    const drawerTopLinks = [
-        {
-            href: `/group/${group.id}/admin/upcoming-livestreams`,
-            icon: StreamIcon,
-            title: 'Upcoming Streams'
-        },
-        {
-            href: `/group/${group.id}/admin/past-livestreams`,
-            icon: PastStreamIcon,
-            title: 'Past Streams'
-        },
-        {
-            href: `/group/${group.id}/admin/drafts`,
-            icon: DraftStreamIcon,
-            title: 'Manage and Approve Drafts'
-        },
-        {
-            href: `/group/${group.id}/admin/edit`,
-            icon: EditGroupIcon,
-            title: 'Edit Group Profile'
-        },
-        {
-            href: `/group/${group.id}/admin/analytics`,
-            icon: AnalyticsIcon,
-            title: 'Analytics'
-        }
-    ];
-
-    if (authenticatedUser?.emailVerified) {
-        headerLinks.push({
-            href: `/groups`,
-            title: 'FOLLOW GROUPS'
-        })
-        drawerBottomLinks.push({
-            href: `/profile`,
-            title: 'PROFILE',
-            icon: ProfileIcon
-        })
-    }
+    const isAdmin = useMemo(() => userData?.isAdmin || (group?.adminEmails?.includes(authenticatedUser?.email)), [userData?.isAdmin, group?.adminEmails, authenticatedUser?.email])
+    const isCorrectGroup = useMemo(() => groupId === group?.groupId, [groupId, group?.groupId])
 
     return (
         <div className={classes.root}>
             <TopBar
                 links={headerLinks}
                 notifications={notifications}
-                setNotifications={setNotifications}
                 onMobileNavOpen={() => setMobileNavOpen(true)}
             />
-            <NavBar
+            {(isLoaded(group) && !isEmpty(group)) && <NavBar
                 drawerTopLinks={drawerTopLinks}
                 drawerBottomLinks={drawerBottomLinks}
                 headerLinks={headerLinks}
                 group={group}
                 onMobileClose={() => setMobileNavOpen(false)}
                 openMobile={isMobileNavOpen}
-            />
+            />}
             <div className={classes.wrapper}>
                 <div className={classes.contentContainer}>
                     <div className={classes.content}>
-                        {!isEmptyObject(group) && React.cloneElement(children, {
+                        {(isLoaded(group) && !isEmpty(group) && isCorrectGroup) ? React.Children.map(children, child => React.cloneElement(child, {
                             notifications,
-                            setNotifications,
-                            group, ...props
-                        })}
+                            isAdmin,
+                            group,
+                            ...props
+                        })):(
+                            <CircularProgress style={{margin: "auto"}}/>
+                        )}
                     </div>
                 </div>
             </div>
@@ -184,4 +65,12 @@ const GroupDashboardLayout = (props) => {
     );
 };
 
+
+GroupDashboardLayout.propTypes = {
+    children: PropTypes.node.isRequired,
+    firebase: PropTypes.object,
+}
+
+GroupDashboardLayout.defaultProps = {
+}
 export default withFirebase(GroupDashboardLayout);

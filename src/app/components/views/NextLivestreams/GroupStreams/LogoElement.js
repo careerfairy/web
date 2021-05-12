@@ -1,8 +1,11 @@
+import PropTypes from 'prop-types'
 import React, {useState} from 'react';
 import { Button} from "@material-ui/core";
 import { makeStyles} from "@material-ui/core/styles";
 import GroupJoinModal from "../../profile/GroupJoinModal";
 import {useRouter} from "next/router";
+import Avatar from "@material-ui/core/Avatar";
+import {getResizedUrl} from "../../../helperFunctions/HelperFunctions";
 
 
 const useStyles = makeStyles(theme => ({
@@ -11,24 +14,9 @@ const useStyles = makeStyles(theme => ({
         justifyContent: "space-between",
         flexDirection: "column"
     },
-    logoImage: {
-        // minWidth: "90",
-        // height: "auto",
-        maxHeight: "90%"
-    },
-    imageWrapper: {
-        height: 50,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
-    },
-    followButton:{
-        marginTop: theme.spacing(1)
-    }
 }))
 
-const LogoElement = ({careerCenter, userData, userFollows, livestreamId, hideFollow}) => {
+const LogoElement = ({careerCenter, userData, userFollows, livestreamId, hideFollow, className}) => {
     const classes = useStyles()
     const router = useRouter()
 
@@ -54,10 +42,13 @@ const LogoElement = ({careerCenter, userData, userFollows, livestreamId, hideFol
 
     return (
         <div className={classes.root}>
-            <div className={classes.imageWrapper}>
-                <img className={classes.logoImage} alt={`${careerCenter.universityName} logo`}
-                     src={careerCenter.logoUrl}/>
-            </div>
+            <Avatar
+                variant="rounded"
+                key={careerCenter.id}
+                className={className}
+                src={getResizedUrl(careerCenter.logoUrl)}
+                alt={careerCenter.universityName}
+            />
             {(!userFollows && !hideFollow) &&
                 <Button size="small" onClick={handleJoin} className={classes.followButton} variant="outlined"
                         color="primary"> Follow </Button>}
@@ -72,4 +63,14 @@ const LogoElement = ({careerCenter, userData, userFollows, livestreamId, hideFol
     );
 };
 
+LogoElement.propTypes = {
+  careerCenter: PropTypes.object,
+  className: PropTypes.string,
+  hideFollow: PropTypes.bool,
+  livestreamId: PropTypes.string,
+  userData: PropTypes.object,
+  userFollows: PropTypes.bool
+}
+
 export default LogoElement;
+

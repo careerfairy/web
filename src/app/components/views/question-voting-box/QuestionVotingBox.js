@@ -1,12 +1,44 @@
-import { Fragment, useState, useEffect } from 'react';
-import { Grid, Image, Button, Icon, Modal, Step, Input } from 'semantic-ui-react';
+import PropTypes from 'prop-types'
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import {useRouter} from 'next/router';
+import {withFirebasePage} from "context/firebase";
+import {Button, Card, CardActions, CardContent, CardHeader, Typography} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 
-import { useRouter } from 'next/router';
-import { withFirebasePage } from "context/firebase";
-
+const useStyles = makeStyles(theme => ({
+    root: {
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        padding: theme.spacing(1)
+    },
+    questionTitle: {
+        fontSize: "1.2em",
+        fontWeight: 500,
+        wordBreak: "break-word"
+    },
+    actions: {
+        marginTop: "auto",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center"
+    },
+    icon: {
+        marginLeft: theme.spacing(0.5)
+    },
+    voteCount: {
+        display: "flex",
+        alignItems: "center",
+        color: theme.palette.action.disabled
+    },
+    voteText: {
+        fontWeight: 700,
+        marginTop: `${theme.spacing(0.5)}px !important`,
+    }
+}))
 
 function QuestionVotingBox(props) {
-
+    const classes = useStyles()
     const router = useRouter();
 
     function upvoteLivestreamQuestion(user, question) {
@@ -26,63 +58,44 @@ function QuestionVotingBox(props) {
     }
 
     return (
-        <div className='streamNextQuestionContainer'>
-            <p style={{ marginBottom: '5px' }}>{ props.question.title }</p>
-            <div className='bottom-element'>
-                <Button icon='thumbs up' size='large' content='Upvote' onClick={() => upvoteLivestreamQuestion(props.user, props.question)} disabled={userHasVotedOnQuestion(props.user, props.question)} primary/>
-                <div className='streamNextQuestionNumberOfVotes'>{ props.question.votes } <Icon name='thumbs up'/></div>
-            </div>
-            <style jsx>{`
-                .streamNextQuestionContainer {
-                    position: relative;
-                    margin: 20px 0;
-                    box-shadow: 0 0 3px grey;
-                    border-radius: 10px;
-                    color: rgb(50,50,50);
-                    background-color: white;
-                    padding: 30px 30px 100px 30px;
-                    font-weight: 500;
-                    font-size: 1.3em;
-                    height: 100%;
-                    min-height: 200px;
-                    text-align: center;
+        <Card elevation={2} className={classes.root}>
+            <CardHeader
+                action={
+                    <div className={classes.voteCount}>
+                        <Typography color="inherit" className={classes.voteText} variant="body1">
+                            {props.question.votes}
+                        </Typography>
+                        <ThumbUpIcon className={classes.icon} color="inherit"/>
+                    </div>
                 }
-
-                .streamNextQuestionContainer .question-upvotes {
-                    margin: 10px 0;
-                    font-size: 0.9em;
-                    font-weight: bold;
-                }
-
-                .streamNextQuestionNumberOfVotes {
-                    font-weight: 600;
-                    font-size: 1.3em;
-                    border-radius: 5px;
-                    display: block;
-                    color: rgb(210,210,210);
-                    font-size: 0.8em;
-                    margin-top: 10px;
-                }
-
-                .bottom-element {
-                    position: absolute;
-                    bottom: 15px;
-                    left: 0;
-                    right: 0;
-                    width: 100%;
-                    text-align: center;
-                }
-
-                .right-votes {
-                    position: absolute;
-                    right: 0;
-                    top: 15px;
-                    color: rgb(130,130,130);
-                    font-size: 0.8em;
-                }
-            `}</style>
-        </div>
-    );
+            />
+            <CardContent>
+                <Typography align="center" className={classes.questionTitle} variant="body2" component="p">
+                    {props.question.title}
+                </Typography>
+            </CardContent>
+            <CardActions className={classes.actions} disableSpacing>
+                <Button disabled={userHasVotedOnQuestion(props.user, props.question)}
+                        variant="contained" fullWidth
+                        onClick={() => upvoteLivestreamQuestion(props.user, props.question)}
+                        color="primary" startIcon={<ThumbUpIcon/>}>
+                    upvote
+                </Button>
+            </CardActions>
+        </Card>
+    )
 }
 
+QuestionVotingBox.propTypes =
+    {
+        firebase: PropTypes.object,
+        livestream: PropTypes.object,
+        question: PropTypes.shape({
+            title: PropTypes.string,
+            votes: PropTypes.number
+        }),
+        user: PropTypes.object
+    }
+
 export default withFirebasePage(QuestionVotingBox);
+

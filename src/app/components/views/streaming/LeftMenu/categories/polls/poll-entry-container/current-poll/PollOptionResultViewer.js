@@ -1,5 +1,4 @@
-import React, {useState, useEffect, Fragment} from 'react';
-import {Input, Icon, Button, Dropdown} from "semantic-ui-react";
+import React, {Fragment} from 'react';
 import { withFirebase } from 'context/firebase';
 
 

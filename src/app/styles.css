@@ -29,5 +29,8 @@
     max-height: 100%;
     max-width: 100%;
     z-index: 1;
-    background-color: black;
+}
+
+a {
+    text-decoration: none;
 }

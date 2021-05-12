@@ -1,13 +1,16 @@
-import React, {useEffect, useMemo, useState} from "react";
-import {Container, Grid} from "@material-ui/core";
+import React, {useMemo, useState} from "react";
+import {Container, Grid, Tooltip} from "@material-ui/core";
 import TotalRegistrations from "./TotalRegistrations";
 import TotalUniqueRegistrations from "./TotalUniqueRegistrations";
 import CategoryBreakdown from "./CategoryBreakdown";
 import AverageRegistrations from "./AverageRegistrations";
-import {mustBeNumber, snapShotsToData} from "../../../../../helperFunctions/HelperFunctions";
-import {makeStyles} from "@material-ui/core/styles";
+import {mustBeNumber} from "../../../../../helperFunctions/HelperFunctions";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 import UserCount from "./UserCount";
+import TotalUniqueParticipatingStudents from "./TotalUniqueParticipatingStudents";
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import {getTotalEmailsFromStreamsByProperty, getUniqueIds} from "../../../../../../data/util/AnalyticsUtil";
 
 
 const useStyles = makeStyles(theme => ({
@@ -30,6 +33,7 @@ const General = ({
                      handleScrollToBreakdown,
                      handleReset,
                      userDataSet,
+                     groups,
                      userTypes,
                      userType,
                      setUserType,
@@ -41,15 +45,10 @@ const General = ({
                      showBar
                  }) => {
     const classes = useStyles()
-    const [currentCategory, setCurrentCategory] = useState({options: []});
     const [localUserType, setLocalUserType] = useState(userTypes[0]);
+    const theme = useTheme()
+    const mediumScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-    useEffect(() => {
-        if (group.categories?.length) {
-            setCurrentCategory(group.categories[0])
-        }
-
-    }, [group.categories])
 
     const getTotalRegisteredUsers = (streamsArray) => {
         const total = streamsArray.reduce(
@@ -61,42 +60,14 @@ const General = ({
         return mustBeNumber(total);
     };
 
-    const getTotal = (streamsArray, prop) => {
-        return streamsArray.reduce(
-            (accumulator, livestream) => {
-                if (livestream?.[prop] === undefined) {
-                    livestream[prop] = []
-                }
-                return [...accumulator, ...livestream[prop]];
-            },
-            []
-        );
-    }
-
-    const getUniqueIds = (arrayOfIds) => {
-        return [...new Set(arrayOfIds)]
-    }
-
-    const getUniqueUsers = (streamsArray, prop) => {
-        const totalViewers = getTotal(streamsArray, prop)
-        // new Set method removes all duplicates from array
-        return totalViewers.filter(function (el) {
-            if (!this[el.userEmail]) {
-                this[el.userEmail] = true;
-                return true;
-            }
-            return false;
-        }, Object.create(null));
-    };
-
     const getAverageRegistrationsPerEvent = () => {
         const average = totalRegistrations / streamsFromTimeFrameAndFuture.length;
         return mustBeNumber(average, 0);
     };
 
     const compareRegistrations = () => {
-        const registrationsFromTimeFrame = getTotal(streamsFromTimeFrame, "registeredUsers").length
-        const registrationsFromBeforeTimeFrame = getTotal(streamsFromBeforeTimeFrame, "registeredUsers").length
+        const registrationsFromTimeFrame = getTotalEmailsFromStreamsByProperty(streamsFromTimeFrame, "registeredUsers").length
+        const registrationsFromBeforeTimeFrame = getTotalEmailsFromStreamsByProperty(streamsFromBeforeTimeFrame, "registeredUsers").length
         const {
             positive,
             percentage,
@@ -109,20 +80,20 @@ const General = ({
         }
     }
 
-    const compareUniqueRegistrations = () => {
-        const totalRegistrationsFromTimeFrame = getTotal(streamsFromTimeFrame, "registeredUsers")
-        const totalRegistrationsFromBeforeTimeFrame = getTotal(streamsFromBeforeTimeFrame, "registeredUsers")
-        const uniqueRegistrationsFromTimeFrame = getUniqueIds(totalRegistrationsFromTimeFrame).length
-        const uniqueRegistrationsFromBeforeTimeFrame = getUniqueIds(totalRegistrationsFromBeforeTimeFrame).length
+    const compareUniqueRegistrations = (prop) => {
+        const totalUsersFromTimeFrame = getTotalEmailsFromStreamsByProperty(streamsFromTimeFrame, prop)
+        const totalUsersFromBeforeTimeFrame = getTotalEmailsFromStreamsByProperty(streamsFromBeforeTimeFrame, prop)
+        const uniqueUsersFromTimeFrame = getUniqueIds(totalUsersFromTimeFrame).length
+        const uniqueUsersFromBeforeTimeFrame = getUniqueIds(totalUsersFromBeforeTimeFrame).length
         const {
             positive,
             percentage,
-        } = getStats(uniqueRegistrationsFromTimeFrame, uniqueRegistrationsFromBeforeTimeFrame)
+        } = getStats(uniqueUsersFromTimeFrame, uniqueUsersFromBeforeTimeFrame)
 
         return {
             positive,
             percentage: `${percentage}%`,
-            dataToCompare: Boolean(uniqueRegistrationsFromBeforeTimeFrame && uniqueRegistrationsFromTimeFrame)
+            dataToCompare: Boolean(uniqueUsersFromBeforeTimeFrame && uniqueUsersFromTimeFrame)
         }
     }
 
@@ -142,35 +113,15 @@ const General = ({
     }
 
     const getTotalUniqueUsers = (streamsArray) => {
-        const totalUsers = getTotal(streamsArray, "registeredUsers")
+        const totalUsers = getTotalEmailsFromStreamsByProperty(streamsArray, "registeredUsers")
         return getUniqueIds(totalUsers).length
     }
 
-    const getAggregateCategories = (participants) => {
-        let categories = []
-        participants.forEach(user => {
-            const matched = user.registeredGroups?.find(groupData => groupData.groupId === group.id)
-            if (matched) {
-                categories.push(matched)
-            }
-        })
-        return categories
+    const getTotalUniqueParticipants = (streamsArray) => {
+        const totalUsers = getTotalEmailsFromStreamsByProperty(streamsArray, "participatingStudents")
+        return getUniqueIds(totalUsers).length
     }
 
-    const getTypeOfStudents = (prop) => {
-        let students = []
-        if (currentStream?.[prop]) {
-            students = currentStream[prop]
-        } else {//Get total Students
-            students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop)
-        }
-        const aggregateCategories = getAggregateCategories(students)
-        const flattenedGroupOptions = [...currentCategory.options]
-        flattenedGroupOptions.forEach(option => {
-            option.count = aggregateCategories.filter(category => category.categories.some(userOption => userOption.selectedValueId === option.id)).length
-        })
-        return flattenedGroupOptions.sort((a, b) => b.count - a.count);
-    }
 
     const getTotalUserDataSetCount = () => {
         return userDataSet?.length
@@ -179,13 +130,17 @@ const General = ({
 
     // use Memo is great for optimizing expensive calculations, the value of the function call will be stored in memory
     // The function will only be re-called when the value(streamsFromTimeFrame) in the dependency array changes
-
+    const isUni = currentUserDataSet.dataSet === "groupUniversityStudents"
 
     const totalRegistrations = useMemo(() => getTotalRegisteredUsers(streamsFromTimeFrameAndFuture), [
         streamsFromTimeFrameAndFuture,
     ]);
 
     const totalUniqueRegistrations = useMemo(() => getTotalUniqueUsers(streamsFromTimeFrameAndFuture), [
+        streamsFromTimeFrameAndFuture,
+    ]);
+
+    const totalUniqueParticipatingStudents = useMemo(() => getTotalUniqueParticipants(streamsFromTimeFrameAndFuture), [
         streamsFromTimeFrameAndFuture,
     ]);
 
@@ -199,88 +154,144 @@ const General = ({
         [streamsFromTimeFrameAndFuture, streamsFromBeforeTimeFrame]
     );
     const uniqueRegistrationsStatus = useMemo(
-        () => compareUniqueRegistrations(),
+        () => compareUniqueRegistrations("registeredUsers"),
+        [streamsFromTimeFrameAndFuture, streamsFromBeforeTimeFrame]
+    );
+    const uniqueParticipationStatus = useMemo(
+        () => compareUniqueRegistrations("participatingStudents"),
         [streamsFromTimeFrameAndFuture, streamsFromBeforeTimeFrame]
     );
 
-    const typesOfOptions = useMemo(
-        () => getTypeOfStudents(localUserType.propertyDataName),
-        [streamsFromTimeFrameAndFuture, currentStream, localUserType, currentCategory.id]
-    );
 
+    const getCategoryProps = () => ({item: true, xs: 12, sm: 12, lg: 6, xl: 6})
     return (
         <Container className={classes.root} maxWidth={false}>
             <Grid container spacing={3}>
+                <Grid xs={12} sm={12} md={7} lg={8} item>
+                    <Grid container spacing={3}>
+                        <Tooltip arrow
+                                 title={`This block displays the total number of registrations for all your events over the past ${globalTimeFrame.name}.`}>
+                            <Grid {...getCategoryProps()}>
+                                <TotalRegistrations
+                                    fetchingStreams={loading}
+                                    registrationsStatus={registrationsStatus}
+                                    totalRegistrations={totalRegistrations}
+                                    timeFrames={globalTimeFrame.timeFrames}
+                                    globalTimeFrame={globalTimeFrame}
+                                    group={group}
+                                />
+                            </Grid>
+                        </Tooltip>
+                        <Tooltip arrow
+                                 title={`This block displays the total number of individual users who registered to your events over the past ${globalTimeFrame.name}.`}>
+                            <Grid {...getCategoryProps()}>
+                                <TotalUniqueRegistrations
+                                    fetchingStreams={loading}
+                                    uniqueRegistrationsStatus={uniqueRegistrationsStatus}
+                                    totalUniqueRegistrations={totalUniqueRegistrations}
+                                    timeFrames={globalTimeFrame.timeFrames}
+                                    globalTimeFrame={globalTimeFrame}
+                                    group={group}
+                                />
+                            </Grid>
+                        </Tooltip>
+                        <Tooltip arrow
+                                 title={`This block displays the average number of registrations per event over the past ${globalTimeFrame.name}.`}>
+                            <Grid {...getCategoryProps()}>
+                                <AverageRegistrations
+                                    fetchingStreams={loading}
+                                    averageRegistrations={averageRegistrations}
+                                    timeFrames={globalTimeFrame.timeFrames}
+                                    group={group}
+                                />
+                            </Grid>
+                        </Tooltip>
+                        <Tooltip arrow
+                                 title={
+                                     isUni ?
+                                         `This block displays the total number of students from ${group.universityName} on CareerFairy.`
+                                         : `This block displays the total number of individual users who registered or attended your events over the past ${globalTimeFrame.name}.`
+                                 }>
+                            <Grid {...getCategoryProps()}>
+                                <UserCount
+                                    fetching={loading}
+                                    totalUsers={getTotalUserDataSetCount()}
+                                    timeFrames={globalTimeFrame.timeFrames}
+                                    currentUserDataSet={currentUserDataSet}
+                                    group={group}
+                                />
+                            </Grid>
+                        </Tooltip>
+                        {(mediumScreen && !group.universityCode) &&
+                        <Tooltip arrow
+                                 title={`This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}>
+                            <Grid item xs={12} md={12} sm={12}>
+                                <TotalUniqueParticipatingStudents
+                                    fetchingStreams={loading}
+                                    totalUniqueParticipatingStudents={totalUniqueParticipatingStudents}
+                                    uniqueParticipationStatus={uniqueParticipationStatus}
+                                    timeFrames={globalTimeFrame.timeFrames}
+                                    globalTimeFrame={globalTimeFrame}
+                                    group={group}
+                                />
+                            </Grid>
+                        </Tooltip>
+                        }
 
-                <Grid item lg={3} sm={6} xl={3} xs={12}>
-                    <TotalRegistrations
-                        fetchingStreams={loading}
-                        registrationsStatus={registrationsStatus}
-                        totalRegistrations={totalRegistrations}
-                        timeFrames={globalTimeFrame.timeFrames}
-                        globalTimeFrame={globalTimeFrame}
-                        group={group}
-                    />
+                        <Grid item xs={12}>
+                            <LatestEvents
+                                timeFrames={globalTimeFrame.timeFrames}
+                                setCurrentStream={setCurrentStream}
+                                fetchingStreams={loading}
+                                currentStream={currentStream}
+                                futureStreams={futureStreams}
+                                streamsFromTimeFrame={streamsFromTimeFrame}
+                                userType={userType}
+                                userTypes={userTypes}
+                                handleScrollToBreakdown={handleScrollToBreakdown}
+                                handleToggleBar={handleToggleBar}
+                                showBar={showBar}
+                                setUserType={setUserType}
+                                group={group}
+                            />
+                        </Grid>
+
+                    </Grid>
                 </Grid>
-                <Grid item lg={3} sm={6} xl={3} xs={12}>
-                    <TotalUniqueRegistrations
-                        fetchingStreams={loading}
-                        uniqueRegistrationsStatus={uniqueRegistrationsStatus}
-                        totalUniqueRegistrations={totalUniqueRegistrations}
-                        timeFrames={globalTimeFrame.timeFrames}
-                        globalTimeFrame={globalTimeFrame}
-                        group={group}
-                    />
-                </Grid>
-                <Grid item lg={3} sm={6} xl={3} xs={12}>
-                    <AverageRegistrations
-                        fetchingStreams={loading}
-                        averageRegistrations={averageRegistrations}
-                        timeFrames={globalTimeFrame.timeFrames}
-                        group={group}
-                    />
-                </Grid>
-                <Grid item lg={3} sm={6} xl={3} xs={12}>
-                    <UserCount
-                        fetching={loading}
-                        totalUsers={getTotalUserDataSetCount()}
-                        timeFrames={globalTimeFrame.timeFrames}
-                        currentUserDataSet={currentUserDataSet}
-                        group={group}
-                    />
-                </Grid>
-                <Grid item lg={8} md={12} xl={9} xs={12}>
-                    <LatestEvents
-                        timeFrames={globalTimeFrame.timeFrames}
-                        setCurrentStream={setCurrentStream}
-                        fetchingStreams={loading}
-                        currentStream={currentStream}
-                        futureStreams={futureStreams}
-                        streamsFromTimeFrame={streamsFromTimeFrame}
-                        userType={userType}
-                        userTypes={userTypes}
-                        handleScrollToBreakdown={handleScrollToBreakdown}
-                        handleToggleBar={handleToggleBar}
-                        showBar={showBar}
-                        setUserType={setUserType}
-                        group={group}
-                    />
-                </Grid>
-                <Grid item lg={4} md={6} xl={3} xs={12}>
-                    <CategoryBreakdown
-                        currentStream={currentStream}
-                        breakdownRef={breakdownRef}
-                        typesOfOptions={typesOfOptions}
-                        localUserType={localUserType}
-                        setLocalUserType={setLocalUserType}
-                        userTypes={userTypes}
-                        handleReset={handleReset}
-                        setCurrentCategory={setCurrentCategory}
-                        currentCategory={currentCategory}
-                        setUserType={setUserType}
-                        setCurrentStream={setCurrentStream}
-                        group={group}
-                    />
+                <Grid xs={12} sm={12} md={5} lg={4} item>
+                    <Grid container spacing={3}>
+                        {(!mediumScreen && !group.universityCode) &&
+                        <Tooltip arrow
+                                 title={`This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}>
+                            <Grid xs={12} item>
+                                <TotalUniqueParticipatingStudents
+                                    fetchingStreams={loading}
+                                    totalUniqueParticipatingStudents={totalUniqueParticipatingStudents}
+                                    uniqueParticipationStatus={uniqueParticipationStatus}
+                                    timeFrames={globalTimeFrame.timeFrames}
+                                    globalTimeFrame={globalTimeFrame}
+                                    group={group}
+                                />
+                            </Grid>
+                        </Tooltip>}
+                        <Grid item xs={12}>
+                            <CategoryBreakdown
+                                currentStream={currentStream}
+                                breakdownRef={breakdownRef}
+                                localUserType={localUserType}
+                                currentUserDataSet={currentUserDataSet}
+                                setLocalUserType={setLocalUserType}
+                                userTypes={userTypes}
+                                streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}
+                                groups={groups}
+                                isUni={isUni}
+                                handleReset={handleReset}
+                                setUserType={setUserType}
+                                setCurrentStream={setCurrentStream}
+                                group={group}
+                            />
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
         </Container>

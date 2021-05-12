@@ -1,21 +1,20 @@
 import React from 'react';
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
-import Page from "../../../../components/page";
 import StreamsOverview from "../../../../components/views/group/admin/streams";
+import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead";
+import {withFirebase} from "../../../../context/firebase";
 
-const PastLivestreamsPage = ({group, firebase}) => {
+const PastLivestreamsPage = ({firebase}) => {
 
     return (
-        <Page title={`CareerFairy | Admin Past Streams of ${group.universityName}`}>
+        <GroupDashboardLayout>
+            <DashboardHead title="CareerFairy | Admin Past Streams of"/>
             <StreamsOverview
                 query={firebase.listenToPastLiveStreamsByGroupId}
-                group={group}
-                firebase={firebase}
                 typeOfStream="past"
             />
-        </Page>
+        </GroupDashboardLayout>
     );
 };
-PastLivestreamsPage.layout = GroupDashboardLayout
 
-export default PastLivestreamsPage;
+export default withFirebase(PastLivestreamsPage);

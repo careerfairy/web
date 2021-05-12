@@ -1,21 +1,28 @@
-import React, {useEffect} from "react";
-import {useRouter} from "next/router";
+import React from "react";
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
-import Page from "../../../../components/page";
+import {makeStyles} from "@material-ui/core/styles";
+import {CircularProgress, Container} from "@material-ui/core";
+import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead";
 
 // the /admin page is just a redirect for now it also eareses it self from the browser history
+const useStyles = makeStyles(theme => ({
+    root: {
+        height: "inherit",
+        display: "grid",
+        placeItems: "center"
+    }
+}))
 const AdminPage = () => {
-    const {replace, asPath} = useRouter();
-
-    replace(`${asPath}/upcoming-livestreams`)
+    const classes = useStyles()
 
     return (
-        <Page title="CareerFairy | Admin">
-            <div/>
-        </Page>
+        <GroupDashboardLayout>
+            <DashboardHead title="CareerFairy | Admin"/>
+            <Container className={classes.root} maxWidth="xl">
+                <CircularProgress/>
+            </Container>
+        </GroupDashboardLayout>
     )
 };
-
-AdminPage.layout = GroupDashboardLayout
 
 export default AdminPage;

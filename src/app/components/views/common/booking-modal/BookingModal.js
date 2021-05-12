@@ -1,12 +1,13 @@
 import {Fragment, useState, useEffect} from 'react'
-import {Icon, Button, Modal, Header, Step, Grid, Input, Image} from "semantic-ui-react";
 
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CommonUtil from 'util/CommonUtil';
 import QuestionVotingBox from 'components/views/question-voting-box/QuestionVotingBox';
 
 import Link from 'next/link';
 
 import {withFirebase} from "context/firebase";
+import { Button, Dialog, DialogContent, Grid, TextField } from '@material-ui/core';
 
 function BookingModal({modalOpen, user, careerCenters, livestream, registration, groupId, setModalOpen, setRegistration, buttonAction, firebase}) {
 
@@ -64,18 +65,12 @@ function BookingModal({modalOpen, user, careerCenters, livestream, registration,
         }
     }, [upcomingQuestions]);
 
-
-    function performConfirmAction() {
-        buttonAction();
-        setModalOpen(false);
-    }
-
     function handleUrl() {
         let url = "/next-livestreams"
         if (groupId) {
-            url = `/next-livestreams?careerCenterId=${groupId}&livestreamId=${livestream.id}`
+            url = `/next-livestreams/${groupId}?livestreamId=${livestream.id}`
         } else if (careerCenters && careerCenters.length && careerCenters.length === 1) {// If there's only one group, please send me to that groups page
-            url = `/next-livestreams?careerCenterId=${careerCenters[0].id}&livestreamId=${livestream.id}`
+            url = `/next-livestreams/${careerCenters[0].id}?livestreamId=${livestream.id}`
         }
         return url
     }
@@ -117,18 +112,18 @@ function BookingModal({modalOpen, user, careerCenters, livestream, registration,
 
     let questionElements = CommonUtil.getRandom(upcomingQuestions, 9).map((question, index) => {
         return (
-            <Grid.Column key={index}>
+            <Grid item key={index} xs={12} sm={4}>
                 <QuestionVotingBox question={question} user={user} livestream={livestream}/>
-            </Grid.Column>
+            </Grid>
         );
     });
 
     return (
         <Fragment>
-            <Modal style={{zIndex: '9999'}} open={modalOpen}>
-                <Modal.Content>
+            <Dialog style={{zIndex: '9999'}} open={modalOpen} fullWidth={true} maxWidth={'md'}>
+                <DialogContent>
                     <div style={{padding: '200px'}} className={registration ? '' : 'hidden'}>
-                        <Image src='/loader.gif' style={{
+                        <img src='/loader.gif' style={{
                             width: '80px',
                             height: 'auto',
                             position: 'fixed',
@@ -138,23 +133,23 @@ function BookingModal({modalOpen, user, careerCenters, livestream, registration,
                         }}/>
                     </div>
                     <div className={registration ? 'hidden' : ''} style={{textAlign: 'center'}}>
-                        <Image src={livestream.companyLogoUrl}
+                        <img src={livestream.companyLogoUrl}
                                style={{maxHeight: '120px', maxWidth: '200px', margin: '20px auto'}}/>
                         <div className={modalStep !== 0 ? 'hidden' : 'modalStep animated fadeIn'}>
-                            <h2 className='booking-modal-title'><Icon name='check circle'/>Your spot is secured!</h2>
-                            <Button style={{margin: '10px 2px'}} primary content='Next'
+                            <h2 className='booking-modal-title'><CheckCircleIcon style={{marginRight: 10}}/>Your spot is secured!</h2>
+                            <Button style={{margin: '10px 2px'}} color='primary' variant='contained'
                                     onClick={() => questionElements.length > 0 ? setModalStep(1) : setModalStep(2)}
-                                    size='large'/>
+                                    size='large'>Next</Button>
                         </div>
                         <div className={modalStep !== 1 ? 'hidden' : 'modalStep'}>
                             <h4 className='booking-modal-subtitle'>Which Questions Should The Speaker Answer?</h4>
                             <div style={{margin: '0 0 50px 0'}}>
-                                <Grid stackable columns={3}>
+                                <Grid container spacing={2}>
                                     {questionElements}
                                 </Grid>
                             </div>
-                            <Button style={{margin: '10px 2px'}} primary content='Next' onClick={() => setModalStep(2)}
-                                    size='large'/>
+                            <Button style={{margin: '10px 2px'}} color='primary' variant='contained'
+                                 onClick={() => setModalStep(2)} size='large'>Next</Button>
                         </div>
                         <div className={modalStep !== 2 ? 'hidden' : 'modalStep animated fadeIn'}>
                             <h4 className='booking-modal-subtitle'>Ask your question. Get the answer during the live
@@ -171,11 +166,11 @@ function BookingModal({modalOpen, user, careerCenters, livestream, registration,
                                         className='livestream-streamer-position'>{livestream.mainSpeakerBackground}</div>
                                 </div>
                             </div>
-                            <Input size='huge' value={newQuestionTitle}
+                            <TextField variant='outlined' value={newQuestionTitle}
                                    placeholder={'What would like to ask our speaker?'} maxLength='170'
-                                   onChange={(event) => setNewQuestionTitle(event.target.value)} fluid/>
-                            <Button style={{margin: '20px 0 0 0'}} primary content='Submit'
-                                    onClick={() => addNewQuestion()} size='large'/>
+                                   onChange={(event) => setNewQuestionTitle(event.target.value)} fullWidth/>
+                            <Button style={{margin: '20px 0 0 0'}} color='primary' variant='contained'
+                                 onClick={() => addNewQuestion()} size='large'>Submit</Button>
                             <div style={{
                                 margin: '20px 0 10px 0',
                                 textAlign: 'center',
@@ -191,8 +186,8 @@ function BookingModal({modalOpen, user, careerCenters, livestream, registration,
                                 future. By joining the Talent Pool, you agree that your profile data will be shared
                                 with {livestream.company}. Don't worry, you can leave a Talent Pool at any time.
                             </div>
-                            <Button style={{margin: '20px 0 0 0'}} content='Join Talent Pool' primary size='large'
-                                    onClick={() => joinTalentPool()}/>
+                            <Button style={{margin: '20px 0 0 0'}} color='primary' variant='contained'
+                                 onClick={() => joinTalentPool()} size='large'>Join Talent Pool</Button>
                             <div style={{
                                 margin: '20px 0 10px 0',
                                 textAlign: 'center',
@@ -202,20 +197,20 @@ function BookingModal({modalOpen, user, careerCenters, livestream, registration,
                             </div>
                         </div>
                         <div className={modalStep !== 4 ? 'hidden' : 'modalStep animated fadeIn'}>
-                            <h2 className='booking-modal-title'><Icon name='check circle'/>Thank you!</h2>
+                            <h2 className='booking-modal-title'><CheckCircleIcon style={{marginRight: 10}}/>Thank you!</h2>
                             {careerCenters ? // This boolean checks whether or not you're in the details page
-                                <Link href={handleUrl()}><a><Button style={{margin: '20px 0 0 0'}} primary fluid
-                                                                    content='See all our events' size='large'
-                                                                    onClick={() => setModalOpen(false)}/></a></Link>
+                                <Link href={handleUrl()}><a>
+                                    <Button style={{margin: '20px 0 0 0'}} color='primary' fluid variant='contained'
+                                    size='large' onClick={() => setModalOpen(false)}>See all our events</Button>
+                                </a></Link>
                                 :
-                                <Button style={{margin: '20px 0 0 0'}} primary fluid
-                                        content='Finish' size='large'
-                                        onClick={() => setModalOpen(false)}/>
+                                <Button style={{margin: '20px 0 0 0'}} color='primary'
+                                 onClick={() => setModalOpen(false)} size='large'>Finish</Button>
                             }
                         </div>
                     </div>
-                </Modal.Content>
-            </Modal>
+                </DialogContent>
+            </Dialog>
             <style jsx>{`
                 .hidden {
                     display: none

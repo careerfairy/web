@@ -7,7 +7,6 @@ import useDevices from 'components/custom-hook/useDevices';
 import useMediaSources from 'components/custom-hook/useMediaSources';
 import VideoControlsContainer from 'components/views/streaming/video-container/VideoControlsContainer';
 import {useAuth} from 'HOCs/AuthProvider';
-import {v4 as uuidv4} from 'uuid';
 import {makeStyles} from "@material-ui/core/styles";
 import SettingsModal from "../../streaming/video-container/SettingsModal";
 import {Typography} from '@material-ui/core';
@@ -40,25 +39,24 @@ const useStyles = makeStyles(theme => ({
 function ViewerComponent(props) {
     const classes = useStyles()
     const [showSettings, setShowSettings] = useState(false);
-    const [streamerId, setStreamerId] = useState(null);
     const [showScreenShareModal, setShowScreenShareModal] = useState(false);
     const [optimizationMode, setOptimizationMode] = useState("detail");
 
-    const {userData, authenticatedUser} = useAuth();
+    const {authenticatedUser} = useAuth();
 
     const streamerReady = true;
 
     const screenSharingMode = (props.currentLivestream.screenSharerId === authenticatedUser?.email &&
         props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
 
-    const {externalMediaStreams, localMediaStream, agoraRtcStatus, agoraRtmStatus} =
+    const {externalMediaStreams,numberOfViewers, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus} =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
             'localVideo',
             screenSharingMode,
             props.livestreamId,
-            streamerId,
+            props.streamerId,
             true
         );
 
@@ -76,16 +74,6 @@ function ViewerComponent(props) {
     } = useMediaSources(devices, authenticatedUser?.email, localMediaStream, !streamerReady || showSettings);
 
     useEffect(() => {
-        if (props.currentLivestream) {
-            if (props.currentLivestream.test) {
-                setStreamerId(uuidv4());
-            } else if (authenticatedUser?.email) {
-                setStreamerId(authenticatedUser.email)
-            }
-        }
-    }, [props.currentLivestream, authenticatedUser])
-
-    useEffect(() => {
         if (props.handRaiseActive && agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
             if (props.currentLivestream) {
                 if (props.currentLivestream.test) {
@@ -96,6 +84,14 @@ function ViewerComponent(props) {
             }
         }
     }, [agoraRtcStatus])
+
+    useEffect(() => {
+        if (numberOfViewers && props.currentLivestream.hasStarted) {
+            props.setNumberOfViewers(numberOfViewers)
+        } else {
+            props.setNumberOfViewers(0)
+        }
+    }, [numberOfViewers, props.currentLivestream.hasStarted]);
 
 
     const attachSinkId = (element, sinkId) => {
@@ -150,6 +146,7 @@ function ViewerComponent(props) {
                                      smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}
                                      speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
                                      streams={externalMediaStreams} localId={props.streamerId}
+                                     isViewer={true}
                                      currentSpeaker={props.currentLivestream.currentSpeakerId}
                                      muted={!props.currentLivestream.hasStarted} {...props}/>
             {shareDesktopOrSlides() &&
@@ -157,6 +154,7 @@ function ViewerComponent(props) {
                 livestreamId={props.currentLivestream.id}
                 presentation={props.currentLivestream.mode === 'presentation'}
                 showMenu={props.showMenu}
+                isStreamer={true}
                 externalMediaStreams={externalMediaStreams}
                 isLocalScreen={false}
                 attachSinkId={attachSinkId}
@@ -170,6 +168,7 @@ function ViewerComponent(props) {
                     streamerId={authenticatedUser.email}
                     joining={true}
                     localMediaStream={localMediaStream}
+                    setLocalMediaStream={setLocalMediaStream}
                     handleClickScreenShareButton={handleClickScreenShareButton}
                     isMainStreamer={false}
                     showSettings={showSettings}

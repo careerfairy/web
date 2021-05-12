@@ -1,12 +1,15 @@
+import PropTypes from 'prop-types'
 import React, {useEffect, useState} from "react";
 import {withFirebasePage} from "context/firebase";
 import {Rating} from "@material-ui/lab";
-import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../HOCs/AuthProvider";
-import { FormHelperText, TextField, Button, Grid, FormControl } from "@material-ui/core";
-import { makeStyles} from "@material-ui/core/styles";
+import {Button, FormControl, FormHelperText, Grid, TextField} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 import {Formik} from "formik";
 import clsx from "clsx";
+import * as actions from '../../../../store/actions'
+import {getMinutesPassed} from "../../../helperFunctions/HelperFunctions";
+import {useDispatch} from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
     snackbar: {
@@ -52,7 +55,8 @@ const ActionComponent = ({
                              noStars
                          }) => {
     const classes = useStyles();
-    const {closeSnackbar} = useSnackbar();
+    const dispatch = useDispatch()
+    const closeSnackbar = (key) => dispatch(actions.closeSnackbar(key))
 
     const handleFormSubmit = async (values, {setSubmitting}) => {
         setSubmitting(true)
@@ -157,7 +161,6 @@ const ActionComponent = ({
                                 sm={12}
                                 xs={12}
                                 item
-                                className={classes.actionItems}
                             >
                                 <Button
                                     disabled={isSubmitting}
@@ -186,10 +189,20 @@ const ActionComponent = ({
     );
 };
 
+ActionComponent.propTypes = {
+    email: PropTypes.string.isRequired,
+    firebase: PropTypes.object,
+    hasText: PropTypes.bool.isRequired,
+    livestreamId: PropTypes.string.isRequired,
+    noStars: PropTypes.bool.isRequired,
+    ratingId: PropTypes.string.isRequired
+}
+
 const RatingContainer = ({firebase, livestream, livestreamId}) => {
     const {authenticatedUser} = useAuth();
     const classes = useStyles();
-    const {enqueueSnackbar} = useSnackbar();
+    const dispatch = useDispatch()
+    const enqueueSnackbar = (...args) => dispatch(actions.enqueueSnackbar(...args))
     const [minutesPassed, setMinutesPassed] = useState(null);
     const [ratings, setRatings] = useState([]);
 
@@ -218,7 +231,7 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setMinutesPassed(getMinutesPassed());
+            setMinutesPassed(getMinutesPassed(livestream));
         }, 10 * 1000); // check for minutes passed every 10 seconds
         return () => clearInterval(interval);
     }, [livestream.start]);
@@ -234,7 +247,7 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
     const hasNotRatedAndTimeHasPassed = (rating) => {
         return Boolean(
             !rating.hasRated &&
-            minutesPassed > rating.appearAfter &&
+            minutesPassed >= rating.appearAfter &&
             authenticatedUser?.email
         )
     }
@@ -242,9 +255,7 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
     const hasNotRatedAndNotTimeYetButStreamEndedAndRatingIsForEnd = (rating) => {
         return Boolean(
             !rating.hasRated &&
-            // minutesPassed < rating.appearAfter &&
             authenticatedUser?.email &&
-            // rating.isForEnd && // I dont care if rating is for end or not, just ask it when stream ends
             livestream.hasEnded
         )
     }
@@ -268,23 +279,26 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
                     setRatings(newRatings); // set updated ratings with new has rated status
                 } else {
                     if ((rating.isForEnd && livestream.hasEnded) || !rating.isForEnd) {
-                        // dispatch snackbar if the rating isn't for the end OR is for the end and the livstream has ender
-                        enqueueSnackbar(rating.question, {
-                            variant: "info",
-                            persist: true,
-                            preventDuplicate: true,
-                            className: rating.hasText && classes.snackbar,
-                            key: rating.id,
-                            action: (
-                                <ActionComponent
-                                    firebase={firebase}
-                                    ratingId={rating.id}
-                                    hasText={rating.hasText}
-                                    noStars={rating.noStars}
-                                    email={authenticatedUser.email}
-                                    livestreamId={livestreamId}
-                                />
-                            ),
+                        // dispatch snackbar if the rating isn't for the end OR is for the end and the livestream has ended
+                        enqueueSnackbar({
+                            message: rating.question,
+                            options: {
+                                variant: "info",
+                                persist: true,
+                                preventDuplicate: true,
+                                className: rating.hasText && classes.snackbar,
+                                key: rating.id,
+                                action: (
+                                    <ActionComponent
+                                        firebase={firebase}
+                                        ratingId={rating.id}
+                                        hasText={rating.hasText}
+                                        noStars={rating.noStars}
+                                        email={authenticatedUser.email}
+                                        livestreamId={livestreamId}
+                                    />
+                                ),
+                            }
                         });
                     }
                 }
@@ -292,17 +306,14 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
         }
     };
 
-    const getMinutesPassed = () => {
-        const now = new Date();
-        if (livestream?.start?.toDate()) {
-            const diff = Math.abs(now - livestream.start.toDate());
-            return Math.floor(diff / 1000 / 60);
-        } else {
-            return null;
-        }
-    };
-
     return null;
 };
 
+RatingContainer.propTypes = {
+    firebase: PropTypes.object,
+    livestream: PropTypes.object.isRequired,
+    livestreamId: PropTypes.string.isRequired
+}
+
 export default withFirebasePage(RatingContainer);
+

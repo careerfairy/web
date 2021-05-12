@@ -110,6 +110,8 @@ const DraftStreamForm = ({
                          }) => {
     const router = useRouter()
     const {userData} = useAuth()
+    const SPEAKER_LIMIT = userData?.isAdmin ? 15 : 10
+
     let {
         query: {careerCenterIds, draftStreamId},
         replace,
@@ -254,9 +256,7 @@ const DraftStreamForm = ({
     }
 
     const handleSetOnlyUrlIds = async () => {
-        console.log("-> in the handle set only");
         const arrayOfUrlIds = careerCenterIds?.split(",") || [group.id]
-        console.log("-> arrayOfUrlIds", arrayOfUrlIds);
         await handleSetGroupIds(arrayOfUrlIds, [], formData)
     }
 
@@ -267,6 +267,7 @@ const DraftStreamForm = ({
     }
 
     const getDownloadUrl = (fileElement) => {
+        console.log("-> fileElement", fileElement);
         if (fileElement) {
             return 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/' + fileElement.replace('/', '%2F') + '?alt=media';
         } else {
@@ -292,6 +293,10 @@ const DraftStreamForm = ({
             preventDuplicate: true,
         });
     };
+
+    const handleClickSubmitForApproval = () => {
+        setStatus(SUBMIT_FOR_APPROVAL)
+    }
 
     const isNotAdmin = () => !Boolean(userData?.isAdmin || group?.id)
 
@@ -486,8 +491,7 @@ const DraftStreamForm = ({
                                     multiline
                                     id="summary"
                                     label="Summary"
-                                    rows={2}
-                                    rowsMax={7}
+                                    rowsMax={10}
                                     inputProps={{maxLength: 5000}}
                                     onBlur={handleBlur}
                                     value={values.summary}
@@ -515,6 +519,7 @@ const DraftStreamForm = ({
                                 <FormGroup>
                                     <SpeakerForm
                                         key={key}
+                                        speakerLimit={SPEAKER_LIMIT}
                                         handleDeleteSpeaker={handleDeleteSpeaker}
                                         setValues={setValues}
                                         speakerObj={speakerObj}
@@ -573,9 +578,7 @@ const DraftStreamForm = ({
                     <ButtonGroup className={classes.buttonGroup} fullWidth>
                         <Button
                             type="submit"
-                            onClick={() => {
-                                setStatus(SUBMIT_FOR_APPROVAL)
-                            }}
+                            onClick={handleClickSubmitForApproval}
                             disabled={isSubmitting || isPending()}
                             size="large"
                             className={classes.submit}

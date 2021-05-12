@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import { Container, Grid } from "@material-ui/core";
@@ -5,6 +6,7 @@ import Profile from "./Profile";
 import ProfileDetails from "./ProfileDetails";
 import ProfileCategories from "./ProfileCategories";
 import ProfilePrivacyPolicy from "./ProfilePrivacyPolicy";
+import {withFirebase} from "../../../../../context/firebase";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -75,4 +77,10 @@ const EditOverview = ({firebase, group}) => {
     );
 };
 
-export default EditOverview;
+EditOverview.propTypes = {
+  firebase: PropTypes.object,
+  group: PropTypes.object,
+}
+
+export default withFirebase(EditOverview);
+

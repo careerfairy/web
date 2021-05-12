@@ -49,14 +49,16 @@ const useStyles = makeStyles((theme) => ({
 
 const NavItem = ({
                      className,
+                     basePath,
                      href,
                      icon: Icon,
                      title,
                      svgIcon,
+                     onClick,
                      ...rest
                  }) => {
     const classes = useStyles();
-    const {asPath} = useRouter()
+    const {pathname} = useRouter()
 
     return (
         <ListItem
@@ -65,9 +67,12 @@ const NavItem = ({
             {...rest}
         >
             <Button
-                href={href}
-                component={Link}
-                className={classes.button}
+                href={onClick ? undefined : href}
+                onClick={onClick}
+                component={onClick ? "button" : Link}
+                className={clsx(classes.button, {
+                    ["active"]: basePath === pathname
+                })}
             >
                 {svgIcon ?
                     <div className={classes.icon}>

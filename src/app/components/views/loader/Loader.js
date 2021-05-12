@@ -1,9 +1,9 @@
-import { Image } from 'semantic-ui-react';
+import { CircularProgress } from '@material-ui/core';
 
 const Loader = () => {
     return (
       <div className='loading-container'>
-            <Image src='/loader.gif' style={{ width: '80px', height: 'auto', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />
+            <CircularProgress src='/loader.gif' style={{ position: 'fixed', top: '50%', left: '50%'}} />
             <style jsx>{`
             .loading-container {
                 position: absolute;

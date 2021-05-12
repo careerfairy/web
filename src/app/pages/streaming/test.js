@@ -1,11 +1,12 @@
 import {useState, useEffect} from 'react';
 
-import { withFirebasePage } from 'context/firebase';
+import {withFirebasePage} from 'context/firebase';
+import {v4 as uuid} from "uuid";
 
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
 import Head from 'next/head';
 import Header from 'components/views/header/Header';
-import { Button, Container, Typography, CircularProgress } from "@material-ui/core";
+import {Button, Container, Typography, CircularProgress} from "@material-ui/core";
 
 function TestStreamingPage(props) {
 
@@ -19,12 +20,12 @@ function TestStreamingPage(props) {
             authorName: 'John C',
             message: 'Hello!',
             timestamp: props.firebase.getFirebaseTimestamp('March 17, 2020 03:24:00')
-        },{
+        }, {
             authorEmail: 'marco@ethz.ch',
             authorName: 'Marco D',
             message: 'Thank you for having us!',
             timestamp: props.firebase.getFirebaseTimestamp('March 17, 2020 03:34:00')
-        },{
+        }, {
             authorEmail: 'david@ethz.ch',
             authorName: 'David P',
             message: 'Hi there!',
@@ -36,7 +37,7 @@ function TestStreamingPage(props) {
             title: 'What is your interview process like?',
             timestamp: props.firebase.getFirebaseTimestamp('March 17, 2020 03:24:00'),
             votes: 24
-        },{
+        }, {
             author: 'john@ethz.ch',
             type: 'new',
             title: 'How has the company changed due to COVID?',
@@ -46,21 +47,21 @@ function TestStreamingPage(props) {
         const testPolls = [{
             question: 'What should we discuss next?',
             state: 'upcoming',
-            options: [{
-                index: 0,
-                name: 'Our next product',
-                votes: 0
-            }, {
-                index: 1,
-                name: 'What our internships look like',
-                votes: 0
-            }, {
-                index: 2,
-                name: 'Our personal story',
-                votes: 0
-            }],
+            options:[
+                {
+                    id: uuid(),
+                    text: 'Our next product',
+                },
+                {
+                    id: uuid(),
+                    text: 'What our internships look like',
+                },
+                {
+                    id: uuid(),
+                    text: 'Our personal story',
+                }
+            ],
             timestamp: props.firebase.getFirebaseTimestamp('March 17, 2020 03:24:00'),
-            voters: []
         }];
         try {
             setLoading(true);
@@ -68,10 +69,11 @@ function TestStreamingPage(props) {
             return props.firebase.setupTestLivestream(livestreamRef.id, testChatEntries, testQuestionsEntries, testPolls).then(() => {
                 router.push('/streaming/' + livestreamRef.id + '/main-streamer');
             })
-        } catch(e) {
+        } catch (e) {
             console.log(e)
         }
     }
+
     return (
         <div>
             <Head>
@@ -80,13 +82,16 @@ function TestStreamingPage(props) {
             <Header color="teal"/>
             <Container style={{paddingTop: "10%"}}>
                 <div>
-                    <Typography gutterBottom variant="h3" style={{ width: '60%'}}>Prepare your livestream</Typography>
-                    <Typography style={{ width: '60%'}}>
-                        Make sure that you can connect to the CareerFairy streaming server and get familiar with 
-                        our interactive features. 
+                    <Typography gutterBottom variant="h3" style={{width: '60%'}}>Prepare your livestream</Typography>
+                    <Typography style={{width: '60%'}}>
+                        Make sure that you can connect to the CareerFairy streaming server and get familiar with
+                        our interactive features.
                     </Typography>
-                    <Typography style={{ width: '60%', margin: '0 0 5% 0'}}>Let's make sure that you're ready when it is time for your stream to start!</Typography>
-                    <Button size="large" variant="contained" color="primary" endIcon={loading && <CircularProgress color="inherit" size={20}/>} disabled={loading} onClick={createTestLivestream}>Test the streaming connection</Button>
+                    <Typography style={{width: '60%', margin: '0 0 5% 0'}}>Let's make sure that you're ready when it is
+                        time for your stream to start!</Typography>
+                    <Button size="large" variant="contained" color="primary"
+                            endIcon={loading && <CircularProgress color="inherit" size={20}/>} disabled={loading}
+                            onClick={createTestLivestream}>Test the streaming connection</Button>
                 </div>
             </Container>
         </div>

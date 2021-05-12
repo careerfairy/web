@@ -1,22 +1,18 @@
-import {Fragment, useState, useEffect} from "react";
-import {Formik} from 'formik';
-import React from "react";
+import React, {Fragment, useEffect, useState} from "react";
 import {withFirebase} from "context/firebase";
 import UserCategorySelector from "components/views/profile/UserCategorySelector";
 import {
     Box,
+    Button,
     CardMedia,
     Checkbox,
     CircularProgress,
-    FormControlLabel,
-    FormLabel,
-    Button,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
-    FormControl,
+    FormControlLabel,
     Typography,
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";

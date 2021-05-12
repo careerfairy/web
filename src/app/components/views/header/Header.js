@@ -1,17 +1,17 @@
 import {useEffect, useState, Fragment, useContext} from 'react'
 import {withFirebase} from "context/firebase";
-import {Icon} from "semantic-ui-react";
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import AuthenticatedHeader from "./authenticated-header/AuthenticatedHeader";
 import NonAuthenticatedHeader from "./non-authenticated-header/NonAuthenticatedHeader";
 import {compose} from "redux"
 import * as actions from '../../../store/actions'
 import {connect} from 'react-redux'
 import Link from 'next/link';
-import {useRouter, withRouter} from 'next/router';
+import {useRouter} from 'next/router';
 import LandingHeader from './landing-header/LandingHeader';
-import {Button} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {useAuth} from "../../../HOCs/AuthProvider";
+import { IconButton } from '@material-ui/core';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -41,87 +41,6 @@ function Header(props) {
 
     const handleLogout = () => {
         props.logout()
-    }
-
-    const ConstantSideHeader = () => {
-        return (
-            <div className='sidebar'>
-                <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{cursor: 'pointer'}}/>
-                <ul>
-                    <li><Link className={`${isHighlighted ? "highlighted" : ""}`} href='/next-livestreams'><a
-                        className={classes.nextLink}>Next Live
-                        Streams</a></Link></li>
-                    <li><Link href='/discover'><a>Past Live Streams</a></Link></li>
-                    <li><Link href='/companies'><a>Companies</a></Link></li>
-                    <li><Link href='/wishlist'><a>Wishlist</a></Link></li>
-                    <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>
-                    <li><a href='https://corporate.careerfairy.io/career-center'>For Career Centers</a></li>
-                    <li><Link
-                        href={authenticated ? '/profile' : '/login'}><a>{authenticated ? 'My Profile' : 'Log in'}</a></Link>
-                    </li>
-                    {authenticated &&
-                    <li><Button onClick={handleLogout} variant="contained" color="primary">Logout</Button></li>}
-
-                </ul>
-                <style jsx>{`
-                  .sidebar {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    bottom: 0;
-                    width: 300px;
-                    background-color: rgba(30, 30, 30, 0.95);
-                    z-index: 9999;
-                    color: white;
-                    padding: 20px;
-                    text-align: center;
-                  }
-
-                  .highlighted {
-                    border: 5px solid #00d2aa;
-                    border-radius: 5px;
-                  }
-
-                  .sidebar.hidden {
-                    display: none;
-                  }
-
-                  .sidebar ul {
-                    margin-top: 50px;
-                    list-style-type: none;
-                    padding: 0;
-                  }
-
-                  .sidebar ul li {
-                    font-size: 1.2em;
-                    margin-top: 30px;
-                  }
-
-                  .sidebar a, .sidebar div {
-                    font-weight: 600;
-                    color: white;
-                    text-transform: uppercase;
-                  }
-
-                  .sidebar a:hover, .sidebar div:hover {
-                    cursor: pointer;
-                    color: rgb(28, 184, 149);
-                  }
-
-                  @media screen and (max-width: 992px) {
-                    #sidebar-toggle {
-                      display: inline-block;
-                    }
-                  }
-
-                  @media screen and (max-width: 600px) {
-                    .sidebar {
-                      width: 100%;
-                    }
-                  }
-                `}</style>
-            </div>
-        );
     }
 
     function toggleSideBar() {
@@ -161,14 +80,15 @@ function Header(props) {
             </div>
             <div
                 className={sidebarState !== "opened" ? 'sidebar hidden' : sidebarState === "opened" ? 'sidebar animated slideInLeft faster' : 'sidebar animated slideOutLeft faster'}>
-                <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{cursor: 'pointer'}}/>
+                <IconButton aria-label="delete" onClick={toggleSideBar}>
+                  <HighlightOffIcon fontSize='large' style={{ color: 'white' }}/>
+                </IconButton>
                 <ul>
                     <li><Link className="next-livestream-link" href='/next-livestreams'><a onClick={toggleSideBar}
                                                                                            className={classes.nextLink}>Next
                         Live Streams</a></Link>
                     </li>
                     {authenticated && <li><a onClick={toggleSideBar} href='/groups'>Follow Groups</a></li>}
-                    <li><Link href='/discover'><a onClick={toggleSideBar}>Past Live Streams</a></Link></li>
                     <li><Link href='/companies'><a onClick={toggleSideBar}>Companies</a></Link></li>
                     <li><Link href='/wishlist'><a onClick={toggleSideBar}>Wishlist</a></Link></li>
                     <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>
@@ -180,6 +100,10 @@ function Header(props) {
                 </ul>
             </div>
             <style jsx>{`
+              a {
+                text-decoration: none
+              }
+          
               #mainHeader header #signupLink:hover, #mainHeader header #wishlistLink:hover {
                 background-color: rgb(0, 210, 170);
               }

@@ -2,13 +2,14 @@ import React, {useState} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 
-import { Container, Typography, useMediaQuery, AppBar, Tabs, Tab, Box } from "@material-ui/core";
+import {Container, Typography, useMediaQuery, AppBar, Tabs, Tab, Box} from "@material-ui/core";
 import PersonalInfo from "./personal-info/PersonalInfo";
 import {withFirebase} from "context/firebase";
 import JoinedGroups from "./my-groups/JoinedGroups";
 import AdminGroups from "./my-groups/AdminGroups";
 import {useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
+import {useAuth} from "../../../HOCs/AuthProvider";
 
 function TabPanel(props) {
     const {children, value, index, ...other} = props;
@@ -47,13 +48,16 @@ const ProfileNav = ({userData}) => {
     const theme = useTheme();
     const native = useMediaQuery(theme.breakpoints.down('xs'));
     const [value, setValue] = useState(0);
+    const {authenticatedUser} = useAuth()
+
     useFirestoreConnect(() => [
         {
             collection: 'careerCenterData',
-            where: userData.isAdmin ? ["test", "==", false] : ["adminEmail", "==", userData.id]
+            where: userData.isAdmin ? ["test", "==", false] : ["adminEmails", "array-contains", authenticatedUser.email],
+            storeAs: "adminGroups"
         }
     ])
-    const careerCenters = useSelector(state => state.firestore.ordered?.careerCenterData || [])
+    const adminGroups = useSelector(state => state.firestore.ordered["adminGroups"] || [])
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -79,9 +83,9 @@ const ProfileNav = ({userData}) => {
              label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>,
     ]
 
-    if (careerCenters.length) {
+    if (adminGroups.length) {
         views.push(<TabPanel key={2} value={value} index={2} dir={theme.direction}>
-            <AdminGroups userData={userData} adminGroups={careerCenters}/>
+            <AdminGroups userData={userData} adminGroups={adminGroups}/>
         </TabPanel>)
         tabsArray.push(<Tab key={2} wrapped fullWidth
                             label={<Typography

@@ -1,9 +1,15 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
-import {Typography, LinearProgress, Box, Grid} from "@material-ui/core";
+import {Grid, LinearProgress, Typography} from "@material-ui/core";
 import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
+import LazyLoad from 'react-lazyload'
+import Spinner from "./groupStreamCard/Spinner";
+import useInfiniteScrollClient from "../../../custom-hook/useInfiniteScrollClient";
+import clsx from "clsx";
+import {useAuth} from "../../../../HOCs/AuthProvider";
 
+const gridItemHeight = 530
 const useStyles = makeStyles((theme) => ({
     root: {
         flex: 1,
@@ -26,67 +32,113 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        minHeight: "50vh"
     },
+    streamGridItem: {
+        height: gridItemHeight,
+        display: "flex"
+    },
+    dynamicHeight: {
+        height: "auto"
+    }
 }));
 
 
+const Wrapper = ({children, streamId}) => {
+
+    return (
+        <LazyLoad
+            style={{flex: 1, display: "flex", width: "-webkit-fill-available"}}
+            key={streamId}
+            height={gridItemHeight}
+            // unmountIfInvisible
+            scroll
+            offset={[0, 0]}
+            placeholder={<Spinner/>}>
+            {children}
+        </LazyLoad>
+    )
+}
+
 const GroupStreams = ({
                           groupData,
-                          userData,
-                          user,
                           livestreams,
                           mobile,
                           searching,
                           livestreamId,
                           careerCenterId,
-                          alreadyJoined,
                           listenToUpcoming,
                           selectedOptions,
-                          hasCategories,
-                          width
+                          isPastLivestreams,
                       }) => {
         const classes = useStyles()
+        const {userData, authenticatedUser: user} = useAuth()
         const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
-        const searchedButNoResults = selectedOptions.length && !searching && !livestreams.length
+        const searchedButNoResults = selectedOptions?.length && !searching && !livestreams?.length
+        const [slicedLivestreams, loadMoreLivestreams, hasMoreLivestreams, totalLivestreams] = useInfiniteScrollClient(livestreams, 6, 3);
+
+        const handleScroll = () => {
+            const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight * 0.6
+            if (bottom && hasMoreLivestreams) {
+                loadMoreLivestreams()
+            }
+        };
+
+        useEffect(() => {
+            window.addEventListener('scroll', handleScroll, {
+                passive: true
+            });
+
+            return () => {
+                window.removeEventListener('scroll', handleScroll);
+            };
+        }, [totalLivestreams, slicedLivestreams]);
+
         useEffect(() => {
             if (globalCardHighlighted) {
                 setGlobalCardHighlighted(false)
             }
         }, [groupData])
 
-        const renderStreamCards = livestreams?.map((livestream, index) => {
+        const renderStreamCards = slicedLivestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                    <Grid style={{height: !mobile && 600}} key={livestream.id} xs={12} sm={12} md={6}
-                          lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
-                        <GroupStreamCardV2
+                    <Grid
+                        className={clsx(classes.streamGridItem, {
+                            [classes.dynamicHeight]: mobile
+                        })}
+                        key={livestream.id} xs={12} sm={12} md={6}
+                        lg={4} xl={4} item>
+                        <Wrapper
                             index={index}
-                            width={width}
-                            mobile={mobile}
-                            setGlobalCardHighlighted={setGlobalCardHighlighted}
-                            globalCardHighlighted={globalCardHighlighted}
-                            hasCategories={hasCategories}
-                            groupData={groupData}
-                            listenToUpcoming={listenToUpcoming}
-                            careerCenterId={careerCenterId}
-                            livestreamId={livestreamId}
-                            user={user} userData={userData} fields={null}
-                            careerCenters={[]}
-                            id={livestream.id}
-                            key={livestream.id}
-                            livestream={livestream}
-                        />
+                            streamId={livestream.id}
+                        >
+                            <GroupStreamCardV2
+                                mobile={mobile}
+                                isPastLivestreams={isPastLivestreams}
+                                setGlobalCardHighlighted={setGlobalCardHighlighted}
+                                globalCardHighlighted={globalCardHighlighted}
+                                groupData={groupData}
+                                listenToUpcoming={listenToUpcoming}
+                                careerCenterId={careerCenterId}
+                                livestreamId={livestreamId}
+                                user={user} userData={userData}
+                                id={livestream.id}
+                                key={livestream.id}
+                                livestream={livestream}
+                            />
+                        </Wrapper>
                     </Grid>
                 )
             }
         })
 
         return (
-            <Grid item xs={12} sm={12} md={hasCategories ? 8 : 12} lg={hasCategories ? 8 : 12} xl={hasCategories ? 8 : 12}>
-                <Grid container spacing={mobile? 2: 4}>
+            <Grid item xs={12}>
+                <Grid container spacing={mobile ? 2 : 4}>
                     {groupData.id || listenToUpcoming ? (searching ?
                         <Grid md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
-                            <LinearProgress style={{width: "80%", marginTop: 100}} color="primary"/>
+                            <LinearProgress style={{width: "80%"}} color="primary"/>
                         </Grid>
                         :
                         livestreams.length ?
@@ -95,8 +147,8 @@ const GroupStreams = ({
                             <Grid sm={12} xs={12} md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
                                 <Typography className={classes.emptyMessage} align="center" variant="h5"
                                             style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :
-                                    <strong>{groupData.universityName} currently has no scheduled live
-                                        streams</strong>}</Typography>
+                                    <strong>{groupData.universityName} currently has
+                                        no {isPastLivestreams ? "past" : "scheduled"} live streams</strong>}</Typography>
                             </Grid>)
                         : null}
                 </Grid>

@@ -1,20 +1,69 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import {makeStyles} from "@material-ui/core/styles";
-import {Button, Typography} from "@material-ui/core";
+import {isEmpty} from 'lodash/fp'
+import {
+    Button,
+    CircularProgress,
+    Collapse, Container,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    Switch,
+    TextField,
+    Typography
+} from "@material-ui/core";
+import WarningIcon from '@material-ui/icons/Warning';
+import {URL_REGEX} from 'components/util/constants';
 
 const useStyles = makeStyles((theme) => ({
     background: {
-        width: "100%",
+        // width: "100%",
         height: "100vh",
         backgroundColor: theme.palette.primary.main,
-        color: "white"
+        color: "white",
+        display: "grid",
+        placeItems: "center",
     },
     centered: {
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%,-50%)"
+        // position: "absolute",
+        // top: "50%",
+        // left: "50%",
+        // transform: "translate(-50%,-50%)",
+        // minWidth: 400
+    },
+    speakerTitle: {
+        fontSize: "1rem",
+        textTransform: "uppercase",
+        fontWeight: "bold",
+        color: theme.palette.text.secondary,
+        marginBottom: 10
+    },
+    speakerName: {
+        fontSize: "1.3rem",
+        fontWeight: "bold"
+    },
+    select: {
+        minWidth: 200
+    },
+    selectNewProfile: {
+        padding: "10px 0",
+        textTransform: "uppercase",
+        fontWeight: "bold",
+        fontSize: "1rem",
+        margin: 5,
+        color: theme.palette.text.secondary,
+    },
+    selectNewProfileIcon: {
+        color: theme.palette.text.secondary,
+    },
+    speakerFunction: {
+        fontSize: "1rem",
+        color: theme.palette.text.secondary
     },
     title: {
         marginBottom: 20,
@@ -22,23 +71,200 @@ const useStyles = makeStyles((theme) => ({
     company: {
         fontWeight: "bold"
     },
-    joinButton: {
-        marginTop: 30
+    padding: {
+        padding: "20px 30px",
+        margin: "20px 0"
+    },
+    linkedInSwitch: {
+        margin: "20px 0 10px 0",
+        fontSize: "0.1rem",
+        fontWeight: "bold"
+    },
+    linkedIn: {
+        width: '100%'
+    },
+    block: {
+        display: 'block'
+    },
+    button: {
+        marginTop: 10,
+        color: "lightgrey"
+    },
+    marginTop: {
+        marginTop: 10
+    },
+    browserMessage: {
+        marginTop: 30,
+        fontSize: "1rem",
+        fontWeight: "bold",
+        fontStyle: "normal",
+        verticalAlign: "middle",
+        "em" : {
+            verticalAlign: "middle"
+        }
+    }, 
+    subline: {
+        marginRight: 5,
+        verticalAlign: "middle"
     }
 }));
 
-function PreparationOverlay ({ livestream, setStreamerReady }) {
+function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebase}) {
+
     const classes = useStyles();
+    const [speaker, setSpeaker] = useState({});
+    const [showLinkedIn, setShowLinkedIn] = useState(false);
+    const [linkedInUrl, setLinkedInUrl] = useState("");
+
+    const [formErrors, setFormErrors] = useState({});
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        let storedSpeakerString = localStorage.getItem("storedSpeaker");
+        if (storedSpeakerString) {
+            if (livestream.liveSpeakers?.length > 0) {
+                let storedSpeaker = JSON.parse(storedSpeakerString);
+                let savedSpeaker = livestream.liveSpeakers?.find( liveSpeaker => {
+                    return liveSpeaker.firstName === storedSpeaker.firstName &&
+                        liveSpeaker.lastName === storedSpeaker.lastName &&
+                        liveSpeaker.position === storedSpeaker.position
+                })
+                if (savedSpeaker) {
+                    setSpeaker(savedSpeaker)
+                } else {
+                    setSpeaker(storedSpeaker)
+                }
+            } else {
+                let storedSpeaker = JSON.parse(storedSpeakerString);
+                setSpeaker(storedSpeaker)
+            }
+        }   
+    },[livestream.liveSpeakers])
+
+    const handleChangeLinkedInShare = (event) => {
+        setShowLinkedIn(!showLinkedIn);
+    };
+
+    const joinStream = (e) => {
+        e.preventDefault()
+        setLoading(true)
+        if (!formHasErrors()) {
+            let newSpeaker = {...speaker}
+            newSpeaker.speakerUuid = streamerUuid;
+            newSpeaker.showLinkedIn = showLinkedIn;
+            newSpeaker.linkedIn = linkedInUrl;
+
+            if (newSpeaker.id) {
+                firebase.updateSpeakersInLivestream(livestream, newSpeaker).then(() => {
+                    setStreamerReady(true)
+                    setLoading(false)
+                })
+            } else {
+                firebase.addSpeakerInLivestream(livestream, newSpeaker).then(() => {
+                    setStreamerReady(true)
+                    setLoading(false)
+                })
+            }
+            localStorage.setItem("storedSpeaker", JSON.stringify(newSpeaker))
+        } else {
+            setLoading(false)
+        }
+    }
+
+    const formHasErrors = () => {
+        let errors = {};
+        if (showLinkedIn) {
+            errors.linkedInUrl = isEmpty(linkedInUrl?.trim()) || !isValidUrl(linkedInUrl)
+        }
+        errors.firstName = isEmpty(speaker.firstName?.trim())
+        errors.lastName = isEmpty(speaker.lastName?.trim())
+        errors.position = isEmpty(speaker.position?.trim())
+        setFormErrors(errors)
+        return Object.keys(errors).some(key => errors[key] === true);
+    }
+
+    const isValidUrl = (value) => {
+        return value.match(URL_REGEX)
+    }
 
     return (
-        <div className={classes.background}>
-            <div className={classes.centered}>
-                <Typography variant="h4" className={classes.title}>Welcome to your stream</Typography>
-                <Typography variant="h2">{ livestream.title }</Typography>
-                <Typography variant="h4" className={classes.company}>{ livestream.company }</Typography>
-                <Button variant='contained' size='large' className={classes.joinButton} onClick={() => setStreamerReady(true) }>Join now</Button>
-            </div>
-        </div>
+        <Container maxWidth={false} className={classes.background}>
+            <form onSubmit={joinStream} className={classes.centered}>
+                <Typography variant="h5" className={classes.title}>Welcome to your stream</Typography>
+                <Typography variant="h4">{livestream.title}</Typography>
+                <Typography variant="h5" className={classes.company}>{livestream.company}</Typography>
+                <Paper className={classes.padding}>
+                    <Typography variant='h4' className={classes.speakerTitle}>Your Speaker Profile</Typography>
+                    <FormGroup>
+                        <FormGroup>
+                            <FormControl className={classes.marginTop}>
+                                <TextField error={formErrors.firstName && isEmpty(speaker.firstName?.trim())}
+                                            helperText={formErrors.firstName && "Required"} id="outlined-basic"
+                                            label="First Name" variant="outlined"
+                                            name="firstName"
+                                            value={speaker.firstName}
+                                            onChange={(event) => setSpeaker({
+                                                ...speaker,
+                                                firstName: event.target.value
+                                            })}/>
+                            </FormControl>
+                            <FormControl className={classes.marginTop}>
+                                <TextField error={formErrors.lastName && isEmpty(speaker.lastName?.trim())}
+                                            helperText={formErrors.lastName && "Required"} id="outlined-basic"
+                                            label="Last Name" variant="outlined"
+                                            name="lastName"
+                                            value={speaker.lastName}
+                                            onChange={(event) => setSpeaker({
+                                                ...speaker,
+                                                lastName: event.target.value
+                                            })}/>
+                            </FormControl>
+                            <FormControl className={classes.marginTop}>
+                                <TextField error={formErrors.position && isEmpty(speaker.position?.trim())}
+                                            helperText={formErrors.position && "Required"} id="outlined-basic"
+                                            label="Occupation" placeholder="Lead Engineer"
+                                            name="jobTitle"
+                                            value={speaker.position} variant="outlined"
+                                            onChange={(event) => setSpeaker({
+                                                ...speaker,
+                                                position: event.target.value
+                                            })}/>
+                            </FormControl>
+                        </FormGroup>
+                        <FormControlLabel
+                            className={classes.linkedInSwitch}
+                            control={
+                                <Switch
+                                    checked={showLinkedIn}
+                                    onChange={handleChangeLinkedInShare}
+                                    color="primary"
+                                    size="small"
+                                />
+                            }
+                            label={showLinkedIn ? "Show LinkedIn Profile" : "Hide LinkedIn Profile"}
+                        />
+                        <Collapse in={showLinkedIn}>
+                            <FormControl className={classes.linkedIn}>
+                                <TextField
+                                    required={showLinkedIn}
+                                    label="LinkedIn Profile URL"
+                                    name="linkedInUrl"
+                                    placeholder="https://linkedin.com/in/your-profile"
+                                    value={linkedInUrl}
+                                    helperText={formErrors.linkedInUrl && "Please enter a valid URL"}
+                                    error={formErrors.linkedInUrl && !isValidUrl(linkedInUrl)}
+                                    onChange={(event) => setLinkedInUrl(event.target.value)}
+                                    variant="outlined"
+                                />
+                            </FormControl>
+                        </Collapse>
+                    </FormGroup>
+                </Paper>
+                <Button variant='contained' type="submit" size='large' onClick={joinStream} disabled={loading}
+                        startIcon={loading && <CircularProgress size="small"/>}>Join now</Button>
+                <Typography className={classes.browserMessage} variant='h5'><WarningIcon className={classes.subline}/><em>Please avoid connecting through a mobile device (iOS/Android)</em></Typography>
+            </form>
+        </Container>
     )
 }
 

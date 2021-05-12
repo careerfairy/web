@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Container, Grid} from "@material-ui/core";
 
 import {makeStyles} from "@material-ui/core/styles";
@@ -26,7 +26,6 @@ const Feedback = ({
                       userTypes,
                       streamDataTypes,
                       streamsFromTimeFrame,
-                      streamsFromTimeFrameAndFuture,
                       fetchingPolls,
                       fetchingQuestions,
                       fetchingRatings,
@@ -51,39 +50,8 @@ const Feedback = ({
         setCurrentRating(null)
     }, [currentStream?.id])
 
-
-    const getUsers = () => {
-        if (currentStream) {
-            return currentStream[userType.propertyDataName]
-        } else {
-            const totalViewers = streamsFromTimeFrameAndFuture.reduce(
-                (accumulator, livestream) => {
-                    return [...accumulator, ...livestream[userType.propertyDataName]];
-                },
-                []
-            );
-            return totalViewers.filter(function (el) {
-                if (!this[el.userEmail]) {
-                    this[el.userEmail] = true;
-                    return true;
-                }
-                return false;
-            }, Object.create(null))
-        }
-    };
-
-    const totalUniqueUsers = useMemo(() => getUsers(), [
-        streamsFromTimeFrameAndFuture, currentStream, userType
-    ]);
-
     const isRating = () => {
         return Boolean(streamDataType.propertyName === "feedback")
-    }
-    const isPoll = () => {
-        return Boolean(streamDataType.propertyName === "pollEntries")
-    }
-    const isQuestion = () => {
-        return Boolean(streamDataType.propertyName === "questions")
     }
 
     const isFetching = () => {
@@ -95,7 +63,6 @@ const Feedback = ({
     const handleScrollToSideRef = () => {
         sideRef.current.scrollIntoView({behavior: 'smooth', block: 'start'})
     }
-
 
     return (
         <Container className={classes.root} maxWidth={false}>
@@ -120,7 +87,6 @@ const Feedback = ({
                 </Grid>
                 <Grid item lg={12} md={12} xl={12} xs={12}>
                     <FeedbackTable
-                        totalUniqueUsers={totalUniqueUsers}
                         typesOfOptions={[]}
                         userTypes={userTypes}
                         setUserType={setUserType}
@@ -137,8 +103,6 @@ const Feedback = ({
                         handleScrollToSideRef={handleScrollToSideRef}
                         setCurrentPoll={setCurrentPoll}
                         streamDataTypes={streamDataTypes}
-                        futureStreams={futureStreams}
-                        streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}
                         userType={userType}
                         group={group}/>
                 </Grid>

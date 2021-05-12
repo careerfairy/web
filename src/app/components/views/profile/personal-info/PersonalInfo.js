@@ -90,10 +90,7 @@ const PersonalInfo = ({userData}) => {
                 firstName: userData?.firstName || '',
                 lastName: userData?.lastName || '',
                 linkedinUrl: userData?.linkedinUrl || '' ? userData.linkedinUrl : '',
-                university: {
-                    code: userData?.universityCode || 'other',
-                    name: userData?.universityName || ''
-                },
+                university: userData?.university,
                 universityCountryCode: userData?.universityCountryCode || ''
             }}
             enableReinitialize
@@ -229,7 +226,7 @@ const PersonalInfo = ({userData}) => {
                                     <UniversityCountrySelector value={values.universityCountryCode}
                                                                handleClose={handleClose}
                                                                submitting={isSubmitting}
-                                                               handleChange={handleChange}
+                                                               setFieldValue={setFieldValue}
                                                                error={errors.universityCountryCode && touched.universityCountryCode && errors.universityCountryCode}
                                                                handleBlur={handleBlur}
                                                                handleOpen={handleOpen}

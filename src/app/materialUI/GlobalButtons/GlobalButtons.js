@@ -96,12 +96,15 @@ const DynamicColorButton = ({disabled, startIcon, loading, color, children, ...r
 
 DynamicColorButton.propTypes = {
     className: PropTypes.string,
-    color: PropTypes.string,
+    color: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.oneOf(['primary', 'secondary']),
+    ]),
     startIcon: PropTypes.node,
     disabled: PropTypes.bool,
-    loading: PropTypes.bool
+    loading: PropTypes.bool,
+    size: PropTypes.oneOf(["small", "medium", "large"])
 };
-
 
 
 //example
@@ -121,12 +124,12 @@ DynamicColorButton.propTypes = {
 // }];
 
 const CustomSplitButton = ({
-                                      options = [],
-                                      mainButtonProps,
-                                      slideDirection = "right",
-                                      sideButtonProps,
-                                      ...props
-                                  }) => {
+                               options = [],
+                               mainButtonProps,
+                               slideDirection = "right",
+                               sideButtonProps,
+                               ...props
+                           }) => {
     const classes = useStyles()
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef(null);

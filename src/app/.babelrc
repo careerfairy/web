@@ -27,6 +27,7 @@
         "camel2DashComponentName": false
       },
       "mui-icons"
-    ]
+    ],
+    ["@babel/plugin-proposal-throw-expressions"]
   ]
 }
