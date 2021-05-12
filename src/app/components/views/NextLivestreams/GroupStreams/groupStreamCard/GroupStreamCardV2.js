@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
     main: {
         display: "flex",
         flex: 1,
-        minHeight: 340,
+        minHeight: 390,
         overflow: 'hidden',
         borderTopLeftRadius: '1.5rem',
         borderTopRightRadius: '1.5rem',
@@ -122,7 +122,6 @@ const useStyles = makeStyles(theme => ({
         marginBottom: '0.5rem',
     },
     title: {
-        fontSize: '2rem',
         fontWeight: 800,
         color: theme.palette.common.white,
         overflow: "hidden",
@@ -514,14 +513,14 @@ const GroupStreamCardV2 = memo(({
                                 }
                             />
                             <Collapse collapsedHeight={80} in={cardHovered}>
-                            <Typography
-                                variant={'h2'}
-                                className={clsx(classes.title, {
-                                    [classes.titleHovered]: cardHovered
-                                })}
-                            >
-                                {livestream.title}
-                            </Typography>
+                                <Typography
+                                    variant={'h4'}
+                                    className={clsx(classes.title, {
+                                        [classes.titleHovered]: cardHovered
+                                    })}
+                                >
+                                    {livestream.title}
+                                </Typography>
                             </Collapse>
                             <Box style={{maxHeight: 165, overflow: "auto", overflowX: "hidden"}}>
                                 {targetOptions.slice(0, cardHovered ? -1 : maxOptions).map(option =>
