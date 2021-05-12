@@ -29,6 +29,7 @@ module.exports = (phase, {defaultConfig}) => {
         config.distDir = '../../dist/client'
     }
     /* config options for all phases except development here */
+    console.log("config", config)
     return withBundleAnalyzer(config)
 }
 
