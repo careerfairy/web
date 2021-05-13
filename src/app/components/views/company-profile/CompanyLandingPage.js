@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
-import {Container, Header as SemanticHeader, Transition, Button} from "semantic-ui-react";
 
 import Header from "components/views/header/Header";
+import { Container, Typography, Button } from "@material-ui/core";
 
 function CompanyLandingPage(props) {
 
@@ -38,18 +38,18 @@ function CompanyLandingPage(props) {
             <div className='mask'>
                 <Header color="white"/>
                 <div className='maskContent'>
-                    <Container textAlign="center" className="titleContainer" style={{ paddingTop: '8%', position: 'relative', color: 'white', minHeight: 'calc(100vh - 100px)'}}>
-                        <SemanticHeader as="h1" style={{ color: 'white', fontSize: '3.5vw', fontFamily: '"Poppins", sans-serif', fontWeight: '500' }}>
+                    <Container className="titleContainer" style={{ paddingTop: '8%', position: 'relative', color: 'white', minHeight: 'calc(100vh - 100px)', textAlign: 'center' }}>
+                        <Typography variant='h1' style={{ color: 'white', fontSize: '4.5vw', fontFamily: '"Poppins", sans-serif', fontWeight: '500', margin: 50 }}>
                             { props.company.name }
-                        </SemanticHeader>
-                        <SemanticHeader as="h3" style={{ color: 'white', fontSize: '1.4em', fontFamily: '"Poppins", sans-serif' }}>
+                        </Typography>
+                        <Typography variant='h3' style={{ color: 'white', fontSize: '1.4em', fontFamily: '"Poppins", sans-serif' }}>
                             { props.company.headline }
-                        </SemanticHeader>
-                        <SemanticHeader as="h5" id='headline' style={{ color: 'white', fontSize: '1.2em', fontWeight: '200', width: '60%', fontFamily: '"Poppins", sans-serif', margin: '5% auto 5% auto' }}>
+                        </Typography>
+                        <Typography variant='h5' id='headline' style={{ color: 'white', fontSize: '1.2em', fontWeight: '200', width: '60%', fontFamily: '"Poppins", sans-serif', margin: '5% auto 5% auto' }}>
                             { props.company.description }
-                        </SemanticHeader>
-                        <Button style={{ display: 'inline', width: '55%', margin: '5px auto' }} size='big' color='teal' basic onClick={() => props.scrollToSecond()}>Discover {props.company.name}</Button>
-                        <Button style={{ display: 'inline', width: '55%', margin: '5px auto' }} color='teal' size='big' onClick={() => props.scrollToThird()}>Watch {props.company.name}</Button>
+                        </Typography>
+                        <Button style={{ display: 'inline', width: '55%', margin: '5px auto' }} size='large' color='primary' variant='outlined' onClick={() => props.scrollToSecond()}>Discover {props.company.name}</Button>
+                        <Button style={{ display: 'inline', width: '55%', margin: '5px auto' }} color='primary' size='large' variant='contained' onClick={() => props.scrollToThird()}>Watch {props.company.name}</Button>
                     </Container>
                 </div>
                 <video id="background-video" key={props.company.backgroundUrl} autoPlay muted loop playsInline>
