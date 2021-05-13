@@ -26,6 +26,7 @@ const useStyles = makeStyles(theme => ({
     speakerName: {
         fontSize: props => props.small ? "0.7rem" : "1rem",
         maxWidth: props => props.small ? "180px" : "100%",
+        margin: 0
     },
     speakerData: {
         maxWidth: props => props.small ? "180px" : "100%",
@@ -38,6 +39,7 @@ const useStyles = makeStyles(theme => ({
         overflow: "hidden",
         whiteSpace: "nowrap",
         textOverflow: "ellipsis",
+        margin: 0
     },
     speakerLinkedIn: {
         marginLeft: 10
@@ -90,7 +92,7 @@ const SpeakerInfoOverlay = ({speaker, small, zIndex}) => {
             <div className={classes.speakerInformation}>
                 <div>
                     <div>
-                        <h3>{`${speaker.firstName} ${speaker.lastName}`}</h3>
+                        <h3 className={classes.speakerName}>{`${speaker.firstName} ${speaker.lastName}`}</h3>
                     </div>
                     <div>
                         <h4 className={classes.speakerPosition}>{`${speaker.position}`}</h4>
