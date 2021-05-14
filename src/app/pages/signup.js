@@ -367,7 +367,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                                 <UniversityCountrySelector value={values.universityCountryCode}
                                                            handleClose={handleClose}
                                                            submitting={submitting(isSubmitting)}
-                                                           handleChange={handleChange}
+                                                           setFieldValue={setFieldValue}
                                                            error={errors.universityCountryCode && touched.universityCountryCode && errors.universityCountryCode}
                                                            handleOpen={handleOpen}
                                                            handleBlur={handleBlur}

@@ -1,9 +1,8 @@
 import { Fragment, useEffect, useState } from "react";
 import { withFirebasePage } from "context/firebase";
-import { Container } from "semantic-ui-react";
-import Footer from "components/views/footer/Footer";
 import Loader from "components/views/loader/Loader";
 import { useRouter } from "next/router";
+import { Container } from "@material-ui/core";
 
 function Unsubscribe(props) {
 
@@ -23,7 +22,7 @@ function Unsubscribe(props) {
         return (
             <Fragment>
                 <div className='companies-container'>
-                    <Container textAlign='center' style={{ padding: '100px'}}>
+                    <Container justify='center' style={{ padding: '100px'}}>
                         <h1 style={{ color: '#00d2aa'}}>CareerFairy</h1>
                         <div>You successfully unsubscribed from our newsletter!</div>
                     </Container>

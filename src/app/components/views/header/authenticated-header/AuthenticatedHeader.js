@@ -1,9 +1,9 @@
 import {Fragment} from 'react';
-import {Image, Icon} from "semantic-ui-react";
+import MenuIcon from '@material-ui/icons/Menu';
 
 import Link from 'next/link';
 import {useRouter} from 'next/router';
-import {Button} from "@material-ui/core";
+import {Button, IconButton} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -30,16 +30,21 @@ const AuthenticatedHeader = (props) => {
         <Fragment>
             <header id='main-header'>
                 <ul id='left-menu'>
-                    <li><Icon id='sidebar-toggle' style={{cursor: 'pointer'}} name='bars' size='big'
-                              color={props.color === "white" ? null : 'teal'} onClick={props.toggleSideBar}/></li>
-                    <li><Link href='/'><a><Image src={props.color === "white" ? '/logo_white.png' : '/logo_teal.png'}
-                                                 style={{
-                                                     cursor: 'pointer',
-                                                     width: '150px',
-                                                     display: 'inline-block',
-                                                     marginTop: '10px',
-                                                     marginLeft: '10px'
-                                                 }}/></a></Link></li>
+                    <li>
+                        <IconButton onClick={props.toggleSideBar}>
+                            <MenuIcon id='sidebar-toggle' fontSize='large' style={{ color: (props.color === "white" ? 'white' : 'rgba(0, 210, 170)') }}/>
+                        </IconButton>
+                    </li>
+                    <li><Link href='/'><a><img src={props.color === "white" ? '/logo_white.png' : '/logo_teal.png'}
+                            style={{
+                                cursor: 'pointer',
+                                width: '150px',
+                                display: 'inline-block',
+                                marginTop: '10px',
+                                marginLeft: '10px'
+                            }}/>
+                        </a></Link>
+                    </li>
                 </ul>
                 <ul id='middle-menu' className={'centered-menu ' + (props.color === "white" ? 'white' : 'dark')}>
                     <li className={props.page === 'next-livestreams' ? 'active' : ''}><Link href='/next-livestreams'><a className={classes.nextLink}>Next
@@ -56,6 +61,10 @@ const AuthenticatedHeader = (props) => {
                 </div>
             </header>
             <style jsx>{`
+            a {
+                text-decoration: none
+            }
+            
             #main-header {
                 width: 100%;
                 height: 80px;
@@ -82,16 +91,13 @@ const AuthenticatedHeader = (props) => {
             #left-menu li{
                 margin: 0;
                 display: inline;
+                vertical-align: middle;
             }
 
             #right-menu {
                 float: right;
                 padding: 15px;
                 vertical-align: top;
-            }
-
-            #sidebar-toggle {
-                display: inline-block;
             }
 
             #right-menu.dark button, #right-menu.dark a {

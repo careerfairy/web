@@ -5,7 +5,7 @@ import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import { Collapse, FormControl, FormHelperText, TextField, CircularProgress } from "@material-ui/core";
 
-const otherObj = {name: "other", id: "other"}
+const otherObj = {name: "Other", id: "other"}
 const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, error, handleBlur, submitting, values}) => {
     const [open, setOpen] = useState(false);
     const [universities, setUniversities] = useState([otherObj])
@@ -22,7 +22,7 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
                         const fetchedUniversities = querySnapshot.data().universities
                         setUniversities([...fetchedUniversities, otherObj])
                     }  else {
-                        setFieldValue("university", {code: "othe", name: "Other"})
+                        setFieldValue("university", otherObj)
                     }
                     return setLoading(false)
                 } catch (e) {
@@ -54,6 +54,8 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
             onChange={(e, value) => {
                 if (value) {
                     setFieldValue("university", {code: value.id, name: value.name})
+                } else {
+                    setFieldValue("university", {code: otherObj.id, name: otherObj.name})
                 }
             }}
             open={open}

@@ -1,5 +1,4 @@
-import React, {useState, useEffect, Fragment} from 'react';
-import {Input, Icon, Button, Modal} from 'semantic-ui-react';
+import React from 'react';
 
 function HandRaiseInactive(props) {
 

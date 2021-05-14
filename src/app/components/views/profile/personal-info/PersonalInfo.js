@@ -226,7 +226,7 @@ const PersonalInfo = ({userData}) => {
                                     <UniversityCountrySelector value={values.universityCountryCode}
                                                                handleClose={handleClose}
                                                                submitting={isSubmitting}
-                                                               handleChange={handleChange}
+                                                               setFieldValue={setFieldValue}
                                                                error={errors.universityCountryCode && touched.universityCountryCode && errors.universityCountryCode}
                                                                handleBlur={handleBlur}
                                                                handleOpen={handleOpen}

@@ -1,5 +1,5 @@
-import { Container } from 'semantic-ui-react'
 
+import { Container } from "@material-ui/core";
 import Header from "../components/views/header/Header";
 
 function CookiePolicy(props) {
@@ -45,7 +45,7 @@ function CookiePolicy(props) {
                         </li>
                         <li>
                             <p>As we sell products it's important for us to understand statistics about how many of the visitors to our site actually make a purchase and as such this is the kind of data that these cookies will track. This is important to you as it means that we can accurately make business predictions that allow us to monitor our advertising and product costs to ensure the best possible price.</p>
-                        </li>import { Container } from 'semantic-ui-react';
+                        </li>
 
                         <li>
                             <p>We use adverts to offset the costs of running this site and provide funding for further development. The behavioural advertising cookies used by this site are designed to ensure that we provide you with the most relevant adverts where possible by anonymously tracking your interests and presenting similar things that may be of interest.</p>

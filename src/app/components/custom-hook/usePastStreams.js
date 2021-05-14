@@ -24,12 +24,12 @@ const usePastStreams = (livestreamId) => {
     useFirestoreConnect(() => [{
         collection: "livestreams",
         where: pastLivestreamsQuery,
-        orderBy: ["start", "asc"],
+        orderBy: ["start", "desc"],
         storeAs: PAST_LIVESTREAMS_NAME
     }])
 
     return useSelector(state =>
-        upcomingLivestreamsSelector(state.firestore.ordered[PAST_LIVESTREAMS_NAME], {livestreamId})
+        upcomingLivestreamsSelector(state.firestore.ordered[PAST_LIVESTREAMS_NAME], {livestreamId, registeredStudentsCount: true})
     )
 };
 

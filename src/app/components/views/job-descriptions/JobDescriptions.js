@@ -1,7 +1,7 @@
 import {useState, useEffect, Fragment} from 'react';
-import { Grid } from 'semantic-ui-react';
 import JobDescription from './job-description/JobDescription';
 import { withFirebase } from 'context/firebase';
+import { Grid } from '@material-ui/core';
 
 function JobDescriptions(props) {
 
@@ -24,16 +24,16 @@ function JobDescriptions(props) {
 
     let positionList = positions.map((position, index) => {
         return (
-            <Grid.Column key={index}>
+            <Grid item xs={12} sm={4} key={index}>
                 <JobDescription position={position} />
-            </Grid.Column>
+            </Grid>
         );
     })
 
     return (
         <Fragment>
             <div className='past-livestream-jobs-container'>
-                <Grid columns='3' stackable>
+                <Grid container>
                     { positionList }
                 </Grid>
             </div>
