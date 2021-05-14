@@ -1,6 +1,18 @@
 import {CLOSE_SNACKBAR, ENQUEUE_SNACKBAR, REMOVE_SNACKBAR} from "./actionTypes";
 import {GENERAL_ERROR} from "../../components/util/constants";
 
+/**
+ * Enqueue a snackbar managed in redux state.
+ * @param {{
+ * options: {
+ * anchorOrigin: {horizontal: string, vertical: string},
+ * variant: ('default' | 'error' | 'success' | 'warning' | 'info')
+ * key: string,
+ * action: object
+ * },
+ * message: string
+ * }} [notification]
+ */
 export const enqueueSnackbar = (notification = {message: "", options: {}}) => {
     const key = notification.options && notification.options.key;
 

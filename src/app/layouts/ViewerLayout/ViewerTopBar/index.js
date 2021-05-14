@@ -145,6 +145,7 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
             <ViewerBreakoutRoomModal
                 open={breakoutRoomModalOpen}
                 onClose={handleCloseBreakoutRoomModal}
+                handleOpen={handleOpenBreakoutRoomModal}
             />
         </React.Fragment>
     );

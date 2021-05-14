@@ -1,13 +1,15 @@
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
-import {shallowEqual, useSelector} from "react-redux";
+import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import {useFirestoreConnect} from "react-redux-firebase";
 import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector";
 import {useRouter} from "next/router";
 import {GlassDialog} from "../../../../materialUI/GlobalModals";
-import {Slide} from "@material-ui/core";
-import * as PropTypes from "prop-types";
+import {Button, Slide} from "@material-ui/core";
+import PropTypes from "prop-types";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import * as actions from 'store/actions'
+import {closeSnackbar, enqueueSnackbar} from "store/actions";
 
 const useStyles = makeStyles(theme => ({}));
 
@@ -16,10 +18,27 @@ const Content = props => {
 };
 
 Content.propTypes = {handleClose: PropTypes.any};
-const ViewerBreakoutRoomModal = ({open, onClose}) => {
+
+const BreakoutSnackAction = ({handleClickConfirm, handleCloseSnackbar}) => {
+    const dispatch = useDispatch()
+
+
+    return (
+        <React.Fragment>
+            <Button onClick={handleClickConfirm}>
+                Checkout
+            </Button>
+            <Button onClick={handleCloseSnackbar}>
+                Dismiss
+            </Button>
+        </React.Fragment>
+    )
+}
+const ViewerBreakoutRoomModal = ({open, onClose, handleOpen}) => {
 
     const classes = useStyles()
     const {query: {livestreamId}} = useRouter()
+    const dispatch = useDispatch()
 
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -30,16 +49,49 @@ const ViewerBreakoutRoomModal = ({open, onClose}) => {
         subcollections: [{
             collection: "breakoutRooms",
         }],
-        storeAs: `ActiveBreakoutRooms of ${livestreamId}`,
+        storeAs: `Active BreakoutRooms of ${livestreamId}`,
         where: ["hasStarted", "==", true],
         limit: open ? undefined : 1
     }] : [], [livestreamId, open]);
-    console.log("-> query", query);
 
     useFirestoreConnect(query)
     const breakoutRooms = useSelector(state =>
-        breakoutRoomsSelector(state.firestore.ordered[`ActiveBreakoutRooms of ${livestreamId}`]), shallowEqual
+        breakoutRoomsSelector(state.firestore.ordered[`Active BreakoutRooms of ${livestreamId}`]), shallowEqual
     )
+
+
+    useEffect(() => {
+        console.log("-> Effect Triggered");
+        if (!open && breakoutRooms?.length) {
+            const message = "There are some breakout rooms active"
+            dispatch(actions.enqueueSnackbar({
+                message: message,
+                options: {
+                    variant: "success",
+                    key: message,
+                    persist: true,
+                    preventDuplicate: true,
+                    action: <BreakoutSnackAction
+                        handleCloseSnackbar={() => handleCloseSnackbar(message)}
+                        handleClickConfirm={() => handleClickConfirmSnackbar(message)}
+                    />,
+                    anchorOrigin: {
+                        horizontal: "right",
+                        vertical: "top"
+                    },
+                }
+            }))
+            // console.log("-> New room!!!!");
+        }
+    }, [open, Boolean(breakoutRooms?.length)]);
+
+    const handleClickConfirmSnackbar = (key) => {
+        handleCloseSnackbar(key)
+        handleOpen()
+    }
+    const handleCloseSnackbar = (key) => {
+        dispatch(actions.closeSnackbar(key))
+    }
 
     const handleClose = () => {
         onClose()
