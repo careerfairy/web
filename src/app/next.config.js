@@ -25,9 +25,9 @@ module.exports = (phase, {defaultConfig}) => {
             return config
         },
     }
-    if (phase === PHASE_PRODUCTION_BUILD) {
-        config.distDir = '../../dist/client'
-    }
+    // if (phase === PHASE_PRODUCTION_BUILD) {
+    //     config.distDir = '../../dist/client'
+    // }
     /* config options for all phases except development here */
     return withBundleAnalyzer(config)
 }
