@@ -1,0 +1,94 @@
+import React, {useEffect, useState} from "react";
+import Box from "@material-ui/core/Box";
+import {
+    Button,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    Switch
+} from "@material-ui/core";
+import PropTypes from "prop-types";
+import List from "@material-ui/core/List";
+import {useFirebase} from "context/firebase";
+import {useRouter} from "next/router";
+
+const BreakoutRoomSettings = ({classes, handleClose, onClick}) => {
+    const {query: {livestreamId}} = useRouter()
+    const {listenToBreakoutRoomSettings, updateCanReturnToMainStream} = useFirebase()
+    const [breakoutRoomSettings, setBreakoutRoomSettings] = useState({});
+
+    useEffect(() => {
+        if (livestreamId) {
+            const unsubscribe = listenToBreakoutRoomSettings(livestreamId, settingsSnap => {
+                const newSettings = settingsSnap.data() || {}
+                setBreakoutRoomSettings(newSettings)
+            })
+
+            return () => unsubscribe()
+        }
+
+    }, [livestreamId])
+
+    const assignOptions = [
+        {
+            primaryText: "Manually",
+            secondaryText: "Participants can return to the main event stream",
+            onClick: () => updateCanReturnToMainStream(livestreamId, !Boolean(breakoutRoomSettings?.canReturnToMainStream)),
+            checked: Boolean(breakoutRoomSettings?.canReturnToMainStream)
+        },
+    ]
+
+    return (
+        <React.Fragment>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+                <DialogTitle>
+                    Room Settings
+                </DialogTitle>
+                <Box py={2} px={1.5}>
+                    <Button onClick={onClick}>
+                        Back
+                    </Button>
+                </Box>
+            </Box>
+            <DialogContent className={classes.breakoutRoomsContent} dividers>
+                <List>
+                    {assignOptions.map(({checked, secondaryText, primaryText, onClick}) => (
+                        <ListItem key={primaryText}
+                                  onClick={onClick}
+                                  selected={checked}
+                                  button>
+                            <ListItemText
+                                primary={primaryText}
+                                secondary={secondaryText}
+                            />
+                            <ListItemIcon style={{minWidth: 0}}>
+                                <Switch
+                                    checked={checked}
+                                    value={checked}
+                                    name="radio-buttons"
+                                    inputProps={{'aria-label': 'A'}}
+                                />
+                            </ListItemIcon>
+                        </ListItem>
+                    ))}
+                </List>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleClose}>
+                    Cancel
+                </Button>
+            </DialogActions>
+        </React.Fragment>
+    );
+};
+
+BreakoutRoomSettings.propTypes = {
+    onClick: PropTypes.func,
+    classes: PropTypes.any,
+    handleClose: PropTypes.any
+};
+
+export default BreakoutRoomSettings

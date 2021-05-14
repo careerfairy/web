@@ -12,6 +12,7 @@ import Box from "@material-ui/core/Box";
 import useStreamToken from "../../../../../components/custom-hook/useStreamToken";
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 import BreakoutRoomOptions from "./BreakoutRoomOptions";
+import BreakoutRoomSettings from "./BreakoutRoomSettings";
 
 const useStyles = makeStyles(theme => ({
     breakoutRoomsContent: {
@@ -25,20 +26,18 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const {isMainStreamer} = useCurrentStream()
     const links = useStreamToken({forStreamType: "mainLivestream"})
     const {openAllBreakoutRooms, closeAllBreakoutRooms} = useFirebase()
-    const {query: {livestreamId, breakoutRoomId}, push} = useRouter()
+    const {query: {livestreamId}, push} = useRouter()
     const dispatch = useDispatch()
     const rtmClient = useSelector(state => state.rtmClient)
     const rtmChannel = useSelector(state => state.rtmChannel)
     const rtcClient = useSelector(state => state.rtcClient)
-
+    const [view, setView] = useState("main");
     const [memberCounts, setMemberCounts] = useState({});
     const [allRoomsOpen, setAllRoomsOpen] = useState(false);
     const [allRoomsClosed, setAllRoomsClosed] = useState(false);
     const [openRoom, setOpenRoom] = useState("");
     const [opening, setOpening] = useState(false);
     const [closing, setClosing] = useState(false);
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const [announcementModalOpen, setAnnouncementModalOpen] = useState(false);
 
 
     useEffect(() => {
@@ -50,14 +49,6 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
         setAllRoomsClosed(breakoutRooms.every(room => !room.hasStarted))
     }, [breakoutRooms])
 
-
-    const handleClickMoreOptions = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleCloseMoreOptions = () => {
-        setAnchorEl(null);
-    };
 
     const getAllMemberCounts = async () => {
         if (rtmClient) {
@@ -118,13 +109,22 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
         await push({pathname: targetPath, query: {auto: true}}, undefined, {shallow: false})
     }
 
-    const handleOpenAnnouncementModal = () => {
-        handleCloseMoreOptions()
-        setAnnouncementModalOpen(true)
+    const openSettings = () => {
+        setView("settings")
     }
 
-    const handleCloseAnnouncementModal = () => {
-        setAnnouncementModalOpen(false)
+    const openMain = () => {
+        setView("main")
+    }
+
+    if (view === "settings") {
+        return (
+            <BreakoutRoomSettings
+                onClick={openMain}
+                classes={classes}
+                handleClose={handleClose}
+            />
+        )
     }
 
     return (
@@ -134,12 +134,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                     Manage Breakout Rooms
                 </DialogTitle>
                 <BreakoutRoomOptions
-                    onClick={handleClickMoreOptions} anchorEl={anchorEl}
-                    announcementModalOpen={announcementModalOpen}
-                    onClose={handleCloseMoreOptions}
-                    handleCloseAnnouncementModal={handleCloseAnnouncementModal}
-                    handleOpenAnnouncementModal={handleOpenAnnouncementModal}
-                    breakoutRoomId={breakoutRoomId}
+                    openSettings={openSettings}
                     handleBackToMainRoom={handleBackToMainRoom}
                 />
             </Box>

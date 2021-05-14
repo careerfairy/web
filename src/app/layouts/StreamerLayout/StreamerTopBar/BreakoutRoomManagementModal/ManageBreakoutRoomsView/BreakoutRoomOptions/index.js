@@ -1,27 +1,55 @@
-import React from "react";
+import React, {useState} from "react";
 import Box from "@material-ui/core/Box";
 import {IconButton, ListItemIcon, Menu, MenuItem, Typography} from "@material-ui/core";
 import MoreOptionsIcon from "@material-ui/icons/MoreHoriz";
 import AnnouncementIcon from "@material-ui/icons/ContactlessOutlined";
 import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
-import AnnouncementModal from "../AnnouncementModal";
+import RoomSettingsIcon from '@material-ui/icons/Settings';
+import AnnouncementModal from "./AnnouncementModal";
 import PropTypes from "prop-types";
+import {useRouter} from "next/router";
+import {makeStyles} from "@material-ui/core/styles";
 
-const BreakoutRoomOptions = ({
-                                 anchorEl,
-                                 breakoutRoomId,
-                                 onClick,
-                                 handleOpenAnnouncementModal,
-                                 handleBackToMainRoom,
-                                 onClose,
-                                 announcementModalOpen,
-                                 handleCloseAnnouncementModal
-                             }) => {
+const useStyles = makeStyles(theme => ({
+    menuIconRoot: {
+        minWidth: theme.spacing(4)
+    }
+}));
+
+const BreakoutRoomOptions = (
+    {
+        handleBackToMainRoom,
+        openSettings,
+    }) => {
+    const {query: {breakoutRoomId}} = useRouter()
+    const classes = useStyles()
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [announcementModalOpen, setAnnouncementModalOpen] = useState(false);
+
+
+    const handleOpenAnnouncementModal = () => {
+        handleCloseMoreOptions()
+        setAnnouncementModalOpen(true)
+    }
+
+    const handleCloseAnnouncementModal = () => {
+        setAnnouncementModalOpen(false)
+    }
+
+    const handleClickMoreOptions = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseMoreOptions = () => {
+        setAnchorEl(null);
+    };
+
 
     return (
         <React.Fragment>
             <Box py={2} px={1.5}>
-                <IconButton onClick={onClick}>
+                <IconButton onClick={handleClickMoreOptions}>
                     <MoreOptionsIcon/>
                 </IconButton>
                 <Menu
@@ -29,28 +57,36 @@ const BreakoutRoomOptions = ({
                     anchorEl={anchorEl}
                     keepMounted
                     open={Boolean(anchorEl)}
-                    onClose={onClose}
+                    onClose={handleCloseMoreOptions}
                 >
                     <MenuItem onClick={handleOpenAnnouncementModal}>
-                        <ListItemIcon>
+                        <ListItemIcon classes={{root: classes.menuIconRoot}}>
                             <AnnouncementIcon/>
                         </ListItemIcon>
                         <Typography variant="inherit" noWrap>
                             Make an Announcement
                         </Typography>
                     </MenuItem>
-                    <MenuItem onClick={onClose}>My account</MenuItem>
                     {breakoutRoomId &&
                     <MenuItem
                         onClick={handleBackToMainRoom}
                     >
-                        <ListItemIcon>
+                        <ListItemIcon classes={{root: classes.menuIconRoot}}>
                             <BackToMainRoomIcon/>
                         </ListItemIcon>
                         <Typography variant="inherit" noWrap>
                             Back to main Room
                         </Typography>
-                    </MenuItem>}
+                    </MenuItem>
+                    }
+                    <MenuItem onClick={openSettings}>
+                        <ListItemIcon classes={{root: classes.menuIconRoot}}>
+                            <RoomSettingsIcon/>
+                        </ListItemIcon>
+                        <Typography variant="inherit" noWrap>
+                            Settings
+                        </Typography>
+                    </MenuItem>
                 </Menu>
             </Box>
             <AnnouncementModal
@@ -62,12 +98,8 @@ const BreakoutRoomOptions = ({
 };
 
 BreakoutRoomOptions.propTypes = {
-    onClick: PropTypes.func,
-    anchorEl: PropTypes.any,
-    onClose: PropTypes.func,
-    handleOpenAnnouncementModal: PropTypes.func,
-    breakoutRoomId: PropTypes.any,
-    handleBackToMainRoom: PropTypes.func
+    handleBackToMainRoom: PropTypes.func,
+    openSettings: PropTypes.func
 };
 
 export default BreakoutRoomOptions

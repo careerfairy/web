@@ -2141,6 +2141,33 @@ class Firebase {
     // Breakout Rooms
 
     /**
+     * @param {string} mainStreamId
+     * @param {function} callback
+     */
+    listenToBreakoutRoomSettings = (mainStreamId, callback) => {
+        const settingsRef = this.firestore.collection("livestreams")
+            .doc(mainStreamId)
+            .collection("breakoutRoomsSettings")
+            .doc("breakoutRoomsSetting")
+        return settingsRef.onSnapshot(callback)
+    }
+
+    /**
+     * @param {string} mainStreamId
+     * @param {boolean} canReturnToMainStream
+     */
+    updateCanReturnToMainStream = (mainStreamId, canReturnToMainStream) => {
+        const settingsRef = this.firestore.collection("livestreams")
+            .doc(mainStreamId)
+            .collection("breakoutRoomsSettings")
+            .doc("breakoutRoomsSetting")
+
+        return settingsRef.set({
+            canReturnToMainStream: canReturnToMainStream
+        }, {merge: true})
+    }
+
+    /**
      * @param {firebase.firestore.UpdateData|string} newData
      * @param {string} roomId
      * @param {string} mainStreamId
