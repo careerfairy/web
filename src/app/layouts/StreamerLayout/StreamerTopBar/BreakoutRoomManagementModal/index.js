@@ -22,7 +22,7 @@ const Content = ({handleClose}) => {
         doc: livestreamId,
         subcollections: [{
             collection: "breakoutRooms",
-            orderBy: ["index", "asc"]
+            orderBy: [["start", "desc"], ["index", "asc"]]
         }],
         storeAs: `breakoutRooms of ${livestreamId}`,
     }] : [], [livestreamId]);

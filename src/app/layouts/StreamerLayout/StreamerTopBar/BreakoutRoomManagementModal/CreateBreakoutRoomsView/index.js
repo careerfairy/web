@@ -96,36 +96,36 @@ const options = Array.from({length: MAX_ROOMS}, (_, i) => i + 1)
                         </FormControl>
                     </Box>
                 </Box>
-                <Divider/>
-                <Box p={1}>
-                    <Typography variant="h6">
-                        Participants
-                    </Typography>
-                    <DialogContentText>
-                        How do you want to assign people to rooms?
-                    </DialogContentText>
-                    <List>
-                        {assignOptions.map(({value, secondaryText, primaryText, onClick}) => (
-                            <ListItem key={value}
-                                      onClick={onClick}
-                                      selected={assignType === value}
-                                      button>
-                                <ListItemText
-                                    primary={primaryText}
-                                    secondary={secondaryText}
-                                />
-                                <ListItemIcon style={{minWidth: 0}}>
-                                    <Radio
-                                        checked={assignType === value}
-                                        value={value}
-                                        name="radio-buttons"
-                                        inputProps={{'aria-label': 'A'}}
-                                    />
-                                </ListItemIcon>
-                            </ListItem>
-                        ))}
-                    </List>
-                </Box>
+                {/*<Divider/>*/}
+                {/*<Box p={1}>*/}
+                {/*    <Typography variant="h6">*/}
+                {/*        Participants*/}
+                {/*    </Typography>*/}
+                {/*    <DialogContentText>*/}
+                {/*        How do you want to assign people to rooms?*/}
+                {/*    </DialogContentText>*/}
+                {/*    <List>*/}
+                {/*        {assignOptions.map(({value, secondaryText, primaryText, onClick}) => (*/}
+                {/*            <ListItem key={value}*/}
+                {/*                      onClick={onClick}*/}
+                {/*                      selected={assignType === value}*/}
+                {/*                      button>*/}
+                {/*                <ListItemText*/}
+                {/*                    primary={primaryText}*/}
+                {/*                    secondary={secondaryText}*/}
+                {/*                />*/}
+                {/*                <ListItemIcon style={{minWidth: 0}}>*/}
+                {/*                    <Radio*/}
+                {/*                        checked={assignType === value}*/}
+                {/*                        value={value}*/}
+                {/*                        name="radio-buttons"*/}
+                {/*                        inputProps={{'aria-label': 'A'}}*/}
+                {/*                    />*/}
+                {/*                </ListItemIcon>*/}
+                {/*            </ListItem>*/}
+                {/*        ))}*/}
+                {/*    </List>*/}
+                {/*</Box>*/}
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>

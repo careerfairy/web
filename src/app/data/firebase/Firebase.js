@@ -2181,6 +2181,33 @@ class Firebase {
     }
 
     /**
+     * @param {string} title
+     * @param {string} mainStreamId
+     */
+    addBreakoutRoom = (title, mainStreamId) => {
+        const livestreamRef = this.firestore.collection("livestreams").doc(mainStreamId)
+        return this.firestore.runTransaction((transaction) => {
+            return transaction.get(livestreamRef).then((livestreamSnap) => {
+                const livestreamData = livestreamSnap.data()
+                const isTestStream = livestreamData.test
+                const companyLogo = livestreamData.companyLogoUrl || ""
+                    const breakoutRoomRef = livestreamRef.collection("breakoutRooms").doc()
+                    const newBreakoutRoom = this.buildBreakoutRoom(breakoutRoomRef.id, isTestStream, title, companyLogo)
+                    transaction.set(breakoutRoomRef, newBreakoutRoom)
+                    if (!isTestStream) {
+                        // If the main stream isn't a test, we will then need secure tokens for each breakout room
+                        const breakoutTokenRef = breakoutRoomRef.collection("tokens")
+                            .doc("secureToken");
+                        const token = uuidv4();
+                        transaction.set(breakoutTokenRef, {
+                            value: token,
+                        })
+                    }
+            });
+        });
+    }
+
+    /**
      * @param {string} roomId
      * @param {string} mainStreamId
      */
@@ -2238,7 +2265,7 @@ class Firebase {
             test,
             companyLogo,
             title,
-            index
+            ...(index && {index: index})
         }
     }
 

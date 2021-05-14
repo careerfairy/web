@@ -5,10 +5,12 @@ import MoreOptionsIcon from "@material-ui/icons/MoreHoriz";
 import AnnouncementIcon from "@material-ui/icons/ContactlessOutlined";
 import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
 import RoomSettingsIcon from '@material-ui/icons/Settings';
+import AddRoomIcon from '@material-ui/icons/Add';
 import AnnouncementModal from "./AnnouncementModal";
 import PropTypes from "prop-types";
 import {useRouter} from "next/router";
 import {makeStyles} from "@material-ui/core/styles";
+import AddRoomModal from "./AddRoomModal";
 
 const useStyles = makeStyles(theme => ({
     menuIconRoot: {
@@ -26,6 +28,7 @@ const BreakoutRoomOptions = (
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [announcementModalOpen, setAnnouncementModalOpen] = useState(false);
+    const [addRoomModalOpen, setAddRoomModalOpen] = useState(false);
 
 
     const handleOpenAnnouncementModal = () => {
@@ -45,6 +48,14 @@ const BreakoutRoomOptions = (
         setAnchorEl(null);
     };
 
+    const handleCloseAddRoomModal = () => {
+        handleCloseMoreOptions()
+        setAddRoomModalOpen(false)
+    }
+    const handleOpenAddRoomModal = () => {
+        handleCloseMoreOptions()
+        setAddRoomModalOpen(true)
+    }
 
     return (
         <React.Fragment>
@@ -77,8 +88,15 @@ const BreakoutRoomOptions = (
                         <Typography variant="inherit" noWrap>
                             Back to main Room
                         </Typography>
+                    </MenuItem>}
+                    <MenuItem onClick={handleOpenAddRoomModal}>
+                        <ListItemIcon classes={{root: classes.menuIconRoot}}>
+                            <AddRoomIcon/>
+                        </ListItemIcon>
+                        <Typography variant="inherit" noWrap>
+                            Add Room
+                        </Typography>
                     </MenuItem>
-                    }
                     <MenuItem onClick={openSettings}>
                         <ListItemIcon classes={{root: classes.menuIconRoot}}>
                             <RoomSettingsIcon/>
@@ -92,6 +110,10 @@ const BreakoutRoomOptions = (
             <AnnouncementModal
                 open={announcementModalOpen}
                 onClose={handleCloseAnnouncementModal}
+            />
+            <AddRoomModal
+                open={addRoomModalOpen}
+                onClose={handleCloseAddRoomModal}
             />
         </React.Fragment>
     );
