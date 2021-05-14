@@ -4,14 +4,25 @@ import {CircularProgress, DialogContent, Slide} from "@material-ui/core";
 import {useCurrentStream} from "../../../../context/stream/StreamContext";
 import {useRouter} from "next/router";
 import {isEmpty, isLoaded, useFirestoreConnect} from "react-redux-firebase";
-import {useSelector} from "react-redux";
+import {shallowEqual, useSelector} from "react-redux";
 import CreateBreakoutRoomsView from "./CreateBreakoutRoomsView";
 import ManageBreakoutRoomsView from "./ManageBreakoutRoomsView";
 import {GlassDialog} from "materialUI/GlobalModals";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import {useTheme} from "@material-ui/core/styles";
+import {createSelector} from "reselect";
+import {dynamicSort} from "../../../../components/helperFunctions/HelperFunctions";
 
 
+const breakoutRoomsSelector = createSelector(
+    breakoutRooms => breakoutRooms,
+    (breakoutRooms) => {
+        if (breakoutRooms) {
+            return [...breakoutRooms].sort(dynamicSort("index", true))
+        }
+        return breakoutRooms
+    }
+)
 const Content = ({handleClose}) => {
 
     const {query: {livestreamId}} = useRouter()
@@ -22,14 +33,15 @@ const Content = ({handleClose}) => {
         doc: livestreamId,
         subcollections: [{
             collection: "breakoutRooms",
-            orderBy: [["start", "desc"], ["index", "asc"]]
         }],
         storeAs: `breakoutRooms of ${livestreamId}`,
     }] : [], [livestreamId]);
 
     useFirestoreConnect(query)
+    const breakoutRooms = useSelector(state =>
+        breakoutRoomsSelector(state.firestore.ordered[`breakoutRooms of ${livestreamId}`]), shallowEqual
+    )
 
-    const breakoutRooms = useSelector(state => state.firestore.ordered[`breakoutRooms of ${livestreamId}`])
 
     if (!isLoaded(breakoutRooms)) {
         return (
