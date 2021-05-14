@@ -6,6 +6,7 @@ import AnnouncementIcon from "@material-ui/icons/ContactlessOutlined";
 import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
 import RoomSettingsIcon from '@material-ui/icons/Settings';
 import AddRoomIcon from '@material-ui/icons/AddCircleOutline';
+import RefreshRoomsIcon from '@material-ui/icons/Refresh';
 import AnnouncementModal from "./AnnouncementModal";
 import PropTypes from "prop-types";
 import {useRouter} from "next/router";
@@ -22,6 +23,8 @@ const BreakoutRoomOptions = (
     {
         handleBackToMainRoom,
         openSettings,
+        handleRefresh,
+        loading
     }) => {
     const {query: {breakoutRoomId}} = useRouter()
     const classes = useStyles()
@@ -55,6 +58,11 @@ const BreakoutRoomOptions = (
     const handleOpenAddRoomModal = () => {
         handleCloseMoreOptions()
         setAddRoomModalOpen(true)
+    }
+
+    const handleClickRefresh = async () => {
+        await handleRefresh()
+        handleCloseMoreOptions()
     }
 
     return (
@@ -95,6 +103,14 @@ const BreakoutRoomOptions = (
                         </ListItemIcon>
                         <Typography variant="inherit" noWrap>
                             Add Room
+                        </Typography>
+                    </MenuItem>
+                    <MenuItem disabled={loading} onClick={handleClickRefresh}>
+                        <ListItemIcon classes={{root: classes.menuIconRoot}}>
+                            <RefreshRoomsIcon />
+                        </ListItemIcon>
+                        <Typography variant="inherit" noWrap>
+                            Refresh
                         </Typography>
                     </MenuItem>
                     <MenuItem onClick={openSettings}>

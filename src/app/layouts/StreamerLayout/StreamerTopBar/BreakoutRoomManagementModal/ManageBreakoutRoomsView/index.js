@@ -46,7 +46,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const [openRoom, setOpenRoom] = useState("");
     const [opening, setOpening] = useState(false);
     const [closing, setClosing] = useState(false);
-
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         getAllMemberCounts()
@@ -117,6 +117,16 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
         await push({pathname: targetPath, query: {auto: true}}, undefined, {shallow: false})
     }
 
+    const handleRefresh = async () => {
+        try {
+            setRefreshing(true)
+            await getAllMemberCounts()
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
+        setRefreshing(false)
+    }
+
     const openSettings = () => {
         setView("settings")
     }
@@ -143,6 +153,8 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                 </DialogTitle>
                 <BreakoutRoomOptions
                     openSettings={openSettings}
+                    handleRefresh={handleRefresh}
+                    loading={refreshing}
                     handleBackToMainRoom={handleBackToMainRoom}
                 />
             </Box>
