@@ -37,11 +37,14 @@ const useStyles = makeStyles(theme => ({
         marginLeft: theme.spacing(0.5)
     },
     floatingViewCount: {
+        color: theme.palette.primary.main,
+    },
+    floatingWrapper:{
         position: 'absolute',
         top: theme.spacing(2.5),
         right: theme.spacing(2.5),
         zIndex: 120,
-        color: theme.palette.primary.main,
+
     }
 }));
 
@@ -63,6 +66,8 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
 
     if (mobile && !showMenu) {
         return (
+            <React.Fragment>
+            <div className={classes.floatingWrapper}>
             <IconButton onClick={showAudience} className={classes.floatingViewCount}>
                 <Badge max={999999} color="secondary" badgeContent={numberOfViewers}>
                     <NewFeatureHint
@@ -75,6 +80,13 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
                     </NewFeatureHint>
                 </Badge>
             </IconButton>
+            </div>
+                <ViewerBreakoutRoomModal
+                    open={breakoutRoomModalOpen}
+                    onClose={handleCloseBreakoutRoomModal}
+                    handleOpen={handleOpenBreakoutRoomModal}
+                />
+            </React.Fragment>
         )
     }
 
