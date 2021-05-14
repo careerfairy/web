@@ -5,7 +5,7 @@ import {useFirestoreConnect} from "react-redux-firebase";
 import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector";
 import {useRouter} from "next/router";
 import {GlassDialog} from "../../../../materialUI/GlobalModals";
-import {Button, Slide} from "@material-ui/core";
+import {Button, DialogContent, DialogTitle, Slide} from "@material-ui/core";
 import PropTypes from "prop-types";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import * as actions from 'store/actions'
@@ -13,8 +13,17 @@ import {closeSnackbar, enqueueSnackbar} from "store/actions";
 
 const useStyles = makeStyles(theme => ({}));
 
-const Content = props => {
-    return null;
+const Content = ({}) => {
+    return (
+        <React.Fragment>
+            <DialogTitle>
+                Live Rooms
+            </DialogTitle>
+            <DialogContent>
+
+            </DialogContent>
+        </React.Fragment>
+    )
 };
 
 Content.propTypes = {handleClose: PropTypes.any};
@@ -25,10 +34,10 @@ const BreakoutSnackAction = ({handleClickConfirm, handleCloseSnackbar}) => {
 
     return (
         <React.Fragment>
-            <Button onClick={handleClickConfirm}>
+            <Button  variant="outlined" color="primary" onClick={handleClickConfirm}>
                 Checkout
             </Button>
-            <Button onClick={handleCloseSnackbar}>
+            <Button variant="outlined" onClick={handleCloseSnackbar}>
                 Dismiss
             </Button>
         </React.Fragment>
@@ -67,7 +76,7 @@ const ViewerBreakoutRoomModal = ({open, onClose, handleOpen}) => {
             dispatch(actions.enqueueSnackbar({
                 message: message,
                 options: {
-                    variant: "success",
+                    variant: "info",
                     key: message,
                     persist: true,
                     preventDuplicate: true,
@@ -76,7 +85,7 @@ const ViewerBreakoutRoomModal = ({open, onClose, handleOpen}) => {
                         handleClickConfirm={() => handleClickConfirmSnackbar(message)}
                     />,
                     anchorOrigin: {
-                        horizontal: "right",
+                        horizontal: "center",
                         vertical: "top"
                     },
                 }
