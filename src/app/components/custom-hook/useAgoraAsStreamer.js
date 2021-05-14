@@ -215,7 +215,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 localVideo.play(videoId);
                 await rtcClient.setClientRole("host")
                 await rtcClient.publish([localAudio, localVideo]);
-                await rtcClient.startLiveStreaming("rtmp://live.restream.io/live/re_4175417_1cc8a2737fb3b4a6f305", false)
                 await rtcClient.enableDualStream();
                 rtcClient.enableAudioVolumeIndicator()
                 setAgoraRtcStatus({
@@ -235,6 +234,11 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             await rtcClient.setClientRole("audience");
             try {
                 const uid = await rtcClient.join( AGORA_APP_ID, roomId, agoraToken.rtcToken, userUid)
+
+                setAgoraRtcStatus({
+                    type: "INFO",
+                    msg: "RTC_JOINED_CHANNEL"
+                })
             } catch (error) {
                 handleError(error)
             }

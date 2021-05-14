@@ -89,7 +89,7 @@ const RemoteVideoContainer = ({
 
     useEffect(() => {
         if (!isPlayMode) {
-            let audioElement = document.getElementById(`audio${stream.streamId}`)
+            let audioElement = document.getElementById(`audio${stream.uid}`)
             if (audioElement) {
                 attachSinkId(audioElement, speakerSource)
             }
@@ -124,14 +124,14 @@ const RemoteVideoContainer = ({
 
     function generateDemoHandRaiser() {
         let video = document.createElement('video');
-        const videoContainer = document.querySelector('#' + stream.streamId);
+        const videoContainer = document.querySelector('#' + stream.uid);
         videoContainer.appendChild(video);
         video.src = stream.url;
         video.loop = true;
         video.play();
     }
 
-    const speaker = !isScreenShareVideo ? currentLivestream.liveSpeakers.find(speaker => speaker.speakerUuid === stream.streamId) : null;
+    const speaker = !isScreenShareVideo ? currentLivestream.liveSpeakers.find(speaker => speaker.speakerUuid === stream.uid) : null;
 
     return (
         <WhiteTooltip
