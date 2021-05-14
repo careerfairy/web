@@ -167,6 +167,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                         rtmClient={rtmClient}
                         index={index}
                         openRoom={openRoom}
+                        refreshing={refreshing}
                         mobile={mobile}
                         handleDisconnect={handleDisconnect}
                         handleClose={handleClose}

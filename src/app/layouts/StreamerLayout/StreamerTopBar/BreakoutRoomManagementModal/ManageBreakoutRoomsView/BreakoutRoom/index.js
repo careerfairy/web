@@ -1,6 +1,15 @@
 import PropTypes from 'prop-types'
 import {useTheme} from "@material-ui/core/styles";
-import {Accordion, AccordionSummary, Button, Chip, Grid, IconButton, Tooltip} from "@material-ui/core";
+import {
+    Accordion,
+    AccordionSummary,
+    Button,
+    Chip,
+    CircularProgress,
+    Grid,
+    IconButton,
+    Tooltip
+} from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
@@ -116,6 +125,7 @@ const BreakoutRoom = ({
                           handleOpenAccordion,
                           handleDisconnect,
                           handleClose,
+                          refreshing,
                           mobile
                       }) => {
 
@@ -213,10 +223,10 @@ const BreakoutRoom = ({
 
                         >
                             <Grid item xs={mobile ? 4 : 3}>
-                                    <Typography
-                                                variant="subtitle1">
-                                        {title}
-                                    </Typography>
+                                <Typography
+                                    variant="subtitle1">
+                                    {title}
+                                </Typography>
                             </Grid>
                             <Grid item xs={2}>
                                 <Chip
@@ -248,10 +258,14 @@ const BreakoutRoom = ({
                                     handleClickDelete={handleClickDelete}
                                 />
                             )}
-                            <Grid justify="flex-end" item xs={1}>
-                                <Typography variant="h6">
-                                    {memberCount}
-                                </Typography>
+                            <Grid style={{display: "flex", alignItems: "center", justifyContent: "center"}} item xs={1}>
+                                {refreshing ? (
+                                    <CircularProgress/>
+                                ) : (
+                                    <Typography variant="h6">
+                                        {memberCount}
+                                    </Typography>
+                                )}
                             </Grid>
                         </Grid>
                     </Box>
