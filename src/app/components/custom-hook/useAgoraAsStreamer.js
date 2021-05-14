@@ -21,6 +21,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const rtmClient = useSelector(state => state.rtmClient)
     const rtmChannel = useSelector(state => state.rtmChannel)
     const rtcClient = useSelector(state => state.rtcClient)
+
     const [networkQuality, setNetworkQuality] = useState({
         downlinkNetworkQuality: 0,
         type: "network-quality",

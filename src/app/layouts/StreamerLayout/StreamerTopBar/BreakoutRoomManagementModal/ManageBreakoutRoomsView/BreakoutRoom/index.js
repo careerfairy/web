@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import {useTheme} from "@material-ui/core/styles";
-import {Accordion, AccordionSummary, Button, Chip} from "@material-ui/core";
+import {Accordion, AccordionSummary, Button, Chip, Grid} from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
@@ -20,6 +20,7 @@ import useStreamToken from "../../../../../../components/custom-hook/useStreamTo
 const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom, loading}) => {
     const theme = useTheme()
     return <React.Fragment>
+        <Grid item xs={3}>
         <Button
             onClick={handleOpenRoom}
             disabled={loading}
@@ -27,6 +28,8 @@ const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom
         >
             Open
         </Button>
+        </Grid>
+        <Grid item xs={3}>
         <Button
             onClick={handleClickRename}
             disabled={loading}
@@ -34,6 +37,8 @@ const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom
         >
             Rename
         </Button>
+        </Grid>
+        <Grid item xs={3}>
         <Button
             onClick={handleClickDelete}
             disabled={loading}
@@ -41,6 +46,7 @@ const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom
         >
             Delete
         </Button>
+        </Grid>
     </React.Fragment>;
 };
 
@@ -50,12 +56,15 @@ const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, 
     const {query: {breakoutRoomId}, push} = useRouter()
 
     return <React.Fragment>
+        <Grid item xs={3}>
         <Button
             onClick={handleCloseRoom}
             disabled={loading}
         >
             Close Room
         </Button>
+        </Grid>
+        <Grid item xs={3}>
         {roomId !== breakoutRoomId && (
             <Button
                 onClick={handleJoinRoom}
@@ -67,6 +76,8 @@ const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, 
                 Join Room
             </Button>
         )}
+        </Grid>
+        <Grid item xs={3}>
         <Button
             onClick={handleClickRename}
             disabled={loading}
@@ -74,6 +85,7 @@ const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, 
         >
             Rename
         </Button>
+        </Grid>
     </React.Fragment>;
 };
 
@@ -182,11 +194,14 @@ const BreakoutRoom = ({
                             {title}
                         </Typography>
                         <Box flex={1} display="flex" marginLeft={3} alignItems="center" justifyContent="space-between">
+                            <Grid container spacing={1}>
+                            <Grid item xs={3}>
                             <Chip
                                 title={hasStarted ? "OPEN" : "CLOSED"}
                                 label={hasStarted ? "OPEN" : "CLOSED"}
                                 color={hasStarted ? "primary" : "secondary"}
                             />
+                            </Grid>
                             {hasStarted ? (
                                 <RoomOpenedActions
                                     loading={loading}
@@ -204,6 +219,7 @@ const BreakoutRoom = ({
                                     handleClickDelete={handleClickDelete}
                                 />
                             )}
+                            </Grid>
                             <Typography variant="h6">
                                 {memberCount}
                             </Typography>

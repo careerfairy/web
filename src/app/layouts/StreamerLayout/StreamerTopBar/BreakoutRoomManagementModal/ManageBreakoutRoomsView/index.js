@@ -143,6 +143,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                 <Button onClick={handleClose}>
                     Cancel
                 </Button>
+                <Box flex={1}/>
                 {!allRoomsClosed &&
                 <Button
                     disabled={closing || opening}
