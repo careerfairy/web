@@ -98,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: "bold",
         fontStyle: "normal",
         verticalAlign: "middle",
-        "em" : {
+        "em": {
             verticalAlign: "middle"
         }
     },
@@ -112,7 +112,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady}) {
 
     const classes = useStyles();
     const {updateSpeaker, addSpeaker} = usePreparationOverlay()
-    const {query:{auto}} = useRouter()
+    const {query: {auto}} = useRouter()
     const [speaker, setSpeaker] = useState({
         firstName: "",
         lastName: "",
@@ -122,6 +122,12 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady}) {
     const [linkedInUrl, setLinkedInUrl] = useState("");
     const [formErrors, setFormErrors] = useState({});
     const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (auto === true) {
+
+        }
+    }, [auto])
 
     useEffect(() => {
         let storedSpeakerString = localStorage.getItem("storedSpeaker");
@@ -266,7 +272,8 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady}) {
                 </Paper>
                 <Button variant='contained' type="submit" size='large' onClick={joinStream} disabled={loading}
                         startIcon={loading && <CircularProgress size="small"/>}>Join now</Button>
-                <Typography className={classes.browserMessage} variant='h5'><WarningIcon className={classes.subline}/><em>Please avoid connecting through a mobile device (iOS/Android)</em></Typography>
+                <Typography className={classes.browserMessage} variant='h5'><WarningIcon
+                    className={classes.subline}/><em>Please avoid connecting through a mobile device (iOS/Android)</em></Typography>
             </form>
         </Container>
     )

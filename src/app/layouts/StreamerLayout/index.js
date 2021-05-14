@@ -123,6 +123,17 @@ const StreamerLayout = (props) => {
     }, [router, token, currentLivestream?.test, currentLivestream?.id]);
 
     useEffect(() => {
+        function checkIfStreamerHasInfo() {
+            const hasStreamerInfo = currentLivestream?.liveSpeakers?.some(speaker => speaker.speakerUuid === streamerId)
+            setStreamerReady(Boolean(hasStreamerInfo))
+        }
+
+        if (currentLivestream) {
+            checkIfStreamerHasInfo()
+        }
+    }, [currentLivestream?.liveSpeakers, streamerId])
+
+    useEffect(() => {
         const regex = /-/g;
         if (livestreamId && !isMainStreamer) {
             if (localStorage.getItem('streamingUuid')) {

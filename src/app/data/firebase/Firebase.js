@@ -2255,6 +2255,15 @@ class Firebase {
                     const breakoutRoomRef = livestreamRef.collection("breakoutRooms").doc()
                     const newBreakoutRoom = this.buildBreakoutRoom(breakoutRoomRef.id, isTestStream, `Breakout Room ${i}`, companyLogo, i)
                     transaction.set(breakoutRoomRef, newBreakoutRoom)
+                    if (!isTestStream) {
+                        // If the main stream isn't a test, we will then need tokens for each breakout room
+                        const breakoutTokenRef = breakoutRoomRef.collection("tokens")
+                            .doc("secureToken");
+                        const token = uuidv4();
+                        transaction.set(breakoutTokenRef, {
+                            value: token,
+                        })
+                    }
                 }
             });
         });
