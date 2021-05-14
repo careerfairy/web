@@ -12,7 +12,7 @@ const minAnnouncementLength = 5
 
 const ModalContent = ({handleClose}) => {
     const {query: {livestreamId}} = useRouter()
-    const {sendBroadcastToBreakoutRooms} = useFirebase()
+    const {sendBroadcastToBreakoutRooms, getStreamerData} = useFirebase()
     const {currentLivestream, streamerId} = useCurrentStream()
     const dispatch = useDispatch()
     const {
@@ -31,10 +31,7 @@ const ModalContent = ({handleClose}) => {
         onSubmit: async values => {
             try {
                 const announcement = values.announcement
-                const streamerData = currentLivestream?.liveSpeakers?.find(speaker => speaker.speakerUuid === streamerId) || {
-                    firstName: "Streamer",
-                    lastName: "Streamer"
-                }
+                const streamerData = getStreamerData(currentLivestream, streamerId)
                 const authorData = {
                     name: `${streamerData.firstName} ${streamerData.lastName}`,
                     email: "Streamer"

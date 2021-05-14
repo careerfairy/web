@@ -2296,6 +2296,23 @@ class Firebase {
             batch.set(breakoutChatRef, broadcastMessage)
 
         }
+
+        return await batch.commit()
+    }
+
+    // Streamer Helpers
+
+    /**
+     * Get the streamer's data from the current stream using their Id
+     * @param {({liveSpeakers: array})|| Boolean} currentLivestream
+     * @param {string} streamerId
+     * @returns {({firstName: string, lastName: string})} streamerData
+     */
+    getStreamerData = (currentLivestream, streamerId) => {
+       return  currentLivestream?.liveSpeakers?.find(speaker => speaker.speakerUuid === streamerId) || {
+            firstName: "Streamer",
+            lastName: "Streamer"
+        }
     }
 
     // DB functions
