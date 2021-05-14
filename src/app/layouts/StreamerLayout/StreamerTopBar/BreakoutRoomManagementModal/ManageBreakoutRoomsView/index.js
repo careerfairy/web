@@ -1,17 +1,29 @@
 import React, {useCallback, useEffect, useState} from "react";
-import {Button, DialogActions, DialogContent, DialogTitle} from "@material-ui/core";
+import {
+    Button,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    ListItemIcon,
+    Menu,
+    MenuItem, Typography
+} from "@material-ui/core";
 import PropTypes from "prop-types";
 import {streamShape} from "types";
 import {makeStyles} from "@material-ui/core/styles";
 import {useDispatch, useSelector} from "react-redux";
-import BackToMainRoomIcon from '@material-ui/icons/KeyboardBackspace';
+import BackToMainRoomIcon from '@material-ui/icons/ArrowBackIos';
 import BreakoutRoom from "./BreakoutRoom";
 import {useFirebase} from "context/firebase";
 import {useRouter} from "next/router";
 import * as actions from 'store/actions'
 import Box from "@material-ui/core/Box";
+import MoreOptionsIcon from '@material-ui/icons/MoreHoriz';
 import useStreamToken from "../../../../../components/custom-hook/useStreamToken";
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
+import AnnouncementModal from "./AnnouncementModal";
+import AnnouncementIcon from '@material-ui/icons/ContactlessOutlined';
 
 const useStyles = makeStyles(theme => ({
     breakoutRoomsContent: {
@@ -36,6 +48,9 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const [openRoom, setOpenRoom] = useState("");
     const [opening, setOpening] = useState(false);
     const [closing, setClosing] = useState(false);
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [announcementModalOpen, setAnnouncementModalOpen] = useState(false);
+
 
     useEffect(() => {
         getAllMemberCounts()
@@ -45,6 +60,15 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
         setAllRoomsOpen(breakoutRooms.every(room => room.hasStarted))
         setAllRoomsClosed(breakoutRooms.every(room => !room.hasStarted))
     }, [breakoutRooms])
+
+
+    const handleClickMoreOptions = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseMoreOptions = () => {
+        setAnchorEl(null);
+    };
 
     const getAllMemberCounts = async () => {
         if (rtmClient) {
@@ -105,23 +129,54 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
         await push({pathname: targetPath, query: {auto: true}}, undefined, {shallow: false})
     }
 
+    const handleOpenAnnouncementModal = () => {
+        handleCloseMoreOptions()
+        setAnnouncementModalOpen(true)
+    }
+
+    const handleCloseAnnouncementModal = () => {
+        setAnnouncementModalOpen(false)
+    }
+
     return (
         <React.Fragment>
             <Box display="flex" alignItems="center" justifyContent="space-between">
                 <DialogTitle>
                     Manage Breakout Rooms
-                    {/*- {breakoutRooms.length}*/}
                 </DialogTitle>
-                {breakoutRoomId &&
-                (<Box py={2} px={1.5}>
-                    <Button
-                        onClick={handleBackToMainRoom}
-                        startIcon={<BackToMainRoomIcon/>}
+                <Box py={2} px={1.5}>
+                    <IconButton onClick={handleClickMoreOptions}>
+                        <MoreOptionsIcon/>
+                    </IconButton>
+                    <Menu
+                        id="simple-menu"
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={Boolean(anchorEl)}
+                        onClose={handleCloseMoreOptions}
                     >
-                        Back to main Room
-                    </Button>
-                </Box>)
-                }
+                        <MenuItem onClick={handleOpenAnnouncementModal}>
+                            <ListItemIcon>
+                            <AnnouncementIcon/>
+                            </ListItemIcon>
+                            <Typography variant="inherit" noWrap>
+                                Make an Announcement
+                            </Typography>
+                        </MenuItem>
+                        <MenuItem onClick={handleCloseMoreOptions}>My account</MenuItem>
+                        {breakoutRoomId &&
+                        <MenuItem
+                            onClick={handleBackToMainRoom}
+                        >
+                            <ListItemIcon>
+                            <BackToMainRoomIcon/>
+                            </ListItemIcon>
+                            <Typography variant="inherit" noWrap>
+                                Back to main Room
+                            </Typography>
+                        </MenuItem>}
+                    </Menu>
+                </Box>
             </Box>
             <DialogContent className={classes.breakoutRoomsContent} dividers>
                 {breakoutRooms.map((room, index) => (
@@ -164,6 +219,10 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                 </Button>}
 
             </DialogActions>
+            <AnnouncementModal
+                open={announcementModalOpen}
+                onClose={handleCloseAnnouncementModal}
+            />
         </React.Fragment>
     )
 }

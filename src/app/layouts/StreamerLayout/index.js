@@ -217,7 +217,7 @@ const StreamerLayout = (props) => {
 
     return (
         <NotificationsContext.Provider value={{setNewNotification, setNotificationToRemove}}>
-            <CurrentStreamContext.Provider value={{currentLivestream, isBreakout, isMainStreamer, isStreamer: true}}>
+            <CurrentStreamContext.Provider value={{currentLivestream, isBreakout, isMainStreamer, isStreamer: true, streamerId}}>
                 <div className={classes.root}>
                     <StreamerTopBar
                         firebase={firebase}

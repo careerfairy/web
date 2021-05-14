@@ -2256,7 +2256,7 @@ class Firebase {
                     const newBreakoutRoom = this.buildBreakoutRoom(breakoutRoomRef.id, isTestStream, `Breakout Room ${i}`, companyLogo, i)
                     transaction.set(breakoutRoomRef, newBreakoutRoom)
                     if (!isTestStream) {
-                        // If the main stream isn't a test, we will then need tokens for each breakout room
+                        // If the main stream isn't a test, we will then need secure tokens for each breakout room
                         const breakoutTokenRef = breakoutRoomRef.collection("tokens")
                             .doc("secureToken");
                         const token = uuidv4();
@@ -2267,6 +2267,35 @@ class Firebase {
                 }
             });
         });
+    }
+
+    /**
+     * @param {string} announcement
+     * @param {string} mainStreamId
+     * @param {({name:string, email:string})} author
+     */
+    sendBroadcastToBreakoutRooms = async (announcement, mainStreamId, author) => {
+        const batch = this.firestore.batch()
+        const breakoutRoomsRef = this.firestore.collection("livestreams")
+            .doc(mainStreamId)
+            .collection("breakoutRooms")
+
+        const breakoutRoomsSnaps = await breakoutRoomsRef.get()
+
+        for (const breakoutSnap of breakoutRoomsSnaps.docs) {
+            let breakoutChatRef = breakoutSnap.ref
+                .collection("chatEntries")
+                .doc()
+            const broadcastMessage = {
+                authorEmail: author.email,
+                authorName: author.name,
+                message: announcement,
+                timestamp: this.getServerTimestamp(),
+                type: "broadcast"
+            }
+            batch.set(breakoutChatRef, broadcastMessage)
+
+        }
     }
 
     // DB functions

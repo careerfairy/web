@@ -4,7 +4,8 @@ const CurrentStreamContext = React.createContext({
     currentLivestream: false,
     isBreakout: false,
     isStreamer: false,
-    isMainStreamer: false
+    isMainStreamer: false,
+    streamerId: ""
 });
 
 const useCurrentStream = () => useContext(CurrentStreamContext);
