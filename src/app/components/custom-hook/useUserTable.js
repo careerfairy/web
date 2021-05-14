@@ -3,7 +3,7 @@ import {copyStringToClipboard} from "../helperFunctions/HelperFunctions";
 import {useDispatch} from "react-redux";
 import * as actions from '../../store/actions'
 import {LinkifyText, tableIcons} from "../util/tableUtils";
-import {universityCountriesMap} from "../util/constants";
+import {universityCountriesMap} from "../util/constants/universityCountries";
 
 const columns = () => [
     {

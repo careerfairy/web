@@ -1,5 +1,6 @@
+import { Button, Typography } from '@material-ui/core';
 import {useState} from 'react';
-import { Header, Icon, Button } from 'semantic-ui-react';
+import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 
 function JobDescription(props) {
 
@@ -11,13 +12,13 @@ function JobDescription(props) {
 
     return (
         <div className='past-livestream-job'>
-            <div className='past-livestream-job-label'><Icon name='briefcase'/><span>Livestreamed Job Offer</span></div>
-            <Header as='h3' id='past-livestream-job-title' style={{ fontSize: '1.5em', textAlign: 'left', fontWeight: '700', color: 'rgb(60,60,60)', marginTop: '10px'}}>{ props.position.title }</Header>
+            <div className='past-livestream-job-label'><BusinessCenterIcon/><span>Livestreamed Job Offer</span></div>
+            <Typography variant={'h3'} id='past-livestream-job-title' style={{ fontSize: '1.5em', textAlign: 'left', fontWeight: '700', color: 'rgb(60,60,60)', marginTop: '10px'}}>{ props.position.title }</Typography>
             <div className='past-livestream-job-content'>
                 <p className='past-livestream-job-description' style={ jobPostingOpen ? {} : { height: '60px', overflow: 'hidden' }}>{ props.position.description }</p>
             </div>
-            <Button icon='angle up' size='mini' content={jobPostingOpen ? 'Hide Details' : 'See Details'} basic onClick={() => setJobPostingOpen(!jobPostingOpen)}/>
-            <Button size='mini' content='Apply Now' primary onClick={() => openLink(props.position.url)}/>
+            <Button size='small' variant='outlined' onClick={() => setJobPostingOpen(!jobPostingOpen)}>{ jobPostingOpen ? 'Hide Details' : 'See Details' }</Button>
+            <Button size='small' color='primary' onClick={() => openLink(props.position.url)}>Apply Now</Button>
             <style jsx>{`
                 .past-livestream-job-label {
                     text-transform: uppercase;

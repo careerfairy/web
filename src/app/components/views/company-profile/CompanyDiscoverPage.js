@@ -1,77 +1,64 @@
 import React from 'react';
 
-import { Container, Image, Grid, Header, Icon } from 'semantic-ui-react';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import ElementTagList from '../common/ElementTagList';
 import CompanyLocationFlags from '../common/CompanyLocationFlags';
 
 import JobDescriptions from '../job-descriptions/JobDescriptions';
 import { withFirebase } from 'context/firebase';
+import { Container, Grid, Typography } from '@material-ui/core';
 
 function CompanyDiscoverPage(props) {
 
     return (
         <div className='discover-container'>
-            <Container textAlign='center'>
-                <Grid stackable centered={false} textAlign='left' className='middle aligned'>
-                    <Grid.Row columns={2}>
-                        <Grid.Column textAlign='left' width={8} className='computer only tablet only'>
-                            <Image style={{ display: 'inline-block', maxHeight: '150px',  width: 'auto' }} src={ props.company.logoUrl } size='medium'/>
-                        </Grid.Column>
-                        <Grid.Column textAlign='right' width={8} className='computer only tablet only'>
-                            <a href={'http://www.' + props.company.url} target="_blank" rel="noopener noreferrer" id='visit-website-button'>Visit Website</a>
-                        </Grid.Column>
-                        <Grid.Column textAlign='center' width={16} className='mobile only'>
-                            <Image id='discover-logo' src={ props.company.logoUrl } size='medium'/>
-                        </Grid.Column>
-                        <Grid.Column textAlign='center' width={16} className='mobile only'>
-                            <a href={'http://www.' + props.company.url} target="_blank" rel="noopener noreferrer" id='visit-website-button'>Visit Website</a>
-                        </Grid.Column>
-                    </Grid.Row>
+            <Container>
+                <Grid container spacing={4} alignItems='center'>
+                    <Grid item xs={12} md={6}>
+                        <img style={{ display: 'inline-block', maxHeight: '150px', maxWidth: '400px',  width: 'auto' }} src={ props.company.logoUrl } size='medium'/>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <a href={'http://www.' + props.company.url} target="_blank" rel="noopener noreferrer" id='visit-website-button'>Visit Website</a>
+                    </Grid>
                 </Grid>
-                <Grid stackable centered={false} textAlign='left'>
-                    <Grid.Row columns={1}>
-                        <Grid.Column textAlign='left'>
-                            <div id='discover-company-description'><span>{ props.company.industry }</span>{ props.company.headquarters }</div>
-                        </Grid.Column>
-                    </Grid.Row>
-                    <Grid.Row columns={1}>
-                        <Grid.Column id='discover-products'>
-                            <Header as='h5' id='discover-inner-header'>What you should know about us</Header>
-                            <p>{ props.company.mainProducts }</p>
-                        </Grid.Column>
-                    </Grid.Row>
-                    <Grid.Row columns={3}>
-                        <Grid.Column id='discover-hiring'>
-                            <Header as='h5' id='discover-inner-header'>Hiring from</Header>
-                            <ElementTagList fields={ props.company.fieldsHiring } />
-                        </Grid.Column>
-                        <Grid.Column id='discover-employee-count'>
-                            <Header as='h5' id='discover-inner-header-employees'>Employees</Header>
-                            <p style={{ fontSize: '3em', fontWeight: '500', marginBottom: '0' }}>{ props.company.employees }</p>
-                            <div className='discover-employee-gender-distribution'>
-                                <Icon name='woman' size='large'/>
-                                { props.company.femaleRatio}%
-                                <Icon name='man' size='large'/>
-                                {100 - props.company.femaleRatio}%
-                            </div>
-                        </Grid.Column>
-                        <Grid.Column id='discover-locations'>
-                            <Header as='h5' id='discover-inner-header'>Locations</Header>
-                            <CompanyLocationFlags countries={props.company.locations} />
-                        </Grid.Column>
-                    </Grid.Row>
+                <Grid container spacing={4}>
+                    <Grid item xs={12}>
+                        <div id='discover-company-description'><span>{ props.company.industry }</span>{ props.company.headquarters }</div>
+                    </Grid>
+                    <Grid item xs={12} id='discover-products'>
+                        <Typography variant='h5' id='discover-inner-header'>What you should know about us</Typography>
+                        <p>{ props.company.mainProducts }</p>
+                    </Grid>
+                    <Grid item xs={4} id='discover-hiring'>
+                        <Typography variant='h5' id='discover-inner-header'>Hiring from</Typography>
+                        <ElementTagList fields={ props.company.fieldsHiring } />
+                    </Grid>
+                    <Grid item xs={4} id='discover-employee-count'>
+                        <Typography variant='h5' id='discover-inner-header-employees'>Employees</Typography>
+                        <p style={{ fontSize: '3em', fontWeight: '500', marginBottom: '0' }}>{ props.company.employees }</p>
+                        <div className='discover-employee-gender-distribution'>
+                            <em style={{ fontWeight: 'bold', marginRight: 2 }}>F</em>
+                            { props.company.femaleRatio}%
+                            <em style={{ fontWeight: 'bold', marginLeft: 5, marginRight: 2 }}>M</em>
+                            {100 - props.company.femaleRatio}%
+                        </div>
+                    </Grid>
+                    <Grid item xs={4} id='discover-locations'>
+                        <Typography variant='h5' id='discover-inner-header'>Locations</Typography>
+                        <CompanyLocationFlags countries={props.company.locations} />
+                    </Grid>
                 </Grid>
-                <Grid id='discover-hiring-grid' textAlign='left' stackable style={{ marginBottom: '20px'}}>
-                    <Grid.Row columns={3}>
+                <Grid container spacing={4} id='discover-hiring-grid' style={{ marginBottom: '20px'}}>
+                    <Grid item xs={12}>
                         <JobDescriptions {...props} company={props.company} />
-                    </Grid.Row>
+                    </Grid>
                 </Grid>
             </Container>
-            <Container textAlign="center" className="titleFooter dark" onClick={() => props.fullpageApi.moveSectionDown()}>
+            <Container style={{ textAlign: 'center' }} className="titleFooter dark" onClick={() => props.fullpageApi.moveSectionDown()}>
                 <p id='footer'>
                     Watch {props.company.name }
                 </p>
-                <Icon name='angle down' size='big' id='footer_icon'/>
+                <KeyboardArrowDownIcon size='large' id='footer_icon'/>
             </Container>
             <style jsx>{`
                 .discover-container {

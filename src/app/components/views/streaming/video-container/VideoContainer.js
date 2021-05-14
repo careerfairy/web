@@ -120,7 +120,7 @@ function VideoContainer(props) {
             }, 2500);
             return () => clearTimeout(timeout);
         }
-    }, [audioCounter, props.currentLivestream.mode]);
+    }, [audioCounter, props.currentLivestream.mode, externalMediaStreams.length]);
 
     useEffect(() => {
         if (agoraRtcStatus && agoraRtcStatus.type === "INFO" && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {

@@ -1,5 +1,5 @@
+import { Grid } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { Grid } from "semantic-ui-react";
 
 export default function CountdownTimer(props) {
   const calculateTimeLeft = () => {
@@ -31,7 +31,7 @@ export default function CountdownTimer(props) {
 
   Object.keys(timeLeft).forEach((interval, index) => {
     timerComponents.push(
-      <Grid.Column mobile='4' tablet='3' computer='2' textAlign='center' key={index}>
+      <Grid item xs={3} md={2} style={{ textAlign: 'center' }} key={index}>
         <div className='timeElement'>
             <div className='number'>
                 {timeLeft[interval]}
@@ -62,15 +62,13 @@ export default function CountdownTimer(props) {
               }
           `}</style>
         </div>
-      </Grid.Column>
+      </Grid>
     );
   });
 
   return (
-    <div>
-      <Grid centered>
+      <Grid container justify="center" alignItems="center">
       {timerComponents.length ? timerComponents : <span style={{ margin: '30px' }}>{ props.children }</span>}
       </Grid>
-    </div>
   );
 }

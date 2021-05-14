@@ -14,6 +14,7 @@ import {
     TextField,
     Typography
 } from "@material-ui/core";
+import WarningIcon from '@material-ui/icons/Warning';
 import {URL_REGEX} from 'components/util/constants';
 import usePreparationOverlay from "../../../custom-hook/usePreparationOverlay";
 import {useRouter} from "next/router";
@@ -90,6 +91,20 @@ const useStyles = makeStyles((theme) => ({
     },
     marginTop: {
         marginTop: 10
+    },
+    browserMessage: {
+        marginTop: 30,
+        fontSize: "1rem",
+        fontWeight: "bold",
+        fontStyle: "normal",
+        verticalAlign: "middle",
+        "em" : {
+            verticalAlign: "middle"
+        }
+    },
+    subline: {
+        marginRight: 5,
+        verticalAlign: "middle"
     }
 }));
 
@@ -251,6 +266,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady}) {
                 </Paper>
                 <Button variant='contained' type="submit" size='large' onClick={joinStream} disabled={loading}
                         startIcon={loading && <CircularProgress size="small"/>}>Join now</Button>
+                <Typography className={classes.browserMessage} variant='h5'><WarningIcon className={classes.subline}/><em>Please avoid connecting through a mobile device (iOS/Android)</em></Typography>
             </form>
         </Container>
     )

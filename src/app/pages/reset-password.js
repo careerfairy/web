@@ -1,6 +1,10 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import {Button, Container, Form, Header, Image, Message, Icon} from "semantic-ui-react";
 import { withFirebase} from "../context/firebase";
+
+import MicIcon from '@material-ui/icons/Mic';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -9,6 +13,7 @@ import axios from 'axios';
 
 import Head from 'next/head';
 import {useAuth} from "../HOCs/AuthProvider";
+import { Button, Card, Container, TextField, Typography } from '@material-ui/core';
 
 function ResetPasswordPage(props) {
 
@@ -30,7 +35,7 @@ function ResetPasswordPage(props) {
     return (
         <div className='tealBackground'>
             <header>
-                <Link href='/'><a><Image src='/logo_white.png' style={{ width: '150px', margin: '20px', display: 'inline-block' }} /></a></Link>
+                <Link href='/'><a><img src='/logo_white.png' style={{ width: '150px', margin: '20px', display: 'inline-block' }} /></a></Link>
             </header>
             <ResetPasswordBase user={user}/>
             <style jsx>{`
@@ -49,10 +54,7 @@ const LogInForm = withFirebase(ResetPasswordBase);
 
 export function ResetPasswordBase(props) {
 
-    const router = useRouter();
-    const [successMessageShown, setSuccessMessageShown] = useState(false);
     const [completed, setCompleted] = useState(false);
-    const [noAccountMessageShown, setNoAccountMessageShown] = useState(false);
 
     return (
         <Fragment>
@@ -72,6 +74,7 @@ export function ResetPasswordBase(props) {
                                 return errors;
                             }}
                             onSubmit={(values, { setSubmitting }) => {
+                                debugger;
                                 setCompleted(false);
                                 axios({
                                     method: 'post',
@@ -99,30 +102,44 @@ export function ResetPasswordBase(props) {
                                 isSubmitting,
                                 /* and other goodies */
                             }) => (
-                                <Form id='signUpForm' onSubmit={handleSubmit}>
+                                <form id='signUpForm' onSubmit={handleSubmit}>
                                     <div style={{ textAlign: 'center', color: 'rgb(200,200,200)' }}>
-                                        <Icon name='microphone' size='big' style={{ margin: '0 10px'}}/>
-                                        <Icon name='briefcase' size='big' style={{ margin: '0 10px'}}/>
-                                        <Icon name='film' size='big' style={{ margin: '0 10px'}}/>
+                                        <MicIcon fontSize='large' style={{ margin: '0 10px'}}/>
+                                        <ArrowForwardIosIcon fontSize='large' style={{ margin: '0 10px'}}/>
+                                        <BusinessCenterIcon fontSize='large' style={{ margin: '0 10px'}}/>
                                     </div>
                                     <div style={{ color: 'rgb(0, 210, 170)', fontWeight: '500', fontSize: '2em', margin: '40px 0 30px 0', textAlign: 'center' }}>
                                         CareerFairy
                                     </div>
-                                    <Form.Field>
-                                        <label style={{ color: 'rgb(120,120,120)' }}>Email</label>
-                                        <input id='emailInput' type='text' name='email' placeholder='Email' onChange={handleChange} onBlur={handleBlur} value={values.email} disabled={isSubmitting} />
+                                    <div>
+                                        {/* <label style={{ color: 'rgb(120,120,120)' }}>Email</label>
+                                        <input id='emailInput' type='text' name='email'  onChange={handleChange} onBlur={handleBlur} value={values.email} disabled={isSubmitting} /> */}
+                                        <TextField
+                                            required
+                                            name='email'
+                                            id="outlined-required"
+                                            placeholder='Email'
+                                            onChange={handleChange}
+                                            value={values.email} 
+                                            disabled={isSubmitting}
+                                            label="Email"
+                                            variant="outlined"
+                                            fullWidth={true}
+                                            />
                                         <div className='field-error'>
                                             {errors.email && touched.email && errors.email}
                                         </div>
-                                    </Form.Field>
-                                    <Button id='submitButton' fluid primary size='big' type="submit" loading={isSubmitting}>Reset Password</Button> 
-                                    <Message info hidden={!completed}>
-                                        <Message.Header>Done!</Message.Header>
+                                    </div>
+                                    <Button type="submit" disabled={isSubmitting} startIcon={isSubmitting && <CircularProgress fontSize="small" style={{ color: 'white' }}/>} color='primary' variant='contained' fullWidth={true}>Reset Password</Button> 
+                                    {completed &&          
+                                    <Card style={{ padding: 10, marginTop: 20 }}>
+                                        <Typography variant='h4' style={{ marginBottom: 10 }}>Done!</Typography>
                                         <p>
                                         If you're email is registered, you will shortly receive an email to complete your password reset.
                                         </p>
-                                    </Message>
-                                </Form>
+                                    </Card>
+                                    }
+                                </form>
                             )}
                             </Formik>
                         </div>

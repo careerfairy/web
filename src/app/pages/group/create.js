@@ -1,6 +1,5 @@
 import {useEffect, useState, useContext} from 'react'
 import Head from 'next/head';
-import {Container} from 'semantic-ui-react';
 import {useRouter} from 'next/router';
 import {withFirebase} from '../../context/firebase';
 import Header from '../../components/views/header/Header';
@@ -12,7 +11,7 @@ import {GlobalBackground} from "../../materialUI/GlobalBackground/GlobalBackGrou
 import Loader from "../../components/views/loader/Loader";
 import {useAuth} from "../../HOCs/AuthProvider";
 
-import {Stepper, Step, StepLabel} from '@material-ui/core';
+import {Stepper, Step, StepLabel, Container} from '@material-ui/core';
 import {useSnackbar} from "notistack";
 import {GENERAL_ERROR} from "../../components/util/constants";
 
@@ -182,7 +181,7 @@ const CreateGroup = ({firebase}) => {
                 <title key="title">CareerFairy | Create a group</title>
             </Head>
             <Header classElement='relative white-background'/>
-            <Container textAlign='left'>
+            <Container>
                 <Stepper style={{backgroundColor: '#FAFAFA'}} activeStep={activeStep} alternativeLabel>
                     {steps.map((label) => (
                         <Step key={label}>

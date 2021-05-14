@@ -1,11 +1,7 @@
-import {useState, useEffect, useRef, Fragment} from 'react';
-import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
+import {useState} from 'react';
 
-import { useRouter } from 'next/router';
 import { withFirebasePage } from 'context/firebase';
-import SmallStreamerVideoDisplayer from 'components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
-import useUserMedia from '../../../custom-hook/useDevices';
 import { v4 as uuidv4 } from 'uuid';
 import {useAuth} from "../../../../HOCs/AuthProvider";
 import useStreamRef from "../../../custom-hook/useStreamRef";
