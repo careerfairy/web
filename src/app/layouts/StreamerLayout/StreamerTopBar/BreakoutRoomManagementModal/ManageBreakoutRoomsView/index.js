@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import {Button, DialogActions, DialogContent, DialogTitle} from "@material-ui/core";
 import PropTypes from "prop-types";
 import {streamShape} from "types";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {useDispatch, useSelector} from "react-redux";
 import BreakoutRoom from "./BreakoutRoom";
 import {useFirebase} from "context/firebase";
@@ -13,17 +13,25 @@ import useStreamToken from "../../../../../components/custom-hook/useStreamToken
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 import BreakoutRoomOptions from "./BreakoutRoomOptions";
 import BreakoutRoomSettings from "./BreakoutRoomSettings";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
     breakoutRoomsContent: {
         // background: theme.palette.background.default
     },
+    contentMobile: {
+        padding: theme.spacing(1)
+    }
 }));
 
 
 const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const classes = useStyles()
     const {isMainStreamer} = useCurrentStream()
+    const theme = useTheme()
+    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
+
     const links = useStreamToken({forStreamType: "mainLivestream"})
     const {openAllBreakoutRooms, closeAllBreakoutRooms} = useFirebase()
     const {query: {livestreamId}, push} = useRouter()
@@ -138,13 +146,16 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                     handleBackToMainRoom={handleBackToMainRoom}
                 />
             </Box>
-            <DialogContent className={classes.breakoutRoomsContent} dividers>
+            <DialogContent className={clsx(classes.breakoutRoomsContent, {
+                [classes.contentMobile]: mobile
+            })} dividers>
                 {breakoutRooms.map((room, index) => (
                     <BreakoutRoom
                         updateMemberCount={updateMemberCount}
                         rtmClient={rtmClient}
                         index={index}
                         openRoom={openRoom}
+                        mobile={mobile}
                         handleDisconnect={handleDisconnect}
                         handleClose={handleClose}
                         handleOpenAccordion={handleOpenAccordion}

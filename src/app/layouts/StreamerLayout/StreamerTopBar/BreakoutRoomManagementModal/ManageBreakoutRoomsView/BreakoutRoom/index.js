@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types'
 import {useTheme} from "@material-ui/core/styles";
-import {Accordion, AccordionSummary, Button, Chip, Grid} from "@material-ui/core";
+import {Accordion, AccordionSummary, Button, Chip, Grid, IconButton, Tooltip} from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import RenameRoomIcon from "@material-ui/icons/Edit";
 import DeleteRoomIcon from "@material-ui/icons/Close";
 import BreakoutRoomAccordionContent from './BreakoutRoomAccordionContent'
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import EditRoomNameModal from "./EditRoomNameModal";
 import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal";
 import {useFirebase} from "context/firebase";
@@ -16,75 +16,87 @@ import * as actions from 'store/actions'
 import {useDispatch} from "react-redux";
 import {useCurrentStream} from "../../../../../../context/stream/StreamContext";
 import useStreamToken from "../../../../../../components/custom-hook/useStreamToken";
+import useTextOverflow from "../../../../../../components/custom-hook/useTextOverflow";
 
-const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom, loading}) => {
+const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom, loading, mobile}) => {
     const theme = useTheme()
     return <React.Fragment>
-        <Grid item xs={3}>
-        <Button
-            onClick={handleOpenRoom}
-            disabled={loading}
-            // startIcon={<RenameRoomIcon/>}
-        >
-            Open
-        </Button>
+        <Grid item xs={2}>
+            <Button
+                onClick={handleOpenRoom}
+                disabled={loading}
+                // startIcon={<RenameRoomIcon/>}
+            >
+                Open
+            </Button>
         </Grid>
-        <Grid item xs={3}>
-        <Button
-            onClick={handleClickRename}
-            disabled={loading}
-            startIcon={<RenameRoomIcon/>}
-        >
-            Rename
-        </Button>
+        <Grid item xs={mobile ? 1 : 2}>
+            {mobile ? (
+                <IconButton size="small" onClick={handleClickRename}
+                            disabled={loading}>
+                    <RenameRoomIcon/>
+                </IconButton>
+            ) : (
+                <Button
+                    onClick={handleClickRename}
+                    disabled={loading}
+                    startIcon={<RenameRoomIcon/>}
+                >
+                    Rename
+                </Button>
+            )}
         </Grid>
-        <Grid item xs={3}>
-        <Button
-            onClick={handleClickDelete}
-            disabled={loading}
-            startIcon={<DeleteRoomIcon htmlColor={theme.palette.error.main}/>}
-        >
-            Delete
-        </Button>
+        <Grid item xs={mobile ? 1 : 2}>
+            {mobile ? (
+                <IconButton size="small" onClick={handleClickDelete}
+                            disabled={loading}>
+                    <DeleteRoomIcon htmlColor={theme.palette.error.main}/>
+                </IconButton>
+            ) : (
+                <Button
+                    onClick={handleClickDelete}
+                    disabled={loading}
+                    startIcon={<DeleteRoomIcon htmlColor={theme.palette.error.main}/>}
+                >
+                    Delete
+                </Button>
+            )}
         </Grid>
     </React.Fragment>;
 };
 
-const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, breakoutRoomLink, handleCloseRoom}) => {
+const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, mobile, handleCloseRoom}) => {
     const theme = useTheme()
 
     const {query: {breakoutRoomId}, push} = useRouter()
 
     return <React.Fragment>
-        <Grid item xs={3}>
-        <Button
-            onClick={handleCloseRoom}
-            disabled={loading}
-        >
-            Close Room
-        </Button>
-        </Grid>
-        <Grid item xs={3}>
-        {roomId !== breakoutRoomId && (
+        <Grid item xs={2}>
             <Button
-                onClick={handleJoinRoom}
+                onClick={handleCloseRoom}
                 disabled={loading}
-                // href={breakoutRoomLink}
-                // component="a"
-                // component={Link}
             >
-                Join Room
+                Close Room
             </Button>
-        )}
         </Grid>
-        <Grid item xs={3}>
-        <Button
-            onClick={handleClickRename}
-            disabled={loading}
-            startIcon={<RenameRoomIcon/>}
-        >
-            Rename
-        </Button>
+        <Grid item xs={2}>
+            {roomId !== breakoutRoomId && (
+                <Button
+                    onClick={handleJoinRoom}
+                    disabled={loading}
+                >
+                    Join Room
+                </Button>
+            )}
+        </Grid>
+        <Grid item xs={2}>
+            <Button
+                onClick={handleClickRename}
+                disabled={loading}
+                startIcon={<RenameRoomIcon/>}
+            >
+                Rename
+            </Button>
         </Grid>
     </React.Fragment>;
 };
@@ -103,13 +115,16 @@ const BreakoutRoom = ({
                           updateMemberCount,
                           handleOpenAccordion,
                           handleDisconnect,
-                          handleClose
+                          handleClose,
+                          mobile
                       }) => {
+
     const dispatch = useDispatch()
     const links = useStreamToken({forStreamType: "breakoutRoom", targetBreakoutRoomId: id})
-    const {isStreamer, isMainStreamer,isBreakout} = useCurrentStream()
+
+    const {isStreamer, isMainStreamer, isBreakout} = useCurrentStream()
     const {deleteBreakoutRoom, updateBreakoutRoom} = useFirebase()
-    const {query: {livestreamId}, push, reload} = useRouter()
+    const {query: {livestreamId}, push} = useRouter()
     const [editRoomNameModalOpen, setEditRoomNameModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [deleteBreakoutRoomModalOpen, setDeleteBreakoutRoomModalOpen] = useState(false);
@@ -170,12 +185,13 @@ const BreakoutRoom = ({
     const handleJoinRoom = async (event) => {
         event.stopPropagation()
         // if(!isBreakout){
-            await handleDisconnect()
+        await handleDisconnect()
         // }
         handleClose()
         // window.location.href = breakoutRoomLink
         await push({pathname: breakoutRoomLink, query: {auto: true}}, undefined, {shallow: false})
     }
+
     return (
         <React.Fragment>
             <Accordion
@@ -190,22 +206,34 @@ const BreakoutRoom = ({
                     id="additional-actions1-header"
                 >
                     <Box display="flex" width="100%" alignItems="center" justifyContent="space-between">
-                        <Typography variant="h6">
-                            {title}
-                        </Typography>
-                        <Box flex={1} display="flex" marginLeft={3} alignItems="center" justifyContent="space-between">
-                            <Grid container spacing={1}>
-                            <Grid item xs={3}>
-                            <Chip
-                                title={hasStarted ? "OPEN" : "CLOSED"}
-                                label={hasStarted ? "OPEN" : "CLOSED"}
-                                color={hasStarted ? "primary" : "secondary"}
-                            />
+                        <Grid container spacing={1}
+                              direction="row"
+                              justify="space-between"
+                              alignItems="center"
+
+                        >
+                            <Grid item xs={mobile ? 4 : 3}>
+                                    <Typography
+                                                variant="subtitle1">
+                                        {title}
+                                    </Typography>
+                            </Grid>
+                            <Grid item xs={2}>
+                                <Chip
+                                    label={
+                                        <Typography variant="body2">
+                                            {hasStarted ? "OPEN" : "CLOSED"}
+                                        </Typography>
+                                    }
+                                    title={hasStarted ? "OPEN" : "CLOSED"}
+                                    color={hasStarted ? "primary" : "secondary"}
+                                />
                             </Grid>
                             {hasStarted ? (
                                 <RoomOpenedActions
                                     loading={loading}
                                     roomId={id}
+                                    mobile={mobile}
                                     handleJoinRoom={handleJoinRoom}
                                     handleCloseRoom={handleCloseRoom}
                                     handleClickRename={handleClickRename}
@@ -214,16 +242,18 @@ const BreakoutRoom = ({
                             ) : (
                                 <RoomClosedActions
                                     loading={loading}
+                                    mobile={mobile}
                                     handleClickRename={handleClickRename}
                                     handleOpenRoom={handleOpenRoom}
                                     handleClickDelete={handleClickDelete}
                                 />
                             )}
+                            <Grid justify="flex-end" item xs={1}>
+                                <Typography variant="h6">
+                                    {memberCount}
+                                </Typography>
                             </Grid>
-                            <Typography variant="h6">
-                                {memberCount}
-                            </Typography>
-                        </Box>
+                        </Grid>
                     </Box>
                 </AccordionSummary>
                 <BreakoutRoomAccordionContent

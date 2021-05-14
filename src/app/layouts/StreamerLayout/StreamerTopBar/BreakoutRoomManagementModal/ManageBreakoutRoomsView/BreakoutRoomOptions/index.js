@@ -5,7 +5,7 @@ import MoreOptionsIcon from "@material-ui/icons/MoreHoriz";
 import AnnouncementIcon from "@material-ui/icons/ContactlessOutlined";
 import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
 import RoomSettingsIcon from '@material-ui/icons/Settings';
-import AddRoomIcon from '@material-ui/icons/Add';
+import AddRoomIcon from '@material-ui/icons/AddCircleOutline';
 import AnnouncementModal from "./AnnouncementModal";
 import PropTypes from "prop-types";
 import {useRouter} from "next/router";
@@ -91,7 +91,7 @@ const BreakoutRoomOptions = (
                     </MenuItem>}
                     <MenuItem onClick={handleOpenAddRoomModal}>
                         <ListItemIcon classes={{root: classes.menuIconRoot}}>
-                            <AddRoomIcon/>
+                            <AddRoomIcon />
                         </ListItemIcon>
                         <Typography variant="inherit" noWrap>
                             Add Room
