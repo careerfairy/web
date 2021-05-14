@@ -1,35 +1,24 @@
 import React, {useCallback, useEffect, useState} from "react";
-import {
-    Button,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    IconButton,
-    ListItemIcon,
-    Menu,
-    MenuItem, Typography
-} from "@material-ui/core";
+import {Button, DialogActions, DialogContent, DialogTitle} from "@material-ui/core";
 import PropTypes from "prop-types";
 import {streamShape} from "types";
 import {makeStyles} from "@material-ui/core/styles";
 import {useDispatch, useSelector} from "react-redux";
-import BackToMainRoomIcon from '@material-ui/icons/ArrowBackIos';
 import BreakoutRoom from "./BreakoutRoom";
 import {useFirebase} from "context/firebase";
 import {useRouter} from "next/router";
 import * as actions from 'store/actions'
 import Box from "@material-ui/core/Box";
-import MoreOptionsIcon from '@material-ui/icons/MoreHoriz';
 import useStreamToken from "../../../../../components/custom-hook/useStreamToken";
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
-import AnnouncementModal from "./AnnouncementModal";
-import AnnouncementIcon from '@material-ui/icons/ContactlessOutlined';
+import BreakoutRoomOptions from "./BreakoutRoomOptions";
 
 const useStyles = makeStyles(theme => ({
     breakoutRoomsContent: {
         // background: theme.palette.background.default
     },
 }));
+
 
 const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     const classes = useStyles()
@@ -144,39 +133,15 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                 <DialogTitle>
                     Manage Breakout Rooms
                 </DialogTitle>
-                <Box py={2} px={1.5}>
-                    <IconButton onClick={handleClickMoreOptions}>
-                        <MoreOptionsIcon/>
-                    </IconButton>
-                    <Menu
-                        id="simple-menu"
-                        anchorEl={anchorEl}
-                        keepMounted
-                        open={Boolean(anchorEl)}
-                        onClose={handleCloseMoreOptions}
-                    >
-                        <MenuItem onClick={handleOpenAnnouncementModal}>
-                            <ListItemIcon>
-                            <AnnouncementIcon/>
-                            </ListItemIcon>
-                            <Typography variant="inherit" noWrap>
-                                Make an Announcement
-                            </Typography>
-                        </MenuItem>
-                        <MenuItem onClick={handleCloseMoreOptions}>My account</MenuItem>
-                        {breakoutRoomId &&
-                        <MenuItem
-                            onClick={handleBackToMainRoom}
-                        >
-                            <ListItemIcon>
-                            <BackToMainRoomIcon/>
-                            </ListItemIcon>
-                            <Typography variant="inherit" noWrap>
-                                Back to main Room
-                            </Typography>
-                        </MenuItem>}
-                    </Menu>
-                </Box>
+                <BreakoutRoomOptions
+                    onClick={handleClickMoreOptions} anchorEl={anchorEl}
+                    announcementModalOpen={announcementModalOpen}
+                    onClose={handleCloseMoreOptions}
+                    handleCloseAnnouncementModal={handleCloseAnnouncementModal}
+                    handleOpenAnnouncementModal={handleOpenAnnouncementModal}
+                    breakoutRoomId={breakoutRoomId}
+                    handleBackToMainRoom={handleBackToMainRoom}
+                />
             </Box>
             <DialogContent className={classes.breakoutRoomsContent} dividers>
                 {breakoutRooms.map((room, index) => (
@@ -219,10 +184,6 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                 </Button>}
 
             </DialogActions>
-            <AnnouncementModal
-                open={announcementModalOpen}
-                onClose={handleCloseAnnouncementModal}
-            />
         </React.Fragment>
     )
 }
