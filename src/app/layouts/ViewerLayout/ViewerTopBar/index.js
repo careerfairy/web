@@ -14,6 +14,7 @@ import PeopleIcon from "@material-ui/icons/People";
 import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
 import NewFeatureHint from "../../../components/util/NewFeatureHint";
 import useJoinTalentPool from "../../../components/custom-hook/useJoinTalentPool";
+import ViewerBreakoutRoomModal from "./ViewerBreakoutRoomModal";
 
 const useStyles = makeStyles(theme => ({
     joinButton: {
@@ -50,7 +51,15 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
     const {toggleTheme, themeMode} = useThemeToggle()
     const {currentLivestream} = useCurrentStream()
     const {userIsInTalentPool, handlers:{joinTalentPool,leaveTalentPool}} = useJoinTalentPool()
+    const [breakoutRoomModalOpen, setBreakoutRoomModalOpen] = useState(false);
 
+    const handleOpenBreakoutRoomModal = () => {
+        setBreakoutRoomModalOpen(true)
+    }
+
+    const handleCloseBreakoutRoomModal = () => {
+        setBreakoutRoomModalOpen(false)
+    }
 
     if (mobile && !showMenu) {
         return (
@@ -85,6 +94,7 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
 
 
     return (
+        <React.Fragment>
         <AppBar elevation={1} color="transparent">
             <Toolbar className={classes.toolbar}>
                 <MainLogo/>
@@ -132,6 +142,11 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
                     color={userIsInTalentPool ? "default" : "primary"}/>}
             </Toolbar>
         </AppBar>
+            <ViewerBreakoutRoomModal
+                open={breakoutRoomModalOpen}
+                onClose={handleCloseBreakoutRoomModal}
+            />
+        </React.Fragment>
     );
 };
 

@@ -10,19 +10,8 @@ import ManageBreakoutRoomsView from "./ManageBreakoutRoomsView";
 import {GlassDialog} from "materialUI/GlobalModals";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import {useTheme} from "@material-ui/core/styles";
-import {createSelector} from "reselect";
-import {dynamicSort} from "../../../../components/helperFunctions/HelperFunctions";
+import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector";
 
-
-const breakoutRoomsSelector = createSelector(
-    breakoutRooms => breakoutRooms,
-    (breakoutRooms) => {
-        if (breakoutRooms) {
-            return [...breakoutRooms].sort(dynamicSort("index", true))
-        }
-        return breakoutRooms
-    }
-)
 const Content = ({handleClose}) => {
 
     const {query: {livestreamId}} = useRouter()
