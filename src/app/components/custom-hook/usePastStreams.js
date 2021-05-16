@@ -29,7 +29,7 @@ const usePastStreams = (livestreamId) => {
     }])
 
     return useSelector(state =>
-        upcomingLivestreamsSelector(state.firestore.ordered[PAST_LIVESTREAMS_NAME], {livestreamId})
+        upcomingLivestreamsSelector(state.firestore.ordered[PAST_LIVESTREAMS_NAME], {livestreamId, registeredStudentsCount: true})
     )
 };
 

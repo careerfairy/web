@@ -461,6 +461,7 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                         style={{
                             maxHeight: "60px",
                             maxWidth: "250px",
+                            width: "100%",
                             margin: "10px auto 5px auto",
                         }}
                     />
