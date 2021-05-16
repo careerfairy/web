@@ -116,7 +116,6 @@ const TopBar = ({
                 <Hidden mdUp>
                     <MiniLogo/>
                 </Hidden>
-
                 <Hidden mdDown>
                     <Zoom unmountOnExit in={showHeaderLinks}>
                         <Tabs value={false} classes={{indicator: classes.indicator}}>
