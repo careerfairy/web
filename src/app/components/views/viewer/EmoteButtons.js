@@ -1,16 +1,15 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Box, ClickAwayListener, Fab, CircularProgress} from "@material-ui/core";
+import React, {memo, useCallback, useEffect, useState} from 'react';
+import {Box, CircularProgress, ClickAwayListener, Fab} from "@material-ui/core";
 import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
-import {makeStyles, fade} from "@material-ui/core/styles";
+import {fade, makeStyles} from "@material-ui/core/styles";
 import {amber, deepOrange, grey, red} from "@material-ui/core/colors";
 import ClappingSVG from "../../util/CustomSVGs";
-import * as actions from "../../../store/actions";
-import {useDispatch} from "react-redux";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import {useAuth} from "../../../HOCs/AuthProvider";
-import {withFirebase} from "context/firebase";
+import {useFirebase} from "context/firebase";
 import {TEST_EMAIL} from "../streaming/LeftMenu/categories/chat/EmotesModal/utils";
+import {useRouter} from "next/router";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -142,9 +141,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 const delay = 3000; //3 seconds
 const smoothness = 2
-const EmoteButtons = ({firebase, createEmote}) => {
-    const dispatch = useDispatch()
-    const {currentLivestream: {id: livestreamId}} = useCurrentStream()
+const EmoteButtons = ({createEmote}) => {
+    const firebase = useFirebase()
+    const {query: {livestreamId}} = useRouter()
     const {authenticatedUser} = useAuth()
     const classes = useStyles({handRaiseActive: false});
     const SPEED = isNaN(smoothness) ? 2 : smoothness
@@ -249,4 +248,4 @@ const EmoteButtons = ({firebase, createEmote}) => {
     );
 };
 
-export default withFirebase(EmoteButtons);
+export default memo(EmoteButtons);
