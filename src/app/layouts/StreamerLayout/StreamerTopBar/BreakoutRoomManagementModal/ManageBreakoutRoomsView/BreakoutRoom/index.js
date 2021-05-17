@@ -171,7 +171,7 @@ const BreakoutRoom = ({
         event.stopPropagation()
         try {
             setLoading(true)
-            await updateBreakoutRoom({hasStarted: false}, id, livestreamId)
+            await updateBreakoutRoom({hasStarted: false, hasEnded: true}, id, livestreamId)
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
         }

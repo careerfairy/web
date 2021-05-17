@@ -13,6 +13,7 @@ import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 import PropTypes from "prop-types";
 import useStreamRef from "../../components/custom-hook/useStreamRef";
+import StreamClosedCountdown from "../../components/views/streaming/sharedComponents/StreamClosedCountdown";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -177,6 +178,7 @@ const ViewerLayout = (props) => {
                     numberOfViewers={numberOfViewers}
                     mobile={mobile}
                 />
+                <StreamClosedCountdown/>
                 <LeftMenu
                     handRaiseActive={handRaiseActive}
                     setHandRaiseActive={setHandRaiseActive}

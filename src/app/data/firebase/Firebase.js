@@ -2250,7 +2250,8 @@ class Firebase {
             if (breakoutRoomSnap.exists) {
                 const roomRef = breakoutRoomSnap.ref
                 batch.update(roomRef, {
-                    hasStarted: false
+                    hasStarted: false,
+                    hasEnded: true
                 })
             }
         }
