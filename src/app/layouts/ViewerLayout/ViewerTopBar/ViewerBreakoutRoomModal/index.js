@@ -199,6 +199,8 @@ const ViewerBreakoutRoomModal = ({open, onClose, handleOpen, handleBackToMainRoo
                     },
                 }
             }))
+
+            return () => handleCloseSnackbar(snackbarKey)
         }
     }, [Boolean(breakoutRooms?.length), livestreamId]);
 

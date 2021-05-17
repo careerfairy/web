@@ -17,7 +17,6 @@ import {useRouter} from "next/router";
  */
 export function useAgoraToken(roomId, uid, isStreamer, securityToken, isScreenShareToken, streamDocumentPath) {
     const {asPath} = useRouter();
-
     const [agoraToken, setAgoraToken] = useState(null);
     const {getSecureAgoraToken} = useFirebase()
     const dispatch = useDispatch()

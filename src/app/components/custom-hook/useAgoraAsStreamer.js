@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import window, {document} from 'global';
 import {useAgoraToken} from './useAgoraToken';
 import {useDispatch, useSelector} from "react-redux";
@@ -8,7 +8,6 @@ import {useRouter} from 'next/router';
 import useStreamRef from "./useStreamRef";
 
 export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer) {
-    // console.count("-> useAgoraAsStreamer");
 
     const dispatch = useDispatch()
     const {path} = useStreamRef();
@@ -18,9 +17,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const [removedStream, setRemovedStream] = useState(null);
     const [externalMediaStreams, setExternalMediaStreams] = useState([]);
 
-    const rtmClient = useSelector(state => state.rtmClient)
-    const rtmChannel = useSelector(state => state.rtmChannel)
-    const rtcClient = useSelector(state => state.rtcClient)
 
     const [networkQuality, setNetworkQuality] = useState({
         downlinkNetworkQuality: 0,
@@ -32,15 +28,16 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const token = router.query.token || '';
 
     const [agoraRTC, setAgoraRTC] = useState(null);
-    // console.log("-> rtcClient", rtcClient);
+    const [rtcClient, setRtcClient] = useState(null);
     const [screenShareRtcClient, setScreenShareRtcClient] = useState(null);
     const [screenShareRtcStream, setScreenShareRtcStream] = useState(null);
 
+    const [rtmClient, setRtmClient] = useState(null);
+    const [rtmChannel, setRtmChannel] = useState(null);
 
     const [userUid, setUserUid] = useState(null);
     const [readyToConnect, setReadyToConnect] = useState(false);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
-    const [connected, setConnected] = useState(false);
     const [agoraRtcStatus, setAgoraRtcStatus] = useState({
         type: "INFO",
         msg: "RTC_INITIAL"
@@ -125,9 +122,17 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
 
     const removeClientsFromRedux = () => {
-        dispatch(actions.removeRtmClient())
-        dispatch(actions.removeRtmChannel())
-        dispatch(actions.removeRtcClient())
+        // dispatch(actions.removeRtmClient())
+        // dispatch(actions.removeRtmChannel())
+        // dispatch(actions.removeRtcClient())
+    }
+
+    const createEmote = async (emoteType) => {
+        try {
+            const messageToSend = await dispatch(actions.createEmote(emoteType))
+            rtmChannel.sendMessage(messageToSend)
+        } catch (e) {
+        }
     }
 
     const handleConnectClients = () => {
@@ -142,7 +147,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             removeClientsFromRedux()
             console.log("-> CLOSING CONNECTIONS FINISHED");
         }
-            setExternalMediaStreams([])
+        setExternalMediaStreams([])
     }
 
     const removeAllClients = () => {
@@ -393,7 +398,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             // NETWORK QUALITY
         });
 
-        dispatch(actions.setRtcClientObj(rtcClient))
+        // dispatch(actions.setRtcClientObj(rtcClient))
+        setRtcClient(rtcClient);
     }
 
     const connectAgoraRTM = () => {
@@ -443,12 +449,12 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
 
             channel.join().then(() => {
-                dispatch(actions.setRtmChannelObj(channel))
+                // dispatch(actions.setRtmChannelObj(channel))
                 console.log('--> Joined channel');
                 // channel.getMembers().then(result => {
                 //     console.log("-> getMembers result", result);
                 // })
-
+                setRtmChannel(channel);
             }).catch(error => {
                 console.error(error);
             });
@@ -457,7 +463,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             console.log('AgoraRTM client login failure', err);
         });
 
-            dispatch(actions.setRtmClientObj(rtmClient))
+        // dispatch(actions.setRtmClientObj(rtmClient))
+        setRtmClient(rtmClient);
     }
 
     useEffect(() => {
@@ -717,6 +724,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         networkQuality,
         numberOfViewers,
         setAddedStream,
-        setRemovedStream
+        setRemovedStream,
+        createEmote
     };
 }

@@ -12,6 +12,7 @@ import userDataSetReducer from "./userDataSetReducer";
 import currentFilterGroupReducer from "./currentFilterGroupReducer";
 import nextLivestreamsReducer from "./nextLivestreamsReducer";
 import rtcClientReducer from "./rtcClientReducer";
+import streamReducer from "./streamReducer";
 
 export default combineReducers({
     auth: authReducer,
@@ -25,5 +26,6 @@ export default combineReducers({
     snackbars: snackbarReducer,
     userDataSet: userDataSetReducer,
     currentFilterGroup: currentFilterGroupReducer,
-    nextLivestreams: nextLivestreamsReducer
+    nextLivestreams: nextLivestreamsReducer,
+    stream: streamReducer
 });

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import {withFirebase} from "../../context/firebase";
 import StreamerTopBar from "./StreamerTopBar";
@@ -10,8 +10,7 @@ import {useRouter} from "next/router";
 import NotificationsContext from "../../context/notifications/NotificationsContext";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import {v4 as uuidv4} from "uuid";
-import {isEmpty, isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
-import {shallowEqual, useSelector} from "react-redux";
+import {isEmpty, isLoaded} from "react-redux-firebase";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 
@@ -64,15 +63,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const MAIN_STREAMER_PATHS = ["/streaming/[livestreamId]/breakout-room/[breakoutRoomId]/main-streamer", "/streaming/[livestreamId]/main-streamer"]
 
 const StreamerLayout = (props) => {
     const {children, firebase, isBreakout, isMainStreamer} = props
-    const {query: {token, livestreamId: baseStreamId, breakoutRoomId}} = useRouter()
+    const {query: {token, livestreamId: baseStreamId, breakoutRoomId, auto}} = useRouter()
     const livestreamId = breakoutRoomId || baseStreamId
     const router = useRouter();
     const smallScreen = useMediaQuery('(max-width:700px)');
-console.count("-> StreamerLayout");
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [newNotification, setNewNotification] = useState(null);
     const [notificationToRemove, setNotificationToRemove] = useState(null);
@@ -128,10 +125,10 @@ console.count("-> StreamerLayout");
             setStreamerReady(Boolean(hasStreamerInfo))
         }
 
-        if (currentLivestream) {
+        if (currentLivestream && auto === "true") {
             checkIfStreamerHasInfo()
         }
-    }, [currentLivestream?.liveSpeakers, streamerId])
+    }, [currentLivestream?.liveSpeakers, streamerId, auto])
 
     useEffect(() => {
         const regex = /-/g;

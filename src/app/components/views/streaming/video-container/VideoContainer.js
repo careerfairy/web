@@ -19,6 +19,7 @@ import ErrorModal from '../modal/ErrorModal';
 import SettingsModal from "./SettingsModal";
 import ScreenShareModal from "./ScreenShareModal";
 import useStreamRef from "../../../custom-hook/useStreamRef";
+import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/StreamerTopBar/BreakoutRoomManagementModal";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -366,6 +367,7 @@ function VideoContainer(props) {
                 handleClose={handleCloseScreenShareModal}
                 handleScreenShare={handleScreenShare}
             />
+            <BreakoutRoomManagementModal/>
             <DemoIntroModal livestreamId={props.currentLivestream.id}
                             open={showDemoIntroModal}
                             handleClose={handleCloseDemoIntroModal}/>

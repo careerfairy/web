@@ -1,16 +1,17 @@
-import React, {useMemo} from 'react'
+import React, {memo, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {CircularProgress, DialogContent, Slide} from "@material-ui/core";
 import {useCurrentStream} from "../../../../context/stream/StreamContext";
 import {useRouter} from "next/router";
 import {isEmpty, isLoaded, useFirestoreConnect} from "react-redux-firebase";
-import {shallowEqual, useSelector} from "react-redux";
+import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import CreateBreakoutRoomsView from "./CreateBreakoutRoomsView";
 import ManageBreakoutRoomsView from "./ManageBreakoutRoomsView";
 import {GlassDialog} from "materialUI/GlobalModals";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import {useTheme} from "@material-ui/core/styles";
 import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector";
+import * as actions from 'store/actions'
 
 const Content = ({handleClose}) => {
     console.count("-> Content");
@@ -48,9 +49,16 @@ const Content = ({handleClose}) => {
 
     return <ManageBreakoutRoomsView handleClose={handleClose} breakoutRooms={breakoutRooms}/>
 }
-export const BreakoutRoomManagementModal = ({open, onClose}) => {
+const BreakoutRoomManagementModal = () => {
+    const open = useSelector(state => state.stream.layout.streamerBreakoutRoomModalOpen)
+    console.log("-> open modal Open", open);
     const theme = useTheme()
+    const dispatch = useDispatch()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const onClose = () => {
+        dispatch(actions.closeStreamerBreakoutModal())
+    }
     const handleClose = () => {
         onClose()
     }
@@ -68,3 +76,4 @@ BreakoutRoomManagementModal.propTypes = {
     open: PropTypes.bool
 }
 
+export default memo(BreakoutRoomManagementModal)

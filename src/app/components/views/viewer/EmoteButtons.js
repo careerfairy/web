@@ -142,7 +142,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 const delay = 3000; //3 seconds
 const smoothness = 2
-const EmoteButtons = ({firebase}) => {
+const EmoteButtons = ({firebase, createEmote}) => {
     const dispatch = useDispatch()
     const {currentLivestream: {id: livestreamId}} = useCurrentStream()
     const {authenticatedUser} = useAuth()
@@ -194,18 +194,19 @@ const EmoteButtons = ({firebase}) => {
 
     const handleClap = useCallback(() => {
         postIcon('clapping')
-    }, [iconsDisabled, livestreamId, authenticatedUser])
+    }, [iconsDisabled, livestreamId, authenticatedUser, createEmote])
 
     const handleLike = useCallback(() => {
         postIcon('like')
-    }, [iconsDisabled, livestreamId, authenticatedUser])
+    }, [iconsDisabled, livestreamId, authenticatedUser, createEmote])
     const handleHeart = useCallback(() => {
         postIcon('heart')
-    }, [iconsDisabled, livestreamId, authenticatedUser])
+    }, [iconsDisabled, livestreamId, authenticatedUser, createEmote])
 
     const postIcon = (iconName) => {
         if (!iconsDisabled) {
-            dispatch(actions.createEmote(iconName))
+            createEmote(iconName)
+            // dispatch(actions.createEmote(iconName))
             setIconsDisabled(true);
             firebase.postIcon(livestreamId, iconName, authenticatedUser.email || TEST_EMAIL);
         }

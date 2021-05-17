@@ -32,7 +32,8 @@ import NewFeatureHint from "../../../components/util/NewFeatureHint";
 import useStreamToken from "../../../components/custom-hook/useStreamToken";
 import useStreamRef from "../../../components/custom-hook/useStreamRef";
 import {BreakoutRoomManagementModal} from "./BreakoutRoomManagementModal";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import * as actions from "store/actions"
 
 const useStyles = makeStyles(theme => ({
     toolbar: {
@@ -62,29 +63,19 @@ const useStyles = makeStyles(theme => ({
 
 const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
     const {currentLivestream} = useCurrentStream()
+    const dispatch = useDispatch()
     const streamRef = useStreamRef();
     const classes = useStyles({hasStarted: currentLivestream?.hasStarted})
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('md'))
     const {toggleTheme, themeMode} = useThemeToggle()
     const [numberOfViewers, setNumberOfViewers] = useState(0);
-    // const rtmChannel = useSelector(state => state.rtmChannel)
     // console.count("-> StreamerTopBar");
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [hideTooltip, setHideTooltip] = useState(false);
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
     const [openStreamerBreakoutRoomModal, setOpenStreamerBreakoutRoomModal] = useState(false);
     const {joiningStreamerLink, viewerLink} = useStreamToken()
-
-    // useEffect(() => {
-    //     if (rtmChannel) {
-    // console.log("-> rtmChannel", rtmChannel);
-    // rtmChannel.on("MemberCountUpdated", memberCount => {
-    //     console.log("-> MemberCount", memberCount);
-    //     setNumberOfViewers(memberCount)
-    // })
-    //     }
-    // }, [rtmChannel?.channelId]);
 
     useEffect(() => {
         if (currentLivestream.start) {
@@ -106,10 +97,11 @@ const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
     }
 
     const handleOpenBreakoutRoomModal = () => {
-        setOpenStreamerBreakoutRoomModal(true)
+        console.log("-> handleOpenBreakoutRoomModal");
+        dispatch(actions.openStreamerBreakoutModal())
     }
     const handleCloseBreakoutRoomModal = () => {
-        setOpenStreamerBreakoutRoomModal(false)
+        dispatch(actions.closeStreamerBreakoutModal())
     }
 
     return (
@@ -260,10 +252,6 @@ const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
                 open={speakerManagementOpen}
                 joiningStreamerLink={joiningStreamerLink}
                 setOpen={setSpeakerManagementOpen}
-            />
-            <BreakoutRoomManagementModal
-                open={openStreamerBreakoutRoomModal}
-                onClose={handleCloseBreakoutRoomModal}
             />
         </Fragment>
     );
