@@ -173,6 +173,7 @@ const ViewerLayout = (props) => {
                 <ViewerTopBar
                     showAudience={showAudience}
                     showMenu={showMenu}
+                    audienceDrawerOpen={audienceDrawerOpen}
                     numberOfViewers={numberOfViewers}
                     mobile={mobile}
                 />

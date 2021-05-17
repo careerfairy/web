@@ -1,12 +1,11 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
+import {fade, makeStyles} from "@material-ui/core/styles";
 import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import {useFirestoreConnect} from "react-redux-firebase";
 import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector";
 import {useRouter} from "next/router";
-import {Box, Button, Chip, DialogActions, Drawer, IconButton, ListItem, ListItemText} from "@material-ui/core";
+import {Box, Button, Chip, DialogActions, Drawer, IconButton, ListItem, ListItemText, Tooltip} from "@material-ui/core";
 import PropTypes from "prop-types";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 import * as actions from 'store/actions'
 import Zoom from 'react-reveal/Zoom';
 import {getBaseUrl} from "../../../../components/helperFunctions/HelperFunctions";
@@ -50,11 +49,9 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Content = ({breakoutRooms, fullyOpened, handleClose, handleBackToMainRoom}) => {
+const Content = ({breakoutRooms, fullyOpened, handleClose, handleBackToMainRoom, mobile}) => {
     const classes = useStyles()
     const {query: {livestreamId, breakoutRoomId}} = useRouter()
-    const theme = useTheme()
-    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const handleGoToRoom = async (roomId) => {
         handleClose()
@@ -72,14 +69,16 @@ const Content = ({breakoutRooms, fullyOpened, handleClose, handleBackToMainRoom}
                 <Box flex={1}/>
                 {breakoutRoomId && (
                     <div>
-                        <Button
-                            startIcon={<BackToMainRoomIcon/>}
-                            onClick={handleBackToMainRoom}
-                            color="secondary"
-                            variant="contained"
-                        >
-                            Back to main Room
-                        </Button>
+                        <Tooltip title={mobile ? "Back to main room" : ""}>
+                            <Button
+                                startIcon={<BackToMainRoomIcon/>}
+                                onClick={handleBackToMainRoom}
+                                color="secondary"
+                                variant="contained"
+                            >
+                                {mobile ? "Back" : "Back to main Room"}
+                            </Button>
+                        </Tooltip>
                     </div>
                 )}
                 {mobile ? (
@@ -151,13 +150,19 @@ const BreakoutSnackAction = ({handleClickConfirm, handleCloseSnackbar}) => {
 }
 
 const snackbarKey = "There are some breakout rooms active"
-const ViewerBreakoutRoomModal = ({open, onClose, handleOpen, handleBackToMainRoom}) => {
+const ViewerBreakoutRoomModal = ({
+                                     open,
+                                     onClose,
+                                     handleOpen,
+                                     handleBackToMainRoom,
+                                     mobile,
+                                     localStorageAudienceDrawerKey
+                                 }) => {
 
     const classes = useStyles()
     const {query: {livestreamId}} = useRouter()
     const dispatch = useDispatch()
     const [fullyOpened, setFullyOpened] = useState(false);
-    const theme = useTheme()
 
     const query = useMemo(() => livestreamId ? [{
         collection: "livestreams",
@@ -181,7 +186,10 @@ const ViewerBreakoutRoomModal = ({open, onClose, handleOpen, handleBackToMainRoo
 
     useEffect(() => {
 
-        if (!open && breakoutRooms?.length && !hasDismissedSnackbar()) {
+        if (!open && breakoutRooms?.length &&
+            !hasDismissedSnackbar()
+            && hasSeenAudienceDrawer()
+        ) {
             dispatch(actions.enqueueSnackbar({
                 message: snackbarKey,
                 options: {
@@ -208,6 +216,11 @@ const ViewerBreakoutRoomModal = ({open, onClose, handleOpen, handleBackToMainRoo
         handleDismissSnackbar()
         handleCloseSnackbar(key)
         handleOpen()
+    }
+
+    const hasSeenAudienceDrawer = () => {
+        const key = localStorage.getItem(localStorageAudienceDrawerKey)
+        return Boolean(JSON.parse(key))
     }
 
     const hasDismissedSnackbar = () => {
@@ -244,7 +257,8 @@ const ViewerBreakoutRoomModal = ({open, onClose, handleOpen, handleBackToMainRoo
                     onEntered: handleEntered,
                 }}
                 onClose={handleClose}>
-            <Content fullyOpened={fullyOpened} handleBackToMainRoom={handleBackToMainRoom} breakoutRooms={breakoutRooms}
+            <Content fullyOpened={fullyOpened} mobile={mobile} handleBackToMainRoom={handleBackToMainRoom}
+                     breakoutRooms={breakoutRooms}
                      handleClose={handleClose}/>
         </Drawer>
     );

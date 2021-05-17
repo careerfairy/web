@@ -57,7 +57,7 @@ const ModalContent = ({handleClose}) => {
     return (
         <form onSubmit={handleSubmit}>
             <DialogTitle>
-                Make An Announcement
+                Send a message to all rooms
             </DialogTitle>
             <DialogContent>
                 <TextField

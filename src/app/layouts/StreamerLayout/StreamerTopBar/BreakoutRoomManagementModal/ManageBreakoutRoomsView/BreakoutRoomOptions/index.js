@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import Box from "@material-ui/core/Box";
-import {IconButton, ListItemIcon, Menu, MenuItem, Typography} from "@material-ui/core";
+import {IconButton, ListItemIcon, Menu, MenuItem, Tooltip, Typography} from "@material-ui/core";
 import MoreOptionsIcon from "@material-ui/icons/MoreHoriz";
 import AnnouncementIcon from "@material-ui/icons/ContactlessOutlined";
 import RoomSettingsIcon from '@material-ui/icons/Settings';
@@ -65,7 +65,7 @@ const BreakoutRoomOptions = (
     return (
         <React.Fragment>
             <Box py={2} px={1}>
-                <IconButton size={mobile? "small": "medium"} onClick={handleClickMoreOptions}>
+                <IconButton size={mobile ? "small" : "medium"} onClick={handleClickMoreOptions}>
                     <MoreOptionsIcon/>
                 </IconButton>
                 <Menu
@@ -75,18 +75,19 @@ const BreakoutRoomOptions = (
                     open={Boolean(anchorEl)}
                     onClose={handleCloseMoreOptions}
                 >
-                    <MenuItem onClick={handleOpenAnnouncementModal}>
-                        <ListItemIcon classes={{root: classes.menuIconRoot}}>
-                            <AnnouncementIcon/>
-                        </ListItemIcon>
-                        <Typography variant="inherit" noWrap>
-                            Make an Announcement
-                        </Typography>
-                    </MenuItem>
-
+                    <Tooltip title="Send a broadcast message to all breakout rooms">
+                        <MenuItem onClick={handleOpenAnnouncementModal}>
+                            <ListItemIcon classes={{root: classes.menuIconRoot}}>
+                                <AnnouncementIcon/>
+                            </ListItemIcon>
+                            <Typography variant="inherit" noWrap>
+                                Broadcast a message
+                            </Typography>
+                        </MenuItem>
+                    </Tooltip>
                     <MenuItem onClick={handleOpenAddRoomModal}>
                         <ListItemIcon classes={{root: classes.menuIconRoot}}>
-                            <AddRoomIcon />
+                            <AddRoomIcon/>
                         </ListItemIcon>
                         <Typography variant="inherit" noWrap>
                             Add Room
@@ -94,7 +95,7 @@ const BreakoutRoomOptions = (
                     </MenuItem>
                     <MenuItem disabled={loading} onClick={handleClickRefresh}>
                         <ListItemIcon classes={{root: classes.menuIconRoot}}>
-                            <RefreshRoomsIcon />
+                            <RefreshRoomsIcon/>
                         </ListItemIcon>
                         <Typography variant="inherit" noWrap>
                             Refresh

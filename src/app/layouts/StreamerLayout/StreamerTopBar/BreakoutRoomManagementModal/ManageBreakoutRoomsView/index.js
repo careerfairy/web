@@ -56,9 +56,9 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose, agoraHandlers}) =>
 
 
     const getAllMemberCounts = async () => {
-            const breakoutRoomIds = breakoutRooms.map(room => room.id)
-            const channelMemberCountObj = await agoraHandlers.getChannelMemberCount(breakoutRoomIds)
-            setMemberCounts(channelMemberCountObj)
+        const breakoutRoomIds = breakoutRooms.map(room => room.id)
+        const channelMemberCountObj = await agoraHandlers.getChannelMemberCount(breakoutRoomIds)
+        setMemberCounts(channelMemberCountObj)
     }
 
     const updateMemberCount = useCallback((roomId, newCount) => {
@@ -92,7 +92,6 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose, agoraHandlers}) =>
     }
 
     const handleDisconnect = async () => {
-        console.log("-> agoraHandlers in handleDisconnect", agoraHandlers);
         await agoraHandlers.handleDisconnect()
     }
 
@@ -148,7 +147,8 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose, agoraHandlers}) =>
                         <BackToMainRoomIcon/>
                     }
                 >
-                    {mobile ? "Back" : "Back to main Room"}
+                    Back to main Room
+                    {/*{mobile ? "Back" : "Back to main Room"}*/}
                 </Button>}
                 <BreakoutRoomOptions
                     openSettings={openSettings}

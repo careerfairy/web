@@ -54,6 +54,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+const localStorageAudienceDrawerKey = "hasSeenAudienceDrawer"
 const ViewerTopBar = ({mobile, numberOfViewers, showAudience, showMenu}) => {
     const classes = useStyles()
     const {query: {livestreamId, breakoutRoomId}} = useRouter()
@@ -87,7 +88,7 @@ const ViewerTopBar = ({mobile, numberOfViewers, showAudience, showMenu}) => {
                             <NewFeatureHint
                                 onClick={showAudience}
                                 tooltipText="Click here to see who's joined the stream since the start"
-                                localStorageKey="hasSeenAudienceDrawer"
+                                localStorageKey={localStorageAudienceDrawerKey}
                                 tooltipTitle="Hint"
                             >
                                 <PeopleIcon/>
@@ -96,6 +97,8 @@ const ViewerTopBar = ({mobile, numberOfViewers, showAudience, showMenu}) => {
                     </IconButton>
                 </div>
                 <ViewerBreakoutRoomModal
+                    mobile={mobile}
+                    localStorageAudienceDrawerKey={localStorageAudienceDrawerKey}
                     open={breakoutRoomModalOpen}
                     handleBackToMainRoom={handleBackToMainRoom}
                     onClose={handleCloseBreakoutRoomModal}
@@ -133,11 +136,11 @@ const ViewerTopBar = ({mobile, numberOfViewers, showAudience, showMenu}) => {
                     <Box display="flex" alignItems="center">
                         {breakoutRoomId &&
                         <Tooltip title="Back to main room">
-                        <Button onClick={handleBackToMainRoom}
-                                startIcon={<BackToMainRoomIcon/>}
-                                color="secondary" variant="contained">
-                            Back
-                        </Button>
+                            <Button onClick={handleBackToMainRoom}
+                                    startIcon={<BackToMainRoomIcon/>}
+                                    color="secondary" variant="contained">
+                                Back
+                            </Button>
                         </Tooltip>}
                         {breakoutRoomOpen &&
                         <Tooltip title="Checkout breakout rooms">
@@ -157,7 +160,7 @@ const ViewerTopBar = ({mobile, numberOfViewers, showAudience, showMenu}) => {
                         <NewFeatureHint
                             onClick={showAudience}
                             tooltipText="Click here to see who's joined the stream since the start"
-                            localStorageKey="hasSeenAudienceDrawer"
+                            localStorageKey={localStorageAudienceDrawerKey}
                             tooltipTitle="Hint"
                         >
                             <Box className={classes.viewCount}>
@@ -186,6 +189,7 @@ const ViewerTopBar = ({mobile, numberOfViewers, showAudience, showMenu}) => {
             </AppBar>
             <ViewerBreakoutRoomModal
                 open={breakoutRoomModalOpen}
+                localStorageAudienceDrawerKey={localStorageAudienceDrawerKey}
                 handleBackToMainRoom={handleBackToMainRoom}
                 onClose={handleCloseBreakoutRoomModal}
                 handleOpen={handleOpenBreakoutRoomModal}
