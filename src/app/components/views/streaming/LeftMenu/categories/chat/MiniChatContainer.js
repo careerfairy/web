@@ -90,6 +90,8 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
+const now = new Date()
+
 function MiniChatContainer({isStreamer, livestream, firebase, className}) {
     const {authenticatedUser, userData} = useAuth();
     const {tutorialSteps, setTutorialSteps, handleConfirmStep} = useContext(TutorialContext);
@@ -112,15 +114,16 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
             const unsubscribe = firebase.listenToChatEntries(streamRef, 150, querySnapshot => {
                 const newEntries = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()})).reverse()
                 setChatEntries(newEntries);
-                if (!open) {
+                querySnapshot.docChanges().forEach(change => {
                     let number = 0;
-                    querySnapshot.docChanges().forEach(change => {
-                        if (change.type === "added" && number < 99) {
+                    if (change.type === "added") {
+                        handleBroadcast(change)
+                        if (!open && number < 99) {
                             number++;
+                            setNumberOfLatestChanges(number);
                         }
-                    })
-                    setNumberOfLatestChanges(number);
-                }
+                    }
+                })
             });
             return () => unsubscribe();
         }
@@ -144,6 +147,17 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
             setNumberOfMissedEntries(3); // resets the missed entries back to 3
         }
     }, [tutorialSteps.streamerReady])
+
+    const handleBroadcast = (change) => {
+        const entryData = change.doc.data()
+        if (entryData.type === "broadcast") {
+            const isNewBroadcast = entryData.timestamp?.toDate() > now
+            if (isNewBroadcast) {
+                console.log("-> isNewBroadcast", isNewBroadcast);
+                alert(entryData.message)
+            }
+        }
+    }
 
     const isOpen = (property) => {
         return Boolean(livestream.test
