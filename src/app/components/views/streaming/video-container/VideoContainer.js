@@ -25,7 +25,6 @@ function VideoContainer(props) {
     const {
         tutorialSteps,
         setTutorialSteps,
-        showBubbles,
         setShowBubbles,
         handleConfirmStep,
         getActiveTutorialStepKey
@@ -35,7 +34,6 @@ function VideoContainer(props) {
     const isMainStreamer = props.streamerId === props.currentLivestream.id;
 
     const [errorMessage, setErrorMessage] = useState(null);
-    const [screenSharePermissionDenied, setScreenSharePermissionDenied] = useState(false);
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
 
     const [streamerConnected, setStreamerConnected] = useState(false);
@@ -71,6 +69,7 @@ function VideoContainer(props) {
             props.currentLivestream.id,
             props.streamerId,
             props.viewer,
+            
         );
 
     const devices = useDevices(agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED");

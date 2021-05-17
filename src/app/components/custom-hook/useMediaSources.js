@@ -26,11 +26,11 @@ export default function useMediaSources(devices, streamId, localStream, showSoun
 
     useEffect(() => {
         if (devices && localStream) {
-            if (devices.audioInputList && devices.audioInputList.length > 0 && (!audioSource || !devices.audioInputList.some( device => device.value === audioSource))
-                && devices.videoDeviceList && devices.videoDeviceList.length > 0 && (!videoSource || !devices.videoDeviceList.some( device => device.value === videoSource))) {
+            if (devices.audioInputList && devices.audioInputList.length > 0
+                && devices.videoDeviceList && devices.videoDeviceList.length > 0) {
                 initalizeAudioAndVideoSources(devices.audioInputList[0].value, devices.videoDeviceList[0].value)
             }
-            if (devices.audioOutputList && devices.audioOutputList.length > 0 && (!speakerSource || !devices.audioOutputList.some( device => device.value === speakerSource))) {
+            if (devices.audioOutputList && devices.audioOutputList.length > 0) {
                 updateSpeakerSource(devices.audioOutputList[0].value);
             }
         }   
