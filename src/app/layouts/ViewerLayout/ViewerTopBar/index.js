@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 600,
         marginLeft: theme.spacing(0.5)
     },
-    floatingViewCount: {
+    floatingButton: {
         color: theme.palette.primary.main,
     },
     floatingWrapper: {
@@ -83,7 +83,21 @@ const ViewerTopBar = ({mobile, numberOfViewers, showAudience, showMenu}) => {
         return (
             <React.Fragment>
                 <div className={classes.floatingWrapper}>
-                    <IconButton onClick={showAudience} className={classes.floatingViewCount}>
+                    {breakoutRoomId &&
+                    <Tooltip title="Back to main room">
+                        <Button onClick={handleBackToMainRoom}
+                                startIcon={<BackToMainRoomIcon/>}
+                                color="secondary" variant="outlined">
+                            Back
+                        </Button>
+                    </Tooltip>}
+                    {breakoutRoomOpen &&
+                    <Tooltip title="Checkout breakout rooms">
+                        <IconButton className={classes.floatingButton} color="white" disabled={breakoutRoomModalOpen} onClick={handleOpenBreakoutRoomModal}>
+                            <BreakoutRoomIcon/>
+                        </IconButton>
+                    </Tooltip>}
+                    <IconButton onClick={showAudience} className={classes.floatingButton}>
                         <Badge max={999999} color="secondary" badgeContent={numberOfViewers}>
                             <NewFeatureHint
                                 onClick={showAudience}

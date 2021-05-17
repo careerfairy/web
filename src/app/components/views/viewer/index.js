@@ -13,6 +13,7 @@ import clsx from "clsx";
 import StreamNotifications from "../streaming/sharedComponents/StreamNotifications";
 import AudienceDrawer from "../streaming/AudienceDrawer";
 import ButtonComponent from "../streaming/sharedComponents/ButtonComponent";
+import StreamClosedCountdown from "../streaming/sharedComponents/StreamClosedCountdown";
 
 const useStyles = makeStyles(theme => ({
     iconsContainer: {
@@ -132,6 +133,7 @@ const ViewerOverview = ({
                     <div>Click to play</div>
                 </div>
             </Backdrop>
+            <StreamClosedCountdown/>
         </Fragment>
     );
 };

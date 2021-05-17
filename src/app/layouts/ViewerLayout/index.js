@@ -178,7 +178,6 @@ const ViewerLayout = (props) => {
                     numberOfViewers={numberOfViewers}
                     mobile={mobile}
                 />
-                <StreamClosedCountdown/>
                 <LeftMenu
                     handRaiseActive={handRaiseActive}
                     setHandRaiseActive={setHandRaiseActive}

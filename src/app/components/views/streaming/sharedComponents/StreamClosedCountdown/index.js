@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 import {CountdownCircleTimer} from 'react-countdown-circle-timer'
 import {Backdrop, Typography} from "@material-ui/core";
@@ -6,6 +6,7 @@ import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {colorsArray} from "../../../../util/colors";
 import Box from "@material-ui/core/Box";
 import useStreamToken from "../../../../custom-hook/useStreamToken";
+import {useRouter} from "next/router";
 
 const useStyles = makeStyles(theme => ({
     backdrop: {
@@ -15,14 +16,14 @@ const useStyles = makeStyles(theme => ({
         fontSize: "32px"
     },
     title: {
-        color: theme.palette.common.white
+        color: theme.palette.common.white,
+        padding: theme.spacing(0, 3)
     }
 }));
 
 const timerProps = {
-    isPlaying: true,
     size: 240,
-    strokeWidth: 6
+    strokeWidth: 10
 };
 
 
@@ -50,17 +51,17 @@ const StreamClosedCountdown = () => {
         window.location.href = isMainStreamer ? links.mainStreamerLink : isStreamer ? links.joiningStreamerLink : links.viewerLink
     }
 
-    const startCountDown = Boolean(isBreakout && !hasStarted && hasEnded)
+    const startCountDown = Boolean(isBreakout && !hasStarted && hasEnded && Boolean(Object.keys(links).length))
 
-    return startCountDown ? (
-        <Backdrop className={classes.backdrop} open>
+    return (
+        <Backdrop className={classes.backdrop} open={startCountDown}>
             <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center">
                 <Typography className={classes.title} gutterBottom align="center" variant="h4">
                     This room has been closed, you will be re-directed in
                 </Typography>
                 <CountdownCircleTimer
-                    {...timerProps}
-                    isPlaying
+                    isPlaying={startCountDown}
+                    key={links.viewerLink}
                     onComplete={handleComplete}
                     duration={10}
                     colors={[
@@ -75,7 +76,7 @@ const StreamClosedCountdown = () => {
                 </CountdownCircleTimer>
             </Box>
         </Backdrop>
-    ) : null;
+    ) ;
 }
 
 export default StreamClosedCountdown;
