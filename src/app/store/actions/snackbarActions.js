@@ -46,6 +46,21 @@ export const sendGeneralError = (error = "") => async (dispatch) => {
         }
     }))
 }
+export const enqueueBroadcastMessage = (message = "", action) => async (dispatch) => {
+    dispatch(enqueueSnackbar({
+        message: message,
+        options: {
+            variant: "warning",
+            preventDuplicate: true,
+            key: message,
+            action,
+            anchorOrigin:{
+                vertical: "top",
+                horizontal: "center"
+            }
+        }
+    }))
+}
 
 /**
  * Call an on call cloud function to generate a secure agora token.

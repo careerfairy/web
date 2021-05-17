@@ -1,6 +1,6 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
-import {withFirebase} from 'context/firebase';
+import {useFirebase, withFirebase} from 'context/firebase';
 import ChevronRightRoundedIcon from '@material-ui/icons/ChevronRightRounded';
 import ChatEntryContainer from './ChatEntryContainer';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
@@ -12,9 +12,9 @@ import {
     Collapse,
     TextField,
     Typography,
-    IconButton,
+    IconButton, Button,
 } from "@material-ui/core";
-import {makeStyles, fade} from "@material-ui/core/styles";
+import {makeStyles, fade, useTheme} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
 import TutorialContext from "../../../../../../context/tutorials/TutorialContext";
 import {
@@ -28,6 +28,10 @@ import {useAuth} from "../../../../../../HOCs/AuthProvider";
 import clsx from "clsx";
 import EmotesModal from "./EmotesModal";
 import useStreamRef from "../../../../../custom-hook/useStreamRef";
+import {useDispatch} from "react-redux";
+import * as actions from 'store/actions'
+import {enqueueBroadcastMessage} from "store/actions";
+import {useCurrentStream} from "../../../../../../context/stream/StreamContext";
 
 const useStyles = makeStyles(theme => ({
     root: {},
@@ -92,8 +96,11 @@ const useStyles = makeStyles(theme => ({
 
 const now = new Date()
 
-function MiniChatContainer({isStreamer, livestream, firebase, className}) {
+function MiniChatContainer({isStreamer, livestream, className}) {
     const {authenticatedUser, userData} = useAuth();
+    const firebase = useFirebase()
+    const dispatch = useDispatch()
+    const theme = useTheme()
     const {tutorialSteps, setTutorialSteps, handleConfirmStep} = useContext(TutorialContext);
     const streamRef = useStreamRef();
     const [chatEntries, setChatEntries] = useState([]);
@@ -148,13 +155,22 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
         }
     }, [tutorialSteps.streamerReady])
 
-    const handleBroadcast = (change) => {
+    const handleBroadcast = async (change) => {
         const entryData = change.doc.data()
         if (entryData.type === "broadcast") {
             const isNewBroadcast = entryData.timestamp?.toDate() > now
             if (isNewBroadcast) {
-                console.log("-> isNewBroadcast", isNewBroadcast);
-                alert(entryData.message)
+                const {authorName, message} = entryData
+                const broadCastMessage = `${authorName} - ${message}`
+                const handleCloseAction = () => dispatch(actions.closeSnackbar(broadCastMessage))
+                const action = (
+                    <Button
+                        style={{color: theme.palette.common.white}}
+                        onClick={handleCloseAction}>
+                        Dismiss
+                    </Button>
+                )
+                dispatch(actions.enqueueBroadcastMessage(broadCastMessage, action))
             }
         }
     }
