@@ -205,7 +205,6 @@ const EmoteButtons = ({createEmote}) => {
     const postIcon = (iconName) => {
         if (!iconsDisabled) {
             createEmote(iconName)
-            // dispatch(actions.createEmote(iconName))
             setIconsDisabled(true);
             firebase.postIcon(livestreamId, iconName, authenticatedUser.email || TEST_EMAIL);
         }
