@@ -57,7 +57,9 @@ function ViewerComponent(props) {
             screenSharingMode,
             props.livestreamId,
             props.streamerId,
-            true
+            true,
+            "motion",
+            props.setShowVideoButton
         );
 
     const devices = useDevices(agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED");

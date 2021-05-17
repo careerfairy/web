@@ -16,7 +16,6 @@ export default function useDevices(refreshDevices) {
     },[refreshDevices]);
 
     function gotDevices(deviceInfos) {
-        
         let audioInputList = [];
         let audioOutputList = [];
         let videoDeviceList = [];
@@ -38,11 +37,14 @@ export default function useDevices(refreshDevices) {
                 console.log('Some other kind of source/device: ', deviceInfo);
             }
         }
-        setDeviceList({
+
+        const newDevices = {
             "audioInputList": audioInputList,
             "audioOutputList": audioOutputList,
             "videoDeviceList": videoDeviceList
-        });
+        };
+        debugger;
+        setDeviceList(newDevices);
     }
 
     function handleError(error) {
