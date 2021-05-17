@@ -1,5 +1,5 @@
-import {useCurrentStream} from "../../../../../../../context/stream/StreamContext";
-import {useFirebase} from "../../../../../../../context/firebase";
+import {useCurrentStream} from "context/stream/StreamContext";
+import {useFirebase} from "context/firebase";
 import React, {useEffect, useState} from "react";
 import useInfiniteScrollClient from "../../../../../../../components/custom-hook/useInfiniteScrollClient";
 import {AccordionDetails} from "@material-ui/core";
@@ -9,7 +9,6 @@ import Typography from "@material-ui/core/Typography";
 import PropTypes from "prop-types";
 import UserList from "./UserList";
 import {makeStyles} from "@material-ui/core/styles";
-import {EMAIL_REGEX} from "../../../../../../../components/util/constants";
 
 const useStyles = makeStyles(theme => ({
     listWrapper: {
@@ -137,8 +136,6 @@ const BreakoutRoomAccordionContent = ({
             updateMemberCount
         )
         const members = await agoraHandlers.getChannelMembers(newRtmChannel)
-        // console.log("-> newRtmChannel", newRtmChannel);
-        // console.log("-> members", members);
         setRtmChannel(newRtmChannel)
         setChannelMemberIds(members)
     }
