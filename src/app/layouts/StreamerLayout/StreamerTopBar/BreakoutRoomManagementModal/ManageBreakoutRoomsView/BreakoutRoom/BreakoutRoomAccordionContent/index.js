@@ -9,6 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import PropTypes from "prop-types";
 import UserList from "./UserList";
 import {makeStyles} from "@material-ui/core/styles";
+import {EMAIL_REGEX} from "../../../../../../../components/util/constants";
 
 const useStyles = makeStyles(theme => ({
     listWrapper: {

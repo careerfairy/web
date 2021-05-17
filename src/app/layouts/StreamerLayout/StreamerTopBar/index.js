@@ -97,11 +97,7 @@ const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
     }
 
     const handleOpenBreakoutRoomModal = () => {
-        console.log("-> handleOpenBreakoutRoomModal");
         dispatch(actions.openStreamerBreakoutModal())
-    }
-    const handleCloseBreakoutRoomModal = () => {
-        dispatch(actions.closeStreamerBreakoutModal())
     }
 
     return (

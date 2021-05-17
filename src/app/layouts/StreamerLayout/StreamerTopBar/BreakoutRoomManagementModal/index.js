@@ -14,9 +14,7 @@ import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoom
 import * as actions from 'store/actions'
 
 const Content = ({handleClose, agoraHandlers}) => {
-    console.count("-> Content");
     const {query: {livestreamId}} = useRouter()
-    const {isMainStreamer} = useCurrentStream()
 
     const query = useMemo(() => livestreamId ? [{
         collection: "livestreams",
