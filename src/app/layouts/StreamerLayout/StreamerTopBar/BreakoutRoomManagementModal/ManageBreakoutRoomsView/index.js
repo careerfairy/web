@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from "react";
-import {Button, DialogActions, DialogContent, DialogTitle} from "@material-ui/core";
+import {Button, DialogActions, DialogContent, DialogTitle, ListItemIcon, MenuItem, Typography} from "@material-ui/core";
 import PropTypes from "prop-types";
 import {streamShape} from "types";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
@@ -15,6 +15,7 @@ import BreakoutRoomOptions from "./BreakoutRoomOptions";
 import BreakoutRoomSettings from "./BreakoutRoomSettings";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import clsx from "clsx";
+import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
 
 const useStyles = makeStyles(theme => ({
     breakoutRoomsContent: {
@@ -34,7 +35,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
 
     const links = useStreamToken({forStreamType: "mainLivestream"})
     const {openAllBreakoutRooms, closeAllBreakoutRooms} = useFirebase()
-    const {query: {livestreamId}, push} = useRouter()
+    const {query: {livestreamId, breakoutRoomId}} = useRouter()
     const dispatch = useDispatch()
     const rtmClient = useSelector(state => state.rtmClient)
     const rtmChannel = useSelector(state => state.rtmChannel)
@@ -114,7 +115,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
         await handleDisconnect()
         handleClose()
         const targetPath = isMainStreamer ? links.mainStreamerLink : links.joiningStreamerLink
-        await push({pathname: targetPath, query: {auto: true}}, undefined, {shallow: false})
+        window.location.href = `${targetPath}?auto=true`
     }
 
     const handleRefresh = async () => {
@@ -149,13 +150,25 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
         <React.Fragment>
             <Box display="flex" alignItems="center" justifyContent="space-between">
                 <DialogTitle>
-                    Manage Breakout Rooms
+                    {mobile ? "Manage" :"Manage Breakout Rooms"}
                 </DialogTitle>
+                <Box flex={1}/>
+                {breakoutRoomId &&
+                <Button
+                    onClick={handleBackToMainRoom}
+                    variant="contained"
+                    size={mobile? "small": "medium"}
+                    color="primary"
+                    startIcon={
+                        <BackToMainRoomIcon/>
+                    }
+                >
+                    {mobile ? "Back" : "Back to main Room"}
+                </Button>}
                 <BreakoutRoomOptions
                     openSettings={openSettings}
                     handleRefresh={handleRefresh}
                     loading={refreshing}
-                    handleBackToMainRoom={handleBackToMainRoom}
                 />
             </Box>
             <DialogContent className={clsx(classes.breakoutRoomsContent, {

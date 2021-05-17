@@ -13,7 +13,7 @@ import {useTheme} from "@material-ui/core/styles";
 import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector";
 
 const Content = ({handleClose}) => {
-
+    console.count("-> Content");
     const {query: {livestreamId}} = useRouter()
     const {isMainStreamer} = useCurrentStream()
 

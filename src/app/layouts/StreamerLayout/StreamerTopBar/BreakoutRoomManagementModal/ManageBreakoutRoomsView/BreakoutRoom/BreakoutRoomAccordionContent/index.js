@@ -65,13 +65,9 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
 
     useEffect(() => {
         (async function fetchAndMapMemberData() {
-            console.log("-> paginatedChannelMembers", paginatedChannelMembers);
-            console.log("-> channelMemberDictionary", channelMemberDictionary);
-            console.log("-> roomId", roomId);
             const membersToFetch = paginatedChannelMembers.filter(member => !channelMemberDictionary[member])
                 .map(member => member.replace(roomId, ''))
                 .filter(memberId => memberId !== livestreamId)
-            console.log("-> membersToFetch", membersToFetch);
             if (membersToFetch?.length) {
                 const arrayOfUserObjects = await getUsersByEmail(membersToFetch, {withEmpty: true})
                 setChannelMemberDictionary(prevState => {

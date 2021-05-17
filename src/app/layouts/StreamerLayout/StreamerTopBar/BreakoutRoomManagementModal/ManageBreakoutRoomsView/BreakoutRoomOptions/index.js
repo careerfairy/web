@@ -3,13 +3,11 @@ import Box from "@material-ui/core/Box";
 import {IconButton, ListItemIcon, Menu, MenuItem, Typography} from "@material-ui/core";
 import MoreOptionsIcon from "@material-ui/icons/MoreHoriz";
 import AnnouncementIcon from "@material-ui/icons/ContactlessOutlined";
-import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
 import RoomSettingsIcon from '@material-ui/icons/Settings';
 import AddRoomIcon from '@material-ui/icons/AddCircleOutline';
 import RefreshRoomsIcon from '@material-ui/icons/Refresh';
 import AnnouncementModal from "./AnnouncementModal";
 import PropTypes from "prop-types";
-import {useRouter} from "next/router";
 import {makeStyles} from "@material-ui/core/styles";
 import AddRoomModal from "./AddRoomModal";
 
@@ -21,12 +19,11 @@ const useStyles = makeStyles(theme => ({
 
 const BreakoutRoomOptions = (
     {
-        handleBackToMainRoom,
         openSettings,
         handleRefresh,
-        loading
+        loading,
+        mobile
     }) => {
-    const {query: {breakoutRoomId}} = useRouter()
     const classes = useStyles()
 
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -67,8 +64,8 @@ const BreakoutRoomOptions = (
 
     return (
         <React.Fragment>
-            <Box py={2} px={1.5}>
-                <IconButton onClick={handleClickMoreOptions}>
+            <Box py={2} px={1}>
+                <IconButton size={mobile? "small": "medium"} onClick={handleClickMoreOptions}>
                     <MoreOptionsIcon/>
                 </IconButton>
                 <Menu
@@ -86,17 +83,7 @@ const BreakoutRoomOptions = (
                             Make an Announcement
                         </Typography>
                     </MenuItem>
-                    {breakoutRoomId &&
-                    <MenuItem
-                        onClick={handleBackToMainRoom}
-                    >
-                        <ListItemIcon classes={{root: classes.menuIconRoot}}>
-                            <BackToMainRoomIcon/>
-                        </ListItemIcon>
-                        <Typography variant="inherit" noWrap>
-                            Back to main Room
-                        </Typography>
-                    </MenuItem>}
+
                     <MenuItem onClick={handleOpenAddRoomModal}>
                         <ListItemIcon classes={{root: classes.menuIconRoot}}>
                             <AddRoomIcon />
@@ -136,7 +123,6 @@ const BreakoutRoomOptions = (
 };
 
 BreakoutRoomOptions.propTypes = {
-    handleBackToMainRoom: PropTypes.func,
     openSettings: PropTypes.func
 };
 

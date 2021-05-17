@@ -1,7 +1,8 @@
 import React, {useMemo} from 'react';
-import {populate, useFirestoreConnect} from "react-redux-firebase";
+import {useFirestoreConnect} from "react-redux-firebase";
 import {shallowEqual, useSelector} from "react-redux";
 import {useRouter} from "next/router";
+import currentLivestreamSelector from "../selectors/currentLivestreamSelector";
 
 const useStreamConnect = () => {
     const {query: {livestreamId, breakoutRoomId}} = useRouter()
@@ -41,14 +42,9 @@ const useStreamConnect = () => {
 
     useFirestoreConnect(query)
 
-    const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
-        ...populate(firestore, "currentLivestream", populates),
-        id: breakoutRoomId || livestreamId
-    }, shallowEqual)
-
-    // console.log("-> currentLivestream", currentLivestream);
-
-    return currentLivestream
+    return useSelector(state =>
+            currentLivestreamSelector(state, {streamId: breakoutRoomId || livestreamId}),
+        shallowEqual)
 }
 
 export default useStreamConnect;

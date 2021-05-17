@@ -4,25 +4,16 @@ import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import {useFirestoreConnect} from "react-redux-firebase";
 import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector";
 import {useRouter} from "next/router";
-import {
-    Box,
-    Button, Chip, DialogActions,
-    DialogContent,
-    DialogTitle,
-    Drawer,
-    ListItem,
-    ListItemSecondaryAction,
-    ListItemText,
-    Typography
-} from "@material-ui/core";
+import {Box, Button, Chip, DialogActions, Drawer, IconButton, ListItem, ListItemText} from "@material-ui/core";
 import PropTypes from "prop-types";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import * as actions from 'store/actions'
 import Zoom from 'react-reveal/Zoom';
 import {getBaseUrl} from "../../../../components/helperFunctions/HelperFunctions";
-import Link from "materialUI/NextNavLink";
 import {ThemedPermanentMarker} from "../../../../materialUI/GlobalTitles";
 import clsx from "clsx";
+import CloseIcon from '@material-ui/icons/Close';
+import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
 
 
 const useStyles = makeStyles(theme => ({
@@ -53,12 +44,24 @@ const useStyles = makeStyles(theme => ({
         textAlign: "left",
         fontSize: theme.typography.h2.fontSize,
         width: "auto"
+    },
+    modalButton: {
+        color: theme.palette.common.white
     }
 }));
 
-const Content = ({breakoutRooms, fullyOpened, handleClose}) => {
+const Content = ({breakoutRooms, fullyOpened, handleClose, handleBackToMainRoom}) => {
     const classes = useStyles()
     const {query: {livestreamId, breakoutRoomId}} = useRouter()
+    const theme = useTheme()
+    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const handleGoToRoom = async (roomId) => {
+        handleClose()
+        window.location.href = `${getBaseUrl()}/streaming/${livestreamId}/breakout-room/${roomId}/viewer`
+    }
+
+    const closeProps = () => ({className: classes.modalButton, onClick: handleClose})
 
     return (
         <div className={classes.contentRoot}>
@@ -66,28 +69,40 @@ const Content = ({breakoutRooms, fullyOpened, handleClose}) => {
                 <ThemedPermanentMarker className={classes.title}>
                     Live Rooms
                 </ThemedPermanentMarker>
+                <Box flex={1}/>
                 {breakoutRoomId && (
                     <div>
-                        <Button color="primary" variant="contained">
+                        <Button
+                            startIcon={<BackToMainRoomIcon/>}
+                            onClick={handleBackToMainRoom}
+                            color="secondary"
+                            variant="contained"
+                        >
                             Back to main Room
                         </Button>
                     </div>
                 )}
+                {mobile ? (
+                    <IconButton {...closeProps()}>
+                        <CloseIcon/>
+                    </IconButton>
+                ) : (<Button {...closeProps()}>
+                    Close
+                </Button>)}
             </Box>
             <Box p={1}>
-                <Zoom duration={500} left opposite cascade collapse when={Boolean(fullyOpened)}>
+                <Zoom duration={250} left opposite cascade when={Boolean(fullyOpened)}>
                     <div>
                         {breakoutRooms.map(room => {
                             const activeRoom = room.id === breakoutRoomId
                             return (
                                 <ListItem
                                     button={!activeRoom}
+                                    onClick={() => handleGoToRoom(room.id)}
                                     className={clsx(classes.breakoutRoomItem, {
                                         [classes.activeItem]: activeRoom
                                     })}
                                     classes={{selected: classes.selectedItem}}
-                                    component={!activeRoom && Link}
-                                    href={`${getBaseUrl()}/streaming/${livestreamId}/breakout-room/${room.id}/viewer`}
                                     key={room.id}
                                 >
                                     <ListItemText
@@ -106,9 +121,7 @@ const Content = ({breakoutRooms, fullyOpened, handleClose}) => {
                 </Zoom>
             </Box>
             <DialogActions>
-                <Button onClick={handleClose}>
-                    Close
-                </Button>
+
             </DialogActions>
         </div>
     )
@@ -136,14 +149,15 @@ const BreakoutSnackAction = ({handleClickConfirm, handleCloseSnackbar}) => {
         </React.Fragment>
     )
 }
-const ViewerBreakoutRoomModal = ({open, onClose, handleOpen}) => {
+
+const snackbarKey = "There are some breakout rooms active"
+const ViewerBreakoutRoomModal = ({open, onClose, handleOpen, handleBackToMainRoom}) => {
 
     const classes = useStyles()
     const {query: {livestreamId}} = useRouter()
     const dispatch = useDispatch()
     const [fullyOpened, setFullyOpened] = useState(false);
     const theme = useTheme()
-    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const query = useMemo(() => livestreamId ? [{
         collection: "livestreams",
@@ -162,18 +176,22 @@ const ViewerBreakoutRoomModal = ({open, onClose, handleOpen}) => {
     )
 
     useEffect(() => {
-        if (!open && breakoutRooms?.length) {
-            const message = "There are some breakout rooms active"
+        return () => handleCloseSnackbar(snackbarKey)
+    }, [])
+
+    useEffect(() => {
+
+        if (!open && breakoutRooms?.length && !hasDismissedSnackbar()) {
             dispatch(actions.enqueueSnackbar({
-                message: message,
+                message: snackbarKey,
                 options: {
                     variant: "info",
-                    key: message,
+                    key: snackbarKey,
                     persist: true,
                     preventDuplicate: true,
                     action: <BreakoutSnackAction
-                        handleCloseSnackbar={() => handleCloseSnackbar(message)}
-                        handleClickConfirm={() => handleClickConfirmSnackbar(message)}
+                        handleCloseSnackbar={() => handleCloseAction(snackbarKey)}
+                        handleClickConfirm={() => handleClickConfirmSnackbar(snackbarKey)}
                     />,
                     anchorOrigin: {
                         vertical: 'top',
@@ -182,11 +200,25 @@ const ViewerBreakoutRoomModal = ({open, onClose, handleOpen}) => {
                 }
             }))
         }
-    }, [Boolean(breakoutRooms?.length)]);
+    }, [Boolean(breakoutRooms?.length), livestreamId]);
 
     const handleClickConfirmSnackbar = (key) => {
+        handleDismissSnackbar()
         handleCloseSnackbar(key)
         handleOpen()
+    }
+
+    const hasDismissedSnackbar = () => {
+        const dismissedStream = localStorage.getItem("dismissedStream")
+        return dismissedStream === livestreamId
+    }
+    const handleCloseAction = (key) => {
+        handleDismissSnackbar()
+        handleCloseSnackbar(key)
+    }
+
+    const handleDismissSnackbar = () => {
+        localStorage.setItem("dismissedStream", `${livestreamId}`)
     }
     const handleCloseSnackbar = (key) => {
         dispatch(actions.closeSnackbar(key))
@@ -210,7 +242,8 @@ const ViewerBreakoutRoomModal = ({open, onClose, handleOpen}) => {
                     onEntered: handleEntered,
                 }}
                 onClose={handleClose}>
-            <Content fullyOpened={fullyOpened} breakoutRooms={breakoutRooms} handleClose={handleClose}/>
+            <Content fullyOpened={fullyOpened} handleBackToMainRoom={handleBackToMainRoom} breakoutRooms={breakoutRooms}
+                     handleClose={handleClose}/>
         </Drawer>
     );
 };

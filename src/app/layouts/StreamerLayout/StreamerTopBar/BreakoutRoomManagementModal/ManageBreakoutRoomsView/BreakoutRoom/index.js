@@ -1,22 +1,13 @@
 import PropTypes from 'prop-types'
 import {useTheme} from "@material-ui/core/styles";
-import {
-    Accordion,
-    AccordionSummary,
-    Button,
-    Chip,
-    CircularProgress,
-    Grid,
-    IconButton,
-    Tooltip
-} from "@material-ui/core";
+import {Accordion, AccordionSummary, Button, Chip, CircularProgress, Grid, IconButton} from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import RenameRoomIcon from "@material-ui/icons/Edit";
 import DeleteRoomIcon from "@material-ui/icons/Close";
 import BreakoutRoomAccordionContent from './BreakoutRoomAccordionContent'
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import EditRoomNameModal from "./EditRoomNameModal";
 import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal";
 import {useFirebase} from "context/firebase";
@@ -25,7 +16,6 @@ import * as actions from 'store/actions'
 import {useDispatch} from "react-redux";
 import {useCurrentStream} from "../../../../../../context/stream/StreamContext";
 import useStreamToken from "../../../../../../components/custom-hook/useStreamToken";
-import useTextOverflow from "../../../../../../components/custom-hook/useTextOverflow";
 
 const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom, loading, mobile}) => {
     const theme = useTheme()
@@ -34,7 +24,6 @@ const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom
             <Button
                 onClick={handleOpenRoom}
                 disabled={loading}
-                // startIcon={<RenameRoomIcon/>}
             >
                 Open
             </Button>
@@ -85,7 +74,7 @@ const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, 
                 onClick={handleCloseRoom}
                 disabled={loading}
             >
-                Close Room
+                {mobile ? "Close":"Close Room"}
             </Button>
         </Grid>
         <Grid item xs={2}>
@@ -94,18 +83,25 @@ const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, 
                     onClick={handleJoinRoom}
                     disabled={loading}
                 >
-                    Join Room
+                    {mobile ? "Join":"Join Room"}
                 </Button>
             )}
         </Grid>
-        <Grid item xs={2}>
-            <Button
-                onClick={handleClickRename}
-                disabled={loading}
-                startIcon={<RenameRoomIcon/>}
-            >
-                Rename
-            </Button>
+        <Grid item xs={mobile ? 1 : 2}>
+            {mobile ? (
+                <IconButton size="small" onClick={handleClickRename}
+                            disabled={loading}>
+                    <RenameRoomIcon/>
+                </IconButton>
+            ) : (
+                <Button
+                    onClick={handleClickRename}
+                    disabled={loading}
+                    startIcon={<RenameRoomIcon/>}
+                >
+                    Rename
+                </Button>
+            )}
         </Grid>
     </React.Fragment>;
 };
@@ -134,7 +130,7 @@ const BreakoutRoom = ({
 
     const {isStreamer, isMainStreamer, isBreakout} = useCurrentStream()
     const {deleteBreakoutRoom, updateBreakoutRoom} = useFirebase()
-    const {query: {livestreamId}, push} = useRouter()
+    const {query: {livestreamId}} = useRouter()
     const [editRoomNameModalOpen, setEditRoomNameModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [deleteBreakoutRoomModalOpen, setDeleteBreakoutRoomModalOpen] = useState(false);
@@ -198,8 +194,7 @@ const BreakoutRoom = ({
         await handleDisconnect()
         // }
         handleClose()
-        // window.location.href = breakoutRoomLink
-        await push({pathname: breakoutRoomLink, query: {auto: true}}, undefined, {shallow: false})
+        window.location.href = `${breakoutRoomLink}?auto=true`
     }
 
     return (
@@ -222,16 +217,16 @@ const BreakoutRoom = ({
                               alignItems="center"
 
                         >
-                            <Grid item xs={mobile ? 4 : 3}>
+                            <Grid item xs={3}>
                                 <Typography
                                     variant="subtitle1">
                                     {title}
                                 </Typography>
                             </Grid>
-                            <Grid item xs={2}>
+                            <Grid item xs={mobile ? 3:2}>
                                 <Chip
                                     label={
-                                        <Typography variant="body2">
+                                        <Typography variant="caption">
                                             {hasStarted ? "OPEN" : "CLOSED"}
                                         </Typography>
                                     }

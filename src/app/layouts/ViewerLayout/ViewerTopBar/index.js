@@ -15,6 +15,12 @@ import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
 import NewFeatureHint from "../../../components/util/NewFeatureHint";
 import useJoinTalentPool from "../../../components/custom-hook/useJoinTalentPool";
 import ViewerBreakoutRoomModal from "./ViewerBreakoutRoomModal";
+import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
+import {useRouter} from "next/router";
+import useStreamToken from "../../../components/custom-hook/useStreamToken";
+import BreakoutRoomIcon from "@material-ui/icons/Widgets";
+import {shallowEqual, useSelector} from "react-redux";
+import breakoutRoomsSelector from "../../../components/selectors/breakoutRoomsSelector";
 
 const useStyles = makeStyles(theme => ({
     joinButton: {
@@ -39,7 +45,7 @@ const useStyles = makeStyles(theme => ({
     floatingViewCount: {
         color: theme.palette.primary.main,
     },
-    floatingWrapper:{
+    floatingWrapper: {
         position: 'absolute',
         top: theme.spacing(2.5),
         right: theme.spacing(2.5),
@@ -48,13 +54,17 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu}) => {
-
+const ViewerTopBar = ({mobile, numberOfViewers, showAudience, showMenu}) => {
     const classes = useStyles()
+    const {query: {livestreamId, breakoutRoomId}} = useRouter()
     const {toggleTheme, themeMode} = useThemeToggle()
+    const links = useStreamToken({forStreamType: "mainLivestream"})
     const {currentLivestream} = useCurrentStream()
-    const {userIsInTalentPool, handlers:{joinTalentPool,leaveTalentPool}} = useJoinTalentPool()
+    const {userIsInTalentPool, handlers: {joinTalentPool, leaveTalentPool}} = useJoinTalentPool()
     const [breakoutRoomModalOpen, setBreakoutRoomModalOpen] = useState(false);
+    const breakoutRoomOpen = useSelector(state =>
+        Boolean(breakoutRoomsSelector(state.firestore.ordered[`Active BreakoutRooms of ${livestreamId}`])?.length)
+    )
 
     const handleOpenBreakoutRoomModal = () => {
         setBreakoutRoomModalOpen(true)
@@ -64,25 +74,30 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
         setBreakoutRoomModalOpen(false)
     }
 
+    const handleBackToMainRoom = () => {
+        window.location.href = links.viewerLink
+    }
+
     if (mobile && !showMenu) {
         return (
             <React.Fragment>
-            <div className={classes.floatingWrapper}>
-            <IconButton onClick={showAudience} className={classes.floatingViewCount}>
-                <Badge max={999999} color="secondary" badgeContent={numberOfViewers}>
-                    <NewFeatureHint
-                        onClick={showAudience}
-                        tooltipText="Click here to see who's joined the stream since the start"
-                        localStorageKey="hasSeenAudienceDrawer"
-                        tooltipTitle="Hint"
-                    >
-                        <PeopleIcon/>
-                    </NewFeatureHint>
-                </Badge>
-            </IconButton>
-            </div>
+                <div className={classes.floatingWrapper}>
+                    <IconButton onClick={showAudience} className={classes.floatingViewCount}>
+                        <Badge max={999999} color="secondary" badgeContent={numberOfViewers}>
+                            <NewFeatureHint
+                                onClick={showAudience}
+                                tooltipText="Click here to see who's joined the stream since the start"
+                                localStorageKey="hasSeenAudienceDrawer"
+                                tooltipTitle="Hint"
+                            >
+                                <PeopleIcon/>
+                            </NewFeatureHint>
+                        </Badge>
+                    </IconButton>
+                </div>
                 <ViewerBreakoutRoomModal
                     open={breakoutRoomModalOpen}
+                    handleBackToMainRoom={handleBackToMainRoom}
                     onClose={handleCloseBreakoutRoomModal}
                     handleOpen={handleOpenBreakoutRoomModal}
                 />
@@ -107,55 +122,71 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
 
     return (
         <React.Fragment>
-        <AppBar elevation={1} color="transparent">
-            <Toolbar className={classes.toolbar}>
-                <MainLogo/>
-                {logoElements}
-                <Box flexGrow={1}/>
-                {currentLivestream.companyLogoUrl && <Logo
-                    src={currentLivestream.companyLogoUrl}
-                />}
-                <Box display="flex" alignItems="center">
-                    <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
-                        <Checkbox
-                            checked={themeMode === "dark"}
-                            onChange={toggleTheme}
-                            icon={<Brightness4Icon/>}
-                            checkedIcon={<Brightness7Icon/>}
-                            color="default"
-                        />
-                    </Tooltip>
-                    <NewFeatureHint
-                        onClick={showAudience}
-                        tooltipText="Click here to see who's joined the stream since the start"
-                        localStorageKey="hasSeenAudienceDrawer"
-                        tooltipTitle="Hint"
-                    >
-                        <Box className={classes.viewCount}>
-                            <Tooltip title="See who joined">
-                                <Button color="primary" size="large"
-                                        startIcon={<Badge max={999999} color="secondary" badgeContent={numberOfViewers}>
-                                            <PeopleIcon/>
-                                        </Badge>} onClick={showAudience}>
-                                    See who joined
-                                </Button>
-                            </Tooltip>
-                        </Box>
-                    </NewFeatureHint>
-                </Box>
-                {!currentLivestream.hasNoTalentPool &&
-                <Button
-                    children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
-                    variant="contained"
-                    className={classes.joinButton}
-                    startIcon={<HowToRegRoundedIcon/>}
-                    icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
-                    onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
-                    color={userIsInTalentPool ? "default" : "primary"}/>}
-            </Toolbar>
-        </AppBar>
+            <AppBar elevation={1} color="transparent">
+                <Toolbar className={classes.toolbar}>
+                    <MainLogo/>
+                    {logoElements}
+                    <Box flexGrow={1}/>
+                    {currentLivestream.companyLogoUrl && <Logo
+                        src={currentLivestream.companyLogoUrl}
+                    />}
+                    <Box display="flex" alignItems="center">
+                        {breakoutRoomId &&
+                        <Tooltip title="Back to main room">
+                        <Button onClick={handleBackToMainRoom}
+                                startIcon={<BackToMainRoomIcon/>}
+                                color="secondary" variant="contained">
+                            Back
+                        </Button>
+                        </Tooltip>}
+                        {breakoutRoomOpen &&
+                        <Tooltip title="Checkout breakout rooms">
+                            <IconButton disabled={breakoutRoomModalOpen} onClick={handleOpenBreakoutRoomModal}>
+                                <BreakoutRoomIcon/>
+                            </IconButton>
+                        </Tooltip>}
+                        <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
+                            <Checkbox
+                                checked={themeMode === "dark"}
+                                onChange={toggleTheme}
+                                icon={<Brightness4Icon/>}
+                                checkedIcon={<Brightness7Icon/>}
+                                color="default"
+                            />
+                        </Tooltip>
+                        <NewFeatureHint
+                            onClick={showAudience}
+                            tooltipText="Click here to see who's joined the stream since the start"
+                            localStorageKey="hasSeenAudienceDrawer"
+                            tooltipTitle="Hint"
+                        >
+                            <Box className={classes.viewCount}>
+                                <Tooltip title="See who joined">
+                                    <Button color="primary" size="large"
+                                            startIcon={<Badge max={999999} color="secondary"
+                                                              badgeContent={numberOfViewers}>
+                                                <PeopleIcon/>
+                                            </Badge>} onClick={showAudience}>
+                                        See who joined
+                                    </Button>
+                                </Tooltip>
+                            </Box>
+                        </NewFeatureHint>
+                    </Box>
+                    {!currentLivestream.hasNoTalentPool &&
+                    <Button
+                        children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
+                        variant="contained"
+                        className={classes.joinButton}
+                        startIcon={<HowToRegRoundedIcon/>}
+                        icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
+                        onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
+                        color={userIsInTalentPool ? "default" : "primary"}/>}
+                </Toolbar>
+            </AppBar>
             <ViewerBreakoutRoomModal
                 open={breakoutRoomModalOpen}
+                handleBackToMainRoom={handleBackToMainRoom}
                 onClose={handleCloseBreakoutRoomModal}
                 handleOpen={handleOpenBreakoutRoomModal}
             />
@@ -164,12 +195,12 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
 };
 
 ViewerTopBar.propTypes = {
-    firebase: PropTypes.object,
     mobile: PropTypes.bool.isRequired,
     numberOfViewers: PropTypes.number.isRequired,
     showAudience: PropTypes.func.isRequired,
-    showMenu: PropTypes.bool.isRequired
+    showMenu: PropTypes.bool.isRequired,
+    selectedState: PropTypes.string
 }
 
-export default withFirebase(ViewerTopBar);
+export default ViewerTopBar;
 
