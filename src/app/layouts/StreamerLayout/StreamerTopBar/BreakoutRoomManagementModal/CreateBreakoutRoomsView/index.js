@@ -10,18 +10,12 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Divider,
     FormControl,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
     MenuItem,
-    Radio,
     Select,
     Typography
 } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
-import List from "@material-ui/core/List";
 import {DynamicColorButton} from "materialUI/GlobalButtons/GlobalButtons";
 
 const MAX_ROOMS = 10

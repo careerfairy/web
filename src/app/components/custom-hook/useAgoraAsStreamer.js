@@ -1,7 +1,7 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import window, {document} from 'global';
 import {useAgoraToken} from './useAgoraToken';
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {EMOTE_MESSAGE_TEXT_TYPE} from "../util/constants";
 import * as actions from '../../store/actions'
 import {useRouter} from 'next/router';
@@ -116,24 +116,56 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         handleSwitchRooms()
     }, [router.asPath])
 
-    // useEffect(() => {
-    //     return () => handleSwitchRooms()
-    // }, [router.pathname])
-
-
-    const removeClientsFromRedux = () => {
-        // dispatch(actions.removeRtmClient())
-        // dispatch(actions.removeRtmChannel())
-        // dispatch(actions.removeRtcClient())
-    }
-
-    const createEmote =  useCallback( async(emoteType) => {
+    const createEmote = useCallback(async (emoteType) => {
         try {
             const messageToSend = await dispatch(actions.createEmote(emoteType))
             rtmChannel.sendMessage(messageToSend)
         } catch (e) {
         }
-    },[dispatch, rtmChannel])
+    }, [dispatch, rtmChannel])
+
+    const agoraHandlers = useMemo(() => ({
+        getChannelMemberCount: async (channelIds) => {
+            return await rtmClient.getChannelMemberCount(channelIds)
+        },
+        handleDisconnect: async () => {
+            if (rtmChannel) {
+                rtmChannel.removeAllListeners()
+                await rtmChannel.leave()
+            }
+            if (rtmClient) {
+                rtmClient.removeAllListeners()
+                await rtmClient.logout()
+            }
+            if (rtcClient) {
+                await rtcClient.leave()
+            }
+        },
+        joinChannel: async (targetRoomId, handleMemberJoined, handleMemberLeft, updateMemberCount) => {
+            let newChannel
+            if (targetRoomId === roomId) { // Dont re-join the current stream channel pls
+                newChannel = rtmChannel
+            } else {
+                newChannel = rtmClient.createChannel(targetRoomId)
+                await newChannel.join()
+            }
+            newChannel.on("MemberJoined", handleMemberJoined)
+            newChannel.on("MemberLeft", handleMemberLeft)
+            newChannel.on("MemberCountUpdated", newCount => {
+                updateMemberCount(roomId, newCount - 1)
+            })
+            return newChannel
+
+        },
+        getChannelMembers: async (channel) => {
+            return await channel.getMembers()
+        },
+        leaveChannel: async (channel) => {
+            if(channel.channelId === roomId) return // Dont leave the current stream channel pls
+            channel.removeAllListeners()
+            await channel.leave()
+        }
+    }), [rtmClient, rtmChannel, rtcClient, roomId])
 
     const handleConnectClients = () => {
         console.log("-> Connecting Clients");
@@ -144,7 +176,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         if (rtcClient || rtmClient || rtmChannel) {
             console.log("-> CLOSING CONNECTIONS");
             removeAllClients()
-            removeClientsFromRedux()
             console.log("-> CLOSING CONNECTIONS FINISHED");
         }
         setExternalMediaStreams([])
@@ -398,7 +429,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             // NETWORK QUALITY
         });
 
-        // dispatch(actions.setRtcClientObj(rtcClient))
         setRtcClient(rtcClient);
     }
 
@@ -449,11 +479,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
 
             channel.join().then(() => {
-                // dispatch(actions.setRtmChannelObj(channel))
                 console.log('--> Joined channel');
-                // channel.getMembers().then(result => {
-                //     console.log("-> getMembers result", result);
-                // })
                 setRtmChannel(channel);
             }).catch(error => {
                 console.error(error);
@@ -463,7 +489,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             console.log('AgoraRTM client login failure', err);
         });
 
-        // dispatch(actions.setRtmClientObj(rtmClient))
         setRtmClient(rtmClient);
     }
 
@@ -725,6 +750,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         numberOfViewers,
         setAddedStream,
         setRemovedStream,
-        createEmote
+        createEmote,
+        agoraHandlers
     };
 }

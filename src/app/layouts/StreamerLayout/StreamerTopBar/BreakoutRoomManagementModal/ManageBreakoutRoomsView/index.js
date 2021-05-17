@@ -1,9 +1,9 @@
 import React, {useCallback, useEffect, useState} from "react";
-import {Button, DialogActions, DialogContent, DialogTitle, ListItemIcon, MenuItem, Typography} from "@material-ui/core";
+import {Button, DialogActions, DialogContent, DialogTitle} from "@material-ui/core";
 import PropTypes from "prop-types";
 import {streamShape} from "types";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import BreakoutRoom from "./BreakoutRoom";
 import {useFirebase} from "context/firebase";
 import {useRouter} from "next/router";
@@ -27,19 +27,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
+const ManageBreakoutRoomsView = ({breakoutRooms, handleClose, agoraHandlers}) => {
     const classes = useStyles()
     const {isMainStreamer} = useCurrentStream()
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
-
     const links = useStreamToken({forStreamType: "mainLivestream"})
     const {openAllBreakoutRooms, closeAllBreakoutRooms} = useFirebase()
     const {query: {livestreamId, breakoutRoomId}} = useRouter()
     const dispatch = useDispatch()
-    const rtmClient = useSelector(state => state.rtmClient)
-    const rtmChannel = useSelector(state => state.rtmChannel)
-    const rtcClient = useSelector(state => state.rtcClient)
     const [view, setView] = useState("main");
     const [memberCounts, setMemberCounts] = useState({});
     const [allRoomsOpen, setAllRoomsOpen] = useState(false);
@@ -60,11 +56,9 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
 
 
     const getAllMemberCounts = async () => {
-        if (rtmClient) {
             const breakoutRoomIds = breakoutRooms.map(room => room.id)
-            const channelMemberCountObj = await rtmClient.getChannelMemberCount(breakoutRoomIds)
+            const channelMemberCountObj = await agoraHandlers.getChannelMemberCount(breakoutRoomIds)
             setMemberCounts(channelMemberCountObj)
-        }
     }
 
     const updateMemberCount = useCallback((roomId, newCount) => {
@@ -98,17 +92,8 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
     }
 
     const handleDisconnect = async () => {
-        if (rtmChannel) {
-            rtmChannel.removeAllListeners()
-            await rtmChannel.leave()
-        }
-        if (rtmClient) {
-            rtmClient.removeAllListeners()
-            await rtmClient.logout()
-        }
-        if (rtcClient) {
-            await rtcClient.leave()
-        }
+        console.log("-> agoraHandlers in handleDisconnect", agoraHandlers);
+        await agoraHandlers.handleDisconnect()
     }
 
     const handleBackToMainRoom = async () => {
@@ -150,14 +135,14 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
         <React.Fragment>
             <Box display="flex" alignItems="center" justifyContent="space-between">
                 <DialogTitle>
-                    {mobile ? "Manage" :"Manage Breakout Rooms"}
+                    {mobile ? "Manage" : "Manage Breakout Rooms"}
                 </DialogTitle>
                 <Box flex={1}/>
                 {breakoutRoomId &&
                 <Button
                     onClick={handleBackToMainRoom}
                     variant="contained"
-                    size={mobile? "small": "medium"}
+                    size={mobile ? "small" : "medium"}
                     color="primary"
                     startIcon={
                         <BackToMainRoomIcon/>
@@ -177,8 +162,8 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose}) => {
                 {breakoutRooms.map((room, index) => (
                     <BreakoutRoom
                         updateMemberCount={updateMemberCount}
-                        rtmClient={rtmClient}
                         index={index}
+                        agoraHandlers={agoraHandlers}
                         openRoom={openRoom}
                         refreshing={refreshing}
                         mobile={mobile}

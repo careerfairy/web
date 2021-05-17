@@ -13,7 +13,7 @@ import {useTheme} from "@material-ui/core/styles";
 import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector";
 import * as actions from 'store/actions'
 
-const Content = ({handleClose}) => {
+const Content = ({handleClose, agoraHandlers}) => {
     console.count("-> Content");
     const {query: {livestreamId}} = useRouter()
     const {isMainStreamer} = useCurrentStream()
@@ -47,11 +47,10 @@ const Content = ({handleClose}) => {
         return <CreateBreakoutRoomsView handleClose={handleClose}/>
     }
 
-    return <ManageBreakoutRoomsView handleClose={handleClose} breakoutRooms={breakoutRooms}/>
+    return <ManageBreakoutRoomsView agoraHandlers={agoraHandlers} handleClose={handleClose} breakoutRooms={breakoutRooms}/>
 }
-const BreakoutRoomManagementModal = () => {
+const BreakoutRoomManagementModal = ({agoraHandlers}) => {
     const open = useSelector(state => state.stream.layout.streamerBreakoutRoomModalOpen)
-    console.log("-> open modal Open", open);
     const theme = useTheme()
     const dispatch = useDispatch()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -66,7 +65,7 @@ const BreakoutRoomManagementModal = () => {
     return (
         <GlassDialog TransitionComponent={Slide} fullScreen={mobile} maxWidth="md" fullWidth open={open}
                      onClose={handleClose}>
-            <Content handleClose={handleClose}/>
+            <Content agoraHandlers={agoraHandlers} handleClose={handleClose}/>
         </GlassDialog>
     )
 };

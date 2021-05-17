@@ -4,14 +4,11 @@ import { firestoreReducer } from 'redux-firestore';
 
 import authReducer from './authReducer';
 import todosReducer from './todosReducer';
-import rtmChannelReducer from "./rtmChannelReducer";
-import rtmClientReducer from "./rtmClientReducer";
 import emotesReducer from "./emotesReducer";
 import snackbarReducer from "./snackbarReducer";
 import userDataSetReducer from "./userDataSetReducer";
 import currentFilterGroupReducer from "./currentFilterGroupReducer";
 import nextLivestreamsReducer from "./nextLivestreamsReducer";
-import rtcClientReducer from "./rtcClientReducer";
 import streamReducer from "./streamReducer";
 
 export default combineReducers({
@@ -19,9 +16,6 @@ export default combineReducers({
     todos: todosReducer,
     firebase: firebaseReducer,
     firestore: firestoreReducer,
-    rtmChannel: rtmChannelReducer,
-    rtcClient: rtcClientReducer,
-    rtmClient: rtmClientReducer,
     emotes: emotesReducer,
     snackbars: snackbarReducer,
     userDataSet: userDataSetReducer,

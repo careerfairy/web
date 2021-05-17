@@ -115,14 +115,14 @@ RoomClosedActions.propTypes = {
 const BreakoutRoom = ({
                           breakoutRoom: {title, id, liveSpeakers, hasStarted},
                           openRoom,
-                          rtmClient,
                           memberCount,
                           updateMemberCount,
                           handleOpenAccordion,
                           handleDisconnect,
                           handleClose,
                           refreshing,
-                          mobile
+                          mobile,
+                          agoraHandlers
                       }) => {
 
     const dispatch = useDispatch()
@@ -267,7 +267,7 @@ const BreakoutRoom = ({
                 </AccordionSummary>
                 <BreakoutRoomAccordionContent
                     roomId={id}
-                    rtmClient={rtmClient}
+                    agoraHandlers={agoraHandlers}
                     liveSpeakers={liveSpeakers}
                     updateMemberCount={updateMemberCount}
                 />

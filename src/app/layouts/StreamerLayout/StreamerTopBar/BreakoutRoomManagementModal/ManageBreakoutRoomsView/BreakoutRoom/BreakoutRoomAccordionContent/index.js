@@ -2,7 +2,6 @@ import {useCurrentStream} from "../../../../../../../context/stream/StreamContex
 import {useFirebase} from "../../../../../../../context/firebase";
 import React, {useEffect, useState} from "react";
 import useInfiniteScrollClient from "../../../../../../../components/custom-hook/useInfiniteScrollClient";
-import {useSelector} from "react-redux";
 import {AccordionDetails} from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import EmptyRoomIcon from "@material-ui/icons/SentimentDissatisfied";
@@ -26,12 +25,18 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liveSpeakers, openRoom}) => {
+const BreakoutRoomAccordionContent = ({
+                                          agoraHandlers,
+                                          updateMemberCount,
+                                          roomId,
+                                          liveSpeakers,
+                                          openRoom
+                                      }) => {
     const {currentLivestream: {id: livestreamId}} = useCurrentStream()
     const {getUsersByEmail} = useFirebase()
-    const [breakoutRoomChannel, setBreakoutRoomChannel] = useState(null);
     const [channelMemberIds, setChannelMemberIds] = useState([]);
     const [channelMembers, setChannelMembers] = useState([]);
+    const [rtmChannel, setRtmChannel] = useState(null);
 
     const [
         paginatedChannelMembers,
@@ -39,7 +44,6 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
         hasMorePaginatedChannelMembers
     ] = useInfiniteScrollClient(channelMemberIds, 5)
     const [channelMemberDictionary, setChannelMemberDictionary] = useState({});
-    const rtmChannel = useSelector(state => state.rtmChannel)
     const classes = useStyles()
 
     useEffect(() => {
@@ -82,23 +86,13 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
     }, [paginatedChannelMembers])
 
     useEffect(() => {
-        if (rtmClient && !breakoutRoomChannel) {
-            connectToChannel()
-        }
-        return () => leaveChannel()
-    }, [Boolean(rtmClient), Boolean(breakoutRoomChannel)]);
+        connectToChannel()
+    }, []);
+
 
     useEffect(() => {
-        if (breakoutRoomChannel) {
-            breakoutRoomChannel.on("MemberJoined", handleMemberJoined)
-            breakoutRoomChannel.on("MemberLeft", handleMemberLeft)
-            breakoutRoomChannel.on("MemberCountUpdated", newCount => {
-                updateMemberCount(roomId, newCount - 1)
-            })
-            return () => leaveChannel()
-        }
-    }, [Boolean(breakoutRoomChannel)])
-
+        return () => leaveChannel()
+    }, [rtmChannel])
     useEffect(() => {
         getMemberCount()
     }, [roomId])
@@ -128,31 +122,28 @@ const BreakoutRoomAccordionContent = ({updateMemberCount, roomId, rtmClient, liv
 
 
     const leaveChannel = async () => {
-        console.log("-> leaving channel" );
-        if (breakoutRoomChannel && (roomId !== livestreamId)) {
-            try {
-                breakoutRoomChannel.removeAllListeners()
-               await breakoutRoomChannel.leave()
-            } catch (e) {
-            }
+        if (rtmChannel) {
+            await agoraHandlers.leaveChannel(rtmChannel)
+            setRtmChannel(null)
         }
     }
 
     const connectToChannel = async () => {
-        let channel
-        if (roomId === livestreamId) {
-            channel = rtmChannel
-        } else {
-            channel = rtmClient.createChannel(roomId)
-            await channel.join()
-        }
-        const members = await channel.getMembers() || []
+        const newRtmChannel = await agoraHandlers.joinChannel(
+            roomId,
+            handleMemberJoined,
+            handleMemberLeft,
+            updateMemberCount
+        )
+        const members = await agoraHandlers.getChannelMembers(newRtmChannel)
+        // console.log("-> newRtmChannel", newRtmChannel);
+        // console.log("-> members", members);
+        setRtmChannel(newRtmChannel)
         setChannelMemberIds(members)
-        setBreakoutRoomChannel(channel)
     }
 
     const getMemberCount = async () => {
-        const channelMemberCountObj = await rtmClient.getChannelMemberCount([roomId])
+        const channelMemberCountObj = await agoraHandlers.getChannelMemberCount([roomId])
         const memberCount = channelMemberCountObj[roomId]
         updateMemberCount(roomId, memberCount - 1)
     }

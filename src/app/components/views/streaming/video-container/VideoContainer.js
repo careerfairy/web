@@ -62,7 +62,8 @@ function VideoContainer(props) {
         networkQuality,
         numberOfViewers,
         setAddedStream,
-        setRemovedStream
+        setRemovedStream,
+        agoraHandlers
     } =
         useAgoraAsStreamer(
             true,
@@ -294,6 +295,9 @@ function VideoContainer(props) {
 
     return (
         <Fragment>
+            <BreakoutRoomManagementModal
+                agoraHandlers={agoraHandlers}
+            />
             <div>
                 <div>
                     <CurrentSpeakerDisplayer
@@ -367,7 +371,7 @@ function VideoContainer(props) {
                 handleClose={handleCloseScreenShareModal}
                 handleScreenShare={handleScreenShare}
             />
-            <BreakoutRoomManagementModal/>
+
             <DemoIntroModal livestreamId={props.currentLivestream.id}
                             open={showDemoIntroModal}
                             handleClose={handleCloseDemoIntroModal}/>

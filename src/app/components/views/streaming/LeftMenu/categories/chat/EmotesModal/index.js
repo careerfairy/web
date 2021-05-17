@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, {useCallback, useEffect, useMemo} from 'react';
-import {shallowEqual, useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {v4 as uuidv4} from 'uuid'
 import {Button, CircularProgress, DialogActions, DialogContent, DialogTitle, List, Tab, Tabs} from "@material-ui/core";
 
@@ -13,7 +13,7 @@ import {useCurrentStream} from "../../../../../../../context/stream/StreamContex
 import PanelDisplay from "./PanelDisplay";
 import EmotesModalUser from "./EmotesModalUser";
 import {TEST_EMAIL} from "./utils";
-import {populate, useFirestoreConnect, isLoaded} from "react-redux-firebase";
+import {isLoaded} from "react-redux-firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 import usePopulatedChatEntry from "../../../../../../custom-hook/usePopulatedChatEntry";
