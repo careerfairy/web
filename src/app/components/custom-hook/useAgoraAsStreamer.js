@@ -122,6 +122,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         setAgoraRTC(AgoraRTC);
 
         AgoraRTC.onAudioAutoplayFailed = () => {
+            console.log("onAudioAutoplayFailed")
             setShowVideoButton({ paused: false, muted: true })
         }
 
