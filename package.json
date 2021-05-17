@@ -42,7 +42,6 @@
     "@react-pdf/styled-components": "^1.4.0",
     "@sentry/browser": "^5.13.2",
     "agora-access-token": "^2.0.4",
-    "agora-rtc-sdk": "^3.4.0",
     "agora-rtc-sdk-ng": "^4.4.0",
     "agora-rtm-sdk": "^1.4.1",
     "algoliasearch": "^4.8.3",
