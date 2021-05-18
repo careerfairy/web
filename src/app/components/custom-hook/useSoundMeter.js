@@ -1,111 +1,82 @@
 import { useState, useEffect } from "react";
 import { navigator } from "global";
+import 'volumemeter'
 
-export function useSoundMeter(showAudioMeter, localStream, update) {
+export function useSoundMeter(showAudioMeter, audioTrack, update) {
 
     const [audioValue, setAudioValue] = useState(0);
-    const [soundMeter, setSoundMeter] = useState(null);
-    const [soundMeterInterval, setSoundMeterInterval] = useState(null);
-
+    const [isFirstClick, setIsFirstClick] = useState(true)
 
     useEffect(() => {
         if (showAudioMeter) {
-            if (navigator && localStream) {
+            if (navigator && audioTrack) {
                 try {
                     window.AudioContext = window.AudioContext || window.webkitAudioContext;
                     window.audioContext = new AudioContext();
                 } catch (e) {
                     console.log('Web Audio API not supported.');
                 }
-                if (soundMeter) {
-                    soundMeter.stop();
-                }
-                connectStream(localStream);
+                onMicrophoneGranted(audioTrack);
+            }
+        } 
+    },[showAudioMeter, audioTrack, navigator, update]);
 
-                return () => clearInterval(soundMeterInterval)
-            }
-        } else {
-            if (soundMeter) {
-                clearInterval(soundMeterInterval)
-                soundMeter.stop();
-            }
-        }
-    },[showAudioMeter, localStream, navigator, update]);
-  
-    function SoundMeter(context) {
-        this.context = context;
-        this.instant = 0.0;
-        this.slow = 0.0;
-        this.clip = 0.0;
-        this.script = context.createScriptProcessor(2048, 1, 1);
-        const that = this;
-        this.script.onaudioprocess = function(event) {
-            const input = event.inputBuffer.getChannelData(0);
-            let i;
-            let sum = 0.0;
-            let clipcount = 0;
-            for (i = 0; i < input.length; ++i) {
-                sum += input[i] * input[i];
-                if (Math.abs(input[i]) > 0.99) {
-                clipcount += 1;
-                }
-            }
-            that.instant = Math.sqrt(sum / input.length);
-            that.slow = 0.95 * that.slow + 0.05 * that.instant;
-            that.clip = clipcount / input.length;
-        };
-      }
-      
-    SoundMeter.prototype.connectToSource = function(stream, callback) {
-        try {
-            this.mic = this.context.createMediaStreamSource(stream);
-            this.mic.connect(this.script);
-            // necessary to make sample run, but should not be.
-            this.script.connect(this.context.destination);
-            if (typeof callback !== 'undefined') {
-            callback(null);
-            }
-        } catch (e) {
-            console.error(e);
-            if (typeof callback !== 'undefined') {
-            callback(e);
-            }
-        }
-    };
+    async function onMicrophoneGranted(stream) {
+        // Instanciate just in the first time
+        // when button is pressed
+        if (isFirstClick) {
+            debugger;
+            setIsFirstClick(false)
+            // Initialize AudioContext object(
+            audioContext = new AudioContext()
     
-    SoundMeter.prototype.stop = function() {
-        if (this.mic) {
-            this.mic.disconnect();
-        }
-        if (this.script) {
-            this.script.disconnect();
-        }
-    };
-
-    function connectStream(stream) {
-        let zeroCounter = 0;
-        const soundMeter = new SoundMeter(window.audioContext);
-        soundMeter.connectToSource(stream, function(e) {
-        if (e) {
-            console.log(e);
-            return;
-        }
-        const newInterval = setInterval(() => {
-            if (soundMeter.instant.toFixed(2) == 0) {
-                zeroCounter += 1;
-                if (zeroCounter === 30) {
-                    setAudioValue(0);    
-                    zeroCounter = 0;
-                }
-            } else {
-                setAudioValue(soundMeter.instant.toFixed(2));           
+            // Adding an AudioWorkletProcessor
+            // from another script with addModule) method
+            try {
+                await audioContext.audioWorklet.addModule('scripts/volume-meter-processor.js')
+            } catch(error) {
+                debugger
+                console.error(error)
             }
-        }, 200);
-
-            setSoundMeterInterval(newInterval)
-        });
-        setSoundMeter(soundMeter);
-
+    
+            // Creating a MediaStreamSource object
+            // and sending a MediaStream object granted by 
+            // the user
+            let microphone = audioContext.createMediaStreamSource(stream)
+    
+            // Creating AudioWorkletNode sending
+            // context and name of processor registered
+            // in vumeter-processor.js
+            const node = new AudioWorkletNode(audioContext, 'volumemeter')
+    
+            // Listing any message from AudioWorkletProcessor in its
+            // process method here where you can know
+            // the volume level
+            node.port.onmessage  = event => {
+                let _volume = 0
+                let _sensibility = 5 // Just to add any sensibility to our ecuation
+                if (event.data.volume) {
+                    _volume = event.data.volume;
+                    setAudioValue((_volume * 100) / _sensibility)
+                }              
+            }
+    
+            // Now this is the way to
+            // connect our microphone to
+            // the AudioWorkletNode and output from audioContext
+            microphone.connect(node).connect(audioContext.destination)
+    
+        }
+    
+        // Just to know if button is on or off
+        // and stop or resume the microphone listening
+        // if (listening) {
+        //     audioContext.suspend()
+        // } else {
+        //     audioContext.resume()
+        // }
+    
+        // listening = !listening
     }
 
     return audioValue;

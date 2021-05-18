@@ -22,7 +22,7 @@ export default function useMediaSources(devices, streamId, localStream, showSoun
         }
     }, [localStream, audioSource, videoSource])
 
-    const audioLevel = useSoundMeter(showSoundMeter, localMediaStream, soundMediaUpdateCounter);
+    const audioLevel = useSoundMeter(showSoundMeter, localStream?.audioTrack?.getMediaStreamTrack(), soundMediaUpdateCounter);
 
     useEffect(() => {
         if (devices && localStream) {
