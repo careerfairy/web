@@ -96,7 +96,7 @@ const useStyles = makeStyles(theme => ({
 
 const now = new Date()
 
-function MiniChatContainer({isStreamer, livestream, className}) {
+function MiniChatContainer({isStreamer, livestream, className, mobile}) {
     const {authenticatedUser, userData} = useAuth();
     const firebase = useFirebase()
     const dispatch = useDispatch()
@@ -223,6 +223,10 @@ function MiniChatContainer({isStreamer, livestream, className}) {
                 setTimeout(() => setOpen(false), 2000)
             }
         }
+    }
+
+    if(mobile){
+        return null
     }
 
     const chatElements = chatEntries.map(chatEntry =>

@@ -2197,18 +2197,18 @@ class Firebase {
                 const livestreamData = livestreamSnap.data()
                 const isTestStream = livestreamData.test
                 const companyLogo = livestreamData.companyLogoUrl || ""
-                    const breakoutRoomRef = livestreamRef.collection("breakoutRooms").doc()
-                    const newBreakoutRoom = this.buildBreakoutRoom(breakoutRoomRef.id, isTestStream, title, companyLogo)
-                    transaction.set(breakoutRoomRef, newBreakoutRoom)
-                    if (!isTestStream) {
-                        // If the main stream isn't a test, we will then need secure tokens for each breakout room
-                        const breakoutTokenRef = breakoutRoomRef.collection("tokens")
-                            .doc("secureToken");
-                        const token = uuidv4();
-                        transaction.set(breakoutTokenRef, {
-                            value: token,
-                        })
-                    }
+                const breakoutRoomRef = livestreamRef.collection("breakoutRooms").doc()
+                const newBreakoutRoom = this.buildBreakoutRoom(breakoutRoomRef.id, isTestStream, title, companyLogo)
+                transaction.set(breakoutRoomRef, newBreakoutRoom)
+                if (!isTestStream) {
+                    // If the main stream isn't a test, we will then need secure tokens for each breakout room
+                    const breakoutTokenRef = breakoutRoomRef.collection("tokens")
+                        .doc("secureToken");
+                    const token = uuidv4();
+                    transaction.set(breakoutTokenRef, {
+                        value: token,
+                    })
+                }
             });
         });
     }
@@ -2337,26 +2337,32 @@ class Firebase {
      */
     sendBroadcastToBreakoutRooms = async (announcement, mainStreamId, author) => {
         const batch = this.firestore.batch()
-        const breakoutRoomsRef = this.firestore.collection("livestreams")
+        const mainStreamRef = this.firestore.collection("livestreams")
             .doc(mainStreamId)
+
+        const mainStreamChatRef = mainStreamRef.collection("chatEntries")
+            .doc()
+        const breakoutRoomsRef = mainStreamRef
             .collection("breakoutRooms")
 
         const breakoutRoomsSnaps = await breakoutRoomsRef.get()
 
+        const broadcastMessage = {
+            authorEmail: author.email,
+            authorName: author.name,
+            message: announcement,
+            timestamp: this.getServerTimestamp(),
+            type: "broadcast"
+        }
         for (const breakoutSnap of breakoutRoomsSnaps.docs) {
             let breakoutChatRef = breakoutSnap.ref
                 .collection("chatEntries")
                 .doc()
-            const broadcastMessage = {
-                authorEmail: author.email,
-                authorName: author.name,
-                message: announcement,
-                timestamp: this.getServerTimestamp(),
-                type: "broadcast"
-            }
             batch.set(breakoutChatRef, broadcastMessage)
 
         }
+
+        batch.set(mainStreamChatRef, broadcastMessage)
 
         return await batch.commit()
     }
@@ -2370,7 +2376,7 @@ class Firebase {
      * @returns {({firstName: string, lastName: string})} streamerData
      */
     getStreamerData = (currentLivestream, streamerId) => {
-       return  currentLivestream?.liveSpeakers?.find(speaker => speaker.speakerUuid === streamerId) || {
+        return currentLivestream?.liveSpeakers?.find(speaker => speaker.speakerUuid === streamerId) || {
             firstName: "Streamer",
             lastName: "Streamer"
         }

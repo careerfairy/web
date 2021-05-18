@@ -21,7 +21,6 @@ const useStreamToken = (options = {forStreamType: "", targetBreakoutRoomId:""}) 
     useEffect(() => {
         if (livestreamId) {
             (async function getToken() {
-                console.log("-> getting Tokens");
                 let tokenDoc
                 let breakoutRoomPath
                 if (options.forStreamType === "breakoutRoom" && options.targetBreakoutRoomId) {

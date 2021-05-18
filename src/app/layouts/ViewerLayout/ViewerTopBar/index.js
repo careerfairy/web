@@ -44,6 +44,8 @@ const useStyles = makeStyles(theme => ({
     },
     floatingButton: {
         color: theme.palette.primary.main,
+        width: 48,
+        height:48
     },
     floatingWrapper: {
         position: 'absolute',
@@ -86,6 +88,7 @@ const ViewerTopBar = ({mobile, numberOfViewers, showAudience, showMenu}) => {
                     {breakoutRoomId &&
                     <Tooltip title="Back to main room">
                         <Button onClick={handleBackToMainRoom}
+                                style={{marginRight: 5}}
                                 startIcon={<BackToMainRoomIcon/>}
                                 color="secondary" variant="outlined">
                             Back
@@ -93,7 +96,7 @@ const ViewerTopBar = ({mobile, numberOfViewers, showAudience, showMenu}) => {
                     </Tooltip>}
                     {breakoutRoomOpen &&
                     <Tooltip title="Checkout breakout rooms">
-                        <IconButton className={classes.floatingButton} color="white" disabled={breakoutRoomModalOpen} onClick={handleOpenBreakoutRoomModal}>
+                        <IconButton className={classes.floatingButton} disabled={breakoutRoomModalOpen} onClick={handleOpenBreakoutRoomModal}>
                             <BreakoutRoomIcon/>
                         </IconButton>
                     </Tooltip>}

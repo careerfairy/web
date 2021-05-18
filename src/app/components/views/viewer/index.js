@@ -102,9 +102,9 @@ const ViewerOverview = ({
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}
                 />
 
-                {!mobile &&
-                <MiniChatContainer className={classes.miniChatContainer} livestream={currentLivestream}
-                                   isStreamer={false}/>}
+                { <MiniChatContainer mobile={mobile} className={classes.miniChatContainer}
+                                                livestream={currentLivestream}
+                                                isStreamer={false}/> }
 
 
             </div>
