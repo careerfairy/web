@@ -100,7 +100,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose, agoraHandlers}) =>
         await handleDisconnect()
         handleClose()
         const targetPath = isMainStreamer ? links.mainStreamerLink : links.joiningStreamerLink
-        window.location.href =  addQueryParam(targetPath, "auto=true")
+        window.location.href = addQueryParam(targetPath, "auto=true")
     }
 
     const handleRefresh = async () => {
@@ -147,15 +147,18 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose, agoraHandlers}) =>
                     startIcon={
                         <BackToMainRoomIcon/>
                     }
+                    style={{marginRight: 16}}
                 >
                     Back to main Room
                     {/*{mobile ? "Back" : "Back to main Room"}*/}
                 </Button>}
+                {isMainStreamer &&
                 <BreakoutRoomOptions
                     openSettings={openSettings}
+                    isMainStreamer={isMainStreamer}
                     handleRefresh={handleRefresh}
                     loading={refreshing}
-                />
+                />}
             </Box>
             <DialogContent className={clsx(classes.breakoutRoomsContent, {
                 [classes.contentMobile]: mobile
@@ -164,6 +167,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose, agoraHandlers}) =>
                     <BreakoutRoom
                         updateMemberCount={updateMemberCount}
                         index={index}
+                        isMainStreamer={isMainStreamer}
                         agoraHandlers={agoraHandlers}
                         openRoom={openRoom}
                         refreshing={refreshing}
@@ -179,28 +183,29 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose, agoraHandlers}) =>
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>
-                    Cancel
+                    Close
                 </Button>
-                <Box flex={1}/>
-                {!allRoomsClosed &&
-                <Button
-                    disabled={closing || opening}
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleCloseAllRooms}
-                >
-                    Close All Rooms
-                </Button>}
-                {!allRoomsOpen &&
-                <Button
-                    disabled={closing || opening}
-                    variant="contained"
-                    color="primary"
-                    onClick={handleOpenAllRooms}
-                >
-                    Start All Rooms
-                </Button>}
-
+                {isMainStreamer && <React.Fragment>
+                    <Box flex={1}/>
+                    {!allRoomsClosed &&
+                    <Button
+                        disabled={closing || opening}
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleCloseAllRooms}
+                    >
+                        Close All Rooms
+                    </Button>}
+                    {!allRoomsOpen &&
+                    <Button
+                        disabled={closing || opening}
+                        variant="contained"
+                        color="primary"
+                        onClick={handleOpenAllRooms}
+                    >
+                        Start All Rooms
+                    </Button>}
+                </React.Fragment>}
             </DialogActions>
         </React.Fragment>
     )

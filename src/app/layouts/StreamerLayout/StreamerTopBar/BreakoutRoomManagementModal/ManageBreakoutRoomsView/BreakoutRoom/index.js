@@ -1,6 +1,15 @@
 import PropTypes from 'prop-types'
-import {useTheme} from "@material-ui/core/styles";
-import {Accordion, AccordionSummary, Button, Chip, CircularProgress, Grid, IconButton} from "@material-ui/core";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
+import {
+    Accordion,
+    AccordionSummary,
+    Button,
+    Chip,
+    CircularProgress,
+    Grid,
+    IconButton,
+    Tooltip
+} from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
@@ -17,92 +26,167 @@ import {useDispatch} from "react-redux";
 import {useCurrentStream} from "../../../../../../context/stream/StreamContext";
 import useStreamToken from "../../../../../../components/custom-hook/useStreamToken";
 import {addQueryParam} from "../../../../../../components/helperFunctions/HelperFunctions";
+import clsx from "clsx";
 
-const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom, loading, mobile}) => {
+
+const useStyles = makeStyles(theme => ({
+    root: {},
+    activeRoom: {
+        background: theme.palette.primary.main,
+        color: theme.palette.common.white
+    },
+    activeColor: {
+        color: theme.palette.common.white
+    },
+    statusActive: {
+        background: theme.palette.common.white
+    },
+    status: {}
+}));
+const RoomClosedActions = ({
+                               handleClickRename,
+                               handleClickDelete,
+                               handleOpenRoom,
+                               loading,
+                               mobile,
+                               isMainStreamer,
+                               active
+                           }) => {
     const theme = useTheme()
+    const classes = useStyles()
     return <React.Fragment>
         <Grid item xs={2}>
+            {isMainStreamer &&
             <Button
                 onClick={handleOpenRoom}
+                className={clsx({
+                    [classes.activeColor]: active
+                })}
                 disabled={loading}
             >
                 Open
-            </Button>
+            </Button>}
         </Grid>
         <Grid item xs={mobile ? 1 : 2}>
-            {mobile ? (
-                <IconButton size="small" onClick={handleClickRename}
-                            disabled={loading}>
-                    <RenameRoomIcon/>
-                </IconButton>
-            ) : (
-                <Button
-                    onClick={handleClickRename}
-                    disabled={loading}
-                    startIcon={<RenameRoomIcon/>}
-                >
-                    Rename
-                </Button>
-            )}
+            {isMainStreamer &&
+            <React.Fragment>
+                {mobile ? (
+                    <IconButton size="small" onClick={handleClickRename}
+                                disabled={loading}>
+                        <RenameRoomIcon
+                            className={clsx({
+                                [classes.activeColor]: active
+                            })}/>
+                    </IconButton>
+                ) : (
+                    <Button
+                        onClick={handleClickRename}
+                        disabled={loading}
+                        className={clsx({
+                            [classes.activeColor]: active
+                        })}
+                        startIcon={<RenameRoomIcon/>}
+                    >
+                        Rename
+                    </Button>
+                )}
+            </React.Fragment>}
         </Grid>
         <Grid item xs={mobile ? 1 : 2}>
-            {mobile ? (
-                <IconButton size="small" onClick={handleClickDelete}
-                            disabled={loading}>
-                    <DeleteRoomIcon htmlColor={theme.palette.error.main}/>
-                </IconButton>
-            ) : (
-                <Button
-                    onClick={handleClickDelete}
-                    disabled={loading}
-                    startIcon={<DeleteRoomIcon htmlColor={theme.palette.error.main}/>}
-                >
-                    Delete
-                </Button>
-            )}
+            {isMainStreamer &&
+            <React.Fragment>
+                {mobile ? (
+                    <IconButton size="small" onClick={handleClickDelete}
+                                disabled={loading}>
+                        <DeleteRoomIcon htmlColor={theme.palette.error.main}/>
+                    </IconButton>
+                ) : (
+                    <Button
+                        onClick={handleClickDelete}
+                        disabled={loading}
+                        className={clsx({
+                            [classes.activeColor]: active
+                        })}
+                        startIcon={<DeleteRoomIcon htmlColor={theme.palette.error.main}/>}
+                    >
+                        Delete
+                    </Button>
+                )}
+            </React.Fragment>}
         </Grid>
     </React.Fragment>;
 };
 
-const RoomOpenedActions = ({handleClickRename, handleJoinRoom, loading, roomId, mobile, handleCloseRoom}) => {
-    const theme = useTheme()
-
-    const {query: {breakoutRoomId}, push} = useRouter()
+const RoomOpenedActions = ({
+                               handleClickRename,
+                               handleJoinRoom,
+                               loading,
+                               roomId,
+                               mobile,
+                               handleCloseRoom,
+                               isMainStreamer,
+                               active
+                           }) => {
+    const classes = useStyles()
+    const {query: {breakoutRoomId}} = useRouter()
 
     return <React.Fragment>
         <Grid item xs={2}>
+            {isMainStreamer &&
             <Button
                 onClick={handleCloseRoom}
                 disabled={loading}
+                className={clsx({
+                    [classes.activeColor]: active
+                })}
             >
-                {mobile ? "Close":"Close Room"}
+                {mobile ? "Close" : "Close Room"}
             </Button>
+            }
         </Grid>
-        <Grid item xs={2}>
-            {roomId !== breakoutRoomId && (
+        <Grid item xs={mobile ? 1 : 2}>
+            {(roomId !== breakoutRoomId) ? (
                 <Button
                     onClick={handleJoinRoom}
                     disabled={loading}
+                    className={clsx({
+                        [classes.activeColor]: active
+                    })}
                 >
-                    {mobile ? "Join":"Join Room"}
+                    {mobile ? "Join" : "Join Room"}
                 </Button>
+            ) : (
+                <Tooltip title="You are in this room">
+                    <Typography align="center" style={{fontWeight: 600}}>
+                        Me
+                    </Typography>
+                </Tooltip>
             )}
         </Grid>
         <Grid item xs={mobile ? 1 : 2}>
-            {mobile ? (
-                <IconButton size="small" onClick={handleClickRename}
-                            disabled={loading}>
-                    <RenameRoomIcon/>
-                </IconButton>
-            ) : (
-                <Button
-                    onClick={handleClickRename}
-                    disabled={loading}
-                    startIcon={<RenameRoomIcon/>}
-                >
-                    Rename
-                </Button>
-            )}
+            {isMainStreamer &&
+            <React.Fragment>
+                {mobile ? (
+                    <IconButton size="small" onClick={handleClickRename}
+                                className={clsx({
+                                    [classes.activeColor]: active
+                                })}
+                                disabled={loading}>
+                        <RenameRoomIcon/>
+                    </IconButton>
+                ) : (
+                    <Button
+                        onClick={handleClickRename}
+                        disabled={loading}
+                        className={clsx({
+                            [classes.activeColor]: active
+                        })}
+                        startIcon={<RenameRoomIcon/>}
+                    >
+                        Rename
+                    </Button>
+                )}
+            </React.Fragment>}
         </Grid>
     </React.Fragment>;
 };
@@ -125,13 +209,13 @@ const BreakoutRoom = ({
                           mobile,
                           agoraHandlers
                       }) => {
-
+    const classes = useStyles()
     const dispatch = useDispatch()
     const links = useStreamToken({forStreamType: "breakoutRoom", targetBreakoutRoomId: id})
 
     const {isStreamer, isMainStreamer, isBreakout} = useCurrentStream()
     const {deleteBreakoutRoom, updateBreakoutRoom} = useFirebase()
-    const {query: {livestreamId}} = useRouter()
+    const {query: {livestreamId, breakoutRoomId}} = useRouter()
     const [editRoomNameModalOpen, setEditRoomNameModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [deleteBreakoutRoomModalOpen, setDeleteBreakoutRoomModalOpen] = useState(false);
@@ -206,6 +290,9 @@ const BreakoutRoom = ({
                 TransitionProps={{unmountOnExit: true}}
             >
                 <AccordionSummary
+                    className={clsx(classes.root, {
+                        [classes.activeRoom]: id === breakoutRoomId
+                    })}
                     expandIcon={<ExpandMoreIcon/>}
                     aria-label="Expand"
                     aria-controls="additional-actions1-content"
@@ -224,13 +311,17 @@ const BreakoutRoom = ({
                                     {title}
                                 </Typography>
                             </Grid>
-                            <Grid item xs={mobile ? 3:2}>
+                            <Grid item xs={mobile ? 3 : 2}>
                                 <Chip
                                     label={
                                         <Typography variant="caption">
                                             {hasStarted ? "OPEN" : "CLOSED"}
                                         </Typography>
                                     }
+                                    className={clsx(classes.status, {
+                                        [classes.statusActive]: breakoutRoomId === id
+                                    })}
+                                    variant={breakoutRoomId === id ? "outlined" : "default"}
                                     title={hasStarted ? "OPEN" : "CLOSED"}
                                     color={hasStarted ? "primary" : "secondary"}
                                 />
@@ -240,6 +331,8 @@ const BreakoutRoom = ({
                                     loading={loading}
                                     roomId={id}
                                     mobile={mobile}
+                                    active={breakoutRoomId === id}
+                                    isMainStreamer={isMainStreamer}
                                     handleJoinRoom={handleJoinRoom}
                                     handleCloseRoom={handleCloseRoom}
                                     handleClickRename={handleClickRename}
@@ -249,6 +342,8 @@ const BreakoutRoom = ({
                                 <RoomClosedActions
                                     loading={loading}
                                     mobile={mobile}
+                                    active={breakoutRoomId === id}
+                                    isMainStreamer={isMainStreamer}
                                     handleClickRename={handleClickRename}
                                     handleOpenRoom={handleOpenRoom}
                                     handleClickDelete={handleClickDelete}

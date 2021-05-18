@@ -22,7 +22,7 @@ const BreakoutRoomOptions = (
         openSettings,
         handleRefresh,
         loading,
-        mobile
+        mobile,
     }) => {
     const classes = useStyles()
 

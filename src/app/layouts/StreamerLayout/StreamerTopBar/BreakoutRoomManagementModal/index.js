@@ -1,6 +1,14 @@
 import React, {memo, useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {CircularProgress, DialogContent, Slide} from "@material-ui/core";
+import {
+    Button,
+    CircularProgress,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Slide
+} from "@material-ui/core";
 import {useCurrentStream} from "../../../../context/stream/StreamContext";
 import {useRouter} from "next/router";
 import {isEmpty, isLoaded, useFirestoreConnect} from "react-redux-firebase";
@@ -15,6 +23,7 @@ import * as actions from 'store/actions'
 
 const Content = ({handleClose, agoraHandlers}) => {
     const {query: {livestreamId}} = useRouter()
+    const {isMainStreamer} = useCurrentStream()
 
     const query = useMemo(() => livestreamId ? [{
         collection: "livestreams",
@@ -42,10 +51,30 @@ const Content = ({handleClose, agoraHandlers}) => {
     }
 
     if (isEmpty(breakoutRooms)) {
+        if (!isMainStreamer) {
+            return (
+                <React.Fragment>
+                    <DialogTitle>
+                        Manage Breakout Rooms
+                    </DialogTitle>
+                    <DialogContent dividers>
+                        <DialogContentText>
+                            Please wait for the main streamer/host to create breakout rooms
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose}>
+                            Close
+                        </Button>
+                    </DialogActions>
+                </React.Fragment>
+            )
+        }
         return <CreateBreakoutRoomsView handleClose={handleClose}/>
     }
 
-    return <ManageBreakoutRoomsView agoraHandlers={agoraHandlers} handleClose={handleClose} breakoutRooms={breakoutRooms}/>
+    return <ManageBreakoutRoomsView  agoraHandlers={agoraHandlers} handleClose={handleClose}
+                                    breakoutRooms={breakoutRooms}/>
 }
 const BreakoutRoomManagementModal = ({agoraHandlers}) => {
     const open = useSelector(state => state.stream.layout.streamerBreakoutRoomModalOpen)

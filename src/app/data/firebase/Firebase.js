@@ -1236,8 +1236,7 @@ class Firebase {
         let i, j, tempArray, chunk = 800;
         for (i = 0, j = arrayOfEmails.length; i < j; i += chunk) {
             tempArray = arrayOfEmails.slice(i, i + chunk);
-            // console.log("-> tempArray", tempArray);
-            const userSnaps = await Promise.all(tempArray.map(email => this.firestore.collection("userData").doc(email).get()))
+            const userSnaps = await Promise.all(tempArray.filter(email => email).map(email => this.firestore.collection("userData").doc(email).get()))
             let newUsers;
             if (options.withEmpty) {
                 newUsers = userSnaps.map(doc => ({id: doc.id, ...doc.data()}))
