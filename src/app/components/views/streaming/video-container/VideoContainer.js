@@ -187,13 +187,13 @@ function VideoContainer(props) {
         }
     }, [localMediaStream, externalMediaStreams, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
 
-    useEffect(() => {
-        if (numberOfViewers && props.currentLivestream.hasStarted) {
-            props.setNumberOfViewers(numberOfViewers)
-        } else {
-            props.setNumberOfViewers(0)
-        }
-    }, [numberOfViewers, props.currentLivestream.hasStarted]);
+    // useEffect(() => {
+    //     if (numberOfViewers && props.currentLivestream.hasStarted) {
+    //         props.setNumberOfViewers(numberOfViewers)
+    //     } else {
+    //         props.setNumberOfViewers(0)
+    //     }
+    // }, [numberOfViewers, props.currentLivestream.hasStarted]);
 
     const setDesktopMode = async (mode, initiatorId) => {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;

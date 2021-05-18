@@ -57,12 +57,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const localStorageAudienceDrawerKey = "hasSeenAudienceDrawer"
-const ViewerTopBar = ({mobile, numberOfViewers, showAudience, showMenu}) => {
+const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
     const classes = useStyles()
     const {query: {livestreamId, breakoutRoomId}} = useRouter()
     const {toggleTheme, themeMode} = useThemeToggle()
     const links = useStreamToken({forStreamType: "mainLivestream"})
     const {currentLivestream} = useCurrentStream()
+    const numberOfViewers = useSelector(state =>currentLivestream?.hasStarted? state.stream.stats.numberOfViewers: 0)
     const {userIsInTalentPool, handlers: {joinTalentPool, leaveTalentPool}} = useJoinTalentPool()
     const [breakoutRoomModalOpen, setBreakoutRoomModalOpen] = useState(false);
     const breakoutRoomOpen = useSelector(state =>
@@ -217,7 +218,6 @@ const ViewerTopBar = ({mobile, numberOfViewers, showAudience, showMenu}) => {
 
 ViewerTopBar.propTypes = {
     mobile: PropTypes.bool.isRequired,
-    numberOfViewers: PropTypes.number.isRequired,
     showAudience: PropTypes.func.isRequired,
     showMenu: PropTypes.bool.isRequired,
     selectedState: PropTypes.string

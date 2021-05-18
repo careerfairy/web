@@ -61,16 +61,17 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
-    const {currentLivestream} = useCurrentStream()
+const StreamerTopBar = ({firebase, showAudience}) => {
+
+    const {currentLivestream, isBreakout, isMainStreamer, isStreamer} = useCurrentStream()
+
     const dispatch = useDispatch()
     const streamRef = useStreamRef();
     const classes = useStyles({hasStarted: currentLivestream?.hasStarted})
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('md'))
     const {toggleTheme, themeMode} = useThemeToggle()
-    const [numberOfViewers, setNumberOfViewers] = useState(0);
-    // console.count("-> StreamerTopBar");
+    const numberOfViewers = useSelector(state => currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0)
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [hideTooltip, setHideTooltip] = useState(false);
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
@@ -110,7 +111,7 @@ const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
                     <Hidden mdUp>
                         <MiniLogo/>
                     </Hidden>
-                    {isMainStreamer &&
+                    {(isMainStreamer || (isStreamer && isBreakout)) &&
                     <Fragment>
                         <StandartTooltip
                             arrow
@@ -141,8 +142,6 @@ const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
 
                             />
                         </StandartTooltip>
-
-
                     </Fragment>
                     }
                     {mobile ?

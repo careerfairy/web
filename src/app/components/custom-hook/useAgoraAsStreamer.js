@@ -37,7 +37,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
     const [userUid, setUserUid] = useState(null);
     const [readyToConnect, setReadyToConnect] = useState(false);
-    const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [agoraRtcStatus, setAgoraRtcStatus] = useState({
         type: "INFO",
         msg: "RTC_INITIAL"
@@ -479,6 +478,9 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
 
             channel.join().then(() => {
+                channel.on("MemberCountUpdated", (newCount) => {
+                    dispatch(actions.setNumberOfViewers(newCount))
+                })
                 console.log('--> Joined channel');
                 setRtmChannel(channel);
             }).catch(error => {
@@ -598,18 +600,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         }
     }, [isPlayMode])
 
-    useEffect(() => {
-        if (rtmChannel) {
-            // let interval = setInterval(() => {
-            //
-            //     rtmClient.getChannelMemberCount([roomId]).then(result => {
-            //         setNumberOfViewers(result[roomId])
-            //         // console.log(result)
-            //     })
-            // }, 5000)
-            // return () => clearInterval(interval);
-        }
-    }, [rtmChannel])
 
     const removeStreamFromList = (streamId, streamList) => {
         const streamListCopy = [...streamList];
@@ -747,7 +737,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         agoraRtcStatus,
         agoraRtmStatus,
         networkQuality,
-        numberOfViewers,
         setAddedStream,
         setRemovedStream,
         createEmote,

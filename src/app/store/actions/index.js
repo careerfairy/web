@@ -1,4 +1,3 @@
-import {enqueueBroadcastMessage} from "./snackbarActions";
 
 export {
     signUp,
@@ -44,4 +43,4 @@ export {
     toggleNextLivestreamsFilter, closeNextLivestreamsFilter, openNextLivestreamsFilter
 } from './nextLivestreamsActions'
 
-export {openStreamerBreakoutModal, closeStreamerBreakoutModal} from "./streamActions";
+export {openStreamerBreakoutModal, closeStreamerBreakoutModal, setNumberOfViewers} from "./streamActions";

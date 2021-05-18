@@ -69,7 +69,6 @@ const ViewerLayout = (props) => {
     const mobile = useMediaQuery(`(max-width:${values.mobile}px)`)
     const streamRef = useStreamRef();
     const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
-    const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [showVideoButton, setShowVideoButton] = useState({paused: false, muted: false});
     const [play, setPlay] = useState(false);
     const [unmute, setUnmute] = useState(false);
@@ -128,7 +127,6 @@ const ViewerLayout = (props) => {
         });
     }
 
-    const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
     const handleStateChange = useCallback((state) => {
         if (!showMenu) {
             setShowMenu(true);
@@ -175,7 +173,6 @@ const ViewerLayout = (props) => {
                     showAudience={showAudience}
                     showMenu={showMenu}
                     audienceDrawerOpen={audienceDrawerOpen}
-                    numberOfViewers={numberOfViewers}
                     mobile={mobile}
                 />
                 <LeftMenu
@@ -209,7 +206,6 @@ const ViewerLayout = (props) => {
                                 streamerId,
                                 mobile,
                                 showAudience,
-                                setNumberOfViewers: handleSetNumberOfViewers,
                                 hideAudience,
                                 audienceDrawerOpen,
                                 setShowVideoButton,

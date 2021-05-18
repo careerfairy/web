@@ -51,7 +51,7 @@ function ViewerComponent(props) {
     const screenSharingMode = (props.currentLivestream.screenSharerId === authenticatedUser?.email &&
         props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
 
-    const {externalMediaStreams,numberOfViewers, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus, createEmote} =
+    const {externalMediaStreams, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus, createEmote} =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
@@ -87,13 +87,13 @@ function ViewerComponent(props) {
         }
     }, [agoraRtcStatus])
 
-    useEffect(() => {
-        if (numberOfViewers && props.currentLivestream.hasStarted) {
-            props.setNumberOfViewers(numberOfViewers)
-        } else {
-            props.setNumberOfViewers(0)
-        }
-    }, [numberOfViewers, props.currentLivestream.hasStarted]);
+    // useEffect(() => {
+    //     if (numberOfViewers && props.currentLivestream.hasStarted) {
+    //         props.setNumberOfViewers(numberOfViewers)
+    //     } else {
+    //         props.setNumberOfViewers(0)
+    //     }
+    // }, [numberOfViewers, props.currentLivestream.hasStarted]);
 
 
     const attachSinkId = (element, sinkId) => {

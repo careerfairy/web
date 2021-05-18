@@ -10,3 +10,11 @@ export const openStreamerBreakoutModal = () => async (dispatch) => {
 export const closeStreamerBreakoutModal = () => async (dispatch) => {
     dispatch({type: actions.CLOSE_STREAMER_BREAKOUT_MODAL})
 };
+
+// Close the streamer breakoutModal
+/**
+ * @param {number} numberOfViewers
+ */
+export const setNumberOfViewers = (numberOfViewers) => async (dispatch) => {
+    dispatch({type: actions.SET_NUMBER_OF_VIEWERS, payload: numberOfViewers || 0})
+};

@@ -69,7 +69,6 @@ const ViewerOverview = ({
                             handleStateChange,
                             selectedState,
                             showMenu,
-                            setNumberOfViewers,
                             setShowVideoButton,
                             hideAudience,
                             audienceDrawerOpen,
@@ -96,7 +95,6 @@ const ViewerOverview = ({
                 />
                 <ViewerComponent
                     livestreamId={currentLivestream.id} streamerId={streamerId}
-                    setNumberOfViewers={setNumberOfViewers}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     showVideoButton={showVideoButton}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}

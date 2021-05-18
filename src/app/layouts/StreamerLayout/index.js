@@ -72,7 +72,6 @@ const StreamerLayout = (props) => {
     const router = useRouter();
     const streamRef = useStreamRef();
     const smallScreen = useMediaQuery('(max-width:700px)');
-    const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [newNotification, setNewNotification] = useState(null);
     const [notificationToRemove, setNotificationToRemove] = useState(null);
     const [notifications, setNotifications] = useState([]);
@@ -86,7 +85,6 @@ const StreamerLayout = (props) => {
     const [sliding, setSliding] = useState(false);
 
 
-    const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
 
     const currentLivestream = useStreamConnect()
 
@@ -216,8 +214,6 @@ const StreamerLayout = (props) => {
                     <StreamerTopBar
                         firebase={firebase}
                         showAudience={showAudience}
-                        isMainStreamer={isMainStreamer}
-                        numberOfViewers={numberOfViewers}
                     />
                     <LeftMenu
                         handleStateChange={handleStateChange}
@@ -250,7 +246,6 @@ const StreamerLayout = (props) => {
                                     showMenu,
                                     notifications,
                                     streamerId,
-                                    setNumberOfViewers: handleSetNumberOfViewers
                                 })}
                             </div>
                         </div>
