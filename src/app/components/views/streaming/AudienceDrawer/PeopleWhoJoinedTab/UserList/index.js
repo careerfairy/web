@@ -29,7 +29,7 @@ const UserList = ({audience, isStreamer}) => {
 
 
 UserList.propTypes = {
-    audience: PropTypes.array.isRequired,
+    // audience: PropTypes.array.isRequired,
     isStreamer: PropTypes.bool.isRequired
 }
 export default memo(UserList);
