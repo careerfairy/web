@@ -142,22 +142,7 @@ const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
                             />
                         </StandartTooltip>
 
-                        {mobile ?
-                            <Tooltip title="Invite an additional streamer">
-                                <IconButton onClick={() => {
-                                    setSpeakerManagementOpen(true)
-                                }}>
-                                    <PersonAddIcon color="inherit"/>
-                                </IconButton>
-                            </Tooltip>
-                            :
-                            <Button
-                                children="Invite a streamer"
-                                startIcon={<PersonAddIcon color="inherit"/>}
-                                onClick={() => {
-                                    setSpeakerManagementOpen(true)
-                                }}
-                            />}
+
                     </Fragment>
                     }
                     {mobile ?
@@ -177,26 +162,48 @@ const StreamerTopBar = ({firebase, isMainStreamer, showAudience}) => {
                             </Typography>
                             {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                         </Box>}
-                    {mobile ?
-                        <Tooltip title="Open Student View">
-                            <IconButton target="_blank" href={viewerLink}>
-                                <OpenInBrowserIcon color="inherit"/>
-                            </IconButton>
-                        </Tooltip>
-                        :
-                        <Button
-                            href={viewerLink}
-                            target="_blank"
-                            children="Open Student View"
-                            startIcon={<OpenInBrowserIcon color="inherit"/>}
-                        />
-                    }
                     <Box display="flex" alignItems="center">
+                        {
+                            // mobile ?
+                            <Tooltip title="Invite an additional streamer">
+                                <IconButton onClick={() => {
+                                    setSpeakerManagementOpen(true)
+                                }}>
+                                    <PersonAddIcon color="inherit"/>
+                                </IconButton>
+                            </Tooltip>
+                            // :
+                            // <Tooltip title="Invite an additional streamer">
+                            //     <Button
+                            //         children="Invite"
+                            //         startIcon={<PersonAddIcon color="inherit"/>}
+                            //         onClick={() => {
+                            //             setSpeakerManagementOpen(true)
+                            //         }}
+                            //     />
+                            // </Tooltip>
+                        }
+
                         <Tooltip title="Manage breakout rooms">
                             <IconButton disabled={openStreamerBreakoutRoomModal} onClick={handleOpenBreakoutRoomModal}>
                                 <BreakoutRoomIcon/>
                             </IconButton>
                         </Tooltip>
+                        {
+                            // mobile ?
+                            <Tooltip title="Open Student View">
+                                <IconButton target="_blank" href={viewerLink}>
+                                    <OpenInBrowserIcon color="inherit"/>
+                                </IconButton>
+                            </Tooltip>
+                            // :
+                            // <Button
+                            //     href={viewerLink}
+                            //     target="_blank"
+                            //     children="Open Student View"
+                            //     startIcon={<OpenInBrowserIcon color="inherit"/>}
+                            // />
+                        }
                         <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
                             <Checkbox
                                 checked={themeMode === "dark"}
