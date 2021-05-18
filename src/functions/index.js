@@ -31,6 +31,7 @@ const livestreams = require('./livestreams')
 const universityEmails = require('./universityEmails')
 const algolia = require('./algolia')
 const analytics = require('./analytics')
+const breakoutRooms = require('./breakoutRooms')
 
 // Hosting
 exports.production = hosting.production
@@ -87,3 +88,6 @@ exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex
 
 // Analytics
 exports.updateUserDataAnalyticsOnWrite = analytics.updateUserDataAnalyticsOnWrite
+
+// Breakout Rooms
+exports.updateBreakoutRoomStatusOnWrite = breakoutRooms.updateBreakoutRoomStatusOnWrite

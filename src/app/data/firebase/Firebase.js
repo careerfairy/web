@@ -2366,6 +2366,14 @@ class Firebase {
         return await batch.commit()
     }
 
+    getBreakoutRoomWithIds = (mainStreamId, breakoutRoomId) => {
+        const ref = this.firestore.collection("livestreams")
+            .doc(mainStreamId)
+            .collection("breakoutRooms")
+            .doc(breakoutRoomId)
+        return ref.get()
+    }
+
     // Streamer Helpers
 
     /**
