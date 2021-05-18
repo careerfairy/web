@@ -801,6 +801,12 @@ class Firebase {
             .doc("secureToken");
         return ref.get();
     }
+    getLivestreamSecureTokenWithRef = (streamRef) => {
+        let ref = streamRef
+            .collection("tokens")
+            .doc("secureToken");
+        return ref.get();
+    }
 
     getBreakoutRoomSecureToken = (livestreamId, breakoutRoomId) => {
         let ref = this.firestore

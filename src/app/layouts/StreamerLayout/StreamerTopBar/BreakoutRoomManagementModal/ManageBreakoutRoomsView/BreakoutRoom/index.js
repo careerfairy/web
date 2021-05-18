@@ -16,6 +16,7 @@ import * as actions from 'store/actions'
 import {useDispatch} from "react-redux";
 import {useCurrentStream} from "../../../../../../context/stream/StreamContext";
 import useStreamToken from "../../../../../../components/custom-hook/useStreamToken";
+import {addQueryParam} from "../../../../../../components/helperFunctions/HelperFunctions";
 
 const RoomClosedActions = ({handleClickRename, handleClickDelete, handleOpenRoom, loading, mobile}) => {
     const theme = useTheme()
@@ -194,7 +195,7 @@ const BreakoutRoom = ({
         await handleDisconnect()
         // }
         handleClose()
-        window.location.href = `${breakoutRoomLink}?auto=true`
+        window.location.href = addQueryParam(breakoutRoomLink, "auto=true")
     }
 
     return (

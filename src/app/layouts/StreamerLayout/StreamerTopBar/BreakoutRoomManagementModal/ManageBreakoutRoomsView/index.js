@@ -16,6 +16,7 @@ import BreakoutRoomSettings from "./BreakoutRoomSettings";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import clsx from "clsx";
 import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
+import {addQueryParam} from "../../../../../components/helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(theme => ({
     breakoutRoomsContent: {
@@ -99,7 +100,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose, agoraHandlers}) =>
         await handleDisconnect()
         handleClose()
         const targetPath = isMainStreamer ? links.mainStreamerLink : links.joiningStreamerLink
-        window.location.href = `${targetPath}?auto=true`
+        window.location.href =  addQueryParam(targetPath, "auto=true")
     }
 
     const handleRefresh = async () => {

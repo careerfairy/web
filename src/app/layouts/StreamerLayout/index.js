@@ -13,6 +13,7 @@ import {v4 as uuidv4} from "uuid";
 import {isEmpty, isLoaded} from "react-redux-firebase";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
+import useStreamRef from "../../components/custom-hook/useStreamRef";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -69,6 +70,7 @@ const StreamerLayout = (props) => {
     const {query: {token, livestreamId: baseStreamId, breakoutRoomId, auto}} = useRouter()
     const livestreamId = breakoutRoomId || baseStreamId
     const router = useRouter();
+    const streamRef = useStreamRef();
     const smallScreen = useMediaQuery('(max-width:700px)');
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [newNotification, setNewNotification] = useState(null);
@@ -94,17 +96,13 @@ const StreamerLayout = (props) => {
         smallScreen
     });
 
-
     useEffect(() => {
-        if (router && router.query && currentLivestream && !currentLivestream.test
-            // Absolving breakout rooms from token auth
-            && !isBreakout
-        ) {
+        if (router && router.query && currentLivestream && !currentLivestream.test) {
             if (!token) {
                 router.push('/streaming/error')
 
             } else {
-                firebase.getLivestreamSecureToken(currentLivestream.id).then(doc => {
+                firebase.getLivestreamSecureTokenWithRef(streamRef).then(doc => {
                     if (!doc.exists) {
                         router.push('/streaming/error')
                     }
@@ -186,8 +184,7 @@ const StreamerLayout = (props) => {
     }, [showMenu])
 
     const tokenIsValidated = () => {
-        // Absolving breakout room from token auth
-        if (currentLivestream?.test || isBreakout) {
+        if (currentLivestream?.test) {
             return true;
         } else {
             return tokenChecked;

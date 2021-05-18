@@ -355,3 +355,10 @@ export const getResizedUrl = (url, size = "sm") => {
 export const getResponsiveResizedUrl = (url, isMobile, mobileSize = "sm", desktopSize = "lg") => {
     return getResizedUrl(url, isMobile ? mobileSize : desktopSize)
 }
+
+export const addQueryParam = (url, queryParam) => {
+    if(url.includes("?")){
+        return `${url}&${queryParam}`
+    }
+    return `${url}?${queryParam}`
+}
