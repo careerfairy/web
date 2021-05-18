@@ -122,7 +122,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         });
         rtcClient.init(AGORA_APP_ID);
         AgoraRTC.Logger.setLogLevel(AgoraRTC.Logger.ERROR)
-        //rtcClient.startProxyServer(3);
 
         setAgoraRtcStatus({
             type: "INFO",
@@ -130,6 +129,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         })
 
         if (!isViewer) {
+            rtcClient.startProxyServer(3);
             rtcClient.setClientRole("host")
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
 
@@ -428,7 +428,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                         codec: "vp8",
                     });
                     screenShareClient.setClientRole('host')
-                    //screenShareClient.startProxyServer(3);
+                    screenShareClient.startProxyServer(3);
 
                     screenShareClient.init(AGORA_APP_ID, () => {
                         publishScreenShareStream(screenShareClient)
