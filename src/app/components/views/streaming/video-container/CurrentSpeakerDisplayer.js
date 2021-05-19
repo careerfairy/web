@@ -200,6 +200,15 @@ function CurrentSpeakerDisplayer(props) {
         externalVideoElements.unshift(localVideoElement);
     }
 
+    //TO BE TESTED
+    if (externalVideoElements.length > 4) {
+        let currentSpeakerElement = externalVideoElements.find( stream => stream.streamId === props.currentSpeaker )
+        let rearrangedVideoElements = externalVideoElements.filter( stream => stream.streamId !== props.currentSpeaker )
+
+        rearrangedVideoElements.unshift(currentSpeakerElement);
+        externalVideoElements = rearrangedVideoElements
+    }
+
     return (
         <div className={classes.relativeContainer}>
             <div className={classes.relativeContainerVideos} style={{height: getMinimizedSpeakersGridHeight()}}>
