@@ -73,7 +73,7 @@ const ViewerOverview = ({
                             hideAudience,
                             audienceDrawerOpen,
                         }) => {
-    const {currentLivestream} = useCurrentStream()
+    const {currentLivestream, isBreakout} = useCurrentStream()
 
     const classes = useStyles({mobile})
     return (
@@ -97,6 +97,7 @@ const ViewerOverview = ({
                     livestreamId={currentLivestream.id} streamerId={streamerId}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     showVideoButton={showVideoButton}
+                    isBreakout={isBreakout}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}
                 />
 

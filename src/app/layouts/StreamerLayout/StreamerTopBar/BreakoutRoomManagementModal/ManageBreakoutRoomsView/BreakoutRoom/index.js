@@ -149,6 +149,8 @@ const RoomOpenedActions = ({
                 <Button
                     onClick={handleJoinRoom}
                     disabled={loading}
+                    variant="contained"
+                    color="primary"
                     className={clsx({
                         [classes.activeColor]: active
                     })}
@@ -158,7 +160,7 @@ const RoomOpenedActions = ({
             ) : (
                 <Tooltip title="You are in this room">
                     <Typography align="center" style={{fontWeight: 600}}>
-                        Me
+                        You Are Here
                     </Typography>
                 </Tooltip>
             )}

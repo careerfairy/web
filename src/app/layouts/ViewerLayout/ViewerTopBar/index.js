@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {AppBar, Badge, Box, Button, Checkbox, IconButton, Toolbar, Tooltip} from "@material-ui/core";
 import {MainLogo} from "../../../components/logos";
@@ -7,8 +7,6 @@ import Brightness7Icon from "@material-ui/icons/Brightness7";
 import PropTypes from 'prop-types';
 import Logo from "./Logo";
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
-import {useAuth} from "../../../HOCs/AuthProvider";
-import {withFirebase} from "../../../context/firebase";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import PeopleIcon from "@material-ui/icons/People";
 import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
@@ -19,8 +17,9 @@ import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
 import {useRouter} from "next/router";
 import useStreamToken from "../../../components/custom-hook/useStreamToken";
 import BreakoutRoomIcon from "@material-ui/icons/Widgets";
-import {shallowEqual, useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import breakoutRoomsSelector from "../../../components/selectors/breakoutRoomsSelector";
+import * as actions from 'store/actions'
 
 const useStyles = makeStyles(theme => ({
     joinButton: {
@@ -60,6 +59,7 @@ const localStorageAudienceDrawerKey = "hasSeenAudienceDrawer"
 const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
     const classes = useStyles()
     const {query: {livestreamId, breakoutRoomId}} = useRouter()
+    const dispatch = useDispatch()
     const {toggleTheme, themeMode} = useThemeToggle()
     const links = useStreamToken({forStreamType: "mainLivestream"})
     const {currentLivestream} = useCurrentStream()
@@ -70,17 +70,15 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
         Boolean(breakoutRoomsSelector(state.firestore.ordered[`Active BreakoutRooms of ${livestreamId}`])?.length)
     )
 
-    const handleOpenBreakoutRoomModal = () => {
-        setBreakoutRoomModalOpen(true)
-    }
-
-    const handleCloseBreakoutRoomModal = () => {
-        setBreakoutRoomModalOpen(false)
-    }
 
     const handleBackToMainRoom = () => {
         window.location.href = links.viewerLink
     }
+
+    const handleOpenBreakoutRoomModal = () => {
+        dispatch(actions.openViewerBreakoutModal())
+    }
+
 
     if (mobile && !showMenu) {
         return (
@@ -117,10 +115,7 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
                 <ViewerBreakoutRoomModal
                     mobile={mobile}
                     localStorageAudienceDrawerKey={localStorageAudienceDrawerKey}
-                    open={breakoutRoomModalOpen}
                     handleBackToMainRoom={handleBackToMainRoom}
-                    onClose={handleCloseBreakoutRoomModal}
-                    handleOpen={handleOpenBreakoutRoomModal}
                 />
             </React.Fragment>
         )
@@ -209,8 +204,6 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
                 open={breakoutRoomModalOpen}
                 localStorageAudienceDrawerKey={localStorageAudienceDrawerKey}
                 handleBackToMainRoom={handleBackToMainRoom}
-                onClose={handleCloseBreakoutRoomModal}
-                handleOpen={handleOpenBreakoutRoomModal}
             />
         </React.Fragment>
     );

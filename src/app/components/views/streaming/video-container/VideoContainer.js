@@ -20,6 +20,7 @@ import SettingsModal from "./SettingsModal";
 import ScreenShareModal from "./ScreenShareModal";
 import useStreamRef from "../../../custom-hook/useStreamRef";
 import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/StreamerTopBar/BreakoutRoomManagementModal";
+import useFallbackStream from "../../../custom-hook/useFallbackStream";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -74,6 +75,7 @@ function VideoContainer(props) {
             props.streamerId,
             props.viewer,
         );
+    console.log("-> localMediaStream", localMediaStream);
 
     const devices = useDevices(agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED");
 
@@ -87,6 +89,8 @@ function VideoContainer(props) {
         localMediaStream: displayableMediaStream,
         audioLevel
     } = useMediaSources(devices, props.streamerId, localMediaStream, !streamerReady || showSettings);
+
+    const {} = useFallbackStream(localMediaStream, externalMediaStreams)
 
     useEffect(() => {
         if (isMainStreamer && props.currentLivestream.mode !== 'desktop' && props.currentLivestream.speakerSwitchMode !== 'manual') {
@@ -123,6 +127,12 @@ function VideoContainer(props) {
             return () => clearTimeout(timeout);
         }
     }, [audioCounter, props.currentLivestream.mode, externalMediaStreams.length]);
+
+    useEffect(() => {
+
+    }, [externalMediaStreams, localMediaStream])
+
+    console.log("-> externalMediaStreams", externalMediaStreams);
 
     useEffect(() => {
         if (agoraRtcStatus && agoraRtcStatus.type === "INFO" && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
@@ -186,14 +196,6 @@ function VideoContainer(props) {
             }
         }
     }, [localMediaStream, externalMediaStreams, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
-
-    // useEffect(() => {
-    //     if (numberOfViewers && props.currentLivestream.hasStarted) {
-    //         props.setNumberOfViewers(numberOfViewers)
-    //     } else {
-    //         props.setNumberOfViewers(0)
-    //     }
-    // }, [numberOfViewers, props.currentLivestream.hasStarted]);
 
     const setDesktopMode = async (mode, initiatorId) => {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;

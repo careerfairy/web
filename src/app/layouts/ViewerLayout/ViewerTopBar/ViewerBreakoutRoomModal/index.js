@@ -25,6 +25,7 @@ import clsx from "clsx";
 import CloseIcon from '@material-ui/icons/Close';
 import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
 import {useFirebase} from "../../../../context/firebase";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 
 const useStyles = makeStyles(theme => ({
@@ -118,7 +119,7 @@ const Content = ({breakoutRooms, fullyOpened, handleClose, handleBackToMainRoom,
                                 >
                                     <ListItemText
                                         primary={room.title}
-                                        secondary={activeRoom ? "You're Here" : "Click to checkout"}
+                                        secondary={activeRoom ? "You are Here" : "Click to checkout"}
                                     />
                                     <Chip
                                         color="primary"
@@ -163,14 +164,15 @@ const BreakoutSnackAction = ({handleClickConfirm, handleCloseSnackbar}) => {
 
 const snackbarKey = "There are some breakout rooms active"
 const ViewerBreakoutRoomModal = ({
-                                     open,
-                                     onClose,
-                                     handleOpen,
                                      handleBackToMainRoom,
                                      mobile,
                                      localStorageAudienceDrawerKey
                                  }) => {
     let prevOpenRooms = useRef()
+
+
+    const open = useSelector(state => state.stream.layout.viewerBreakoutRoomModalOpen)
+
     const classes = useStyles()
     const {query: {livestreamId, breakoutRoomId}} = useRouter()
     const dispatch = useDispatch()
@@ -178,6 +180,8 @@ const ViewerBreakoutRoomModal = ({
     const [breakoutRoomSettings, setBreakoutRoomSettings] = useState({});
 
     const {listenToBreakoutRoomSettings, getBreakoutRoomWithIds} = useFirebase()
+
+
 
     useEffect(() => {
         if (livestreamId) {
@@ -221,7 +225,6 @@ const ViewerBreakoutRoomModal = ({
 
         if (!open && breakoutRooms?.length &&
             !hasDismissedSnackbar()
-            // && hasSeenAudienceDrawer()
         ) {
             dispatch(actions.enqueueSnackbar({
                 message: snackbarKey,
@@ -334,6 +337,15 @@ const ViewerBreakoutRoomModal = ({
     const handleEntered = () => {
         setFullyOpened(true)
     }
+
+    const onClose = () => {
+        dispatch(actions.closeViewerBreakoutModal())
+    }
+
+    const handleOpen = () => {
+        dispatch(actions.openViewerBreakoutModal())
+    }
+
 
     return (
         <Drawer anchor="top" open={open}
