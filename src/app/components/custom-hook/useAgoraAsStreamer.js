@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import window, {document} from 'global';
 import {useAgoraToken} from './useAgoraToken';
 import {useDispatch} from "react-redux";
@@ -106,6 +106,14 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             connectAgoraRTM()
         }
     }, [readyToConnect])
+
+    const createEmote = useCallback(async (emoteType) => {
+        try {
+            const messageToSend = await dispatch(actions.createEmote(emoteType))
+            rtmChannel.sendMessage(messageToSend)
+        } catch (e) {
+        }
+    }, [dispatch, rtmChannel])
 
     const connectAgoraRTC = () => {
 
@@ -402,7 +410,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
             channel.join().then(() => {
 
-                dispatch(actions.setRtmChannelObj(channel))
                 console.log('Joined channel');
                 // channel.getMembers().then(result => {
                 //     console.log("-> getMembers result", result);
@@ -676,6 +683,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         networkQuality,
         numberOfViewers,
         setAddedStream,
-        setRemovedStream
+        setRemovedStream,
+        createEmote
     };
 }

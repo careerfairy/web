@@ -60,6 +60,8 @@ const useStyles = makeStyles((theme) => ({
 
 
 const ViewerLayout = (props) => {
+    // console.log("-> props", props);
+    // console.count("-> ViewerLayout");
     const {children, firebase} = props
     const {query: {livestreamId}, replace, asPath} = useRouter()
     const {authenticatedUser, userData} = useAuth();
