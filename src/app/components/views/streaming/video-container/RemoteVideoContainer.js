@@ -118,7 +118,7 @@ const RemoteVideoContainer = ({
 
     useEffect(() => {
         if (unmute) {
-            stream?.stream?.play(stream.streamId, {muted: false});
+            stream.stream?.play(stream.streamId, {muted: false});
         }
     }, [unmute])
 
