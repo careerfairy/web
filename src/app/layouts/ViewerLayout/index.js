@@ -1,16 +1,16 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import {withFirebase} from "../../context/firebase";
 import {useRouter} from "next/router";
 import ViewerTopBar from "./ViewerTopBar";
-import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
-import {shallowEqual, useSelector} from "react-redux";
+import {isLoaded} from "react-redux-firebase";
 import {useAuth} from "../../HOCs/AuthProvider";
 import Loader from "../../components/views/loader/Loader";
 import {useMediaQuery} from "@material-ui/core";
 import LeftMenu from "../../components/views/viewer/LeftMenu/LeftMenu";
 import {v4 as uuidv4} from "uuid";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
+import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme) => ({
@@ -60,6 +60,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 const ViewerLayout = (props) => {
+
     const {children, firebase} = props
     const {query: {livestreamId}, replace, asPath} = useRouter()
     const {authenticatedUser, userData} = useAuth();
@@ -80,23 +81,7 @@ const ViewerLayout = (props) => {
     const [selectedState, setSelectedState] = useState("questions");
 
 
-    const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'careerCenters'}]
-
-    const query = useMemo(() => livestreamId ? [
-        {
-            collection: "livestreams",
-            doc: livestreamId,
-            storeAs: "currentLivestream",
-            populates
-        }
-    ] : [], [livestreamId])
-
-    useFirestoreConnect(query)
-
-    const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
-        ...populate(firestore, "currentLivestream", populates),
-        id: livestreamId
-    }, shallowEqual)
+    const currentLivestream = useStreamConnect()
 
     const notAuthorized = currentLivestream && !currentLivestream.test && authenticatedUser?.isLoaded && authenticatedUser?.isEmpty
 

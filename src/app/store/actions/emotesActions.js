@@ -16,7 +16,7 @@ const buildEmoteAction = (message, memberId) => {
 // Send an emote through the channel reference in the store
 export const createEmote = (emoteType) => async (dispatch, getState,
 ) => {
-    const {rtmChannel, firebase: {auth}} = getState()
+    const {firebase: {auth}} = getState()
     const memberId = auth.id || tempId
 
     try {
@@ -28,11 +28,13 @@ export const createEmote = (emoteType) => async (dispatch, getState,
         }
         dispatch(setEmote(message, memberId))
         const stringMsg = JSON.stringify(message)
-        await rtmChannel.sendMessage({
+        const messageToSend = {
             messageType: "TEXT",
             text: stringMsg
-        })
+        }
+        // await rtmChannel.sendMessage()
         dispatch({type: actions.SEND_EMOTE_SUCCESS})
+        return messageToSend
     } catch (e) {
         dispatch({type: actions.SEND_EMOTE_FAIL, payload: e});
         return e

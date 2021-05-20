@@ -13,6 +13,8 @@ import {Typography} from '@material-ui/core';
 import ScreenShareModal from "../../streaming/video-container/ScreenShareModal";
 import LoadingModal from 'components/views/streaming/modal/LoadingModal';
 import ErrorModal from 'components/views/streaming/modal/ErrorModal';
+import EmoteButtons from "../EmoteButtons";
+
 
 const useStyles = makeStyles(theme => ({
     waitingOverlay: {
@@ -49,7 +51,7 @@ function ViewerComponent(props) {
     const screenSharingMode = (props.currentLivestream.screenSharerId === authenticatedUser?.email &&
         props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
 
-    const {externalMediaStreams,numberOfViewers, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus} =
+    const {externalMediaStreams,numberOfViewers, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus, createEmote} =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
@@ -142,6 +144,7 @@ function ViewerComponent(props) {
 
     return (
         <div>
+            <EmoteButtons createEmote={createEmote}/>
             <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive}
                                      smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}
                                      speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
