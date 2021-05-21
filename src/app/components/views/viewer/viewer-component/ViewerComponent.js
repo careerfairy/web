@@ -91,13 +91,13 @@ function ViewerComponent(props) {
             }
         }
     }, [agoraRtcStatus])
-console.log("-> externalMediaStreams", externalMediaStreams);
+// console.log("-> externalMediaStreams", externalMediaStreams);
     useEffect(() => {
         if (!props.isBreakout && !externalMediaStreams?.length && hasActiveRooms) {
-            console.log("-> props.isBreakout", props.isBreakout);
-            console.log("-> externalMediaStreams", externalMediaStreams);
-            console.log("-> hasActiveRooms", hasActiveRooms);
-            dispatch(actions.openViewerBreakoutModal())
+            // console.log("-> props.isBreakout", props.isBreakout);
+            // console.log("-> externalMediaStreams", externalMediaStreams);
+            // console.log("-> hasActiveRooms", hasActiveRooms);
+            // dispatch(actions.openViewerBreakoutModal())
         }
 
     }, [Boolean(externalMediaStreams?.length), props.isBreakout, hasActiveRooms])
