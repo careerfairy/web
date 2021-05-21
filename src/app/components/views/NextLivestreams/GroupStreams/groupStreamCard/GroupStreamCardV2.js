@@ -250,7 +250,7 @@ const GroupStreamCardV2 = memo(({
                                 }) => {
     const mediaStyles = useCoverCardMediaStyles();
     const classes = useStyles()
-    const {pathname, absolutePath} = useRouter();
+    const {pathname, absolutePath, push} = useRouter();
     const linkToStream = useMemo(() => pathname === "/next-livestreams/[groupId]" ?
         `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}` :
         `/next-livestreams?livestreamId=${livestream.id}`,
@@ -351,7 +351,7 @@ const GroupStreamCardV2 = memo(({
 
     function deregisterFromLivestream() {
         if (user.isLoaded && user.isEmpty) {
-            return router.push({
+            return push({
                 pathname: '/login',
                 query: {absolutePath}
             });
@@ -362,14 +362,14 @@ const GroupStreamCardV2 = memo(({
 
     async function startRegistrationProcess() {
         if (user.isLoaded && user.isEmpty || !user.emailVerified) {
-            return router.push({
+            return push({
                 pathname: `/login`,
                 query: {absolutePath: linkToStream},
             });
         }
 
         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-            return router.push({
+            return push({
                 pathname: '/profile',
                 query: "profile"
             });
