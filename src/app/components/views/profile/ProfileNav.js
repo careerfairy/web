@@ -3,10 +3,10 @@ import SwipeableViews from 'react-swipeable-views';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 
 import {Container, Typography, useMediaQuery, AppBar, Tabs, Tab, Box} from "@material-ui/core";
-import UserData from "./userData/UserData";
 import {withFirebase} from "context/firebase";
 import JoinedGroups from "./my-groups/JoinedGroups";
 import AdminGroups from "./my-groups/AdminGroups";
+import UserData from "./userData/UserData";
 import {useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 import {useAuth} from "../../../HOCs/AuthProvider";
