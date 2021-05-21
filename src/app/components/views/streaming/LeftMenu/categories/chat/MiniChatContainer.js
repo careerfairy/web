@@ -1,8 +1,8 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import {withFirebase} from 'context/firebase';
 import ChevronRightRoundedIcon from '@material-ui/icons/ChevronRightRounded';
-import ChatEntryContainer from './chat-entry-container/ChatEntryContainer';
+import ChatEntryContainer from './ChatEntryContainer';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import {
     Accordion,
@@ -26,11 +26,11 @@ import {
 import CustomScrollToBottom from "../../../../../util/CustomScrollToBottom";
 import {useAuth} from "../../../../../../HOCs/AuthProvider";
 import clsx from "clsx";
+import EmotesModal from "./EmotesModal";
 
 const useStyles = makeStyles(theme => ({
-    root: {
-    },
-    accordionRoot:{
+    root: {},
+    accordionRoot: {
         boxShadow: theme.shadows[3],
         background: theme.palette.background.paper
     },
@@ -83,6 +83,9 @@ const useStyles = makeStyles(theme => ({
         "& div": {
             overflowX: "hidden",
         }
+    },
+    entriesWrapper: {
+        padding: theme.spacing(1)
     }
 }))
 
@@ -93,7 +96,7 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
     const [chatEntries, setChatEntries] = useState([]);
     const [focused, setFocused] = useState(false);
     const [submitting, setSubmitting] = useState(false);
-
+    const [currentEntry, setCurrentEntry] = useState(null);
     const [numberOfMissedEntries, setNumberOfMissedEntries] = useState(0);
     const [numberOfLatestChanges, setNumberOfLatestChanges] = useState(0);
 
@@ -106,13 +109,8 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
     useEffect(() => {
         if (livestream.id) {
             const unsubscribe = firebase.listenToChatEntries(livestream.id, 150, querySnapshot => {
-                var chatEntries = [];
-                querySnapshot.forEach(doc => {
-                    let entry = doc.data();
-                    entry.id = doc.id;
-                    chatEntries.unshift(entry);
-                });
-                setChatEntries(chatEntries);
+                const newEntries = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()})).reverse()
+                setChatEntries(newEntries);
                 if (!open) {
                     let number = 0;
                     querySnapshot.docChanges().forEach(change => {
@@ -153,6 +151,13 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
         )
     }
 
+    const handleSetCurrentEntry = useCallback((chatEntry) => {
+        setCurrentEntry(chatEntry)
+    }, [])
+
+    const handleClearCurrentEntry = () => {
+        setCurrentEntry(null)
+    }
 
     function addNewChatEntry() {
         if (isEmpty || submitting) {
@@ -189,11 +194,13 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
         }
     }
 
-    let chatElements = chatEntries.map((chatEntry, index) => {
-        return (
-            <ChatEntryContainer key={chatEntry?.id} chatEntry={chatEntry}/>
-        );
-    });
+    const chatElements = chatEntries.map(chatEntry =>
+        <ChatEntryContainer
+            handleSetCurrentEntry={handleSetCurrentEntry}
+            currentEntry={currentEntry}
+            key={chatEntry.id}
+            chatEntry={chatEntry}/>
+    );
 
     const playIcon = (<div>
         <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}
@@ -222,9 +229,9 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
                 <Accordion
                     TransitionProps={{unmountOnExit: true}}
                     onChange={() => {
-                    !open && isOpen(14) && handleConfirmStep(14)
-                    setOpen(!open)
-                }}
+                        !open && isOpen(14) && handleConfirmStep(14)
+                        setOpen(!open)
+                    }}
                     className={classes.accordionRoot}
                     expanded={open}
                 >
@@ -242,7 +249,8 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
                         </Typography>
                     </AccordionSummary>
                     <AccordionDetails className={classes.chatRoom}>
-                        <CustomScrollToBottom className={classes.scrollToBottom} scrollItems={chatElements}/>
+                        <CustomScrollToBottom scrollViewClassName={classes.entriesWrapper}
+                                              className={classes.scrollToBottom} scrollItems={chatElements}/>
                         <WhiteTooltip
                             placement="right-start"
                             title={
@@ -280,6 +288,7 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
                     </AccordionDetails>
                 </Accordion>
             </WhiteTooltip>
+            <EmotesModal chatEntry={currentEntry} onClose={handleClearCurrentEntry}/>
         </div>
     );
 }

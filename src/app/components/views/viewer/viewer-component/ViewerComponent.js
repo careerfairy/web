@@ -13,6 +13,8 @@ import {Typography} from '@material-ui/core';
 import ScreenShareModal from "../../streaming/video-container/ScreenShareModal";
 import LoadingModal from 'components/views/streaming/modal/LoadingModal';
 import ErrorModal from 'components/views/streaming/modal/ErrorModal';
+import EmoteButtons from "../EmoteButtons";
+
 
 const useStyles = makeStyles(theme => ({
     waitingOverlay: {
@@ -42,14 +44,14 @@ function ViewerComponent(props) {
     const [showScreenShareModal, setShowScreenShareModal] = useState(false);
     const [optimizationMode, setOptimizationMode] = useState("detail");
 
-    const {userData, authenticatedUser} = useAuth();
+    const {authenticatedUser} = useAuth();
 
     const streamerReady = true;
 
     const screenSharingMode = (props.currentLivestream.screenSharerId === authenticatedUser?.email &&
         props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
 
-    const {externalMediaStreams, localMediaStream, agoraRtcStatus, agoraRtmStatus} =
+    const {externalMediaStreams,numberOfViewers, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus, createEmote} =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
@@ -84,6 +86,14 @@ function ViewerComponent(props) {
             }
         }
     }, [agoraRtcStatus])
+
+    useEffect(() => {
+        if (numberOfViewers && props.currentLivestream.hasStarted) {
+            props.setNumberOfViewers(numberOfViewers)
+        } else {
+            props.setNumberOfViewers(0)
+        }
+    }, [numberOfViewers, props.currentLivestream.hasStarted]);
 
 
     const attachSinkId = (element, sinkId) => {
@@ -134,10 +144,12 @@ function ViewerComponent(props) {
 
     return (
         <div>
+            <EmoteButtons createEmote={createEmote}/>
             <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive}
                                      smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}
                                      speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
                                      streams={externalMediaStreams} localId={props.streamerId}
+                                     isViewer={true}
                                      currentSpeaker={props.currentLivestream.currentSpeakerId}
                                      muted={!props.currentLivestream.hasStarted} {...props}/>
             {shareDesktopOrSlides() &&
@@ -145,6 +157,7 @@ function ViewerComponent(props) {
                 livestreamId={props.currentLivestream.id}
                 presentation={props.currentLivestream.mode === 'presentation'}
                 showMenu={props.showMenu}
+                isStreamer={true}
                 externalMediaStreams={externalMediaStreams}
                 isLocalScreen={false}
                 attachSinkId={attachSinkId}
@@ -158,6 +171,7 @@ function ViewerComponent(props) {
                     streamerId={authenticatedUser.email}
                     joining={true}
                     localMediaStream={localMediaStream}
+                    setLocalMediaStream={setLocalMediaStream}
                     handleClickScreenShareButton={handleClickScreenShareButton}
                     isMainStreamer={false}
                     showSettings={showSettings}

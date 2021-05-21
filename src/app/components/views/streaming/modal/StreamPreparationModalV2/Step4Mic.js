@@ -10,8 +10,6 @@ import {
     Select,
     Typography
 } from "@material-ui/core";
-import HeadsetMicIcon from '@material-ui/icons/HeadsetMic';
-import {Icon} from "semantic-ui-react";
 import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
 import {makeStyles} from "@material-ui/core/styles";
 

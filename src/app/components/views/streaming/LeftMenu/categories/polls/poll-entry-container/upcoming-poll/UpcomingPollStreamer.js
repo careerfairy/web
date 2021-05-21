@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import EditIcon from '@material-ui/icons/Edit';
 import {withFirebase} from 'context/firebase';
 import PollCreationModal from '../../poll-creation-modal/PollCreationModal';
@@ -89,6 +89,9 @@ function UpcomingPollStreamer({
     const [anchorEl, setAnchorEl] = useState(null);
     const {tutorialSteps, setTutorialSteps, handleConfirmStep} = useContext(TutorialContext);
 
+    useEffect(() => {
+
+    },[poll?.options])
     const isOpen = (property) => {
         return Boolean(livestream.test && index === 0
             && showMenu && tutorialSteps.streamerReady
@@ -142,20 +145,16 @@ function UpcomingPollStreamer({
     }
 
 
-    let totalVotes = 0;
-    poll.options.forEach(option => totalVotes += option.votes);
-
-
-    const optionElements = poll.options.map((option, index) => {
+    const optionElements = poll?.options?.map(({id, text}, index) => {
         return (
-            <ListItem disableGutters dense key={index}>
+            <ListItem disableGutters dense key={id}>
                 <ListItemIcon>
                     <ListNumber style={{backgroundColor: colorsArray[index]}}>
                         {index + 1}
                     </ListNumber>
                 </ListItemIcon>
                 <ListItemText>
-                    {option.name}
+                    {text}
                 </ListItemText>
             </ListItem>
         )

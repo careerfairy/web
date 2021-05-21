@@ -1,5 +1,4 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import 'semantic/dist/semantic.min.css';
 import 'styles.css';
 import FirebaseContext from 'context/firebase/FirebaseContext';
 import Firebase from 'context/firebase';
@@ -22,20 +21,20 @@ import {createFirestoreInstance} from "redux-firestore";
 import {Provider} from "react-redux";
 import {ThemeProviderWrapper} from "../context/theme/ThemeContext";
 import {CssBaseline} from '@material-ui/core';
+import Notifier from "../components/views/notifier";
 
 
 config({ssrFadeout: true});
 
 
-
 // react-redux-firebase config
 const rrfConfig = {
-    userProfile: 'userData',
+    // userProfile: 'userData',
     useFirestoreForProfile: true, // Firestore for Profile instead of Realtime DB
     attachAuthIsReady: true, // attaches auth is ready promise to store
 };
 
-const store = newStore();
+export const store = newStore();
 const rrfProps = {
     firebase,
     config: rrfConfig,
@@ -62,7 +61,6 @@ function MyApp({Component, pageProps}) {
 
     const [showBubbles, setShowBubbles] = useState(false)
     const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
-
 
     useEffect(() => {
         // Remove the server-side injected CSS.
@@ -108,37 +106,33 @@ function MyApp({Component, pageProps}) {
             </Head>
             <Provider store={store}>
                 <ReactReduxFirebaseProvider {...rrfProps}>
-                    <AuthProvider firebase={firebase}>
-                        <FirebaseContext.Provider value={firebase}>
-                            <ThemeProviderWrapper>
+                    <ThemeProviderWrapper>
+                        <AuthProvider>
+                            <FirebaseContext.Provider value={firebase}>
                                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
 
-                                        <TutorialContext.Provider value={{
-                                            tutorialSteps,
-                                            setTutorialSteps,
-                                            showBubbles,
-                                            setShowBubbles,
-                                            getActiveTutorialStepKey,
-                                            handleConfirmStep,
-                                            isOpen
-                                        }}>
-                                            <ErrorContext.Provider value={{generalError, setGeneralError}}>
-                                                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                                                <CssBaseline/>
-                                                {Component.layout ?
-                                                    <Component.layout>
-                                                        <Component {...pageProps} />
-                                                    </Component.layout>
-                                                    :
-                                                    <Component {...pageProps} />}
-                                                <ErrorSnackBar handleClose={() => setGeneralError("")}
-                                                               errorMessage={generalError}/>
-                                            </ErrorContext.Provider>
-                                        </TutorialContext.Provider>
+                                    <TutorialContext.Provider value={{
+                                        tutorialSteps,
+                                        setTutorialSteps,
+                                        showBubbles,
+                                        setShowBubbles,
+                                        getActiveTutorialStepKey,
+                                        handleConfirmStep,
+                                        isOpen
+                                    }}>
+                                        <ErrorContext.Provider value={{generalError, setGeneralError}}>
+                                            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                            <CssBaseline/>
+                                            <Component {...pageProps} />
+                                            <Notifier/>
+                                            <ErrorSnackBar handleClose={() => setGeneralError("")}
+                                                           errorMessage={generalError}/>
+                                        </ErrorContext.Provider>
+                                    </TutorialContext.Provider>
                                 </MuiPickersUtilsProvider>
-                            </ThemeProviderWrapper>
-                        </FirebaseContext.Provider>
-                    </AuthProvider>
+                            </FirebaseContext.Provider>
+                        </AuthProvider>
+                    </ThemeProviderWrapper>
                 </ReactReduxFirebaseProvider>
             </Provider>
         </Fragment>

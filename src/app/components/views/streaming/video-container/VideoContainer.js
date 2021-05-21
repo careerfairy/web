@@ -19,15 +19,7 @@ import ErrorModal from '../modal/ErrorModal';
 import SettingsModal from "./SettingsModal";
 import ScreenShareModal from "./ScreenShareModal";
 
-const useStyles = makeStyles((theme) => ({
-    blackFrame: {
-        position: "absolute",
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
-    }
-}));
+const useStyles = makeStyles((theme) => ({}));
 
 function VideoContainer(props) {
     const {
@@ -128,7 +120,7 @@ function VideoContainer(props) {
             }, 2500);
             return () => clearTimeout(timeout);
         }
-    }, [audioCounter, props.currentLivestream.mode]);
+    }, [audioCounter, props.currentLivestream.mode, externalMediaStreams.length]);
 
     useEffect(() => {
         if (agoraRtcStatus && agoraRtcStatus.type === "INFO" && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
@@ -168,23 +160,27 @@ function VideoContainer(props) {
     const [timeoutState, setTimeoutState] = useState(null);
 
     useEffect(() => {
-        if (localMediaStream && externalMediaStreams && externalMediaStreams.length > 3) {
-            if (props.streamerId === props.currentLivestream.currentSpeakerId && props.currentLivestream.mode !== "desktop" && props.currentLivestream.mode !== "presentation") {
-                if (timeoutState) {
-                    clearTimeout(timeoutState);
+        if (localMediaStream && externalMediaStreams) {
+            if (externalMediaStreams.length > 3) {
+                if (props.streamerId === props.currentLivestream.currentSpeakerId && props.currentLivestream.mode !== "desktop" && props.currentLivestream.mode !== "presentation") {
+                    if (timeoutState) {
+                        clearTimeout(timeoutState);
+                    }
+                    let newTimeout = setTimeout(() => {
+                        localMediaStream.setVideoProfile("480p_9")
+                    }, 20000);
+                    setTimeoutState(newTimeout)
+                } else {
+                    if (timeoutState) {
+                        clearTimeout(timeoutState);
+                    }
+                    let newTimeout = setTimeout(() => {
+                        localMediaStream.setVideoProfile("180p")
+                    }, 20000);
+                    setTimeoutState(newTimeout)
                 }
-                let newTimeout = setTimeout(() => {
-                    localMediaStream.setVideoProfile("480p_9")
-                }, 20000);
-                setTimeoutState(newTimeout)
             } else {
-                if (timeoutState) {
-                    clearTimeout(timeoutState);
-                }
-                let newTimeout = setTimeout(() => {
-                    localMediaStream.setVideoProfile("180p")
-                }, 20000);
-                setTimeoutState(newTimeout)
+                localMediaStream.setVideoProfile("480p_9")
             }
         }
     }, [localMediaStream, externalMediaStreams, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
@@ -297,7 +293,7 @@ function VideoContainer(props) {
 
     return (
         <Fragment>
-            <div className={classes.blackFrame}>
+            <div>
                 <div>
                     <CurrentSpeakerDisplayer
                         isPlayMode={false}
@@ -342,6 +338,7 @@ function VideoContainer(props) {
             </div>
             <SettingsModal open={showSettings} close={() => setShowSettings(false)}
                            streamId={props.streamerId}
+                           smallScreen={props.smallScreen}
                            devices={devices} localStream={localMediaStream}
                            displayableMediaStream={displayableMediaStream}
                            audioSource={audioSource} updateAudioSource={updateAudioSource}
@@ -349,22 +346,23 @@ function VideoContainer(props) {
                            speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                            attachSinkId={attachSinkId}/>
             <StreamPreparationModalV2 readyToConnect={Boolean(props.currentLivestream && props.currentLivestream.id)}
-                audioSource={audioSource} updateAudioSource={updateAudioSource}
-                videoSource={videoSource} updateVideoSource={updateVideoSource}
-                speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                audioLevel={audioLevel} streamerConnected={streamerConnected}
-                streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                localStream={displayableMediaStream}
-                connectionEstablished={connectionEstablished}
-                isTest={props.currentLivestream.test} viewer={props.viewer}
-                handleOpenDemoIntroModal={handleOpenDemoIntroModal}
-                attachSinkId={attachSinkId} devices={devices}
-                setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                isStreaming={isStreaming}/>
-            <LoadingModal agoraRtcStatus={agoraRtcStatus} />
-            <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus} />
+                                      audioSource={audioSource} updateAudioSource={updateAudioSource}
+                                      videoSource={videoSource} updateVideoSource={updateVideoSource}
+                                      speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
+                                      audioLevel={audioLevel} streamerConnected={streamerConnected}
+                                      streamerReady={streamerReady} setStreamerReady={setStreamerReady}
+                                      localStream={displayableMediaStream}
+                                      connectionEstablished={connectionEstablished}
+                                      isTest={props.currentLivestream.test} viewer={props.viewer}
+                                      handleOpenDemoIntroModal={handleOpenDemoIntroModal}
+                                      attachSinkId={attachSinkId} devices={devices}
+                                      setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
+                                      isStreaming={isStreaming}/>
+            <LoadingModal agoraRtcStatus={agoraRtcStatus}/>
+            <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus}/>
             <ScreenShareModal
                 open={showScreenShareModal}
+                smallScreen={props.smallScreen}
                 handleClose={handleCloseScreenShareModal}
                 handleScreenShare={handleScreenShare}
             />

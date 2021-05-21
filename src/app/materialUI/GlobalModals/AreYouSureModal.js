@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 
@@ -48,6 +49,17 @@ const AreYouSureModal = ({title = "Are you sure?", message, handleConfirm, open,
     );
 }
 
-export default AreYouSureModal;
+AreYouSureModal.propTypes = {
+  handleClose: PropTypes.func.isRequired,
+  handleConfirm: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+  message: PropTypes.string,
+  open: PropTypes.bool.isRequired,
+  title: PropTypes.string
+}
 
+AreYouSureModal.defaultProps = {
+  title: "Are you sure?"
+}
+export default AreYouSureModal;
 

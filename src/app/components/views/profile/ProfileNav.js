@@ -53,10 +53,11 @@ const ProfileNav = ({userData}) => {
     useFirestoreConnect(() => [
         {
             collection: 'careerCenterData',
-            where: userData.isAdmin ? ["test", "==", false] : ["adminEmails", "array-contains", authenticatedUser.email]
+            where: userData.isAdmin ? ["test", "==", false] : ["adminEmails", "array-contains", authenticatedUser.email],
+            storeAs: "adminGroups"
         }
     ])
-    const careerCenters = useSelector(state => state.firestore.ordered?.careerCenterData || [])
+    const adminGroups = useSelector(state => state.firestore.ordered["adminGroups"] || [])
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -82,9 +83,9 @@ const ProfileNav = ({userData}) => {
              label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>,
     ]
 
-    if (careerCenters.length) {
+    if (adminGroups.length) {
         views.push(<TabPanel key={2} value={value} index={2} dir={theme.direction}>
-            <AdminGroups userData={userData} adminGroups={careerCenters}/>
+            <AdminGroups userData={userData} adminGroups={adminGroups}/>
         </TabPanel>)
         tabsArray.push(<Tab key={2} wrapped fullWidth
                             label={<Typography

@@ -1,6 +1,7 @@
 import { withFirebase } from 'context/firebase';
 import StatsUtil from 'data/util/StatsUtil';
 import { useState, useEffect } from 'react';
+import PollUtil from "../../data/util/PollUtil";
 
 export function useLivestreamMetadata(livestream, group, firebase, userRequestedDownload) {
 
@@ -57,6 +58,7 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
                 querySnapshot.forEach(doc => {
                     let cc = doc.data();
                     cc.id = doc.id;
+                    cc.options = PollUtil.convertPollOptionsObjectToArray(cc.options)
                     pollList.push(cc);
                 });
                 setPolls(pollList);
@@ -178,11 +180,12 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
 
     function studentBelongsToGroup(student) {
         if (group.universityCode) {
-            if (student.universityCode === group.universityCode) {
-                return student.groupIds && student.groupIds.includes(group.groupId);
-            } else {
-                return false;
-            }
+            // if (student.university?.code === group.universityCode) {
+            return student.university?.code === group.universityCode
+                // return student.groupIds && student.groupIds.includes(group.groupId);
+            // } else {
+            //     return false;
+            // }
         } else {
             return student.groupIds && student.groupIds.includes(group.groupId);
         }

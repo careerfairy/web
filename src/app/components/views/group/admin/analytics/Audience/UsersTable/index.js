@@ -1,16 +1,22 @@
 import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { Card, Slide, Tabs, Tab } from '@material-ui/core';
+import {Card, Slide, Tab, Tabs} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
-import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
+import {copyStringToClipboard, prettyDate, toTitleCase} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import MaterialTable from "material-table";
 import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} from "../../common/TableUtils";
 import UserInnerTable from "./UserInnerTable";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 import {makeStyles} from "@material-ui/core/styles";
+import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil";
+import {useSelector} from "react-redux";
+import StatsUtil from "../../../../../../../data/util/StatsUtil";
+import GroupsUtil from "../../../../../../../data/util/GroupsUtil";
+import {universityCountriesMap} from "../../../../../../util/constants/universityCountries";
 
+const customTableOptions = {...defaultTableOptions}
 const useStyles = makeStyles((theme) => ({
     root: {},
     actions: {
@@ -41,6 +47,7 @@ const UsersTable = ({
                         futureStreams,
                         isFollowers,
                         handleReset,
+                        currentUserDataSet,
                         totalUniqueUsers,
                         streamsFromTimeFrameAndFuture,
                         breakdownRef,
@@ -54,147 +61,71 @@ const UsersTable = ({
     const [selection, setSelection] = useState([]);
     const {enqueueSnackbar} = useSnackbar()
     const [users, setUsers] = useState([]);
+    const [targetGroups, setTargetGroups] = useState([]);
 
-    const columns = [
-        {
-            field: "firstName",
-            title: "First Name",
-            width: 140,
-        },
-        {
-            field: "lastName",
-            title: "Last Name",
-            width: 140,
-        },
-        {
-            field: "linkedinUrl",
-            title: "LinkedIn",
-            width: 180,
-        },
-        {
-            field: "universityName",
-            title: "University",
-            width: 150,
-        },
-        {
-            field: "universityCountry",
-            title: "University Country",
-            cellStyle: {
-                width: 300,
-            },
-        },
-        {
-            field: "numberOfStreamsWatched",
-            title: "Events Attended",
-            width: 150,
-        },
-        {
-            field: "numberOfStreamsRegistered",
-            title: "Events Registered To",
-            width: 170,
-        },
-        {
-            field: "userEmail",
-            title: "Email",
-            width: 200,
-            // hidden: userType.propertyName !== "talentPool",
-            render: (params) => (
-                <a href={`mailto:${params.value}`}>
-                    {params.value}
-                </a>
-            ),
-        },
-        {
-            field: "watchedEvent",
-            title: "Attended Event",
-            width: 170,
-            hidden: !currentStream
-        }
-    ]
+    const categoryFields = () => {
+        const arrayOfGroups = targetGroups.length ? targetGroups : [group]
+        const tableFieldsMap = arrayOfGroups.reduce((acc, {categories}) => {
+            if (categories?.length) {
+                categories.forEach(({name, options}) => {
+                    const categoryKey = name.toLowerCase()
+                    const newOptions = options.map(({name}) => name.toLowerCase())
+                    const uniqueOptions = acc[categoryKey] ? [...new Set(acc[categoryKey].concat(newOptions))] : newOptions
+                    acc[categoryKey] = uniqueOptions.map(name => toTitleCase(name))
+                })
+            }
+            return acc
+        }, {})
+        return Object.keys(tableFieldsMap).map(key => {
+            const titledLabel = toTitleCase(key)
+            const lookup = tableFieldsMap[key].reduce((acc, curr) => {
+                acc[curr] = curr
+                return acc
+            }, {"": "none"})
+            return {
+                field: titledLabel,
+                title: titledLabel,
+                lookup
+            }
+        })
+    }
+
+    const allGroupsMap = useSelector(state => state.firestore.data?.allGroups || {})
+
 
     useEffect(() => {
-        setUsers(totalUniqueUsers)
-        mapUserCategories()
-        mapStreamsWatched()
-        mapStreamsRegistered()
-        setSelection([])
+        let newTargetGroups = []
+        if (currentUserDataSet.dataSet === "followers" && currentStream?.groupIds?.length > 1) {
+            newTargetGroups = currentStream.groupIds.map(groupId => ({
+                ...allGroupsMap[groupId],
+                options: GroupsUtil.handleFlattenOptions(allGroupsMap[groupId])
+            }))
+        }
+        setTargetGroups(newTargetGroups)
 
-    }, [totalUniqueUsers])
+    }, [currentUserDataSet, currentStream?.groupIds])
+
+    useEffect(() => {
+        let newUsers;
+        if (targetGroups.length) {
+            newUsers = totalUniqueUsers?.map(user => {
+                const relevantGroup = StatsUtil.getFirstGroupThatUserBelongsTo(user, targetGroups, group)
+                return AnalyticsUtil.mapUserEngagement(user, streamsFromTimeFrameAndFuture, relevantGroup || group, group)
+            }) || []
+        } else {
+            newUsers = totalUniqueUsers?.map(user => {
+                return AnalyticsUtil.mapUserEngagement(user, streamsFromTimeFrameAndFuture, group)
+            }) || []
+        }
+        setUsers(newUsers)
+        setSelection([])
+    }, [totalUniqueUsers, targetGroups])
 
     useEffect(() => {
         if (dataTableRef.current) {
             dataTableRef.current.onAllSelected(false)
         }
     }, [currentStream?.id])
-
-    const getCategoryOptionName = (targetCategoryId, user) => {
-        if (user.registeredGroups) {
-            const targetGroup = user.registeredGroups.find(groupObj => groupObj.groupId === group.id)
-            if (targetGroup?.categories) {
-                const targetCategory = targetGroup.categories.find(categoryObj => categoryObj.id === targetCategoryId)
-                if (targetCategory?.selectedValueId) {
-                    const targetOption = groupOptions.find(option => option.id === targetCategory.selectedValueId)
-                    if (targetOption?.name) {
-                        return targetOption.name
-                    }
-                }
-            }
-        }
-    }
-
-    const mapUserCategories = () => {
-        const groupCategories = group.categories ? [...group.categories] : []
-        if (groupCategories.length) {
-            const updatedUsers = totalUniqueUsers?.map(user => {
-                const updatedUser = user
-                groupCategories.forEach(category => {
-                    const targetCategoryId = category.id
-                    if (targetCategoryId) {
-                        const propertyName = category.name
-                        updatedUser[propertyName] = getCategoryOptionName(targetCategoryId, user)
-                    }
-                })
-                return updatedUser
-            })
-            setUsers(updatedUsers)
-        }
-    }
-
-    const mapStreamsWatched = () => {
-        const updatedUsers = totalUniqueUsers.map(user => {
-            user.watchedEvent = false
-            const currentUserEmail = user.userEmail
-            if (currentUserEmail) {
-                const watchedStreams = []
-                streamsFromTimeFrameAndFuture.forEach(stream => {
-                    if (stream?.participatingStudents?.some(userEmail => userEmail === currentUserEmail)) {
-                        watchedStreams.push(stream)
-                        user.watchedEvent = true
-                    }
-                })
-                user.numberOfStreamsWatched = watchedStreams.length
-                user.streamsWatched = watchedStreams
-            }
-            return user
-        })
-        setUsers(updatedUsers)
-    }
-    const mapStreamsRegistered = () => {
-        const updatedUsers = totalUniqueUsers.map(currentUser => {
-            if (currentUser.userEmail) {
-                const registeredStreams = []
-                streamsFromTimeFrameAndFuture.forEach(stream => {
-                    if (stream?.registeredUsers?.some(userEmail => userEmail === currentUser.userEmail)) {
-                        registeredStreams.push(stream)
-                    }
-                })
-                currentUser.numberOfStreamsRegistered = registeredStreams.length
-                currentUser.streamsRegistered = registeredStreams
-            }
-            return currentUser
-        })
-        setUsers(updatedUsers)
-    }
 
     const handleCopyEmails = () => {
         const emails = selection.map(user => user.id).join(";")
@@ -232,9 +163,6 @@ const UsersTable = ({
         setUserType(userTypes[index])
     };
 
-
-    const isTalentPool = () => userType.propertyName === "talentPool"
-
     const getTitle = () => currentStream ? `For ${currentStream.company} on ${prettyDate(currentStream.start)}` : "For all Events"
 
     return (
@@ -266,36 +194,26 @@ const UsersTable = ({
                     tableRef={dataTableRef}
                     isLoading={fetchingStreams}
                     data={users}
-                    options={defaultTableOptions}
+                    options={customTableOptions}
                     columns={[
                         {
                             field: "firstName",
                             title: "First Name",
-                            cellStyle: {
-                                width: 300,
-                            },
                         },
                         {
                             field: "lastName",
                             title: "Last Name",
-                            cellStyle: {
-                                width: 300,
-                            },
                         },
                         {
-                            field: "universityName",
+                            field: "university.name",
                             title: "University",
-                            cellStyle: {
-                                width: 300,
-                            },
                         },
                         {
-                            field: "universityCountry",
+                            field: "universityCountryCode",
                             title: "University Country",
-                            cellStyle: {
-                                width: 300,
-                            },
+                            lookup: universityCountriesMap
                         },
+                        ...categoryFields().map(e => e),
                         {
                             field: "numberOfStreamsWatched",
                             title: "Events Attended",
@@ -309,8 +227,6 @@ const UsersTable = ({
                         {
                             field: "userEmail",
                             title: "Email",
-                            // hidden: userType.propertyName !== "talentPool",
-                            // export: userType.propertyName === "talentPool",
                             render: ({id}) => (
                                 <a href={`mailto:${id}`}>
                                     {id}
@@ -368,7 +284,7 @@ const UsersTable = ({
 
                     ]}
                     actions={[
-                        exportSelectionAction(columns, getTitle()),
+                        exportSelectionAction(dataTableRef?.current?.props?.columns || [], getTitle()),
                         (rowData) => ({
                             tooltip: !(rowData.length === 0
                                 // || !isTalentPool()

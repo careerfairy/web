@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
             transform: "scaleX(0)",
             transition: theme.transitions.create(['all'], {
                 easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.complex,
+                duration: theme.transitions.duration.short,
             }),
         },
         "&:hover:before": {
@@ -133,8 +133,14 @@ const TopBar = ({className, notifications, links, onMobileNavOpen, ...rest}) => 
 };
 
 TopBar.propTypes = {
-    className: PropTypes.string,
-    onMobileNavOpen: PropTypes.func
-};
+  className: PropTypes.string,
+  links: PropTypes.array,
+  notifications: PropTypes.array,
+  onMobileNavOpen: PropTypes.func
+}
 
+TopBar.defaultProps = {
+  links: []
+}
 export default TopBar;
+

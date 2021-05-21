@@ -1,6 +1,6 @@
-function MulitLineText(props) {
+function MulitLineText({text = ""}) {
 
-    let textElements = props.text.split('//n').map((textElement, index) => {
+    let textElements = text.split('//n').map((textElement, index) => {
         return(
             <div key={index} style={{ margin: '15px 0'}}>
                 { textElement }

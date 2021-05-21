@@ -1,5 +1,6 @@
 import firebase from '../../Firebase/Firebase';
 import {v4 as uuidv4} from 'uuid';
+import {FORTY_FIVE_MINUTES_IN_MILLISECONDS, START_DATE_FOR_REPORTED_EVENTS} from "../constants/streamContants";
 
 // import firebase from "firebase/app";
 // import "firebase/auth";
@@ -16,10 +17,6 @@ import {v4 as uuidv4} from 'uuid';
 // };
 
 class Firebase {
-    getFirebaseTimestamp = (dateString) => {
-        return firebase.firestore.Timestamp.fromDate(new Date(dateString));
-    };
-
     constructor() {
         // if (!firebase.apps.length) {
         //     firebase.initializeApp(config);
@@ -27,6 +24,26 @@ class Firebase {
         this.auth = firebase.auth();
         this.firestore = firebase.firestore();
         this.storage = firebase.storage();
+        this.functions = firebase.functions()
+        // if (process.env.NODE_ENV === 'development') {
+        //     this.functions.useFunctionsEmulator('http://localhost:5001');
+        // }
+    }
+
+    getFirebaseTimestamp = (dateString) => {
+        return firebase.firestore.Timestamp.fromDate(new Date(dateString));
+    };
+
+    // *** Functions Api ***
+
+    getPartnerFollowerData = async (requestingGroup, groups, streams, currentUserDataSet) => {
+        const getGroupsAndTheirFollowers = this.functions.httpsCallable("getGroupsAndTheirFollowers")
+        return await getGroupsAndTheirFollowers({requestingGroup, groups, streams, currentUserDataSet})
+    }
+
+    createUserInAuthAndFirebase = async (userData) => {
+        const createUserInAuthAndFirebase = this.functions.httpsCallable("createNewUserAccount")
+        return createUserInAuthAndFirebase({userData})
     }
 
     // *** Auth API ***
@@ -284,25 +301,20 @@ class Firebase {
         try {
             const ratings = [
                 {
-                    message: "How would you rate this live stream?",
-                    type: "overall",
-                    appearAfter: 20,
-                    hasRated: false,
-                    isForEnd: false
-                },
-                {
                     message: `How happy are you with the content shared by ${livestream.company}?`,
                     type: "company",
                     appearAfter: 30,
-                    hasRated: false,
-                    isForEnd: false
                 },
                 {
-                    message: `After this stream, are you more likely to apply to ${livestream.company}?`,
+                    message: `Are you more likely to apply to ${livestream.company} thanks to this live stream?`,
                     type: "willingnessToApply",
-                    appearAfter: 25,
-                    hasRated: false,
-                    isForEnd: true
+                    appearAfter: 40,
+                },
+                {
+                    message: "How would you rate this live stream experience? Any feedback you would like to share?",
+                    type: "overall",
+                    appearAfter: 45,
+                    hasText: true,
                 },
             ]
 
@@ -337,7 +349,8 @@ class Firebase {
                 batch.set(ratingRef, {
                     title: rating.type,
                     question: rating.message,
-                    appearAfter: rating.appearAfter
+                    appearAfter: rating.appearAfter,
+                    hasText: Boolean(rating.hasText)
                 })
             }
 
@@ -730,13 +743,11 @@ class Firebase {
     }
 
     listenToPastLiveStreamsByGroupId = (groupId, callback) => {
-        let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
-        const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
         let ref = this.firestore
             .collection("livestreams")
             .where("test", "==", false)
             .where("groupIds", "array-contains", groupId)
-            .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
+            .where("start", "<", new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
             .orderBy("start", "desc")
         return ref.onSnapshot(callback)
@@ -812,15 +823,17 @@ class Firebase {
         return this.firestore.runTransaction((transaction) => {
             return transaction.get(ref).then((livestreamDoc) => {
                 let livestream = livestreamDoc.data()
-                let updatedSpeakers = livestream.speakers.filter( existingSpeaker => existingSpeaker.id !== speaker.id )
-                updatedSpeakers.forEach( existingSpeaker => {
-                    if ( existingSpeaker.speakerUuid === speaker.speakerUuid ) {
-                        delete existingSpeaker.speakerUuid;
-                    }
-                });
+                let updatedSpeakers = livestream.liveSpeakers?.filter(existingSpeaker => existingSpeaker.id !== speaker.id) || [];
+                if (updatedSpeakers && updatedSpeakers.length > 0) {
+                    updatedSpeakers.forEach(existingSpeaker => {
+                        if (existingSpeaker.speakerUuid === speaker.speakerUuid) {
+                            delete existingSpeaker.speakerUuid;
+                        }
+                    });
+                }
                 updatedSpeakers.push(speaker)
                 transaction.update(ref, {
-                    speakers: updatedSpeakers
+                    liveSpeakers: updatedSpeakers
                 });
             });
         });
@@ -835,29 +848,28 @@ class Firebase {
                 let livestream = livestreamDoc.data()
                 let speakerRef = this.firestore.collection("livestreams").doc(livestreamDoc.id).collection("speakers").doc();
                 speaker.id = speakerRef.id;
-                let updatedSpeakers = livestream.speakers ? [ ...livestream.speakers ] : []
-                updatedSpeakers.forEach( existingSpeaker => {
-                    if ( existingSpeaker.speakerUuid === speaker.speakerUuid ) {
+                let updatedSpeakers = livestream.liveSpeakers ? [...livestream.liveSpeakers] : []
+                updatedSpeakers.forEach(existingSpeaker => {
+                    if (existingSpeaker.speakerUuid === speaker.speakerUuid) {
                         delete existingSpeaker.speakerUuid;
                     }
                 });
                 updatedSpeakers.push(speaker)
                 transaction.update(ref, {
-                    speakers: updatedSpeakers
+                    liveSpeakers: updatedSpeakers
                 });
             });
         });
     }
 
     putQuestionComment = (livestreamId, questionId, comment) => {
-        comment.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
             .doc(questionId)
             .collection("comments");
-        return ref.add(comment);
+        return ref.add({...comment, timestamp: this.getServerTimestamp()});
     };
 
     putLivestreamQuestion = (livestreamId, question) => {
@@ -908,18 +920,51 @@ class Firebase {
             .collection("livestreams")
             .doc(livestreamId)
             .collection("chatEntries")
-            .orderBy("timestamp", "desc")
             .limit(limit)
+            .orderBy("timestamp", "desc")
         return ref.onSnapshot(callback);
     }
 
     putChatEntry = (livestreamId, chatEntry) => {
         chatEntry.timestamp = this.getServerTimestamp()
+        const newChatEntry = {
+            ...chatEntry,
+            laughing: [],
+            wow: [],
+            heart: [],
+            thumbsUp: []
+        }
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("chatEntries");
-        return ref.add(chatEntry);
+        return ref.add(newChatEntry);
+    }
+
+    emoteComment = (livestreamId, chatEntryId, fieldProp, userEmail) => {
+        const otherProps = ["wow", "laughing", "heart", "thumbsUp"].filter(prop => prop !== fieldProp)
+        const chatEntryRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("chatEntries")
+            .doc(chatEntryId)
+        const data = {
+            [fieldProp]: firebase.firestore.FieldValue.arrayUnion(userEmail)
+        }
+        otherProps.forEach(otherProp => {
+            data[otherProp] = firebase.firestore.FieldValue.arrayRemove(userEmail)
+        })
+        return chatEntryRef.update(data)
+    }
+    unEmoteComment = (livestreamId, chatEntryId, fieldProp, userEmail) => {
+        const chatEntryRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("chatEntries")
+            .doc(chatEntryId)
+        return chatEntryRef.update({
+            [fieldProp]: firebase.firestore.FieldValue.arrayRemove(userEmail)
+        })
     }
 
     setLivestreamHasStarted = (hasStarted, livestreamId) => {
@@ -1012,6 +1057,25 @@ class Firebase {
             .collection("participatingStudents");
         return ref.get();
     }
+    listenToLivestreamParticipatingStudents = (livestreamId, callback) => {
+        const now = new Date()
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("participatingStudents")
+            .where("joined", ">", now)
+            .orderBy("joined", "asc")
+            .limit(1)
+        return ref.onSnapshot(callback);
+    }
+
+    listenToAllLivestreamParticipatingStudents = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("participatingStudents")
+        return ref.onSnapshot(callback);
+    }
 
     getLivestreamTalentPoolMembers = (companyId) => {
         let ref = this.firestore
@@ -1070,6 +1134,53 @@ class Firebase {
         }
         return groups;
     };
+
+    getGroupsByGroupId = async (arrayOfIds = [""]) => {
+        let groups = []
+        let i, j, temparray, chunk = 10;
+        for (i = 0, j = arrayOfIds.length; i < j; i += chunk) {
+            temparray = arrayOfIds.slice(i, i + chunk);
+            const snapshots = await this.firestore.collection("careerCenterData").where('groupId', 'in', temparray).get()
+            const snapGroups = snapshots.docs.map(doc => ({id: doc.id, ...doc.data()}))
+            groups = [...groups, ...snapGroups]
+        }
+        return groups;
+    };
+
+    getUsersByEmailInBatches = async (arrayOfEmails = [""]) => {
+        let totalUsers = []
+        let i, j, temparray, chunk = 10;
+        for (i = 0, j = arrayOfEmails.length; i < j; i += chunk) {
+            temparray = arrayOfEmails.slice(i, i + chunk);
+            const userEmailSnaps = await this.firestore.collection("userData").where('userEmail', 'in', temparray).get()
+            const newUsers = userEmailSnaps.docs.map(doc => ({id: doc.id, ...doc.data()}))
+            totalUsers = [...totalUsers, ...newUsers]
+        }
+        return totalUsers;
+    };
+
+    getUsersByEmail = async (arrayOfEmails = [""]) => {
+        let totalUsers = []
+        let i, j, temparray, chunk = 800;
+        for (i = 0, j = arrayOfEmails.length; i < j; i += chunk) {
+            temparray = arrayOfEmails.slice(i, i + chunk);
+            const userSnaps = await Promise.all(temparray.map(email => this.firestore.collection("userData").doc(email).get()))
+            const newUsers = userSnaps.filter(doc => doc.exists).map(doc => ({id: doc.id, ...doc.data()}))
+            totalUsers = [...totalUsers, ...newUsers]
+        }
+        return totalUsers
+    };
+
+    getFollowingGroups = async (groupIds = []) => {
+        const uniqueGroupIds = [...new Set(groupIds)]
+        const groupSnaps = await Promise.all(uniqueGroupIds.map(groupId => this.firestore.collection("careerCenterData").doc(groupId).get()))
+        return groupSnaps.filter(doc => doc.exists).map(doc => ({id: doc.id, ...doc.data()}))
+    }
+
+    getGroupsWithIds = async (arrayOfGroupIds) => {
+        return await this.getFollowingGroups(arrayOfGroupIds)
+    }
+
 
     listenCareerCentersByAdminEmail = (email, callback) => {
         let ref = this.firestore
@@ -1242,22 +1353,14 @@ class Firebase {
             .collection("livestreams")
             .doc(livestreamId)
             .collection("polls");
-
         let pollObject = {
             timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
             question: pollQuestion,
-            options: [],
+            options: pollOptions,
             voters: [],
             state: "upcoming",
         };
-        pollOptions.forEach((option, index) => {
-            pollObject.options.push({
-                name: option,
-                votes: 0,
-                voters: [],
-                index: index,
-            });
-        });
+
         return ref.add(pollObject);
     };
 
@@ -1267,21 +1370,45 @@ class Firebase {
             .doc(livestreamId)
             .collection("polls")
             .doc(pollId);
-
         let pollObject = {
             question: pollQuestion,
-            options: [],
+            options: pollOptions,
         };
-        pollOptions.forEach((option, index) => {
-            pollObject.options.push({
-                name: option,
-                votes: 0,
-                voters: [],
-                index: index,
-            });
-        });
         return ref.update(pollObject);
     };
+
+    listenToPollVoters = (livestreamId, pollId, callback) => {
+        const pollVotersRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId)
+            .collection("voters")
+        return pollVotersRef.onSnapshot(callback);
+    }
+
+    listenToVoteOnPoll = (livestreamId, pollId, authEmail, callback) => {
+        const pollVotersRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId)
+            .collection("voters")
+            .doc(authEmail)
+        return pollVotersRef.onSnapshot(callback);
+    }
+
+    checkIfHasVotedOnPoll = async (livestreamId, pollId, authEmail) => {
+        const pollVoterRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId)
+            .collection("voters")
+            .doc(authEmail)
+        const voterSnap = await pollVoterRef.get()
+        return voterSnap.exists
+    }
 
     deleteLivestreamPoll = (livestreamId, pollId) => {
         let ref = this.firestore
@@ -1312,34 +1439,24 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    voteForPollOption = (livestreamId, pollId, userEmail, optionIndex) => {
-        let ref = this.firestore
+    voteForPollOption = (livestreamId, pollId, userEmail, optionId) => {
+        let pollRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("polls")
-            .doc(pollId);
-        return this.firestore.runTransaction((transaction) => {
-            return transaction.get(ref).then((pollDoc) => {
-                let poll = pollDoc.data();
-                const updatedOptions = poll.options.map((option, index) => {
-                    if (index !== optionIndex) {
-                        return option;
-                    } else {
-                        return {
-                            name: option.name,
-                            votes: option.votes ? option.votes + 1 : 1,
-                            index: index,
-                            voters: option.voters
-                                ? [...option.voters, userEmail]
-                                : [userEmail],
-                        };
-                    }
-                });
-                (poll.voters = firebase.firestore.FieldValue.arrayUnion(userEmail)),
-                    (poll.options = updatedOptions);
-                transaction.update(ref, poll);
-            });
-        });
+            .doc(pollId)
+            .collection("voters")
+            .doc(userEmail)
+        return pollRef.set({
+            optionId: optionId,
+            timestamp: this.getServerTimestamp()
+        })
+
+        // return pollRef.update({
+        //     [`options.${optionIndex}.votes`]: firebase.firestore.FieldValue.increment(1),
+        //     [`options.${optionIndex}.voters`]: firebase.firestore.FieldValue.arrayUnion(userEmail),
+        //     voters: firebase.firestore.FieldValue.arrayUnion(userEmail)
+        // })
     };
 
     setPollState = (livestreamId, pollId, state) => {
@@ -1516,7 +1633,10 @@ class Firebase {
             .collection("participatingStudents")
             .doc(userData.userEmail)
 
-        batch.set(participantsRef, userData)
+        batch.set(participantsRef, {
+            ...userData,
+            joined: this.getServerTimestamp()
+        })
         batch.update(livestreamRef, {
             participatingStudents: firebase.firestore.FieldValue.arrayUnion(userData.userEmail),
         })

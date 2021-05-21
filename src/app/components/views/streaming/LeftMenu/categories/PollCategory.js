@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {useState, useEffect, Fragment, useContext} from 'react';
 import {withFirebase} from 'context/firebase';
 import BarChartIcon from '@material-ui/icons/BarChart';
@@ -18,6 +19,7 @@ import {
     WhiteTooltip
 } from "../../../../../materialUI/GlobalTooltips";
 import {makeStyles} from "@material-ui/core/styles";
+import {getCorrectPollOptionData} from "../../../../../data/util/PollUtil";
 
 const useStyles = makeStyles(theme => ({
     pollHeader: {
@@ -25,7 +27,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function PollCategory({firebase, streamer, livestream, selectedState, showMenu, user, userData, sliding}) {
+const PollCategory = ({firebase, streamer, livestream, selectedState, showMenu, user, userData, sliding}) => {
     const classes = useStyles()
     const [addNewPoll, setAddNewPoll] = useState(false);
     const [pollEntries, setPollEntries] = useState([]);
@@ -35,12 +37,14 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
     useEffect(() => {
         if (livestream.id) {
             const unsubscribe = firebase.listenToPollEntries(livestream.id, querySnapshot => {
-                var pollEntries = [];
-                querySnapshot.forEach(doc => {
-                    let poll = doc.data();
-                    poll.id = doc.id;
-                    pollEntries.push(poll);
-                });
+                const pollEntries = querySnapshot.docs.map(doc => {
+                    const data = doc.data()
+                    return {
+                        id: doc.id,
+                        ...data,
+                        options: getCorrectPollOptionData(data)
+                    }
+                })
                 setPollEntries(pollEntries);
             });
             return () => unsubscribe();
@@ -118,7 +122,10 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
                             }} variant="contained" color="primary"/>
                 </WhiteTooltip>
             </QuestionContainerHeader>
-            <div style={{width: "100%"}}>
+            <div style={{width: "100%",
+                flex: 1,
+                overflow: "auto"
+            }}>
                 {pollElements}
             </div>
             <PollCreationModal livestreamId={livestream.id} open={addNewPoll} initialPoll={null}
@@ -127,4 +134,16 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
     );
 }
 
+PollCategory.propTypes = {
+    firebase: PropTypes.object,
+    livestream: PropTypes.object.isRequired,
+    selectedState: PropTypes.string.isRequired,
+    showMenu: PropTypes.bool.isRequired,
+    sliding: PropTypes.bool.isRequired,
+    streamer: PropTypes.bool.isRequired,
+    user: PropTypes.object,
+    userData: PropTypes.object
+}
+
 export default withFirebase(PollCategory);
+

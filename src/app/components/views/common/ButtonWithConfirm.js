@@ -1,13 +1,12 @@
 import React, {Fragment, useState} from 'react'
 import {
     Button,
-    DialogContentText,
-    Tooltip,
-    Dialog,
-    DialogContent,
-    DialogTitle,
     DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     IconButton,
+    Tooltip,
     useMediaQuery,
 } from "@material-ui/core";
 import CheckIcon from '@material-ui/icons/Check';
@@ -50,12 +49,19 @@ function ButtonWithConfirm({
                         {rest.startIcon}
                     </IconButton>
                     :
-                    <Button {...rest} style={{background: color}} color="primary" variant="contained"
-                            onClick={() => setModalOpen(true)}
-                            disabled={disabled}>{buttonLabel}</Button>
+                    <span>
+                    <Button
+                        style={{background: color}} color="primary" variant="contained"
+                        startIcon={rest.startIcon}
+                        onClick={() => setModalOpen(true)}
+                        disabled={disabled}
+                    >
+                        {buttonLabel}
+                    </Button>
+                    </span>
                 }
             </Tooltip>
-            <GlassDialog open={modalOpen} onClose={() => setModalOpen(false)} centered={false}>
+            <GlassDialog open={modalOpen} onClose={() => setModalOpen(false)}>
                 <DialogTitle>
                     Just making sure
                 </DialogTitle>
@@ -65,7 +71,7 @@ function ButtonWithConfirm({
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button startIcon={<ClearIcon/>} variant="contained" basic color='grey'
+                    <Button startIcon={<ClearIcon/>} variant="contained"
                             onClick={() => setModalOpen(false)}>
                         Cancel
                     </Button>

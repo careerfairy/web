@@ -1,14 +1,36 @@
 export default class GroupsUtil {
 
     static getGroupCategoryName(categoryId, group) {
-        let searchForCategory = group.categories.find( category => category.id === categoryId);
+        let searchForCategory = group.categories.find(category => category.id === categoryId);
         return searchForCategory.name;
     }
 
     static getGroupCategoryOptionName(categoryId, optionId, group) {
-        let searchForCategory = group.categories.find( category => category.id === categoryId);
-        let searchForOption = searchForCategory.options.find( option => option.id === optionId);
+        let searchForCategory = group.categories.find(category => category.id === categoryId);
+        let searchForOption = searchForCategory.options.find(option => option.id === optionId);
         return searchForOption.name;
+    }
+
+    static handleFlattenOptions = (group) => {
+        let optionsArray = []
+        if (group.categories && group.categories.length) {
+            group.categories.forEach(category => {
+                if (category.options && category.options.length) {
+                    category.options.forEach(option => optionsArray.push(option))
+                }
+            })
+        }
+        return optionsArray
+    }
+
+    static getUniqueGroupsFromArrayOfGroups = (groups = []) => {
+        return groups.filter(function (el) {
+            if (!this[el.groupId]) {
+                this[el.groupId] = true;
+                return true;
+            }
+            return false;
+        }, Object.create(null));
     }
 
     static getPolicyStatus = async (groups, userEmail, firebase) => {

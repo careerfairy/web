@@ -2,21 +2,27 @@ import React, {Fragment, useEffect, useMemo, useRef, useState} from "react";
 import {v4 as uuid} from 'uuid';
 import SwipeableViews from 'react-swipeable-views';
 import General from "./General";
-import {useTheme, fade, makeStyles} from "@material-ui/core/styles";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import {SwipeablePanel} from "../../../../../materialUI/GlobalPanels/GlobalPanels";
 import Audience from "./Audience";
 import Title from "./Title";
-import {
-    handleFlattenOptions,
-    handleFlattenOptionsWithoutLvlOfStudy
-} from "../../../../helperFunctions/streamFormFunctions";
 import Feedback from "./Feedback";
-import {universityCountriesMap} from "../../../../util/constants";
-import {useFirestoreConnect, withFirestore, isLoaded} from "react-redux-firebase";
-import {useSelector, shallowEqual} from "react-redux";
+import {isEmpty, isLoaded, useFirestoreConnect, withFirestore} from "react-redux-firebase";
+import {useDispatch, useSelector} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
-
-import { AppBar, Tabs, Tab, Box } from '@material-ui/core';
+import * as actions from '../../../../../store/actions'
+import {AppBar, Box, Tab, Tabs} from '@material-ui/core';
+import AnalyticsUtil, {
+    arraysOfIdsEqual,
+    getTotalUniqueStreamGroupIdsFromStreams
+} from "../../../../../data/util/AnalyticsUtil";
+import GroupsUtil from "../../../../../data/util/GroupsUtil";
+import {createSelector} from 'reselect'
+import PollUtil, {getCorrectPollOptionData} from "../../../../../data/util/PollUtil";
+import useTimeFrames from "../../../../custom-hook/useTimeFrames";
+import useUserDataSet from "../../../../custom-hook/useUserDataSet";
+import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDictionary";
+import {repositionElement} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -43,113 +49,6 @@ const useStyles = makeStyles((theme) => ({
 
 const now = new Date()
 
-const sevenDays = new Date().setDate(new Date().getDate() - 7)
-const twoWeeks = new Date().setDate(new Date().getDate() - 14)
-
-const fourWeeks = new Date().setDate(new Date().getDate() - 28)
-
-const thirtyDays = new Date().setMonth(new Date().getMonth() - 1)
-const twoMonths = new Date().setMonth(new Date().getMonth() - 2)
-
-const fourMonths = new Date().setMonth(new Date().getMonth() - 4)
-const eightMonths = new Date().setMonth(new Date().getMonth() - 8)
-
-const sixMonths = new Date().setMonth(new Date().getMonth() - 6)
-
-const oneYear = new Date().setFullYear(new Date().getFullYear() - 1)
-const twoYears = new Date().setFullYear(new Date().getFullYear() - 2)
-
-const timeFrames = [
-    {
-        name: "1 Year",
-        pastName: "year",
-        date: oneYear,
-        id: uuid()
-    },
-    {
-        name: "6 Months",
-        pastName: "6 months",
-        date: sixMonths,
-        id: uuid()
-    },
-    {
-        name: "4 Months",
-        pastName: "4 months",
-        date: fourMonths,
-        id: uuid()
-    },
-    {
-        name: "2 Months",
-        pastName: "2 months",
-        date: twoMonths,
-        id: uuid()
-    },
-    {
-        name: "month",
-        pastName: "month",
-        date: thirtyDays,
-        id: uuid()
-    },
-    {
-        name: "week",
-        pastName: "week",
-        date: sevenDays,
-        id: uuid()
-    },
-]
-
-const globalTimeFrames = [
-    {
-        globalDate: oneYear,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= oneYear),
-        name: "year",
-        id: uuid(),
-        double: twoYears
-    },
-    {
-        globalDate: sixMonths,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= sixMonths),
-        name: "six months",
-        id: uuid(),
-        double: oneYear
-    },
-    {
-        globalDate: fourMonths,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= fourMonths),
-        name: "four months",
-        id: uuid(),
-        double: eightMonths
-    },
-    {
-        globalDate: twoMonths,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= twoMonths),
-        name: "two months",
-        id: uuid(),
-        double: fourMonths
-    },
-    {
-        globalDate: thirtyDays,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= thirtyDays),
-        name: "month",
-        id: uuid(),
-        double: twoMonths
-    },
-    {
-        globalDate: twoWeeks,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= twoWeeks),
-        name: "2 weeks",
-        id: uuid(),
-        double: fourWeeks
-    },
-    {
-        globalDate: sevenDays,
-        timeFrames: timeFrames.filter(timeOb => timeOb.date >= sevenDays),
-        name: "week",
-        id: uuid(),
-        double: twoWeeks
-    },
-]
-
 const userTypes = [
     {
         propertyName: "talentPool",
@@ -165,7 +64,7 @@ const userTypes = [
     },
     {
         propertyName: "participatingStudents",
-        displayName: "Participating Students",
+        displayName: "Participating Users",
         propertyDataName: "participatingStudentsData",
         universityPropertyDataName: "universityParticipatingStudentsData"
     },
@@ -185,7 +84,34 @@ const streamDataTypes = [
         displayName: "Feedback",
     }]
 
-
+const streamsSelector = createSelector(
+    livestreams => livestreams,
+    (_, {userDataSetDictionary}) => userDataSetDictionary,
+    (_, {streamsMounted}) => streamsMounted,
+    (_, {setStreamsMounted}) => setStreamsMounted,
+    (livestreams, userDataSetDictionary, streamsMounted, setStreamsMounted) => {
+        let streams = []
+        if (livestreams) {
+            streams = livestreams.map(streamObj => {
+                const livestream = {...streamObj}
+                livestream.date = livestream.start?.toDate()
+                for (const userType of userTypes) {
+                    if (isLoaded(userDataSetDictionary) && !isEmpty((userDataSetDictionary))) {
+                        livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
+                    }
+                    livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
+                        ...userDataSetDictionary?.[userEmail],
+                    }))
+                }
+                return livestream
+            })
+            if (!streamsMounted) {
+                setStreamsMounted(true)
+            }
+        }
+        return streams
+    }
+)
 const AnalyticsOverview = ({firebase, group, firestore}) => {
     const userDataSets = [
         {
@@ -197,57 +123,85 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         {
             id: uuid(),
             dataSet: "followers",
-            displayName: "Subscribed students",
-            miscName: "All subscribed students"
+            displayName: "Total engaged students",
+            miscName: "Total engaged students"
         },
     ]
 
     if (!group.universityCode) {
         userDataSets.shift()
     }
+    const {globalTimeFrames} = useTimeFrames()
 
+    const dispatch = useDispatch()
     const classes = useStyles();
     const breakdownRef = useRef(null)
     const theme = useTheme()
     const [value, setValue] = useState(0);
     const {userData} = useAuth();
-
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [showBar, setShowBar] = useState(false);
     const [userType, setUserType] = useState(userTypes[0]);
     const [streamDataType, setStreamDataType] = useState(streamDataTypes[0]);
     const [groupOptions, setGroupOptions] = useState([]);
     const [currentStream, setCurrentStream] = useState(null);
-    const [groupOptionsWithoutLvlOfStudy, setGroupOptionsWithoutLvlOfStudy] = useState([]);
     const [fetchingQuestions, setFetchingQuestions] = useState(false);
     const [fetchingRatings, setFetchingRatings] = useState(false);
     const [fetchingPolls, setFetchingPolls] = useState(false);
     const [limitedUserTypes, setLimitedUserTypes] = useState(userTypes);
     const [currentUserDataSet, setCurrentUserDataSet] = useState(userDataSets[0]);
+    const [streamsMounted, setStreamsMounted] = useState(false);
+    const [groups, setGroups] = useState([]);
 
-    useFirestoreConnect(() => [{
+    const query = useMemo(() => [{
         collection: `livestreams`,
         where: [["start", ">", new Date(globalTimeFrame.double)], ["groupIds", "array-contains", group.id], ["test", "==", false]],
-        orderBy: ["start", "asc"]
-    }], [globalTimeFrame])
+        orderBy: ["start", "asc"],
+        storeAs: `livestreams of ${group.groupId}`
+    }], [globalTimeFrame, group.groupId])
 
-    const userDataSetDictionary = useSelector(state => state.firestore.data[currentUserDataSet.dataSet], shallowEqual)
-    const userDataSet = useSelector(state => state.firestore.ordered[currentUserDataSet.dataSet], shallowEqual)
-    const livestreamsInStore = useSelector(state => state.firestore.ordered.livestreams)
-    const livestreams = useMemo(() => livestreamsInStore?.map(streamObj => {
-        const livestream = {...streamObj}
-        livestream.date = livestream.start?.toDate()
-        for (const userType of userTypes) {
-            // if (currentUserDataSet.dataSet === "groupUniversityStudents") {// Change the graph and status data if we're looking at the groups university Students
-            livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
-            // }
-            livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
-                ...userDataSetDictionary?.[userEmail],
-                universityCountry: universityCountriesMap[userDataSetDictionary?.[userEmail]?.universityCountryCode]
-            }))
+    useFirestoreConnect(query)
+    const allGroups = useSelector(state => state.firestore.ordered?.allGroups)
+    const allGroupsDictionary = useSelector(state => state.firestore.data?.allGroups)
+    const uniStudents = useMemo(() => Boolean(currentUserDataSet.dataSet === "groupUniversityStudents"), [currentUserDataSet, group.id])
+    const userDataSetDictionary = useUserDataSetDictionary(currentUserDataSet)
+    const userDataSet = useUserDataSet(currentUserDataSet)
+
+    const livestreams = useSelector(({firestore: {ordered}}) =>
+        streamsSelector(ordered[`livestreams of ${group.groupId}`], {
+            userDataSetDictionary,
+            streamsMounted,
+            setStreamsMounted
+        })
+    )
+
+    useEffect(() => {
+        return () => setStreamsMounted(false)
+    }, [])
+
+    useEffect(() => {
+        if (uniStudents) {
+            setGroups([{...group, options: GroupsUtil.handleFlattenOptions(group)}])
+        } else if (allGroupsDictionary) {
+            const streams = currentStream ? [currentStream] : streamsFromTimeFrameAndFuture
+            let newGroupIds = getTotalUniqueStreamGroupIdsFromStreams(streams)
+            const adminGroupIdIndex = newGroupIds.findIndex(groupId => groupId === group.id)
+            if (adminGroupIdIndex > -1) {
+                repositionElement(newGroupIds, adminGroupIdIndex, 0)
+            }
+            const areEqual = arraysOfIdsEqual(newGroupIds, groups.map(({groupId}) => groupId))
+
+            if (!areEqual) {
+                const newGroups = newGroupIds.map(groupId => {
+                    const group = allGroupsDictionary[groupId]
+                    return {...group, id: group.groupId, options: GroupsUtil.handleFlattenOptions(group)}
+                })
+                setGroups(newGroups)
+            }
+
         }
-        return livestream
-    }) || [], [livestreamsInStore, userDataSet]);
+
+    }, [streamsMounted, currentStream, allGroupsDictionary, uniStudents])
 
     useEffect(() => {
         if (group.universityCode) {
@@ -255,7 +209,8 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
                 try {
                     await firestore.get({
                         collection: "userData",
-                        where: ["universityCode", "==", group.universityCode],
+                        where: [["university.code", "==", group.universityCode]],
+                        // where: [["university.code", "==", group.universityCode], ["groupIds", "array-contains", group.id]],
                         storeAs: "groupUniversityStudents",
                     })
                 } catch (e) {
@@ -265,19 +220,37 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         }
     }, [group?.universityCode]);
 
+
     useEffect(() => {
-        (async function getFollowers() {
-            try {
-                await firestore.get({
-                    collection: "userData",
-                    where: ["groupIds", "array-contains", group.id],
-                    storeAs: "followers",
-                })
-            } catch (e) {
-                console.log("-> e in getting followers", e);
-            }
-        })()
+        if (!allGroups) {
+            (async function getAllGroups() {
+                try {
+                    await firestore.get({
+                        collection: "careerCenterData",
+                        storeAs: "allGroups",
+                    })
+                } catch (e) {
+                    console.log("-> e in getting student", e);
+                }
+            })()
+        }
     }, []);
+
+    useEffect(() => {
+        if (streamsMounted && !uniStudents && (!userDataSetDictionary || !userDataSet)) {
+            (async function getTotalEngagedUsers() {
+                try {
+                    const totalIds = AnalyticsUtil.getTotalUniqueIds(livestreams)
+                    const totalUsers = await firebase.getUsersByEmail(totalIds)
+                    const dictionaryOfUsers = AnalyticsUtil.convertArrayOfUserObjectsToDictionary(totalUsers)
+                    dispatch(actions.setOrderedUserDataSet(totalUsers))
+                    dispatch(actions.setMapUserDataSet(dictionaryOfUsers))
+                } catch (e) {
+                    console.log("-> e in getting followers", e);
+                }
+            })()
+        }
+    }, [streamsMounted, uniStudents]);
 
     useEffect(() => {
         if (currentUserDataSet.dataSet === "followers" && !userData?.isAdmin) {
@@ -289,11 +262,8 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     }, [currentUserDataSet.dataSet, userData])
 
     useEffect(() => {
-        const flattenedGroupOptions = handleFlattenOptions(group)
-        const flattenedGroupOptionsWithoutLvlOfStudy = handleFlattenOptionsWithoutLvlOfStudy(group)
-        setGroupOptionsWithoutLvlOfStudy(flattenedGroupOptionsWithoutLvlOfStudy)
+        const flattenedGroupOptions = GroupsUtil.handleFlattenOptions(group)
         setGroupOptions(flattenedGroupOptions)
-
     }, [group])
 
     useEffect(() => {
@@ -303,10 +273,11 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
                 const pollEntries = querySnapshot.docs.map(doc => {
                     const data = doc.data()
                     return {
+                        ...data,
                         id: doc.id,
                         date: data.timestamp?.toDate(),
-                        votes: data.voters?.length || 0,
-                        ...data
+                        // votes: data.voters?.length || 0,
+                        options: getCorrectPollOptionData(data),
                     }
                 })
                 setCurrentStream(prevState => ({...prevState, pollEntries}));
@@ -322,12 +293,10 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             const unsubscribeQuestions = firebase.listenToLivestreamQuestions(currentStream.id, querySnapshot => {
                 const questions = querySnapshot.docs.map(doc => {
                     const questionData = doc.data()
-                    const authorData = userDataSet.find(follower => follower.userEmail === questionData.author)
                     return {
                         id: doc.id,
                         ...questionData,
                         date: questionData.timestamp?.toDate(),
-                        authorData
                     }
                 })
                 setCurrentStream(prevState => ({...prevState, questions}));
@@ -437,11 +406,10 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         group,
         futureStreams,
         globalTimeFrame,
-        loading: !isLoaded(livestreamsInStore) || !isLoaded(userDataSet),
+        loading: !isLoaded(livestreams) || !isLoaded(userDataSet),
         streamsFromTimeFrame,
         showBar,
         handleToggleBar,
-        streamsFromTimeFrameAndFuture,
         breakdownRef,
         handleScrollToBreakdown,
         currentStream,
@@ -451,6 +419,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         setUserType,
         groupOptions,
         ...(tabName !== "feedback" && {
+            streamsFromTimeFrameAndFuture,
             handleReset
         }),
         ...(tabName === "feedback" && {
@@ -463,30 +432,34 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         }),
         ...(tabName === "audience" && {
             isFollowers,
-            limitedUserTypes
+            limitedUserTypes,
+            currentUserDataSet
         }),
         ...(tabName === "general" && {
             streamsFromBeforeTimeFrame,
             userDataSet,
-            currentUserDataSet
+            currentUserDataSet,
+            groups
         }),
     })
 
 
     return (
         <Fragment>
-            <Box className={classes.title} p={3}>
-                <Title
-                    setGlobalTimeFrame={setGlobalTimeFrame}
-                    userDataSets={userDataSets}
-                    currentUserDataSet={currentUserDataSet}
-                    setCurrentUserDataSet={setCurrentUserDataSet}
-                    globalTimeFrames={globalTimeFrames}
-                    group={group}
-                    globalTimeFrame={globalTimeFrame}
-                />
-            </Box>
             <AppBar className={classes.appBar} position="sticky" color="default">
+                <Box className={classes.title}>
+                    <Title
+                        setGlobalTimeFrame={setGlobalTimeFrame}
+                        userDataSets={userDataSets}
+                        streamsMounted={streamsMounted}
+                        setStreamsMounted={setStreamsMounted}
+                        currentUserDataSet={currentUserDataSet}
+                        setCurrentUserDataSet={setCurrentUserDataSet}
+                        globalTimeFrames={globalTimeFrames}
+                        group={group}
+                        globalTimeFrame={globalTimeFrame}
+                    />
+                </Box>
                 <Tabs
                     value={value}
                     TabIndicatorProps={{className: classes.indicator}}

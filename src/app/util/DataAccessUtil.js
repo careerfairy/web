@@ -9,8 +9,8 @@ export default class DataAccessUtil {
         } else {
             return this.sendLivestreamEmailRegistrationConfirmation(user, userData, livestream);
         }
-    } 
-    
+    }
+
     static sendLivestreamEmailRegistrationConfirmation(user, userData, livestream) {
         return axios({
             method: 'post',

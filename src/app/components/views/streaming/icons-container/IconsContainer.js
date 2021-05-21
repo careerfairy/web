@@ -1,4 +1,4 @@
-import React, {memo, useContext, useEffect, useMemo, useState} from 'react';
+import React, {memo, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import * as actions from '../../../../store/actions'
 import RubberBand from 'react-reveal/RubberBand';
 import {makeStyles} from "@material-ui/core/styles";
@@ -11,8 +11,6 @@ import {useDispatch, useSelector} from "react-redux";
 import {TransitionGroup} from "react-transition-group";
 import {EMOTE_MESSAGE_TEXT_TYPE} from "../../../util/constants";
 import clsx from "clsx";
-
-var _ = require('lodash')
 
 const useStyles = makeStyles(theme => ({
     root: {},
@@ -53,7 +51,6 @@ const START_DISTANCE = 0
 const ActionButton = React.memo(({iconName, color, getRandomDuration, getRandomHorizontalPosition, id}) => {
     const [distance, setDistance] = useState(START_DISTANCE)
     const [opacity, setOpacity] = useState(1)
-
     useEffect(() => {
         setDistance(-100)
         setOpacity(0)
@@ -73,7 +70,6 @@ const ActionButton = React.memo(({iconName, color, getRandomDuration, getRandomH
         }
     }
 
-
     return (
         <div className={classes.animatedBox}>
             <RubberBand style={{position: "absolute"}}>
@@ -83,7 +79,7 @@ const ActionButton = React.memo(({iconName, color, getRandomDuration, getRandomH
             </RubberBand>
         </div>
     )
-})
+}, () => true)
 
 const randomInteger = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -110,7 +106,7 @@ function IconsContainer({className}) {
         }
     }, [showBubbles])
 
-    const simulateEmotes = () => {
+    const simulateEmotes =  () => {
         const index = randomInteger(1, 3)
         const memberId = uuidv4()
         const message = {
@@ -121,15 +117,15 @@ function IconsContainer({className}) {
         dispatch(actions.setEmote(message, memberId))
     }
 
-    function getRandomHorizontalPosition(maxDistance) {
+    const getRandomHorizontalPosition = useCallback((maxDistance) => {
         return Math.random() * maxDistance;
-    }
+    }, [])
 
-    function getRandomDuration(min, max) {
+    const getRandomDuration = useCallback((min, max) => {
         return Math.random() * (max - min) + min //returns int between min and max
-    }
+    }, [])
 
-    const getColor = (iconName) => {
+    const getColor = useCallback((iconName) => {
         if (iconName === "clapping") {
             return "#f15946"
         } else if (iconName === "heart") {
@@ -137,25 +133,23 @@ function IconsContainer({className}) {
         } else {
             return "#e01a4f"
         }
-    }
+    }, [])
 
     return (
         <div className={clsx(classes.root, className)}>
-            <TransitionGroup>
-                {emotesData.length > 0 && (
-                    <TransitionGroup>
-                        {emotesData.map((iconEl) => (
-                            <ActionButton
-                                id={iconEl.timestamp}
-                                key={iconEl.timestamp}
-                                getRandomHorizontalPosition={getRandomHorizontalPosition}
-                                iconName={iconEl.emoteType}
-                                getRandomDuration={getRandomDuration}
-                                color={getColor(iconEl.emoteType)}/>
-                        ))}
-                    </TransitionGroup>
-                )}
-            </TransitionGroup>
+            {emotesData.length > 0 && (
+                <TransitionGroup>
+                    {emotesData.map((iconEl) => (
+                        <ActionButton
+                            id={iconEl.timestamp}
+                            key={iconEl.timestamp}
+                            getRandomHorizontalPosition={getRandomHorizontalPosition}
+                            iconName={iconEl.emoteType}
+                            getRandomDuration={getRandomDuration}
+                            color={getColor(iconEl.emoteType)}/>
+                    ))}
+                </TransitionGroup>
+            )}
         </div>
     );
 }

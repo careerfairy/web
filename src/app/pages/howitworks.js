@@ -1,14 +1,11 @@
-import { Fragment, useEffect, useRef, useState } from "react";
-import {Container, Grid, Image, Button, Icon} from "semantic-ui-react";
+import { Fragment, useEffect, useState } from "react";
 
 import { withFirebase } from '../context/firebase/FirebaseContext';
-import { useRouter } from 'next/router';
-import { compose } from 'redux';
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
-import { urlObjectKeys } from "next/dist/next-server/lib/utils";
 
 import Head from 'next/head';
+import { Container, Grid } from "@material-ui/core";
 
 function HowItWorks(props) {
 
@@ -27,26 +24,6 @@ function HowItWorks(props) {
             setCompanies(companiesList);
         });
     }, []);
-
-    let companyPreviewElements = companies.filter(company => company.rank === 1).map( (company, index) => {
-        return (
-            <Grid.Column computer='2' mobile='3' key={index}>
-                <div className='overviewPreviewLogoContainer'>
-                    <div>
-                        <Image style={{ maxHeight: '40px', filter: 'brightness(0) invert(0.9)', margin: '0 auto' }} src={company.logoUrl}/>
-                    </div>
-                        <style jsx>{`
-                            .overviewPreviewLogoContainer div {
-                                width: 80%;
-                                margin: 0 auto;
-                                text-align: center;
-                                padding: 20px 0;
-                            }
-                        `}</style>
-                </div>
-            </Grid.Column>
-        );
-    })
 
     function goToRoute(route) {
         router.push(route);
@@ -68,39 +45,35 @@ function HowItWorks(props) {
                 </div>
             </div>
             <div className='top-icons'>
-                <Container>
+                <Container style={{ textAlign: 'center' }}>
                     <div className='company-icons-label'>What is CareerFairy?</div>
                     <div className='company-icons-sublabel'>From your laptop or smartphone, meet employees who share your background.<br/> Ask any question and get the answer during the livestream!</div>
-                    <Image id='meet-companies-image' style={{ width: '80%', maxWidth: '900px', margin: '0 auto 50px auto'}} src={secondPicture}/>
+                    <img id='meet-companies-image' style={{ width: '80%', maxWidth: '900px', margin: '0 auto 50px auto'}} src={secondPicture}/>
                     <div className='company-icons-sublabel'>Discover their work, see their office, get answers to all your questions and find out how you could join them in the future.</div>
-                    <Grid centered textAlign='center'>
-                    </Grid>
                 </Container>     
             </div>
             <div className='company-icons'>
                 <Container>
                 <div className='company-icons-label'>How it works</div>
-                <Grid stackable centered>
-                        <Grid.Row>
-                            <Grid.Column textAlign='center' style={{ padding: '0 25px' }} width={4}>
-                                <h1 style={{ fontSize: '4em', color: 'rgb(0, 210, 170)'}}>1</h1>
-                                <h2 className='careerStep'>Register to your favorite events</h2>
-                                {/* <Image className='stepImage' src={planning} style={{ width: '40%', margin: '30px auto'}}/> */}
-                                <div>We’ll notify you shortly before the live stream starts to ensure that you don’t miss anything!</div>                
-                            </Grid.Column>
-                            <Grid.Column textAlign='center' style={{ padding: '0 25px' }} width={4}>
-                                <h1 style={{ fontSize: '4em', color: 'rgb(0, 210, 170)'}}>2</h1>
-                                <h2 className='careerStep'>Join live stream & ask questions</h2>
-                                {/* <Image className='stepImage' src={digitalMarketing}  style={{ width: '40%', margin: '30px auto'}}/> */}
-                                <div>Be anonymous or show the company that you’re interested. Ask your written questions or just listen to the speaker. It’s up to you.</div>
-                            </Grid.Column>
-                            <Grid.Column textAlign='center' style={{ padding: '0 25px' }} width={4}>
-                                <h1 style={{ fontSize: '4em', color: 'rgb(0, 210, 170)'}}>3</h1>
-                                <h2 className='careerStep'>If convinced, join the talent pool</h2>
-                                {/* <Image className='stepImage' src={value}  style={{ width: '40%', margin: '30px auto'}}/> */}
-                                <div>In one click, let the company know you’re interested and be contacted if there’s an opportunity for you at any point in the future.</div>
-                            </Grid.Column>
-                        </Grid.Row>
+                    <Grid container justify="center" style={{ textAlign: "center" }}>
+                        <Grid item xs={3} style={{ padding: '0 25px' }}>
+                            <h1 style={{ fontSize: '4em', color: 'rgb(0, 210, 170)'}}>1</h1>
+                            <h2 className='careerStep'>Register to your favorite events</h2>
+                            {/* <Image className='stepImage' src={planning} style={{ width: '40%', margin: '30px auto'}}/> */}
+                            <div>We’ll notify you shortly before the live stream starts to ensure that you don’t miss anything!</div>                
+                        </Grid>
+                        <Grid item xs={3} style={{ padding: '0 25px' }}>
+                            <h1 style={{ fontSize: '4em', color: 'rgb(0, 210, 170)'}}>2</h1>
+                            <h2 className='careerStep'>Join live stream & ask questions</h2>
+                            {/* <Image className='stepImage' src={digitalMarketing}  style={{ width: '40%', margin: '30px auto'}}/> */}
+                            <div>Be anonymous or show the company that you’re interested. Ask your written questions or just listen to the speaker. It’s up to you.</div>
+                        </Grid>
+                        <Grid item xs={3} style={{ padding: '0 25px' }}>
+                            <h1 style={{ fontSize: '4em', color: 'rgb(0, 210, 170)'}}>3</h1>
+                            <h2 className='careerStep'>If convinced, join the talent pool</h2>
+                            {/* <Image className='stepImage' src={value}  style={{ width: '40%', margin: '30px auto'}}/> */}
+                            <div>In one click, let the company know you’re interested and be contacted if there’s an opportunity for you at any point in the future.</div>
+                        </Grid>
                     </Grid>
                 </Container>     
             </div>

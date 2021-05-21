@@ -1,20 +1,28 @@
-import React, {useState, useEffect, useContext} from 'react';
+import PropTypes from 'prop-types'
+import React, {memo, useContext, useEffect, useState} from 'react';
 import ThumbUpRoundedIcon from '@material-ui/icons/ThumbUpRounded';
 import Linkify from 'react-linkify';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
 import {withFirebase} from 'context/firebase';
-import { Box, Button, Slide, TextField, Grow, Typography, Collapse, Card, Paper } from "@material-ui/core";
-import {makeStyles, useTheme} from "@material-ui/core/styles";
-import {PlayIconButton} from "materialUI/GlobalButtons/GlobalButtons";
 import {
-    TooltipButtonComponent,
-    TooltipText,
-    TooltipTitle,
-    WhiteTooltip
-} from "materialUI/GlobalTooltips";
+    Box,
+    Button,
+    Card,
+    CircularProgress, ClickAwayListener,
+    Collapse,
+    Grow,
+    Paper,
+    Slide,
+    TextField,
+    Typography
+} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
+import {PlayIconButton} from "materialUI/GlobalButtons/GlobalButtons";
+import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "materialUI/GlobalTooltips";
 import TutorialContext from "context/tutorials/TutorialContext";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
+import {compose} from "redux"
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
@@ -80,62 +88,74 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
-    const classes = useStyles()
-    return (
-        <div className={classes.reactionsToggle} onClick={() => setShowAllReactions(!showAllReactions)}>
-            {showAllReactions ? <ExpandLessRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/> :
-                <ExpandMoreRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/>}
+const ReactionsToggle = ({handleToggle, showAllReactions, loading, active}) => {
+    const classes = useStyles({active})
+
+    return loading ? (
+        <CircularProgress/>
+    ) : (
+        <div className={classes.reactionsToggle} onClick={handleToggle}>
+            {showAllReactions ? (
+                <ExpandLessRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/>
+            ) : (
+                <ExpandMoreRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/>)}
             <Typography className={classes.showText}>{showAllReactions ? 'Hide' : 'Show all reactions'}</Typography>
         </div>
     )
 }
 
-const QuestionContainer = ({
-                               sliding,
-                               user,
-                               livestream,
-                               streamer,
-                               question,
-                               questions,
-                               firebase,
-                               index,
-                               isNextQuestions,
-                               selectedState,
-                               showMenu
-                           }) => {
+
+const QuestionContainer = memo(({
+                                    sliding,
+                                    user,
+                                    livestream,
+                                    streamer,
+                                    question,
+                                    firebase,
+                                    index,
+                                    isNextQuestions,
+                                    selectedState,
+                                    goToThisQuestion,
+                                    setOpenQuestionId,
+                                    openQuestionId,
+                                    showMenu
+                                }) => {
 
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
     const {authenticatedUser, userData} = useAuth();
     const {tutorialSteps, handleConfirmStep} = useContext(TutorialContext);
-
+    const [loading, setLoading] = useState(false);
     const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream?.test)
     const active = question?.type === 'current'
     const old = question?.type !== 'new'
     const upvoted = (!user && !livestream?.test) || (question?.emailOfVoters ? question?.emailOfVoters.indexOf(livestream?.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
     const classes = useStyles({active})
 
-
     useEffect(() => {
-        if (livestream.id && question.id) {
+        if (livestream.id && question.id && showAllReactions) {
+            setLoading(true)
             const unsubscribe = firebase.listenToQuestionComments(livestream.id, question.id, querySnapshot => {
-                var commentsList = [];
-                querySnapshot.forEach(doc => {
-                    let comment = doc.data();
-                    comment.id = doc.id;
-                    commentsList.push(comment);
-                });
-                setComments(commentsList);
+                setComments(querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()})));
+                setLoading(false)
             });
             return () => unsubscribe();
         }
-    }, [livestream.id, question.id]);
+    }, [livestream.id, question.id, showAllReactions]);
+
+    useEffect(() => {
+        if (livestream.id && question.id && !showAllReactions) {
+            if (question.firstComment) {
+                setComments([question.firstComment])
+            }
+        }
+    }, [question.firstComment, showAllReactions]);
+
 
     useEffect(() => {
         if (active && !showAllReactions) {
-            setShowAllReactions(true)
+            makeGloballyActive()
         }
     }, [active, question.type])
 
@@ -156,7 +176,7 @@ const QuestionContainer = ({
         firebase.putQuestionComment(livestream.id, question.id, newComment)
             .then(() => {
                 setNewCommentTitle("");
-                setShowAllReactions(true);
+                makeGloballyActive()
             }, error => {
                 console.log("Error: " + error);
             })
@@ -172,15 +192,6 @@ const QuestionContainer = ({
     function upvoteLivestreamQuestion() {
         let authEmail = livestream.test ? 'streamerEmail' : authenticatedUser.email;
         firebase.upvoteLivestreamQuestion(livestream.id, question, authEmail);
-    }
-
-    function goToThisQuestion(nextQuestionId) {
-        const currentQuestion = questions.find(question => question.type === 'current');
-        if (currentQuestion) {
-            firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, livestream.id);
-        } else {
-            firebase.goToNextLivestreamQuestion(null, nextQuestionId, livestream.id);
-        }
     }
 
     const isOpen = (property) => {
@@ -200,18 +211,39 @@ const QuestionContainer = ({
         </a>
     );
 
+    const makeGloballyActive = () => {
+        setOpenQuestionId(question.id)
+        setShowAllReactions(true)
+    }
+    const clearGloballyActive = () => {
+        setOpenQuestionId("")
+        setShowAllReactions(false)
+    }
 
-    let commentsElements = comments.map((comment, index) => {
+    const handleToggle = () => {
+        if (showAllReactions) {
+            clearGloballyActive()
+        } else {
+            makeGloballyActive()
+        }
+    }
+
+    let commentsElements = comments.map(comment => {
         return (
             <Slide key={comment.id} in direction="right">
-                <Box className={classes.questionComment} borderRadius={8} mb={1} p={1} component={Card}>
+                <Box key={comment.id} className={classes.questionComment} borderRadius={8} mb={1} p={1}
+                     component={Card}>
                     <div style={{wordBreak: "break-word"}}>
                         <Linkify componentDecorator={componentDecorator}>
+                            <span>
                             {comment.title}
+                            </span>
                         </Linkify>
                     </div>
                     <div style={{fontSize: "0.8em", color: "rgb(160,160,160)"}}>
+                        <span>
                         @{comment.author}
+                        </span>
                     </div>
                 </Box>
             </Slide>
@@ -235,12 +267,17 @@ const QuestionContainer = ({
                 <Paper elevation={4} className={classes.questionContainer}>
                     <div style={{padding: "20px 20px 5px 20px"}}>
                         <div className={classes.upVotes}>
-                            {question.votes} <ThumbUpRoundedIcon color="inherit"
-                                                                 style={{verticalAlign: "text-top"}}
-                                                                 fontSize='small'/>
+                            <span>
+                            {question.votes}
+                            </span>
+                            <ThumbUpRoundedIcon color="inherit"
+                                                style={{verticalAlign: "text-top"}}
+                                                fontSize='small'/>
                         </div>
                         <div className={classes.reactionsQuestion}>
+                            <span>
                             {question.title}
+                            </span>
                         </div>
                         <Typography style={{
                             fontSize: "1em",
@@ -249,15 +286,21 @@ const QuestionContainer = ({
                             color: active ? "white" : "rgb(200,200,200)",
                             marginBottom: "1rem"
                         }}>
-                            {comments.length} reaction{comments.length !== 1 && "s"}
+                            {question.numberOfComments || 0} reaction{question.numberOfComments !== 1 &&
+                        <span>s</span>}
                         </Typography>
                         {commentsElements[0]}
-                        <Collapse style={{width: "100%"}} in={showAllReactions}>
+                        <Collapse style={{width: "100%"}}
+                                  in={showAllReactions && !loading && question.id === openQuestionId}>
                             {commentsElements.slice(1)}
                         </Collapse>
-                        {comments.length > 1 && <ReactionsToggle
-                            setShowAllReactions={setShowAllReactions}
-                            showAllReactions={showAllReactions}/>}
+                        {question.numberOfComments > 1 &&
+                        <ReactionsToggle
+                            handleToggle={handleToggle}
+                            active={active}
+                            showAllReactions={showAllReactions}
+                            loading={loading}
+                        />}
                     </div>
                     <WhiteTooltip
                         placement="right-start"
@@ -313,7 +356,6 @@ const QuestionContainer = ({
                             } open={isOpen(1)}>
                             <Button
                                 startIcon={<ThumbUpRoundedIcon/>}
-                                children={active ? "Answering" : old ? "Answered" : "Answer Now"}
                                 size='small'
                                 disableElevation
                                 disabled={old}
@@ -325,11 +367,15 @@ const QuestionContainer = ({
                                     isOpen(1) && handleConfirmStep(1)
                                 }}
                                 variant="contained"
-                            />
+                            >
+                                {active ?
+                                    <span>Answering</span> : old ? <span>Answered</span> :
+                                        <span>Answer Now</span>
+                                }
+                            </Button>
                         </WhiteTooltip>
                         : <Button
                             startIcon={<ThumbUpRoundedIcon/>}
-                            children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
                             size='small'
                             disableElevation
                             className={classes.questionButton}
@@ -337,12 +383,39 @@ const QuestionContainer = ({
                             fullWidth
                             variant="contained"
                             onClick={() => upvoteLivestreamQuestion()}
-                            disabled={old || upvoted}/>}
+                            disabled={old || upvoted}>
+                            {!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ?
+                                <span>
+                                UPVOTED!
+                                </span>
+                                :
+                                <span>
+                                UPVOTE
+                                </span>
+                            }
+                        </Button>}
                 </Paper>
             </WhiteTooltip>
         </Grow>
     );
+})
+
+QuestionContainer.propTypes = {
+    goToThisQuestion: PropTypes.func.isRequired,
+    index: PropTypes.number.isRequired,
+    isNextQuestions: PropTypes.bool.isRequired,
+    livestream: PropTypes.object.isRequired,
+    question: PropTypes.object.isRequired,
+    selectedState: PropTypes.any,
+    showMenu: PropTypes.bool,
+    sliding: PropTypes.bool,
+    streamer: PropTypes.bool,
+    user: PropTypes.object,
+    setOpenQuestionId: PropTypes.func.isRequired,
+    openQuestionId: PropTypes.string
 }
 
+export default compose(
+    withFirebase,
+)(QuestionContainer)
 
-export default withFirebase(QuestionContainer);

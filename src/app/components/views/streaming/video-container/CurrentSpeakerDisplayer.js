@@ -12,8 +12,8 @@ const useStyles = makeStyles(theme => ({
         height: "100%",
         display: "inline-block",
         width: 250,
-        [theme.breakpoints.down("mobile")]: {
-            width: 150
+        [theme.breakpoints.down("sm")]: {
+            width: 190
         },
     },
     externalSpeakerVideo: {
@@ -42,7 +42,10 @@ const useStyles = makeStyles(theme => ({
         height: "100%",
         display: "inline-block",
         verticalAlign: "top",
-        margin: "0"
+        margin: "0",
+        [theme.breakpoints.down("sm")]: {
+            minWidth: 190,
+        },
     },
     localSpeakerVideo: {
         position: "absolute",
@@ -63,7 +66,10 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: "black",
         width: "100%",
         margin: "0 auto",
-        zIndex: 2000
+        zIndex: 2000,
+        "& video": {
+            // objectFit: "contain !important",
+        }
     },
     relativeContainer: {
         position: "relative",
@@ -77,6 +83,12 @@ const useStyles = makeStyles(theme => ({
         overflowY: "hidden",
         whiteSpace: "nowrap",
         textAlign: "center",
+        '& > div': {
+            margin: theme.spacing(0.2),
+        },
+        // '& > *:nth-last-child(n+2)': {
+        //     margin: theme.spacing(0, 0.2)
+        // },
         '&::-webkit-scrollbar': {
             height: 5
         },
@@ -91,22 +103,24 @@ const useStyles = makeStyles(theme => ({
 
 function CurrentSpeakerDisplayer(props) {
     const classes = useStyles()
-
     const windowSize = useWindowSize();
 
     function getVideoContainerHeight(streamId) {
         if (props.isPlayMode) {
             if (props.smallScreenMode) {
-                return windowSize.width > 768 ? '20vh' : '15vh';
+                return "20vh"
+                // return windowSize.width > 768 ? '20vh' : '15vh';
             }
             if (props.streams.length > 1) {
                 if (streamId === props.currentSpeaker) {
-                    return windowSize.width > 768 ? 'calc(80vh - 55px)' : '45vh';
+                    return windowSize.width > 768 ? 'calc(80vh - 55px)' : '80vh';
+                    // return windowSize.width > 768 ? 'calc(80vh - 55px)' : '45vh';
                 } else {
-                    return windowSize.width > 768 ? '20vh' : '15vh';
+                    return "20vh";
+                    // return windowSize.width > 768 ? '20vh' : '15vh';
                 }
             } else {
-                return windowSize.width > 768 ? 'calc(100vh - 55px)' : '60vh';
+                return windowSize.width > 768 ? 'calc(100vh - 55px)' : props.isViewer ? '100vh' : '60vh';
             }
         } else {
             if (props.smallScreenMode) {
@@ -114,7 +128,7 @@ function CurrentSpeakerDisplayer(props) {
             }
             if (props.streams.length > 0) {
                 if (streamId === props.currentSpeaker) {
-                    return 'calc(80vh - 55px)';
+                    return (windowSize.width > 768 || !props.isViewer) ? 'calc(80vh - 55px)' : '80vh';
                 } else {
                     return '20vh';
                 }
@@ -127,7 +141,8 @@ function CurrentSpeakerDisplayer(props) {
     function getMinimizedSpeakersGridHeight() {
         if (props.isPlayMode) {
             if (props.streams.length > 1 || props.smallScreenMode) {
-                return windowSize.width > 768 ? '20vh' : '15vh';
+                return "20vh";
+                // return windowSize.width > 768 ? '20vh' : '15vh';
             } else {
                 return '0';
             }
@@ -160,27 +175,54 @@ function CurrentSpeakerDisplayer(props) {
         }
     }
 
-    let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
-        const videoClass = getVideoContainerClass(stream.streamId, "external");
-        return (
-            <div key={stream.streamId} className={ classes[videoClass] }
-                 style={{padding: 0}}>
-                <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream}
-                    height={ getVideoContainerHeight(stream.streamId) } small={ videoClass.includes("QuarterWidth") } index={index}/>
-            </div>
-        );
-    });
+    let externalVideoElements = []
+
+    if (props.streams.length > 4) {
+        let currentSpeakerStream = props.streams.find( stream => stream.streamId === props.currentSpeaker )
+        let rearrangedVideoStreams = props.streams.filter( stream => stream.streamId !== props.currentSpeaker )
+
+        if (currentSpeakerStream) {
+            rearrangedVideoStreams.unshift(currentSpeakerStream);
+        }
+        externalVideoElements = rearrangedVideoStreams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
+            const videoClass = getVideoContainerClass(stream.streamId, "external");
+            return (
+                <div key={stream.streamId} className={classes[videoClass]}
+                     style={{padding: 0}}>
+                    <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream}
+                                          height={getVideoContainerHeight(stream.streamId)}
+                                          small={videoClass.includes("QuarterWidth")} index={index}/>
+                </div>
+            );
+        });
+    } else {
+        externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
+            const videoClass = getVideoContainerClass(stream.streamId, "external");
+            return (
+                <div key={stream.streamId} className={classes[videoClass]}
+                     style={{padding: 0}}>
+                    <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream}
+                                          height={getVideoContainerHeight(stream.streamId)}
+                                          small={videoClass.includes("QuarterWidth")} index={index}/>
+                </div>
+            );
+        });
+    }
 
     if (!props.isPlayMode) {
         const localVideoClass = getVideoContainerClass(props.localId, "local");
-        const localSpeaker = props.currentLivestream.speakers?.find( speaker => speaker.speakerUuid === props.localId );
-        let localVideoElement = 
-            <div key={"localVideo"} className={ classes[localVideoClass] }>
-                <LocalVideoContainer localId={props.localId} localSpeaker={localSpeaker} height={getVideoContainerHeight(props.localId)} small={localVideoClass.includes("QuarterWidth")} {...props}/>
+        const localSpeaker = props.currentLivestream.liveSpeakers?.find(speaker => speaker.speakerUuid === props.localId);
+        let localVideoElement =
+            <div key={"localVideo"} className={classes[localVideoClass]}>
+                <LocalVideoContainer localId={props.localId} localSpeaker={localSpeaker}
+                                     height={getVideoContainerHeight(props.localId)}
+                                     small={localVideoClass.includes("QuarterWidth")} {...props}/>
             </div>
 
         externalVideoElements.unshift(localVideoElement);
     }
+
+    //TO BE TESTED
 
     return (
         <div className={classes.relativeContainer}>
