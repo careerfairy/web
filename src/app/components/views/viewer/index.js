@@ -105,7 +105,6 @@ const ViewerOverview = ({
                 <MiniChatContainer className={classes.miniChatContainer} livestream={currentLivestream}
                                    isStreamer={false}/>}
 
-                <EmoteButtons/>
             </div>
             <IconsContainer className={classes.iconsContainer}
                             isTest={currentLivestream.test}

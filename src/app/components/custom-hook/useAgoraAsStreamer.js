@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import window, {document} from 'global';
 import {useAgoraToken} from './useAgoraToken';
 import {useDispatch} from "react-redux";
@@ -107,6 +107,14 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         }
     }, [readyToConnect])
 
+    const createEmote = useCallback(async (emoteType) => {
+        try {
+            const messageToSend = await dispatch(actions.createEmote(emoteType))
+            rtmChannel.sendMessage(messageToSend)
+        } catch (e) {
+        }
+    }, [dispatch, rtmChannel])
+
     const connectAgoraRTC = () => {
 
         setAgoraRtcStatus({
@@ -122,7 +130,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         });
         rtcClient.init(AGORA_APP_ID);
         AgoraRTC.Logger.setLogLevel(AgoraRTC.Logger.ERROR)
-        //rtcClient.startProxyServer(3);
 
         setAgoraRtcStatus({
             type: "INFO",
@@ -130,6 +137,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         })
 
         if (!isViewer) {
+            rtcClient.startProxyServer(3);
             rtcClient.setClientRole("host")
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
 
@@ -402,7 +410,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
             channel.join().then(() => {
 
-                dispatch(actions.setRtmChannelObj(channel))
                 console.log('Joined channel');
                 // channel.getMembers().then(result => {
                 //     console.log("-> getMembers result", result);
@@ -428,7 +435,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                         codec: "vp8",
                     });
                     screenShareClient.setClientRole('host')
-                    //screenShareClient.startProxyServer(3);
+                    screenShareClient.startProxyServer(3);
 
                     screenShareClient.init(AGORA_APP_ID, () => {
                         publishScreenShareStream(screenShareClient)
@@ -676,6 +683,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         networkQuality,
         numberOfViewers,
         setAddedStream,
-        setRemovedStream
+        setRemovedStream,
+        createEmote
     };
 }

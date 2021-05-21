@@ -60,7 +60,7 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
     const classes = useStyles({hasStarted: currentLivestream?.hasStarted})
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('md'))
-    const {query: {livestreamId}} = useRouter()
+    const {query: {livestreamId, token}} = useRouter()
     const {toggleTheme, themeMode} = useThemeToggle()
 
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
@@ -75,7 +75,7 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
             if (window?.location?.origin) {
                 baseUrl = window.location.origin
             }
-            const link = `${baseUrl}/streaming/${livestreamId}/joining-streamer?pwd=qdhwuiehd7qw789d79w8e8dheiuhiqwdu`;
+            const link = `${baseUrl}/streaming/${livestreamId}/joining-streamer?token=${token}`;
             setJoiningStreamerLink(link)
         }
     }, [livestreamId])

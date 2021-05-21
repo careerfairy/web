@@ -98,7 +98,7 @@ const RemoteVideoContainer = ({
             generateDemoHandRaiser()
         } else {
             if (!stream.stream.isPlaying()) {
-                stream.stream.play(stream.streamId, {fit: isScreenShareVideo ? 'contain' : 'cover'}, err => {
+                stream?.stream?.play(stream.streamId, {fit: isScreenShareVideo ? 'contain' : 'cover'}, err => {
                     if (err) {
                         setShowVideoButton({paused: false, muted: true});
                     }
@@ -118,7 +118,7 @@ const RemoteVideoContainer = ({
 
     useEffect(() => {
         if (unmute) {
-            stream.stream.play(stream.streamId, {muted: false});
+            stream.stream?.play(stream.streamId, {muted: false});
         }
     }, [unmute])
 

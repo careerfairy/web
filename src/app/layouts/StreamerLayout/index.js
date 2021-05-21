@@ -10,9 +10,9 @@ import {useRouter} from "next/router";
 import NotificationsContext from "../../context/notifications/NotificationsContext";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import {v4 as uuidv4} from "uuid";
-import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
-import {shallowEqual, useSelector} from "react-redux";
+import {isLoaded} from "react-redux-firebase";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -64,6 +64,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const StreamerLayout = (props) => {
+
     const {children, firebase} = props
     const {query: {token, livestreamId}, pathname} = useRouter()
     const router = useRouter();
@@ -88,22 +89,14 @@ const StreamerLayout = (props) => {
 
     const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
     const isMainStreamer = useMemo(() => pathname === "/streaming/[livestreamId]/main-streamer", [pathname])
-    const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'careerCenters'}]
-    const query = useMemo(() => livestreamId ? [
-        {
-            collection: "livestreams",
-            doc: livestreamId,
-            storeAs: "currentLivestream",
-            populates
-        }
-    ] : [], [livestreamId])
 
-    useFirestoreConnect(query)
+    const currentLivestream = useStreamConnect()
 
-    const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
-        ...populate(firestore, "currentLivestream", populates),
-        id: livestreamId
-    }, shallowEqual)
+
+    // const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
+    //     ...populate(firestore, "currentLivestream", populates),
+    //     id: livestreamId
+    // }, shallowEqual)
 
     const classes = useStyles({
         showMenu,
