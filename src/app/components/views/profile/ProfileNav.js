@@ -6,7 +6,7 @@ import {Container, Typography, useMediaQuery, AppBar, Tabs, Tab, Box} from "@mat
 import {withFirebase} from "context/firebase";
 import JoinedGroups from "./my-groups/JoinedGroups";
 import AdminGroups from "./my-groups/AdminGroups";
-import UserData from "./user-data/UserData";
+import UserData from "./userData";
 import {useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 import {useAuth} from "../../../HOCs/AuthProvider";
