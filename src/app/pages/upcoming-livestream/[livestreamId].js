@@ -32,6 +32,7 @@ import {companyLogoPlaceholder} from "../../constants/images";
 import {getResizedUrl} from "../../components/helperFunctions/HelperFunctions";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
 import Typography from "@material-ui/core/Typography";
+import JoinTalentPoolModal from "../../components/views/common/join-talent-pool-modal/JoinTalentPoolModal";
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
