@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 
@@ -50,13 +50,20 @@ const ProfileNav = ({userData}) => {
     const [value, setValue] = useState(0);
     const {authenticatedUser} = useAuth()
 
-    useFirestoreConnect(() => [
-        {
-            collection: 'careerCenterData',
-            where: userData.isAdmin ? ["test", "==", false] : ["adminEmails", "array-contains", authenticatedUser.email],
-            storeAs: "adminGroups"
+    const query = useMemo(() => {
+        let query = []
+        if (authenticatedUser?.email) {
+            query.push({
+                collection: 'careerCenterData',
+                where: userData?.isAdmin ? ["test", "==", false] : ["adminEmails", "array-contains", authenticatedUser?.email],
+                storeAs: "adminGroups"
+            })
         }
-    ])
+        return query
+    }, [authenticatedUser?.email, userData?.isAdmin])
+
+    useFirestoreConnect(query)
+
     const adminGroups = useSelector(state => state.firestore.ordered["adminGroups"] || [])
 
     const handleChange = (event, newValue) => {
