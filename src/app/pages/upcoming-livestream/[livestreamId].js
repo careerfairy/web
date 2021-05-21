@@ -456,7 +456,7 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
     let logoElements = careerCenters.map((careerCenter, index) => {
         return (
             <Grid item xs={4} md={3} key={careerCenter.groupId}>
-                <Paper className={classes.logoWrapper} justify="center" style={{ textAlign: "center" }}>
+                <Paper className={classes.logoWrapper} justify="center" style={{textAlign: "center"}}>
                     <img
                         src={getResizedUrl(careerCenter.logoUrl, "md")}
                         style={{
@@ -464,6 +464,7 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                             maxWidth: "250px",
                             width: "100%",
                             margin: "10px auto 5px auto",
+                            objectFit: "contain"
                         }}
                     />
                 </Paper>
@@ -508,8 +509,8 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                                     border: userIsRegistered() ? "2px solid white" : "",
                                 }}
                             >
-                                <RssFeedIcon style={{ verticalAlign: "middle", marginRight: 5 }}/>
-                                <span style={{ verticalAlign: "middle" }}>Live stream</span>
+                                <RssFeedIcon style={{verticalAlign: "middle", marginRight: 5}}/>
+                                <span style={{verticalAlign: "middle"}}>Live stream</span>
                             </div>
                             <div
                                 className="livestream-title"
@@ -522,7 +523,7 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                                 style={{color: userIsRegistered() ? "white" : ""}}
                             >
                 <span>
-                  <DateRangeIcon style={{ marginRight: 5 }}/>
+                  <DateRangeIcon style={{marginRight: 5}}/>
                     {DateUtil.getPrettyDate(currentLivestream.startDate)}
                 </span>
                             </div>
@@ -560,9 +561,9 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                                     </Countdown>
                                 </div>
                             </div>
-                            <div style={{margin: "50px 0" }}>
+                            <div style={{margin: "50px 0"}}>
                                 <Box>
-                                    <Paper className={classes.logoWrapper} style={{ maxWidth: 300, margin: '0 auto' }}>
+                                    <Paper className={classes.logoWrapper} style={{maxWidth: 300, margin: '0 auto'}}>
                                         <img
                                             src={getResizedUrl(currentLivestream.companyLogoUrl, "md")}
                                             style={{
@@ -573,7 +574,7 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                                         />
                                     </Paper>
                                 </Box>
-                                <Grid container justify="center" align="center">                                        
+                                <Grid container justify="center" align="center">
                                     {speakerElements}
                                 </Grid>
                             </div>
@@ -753,7 +754,7 @@ function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
                         style={{margin: "50px 0 0 0"}}
                     >
                         <Grid item xs={12} md={6}
-                            style={{textAlign: "center"}}
+                              style={{textAlign: "center"}}
                         >
                             <Button
                                 size="large"
