@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     })
 }));
 
-const buttonChoices = ['Download CV', 'Upload New CV', 'Delete CV'];
+const buttonChoices = ['Download CV', 'Upload New CV [.pdf]', 'Delete CV'];
 
 const UserResume = ({firebase, userData}) => {
 
@@ -95,7 +95,7 @@ const UserResume = ({firebase, userData}) => {
                 console.log("upload successful")
                 uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
                     console.log("Download Url", downloadURL)
-                    dispatch(actions.editUserProfile({ userResume: downloadURL }))
+                    dispatch(actions.editUserProfile({ userResume: downloadURL, shareResume: true  }))
                     setSelectedIndex(0);
                 });
             });
@@ -156,7 +156,7 @@ const UserResume = ({firebase, userData}) => {
                                     onError={errMsg => ( console.log(errMsg) )}>
                                     <Button className={classes.button}>
                                         <Add className={classes.buttonIcon} fontSize='small'/>
-                                        Upload New CV
+                                        Upload New CV [.pdf]
                                     </Button>                  
                                 </FilePickerContainer>
                             }
@@ -220,7 +220,7 @@ const UserResume = ({firebase, userData}) => {
                         onError={errMsg => ( console.log(errMsg) )}>
                         <Button color='primary' variant='contained'  className={classes.buttons}>
                             <Add className={classes.buttonIcon} fontSize='small'/>
-                            Upload New CV
+                            Upload New CV [.pdf]
                         </Button>                  
                     </FilePickerContainer>
                 </div>
