@@ -118,7 +118,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         }
     }, [dispatch, rtmChannel])
 
-    const connectAgoraRTC = () => {
+    const connectAgoraRTC = async () => {
 
         setAgoraRtcStatus({
             type: "INFO",
@@ -178,7 +178,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                     }
                 }
             });
-            dispatch(actions.setExternalTracks(externalUsers))
             updateExternalUsers(externalUsers)
         });
 
@@ -197,7 +196,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                     }
                 }
             });
-            dispatch(actions.setExternalTracks(externalUsers))
             updateExternalUsers(externalUsers)
         });
 
@@ -244,7 +242,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                     videoTrack: localVideo,
                     audioTrack: localAudio
                 });
-                dispatch(actions.setRtcClient(rtcClient))
             } catch (error) {
                 handleRtcError(error)
             }
