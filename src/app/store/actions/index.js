@@ -11,9 +11,6 @@ export {
 
 export {addTodo, deleteTodo, editTodo} from './todoActions.js';
 export {createEmote, setEmote} from './emotesActions.js';
-export {setRtmChannelObj, removeRtmChannel} from './rtmChannelActions.js';
-export {setRtcClient, removeRtcClient} from './rtcClientActions.js';
-export {setExternalTracks, removeExternalTracks} from './externalTracksActions.js';
 
 export {
     removeMappedUserDataSet, removeOrderedUserDataSet, setMapUserDataSet, setOrderedUserDataSet

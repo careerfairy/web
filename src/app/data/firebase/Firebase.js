@@ -1177,6 +1177,10 @@ class Firebase {
         return groupSnaps.filter(doc => doc.exists).map(doc => ({id: doc.id, ...doc.data()}))
     }
 
+    getGroupsWithIds = async (arrayOfGroupIds) => {
+        return await this.getFollowingGroups(arrayOfGroupIds)
+    }
+
 
     listenCareerCentersByAdminEmail = (email, callback) => {
         let ref = this.firestore

@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useState, useRef} from 'react';
 import window, {document} from 'global';
 import {useAgoraToken} from './useAgoraToken';
 import {useDispatch} from "react-redux";
@@ -110,7 +110,15 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         }
     }, [readyToConnect, proxyMode])
 
-    const connectAgoraRTC = async () => {
+    const createEmote = useCallback(async (emoteType) => {
+        try {
+            const messageToSend = await dispatch(actions.createEmote(emoteType))
+            rtmChannel.sendMessage(messageToSend)
+        } catch (e) {
+        }
+    }, [dispatch, rtmChannel])
+
+    const connectAgoraRTC = () => {
 
         setAgoraRtcStatus({
             type: "INFO",
@@ -130,6 +138,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             mode: "live",
             codec: "h264",
         });
+
         setRtcClient(rtcClient);
 
         if (proxyMode === true) {
@@ -197,6 +206,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         });
 
         if (!isViewer) {
+            rtcClient.startProxyServer(3);
             rtcClient.setClientRole("host")
             try {
                 await rtcClient.join( AGORA_APP_ID, roomId, agoraToken.rtcToken, userUid)
@@ -299,7 +309,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
             channel.join().then(() => {
 
-                dispatch(actions.setRtmChannelObj(channel))
                 console.log('Joined channel');
 
                 setRtmChannel(channel);
@@ -507,5 +516,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         agoraRtmStatus,
         networkQuality,
         numberOfViewers,
+        createEmote
     };
 }

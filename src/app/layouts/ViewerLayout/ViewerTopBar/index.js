@@ -13,6 +13,7 @@ import {useCurrentStream} from "../../../context/stream/StreamContext";
 import PeopleIcon from "@material-ui/icons/People";
 import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
 import NewFeatureHint from "../../../components/util/NewFeatureHint";
+import useStreamGroups from "../../../components/custom-hook/useStreamGroups";
 
 const useStyles = makeStyles(theme => ({
     joinButton: {
@@ -50,6 +51,7 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
     const {toggleTheme, themeMode} = useThemeToggle()
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const {currentLivestream} = useCurrentStream()
+    const careerCenters = useStreamGroups(currentLivestream?.groupIds, firebase)
 
     useEffect(() => {
         if (userData?.talentPools && currentLivestream && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
@@ -96,7 +98,7 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
     }
 
 
-    const logoElements = currentLivestream?.careerCenters?.map(cc => {
+    const logoElements = careerCenters.map(cc => {
         return (
             <Logo
                 key={cc.groupId}

@@ -1,12 +1,12 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 
 import {Container, Typography, useMediaQuery, AppBar, Tabs, Tab, Box} from "@material-ui/core";
-import PersonalInfo from "./personal-info/PersonalInfo";
 import {withFirebase} from "context/firebase";
 import JoinedGroups from "./my-groups/JoinedGroups";
 import AdminGroups from "./my-groups/AdminGroups";
+import UserData from "./userData";
 import {useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 import {useAuth} from "../../../HOCs/AuthProvider";
@@ -50,13 +50,20 @@ const ProfileNav = ({userData}) => {
     const [value, setValue] = useState(0);
     const {authenticatedUser} = useAuth()
 
-    useFirestoreConnect(() => [
-        {
-            collection: 'careerCenterData',
-            where: userData.isAdmin ? ["test", "==", false] : ["adminEmails", "array-contains", authenticatedUser.email],
-            storeAs: "adminGroups"
+    const query = useMemo(() => {
+        let query = []
+        if (authenticatedUser?.email) {
+            query.push({
+                collection: 'careerCenterData',
+                where: userData?.isAdmin ? ["test", "==", false] : ["adminEmails", "array-contains", authenticatedUser?.email],
+                storeAs: "adminGroups"
+            })
         }
-    ])
+        return query
+    }, [authenticatedUser?.email, userData?.isAdmin])
+
+    useFirestoreConnect(query)
+
     const adminGroups = useSelector(state => state.firestore.ordered["adminGroups"] || [])
 
     const handleChange = (event, newValue) => {
@@ -69,7 +76,7 @@ const ProfileNav = ({userData}) => {
 
     const views = [
         <TabPanel key={0} value={value} index={0} dir={theme.direction}>
-            <PersonalInfo userData={userData}/>
+            <UserData userData={userData}/>
         </TabPanel>,
         <TabPanel key={1} value={value} index={1} dir={theme.direction}>
             <JoinedGroups userData={userData}/>
