@@ -4,7 +4,7 @@ const MINIMUM_VALUE = 0.00001;
 // This is the way to register an AudioWorkletProcessor
 // it's necessary to declare a name, in this case
 // the name is "vumeter"
-registerProcessor('volumemeter', class extends AudioWorkletProcessor {
+registerProcessor('vumeter', class extends AudioWorkletProcessor {
 
   _volume
   _updateIntervalInMS
@@ -13,7 +13,7 @@ registerProcessor('volumemeter', class extends AudioWorkletProcessor {
   constructor () {
     super();
     this._volume = 0;
-    this._updateIntervalInMS = 25;
+    this._updateIntervalInMS = 100;
     this._nextUpdateFrame = this._updateIntervalInMS;
     this.port.onmessage = event => {
       if (event.data.updateIntervalInMS)
