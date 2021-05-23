@@ -80,9 +80,8 @@ const RemoteVideoContainer = ({
         if (stream.uid === 'demoStream') {
             generateDemoHandRaiser()
         } else {
-            if (stream.videoTrack && !stream.videoTrack.isPlaying) {
+            if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
                 stream.videoTrack?.play(stream.uid, {fit: isScreenShareVideo ? 'contain' : 'cover'});
-                // stream.stream.audioTrack?.play();
             }
         }
     }, [stream.uid, stream.videoTrack]);
@@ -98,7 +97,7 @@ const RemoteVideoContainer = ({
 
     useEffect(() => {
         if (unmute) {
-            stream.audioTrack.play();
+            stream?.audioTrack?.play();
         }
     }, [unmute])
 
