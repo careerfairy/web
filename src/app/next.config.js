@@ -6,7 +6,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const {PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD} = require('next/constants')
 
 module.exports = (phase, {defaultConfig}) => {
-    // console.log("-> phase", phase);
+    //console.log("-> phase", phase);
     const config = {
         env: {
             REACT_APP_FIREBASE_API_KEY: 'AIzaSyAMx1wVVxqo4fooh0OMVSeSTOqNKzMbch0',
@@ -21,7 +21,6 @@ module.exports = (phase, {defaultConfig}) => {
                 poll: 1000,
                 aggregateTimeout: 300,
             }
-
             return config
         },
     }

@@ -1,14 +1,12 @@
 import {createSelector} from 'reselect';
-import {populate} from "react-redux-firebase";
-
-const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'careerCenters'}]
 
 const currentLivestreamSelector = createSelector(
-    state => populate(state.firestore, "currentLivestream", populates),
+    state => state.firestore.data.currentLivestream,
     (_, {streamId}) => streamId,
-    (currentLivestream, streamId) => {
-        if (!currentLivestream) return currentLivestream
-        if (!currentLivestream.id) {
+    (stream, streamId) => {
+        if (!stream) return stream
+        let currentLivestream = {...stream}
+        if (!stream.id) {
             currentLivestream.id = streamId
         }
         return currentLivestream

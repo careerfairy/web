@@ -143,7 +143,7 @@ const delay = 3000; //3 seconds
 const smoothness = 2
 const EmoteButtons = ({createEmote}) => {
     const firebase = useFirebase()
-    const {query: {livestreamId}} = useRouter()
+    const {currentLivestream: {id: livestreamId}} = useCurrentStream()
     const {authenticatedUser} = useAuth()
     const classes = useStyles({handRaiseActive: false});
     const SPEED = isNaN(smoothness) ? 2 : smoothness

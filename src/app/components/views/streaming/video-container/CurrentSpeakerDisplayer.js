@@ -187,17 +187,39 @@ function CurrentSpeakerDisplayer(props) {
         }
     }
 
-    let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
-        const videoClass = getVideoContainerClass(stream.streamId, "external");
-        return (
-            <div key={stream.streamId} className={classes[videoClass]}
-                 style={{padding: 0}}>
-                <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream}
-                                      height={getVideoContainerHeight(stream.streamId)}
-                                      small={videoClass.includes("QuarterWidth")} index={index}/>
-            </div>
-        );
-    });
+    let externalVideoElements = []
+
+    if (props.streams.length > 4) {
+        let currentSpeakerStream = props.streams.find( stream => stream.streamId === props.currentSpeaker )
+        let rearrangedVideoStreams = props.streams.filter( stream => stream.streamId !== props.currentSpeaker )
+
+        if (currentSpeakerStream) {
+            rearrangedVideoStreams.unshift(currentSpeakerStream);
+        }
+        externalVideoElements = rearrangedVideoStreams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
+            const videoClass = getVideoContainerClass(stream.streamId, "external");
+            return (
+                <div key={stream.streamId} className={classes[videoClass]}
+                     style={{padding: 0}}>
+                    <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream}
+                                          height={getVideoContainerHeight(stream.streamId)}
+                                          small={videoClass.includes("QuarterWidth")} index={index}/>
+                </div>
+            );
+        });
+    } else {
+        externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
+            const videoClass = getVideoContainerClass(stream.streamId, "external");
+            return (
+                <div key={stream.streamId} className={classes[videoClass]}
+                     style={{padding: 0}}>
+                    <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream}
+                                          height={getVideoContainerHeight(stream.streamId)}
+                                          small={videoClass.includes("QuarterWidth")} index={index}/>
+                </div>
+            );
+        });
+    }
 
     if (!props.isPlayMode) {
         const localVideoClass = getVideoContainerClass(props.localId, "local");
@@ -225,10 +247,11 @@ function CurrentSpeakerDisplayer(props) {
             </div>)
     }
 
+    //TO BE TESTED
+
     return (
         <div className={classes.relativeContainer}>
             <div className={classes.relativeContainerVideos} style={{height: getMinimizedSpeakersGridHeight()}}>
-
                 {externalVideoElements}
             </div>
         </div>

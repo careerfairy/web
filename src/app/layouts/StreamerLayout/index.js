@@ -84,6 +84,9 @@ const StreamerLayout = (props) => {
     const [selectedState, setSelectedState] = useState("questions");
     const [sliding, setSliding] = useState(false);
 
+    const [showVideoButton, setShowVideoButton] = useState({paused: false, muted: false});
+    const [play, setPlay] = useState(false);
+    const [unmute, setUnmute] = useState(true);
 
 
     const currentLivestream = useStreamConnect()
@@ -173,6 +176,19 @@ const StreamerLayout = (props) => {
         setAudienceDrawerOpen(false)
     }, []);
 
+    const unmuteVideos = useCallback(() => {
+        setShowVideoButton(prevState => {
+            return {paused: prevState.paused, muted: false}
+        });
+        setUnmute(true);
+    }, [])
+
+    const playVideos = useCallback(() => {
+        setShowVideoButton(prevState => {
+            return {paused: false, muted: false}
+        });
+        setPlay(true);
+    }, [])
 
     const handleStateChange = useCallback((state) => {
         if (!showMenu) {
@@ -233,6 +249,12 @@ const StreamerLayout = (props) => {
                             <div className={classes.content}>
                                 {React.cloneElement(children, {
                                     ...props,
+                                    playVideos,
+                                    unmuteVideos,
+                                    showVideoButton,
+                                    setShowVideoButton,
+                                    play,
+                                    unmute,
                                     newNotification,
                                     isMainStreamer,
                                     isStreamer: true,

@@ -20,6 +20,7 @@ import BreakoutRoomIcon from "@material-ui/icons/Widgets";
 import {useDispatch, useSelector} from "react-redux";
 import breakoutRoomsSelector from "../../../components/selectors/breakoutRoomsSelector";
 import * as actions from 'store/actions'
+import useStreamGroups from "../../../components/custom-hook/useStreamGroups";
 
 const useStyles = makeStyles(theme => ({
     joinButton: {
@@ -64,6 +65,7 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
     const dispatch = useDispatch()
     const {toggleTheme, themeMode} = useThemeToggle()
     const links = useStreamToken({forStreamType: "mainLivestream"})
+
     const {currentLivestream} = useCurrentStream()
     const numberOfViewers = useSelector(state => currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0)
     const {userIsInTalentPool, handlers: {joinTalentPool, leaveTalentPool}} = useJoinTalentPool()
@@ -71,6 +73,7 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
     const breakoutRoomOpen = useSelector(state =>
         Boolean(breakoutRoomsSelector(state.firestore.ordered[`Active BreakoutRooms of ${livestreamId}`])?.length)
     )
+    const careerCenters = useStreamGroups(currentLivestream?.groupIds, firebase)
 
 
     const handleBackToMainRoom = () => {
@@ -133,7 +136,7 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
     }
 
 
-    const logoElements = currentLivestream?.careerCenters?.map(cc => {
+    const logoElements = careerCenters.map(cc => {
         return (
             <Logo
                 key={cc.groupId}
