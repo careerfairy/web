@@ -73,7 +73,7 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
     const breakoutRoomOpen = useSelector(state =>
         Boolean(breakoutRoomsSelector(state.firestore.ordered[`Active BreakoutRooms of ${livestreamId}`])?.length)
     )
-    const careerCenters = useStreamGroups(currentLivestream?.groupIds, firebase)
+    const careerCenters = useStreamGroups(currentLivestream?.groupIds)
 
 
     const handleBackToMainRoom = () => {

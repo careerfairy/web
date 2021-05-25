@@ -116,13 +116,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         handleSwitchRooms()
     }, [router.asPath])
 
-    const createEmote = useCallback(async (emoteType) => {
-        try {
-            const messageToSend = await dispatch(actions.createEmote(emoteType))
-            rtmChannel.sendMessage(messageToSend)
-        } catch (e) {
-        }
-    }, [dispatch, rtmChannel])
+
 
     const agoraHandlers = useMemo(() => ({
         getChannelMemberCount: async (channelIds) => {
