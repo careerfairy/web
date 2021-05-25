@@ -124,12 +124,6 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady}) {
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        if (auto === true) {
-
-        }
-    }, [auto])
-
-    useEffect(() => {
         let storedSpeakerString = localStorage.getItem("storedSpeaker");
         if (storedSpeakerString) {
             if (livestream.liveSpeakers?.length > 0) {

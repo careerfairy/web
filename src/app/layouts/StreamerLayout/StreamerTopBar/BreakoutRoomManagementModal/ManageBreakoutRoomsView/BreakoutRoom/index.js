@@ -7,7 +7,7 @@ import {
     Chip,
     CircularProgress,
     Grid,
-    IconButton,
+    IconButton, Menu, MenuItem,
     Tooltip
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -125,7 +125,11 @@ const RoomOpenedActions = ({
                                mobile,
                                handleCloseRoom,
                                isMainStreamer,
-                               active
+                               joinAsMenuData,
+                               handleCloseJoinAsMenu,
+                               active,
+                               handleGoToRoomWithNewProfile,
+                               handleGoToRoomWithAutoProfile,
                            }) => {
     const classes = useStyles()
     const {query: {breakoutRoomId}} = useRouter()
@@ -146,17 +150,30 @@ const RoomOpenedActions = ({
         </Grid>
         <Grid item xs={mobile ? 1 : 2}>
             {(roomId !== breakoutRoomId) ? (
-                <Button
-                    onClick={handleJoinRoom}
-                    disabled={loading}
-                    variant="contained"
-                    color="primary"
-                    className={clsx({
-                        [classes.activeColor]: active
-                    })}
-                >
-                    {mobile ? "Join" : "Join Room"}
-                </Button>
+                <React.Fragment>
+                    <Button
+                        onClick={handleJoinRoom}
+                        disabled={loading}
+                        variant="contained"
+                        color="primary"
+                        className={clsx({
+                            [classes.activeColor]: active
+                        })}
+                    >
+                        {mobile ? "Join" : "Join Room"}
+                    </Button>
+                    <Menu
+                        id="join-as-menu"
+                        anchorEl={joinAsMenuData.anchorEl}
+                        keepMounted
+                        open={Boolean(joinAsMenuData.anchorEl)}
+                        onClose={handleCloseJoinAsMenu}
+                    >
+                        <MenuItem onClick={handleGoToRoomWithAutoProfile}>Join
+                            as {joinAsMenuData?.profile?.firstName}</MenuItem>
+                        <MenuItem onClick={handleGoToRoomWithNewProfile}>Join with a different profile</MenuItem>
+                    </Menu>
+                </React.Fragment>
             ) : (
                 <Tooltip title="You are in this room">
                     <Typography align="center" style={{fontWeight: 600}}>
@@ -199,6 +216,7 @@ RoomClosedActions.propTypes = {
     handleOpenRoom: PropTypes.func.isRequired,
     loading: PropTypes.bool,
 }
+const initialJoinAsData = {anchorEl: null, profile: null, link: ""}
 const BreakoutRoom = ({
                           breakoutRoom: {title, id, liveSpeakers, hasStarted},
                           openRoom,
@@ -222,6 +240,7 @@ const BreakoutRoom = ({
     const [loading, setLoading] = useState(false);
     const [deleteBreakoutRoomModalOpen, setDeleteBreakoutRoomModalOpen] = useState(false);
     const [breakoutRoomLink, setBreakoutRoomLink] = useState("");
+    const [joinAsMenuData, setJoinAsMenuData] = useState(initialJoinAsData);
 
     useEffect(() => {
         const newBreakoutRoomLink = isMainStreamer ? links.mainStreamerLink : isStreamer ? links.joiningStreamerLink : links.viewerLink
@@ -265,6 +284,14 @@ const BreakoutRoom = ({
         setLoading(false)
     }
 
+    const handleOpenJoinAsMenu = (anchorEl, link, profile) => {
+        setJoinAsMenuData({anchorEl, link, profile})
+    }
+    const handleCloseJoinAsMenu = (event) => {
+        event?.stopPropagation()
+        setJoinAsMenuData(initialJoinAsData)
+    }
+
     const handleDeleteBreakoutRoom = async () => {
         setLoading(true)
         try {
@@ -277,11 +304,33 @@ const BreakoutRoom = ({
 
     const handleJoinRoom = async (event) => {
         event.stopPropagation()
-        // if(!isBreakout){
-        await handleDisconnect()
-        // }
+        const streamerId = localStorage.getItem('streamingUuid')
+        const prevProfile = liveSpeakers?.find(speaker => speaker.speakerUuid.replace(id, "") === streamerId)
+        if (prevProfile) {
+            handleOpenJoinAsMenu(event.currentTarget, breakoutRoomLink, prevProfile)
+            return
+        }
+        return handleGoToRoom()
+    }
+
+    const handleGoToRoom = async (auto) => {
+        if (!isBreakout) {
+            await handleDisconnect()
+        }
         handleClose()
-        window.location.href = addQueryParam(breakoutRoomLink, "auto=true")
+        window.location.href = addQueryParam(breakoutRoomLink, auto ? "auto=true" : "")
+    }
+
+    const handleGoToRoomWithAutoProfile = (event) => {
+        event.stopPropagation()
+        handleCloseJoinAsMenu()
+        return handleGoToRoom(true)
+    }
+
+    const handleGoToRoomWithNewProfile = (event) => {
+        event.stopPropagation()
+        handleCloseJoinAsMenu()
+        return handleGoToRoom()
     }
 
     return (
@@ -334,6 +383,10 @@ const BreakoutRoom = ({
                                     roomId={id}
                                     mobile={mobile}
                                     active={breakoutRoomId === id}
+                                    joinAsMenuData={joinAsMenuData}
+                                    handleGoToRoomWithAutoProfile={handleGoToRoomWithAutoProfile}
+                                    handleGoToRoomWithNewProfile={handleGoToRoomWithNewProfile}
+                                    handleCloseJoinAsMenu={handleCloseJoinAsMenu}
                                     isMainStreamer={isMainStreamer}
                                     handleJoinRoom={handleJoinRoom}
                                     handleCloseRoom={handleCloseRoom}

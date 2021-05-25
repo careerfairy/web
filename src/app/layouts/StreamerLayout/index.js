@@ -117,14 +117,15 @@ const StreamerLayout = (props) => {
 
     useEffect(() => {
         function checkIfStreamerHasInfo() {
-            const hasStreamerInfo = currentLivestream?.liveSpeakers?.some(speaker => speaker.speakerUuid === streamerId)
+            let storedUuid = localStorage.getItem('streamingUuid')
+            const hasStreamerInfo = currentLivestream?.liveSpeakers?.some(speaker => speaker.speakerUuid.replace(currentLivestream.id, "") === storedUuid)
             setStreamerReady(Boolean(hasStreamerInfo))
         }
 
         if (currentLivestream && auto === "true") {
             checkIfStreamerHasInfo()
         }
-    }, [currentLivestream?.liveSpeakers, streamerId, auto])
+    }, [currentLivestream?.liveSpeakers, auto])
 
     useEffect(() => {
         const regex = /-/g;

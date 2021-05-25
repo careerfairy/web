@@ -4,6 +4,8 @@ import {useWindowSize} from '../../../custom-hook/useWindowSize';
 import {makeStyles} from "@material-ui/core/styles";
 import SpeakerInfoOverlay from './SpeakerInfoOverlay';
 import LocalVideoContainer from './LocalVideoContainer';
+import Typography from "@material-ui/core/Typography";
+import {Box, CircularProgress} from "@material-ui/core";
 
 
 const useStyles = makeStyles(theme => ({
@@ -74,7 +76,16 @@ const useStyles = makeStyles(theme => ({
     relativeContainer: {
         position: "relative",
         height: "100%",
-        minHeight: "calc(100vh - 55px)"
+        minHeight: "calc(100vh - 55px)",
+    },
+    noStreamOverlayWrapper: {
+        position: "relative",
+        height: "100%",
+        minHeight: "calc(100vh - 55px)",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+
     },
     relativeContainerVideos: {
         margin: "0",
@@ -104,6 +115,7 @@ const useStyles = makeStyles(theme => ({
 function CurrentSpeakerDisplayer(props) {
     const classes = useStyles()
     const windowSize = useWindowSize();
+
 // console.count("-> CurrentSpeakerDisplayer");
     function getVideoContainerHeight(streamId) {
         if (props.isPlayMode) {
@@ -200,9 +212,23 @@ function CurrentSpeakerDisplayer(props) {
         externalVideoElements.unshift(localVideoElement);
     }
 
+    if (!externalVideoElements.length) {
+        return (
+            <div className={classes.noStreamOverlayWrapper}>
+                {props.joinedChannel ? (
+                    <Typography variant="h5" style={{color: "white", margin: "auto"}}>
+                        Waiting for streamer
+                    </Typography>
+                ) : (
+                    <CircularProgress style={{margin: "auto"}}/>
+                )}
+            </div>)
+    }
+
     return (
         <div className={classes.relativeContainer}>
             <div className={classes.relativeContainerVideos} style={{height: getMinimizedSpeakersGridHeight()}}>
+
                 {externalVideoElements}
             </div>
         </div>

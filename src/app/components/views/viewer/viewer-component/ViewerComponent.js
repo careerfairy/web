@@ -18,6 +18,7 @@ import EmoteButtons from "../EmoteButtons";
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
 import * as actions from 'store/actions'
+import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 
 const useStyles = makeStyles(theme => ({
     waitingOverlay: {
@@ -50,13 +51,13 @@ function ViewerComponent(props) {
     const streamRef = useStreamRef();
     const {query: {livestreamId}} = useRouter()
     const {authenticatedUser} = useAuth();
-    const hasActiveRooms = useSelector(state => Boolean(state.firestore.ordered?.[`Active BreakoutRooms of ${livestreamId}`]))
+    const hasActiveRooms = useSelector(state => Boolean(state.firestore.ordered?.[`Active BreakoutRooms of ${livestreamId}`]?.length))
     const streamerReady = true;
 
     const screenSharingMode = (props.currentLivestream.screenSharerId === authenticatedUser?.email &&
         props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
 
-    const {externalMediaStreams, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus, createEmote} =
+    const {externalMediaStreams, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus, createEmote, joinedChannel} =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
@@ -91,16 +92,19 @@ function ViewerComponent(props) {
             }
         }
     }, [agoraRtcStatus])
-// console.log("-> externalMediaStreams", externalMediaStreams);
+
+    const currentSpeakerId = useCurrentSpeaker(localMediaStream, externalMediaStreams)
+
     useEffect(() => {
-        if (!props.isBreakout && !externalMediaStreams?.length && hasActiveRooms) {
-            // console.log("-> props.isBreakout", props.isBreakout);
-            // console.log("-> externalMediaStreams", externalMediaStreams);
-            // console.log("-> hasActiveRooms", hasActiveRooms);
-            // dispatch(actions.openViewerBreakoutModal())
+        if (joinedChannel && !props.isBreakout && !externalMediaStreams?.length && hasActiveRooms) {
+            const timout = setTimeout(function() { //Start the timer
+            dispatch(actions.openViewerBreakoutModal())
+            }, 3000) // Only open modal If no streams appear after 3 seconds
+
+            return () => clearTimeout(timout) // Cancel opening modal if streams appear before 3 seconds
         }
 
-    }, [Boolean(externalMediaStreams?.length), props.isBreakout, hasActiveRooms])
+    }, [Boolean(externalMediaStreams?.length), props.isBreakout, hasActiveRooms, joinedChannel])
 
 
     const attachSinkId = (element, sinkId) => {
@@ -158,7 +162,9 @@ function ViewerComponent(props) {
                                          speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
                                          streams={externalMediaStreams} localId={props.streamerId}
                                          isViewer={true}
-                                         currentSpeaker={props.currentLivestream.currentSpeakerId}
+                                         joinedChannel={joinedChannel}
+                                         isBreakout={props.isBreakout}
+                                         currentSpeaker={currentSpeakerId}
                                          muted={!props.currentLivestream.hasStarted} {...props}/>
                 {shareDesktopOrSlides() &&
                 <SmallStreamerVideoDisplayer

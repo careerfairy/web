@@ -20,7 +20,7 @@ import SettingsModal from "./SettingsModal";
 import ScreenShareModal from "./ScreenShareModal";
 import useStreamRef from "../../../custom-hook/useStreamRef";
 import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/StreamerTopBar/BreakoutRoomManagementModal";
-import useFallbackStream from "../../../custom-hook/useFallbackStream";
+import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -48,7 +48,6 @@ function VideoContainer(props) {
     const [isStreaming, setIsStreaming] = useState(false);
     const [showScreenShareModal, setShowScreenShareModal] = useState(false);
     const [optimizationMode, setOptimizationMode] = useState("detail");
-    const [audioCounter, setAudioCounter] = useState(0);
     const [showSettings, setShowSettings] = useState(false);
 
     const screenSharingMode = (props.currentLivestream.screenSharerId === props.streamerId &&
@@ -75,7 +74,6 @@ function VideoContainer(props) {
             props.streamerId,
             props.viewer,
         );
-    console.log("-> localMediaStream", localMediaStream);
 
     const devices = useDevices(agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED");
 
@@ -90,49 +88,7 @@ function VideoContainer(props) {
         audioLevel
     } = useMediaSources(devices, props.streamerId, localMediaStream, !streamerReady || showSettings);
 
-    const {} = useFallbackStream(localMediaStream, externalMediaStreams)
-
-    useEffect(() => {
-        if (isMainStreamer && props.currentLivestream.mode !== 'desktop' && props.currentLivestream.speakerSwitchMode !== 'manual') {
-            let timeout = setTimeout(() => {
-                let audioLevels = externalMediaStreams.map(stream => {
-                    if (stream.streamId !== 'demoStream') {
-                        return {
-                            streamId: stream.streamId,
-                            audioLevel: stream.stream.getAudioLevel()
-                        }
-                    } else {
-                        return {
-                            streamId: stream.streamId,
-                            audioLevel: 0
-                        }
-                    }
-                });
-                if (localMediaStream) {
-                    audioLevels.push({
-                        streamId: localMediaStream.getId(),
-                        audioLevel: localMediaStream.getAudioLevel()
-                    });
-                }
-                if (audioLevels && audioLevels.length > 1) {
-                    const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
-                    if (maxEntry.audioLevel > 0.05) {
-                        setLivestreamCurrentSpeakerId(maxEntry.streamId);
-                    } else if (!audioLevels.some(audioLevel => audioLevel.streamId === props.currentLivestream.currentSpeakerId)) {
-                        setLivestreamCurrentSpeakerId(maxEntry.streamId);
-                    }
-                }
-                setAudioCounter(audioCounter + 1);
-            }, 2500);
-            return () => clearTimeout(timeout);
-        }
-    }, [audioCounter, props.currentLivestream.mode, externalMediaStreams.length]);
-
-    useEffect(() => {
-
-    }, [externalMediaStreams, localMediaStream])
-
-    console.log("-> externalMediaStreams", externalMediaStreams);
+    const currentSpeakerId = useCurrentSpeaker(localMediaStream, externalMediaStreams)
 
     useEffect(() => {
         if (agoraRtcStatus && agoraRtcStatus.type === "INFO" && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
@@ -146,11 +102,7 @@ function VideoContainer(props) {
         }
     }, [agoraRtcStatus])
 
-    useEffect(() => {
-        if (isMainStreamer && props.currentLivestream.mode === 'desktop') {
-            setLivestreamCurrentSpeakerId(props.currentLivestream.screenSharerId);
-        }
-    }, [props.currentLivestream.mode])
+
 
     useEffect(() => {
         if (props.streamerId && props.currentLivestream.id) {
@@ -160,14 +112,7 @@ function VideoContainer(props) {
         }
     }, [props.streamerId, props.currentLivestream.id])
 
-    useEffect(() => {
-        if (externalMediaStreams && props.currentLivestream.currentSpeakerId) {
-            let existingCurrentSpeaker = externalMediaStreams.find(stream => stream.streamId === props.currentLivestream.currentSpeakerId)
-            if (!existingCurrentSpeaker) {
-                setLivestreamCurrentSpeakerId(props.currentLivestream.id);
-            }
-        }
-    }, [externalMediaStreams])
+
 
     const [timeoutState, setTimeoutState] = useState(null);
 
@@ -200,15 +145,6 @@ function VideoContainer(props) {
     const setDesktopMode = async (mode, initiatorId) => {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;
         await props.firebase.setDesktopMode(streamRef, mode, screenSharerId);
-    }
-
-
-    const setLivestreamCurrentSpeakerId = (id) => {
-        props.firebase.setLivestreamCurrentSpeakerId(streamRef, id);
-    }
-
-    const reloadPage = () => {
-        location.reload();
     }
 
     const attachSinkId = (element, sinkId) => {
@@ -311,7 +247,7 @@ function VideoContainer(props) {
                         speakerSource={speakerSource}
                         attachSinkId={attachSinkId}
                         streams={externalMediaStreams}
-                        currentSpeaker={props.currentLivestream.currentSpeakerId}
+                        currentSpeaker={currentSpeakerId}
                         setRemovedStream={setRemovedStream}
                         {...props}
                         muted={false}

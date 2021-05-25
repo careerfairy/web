@@ -357,7 +357,8 @@ export const getResponsiveResizedUrl = (url, isMobile, mobileSize = "sm", deskto
 }
 
 export const addQueryParam = (url, queryParam) => {
-    if(url.includes("?")){
+    if (!queryParam) return url
+    if (url.includes("?")) {
         return `${url}&${queryParam}`
     }
     return `${url}?${queryParam}`

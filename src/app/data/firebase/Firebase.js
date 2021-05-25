@@ -501,25 +501,22 @@ class Firebase {
         });
         return batch.commit();
     }
-    resetTestStream = async (livestreamId, testChats, testQuestions, testPolls) => {
+    resetTestStream = async (streamRef, testChats, testQuestions, testPolls) => {
 
         let batch = this.firestore.batch();
-        let livestreamRef = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId);
 
         // reset hand raise and current speaker
-        batch.update(livestreamRef, {
+        batch.update(streamRef, {
             handRaiseActive: false,
-            currentSpeakerId: livestreamId
+            currentSpeakerId: streamRef.id
         });
 
         // Declare all the refs
-        let chatsRef = livestreamRef
+        let chatsRef = streamRef
             .collection("chatEntries");
-        let questionsRef = livestreamRef
+        let questionsRef = streamRef
             .collection("questions");
-        let pollsRef = livestreamRef
+        let pollsRef = streamRef
             .collection("polls");
 
         // Delete all existing docs

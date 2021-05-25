@@ -275,10 +275,10 @@ const ViewerBreakoutRoomModal = ({
                     message: message,
                     options: {
                         variant: "info",
-                        anchorOrigin: {
-                            vertical: "top",
-                            horizontal: "center"
-                        },
+                        // anchorOrigin: {
+                        //     vertical: "top",
+                        //     // horizontal: "center"
+                        // },
                         preventDuplicate: true,
                         key: breakoutId,
                         action: <React.Fragment>

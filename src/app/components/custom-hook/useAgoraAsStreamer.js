@@ -16,6 +16,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const [updatedStream, setUpdatedStream] = useState(null);
     const [removedStream, setRemovedStream] = useState(null);
     const [externalMediaStreams, setExternalMediaStreams] = useState([]);
+    const [joinedChannel, setJoinedChannel] = useState(false);
 
 
     const [networkQuality, setNetworkQuality] = useState({
@@ -478,6 +479,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
 
             channel.join().then(() => {
+                setJoinedChannel(true)
                 channel.on("MemberCountUpdated", (newCount) => {
                     dispatch(actions.setNumberOfViewers(newCount))
                 })
@@ -740,6 +742,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         setAddedStream,
         setRemovedStream,
         createEmote,
-        agoraHandlers
+        agoraHandlers,
+        joinedChannel
     };
 }

@@ -44,13 +44,15 @@ const useStyles = makeStyles(theme => ({
     floatingButton: {
         color: theme.palette.primary.main,
         width: 48,
-        height:48
+        height: 48
     },
     floatingWrapper: {
         position: 'absolute',
         top: theme.spacing(2.5),
         right: theme.spacing(2.5),
         zIndex: 120,
+        display: "flex",
+        alignItems: "baseline"
 
     }
 }));
@@ -63,7 +65,7 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
     const {toggleTheme, themeMode} = useThemeToggle()
     const links = useStreamToken({forStreamType: "mainLivestream"})
     const {currentLivestream} = useCurrentStream()
-    const numberOfViewers = useSelector(state =>currentLivestream?.hasStarted? state.stream.stats.numberOfViewers: 0)
+    const numberOfViewers = useSelector(state => currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0)
     const {userIsInTalentPool, handlers: {joinTalentPool, leaveTalentPool}} = useJoinTalentPool()
     const [breakoutRoomModalOpen, setBreakoutRoomModalOpen] = useState(false);
     const breakoutRoomOpen = useSelector(state =>
@@ -95,10 +97,14 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
                     </Tooltip>}
                     {breakoutRoomOpen &&
                     <Tooltip title="Checkout breakout rooms">
-                        <IconButton className={classes.floatingButton} disabled={breakoutRoomModalOpen} onClick={handleOpenBreakoutRoomModal}>
-                            <BreakoutRoomIcon/>
+                        <IconButton className={classes.floatingButton} disabled={breakoutRoomModalOpen}
+                                    onClick={handleOpenBreakoutRoomModal}>
+                            <Badge color="secondary" badgeContent={"!"}>
+                                <BreakoutRoomIcon/>
+                            </Badge>
                         </IconButton>
                     </Tooltip>}
+                    <Tooltip title="See who joined">
                     <IconButton onClick={showAudience} className={classes.floatingButton}>
                         <Badge max={999999} color="secondary" badgeContent={numberOfViewers}>
                             <NewFeatureHint
@@ -111,6 +117,7 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
                             </NewFeatureHint>
                         </Badge>
                     </IconButton>
+                    </Tooltip>
                 </div>
                 <ViewerBreakoutRoomModal
                     mobile={mobile}
@@ -158,7 +165,10 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
                         {breakoutRoomOpen &&
                         <Tooltip title="Checkout breakout rooms">
                             <IconButton disabled={breakoutRoomModalOpen} onClick={handleOpenBreakoutRoomModal}>
-                                <BreakoutRoomIcon/>
+                                <Badge color="secondary" badgeContent={"!"}>
+                                    <BreakoutRoomIcon
+                                    />
+                                </Badge>
                             </IconButton>
                         </Tooltip>}
                         <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
