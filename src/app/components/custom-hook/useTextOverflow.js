@@ -1,19 +1,21 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
-const useTextOverflow = (labelRef) => {
+/**
+ * @param {*[]} dependencies
+ */
+const useTextOverflow = (dependencies = []) => {
     // Setup a ref
+    const labelRef = useRef()
 
     // State for tracking if ellipsis is active
     const [isEllipsisActive, setIsEllipsisActive] = useState(false);
 
     // Setup a use effect
     useEffect(() => {
-        if (labelRef?.current?.offsetWidth < labelRef?.current?.scrollWidth) {
-            setIsEllipsisActive(true);
-        }
-    }, [labelRef?.current]); // I was also tracking if the data was loading
+        setIsEllipsisActive(Boolean(labelRef?.current?.offsetWidth < labelRef?.current?.scrollWidth));
+    }, [labelRef?.current, ...dependencies]); // I was also tracking if the data was loading
 
-    return isEllipsisActive;
+    return [isEllipsisActive, labelRef];
 }
 
 export default useTextOverflow;

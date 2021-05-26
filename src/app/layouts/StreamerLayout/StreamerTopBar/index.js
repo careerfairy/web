@@ -31,13 +31,13 @@ import {maybePluralize} from "../../../components/helperFunctions/HelperFunction
 import NewFeatureHint from "../../../components/util/NewFeatureHint";
 import useStreamToken from "../../../components/custom-hook/useStreamToken";
 import useStreamRef from "../../../components/custom-hook/useStreamRef";
-import {BreakoutRoomManagementModal} from "./BreakoutRoomManagementModal";
 import {useDispatch, useSelector} from "react-redux";
 import * as actions from "store/actions"
+import {TOP_BAR_HEIGHT} from "constants/streamLayout";
 
 const useStyles = makeStyles(theme => ({
     toolbar: {
-        minHeight: 55,
+        minHeight: TOP_BAR_HEIGHT,
         display: "flex",
         justifyContent: "space-between"
     },
@@ -163,7 +163,6 @@ const StreamerTopBar = ({firebase, showAudience}) => {
                         </Box>}
                     <Box display="flex" alignItems="center">
                         {
-                            // mobile ?
                             <Tooltip title="Invite an additional streamer">
                                 <IconButton onClick={() => {
                                     setSpeakerManagementOpen(true)
@@ -171,16 +170,6 @@ const StreamerTopBar = ({firebase, showAudience}) => {
                                     <PersonAddIcon color="inherit"/>
                                 </IconButton>
                             </Tooltip>
-                            // :
-                            // <Tooltip title="Invite an additional streamer">
-                            //     <Button
-                            //         children="Invite"
-                            //         startIcon={<PersonAddIcon color="inherit"/>}
-                            //         onClick={() => {
-                            //             setSpeakerManagementOpen(true)
-                            //         }}
-                            //     />
-                            // </Tooltip>
                         }
 
                         <Tooltip title="Manage breakout rooms">
@@ -189,19 +178,11 @@ const StreamerTopBar = ({firebase, showAudience}) => {
                             </IconButton>
                         </Tooltip>
                         {
-                            // mobile ?
                             <Tooltip title="Open Student View">
                                 <IconButton target="_blank" href={viewerLink}>
                                     <OpenInBrowserIcon color="inherit"/>
                                 </IconButton>
                             </Tooltip>
-                            // :
-                            // <Button
-                            //     href={viewerLink}
-                            //     target="_blank"
-                            //     children="Open Student View"
-                            //     startIcon={<OpenInBrowserIcon color="inherit"/>}
-                            // />
                         }
                         <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
                             <Checkbox

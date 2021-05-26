@@ -82,7 +82,7 @@ const StreamerOverview = ({
                               playVideos,
                               unmuteVideos,
                           }) => {
-    const {currentLivestream} = useCurrentStream()
+    const {currentLivestream, isBreakout} = useCurrentStream()
     const classes = useStyles()
 
     return (
@@ -94,6 +94,8 @@ const StreamerOverview = ({
                     streamerId={streamerId}
                     smallScreen={smallScreen}
                     setNumberOfViewers={setNumberOfViewers}
+                                isStreamer={isStreamer}
+                                isBreakout={isBreakout}
                     showMenu={showMenu} viewer={false}
                     setShowVideoButton={setShowVideoButton} showVideoButton={showVideoButton}
                     play={play} unmute={unmute}

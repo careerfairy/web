@@ -156,6 +156,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose, agoraHandlers}) =>
                 <BreakoutRoomOptions
                     openSettings={openSettings}
                     isMainStreamer={isMainStreamer}
+                    numberOfRooms={breakoutRooms?.length || 0}
                     handleRefresh={handleRefresh}
                     loading={refreshing}
                 />}
@@ -203,7 +204,7 @@ const ManageBreakoutRoomsView = ({breakoutRooms, handleClose, agoraHandlers}) =>
                         color="primary"
                         onClick={handleOpenAllRooms}
                     >
-                        Start All Rooms
+                        Open All Rooms
                     </Button>}
                 </React.Fragment>}
             </DialogActions>

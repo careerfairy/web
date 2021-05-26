@@ -162,6 +162,7 @@ function ViewerComponent(props) {
                                          speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
                                          streams={externalMediaStreams} localId={props.streamerId}
                                          isViewer={true}
+                                         streamTitle={props.currentLivestream.title}
                                          joinedChannel={joinedChannel}
                                          isBreakout={props.isBreakout}
                                          currentSpeaker={currentSpeakerId}
@@ -172,6 +173,7 @@ function ViewerComponent(props) {
                     presentation={props.currentLivestream.mode === 'presentation'}
                     showMenu={props.showMenu}
                     isStreamer={true}
+                    isBreakout={props.isBreakout}
                     externalMediaStreams={externalMediaStreams}
                     isLocalScreen={false}
                     attachSinkId={attachSinkId}

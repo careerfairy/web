@@ -240,12 +240,15 @@ function VideoContainer(props) {
                 <div>
                     <CurrentSpeakerDisplayer
                         isPlayMode={false}
+                        streamTitle={props.currentLivestream.title}
                         smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}
                         speakerSwitchModeActive={isMainStreamer}
                         localId={props.streamerId}
                         localStream={localMediaStream}
                         speakerSource={speakerSource}
                         attachSinkId={attachSinkId}
+                        isStreamer={props.isStreamer}
+                        isBreakout={props.isBreakout}
                         streams={externalMediaStreams}
                         currentSpeaker={currentSpeakerId}
                         setRemovedStream={setRemovedStream}
@@ -256,6 +259,7 @@ function VideoContainer(props) {
                 {sharingContent() &&
                 <SmallStreamerVideoDisplayer
                     livestreamId={props.currentLivestream.id}
+                    isBreakout={props.isBreakout}
                     presentation={props.currentLivestream.mode === 'presentation'}
                     showMenu={props.showMenu}
                     externalMediaStreams={externalMediaStreams}

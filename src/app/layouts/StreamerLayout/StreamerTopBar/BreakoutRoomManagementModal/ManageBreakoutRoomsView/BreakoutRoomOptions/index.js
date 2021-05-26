@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {useState} from "react";
 import Box from "@material-ui/core/Box";
 import {IconButton, ListItemIcon, Menu, MenuItem, Tooltip, Typography} from "@material-ui/core";
@@ -7,9 +8,9 @@ import RoomSettingsIcon from '@material-ui/icons/Settings';
 import AddRoomIcon from '@material-ui/icons/AddCircleOutline';
 import RefreshRoomsIcon from '@material-ui/icons/Refresh';
 import AnnouncementModal from "./AnnouncementModal";
-import PropTypes from "prop-types";
 import {makeStyles} from "@material-ui/core/styles";
 import AddRoomModal from "./AddRoomModal";
+import {MAX_BREAKOUT_ROOMS} from "constants/breakoutRooms";
 
 const useStyles = makeStyles(theme => ({
     menuIconRoot: {
@@ -23,6 +24,7 @@ const BreakoutRoomOptions = (
         handleRefresh,
         loading,
         mobile,
+        numberOfRooms
     }) => {
     const classes = useStyles()
 
@@ -85,12 +87,12 @@ const BreakoutRoomOptions = (
                             </Typography>
                         </MenuItem>
                     </Tooltip>
-                    <MenuItem onClick={handleOpenAddRoomModal}>
+                    <MenuItem disabled={numberOfRooms >= MAX_BREAKOUT_ROOMS} onClick={handleOpenAddRoomModal}>
                         <ListItemIcon classes={{root: classes.menuIconRoot}}>
                             <AddRoomIcon/>
                         </ListItemIcon>
                         <Typography variant="inherit" noWrap>
-                            Add Room
+                            {numberOfRooms >= MAX_BREAKOUT_ROOMS ? "Maximum amount of rooms reached" : "Add Room"}
                         </Typography>
                     </MenuItem>
                     <MenuItem disabled={loading} onClick={handleClickRefresh}>
@@ -124,7 +126,11 @@ const BreakoutRoomOptions = (
 };
 
 BreakoutRoomOptions.propTypes = {
+    handleRefresh: PropTypes.func,
+    loading: PropTypes.bool,
+    mobile: PropTypes.object,
+    numberOfRooms: PropTypes.number,
     openSettings: PropTypes.func
-};
+}
 
 export default BreakoutRoomOptions

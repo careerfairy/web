@@ -148,7 +148,7 @@ const RoomOpenedActions = ({
             </Button>
             }
         </Grid>
-        <Grid item xs={mobile ? 1 : 2}>
+        <Grid item xs={mobile ? 2 : 2}>
             {(roomId !== breakoutRoomId) ? (
                 <React.Fragment>
                     <Button
@@ -362,7 +362,7 @@ const BreakoutRoom = ({
                                     {title}
                                 </Typography>
                             </Grid>
-                            <Grid item xs={mobile ? 3 : 2}>
+                            <Grid item xs={mobile ? hasStarted?2: 3 : 2}>
                                 <Chip
                                     label={
                                         <Typography variant="caption">
