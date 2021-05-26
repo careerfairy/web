@@ -11,6 +11,7 @@ import {
     WhiteTooltip
 } from "../../../../../../../../materialUI/GlobalTooltips";
 import {getRandomInt, getRandomWeightedInt, isServer} from "../../../../../../../helperFunctions/HelperFunctions";
+import useStreamRef from "../../../../../../../custom-hook/useStreamRef";
 
 // function getRandomInt(min, max, index) {
 //     return (Math.floor((Math.random() * (max - min + 1) + min) / (index + 1)));
@@ -62,7 +63,7 @@ function CurrentPollStreamer({
     const [demoMode, setDemoMode] = useState(false)
     const [numberOfTimes, setNumberOfTimes] = useState(0)
     const classes = useStyles({demoMode})
-
+    const streamRef = useStreamRef()
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     const isOpen = (property) => {
@@ -116,7 +117,7 @@ function CurrentPollStreamer({
     }, [demoMode])
 
     function setPollState(state) {
-        firebase.setPollState(livestream.id, poll.id, state);
+        firebase.setPollState(streamRef, poll.id, state);
     }
 
     let totalVotes = 0;

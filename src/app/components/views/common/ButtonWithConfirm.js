@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react'
+import React, {Fragment, useMemo, useState} from 'react'
 import {
     Button,
     DialogActions,
@@ -11,7 +11,7 @@ import {
 } from "@material-ui/core";
 import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
-import {GlassDialog} from "../../../materialUI/GlobalModals";
+import {GlassDialog} from "materialUI/GlobalModals";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
@@ -36,10 +36,17 @@ function ButtonWithConfirm({
     const classes = useStyles({hasStarted})
     const [modalOpen, setModalOpen] = useState(false);
 
-    function performConfirmAction() {
-        buttonAction();
-        setModalOpen(false);
-    }
+    const memorisedState = useMemo(() => ({
+        // This ensures that at the context of which the button was clicked
+        // stays the same even if the stream hasStarted status changes
+        // which avoids the random toggles
+        performConfirmAction: () => {
+            buttonAction()
+            setModalOpen(false)
+        },
+        confirmDescription
+    }), [modalOpen])
+
 
     return (
         <Fragment>
@@ -67,7 +74,7 @@ function ButtonWithConfirm({
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        {confirmDescription}
+                        {memorisedState.confirmDescription}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -75,7 +82,7 @@ function ButtonWithConfirm({
                             onClick={() => setModalOpen(false)}>
                         Cancel
                     </Button>
-                    <Button startIcon={<CheckIcon/>} variant="contained" color="primary" onClick={performConfirmAction}>
+                    <Button startIcon={<CheckIcon/>} variant="contained" color="primary" onClick={memorisedState.performConfirmAction}>
                         Confirm
                     </Button>
                 </DialogActions>

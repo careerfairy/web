@@ -1,8 +1,7 @@
 import React, {useMemo} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {useSelector} from "react-redux";
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
-import {Grid, Zoom} from "@material-ui/core";
+import {Grid} from "@material-ui/core";
 import TalentPoolPercentage from "./TalentPoolPercentage";
 import AudienceCategoryChart from "./AudienceCategoryChart";
 import {isEmpty, isLoaded} from "react-redux-firebase";

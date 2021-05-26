@@ -10,6 +10,7 @@ import BreakdownTab from "./BreakdownTab";
 import {withFirebase} from "../../../../context/firebase";
 import {useCurrentStream} from "../../../../context/stream/StreamContext";
 import PeopleWhoJoinedTab from "./PeopleWhoJoinedTab";
+import useStreamRef from "../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     drawerContent: {
@@ -42,6 +43,7 @@ const useStyles = makeStyles(theme => ({
 const DrawerContent = ({isStreamer, hideAudience, firebase}) => {
     const theme = useTheme();
     const classes = useStyles()
+    const streamRef = useStreamRef();
     const [value, setValue] = React.useState(isStreamer ? 1 : 0);
     const [participatingStudents, setParticipatingStudents] = React.useState(undefined);
 
@@ -49,7 +51,7 @@ const DrawerContent = ({isStreamer, hideAudience, firebase}) => {
 
     useEffect(() => {
         if (streamId) {
-            const unsubscribe = firebase.listenToAllLivestreamParticipatingStudents(streamId, querySnapshot => {
+            const unsubscribe = firebase.listenToAllLivestreamParticipatingStudents(streamRef, querySnapshot => {
                 const participatingStudents = querySnapshot.docs.map(doc => ({
                     id: doc.id, ...doc.data(),
                     inTalentPool: talentPool?.includes(doc.id)

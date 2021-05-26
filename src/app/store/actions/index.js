@@ -16,7 +16,9 @@ export {
     removeMappedUserDataSet, removeOrderedUserDataSet, setMapUserDataSet, setOrderedUserDataSet
 } from './userDataSetActions.js';
 
-export {closeSnackbar, enqueueSnackbar, removeSnackbar, sendGeneralError} from './snackbarActions.js'
+export {
+    closeSnackbar, enqueueSnackbar, removeSnackbar, sendGeneralError, sendCustomError, enqueueBroadcastMessage
+} from './snackbarActions.js'
 export {
     deleteFilterGroup,
     setFilters,
@@ -41,3 +43,11 @@ export {
 export {
     toggleNextLivestreamsFilter, closeNextLivestreamsFilter, openNextLivestreamsFilter
 } from './nextLivestreamsActions'
+
+export {
+    openStreamerBreakoutModal,
+    closeStreamerBreakoutModal,
+    setNumberOfViewers,
+    closeViewerBreakoutModal,
+    openViewerBreakoutModal
+} from "./streamActions";

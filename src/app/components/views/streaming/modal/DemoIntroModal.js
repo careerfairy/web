@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {withFirebase} from "../../../../context/firebase";
+import {withFirebase} from "context/firebase";
 import {
     Button,
     DialogContentText,
@@ -8,11 +8,13 @@ import {
     DialogActions,
     CircularProgress,
 } from "@material-ui/core";
-import {GlassDialog} from "../../../../materialUI/GlobalModals";
+import {GlassDialog} from "materialUI/GlobalModals";
 import {v4 as uuid} from "uuid";
+import useStreamRef from "../../../custom-hook/useStreamRef";
 
 const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
     const [loading, setLoading] = useState(false)
+    const streamRef = useStreamRef();
 
     const createTestLivestream = async () => {
         const testChatEntries = [{
@@ -65,7 +67,7 @@ const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
         }];
         try {
             setLoading(true);
-            await firebase.resetTestStream(livestreamId, testChatEntries, testQuestionsEntries, testPolls)
+            await firebase.resetTestStream(streamRef, testChatEntries, testQuestionsEntries, testPolls)
             handleClose(true) // handleClose should trigger some emotes
         } catch (e) {
             console.log(e)

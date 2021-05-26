@@ -37,6 +37,8 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import {useDispatch} from "react-redux";
 import {compose} from "redux"
 import {useCurrentStream} from "../../../../context/stream/StreamContext";
+import {truncate} from "../../../helperFunctions/HelperFunctions";
+import useStreamRef from "../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     view: {
@@ -100,6 +102,9 @@ const QuestionCategory = (props) => {
     const {selectedState, sliding, streamer, firebase, showMenu, isMobile} = props
     const {currentLivestream: livestream} = useCurrentStream()
     const theme = useTheme()
+
+    const streamRef = useStreamRef()
+
     const classes = useStyles({isMobile})
     const dispatch = useDispatch()
     const [showQuestionModal, setShowQuestionModal] = useState(false);
@@ -116,11 +121,11 @@ const QuestionCategory = (props) => {
 
 
     const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming, totalUpcoming] = useInfiniteScroll(
-        firebase.listenToUpcomingLivestreamQuestions(livestream.id), 10
+        firebase.listenToUpcomingLivestreamQuestions(streamRef), 10
     );
 
     const [itemsPast, loadMorePast, hasMorePast] = useInfiniteScroll(
-        firebase.listenToPastLivestreamQuestions(livestream.id), 10
+        firebase.listenToPastLivestreamQuestions(streamRef), 10
     );
 
     useEffect(() => {
@@ -184,9 +189,9 @@ const QuestionCategory = (props) => {
             setGoingToQuestion(true)
             const currentQuestion = itemsUpcoming.find(question => question.type === 'current');
             if (currentQuestion) {
-                await firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, livestream.id);
+                await firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, streamRef);
             } else {
-                await firebase.goToNextLivestreamQuestion(null, nextQuestionId, livestream.id);
+                await firebase.goToNextLivestreamQuestion(null, nextQuestionId, streamRef);
             }
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
@@ -209,7 +214,7 @@ const QuestionCategory = (props) => {
                 author: !livestream.test ? authenticatedUser.email : 'test@careerfairy.io',
                 displayName: !livestream.test ? `${userData.firstName} ${userData.lastName}` : 'A viewer'
             }
-            await firebase.putLivestreamQuestion(livestream.id, newQuestion)
+            await firebase.addLivestreamQuestion(streamRef, newQuestion)
         } catch (e) {
             dispatch(actions.sendGeneralError(e))
         }
@@ -224,7 +229,6 @@ const QuestionCategory = (props) => {
             streamer={streamer}
             goToThisQuestion={goToThisQuestion}
             isNextQuestions={value === 0}
-            livestream={livestream}
             setOpenQuestionId={setOpenQuestionId}
             index={index} sliding={sliding}
             showMenu={showMenu}
@@ -242,7 +246,6 @@ const QuestionCategory = (props) => {
             key={question.id}
             streamer={streamer}
             isNextQuestions={value === 1}
-            livestream={livestream}
             index={index}
             openQuestionId={openQuestionId}
             sliding={sliding}

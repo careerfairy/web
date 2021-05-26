@@ -1,6 +1,18 @@
 import {CLOSE_SNACKBAR, ENQUEUE_SNACKBAR, REMOVE_SNACKBAR} from "./actionTypes";
 import {GENERAL_ERROR} from "../../components/util/constants";
 
+/**
+ * Enqueue a snackbar managed in redux state.
+ * @param {{
+ * options: {
+ * anchorOrigin: {horizontal: string, vertical: string},
+ * variant: ('default' | 'error' | 'success' | 'warning' | 'info')
+ * key: string,
+ * action: object
+ * },
+ * message: string
+ * }} [notification]
+ */
 export const enqueueSnackbar = (notification = {message: "", options: {}}) => {
     const key = notification.options && notification.options.key;
 
@@ -31,6 +43,37 @@ export const sendGeneralError = (error = "") => async (dispatch) => {
         options: {
             variant: "error",
             preventDuplicate: true
+        }
+    }))
+}
+export const enqueueBroadcastMessage = (message = "", action) => async (dispatch) => {
+    dispatch(enqueueSnackbar({
+        message: message,
+        options: {
+            variant: "warning",
+            preventDuplicate: true,
+            key: message,
+            action,
+            anchorOrigin:{
+                vertical: "top",
+                horizontal: "center"
+            }
+        }
+    }))
+}
+
+/**
+ * Call an on call cloud function to generate a secure agora token.
+ * @param {{options: {anchorOrigin: {horizontal: string, vertical: string}, key: string}, message: string}} data
+ */
+export const sendCustomError = (data = {}) => async (dispatch) => {
+    console.error("error", data.message)
+    dispatch(enqueueSnackbar({
+        message: data.message,
+        options: {
+            variant: "error",
+            preventDuplicate: true,
+            ...data.options,
         }
     }))
 }

@@ -20,6 +20,7 @@ import {
 } from "../../../../../materialUI/GlobalTooltips";
 import {makeStyles} from "@material-ui/core/styles";
 import {getCorrectPollOptionData} from "../../../../../data/util/PollUtil";
+import useStreamRef from "../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     pollHeader: {
@@ -31,12 +32,13 @@ const PollCategory = ({firebase, streamer, livestream, selectedState, showMenu, 
     const classes = useStyles()
     const [addNewPoll, setAddNewPoll] = useState(false);
     const [pollEntries, setPollEntries] = useState([]);
+    const streamRef = useStreamRef()
     const [demoPolls, setDemoPolls] = useState(false);
     const {tutorialSteps, handleConfirmStep} = useContext(TutorialContext);
 
     useEffect(() => {
         if (livestream.id) {
-            const unsubscribe = firebase.listenToPollEntries(livestream.id, querySnapshot => {
+            const unsubscribe = firebase.listenToPollEntriesWithStreamRef(streamRef, querySnapshot => {
                 const pollEntries = querySnapshot.docs.map(doc => {
                     const data = doc.data()
                     return {

@@ -1,6 +1,6 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
-import {withFirebase} from 'context/firebase';
+import {useFirebase, withFirebase} from 'context/firebase';
 import ChevronRightRoundedIcon from '@material-ui/icons/ChevronRightRounded';
 import ChatEntryContainer from './ChatEntryContainer';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
@@ -12,9 +12,9 @@ import {
     Collapse,
     TextField,
     Typography,
-    IconButton,
+    IconButton, Button,
 } from "@material-ui/core";
-import {makeStyles, fade} from "@material-ui/core/styles";
+import {makeStyles, fade, useTheme} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
 import TutorialContext from "../../../../../../context/tutorials/TutorialContext";
 import {
@@ -27,6 +27,11 @@ import CustomScrollToBottom from "../../../../../util/CustomScrollToBottom";
 import {useAuth} from "../../../../../../HOCs/AuthProvider";
 import clsx from "clsx";
 import EmotesModal from "./EmotesModal";
+import useStreamRef from "../../../../../custom-hook/useStreamRef";
+import {useDispatch} from "react-redux";
+import * as actions from 'store/actions'
+import {enqueueBroadcastMessage} from "store/actions";
+import {useCurrentStream} from "../../../../../../context/stream/StreamContext";
 
 const useStyles = makeStyles(theme => ({
     root: {},
@@ -89,10 +94,15 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function MiniChatContainer({isStreamer, livestream, firebase, className}) {
-    const {authenticatedUser, userData} = useAuth();
-    const {tutorialSteps, setTutorialSteps, handleConfirmStep} = useContext(TutorialContext);
+const now = new Date()
 
+function MiniChatContainer({isStreamer, livestream, className, mobile}) {
+    const {authenticatedUser, userData} = useAuth();
+    const firebase = useFirebase()
+    const dispatch = useDispatch()
+    const theme = useTheme()
+    const {tutorialSteps, setTutorialSteps, handleConfirmStep} = useContext(TutorialContext);
+    const streamRef = useStreamRef();
     const [chatEntries, setChatEntries] = useState([]);
     const [focused, setFocused] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -108,18 +118,19 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
 
     useEffect(() => {
         if (livestream.id) {
-            const unsubscribe = firebase.listenToChatEntries(livestream.id, 150, querySnapshot => {
+            const unsubscribe = firebase.listenToChatEntries(streamRef, 150, querySnapshot => {
                 const newEntries = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()})).reverse()
                 setChatEntries(newEntries);
-                if (!open) {
+                querySnapshot.docChanges().forEach(change => {
                     let number = 0;
-                    querySnapshot.docChanges().forEach(change => {
-                        if (change.type === "added" && number < 99) {
+                    if (change.type === "added") {
+                        handleBroadcast(change)
+                        if (!open && number < 99) {
                             number++;
+                            setNumberOfLatestChanges(number);
                         }
-                    })
-                    setNumberOfLatestChanges(number);
-                }
+                    }
+                })
             });
             return () => unsubscribe();
         }
@@ -143,6 +154,26 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
             setNumberOfMissedEntries(3); // resets the missed entries back to 3
         }
     }, [tutorialSteps.streamerReady])
+
+    const handleBroadcast = async (change) => {
+        const entryData = change.doc.data()
+        if (entryData.type === "broadcast") {
+            const isNewBroadcast = entryData.timestamp?.toDate() > now
+            if (isNewBroadcast) {
+                const {authorName, message} = entryData
+                const broadCastMessage = `${authorName} - ${message}`
+                const handleCloseAction = () => dispatch(actions.closeSnackbar(broadCastMessage))
+                const action = (
+                    <Button
+                        style={{color: theme.palette.common.white}}
+                        onClick={handleCloseAction}>
+                        Dismiss
+                    </Button>
+                )
+                dispatch(actions.enqueueBroadcastMessage(broadCastMessage, action))
+            }
+        }
+    }
 
     const isOpen = (property) => {
         return Boolean(livestream.test
@@ -173,7 +204,7 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
         }
 
         isOpen(15) && handleConfirmStep(15)
-        firebase.putChatEntry(livestream.id, newChatEntryObject)
+        firebase.putChatEntry(streamRef, newChatEntryObject)
             .then(() => {
                 setSubmitting(false)
                 setNewChatEntry('');
@@ -192,6 +223,10 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
                 setTimeout(() => setOpen(false), 2000)
             }
         }
+    }
+
+    if(mobile){
+        return null
     }
 
     const chatElements = chatEntries.map(chatEntry =>

@@ -1,4 +1,4 @@
-import React, {useState, Fragment, useEffect} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {
     AppBar,
@@ -10,7 +10,8 @@ import {
     IconButton,
     Toolbar,
     Tooltip,
-    Typography, useMediaQuery
+    Typography,
+    useMediaQuery
 } from "@material-ui/core";
 import {MainLogo, MiniLogo} from "../../../components/logos";
 import {StandartTooltip, TooltipButtonComponent, TooltipText, TooltipTitle} from "../../../materialUI/GlobalTooltips";
@@ -21,17 +22,22 @@ import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import OpenInBrowserIcon from "@material-ui/icons/OpenInBrowser";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
+import BreakoutRoomIcon from '@material-ui/icons/Widgets';
 import PeopleIcon from "@material-ui/icons/People";
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
 import SpeakerManagementModal from "../../../components/views/streaming/modal/SpeakerManagementModal";
-import {useRouter} from "next/router";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import {maybePluralize} from "../../../components/helperFunctions/HelperFunctions";
 import NewFeatureHint from "../../../components/util/NewFeatureHint";
+import useStreamToken from "../../../components/custom-hook/useStreamToken";
+import useStreamRef from "../../../components/custom-hook/useStreamRef";
+import {useDispatch, useSelector} from "react-redux";
+import * as actions from "store/actions"
+import {TOP_BAR_HEIGHT} from "constants/streamLayout";
 
 const useStyles = makeStyles(theme => ({
     toolbar: {
-        minHeight: 55,
+        minHeight: TOP_BAR_HEIGHT,
         display: "flex",
         justifyContent: "space-between"
     },
@@ -54,31 +60,23 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience}) => {
-    const {currentLivestream} = useCurrentStream()
 
+const StreamerTopBar = ({firebase, showAudience}) => {
+
+    const {currentLivestream, isBreakout, isMainStreamer, isStreamer} = useCurrentStream()
+
+    const dispatch = useDispatch()
+    const streamRef = useStreamRef();
     const classes = useStyles({hasStarted: currentLivestream?.hasStarted})
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('md'))
-    const {query: {livestreamId, token}} = useRouter()
     const {toggleTheme, themeMode} = useThemeToggle()
-
+    const numberOfViewers = useSelector(state => currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0)
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [hideTooltip, setHideTooltip] = useState(false);
-    const [joiningStreamerLink, setJoiningStreamerLink] = useState("")
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
-
-
-    useEffect(() => {
-        if (livestreamId) {
-            let baseUrl = "https://careerfairy.io"
-            if (window?.location?.origin) {
-                baseUrl = window.location.origin
-            }
-            const link = `${baseUrl}/streaming/${livestreamId}/joining-streamer?token=${token}`;
-            setJoiningStreamerLink(link)
-        }
-    }, [livestreamId])
+    const [openStreamerBreakoutRoomModal, setOpenStreamerBreakoutRoomModal] = useState(false);
+    const {joiningStreamerLink, viewerLink} = useStreamToken()
 
     useEffect(() => {
         if (currentLivestream.start) {
@@ -89,16 +87,18 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
                 }
             }, 1000)
         }
-    }, [currentLivestream.start]);
+    }, [currentLivestream?.start]);
 
     function dateIsInUnder2Minutes(date) {
         return new Date(date).getTime() - Date.now() < 1000 * 60 * 2 || Date.now() > new Date(date).getTime();
     }
 
     function setStreamingStarted(started) {
-        firebase.setLivestreamHasStarted(started, currentLivestream.id);
+        firebase.setLivestreamHasStarted(started, streamRef);
+    }
 
-
+    const handleOpenBreakoutRoomModal = () => {
+        dispatch(actions.openStreamerBreakoutModal())
     }
 
     return (
@@ -111,7 +111,7 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
                     <Hidden mdUp>
                         <MiniLogo/>
                     </Hidden>
-                    {isMainStreamer &&
+                    {(isMainStreamer || (isStreamer && isBreakout)) &&
                     <Fragment>
                         <StandartTooltip
                             arrow
@@ -142,23 +142,6 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
 
                             />
                         </StandartTooltip>
-
-                        {mobile ?
-                            <Tooltip title="Invite an additional streamer">
-                                <IconButton onClick={() => {
-                                    setSpeakerManagementOpen(true)
-                                }}>
-                                    <PersonAddIcon color="inherit"/>
-                                </IconButton>
-                            </Tooltip>
-                            :
-                            <Button
-                                children="Invite a streamer"
-                                startIcon={<PersonAddIcon color="inherit"/>}
-                                onClick={() => {
-                                    setSpeakerManagementOpen(true)
-                                }}
-                            />}
                     </Fragment>
                     }
                     {mobile ?
@@ -178,24 +161,29 @@ const StreamerTopBar = ({firebase, isMainStreamer, numberOfViewers, showAudience
                             </Typography>
                             {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                         </Box>}
-                    {isMainStreamer &&
-                    <Fragment>
-                        {mobile ?
+                    <Box display="flex" alignItems="center">
+                        {
+                            <Tooltip title="Invite an additional streamer">
+                                <IconButton onClick={() => {
+                                    setSpeakerManagementOpen(true)
+                                }}>
+                                    <PersonAddIcon color="inherit"/>
+                                </IconButton>
+                            </Tooltip>
+                        }
+
+                        <Tooltip title="Manage breakout rooms">
+                            <IconButton disabled={openStreamerBreakoutRoomModal} onClick={handleOpenBreakoutRoomModal}>
+                                <BreakoutRoomIcon/>
+                            </IconButton>
+                        </Tooltip>
+                        {
                             <Tooltip title="Open Student View">
-                                <IconButton target="_blank" href={`/streaming/${currentLivestream.id}/viewer`}>
+                                <IconButton target="_blank" href={viewerLink}>
                                     <OpenInBrowserIcon color="inherit"/>
                                 </IconButton>
                             </Tooltip>
-                            :
-                            <Button
-                                href={`/streaming/${currentLivestream.id}/viewer`}
-                                target="_blank"
-                                children="Open Student View"
-                                startIcon={<OpenInBrowserIcon color="inherit"/>}
-                            />
                         }
-                    </Fragment>}
-                    <Box display="flex" alignItems="center">
                         <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
                             <Checkbox
                                 checked={themeMode === "dark"}

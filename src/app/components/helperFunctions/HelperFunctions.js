@@ -231,8 +231,8 @@ export const mergeArrayOfObjects = (arr1, arr2, property) => {
 
 export const getMinutes = value => (value === LONG_NUMBER ? "stream Ends" : `${value} minutes`)
 
-export const dynamicSort = (property) => {
-    let sortOrder = -1;
+export const dynamicSort = (property, reverse) => {
+    let sortOrder = reverse ? 1 : -1;
     if (property[0] === "-") {
         sortOrder = -1;
         property = property.substr(1);
@@ -304,7 +304,7 @@ export const getRandomColor = () => {
     return '#' + Math.round(Math.random() * max).toString(16);
 }
 
-export const getRandomInt =(min, max) =>{
+export const getRandomInt = (min, max) => {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -313,7 +313,6 @@ export const getRandomInt =(min, max) =>{
 export const getRandomWeightedInt = (min, max, index) => {
     return (Math.floor((Math.random() * (max - min + 1) + min) / (index + 1)));
 }
-
 
 
 /**
@@ -355,4 +354,12 @@ export const getResizedUrl = (url, size = "sm") => {
 
 export const getResponsiveResizedUrl = (url, isMobile, mobileSize = "sm", desktopSize = "lg") => {
     return getResizedUrl(url, isMobile ? mobileSize : desktopSize)
+}
+
+export const addQueryParam = (url, queryParam) => {
+    if (!queryParam) return url
+    if (url.includes("?")) {
+        return `${url}&${queryParam}`
+    }
+    return `${url}?${queryParam}`
 }

@@ -1,19 +1,24 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import window, {document} from 'global';
 import {useAgoraToken} from './useAgoraToken';
 import {useDispatch} from "react-redux";
 import {EMOTE_MESSAGE_TEXT_TYPE} from "../util/constants";
 import * as actions from '../../store/actions'
 import {useRouter} from 'next/router';
+import useStreamRef from "./useStreamRef";
 
-export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer, optimizationMode) {
+export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer) {
 
     const dispatch = useDispatch()
+    const {path} = useStreamRef();
     const [localMediaStream, setLocalMediaStream] = useState(null);
     const [addedStream, setAddedStream] = useState(null);
     const [updatedStream, setUpdatedStream] = useState(null);
     const [removedStream, setRemovedStream] = useState(null);
     const [externalMediaStreams, setExternalMediaStreams] = useState([]);
+    const [joinedChannel, setJoinedChannel] = useState(false);
+
+
     const [networkQuality, setNetworkQuality] = useState({
         downlinkNetworkQuality: 0,
         type: "network-quality",
@@ -33,7 +38,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
     const [userUid, setUserUid] = useState(null);
     const [readyToConnect, setReadyToConnect] = useState(false);
-    const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [agoraRtcStatus, setAgoraRtcStatus] = useState({
         type: "INFO",
         msg: "RTC_INITIAL"
@@ -43,8 +47,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         msg: "RTM_INITIAL"
     });
 
-    const agoraToken = useAgoraToken(roomId, userUid, !isViewer, token, false);
-    const agoraScreenShareToken = useAgoraToken(roomId, userUid, !isViewer, token, true);
+    const agoraToken = useAgoraToken(roomId, userUid, !isViewer, token, false, path);
+    const agoraScreenShareToken = useAgoraToken(roomId, userUid, !isViewer, token, true, path);
 
     const AGORA_APP_ID = "53675bc6d3884026a72ecb1de3d19eb1";
 
@@ -53,6 +57,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             setUserUid(streamId)
         }
     }, [streamId])
+
 
     useEffect(() => {
         if (addedStream) {
@@ -88,24 +93,93 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     }, [removedStream]);
 
     useEffect(() => {
-        if (window &&
-            userUid &&
-            streamerReady &&
-            roomId &&
-            streamId &&
-            agoraToken &&
-            agoraScreenShareToken &&
-            document) {
-            setReadyToConnect(true);
-        }
-    }, [window, userUid, streamerReady, roomId, streamId, agoraToken, agoraScreenShareToken, document])
+        setReadyToConnect(
+            Boolean(
+                window &&
+                userUid &&
+                streamerReady &&
+                roomId &&
+                streamId &&
+                agoraToken &&
+                agoraScreenShareToken &&
+                document
+            ));
+    }, [window, userUid, streamerReady, roomId, streamId, agoraToken, agoraScreenShareToken, document, router.asPath])
 
     useEffect(() => {
         if (readyToConnect) {
-            connectAgoraRTC()
-            connectAgoraRTM()
+            handleConnectClients()
         }
     }, [readyToConnect])
+
+    useEffect(() => {
+        handleSwitchRooms()
+    }, [router.asPath])
+
+
+
+    const agoraHandlers = useMemo(() => ({
+        getChannelMemberCount: async (channelIds) => {
+            return await rtmClient.getChannelMemberCount(channelIds)
+        },
+        handleDisconnect: async () => {
+            if (rtmChannel) {
+                rtmChannel.removeAllListeners()
+                await rtmChannel.leave()
+            }
+            if (rtmClient) {
+                rtmClient.removeAllListeners()
+                await rtmClient.logout()
+            }
+            if (rtcClient) {
+                await rtcClient.leave()
+            }
+        },
+        joinChannel: async (targetRoomId, handleMemberJoined, handleMemberLeft, updateMemberCount) => {
+            let newChannel
+            if (targetRoomId === roomId) { // Dont re-join the current stream channel pls
+                newChannel = rtmChannel
+            } else {
+                newChannel = rtmClient.createChannel(targetRoomId)
+                await newChannel.join()
+            }
+            newChannel.on("MemberJoined", handleMemberJoined)
+            newChannel.on("MemberLeft", handleMemberLeft)
+            newChannel.on("MemberCountUpdated", newCount => {
+                updateMemberCount(roomId, newCount - 1)
+            })
+            return newChannel
+
+        },
+        getChannelMembers: async (channel) => {
+            return await channel.getMembers()
+        },
+        leaveChannel: async (channel) => {
+            if(channel.channelId === roomId) return // Dont leave the current stream channel pls
+            channel.removeAllListeners()
+            await channel.leave()
+        }
+    }), [rtmClient, rtmChannel, rtcClient, roomId])
+
+    const handleConnectClients = () => {
+        console.log("-> Connecting Clients");
+        connectAgoraRTC()
+        connectAgoraRTM()
+    }
+    const handleSwitchRooms = async () => {
+        if (rtcClient || rtmClient || rtmChannel) {
+            console.log("-> CLOSING CONNECTIONS");
+            removeAllClients()
+            console.log("-> CLOSING CONNECTIONS FINISHED");
+        }
+        setExternalMediaStreams([])
+    }
+
+    const removeAllClients = () => {
+        setAgoraRTC(null)
+        setScreenShareRtcClient(null)
+        setScreenShareRtcStream(null)
+    }
 
     const createEmote = useCallback(async (emoteType) => {
         try {
@@ -140,7 +214,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             rtcClient.startProxyServer(3);
             rtcClient.setClientRole("host")
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
-
                 setAgoraRtcStatus({
                     type: "INFO",
                     msg: "RTC_JOINED_CHANNEL"
@@ -185,7 +258,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
         rtcClient.on("stream-published", function (evt) {
             rtcClient.enableDualStream(() => {
-                console.log("-> dualStream enabled on rtc client");
+                // console.log("-> dualStream enabled on rtc client");
             }, function (err) {
                 console.log("-> dualStream failed on rtc client", err);
                 setAgoraRtcStatus({
@@ -208,6 +281,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         rtcClient.on("stream-subscribed", function (evt) {
             let stream = evt.stream;
             let streamId = String(stream.getId());
+            console.log("--> stream-added")
             rtcClient.setStreamFallbackOption(stream, 2);
             setAddedStream({
                 streamId: streamId,
@@ -220,7 +294,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         });
 
         rtcClient.on("stream-removed", function (evt) {
-            console.log("stream-removed")
+            console.log("--> stream-removed")
             if (evt.stream) {
                 let stream = evt.stream;
                 let streamId = String(stream.getId());
@@ -230,7 +304,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         });
 
         rtcClient.on("peer-leave", function (evt) {
-            console.log("peer-leave")
+            console.log("--> peer-leave")
             if (evt.stream) {
                 let stream = evt.stream;
                 let streamId = String(stream.getId());
@@ -396,9 +470,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
             const channel = rtmClient.createChannel(roomId);
 
-
-
-
             channel.on('ChannelMessage', (message, memberId) => {
                 if (message.messageType === "TEXT") {
                     const messageData = JSON.parse(message.text)
@@ -408,12 +479,13 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 }
             });
 
-            channel.join().then(() => {
 
-                console.log('Joined channel');
-                // channel.getMembers().then(result => {
-                //     console.log("-> getMembers result", result);
-                // })
+            channel.join().then(() => {
+                setJoinedChannel(true)
+                channel.on("MemberCountUpdated", (newCount) => {
+                    dispatch(actions.setNumberOfViewers(newCount))
+                })
+                console.log('--> Joined channel');
                 setRtmChannel(channel);
             }).catch(error => {
                 console.error(error);
@@ -532,18 +604,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         }
     }, [isPlayMode])
 
-    useEffect(() => {
-        if (rtmChannel) {
-            let interval = setInterval(() => {
-
-                rtmClient.getChannelMemberCount([roomId]).then(result => {
-                    setNumberOfViewers(result[roomId])
-                    // console.log(result)
-                })
-            }, 5000)
-            return () => clearInterval(interval);
-        }
-    }, [rtmChannel])
 
     const removeStreamFromList = (streamId, streamList) => {
         const streamListCopy = [...streamList];
@@ -681,9 +741,10 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         agoraRtcStatus,
         agoraRtmStatus,
         networkQuality,
-        numberOfViewers,
         setAddedStream,
         setRemovedStream,
-        createEmote
+        createEmote,
+        agoraHandlers,
+        joinedChannel
     };
 }

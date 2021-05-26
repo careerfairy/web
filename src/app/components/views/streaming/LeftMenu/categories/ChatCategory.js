@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, {useCallback, useEffect, useState} from 'react';
-import {withFirebase} from '../../../../../context/firebase';
+import {withFirebase} from 'context/firebase';
 import {grey} from "@material-ui/core/colors";
 import {IconButton, TextField, Typography} from "@material-ui/core";
 import {fade, makeStyles} from "@material-ui/core/styles";
@@ -10,6 +10,7 @@ import ChatEntryContainer from './chat/ChatEntryContainer';
 import CustomScrollToBottom from "../../../../util/CustomScrollToBottom";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import EmotesModal from "./chat/EmotesModal";
+import useStreamRef from "../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -76,7 +77,7 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
 
     const {authenticatedUser, userData} = useAuth();
     const [focused, setFocused] = useState(false);
-
+    const streamRef = useStreamRef();
 
     const [newChatEntry, setNewChatEntry] = useState('');
     const [chatEntries, setChatEntries] = useState([]);
@@ -88,7 +89,7 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
 
     useEffect(() => {
         if (livestream.id) {
-            const unsubscribe = firebase.listenToChatEntries(livestream.id, 150, querySnapshot => {
+            const unsubscribe = firebase.listenToChatEntries(streamRef, 150, querySnapshot => {
                 const newEntries = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()})).reverse()
                 setChatEntries(newEntries);
             });
@@ -109,7 +110,7 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
             votes: 0
         }
 
-        firebase.putChatEntry(livestream.id, newChatEntryObject)
+        firebase.putChatEntry(streamRef, newChatEntryObject)
             .then(() => {
                 setSubmitting(false)
                 setNewChatEntry('');

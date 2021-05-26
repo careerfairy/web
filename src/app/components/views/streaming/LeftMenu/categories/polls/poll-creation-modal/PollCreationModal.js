@@ -19,6 +19,7 @@ import {
 import {BarChart} from "@material-ui/icons";
 import {GlassDialog} from "../../../../../../../materialUI/GlobalModals";
 import {v4 as uuidv4} from "uuid";
+import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 
 /**
  * Create Empty Option.
@@ -28,7 +29,7 @@ const createEmptyOption = () => ({id: uuidv4(), text: ''})
 const getInitialOptions = () => [createEmptyOption(), createEmptyOption()]
 
 function PollCreationModal({open, handleClose, livestreamId, initialOptions, initialPoll, firebase}) {
-
+    const streamRef = useStreamRef();
     const [question, setQuestion] = useState('');
     const [options, setOptions] = useState(getInitialOptions());
     const [error, setError] = useState(false);
@@ -89,11 +90,11 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
         setLoading(true);
         // const optionsObject = PollUtil.convertPollOptionNamesArrayToObject(options)
         if (initialPoll) {
-            firebase.updateLivestreamPoll(livestreamId, initialPoll.id, question, options).then(() => {
+            firebase.updateLivestreamPoll(streamRef, initialPoll.id, question, options).then(() => {
                 resetForm()
             });
         } else {
-            firebase.createLivestreamPoll(livestreamId, question, options).then(() => {
+            firebase.createLivestreamPoll(streamRef, question, options).then(() => {
                 resetForm()
             });
         }

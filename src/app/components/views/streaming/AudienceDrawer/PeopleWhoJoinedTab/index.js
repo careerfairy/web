@@ -3,7 +3,6 @@ import React, {Fragment, useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {FormControl, Grid, InputLabel, MenuItem, Select, TextField} from "@material-ui/core";
 import UserList from "./UserList";
-import {useSelector} from "react-redux";
 import {isEmpty, isLoaded} from "react-redux-firebase";
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 import EmptyDisplay from "../displays/EmptyDisplay";

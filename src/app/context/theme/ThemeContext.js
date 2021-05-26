@@ -8,8 +8,12 @@ const ThemeContext = createContext();
 const pathsReadyForDarkMode = [
     "/streaming/[livestreamId]/joining-streamer",
     "/streaming/[livestreamId]/main-streamer",
-    "/streaming/[livestreamId]/viewer"
+    "/streaming/[livestreamId]/viewer",
+    "/streaming/[livestreamId]/breakout-room/[breakoutRoomId]/joining-streamer",
+    "/streaming/[livestreamId]/breakout-room/[breakoutRoomId]/main-streamer",
+    "/streaming/[livestreamId]/breakout-room/[breakoutRoomId]/viewer"
 ];
+
 const initialTheme = responsiveFontSizes(createMuiTheme(baseThemeObj))
 const ThemeProviderWrapper = ({children}) => {
     const {pathname} = useRouter()
