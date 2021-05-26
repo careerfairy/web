@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useFirebase} from "../../context/firebase";
+import {useFirebase} from "context/firebase";
 
 const useStreamGroups = (groupIds) => {
     const [careerCenters, setCareerCenters] = useState([]);
