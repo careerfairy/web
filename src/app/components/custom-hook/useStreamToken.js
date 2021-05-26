@@ -5,10 +5,12 @@ import {useFirebase} from "context/firebase";
 import useStreamRef from "./useStreamRef";
 
 /**
- * @param {({forStreamType: (''|'breakoutRoom'|'mainLivestream' ), targetBreakoutRoomId: string})} options Object
+ * Get the stream token.
+ * @param {Object} options - The configurations optionObject
+ * @param {string|'mainLivestream'|'breakoutRoom'} options.forStreamType - The type of stream you would like the token for.
+ * @param {string} [options.targetBreakoutRoomId] - The id of a particular breakout room you are looking for.
  * @returns {({streamToken: string, mainStreamerLink: string, joiningStreamerLink: string, viewerLink: string})} Returns the 3 stream link types
  */
-
 const useStreamToken = (options = {forStreamType: "", targetBreakoutRoomId:""}) => {
     const {query: {livestreamId, breakoutRoomId}} = useRouter()
     const streamRef = useStreamRef();
