@@ -18,7 +18,6 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center"
     },
     section: {
-        // paddingBottom: theme.spacing(1)
     },
     bookingButton: {
         background: theme.palette.common.white,
@@ -27,12 +26,8 @@ const useStyles = makeStyles(theme => ({
             color: theme.palette.common.white,
         }
     },
-    bookADemoHeader: {
-        marginBottom: [theme.spacing(2), "!important"]
-    },
     testimonialsWrapper: {
         display: "flex",
-        // border: "2px solid pink",
         width: "100%"
     },
     subTitle: {
@@ -51,7 +46,8 @@ const useStyles = makeStyles(theme => ({
         width: "100%",
         height: "auto",
         maxWidth: 1200,
-        marginTop: "-10%"
+        marginTop: "-2%",
+        boxShadow: theme.shadows[15]
     },
     imagesWrapper: {
         display: "flex",
@@ -77,7 +73,6 @@ const AnalyticsSection = (props) => {
             <Container className={classes.container}>
                 <SectionHeader
                     color={props.color}
-                    className={classes.bookADemoHeader}
                     subTitleClassName={classes.subTitle}
                     titleClassName={classes.title}
                     title={props.title}

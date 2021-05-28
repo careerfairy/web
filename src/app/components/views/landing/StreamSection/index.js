@@ -2,9 +2,10 @@ import PropTypes from 'prop-types'
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import {Container, Grid} from "@material-ui/core";
+import {Container} from "@material-ui/core";
 import SectionHeader from "components/views/common/SectionHeader";
-import TestimonialCard from "./TestimonialCard";
+import {analyticsPreviewImage, analyticsSVG, streamerImage} from "../../../../constants/images";
+import {getResizedUrl} from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -17,7 +18,6 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center"
     },
     section: {
-        // paddingBottom: theme.spacing(1)
     },
     bookingButton: {
         background: theme.palette.common.white,
@@ -28,12 +28,28 @@ const useStyles = makeStyles(theme => ({
     },
     testimonialsWrapper: {
         display: "flex",
-        // border: "2px solid pink",
         width: "100%"
+    },
+    subTitle: {
+        color: theme.palette.text.secondary,
+        fontWeight: 500
+    },
+    title: {
+    },
+    streamerImage: {
+        width: "100%",
+        height: "auto",
+        maxWidth: 1200,
+        boxShadow: theme.shadows[15]
+    },
+    imagesWrapper: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center"
     }
 }));
 
-const TestimonialsSection = (props) => {
+const StreamSection = (props) => {
 
     const classes = useStyles()
 
@@ -50,31 +66,22 @@ const TestimonialsSection = (props) => {
             <Container className={classes.container}>
                 <SectionHeader
                     color={props.color}
+                    subTitleClassName={classes.subTitle}
+                    titleClassName={classes.title}
                     title={props.title}
                     subtitle={props.subtitle}
                 />
-                <Grid container className={classes.testimonialsWrapper}>
-                    <Grid item xs={12}>
-                        <TestimonialCard
-                            position="Employer Branding Expert @Accenture Germany"
-                            name="Kristina Neidert"
-                            rating={5}
-                            avatarUrl={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/testimonial-avatars%2Fkristina.png?alt=media&token=ee0eca2f-4be8-4f1a-a1b1-f7da8d9bb48f"}
-                            reviewText="Lorem Ipsum is simply dummy text of the printing
-                            and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
-                             remaining essentially unchanged."
-                            title={"Amazing"}
-                        />
-                    </Grid>
-                </Grid>
+                <div className={classes.imagesWrapper}>
+                    <img className={classes.streamerImage} src={streamerImage} alt="analytics"/>
+                </div>
             </Container>
         </Section>
     );
 };
 
-export default TestimonialsSection;
+export default StreamSection;
 
-TestimonialsSection.propTypes = {
+StreamSection.propTypes = {
     backgroundColor: PropTypes.any,
     backgroundImage: PropTypes.any,
     backgroundImageClassName: PropTypes.any,

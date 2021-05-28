@@ -3,4 +3,5 @@ export const searchImage = "https://firebasestorage.googleapis.com/v0/b/careerfa
 export const companyLogoPlaceholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media"
 export const signInImage = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/ui-icons%2Fsign-in-icon.svg?alt=media&token=3b3b804b-84c2-4dd6-9fc5-8a580abdd4b4"
 export const analyticsSVG = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2FanalyticsIllustration.svg?alt=media&token=bf5d2bd5-ac8d-4bf4-b787-8a116f7cf755"
-export const analyticsPreviewImage = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fanalytics-preview.png?alt=media&token=8a82d4ac-5082-4102-81b2-e6debc8d7d39"
+export const analyticsPreviewImage = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fanalytics-preview.webp?alt=media&token=545502d8-c0f8-4e27-92e1-640dc2bacc61"
+export const streamerImage = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstreamer.webp?alt=media&token=20bd52bc-860c-4f62-8292-9800e6691cee"

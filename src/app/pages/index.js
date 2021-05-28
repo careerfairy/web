@@ -4,6 +4,7 @@ import LandingLayout from "../layouts/LandingLayout";
 import BookADemoSection from "../components/views/landing/BookADemoSection";
 import TestimonialsSection from "../components/views/landing/TestimonialsSection";
 import AnalyticsSection from "../components/views/landing/AnalyticsSection";
+import StreamSection from "../components/views/landing/StreamSection";
 
 const useStyles = makeStyles(theme => ({}));
 
@@ -13,6 +14,12 @@ const LandingPage = ({}) => {
 
     return (
         <LandingLayout>
+            <StreamSection
+                title={<>Showcase your best ambassadors <b>- your employees.</b></>}
+                subtitle="We believe that your employees are your biggest asset, and their insights provide
+                an authentic look into the opportunities that your company has to offer. Their passion is what
+                will attract tomorrow's best hires"
+            />
             <AnalyticsSection
                 title={<>Measure your success with <b>concrete data</b></>}
                 subtitle="Track registrations, participants, feedback
