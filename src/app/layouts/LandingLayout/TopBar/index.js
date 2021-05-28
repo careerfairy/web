@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
         height: 60
     },
     navIconButton: {
-        color: "white !important"
+        // color: "white !important"
     },
     toolbar: {
         display: "flex",
@@ -97,6 +97,7 @@ const TopBar = ({className, ...rest}) => {
                         <IconButton
                             component={Link}
                             className={classes.navIconButton}
+                            color="primary"
                             href="/profile"
                         >
                             <AccountCircleOutlinedIcon/>
