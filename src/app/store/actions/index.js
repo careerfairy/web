@@ -1,3 +1,5 @@
+import {openNavDrawer} from "./generalLayoutActions";
+
 export {
     signUp,
     signOut,
@@ -51,3 +53,5 @@ export {
     closeViewerBreakoutModal,
     openViewerBreakoutModal
 } from "./streamActions";
+
+export {openNavDrawer, closeNavDrawer, toggleNavDrawer} from './generalLayoutActions'

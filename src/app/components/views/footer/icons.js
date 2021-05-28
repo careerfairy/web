@@ -9,11 +9,11 @@ const icons = [
     },
     {
         icon: <FacebookIcon/>,
-        href: 'https://www.linkedin.com/company/careerfairy/'
+        href: 'https://www.facebook.com/careerfairy'
     },
     {
         icon: <InstagramIcon/>,
-        href: 'https://www.linkedin.com/company/careerfairy/'
+        href: 'https://www.instagram.com/careerfairy/'
     }
 ]
 

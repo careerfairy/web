@@ -72,7 +72,8 @@ const FooterV2 = ({}) => {
                     <Grid justify="center" container>
                         {footerLinks.map(({links, category}) =>
                             (<Grid key={category} item xs={12} sm={4} md={3} lg={2}>
-                                    {links.map(({label, href}) => (<div className={classes.linkWrapper}>
+                                    {links.map(({label, href}) => (
+                                        <div key={href} className={classes.linkWrapper}>
                                             <Link href={href}>
                                                 <a>{label}</a>
                                             </Link>

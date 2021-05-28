@@ -4,10 +4,12 @@ import PropTypes from 'prop-types';
 import {AppBar, Box, Hidden, IconButton, Tab, Tabs, Toolbar} from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
-import Link from '../../../materialUI/NextNavLink'
-import {MainLogo, MiniLogo} from "../../../components/logos";
+import Link from 'materialUI/NextNavLink'
+import {MainLogo, MiniLogo} from "components/logos";
 import {makeStyles} from "@material-ui/core/styles"
-import useGeneralLinks from "../../../components/custom-hook/useGeneralLinks";
+import useGeneralLinks from "components/custom-hook/useGeneralLinks";
+import * as actions from "store/actions";
+import {useDispatch} from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
     avatar: {
@@ -59,10 +61,13 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const TopBar = ({className,  onMobileNavOpen, ...rest}) => {
+const TopBar = ({className, ...rest}) => {
     const classes = useStyles();
 
-    const {mainLinks, secondaryLinks} = useGeneralLinks()
+    const {mainLinks} = useGeneralLinks()
+    const dispatch = useDispatch()
+    const handleDrawerOpen = () => dispatch(actions.openNavDrawer())
+
 
     return (
         <AppBar elevation={0} className={clsx(classes.root, className)} {...rest}>
@@ -98,7 +103,7 @@ const TopBar = ({className,  onMobileNavOpen, ...rest}) => {
                         </IconButton>
                     </Hidden>
                     <Hidden lgUp>
-                        <IconButton color="primary" onClick={onMobileNavOpen}>
+                        <IconButton color="primary" onClick={handleDrawerOpen}>
                             <MenuIcon/>
                         </IconButton>
                     </Hidden>

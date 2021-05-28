@@ -10,6 +10,7 @@ import userDataSetReducer from "./userDataSetReducer";
 import currentFilterGroupReducer from "./currentFilterGroupReducer";
 import nextLivestreamsReducer from "./nextLivestreamsReducer";
 import streamReducer from "./streamReducer";
+import generalLayoutReducer from "./generalLayoutReducer";
 
 export default combineReducers({
     auth: authReducer,
@@ -21,5 +22,6 @@ export default combineReducers({
     userDataSet: userDataSetReducer,
     currentFilterGroup: currentFilterGroupReducer,
     nextLivestreams: nextLivestreamsReducer,
-    stream: streamReducer
+    generalLayout: generalLayoutReducer,
+    stream: streamReducer,
 });

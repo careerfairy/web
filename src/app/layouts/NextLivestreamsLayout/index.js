@@ -15,10 +15,10 @@ const NextLivestreamsLayout = (props) => {
     const {children, currentGroup} = props
     const drawerWidth = 300
     const classes = useStyles({drawerWidth});
-    const [isMobileNavOpen, setMobileNavOpen] = useState(false);
 
     const {mainLinks, secondaryLinks} = useGeneralLinks()
 
+    const [isMobileNavOpen, setMobileNavOpen] = useState(false);
     const handleDrawerOpen = () => setMobileNavOpen(true)
     const handleDrawerClose = () => setMobileNavOpen(false)
     const handleDrawerToggle = () => setMobileNavOpen(!isMobileNavOpen)
