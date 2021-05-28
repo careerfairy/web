@@ -89,7 +89,6 @@ const NavBar = memo(({
     const signOut = () => dispatch(actions.signOut())
     const {secondaryLinks,mainLinks} = useGeneralLinks()
     const openMobile = useSelector(state => state.generalLayout.layout.drawerOpen)
-    console.log("-> openMobile", openMobile);
     const handleDrawerClose = () => dispatch(actions.closeNavDrawer())
     const handleDrawerToggle = () => dispatch(actions.toggleNavDrawer())
 
@@ -158,17 +157,17 @@ const NavBar = memo(({
                     {content}
                 </Drawer>
             </Hidden>
-            <Hidden mdDown>
-                <Drawer
-                    anchor="left"
-                    classes={{paper: clsx(classes.desktopDrawer, classes.background)}}
-                    className={classes.drawer}
-                    open
-                    variant="persistent"
-                >
-                    {content}
-                </Drawer>
-            </Hidden>
+            {/*<Hidden mdDown>*/}
+            {/*    <Drawer*/}
+            {/*        anchor="left"*/}
+            {/*        classes={{paper: clsx(classes.desktopDrawer, classes.background)}}*/}
+            {/*        className={classes.drawer}*/}
+            {/*        open*/}
+            {/*        variant="persistent"*/}
+            {/*    >*/}
+            {/*        {content}*/}
+            {/*    </Drawer>*/}
+            {/*</Hidden>*/}
         </>
     );
 

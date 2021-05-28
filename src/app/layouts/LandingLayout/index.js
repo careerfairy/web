@@ -10,7 +10,7 @@ const useStyles = makeStyles(styles);
 const drawerWidth = 300
 const LandingLayout = ({children}) => {
 
-    const classes = useStyles({drawerWidth})
+    const classes = useStyles()
 
     return (
         <React.Fragment>

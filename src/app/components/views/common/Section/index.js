@@ -7,7 +7,7 @@ import BackgroundImage from "../BackgroundImage";
 
 const useStyles = makeStyles(theme => ({
     sectionComponent: {
-        backgroundColor: (props) => props.backgroundColor,
+        background: (props) => props.backgroundColor,
         display: "block",
         position: "relative",
         [theme.breakpoints.up("sm")]: {

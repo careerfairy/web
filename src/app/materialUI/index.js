@@ -6,8 +6,9 @@ export const baseThemeObj = {
             contrastText: "#FFFFFF"
         },
         secondary: {
-            main: "#fa0087",
-            dark: "#be0066",
+            light: "#b4a8ff",
+            main: "#7431e2",
+            dark: "#590db6",
             contrastText: "#FFFFFF"
         },
 
