@@ -4,8 +4,9 @@ import {makeStyles} from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import {Container, Grid} from "@material-ui/core";
 import SectionHeader from "components/views/common/SectionHeader";
-import {analyticsPreviewImage, analyticsSVG} from "../../../../constants/images";
+import {analyticsPreviewImage, analyticsSVG, rectangle1} from "../../../../constants/images";
 import {getResizedUrl} from "../../../helperFunctions/HelperFunctions";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -18,6 +19,7 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center"
     },
     section: {
+        position: "relative"
     },
     bookingButton: {
         background: theme.palette.common.white,
@@ -53,6 +55,17 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "column",
         alignItems: "center"
+    },
+    analyticsImage:{
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "right bottom",
+        // backgroundSize: "700px 700px"
+    },
+    backgroundRectangle:{
+        position: "absolute",
+        top: "calc(-1vw - 15%)",
+        left: "calc(26vw - -14%)",
+        width: "2000px"
     }
 }));
 
@@ -65,11 +78,12 @@ const AnalyticsSection = (props) => {
             className={classes.section}
             big={props.big}
             color={props.color}
-            backgroundImageClassName={props.backgroundImageClassName}
+            backgroundImageClassName={clsx(props.backgroundImageClassName, classes.analyticsImage)}
             backgroundImage={props.backgroundImage}
             backgroundImageOpacity={props.backgroundImageOpacity}
             backgroundColor={props.backgroundColor}
         >
+            <img className={classes.backgroundRectangle} alt="background-rectangle" src={rectangle1}/>
             <Container className={classes.container}>
                 <SectionHeader
                     color={props.color}

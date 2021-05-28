@@ -5,6 +5,7 @@ import BookADemoSection from "../components/views/landing/BookADemoSection";
 import TestimonialsSection from "../components/views/landing/TestimonialsSection";
 import AnalyticsSection from "../components/views/landing/AnalyticsSection";
 import StreamSection from "../components/views/landing/StreamSection";
+import {rectangle1} from "../constants/images";
 
 const useStyles = makeStyles(theme => ({}));
 
