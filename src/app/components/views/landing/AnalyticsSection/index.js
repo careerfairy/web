@@ -51,7 +51,7 @@ const useStyles = makeStyles(theme => ({
         width: "100%",
         height: "auto",
         maxWidth: 1200,
-        marginTop: "-10vw"
+        marginTop: "-10%"
     },
     imagesWrapper: {
         display: "flex",
