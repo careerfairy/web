@@ -63,9 +63,9 @@ const useStyles = makeStyles(theme => ({
     },
     backgroundRectangle:{
         position: "absolute",
-        top: "calc(-1vw - 15%)",
+        top: "35%",
         left: "calc(26vw - -14%)",
-        width: "2000px"
+        width: "100%"
     }
 }));
 
