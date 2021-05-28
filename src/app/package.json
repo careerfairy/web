@@ -107,6 +107,7 @@
     "@babel/plugin-proposal-throw-expressions": "^7.12.13",
     "@material-ui/codemod": "^4.5.0",
     "@next/bundle-analyzer": "^10.0.6",
+    "@svgr/webpack": "^5.5.0",
     "clsx": "^1.1.1",
     "jscodeshift": "^0.11.0",
     "node-sass": "^5.0.0",

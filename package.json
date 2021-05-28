@@ -127,6 +127,7 @@
     "@babel/core": "^7.5.5",
     "@babel/plugin-proposal-throw-expressions": "^7.12.13",
     "@babel/preset-env": "^7.5.5",
+    "@svgr/webpack": "^5.5.0",
     "babel-plugin-lodash": "^3.3.4",
     "cors": "^2.8.5",
     "cpx": "^1.5.0",

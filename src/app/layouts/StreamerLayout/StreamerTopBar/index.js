@@ -106,7 +106,7 @@ const StreamerTopBar = ({firebase, showAudience}) => {
             <AppBar elevation={1} color="transparent">
                 <Toolbar className={classes.toolbar}>
                     <Hidden smDown>
-                        <MainLogo/>
+                        <MainLogo white={theme.palette.type === "dark"}/>
                     </Hidden>
                     <Hidden mdUp>
                         <MiniLogo/>

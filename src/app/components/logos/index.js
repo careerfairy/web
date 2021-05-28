@@ -7,17 +7,20 @@ const useStyles = makeStyles(theme => ({
         cursor: 'pointer',
         width: '150px',
         display: 'inline-block',
-        marginTop: '10px',
+        // marginTop: '10px',
         // marginLeft: '10px'
+    },
+    logoLink:{
+        display: "flex"
     }
 }))
 export const MainLogo = ({white}) => {
     const classes = useStyles()
     return (
         <Link href='/'>
-            <a>
+            <a className={classes.logoLink}>
                 <img alt="CareerFairy Logo"
-                     src={white ? '/logo_white.png' : '/logo_teal.png'}
+                     src={white ? '/logo_white.svg' : '/logo_teal.svg'}
                      className={classes.mainLogo}/>
             </a>
         </Link>

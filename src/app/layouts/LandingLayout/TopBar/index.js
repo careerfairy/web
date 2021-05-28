@@ -7,6 +7,7 @@ import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined'
 import Link from '../../../materialUI/NextNavLink'
 import {MainLogo, MiniLogo} from "../../../components/logos";
 import {makeStyles} from "@material-ui/core/styles"
+import useGeneralLinks from "../../../components/custom-hook/useGeneralLinks";
 
 const useStyles = makeStyles((theme) => ({
     avatar: {
@@ -23,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     navLinks: {
         fontWeight: 600,
         opacity: 1,
-        color: `${theme.palette.primary.contrastText} !important`,
+        // color: `${theme.palette.primary.contrastText} !important`,
         "&:before": {
             content: '""',
             position: "absolute",
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
             height: 2,
             bottom: 4,
             left: "0",
-            backgroundColor: theme.palette.common.white,
+            backgroundColor: theme.palette.common.black,
             visibility: "hidden",
             WebkitTransform: "scaleX(0)",
             transform: "scaleX(0)",
@@ -47,34 +48,34 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     indicator: {
-        background: theme.palette.common.white,
-        color: theme.palette.common.white
+        background: theme.palette.common.black,
+        color: theme.palette.common.black
     },
     root: {
         // Ensures top bar's Zindex is always above the drawer
         zIndex: theme.zIndex.drawer + 1,
-        background: "transparent"
+        background: "transparent",
+        color: theme.palette.common.black
     }
 }));
-const links = [
-    {
-    }
-]
+
 const TopBar = ({className,  onMobileNavOpen, ...rest}) => {
     const classes = useStyles();
 
+    const {mainLinks, secondaryLinks} = useGeneralLinks()
+
     return (
-        <AppBar elevation={1} className={clsx(classes.root, className)} {...rest}>
+        <AppBar elevation={0} className={clsx(classes.root, className)} {...rest}>
             <Toolbar className={classes.toolbar}>
                 <Hidden smDown>
-                    <MainLogo white/>
+                    <MainLogo/>
                 </Hidden>
                 <Hidden mdUp>
                     <MiniLogo/>
                 </Hidden>
                 <Hidden smDown>
                     <Tabs value={false} classes={{indicator: classes.indicator}}>
-                        {links.map((item) => {
+                        {mainLinks.map((item) => {
                             return (
                                 <Tab
                                     key={item.title}
@@ -97,7 +98,7 @@ const TopBar = ({className,  onMobileNavOpen, ...rest}) => {
                         </IconButton>
                     </Hidden>
                     <Hidden lgUp>
-                        <IconButton color="inherit" onClick={onMobileNavOpen}>
+                        <IconButton color="primary" onClick={onMobileNavOpen}>
                             <MenuIcon/>
                         </IconButton>
                     </Hidden>
