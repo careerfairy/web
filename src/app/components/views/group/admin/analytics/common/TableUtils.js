@@ -2,7 +2,7 @@ import React, {forwardRef, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {getMinutes, prettyDate} from "../../../../../helperFunctions/HelperFunctions";
 import {Rating} from "@material-ui/lab";
-import { Box, Tooltip, Typography } from "@material-ui/core";
+import {Box, Button, Tooltip, Typography} from "@material-ui/core";
 import {CsvBuilder} from "filefy";
 
 import AddBox from '@material-ui/icons/AddBox';
@@ -36,7 +36,7 @@ import LibraryAddOutlinedIcon from '@material-ui/icons/LibraryAddOutlined';
 import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
-
+import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import Linkify from "react-linkify";
 
 export const tableIcons = {
@@ -75,7 +75,8 @@ export const tableIcons = {
     DeleteForeverIcon: forwardRef((props, ref) => <DeleteForeverIcon {...props} ref={ref}/>),
     RedDeleteForeverIcon: forwardRef((props, ref) => <DeleteForeverIcon color="error" {...props} ref={ref}/>),
     RotateLeftIcon: forwardRef((props, ref) => <RotateLeftIcon {...props} ref={ref}/>),
-    DeleteForeverOutlinedIcon: forwardRef((props, ref) => <DeleteForeverOutlinedIcon {...props} ref={ref}/>)
+    DeleteForeverOutlinedIcon: forwardRef((props, ref) => <DeleteForeverOutlinedIcon {...props} ref={ref}/>),
+    PictureAsPdfIcon: forwardRef((props, ref) => <PictureAsPdfIcon {...props} ref={ref}/>)
 };
 
 export const exportSelectionAction = (columns = [], title="Selected_Table") => {

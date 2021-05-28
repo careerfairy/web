@@ -1,9 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Card, Slide, Tab, Tabs} from '@material-ui/core';
+import {Button, Card, Slide, Tab, Tabs} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
-import {copyStringToClipboard, prettyDate, toTitleCase} from "../../../../../../helperFunctions/HelperFunctions";
+import {
+    copyStringToClipboard,
+    prettyDate,
+    prettyLocalizedDate,
+    toTitleCase
+} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import MaterialTable from "material-table";
 import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} from "../../common/TableUtils";
@@ -15,6 +20,8 @@ import {useSelector} from "react-redux";
 import StatsUtil from "../../../../../../../data/util/StatsUtil";
 import GroupsUtil from "../../../../../../../data/util/GroupsUtil";
 import {universityCountriesMap} from "../../../../../../util/constants/universityCountries";
+import PDFIcon from '@material-ui/icons/PictureAsPdf';
+import JSZip from 'jszip'
 
 const customTableOptions = {...defaultTableOptions}
 const useStyles = makeStyles((theme) => ({
@@ -62,7 +69,6 @@ const UsersTable = ({
     const {enqueueSnackbar} = useSnackbar()
     const [users, setUsers] = useState([]);
     const [targetGroups, setTargetGroups] = useState([]);
-
     const categoryFields = () => {
         const arrayOfGroups = targetGroups.length ? targetGroups : [group]
         const tableFieldsMap = arrayOfGroups.reduce((acc, {categories}) => {
@@ -163,7 +169,60 @@ const UsersTable = ({
         setUserType(userTypes[index])
     };
 
+    const handleDownload = async ({url, fileName}) => {
+        return fetch(url).then(resp => resp.arrayBuffer()).then(resp => {
+            // set the blog type to final pdf
+            const file = new Blob([resp], {type: 'application/pdf'});
+            // process to auto download it
+            const fileURL = URL.createObjectURL(file);
+            const link = document.createElement('a');
+            link.href = fileURL;
+            link.download = fileName + new Date() + ".pdf";
+            link.click();
+        });
+    }
+
+    const handleDownloadCVs = async () => {
+        const cvUrls = selection.filter(user => user.userResume).map(user => ({
+            url: user.userResume,
+            fileName: getFileName(user)
+        }))
+        await batch(cvUrls)
+    }
+
+
+    const batch = async (arrayOfDownloadData) => {
+        const zip = new JSZip();
+        const linkElement = document.createElement('a');
+
+        function request({url, fileName}) {
+            return fetch(url).then(resp => resp.arrayBuffer()).then(resp => {
+                // set the blog type to final pdf
+                const file = new Blob([resp], {type: 'application/pdf'});
+                // process to auto download it
+                const fileURL = URL.createObjectURL(file);
+                zip.file(fileName, file);
+            })
+        }
+
+        Promise.all(arrayOfDownloadData.map(data => {
+            return request(data)
+        }))
+            .then(function () {
+                zip.generateAsync({
+                    type: "blob"
+                })
+                    .then(function (content) {
+                        linkElement.download = `CVs of ${userType.displayName} ${getTitle()}`;
+                        linkElement.href = URL.createObjectURL(content);
+                        linkElement.innerHTML = "download " + linkElement.download;
+                        linkElement.click();
+                    });
+            })
+    }
     const getTitle = () => currentStream ? `For ${currentStream.company} on ${prettyDate(currentStream.start)}` : "For all Events"
+
+    const getFileName = (userData) => `${userData.firstName} ${userData.lastName} CV - ${prettyLocalizedDate(new Date())}`
 
     return (
         <Slide direction="up" unmountOnExit mountOnEnter in={!shouldHide()}>
@@ -225,6 +284,26 @@ const UsersTable = ({
                             type: "numeric"
                         },
                         {
+                            field: "userResume",
+                            title: "CV",
+                            type: "boolean",
+                            searchable: false,
+                            render: (rowData) => rowData.userResume ? <Button
+                                size="small"
+                                startIcon={<PDFIcon/>}
+                                onClick={() => handleDownload({
+                                    url: rowData.userResume,
+                                    fileName: getFileName(rowData)
+                                })}
+                                variant="contained"
+                                color="primary">
+                                Download
+                            </Button> : null,
+                            cellStyle: {
+                                width: 300,
+                            },
+                        },
+                        {
                             field: "userEmail",
                             title: "Email",
                             render: ({id}) => (
@@ -244,6 +323,7 @@ const UsersTable = ({
                                 width: 300,
                             },
                         },
+
                         {
                             field: "watchedEvent",
                             title: "Attended Event",
@@ -306,6 +386,17 @@ const UsersTable = ({
                                 // || !isTalentPool()
                             ),
                             onClick: handleCopyLinkedin
+                        }),
+                        (rowData) => ({
+                            tooltip: !(rowData.length === 0
+                                // || !isTalentPool()
+                            ) && "Download CVs",
+                            position: "toolbarOnSelect",
+                            icon: tableIcons.PictureAsPdfIcon,
+                            disabled: (rowData.length === 0
+                                // || !isTalentPool()
+                            ),
+                            onClick: handleDownloadCVs
                         }),
                         {
                             disabled: !Boolean(currentStream),
