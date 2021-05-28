@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     subtitle: {
         // Subtitle text generally isn't very long
         // so usually looks better to limit width.
-        maxWidth: "700px",
+        maxWidth: "500px",
         // So we can have max-width but still
         // have alignment controlled by text-align.
         display: "inline-block"
@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
 
 function SectionHeader(props) {
     const classes = useStyles({
-        color: props.color
+        color: props.color,
     })
     // Render nothing if no title or subtitle
     if (!props.title && !props.subtitle) {
@@ -38,14 +38,14 @@ function SectionHeader(props) {
     return (
         <header className={clsx(classes.sectionHeader, props.className)}>
             {props.title && (
-                <Typography align="center" variant="h3">
+                <Typography gutterBottom className={props.titleClassName} align="center" variant="h3" component="h3">
                     {props.title}
                 </Typography>
             )}
 
             {props.subtitle && (
-                <Typography align="center" variant="subtitle1">
-                    <span className={classes.subtitle}>{props.subtitle}</span>
+                <Typography align="center" component="h5" variant="subtitle1">
+                    <span className={clsx(classes.subtitle, props.subTitleClassName)}>{props.subtitle}</span>
                 </Typography>
             )}
             {props.hasSearch && (
@@ -61,6 +61,8 @@ SectionHeader.propTypes = {
     className: PropTypes.string,
     subtitle: PropTypes.string,
     title: PropTypes.string,
+    subTitleClassName: PropTypes.string,
+    titleClassName: PropTypes.string,
     color: PropTypes.string,
 }
 

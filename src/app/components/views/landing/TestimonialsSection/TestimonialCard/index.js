@@ -7,7 +7,8 @@ const useStyles = makeStyles(theme => ({
     root: {
         display: "flex",
         position: "relative",
-        justifyContent: "center"
+        justifyContent: "center",
+        padding: theme.spacing(1)
     },
     backgroundRect: {
         top: "50%",
@@ -107,9 +108,10 @@ const TestimonialCard = ({avatarUrl, title, rating, position, name, reviewText})
                                     <Typography className={classes.cardReview} variant="body2" component="p">
                                         {reviewText}
                                     </Typography>
-                                    <Typography component="h4"
-                                                variant="subtitle1"
-                                                className={classes.cardAuthor}
+                                    <Typography
+                                        component="h4"
+                                        variant="subtitle1"
+                                        className={classes.cardAuthor}
                                     >
                                         {name}
                                     </Typography>
