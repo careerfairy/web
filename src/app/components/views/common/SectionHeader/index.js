@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
         display: "inline-block"
     }
 }));
-
+//
 function SectionHeader(props) {
     const classes = useStyles({
         color: props.color,
