@@ -234,7 +234,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                     startIcon={currentStream && <SaveIcon fontSize={size}/>} variant="contained" autoFocus
                     color="primary"
                     onClick={handleSaveOrUpdate}>
-                <Typography variant={size === "large" && "h5"}>
+                <Typography variant={size === "large" ? "h5": undefined}>
                     {!currentStream ? "Create draft" : isActualLivestream() ? "update and close" : "save changes and close"}
                 </Typography>
             </Button>
