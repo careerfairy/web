@@ -6,3 +6,4 @@ export const analyticsSVG = "https://firebasestorage.googleapis.com/v0/b/careerf
 export const analyticsPreviewImage = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fanalytics-preview.webp?alt=media&token=545502d8-c0f8-4e27-92e1-640dc2bacc61"
 export const streamerImage = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstreamer.webp?alt=media&token=20bd52bc-860c-4f62-8292-9800e6691cee"
 export const rectangle1 = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Frectangle-1.svg?alt=media&token=da6df4f2-a578-463b-9441-70acf6e0dcf5"
+export const rectangle2 = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Frectangle-2.svg?alt=media&token=da6df4f2-a578-463b-9441-70acf6e0dcf5"
