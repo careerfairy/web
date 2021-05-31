@@ -16,12 +16,13 @@ import UserInnerTable from "./UserInnerTable";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 import {makeStyles} from "@material-ui/core/styles";
 import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import StatsUtil from "../../../../../../../data/util/StatsUtil";
 import GroupsUtil from "../../../../../../../data/util/GroupsUtil";
 import {universityCountriesMap} from "../../../../../../util/constants/universityCountries";
 import PDFIcon from '@material-ui/icons/PictureAsPdf';
 import JSZip from 'jszip'
+import * as actions from 'store/actions'
 
 const customTableOptions = {...defaultTableOptions}
 const useStyles = makeStyles((theme) => ({
@@ -69,6 +70,9 @@ const UsersTable = ({
     const {enqueueSnackbar} = useSnackbar()
     const [users, setUsers] = useState([]);
     const [targetGroups, setTargetGroups] = useState([]);
+    const [processingCVs, setProcessingCVs] = useState(false);
+    const dispatch = useDispatch()
+
     const categoryFields = () => {
         const arrayOfGroups = targetGroups.length ? targetGroups : [group]
         const tableFieldsMap = arrayOfGroups.reduce((acc, {categories}) => {
@@ -192,33 +196,39 @@ const UsersTable = ({
 
 
     const batch = async (arrayOfDownloadData) => {
-        const zip = new JSZip();
-        const linkElement = document.createElement('a');
+        try {
+            setProcessingCVs(true)
+            const zip = new JSZip();
+            const linkElement = document.createElement('a');
 
-        function request({url, fileName}) {
-            return fetch(url).then(resp => resp.arrayBuffer()).then(resp => {
-                // set the blog type to final pdf
-                const file = new Blob([resp], {type: 'application/pdf'});
-                // process to auto download it
-                const fileURL = URL.createObjectURL(file);
-                zip.file(fileName, file);
-            })
-        }
-
-        Promise.all(arrayOfDownloadData.map(data => {
-            return request(data)
-        }))
-            .then(function () {
-                zip.generateAsync({
-                    type: "blob"
+            function request({url, fileName}) {
+                return fetch(url).then(resp => resp.arrayBuffer()).then(resp => {
+                    // set the blog type to final pdf
+                    const file = new Blob([resp], {type: 'application/pdf'});
+                    // process to auto download it
+                    // const fileURL = URL.createObjectURL(file);
+                    zip.file(`${fileName}.pdf`, file);
                 })
-                    .then(function (content) {
-                        linkElement.download = `CVs of ${userType.displayName} ${getTitle()}`;
-                        linkElement.href = URL.createObjectURL(content);
-                        linkElement.innerHTML = "download " + linkElement.download;
-                        linkElement.click();
-                    });
-            })
+            }
+
+            await Promise.all(arrayOfDownloadData.map(data => {
+                return request(data)
+            }))
+                .then(function () {
+                    zip.generateAsync({
+                        type: "blob"
+                    })
+                        .then(function (content) {
+                            linkElement.download = `CVs of ${userType.displayName} ${getTitle()}`;
+                            linkElement.href = URL.createObjectURL(content);
+                            linkElement.innerHTML = "download " + linkElement.download;
+                            linkElement.click();
+                        });
+                })
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
+        setProcessingCVs(false)
     }
     const getTitle = () => currentStream ? `For ${currentStream.company} on ${prettyDate(currentStream.start)}` : "For all Events"
 
@@ -251,7 +261,7 @@ const UsersTable = ({
                 <MaterialTable
                     icons={tableIcons}
                     tableRef={dataTableRef}
-                    isLoading={fetchingStreams}
+                    isLoading={fetchingStreams || processingCVs}
                     data={users}
                     options={customTableOptions}
                     columns={[
@@ -394,7 +404,7 @@ const UsersTable = ({
                             position: "toolbarOnSelect",
                             icon: tableIcons.PictureAsPdfIcon,
                             disabled: (rowData.length === 0
-                                // || !isTalentPool()
+                                || processingCVs
                             ),
                             onClick: handleDownloadCVs
                         }),
