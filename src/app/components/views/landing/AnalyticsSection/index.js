@@ -59,7 +59,6 @@ const useStyles = makeStyles(theme => ({
     analyticsImage:{
         backgroundRepeat: "no-repeat",
         backgroundPosition: "right bottom",
-        // backgroundSize: "700px 700px"
     },
     backgroundRectangle:{
         position: "absolute",

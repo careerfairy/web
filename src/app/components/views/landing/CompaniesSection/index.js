@@ -2,9 +2,9 @@ import PropTypes from "prop-types";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import { Container } from "@material-ui/core";
+import { Container, Typography } from "@material-ui/core";
 import SectionHeader from "components/views/common/SectionHeader";
-import RoundButton from "materialUI/GlobalButtons/RoundButton";
+import { streamerImage } from "../../../../constants/images";
 
 const useStyles = makeStyles((theme) => ({
    container: {
@@ -16,9 +16,7 @@ const useStyles = makeStyles((theme) => ({
       flexDirection: "column",
       alignItems: "center",
    },
-   section: {
-      // paddingBottom: theme.spacing(1)
-   },
+   section: {},
    bookingButton: {
       background: theme.palette.common.white,
       color: theme.palette.secondary.main,
@@ -26,12 +24,23 @@ const useStyles = makeStyles((theme) => ({
          color: theme.palette.common.white,
       },
    },
-   bookADemoHeader: {
-      marginBottom: [theme.spacing(2), "!important"],
+   testimonialsWrapper: {
+      display: "flex",
+      width: "100%",
+   },
+   subTitle: {
+      color: theme.palette.text.secondary,
+      fontWeight: 500,
+   },
+   title: {},
+   imagesWrapper: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
    },
 }));
 
-const BookADemoSection = (props) => {
+const CompaniesSection = (props) => {
    const classes = useStyles();
 
    return (
@@ -47,25 +56,20 @@ const BookADemoSection = (props) => {
          <Container className={classes.container}>
             <SectionHeader
                color={props.color}
-               className={classes.bookADemoHeader}
+               subTitleClassName={classes.subTitle}
+               titleClassName={classes.title}
                title={props.title}
                subtitle={props.subtitle}
             />
-            <RoundButton
-               className={classes.bookingButton}
-               color="secondary"
-               variant="contained"
-            >
-               Book a Demo
-            </RoundButton>
+            <div className={classes.imagesWrapper}></div>
          </Container>
       </Section>
    );
 };
 
-export default BookADemoSection;
+export default CompaniesSection;
 
-BookADemoSection.propTypes = {
+CompaniesSection.propTypes = {
    backgroundColor: PropTypes.any,
    backgroundImage: PropTypes.any,
    backgroundImageClassName: PropTypes.any,
