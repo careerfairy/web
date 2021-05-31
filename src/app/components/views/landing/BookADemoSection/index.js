@@ -16,9 +16,7 @@ const useStyles = makeStyles((theme) => ({
       flexDirection: "column",
       alignItems: "center",
    },
-   section: {
-      // paddingBottom: theme.spacing(1)
-   },
+   section: {},
    bookingButton: {
       background: theme.palette.common.white,
       color: theme.palette.secondary.main,

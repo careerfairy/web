@@ -2,50 +2,41 @@ import PropTypes from "prop-types";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import { Container, Typography } from "@material-ui/core";
 import SectionHeader from "components/views/common/SectionHeader";
-import { streamerImage } from "../../../../constants/images";
+import landingUniversities from "../../../../constants/landingUniversities";
+import SectionContainer from "../../common/Section/Container";
 
 const useStyles = makeStyles((theme) => ({
-   container: {
-      zIndex: 1,
-      "&.MuiContainer-root": {
-         position: "relative",
-      },
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-   },
-   section: {},
-   bookingButton: {
-      background: theme.palette.common.white,
-      color: theme.palette.secondary.main,
-      "&:hover": {
-         color: theme.palette.common.white,
-      },
-   },
-   testimonialsWrapper: {
-      display: "flex",
-      width: "100%",
-   },
    subTitle: {
       color: theme.palette.text.secondary,
       fontWeight: 500,
    },
-   title: {},
    imagesWrapper: {
       display: "flex",
-      flexDirection: "column",
+      flexWrap: "wrap",
+      width: "100%",
       alignItems: "center",
+      justifyContent: "center",
+   },
+   universityLogo: {
+      width: "auto",
+      height: "50px",
+      margin: theme.spacing(2),
+      transition: theme.transitions.create("transform", {
+         duration: theme.transitions.duration.short,
+         easing: theme.transitions.easing.easeInOut,
+      }),
+      "&:hover": {
+         transform: "scale(1.1) rotate(1deg)",
+      },
    },
 }));
 
-const CompaniesSection = (props) => {
+const UniversitySection = (props) => {
    const classes = useStyles();
 
    return (
       <Section
-         className={classes.section}
          big={props.big}
          color={props.color}
          backgroundImageClassName={props.backgroundImageClassName}
@@ -53,23 +44,34 @@ const CompaniesSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         <Container className={classes.container}>
+         <SectionContainer>
             <SectionHeader
                color={props.color}
                subTitleClassName={classes.subTitle}
-               titleClassName={classes.title}
                title={props.title}
                subtitle={props.subtitle}
             />
-            <div className={classes.imagesWrapper}></div>
-         </Container>
+            <div className={classes.imagesWrapper}>
+               {landingUniversities.map(
+                  ({ name, imageUrlDark, imageUrlMain, website }) => (
+                     <a key={name} target="_blank" href={website}>
+                        <img
+                           className={classes.universityLogo}
+                           src={imageUrlMain}
+                           alt={name}
+                        />
+                     </a>
+                  )
+               )}
+            </div>
+         </SectionContainer>
       </Section>
    );
 };
 
-export default CompaniesSection;
+export default UniversitySection;
 
-CompaniesSection.propTypes = {
+UniversitySection.propTypes = {
    backgroundColor: PropTypes.any,
    backgroundImage: PropTypes.any,
    backgroundImageClassName: PropTypes.any,

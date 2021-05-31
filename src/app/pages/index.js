@@ -5,10 +5,12 @@ import BookADemoSection from "../components/views/landing/BookADemoSection";
 import TestimonialsSection from "../components/views/landing/TestimonialsSection";
 import AnalyticsSection from "../components/views/landing/AnalyticsSection";
 import StreamSection from "../components/views/landing/StreamSection";
-import { rectangle1 } from "../constants/images";
-import CompaniesSection from "../components/views/landing/CompaniesSection";
+import UniversitySection from "../components/views/landing/UniversitySection";
+import BenefitsSection from "../components/views/landing/BenefitsSection";
 
-const useStyles = makeStyles((theme) => ({}));
+const useStyles = makeStyles((theme) => ({
+
+}));
 
 const LandingPage = ({}) => {
    const {
@@ -17,8 +19,13 @@ const LandingPage = ({}) => {
 
    return (
       <LandingLayout>
-         <CompaniesSection
-            subtitle="The best talent is eavenly distributed, which makes it 
+         <BenefitsSection
+            title={
+             "Key Benefits"
+            }
+         />
+         <UniversitySection
+            subtitle="The best talent is evenly distributed, which makes it
             hard to reach. With CareerFairy live streams, 
             you can reach students at multiple top universities in a 
             single one hour-long event. No travel, no logistics, no days off work."

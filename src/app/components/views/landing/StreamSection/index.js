@@ -17,13 +17,6 @@ const useStyles = makeStyles((theme) => ({
       alignItems: "center",
    },
    section: {},
-   bookingButton: {
-      background: theme.palette.common.white,
-      color: theme.palette.secondary.main,
-      "&:hover": {
-         color: theme.palette.common.white,
-      },
-   },
    testimonialsWrapper: {
       display: "flex",
       width: "100%",
@@ -72,7 +65,6 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamSection = (props) => {
    const classes = useStyles();
-
    return (
       <Section
          className={classes.section}

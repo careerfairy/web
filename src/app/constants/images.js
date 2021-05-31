@@ -7,3 +7,6 @@ export const analyticsPreviewImage = "https://firebasestorage.googleapis.com/v0/
 export const streamerImage = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstreamer.webp?alt=media&token=20bd52bc-860c-4f62-8292-9800e6691cee"
 export const rectangle1 = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Frectangle-1.svg?alt=media&token=da6df4f2-a578-463b-9441-70acf6e0dcf5"
 export const rectangle2 = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Frectangle-2.svg?alt=media&token=da6df4f2-a578-463b-9441-70acf6e0dcf5"
+export const reachShape = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Freach-shape.svg?alt=media&token=9b9cf2fd-c52c-4ed0-845c-06dcd559ba1d"
+export const measureShape = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fmeasure-shape.svg?alt=media&token=96bcc345-e84f-4d4e-9908-97d60296d08c"
+export const engageShape = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fengage-shape.svg?alt=media&token=447df635-831d-49ad-ab15-e929193ce3a2"
