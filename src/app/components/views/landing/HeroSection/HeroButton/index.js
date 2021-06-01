@@ -7,6 +7,7 @@ import clsx from "clsx";
 const useStyles = makeStyles((theme) => ({
    heroBtnRoot: {
       position: "relative",
+      width: "inherit"
    },
    buttonBackgroundIcon: {
       position: 'absolute',

@@ -1,28 +1,29 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
 import SectionContainer from "../../common/Section/Container";
 import StarsIcon from "@material-ui/icons/Stars";
 import Typography from "@material-ui/core/Typography";
-import { Grid, Hidden } from "@material-ui/core";
+import { Grid, Hidden, useMediaQuery } from "@material-ui/core";
 import HeroButton from "./HeroButton";
-import Link from 'materialUI/NextNavLink'
+import Link from "materialUI/NextNavLink";
 import {
    calendarIcon,
    laptopDemo,
    playIcon,
 } from "../../../../constants/images";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
    section: {
       padding: 0,
    },
-   linkButton:{
-     textDecoration: "none !important"
+   linkButton: {
+      textDecoration: "none !important",
    },
-   heroGridContainer: {
+   heroContainer: {
       minHeight: "calc(100vh - 60px)",
    },
    subTitle: {
@@ -37,11 +38,11 @@ const useStyles = makeStyles((theme) => ({
    buttonsWrapper: {
       marginTop: theme.spacing(10),
       width: "100%",
-      display: "flex",
-      justifyContent: "space-around",
-      "& > *":{
-         marginTop: theme.spacing(1),
-         marginBottom: theme.spacing(1)
+      // display: "flex",
+      // justifyContent: "space-around",
+      "& > *": {
+         // marginTop: theme.spacing(1),
+         // marginBottom: theme.spacing(1),
       },
       "& > *:nth-last-child(n+2)": {
          // marginRight: theme.spacing(2)
@@ -53,18 +54,23 @@ const useStyles = makeStyles((theme) => ({
       flexWrap: "wrap",
    },
    heroContent: {
+      padding: theme.spacing(0, 5),
+      maxWidth: 780,
+   },
+   heroContentWrapper: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
+      alignItems: "center",
    },
    laptopImageWrapper: {
       position: "relative",
    },
    laptopDemoImg: {
       bottom: 0,
-      height: "80%",
+      width: "100%",
       position: "absolute",
-      left: "30px",
+      right: 0,
    },
 }));
 
@@ -80,6 +86,9 @@ const RockstarText = () => {
 
 const HeroSection = (props) => {
    const classes = useStyles();
+   const theme = useTheme();
+   const desktop = useMediaQuery(theme.breakpoints.up("md"));
+   console.log("-> desktop", desktop);
    return (
       <Section
          big={props.big}
@@ -90,24 +99,27 @@ const HeroSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         <SectionContainer>
+         <Grid className={classes.heroContainer} container>
             <Grid
-               justify="center"
-               className={classes.heroGridContainer}
-               container
-               spacing={2}
+               className={classes.heroContentWrapper}
+               item
+               xs={12}
+               md={12}
+               lg={6}
             >
-               <Grid className={classes.heroContent} xs={12} md={6} lg={7} item>
+               <div className={classes.heroContent}>
                   <Typography variant="h2">
                      Hunt the <b>rising talents</b> and grow them{" "}
                      <b>
                         into <RockstarText />
                      </b>
                   </Typography>
-                  <div className={classes.buttonsWrapper}>
+                  <Grid spacing={2} container className={classes.buttonsWrapper}>
+                     <Grid xs={12} sm={12} md={6} item>
                      <HeroButton
                         color="primary"
                         variant="outlined"
+                        fullWidth
                         href="/next-livestreams"
                         className={classes.linkButton}
                         component={Link}
@@ -115,38 +127,37 @@ const HeroSection = (props) => {
                      >
                         Our Next Events
                      </HeroButton>
+                     </Grid>
+                     <Grid xs={12} sm={12} md={6} item>
                      <HeroButton
                         color="secondary"
+                        fullWidth
                         withGradient
                         iconUrl={calendarIcon}
                         variant="contained"
                      >
                         Book a Demo
                      </HeroButton>
-                  </div>
-               </Grid>
-               <Hidden smDown>
-                  <Grid
-                     className={classes.laptopImageWrapper}
-                     xs={12}
-                     md={6}
-                     lg={5}
-                     item
-                  >
-                     <img
-                        className={classes.laptopDemoImg}
-                        src={laptopDemo}
-                        alt="laptop-demo"
-                     />
+                     </Grid>
                   </Grid>
-               </Hidden>
+               </div>
             </Grid>
-            <SectionHeader
-               color={props.color}
-               title={props.title}
-               subtitle={props.subtitle}
-            />
-         </SectionContainer>
+            <Hidden mdDown>
+               <Grid
+                  className={classes.laptopImageWrapper}
+                  item
+                  xs={12}
+                  md={12}
+                  lg={6}
+               >
+                  <img
+                     className={classes.laptopDemoImg}
+                     src={laptopDemo}
+                     alt="laptop-demo"
+                  />
+               </Grid>
+            </Hidden>
+         </Grid>
       </Section>
    );
 };

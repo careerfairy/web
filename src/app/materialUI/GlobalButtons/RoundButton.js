@@ -4,14 +4,17 @@ import { fade, makeStyles, useTheme } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
 import clsx from "clsx";
 
-const paddingSize = 6;
-const mobileFactor = 0.8
+const paddingSize = 4;
+const paddingXFactor = 0.5;
+const mobileFactor = 0.8;
 const useStyles = makeStyles((theme) => ({
    root: {
-      padding: `${paddingSize * 0.3}em ${paddingSize}em`,
+      padding: `${paddingSize * paddingXFactor}em ${paddingSize}em`,
       borderRadius: `${paddingSize}em`,
       [theme.breakpoints.down("xs")]: {
-         padding: `${paddingSize * 0.3 * mobileFactor}em ${paddingSize * mobileFactor}em`,
+         padding: `${paddingSize * paddingXFactor * mobileFactor}em ${
+            paddingSize * mobileFactor
+         }em`,
          borderRadius: `${paddingSize * mobileFactor}em`,
       },
    },
