@@ -8,6 +8,7 @@ import StarsIcon from "@material-ui/icons/Stars";
 import Typography from "@material-ui/core/Typography";
 import { Grid, Hidden } from "@material-ui/core";
 import HeroButton from "./HeroButton";
+import Link from 'materialUI/NextNavLink'
 import {
    calendarIcon,
    laptopDemo,
@@ -17,6 +18,9 @@ import {
 const useStyles = makeStyles((theme) => ({
    section: {
       padding: 0,
+   },
+   linkButton:{
+     textDecoration: "none !important"
    },
    heroGridContainer: {
       minHeight: "calc(100vh - 60px)",
@@ -34,7 +38,18 @@ const useStyles = makeStyles((theme) => ({
       marginTop: theme.spacing(10),
       width: "100%",
       display: "flex",
-      "& > *:nth-last-child(n+2)": {},
+      justifyContent: "space-around",
+      "& > *":{
+         marginTop: theme.spacing(1),
+         marginBottom: theme.spacing(1)
+      },
+      "& > *:nth-last-child(n+2)": {
+         // marginRight: theme.spacing(2)
+         // margin: theme.spacing(2, 2, 2, 0),
+         // [theme.breakpoints.down("xs")]: {
+         //    margin: theme.spacing(1, 1, 1, 0),
+         // }
+      },
       flexWrap: "wrap",
    },
    heroContent: {
@@ -82,7 +97,7 @@ const HeroSection = (props) => {
                container
                spacing={2}
             >
-               <Grid className={classes.heroContent} xs={12} md={7} item>
+               <Grid className={classes.heroContent} xs={12} md={6} lg={7} item>
                   <Typography variant="h2">
                      Hunt the <b>rising talents</b> and grow them{" "}
                      <b>
@@ -93,6 +108,9 @@ const HeroSection = (props) => {
                      <HeroButton
                         color="primary"
                         variant="outlined"
+                        href="/next-livestreams"
+                        className={classes.linkButton}
+                        component={Link}
                         iconUrl={playIcon}
                      >
                         Our Next Events
@@ -111,7 +129,8 @@ const HeroSection = (props) => {
                   <Grid
                      className={classes.laptopImageWrapper}
                      xs={12}
-                     md={5}
+                     md={6}
+                     lg={5}
                      item
                   >
                      <img

@@ -5,13 +5,14 @@ import { Button } from "@material-ui/core";
 import clsx from "clsx";
 
 const paddingSize = 6;
+const mobileFactor = 0.8
 const useStyles = makeStyles((theme) => ({
    root: {
       padding: `${paddingSize * 0.3}em ${paddingSize}em`,
       borderRadius: `${paddingSize}em`,
       [theme.breakpoints.down("xs")]: {
-         padding: `${paddingSize * 0.3 * 0.6}em ${paddingSize * 0.6}em`,
-         borderRadius: `${paddingSize * 0.6}em`,
+         padding: `${paddingSize * 0.3 * mobileFactor}em ${paddingSize * mobileFactor}em`,
+         borderRadius: `${paddingSize * mobileFactor}em`,
       },
    },
    withGradient: {
