@@ -2,21 +2,16 @@ import PropTypes from "prop-types";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import { Container } from "@material-ui/core";
 import SectionHeader from "components/views/common/SectionHeader";
 import RoundButton from "materialUI/GlobalButtons/RoundButton";
+import SectionContainer from "../../common/Section/Container";
 
 const useStyles = makeStyles((theme) => ({
-   container: {
-      zIndex: 1,
-      "&.MuiContainer-root": {
-         position: "relative",
-      },
+   section: {
+      height: "100vh",
       display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
+      alignItems:"center"
    },
-   section: {},
    bookingButton: {
       background: theme.palette.common.white,
       color: theme.palette.secondary.main,
@@ -42,7 +37,7 @@ const BookADemoSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         <Container className={classes.container}>
+         <SectionContainer>
             <SectionHeader
                color={props.color}
                className={classes.bookADemoHeader}
@@ -56,7 +51,7 @@ const BookADemoSection = (props) => {
             >
                Book a Demo
             </RoundButton>
-         </Container>
+         </SectionContainer>
       </Section>
    );
 };

@@ -3,12 +3,14 @@ export const baseThemeObj = {
         primary: {
             main: "#00d2aa",
             dark: "#00b08f",
-            contrastText: "#FFFFFF"
+            contrastText: "#FFFFFF",
+            gradient:"#07c1a7",
         },
         secondary: {
             light: "#b4a8ff",
             main: "#7431e2",
             dark: "#590db6",
+            gradient:"#644eec",
             contrastText: "#FFFFFF"
         },
 

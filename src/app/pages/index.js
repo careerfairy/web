@@ -7,6 +7,8 @@ import AnalyticsSection from "../components/views/landing/AnalyticsSection";
 import StreamSection from "../components/views/landing/StreamSection";
 import UniversitySection from "../components/views/landing/UniversitySection";
 import BenefitsSection from "../components/views/landing/BenefitsSection";
+import CompaniesSection from "../components/views/landing/CompaniesSection";
+import HeroSection from "../components/views/landing/HeroSection";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -19,6 +21,9 @@ const LandingPage = ({}) => {
 
    return (
       <LandingLayout>
+        <HeroSection
+        />
+        <CompaniesSection/>
          <BenefitsSection
             title={
              "Key Benefits"

@@ -1,8 +1,10 @@
-import { styled } from "@material-ui/core/styles";
+import PropTypes from "prop-types";
 import { Container } from "@material-ui/core";
+import React from "react";
+import { makeStyles } from "@material-ui/core/styles";
 
-const SectionContainer = styled(Container)({
-   container: {
+const useStyles = makeStyles((theme) => ({
+   root: {
       zIndex: 1,
       "&.MuiContainer-root": {
          position: "relative",
@@ -11,6 +13,14 @@ const SectionContainer = styled(Container)({
       flexDirection: "column",
       alignItems: "center",
    },
-});
+}));
 
+const SectionContainer = ({ children, ...props }) => {
+   const classes = useStyles();
+   return <Container maxWidth="lg" className={classes.root} {...props} children={children} />;
+};
+
+SectionContainer.propTypes = {
+   children: PropTypes.node.isRequired,
+};
 export default SectionContainer;

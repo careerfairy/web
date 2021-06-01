@@ -8,7 +8,7 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         position: "relative",
         justifyContent: "center",
-        padding: theme.spacing(1)
+        padding: theme.spacing(5)
     },
     backgroundRect: {
         top: "50%",

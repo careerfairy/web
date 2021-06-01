@@ -71,6 +71,7 @@ Section.propTypes = {
     children: PropTypes.any,
     color: PropTypes.string,
     big: PropTypes.bool,
+    className: PropTypes.string
 }
 
 export default Section;

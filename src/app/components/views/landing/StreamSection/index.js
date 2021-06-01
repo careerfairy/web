@@ -2,20 +2,12 @@ import PropTypes from "prop-types";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import { Container, Typography } from "@material-ui/core";
 import SectionHeader from "components/views/common/SectionHeader";
 import { streamerImage } from "../../../../constants/images";
+import HighlightText from "../common/HighlightText";
+import SectionContainer from "../../common/Section/Container";
 
 const useStyles = makeStyles((theme) => ({
-   container: {
-      zIndex: 1,
-      "&.MuiContainer-root": {
-         position: "relative",
-      },
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-   },
    section: {},
    testimonialsWrapper: {
       display: "flex",
@@ -54,13 +46,6 @@ const useStyles = makeStyles((theme) => ({
       background:
          "radial-gradient(closest-corner at 60% 55%, #E8FFFC, #CEDDF2)",
    },
-   HighlightTag: {
-      background: theme.palette.secondary.light,
-      padding: theme.spacing(1),
-      color: theme.palette.common.white,
-      borderRadius: theme.spacing(1),
-      marginBottom: theme.spacing(1),
-   },
 }));
 
 const StreamSection = (props) => {
@@ -76,12 +61,10 @@ const StreamSection = (props) => {
          backgroundColor={props.backgroundColor}
       >
          <div className={classes.backgroundRectangle} />
-         <Container className={classes.container}>
-            <div className={classes.HighlightTag}>
-               <Typography variant="body2">
-                  Why use live streams to showcase your opportunities?
-               </Typography>
-            </div>
+         <SectionContainer>
+            <HighlightText
+               text={"Why use live streams to showcase your opportunities?"}
+            />
             <SectionHeader
                color={props.color}
                subTitleClassName={classes.subTitle}
@@ -96,7 +79,7 @@ const StreamSection = (props) => {
                   alt="analytics"
                />
             </div>
-         </Container>
+         </SectionContainer>
       </Section>
    );
 };

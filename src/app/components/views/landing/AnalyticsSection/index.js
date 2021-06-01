@@ -2,7 +2,6 @@ import PropTypes from "prop-types";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import { Container } from "@material-ui/core";
 import SectionHeader from "components/views/common/SectionHeader";
 import {
    analyticsPreviewImage,
@@ -10,17 +9,9 @@ import {
    rectangle1,
 } from "../../../../constants/images";
 import clsx from "clsx";
+import SectionContainer from "../../common/Section/Container";
 
 const useStyles = makeStyles((theme) => ({
-   container: {
-      zIndex: 1,
-      "&.MuiContainer-root": {
-         position: "relative",
-      },
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-   },
    section: {
       position: "relative",
    },
@@ -81,7 +72,7 @@ const AnalyticsSection = (props) => {
             alt="background-rectangle"
             src={rectangle1}
          />
-         <Container className={classes.container}>
+         <SectionContainer>
             <SectionHeader
                color={props.color}
                subTitleClassName={classes.subTitle}
@@ -101,7 +92,7 @@ const AnalyticsSection = (props) => {
                   alt="analytics"
                />
             </div>
-         </Container>
+         </SectionContainer>
       </Section>
    );
 };
