@@ -46,11 +46,10 @@ const useStyles = makeStyles((theme) => ({
       position: "relative",
    },
    laptopDemoImg: {
+      bottom: 0,
       height: "80%",
       position: "absolute",
-      top: "0px",
       left: "30px",
-      animation: "3s ease-out 0s 1 normal none running moveRight",
    },
 }));
 
