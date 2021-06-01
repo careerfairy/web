@@ -23,7 +23,7 @@ const LandingPage = ({}) => {
       <LandingLayout>
         <HeroSection
         />
-        <CompaniesSection/>
+        <CompaniesSection big/>
          <BenefitsSection
             title={
              "Key Benefits"

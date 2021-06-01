@@ -7,7 +7,8 @@ const landingLayoutStyles = (theme) => ({
         ...nextLivestreamsLayoutStyles(theme).root,
         backgroundColor: theme.palette.common.white,
         background: `url(${mainBackground})`,
-        backgroundRepeat: "no-repeat"
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "auto 150vh"
     },
 })
 
