@@ -6,7 +6,7 @@ import styles from "../../materialUI/styles/layoutStyles/landingLayoutStyles";
 import FooterV2 from "../../components/views/footer/FooterV2";
 
 const useStyles = makeStyles(styles);
-
+//
 const drawerWidth = 300;
 const LandingLayout = ({ children }) => {
    const classes = useStyles();
