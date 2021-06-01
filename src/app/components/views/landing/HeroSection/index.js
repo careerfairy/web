@@ -38,20 +38,6 @@ const useStyles = makeStyles((theme) => ({
    buttonsWrapper: {
       marginTop: theme.spacing(10),
       width: "100%",
-      // display: "flex",
-      // justifyContent: "space-around",
-      "& > *": {
-         // marginTop: theme.spacing(1),
-         // marginBottom: theme.spacing(1),
-      },
-      "& > *:nth-last-child(n+2)": {
-         // marginRight: theme.spacing(2)
-         // margin: theme.spacing(2, 2, 2, 0),
-         // [theme.breakpoints.down("xs")]: {
-         //    margin: theme.spacing(1, 1, 1, 0),
-         // }
-      },
-      flexWrap: "wrap",
    },
    heroContent: {
       padding: theme.spacing(0, 5),
