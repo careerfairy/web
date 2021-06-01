@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {v4 as uuidv4} from 'uuid';
-import {Button, Card, CardActions, CardHeader} from "@material-ui/core";
+import {Button, Card, CardActions, CardHeader, Tooltip} from "@material-ui/core";
 import TutorialContext from "context/tutorials/TutorialContext";
 import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "materialUI/GlobalTooltips";
 import {makeStyles} from "@material-ui/core/styles";
@@ -11,7 +11,8 @@ const useStyles = makeStyles(theme => ({
         width: "100%",
         background: theme.palette.primary.main,
         marginBottom: theme.spacing(1),
-        color: theme.palette.common.white
+        color: theme.palette.common.white,
+        minHeight: 140
     },
     handRaiseContainerRequested: {
         width: "100%",
@@ -73,16 +74,25 @@ function RequestedHandRaiseElement(props) {
                     title="HAND RAISED"
                     subheader={props.request.name}
                 />
-                <CardActions>
-                    <Button variant="contained" style={{marginRight: "1rem"}} children='Invite to speak'
-                            size='small' onClick={() => {
-                        if (isOpen(10)) {
-                            handleConfirmStep(10)
-                            updateHandRaiseRequest('connected')
-                        } else {
-                            updateHandRaiseRequest('invited')
-                        }
-                    }} color="primary"/>
+                <CardActions>     
+                    {
+                        props.numberOfActiveHandRaisers > 7 ? 
+                        <Tooltip title='You cannot invite more than 8 people simultaneously in hand raise'>
+                            <div>
+                                <Button variant="contained" style={{marginRight: "1rem"}} children='Invite to speak' disabled
+                                    size='small' color="primary"/>
+                            </div>
+                        </Tooltip> : 
+                        <Button variant="contained" style={{marginRight: "1rem"}} children='Invite to speak'
+                                size='small' onClick={() => {
+                            if (isOpen(10)) {
+                                handleConfirmStep(10)
+                                updateHandRaiseRequest('connected')
+                            } else {
+                                updateHandRaiseRequest('invited')
+                            }
+                        }} color="primary"/>
+                    }                
                     <Button variant="contained" color="default" children='Deny' size='small'
                             disabled={isOpen(10)}
                             onClick={() => updateHandRaiseRequest('denied')}/>
