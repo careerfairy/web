@@ -90,7 +90,7 @@ function ErrorModal({ agoraRtcStatus, agoraRtcConnectionStatus, agoraRtmStatus }
     const [reconnectTimeout, setReconnectTimeout] = useState(false)
     const classes = useStyles();
 
-    const notifyAudio = new Audio('/sounds/alert_simple.wav');
+    const notifyAudio = new Audio('https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/static_files%2Falert_simple.wav?alt=media');
 
     const errorInRtc = agoraRtcStatus && agoraRtcStatus.type === "ERROR"
     const errorInRtm = agoraRtmStatus && agoraRtmStatus.type === "ERROR"
