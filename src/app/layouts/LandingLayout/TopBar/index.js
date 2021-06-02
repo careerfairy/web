@@ -13,12 +13,14 @@ import {
 import MenuIcon from "@material-ui/icons/Menu";
 import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
 import Link from "materialUI/NextNavLink";
-import { MainLogo, MiniLogo } from "components/logos";
-import { makeStyles } from "@material-ui/core/styles";
+import { MainLogo } from "components/logos";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import useGeneralLinks from "components/custom-hook/useGeneralLinks";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
 import HideOnScroll from "../../../components/views/common/HideOnScroll";
+import { useAuth } from "../../../HOCs/AuthProvider";
+import LoginButton from "../../../components/views/common/LoginButton";
 
 const useStyles = makeStyles((theme) => ({
    avatar: {
@@ -50,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
          height: 2,
          bottom: 4,
          left: "0",
-         backgroundColor: theme.palette.common.black,
+         backgroundColor: (props) => props.navLinksColor,
          visibility: "hidden",
          WebkitTransform: "scaleX(0)",
          transform: "scaleX(0)",
@@ -66,13 +68,13 @@ const useStyles = makeStyles((theme) => ({
       },
    },
    indicator: {
-      background: theme.palette.common.black,
-      color: theme.palette.common.black,
+      background: (props) => props.navLinksColor,
+      color: (props) => props.navLinksColor,
    },
    root: {
       // Ensures top bar's Zindex is always above the drawer
       zIndex: theme.zIndex.drawer + 1,
-      color: theme.palette.common.black,
+      color: (props) => props.navLinksColor,
       background: "transparent",
    },
    whiteToolbar: {
@@ -82,13 +84,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const TopBar = ({ className, ...rest }) => {
-   const classes = useStyles();
+   const theme = useTheme();
+   const classes = useStyles({
+      navLinksColor: theme.palette.grey["800"],
+   });
 
    const { mainLinks } = useGeneralLinks();
    const dispatch = useDispatch();
    const [scrolled, setScrolled] = useState(false);
-
    const handleDrawerOpen = () => dispatch(actions.openNavDrawer());
+   const { authenticatedUser } = useAuth();
 
    useEffect(() => {
       window.addEventListener("scroll", listenScrollEvent);
@@ -107,12 +112,7 @@ const TopBar = ({ className, ...rest }) => {
                   [classes.whiteToolbar]: scrolled,
                })}
             >
-               <Hidden smDown>
-                  <MainLogo />
-               </Hidden>
-               <Hidden mdUp>
-                  <MiniLogo />
-               </Hidden>
+               <MainLogo />
                <Hidden smDown>
                   <Tabs
                      value={false}
@@ -132,14 +132,19 @@ const TopBar = ({ className, ...rest }) => {
                </Hidden>
                <Box>
                   <Hidden mdDown>
-                     <IconButton
-                        component={Link}
-                        className={classes.navIconButton}
-                        color="primary"
-                        href="/profile"
-                     >
-                        <AccountCircleOutlinedIcon />
-                     </IconButton>
+                     {authenticatedUser.isLoaded &&
+                     authenticatedUser.isEmpty ? (
+                        <LoginButton />
+                     ) : (
+                        <IconButton
+                           component={Link}
+                           className={classes.navIconButton}
+                           color="primary"
+                           href="/profile"
+                        >
+                           <AccountCircleOutlinedIcon />
+                        </IconButton>
+                     )}
                   </Hidden>
                   <Hidden lgUp>
                      <IconButton color="primary" onClick={handleDrawerOpen}>

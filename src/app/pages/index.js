@@ -10,6 +10,7 @@ import BenefitsSection from "../components/views/landing/BenefitsSection";
 import CompaniesSection from "../components/views/landing/CompaniesSection";
 import HeroSection from "../components/views/landing/HeroSection";
 import CalendlyModal from "../components/views/landing/CalendlyModal";
+import ScrollToTop from "../components/views/common/ScrollToTop";
 
 const LandingPage = ({}) => {
    const {
@@ -70,6 +71,7 @@ const LandingPage = ({}) => {
             open={calendlyModalOpen}
             onClose={handleCloseCalendly}
          />
+        <ScrollToTop/>
       </LandingLayout>
    );
 };

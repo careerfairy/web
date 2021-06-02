@@ -8,7 +8,6 @@ import {
    Grid,
    Typography,
 } from "@material-ui/core";
-import { Rating } from "@material-ui/lab";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -31,8 +30,9 @@ const useStyles = makeStyles((theme) => ({
       borderRadius: "50px",
       [theme.breakpoints.down("sm")]: {
          left: "50%",
-         width: "100%",
+         width: "99%",
       },
+      boxShadow: theme.shadows[1],
    },
    innerWrapper: {
       zIndex: 2,
@@ -49,11 +49,11 @@ const useStyles = makeStyles((theme) => ({
    avatar: {
       width: 170,
       height: 170,
-      borderRadius: theme.spacing(4),
+      borderRadius: 50,
       "& img": {
          objectFit: "contain",
       },
-      boxShadow: theme.shadows[10],
+      boxShadow: theme.shadows[4],
    },
    cardHeaderWrapper: {
       display: "flex",
@@ -114,7 +114,7 @@ const TestimonialCard = ({
                                     className={classes.cardTitle}
                                     variant="h5"
                                  >
-                                    {`"${title}"`}
+                                    {`“${title}”`}
                                  </Typography>
                                  {/*<Rating*/}
                                  {/*    defaultValue={2}*/}

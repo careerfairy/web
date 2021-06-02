@@ -12,7 +12,7 @@ import { Fab } from "@material-ui/core";
 const useStyles = makeStyles((theme) => ({
    root: {},
    arrow: {
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down("md")]: {
          display: ["none", "!important"],
       },
       zIndex: 1,
@@ -70,7 +70,17 @@ const TestimonialCarousel = ({}) => {
       initialSlide: 0,
       autoplay: true,
       autoplaySpeed: 10000,
-      pauseOnHover: true
+      pauseOnHover: true,
+      appendDots: dots => (
+        <div
+          style={{
+             borderRadius: "10px",
+             padding: "10px"
+          }}
+        >
+           <ul style={{ margin: "0px" }}> {dots} </ul>
+        </div>
+      ),
    });
 
    return (

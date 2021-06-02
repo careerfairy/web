@@ -43,9 +43,6 @@ const NextLivestreamsLayout = (props) => {
                 <div className={classes.wrapper}>
                     <div className={classes.contentContainer}>
                         <div className={classes.content}>
-                            {/*{React.Children.map(children, child => React.cloneElement(child, {*/}
-                            {/*    ...props*/}
-                            {/*}))}*/}
                             {children}
                             <Footer/>
                         </div>
