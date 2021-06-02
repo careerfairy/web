@@ -1,5 +1,6 @@
 import React from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { openPopupWidget } from "react-calendly";
 import LandingLayout from "../layouts/LandingLayout";
 import BookADemoSection from "../components/views/landing/BookADemoSection";
 import TestimonialsSection from "../components/views/landing/TestimonialsSection";
@@ -10,25 +11,61 @@ import BenefitsSection from "../components/views/landing/BenefitsSection";
 import CompaniesSection from "../components/views/landing/CompaniesSection";
 import HeroSection from "../components/views/landing/HeroSection";
 
-const useStyles = makeStyles((theme) => ({
-
-}));
+const useStyles = makeStyles((theme) => ({}));
 
 const LandingPage = ({}) => {
    const {
-      palette: { secondary, common, grey },
+      palette: { secondary, common, grey,background, primary , text},
    } = useTheme();
+
+   const handleOpenCalendly = () => {
+      const styles = {
+         height: "100px",
+      };
+      const pageSettings = {
+        backgroundColor: background.default,
+        hideEventTypeDetails: false,
+        hideLandingPageDetails: false,
+        primaryColor: primary.main,
+        textColor: text.primary
+      }
+
+      const prefil = {
+        // email: 'test@test.com',
+        // firstName: 'Jon',
+        // lastName: 'Snow',
+        // name: 'Jon Snow',
+        // guests: [
+        //   'janedoe@example.com',
+        //   'johndoe@example.com'
+        // ],
+        // customAnswers: {
+        //   a1: 'a1',
+        //   a2: 'a2',
+        //   a3: 'a3',
+        //   a4: 'a4',
+        //   a5: 'a5',
+        //   a6: 'a6',
+        //   a7: 'a7',
+        //   a8: 'a8',
+        //   a9: 'a9',
+        //   a10: 'a10'
+        // }
+      }
+      const utm = {
+        utmCampaign: 'Spring Sale 2019',
+        utmContent: 'Shoe and Shirts',
+        utmMedium: 'Ad',
+        utmSource: 'Facebook',
+        utmTerm: 'Spring'
+      }
+   };
 
    return (
       <LandingLayout>
-        <HeroSection
-        />
-        <CompaniesSection big/>
-         <BenefitsSection
-            title={
-             "Key Benefits"
-            }
-         />
+         <HeroSection />
+         <CompaniesSection big />
+         <BenefitsSection title={"Key Benefits"} />
          <UniversitySection
             subtitle="The best talent is evenly distributed, which makes it
             hard to reach. With CareerFairy live streams, 

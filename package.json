@@ -79,6 +79,7 @@
     "notistack": "^1.0.1",
     "postmark": "^2.3.5",
     "react": "^16.14.0",
+    "react-calendly": "^2.0.2",
     "react-chartjs-2": "^2.10.0",
     "react-countdown-circle-timer": "^2.5.3",
     "react-csv": "^2.0.3",
