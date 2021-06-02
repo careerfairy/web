@@ -60,7 +60,7 @@ const CompaniesSection = (props) => {
          backgroundColor={props.backgroundColor}
       >
          <SectionContainer>
-            <HighlightText text={"Over 250+ happy customers"} />
+            <HighlightText text={"Over 200+ happy customers"} />
             <div className={classes.imagesWrapper}>
                {landingCompanies.map(
                   ({ name, imageUrlDark, imageUrlMain, website }) => (

@@ -29,13 +29,13 @@ const LandingPage = ({}) => {
       <LandingLayout>
          <HeroSection handleOpenCalendly={handleOpenCalendly} />
          <CompaniesSection big />
-         <BenefitsSection title={"Key Benefits"} />
+         <BenefitsSection title={"Why CareerFairy?"} />
          <UniversitySection
             subtitle="The best talent is evenly distributed, which makes it
             hard to reach. With CareerFairy live streams,
             you can reach students at multiple top universities in a
             single one hour-long event. No travel, no logistics, no days off work."
-            title="Reach your target universities with a single event"
+            title="Some universities that we work with"
          />
          <StreamSection
             title={
@@ -44,8 +44,7 @@ const LandingPage = ({}) => {
                </>
             }
             subtitle="We believe that your employees are your biggest asset, and their insights provide
-                an authentic look into the opportunities that your company has to offer. Their passion is what
-                will attract tomorrow's best hires"
+                an authentic look into the opportunities that your company has to offer."
          />
          <AnalyticsSection
             title={
@@ -53,8 +52,7 @@ const LandingPage = ({}) => {
                   Measure your success with <b>concrete data</b>
                </>
             }
-            subtitle="Track registrations, participants, feedback
-                 and your talent pool throughout the lifecycle of your stream"
+            subtitle="Evaluate the success of your events, gather live feedback from your audience and follow up easily with interesting candidates"
          />
          <TestimonialsSection
             title="What They Are Saying"
@@ -65,7 +63,7 @@ const LandingPage = ({}) => {
             color={common.white}
             big
             handleOpenCalendly={handleOpenCalendly}
-            title={"Interesting?"}
+            title={"Join the ranks of leading organizations today"}
          />
          <CalendlyModal
             open={calendlyModalOpen}

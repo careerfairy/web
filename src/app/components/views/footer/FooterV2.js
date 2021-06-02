@@ -97,7 +97,7 @@ const FooterV2 = ({}) => {
                 </div>
                 <div>
                     <Typography align="center">
-                        2020 - CareerFairy GmbH - All Rights Reserved - Made in Zurich, Switzerland
+                        2021 - CareerFairy AG - All Rights Reserved - Made in Zurich, Switzerland
                     </Typography>
                 </div>
             </Container>

@@ -20,9 +20,9 @@ const useStyles = makeStyles((theme) => ({
    linkButton: {
       textDecoration: "none !important",
       background: theme.palette.common.white,
-      "&:hover":{
-      background: theme.palette.background.paper,
-      }
+      "&:hover": {
+         background: theme.palette.background.paper,
+      },
    },
    heroContainer: {
       minHeight: "calc(100vh - 60px)",
@@ -61,12 +61,36 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const RockstarText = () => {
+// const RockstarText = () => {
+//    const classes = useStyles();
+//    return (
+//       <div>
+//          r<StarsIcon className={classes.starIcon} />
+//          ckstars.
+//       </div>
+//    );
+// };
+// const RockstarText = () => {
+//    const classes = useStyles();
+//    return (
+//       <div style={{display: "inline-block"}}>
+//          <b>
+//             fr
+//             <StarsIcon className={classes.starIcon} />m
+//          </b>
+//       </div>
+//    );
+// };
+const RockstarTextSchools = () => {
    const classes = useStyles();
    return (
-      <div>
-         r<StarsIcon className={classes.starIcon} />
-         ckstars.
+      <div style={{display: "inline-block"}}>
+         <b>
+            sch
+            <StarsIcon className={classes.starIcon} />
+            <StarsIcon className={classes.starIcon} />
+            ls.
+         </b>
       </div>
    );
 };
@@ -94,36 +118,41 @@ const HeroSection = (props) => {
             >
                <div className={classes.heroContent}>
                   <Typography variant="h2">
-                     Hunt the <b>rising talents</b> and grow them{" "}
-                     <b>
-                        into <RockstarText />
-                     </b>
+                     {/*Hunt the <b>rising talents</b> and grow them{" "}*/}
+                     {/*<b>*/}
+                     {/*   into <RockstarText />*/}
+                     {/*</b>*/}
+                     <b>Engage</b> and recruit <b>talents</b> from leading <b>schools.</b>
                   </Typography>
-                  <Grid spacing={2} container className={classes.buttonsWrapper}>
+                  <Grid
+                     spacing={2}
+                     container
+                     className={classes.buttonsWrapper}
+                  >
                      <Grid xs={12} sm={12} md={6} item>
-                     <HeroButton
-                        color="primary"
-                        variant="outlined"
-                        fullWidth
-                        href="/next-livestreams"
-                        className={classes.linkButton}
-                        component={Link}
-                        iconUrl={playIcon}
-                     >
-                        Our Next Events
-                     </HeroButton>
+                        <HeroButton
+                           color="primary"
+                           variant="outlined"
+                           fullWidth
+                           href="/next-livestreams"
+                           className={classes.linkButton}
+                           component={Link}
+                           iconUrl={playIcon}
+                        >
+                           Our Next Events
+                        </HeroButton>
                      </Grid>
                      <Grid xs={12} sm={12} md={6} item>
-                     <HeroButton
-                        color="secondary"
-                        fullWidth
-                        withGradient
-                        onClick={props.handleOpenCalendly}
-                        iconUrl={calendarIcon}
-                        variant="contained"
-                     >
-                        Book a Demo
-                     </HeroButton>
+                        <HeroButton
+                           color="secondary"
+                           fullWidth
+                           withGradient
+                           onClick={props.handleOpenCalendly}
+                           iconUrl={calendarIcon}
+                           variant="contained"
+                        >
+                           Book a Demo
+                        </HeroButton>
                      </Grid>
                   </Grid>
                </div>
@@ -151,13 +180,13 @@ const HeroSection = (props) => {
 export default HeroSection;
 
 HeroSection.propTypes = {
-  backgroundColor: PropTypes.any,
-  backgroundImage: PropTypes.any,
-  backgroundImageClassName: PropTypes.any,
-  backgroundImageOpacity: PropTypes.any,
-  big: PropTypes.any,
-  color: PropTypes.any,
-  handleOpenCalendly: PropTypes.func,
-  subtitle: PropTypes.any,
-  title: PropTypes.any
-}
+   backgroundColor: PropTypes.any,
+   backgroundImage: PropTypes.any,
+   backgroundImageClassName: PropTypes.any,
+   backgroundImageOpacity: PropTypes.any,
+   big: PropTypes.any,
+   color: PropTypes.any,
+   handleOpenCalendly: PropTypes.func,
+   subtitle: PropTypes.any,
+   title: PropTypes.any,
+};

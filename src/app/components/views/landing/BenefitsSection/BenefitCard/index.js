@@ -5,9 +5,10 @@ import clsx from "clsx";
 import { Typography } from "@material-ui/core";
 
 const angle = 20;
-const rectLength = 200;
+const rectLength = 150;
 const useStyles = makeStyles((theme) => ({
    root: {
+      // border: "1px solid red"
    },
    graphicContainer: {
       height: rectLength * 1.5,

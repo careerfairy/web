@@ -8,7 +8,7 @@ import SectionContainer from "../../common/Section/Container";
 
 const useStyles = makeStyles((theme) => ({
    section: {
-      height: "100vh",
+      height: "60vh",
       display: "flex",
       alignItems:"center"
    },

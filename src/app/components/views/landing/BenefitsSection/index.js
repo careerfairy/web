@@ -18,31 +18,38 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: 500,
    },
    benefitsWrapper: {},
-   title: {
-      fontSize: "4.5rem",
-      fontWeight: 500,
-      [theme.breakpoints.down("xs")]: {
-         fontSize: "3.5rem",
-      },
-   },
+   // title: {
+   //    fontSize: "4.5rem",
+   //    fontWeight: 500,
+   //    [theme.breakpoints.down("xs")]: {
+   //       fontSize: "3.5rem",
+   //    },
+   // },
 }));
 
 const benefitsData = [
    {
-      name: "Engage",
-      description: "An engaging platform to brand yourself as a company",
+      name: "Fun career events",
+      description:
+         "A highly interactive format " +
+         "developed for a young " +
+         "audience worldwide",
       imageUrl: engageShape,
    },
    {
-      name: "Reach",
+      name: "Reach more talents",
       description:
-         "Reach more talents through CareerFairy and through CareerFairy's network of schools",
+         "We promote your events to " +
+         "the CareerFairy community " +
+         "and universities",
       imageUrl: reachShape,
    },
    {
-      name: "Measure",
+      name: "Measure the success",
       description:
-         "Measure and demonstrate the results of your events with detailed analytics",
+         "Demonstrate the success of " +
+         "your events through " +
+         "detailed analytics",
       imageUrl: measureShape,
    },
 ];
@@ -62,7 +69,7 @@ const BenefitsSection = (props) => {
          <SectionContainer>
             <SectionHeader
                color={props.color}
-               titleClassName={classes.title}
+               // titleClassName={classes.title}
                subTitleClassName={classes.subTitle}
                title={props.title}
                subtitle={props.subtitle}
@@ -74,7 +81,7 @@ const BenefitsSection = (props) => {
                className={classes.benefitsWrapper}
             >
                {benefitsData.map(({ name, imageUrl, description }) => (
-                  <Grid item xs={12} sm={6} md={3} key={name}>
+                  <Grid item xs={12} sm={6} md={4} key={name}>
                      <BenefitCard
                         name={name}
                         imageUrl={imageUrl}
