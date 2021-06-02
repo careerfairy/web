@@ -34,17 +34,19 @@ function RequestedHandRaiseElement(props) {
 
 
     useEffect(() => {
-        props.setNewNotification({
-            status: "requested",
-            id: notificationId,
-            message: props.request.name + ' has raised a hand and requested to join the stream',
-            confirmMessage: 'Invite',
-            confirm: () => props.updateHandRaiseRequest(props.request.id, 'invited'),
-            cancelMessage: 'Deny',
-            cancel: () => props.updateHandRaiseRequest(props.request.id, 'denied'),
-        });
-
-        return () => props.closeSnackbar(notificationId)
+        if (props.numberOfActiveHandRaisers < 8) {
+            props.setNewNotification({
+                status: "requested",
+                id: notificationId,
+                message: props.request.name + ' has raised a hand and requested to join the stream',
+                confirmMessage: 'Invite',
+                confirm: () => props.updateHandRaiseRequest(props.request.id, 'invited'),
+                cancelMessage: 'Deny',
+                cancel: () => props.updateHandRaiseRequest(props.request.id, 'denied'),
+            });
+    
+            return () => props.closeSnackbar(notificationId)
+        }     
     }, []);
 
     function updateHandRaiseRequest(state) {
