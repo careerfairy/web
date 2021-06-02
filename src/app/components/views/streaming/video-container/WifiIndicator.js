@@ -1,15 +1,21 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {Fragment, useEffect, useMemo, useState} from 'react';
 import {fade, makeStyles} from "@material-ui/core/styles";
 import SignalWifi0BarRoundedIcon from '@material-ui/icons/SignalWifi0BarRounded';
 import SignalWifi1BarRoundedIcon from '@material-ui/icons/SignalWifi1BarRounded';
 import SignalWifi2BarRoundedIcon from '@material-ui/icons/SignalWifi2BarRounded';
 import SignalWifi3BarRoundedIcon from '@material-ui/icons/SignalWifi3BarRounded';
 import SignalWifi4BarRoundedIcon from '@material-ui/icons/SignalWifi4BarRounded';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import CachedIcon from '@material-ui/icons/Cached';
+import WarningIcon from '@material-ui/icons/Warning';
 import {ArrowUp, ArrowDown} from 'react-feather'
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { Tooltip, Box } from "@material-ui/core";
+import { Tooltip, Box, Badge } from "@material-ui/core";
 import Draggable from 'react-draggable';
+import * as actions from 'store/actions'
+import { useDispatch } from 'react-redux';
 
 const gradient = [
     "rgba(0,0,0,0.5)",
@@ -28,7 +34,6 @@ const useStyles = makeStyles(theme => ({
         right: "3%",
         top: "2%",
         zIndex: 9999,
-        display: "flex",
         borderRadius: theme.spacing(2),
         padding: theme.spacing(1),
         boxShadow: theme.shadows[2],
@@ -42,6 +47,9 @@ const useStyles = makeStyles(theme => ({
             transform: `scale(1.2)`,
         }
     },
+    subbox: {
+        display: "flex"
+    }, 
     uplinkWifiIcon: {
         color: ({uplinkIndex}) => gradient[uplinkIndex],
         fontSize: "xx-large",
@@ -63,10 +71,46 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const WifiIndicator = ({isDownLink, uplink, downlink, className, ...rest}) => {
+const WifiIndicator = ({isDownLink, uplink, agoraRtcConnectionStatus, agoraRtmStatus, downlink, className, ...rest}) => {
 
     const [defaultPosition, setDefaultPosition] = useState(undefined);
+    const dispatch = useDispatch();
 
+    useEffect(() => {
+        if (agoraRtcConnectionStatus.curState === "CONNECTING") {
+            enqueueSnackbar("Connecting...", "ConnectingStatus", "warning", true)
+            return () => dispatch(actions.closeSnackbar('ConnectingStatus'))
+        }
+        if (agoraRtcConnectionStatus.curState === "CONNECTED") {
+            enqueueSnackbar("Connected!", "ConnectedStatus", "success", false)
+            return () => dispatch(actions.closeSnackbar('ConnectedStatus'))
+        }
+        if (agoraRtcConnectionStatus.prevState === "CONNECTED" && agoraRtcConnectionStatus.curState === "DISCONNECTED") {
+            enqueueSnackbar("Disconnected. Check your connection...", "DisconnectedStatus", "error", true)
+            return () => dispatch(actions.closeSnackbar('DisconnectedStatus'))
+        }
+    }, [agoraRtcConnectionStatus])
+
+    const enqueueSnackbar = (message, key, variant, persist) => {
+        dispatch(actions.enqueueSnackbar({
+            message: message,
+            options: {
+                variant: variant,
+                key: key,
+                preventDuplicate: true,
+                persist: persist
+            }
+        }))
+    }
+
+    useEffect(() => {
+        return () => {
+            let connectionStati = ["DisconnectedStatus", "ConnectingStatus", "ConnectedStatus"]
+            connectionStati.forEach( status => {
+                dispatch(actions.closeSnackbar(status))
+            })
+        }
+    }, [])
 
     useEffect(() => {
         getSavedPosition()
@@ -139,25 +183,56 @@ const WifiIndicator = ({isDownLink, uplink, downlink, className, ...rest}) => {
     const uplinkInfo = useMemo(() => getNetWorkInfo(true)[uplink], [uplink])
     const downlinkInfo = useMemo(() => getNetWorkInfo()[downlink], [downlink])
 
+    const ConnectionStatusIcon = ({ status }) => {
+        if (status === 'CONNECTED' || status === 'RTM_CONNECTED' ) return  <CheckCircleOutlineIcon style={{ color: '#00F92C' }} />
+        if (status === 'CONNECTING' || status === 'RTM_NETWORK_INTERRUPTED' ) return  <WarningIcon style={{ color: '#FFEF00' }} />
+        if (status === 'DISCONNECTED' || status === 'RTM_DISCONNECTED' ) return  <ErrorOutlineIcon style={{ color: '#FF3200' }} />
+        else return <CachedIcon/>
+    }
+
     return defaultPosition ? (
         <Draggable
             onStop={handleSave}
             defaultPosition={defaultPosition}
             bounds="parent">
-            <Box {...rest} className={clsx(classes.root, className)}>
-                <Tooltip style={{color: uplinkInfo.color}} placement="top" title={uplinkInfo.description}>
-                    <Box marginRight={1} alignItems="center" display="flex">
-                        {uplinkInfo.icon}
-                        <ArrowUp className={clsx(classes.arrowUplinkIcon, classes.svgShadow)}/>
+                <Box {...rest} className={clsx(classes.root, className)}>
+                    <Box>
+                        <Tooltip title={"You are connected to the internet"}>
+                            <Box marginRight={1} marginBottom={1} alignItems="left" className={classes.subbox}>
+                                <Box display="flex" marginRight={1} >
+                                    <ConnectionStatusIcon status={agoraRtmStatus.msg}/>
+                                </Box>
+                                <Box display="flex">
+                                    Internet
+                                </Box>
+                            </Box>
+                        </Tooltip>
+                        <Tooltip title={"You are connected to and streaming on our server"}>
+                            <Box marginRight={1} marginBottom={1} alignItems="left" className={classes.subbox}>
+                                <Box display="flex" marginRight={1} >
+                                    <ConnectionStatusIcon status={agoraRtcConnectionStatus.curState}/>
+                                </Box>
+                                <Box display="flex">
+                                    Streaming
+                                </Box>
+                            </Box>
+                        </Tooltip>
                     </Box>
-                </Tooltip>
-                <Tooltip style={{color: downlinkInfo.color}} placement="top" title={downlinkInfo.description}>
-                    <Box alignItems="center" display="flex">
-                        {downlinkInfo.icon}
-                        <ArrowDown className={clsx(classes.arrowDownlinkIcon, classes.svgShadow)}/>
-                    </Box>
-                </Tooltip>
-            </Box>
+                    <Box className={classes.subbox}>
+                        <Tooltip style={{color: uplinkInfo.color}} placement="top" title={uplinkInfo.description}>
+                            <Box marginRight={1} alignItems="center" display="flex">
+                                {uplinkInfo.icon}
+                                <ArrowUp className={clsx(classes.arrowUplinkIcon, classes.svgShadow)}/>
+                            </Box>
+                        </Tooltip>
+                        <Tooltip style={{color: downlinkInfo.color}} placement="top" title={downlinkInfo.description}>
+                            <Box alignItems="center" display="flex">
+                                {downlinkInfo.icon}
+                                <ArrowDown className={clsx(classes.arrowDownlinkIcon, classes.svgShadow)}/>
+                            </Box>
+                        </Tooltip>
+                    </Box>              
+                </Box>
         </Draggable>
     ) :(<div/>);
 };
