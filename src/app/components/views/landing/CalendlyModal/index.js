@@ -41,10 +41,10 @@ const Content = ({ handleClose, background, primary, text, mobile }) => {
       },
 
       prefill: {
-         email: userData.userEmail || "",
-         firstName: userData.firstName || "",
-         lastName: userData.lastName || "",
-         name: `${userData.firstName || ""} ${userData.lastName || ""}`,
+         email: userData?.userEmail || "",
+         firstName: userData?.firstName || "",
+         lastName: userData?.lastName || "",
+         name: `${userData?.firstName || ""} ${userData?.lastName || ""}`,
       },
    };
    return (
