@@ -12,7 +12,7 @@ import WarningIcon from '@material-ui/icons/Warning';
 import {ArrowUp, ArrowDown} from 'react-feather'
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { Tooltip, Box, Badge } from "@material-ui/core";
+import { Tooltip, Box, Badge, Typography } from "@material-ui/core";
 import Draggable from 'react-draggable';
 import * as actions from 'store/actions'
 import { useDispatch } from 'react-redux';
@@ -68,6 +68,9 @@ const useStyles = makeStyles(theme => ({
     arrowDownlinkIcon: {
         color: ({downlinkIndex}) => gradient[downlinkIndex],
         width: theme.spacing(2)
+    },
+    text: {
+        color: theme.palette.common.white,
     }
 }));
 
@@ -118,7 +121,7 @@ const WifiIndicator = ({isDownLink, uplink, agoraRtcConnectionStatus, agoraRtmSt
 
     const classes = useStyles({
         uplinkIndex: uplink,
-        downlinkIndex: downlink
+        downlinkIndex: downlink,
     })
 
     const handleSave = (e, data) => {
@@ -180,15 +183,53 @@ const WifiIndicator = ({isDownLink, uplink, agoraRtcConnectionStatus, agoraRtmSt
         ]
     }
 
+    const getRtmConnectionInfo = (status) => {
+        switch (status) {
+            case 'RTM_CONNECTED': return {
+                icon: <CheckCircleOutlineIcon style={{ color: '#00F92C' }} />,
+                message: "You are connected to the internet"
+            }
+            case 'RTM_NETWORK_INTERRUPTED': return {
+                icon: <WarningIcon style={{ color: '#FFEF00' }} />,
+                message: "Attempting to connect to the internet..."
+            }
+            case ('RTM_DISCONNECTED'): return {
+                icon: <ErrorOutlineIcon style={{ color: '#FF3200' }} />,
+                message: "You are disconnected from the internet"
+            }
+            default: return {
+                icon: <CachedIcon/>,
+                message: "Waiting for connection status..."
+            }
+        }
+    }
+
+    const getRtcConnectionInfo = (status) => {
+        switch (status) {
+            case 'CONNECTED': return {
+                icon: <CheckCircleOutlineIcon style={{ color: '#00F92C' }} />,
+                message: "You are connected to our streaming server"
+            }
+            case 'CONNECTING': return {
+                icon: <WarningIcon style={{ color: '#FFEF00' }} />,
+                message: "Attempting to connect to our streaming server..."
+            }
+            case 'DISCONNECTED': return {
+                icon: <ErrorOutlineIcon style={{ color: '#FF3200' }} />,
+                message: "You are disconnected from our streaming server"
+            }
+            default: return {
+                icon: <CachedIcon/>,
+                message: "Waiting for connection status..."
+            }
+        }
+    }
+
     const uplinkInfo = useMemo(() => getNetWorkInfo(true)[uplink], [uplink])
     const downlinkInfo = useMemo(() => getNetWorkInfo()[downlink], [downlink])
 
-    const ConnectionStatusIcon = ({ status }) => {
-        if (status === 'CONNECTED' || status === 'RTM_CONNECTED' ) return  <CheckCircleOutlineIcon style={{ color: '#00F92C' }} />
-        if (status === 'CONNECTING' || status === 'RTM_NETWORK_INTERRUPTED' ) return  <WarningIcon style={{ color: '#FFEF00' }} />
-        if (status === 'DISCONNECTED' || status === 'RTM_DISCONNECTED' ) return  <ErrorOutlineIcon style={{ color: '#FF3200' }} />
-        else return <CachedIcon/>
-    }
+    const rtmConnectionInfo = useMemo(() => getRtmConnectionInfo(agoraRtmStatus.msg), [agoraRtmStatus.msg])
+    const rtcConnectionInfo = useMemo(() => getRtcConnectionInfo(agoraRtcConnectionStatus.curState), [agoraRtcConnectionStatus.curState])
 
     return defaultPosition ? (
         <Draggable
@@ -197,22 +238,22 @@ const WifiIndicator = ({isDownLink, uplink, agoraRtcConnectionStatus, agoraRtmSt
             bounds="parent">
                 <Box {...rest} className={clsx(classes.root, className)}>
                     <Box>
-                        <Tooltip title={"You are connected to the internet"}>
+                        <Tooltip title={rtmConnectionInfo.message}>
                             <Box marginRight={1} marginBottom={1} alignItems="left" className={classes.subbox}>
                                 <Box display="flex" marginRight={1} >
-                                    <ConnectionStatusIcon status={agoraRtmStatus.msg}/>
+                                    { rtmConnectionInfo.icon }
                                 </Box>
-                                <Box display="flex">
+                                <Box display="flex" className={classes.text}>
                                     Internet
                                 </Box>
                             </Box>
                         </Tooltip>
-                        <Tooltip title={"You are connected to and streaming on our server"}>
+                        <Tooltip title={rtcConnectionInfo.message}>
                             <Box marginRight={1} marginBottom={1} alignItems="left" className={classes.subbox}>
                                 <Box display="flex" marginRight={1} >
-                                    <ConnectionStatusIcon status={agoraRtcConnectionStatus.curState}/>
+                                    { rtcConnectionInfo.icon }
                                 </Box>
-                                <Box display="flex">
+                                <Box display="flex" className={classes.text}>
                                     Streaming
                                 </Box>
                             </Box>

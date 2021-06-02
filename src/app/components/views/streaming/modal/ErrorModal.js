@@ -87,6 +87,7 @@ function ErrorModal({ agoraRtcStatus, agoraRtcConnectionStatus, agoraRtmStatus }
     const [audioCounter, setAudioCounter] = useState(0)
     const [playWarning, setPlayWarning] = useState(true)
     const [hasHadInitialConnection, setHasHadInitialConnection] = useState(false)
+    const [soundTimeout, setSoundTimeout] = useState(null)
     const [reconnectTimeout, setReconnectTimeout] = useState(false)
     const classes = useStyles();
 
@@ -123,9 +124,12 @@ function ErrorModal({ agoraRtcStatus, agoraRtcConnectionStatus, agoraRtmStatus }
                 playSound(notifyAudio)
                 setAudioCounter( prevState => prevState + 1 )
             }, 2000)
+            setSoundTimeout(timeout)
             return () => clearTimeout(timeout)
+        } else {
+            if (soundTimeout) clearTimeout(soundTimeout)
         }
-    },[agoraRtcStatus, agoraRtmStatus, agoraRtcConnectionStatus, audioCounter])
+    },[agoraRtcStatus, agoraRtmStatus, agoraRtcConnectionStatus, audioCounter, playWarning])
 
     const playSound = audioFile => {
         audioFile.play();
