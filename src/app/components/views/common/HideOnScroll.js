@@ -17,10 +17,8 @@ function HideOnScroll(props) {
 }
 
 HideOnScroll.propTypes = {
-    children: PropTypes.element.isRequired,
-    /**
-     * Injected by the documentation to work in an iframe.
-     * You won't need it on your project.
-     */
-};
+  TransitionComponent: PropTypes.node,
+  children: PropTypes.element.isRequired,
+  disabled: PropTypes.any
+}
 export default HideOnScroll

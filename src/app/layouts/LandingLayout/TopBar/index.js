@@ -31,6 +31,13 @@ const useStyles = makeStyles((theme) => ({
    toolbar: {
       display: "flex",
       justifyContent: "space-between",
+      background: "transparent",
+   },
+   animated: {
+      transition: theme.transitions.create(["background", "box-shadow"], {
+         duration: theme.transitions.duration.complex,
+         easing: theme.transitions.easing.easeInOut,
+      }),
    },
    navLinks: {
       fontWeight: 600,
@@ -65,10 +72,11 @@ const useStyles = makeStyles((theme) => ({
    root: {
       // Ensures top bar's Zindex is always above the drawer
       zIndex: theme.zIndex.drawer + 1,
-      background: "transparent",
       color: theme.palette.common.black,
+      background: "transparent",
    },
-   whiteHeader: {
+   whiteToolbar: {
+      boxShadow: theme.shadows[3],
       background: theme.palette.common.white,
    },
 }));
@@ -88,19 +96,17 @@ const TopBar = ({ className, ...rest }) => {
    }, []);
 
    const listenScrollEvent = (e) => {
-      setScrolled(Boolean(window?.scrollY > 10));
+      setScrolled(Boolean(window?.scrollY > 40));
    };
 
    return (
       <HideOnScroll>
-         <AppBar
-            elevation={scrolled ? 1 : 0}
-            className={clsx(classes.root, className, {
-               [classes.whiteHeader]: scrolled,
-            })}
-            {...rest}
-         >
-            <Toolbar className={classes.toolbar}>
+         <AppBar className={classes.root} elevation={0} {...rest}>
+            <Toolbar
+               className={clsx(classes.toolbar, classes.animated, {
+                  [classes.whiteToolbar]: scrolled,
+               })}
+            >
                <Hidden smDown>
                   <MainLogo />
                </Hidden>
