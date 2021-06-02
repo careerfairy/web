@@ -197,7 +197,7 @@ const UsersTable = ({
     const makefileNameWindowsFriendly = (string) => {
         return string.replace(/[\/\*\|\:\<\>\?\"\\]/gi, '_')
     }
-
+//
     const batch = async (arrayOfDownloadData) => {
         try {
             setProcessingCVs(true)
