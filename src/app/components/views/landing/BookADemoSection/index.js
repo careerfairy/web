@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import PropTypes from "prop-types";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
@@ -48,6 +49,7 @@ const BookADemoSection = (props) => {
                className={classes.bookingButton}
                color="secondary"
                variant="contained"
+               onClick={props.handleOpenCalendly}
             >
                Book a Demo
             </RoundButton>
@@ -59,12 +61,13 @@ const BookADemoSection = (props) => {
 export default BookADemoSection;
 
 BookADemoSection.propTypes = {
-   backgroundColor: PropTypes.any,
-   backgroundImage: PropTypes.any,
-   backgroundImageClassName: PropTypes.any,
-   backgroundImageOpacity: PropTypes.any,
-   big: PropTypes.any,
-   color: PropTypes.any,
-   subtitle: PropTypes.any,
-   title: PropTypes.any,
-};
+  backgroundColor: PropTypes.any,
+  backgroundImage: PropTypes.any,
+  backgroundImageClassName: PropTypes.any,
+  backgroundImageOpacity: PropTypes.any,
+  big: PropTypes.any,
+  color: PropTypes.any,
+  handleOpenCalendly: PropTypes.func,
+  subtitle: PropTypes.any,
+  title: PropTypes.any
+}

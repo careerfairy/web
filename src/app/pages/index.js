@@ -11,8 +11,6 @@ import BenefitsSection from "../components/views/landing/BenefitsSection";
 import CompaniesSection from "../components/views/landing/CompaniesSection";
 import HeroSection from "../components/views/landing/HeroSection";
 
-const useStyles = makeStyles((theme) => ({}));
-
 const LandingPage = ({}) => {
    const {
       palette: { secondary, common, grey,background, primary , text},
@@ -30,7 +28,7 @@ const LandingPage = ({}) => {
         textColor: text.primary
       }
 
-      const prefil = {
+      const prefill = {
         // email: 'test@test.com',
         // firstName: 'Jon',
         // lastName: 'Snow',
@@ -59,11 +57,15 @@ const LandingPage = ({}) => {
         utmSource: 'Facebook',
         utmTerm: 'Spring'
       }
+
+     openPopupWidget({ url, prefill, pageSettings, utm })
    };
 
    return (
       <LandingLayout>
-         <HeroSection />
+         <HeroSection
+           handleOpenCalendly={handleOpenCalendly}
+         />
          <CompaniesSection big />
          <BenefitsSection title={"Key Benefits"} />
          <UniversitySection
@@ -100,6 +102,7 @@ const LandingPage = ({}) => {
             backgroundColor={`linear-gradient(-8deg, ${secondary.main} 1%, ${secondary.light} 100%)`}
             color={common.white}
             big
+            handleOpenCalendly={handleOpenCalendly}
             title={"Interesting?"}
          />
       </LandingLayout>

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import PropTypes from "prop-types";
 import React from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -74,7 +75,7 @@ const HeroSection = (props) => {
    const classes = useStyles();
    const theme = useTheme();
    const desktop = useMediaQuery(theme.breakpoints.up("md"));
-   console.log("-> desktop", desktop);
+
    return (
       <Section
          big={props.big}
@@ -119,6 +120,7 @@ const HeroSection = (props) => {
                         color="secondary"
                         fullWidth
                         withGradient
+                        onClick={props.handleOpenCalendly}
                         iconUrl={calendarIcon}
                         variant="contained"
                      >
@@ -151,12 +153,13 @@ const HeroSection = (props) => {
 export default HeroSection;
 
 HeroSection.propTypes = {
-   backgroundColor: PropTypes.any,
-   backgroundImage: PropTypes.any,
-   backgroundImageClassName: PropTypes.any,
-   backgroundImageOpacity: PropTypes.any,
-   big: PropTypes.any,
-   color: PropTypes.any,
-   subtitle: PropTypes.any,
-   title: PropTypes.any,
-};
+  backgroundColor: PropTypes.any,
+  backgroundImage: PropTypes.any,
+  backgroundImageClassName: PropTypes.any,
+  backgroundImageOpacity: PropTypes.any,
+  big: PropTypes.any,
+  color: PropTypes.any,
+  handleOpenCalendly: PropTypes.func,
+  subtitle: PropTypes.any,
+  title: PropTypes.any
+}
