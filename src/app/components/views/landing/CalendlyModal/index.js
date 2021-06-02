@@ -74,13 +74,15 @@ const CalendlyModal = ({ open, onClose }) => {
          aria-describedby="simple-modal-description"
          onClose={handleClose}
       >
-         <Content
-            primary={theme.palette.primary}
-            mobile={mobile}
-            text={theme.palette.text}
-            background={theme.palette.background}
-            handleClose={handleClose}
-         />
+         <div>
+            <Content
+               primary={theme.palette.primary}
+               mobile={mobile}
+               text={theme.palette.text}
+               background={theme.palette.background}
+               handleClose={handleClose}
+            />
+         </div>
       </Modal>
    );
 };

@@ -13,11 +13,24 @@ const useStyles = makeStyles((theme) => ({
       flexDirection: "column",
       alignItems: "center",
    },
+   customMaxWidth:{
+
+   }
 }));
 
 const SectionContainer = ({ children, ...props }) => {
    const classes = useStyles();
-   return <Container maxWidth="lg" className={classes.root} {...props} children={children} />;
+   return (
+      <Container
+        classes={{
+           maxWidthLg: classes.customMaxWidth
+        }}
+         className={classes.root}
+         maxWidth="md"
+         {...props}
+         children={children}
+      />
+   );
 };
 
 SectionContainer.propTypes = {

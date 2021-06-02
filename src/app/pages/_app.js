@@ -6,8 +6,7 @@ import * as Sentry from '@sentry/browser';
 import config from 'react-reveal/globals';
 import DateFnsUtils from '@date-io/date-fns';
 import {newStore, wrapper} from '../store';
-// import "slick-carousel/slick/slick.css";
-// import "slick-carousel/slick/slick-theme.css";
+
 import firebase from '../Firebase/Firebase';
 import Head from 'next/head';
 import TagManager from 'react-gtm-module'
