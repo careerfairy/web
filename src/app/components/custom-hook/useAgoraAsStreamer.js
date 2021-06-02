@@ -17,7 +17,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const [removedStream, setRemovedStream] = useState(null);
     const [externalMediaStreams, setExternalMediaStreams] = useState([]);
     const [joinedChannel, setJoinedChannel] = useState(false);
-
+    const [timeoutNumber, setTimeoutNumber] = useState(null);
 
     const [networkQuality, setNetworkQuality] = useState({
         downlinkNetworkQuality: 0,
@@ -46,7 +46,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         type: "INFO",
         msg: "RTM_INITIAL"
     });
-
+    const [agoraRtcConnectionStatus, setAgoraRtcConnectionStatus] = useState("INITIAL")
     const agoraToken = useAgoraToken(roomId, userUid, !isViewer, token, false, path);
     const agoraScreenShareToken = useAgoraToken(roomId, userUid, !isViewer, token, true, path);
 
@@ -57,7 +57,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             setUserUid(streamId)
         }
     }, [streamId])
-
 
     useEffect(() => {
         if (addedStream) {
@@ -116,7 +115,20 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         handleSwitchRooms()
     }, [router.asPath])
 
-
+    useEffect(() => {
+        if (timeoutNumber) {
+            clearTimeout(timeoutNumber)
+        }
+        if (agoraRtcStatus.msg === "RTC_JOINING_CHANNEL" || agoraRtcStatus.msg === "RTC_PUBLISHING_STREAM") {
+            let number = setTimeout(() => {
+                setAgoraRtcStatus({
+                    type: "ERROR",
+                    msg: "RTC_CONNECTION_ERROR"
+                })
+            }, 15000);
+            setTimeoutNumber(number)
+        }   
+    }, [agoraRtcStatus])
 
     const agoraHandlers = useMemo(() => ({
         getChannelMemberCount: async (channelIds) => {
@@ -210,50 +222,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             msg: "RTC_JOINING_CHANNEL"
         })
 
-        if (!isViewer) {
-            rtcClient.startProxyServer(3);
-            rtcClient.setClientRole("host")
-            rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
-                setAgoraRtcStatus({
-                    type: "INFO",
-                    msg: "RTC_JOINED_CHANNEL"
-                })
-
-                let localStream = AgoraRTC.createStream({
-                    audio: true,
-                    video: true
-                });
-                localStream.setVideoProfile("480p_9");
-
-                setAgoraRtcStatus({
-                    type: "INFO",
-                    msg: "RTC_REQUEST_MEDIA_ACCESS"
-                })
-
-                localStream.init(() => {
-                    setAgoraRtcStatus({
-                        type: "INFO",
-                        msg: "RTC_PUBLISH_STREAM"
-                    })
-
-                    localStream.play(videoId);
-                    rtcClient.publish(localStream, handleStreamPublishingError)
-                    setLocalMediaStream(localStream);
-                    // Publish the local stream
-                }, handleStreamInitializationError);
-            }, handleClientJoinChannelError);
-
-
-        } else {
-            rtcClient.setClientRole("audience");
-            rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
-                setAgoraRtcStatus({
-                    type: "INFO",
-                    msg: "RTC_STREAM_JOINED_AS_VIEWER"
-                });
-            }, handleClientJoinChannelError);
-        }
-        rtcClient.enableAudioVolumeIndicator()
 
 
         rtcClient.on("stream-published", function (evt) {
@@ -382,6 +350,10 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             setUpdatedStream(streamToUpdate);
         });
 
+        rtcClient.on("connection-state-change", function (evt) {
+            setAgoraRtcConnectionStatus(evt)
+        });
+
         rtcClient.on("unmute-audio", function (evt) {
             // STREAMER HAS UNMUTED AUDIO
             console.log("mute-audio", evt)
@@ -430,6 +402,51 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         rtcClient.on("exception", function (evt) {
             // NETWORK QUALITY
         });
+
+        if (!isViewer) {
+            rtcClient.startProxyServer(3);
+            rtcClient.setClientRole("host")
+            rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
+                setAgoraRtcStatus({
+                    type: "INFO",
+                    msg: "RTC_JOINED_CHANNEL"
+                })
+
+                let localStream = AgoraRTC.createStream({
+                    audio: true,
+                    video: true
+                });
+                localStream.setVideoProfile("480p_9");
+
+                setAgoraRtcStatus({
+                    type: "INFO",
+                    msg: "RTC_REQUEST_MEDIA_ACCESS"
+                })
+
+                localStream.init(() => {
+                    setAgoraRtcStatus({
+                        type: "INFO",
+                        msg: "RTC_PUBLISH_STREAM"
+                    })
+
+                    localStream.play(videoId);
+                    rtcClient.publish(localStream, handleStreamPublishingError)
+                    setLocalMediaStream(localStream);
+                    // Publish the local stream
+                }, handleStreamInitializationError);
+            }, handleClientJoinChannelError);
+
+
+        } else {
+            rtcClient.setClientRole("audience");
+            rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
+                setAgoraRtcStatus({
+                    type: "INFO",
+                    msg: "RTC_STREAM_JOINED_AS_VIEWER"
+                });
+            }, handleClientJoinChannelError);
+        }
+        rtcClient.enableAudioVolumeIndicator()
 
         setRtcClient(rtcClient);
     }
@@ -739,6 +756,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         setLocalMediaStream,
         externalMediaStreams,
         agoraRtcStatus,
+        agoraRtcConnectionStatus,
         agoraRtmStatus,
         networkQuality,
         setAddedStream,

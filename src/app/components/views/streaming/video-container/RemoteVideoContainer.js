@@ -71,19 +71,19 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const RemoteVideoContainer = ({
-                                  attachSinkId,
-                                  currentLivestream,
-                                  height,
-                                  isPlayMode,
-                                  muted,
-                                  play,
-                                  setRemovedStream,
-                                  setShowVideoButton,
-                                  small,
-                                  speakerSource,
-                                  stream,
-                                  unmute
-                              }) => {
+        attachSinkId,
+        currentLivestream,
+        height,
+        isPlayMode,
+        muted,
+        play,
+        setRemovedStream,
+        setShowVideoButton,
+        small,
+        speakerSource,
+        stream,
+        unmute
+    }) => {
 
     const {getActiveTutorialStepKey, handleConfirmStep} = useContext(TutorialContext);
     const activeStep = getActiveTutorialStepKey();

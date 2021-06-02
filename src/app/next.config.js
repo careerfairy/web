@@ -23,6 +23,13 @@ module.exports = (phase, {defaultConfig}) => {
             }
             return config
         },
+        webpack: config => {
+            config.module.rules.push({
+                test: /\.wav$/,
+                loader: "file-loader"
+            })
+            return config
+        }
     }
     // if (phase === PHASE_PRODUCTION_BUILD) {
     //     config.distDir = '../../dist/client'

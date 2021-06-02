@@ -39,6 +39,7 @@
     "date-fns": "^2.0.0",
     "dayjs": "^1.9.3",
     "dotenv": "^8.2.0",
+    "file-loader": "^6.2.0",
     "filefy": "^0.1.10",
     "firebase": "^7.24.0",
     "firebase-functions": "^3.13.2",
