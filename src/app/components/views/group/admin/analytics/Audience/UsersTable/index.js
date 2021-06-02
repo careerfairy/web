@@ -194,6 +194,9 @@ const UsersTable = ({
         await batch(cvUrls)
     }
 
+    const makefileNameWindowsFriendly = (string) => {
+        return string.replace(/[\/\*\|\:\<\>\?\"\\]/gi, '_')
+    }
 
     const batch = async (arrayOfDownloadData) => {
         try {
@@ -207,7 +210,7 @@ const UsersTable = ({
                     const file = new Blob([resp], {type: 'application/pdf'});
                     // process to auto download it
                     // const fileURL = URL.createObjectURL(file);
-                    zip.file(`${fileName}.pdf`, file);
+                    zip.file(`${makefileNameWindowsFriendly(fileName)}.pdf`, file);
                 })
             }
 
@@ -219,7 +222,8 @@ const UsersTable = ({
                         type: "blob"
                     })
                         .then(function (content) {
-                            linkElement.download = `CVs of ${userType.displayName} ${getTitle()}`;
+                            const title = `CVs of ${userType.displayName} ${getTitle()}`
+                            linkElement.download = makefileNameWindowsFriendly(title);
                             linkElement.href = URL.createObjectURL(content);
                             linkElement.innerHTML = "download " + linkElement.download;
                             linkElement.click();
