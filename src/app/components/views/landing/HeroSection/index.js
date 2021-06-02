@@ -1,13 +1,10 @@
-import PropTypes from 'prop-types'
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import SectionHeader from "components/views/common/SectionHeader";
-import SectionContainer from "../../common/Section/Container";
 import StarsIcon from "@material-ui/icons/Stars";
 import Typography from "@material-ui/core/Typography";
-import { Grid, Hidden, useMediaQuery } from "@material-ui/core";
+import { Grid, Hidden } from "@material-ui/core";
 import HeroButton from "./HeroButton";
 import Link from "materialUI/NextNavLink";
 import {
@@ -15,7 +12,6 @@ import {
    laptopDemo,
    playIcon,
 } from "../../../../constants/images";
-import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
    section: {
@@ -23,6 +19,10 @@ const useStyles = makeStyles((theme) => ({
    },
    linkButton: {
       textDecoration: "none !important",
+      background: theme.palette.common.white,
+      "&:hover":{
+      background: theme.palette.background.paper,
+      }
    },
    heroContainer: {
       minHeight: "calc(100vh - 60px)",
@@ -73,8 +73,6 @@ const RockstarText = () => {
 
 const HeroSection = (props) => {
    const classes = useStyles();
-   const theme = useTheme();
-   const desktop = useMediaQuery(theme.breakpoints.up("md"));
 
    return (
       <Section

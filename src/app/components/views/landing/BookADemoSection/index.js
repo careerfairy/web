@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import PropTypes from "prop-types";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";

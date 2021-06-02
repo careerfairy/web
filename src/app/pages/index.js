@@ -1,6 +1,5 @@
-import React from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { openPopupWidget } from "react-calendly";
+import React, { useState } from "react";
+import { useTheme } from "@material-ui/core/styles";
 import LandingLayout from "../layouts/LandingLayout";
 import BookADemoSection from "../components/views/landing/BookADemoSection";
 import TestimonialsSection from "../components/views/landing/TestimonialsSection";
@@ -10,68 +9,30 @@ import UniversitySection from "../components/views/landing/UniversitySection";
 import BenefitsSection from "../components/views/landing/BenefitsSection";
 import CompaniesSection from "../components/views/landing/CompaniesSection";
 import HeroSection from "../components/views/landing/HeroSection";
+import CalendlyModal from "../components/views/landing/CalendlyModal";
 
 const LandingPage = ({}) => {
    const {
-      palette: { secondary, common, grey,background, primary , text},
+      palette: { secondary, common, grey },
    } = useTheme();
 
+   const [calendlyModalOpen, setCalendlyModalOpen] = useState(false);
+
    const handleOpenCalendly = () => {
-      const styles = {
-         height: "100px",
-      };
-      const pageSettings = {
-        backgroundColor: background.default,
-        hideEventTypeDetails: false,
-        hideLandingPageDetails: false,
-        primaryColor: primary.main,
-        textColor: text.primary
-      }
-
-      const prefill = {
-        // email: 'test@test.com',
-        // firstName: 'Jon',
-        // lastName: 'Snow',
-        // name: 'Jon Snow',
-        // guests: [
-        //   'janedoe@example.com',
-        //   'johndoe@example.com'
-        // ],
-        // customAnswers: {
-        //   a1: 'a1',
-        //   a2: 'a2',
-        //   a3: 'a3',
-        //   a4: 'a4',
-        //   a5: 'a5',
-        //   a6: 'a6',
-        //   a7: 'a7',
-        //   a8: 'a8',
-        //   a9: 'a9',
-        //   a10: 'a10'
-        // }
-      }
-      const utm = {
-        utmCampaign: 'Spring Sale 2019',
-        utmContent: 'Shoe and Shirts',
-        utmMedium: 'Ad',
-        utmSource: 'Facebook',
-        utmTerm: 'Spring'
-      }
-
-     openPopupWidget({ url, prefill, pageSettings, utm })
+      setCalendlyModalOpen(true);
    };
+
+   const handleCloseCalendly = () => setCalendlyModalOpen(false);
 
    return (
       <LandingLayout>
-         <HeroSection
-           handleOpenCalendly={handleOpenCalendly}
-         />
+         <HeroSection handleOpenCalendly={handleOpenCalendly} />
          <CompaniesSection big />
          <BenefitsSection title={"Key Benefits"} />
          <UniversitySection
             subtitle="The best talent is evenly distributed, which makes it
-            hard to reach. With CareerFairy live streams, 
-            you can reach students at multiple top universities in a 
+            hard to reach. With CareerFairy live streams,
+            you can reach students at multiple top universities in a
             single one hour-long event. No travel, no logistics, no days off work."
             title="Reach your target universities with a single event"
          />
@@ -104,6 +65,10 @@ const LandingPage = ({}) => {
             big
             handleOpenCalendly={handleOpenCalendly}
             title={"Interesting?"}
+         />
+         <CalendlyModal
+            open={calendlyModalOpen}
+            onClose={handleCloseCalendly}
          />
       </LandingLayout>
    );

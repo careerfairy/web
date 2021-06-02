@@ -1,33 +1,45 @@
 import PropTypes from "prop-types";
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, { useMemo } from "react";
+import { fade, makeStyles, useTheme } from "@material-ui/core/styles";
 import RoundButton from "materialUI/GlobalButtons/RoundButton";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
    heroBtnRoot: {
       position: "relative",
-      width: "inherit"
+      width: "inherit",
    },
    buttonBackgroundIcon: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
       width: "50%",
       height: "auto",
       [theme.breakpoints.down("sm")]: {
-         display: "none"
-      }
+         display: "none",
+      },
    },
-   heroBtn:{
-      filter: "drop-shadow(17.092px 15.39px 36.5px rgba(125,84,242,0.51))",
-
-   }
+   heroBtn: {
+      filter: (props) =>
+         `drop-shadow(17.092px 15.39px 36.5px ${fade(
+            props.buttonColor,
+            0.51
+         )})`,
+   },
 }));
 
-const HeroButton = ({className, iconUrl, ...props }) => {
-   const classes = useStyles();
+const HeroButton = ({ color, className, iconUrl, ...props }) => {
+   const {
+      palette: { primary, secondary, grey },
+   } = useTheme();
+   const buttonColor = useMemo(() => {
+      if (color === "primary") return primary.main;
+      if (color === "secondary") return secondary.main;
+      return grey["300"];
+   }, [color, primary, secondary, grey]);
+
+   const classes = useStyles({ buttonColor });
 
    return (
       <div className={classes.heroBtnRoot}>
@@ -38,7 +50,12 @@ const HeroButton = ({className, iconUrl, ...props }) => {
                alt={props.children}
             />
          )}
-         <RoundButton className={clsx(className, classes.heroBtn)} size="large" {...props} />
+         <RoundButton
+            className={clsx(className, classes.heroBtn)}
+            size="large"
+            color={color}
+            {...props}
+         />
       </div>
    );
 };

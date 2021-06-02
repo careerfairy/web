@@ -50,7 +50,7 @@ const TestimonialsSection = (props) => {
                justify="center"
                className={classes.testimonialsWrapper}
             >
-               <Grid item xs={9}>
+               <Grid item xs={12} md={9}>
                   <TestimonialCard
                      position="Employer Branding Expert @Accenture Germany"
                      name="Kristina Neidert"
