@@ -5,7 +5,7 @@ import StreamerLayout from "../../../layouts/StreamerLayout";
 const StreamerPage = () => {
 
     return (
-        <StreamerLayout>
+        <StreamerLayout isMainStreamer>
             <StreamerOverview/>
         </StreamerLayout>
     )

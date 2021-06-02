@@ -1,14 +1,15 @@
 import {createSelector} from "reselect";
-import {repositionElementInArray} from "../helperFunctions/HelperFunctions";
+import {dynamicSort, repositionElementInArray} from "../helperFunctions/HelperFunctions";
 
 const upcomingLivestreamsSelector = createSelector(
     livestreams => livestreams,
     (_, {livestreamId}) => livestreamId,
-    (livestreams, livestreamId) => {
+    (_, {registeredStudentsCount}) => registeredStudentsCount,
+    (livestreams, livestreamId, registeredStudentsCount) => {
         if (!livestreams) {
             return livestreams
         }
-        let newLivestreams = [...livestreams]
+        let newLivestreams = registeredStudentsCount ? [...livestreams].sort(dynamicSort("registeredStudentsCount")) : [...livestreams]
         if (livestreamId) {
             const currentIndex = newLivestreams.findIndex(
                 (el) => el.id === livestreamId

@@ -17,6 +17,7 @@ import {
 } from "../../../../../../../materialUI/GlobalTooltips";
 import {makeStyles} from "@material-ui/core/styles";
 import {useSnackbar} from "notistack";
+import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     activeHandRaiseContainer: {
@@ -26,6 +27,7 @@ const useStyles = makeStyles(theme => ({
 
 function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding}) {
     const classes = useStyles()
+    const streamRef = useStreamRef();
     const {closeSnackbar} = useSnackbar()
     const {setNewNotification, setNotificationToRemove} = useContext(NotificationsContext);
     const {tutorialSteps, setTutorialSteps, getActiveTutorialStepKey, isOpen: isStepOpen} = useContext(TutorialContext);
@@ -36,7 +38,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
 
     useEffect(() => {
         if (livestream) {
-            firebase.listenToHandRaises(livestream.id, querySnapshot => {
+            firebase.listenToHandRaises(streamRef, querySnapshot => {
                 var handRaiseList = [];
                 querySnapshot.forEach(doc => {
                     let handRaise = doc.data();
@@ -70,12 +72,14 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
 
 
     function setHandRaiseModeInactive() {
-        firebase.setHandRaiseMode(livestream.id, false);
+        firebase.setHandRaiseMode(streamRef, false);
     }
 
     function updateHandRaiseRequest(handRaiseId, state) {
-        firebase.updateHandRaiseRequest(livestream.id, handRaiseId, state);
+        firebase.updateHandRaiseRequest(streamRef, handRaiseId, state);
     }
+
+    let numberOfActiveHandRaisers = handRaises.filter(handRaise => (handRaise.state === 'connected' || handRaise.state === 'connecting' || handRaise.state === 'invited' )).length
 
     let handRaiseElements = handRaises.filter(handRaise => (handRaise.state !== 'unrequested' && handRaise.state !== 'denied')).map(handRaise => {
         return (
@@ -83,7 +87,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
                               key={handRaise.timestamp.toMillis()}
                               updateHandRaiseRequest={updateHandRaiseRequest}
                               setNewNotification={setNewNotification}
-                              closeSnackbar={closeSnackbar}
+                              closeSnackbar={closeSnackbar} numberOfActiveHandRaisers={numberOfActiveHandRaisers}
                               setNotificationToRemove={setNotificationToRemove}/>
         );
     })
@@ -114,6 +118,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
                             the stream. Don't forget to
                             remind them
                             to join in!</Typography>
+                        <Typography style={{marginBottom: "0.8rem", textTransform: "uppercase"}} align="center">You can invite up to 8 hand raisers</Typography>
                         <WhiteTooltip
                             placement="right-end"
                             title={

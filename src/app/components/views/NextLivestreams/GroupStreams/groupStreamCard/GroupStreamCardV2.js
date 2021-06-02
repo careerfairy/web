@@ -8,7 +8,7 @@ import {useRouter} from "next/router";
 import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
-import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
+import {dynamicSort, getResizedUrl, getResponsiveResizedUrl} from "../../../../helperFunctions/HelperFunctions";
 import {Card, CardHeader, ClickAwayListener, Collapse, Grow} from "@material-ui/core";
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
     main: {
         display: "flex",
         flex: 1,
-        minHeight: 340,
+        minHeight: 406,
         overflow: 'hidden',
         borderTopLeftRadius: '1.5rem',
         borderTopRightRadius: '1.5rem',
@@ -122,7 +122,6 @@ const useStyles = makeStyles(theme => ({
         marginBottom: '0.5rem',
     },
     title: {
-        fontSize: '2rem',
         fontWeight: 800,
         color: theme.palette.common.white,
         overflow: "hidden",
@@ -169,9 +168,12 @@ const useStyles = makeStyles(theme => ({
     avaLogoWrapper: {
         display: "flex",
         // flexDirection: "column",
-        flexWrap: "wrap",
         justifyContent: "center",
+        flexWrap: "inherit",
         alignItems: "center"
+    },
+    avaLogoWrapperHovered:{
+        flexWrap: "wrap",
     },
     top: {
         zIndex: 995
@@ -248,7 +250,7 @@ const GroupStreamCardV2 = memo(({
                                 }) => {
     const mediaStyles = useCoverCardMediaStyles();
     const classes = useStyles()
-    const {pathname, absolutePath} = useRouter();
+    const {pathname, absolutePath, push} = useRouter();
     const linkToStream = useMemo(() => pathname === "/next-livestreams/[groupId]" ?
         `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}` :
         `/next-livestreams?livestreamId=${livestream.id}`,
@@ -349,7 +351,7 @@ const GroupStreamCardV2 = memo(({
 
     function deregisterFromLivestream() {
         if (user.isLoaded && user.isEmpty) {
-            return router.push({
+            return push({
                 pathname: '/login',
                 query: {absolutePath}
             });
@@ -360,14 +362,14 @@ const GroupStreamCardV2 = memo(({
 
     async function startRegistrationProcess() {
         if (user.isLoaded && user.isEmpty || !user.emailVerified) {
-            return router.push({
+            return push({
                 pathname: `/login`,
                 query: {absolutePath: linkToStream},
             });
         }
 
         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-            return router.push({
+            return push({
                 pathname: '/profile',
                 query: "profile"
             });
@@ -491,7 +493,7 @@ const GroupStreamCardV2 = memo(({
 
                         <CardMedia
                             classes={mediaStyles}
-                            image={livestream.backgroundImageUrl}
+                            image={getResponsiveResizedUrl(livestream.backgroundImageUrl, mobile, "sm", "md")}
                         />
                         <div className={classes.content}>
                             <CardHeader
@@ -503,7 +505,7 @@ const GroupStreamCardV2 = memo(({
                                     <Avatar
                                         variant="rounded"
                                         className={classes.livestreamCompanyAva}
-                                        src={livestream.companyLogoUrl}
+                                        src={getResizedUrl(livestream.companyLogoUrl)}
                                         alt={livestream.company}
                                     />
                                 }
@@ -514,14 +516,14 @@ const GroupStreamCardV2 = memo(({
                                 }
                             />
                             <Collapse collapsedHeight={80} in={cardHovered}>
-                            <Typography
-                                variant={'h2'}
-                                className={clsx(classes.title, {
-                                    [classes.titleHovered]: cardHovered
-                                })}
-                            >
-                                {livestream.title}
-                            </Typography>
+                                <Typography
+                                    variant={'h4'}
+                                    className={clsx(classes.title, {
+                                        [classes.titleHovered]: cardHovered
+                                    })}
+                                >
+                                    {livestream.title}
+                                </Typography>
                             </Collapse>
                             <Box style={{maxHeight: 165, overflow: "auto", overflowX: "hidden"}}>
                                 {targetOptions.slice(0, cardHovered ? -1 : maxOptions).map(option =>
@@ -566,14 +568,16 @@ const GroupStreamCardV2 = memo(({
                     >
                         <Collapse unmountOnExit in={!cardHovered}>
                             <Fade timeout={300} unmountOnExit in={!cardHovered}>
-                                <Row style={{justifyContent: "space-evenly"}} className={classes.avaLogoWrapper}>
+                                <Row style={{justifyContent: "space-evenly"}}
+                                     className={classes.avaLogoWrapper}
+                                >
                                     <Item>
                                         <AvatarGroup>
                                             {livestream.speakers?.map(speaker => (
                                                 <Avatar
                                                     key={speaker.id}
                                                     className={classes.avatar}
-                                                    src={speaker.avatar || speakerPlaceholder}
+                                                    src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
                                                     alt={speaker.firstName}
                                                 />
                                             ))}
@@ -586,7 +590,7 @@ const GroupStreamCardV2 = memo(({
                                                     variant="rounded"
                                                     key={careerCenter.id}
                                                     className={clsx(classes.groupLogo, classes.groupLogoStacked)}
-                                                    src={careerCenter.logoUrl}
+                                                    src={getResizedUrl(careerCenter.logoUrl, "xs")}
                                                     alt={careerCenter.universityName}
                                                 />
                                             ))}
@@ -596,14 +600,18 @@ const GroupStreamCardV2 = memo(({
                             </Fade>
                         </Collapse>
                         <Collapse unmountOnExit in={cardHovered}>
-                            <div className={classes.avaLogoWrapper}>
+                            <div
+                                className={clsx(classes.avaLogoWrapper,{
+                                    [classes.avaLogoWrapperHovered]: cardHovered
+                                })}
+                            >
                                 {livestream.speakers?.map(speaker => (
                                     <Row className={classes.previewRow} key={speaker.id}>
                                         <Item>
                                             <Avatar
 
                                                 className={classes.avatar}
-                                                src={speaker.avatar || speakerPlaceholder}
+                                                src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
                                                 alt={speaker.firstName}
                                             />
                                         </Item>

@@ -1,5 +1,3 @@
-import { Image } from 'semantic-ui-react';
-
 function CompanyLocationFlags(props) {
 
     let locations = props.countries;
@@ -7,7 +5,7 @@ function CompanyLocationFlags(props) {
     let flags = locations.map((listElement, index) => {
         return(
             <div className='flagContainer' key={listElement}>
-                <Image style={{ borderRadius: '8px', opacity: '0.7', height: '50px' }} src={ 'https://restcountries.eu/data/' + listElement + '.svg' }/>
+                <img style={{ borderRadius: '8px', opacity: '0.7', height: '50px' }} src={ 'https://restcountries.eu/data/' + listElement + '.svg' }/>
                 <style jsx>{`
                     .flagContainer {
                         display: inline-block;

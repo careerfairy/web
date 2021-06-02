@@ -5,6 +5,8 @@ export function useSoundMeter(showAudioMeter, localStream, update) {
 
     const [audioValue, setAudioValue] = useState(0);
     const [soundMeter, setSoundMeter] = useState(null);
+    const [soundMeterInterval, setSoundMeterInterval] = useState(null);
+
 
     useEffect(() => {
         if (showAudioMeter) {
@@ -19,9 +21,12 @@ export function useSoundMeter(showAudioMeter, localStream, update) {
                     soundMeter.stop();
                 }
                 connectStream(localStream);
+
+                return () => clearInterval(soundMeterInterval)
             }
         } else {
             if (soundMeter) {
+                clearInterval(soundMeterInterval)
                 soundMeter.stop();
             }
         }
@@ -52,7 +57,6 @@ export function useSoundMeter(showAudioMeter, localStream, update) {
       }
       
     SoundMeter.prototype.connectToSource = function(stream, callback) {
-        console.log('SoundMeter connecting');
         try {
             this.mic = this.context.createMediaStreamSource(stream);
             this.mic.connect(this.script);
@@ -86,7 +90,7 @@ export function useSoundMeter(showAudioMeter, localStream, update) {
             console.log(e);
             return;
         }
-        setInterval(() => {
+        const newInterval = setInterval(() => {
             if (soundMeter.instant.toFixed(2) == 0) {
                 zeroCounter += 1;
                 if (zeroCounter === 30) {
@@ -97,8 +101,11 @@ export function useSoundMeter(showAudioMeter, localStream, update) {
                 setAudioValue(soundMeter.instant.toFixed(2));           
             }
         }, 200);
+
+            setSoundMeterInterval(newInterval)
         });
         setSoundMeter(soundMeter);
+
     }
 
     return audioValue;

@@ -12,6 +12,8 @@ import {percentageDonutConfig} from "../../../../util/chartUtils";
 import {Doughnut} from "react-chartjs-2";
 import CustomLegend from "../../../../../materialUI/Legends";
 import EmptyDisplay from "../displays/EmptyDisplay";
+import {withFirebase} from "context/firebase";
+import useStreamGroups from "../../../../custom-hook/useStreamGroups";
 
 Chart.defaults.global.plugins.labels = false;
 
@@ -48,16 +50,20 @@ const getChartOptions = (theme) => ({
     },
 })
 
-const AudienceCategoryChart = ({className, audience, ...rest}) => {
+const initialCurrentCategory = {options: []}
+const AudienceCategoryChart = ({className, audience, firebase, ...rest}) => {
     const theme = useTheme()
     const classes = useStyles()
-    const {currentLivestream: {careerCenters}} = useCurrentStream()
+    const {currentLivestream} = useCurrentStream()
+    const unfilteredCareerCenters = useStreamGroups(currentLivestream?.groupIds)
+    const [careerCenters, setCareerCenters] = useState([]);
+
     const chartRef = useRef()
     const [value, setValue] = useState(0);
     const [total, setTotal] = useState(0);
     const [currentGroup, setCurrentGroup] = useState(careerCenters?.[0] || {});
     const [localColors, setLocalColors] = useState(colorsArray);
-    const [currentCategory, setCurrentCategory] = useState({options: []});
+    const [currentCategory, setCurrentCategory] = useState(initialCurrentCategory);
     const [chartOptions, setChartOptions] = useState(getChartOptions(theme));
     const [typesOfOptions, setTypesOfOptions] = useState([]);
 
@@ -66,6 +72,19 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
         labels: [],
         ids: []
     });
+
+    useEffect(() => {
+       function removeCareerCentersWithNoCategories() {
+           setCareerCenters(unfilteredCareerCenters.filter(cc => cc.categories?.length))
+       }
+
+       removeCareerCentersWithNoCategories()
+    },[unfilteredCareerCenters])
+    useEffect(() => {
+        if (careerCenters?.length) {
+            setCurrentGroup(careerCenters[0])
+        }
+    }, [Boolean(careerCenters?.length)])
 
     useEffect(() => {
         if (currentGroup.categories?.length) {
@@ -137,7 +156,8 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
 
     const handleChange = (event, newValue) => {
         setCurrentGroup(careerCenters[newValue])
-        setCurrentCategory(careerCenters[newValue].categories[0])
+        const newCategory = careerCenters[newValue].categories[0]
+        setCurrentCategory(newCategory || initialCurrentCategory)
         setValue(newValue);
     };
 
@@ -223,5 +243,5 @@ AudienceCategoryChart.propTypes = {
     audience: PropTypes.array.isRequired
 }
 
-export default AudienceCategoryChart;
+export default withFirebase(AudienceCategoryChart);
 

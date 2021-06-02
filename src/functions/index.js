@@ -32,6 +32,7 @@ const universityEmails = require('./universityEmails')
 const algolia = require('./algolia')
 const analytics = require('./analytics')
 const recording = require('./recording')
+const breakoutRooms = require('./breakoutRooms')
 
 // Hosting
 exports.production = hosting.production
@@ -51,6 +52,7 @@ exports.resendPostmarkEmailVerificationEmailWithPin = auth.resendPostmarkEmailVe
 // Agora
 exports.generateAgoraToken = agora.generateAgoraToken
 exports.generateAgoraTokenSecure = agora.generateAgoraTokenSecure
+exports.generateAgoraTokenSecureOnCall = agora.generateAgoraTokenSecureOnCall
 exports.startRecordingLivestream = agora.startRecordingLivestream
 
 // Backup
@@ -68,6 +70,7 @@ exports.sendReminderEmailsWhenLivestreamStarts = reminders.sendReminderEmailsWhe
 
 // Livestreams
 exports.scheduleTestLivestreamDeletion = livestreams.scheduleTestLivestreamDeletion
+exports.setFirstCommentOfQuestionOnCreate = livestreams.setFirstCommentOfQuestionOnCreate
 exports.assertLivestreamRegistrationWasCompleted = livestreams.assertLivestreamRegistrationWasCompleted
 exports.assertLivestreamDeregistrationWasCompleted = livestreams.assertLivestreamDeregistrationWasCompleted
 exports.sendLivestreamRegistrationConfirmationEmail = livestreams.sendLivestreamRegistrationConfirmationEmail
@@ -90,3 +93,7 @@ exports.updateUserDataAnalytcicsOnWrite = analytics.updateUserDataAnalyticsOnWri
 //Recording
 exports.startRecordingLivestream = recording.startRecordingLivestream
 exports.stopRecordingLivestream = recording.stopRecordingLivestream
+
+
+// Breakout Rooms
+exports.updateBreakoutRoomStatusOnWrite = breakoutRooms.updateBreakoutRoomStatusOnWrite

@@ -26,6 +26,7 @@ import {
     WhiteTooltip
 } from "../../../../../../../../materialUI/GlobalTooltips";
 import {makeStyles, withStyles} from "@material-ui/core/styles";
+import useStreamRef from "../../../../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles(theme => ({
     upcomingPoll: {
@@ -81,7 +82,7 @@ function UpcomingPollStreamer({
                                   setDemoPolls,
                                   addNewPoll
                               }) {
-
+const streamRef = useStreamRef()
     const classes = useStyles()
     const [editPoll, setEditPoll] = useState(false);
     const [showNotEditableMessage, setShowNotEditableMessage] = useState(false);
@@ -131,11 +132,11 @@ function UpcomingPollStreamer({
     }
 
     function deletePoll() {
-        firebase.deleteLivestreamPoll(livestream.id, poll.id);
+        firebase.deleteLivestreamPoll(streamRef, poll.id);
     }
 
     function setPollState(state) {
-        firebase.setPollState(livestream.id, poll.id, state);
+        firebase.setPollState(streamRef, poll.id, state);
     }
 
     function handleSetIsNotEditablePoll() {
@@ -145,16 +146,16 @@ function UpcomingPollStreamer({
     }
 
 
-    const optionElements = poll.options.map((option, index) => {
+    const optionElements = poll?.options?.map(({id, text}, index) => {
         return (
-            <ListItem disableGutters dense key={option.index}>
+            <ListItem disableGutters dense key={id}>
                 <ListItemIcon>
                     <ListNumber style={{backgroundColor: colorsArray[index]}}>
                         {index + 1}
                     </ListNumber>
                 </ListItemIcon>
                 <ListItemText>
-                    {option.name}
+                    {text}
                 </ListItemText>
             </ListItem>
         )

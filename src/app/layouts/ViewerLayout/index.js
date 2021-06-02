@@ -3,16 +3,17 @@ import {makeStyles, useTheme} from '@material-ui/core/styles';
 import {withFirebase} from "../../context/firebase";
 import {useRouter} from "next/router";
 import ViewerTopBar from "./ViewerTopBar";
-import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
-import {useDispatch, useSelector, shallowEqual} from "react-redux";
+import {isLoaded} from "react-redux-firebase";
 import {useAuth} from "../../HOCs/AuthProvider";
 import Loader from "../../components/views/loader/Loader";
 import {useMediaQuery} from "@material-ui/core";
 import LeftMenu from "../../components/views/viewer/LeftMenu/LeftMenu";
 import {v4 as uuidv4} from "uuid";
-
-import * as actions from "../../store/actions";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
+import useStreamConnect from "../../components/custom-hook/useStreamConnect";
+import PropTypes from "prop-types";
+import useStreamRef from "../../components/custom-hook/useStreamRef";
+import StreamClosedCountdown from "../../components/views/streaming/sharedComponents/StreamClosedCountdown";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -59,20 +60,15 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const DELAY = 3000; //3 seconds
 
 const ViewerLayout = (props) => {
-    const {children, firebase} = props
-    const {query: {livestreamId, token}, replace, asPath} = useRouter()
+    const {children, firebase, isBreakout} = props
+    const {query: {livestreamId, breakoutRoomId, token}, replace, asPath} = useRouter()
     const {authenticatedUser, userData} = useAuth();
-    const dispatch = useDispatch()
     const {breakpoints: {values}} = useTheme()
     const mobile = useMediaQuery(`(max-width:${values.mobile}px)`)
-    const [open, setOpen] = React.useState(true);
-    const [delayHandler, setDelayHandler] = useState(null)
-    const [iconsDisabled, setIconsDisabled] = useState(false);
+    const streamRef = useStreamRef();
     const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
-    const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [showVideoButton, setShowVideoButton] = useState({paused: false, muted: false});
     const [play, setPlay] = useState(false);
     const [unmute, setUnmute] = useState(false);
@@ -86,20 +82,8 @@ const ViewerLayout = (props) => {
     const [selectedState, setSelectedState] = useState("questions");
 
 
-    const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'careerCenters'}]
-    useFirestoreConnect(() => livestreamId ? [
-        {
-            collection: "livestreams",
-            doc: livestreamId,
-            storeAs: "currentLivestream",
-            populates
-        }
-    ] : [], [livestreamId])
+    const currentLivestream = useStreamConnect()
 
-    const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
-        ...populate(firestore, "currentLivestream", populates),
-        id: livestreamId
-    }, shallowEqual)
 
     const notAuthorized = currentLivestream && !currentLivestream.test && ((authenticatedUser?.isLoaded && authenticatedUser?.isEmpty) || isRecording ) 
 
@@ -112,14 +96,22 @@ const ViewerLayout = (props) => {
     }, [mobile]);
 
     useEffect(() => {
-        if (userData?.userEmail && livestreamId) {
-            firebase.setUserIsParticipating(livestreamId, userData);
+        if (userData?.userEmail) {
+            if (livestreamId) {
+                firebase.setUserIsParticipating(livestreamId, userData);
+            }
+            if (breakoutRoomId) {
+                firebase.setUserIsParticipatingWithRef(streamRef, userData);
+            }
+
         }
-    }, [livestreamId, userData]);
+    }, [livestreamId, userData?.email, userData?.linkedinUrl, userData?.firstName, userData?.lastName, breakoutRoomId]);
 
     useEffect(() => {
         if (currentLivestream && !streamerId) {
-            if (currentLivestream.test) {
+            if (currentLivestream.test && authenticatedUser?.email) {
+                setStreamerId(currentLivestream.id + authenticatedUser.email)
+            } else if (currentLivestream.test) {
                 let uuid = uuidv4()
                 let joiningId = uuid.replace(/-/g, '')
                 setStreamerId(currentLivestream.id + joiningId)
@@ -157,13 +149,13 @@ const ViewerLayout = (props) => {
         });
     }
 
-    const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
     const handleStateChange = useCallback((state) => {
         if (!showMenu) {
             setShowMenu(true);
         }
         setSelectedState(state);
     }, [showMenu])
+
     const showAudience = useCallback(() => {
         setAudienceDrawerOpen(true)
     }, []);
@@ -172,46 +164,6 @@ const ViewerLayout = (props) => {
         setAudienceDrawerOpen(false)
     }, []);
 
-    const handleOpen = useCallback(() => {
-        setOpen(true);
-    }, []);
-
-    const handleClose = useCallback(() => {
-        setOpen(false);
-    }, []);
-
-    const handleMouseEnter = useCallback((event) => {
-        clearTimeout(delayHandler)
-        handleOpen()
-    }, [delayHandler])
-
-    const handleMouseLeave = useCallback(() => {
-        setDelayHandler(setTimeout(() => {
-            handleClose()
-        }, DELAY))
-    }, [delayHandler])
-
-    const handleClap = useCallback(() => {
-        postIcon('clapping')
-    }, [iconsDisabled, livestreamId, authenticatedUser])
-
-    const handleLike = useCallback(() => {
-        postIcon('like')
-    }, [iconsDisabled, livestreamId, authenticatedUser])
-    const handleHeart = useCallback(() => {
-        postIcon('heart')
-    }, [iconsDisabled, livestreamId, authenticatedUser])
-
-    const postIcon = (iconName) => {
-        if (!iconsDisabled) {
-            dispatch(actions.createEmote(iconName))
-            setIconsDisabled(true);
-            firebase.postIcon(livestreamId, iconName, authenticatedUser.email);
-        }
-    }
-    const enableIcons = useCallback(() => {
-        setIconsDisabled(false)
-    }, [])
 
     const unmuteVideos = useCallback(() => {
         setShowVideoButton(prevState => {
@@ -237,12 +189,12 @@ const ViewerLayout = (props) => {
 
 
     return (
-        <CurrentStreamContext.Provider value={{currentLivestream}}>
+        <CurrentStreamContext.Provider value={{currentLivestream, isBreakout}}>
             <div className={`${classes.root} notranslate`}>
                 <ViewerTopBar
                     showAudience={showAudience}
                     showMenu={showMenu}
-                    numberOfViewers={numberOfViewers}
+                    audienceDrawerOpen={audienceDrawerOpen}
                     mobile={mobile}
                     isRecording={isRecording}
                 />
@@ -264,7 +216,6 @@ const ViewerLayout = (props) => {
                     <div className={classes.contentContainer}>
                         <div className={classes.content}>
                             {React.cloneElement(children, {
-                                ...props,
                                 playVideos,
                                 handRaiseActive,
                                 unmuteVideos,
@@ -278,18 +229,9 @@ const ViewerLayout = (props) => {
                                 setShowMenu,
                                 streamerId,
                                 mobile,
-                                open,
-                                handleHeart,
-                                handleLike,
-                                handleClap,
-                                enableIcons,
                                 showAudience,
-                                setNumberOfViewers: handleSetNumberOfViewers,
                                 hideAudience,
                                 audienceDrawerOpen,
-                                handleMouseLeave,
-                                iconsDisabled,
-                                handleMouseEnter,
                                 setShowVideoButton,
                                 handleClose,
                                 isRecording,
@@ -302,5 +244,10 @@ const ViewerLayout = (props) => {
         </CurrentStreamContext.Provider>
     );
 };
+
+ViewerLayout.propTypes = {
+    children: PropTypes.node.isRequired,
+    firebase: PropTypes.object
+}
 
 export default withFirebase(ViewerLayout);

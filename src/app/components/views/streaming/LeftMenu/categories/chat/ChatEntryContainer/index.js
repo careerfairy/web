@@ -5,10 +5,11 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Box, Card, IconButton, Popover, Slide, Typography} from "@material-ui/core";
 import {getTimeFromNow} from "../../../../../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
-import {withFirebase} from "../../../../../../../context/firebase";
+import {withFirebase} from "context/firebase";
 import EmojiEmotionsOutlinedIcon from '@material-ui/icons/EmojiEmotionsOutlined';
 import EmotesPreview from "./EmotesPreview";
 import EmotesPopUp from "./EmotesPopUp";
+import clsx from "clsx";
 
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
@@ -55,6 +56,10 @@ const useStyles = makeStyles(theme => ({
                           }) => isMe ? theme.palette.primary.main : isStreamer ? "#ff1493" : theme.palette.background.paper,
         color: ({isMe, isStreamer}) => isMe || isStreamer ? "white" : "inherit",
         overflowWrap: "break-word",
+    },
+    broadcast:{
+        backgroundColor: `${theme.palette.warning.main} !important`,
+        color: `${theme.palette.common.white} !important`,
     },
     author: {
         fontSize: "0.8em",
@@ -129,12 +134,13 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, current
                         horizontal: 'left',
                     }}
                     onClose={handleCloseEmotesMenu}
-                    // disableRestoreFocus
                 >
                     <EmotesPopUp chatEntry={chatEntry} firebase={firebase}
                                  handleCloseEmotesMenu={handleCloseEmotesMenu}/>
                 </Popover>
-                <Box component={Card} className={classes.chatBubble}>
+                <Box component={Card} className={clsx(classes.chatBubble, {
+                    [classes.broadcast]: chatEntry.type === "broadcast"
+                })}>
                     <Linkify componentDecorator={componentDecorator}>
                         {chatEntry.message}
                     </Linkify>

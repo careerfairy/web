@@ -2,13 +2,14 @@ import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {Doughnut} from 'react-chartjs-2';
-import {Box, Card, CardContent,  Divider, Typography} from '@material-ui/core';
+import {Box, Card, CardContent, Divider, Typography} from '@material-ui/core';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
 import {convertStringToArray} from "../../../../../helperFunctions/HelperFunctions";
 import CustomLegend from "../../../../../../materialUI/Legends";
 import {customDonutConfig} from "../common/TableUtils";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
+import useMapPollVoters from "../../../../../custom-hook/useMapPollVoters";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -34,6 +35,7 @@ const FeedbackGraph = ({
                            userTypes,
                            setUserType,
                            currentPoll,
+                           firebase,
                            userType,
                            streamDataType,
                            className,
@@ -47,6 +49,8 @@ const FeedbackGraph = ({
     const [localColors, setLocalColors] = useState(colorsArray);
     const [data, setData] = useState(initialData);
 
+    useMapPollVoters(currentPoll.id, currentStream.id, setData, firebase)
+
     useEffect(() => {
         if (data.datasets.length) {
             setLocalColors([...colorsArray, ...data.datasets.map(() => randomColor())])
@@ -58,14 +62,15 @@ const FeedbackGraph = ({
             setData({
                 datasets: [
                     {
-                        data: currentPoll.options.map(option => option.votes),
+                        data: currentPoll.options.map(() => 0),
                         backgroundColor: localColors,
                         borderWidth: 8,
                         borderColor: theme.palette.common.white,
                         hoverBorderColor: theme.palette.common.white
                     }
                 ],
-                labels: currentPoll.options.map(option => convertStringToArray(option.name))
+                ids: currentPoll.options.map(option => option.id),
+                labels: currentPoll.options.map(option => convertStringToArray(option.text))
             })
         } else {
             setData(initialData)

@@ -1,5 +1,4 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import 'semantic/dist/semantic.min.css';
 import 'styles.css';
 import FirebaseContext from 'context/firebase/FirebaseContext';
 import Firebase from 'context/firebase';
@@ -108,7 +107,7 @@ function MyApp({Component, pageProps}) {
             <Provider store={store}>
                 <ReactReduxFirebaseProvider {...rrfProps}>
                     <ThemeProviderWrapper>
-                        <AuthProvider firebase={firebase}>
+                        <AuthProvider>
                             <FirebaseContext.Provider value={firebase}>
                                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
 

@@ -1,11 +1,11 @@
-import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { Document, Page } from 'react-pdf';
 import * as PDFJS from 'pdfjs-dist/build/pdf';
 
 import { useWindowSize } from 'components/custom-hook/useWindowSize';
-import { IconButton } from '@material-ui/core';
-import { Button, Modal, Progress, Icon } from 'semantic-ui-react';
+import { Button, Dialog, DialogContent, IconButton, LinearProgress } from '@material-ui/core';
+import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 
 import FilePickerContainer from 'components/ssr/FilePickerContainer';
 import { withFirebase } from 'context/firebase';
@@ -131,9 +131,20 @@ function LivestreamPdfViewer (props) {
                 <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'block' : 'none'), overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', bottom: '0', left: '0', zIndex: '1000', width: '100%', padding: '30px', display: props.presenter ? 'block' : 'none', backgroundColor: 'rgba(110,110,110, 0.8)'}}>
                         <div style={{ display: 'inline-block', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
-                            
-                            <Button circular icon='angle left' disabled={goingToNextPage || goingToPreviousPage || (pdfObject ? pdfObject.page === 1 : false)} loading={goingToPreviousPage} onClick={() => decreasePdfPageNumber()}/>
-                            <Button circular icon='angle right' disabled={goingToNextPage || goingToPreviousPage || (pdfObject ? pdfObject.page === pdfNumberOfPages : false)} loading={goingToNextPage} onClick={() => increasePdfPageNumber()}/>
+                            <IconButton variant='contained' disabled={goingToNextPage || goingToPreviousPage || (pdfObject ? pdfObject.page === 1 : false)} onClick={() => decreasePdfPageNumber()}>
+                                {
+                                    goingToPreviousPage ? 
+                                    <CircularProgress style={{ width: 20 }}/> :
+                                    <KeyboardArrowLeftIcon fontSize='large'/>
+                                }
+                            </IconButton>
+                            <IconButton variant='contained' disabled={goingToNextPage || goingToPreviousPage || (pdfObject ? pdfObject.page === pdfNumberOfPages : false)} onClick={() => increasePdfPageNumber()}>
+                                {
+                                    goingToNextPage ? 
+                                    <CircularProgress style={{ width: 20 }}/> :
+                                    <KeyboardArrowRightIcon fontSize='large'/>
+                                }
+                            </IconButton>
                         </div>
                     </div>
                     <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: '1000', display: props.presenter ? 'block' : 'none'}}>
@@ -142,7 +153,7 @@ function LivestreamPdfViewer (props) {
                             onChange={fileObject => { uploadLogo(fileObject)}}
                             maxSize={20}
                             onError={errMsg => ( console.log(errMsg) )}>
-                            <Button primary icon='upload' size='mini' content='Upload Slides [.pdf]' />
+                            <Button color='primary' variant='contained' size='small'>Upload Slides [.pdf]</Button>
                         </FilePickerContainer>
                     </div>
                     <div style={{ position: 'relative', textAlign: 'center'}}>
@@ -171,7 +182,7 @@ function LivestreamPdfViewer (props) {
                                         onChange={fileObject => { uploadLogo(fileObject)}}
                                         maxSize={20}
                                         onError={errMsg => ( console.log(errMsg) )}>
-                                        <Button primary icon='upload' content='Upload Slides [.pdf]' />
+                                        <Button color='primary' children='Upload Slides [.pdf]' variant='contained' />
                                     </FilePickerContainer>
                                 </div>
                             </div>
@@ -181,12 +192,12 @@ function LivestreamPdfViewer (props) {
                         </div>
                     </div>
                 </div>
-                <Modal open={uploadingPresentation}>
-                    <Modal.Content>
+                <Dialog open={uploadingPresentation}>
+                    <DialogContent style={{ padding: 30 }}>
                         <h3>Uploading presentation...</h3>
-                        <Progress percent={progress} indicating/>
-                    </Modal.Content>
-                </Modal>
+                        <LinearProgress variant="determinate" value={progress}/>
+                    </DialogContent>
+                </Dialog>
             </div>
         </Fragment>
     )

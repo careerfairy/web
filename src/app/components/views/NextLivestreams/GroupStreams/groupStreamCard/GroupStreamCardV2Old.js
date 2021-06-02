@@ -32,7 +32,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import CopyToClipboard from "../../../common/CopyToClipboard";
 import LogosPlaceHolder from "./LogosPlaceholder";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
-import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
+import {dynamicSort, getResizedUrl, getResponsiveResizedUrl} from "../../../../helperFunctions/HelperFunctions";
 
 import clsx from "clsx";
 import {Row} from "@mui-treasury/components/flex";
@@ -206,7 +206,7 @@ const useStyles = makeStyles((theme) => {
             top: '0',
             left: 0,
             right: 0,
-            minHeight: "100%",
+            // minHeight: "100%",
             zIndex: '-1',
             overflow: 'hidden',
             borderRadius: theme.spacing(2),
@@ -297,7 +297,7 @@ const useStyles = makeStyles((theme) => {
         expandArea: {
             borderRadius: ({hasGroups}) => !hasGroups && theme.spacing(2.5),
             border: ({hasGroups}) => !hasGroups && "1px solid black",
-            marginTop: theme.spacing(1),
+            marginTop: ({isExpanded}) => isExpanded ? 0 : theme.spacing(1),
             background: ({registered}) => registered ? theme.palette.primary.dark : theme.palette.navyBlue.main,
             color: "white",
             width: "100%",
@@ -321,7 +321,9 @@ const useStyles = makeStyles((theme) => {
             display: "flex",
             justifyContent: ({cardHovered}) => !cardHovered && "space-evenly",
             flexDirection: "column",
-            alignItems: "center"
+            alignItems: "center",
+            position: "relative",
+            width: "100%"
         },
         statusChip: {
             zIndex: 1,
@@ -662,7 +664,7 @@ const GroupStreamCardV2Old = memo(({
     let speakerElements = livestream.speakers?.map(speaker => {
         return (<Avatar
             key={speaker.id}
-            src={speaker.avatar || speakerPlaceholder}
+            src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
             alt={speaker.firstName}/>)
     })
 
@@ -700,7 +702,8 @@ const GroupStreamCardV2Old = memo(({
                                       </Typography>
                                   }/>}
                             {!cardHovered &&
-                            <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
+                            <img className={classes.lowerFrontBackgroundImage}
+                                 src={getResizedUrl(livestream.backgroundImageUrl)}
                                  alt="background"/>
                             }
                             <div className={classes.dateTimeWrapper}>
@@ -730,15 +733,19 @@ const GroupStreamCardV2Old = memo(({
                             <div className={classes.lowerFrontContent}>
                                 <div className={classes.speakersAndLogosWrapper}>
                                     <div className={classes.titleAndSpeakersWrapper}>
-                                        <Typography variant={mobile ? "h6" : cardHovered ? "h4" : "h5"}
-                                                    align="center"
-                                                    className={classes.companyName}>
-                                            {livestream.title}
-                                        </Typography>
+                                        <Row justifyContent="center"
+                                             width="100%">
+                                            <Typography variant={mobile ? "h6" : cardHovered ? "h4" : "h5"}
+                                                        align="center"
+                                                        className={classes.companyName}>
+                                                {livestream.title}
+                                            </Typography>
+                                        </Row>
                                         {!cardHovered &&
                                         <>
                                             {expanded ?
-                                                <Streamers speakers={livestream.speakers} cardHovered={expanded}/>
+                                                <Streamers speakers={livestream.speakers}
+                                                           cardHovered={expanded}/>
                                                 :
                                                 <AvatarGroup max={3}>
                                                     {speakerElements}
@@ -814,7 +821,8 @@ const GroupStreamCardV2Old = memo(({
                                         [classes.pulseAnimate]: shouldPulseBackground()
                                     })
                                 }}>
-                                <img className={classes.backgroundImage} src={livestream.backgroundImageUrl}
+                                <img className={classes.backgroundImage}
+                                     src={getResponsiveResizedUrl(livestream.backgroundImageUrl, mobile, "sm", "md")}
                                      alt="background"/>
                                 {!isDraft &&
                                 <CopyToClipboard

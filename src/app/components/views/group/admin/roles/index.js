@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Container, Grid, Typography} from "@material-ui/core";
+import {Container, Grid} from "@material-ui/core";
 import MembersTable from "./MembersTables";
 import {useSelector} from "react-redux";
-import {useFirestoreConnect} from "react-redux-firebase";
 import AddMemberModal from "./AddMemberModal";
 import {useSnackbar} from "notistack";
 import {GENERAL_ERROR, PERMISSION_ERROR} from "../../../../util/constants";

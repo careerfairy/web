@@ -1,8 +1,10 @@
 import React from 'react';
-import {Icon} from "semantic-ui-react";
 import {Box, Checkbox, FormControlLabel, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import Fade from 'react-reveal/Fade';
+
+import MicIcon from '@material-ui/icons/Mic';
+import WifiIcon from '@material-ui/icons/Wifi';
 
 const chromeLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fchrome.svg?alt=media&token=516e705a-bafa-4a43-99f7-e184cc85b557"
 const edgeLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fedge.svg?alt=media&token=f4165230-170e-454f-9fca-adea53798b9f"
@@ -65,12 +67,12 @@ const Step1Chrome = ({isCompleted, handleMarkComplete, isChromium, localStream})
             {/*<Typography gutterBottom align="center" variant="h4"><b>Preparation</b></Typography>*/}
             <Typography align="left" variant="subtitle1">Please follow these couple of instructions:</Typography>
             <ul className={classes.list}>
-                <li><Icon name='microphone' style={{marginRight: '10px'}}/>Make sure that your webcam and/or microphone
+                <li><MicIcon style={{marginRight: '10px'}}/>Make sure that your webcam and/or microphone
                     are not currently used
                     by
                     any other application.
                 </li>
-                <li><Icon name='wifi' style={{marginRight: '10px'}}/>If possible, avoid connecting through any VPN or
+                <li><WifiIcon style={{marginRight: '10px'}}/>If possible, avoid connecting through any VPN or
                     corporate network with
                     restrictive firewall rules.
                 </li>

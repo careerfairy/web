@@ -71,19 +71,19 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const RemoteVideoContainer = ({
-                                  attachSinkId,
-                                  currentLivestream,
-                                  height,
-                                  isPlayMode,
-                                  muted,
-                                  play,
-                                  setRemovedStream,
-                                  setShowVideoButton,
-                                  small,
-                                  speakerSource,
-                                  stream,
-                                  unmute
-                              }) => {
+        attachSinkId,
+        currentLivestream,
+        height,
+        isPlayMode,
+        muted,
+        play,
+        setRemovedStream,
+        setShowVideoButton,
+        small,
+        speakerSource,
+        stream,
+        unmute
+    }) => {
 
     const {getActiveTutorialStepKey, handleConfirmStep} = useContext(TutorialContext);
     const activeStep = getActiveTutorialStepKey();
@@ -98,7 +98,7 @@ const RemoteVideoContainer = ({
             generateDemoHandRaiser()
         } else {
             if (!stream.stream.isPlaying()) {
-                stream.stream.play(stream.streamId, {fit: isScreenShareVideo ? 'contain' : 'cover'}, err => {
+                stream?.stream?.play(stream.streamId, {fit: isScreenShareVideo ? 'contain' : 'cover'}, err => {
                     if (err) {
                         setShowVideoButton({paused: false, muted: true});
                     }
@@ -108,17 +108,14 @@ const RemoteVideoContainer = ({
     }, [stream.streamId]);
 
     useEffect(() => {
-        if (!isPlayMode) {
-            let audioElement = document.getElementById(`audio${stream.streamId}`)
-            if (audioElement) {
-                attachSinkId(audioElement, speakerSource)
-            }
+        if (!isPlayMode && videoElement.current) {
+            attachSinkId(videoElement.current, speakerSource)
         }
-    }, [speakerSource])
+    }, [speakerSource, videoElement.current])
 
     useEffect(() => {
         if (unmute) {
-            stream.stream.play(stream.streamId, {muted: false});
+            stream.stream?.play(stream.streamId, {muted: false});
         }
     }, [unmute])
 
@@ -164,7 +161,7 @@ const RemoteVideoContainer = ({
         }
     }
 
-    const speaker = !isScreenShareVideo ? currentLivestream.liveSpeakers.find(speaker => speaker.speakerUuid === stream.streamId) : null;
+    const speaker = !isScreenShareVideo ? currentLivestream.liveSpeakers?.find(speaker => speaker.speakerUuid === stream.streamId) : null;
 
 
     return (

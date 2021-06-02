@@ -3,8 +3,9 @@ import {isLoaded} from "react-redux-firebase";
 import NextLivestreams from "../NextLivestreams";
 import {CircularProgress} from "@material-ui/core";
 import * as PropTypes from "prop-types";
-import React from "react";
+import React, {useEffect} from "react";
 import {makeStyles} from "@material-ui/core/styles";
+import { forceCheck } from 'react-lazyload';
 
 const useStyles = makeStyles(theme => ({
     loaderWrapper: {
@@ -29,8 +30,11 @@ export function StreamsSection({
                                    value
                                }) {
     const classes = useStyles()
+    useEffect(() => {
+        forceCheck()
+    },[value])
     return <div className={classes.wrapper}>
-        <SwipeablePanel value={value} index={0}>
+        <SwipeablePanel value={value} index={"upcomingEvents"}>
             {isLoaded(upcomingLivestreams) ? (
                 <NextLivestreams
                     livestreamId={livestreamId}
@@ -45,7 +49,7 @@ export function StreamsSection({
                 </div>
             )}
         </SwipeablePanel>
-        <SwipeablePanel value={value} index={1}>
+        <SwipeablePanel value={value} index={"pastEvents"}>
             {isLoaded(pastLivestreams) ? (
                 <NextLivestreams
                     livestreamId={livestreamId}
@@ -65,7 +69,7 @@ export function StreamsSection({
 }
 
 StreamsSection.propTypes = {
-    value: PropTypes.number,
+    value: PropTypes.string.isRequired,
     dir: PropTypes.any,
     upcomingLivestreams: PropTypes.arrayOf(PropTypes.any),
     livestreamId: PropTypes.any,

@@ -23,21 +23,24 @@ exports.createNewUserAccount = functions.https.onCall( async (data, context) => 
     }
 
     const userData = data.userData;
-    const recipient_email = data.userData.email;
+    const recipient_email = data.userData.email.toLowerCase();
     const pinCode = getRandomInt(9999);
 
+    console.log(`Starting auth account creation process for ${recipient_email}`)
     await admin.auth().createUser({ email: userData.email, password: userData.password })
         .then( async (user) => {
+            console.log(`Starting firestore account creation process for ${recipient_email}`)
             await admin.firestore().collection("userData").doc(recipient_email).set(
                 {
-                    id: userData.email,
+                    id: recipient_email,
                     validationPin: pinCode,
                     firstName: userData.firstName,
                     lastName: userData.lastName,
-                    userEmail: userData.email,
+                    userEmail: recipient_email,
                     university: userData.university,
                     universityCountryCode: userData.universityCountryCode,
                 }).then( async () => {
+                    console.log(`Starting sending email for ${recipient_email}`)
                     const email = {
                         "TemplateId": 17669843,
                         "From": 'CareerFairy <noreply@careerfairy.io>',
@@ -46,18 +49,21 @@ exports.createNewUserAccount = functions.https.onCall( async (data, context) => 
                     };
                     try {
                         let response = await client.sendEmailWithTemplate(email)
+                        console.log(`Sent email successfully for ${recipient_email}`)
                         return response;
                     } catch (error) {
                         console.error(`Error sending PIN email to ${recipient_email}`, error);
+                        console.error(`Starting auth and firestore user deletion ${recipient_email}`, error);    
                         await admin.auth().deleteUser(user.uid)
                         await admin.firestore().collection("userData").doc(recipient_email).delete()
                         throw new functions.https.HttpsError('resource-exhausted', 'Error sending out PIN email');
                     }
             }).catch( async (error) => {
                 if (error.code !== 'resource-exhausted') {
-                    console.error(`Error creating user ${recipient_email} in firestore`, error);
+                    console.error(`Starting auth user deletion ${recipient_email}`, error);    
                     await admin.auth().deleteUser(user.uid)
-                }     
+                } 
+                console.error(`Error creating user ${recipient_email} in firestore`, error);    
                 throw new functions.https.HttpsError('internal', error);
             });
         }).catch( async (error) => {
@@ -153,7 +159,7 @@ exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(async (req, 
 
     setHeaders(req, res)
 
-    const recipient_email = req.body.recipientEmail;
+    const recipient_email = req.body.recipientEmail.toLowercase();
     const recipient_first_name = req.body.firstName;
     const recipient_last_name = req.body.lastName;
     const recipient_university = req.body.universityCode;

@@ -18,9 +18,11 @@ import LoadingModal from '../modal/LoadingModal';
 import ErrorModal from '../modal/ErrorModal';
 import SettingsModal from "./SettingsModal";
 import ScreenShareModal from "./ScreenShareModal";
+import useStreamRef from "../../../custom-hook/useStreamRef";
+import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/StreamerTopBar/BreakoutRoomManagementModal";
+import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 
-const useStyles = makeStyles((theme) => ({
-}));
+const useStyles = makeStyles((theme) => ({}));
 
 function VideoContainer(props) {
     const {
@@ -34,11 +36,11 @@ function VideoContainer(props) {
     const classes = useStyles();
     const localVideoId = 'localVideo';
     const isMainStreamer = props.streamerId === props.currentLivestream.id;
-
+    const streamRef = useStreamRef();
     const [errorMessage, setErrorMessage] = useState(null);
     const [screenSharePermissionDenied, setScreenSharePermissionDenied] = useState(false);
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
-
+    // console.count("-> VideoContainer");
     const [streamerConnected, setStreamerConnected] = useState(false);
     const [streamerReady, setStreamerReady] = useState(false);
 
@@ -46,8 +48,6 @@ function VideoContainer(props) {
     const [isStreaming, setIsStreaming] = useState(false);
     const [showScreenShareModal, setShowScreenShareModal] = useState(false);
     const [optimizationMode, setOptimizationMode] = useState("detail");
-
-    const [audioCounter, setAudioCounter] = useState(0);
     const [showSettings, setShowSettings] = useState(false);
 
     const screenSharingMode = (props.currentLivestream.screenSharerId === props.streamerId &&
@@ -58,11 +58,13 @@ function VideoContainer(props) {
         setLocalMediaStream,
         externalMediaStreams,
         agoraRtcStatus,
+        agoraRtcConnectionStatus,
         agoraRtmStatus,
         networkQuality,
         numberOfViewers,
         setAddedStream,
-        setRemovedStream
+        setRemovedStream,
+        agoraHandlers
     } =
         useAgoraAsStreamer(
             true,
@@ -87,41 +89,7 @@ function VideoContainer(props) {
         audioLevel
     } = useMediaSources(devices, props.streamerId, localMediaStream, !streamerReady || showSettings);
 
-    useEffect(() => {
-        if (isMainStreamer && props.currentLivestream.mode !== 'desktop' && props.currentLivestream.speakerSwitchMode !== 'manual') {
-            let timeout = setTimeout(() => {
-                let audioLevels = externalMediaStreams.map(stream => {
-                    if (stream.streamId !== 'demoStream') {
-                        return {
-                            streamId: stream.streamId,
-                            audioLevel: stream.stream.getAudioLevel()
-                        }
-                    } else {
-                        return {
-                            streamId: stream.streamId,
-                            audioLevel: 0
-                        }
-                    }
-                });
-                if (localMediaStream) {
-                    audioLevels.push({
-                        streamId: localMediaStream.getId(),
-                        audioLevel: localMediaStream.getAudioLevel()
-                    });
-                }
-                if (audioLevels && audioLevels.length > 1) {
-                    const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
-                    if (maxEntry.audioLevel > 0.05) {
-                        setLivestreamCurrentSpeakerId(maxEntry.streamId);
-                    } else if (!audioLevels.some(audioLevel => audioLevel.streamId === props.currentLivestream.currentSpeakerId)) {
-                        setLivestreamCurrentSpeakerId(maxEntry.streamId);
-                    }
-                }
-                setAudioCounter(audioCounter + 1);
-            }, 2500);
-            return () => clearTimeout(timeout);
-        }
-    }, [audioCounter, props.currentLivestream.mode]);
+    const currentSpeakerId = useCurrentSpeaker(localMediaStream, externalMediaStreams)
 
     useEffect(() => {
         if (agoraRtcStatus && agoraRtcStatus.type === "INFO" && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
@@ -135,11 +103,7 @@ function VideoContainer(props) {
         }
     }, [agoraRtcStatus])
 
-    useEffect(() => {
-        if (isMainStreamer && props.currentLivestream.mode === 'desktop') {
-            setLivestreamCurrentSpeakerId(props.currentLivestream.screenSharerId);
-        }
-    }, [props.currentLivestream.mode])
+
 
     useEffect(() => {
         if (props.streamerId && props.currentLivestream.id) {
@@ -149,14 +113,7 @@ function VideoContainer(props) {
         }
     }, [props.streamerId, props.currentLivestream.id])
 
-    useEffect(() => {
-        if (externalMediaStreams && props.currentLivestream.currentSpeakerId && isMainStreamer) {
-            let existingCurrentSpeaker = externalMediaStreams.find(stream => stream.streamId === props.currentLivestream.currentSpeakerId)
-            if (!existingCurrentSpeaker) {
-                setLivestreamCurrentSpeakerId(props.currentLivestream.id);
-            }
-        }
-    }, [externalMediaStreams])
+
 
     const [timeoutState, setTimeoutState] = useState(null);
 
@@ -186,26 +143,9 @@ function VideoContainer(props) {
         }
     }, [localMediaStream, externalMediaStreams, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
 
-    useEffect(() => {
-        if (numberOfViewers && props.currentLivestream.hasStarted) {
-            props.setNumberOfViewers(numberOfViewers)
-        } else {
-            props.setNumberOfViewers(0)
-        }
-    }, [numberOfViewers, props.currentLivestream.hasStarted]);
-
     const setDesktopMode = async (mode, initiatorId) => {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;
-        await props.firebase.setDesktopMode(props.currentLivestream.id, mode, screenSharerId);
-    }
-
-
-    const setLivestreamCurrentSpeakerId = (id) => {
-        props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);
-    }
-
-    const reloadPage = () => {
-        location.reload();
+        await props.firebase.setDesktopMode(streamRef, mode, screenSharerId);
     }
 
     const attachSinkId = (element, sinkId) => {
@@ -294,18 +234,24 @@ function VideoContainer(props) {
 
     return (
         <Fragment>
+            <BreakoutRoomManagementModal
+                agoraHandlers={agoraHandlers}
+            />
             <div>
                 <div>
                     <CurrentSpeakerDisplayer
                         isPlayMode={false}
+                        streamTitle={props.currentLivestream.title}
                         smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}
                         speakerSwitchModeActive={isMainStreamer}
                         localId={props.streamerId}
                         localStream={localMediaStream}
                         speakerSource={speakerSource}
                         attachSinkId={attachSinkId}
+                        isStreamer={props.isStreamer}
+                        isBreakout={props.isBreakout}
                         streams={externalMediaStreams}
-                        currentSpeaker={props.currentLivestream.currentSpeakerId}
+                        currentSpeaker={currentSpeakerId}
                         setRemovedStream={setRemovedStream}
                         {...props}
                         muted={false}
@@ -314,6 +260,7 @@ function VideoContainer(props) {
                 {sharingContent() &&
                 <SmallStreamerVideoDisplayer
                     livestreamId={props.currentLivestream.id}
+                    isBreakout={props.isBreakout}
                     presentation={props.currentLivestream.mode === 'presentation'}
                     showMenu={props.showMenu}
                     externalMediaStreams={externalMediaStreams}
@@ -335,6 +282,8 @@ function VideoContainer(props) {
                 <WifiIndicator
                     uplink={networkQuality.uplinkNetworkQuality}
                     downlink={networkQuality.downlinkNetworkQuality}
+                    agoraRtcConnectionStatus={agoraRtcConnectionStatus}
+                    agoraRtmStatus={agoraRtmStatus}
                 />
             </div>
             <SettingsModal open={showSettings} close={() => setShowSettings(false)}
@@ -347,26 +296,27 @@ function VideoContainer(props) {
                            speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                            attachSinkId={attachSinkId}/>
             <StreamPreparationModalV2 readyToConnect={Boolean(props.currentLivestream && props.currentLivestream.id)}
-                audioSource={audioSource} updateAudioSource={updateAudioSource}
-                videoSource={videoSource} updateVideoSource={updateVideoSource}
-                speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                audioLevel={audioLevel} streamerConnected={streamerConnected}
-                streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                localStream={displayableMediaStream}
-                connectionEstablished={connectionEstablished}
-                isTest={props.currentLivestream.test} viewer={props.viewer}
-                handleOpenDemoIntroModal={handleOpenDemoIntroModal}
-                attachSinkId={attachSinkId} devices={devices}
-                setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                isStreaming={isStreaming}/>
-            <LoadingModal agoraRtcStatus={agoraRtcStatus} />
-            <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus} />
+                                      audioSource={audioSource} updateAudioSource={updateAudioSource}
+                                      videoSource={videoSource} updateVideoSource={updateVideoSource}
+                                      speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
+                                      audioLevel={audioLevel} streamerConnected={streamerConnected}
+                                      streamerReady={streamerReady} setStreamerReady={setStreamerReady}
+                                      localStream={displayableMediaStream}
+                                      connectionEstablished={connectionEstablished}
+                                      isTest={props.currentLivestream.test} viewer={props.viewer}
+                                      handleOpenDemoIntroModal={handleOpenDemoIntroModal}
+                                      attachSinkId={attachSinkId} devices={devices}
+                                      setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
+                                      isStreaming={isStreaming}/>
+            <LoadingModal agoraRtcStatus={agoraRtcStatus}/>
+            <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus} agoraRtcConnectionStatus={agoraRtcConnectionStatus}/>
             <ScreenShareModal
                 open={showScreenShareModal}
                 smallScreen={props.smallScreen}
                 handleClose={handleCloseScreenShareModal}
                 handleScreenShare={handleScreenShare}
             />
+
             <DemoIntroModal livestreamId={props.currentLivestream.id}
                             open={showDemoIntroModal}
                             handleClose={handleCloseDemoIntroModal}/>

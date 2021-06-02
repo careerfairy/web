@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Container, Grid, Icon, Image, Input} from "semantic-ui-react";
-import {Button, TextField} from '@material-ui/core'
+import {Button, Container, TextField, Grid} from '@material-ui/core'
 import Header from "../../components/views/header/Header";
 import SettingsIcon from '@material-ui/icons/Settings';
 import {withFirebasePage} from "context/firebase";
@@ -14,14 +13,15 @@ import BookingModal from "../../components/views/common/booking-modal/BookingMod
 import QuestionVotingBox from "../../components/views/question-voting-box/QuestionVotingBox";
 import StringUtils from "../../util/StringUtils";
 import ClearIcon from '@material-ui/icons/Clear';
-import Head from "next/head";
 import UserUtil from "../../data/util/UserUtil";
-import MulitLineText from "../../components/views/common/MultiLineText";
 import TargetOptions from "../../components/views/common/TargetOptions";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import DataAccessUtil from "util/DataAccessUtil";
 import HowToRegRoundedIcon from '@material-ui/icons/HowToRegRounded';
 import EmailIcon from '@material-ui/icons/Email';
+import RssFeedIcon from '@material-ui/icons/RssFeed';
+import DateRangeIcon from '@material-ui/icons/DateRange';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../components/util/constants";
 import {useAuth} from "../../HOCs/AuthProvider";
@@ -29,6 +29,10 @@ import GroupsUtil from "../../data/util/GroupsUtil";
 import {store} from '../_app'
 import {Paper, Avatar, Box} from '@material-ui/core';
 import {companyLogoPlaceholder} from "../../constants/images";
+import {getResizedUrl} from "../../components/helperFunctions/HelperFunctions";
+import HeadWithMeta from "../../components/page/HeadWithMeta";
+import Typography from "@material-ui/core/Typography";
+import JoinTalentPoolModal from "../../components/views/common/join-talent-pool-modal/JoinTalentPoolModal";
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
@@ -62,17 +66,17 @@ const parseDates = (stream) => {
     return stream
 }
 
-function UpcomingLivestream(props) {
+function UpcomingLivestream({firebase, serverSideLivestream, groupId}) {
     // console.log("-> UpcomingLivestream props", props);
     const classes = useStyles()
     const router = useRouter();
-    const {livestreamId, groupId} = router.query;
+    const {livestreamId} = router.query;
     const absolutePath = router.asPath;
 
     const {userData, authenticatedUser: user} = useAuth();
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
-    const [currentLivestream, setCurrentLivestream] = useState(parseDates(props.currentLivestream));
+    const [currentLivestream, setCurrentLivestream] = useState(parseDates(serverSideLivestream));
     const [registration, setRegistration] = useState(false);
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
@@ -84,11 +88,12 @@ function UpcomingLivestream(props) {
     const [targetOptions, setTargetOptions] = useState([]);
 
     const [openJoinModal, setOpenJoinModal] = useState(false);
+    const [openTalentPoolModal, setOpenTalentPoolModal] = useState(false);
 
 
     useEffect(() => {
         if (livestreamId) {
-            const unsubscribe = props.firebase.listenToLivestreamQuestions(
+            const unsubscribe = firebase.listenToLivestreamQuestions(
                 livestreamId,
                 (querySnapshot) => {
                     var questionsList = [];
@@ -106,7 +111,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (groupId) {
-            const unsubscribe = props.firebase.listenToCareerCenterById(
+            const unsubscribe = firebase.listenToCareerCenterById(
                 groupId,
                 (querySnapshot) => {
                     let group = querySnapshot.data();
@@ -120,14 +125,14 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (livestreamId) {
-            const unsubscribe = props.firebase.listenToScheduledLivestreamById(
+            const unsubscribe = firebase.listenToScheduledLivestreamById(
                 livestreamId,
                 (querySnapshot) => {
                     if (querySnapshot.data()) {
                         let livestream = querySnapshot.data();
-                        livestream.createdDate = livestream.created.toDate?.()
-                        livestream.lastUpdatedDate = livestream.lastUpdated.toDate?.()
-                        livestream.startDate = livestream.start.toDate?.()
+                        livestream.createdDate = livestream.created?.toDate?.()
+                        livestream.lastUpdatedDate = livestream.lastUpdated?.toDate?.()
+                        livestream.startDate = livestream.start?.toDate?.()
                         livestream.id = querySnapshot.id;
                         setCurrentLivestream(livestream);
                     }
@@ -170,7 +175,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (currentLivestream && currentLivestream.groupIds && currentLivestream.groupIds.length) {
-            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.groupIds)
+            firebase.getDetailLivestreamCareerCenters(currentLivestream.groupIds)
                 .then((querySnapshot) => {
                     let groupList = [];
                     querySnapshot.forEach((doc) => {
@@ -215,7 +220,7 @@ function UpcomingLivestream(props) {
             return router.push("/profile");
         }
 
-        props.firebase.deregisterFromLivestream(currentLivestream.id, user.email);
+        firebase.deregisterFromLivestream(currentLivestream.id, user.email);
     }
 
     function joinTalentPool() {
@@ -227,7 +232,7 @@ function UpcomingLivestream(props) {
             return router.push("/profile");
         }
 
-        props.firebase.joinCompanyTalentPool(
+        firebase.joinCompanyTalentPool(
             currentLivestream.companyId,
             user.email,
             currentLivestream.id
@@ -243,7 +248,7 @@ function UpcomingLivestream(props) {
             return router.push("/profile");
         }
 
-        props.firebase.leaveCompanyTalentPool(
+        firebase.leaveCompanyTalentPool(
             currentLivestream.companyId,
             user.email,
             currentLivestream.id
@@ -288,7 +293,7 @@ function UpcomingLivestream(props) {
         const {
             hasAgreedToAll,
             groupsWithPolicies
-        } = await GroupsUtil.getPolicyStatus(careerCenters, user.email, props.firebase)
+        } = await GroupsUtil.getPolicyStatus(careerCenters, user.email, firebase)
         if (!hasAgreedToAll) {
             setOpenJoinModal(true)
             setGroupsWithPolicies(groupsWithPolicies)
@@ -297,7 +302,7 @@ function UpcomingLivestream(props) {
         } else {
             setBookingModalOpen(true);
             setRegistration(true);
-            props.firebase
+            firebase
                 .registerToLivestream(currentLivestream.id, user.email, groupsWithPolicies)
                 .then(() => {
                     sendEmailRegistrationConfirmation();
@@ -307,7 +312,7 @@ function UpcomingLivestream(props) {
     }
 
     function completeRegistrationProcess() {
-        props.firebase.registerToLivestream(currentLivestream.id, user.email, groupsWithPolicies).then(() => {
+        firebase.registerToLivestream(currentLivestream.id, user.email, groupsWithPolicies).then(() => {
             setBookingModalOpen(true);
             sendEmailRegistrationConfirmation();
         })
@@ -326,7 +331,7 @@ function UpcomingLivestream(props) {
             return router.push("/profile");
         }
 
-        props.firebase.deregisterFromLivestream(livestreamId, user.email);
+        firebase.deregisterFromLivestream(livestreamId, user.email);
     }
 
     function dateIsInUnder24Hours(date) {
@@ -352,7 +357,7 @@ function UpcomingLivestream(props) {
             author: user.email,
         };
 
-        props.firebase
+        firebase
             .putLivestreamQuestion(currentLivestream.id, newQuestion)
             .then(
                 () => {
@@ -366,17 +371,12 @@ function UpcomingLivestream(props) {
 
     let speakerElements = currentLivestream?.speakers?.map((speaker, index) => {
         return (
-            <Grid.Column
+            <Grid item xs={12} sm={8} md={4}
                 className={classes.speakerWrapper}
-                verticalAlign="middle"
-                textAlign="center"
-                mobile="16"
-                tablet="8"
-                computer="5"
                 key={speaker.id}
             >
                 <div className="livestream-speaker-avatar-capsule">
-                    <Avatar src={speaker?.avatar?.length ? speaker.avatar : speakerPlaceholder}
+                    <Avatar src={speaker?.avatar?.length ? getResizedUrl(speaker.avatar, "sm") : speakerPlaceholder}
                             className={classes.speakerAvatar}/>
                 </div>
                 <div className="livestream-speaker-description">
@@ -438,35 +438,38 @@ function UpcomingLivestream(props) {
                     margin: 0 0 0 10px;
                   }
                 `}</style>
-            </Grid.Column>
+            </Grid>
         );
     });
 
     let questionElements = upcomingQuestions.map((question, index) => {
         return (
-            <Grid.Column key={question.id || index}>
+            <Grid item xs={12} sm={6} md={4} key={question.id || index}>
                 <QuestionVotingBox
                     question={question}
                     user={user}
                     livestream={currentLivestream}
                 />
-            </Grid.Column>
+            </Grid>
         );
     });
 
     let logoElements = careerCenters.map((careerCenter, index) => {
         return (
-            <Grid.Column key={careerCenter.groupId} mobile="6" computer="4">
-                <Paper className={classes.logoWrapper}>
-                    <Image
-                        src={careerCenter.logoUrl}
+            <Grid item xs={4} md={3} key={careerCenter.groupId}>
+                <Paper className={classes.logoWrapper} justify="center" style={{textAlign: "center"}}>
+                    <img
+                        src={getResizedUrl(careerCenter.logoUrl, "md")}
                         style={{
                             maxHeight: "60px",
+                            maxWidth: "250px",
+                            width: "100%",
                             margin: "10px auto 5px auto",
+                            objectFit: "contain"
                         }}
                     />
                 </Paper>
-            </Grid.Column>
+            </Grid>
         );
     });
 
@@ -477,41 +480,18 @@ function UpcomingLivestream(props) {
     return (
         <div>
             <div className="topLevelContainer">
-                <Head>
-                    {/*Primary Meta Tags */}
-                    <title>CareerFairy | Live Stream with {currentLivestream.company}</title>
-                    <meta name="title" content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
-                    <meta name="description"
-                          content={currentLivestream.title}/>
-
-                    {/*Open Graph / Facebook */}
-                    <meta property="og:type" content="website"/>
-                    <meta property="og:url" content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
-                    <meta property="og:title" key="title"
-                          content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
-                    <meta property="og:site_name" content="CareerFairy"/>
-                    <meta property="og:description"
-                          content={currentLivestream.title}/>
-                    <meta property="og:image"
-                          content={currentLivestream.backgroundImageUrl}/>
-
-                    {/*Twitter*/}
-                    <meta property="twitter:card" content="summary_large_image"/>
-                    <meta property="twitter:url"
-                          content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
-                    <meta property="twitter:title"
-                          content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
-                    <meta property="twitter:description"
-                          content={currentLivestream.title}/>
-                    <meta property="twitter:image"
-                          content={currentLivestream.backgroundImageUrl}/>
-                </Head>
+                <HeadWithMeta
+                    title={`CareerFairy | Live Stream with ${currentLivestream.company}`}
+                    fullPath={groupId ? `https://careerfairy.io/upcoming-livestream/${livestreamId}?groupId=${groupId}` : `https://careerfairy.io/upcoming-livestream/${livestreamId}`}
+                    image={getResizedUrl(currentLivestream.backgroundImageUrl, "sm")}
+                    description={currentLivestream.title}
+                />
                 <Header color="white"/>
                 <div
                     className="video-mask"
                     style={{
                         backgroundImage:
-                            "url(" + currentLivestream.backgroundImageUrl + ")",
+                            "url(" + getResizedUrl(currentLivestream.backgroundImageUrl, "lg") + ")",
                     }}
                 >
                     <div
@@ -530,8 +510,8 @@ function UpcomingLivestream(props) {
                                     border: userIsRegistered() ? "2px solid white" : "",
                                 }}
                             >
-                                <Icon name="rss"/>
-                                Live stream
+                                <RssFeedIcon style={{verticalAlign: "middle", marginRight: 5}}/>
+                                <span style={{verticalAlign: "middle"}}>Live stream</span>
                             </div>
                             <div
                                 className="livestream-title"
@@ -544,7 +524,7 @@ function UpcomingLivestream(props) {
                                 style={{color: userIsRegistered() ? "white" : ""}}
                             >
                 <span>
-                  <Icon name="calendar outline alternate"/>
+                  <DateRangeIcon style={{marginRight: 5}}/>
                     {DateUtil.getPrettyDate(currentLivestream.startDate)}
                 </span>
                             </div>
@@ -582,23 +562,21 @@ function UpcomingLivestream(props) {
                                     </Countdown>
                                 </div>
                             </div>
-                            <div style={{margin: "30px 0"}}>
-                                <Grid className="middle aligned" centered>
-                                    <Grid.Row>
-                                        <Box>
-                                            <Paper className={classes.logoWrapper}>
-                                                <Image
-                                                    src={currentLivestream.companyLogoUrl}
-                                                    style={{
-                                                        maxWidth: "230px",
-                                                        maxHeight: "140px",
-                                                        margin: "10px auto 5px auto",
-                                                    }}
-                                                />
-                                            </Paper>
-                                        </Box>
-                                    </Grid.Row>
-                                    <Grid.Row>{speakerElements}</Grid.Row>
+                            <div style={{margin: "50px 0"}}>
+                                <Box>
+                                    <Paper className={classes.logoWrapper} style={{maxWidth: 300, margin: '0 auto'}}>
+                                        <img
+                                            src={getResizedUrl(currentLivestream.companyLogoUrl, "md")}
+                                            style={{
+                                                maxWidth: "230px",
+                                                maxHeight: "140px",
+                                                margin: "10px auto 5px auto",
+                                            }}
+                                        />
+                                    </Paper>
+                                </Box>
+                                <Grid container justify="center" align="center">
+                                    {speakerElements}
                                 </Grid>
                             </div>
                             <div style={{margin: "40px 0", width: "100%"}}>
@@ -634,7 +612,7 @@ function UpcomingLivestream(props) {
                                 <TargetOptions options={targetOptions}/>
                             </div>
                             <div style={{textAlign: "center", marginBottom: "20px"}}>
-                                <Grid centered className="middle aligned">
+                                <Grid container justify="center" alignItems="center">
                                     {logoElements}
                                 </Grid>
                             </div>
@@ -664,10 +642,9 @@ function UpcomingLivestream(props) {
                             </div>
                         </Container>
                         <div className="bottom-icon">
-                            <Icon
+                            <KeyboardArrowDownIcon
                                 style={{color: "rgb(44, 66, 81)"}}
-                                name="angle down"
-                                size="big"
+                                fontSize="large"
                             />
                         </div>
                     </div>
@@ -684,7 +661,10 @@ function UpcomingLivestream(props) {
                             margin: "0 auto",
                         }}
                     >
-                        <MulitLineText text={currentLivestream.summary}/>
+                        <Typography style={{whiteSpace: "pre-line"}}>
+                            {currentLivestream.summary}
+                        </Typography>
+                        {/*<MulitLineText text={currentLivestream.summary}/>*/}
                     </div>
                 </Container>
             </div>
@@ -720,7 +700,7 @@ function UpcomingLivestream(props) {
                     >
                         Upvote questions from your peers
                     </div>
-                    <Grid stackable columns={3} style={{margin: "5px 0 30px 0"}}>
+                    <Grid container spacing={3} style={{margin: "5px 0 30px 0"}}>
                         {questionElements}
                     </Grid>
                     <div
@@ -750,32 +730,32 @@ function UpcomingLivestream(props) {
                             ? "You are part of the talent pool"
                             : "Join the Talent Pool and Get Hired"}
                     </div>
+                    <div>
+                        <Box>
+                            <Paper style={{maxWidth: 300, margin: '0 auto'}} className={classes.logoWrapper}>
+                                <img
+                                    src={
+                                        currentLivestream.companyLogoUrl
+                                            ? getResizedUrl(currentLivestream.companyLogoUrl, "md")
+                                            : companyLogoPlaceholder
+                                    }
+                                    style={{
+                                        margin: "0 auto",
+                                        maxHeight: "100px",
+                                        maxWidth: "280px"
+                                    }}
+                                />
+                            </Paper>
+                        </Box>
+                    </div>
                     <Grid
+                        container
+                        justify="center"
+                        alignItems="center"
                         style={{margin: "50px 0 0 0"}}
-                        className="middle aligned"
-                        centered
                     >
-                        <div>
-                            <Box>
-                                <Paper style={{maxWidth: 300}} className={classes.logoWrapper}>
-                                    <Image
-                                        src={
-                                            currentLivestream.companyLogoUrl
-                                                ? currentLivestream.companyLogoUrl
-                                                : companyLogoPlaceholder
-                                        }
-                                        style={{
-                                            margin: "0 auto",
-                                            maxHeight: "100px",
-                                        }}
-                                    />
-                                </Paper>
-                            </Box>
-                        </div>
-                        <Grid.Column
-                            computer="8"
-                            mobile="16"
-                            style={{textAlign: "center"}}
+                        <Grid item xs={12} md={6}
+                              style={{textAlign: "center"}}
                         >
                             <Button
                                 size="large"
@@ -791,8 +771,8 @@ function UpcomingLivestream(props) {
                                 }
                                 color={userIsInTalentPool ? "default" : "primary"}
                             />
-                        </Grid.Column>
-                        <Grid.Column width={16}>
+                        </Grid>
+                        <Grid item xs={12}>
                             <div
                                 style={{
                                     margin: "20px 0",
@@ -810,7 +790,7 @@ function UpcomingLivestream(props) {
                                 the company can contact you at any time with a relevant
                                 opportunity.
                             </div>
-                        </Grid.Column>
+                        </Grid>
                     </Grid>
                 </Container>
             </div>
@@ -824,11 +804,8 @@ function UpcomingLivestream(props) {
                     Any problem or question ? We want to hear from you
                 </div>
                 <Container>
-                    <Grid.Column width={16} style={{textAlign: "center"}}>
-                        <a
-                            className="aboutContentContactButton"
-                            href="mailto:thomas@careerfairy.io"
-                        >
+                    <div style={{textAlign: "center"}}>
+                        <a className="aboutContentContactButton" href="mailto:thomas@careerfairy.io">
                             <Button
                                 size="large"
                                 children="Contact CareerFairy"
@@ -837,7 +814,7 @@ function UpcomingLivestream(props) {
                                 style={{margin: "30px 0 0 0"}}
                             />
                         </a>
-                    </Grid.Column>
+                    </div>
                 </Container>
             </div>
             <Footer/>
@@ -859,6 +836,12 @@ function UpcomingLivestream(props) {
                 registration={registration}
                 setRegistration={(value) => setRegistration(value)}
                 user={user}
+            />
+            <JoinTalentPoolModal 
+                livestream={currentLivestream}
+                modalOpen={openTalentPoolModal}
+                setModalOpen={setOpenTalentPoolModal}
+                userData={userData}
             />
             <style jsx>{`
               .hidden {
@@ -1104,31 +1087,31 @@ function UpcomingLivestream(props) {
     );
 }
 
-export async function getServerSideProps({params: {livestreamId}}) {
-    let currentLivestream = {}
+export async function getServerSideProps({params: {livestreamId, groupId}}) {
+    let serverSideLivestream = {}
     const snap = await store.firestore.get({collection: "livestreams", doc: livestreamId})
     if (snap.exists) {
-        currentLivestream = snap.data()
+        serverSideLivestream = snap.data()
         // Clear out sensitive data for initial props
-        delete currentLivestream.registeredUsers
-        delete currentLivestream.talentPool
-        delete currentLivestream.adminEmails
-        delete currentLivestream.adminEmail
-        delete currentLivestream.author
-        delete currentLivestream.status
+        delete serverSideLivestream.registeredUsers
+        delete serverSideLivestream.talentPool
+        delete serverSideLivestream.adminEmails
+        delete serverSideLivestream.adminEmail
+        delete serverSideLivestream.author
+        delete serverSideLivestream.status
 
-        currentLivestream.id = snap.id
-        currentLivestream.createdDateString = currentLivestream.created?.toDate?.().toString()
-        currentLivestream.lastUpdatedDateString = currentLivestream.lastUpdated?.toDate?.().toString()
-        currentLivestream.startDateString = currentLivestream.start?.toDate?.().toString()
+        serverSideLivestream.id = snap.id
+        serverSideLivestream.createdDateString = serverSideLivestream.created?.toDate?.().toString() || null
+        serverSideLivestream.lastUpdatedDateString = serverSideLivestream.lastUpdated?.toDate?.().toString() || null
+        serverSideLivestream.startDateString = serverSideLivestream.start?.toDate?.().toString() || null
 
         // Clear out props that have methods of which the server can't parse
-        delete currentLivestream.created
-        delete currentLivestream.lastUpdated
-        delete currentLivestream.start
+        delete serverSideLivestream.created
+        delete serverSideLivestream.lastUpdated
+        delete serverSideLivestream.start
     }
     return {
-        props: {currentLivestream}, // will be passed to the page component as props
+        props: {serverSideLivestream, groupId: groupId || null}, // will be passed to the page component as props
     }
 }
 

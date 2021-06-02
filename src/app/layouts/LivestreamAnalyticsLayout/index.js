@@ -1,8 +1,7 @@
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import TopBar from "./TopBar";
-import {isEmpty, isLoaded, useFirestoreConnect} from "react-redux-firebase";
-import {CurrentStreamContext} from "../../context/stream/StreamContext";
+import {useFirestoreConnect} from "react-redux-firebase";
 import {useRouter} from "next/router";
 import {useSelector} from "react-redux";
 
@@ -39,8 +38,6 @@ const LivestreamAnalyticsLayout = ({}) => {
     ])
 
     const currentLivestream = useSelector(({firestore:{data}}) => data.currentLivestream )
-    console.log("-> currentLivestream", currentLivestream);
-    console.log("-> livestreamId", livestreamId);
 
     return (
         <div className={classes.root}>

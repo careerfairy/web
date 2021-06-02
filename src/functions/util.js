@@ -33,7 +33,7 @@ const generateEmailData = (livestreamId, livestream, startingNow) => {
     const mailgunVariables = {
         "company": livestream.company,
         "startTime": formatHour(luxonStartDateTime),
-        "streamLink": getStreamLink(livestreamId),
+        "streamLink": livestream.externalEventLink ? livestream.externalEventLink : getStreamLink(livestreamId),
         "german": livestream.language === "DE" ? true : false
     };
     let recipientVariablesObj = {};

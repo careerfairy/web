@@ -56,5 +56,5 @@ NextLivestreamsBannerSection.propTypes = {
   handleChange: PropTypes.any,
   subtitle: PropTypes.any,
   title: PropTypes.any,
-  value: PropTypes.any
+  value: PropTypes.string.isRequired
 }

@@ -13,6 +13,7 @@ import clsx from "clsx";
 import StreamNotifications from "../streaming/sharedComponents/StreamNotifications";
 import AudienceDrawer from "../streaming/AudienceDrawer";
 import ButtonComponent from "../streaming/sharedComponents/ButtonComponent";
+import StreamClosedCountdown from "../streaming/sharedComponents/StreamClosedCountdown";
 
 const useStyles = makeStyles(theme => ({
     iconsContainer: {
@@ -59,34 +60,21 @@ const ViewerOverview = ({
                             handRaiseActive,
                             streamerId,
                             showVideoButton,
-                            handleClap,
                             unmute,
                             play,
-                            open,
-                            handleHeart,
-                            handleLike,
-                            handleMouseEnter,
                             playVideos,
-                            enableIcons,
-                            handleMouseLeave,
-                            iconsDisabled,
                             mobile,
                             unmuteVideos,
                             setShowMenu,
                             handleStateChange,
                             selectedState,
-                            setSelectedState,
                             showMenu,
-                            setNumberOfViewers,
-                            DELAY,
                             setShowVideoButton,
-                            handleClose,
-                            showAudience,
                             hideAudience,
                             audienceDrawerOpen,
                             isRecording
                         }) => {
-    const {currentLivestream} = useCurrentStream()
+    const {currentLivestream, isBreakout} = useCurrentStream()
 
     const classes = useStyles({mobile})
     return (
@@ -109,30 +97,17 @@ const ViewerOverview = ({
                 />
                 <ViewerComponent
                     livestreamId={currentLivestream.id} streamerId={streamerId}
-                    setNumberOfViewers={setNumberOfViewers}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     showVideoButton={showVideoButton}
+                    isBreakout={isBreakout}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}
                 />
 
-                {!mobile &&
-                <MiniChatContainer className={classes.miniChatContainer} livestream={currentLivestream}
-                                   isStreamer={false}/>}
+                { <MiniChatContainer mobile={mobile} className={classes.miniChatContainer}
+                                                livestream={currentLivestream}
+                                                isStreamer={false}/> }
 
-                <EmoteButtons
-                    handRaiseActive={handRaiseActive}
-                    handleClose={handleClose}
-                    handleClap={handleClap}
-                    handleHeart={handleHeart}
-                    handleLike={handleLike}
-                    handleMouseEnter={handleMouseEnter}
-                    handleMouseLeave={handleMouseLeave}
-                    iconsDisabled={iconsDisabled}
-                    enableIcons={enableIcons}
-                    delay={DELAY}
-                    smoothness={2}
-                    open={open}
-                />
+
             </div>
             <IconsContainer className={classes.iconsContainer}
                             isTest={currentLivestream.test}
@@ -159,6 +134,7 @@ const ViewerOverview = ({
                     <div>Click to play</div>
                 </div>
             </Backdrop>
+            <StreamClosedCountdown/>
         </Fragment>
     );
 };

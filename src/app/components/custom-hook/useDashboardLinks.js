@@ -16,10 +16,6 @@ const initialHeaderLinks = [
         title: 'NEXT LIVE STREAMS'
     },
     {
-        href: `/discover`,
-        title: 'PAST LIVE STREAMS'
-    },
-    {
         href: `/wishlist`,
         title: 'WISHLIST'
     }

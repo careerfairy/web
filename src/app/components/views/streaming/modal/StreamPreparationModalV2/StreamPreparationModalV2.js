@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 // Firefox 1.0+
-var isChromium = !!window.chrome
+var isChromium = true
     // Commented because bellow condition returns false on ubunutu a of 03/29/2021
     // && (!!window.chrome.webstore || !!window.chrome.runtime);
 

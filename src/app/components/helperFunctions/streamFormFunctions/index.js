@@ -77,7 +77,7 @@ const buildSpeakersArray = (values) => {
     return Object.keys(values.speakers).map((key, index) => {
         return {
             id: key,
-            avatar: values.speakers[key].avatar,
+            avatar: values.speakers[key].avatar || "",
             background: values.speakers[key].background,
             firstName: values.speakers[key].firstName,
             lastName: values.speakers[key].lastName,
@@ -152,9 +152,9 @@ export const validateStreamForm = (values, isDraft, noValidation = false) => {
         if (!values.speakers[key].position) {
             errors.speakers[key].position = 'Required';
         }
-        if (!values.speakers[key].background) {
-            errors.speakers[key].background = 'Required';
-        }
+        // if (!values.speakers[key].background) { Made background not required
+        //     errors.speakers[key].background = 'Required';
+        // }
         if (!Object.keys(errors.speakers[key]).length) {
             delete errors.speakers[key]
         }

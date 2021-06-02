@@ -8,6 +8,9 @@ import {useCurrentStream} from "../../../context/stream/StreamContext";
 import StreamNotifications from "./sharedComponents/StreamNotifications";
 import AudienceDrawer from "./AudienceDrawer";
 import ButtonComponent from "./sharedComponents/ButtonComponent";
+import VolumeUpRoundedIcon from "@material-ui/icons/VolumeUpRounded";
+import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
+import { Backdrop } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     blackFrame: {
@@ -44,7 +47,18 @@ const useStyles = makeStyles(theme => ({
         right: 100,
         zIndex: 100,
         width: 80
-    }
+    },
+    backdrop: {
+        cursor: "pointer",
+        zIndex: 200
+    },
+    backdropContent: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        color: theme.palette.common.white
+    },
 }));
 
 const StreamerOverview = ({
@@ -60,9 +74,15 @@ const StreamerOverview = ({
                               streamerId,
                               smallScreen,
                               hideAudience,
-                              audienceDrawerOpen
+                              audienceDrawerOpen,
+                              showVideoButton,
+                              setShowVideoButton,
+                              play,
+                              unmute,
+                              playVideos,
+                              unmuteVideos,
                           }) => {
-    const {currentLivestream} = useCurrentStream()
+    const {currentLivestream, isBreakout} = useCurrentStream()
     const classes = useStyles()
 
     return (
@@ -71,10 +91,15 @@ const StreamerOverview = ({
                 className={classes.blackFrame}
             >
                 <VideoContainer currentLivestream={currentLivestream}
-                                streamerId={streamerId}
-                                smallScreen={smallScreen}
-                                setNumberOfViewers={setNumberOfViewers}
-                                showMenu={showMenu} viewer={false}
+                    streamerId={streamerId}
+                    smallScreen={smallScreen}
+                    setNumberOfViewers={setNumberOfViewers}
+                                isStreamer={isStreamer}
+                                isBreakout={isBreakout}
+                    showMenu={showMenu} viewer={false}
+                    setShowVideoButton={setShowVideoButton} showVideoButton={showVideoButton}
+                    play={play} unmute={unmute}
+                    playVideos={playVideos} unmuteVideos={unmuteVideos}
                 />
                 <ButtonComponent
                     setShowMenu={setShowMenu}
@@ -104,6 +129,24 @@ const StreamerOverview = ({
                 className={classes.iconsContainer}
                 isTest={currentLivestream.test}
                 livestreamId={currentLivestream.id}/>
+            <Backdrop
+                open={Boolean(showVideoButton.muted)}
+                className={classes.backdrop}
+                onClick={unmuteVideos}>
+                <div className={classes.backdropContent}>
+                    <VolumeUpRoundedIcon style={{fontSize: '3rem'}}/>
+                    <div>Click to unmute</div>
+                </div>
+            </Backdrop>
+            <Backdrop
+                open={Boolean(showVideoButton.paused)}
+                className={classes.backdrop}
+                onClick={playVideos}>
+                <div className={classes.backdropContent}>
+                    <PlayArrowRoundedIcon style={{fontSize: '3rem'}}/>
+                    <div>Click to play</div>
+                </div>
+            </Backdrop>
         </Fragment>
     );
 };
