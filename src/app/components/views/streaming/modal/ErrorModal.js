@@ -106,6 +106,7 @@ function ErrorModal({ agoraRtcStatus, agoraRtcConnectionStatus, agoraRtmStatus }
         if (agoraRtcConnectionStatus.curState === "CONNECTED") {
             setHasHadInitialConnection(true)
             setReconnectTimeout(false)
+            setPlayWarning(false)
         }
     },[agoraRtcConnectionStatus])
 
