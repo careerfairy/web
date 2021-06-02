@@ -99,11 +99,12 @@ function ErrorModal({ agoraRtcStatus, agoraRtcConnectionStatus, agoraRtmStatus }
 
     useEffect(() => {
         setState("open");
-    },[agoraRtcStatus])
+    },[agoraRtcStatus, agoraRtcConnectionStatus, agoraRtmStatus])
 
     useEffect(() => {
-        if (!hasHadInitialConnection && agoraRtcConnectionStatus.curState === "CONNECTED") {
+        if (agoraRtcConnectionStatus.curState === "CONNECTED") {
             setHasHadInitialConnection(true)
+            setReconnectTimeout(false)
         }
     },[agoraRtcConnectionStatus])
 
