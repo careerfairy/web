@@ -87,7 +87,7 @@ const TestimonialCarousel = ({}) => {
       <div className={classes.root}>
          <Slider {...settings}>
             {testimonialData.map(
-               ({ name, reviewText, title, rating, position, avatarUrl }, index) => (
+               ({ name, reviewText, title, rating, position, avatarUrl, companyUrl }, index) => (
                   <TestimonialCard
                      key={avatarUrl}
                      {...{
@@ -97,6 +97,7 @@ const TestimonialCarousel = ({}) => {
                         rating,
                         position,
                         avatarUrl,
+                       companyUrl,
                         index
                      }}
                   />

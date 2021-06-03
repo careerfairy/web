@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
       height: 50,
       margin: theme.spacing(2),
       transition: theme.transitions.create(["transform", "filter"], {
-         duration: theme.transitions.duration.short,
+         duration: theme.transitions.duration.complex,
          easing: theme.transitions.easing.easeInOut,
       }),
       "&:hover": {
@@ -19,6 +19,10 @@ const useStyles = makeStyles((theme) => ({
    withFilter: {
       filter:
          "invert(55%) sepia(0%) saturate(1465%) hue-rotate(134deg) brightness(94%) contrast(84%) grayscale(100%)",
+      "&:hover": {
+        filter:
+          "invert(55%) sepia(0%) saturate(1465%) hue-rotate(134deg) brightness(20%) contrast(84%) grayscale(100%)",
+      },
    },
 }));
 

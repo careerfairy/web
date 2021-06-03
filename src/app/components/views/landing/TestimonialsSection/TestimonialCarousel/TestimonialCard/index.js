@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
       position: "absolute",
       transform: "translate(-50%, -50%)",
       background: "#E1F0EE",
-      borderRadius: "50px",
+      borderRadius: "2rem",
       [theme.breakpoints.down("sm")]: {
          left: "50%",
          width: "99%",
@@ -77,6 +77,18 @@ const useStyles = makeStyles((theme) => ({
       background: "transparent",
       boxShadow: "none",
    },
+   companyImage: {
+      width: 170,
+      height: "auto",
+      borderRadius: 10,
+      background: theme.palette.common.white,
+      "& img": {
+         objectFit: "contain",
+      },
+      padding: theme.spacing(1.5),
+      boxShadow: theme.shadows[2],
+      marginTop:theme.spacing(2)
+   },
 }));
 
 const TestimonialCard = ({
@@ -86,6 +98,7 @@ const TestimonialCard = ({
    position,
    name,
    reviewText,
+   companyUrl,
 }) => {
    const classes = useStyles();
 
@@ -148,6 +161,10 @@ const TestimonialCard = ({
                            >
                               {position}
                            </Typography>
+                           <Avatar
+                              src={companyUrl}
+                              className={classes.companyImage}
+                           />
                         </CardContent>
                      </Card>
                   </div>
