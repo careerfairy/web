@@ -15,6 +15,7 @@ const pathsReadyForDarkMode = [
 ];
 
 const initialTheme = responsiveFontSizes(createMuiTheme(baseThemeObj))
+
 const ThemeProviderWrapper = ({children}) => {
     const {pathname} = useRouter()
 
