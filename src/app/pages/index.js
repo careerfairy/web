@@ -63,7 +63,7 @@ const LandingPage = ({}) => {
             color={common.white}
             big
             handleOpenCalendly={handleOpenCalendly}
-            title={"Join the ranks of leading organizations today"}
+            title={"Join the ranks of leading organisations today"}
          />
          <CalendlyModal
             open={calendlyModalOpen}

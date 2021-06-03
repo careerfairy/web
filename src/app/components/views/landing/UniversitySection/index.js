@@ -5,6 +5,7 @@ import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
 import landingUniversities from "../../../../constants/landingUniversities";
 import SectionContainer from "../../common/Section/Container";
+import Logo from "../common/Logo";
 
 const useStyles = makeStyles((theme) => ({
    subTitle: {
@@ -17,18 +18,6 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
       alignItems: "center",
       justifyContent: "center",
-   },
-   universityLogo: {
-      width: "auto",
-      height: "50px",
-      margin: theme.spacing(2),
-      transition: theme.transitions.create("transform", {
-         duration: theme.transitions.duration.short,
-         easing: theme.transitions.easing.easeInOut,
-      }),
-      "&:hover": {
-         transform: "scale(1.1) rotate(1deg)",
-      },
    },
 }));
 
@@ -52,17 +41,13 @@ const UniversitySection = (props) => {
                subtitle={props.subtitle}
             />
             <div className={classes.imagesWrapper}>
-               {landingUniversities.map(
-                  ({ name, imageUrlDark, imageUrlMain, website }) => (
-                     <a key={name} target="_blank" href={website}>
-                        <img
-                           className={classes.universityLogo}
-                           src={imageUrlMain}
-                           alt={name}
-                        />
-                     </a>
-                  )
-               )}
+               {landingUniversities.map(({ name, imageUrlMain, website }) => (
+                  <Logo
+                     alt={name}
+                     logoUrl={imageUrlMain}
+                     websiteUrl={website}
+                  />
+               ))}
             </div>
          </SectionContainer>
       </Section>

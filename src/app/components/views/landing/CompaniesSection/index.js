@@ -6,6 +6,7 @@ import SectionContainer from "../../common/Section/Container";
 import HighlightText from "../common/HighlightText";
 import landingCompanies from "../../../../constants/landingCompanies";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
+import Logo from "../common/Logo";
 
 const useStyles = makeStyles((theme) => ({
    section: {
@@ -30,20 +31,6 @@ const useStyles = makeStyles((theme) => ({
       justifyContent: "center",
       marginTop: theme.spacing(2),
    },
-   companyLogo: {
-      filter:
-         "invert(55%) sepia(0%) saturate(1465%) hue-rotate(134deg) brightness(94%) contrast(84%) grayscale(100%)",
-      width: "auto",
-      height: 33,
-      margin: theme.spacing(2),
-      transition: theme.transitions.create("transform", {
-         duration: theme.transitions.duration.short,
-         easing: theme.transitions.easing.easeInOut,
-      }),
-      "&:hover": {
-         transform: "scale(1.1) rotate(1deg)",
-      },
-   },
 }));
 
 const CompaniesSection = (props) => {
@@ -62,16 +49,14 @@ const CompaniesSection = (props) => {
          <SectionContainer>
             <HighlightText text={"Over 200+ happy customers"} />
             <div className={classes.imagesWrapper}>
-               {landingCompanies.map(
-                  ({ name, imageUrlDark, imageUrlMain, website }) => (
-                     <img
-                        key={name}
-                        className={classes.companyLogo}
-                        src={getResizedUrl(imageUrlMain, "xs")}
-                        alt={name}
-                     />
-                  )
-               )}
+               {landingCompanies.map(({ name, imageUrlMain }) => (
+                  <Logo
+                     key={name}
+                     withFilter
+                     alt={name}
+                     logoUrl={getResizedUrl(imageUrlMain, "xs")}
+                  />
+               ))}
             </div>
          </SectionContainer>
       </Section>

@@ -1,26 +1,22 @@
 export default [
    {
-      name: "University of Birmingham",
-      imageUrlDark:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Fbirmingham-logo-dark_400x400.png?alt=media&token=583a00ff-826c-4a68-89cf-e47e7c411a85",
-      imageUrlMain:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Fbirmingham-logo-main_400x400.png?alt=media&token=fa9a00ee-9a3f-4cbe-ada7-4c64b2f997b2",
-      website: "https://www.birmingham.ac.uk/index.aspx",
-   },
-   {
       name: "École polytechnique fédérale de Lausanne ‐ EPFL",
       imageUrlDark:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Fepfl-logo-dark_1200x900.png?alt=media&token=54141d42-557e-4ad0-b1f6-126378064daf",
       imageUrlMain:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Fepfl-logo-main_1200x900.png?alt=media&token=a66ee608-2412-4879-8fda-d811a2e28528",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Fepfl-logo-main.webp?alt=media&token=ffa56fe9-60ba-464d-a681-98bea220bfb7",
       website: "https://www.epfl.ch/",
+      dimensions: {
+         width: 800,
+         height: 233,
+      },
    },
    {
       name: "ETH Zürich",
       imageUrlDark:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Feth-logo-dark_1200x900.png?alt=media&token=aeb9df8f-8c4a-488b-aba4-603b0b80a90f",
       imageUrlMain:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Feth-logo-main_1200x900.png?alt=media&token=08b7fdf2-a7db-4616-afba-236e34b856ad",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Feth-logo-main.webp?alt=media&token=12c5fe83-719d-4636-b55d-01251606e401",
       website: "https://ethz.ch/de.html",
    },
    {
@@ -36,7 +32,7 @@ export default [
       imageUrlDark:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Frwtu-logo-darkpng_1200x900.png?alt=media&token=10d138d7-a76c-41a7-a49b-7eef462e3dd8",
       imageUrlMain:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Frwtu-logo-main_1200x900.png?alt=media&token=167ce658-c2a4-466d-a8e0-e64441ff8560",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Frwtu-logo-main.webp?alt=media&token=2bfa4d43-fd0d-48e3-9611-446fa574342a",
       website: "https://www.rwth-aachen.de/",
    },
    {
@@ -44,7 +40,7 @@ export default [
       imageUrlDark:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Ftu-dresen-logo-dark_1200x900.png?alt=media&token=28d58290-2b97-405f-9467-4079f82302dc",
       imageUrlMain:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Ftu-dresen-logo-main_1200x900.png?alt=media&token=2f3538ed-6d0d-4e81-87a9-fac38c9da809",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Ftu-dresen-logo-main.webp?alt=media&token=29559028-ab61-4f84-86c1-48791294a761",
       website: "https://tu-dresden.de/",
    },
    {
@@ -60,7 +56,7 @@ export default [
       imageUrlDark:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Futrecht-logo-dark_1200x900.png?alt=media&token=26b02df7-7580-44ff-998d-5c9110835ac4",
       imageUrlMain:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Futrecht-logo-main_1200x900.png?alt=media&token=04e59fd7-bb87-4502-a2eb-59b8af40f3e1",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Futrecht-logo-main.webp?alt=media&token=f67bc505-4e96-4a45-9290-4fe265879174",
       website: "https://www.uu.nl/",
    },
 ];
