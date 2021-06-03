@@ -155,7 +155,10 @@ function ViewerComponent(props) {
 
     return (
         <React.Fragment>
-            <EmoteButtons createEmote={createEmote}/>
+            {
+                !props.isRecording &&
+                <EmoteButtons createEmote={createEmote}/> 
+            }
             <div>
                 <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive}
                                          smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}

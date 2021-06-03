@@ -92,7 +92,7 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
                                 "serviceName":"web_recorder_service",
                                 "errorHandlePolicy": "error_abort",
                                 "serviceParam": {
-                                    "url": `https://testing2-careerfairy.web.app/streaming/${streamId}/viewer?token=${token}`,
+                                    "url": `https://careerfairy.io/streaming/${streamId}/viewer?token=${token}`,
                                     "audioProfile": 0,
                                     "videoWidth": 1280,
                                     "videoHeight": 720,
@@ -114,7 +114,7 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
                         "secretKey": awsSecretKey,
                         "fileNamePrefix":[
                             "directory1",
-                            "directory3"
+                            "directory5"
                         ]
                     }
                 }

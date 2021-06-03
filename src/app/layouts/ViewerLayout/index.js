@@ -74,6 +74,7 @@ const ViewerLayout = (props) => {
     const [unmute, setUnmute] = useState(false);
     const [isRecording, setIsRecording] = useState(null);
 
+    const [open, setOpen] = useState(true);
     const [showMenu, setShowMenu] = useState(false);
     const [handRaiseActive, setHandRaiseActive] = useState(false);
     const [streamerId, setStreamerId] = useState(null);
@@ -148,6 +149,10 @@ const ViewerLayout = (props) => {
             query: {absolutePath: asPath},
         });
     }
+
+    const handleClose = useCallback(() => {
+        setOpen(false);
+    }, []);
 
     const handleStateChange = useCallback((state) => {
         if (!showMenu) {
@@ -235,7 +240,6 @@ const ViewerLayout = (props) => {
                                 setShowVideoButton,
                                 handleClose,
                                 isRecording,
-                                DELAY
                             })}
                         </div>
                     </div>

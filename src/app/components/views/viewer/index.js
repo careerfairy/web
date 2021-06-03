@@ -2,7 +2,6 @@ import React, {Fragment} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import ViewerComponent from "./viewer-component/ViewerComponent";
 import MiniChatContainer from "../streaming/LeftMenu/categories/chat/MiniChatContainer";
-import EmoteButtons from "./EmoteButtons";
 import IconsContainer from "../streaming/icons-container/IconsContainer";
 import RatingContainer from "./rating-container/RatingContainer";
 import {Backdrop} from "@material-ui/core";
@@ -99,7 +98,7 @@ const ViewerOverview = ({
                     livestreamId={currentLivestream.id} streamerId={streamerId}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     showVideoButton={showVideoButton}
-                    isBreakout={isBreakout}
+                    isBreakout={isBreakout} isRecording={isRecording}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}
                 />
 
