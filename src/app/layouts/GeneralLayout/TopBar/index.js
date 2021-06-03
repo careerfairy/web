@@ -112,10 +112,12 @@ const TopBar = ({ className, ...rest }) => {
                })}
             </Tabs>
          </Hidden>
-         <Box>
+         <Box display="flex" alignItems="center">
             <Hidden mdDown>
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
-                  <LoginButton />
+                  <div>
+                     <LoginButton />
+                  </div>
                ) : (
                   <IconButton
                      component={Link}
@@ -127,7 +129,11 @@ const TopBar = ({ className, ...rest }) => {
                   </IconButton>
                )}
             </Hidden>
-            <IconButton color="primary" onClick={handleDrawerOpen}>
+            <IconButton
+               style={{ marginLeft: "1rem" }}
+               color="primary"
+               onClick={handleDrawerOpen}
+            >
                <MenuIcon />
             </IconButton>
          </Box>

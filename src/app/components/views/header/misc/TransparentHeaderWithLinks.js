@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { Box, Hidden, IconButton, Tab, Tabs } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -9,9 +9,9 @@ import { makeStyles, useTheme } from "@material-ui/core/styles";
 import useGeneralLinks from "components/custom-hook/useGeneralLinks";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
-import { useAuth } from "../../../HOCs/AuthProvider";
-import LoginButton from "../../../components/views/common/LoginButton";
-import GeneralHeader from "../../../components/views/header/GeneralHeader";
+import { useAuth } from "HOCs/AuthProvider";
+import LoginButton from "components/views/common/LoginButton";
+import GeneralHeader from "components/views/header/GeneralHeader";
 
 const useStyles = makeStyles((theme) => ({
    avatar: {
@@ -74,70 +74,66 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const TopBar = ({ className, ...rest }) => {
-   const theme = useTheme();
-   const classes = useStyles({
-      navLinksColor: theme.palette.grey["800"],
-   });
+const TransparentHeaderWithLinks = ({ className, ...rest }) => {
+  const theme = useTheme();
+  const classes = useStyles({
+    navLinksColor: theme.palette.common.white,
+  });
 
-   const { mainLinks } = useGeneralLinks();
-   const dispatch = useDispatch();
-   const handleDrawerOpen = () => dispatch(actions.openNavDrawer());
-   const { authenticatedUser } = useAuth();
+  const { mainLinks } = useGeneralLinks();
+  const dispatch = useDispatch();
+  const handleDrawerOpen = () => dispatch(actions.openNavDrawer());
+  const { authenticatedUser } = useAuth();
 
-   return (
-      <GeneralHeader transparent>
-         <MainLogo />
-         <Hidden smDown>
-            <Tabs value={false} classes={{ indicator: classes.indicator }}>
-               {mainLinks.map((item) => {
-                  return (
-                     <Tab
-                        key={item.title}
-                        className={classes.navLinks}
-                        label={item.title}
-                        href={item.href}
-                     />
-                  );
-               })}
-            </Tabs>
-         </Hidden>
-         <Box display="flex" alignItems="center">
-            <Hidden mdDown>
-               {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
-                  <div>
-                     <LoginButton />
-                  </div>
-               ) : (
-                  <IconButton
-                     component={Link}
-                     className={classes.navIconButton}
-                     color="primary"
-                     href="/profile"
-                  >
-                     <AccountCircleOutlinedIcon />
-                  </IconButton>
-               )}
-            </Hidden>
+  return (
+    <GeneralHeader >
+      <MainLogo />
+      <Hidden smDown>
+        <Tabs value={false} classes={{ indicator: classes.indicator }}>
+          {mainLinks.map((item) => {
+            return (
+              <Tab
+                key={item.title}
+                className={classes.navLinks}
+                label={item.title}
+                href={item.href}
+              />
+            );
+          })}
+        </Tabs>
+      </Hidden>
+      <Box>
+        <Hidden mdDown>
+          {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
+            <LoginButton />
+          ) : (
             <IconButton
-               style={{ marginLeft: "1rem" }}
-               color="primary"
-               onClick={handleDrawerOpen}
+              component={Link}
+              className={classes.navIconButton}
+              color="primary"
+              href="/profile"
             >
-               <MenuIcon />
+              <AccountCircleOutlinedIcon />
             </IconButton>
-         </Box>
-      </GeneralHeader>
-   );
+          )}
+        </Hidden>
+        <Hidden lgUp>
+          <IconButton color="primary" onClick={handleDrawerOpen}>
+            <MenuIcon />
+          </IconButton>
+        </Hidden>
+      </Box>
+    </GeneralHeader>
+  );
 };
 
-TopBar.propTypes = {
-   className: PropTypes.string,
-   links: PropTypes.array,
-   onMobileNavOpen: PropTypes.func,
+TransparentHeaderWithLinks.propTypes = {
+  className: PropTypes.string,
+  links: PropTypes.array,
+  onMobileNavOpen: PropTypes.func,
 };
 
-TopBar.defaultProps = {
-   links: [],
+TransparentHeaderWithLinks.defaultProps = {
+  links: [],
 };
-export default TopBar;
+export default TransparentHeaderWithLinks;

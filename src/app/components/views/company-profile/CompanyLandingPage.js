@@ -2,6 +2,7 @@ import React, {useEffect} from "react";
 
 import Header from "components/views/header/Header";
 import { Container, Typography, Button } from "@material-ui/core";
+import TransparentHeaderWithLinks from "../header/misc/TransparentHeaderWithLinks";
 
 function CompanyLandingPage(props) {
 
@@ -36,7 +37,7 @@ function CompanyLandingPage(props) {
     return (
         <div id='landingSection'>
             <div className='mask'>
-                <Header color="white"/>
+                <TransparentHeaderWithLinks/>
                 <div className='maskContent'>
                     <Container className="titleContainer" style={{ paddingTop: '8%', position: 'relative', color: 'white', minHeight: 'calc(100vh - 100px)', textAlign: 'center' }}>
                         <Typography variant='h1' style={{ color: 'white', fontSize: '4.5vw', fontFamily: '"Poppins", sans-serif', fontWeight: '500', margin: 50 }}>

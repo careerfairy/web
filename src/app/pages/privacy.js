@@ -3,14 +3,15 @@ import { withFirebase } from '../context/firebase';
 
 import Head from 'next/head';
 import { Container } from "@material-ui/core";
+import GeneralLayout from "../layouts/GeneralLayout";
 
 const PrivacyPolicy = (props) => {
     return (
-        <div>
+        <>
             <Head>
                 <title key="title">CareerFairy | Privacy Policy</title>
             </Head>
-            <Header color="teal"/>
+            <GeneralLayout>
             <div className='cookies-background'>
                 <Container>
                 <h1>Privacy policy</h1> 
@@ -124,7 +125,7 @@ const PrivacyPolicy = (props) => {
             </div>
             <style jsx>{`
                 .cookies-background {
-                    background-color: rgb(253,253,253);
+                    //background-color: rgb(253,253,253);
                     padding: 30px 0;
                     color: rgb(60,60,60);
                 }
@@ -137,7 +138,8 @@ const PrivacyPolicy = (props) => {
                     color: rgb(0, 210, 170);
                 }
             `}</style>
-        </div>
+            </GeneralLayout>
+        </>
     );
 }
 

@@ -29,7 +29,6 @@ const UserProfile = () => {
             ) : (
                <div className={classes.content} />
             )}
-            <Footer />
          </GeneralLayout>
       </React.Fragment>
    );
