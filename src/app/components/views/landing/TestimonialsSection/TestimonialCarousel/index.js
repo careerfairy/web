@@ -64,7 +64,7 @@ const TestimonialCarousel = ({}) => {
       speed: 500,
       slidesToShow: 1,
       slidesToScroll: 1,
-      lazyLoad: true,
+      // lazyLoad: true,
       nextArrow: <SampleNextArrow />,
       prevArrow: <SamplePrevArrow />,
       initialSlide: 0,
