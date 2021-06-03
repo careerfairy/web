@@ -79,13 +79,15 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
         firebase.updateHandRaiseRequest(streamRef, handRaiseId, state);
     }
 
+    let numberOfActiveHandRaisers = handRaises.filter(handRaise => (handRaise.state === 'connected' || handRaise.state === 'connecting' || handRaise.state === 'invited' )).length
+
     let handRaiseElements = handRaises.filter(handRaise => (handRaise.state !== 'unrequested' && handRaise.state !== 'denied')).map(handRaise => {
         return (
             <HandRaiseElement request={handRaise} hasEntered={hasEntered}
                               key={handRaise.timestamp.toMillis()}
                               updateHandRaiseRequest={updateHandRaiseRequest}
                               setNewNotification={setNewNotification}
-                              closeSnackbar={closeSnackbar}
+                              closeSnackbar={closeSnackbar} numberOfActiveHandRaisers={numberOfActiveHandRaisers}
                               setNotificationToRemove={setNotificationToRemove}/>
         );
     })
@@ -116,6 +118,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
                             the stream. Don't forget to
                             remind them
                             to join in!</Typography>
+                        <Typography style={{marginBottom: "0.8rem", textTransform: "uppercase"}} align="center">You can invite up to 8 hand raisers</Typography>
                         <WhiteTooltip
                             placement="right-end"
                             title={

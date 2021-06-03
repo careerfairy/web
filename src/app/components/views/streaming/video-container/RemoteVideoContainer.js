@@ -71,19 +71,19 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const RemoteVideoContainer = ({
-                                  attachSinkId,
-                                  currentLivestream,
-                                  height,
-                                  isPlayMode,
-                                  muted,
-                                  play,
-                                  setRemovedStream,
-                                  setShowVideoButton,
-                                  small,
-                                  speakerSource,
-                                  stream,
-                                  unmute
-                              }) => {
+        attachSinkId,
+        currentLivestream,
+        height,
+        isPlayMode,
+        muted,
+        play,
+        setRemovedStream,
+        setShowVideoButton,
+        small,
+        speakerSource,
+        stream,
+        unmute
+    }) => {
 
     const {getActiveTutorialStepKey, handleConfirmStep} = useContext(TutorialContext);
     const activeStep = getActiveTutorialStepKey();
@@ -108,13 +108,10 @@ const RemoteVideoContainer = ({
     }, [stream.streamId]);
 
     useEffect(() => {
-        if (!isPlayMode) {
-            let audioElement = document.getElementById(`audio${stream.streamId}`)
-            if (audioElement) {
-                attachSinkId(audioElement, speakerSource)
-            }
+        if (!isPlayMode && videoElement.current) {
+            attachSinkId(videoElement.current, speakerSource)
         }
-    }, [speakerSource])
+    }, [speakerSource, videoElement.current])
 
     useEffect(() => {
         if (unmute) {

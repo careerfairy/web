@@ -23,17 +23,20 @@ module.exports = (phase, {defaultConfig}) => {
             }
             return config
         },
-        webpack(config) {
+        webpack: config => {
+            config.module.rules.push({
+                test: /\.wav$/,
+                loader: "file-loader"
+            })
             config.module.rules.push({
                 test: /\.svg$/,
                 issuer: {
                     test: /\.(js|ts)x?$/,
                 },
                 use: ['@svgr/webpack'],
-            });
-
-            return config;
-        },
+            })
+            return config
+        }
     }
     // if (phase === PHASE_PRODUCTION_BUILD) {
     //     config.distDir = '../../dist/client'

@@ -58,6 +58,7 @@ function VideoContainer(props) {
         setLocalMediaStream,
         externalMediaStreams,
         agoraRtcStatus,
+        agoraRtcConnectionStatus,
         agoraRtmStatus,
         networkQuality,
         numberOfViewers,
@@ -281,6 +282,8 @@ function VideoContainer(props) {
                 <WifiIndicator
                     uplink={networkQuality.uplinkNetworkQuality}
                     downlink={networkQuality.downlinkNetworkQuality}
+                    agoraRtcConnectionStatus={agoraRtcConnectionStatus}
+                    agoraRtmStatus={agoraRtmStatus}
                 />
             </div>
             <SettingsModal open={showSettings} close={() => setShowSettings(false)}
@@ -306,7 +309,7 @@ function VideoContainer(props) {
                                       setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
                                       isStreaming={isStreaming}/>
             <LoadingModal agoraRtcStatus={agoraRtcStatus}/>
-            <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus}/>
+            <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus} agoraRtcConnectionStatus={agoraRtcConnectionStatus}/>
             <ScreenShareModal
                 open={showScreenShareModal}
                 smallScreen={props.smallScreen}

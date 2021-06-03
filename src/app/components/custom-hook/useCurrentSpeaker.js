@@ -29,18 +29,9 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
     const [currentSpeakerId, setCurrentSpeakerId] = useState(firestoreCurrentSpeaker);
 
     useEffect(() => {
-        if (mode !== 'desktop' && speakerSwitchMode !== 'manual') {
-            if (isMainStreamer) {
-                const unsubscribe = manageCurrentSpeaker()
-                return () => unsubscribe()
-            } else {
-                const allStreams = getAllStreams(localMediaStream, externalMediaStreams)
-                const streamsHaveMainStreamer = checkIfHasMainStreamer(allStreams)
-                if (!streamsHaveMainStreamer) {
-                    const unsubscribe = manageCurrentSpeaker({isFallback: true})
-                    return () => unsubscribe()
-                }
-            }
+        if (speakerSwitchMode !== 'manual') {
+            const unsubscribe = manageCurrentSpeaker({isFallback: true})
+            return () => unsubscribe()
         }
     }, [audioCounter, mode, externalMediaStreams.length, localMediaStream]);
 

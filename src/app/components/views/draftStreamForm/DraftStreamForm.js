@@ -158,7 +158,13 @@ const DraftStreamForm = ({
             mergedGroups = [...new Set([...mergedGroups, ...group.partnerGroupIds])]
         }
         if (mergedGroups.length) {
-            const totalExistingGroups = await firebase.getCareerCentersByGroupId(mergedGroups)
+            let totalExistingGroups
+            if (userData?.isAdmin) {
+                const allGroupSnaps = await firebase.getAllCareerCenters()
+                totalExistingGroups = allGroupSnaps.docs.map(doc => ({id: doc.id, ...doc.data()}))
+            } else {
+                totalExistingGroups = await firebase.getCareerCentersByGroupId(mergedGroups)
+            }
             const totalFlattenedGroups = totalExistingGroups.map(group => ({
                 ...group,
                 selected: false,
