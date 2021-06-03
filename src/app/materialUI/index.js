@@ -30,6 +30,7 @@ export const baseThemeObj = {
         background: {
             level1: "#212121",
             level2: "#333",
+            level3: "#888",
             offWhite: "#F5F5F5",
             default: "#F5F5F5"
         }

@@ -2,20 +2,9 @@ const functions = require('firebase-functions')
 
 const {axios} = require('./api/axios')
 const {admin} = require('./api/firestoreAdmin')
-const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
+const {RtcTokenBuilder, RtcRole} = require('agora-access-token')
 
-exports.startRecordingLivestream = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    }
+exports.startRecordingLivestream = functions.https.onCall( async (data, context) => {
 
     const appID = '53675bc6d3884026a72ecb1de3d19eb1';
     const appCertificate = '286a21681469490783ab75247de35f37';
@@ -30,8 +19,8 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
     let base64Credentials = Buffer.from(plainCredentials).toString('base64');
 
     let authorizationHeader = `Basic ${base64Credentials}`;
-    let streamId = req.body.streamId
-    let token = req.body.token
+    let streamId = data.streamId
+    let token = data.token
 
     let acquire = null;
     try {
@@ -53,11 +42,9 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
         })
     } catch (e) {
         console.log("Massive error", e);
-        return res.status(400).send()
+        return 
     }
     
-
-    console.log("We got this far");
 
     let resourceId = acquire.data.resourceId;
     const expirationTimeInSeconds = 21600
@@ -75,7 +62,7 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
 
     let storedToken = storedTokenDoc.data().value
     if (storedToken !== token) {
-        return res.status(400).send()
+        return
     }
 
     try{
@@ -92,7 +79,7 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
                                 "serviceName":"web_recorder_service",
                                 "errorHandlePolicy": "error_abort",
                                 "serviceParam": {
-                                    "url": `https://careerfairy.io/streaming/${streamId}/viewer?token=${token}`,
+                                    "url": `https://careerfairy-ssr-webapp-iu5hseak2-careerfairy-ssr.vercel.app/streaming/${streamId}/viewer?token=${token}`,
                                     "audioProfile": 0,
                                     "videoWidth": 1280,
                                     "videoHeight": 720,
@@ -126,8 +113,8 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
             }
         })
     } catch (e) {
-        return res.status(400).send()
         console.log("Error", e.response)
+        return 
     }
 
     let startResponse = start.data;
@@ -145,21 +132,15 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
             resourceId: resourceId
         })
 
-    return res.status(200).send()
+    await admin.firestore().collection('livestreams')
+        .doc(streamId)
+        .update({
+            isRecording: true
+        })
+    return
 });
 
-exports.stopRecordingLivestream = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    }
+exports.stopRecordingLivestream = functions.https.onCall( async (data, context) => {
 
     const appID = '53675bc6d3884026a72ecb1de3d19eb1';
 
@@ -170,8 +151,8 @@ exports.stopRecordingLivestream = functions.https.onRequest(async (req, res) => 
     let base64Credentials = Buffer.from(plainCredentials).toString('base64');
 
     let authorizationHeader = `Basic ${base64Credentials}`;
-    let streamId = req.body.streamId
-    let token = req.body.token
+    let streamId = data.streamId
+    let token = data.token
 
     let storedTokenDoc = await admin.firestore().collection('livestreams')
         .doc(streamId)
@@ -181,7 +162,7 @@ exports.stopRecordingLivestream = functions.https.onRequest(async (req, res) => 
 
     let storedToken = storedTokenDoc.data().value
     if (storedToken !== token) {
-        return res.status(400).send()
+        return 
     }
 
     let recordingToken = await admin.firestore().collection('livestreams')
@@ -193,21 +174,28 @@ exports.stopRecordingLivestream = functions.https.onRequest(async (req, res) => 
 
     console.log(resourceId, sid)
 
-    axios({
-        method: 'post',
-        data: {
-            "cname": streamId,
-            "uid": "1234232",
-            "clientRequest":{}
-        },
-        url: `https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resourceId}/sid/${sid}/mode/web/stop`,
-        headers: {
-            'Authorization': authorizationHeader,
-            'Content-Type': 'application/json'
-        }
-    }).then((response) => { 
-        console.log(response) 
-        return res.status(200).send()
-    }).catch( error => console.log("Error in stop", error));
+    try {
+        await axios({
+            method: 'post',
+            data: {
+                "cname": streamId,
+                "uid": "1234232",
+                "clientRequest":{}
+            },
+            url: `https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resourceId}/sid/${sid}/mode/web/stop`,
+            headers: {
+                'Authorization': authorizationHeader,
+                'Content-Type': 'application/json'
+            }
+        })
+        await admin.firestore().collection('livestreams')
+            .doc(streamId)
+            .update({
+                isRecording: false
+            })
+    } catch (e) {
+        console.log("Error in stop")
+    }
+    return
 });
 

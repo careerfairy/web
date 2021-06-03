@@ -691,6 +691,16 @@ class Firebase {
         return ref.onSnapshot(callback)
     }
 
+    startRecordingLivestream = async (streamId, token) => {
+        const startRecordingLivestream = this.functions.httpsCallable("startRecordingLivestream")
+        return startRecordingLivestream({streamId, token})
+    }
+
+    stopRecordingLivestream = async (streamId, token) => {
+        const stopRecordingLivestream = this.functions.httpsCallable("stopRecordingLivestream")
+        return stopRecordingLivestream({streamId, token})
+    }
+
     listenToUpcomingLiveStreamsByGroupId = (groupId, callback) => {
         var ninetyMinutesInMilliseconds = 1000 * 60 * 90;
         let ref = this.firestore

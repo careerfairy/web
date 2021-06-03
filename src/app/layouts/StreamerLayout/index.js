@@ -231,6 +231,7 @@ const StreamerLayout = (props) => {
                     <StreamerTopBar
                         firebase={firebase}
                         showAudience={showAudience}
+                        token={token}
                     />
                     <LeftMenu
                         handleStateChange={handleStateChange}

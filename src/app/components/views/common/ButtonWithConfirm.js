@@ -16,7 +16,7 @@ import {makeStyles, useTheme} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
     iconInButton: {
-        color: ({hasStarted}) => hasStarted ? theme.palette.error.main : theme.palette.primary.main
+        color: ({color}) => color
     }
 }))
 
@@ -26,14 +26,13 @@ function ButtonWithConfirm({
                                buttonAction,
                                mobile,
                                buttonLabel,
-                               hasStarted,
                                confirmDescription,
                                tooltipTitle,
                                ...rest
                            }) {
     const theme = useTheme()
     const extraSmallScreen = useMediaQuery(theme.breakpoints.down('xs'))
-    const classes = useStyles({hasStarted})
+    const classes = useStyles({color})
     const [modalOpen, setModalOpen] = useState(false);
 
     const memorisedState = useMemo(() => ({
