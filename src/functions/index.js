@@ -36,6 +36,7 @@ const analytics = require('./analytics')
 exports.production = hosting.production
 exports.testing = hosting.testing
 exports.testing2 = hosting.testing2
+exports.personalHabib = hosting.personalHabib
 
 // Auth
 exports.updateFakeUser = auth.updateFakeUser

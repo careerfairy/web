@@ -47,6 +47,21 @@
           "function": "testing2"
         }
       ]
+    },
+    {
+      "target": "personal-habib",
+      "public": "public",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**/**",
+          "function": "personalHabib"
+        }
+      ]
     }
   ],
   "emulators": {
