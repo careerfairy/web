@@ -8,7 +8,6 @@ const NewFeatureHint = ({children, localStorageKey, tooltipText, buttonText, too
 
     useEffect(() => {
         const hasSeenDataSetButton = localStorage.getItem(localStorageKey)
-        debugger;
         if (JSON.parse(hasSeenDataSetButton) || isRecording) {
             setHasSeenTip(true)
         }

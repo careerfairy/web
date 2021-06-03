@@ -6,6 +6,7 @@ import {
     Box,
     Button,
     Checkbox,
+    CircularProgress,
     Hidden,
     IconButton,
     Toolbar,
@@ -19,6 +20,7 @@ import ButtonWithConfirm from "../../../components/views/common/ButtonWithConfir
 import StopIcon from "@material-ui/icons/Stop";
 import PlayCircleFilledWhiteIcon from "@material-ui/icons/PlayCircleFilledWhite";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import OpenInBrowserIcon from "@material-ui/icons/OpenInBrowser";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
@@ -61,7 +63,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-const StreamerTopBar = ({firebase, showAudience}) => {
+const StreamerTopBar = ({firebase, showAudience, token}) => {
 
     const {currentLivestream, isBreakout, isMainStreamer, isStreamer} = useCurrentStream()
 
@@ -74,6 +76,7 @@ const StreamerTopBar = ({firebase, showAudience}) => {
     const numberOfViewers = useSelector(state => currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0)
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [hideTooltip, setHideTooltip] = useState(false);
+    const [loadingRecordingStatus, setLoadingRecordingStatus] = useState(false);
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
     const [openStreamerBreakoutRoomModal, setOpenStreamerBreakoutRoomModal] = useState(false);
     const {joiningStreamerLink, viewerLink} = useStreamToken()
@@ -99,6 +102,20 @@ const StreamerTopBar = ({firebase, showAudience}) => {
 
     const handleOpenBreakoutRoomModal = () => {
         dispatch(actions.openStreamerBreakoutModal())
+    }
+
+    const startRecordingLivestream = () => {
+        setLoadingRecordingStatus(true)
+        firebase.startRecordingLivestream(currentLivestream.id, token).then(() => {
+            setLoadingRecordingStatus(false)
+        })
+    }
+
+    const stopRecordingLivestream = () => {
+        setLoadingRecordingStatus(true)
+        firebase.stopRecordingLivestream(currentLivestream.id, token).then(() => {
+            setLoadingRecordingStatus(false)
+        })
     }
 
     return (
@@ -131,7 +148,6 @@ const StreamerTopBar = ({firebase, showAudience}) => {
                         >
                             <ButtonWithConfirm
                                 color={currentLivestream.hasStarted ? theme.palette.error.main : theme.palette.primary.main}
-                                hasStarted={currentLivestream.hasStarted}
                                 mobile={mobile}
                                 disabled={!streamStartTimeIsNow}
                                 startIcon={currentLivestream.hasStarted ? <StopIcon/> : <PlayCircleFilledWhiteIcon/>}
@@ -139,9 +155,18 @@ const StreamerTopBar = ({firebase, showAudience}) => {
                                 confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'}
                                 buttonLabel={currentLivestream.hasStarted ? `Stop ${mobile ? "" : "Streaming"}` : `Start ${mobile ? "" : "Streaming"}`}
                                 tooltipTitle={currentLivestream.hasStarted ? `Click here to stop streaming` : `Click here to start streaming`}
-
                             />
                         </StandartTooltip>
+                        <ButtonWithConfirm
+                                color={currentLivestream.isRecording ? theme.palette.error.main : theme.palette.background.level3}
+                                mobile={mobile}
+                                disabled={loadingRecordingStatus}
+                                startIcon={loadingRecordingStatus ? <CircularProgress size={20}/> : <FiberManualRecordIcon />}
+                                buttonAction={currentLivestream.isRecording ? stopRecordingLivestream : startRecordingLivestream }
+                                confirmDescription={currentLivestream.isRecording ? 'Are you sure that you want to stop recording this stream?' : 'Are you sure that you want to start recording this stream?'}
+                                buttonLabel={currentLivestream.isRecording ? `Stop ${mobile ? "" : "Recording"}` : `Start ${mobile ? "" : "Recording"}`}
+                                tooltipTitle={currentLivestream.isRecording ? `Click here to stop recording` : `Click here to start recording`}
+                            />
                     </Fragment>
                     }
                     {mobile ?
