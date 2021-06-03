@@ -1,17 +1,14 @@
 import React from "react";
 import clsx from "clsx";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import { withFirebase } from "../../../context/firebase";
 import { Button, Hidden, useMediaQuery } from "@material-ui/core";
-import Zoom from "@material-ui/core/Zoom";
 import Box from "@material-ui/core/Box";
 import { useRouter } from "next/router";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import { MainLogo, MiniLogo } from "../../../components/logos";
+import { MainLogo } from "../../../components/logos";
 import Link from "../../../materialUI/NextNavLink";
 import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -19,6 +16,7 @@ import FilterIcon from "@material-ui/icons/Tune";
 import { useDispatch } from "react-redux";
 import * as actions from "../../../store/actions";
 import { useAuth } from "../../../HOCs/AuthProvider";
+import useGeneralHeader from "../../../components/custom-hook/useGeneralHeader";
 
 const useStyles = makeStyles((theme) => ({
    toolbar: {
@@ -37,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
    navLinks: {
       fontWeight: 600,
       opacity: 1,
-      color: `${theme.palette.primary.contrastText} !important`,
+      color: props =>`${props.navLinksColor} !important`,
       "&:hover": {
          textDecoration: "none !important",
       },
@@ -48,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
          height: 2,
          bottom: 0,
          left: "0",
-         backgroundColor: theme.palette.common.white,
+         backgroundColor: props => props.navLinksColor,
          visibility: "hidden",
          WebkitTransform: "scaleX(0)",
          transform: "scaleX(0)",
@@ -64,11 +62,11 @@ const useStyles = makeStyles((theme) => ({
       },
    },
    indicator: {
-      background: theme.palette.common.white,
-      color: theme.palette.common.white,
+      background: props => props.navLinksColor,
+      color: props => props.navLinksColor,
    },
    navIconButton: {
-      color: "white !important",
+      // color: "white !important",
       "&.MuiLink-underlineHover": {
          textDecoration: "none !important",
       },
@@ -92,7 +90,8 @@ const useStyles = makeStyles((theme) => ({
 const TopBar = ({ links, className, onMobileNavOpen, currentGroup }) => {
    const theme = useTheme();
    const showHeaderLinks = useMediaQuery(theme.breakpoints.up("md"));
-   const classes = useStyles();
+   const { GeneralHeader, headerColors } = useGeneralHeader();
+   const classes = useStyles({navLinksColor: headerColors.navLinksColor});
    const { pathname } = useRouter();
    const dispatch = useDispatch();
    const { authenticatedUser } = useAuth();
@@ -101,69 +100,69 @@ const TopBar = ({ links, className, onMobileNavOpen, currentGroup }) => {
       dispatch(actions.toggleNextLivestreamsFilter());
 
    return (
-      <AppBar elevation={1} className={clsx(classes.root, className)}>
-         <Toolbar className={classes.toolbar}>
-            <MainLogo white />
+      <GeneralHeader headerColors={headerColors} permanent={showHeaderLinks}>
+         <MainLogo />
+         <Hidden mdDown>
+            {showHeaderLinks && (
+               <Tabs
+                  color="inherit"
+                  value={false}
+                  classes={{ indicator: classes.indicator }}
+               >
+                  {links.map((item) => {
+                     return (
+                        <Tab
+                           key={item.title}
+                           component={Link}
+                           className={clsx(classes.navLinks, {
+                              [classes.active]: pathname === item.href,
+                           })}
+                           label={item.title}
+                           href={item.href}
+                        />
+                     );
+                  })}
+               </Tabs>
+            )}
+         </Hidden>
+         <Box>
             <Hidden mdDown>
-               {showHeaderLinks && (
-                  <Tabs
-                     value={false}
-                     classes={{ indicator: classes.indicator }}
+               {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
+                  <Button
+                     component={Link}
+                     href="/login"
+                     variant="contained"
+                     color="primary"
+                     className={classes.navIconButton}
                   >
-                     {links.map((item) => {
-                        return (
-                           <Tab
-                              key={item.title}
-                              component={Link}
-                              className={clsx(classes.navLinks, {
-                                 [classes.active]: pathname === item.href,
-                              })}
-                              label={item.title}
-                              href={item.href}
-                           />
-                        );
-                     })}
-                  </Tabs>
+                     Login
+                  </Button>
+               ) : (
+                  <IconButton
+                     component={Link}
+                     color="primary"
+                     className={classes.navIconButton}
+                     href="/profile"
+                  >
+                     <AccountCircleOutlinedIcon />
+                  </IconButton>
                )}
             </Hidden>
-            <Box>
-               <Hidden mdDown>
-                  {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
-                     <Button
-                        component={Link}
-                        href="/login"
-                        variant="contained"
-                        color="primary"
-                        className={classes.navIconButton}
-                     >
-                        Login
-                     </Button>
-                  ) : (
-                     <IconButton
-                        component={Link}
-                        className={classes.navIconButton}
-                        href="/profile"
-                     >
-                        <AccountCircleOutlinedIcon />
-                     </IconButton>
-                  )}
-               </Hidden>
-               <Hidden lgUp>
-                  {currentGroup?.categories && (
-                     <IconButton
-                        color="inherit"
-                        onClick={handleToggleNextLivestreamsFilter}
-                     >
-                        <FilterIcon />
-                     </IconButton>
-                  )}
-                  <IconButton color="inherit" onClick={onMobileNavOpen}>
-                     <MenuIcon />
+            <Hidden lgUp>
+               {currentGroup?.categories && (
+                  <IconButton
+                     color="primary"
+                     onClick={handleToggleNextLivestreamsFilter}
+                  >
+                     <FilterIcon />
                   </IconButton>
-               </Hidden>
-            </Box>
-         </Toolbar>
-      </AppBar>
+               )}
+               <IconButton color="primary" onClick={onMobileNavOpen}>
+                  <MenuIcon />
+               </IconButton>
+            </Hidden>
+         </Box>
+      </GeneralHeader>
    );
 };
 export default withFirebase(TopBar);

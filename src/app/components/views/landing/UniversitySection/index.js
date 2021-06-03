@@ -6,18 +6,12 @@ import SectionHeader from "components/views/common/SectionHeader";
 import landingUniversities from "../../../../constants/landingUniversities";
 import SectionContainer from "../../common/Section/Container";
 import Logo from "../common/Logo";
+import LogosComponent from "../common/LogosComponent";
 
 const useStyles = makeStyles((theme) => ({
    subTitle: {
       color: theme.palette.text.secondary,
       fontWeight: 500,
-   },
-   imagesWrapper: {
-      display: "flex",
-      flexWrap: "wrap",
-      width: "100%",
-      alignItems: "center",
-      justifyContent: "center",
    },
 }));
 
@@ -40,15 +34,17 @@ const UniversitySection = (props) => {
                title={props.title}
                subtitle={props.subtitle}
             />
-            <div className={classes.imagesWrapper}>
+            <LogosComponent>
                {landingUniversities.map(({ name, imageUrlMain, website }) => (
                   <Logo
+                     key={name}
                      alt={name}
                      logoUrl={imageUrlMain}
                      websiteUrl={website}
+                     withZoom
                   />
                ))}
-            </div>
+            </LogosComponent>
          </SectionContainer>
       </Section>
    );

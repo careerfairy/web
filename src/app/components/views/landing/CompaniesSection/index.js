@@ -7,6 +7,7 @@ import HighlightText from "../common/HighlightText";
 import landingCompanies from "../../../../constants/landingCompanies";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 import Logo from "../common/Logo";
+import LogosComponent from "../common/LogosComponent";
 
 const useStyles = makeStyles((theme) => ({
    section: {
@@ -22,14 +23,6 @@ const useStyles = makeStyles((theme) => ({
       [theme.breakpoints.down("xs")]: {
          fontSize: "3.5rem",
       },
-   },
-   imagesWrapper: {
-      display: "flex",
-      flexWrap: "wrap",
-      width: "100%",
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: theme.spacing(2),
    },
 }));
 
@@ -48,7 +41,7 @@ const CompaniesSection = (props) => {
       >
          <SectionContainer>
             <HighlightText text={"Over 200+ happy customers"} />
-            <div className={classes.imagesWrapper}>
+            <LogosComponent>
                {landingCompanies.map(({ name, imageUrlMain }) => (
                   <Logo
                      key={name}
@@ -57,7 +50,7 @@ const CompaniesSection = (props) => {
                      logoUrl={getResizedUrl(imageUrlMain, "xs")}
                   />
                ))}
-            </div>
+            </LogosComponent>
          </SectionContainer>
       </Section>
    );

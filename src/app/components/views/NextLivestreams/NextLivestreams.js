@@ -48,7 +48,7 @@ const NextLivestreams = ({
 
     const scrollToTop = () => {
         window.scrollTo({
-            top: 300,
+            top: 250,
             behavior: 'smooth'
         });
     };

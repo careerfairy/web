@@ -170,10 +170,13 @@ const useStyles = makeStyles(theme => ({
         // flexDirection: "column",
         justifyContent: "center",
         flexWrap: "inherit",
-        alignItems: "center"
+        alignItems: "center",
+
     },
     avaLogoWrapperHovered:{
         flexWrap: "wrap",
+        maxHeight: 300,
+        overflow: "auto"
     },
     top: {
         zIndex: 995

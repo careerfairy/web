@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
@@ -13,15 +13,15 @@ const useStyles = makeStyles((theme) => ({
          easing: theme.transitions.easing.easeInOut,
       }),
       "&:hover": {
-         transform: "scale(1.05) rotate(0.5deg)",
+         transform: ({ withZoom }) => withZoom && `scale(1.05) rotate(0.5deg)`,
       },
    },
    withFilter: {
       filter:
          "invert(55%) sepia(0%) saturate(1465%) hue-rotate(134deg) brightness(94%) contrast(84%) grayscale(100%)",
       "&:hover": {
-        filter:
-          "invert(55%) sepia(0%) saturate(1465%) hue-rotate(134deg) brightness(20%) contrast(84%) grayscale(100%)",
+         filter:
+            "invert(55%) sepia(0%) saturate(1465%) hue-rotate(134deg) brightness(20%) contrast(84%) grayscale(100%)",
       },
    },
 }));
@@ -36,8 +36,16 @@ const LinkWrapper = ({ websiteUrl, children }) => {
    );
 };
 
-const Logo = ({ logoUrl, alt, withFilter, width, height , websiteUrl}) => {
-   const classes = useStyles();
+const Logo = ({
+   logoUrl,
+   alt,
+   withFilter,
+   width,
+   height,
+   websiteUrl,
+   withZoom,
+}) => {
+   const classes = useStyles({ withZoom });
 
    return (
       <LinkWrapper websiteUrl={websiteUrl}>
@@ -55,12 +63,13 @@ const Logo = ({ logoUrl, alt, withFilter, width, height , websiteUrl}) => {
 };
 
 Logo.propTypes = {
-  alt: PropTypes.string,
-  height: PropTypes.number,
-  logoUrl: PropTypes.string.isRequired,
-  websiteUrl: PropTypes.string,
-  width: PropTypes.number,
-  withFilter: PropTypes.bool
-}
+   alt: PropTypes.string,
+   height: PropTypes.number,
+   logoUrl: PropTypes.string.isRequired,
+   websiteUrl: PropTypes.string,
+   width: PropTypes.number,
+   withFilter: PropTypes.bool,
+   withZoom: PropTypes.bool,
+};
 
 export default Logo;
