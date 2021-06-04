@@ -15,11 +15,9 @@ import {
 } from '@material-ui/core';
 import Step1Chrome from "./Step1Chrome";
 import Step2Camera from "./Step2Camera";
-import Step3Speakers from "./Step3Speakers";
 import Step4Mic from "./Step4Mic";
 import Step5Confirm from "./Step5Confirm";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
-import window from 'global';
 import {GlassDialog} from "../../../../../materialUI/GlobalModals";
 
 const useStyles = makeStyles(theme => ({
@@ -63,11 +61,9 @@ const StreamPreparationModalV2 = ({
                                       updateAudioSource,
                                       videoSource,
                                       updateVideoSource,
-                                      setSpeakerSource,
                                       speakerSource,
                                       devices,
                                       audioLevel,
-                                      attachSinkId,
                                       isTest,
                                       viewer,
                                       handleOpenDemoIntroModal
@@ -209,7 +205,7 @@ const StreamPreparationModalV2 = ({
     }
 
     const shouldDisplayButton = () => {
-        return Boolean(hasDevicesInLocalStorage() && activeStep !== 4)
+        return Boolean(hasDevicesInLocalStorage() && activeStep !== 3)
     }
 
     function getStepContent(stepIndex) {
@@ -234,19 +230,9 @@ const StreamPreparationModalV2 = ({
                                     setVideoSource={updateVideoSource}
                                     videoSource={videoSource}/>;
             case 2:
-                return <Step3Speakers setSpeakerSource={setSpeakerSource}
-                                      devices={devices}
-                                      handleMarkIncomplete={handleMarkIncomplete}
-                                      handleMarkComplete={handleMarkComplete}
-                                      isCompleted={isCompleted()}
-                                      attachSinkId={attachSinkId}
-                                      localStream={localStream}
-                                      speakerSource={speakerSource}/>
-            case 3:
                 return <Step4Mic setAudioSource={updateAudioSource}
                                  audioLevel={audioLevel}
                                  devices={devices}
-                                 attachSinkId={attachSinkId}
                                  localStream={localStream}
                                  handleMarkIncomplete={handleMarkIncomplete}
                                  handleMarkComplete={handleMarkComplete}
@@ -255,7 +241,7 @@ const StreamPreparationModalV2 = ({
                                  speakerSource={speakerSource}
                                  setPlaySound={setPlaySound}
                                  audioSource={audioSource}/>
-            case 4:
+            case 3:
                 return <Step5Confirm setConnectionEstablished={setConnectionEstablished}
                                      isStreaming={isStreaming}
                                      audioSource={audioSource}
