@@ -222,8 +222,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             msg: "RTC_JOINING_CHANNEL"
         })
 
-
-
         rtcClient.on("stream-published", function (evt) {
             rtcClient.enableDualStream(() => {
                 // console.log("-> dualStream enabled on rtc client");
@@ -438,6 +436,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
 
         } else {
+            rtcClient.startProxyServer(3);
             rtcClient.setClientRole("audience");
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
                 setAgoraRtcStatus({

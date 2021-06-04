@@ -29,10 +29,10 @@ const getLivestreamTimeInterval = (livestreamStartDateTime, livestreamTimeZone) 
 
 const generateEmailData = (livestreamId, livestream, startingNow) => {
     let recipientEmails = livestream.registeredUsers.join();
-    var luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), { zone: (livestream.timezone || 'Europe/Zurich') }).toFormat('HH:mm ZZZZ', { locale: "en-GB" });
+    var luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), { zone: (livestream.timezone || 'Europe/Zurich') });
     const mailgunVariables = {
         "company": livestream.company,
-        "startTime": luxonStartDateTime,
+        "startTime": luxonStartDateTime.toFormat('HH:mm ZZZZ', { locale: "en-GB" }),
         "streamLink": livestream.externalEventLink ? livestream.externalEventLink : getStreamLink(livestreamId),
         "german": livestream.language === "DE" ? true : false
     };
