@@ -93,7 +93,8 @@ exports.updateUserDataAnalytcicsOnWrite = analytics.updateUserDataAnalyticsOnWri
 //Recording
 exports.startRecordingLivestream = recording.startRecordingLivestream
 exports.stopRecordingLivestream = recording.stopRecordingLivestream
-
+exports.startRecordingLivestreamApi = recording.startRecordingLivestreamApi
+exports.stopRecordingLivestreamApi = recording.stopRecordingLivestreamApi
 
 // Breakout Rooms
 exports.updateBreakoutRoomStatusOnWrite = breakoutRooms.updateBreakoutRoomStatusOnWrite
