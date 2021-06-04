@@ -10,6 +10,7 @@ import {
 } from "../../../../constants/images";
 import clsx from "clsx";
 import SectionContainer from "../../common/Section/Container";
+import DashboardDemo from "./DashboardDemo";
 
 const useStyles = makeStyles((theme) => ({
    section: {
@@ -49,6 +50,9 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
       height: "auto",
    },
+   dashboardDemoWrapper:{
+      width: "100%"
+   }
 }));
 
 const AnalyticsSection = (props) => {
@@ -91,6 +95,9 @@ const AnalyticsSection = (props) => {
                   src={analyticsPreviewImage}
                   alt="analytics"
                />
+            </div>
+            <div className={classes.dashboardDemoWrapper}>
+               {/*<DashboardDemo/>*/}
             </div>
          </SectionContainer>
       </Section>

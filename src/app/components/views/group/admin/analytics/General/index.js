@@ -161,7 +161,7 @@ const General = ({
         () => compareUniqueRegistrations("participatingStudents"),
         [streamsFromTimeFrameAndFuture, streamsFromBeforeTimeFrame]
     );
-
+console.log("-> globalTimeFrame.timeFrames", globalTimeFrame.timeFrames);
 
     const getCategoryProps = () => ({item: true, xs: 12, sm: 12, lg: 6, xl: 6})
     return (

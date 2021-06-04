@@ -14,6 +14,7 @@ export const calendarIcon = "https://firebasestorage.googleapis.com/v0/b/careerf
 export const playIcon = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Ficons%2Fplay.svg?alt=media&token=00ce21f1-eff3-4102-b0c3-a360374e7515"
 export const laptopDemo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flaptop-demo.webp?alt=media&token=c1793c9e-00e4-4033-87a7-262f6c72f1fd"
 export const mainBackground = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fmain-background.png?alt=media&token=10c9a856-98d2-4668-834d-16b0c6cc1f72"
+export const blankLaptop = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flaptop.webp?alt=media&token=41342a75-c0a3-4462-93b8-6fc1a7ff2558"
 
 
 

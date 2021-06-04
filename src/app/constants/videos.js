@@ -1,0 +1,1 @@
+export const smilingStreamerVideoUrl = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing-videos%2Fengaged-streamer.mp4?alt=media&token=d54f257b-7cca-455e-ada3-ccfd4f259b09"

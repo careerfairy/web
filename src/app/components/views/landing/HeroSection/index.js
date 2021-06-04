@@ -12,6 +12,7 @@ import {
    playIcon,
 } from "../../../../constants/images";
 import SvgIcon from "@material-ui/core/SvgIcon";
+import LaptopVideo from "./LaptopVideo";
 
 const useStyles = makeStyles((theme) => ({
    section: {
@@ -53,6 +54,10 @@ const useStyles = makeStyles((theme) => ({
    },
    laptopImageWrapper: {
       position: "relative",
+   },
+   laptopVideoWrapper:{
+     display: "flex",
+     alignItems: "center"
    },
    laptopDemoImg: {
       bottom: 0,
@@ -169,21 +174,30 @@ const HeroSection = (props) => {
                   </Grid>
                </div>
             </Grid>
-            <Hidden mdDown>
-               <Grid
-                  className={classes.laptopImageWrapper}
-                  item
-                  xs={12}
-                  md={12}
-                  lg={6}
-               >
-                  <img
-                     className={classes.laptopDemoImg}
-                     src={laptopDemo}
-                     alt="laptop-demo"
-                  />
-               </Grid>
-            </Hidden>
+            {/*<Hidden mdDown>*/}
+            {/*   <Grid*/}
+            {/*      className={classes.laptopImageWrapper}*/}
+            {/*      item*/}
+            {/*      xs={12}*/}
+            {/*      md={12}*/}
+            {/*      lg={6}*/}
+            {/*   >*/}
+            {/*      <img*/}
+            {/*         className={classes.laptopDemoImg}*/}
+            {/*         src={laptopDemo}*/}
+            {/*         alt="laptop-demo"*/}
+            {/*      />*/}
+            {/*   </Grid>*/}
+            {/*</Hidden>*/}
+            <Grid
+               className={classes.laptopVideoWrapper}
+               item
+               xs={12}
+               md={12}
+               lg={6}
+            >
+               <LaptopVideo />
+            </Grid>
          </Grid>
       </Section>
    );
