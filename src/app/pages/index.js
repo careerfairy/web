@@ -49,7 +49,7 @@ const LandingPage = ({}) => {
          <AnalyticsSection
             title={
                <>
-                  Measure your success with <b>concrete data</b>
+                 Boost your <b>employer brand</b>, measure the results with <b>data</b>
                </>
             }
             subtitle="Evaluate the success of your events, gather live feedback from your audience and follow up easily with interesting candidates"

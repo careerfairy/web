@@ -28,13 +28,20 @@ export default [
       website: "https://www.imd.org/",
    },
    {
-      name: "RWTH Aachen University",
-      imageUrlDark:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Frwtu-logo-darkpng_1200x900.png?alt=media&token=10d138d7-a76c-41a7-a49b-7eef462e3dd8",
+      name: "Technische Universität Graz",
+      imageUrlDark: "",
       imageUrlMain:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Frwtu-logo-main.webp?alt=media&token=2bfa4d43-fd0d-48e3-9611-446fa574342a",
-      website: "https://www.rwth-aachen.de/",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fcompany-logos%2Ftu-graz-logo-main.webp?alt=media&token=1591ef2c-676e-46e5-beaf-79e180f0c39c",
+      website: "https://www.tugraz.at/home/",
    },
+   // {
+   //    name: "RWTH Aachen University",
+   //    imageUrlDark:
+   //       "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Frwtu-logo-darkpng_1200x900.png?alt=media&token=10d138d7-a76c-41a7-a49b-7eef462e3dd8",
+   //    imageUrlMain:
+   //       "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Frwtu-logo-main.webp?alt=media&token=2bfa4d43-fd0d-48e3-9611-446fa574342a",
+   //    website: "https://www.rwth-aachen.de/",
+   // },
    {
       name: "Dresden University of Technology (Technische Universität Dresden)",
       imageUrlDark:
