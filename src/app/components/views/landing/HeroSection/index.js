@@ -128,7 +128,7 @@ const HeroSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         <Grid className={classes.heroContainer} container>
+         <Grid className={classes.heroContainer} spacing={2} container>
             <Grid
                className={classes.heroContentWrapper}
                item

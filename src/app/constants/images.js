@@ -16,6 +16,7 @@ export const laptopDemo = "https://firebasestorage.googleapis.com/v0/b/careerfai
 export const mainBackground = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fmain-background.png?alt=media&token=10c9a856-98d2-4668-834d-16b0c6cc1f72"
 export const blankLaptop = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flaptop.webp?alt=media&token=41342a75-c0a3-4462-93b8-6fc1a7ff2558"
 export const blankUIQAndA = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fscreen-blank.webp?alt=media&token=d3a37a1c-af2f-46b4-a107-6f6077f3f788"
+export const laptopUi = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flaptop-ui.webp?alt=media&token=15f27c65-a8d4-409f-bc19-a1b73c58fc25"
 
 
 
