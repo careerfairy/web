@@ -173,6 +173,7 @@ const Step3Speakers = ({
    };
 
    const handleClickYes = () => {
+      setClickedNo(false);
       handleStopMusic();
       handleMarkComplete();
    };
@@ -192,18 +193,18 @@ const Step3Speakers = ({
 
    return (
       <Grid style={{ padding: "1rem 0" }} container spacing={2}>
-         {localSpeakers?.[0] && (
+         {/*{localSpeakers?.[0] && (*/}
+         {loopAudio && (
             <Grid xs={12} item>
-               {loopAudio && (
-                  <Typography align="center" variant="h4">
-                     <b>Do you hear a ringtone?</b>
-                  </Typography>
-               )}
-               <Typography align="center" variant="subtitle1">
-                  Current Speaker: <b>{localSpeakers[0].text}</b>
+               <Typography align="center" variant="h4">
+                  <b>Do you hear a ringtone?</b>
                </Typography>
+               {/*<Typography align="center" variant="subtitle1">*/}
+               {/*   Current Speaker: <b>{localSpeakers[0].text}</b>*/}
+               {/*</Typography>*/}
             </Grid>
          )}
+         {/*)}*/}
          <Grid xs={12} className={classes.buttonContainer} item>
             {loopAudio ? (
                <Button variant="outlined" onClick={handleStopMusic}>
@@ -236,8 +237,8 @@ const Step3Speakers = ({
          {clickedNo && (
             <Grid item xs={12}>
                <Alert severity="warning">
-                  Please change the selected speaker within your operating
-                  system if you can't hear the sound being played
+                  Please check the volume or change the selected speaker within
+                  your operating system if you can't hear the sound being played
                </Alert>
             </Grid>
          )}
