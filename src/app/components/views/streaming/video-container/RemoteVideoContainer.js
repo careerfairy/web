@@ -71,7 +71,6 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const RemoteVideoContainer = ({
-        attachSinkId,
         currentLivestream,
         height,
         isPlayMode,
@@ -106,12 +105,6 @@ const RemoteVideoContainer = ({
             }
         }
     }, [stream.streamId]);
-
-    useEffect(() => {
-        if (!isPlayMode && videoElement.current) {
-            attachSinkId(videoElement.current, speakerSource)
-        }
-    }, [speakerSource, videoElement.current])
 
     useEffect(() => {
         if (unmute) {

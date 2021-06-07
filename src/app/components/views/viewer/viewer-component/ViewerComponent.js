@@ -106,26 +106,6 @@ function ViewerComponent(props) {
 
     }, [Boolean(externalMediaStreams?.length), props.isBreakout, hasActiveRooms, joinedChannel])
 
-
-    const attachSinkId = (element, sinkId) => {
-        if (typeof element.sinkId !== 'undefined') {
-            element.setSinkId(sinkId)
-                .then(() => {
-                    console.log(`Success, audio output device attached: ${sinkId}`);
-                })
-                .catch(error => {
-                    let errorMessage = error;
-                    if (error.name === 'SecurityError') {
-                        errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
-                    }
-                    console.error(errorMessage);
-                    // Jump back to first output device in the list as it's the default.
-                });
-        } else {
-            console.warn('Browser does not support output device selection.');
-        }
-    }
-
     const setDesktopMode = async (mode, initiatorId) => {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;
         await props.firebase.setDesktopMode(streamRef, mode, screenSharerId);
@@ -159,7 +139,7 @@ function ViewerComponent(props) {
             <div>
                 <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive}
                                          smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}
-                                         speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
+                                         speakerSwitchModeActive={false} localStream={null}
                                          streams={externalMediaStreams} localId={props.streamerId}
                                          isViewer={true}
                                          streamTitle={props.currentLivestream.title}
@@ -176,7 +156,6 @@ function ViewerComponent(props) {
                     isBreakout={props.isBreakout}
                     externalMediaStreams={externalMediaStreams}
                     isLocalScreen={false}
-                    attachSinkId={attachSinkId}
                     {...props}
                     presenter={false}/>}
                 {props.handRaiseActive &&
@@ -200,7 +179,7 @@ function ViewerComponent(props) {
                                    videoSource={videoSource} updateVideoSource={updateVideoSource}
                                    audioLevel={audioLevel}
                                    speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                                   attachSinkId={attachSinkId}/>
+                                   />
                     <ScreenShareModal
                         open={showScreenShareModal}
                         handleClose={handleCloseScreenShareModal}

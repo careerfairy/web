@@ -57,7 +57,6 @@ function SettingsModal({ open,
                         speakerSource,
                            smallScreen,
                         setSpeakerSource, 
-                        attachSinkId,
                         audioLevel
                     }) {
 
@@ -98,7 +97,7 @@ function SettingsModal({ open,
                             </TabPanel>
                             <TabPanel value={value} index={1} className={classes.content}>
                                 <AudioTab devices={devices} displayableMediaStream={displayableMediaStream} audioLevel={audioLevel} audioSource={audioSource} setAudioSource={updateAudioSource}
-                                    speakerSource={speakerSource} setSpeakerSource={setSpeakerSource} attachSinkId={attachSinkId}/>
+                                    speakerSource={speakerSource} setSpeakerSource={setSpeakerSource}/>
                             </TabPanel>
                         </Grid>
                     </Grid>
