@@ -131,6 +131,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     if (!group.universityCode) {
         userDataSets.shift()
     }
+
     const {globalTimeFrames} = useTimeFrames()
 
     const dispatch = useDispatch()
@@ -139,7 +140,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const theme = useTheme()
     const [value, setValue] = useState(0);
     const {userData} = useAuth();
-    const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
+    const [globalTimeFrame, setGlobalTimeFrame] = useState( group.universityCode? globalTimeFrames[2]: globalTimeFrames[0]);
     const [showBar, setShowBar] = useState(false);
     const [userType, setUserType] = useState(userTypes[0]);
     const [streamDataType, setStreamDataType] = useState(streamDataTypes[0]);
