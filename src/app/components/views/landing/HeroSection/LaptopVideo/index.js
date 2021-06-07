@@ -17,8 +17,8 @@ const useStyles = makeStyles((theme) => ({
     },
     laptopScreenDiv: {
         top: "7.07%",
-        left: "14.8%",
-        width: "70.4%",
+        left: "14.7%",
+        width: "70.5%",
         height: "81.4%",
         justifyContent: "center",
         alignItems: "center",

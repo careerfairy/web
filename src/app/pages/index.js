@@ -28,7 +28,7 @@ const LandingPage = ({}) => {
    return (
       <LandingLayout>
          <HeroSection handleOpenCalendly={handleOpenCalendly} />
-         <CompaniesSection big />
+         <CompaniesSection  />
          <BenefitsSection title={"Why CareerFairy?"} />
          <UniversitySection
             subtitle="The best talent is evenly distributed, which makes it

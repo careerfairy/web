@@ -4,23 +4,32 @@ import HeroButton from "../HeroButton";
 import Link from "materialUI/NextNavLink";
 import {calendarIcon, playIcon} from "constants/images";
 import React from "react";
-import {makeStyles} from "@material-ui/core/styles";
+import {fade, makeStyles} from "@material-ui/core/styles";
 import SvgIcon from "@material-ui/core/SvgIcon";
+
 const useStyles = makeStyles((theme) => ({
     linkButton: {
         textDecoration: "none !important",
-        background: theme.palette.common.white,
+        background: fade(theme.palette.common.white, 0.8),
         "&:hover": {
-            background: theme.palette.background.paper,
+            background: fade(theme.palette.background.paper, 0.8),
         },
     },
     buttonsWrapper: {
         marginTop: theme.spacing(10),
-        width: "100%",
+        [theme.breakpoints.down("sm")]: {
+            marginTop: theme.spacing(1),
+        },
+        //width: "100%",
     },
     heroContent: {
         padding: theme.spacing(0, 5),
-        maxWidth: 780,
+        maxWidth: 720,
+        marginRight: "auto",
+        marginLeft: "auto",
+        [theme.breakpoints.down("sm")]: {
+            padding: theme.spacing(0, 2),
+        },
     },
     starIcon: {
         position: "relative",
@@ -57,8 +66,8 @@ const RockstarTextTalent = () => {
         </div>
     );
 };
-const HeroMessage = ({handleOpenCalendly}) => {
-    const classes = useStyles();
+const HeroMessage = ({handleOpenCalendly, mobile}) => {
+    const classes = useStyles({mobile});
 
     return (
         <div className={classes.heroContent}>

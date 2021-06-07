@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
       },
    },
    heroBtn: {
+      whiteSpace: "nowrap",
       [theme.breakpoints.down("md")]: {
          filter: (props) =>
            `drop-shadow(4.092px 4.39px 9.5px ${fade(

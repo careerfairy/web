@@ -1,29 +1,24 @@
 import PropTypes from "prop-types";
 import React from "react";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import Typography from "@material-ui/core/Typography";
-import {Grid, Hidden} from "@material-ui/core";
-import HeroButton from "./HeroButton";
-import Link from "materialUI/NextNavLink";
-import {
-    calendarIcon,
-    laptopDemo,
-    playIcon,
-} from "../../../../constants/images";
-import SvgIcon from "@material-ui/core/SvgIcon";
+import {Grid} from "@material-ui/core";
 import LaptopVideo from "./LaptopVideo";
 import Fade from 'react-reveal/Fade';
-import Reveal from 'react-reveal/Reveal';
 import HeroMessage from "./HeroMessage";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 const useStyles = makeStyles((theme) => ({
     section: {
         padding: 0,
     },
-    heroContainer: {
+    heroContainerWrapper: {
         minHeight: "calc(100vh - 60px)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: props => props.mobile ? "flex-start" : "center"
     },
+    heroContainer: {},
     subTitle: {
         color: theme.palette.text.secondary,
         fontWeight: 500,
@@ -35,19 +30,20 @@ const useStyles = makeStyles((theme) => ({
     },
     heroContentWrapper: {
         display: "flex",
-        flexDirection: "column",
         justifyContent: "center",
-        alignItems: "center",
+        alignItems: "flex-end",
     },
     laptopVideoWrapper: {
         display: "flex",
-        alignItems: "center"
+        alignItems: "flex-end"
     },
 }));
 
 
 const HeroSection = (props) => {
-    const classes = useStyles();
+    const theme = useTheme()
+    const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const classes = useStyles({mobile});
 
     return (
         <Section
@@ -59,30 +55,32 @@ const HeroSection = (props) => {
             backgroundImageOpacity={props.backgroundImageOpacity}
             backgroundColor={props.backgroundColor}
         >
-            <Grid className={classes.heroContainer} spacing={2} container>
-                <Grid
-                    className={classes.heroContentWrapper}
-                    item
-                    xs={12}
-                    md={12}
-                    lg={6}
-                >
-                    <Fade up>
-                        <HeroMessage handleOpenCalendly={props.handleOpenCalendly}/>
-                    </Fade>
+            <div className={classes.heroContainerWrapper}>
+                <Grid className={classes.heroContainer} spacing={2} container>
+                    <Grid
+                        className={classes.heroContentWrapper}
+                        item
+                        xs={12}
+                        md={6}
+                        lg={6}
+                    >
+                        <Fade up={!mobile} down={mobile}>
+                            <HeroMessage mobile={mobile} handleOpenCalendly={props.handleOpenCalendly}/>
+                        </Fade>
+                    </Grid>
+                    <Grid
+                        className={classes.laptopVideoWrapper}
+                        item
+                        xs={12}
+                        md={6}
+                        lg={6}
+                    >
+                        <Fade up={mobile} down={!mobile}>
+                            <LaptopVideo/>
+                        </Fade>
+                    </Grid>
                 </Grid>
-                <Grid
-                    className={classes.laptopVideoWrapper}
-                    item
-                    xs={12}
-                    md={12}
-                    lg={6}
-                >
-                    <Fade down>
-                        <LaptopVideo/>
-                    </Fade>
-                </Grid>
-            </Grid>
+            </div>
         </Section>
     );
 };

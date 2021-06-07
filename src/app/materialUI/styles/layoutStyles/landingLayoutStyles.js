@@ -8,7 +8,7 @@ const landingLayoutStyles = (theme) => ({
         backgroundColor: theme.palette.common.white,
         background: `url(${mainBackground})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "auto 140vh",
+        backgroundSize: "auto 120vh",
         // backgroundAttachment: "fixed"
     },
 })

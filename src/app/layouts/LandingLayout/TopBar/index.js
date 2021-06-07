@@ -86,7 +86,7 @@ const TopBar = ({ className, ...rest }) => {
    const { authenticatedUser } = useAuth();
 
    return (
-      <GeneralHeader transparent>
+      <GeneralHeader permanent transparent>
          <MainLogo />
          <Hidden smDown>
             <Tabs value={false} classes={{ indicator: classes.indicator }}>
