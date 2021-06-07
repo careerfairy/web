@@ -7,6 +7,14 @@ export const useAudio = (url) => {
 
     const toggle = () => setPlaying(!playing);
 
+    const playAudio = () => {
+        setPlaying(true)
+    }
+
+    const stopAudio = () => {
+        setPlaying(false)
+    }
+
     useEffect(() => {
             playing ? audio.play() : audio.pause();
         },
@@ -23,5 +31,5 @@ export const useAudio = (url) => {
         };
     }, []);
 
-    return [playing, toggle, audio];
+    return [playing, toggle, audio, playAudio, stopAudio];
 };

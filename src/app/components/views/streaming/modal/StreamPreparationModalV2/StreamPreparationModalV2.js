@@ -19,6 +19,7 @@ import Step4Mic from "./Step4Mic";
 import Step5Confirm from "./Step5Confirm";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {GlassDialog} from "../../../../../materialUI/GlobalModals";
+import Step3Speakers from "./Step3Speakers";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -230,6 +231,16 @@ const StreamPreparationModalV2 = ({
                                     setVideoSource={updateVideoSource}
                                     videoSource={videoSource}/>;
             case 2:
+                return <Step3Speakers
+                  // setSpeakerSource={setSpeakerSource}
+                                      devices={devices}
+                                      handleMarkIncomplete={handleMarkIncomplete}
+                                      handleMarkComplete={handleMarkComplete}
+                                      isCompleted={isCompleted()}
+                                      // attachSinkId={attachSinkId}
+                                      localStream={localStream}
+                                      speakerSource={speakerSource}/>
+            case 3:
                 return <Step4Mic setAudioSource={updateAudioSource}
                                  audioLevel={audioLevel}
                                  devices={devices}
@@ -241,7 +252,7 @@ const StreamPreparationModalV2 = ({
                                  speakerSource={speakerSource}
                                  setPlaySound={setPlaySound}
                                  audioSource={audioSource}/>
-            case 3:
+            case 4:
                 return <Step5Confirm setConnectionEstablished={setConnectionEstablished}
                                      isStreaming={isStreaming}
                                      audioSource={audioSource}
@@ -274,7 +285,7 @@ const StreamPreparationModalV2 = ({
 
                         return (<Step key={label} {...stepProps}>
                             <StepButton onClick={handleStep(index)}
-                                        completed={isStepComplete(index)}
+                                        completed={Boolean(isStepComplete(index))}
                                         {...buttonProps}>
                                 {label}
                             </StepButton>
