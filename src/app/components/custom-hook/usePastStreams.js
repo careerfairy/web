@@ -16,7 +16,7 @@ const {fourWeeks, twoMonths, fourMonths, sixMonths, eightMonths} = {
     eightMonths: new Date().setMonth(new Date().getMonth() - 8),
     sixMonths: new Date().setMonth(new Date().getMonth() - 6),
 }
-const earliestTime = new Date(twoMonths)
+const earliestTime = new Date(sixMonths)
 const currentTime = new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS)
 const pastLivestreamsQuery = [["start", "<", currentTime], ["start", ">", earliestTime], ["test", "==", false]]
 const usePastStreams = (livestreamId) => {
