@@ -11,6 +11,7 @@ import CompaniesSection from "../components/views/landing/CompaniesSection";
 import HeroSection from "../components/views/landing/HeroSection";
 import CalendlyModal from "../components/views/landing/CalendlyModal";
 import ScrollToTop from "../components/views/common/ScrollToTop";
+import { useRouter } from "next/router";
 
 const LandingPage = ({}) => {
    const {
@@ -27,7 +28,7 @@ const LandingPage = ({}) => {
 
    return (
       <LandingLayout>
-         <HeroSection handleOpenCalendly={handleOpenCalendly} />
+         <HeroSection big handleOpenCalendly={handleOpenCalendly} />
          <CompaniesSection  />
          <BenefitsSection title={"Why CareerFairy?"} />
          <UniversitySection

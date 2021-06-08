@@ -1,31 +1,31 @@
 import PropTypes from "prop-types";
 import React from "react";
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
 import SectionContainer from "../../common/Section/Container";
 import {
-    engageShape,
-    measureShape,
-    reachShape,
+   engageShape,
+   measureShape,
+   reachShape,
 } from "../../../../constants/images";
 import BenefitCard from "./BenefitCard";
-import {Grid, Grow} from "@material-ui/core";
-import Fade from 'react-reveal/Fade';
+import { Grid } from "@material-ui/core";
+import MuiGridFade from "../../../../materialUI/animations/MuiGridFade";
 
 const useStyles = makeStyles((theme) => ({
-    subTitle: {
-        color: theme.palette.text.secondary,
-        fontWeight: 500,
-    },
-    benefitsWrapper: {},
-    // title: {
-    //    fontSize: "4.5rem",
-    //    fontWeight: 500,
-    //    [theme.breakpoints.down("xs")]: {
-    //       fontSize: "3.5rem",
-    //    },
-    // },
+   subTitle: {
+      color: theme.palette.text.secondary,
+      fontWeight: 500,
+   },
+   benefitsWrapper: {},
+   // title: {
+   //    fontSize: "4.5rem",
+   //    fontWeight: 500,
+   //    [theme.breakpoints.down("xs")]: {
+   //       fontSize: "3.5rem",
+   //    },
+   // },
 }));
 
 const benefitsData = [
@@ -83,18 +83,16 @@ const BenefitsSection = (props) => {
                 >
                     {benefitsData.map(({name, imageUrl, description}, index) => (
                         <Grid item xs={12} sm={6} md={4} key={name}>
-                            <Fade
-                                up
-                                // style={{transformOrigin: '0 0 0'}}
-                                timeout={(index + 1) * 600}
-                                ssrFadeout={false}
+                            <MuiGridFade
+                              index={index}
+                              up
                             >
                                 <BenefitCard
                                     name={name}
                                     imageUrl={imageUrl}
                                     description={description}
                                 />
-                            </Fade>
+                            </MuiGridFade>
                         </Grid>
                     ))}
                 </Grid>

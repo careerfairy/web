@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.down("sm")]: {
             paddingTop: 40
         },
-        paddingTop: 0
+        // paddingTop: 0
     },
     subTitle: {
         color: theme.palette.text.secondary,

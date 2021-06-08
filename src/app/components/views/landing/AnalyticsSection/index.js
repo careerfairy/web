@@ -10,7 +10,9 @@ import {
 } from "../../../../constants/images";
 import clsx from "clsx";
 import SectionContainer from "../../common/Section/Container";
-import DashboardDemo from "./DashboardDemo";
+import { analyticsShowCaseVideoUrl } from "../../../../constants/videos";
+import Fade from "react-reveal/Fade";
+import LightSpeed from "react-reveal/LightSpeed";
 
 const useStyles = makeStyles((theme) => ({
    section: {
@@ -26,13 +28,18 @@ const useStyles = makeStyles((theme) => ({
       height: "auto",
       maxWidth: 600,
    },
-   analyticsPreviewImage: {
+   analyticsPreviewImage: {},
+   videoWrapper: {
       zIndex: 1,
       width: "100%",
       height: "auto",
       maxWidth: 1200,
       marginTop: "-2%",
-      boxShadow: theme.shadows[15],
+      "& video": {
+         borderRadius: "1em",
+         width: "100%",
+         boxShadow: theme.shadows[15],
+      },
    },
    imagesWrapper: {
       display: "flex",
@@ -50,9 +57,9 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
       height: "auto",
    },
-   dashboardDemoWrapper:{
-      width: "100%"
-   }
+   dashboardDemoWrapper: {
+      width: "100%",
+   },
 }));
 
 const AnalyticsSection = (props) => {
@@ -77,6 +84,7 @@ const AnalyticsSection = (props) => {
             src={rectangle1}
          />
          <SectionContainer>
+            <Fade right>
             <SectionHeader
                color={props.color}
                subTitleClassName={classes.subTitle}
@@ -84,20 +92,25 @@ const AnalyticsSection = (props) => {
                title={props.title}
                subtitle={props.subtitle}
             />
+            </Fade>
             <div className={classes.imagesWrapper}>
-               <img
-                  className={classes.graphicIllustration}
-                  src={analyticsSVG}
-                  alt="analytics"
-               />
-               <img
-                  className={classes.analyticsPreviewImage}
-                  src={analyticsPreviewImage}
-                  alt="analytics"
-               />
-            </div>
-            <div className={classes.dashboardDemoWrapper}>
-               {/*<DashboardDemo/>*/}
+               <LightSpeed left>
+                  <img
+                     className={classes.graphicIllustration}
+                     src={analyticsSVG}
+                     alt="analytics"
+                  />
+               </LightSpeed>
+               <div className={classes.videoWrapper}>
+                  <Fade duration={500} left>
+                     <video
+                        src={analyticsShowCaseVideoUrl}
+                        autoPlay
+                        muted
+                        loop
+                     />
+                  </Fade>
+               </div>
             </div>
          </SectionContainer>
       </Section>

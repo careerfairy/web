@@ -6,6 +6,7 @@ import SectionHeader from "components/views/common/SectionHeader";
 import { streamerImage } from "../../../../constants/images";
 import HighlightText from "../common/HighlightText";
 import SectionContainer from "../../common/Section/Container";
+import Fade from "react-reveal/Fade";
 
 const useStyles = makeStyles((theme) => ({
    section: {},
@@ -28,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
+      marginTop: theme.spacing(2)
    },
    backgroundRectangle: {
       top: 0,
@@ -62,23 +64,29 @@ const StreamSection = (props) => {
       >
          <div className={classes.backgroundRectangle} />
          <SectionContainer>
-            <HighlightText
-               text={"Why use live streams to showcase your opportunities?"}
-            />
-            <SectionHeader
-               color={props.color}
-               subTitleClassName={classes.subTitle}
-               titleClassName={classes.title}
-               title={props.title}
-               subtitle={props.subtitle}
-            />
-            <div className={classes.imagesWrapper}>
-               <img
-                  className={classes.streamerImage}
-                  src={streamerImage}
-                  alt="analytics"
+            <Fade left>
+               <HighlightText
+                  text={"Why use live streams to showcase your opportunities?"}
                />
-            </div>
+            </Fade>
+            <Fade right>
+               <SectionHeader
+                  color={props.color}
+                  subTitleClassName={classes.subTitle}
+                  titleClassName={classes.title}
+                  title={props.title}
+                  subtitle={props.subtitle}
+               />
+            </Fade>
+            <Fade up>
+               <div className={classes.imagesWrapper}>
+                  <img
+                     className={classes.streamerImage}
+                     src={streamerImage}
+                     alt="analytics"
+                  />
+               </div>
+            </Fade>
          </SectionContainer>
       </Section>
    );

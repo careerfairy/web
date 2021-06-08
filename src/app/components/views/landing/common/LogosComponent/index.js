@@ -1,6 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid } from "@material-ui/core";
+import Fade from 'react-reveal/Fade';
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -17,11 +18,13 @@ const LogosComponent = ({ children }) => {
    const classes = useStyles();
 
    return (
+     <Fade up>
       <Grid container justify="center" spacing={3} className={classes.root}>
          {children.map((child) => (
             <Grid className={classes.gridItem} key={child.key} item xs>{child}</Grid>
          ))}
       </Grid>
+     </Fade>
    );
 };
 export default LogosComponent;

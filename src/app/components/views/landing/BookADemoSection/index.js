@@ -1,16 +1,17 @@
-import PropTypes from 'prop-types'
-import React from "react";
+import PropTypes from "prop-types";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
 import RoundButton from "materialUI/GlobalButtons/RoundButton";
 import SectionContainer from "../../common/Section/Container";
+import Pulse from "react-reveal/Pulse";
 
 const useStyles = makeStyles((theme) => ({
    section: {
       height: "60vh",
       display: "flex",
-      alignItems:"center"
+      alignItems: "center",
    },
    bookingButton: {
       background: theme.palette.common.white,
@@ -26,8 +27,11 @@ const useStyles = makeStyles((theme) => ({
 
 const BookADemoSection = (props) => {
    const classes = useStyles();
+  const [hovered, setHovered] = useState(false);
 
-   return (
+  const handleToggle = () => setHovered(!hovered)
+
+  return (
       <Section
          className={classes.section}
          big={props.big}
@@ -44,14 +48,19 @@ const BookADemoSection = (props) => {
                title={props.title}
                subtitle={props.subtitle}
             />
+           <Pulse forever>
             <RoundButton
                className={classes.bookingButton}
+               onMouseEnter={handleToggle}
+               onMouseLeave={handleToggle}
                color="secondary"
+               size="large"
                variant="contained"
                onClick={props.handleOpenCalendly}
             >
                Book a Demo
             </RoundButton>
+           </Pulse>
          </SectionContainer>
       </Section>
    );
