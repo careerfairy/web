@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "NODE_OPTIONS=--max_old_space_size=8192 next",
+    "dev:windows": "next",
     "build": "next build --debug",
     "start": "next start"
   },
