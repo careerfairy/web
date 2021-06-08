@@ -11,7 +11,7 @@ import CompaniesSection from "../components/views/landing/CompaniesSection";
 import HeroSection from "../components/views/landing/HeroSection";
 import CalendlyModal from "../components/views/landing/CalendlyModal";
 import ScrollToTop from "../components/views/common/ScrollToTop";
-import { useRouter } from "next/router";
+import { rectangle1 } from "../constants/images";
 
 const LandingPage = ({}) => {
    const {
@@ -53,6 +53,7 @@ const LandingPage = ({}) => {
                  Boost your <b>employer brand</b>, measure the results with <b>data</b>
                </>
             }
+            backgroundImage={rectangle1}
             subtitle="Evaluate the success of your events, gather live feedback from your audience and follow up easily with interesting candidates"
          />
          <TestimonialsSection

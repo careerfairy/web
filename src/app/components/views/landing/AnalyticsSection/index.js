@@ -3,11 +3,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
-import {
-   analyticsPreviewImage,
-   analyticsSVG,
-   rectangle1,
-} from "../../../../constants/images";
+import { analyticsSVG } from "../../../../constants/images";
 import clsx from "clsx";
 import SectionContainer from "../../common/Section/Container";
 import { analyticsShowCaseVideoUrl } from "../../../../constants/videos";
@@ -28,7 +24,9 @@ const useStyles = makeStyles((theme) => ({
       height: "auto",
       maxWidth: 600,
    },
-   analyticsPreviewImage: {},
+   analyticsPreviewImage: {
+
+   },
    videoWrapper: {
       zIndex: 1,
       width: "100%",
@@ -36,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
       maxWidth: 1200,
       marginTop: "-2%",
       "& video": {
-         borderRadius: "1em",
+         borderRadius: "1rem",
          width: "100%",
          boxShadow: theme.shadows[15],
       },
@@ -48,7 +46,8 @@ const useStyles = makeStyles((theme) => ({
    },
    analyticsImage: {
       backgroundRepeat: "no-repeat",
-      backgroundPosition: "right bottom",
+      // backgroundPosition: "right bottom",
+      backgroundPosition: "right -40vw bottom -40vh",
    },
    backgroundRectangle: {
       position: "absolute",
@@ -78,11 +77,11 @@ const AnalyticsSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         <img
-            className={classes.backgroundRectangle}
-            alt="background-rectangle"
-            src={rectangle1}
-         />
+         {/*<img*/}
+         {/*   className={classes.backgroundRectangle}*/}
+         {/*   alt="background-rectangle"*/}
+         {/*   src={rectangle1}*/}
+         {/*/>*/}
          <SectionContainer>
             <Fade right>
             <SectionHeader

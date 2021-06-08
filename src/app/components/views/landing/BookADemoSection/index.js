@@ -51,8 +51,8 @@ const BookADemoSection = (props) => {
            <Pulse forever>
             <RoundButton
                className={classes.bookingButton}
-               onMouseEnter={handleToggle}
-               onMouseLeave={handleToggle}
+               // onMouseEnter={handleToggle}
+               // onMouseLeave={handleToggle}
                color="secondary"
                size="large"
                variant="contained"

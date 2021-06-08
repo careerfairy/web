@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
       height: "auto",
       maxWidth: 1200,
       boxShadow: theme.shadows[15],
+      borderRadius: "1rem",
    },
    imagesWrapper: {
       display: "flex",
