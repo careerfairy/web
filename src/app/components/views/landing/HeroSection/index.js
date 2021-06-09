@@ -18,7 +18,9 @@ const useStyles = makeStyles((theme) => ({
       justifyContent: "center",
       alignItems: (props) => (props.mobile ? "flex-start" : "center"),
    },
-   heroContainer: {},
+   heroContainer: {
+      maxWidth: "90%"
+   },
    subTitle: {
       color: theme.palette.text.secondary,
       fontWeight: 500,

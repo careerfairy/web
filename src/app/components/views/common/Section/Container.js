@@ -26,6 +26,7 @@ const SectionContainer = ({ children, ...props }) => {
            maxWidthLg: classes.customMaxWidth
         }}
          className={classes.root}
+        maxWidth="md"
          {...props}
          children={children}
       />

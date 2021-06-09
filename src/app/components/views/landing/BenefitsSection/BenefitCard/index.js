@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
       left: "50%",
       width: rectLength,
       height: rectLength,
-      [theme.breakpoints.down("xs")]: {
+      [theme.breakpoints.down("sm")]: {
          width: rectLength * 0.7,
          height: rectLength * 0.7,
       },
@@ -68,7 +68,7 @@ const BenefitCard = ({ description, imageUrl, name }) => {
             />
             <img className={classes.graphic} src={imageUrl} alt={name} />
          </div>
-         <Typography gutterBottom component="h4" align="center" variant="h4">
+         <Typography gutterBottom component="h5" align="center" variant="h5">
             <b>{name}</b>
          </Typography>
          <Typography variant="body1" color="textSecondary" align="center">
