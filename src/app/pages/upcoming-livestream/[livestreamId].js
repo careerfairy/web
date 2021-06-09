@@ -1235,6 +1235,7 @@ export async function getServerSideProps({
       delete serverSideLivestream.targetGroups;
       delete serverSideLivestream.hasStarted;
       delete serverSideLivestream.hasSentEmails;
+      delete serverSideLivestream.liveSpeakers;
       delete serverSideLivestream.hasEnded;
       delete serverSideLivestream.hidden;
       delete serverSideLivestream.test;
