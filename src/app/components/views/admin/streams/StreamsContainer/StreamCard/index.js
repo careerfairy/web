@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, {useState} from 'react';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles, useTheme} from '@material-ui/core/styles';
 import {languageCodes} from "../../../../../helperFunctions/streamFormFunctions";
 import {
     CardHeader,
@@ -13,11 +13,12 @@ import {
     CardMedia,
     Button,
     Card,
-    Avatar, IconButton, Menu, MenuItem
+    Avatar, IconButton, Menu, MenuItem, CircularProgress
 } from "@material-ui/core";
 import {getBaseUrl, prettyDate} from "../../../../../helperFunctions/HelperFunctions";
 import RegistrationsIcon from '@material-ui/icons/People';
 import ParticipationIcon from '@material-ui/icons/Visibility';
+import FiberManualRecordIcon  from '@material-ui/icons/FiberManualRecord';
 import JoinIcon from '@material-ui/icons/RecordVoiceOver';
 import {useFirestore} from "react-redux-firebase";
 import {useDispatch} from "react-redux";
@@ -25,6 +26,7 @@ import * as actions from '../../../../../../store/actions/index'
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog";
 import {streamType} from "../../../../../../types";
+import { withFirebase } from 'context/firebase';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -48,11 +50,14 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const StreamCard = ({stream}) => {
+const StreamCard = ({stream, firebase}) => {
     const classes = useStyles();
     const firestore = useFirestore()
+    const theme = useTheme()
     const dispatch = useDispatch()
 
+    const [token, setToken] = useState(null);
+    const [loadingRecording, setLoadingRecording] = useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [openStreamerLinksDialog, setOpenStreamerLinksDialog] = React.useState(false);
 
@@ -63,6 +68,64 @@ const StreamCard = ({stream}) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const startRecordingStream = async () => { 
+        setLoadingRecording(true)
+        try {
+            const tokenDoc = await firestore.get({
+                collection: "livestreams",
+                doc: stream.id,
+                subcollections: [{
+                    collection: "tokens",
+                    doc: "secureToken",
+                }]
+            })
+            if (tokenDoc.exists) {
+                const secureToken = tokenDoc.data().value
+                firebase.startRecordingLivestream(stream.id, secureToken).then(() => {
+                    setLoadingRecording(false)
+                }).catch(() => {
+                    dispatch(actions.sendGeneralError("Error starting the recording"))
+                    setLoadingRecording(false)
+                });
+            } else {
+                dispatch(actions.sendGeneralError("This stream has no token"))
+                setLoadingRecording(false)
+            }
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+            setLoadingRecording(false)
+        }
+    }
+
+    const stopRecordingStream = async () => { 
+        setLoadingRecording(true)
+        try {
+            const tokenDoc = await firestore.get({
+                collection: "livestreams",
+                doc: stream.id,
+                subcollections: [{
+                    collection: "tokens",
+                    doc: "secureToken",
+                }]
+            })
+            if (tokenDoc.exists) {
+                const secureToken = tokenDoc.data().value
+                firebase.stopRecordingLivestream(stream.id, secureToken).then(() => {
+                    setLoadingRecording(false)
+                }).catch(() => {
+                    dispatch(actions.sendGeneralError("Error stopping the recording"))
+                    setLoadingRecording(false)
+                });
+            } else {
+                dispatch(actions.sendGeneralError("This stream has no token"))
+                setLoadingRecording(false)
+            }
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+            setLoadingRecording(false)
+        }
+    }
 
     const handleJoinAsStreamer = async () => {
         try {
@@ -157,6 +220,7 @@ const StreamCard = ({stream}) => {
                     className={classes.spyButton}
                     target="_blank"
                     startIcon={<ParticipationIcon/>}
+                    size='small'
                     href={`https://testing2-careerfairy.web.app/streaming/${stream.id}/viewer`}
                     color="primary">
                     Spy
@@ -164,10 +228,21 @@ const StreamCard = ({stream}) => {
                 <Button
                     startIcon={<JoinIcon/>}
                     variant="contained"
+                    size='small'
                     onClick={handleJoinAsStreamer}
                     color="secondary"
                 >
-                    Join as streamer
+                    Join
+                </Button>
+                <Button
+                    variant="contained"
+                    size='small'
+                    disabled={loadingRecording}
+                    style={{ background: (stream.isRecording ? theme.palette.error.main  : ''), color: (stream.isRecording ? theme.palette.common.white  : '') }}
+                    startIcon={loadingRecording ? <CircularProgress size={20} /> : <FiberManualRecordIcon />}
+                    onClick={stream.isRecording ? stopRecordingStream : startRecordingStream }
+                >
+                    { stream.isRecording ? 'Stop Recording' : 'Start Recording' }
                 </Button>
             </CardActions>
             <StreamerLinksDialog
@@ -184,5 +259,5 @@ StreamCard.propTypes = {
     stream: streamType.isRequired
 }
 
-export default StreamCard
+export default withFirebase(StreamCard)
 
