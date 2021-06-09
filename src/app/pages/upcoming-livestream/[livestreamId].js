@@ -97,7 +97,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    const [isPastEvent, setIsPastEvent] = useState(
       dateIsHasPassed(currentLivestream?.startDate)
    );
-   console.log("-> isPastEvent", isPastEvent);
 
    useEffect(() => {
       // Checks if the event is old and has a summary,
