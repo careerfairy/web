@@ -157,16 +157,19 @@ const StreamerTopBar = ({firebase, showAudience, token}) => {
                                 tooltipTitle={currentLivestream.hasStarted ? `Click here to stop streaming` : `Click here to start streaming`}
                             />
                         </StandartTooltip>
-                        <ButtonWithConfirm
-                                color={currentLivestream.isRecording ? theme.palette.error.main : theme.palette.background.level3}
-                                mobile={mobile}
-                                disabled={loadingRecordingStatus}
-                                startIcon={loadingRecordingStatus ? <CircularProgress size={20}/> : <FiberManualRecordIcon />}
-                                buttonAction={currentLivestream.isRecording ? stopRecordingLivestream : startRecordingLivestream }
-                                confirmDescription={currentLivestream.isRecording ? 'Are you sure that you want to stop recording this stream?' : 'Are you sure that you want to start recording this stream?'}
-                                buttonLabel={currentLivestream.isRecording ? `Stop ${mobile ? "" : "Recording"}` : `Start ${mobile ? "" : "Recording"}`}
-                                tooltipTitle={currentLivestream.isRecording ? `Click here to stop recording` : `Click here to start recording`}
-                            />
+                        {
+                            currentLivestream.hasRecordingOption &&
+                            <ButtonWithConfirm
+                                    color={currentLivestream.isRecording ? theme.palette.error.main : theme.palette.background.level3}
+                                    mobile={mobile}
+                                    disabled={loadingRecordingStatus}
+                                    startIcon={loadingRecordingStatus ? <CircularProgress size={20}/> : <FiberManualRecordIcon />}
+                                    buttonAction={currentLivestream.isRecording ? stopRecordingLivestream : startRecordingLivestream }
+                                    confirmDescription={currentLivestream.isRecording ? 'Are you sure that you want to stop recording this stream?' : 'Are you sure that you want to start recording this stream?'}
+                                    buttonLabel={currentLivestream.isRecording ? `Stop ${mobile ? "" : "Recording"}` : `Start ${mobile ? "" : "Recording"}`}
+                                    tooltipTitle={currentLivestream.isRecording ? `Click here to stop recording` : `Click here to start recording`}
+                                />
+                        }
                     </Fragment>
                     }
                     {mobile ?
