@@ -21,7 +21,7 @@ const LogosComponent = ({ children }) => {
      <Fade up>
       <Grid container justify="center" spacing={3} className={classes.root}>
          {children.map((child) => (
-            <Grid className={classes.gridItem} key={child.key} item xs>{child}</Grid>
+            <Grid className={classes.gridItem} key={child.key} item xs={12} sm={6} md={3}>{child}</Grid>
          ))}
       </Grid>
      </Fade>
