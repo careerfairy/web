@@ -97,6 +97,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    const [isPastEvent, setIsPastEvent] = useState(
       dateIsHasPassed(currentLivestream?.startDate)
    );
+   console.log("-> isPastEvent", isPastEvent);
 
    useEffect(() => {
       // Checks if the event is old and has a summary,
@@ -391,11 +392,12 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
     * @param {number|string|VarDate|Date} date
     * @param {number} additionalMinutes - Amount of additional minutes to be added to current time
     */
-   function dateIsHasPassed(date, additionalMinutes = 60) {
-      return (
-         new Date(date).getTime() - Date.now() < 1000 * 60 * 60 * 24 ||
-         Date.now() + additionalMinutes * 60 * 1000 > new Date(date).getTime()
-      );
+   function dateIsHasPassed(date, additionalMinutes = 300) {
+      return false
+      // return (
+      //   new Date(date).getTime() - Date.now() < 1000 * 60 * 60 * 24 ||
+      //   Date.now() > new Date(date).getTime()
+      // );
    }
 
    function addNewQuestion() {
