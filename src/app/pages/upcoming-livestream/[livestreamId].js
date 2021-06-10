@@ -52,6 +52,40 @@ const useStyles = makeStyles((theme) => ({
    input: {
       background: theme.palette.background.paper,
    },
+   logoElementImage: {
+      width: "100%"
+   },
+   logoGrid: {
+      padding: theme.spacing(0.5),
+      height: "100%",
+      "& img":{
+
+      width: "100%",
+      objectFit: "contain",
+      maxHeight: 60,
+      maxWidth: 250,
+      }
+   },
+   companyLogo:{
+      margin: "0 auto",
+      maxHeight: "100px",
+      maxWidth: "280px",
+   },
+   imageGrid:{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center"
+   },
+   logosGridContainerWrapper:{
+      maxWidth: 720,
+      margin: "0 auto",
+
+   },
+   logosGridContainer:{
+      background: theme.palette.background.paper,
+      borderRadius: "0.5rem",
+      boxShadow: theme.shadows[2],
+   }
 }));
 
 const parseDates = (stream) => {
@@ -70,7 +104,6 @@ const parseDates = (stream) => {
 };
 
 function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
-   // console.count("-> UpcomingLivestream");
    const classes = useStyles();
    const router = useRouter();
    const { livestreamId } = router.query;
@@ -95,22 +128,22 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    const [openJoinModal, setOpenJoinModal] = useState(false);
    const [openTalentPoolModal, setOpenTalentPoolModal] = useState(false);
    const [isPastEvent, setIsPastEvent] = useState(
-      dateIsHasPassed(currentLivestream?.startDate)
+      streamIsOld(currentLivestream?.startDate)
    );
 
    useEffect(() => {
       // Checks if the event is old and has a summary,
       // if so the browser will scroll to the summary
       // on mount only.
-      if(isPastEvent && currentLivestream?.summary){
+      if (isPastEvent && currentLivestream?.summary) {
          window.scrollTo({
             behavior: "smooth",
-            top: summaryRef.current?.offsetTop - 100
+            top: summaryRef.current?.offsetTop - 100,
          });
       }
-   },[])
+   }, []);
    useEffect(() => {
-      setIsPastEvent(dateIsHasPassed(currentLivestream?.startDate));
+      setIsPastEvent(streamIsOld(currentLivestream?.startDate));
    }, [currentLivestream?.startDate]);
 
    useEffect(() => {
@@ -388,16 +421,22 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    }
 
    /**
-    * @param {number|string|VarDate|Date} date
-    * @param {number} additionalMinutes - Amount of additional minutes to be added to current time
+    * @param {number|string|VarDate|Date} streamStartDate -  Date
+    * @param {number} minimumTimeElapsed - Minimum time (minutes) that must have passed since the start of the stream
     */
-   function dateIsHasPassed(date, additionalMinutes = 300) {
-      return false
-      // return (
-      //   new Date(date).getTime() - Date.now() < 1000 * 60 * 60 * 24 ||
-      //   Date.now() > new Date(date).getTime()
-      // );
+   function streamIsOld(streamStartDate, minimumTimeElapsed = 120) {
+      const streamDate = new Date(streamStartDate);
+      const now = new Date();
+      const timeElapsed = now - streamDate;
+      return timeElapsed > minimumTimeElapsed * 60 * 1000;
    }
+
+   const lessThanOneHourAgo = (date) => {
+      const HOUR = 1000 * 60 * 60;
+      const anHourAgo = Date.now() - HOUR;
+
+      return date > anHourAgo;
+   };
 
    function addNewQuestion() {
       if (!user || !user.emailVerified) {
@@ -522,23 +561,11 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    let logoElements = careerCenters.map((careerCenter, index) => {
       return (
-         <Grid item xs={4} md={3} key={careerCenter.groupId}>
-            <Paper
-               className={classes.logoWrapper}
-               justify="center"
-               style={{ textAlign: "center" }}
-            >
+         <Grid className={classes.imageGrid} item xs={12} sm md key={careerCenter.groupId}>
                <img
                   src={getResizedUrl(careerCenter.logoUrl, "md")}
-                  style={{
-                     maxHeight: "60px",
-                     maxWidth: "250px",
-                     width: "100%",
-                     margin: "10px auto 5px auto",
-                     objectFit: "contain",
-                  }}
+                  className={classes.logoElementImage}
                />
-            </Paper>
          </Grid>
       );
    });
@@ -642,29 +669,34 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                            </div>
                         </div>
                      )}
-                     <div style={{ margin: "50px 0" }}>
-                        <Box>
-                           <Paper
-                              className={classes.logoWrapper}
-                              style={{ maxWidth: 300, margin: "0 auto" }}
-                           >
+                     <div style={{ margin: "50px 0", display: "flex" }}>
+                        <Grid
+                           container
+                           justify="center"
+                           style={{
+                              maxWidth: 300,
+                              margin: "0 auto",
+                           }}
+                        >
+                           <Grid item xs>
+                              <Paper
+                                // style={{ maxWidth: 300, margin: "0 auto" }}
+                                className={classes.logoWrapper}
+                              >
                               <img
                                  src={getResizedUrl(
                                     currentLivestream.companyLogoUrl,
                                     "md"
                                  )}
-                                 style={{
-                                    maxWidth: "230px",
-                                    maxHeight: "140px",
-                                    margin: "10px auto 5px auto",
-                                 }}
+                                 className={classes.companyLogo}
                               />
-                           </Paper>
-                        </Box>
-                        <Grid container justify="center" align="center">
-                           {speakerElements}
+                              </Paper>
+                           </Grid>
                         </Grid>
                      </div>
+                     <Grid container justify="center" align="center">
+                        {speakerElements}
+                     </Grid>
                      <div style={{ margin: "40px 0", width: "100%" }}>
                         <div>
                            {!isPastEvent && (
@@ -713,9 +745,17 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                         <TargetOptions options={targetOptions} />
                      </div>
                      <div style={{ textAlign: "center", marginBottom: "20px" }}>
-                        <Grid container justify="center" alignItems="center">
+                        <div className={classes.logosGridContainerWrapper}>
+                        <Grid
+                           container
+                           spacing={4}
+                           justify="center"
+                           className={classes.logosGridContainer}
+                           // alignItems="stretch"
+                        >
                            {logoElements}
                         </Grid>
+                        </div>
                      </div>
                      {!isPastEvent && (
                         <div className="topDescriptionContainer">
@@ -756,7 +796,9 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          </div>
          <div className="white-container">
             <Container>
-               <div ref={summaryRef} className="container-title">Short summary</div>
+               <div ref={summaryRef} className="container-title">
+                  Short summary
+               </div>
                <div
                   style={{
                      fontSize: "1.3em",
@@ -774,6 +816,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                </div>
             </Container>
          </div>
+         ;
          {!isPastEvent && (
             <div className="grey-container">
                <Container>
@@ -846,9 +889,8 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                      : "Join the Talent Pool and Get Hired"}
                </div>
                <div>
-                  <Box>
+                  <Box display="flex" justifyContent="center">
                      <Paper
-                        style={{ maxWidth: 300, margin: "0 auto" }}
                         className={classes.logoWrapper}
                      >
                         <img
@@ -860,11 +902,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                                    )
                                  : companyLogoPlaceholder
                            }
-                           style={{
-                              margin: "0 auto",
-                              maxHeight: "100px",
-                              maxWidth: "280px",
-                           }}
+                           className={classes.companyLogo}
                         />
                      </Paper>
                   </Box>
@@ -917,6 +955,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                </Grid>
             </Container>
          </div>
+         ;
          <div
             className={
                "grey-container " +
@@ -943,7 +982,8 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                </div>
             </Container>
          </div>
-         <Footer />
+         ;
+         <Footer />;
          <GroupJoinToAttendModal
             open={openJoinModal}
             groupsWithPolicies={groupsWithPolicies}
@@ -953,6 +993,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
             onConfirm={completeRegistrationProcess}
             closeModal={handleCloseJoinModal}
          />
+         ;
          <BookingModal
             careerCenters={careerCenters}
             livestream={currentLivestream}
@@ -963,12 +1004,14 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
             setRegistration={(value) => setRegistration(value)}
             user={user}
          />
+         ;
          <JoinTalentPoolModal
             livestream={currentLivestream}
             modalOpen={openTalentPoolModal}
             setModalOpen={setOpenTalentPoolModal}
             userData={userData}
          />
+         ;
          <style jsx>{`
             .hidden {
                display: none;
@@ -1211,6 +1254,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                color: rgb(44, 66, 81);
             }
          `}</style>
+         ;
       </div>
    );
 }
