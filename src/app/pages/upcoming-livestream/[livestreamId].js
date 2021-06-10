@@ -1271,7 +1271,18 @@ export async function getServerSideProps({
       serverSideLivestream = snap.data();
       // Clear out sensitive data for initial props
       delete serverSideLivestream.registeredUsers;
+      delete serverSideLivestream.registeredStudentsCount;
+      delete serverSideLivestream.currentSpeakerId;
+      delete serverSideLivestream.participatingStudents;
+      delete serverSideLivestream.participatingStudentsCount;
       delete serverSideLivestream.talentPool;
+      delete serverSideLivestream.targetGroups;
+      delete serverSideLivestream.hasStarted;
+      delete serverSideLivestream.hasSentEmails;
+      delete serverSideLivestream.liveSpeakers;
+      delete serverSideLivestream.hasEnded;
+      delete serverSideLivestream.hidden;
+      delete serverSideLivestream.test;
       delete serverSideLivestream.adminEmails;
       delete serverSideLivestream.adminEmail;
       delete serverSideLivestream.author;
