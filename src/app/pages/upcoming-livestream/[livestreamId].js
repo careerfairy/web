@@ -34,6 +34,7 @@ import HeadWithMeta from "../../components/page/HeadWithMeta";
 import Typography from "@material-ui/core/Typography";
 import JoinTalentPoolModal from "../../components/views/common/join-talent-pool-modal/JoinTalentPoolModal";
 import LinkifyText from "../../components/util/LinkifyText";
+import { Item, Row } from "@mui-treasury/components/flex";
 
 const useStyles = makeStyles((theme) => ({
    speakerAvatar: {
@@ -53,10 +54,10 @@ const useStyles = makeStyles((theme) => ({
       background: theme.palette.background.paper,
    },
    logoElementImage: {
-      width: "100%"
+     maxHeight: 100,
+      maxWidth: 180
    },
    logoGrid: {
-      padding: theme.spacing(0.5),
       height: "100%",
       "& img":{
 
@@ -67,9 +68,13 @@ const useStyles = makeStyles((theme) => ({
       }
    },
    companyLogo:{
+      padding: theme.spacing(0.5),
+      borderRadius: "0.3rem",
       margin: "0 auto",
-      maxHeight: "100px",
+      maxHeight: "150px",
       maxWidth: "280px",
+      boxShadow: theme.shadows[4],
+      background: theme.palette.common.white
    },
    imageGrid:{
       display: "flex",
@@ -77,14 +82,22 @@ const useStyles = makeStyles((theme) => ({
       alignItems: "center"
    },
    logosGridContainerWrapper:{
-      maxWidth: 720,
+      maxWidth: "80%",
       margin: "0 auto",
-
+display: "flex",
+      justifyContent: "center",
+      alignItems: "center"
    },
-   logosGridContainer:{
+   logoElementsRow:{
+     justifyContent: "space-around",
+     flexWrap: "wrap",
       background: theme.palette.background.paper,
       borderRadius: "0.5rem",
       boxShadow: theme.shadows[2],
+      width: "fit-content"
+   },
+   logosGridContainer:{
+
    }
 }));
 
@@ -561,12 +574,13 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    let logoElements = careerCenters.map((careerCenter, index) => {
       return (
-         <Grid className={classes.imageGrid} item xs={12} sm md key={careerCenter.groupId}>
-               <img
-                  src={getResizedUrl(careerCenter.logoUrl, "md")}
-                  className={classes.logoElementImage}
-               />
-         </Grid>
+         <Item className={classes.imageGrid} >
+            <img
+               src={getResizedUrl(careerCenter.logoUrl, "lg")}
+               className={classes.logoElementImage}
+               alt={`${currentLivestream.company} - logo`}
+            />
+         </Item>
       );
    });
 
@@ -670,19 +684,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                         </div>
                      )}
                      <div style={{ margin: "50px 0", display: "flex" }}>
-                        <Grid
-                           container
-                           justify="center"
-                           style={{
-                              maxWidth: 300,
-                              margin: "0 auto",
-                           }}
-                        >
-                           <Grid item xs>
-                              <Paper
-                                // style={{ maxWidth: 300, margin: "0 auto" }}
-                                className={classes.logoWrapper}
-                              >
                               <img
                                  src={getResizedUrl(
                                     currentLivestream.companyLogoUrl,
@@ -690,9 +691,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                                  )}
                                  className={classes.companyLogo}
                               />
-                              </Paper>
-                           </Grid>
-                        </Grid>
                      </div>
                      <Grid container justify="center" align="center">
                         {speakerElements}
@@ -746,15 +744,13 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                      </div>
                      <div style={{ textAlign: "center", marginBottom: "20px" }}>
                         <div className={classes.logosGridContainerWrapper}>
-                        <Grid
-                           container
-                           spacing={4}
-                           justify="center"
-                           className={classes.logosGridContainer}
-                           // alignItems="stretch"
+                        <Row
+                          style={{ justifyContent: "space-evenly" }}
+                          gap={1.5}
+                          className={classes.logoElementsRow}
                         >
                            {logoElements}
-                        </Grid>
+                        </Row>
                         </div>
                      </div>
                      {!isPastEvent && (
@@ -890,9 +886,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                </div>
                <div>
                   <Box display="flex" justifyContent="center">
-                     <Paper
-                        className={classes.logoWrapper}
-                     >
                         <img
                            src={
                               currentLivestream.companyLogoUrl
@@ -904,7 +897,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                            }
                            className={classes.companyLogo}
                         />
-                     </Paper>
                   </Box>
                </div>
                <Grid
