@@ -27,17 +27,25 @@ const initialMainLinks = [
 ]
 const initialSecondaryLinks = [
     {
-        href: `https://corporate.careerfairy.io/companies`,
+        href: `/companies`,
         title: 'FOR COMPANIES',
-        basePath: 'https://corporate.careerfairy.io/companies'
+        basePath: '/companies'
     },
     {
-        href: `https://corporate.careerfairy.io/career-center`,
+        href: `/career-center`,
         title: 'FOR CAREER CENTERS',
-        basePath: 'https://corporate.careerfairy.io/career-center'
+        basePath: '/career-center'
     }
 ]
 
+const landingLinks = [
+    {
+        href: `/`,
+        title: 'FOR STUDENTS',
+        basePath: '/'
+    },
+  ...initialSecondaryLinks
+]
 const useGeneralLinks = () => {
     const {authenticatedUser} = useAuth()
 
@@ -57,7 +65,7 @@ const useGeneralLinks = () => {
     }, [authenticatedUser?.emailVerified])
 
 
-    return {secondaryLinks, mainLinks}
+    return {secondaryLinks, mainLinks, landingLinks}
 };
 
 export default useGeneralLinks;

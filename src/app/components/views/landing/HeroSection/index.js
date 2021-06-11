@@ -41,7 +41,16 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const HeroSection = (props) => {
+const HeroSection = ({
+                        backgroundColor,
+                        backgroundImage,
+                        backgroundImageClassName,
+                        backgroundImageOpacity,
+                        big,
+                        color,
+                        handleOpenCalendly,
+                        title
+                     }) => {
    const theme = useTheme();
    const mobile = useMediaQuery(theme.breakpoints.down("sm"));
    const classes = useStyles({ mobile });
@@ -54,13 +63,13 @@ const HeroSection = (props) => {
 
    return (
       <Section
-         big={props.big}
+         big={big}
          className={classes.section}
-         color={props.color}
-         backgroundImageClassName={props.backgroundImageClassName}
-         backgroundImage={props.backgroundImage}
-         backgroundImageOpacity={props.backgroundImageOpacity}
-         backgroundColor={props.backgroundColor}
+         color={color}
+         backgroundImageClassName={backgroundImageClassName}
+         backgroundImage={backgroundImage}
+         backgroundImageOpacity={backgroundImageOpacity}
+         backgroundColor={backgroundColor}
       >
          <div className={classes.heroContainerWrapper}>
             <Grid className={classes.heroContainer} spacing={2} container>
@@ -71,7 +80,8 @@ const HeroSection = (props) => {
                      ) : (
                         <HeroMessage
                            mobile={mobile}
-                           handleOpenCalendly={props.handleOpenCalendly}
+                           title={title}
+                           handleOpenCalendly={handleOpenCalendly}
                         />
                      )}
                   </Fade>
@@ -81,7 +91,8 @@ const HeroSection = (props) => {
                      {mobile ? (
                         <HeroMessage
                            mobile={mobile}
-                           handleOpenCalendly={props.handleOpenCalendly}
+                           title={title}
+                           handleOpenCalendly={handleOpenCalendly}
                         />
                      ) : (
                         <LaptopVideo />

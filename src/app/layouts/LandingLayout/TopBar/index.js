@@ -12,6 +12,8 @@ import { useDispatch } from "react-redux";
 import { useAuth } from "../../../HOCs/AuthProvider";
 import LoginButton from "../../../components/views/common/LoginButton";
 import GeneralHeader from "../../../components/views/header/GeneralHeader";
+import clsx from "clsx";
+import { useRouter } from "next/router";
 
 const useStyles = makeStyles((theme) => ({
    avatar: {
@@ -72,6 +74,20 @@ const useStyles = makeStyles((theme) => ({
       boxShadow: theme.shadows[3],
       background: theme.palette.common.white,
    },
+   active: {
+      "&:before": {
+         content: '""',
+         position: "absolute",
+         width: "100%",
+         height: 2,
+         bottom: 4,
+         left: "0",
+         backgroundColor: theme.palette.common.white,
+         visibility: "visible",
+         WebkitTransform: "scaleX(1)",
+         transform: "scaleX(1)",
+      },
+   },
 }));
 
 const TopBar = ({ className, ...rest }) => {
@@ -79,8 +95,9 @@ const TopBar = ({ className, ...rest }) => {
    const classes = useStyles({
       navLinksColor: theme.palette.grey["800"],
    });
+   const {pathname} = useRouter()
 
-   const { mainLinks } = useGeneralLinks();
+   const { landingLinks } = useGeneralLinks();
    const dispatch = useDispatch();
    const handleDrawerOpen = () => dispatch(actions.openNavDrawer());
    const { authenticatedUser } = useAuth();
@@ -90,11 +107,13 @@ const TopBar = ({ className, ...rest }) => {
          <MainLogo />
          <Hidden smDown>
             <Tabs value={false} classes={{ indicator: classes.indicator }}>
-               {mainLinks.map((item) => {
+               {landingLinks.map((item) => {
                   return (
                      <Tab
                         key={item.title}
-                        className={classes.navLinks}
+                        className={clsx(classes.navLinks, {
+                           [classes.active]: pathname === item.href,
+                        })}
                         label={item.title}
                         href={item.href}
                      />
