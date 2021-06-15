@@ -22,7 +22,7 @@ import {Provider} from "react-redux";
 import {ThemeProviderWrapper} from "../context/theme/ThemeContext";
 import {CssBaseline} from '@material-ui/core';
 import Notifier from "../components/views/notifier";
-import { getCookieConsentVsalue } from "react-cookie-consent";
+import { getCookieConsentValue } from "react-cookie-consent";
 import CFCookieConsent from 'components/views/common/cookie-consent/CFCookieConsent';
 
 
