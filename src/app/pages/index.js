@@ -68,7 +68,6 @@ function LandingPage(props) {
     const secondPicture = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Finteract.png?alt=media";
 
     const [user, setUser] = useState(false);
-    const [userData, setUserData] = useState(null);
 
     const [companies, setCompanies] = useState([]);
     const [mentors, setMentors] = useState([]);
@@ -88,21 +87,6 @@ function LandingPage(props) {
             }
         });
     }, []);
-
-    useEffect(() => {
-        if (user) {
-            props.firebase.getUserData(user.email)
-                .then(querySnapshot => {
-                    let user = querySnapshot.data();
-                    if (user) {
-                        setUserData(user);
-                    }
-                    if (!user) {
-                        router.replace('/profile');
-                    }
-                });
-        }
-    }, [user]);
 
     useEffect(() => {
         props.firebase.getMentors().then(querySnapshot => {
@@ -133,27 +117,6 @@ function LandingPage(props) {
             behavior: 'smooth'
         });
     }
-
-    let companyPreviewElements = companies.filter(company => company.rank === 1).map((company, index) => {
-        return (
-            <Grid item xs={3} lg={2} key={index}>
-                <div className='overviewPreviewLogoContainer'>
-                    <div>
-                        <img style={{maxHeight: '40px', filter: 'brightness(0) invert(0.9)', margin: '0 auto'}}
-                               src={company.logoUrl}/>
-                    </div>
-                    <style jsx>{`
-                      .overviewPreviewLogoContainer div {
-                        width: 80%;
-                        margin: 0 auto;
-                        text-align: center;
-                        padding: 20px 0;
-                      }
-                    `}</style>
-                </div>
-            </Grid>
-        );
-    })
 
     let companyElements = companies.map((company, index) => {
         return (
