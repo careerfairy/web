@@ -293,7 +293,7 @@ const UsersTable = ({
       <Tab
          href={`/group/${group.id}/admin/edit#privacy-policy`}
          component={Link}
-         label={`Click here to activate your privacy to see registered users ${
+         label={`Click here to activate your privacy to see users ${
             group?.universityCode ? "outside of your university" : ""
          }`}
       />

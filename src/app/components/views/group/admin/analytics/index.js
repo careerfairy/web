@@ -304,10 +304,10 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
       if (currentUserDataSet.dataSet === "followers" && !userData?.isAdmin) {
          let limitedUserTypes = [...userTypes];
          const policyActive = Boolean(group?.privacyPolicyActive);
-         limitedUserTypes = limitedUserTypes.filter(
-            ({ propertyName }) => propertyName !== "participatingStudents"
-         );
          if (!policyActive) {
+            limitedUserTypes = limitedUserTypes.filter(
+               ({ propertyName }) => propertyName !== "participatingStudents"
+            );
             limitedUserTypes = limitedUserTypes.filter(
                ({ propertyName }) => propertyName !== "registeredUsers"
             );
