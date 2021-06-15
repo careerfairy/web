@@ -22,7 +22,7 @@ import {Provider} from "react-redux";
 import {ThemeProviderWrapper} from "../context/theme/ThemeContext";
 import {CssBaseline} from '@material-ui/core';
 import Notifier from "../components/views/notifier";
-import CookieConsent from "react-cookie-consent";
+import { getCookieConsentValue } from "react-cookie-consent";
 import CFCookieConsent from 'components/views/cookie-consent/CFCookieConsent';
 
 
@@ -76,9 +76,13 @@ function MyApp({Component, pageProps}) {
         gtmId: 'GTM-P29VCWC'
     }
 
+    const cookieValue = getCookieConsentValue()
+
     useEffect(() => {
-        TagManager.initialize(tagManagerArgs);
-    }, []);
+        if (Boolean(cookieValue === 'true')) {
+            TagManager.initialize(tagManagerArgs);
+        }
+    }, [cookieValue]);
 
     const getActiveTutorialStepKey = () => {
         const activeStep = Object.keys(tutorialSteps).find((key) => {
