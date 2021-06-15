@@ -11,7 +11,6 @@ import {NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL} from "../../constants/routes
 import {getServerSideStream} from "../../util/serverUtil";
 import {getResizedUrl} from "../../components/helperFunctions/HelperFunctions";
 import ScrollToTop from "../../components/views/common/ScrollToTop";
-import PrivacyCookie from "../../components/views/common/PrivacyCookie";
 
 const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
 
@@ -93,7 +92,6 @@ const nextLivestreamsPage = ({livestreamId, serverSideStream, initialTabValue}) 
                     listenToUpcoming
                     pastLivestreams={pastLivestreams}
                 />
-                <PrivacyCookie/>
             </NextLivestreamsLayout>
             <ScrollToTop/>
         </React.Fragment>
