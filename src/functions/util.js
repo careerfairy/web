@@ -59,10 +59,18 @@ const generateEmailData = (livestreamId, livestream, startingNow) => {
         }
     }
 }
+
+const getArrayDifference = (array1, array2) => {
+    return array2.filter( element => {
+        return !array1.includes(element)
+    })
+}
+
 module.exports = {
     setHeaders,
     generateEmailData,
     formatHour,
     getLivestreamTimeInterval,
-    getStreamLink
+    getStreamLink,
+    getArrayDifference
 }
