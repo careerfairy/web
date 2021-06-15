@@ -22,6 +22,8 @@ import {Provider} from "react-redux";
 import {ThemeProviderWrapper} from "../context/theme/ThemeContext";
 import {CssBaseline} from '@material-ui/core';
 import Notifier from "../components/views/notifier";
+import CookieConsent from "react-cookie-consent";
+import CFCookieConsent from 'components/views/cookie-consent/CFCookieConsent';
 
 
 config({ssrFadeout: true});
@@ -99,6 +101,7 @@ function MyApp({Component, pageProps}) {
         const activeStep = getActiveTutorialStepKey()
         return Boolean(activeStep === property)
     }
+
     return (
         <Fragment>
             <Head>
@@ -123,6 +126,7 @@ function MyApp({Component, pageProps}) {
                                         <ErrorContext.Provider value={{generalError, setGeneralError}}>
                                             {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                                             <CssBaseline/>
+                                            <CFCookieConsent/>
                                             <Component {...pageProps} />
                                             <Notifier/>
                                             <ErrorSnackBar handleClose={() => setGeneralError("")}
