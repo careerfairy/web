@@ -47,22 +47,12 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const AudioTab = ({audioLevel, audioSource, devices, setAudioSource, setSpeakerSource, speakerSource, attachSinkId, sinkId}) => {
+const AudioTab = ({audioLevel, audioSource, devices, setAudioSource }) => {
     const classes = useStyles()
     const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
 
-    useEffect(() => {
-        if (speakerSource) {
-            attachSinkId(audio, speakerSource);
-        }
-    }, [speakerSource])
-
     const handleChangeMic = (event) => {
         setAudioSource(event.target.value)
-    }
-
-    const handleChangeSpeaker = async (event) => {
-        setSpeakerSource(event.target.value)
     }
 
     return (
@@ -90,27 +80,9 @@ const AudioTab = ({audioLevel, audioSource, devices, setAudioSource, setSpeakerS
             </Grid>}
             {devices.audioOutputList.length && 
             <Grid item lg={12} md={12} sm={12} xs={12}>
-                <FormControl disabled={!devices.audioOutputList.length} fullWidth variant="outlined">
-                    <InputLabel id="speakerSelect">Select Speakers</InputLabel>
-                    <Select value={speakerSource}
-                            fullWidth
-                            disabled={!devices.audioOutputList.length}
-                            onChange={handleChangeSpeaker}
-                            variant="outlined"
-                            id="speakerSelect"
-                            label="Select Speaker"
-                    >
-                        <MenuItem value="" disabled>
-                            Select a Speaker
-                        </MenuItem>
-                        {devices.audioOutputList.map(device => {
-                            return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
-                        })}
-                    </Select>
-                </FormControl>
                 <Button variant='outlined' onClick={toggle} className={classes.button}>{ playing ? 'Stop playing' : 'Play some music'}</Button>
                 { playing &&
-                    <Typography>If you cannot hear the music, try another speaker or increase the volume on your device.</Typography>
+                    <Typography>If you cannot hear the music, try changing the speaker on your computer or increase the volume on your device.</Typography>
                 }
             </Grid>}
         </Grid>

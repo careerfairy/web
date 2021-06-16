@@ -60,6 +60,7 @@ exports.exportFirestoreBackup = backup.exportFirestoreBackup
 // Group Admin
 exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail
 exports.sendDraftApprovalRequestEmail = groupAdmin.sendDraftApprovalRequestEmail
+exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus
 
 // Reminders
 exports.sendReminderEmailToRegistrants = reminders.sendReminderEmailToRegistrants

@@ -147,26 +147,7 @@ function VideoContainer(props) {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;
         await props.firebase.setDesktopMode(streamRef, mode, screenSharerId);
     }
-
-    const attachSinkId = (element, sinkId) => {
-        if (typeof element.sinkId !== 'undefined') {
-            element.setSinkId(sinkId)
-                .then(() => {
-                    console.log(`Success, audio output device attached: ${sinkId}`);
-                })
-                .catch(error => {
-                    let errorMessage = error;
-                    if (error.name === 'SecurityError') {
-                        errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
-                    }
-                    console.error(errorMessage);
-                    // Jump back to first output device in the list as it's the default.
-                });
-        } else {
-            console.warn('Browser does not support output device selection.');
-        }
-    }
-
+    
     useEffect(() => {
         const activeStep = getActiveTutorialStepKey();
         if (localMediaStream && activeStep > 0) {
@@ -247,7 +228,6 @@ function VideoContainer(props) {
                         localId={props.streamerId}
                         localStream={localMediaStream}
                         speakerSource={speakerSource}
-                        attachSinkId={attachSinkId}
                         isStreamer={props.isStreamer}
                         isBreakout={props.isBreakout}
                         streams={externalMediaStreams}
@@ -265,7 +245,6 @@ function VideoContainer(props) {
                     showMenu={props.showMenu}
                     externalMediaStreams={externalMediaStreams}
                     isLocalScreen={screenSharingMode}
-                    attachSinkId={attachSinkId}
                     presenter={true}/>}
                 <VideoControlsContainer
                     currentLivestream={props.currentLivestream}
@@ -294,7 +273,7 @@ function VideoContainer(props) {
                            audioSource={audioSource} updateAudioSource={updateAudioSource}
                            videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                            speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                           attachSinkId={attachSinkId}/>
+                           />
             <StreamPreparationModalV2 readyToConnect={Boolean(props.currentLivestream && props.currentLivestream.id)}
                                       audioSource={audioSource} updateAudioSource={updateAudioSource}
                                       videoSource={videoSource} updateVideoSource={updateVideoSource}
@@ -305,7 +284,7 @@ function VideoContainer(props) {
                                       connectionEstablished={connectionEstablished}
                                       isTest={props.currentLivestream.test} viewer={props.viewer}
                                       handleOpenDemoIntroModal={handleOpenDemoIntroModal}
-                                      attachSinkId={attachSinkId} devices={devices}
+                                      devices={devices}
                                       setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
                                       isStreaming={isStreaming}/>
             <LoadingModal agoraRtcStatus={agoraRtcStatus}/>
