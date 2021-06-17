@@ -67,7 +67,7 @@ const StreamSection = (props) => {
          <SectionContainer>
             <Fade left>
                <HighlightText
-                  text={"Why use live streams to showcase your opportunities?"}
+                  text={"Why use live streams to showcase opportunities?"}
                />
             </Fade>
             <Fade right>

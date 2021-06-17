@@ -28,33 +28,6 @@ const useStyles = makeStyles((theme) => ({
    // },
 }));
 
-const benefitsData = [
-    {
-        name: "Fun career events",
-        description:
-            "A highly interactive format " +
-            "developed for a young " +
-            "audience worldwide",
-        imageUrl: engageShape,
-    },
-    {
-        name: "Reach more talents",
-        description:
-            "We promote your events to " +
-            "the CareerFairy community " +
-            "and universities",
-        imageUrl: reachShape,
-    },
-    {
-        name: "Measure the success",
-        description:
-            "Demonstrate the success of " +
-            "your events through " +
-            "detailed analytics",
-        imageUrl: measureShape,
-    },
-];
-
 const BenefitsSection = (props) => {
     const classes = useStyles();
 
@@ -78,11 +51,11 @@ const BenefitsSection = (props) => {
                 <Grid
                     justify="space-around"
                     container
-                    spacing={2}
+                    spacing={5}
                     className={classes.benefitsWrapper}
                 >
-                    {benefitsData.map(({name, imageUrl, description}, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={name}>
+                    {props.benefits.map(({name, imageUrl, description}, index) => (
+                        <Grid item xs={12} sm={6} md={3} key={name}>
                             <MuiGridFade
                               index={index}
                               up

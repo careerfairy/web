@@ -8,11 +8,11 @@ import FooterV2 from "../../components/views/footer/FooterV2";
 const useStyles = makeStyles(styles);
 
 const drawerWidth = 300;
-const LandingLayout = ({ children }) => {
+const LandingLayout = ({ backgroundImage, children }) => {
    const classes = useStyles();
 
    return (
-      <div className={classes.root}>
+      <div className={classes.root} style={{ backgroundImage: `url(${backgroundImage})` }}>
          <TopBar />
          <NavBar drawerWidth={drawerWidth} />
          <div className={classes.wrapper}>

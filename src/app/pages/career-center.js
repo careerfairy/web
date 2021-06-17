@@ -11,7 +11,7 @@ import CompaniesSection from "../components/views/landing/CompaniesSection";
 import HeroSection from "../components/views/landing/HeroSection";
 import CalendlyModal from "../components/views/landing/CalendlyModal";
 import ScrollToTop from "../components/views/common/ScrollToTop";
-import { rectangle1 } from "../constants/images";
+import { rectangle1, alternateBackground, engageShape } from "../constants/images";
 
 const CareerCenterLandingPage = ({}) => {
    const {
@@ -26,45 +26,99 @@ const CareerCenterLandingPage = ({}) => {
 
    const handleCloseCalendly = () => setCalendlyModalOpen(false);
 
+   const careerCenterBenefitsData = [
+      {
+          name: "Empower your corporate partners",
+          description:
+              "Enable new and existing corporate " +
+              "partners to book live streams with you to " +
+              "remotely engage with your student " + 
+              "community",
+          imageUrl: engageShape,
+      },
+      {
+          name: "Forget the hassle",
+          description:
+              "Set up and manage your live " +
+              "streams in a few clicks. No room to " +
+              "book, no complex logistics to " + 
+              "deal with.",
+          imageUrl: engageShape,
+      },
+      {
+          name: "Generate additional revenue",
+          description:
+              "Don't compromise your current " +
+              "offering. Set the price of the live streams " +
+              "yourself and organize the number " + 
+              "of events that you want to offer ",
+          imageUrl: engageShape,
+      },
+      {
+          name: "Create a better student experience",
+          description:
+              "Students engage with employees " +
+              "through their smartphone and " +
+              "directly apply through the " + 
+              "company's talent pool",
+          imageUrl: engageShape,
+      }
+  ];
+
+  const careerCenterBenefitsData2 = [
+   {
+       name: "Plan a livestream",
+       description:
+           "Manage your livestream requests " +
+           "from companies and setup future " +
+           "events",
+       imageUrl: engageShape,
+   },
+   {
+       name: "Promote the event",
+       description:
+           "Once a livestream event is scheduled " +
+           "notify all target student communities " +
+           "and universities",
+       imageUrl: engageShape,
+   },
+   {
+       name: "Track analytics",
+       description:
+           "Access relevant audience data in " +
+           "real-time and provide feedback to " +
+           "your corporate partners",
+       imageUrl: engageShape,
+   }
+];
+
    return (
-      <LandingLayout>
+      <LandingLayout backgroundImage={alternateBackground}>
          <HeroSection
             title={
-              <b>Boost student & employer interactions with our career live streams</b>
+              <div><b>Boost</b> student & employer interactions with our <b>career live streams</b></div>
             }
             big
             handleOpenCalendly={handleOpenCalendly}
          />
-         <CompaniesSection />
-         <BenefitsSection title={"Why CareerFairy?"} />
+         <BenefitsSection title={"Why join CareerFairy?"} benefits={careerCenterBenefitsData} />
          <UniversitySection
-            subtitle="The best talent is evenly distributed, which makes it
-            hard to reach. With CareerFairy live streams,
-            you can reach students at multiple top universities in a
-            single one hour-long event. No travel, no logistics, no days off work."
-            title="Some universities that we work with"
+            subtitle=""
+            title="We already work with"
          />
          <StreamSection
             title={
                <>
-                  Showcase your best ambassadors <b>- your employees.</b>
+                  <b>Track</b> and <b>measure</b> your events
                </>
             }
             subtitle="We believe that your employees are your biggest asset, and their insights provide
                 an authentic look into the opportunities that your company has to offer."
          />
-         <AnalyticsSection
-            title={
-               <>
-                  Boost your <b>employer brand</b>, measure the results with{" "}
-                  <b>data</b>
-               </>
-            }
-            backgroundImage={rectangle1}
-            subtitle="Evaluate the success of your events, gather live feedback from your audience and follow up easily with interesting candidates"
-         />
+         <BenefitsSection title={"Simple setup"} benefits={careerCenterBenefitsData2} />
+         <CompaniesSection title=""/>
          <TestimonialsSection
-            title="What They Are Saying"
+            title="What Companies Are Saying"
             backgroundColor={grey["200"]}
          />
          <BookADemoSection
@@ -72,7 +126,7 @@ const CareerCenterLandingPage = ({}) => {
             color={common.white}
             big
             handleOpenCalendly={handleOpenCalendly}
-            title={"Join the ranks of leading organisations today"}
+            title={"Have a chat with us"}
          />
          <CalendlyModal
             open={calendlyModalOpen}

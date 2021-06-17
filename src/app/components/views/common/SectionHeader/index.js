@@ -44,6 +44,7 @@ function SectionHeader(props) {
                align="center"
                variant="h3"
                component="h3"
+               margin={20}
             >
                {props.title}
             </Typography>

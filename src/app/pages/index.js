@@ -11,7 +11,7 @@ import CompaniesSection from "../components/views/landing/CompaniesSection";
 import HeroSection from "../components/views/landing/HeroSection";
 import CalendlyModal from "../components/views/landing/CalendlyModal";
 import ScrollToTop from "../components/views/common/ScrollToTop";
-import { rectangle1 } from "../constants/images";
+import { rectangle1, mainBackground, engageShape, reachShape, measureShape } from "../constants/images";
 
 const LandingPage = ({}) => {
    const {
@@ -26,11 +26,38 @@ const LandingPage = ({}) => {
 
    const handleCloseCalendly = () => setCalendlyModalOpen(false);
 
+   const companyBenefitsData = [
+    {
+        name: "Create fun career events",
+        description:
+            "A highly interactive format " +
+            "developed for a young " +
+            "audience worldwide",
+        imageUrl: engageShape,
+    },
+    {
+        name: "Reach more talents",
+        description:
+            "We promote your events to " +
+            "the CareerFairy community " +
+            "and universities",
+        imageUrl: reachShape,
+    },
+    {
+        name: "Easily measure success",
+        description:
+            "Demonstrate the success of " +
+            "your events through " +
+            "detailed analytics",
+        imageUrl: measureShape,
+    },
+];
+
    return (
-      <LandingLayout>
+      <LandingLayout backgroundImage={mainBackground}>
          <HeroSection big handleOpenCalendly={handleOpenCalendly} />
          <CompaniesSection  />
-         <BenefitsSection title={"Why CareerFairy?"} />
+         <BenefitsSection title={"Why CareerFairy?"} benefits={companyBenefitsData} />
          <UniversitySection
             subtitle="The best talent is evenly distributed, which makes it
             hard to reach. With CareerFairy live streams,

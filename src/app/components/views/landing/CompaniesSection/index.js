@@ -11,7 +11,7 @@ import LogosComponent from "../common/LogosComponent";
 
 const useStyles = makeStyles((theme) => ({
     section: {
-        paddingBottom: 0,
+        paddingBottom: 20,
         [theme.breakpoints.down("sm")]: {
             paddingTop: 40
         },

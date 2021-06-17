@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { Typography } from "@material-ui/core";
 
 const angle = 20;
-const rectLength = 150;
+const rectLength = 130;
 const useStyles = makeStyles((theme) => ({
    root: {
       // border: "1px solid red"
@@ -43,8 +43,13 @@ const useStyles = makeStyles((theme) => ({
    graphic: {
       position: "absolute",
       top: "50%",
+      width: rectLength * 0.6,
+      height: "auto",
       left: "50%",
       transform: `translate(-50%,-50%)`,
+      [theme.breakpoints.down("sm")]: {
+         width: rectLength * 0.5,
+      },
    },
 }));
 
@@ -68,9 +73,11 @@ const BenefitCard = ({ description, imageUrl, name }) => {
             />
             <img className={classes.graphic} src={imageUrl} alt={name} />
          </div>
-         <Typography gutterBottom component="h5" align="center" variant="h5">
-            <b>{name}</b>
-         </Typography>
+         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 100 }}>
+            <Typography gutterBottom component="h5" align="center" variant="h5">
+               <b>{name}</b>
+            </Typography>
+         </div>     
          <Typography variant="body1" color="textSecondary" align="center">
             {description}
          </Typography>
