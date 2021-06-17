@@ -56,7 +56,7 @@ const LandingPage = ({}) => {
    return (
       <LandingLayout backgroundImage={mainBackground}>
          <HeroSection big handleOpenCalendly={handleOpenCalendly} />
-         <CompaniesSection  />
+         <CompaniesSection overheadText="Over 200+ happy customers"/>
          <BenefitsSection title={"Why CareerFairy?"} benefits={companyBenefitsData} />
          <UniversitySection
             subtitle="The best talent is evenly distributed, which makes it

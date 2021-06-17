@@ -3,7 +3,6 @@ import { useTheme } from "@material-ui/core/styles";
 import LandingLayout from "../layouts/LandingLayout";
 import BookADemoSection from "../components/views/landing/BookADemoSection";
 import TestimonialsSection from "../components/views/landing/TestimonialsSection";
-import AnalyticsSection from "../components/views/landing/AnalyticsSection";
 import StreamSection from "../components/views/landing/StreamSection";
 import UniversitySection from "../components/views/landing/UniversitySection";
 import BenefitsSection from "../components/views/landing/BenefitsSection";
@@ -11,7 +10,8 @@ import CompaniesSection from "../components/views/landing/CompaniesSection";
 import HeroSection from "../components/views/landing/HeroSection";
 import CalendlyModal from "../components/views/landing/CalendlyModal";
 import ScrollToTop from "../components/views/common/ScrollToTop";
-import { rectangle1, alternateBackground, engageShape } from "../constants/images";
+import { star, mouse, wallet, phone, livestream, promote, trackAnalytics, alternateBackground, engageShape } from "../constants/images";
+import ExperienceSection from "components/views/landing/ExperienceSection";
 
 const CareerCenterLandingPage = ({}) => {
    const {
@@ -34,7 +34,7 @@ const CareerCenterLandingPage = ({}) => {
               "partners to book live streams with you to " +
               "remotely engage with your student " + 
               "community",
-          imageUrl: engageShape,
+          imageUrl: star,
       },
       {
           name: "Forget the hassle",
@@ -43,7 +43,7 @@ const CareerCenterLandingPage = ({}) => {
               "streams in a few clicks. No room to " +
               "book, no complex logistics to " + 
               "deal with.",
-          imageUrl: engageShape,
+          imageUrl: mouse,
       },
       {
           name: "Generate additional revenue",
@@ -52,7 +52,7 @@ const CareerCenterLandingPage = ({}) => {
               "offering. Set the price of the live streams " +
               "yourself and organize the number " + 
               "of events that you want to offer ",
-          imageUrl: engageShape,
+          imageUrl: wallet,
       },
       {
           name: "Create a better student experience",
@@ -61,7 +61,7 @@ const CareerCenterLandingPage = ({}) => {
               "through their smartphone and " +
               "directly apply through the " + 
               "company's talent pool",
-          imageUrl: engageShape,
+          imageUrl: phone,
       }
   ];
 
@@ -72,7 +72,7 @@ const CareerCenterLandingPage = ({}) => {
            "Manage your livestream requests " +
            "from companies and setup future " +
            "events",
-       imageUrl: engageShape,
+       imageUrl: livestream,
    },
    {
        name: "Promote the event",
@@ -80,7 +80,7 @@ const CareerCenterLandingPage = ({}) => {
            "Once a livestream event is scheduled " +
            "notify all target student communities " +
            "and universities",
-       imageUrl: engageShape,
+       imageUrl: promote,
    },
    {
        name: "Track analytics",
@@ -88,7 +88,7 @@ const CareerCenterLandingPage = ({}) => {
            "Access relevant audience data in " +
            "real-time and provide feedback to " +
            "your corporate partners",
-       imageUrl: engageShape,
+       imageUrl: trackAnalytics,
    }
 ];
 
@@ -106,17 +106,11 @@ const CareerCenterLandingPage = ({}) => {
             subtitle=""
             title="We already work with"
          />
-         <StreamSection
-            title={
-               <>
-                  <b>Track</b> and <b>measure</b> your events
-               </>
-            }
-            subtitle="We believe that your employees are your biggest asset, and their insights provide
-                an authentic look into the opportunities that your company has to offer."
+         <ExperienceSection
+            handleOpenCalendly={handleOpenCalendly}
          />
          <BenefitsSection title={"Simple setup"} benefits={careerCenterBenefitsData2} />
-         <CompaniesSection title=""/>
+         <CompaniesSection  overheadText="Access our network of 200+ employers"/>
          <TestimonialsSection
             title="What Companies Are Saying"
             backgroundColor={grey["200"]}

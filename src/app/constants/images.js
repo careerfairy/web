@@ -18,8 +18,14 @@ export const alternateBackground = "https://firebasestorage.googleapis.com/v0/b/
 export const blankLaptop = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flaptop.webp?alt=media&token=41342a75-c0a3-4462-93b8-6fc1a7ff2558"
 export const blankUIQAndA = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fscreen-blank.webp?alt=media&token=d3a37a1c-af2f-46b4-a107-6f6077f3f788"
 export const laptopUi = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flaptop-ui.webp?alt=media&token=15f27c65-a8d4-409f-bc19-a1b73c58fc25"
-
-
+export const mouse = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fmouse.svg?alt=media&token=8078e3f1-e366-48d2-aefd-749c7227e629"
+export const star = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstar.svg?alt=media&token=38c197b5-f87e-4ef1-bd65-ad19e25bf445"
+export const trackAnalytics = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Ftrackanalytics.svg?alt=media&token=dc625a10-55e7-4ba7-86a0-bd18e488e464"
+export const phone = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fphone.svg?alt=media&token=2113034e-1219-4384-ac1a-b9a7ce9748a6"
+export const promote = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fpromote.svg?alt=media&token=2ec15325-fcb8-4d9c-a221-634a39075c61"
+export const ipad = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fipad.jpg?alt=media&token=4e157eb7-a10b-4aed-9324-00922f96e33b"
+export const livestream = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flivestream.svg?alt=media&token=e7da7142-ce12-48ba-8937-b1e2be132720"
+export const wallet = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fwallet.svg?alt=media&token=f05c1fa4-b193-46a3-8888-95a5c0b5e016"
 
 
 

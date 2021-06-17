@@ -44,7 +44,7 @@ const CompaniesSection = (props) => {
             backgroundColor={props.backgroundColor}
         >
             <SectionContainer>
-                <HighlightText text={"Over 200+ happy customers"}/>
+                <HighlightText text={props.overheadText}/>
                 <LogosComponent>
                     {landingCompanies.map(({name, imageUrlMain}) => (
                         <Logo

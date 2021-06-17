@@ -43,7 +43,8 @@ const useStyles = makeStyles((theme) => ({
    graphic: {
       position: "absolute",
       top: "50%",
-      width: rectLength * 0.6,
+      maxWidth: rectLength * 0.6,
+      maxHeight:  rectLength * 0.6,
       height: "auto",
       left: "50%",
       transform: `translate(-50%,-50%)`,
