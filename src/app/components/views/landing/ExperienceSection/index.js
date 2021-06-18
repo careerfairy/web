@@ -86,7 +86,7 @@ const ExperienceSection = (props) => {
                </div>
             </Fade>
             <Fade left>
-               <p className={classes.imageText}>We offer you a digital channel that complements career fairs and other face-to-face events at your university. During a livestream, one or more employees of a company can give students insights into their daily work and answer all of their questions about the reality on the job.</p>
+               <p className={classes.imageText}>During a livestream, one or more employees of a company gives students insights into their daily work and answer all of their questions about the reality on the job.</p>
                <HeroButton
                   color="secondary"
                   fullWidth

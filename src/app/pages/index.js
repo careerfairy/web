@@ -59,11 +59,8 @@ const LandingPage = ({}) => {
          <CompaniesSection overheadText="Over 200+ happy customers"/>
          <BenefitsSection title={"Why CareerFairy?"} benefits={companyBenefitsData} />
          <UniversitySection
-            subtitle="The best talent is evenly distributed, which makes it
-            hard to reach. With CareerFairy live streams,
-            you can reach students at multiple top universities in a
-            single one hour-long event. No travel, no logistics, no days off work."
-            title="Some universities that we work with"
+            title={"Some of the universities we work with"}
+            subtitle="Reach students at multiple universities with a single event. No travel, no logistics, no days off work."
          />
          <StreamSection
             title={

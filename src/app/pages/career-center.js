@@ -28,11 +28,11 @@ const CareerCenterLandingPage = ({}) => {
 
    const careerCenterBenefitsData = [
       {
-          name: "Empower your corporate partners",
+          name: "Open new doors for your students",
           description:
-              "Enable new and existing corporate " +
-              "partners to book live streams with you to " +
-              "remotely engage with your student " + 
+              "Enable companies on CareerFairy " +
+              "to book live streams with you to " +
+              "engage with your student " + 
               "community",
           imageUrl: star,
       },
@@ -55,13 +55,12 @@ const CareerCenterLandingPage = ({}) => {
           imageUrl: wallet,
       },
       {
-          name: "Create a better student experience",
+          name: "Get feedback from your students",
           description:
-              "Students engage with employees " +
-              "through their smartphone and " +
-              "directly apply through the " + 
-              "company's talent pool",
-          imageUrl: phone,
+              "CareerFairy provides detailed analytics" +
+              "to help you understand what your students " +
+              "are looking for",
+          imageUrl: trackAnalytics,
       }
   ];
 
@@ -77,9 +76,8 @@ const CareerCenterLandingPage = ({}) => {
    {
        name: "Promote the event",
        description:
-           "Once a livestream event is scheduled " +
-           "notify all target student communities " +
-           "and universities",
+           "Once a livestream event is scheduled, " +
+           "you notify your students about the event ",
        imageUrl: promote,
    },
    {

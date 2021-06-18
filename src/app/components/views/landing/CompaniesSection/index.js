@@ -49,7 +49,6 @@ const CompaniesSection = (props) => {
                     {landingCompanies.map(({name, imageUrlMain}) => (
                         <Logo
                             key={name}
-                            withFilter
                             alt={name}
                             logoUrl={getResizedUrl(imageUrlMain, "xs")}
                         />

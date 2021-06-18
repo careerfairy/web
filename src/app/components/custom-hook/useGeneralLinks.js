@@ -27,11 +27,6 @@ const initialMainLinks = [
 ]
 const initialSecondaryLinks = [
     {
-        href: `/companies`,
-        title: 'FOR COMPANIES',
-        basePath: '/companies'
-    },
-    {
         href: `/career-center`,
         title: 'FOR CAREER CENTERS',
         basePath: '/career-center'
@@ -41,7 +36,7 @@ const initialSecondaryLinks = [
 const landingLinks = [
     {
         href: `/`,
-        title: 'FOR STUDENTS',
+        title: 'FOR COMPANIES',
         basePath: '/'
     },
   ...initialSecondaryLinks
