@@ -113,7 +113,7 @@ const HeroMessage = ({ handleOpenCalendly, title, mobile }) => {
 HeroMessage.propTypes = {
    handleOpenCalendly: PropTypes.func,
    mobile: PropTypes.bool,
-   title: PropTypes.string,
+   title: PropTypes.any,
 };
 
 export default HeroMessage;
