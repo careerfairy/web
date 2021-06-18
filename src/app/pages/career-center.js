@@ -102,7 +102,7 @@ const CareerCenterLandingPage = ({}) => {
          <BenefitsSection title={"Why join CareerFairy?"} benefits={careerCenterBenefitsData} />
          <UniversitySection
             subtitle=""
-            title="We already work with"
+            title="Some of the universities we work with"
          />
          <ExperienceSection
             handleOpenCalendly={handleOpenCalendly}

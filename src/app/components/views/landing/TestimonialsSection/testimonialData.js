@@ -1,7 +1,7 @@
 export default [
    {
       rating: 0,
-      title: "Amazing",
+      title: "Interactive and fun events",
       reviewText:
          "Couldn’t be happier with our collaboration with the creative minds at CareerFairy – they are unique in terms of flexibility and implementation of useful features. The livestreaming platform itself is amazing, especially regarding the candidate experience. We had a lot of fun hosting our event series with 600 students.",
       avatarUrl:
@@ -12,7 +12,7 @@ export default [
    },
    {
       rating: 0,
-      title: "Flexible",
+      title: "Attract more relevant talents",
       reviewText:
          "As we are in need of many different talents we found with CareerFairy a great and user friendly platform that allows us to reach a wide audience - especially important in this uncertain times. We highly appreciate their straight-forward and flexible way of working.",
       avatarUrl:
@@ -23,7 +23,7 @@ export default [
    },
    {
       rating: 0,
-      title: "Interaction",
+      title: "Connect with more universities",
       reviewText:
          "CareerFairy enabled us to establish contact with students from many different universities.\n" +
          "We really enjoyed the interaction with students via the new live streaming technology. ",

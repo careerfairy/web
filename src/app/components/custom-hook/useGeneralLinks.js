@@ -27,6 +27,16 @@ const initialMainLinks = [
 ]
 const initialSecondaryLinks = [
     {
+        href: `/next-livestreams`,
+        title: 'FOR STUDENTS',
+        basePath: '/next-livestreams'
+    },
+    {
+        href: `/`,
+        title: 'FOR COMPANIES',
+        basePath: '/'
+    },
+    {
         href: `/career-center`,
         title: 'FOR CAREER CENTERS',
         basePath: '/career-center'
@@ -34,11 +44,6 @@ const initialSecondaryLinks = [
 ]
 
 const landingLinks = [
-    {
-        href: `/`,
-        title: 'FOR COMPANIES',
-        basePath: '/'
-    },
   ...initialSecondaryLinks
 ]
 const useGeneralLinks = () => {

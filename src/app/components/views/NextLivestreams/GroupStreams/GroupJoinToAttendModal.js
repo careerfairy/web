@@ -200,24 +200,12 @@ const GroupJoinToAttendModal = ({
                         </Box>
                         <Box p={2} className={classes.actions}>
                             {localGroupsWithPolicies.map((group, index) => (
-                                <FormControlLabel
-                                    key={group.id}
-                                    label={
-                                        <Typography>
-                                            I agree to <a target="_blank"
-                                                          href={group.privacyPolicyUrl}> {group.universityName}'s
-                                            privacy policy</a>
-                                        </Typography>
-                                    }
-                                    control={
-                                        <Checkbox
-                                            checked={!group.needsToAgree}
-                                            onChange={() => handleToggleAgree(index)}
-                                            name="checkedB"
-                                            color="primary"
-                                        />
-                                    }
-                                />
+                                <Typography style={{ fontSize: '0.8rem'}}>
+                                    Your participant information (surname, first name, university affiliation) and the data above will be transferred to the organizer when you register for the event. The data protection notice of the organizer applies. You can find it                      
+                                     <a  target="_blank" style={{ marginLeft: 4 }}
+                                        href={group.privacyPolicyUrl}>
+                                     here</a>.
+                                </Typography>
                             ))}
                         </Box>
                     </DialogContent>

@@ -442,8 +442,8 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                                         color="primary"
                                     />}
                                     label={<>I agree to
-                                        the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link
-                                            href='/privacy'><a>Privacy Policy</a></Link></>}
+                                        the <Link href='/terms'><a>Terms & Conditions</a></Link> and I have taken note of the <Link
+                                            href='/privacy'><a>Data Protection Notice</a></Link></>}
                                 />
                                 <Collapse in={Boolean(errors.agreeTerm && touched.agreeTerm && errors.agreeTerm)}>
                                     <FormHelperText error>
