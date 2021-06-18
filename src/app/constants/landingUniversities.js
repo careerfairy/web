@@ -20,10 +20,10 @@ export default [
         website: "https://ethz.ch/de.html",
     },
     {
-        name: "University of Basel",
+        name: "University of Duisburg-Essen",
         imageUrlDark: "",
-        imageUrlMain: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Funiversity-logos%2Fbasel-logo-main.webp?alt=media&token=493dd202-cbac-40a0-8eff-e39e2fa595f9",
-        website: "https://www.unibas.ch/de",
+        imageUrlMain: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/university-logos%2Funi-duisburg-essen.png?alt=media&token=093030a0-0f6f-4466-9e7a-93db7477b45b",
+        website: "https://www.uni-due.de/en/",
     },
     {
         name: "IMD Business School",
