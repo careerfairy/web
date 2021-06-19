@@ -149,16 +149,6 @@ const GroupJoinToAttendModal = ({
         }
     };
 
-    const handleToggleAgree = index => {
-        const newGroupsWithPolicies = [...localGroupsWithPolicies]
-        newGroupsWithPolicies[index].needsToAgree = !newGroupsWithPolicies[index].needsToAgree
-        setLocalGroupsWithPolicies(newGroupsWithPolicies)
-    }
-
-    const stillNeedsToAgree = () => {
-        return localGroupsWithPolicies.some(group => group.needsToAgree)
-    }
-
     const renderCategories = categories.map((category, index) => {
         return (
             <Fragment key={category.id}>
@@ -215,7 +205,7 @@ const GroupJoinToAttendModal = ({
                         </Button>
                         {((alreadyJoined && group.categories) || !alreadyJoined) && (
                             <Button
-                                disabled={!allSelected || submitting || stillNeedsToAgree()}
+                                disabled={!allSelected || submitting}
                                 variant="contained"
                                 size="large"
                                 endIcon={
