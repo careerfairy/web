@@ -1,0 +1,352 @@
+[debug] [2021-06-24T11:28:32.388Z] ----------------------------------------------------------------------
+[debug] [2021-06-24T11:28:32.390Z] Command:       /Users/mvoss/.nvm/versions/node/v10.19.0/bin/node /Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/.bin/firebase serve --only functions,hosting
+[debug] [2021-06-24T11:28:32.390Z] CLI Version:   7.16.2
+[debug] [2021-06-24T11:28:32.390Z] Platform:      darwin
+[debug] [2021-06-24T11:28:32.390Z] Node Version:  v10.19.0
+[debug] [2021-06-24T11:28:32.397Z] Time:          Thu Jun 24 2021 13:28:32 GMT+0200 (Central European Summer Time)
+[debug] [2021-06-24T11:28:32.398Z] ----------------------------------------------------------------------
+[debug] [2021-06-24T11:28:32.398Z] 
+[debug] [2021-06-24T11:28:32.410Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2021-06-24T11:28:32.410Z] > authorizing via signed-in user
+[debug] [2021-06-24T11:28:32.410Z] [iam] checking project careerfairy-e1fd9 for permissions ["firebase.projects.get"]
+[debug] [2021-06-24T11:28:32.412Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2021-06-24T11:28:32.412Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2021-06-24T11:28:32.625Z] <<< HTTP RESPONSE 200
+[debug] [2021-06-24T11:28:32.652Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/careerfairy-e1fd9:testIamPermissions  
+
+[debug] [2021-06-24T11:28:33.417Z] <<< HTTP RESPONSE 200
+[debug] [2021-06-24T11:28:33.418Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/careerfairy-e1fd9  
+ 
+[debug] [2021-06-24T11:28:33.692Z] <<< HTTP RESPONSE 200
+[debug] [2021-06-24T11:28:33.696Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/careerfairy-e1fd9/webApps/-/config  
+ 
+[info] ✔  functions: Using node@10 from host.
+[info] ✔  functions: functions emulator started at http://localhost:5001
+[debug] [2021-06-24T11:28:34.473Z] <<< HTTP RESPONSE 200
+[info] i  functions: Watching "/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp" for Cloud Functions...
+[debug] [2021-06-24T11:28:34.524Z] [worker-pool] addWorker(~diagnostic~)
+[debug] [2021-06-24T11:28:34.524Z] [worker-pool] Adding worker with key ~diagnostic~, total=1
+[debug] [2021-06-24T11:28:34.524Z] [worker-pool] submitWork(triggerId=)
+[debug] [2021-06-24T11:28:34.525Z] [worker-~diagnostic~-11a38d86-ed7f-4b03-b7cb-e34a8be91197]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_20646.sock
+[debug] [2021-06-24T11:28:34.525Z] [worker-~diagnostic~-11a38d86-ed7f-4b03-b7cb-e34a8be91197]: BUSY
+[info] i  hosting[production]: Serving hosting files from: public
+[info] ✔  hosting[production]: Local server: http://localhost:5000
+[info] i  hosting[testing]: Serving hosting files from: public
+[info] ✔  hosting[testing]: Local server: http://localhost:5005
+[info] i  hosting[testing2]: Serving hosting files from: public
+[info] ✔  hosting[testing2]: Local server: http://localhost:5006
+[info] i  hosting[personal-habib]: Serving hosting files from: public
+[info] ✔  hosting[personal-habib]: Local server: http://localhost:5007
+[debug] [2021-06-24T11:28:34.781Z] [runtime-status] [20646] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2021-06-24T11:28:34.782Z] [runtime-status] [20646] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2021-06-24T11:28:34.786Z] [runtime-status] [20646] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.13.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2021-06-24T11:28:34.789Z] [runtime-status] [20646] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.14.1","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2021-06-24T11:28:34.791Z] [runtime-status] [20646] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.14.1","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[info] ✔  functions[production]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/production).
+[info] ✔  functions[testing]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/testing).
+[info] ✔  functions[testing2]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/testing2).
+[info] ✔  functions[personalHabib]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/personalHabib).
+[info] ✔  functions[createNewUserAccount]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/createNewUserAccount).
+[info] ✔  functions[updateFakeUser]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/updateFakeUser).
+[info] ✔  functions[verifyEmailWithPin]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/verifyEmailWithPin).
+[info] ✔  functions[sendPostmarkResetPasswordEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkResetPasswordEmail).
+[info] ✔  functions[sendPostmarkEmailUserDataAndUni]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkEmailUserDataAndUni).
+[info] ✔  functions[sendPostmarkEmailUserDataAndUniWithName]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkEmailUserDataAndUniWithName).
+[info] ✔  functions[resendPostmarkEmailVerificationEmailWithPin]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/resendPostmarkEmailVerificationEmailWithPin).
+[info] ✔  functions[generateAgoraToken]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/generateAgoraToken).
+[info] ✔  functions[generateAgoraTokenSecure]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/generateAgoraTokenSecure).
+[info] ✔  functions[generateAgoraTokenSecureOnCall]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/generateAgoraTokenSecureOnCall).
+[info] ✔  functions[startRecordingLivestream]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/startRecordingLivestream).
+[info] ✔  functions[sendDashboardInviteEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendDashboardInviteEmail).
+[info] ✔  functions[sendDraftApprovalRequestEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendDraftApprovalRequestEmail).
+[info] ✔  functions[sendReminderEmailToRegistrants]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendReminderEmailToRegistrants).
+[info] ✔  functions[sendReminderEmailToUserFromUniversity]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendReminderEmailToUserFromUniversity).
+[info] ✔  functions[sendLivestreamRegistrationConfirmationEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendLivestreamRegistrationConfirmationEmail).
+[info] ✔  functions[sendPhysicalEventRegistrationConfirmationEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPhysicalEventRegistrationConfirmationEmail).
+[info] ✔  functions[sendEmailToStudentOfUniversityAndField]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendEmailToStudentOfUniversityAndField).
+[info] ✔  functions[stopRecordingLivestream]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/stopRecordingLivestream).
+[info] ✔  functions[startRecordingLivestreamApi]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/startRecordingLivestreamApi).
+[info] ✔  functions[stopRecordingLivestreamApi]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/stopRecordingLivestreamApi).
+[info] i  functions[exportFirestoreBackup]: function ignored because the pubsub emulator does not exist or is not running.
+[info] i  functions[scheduleReminderEmailSendTestOnRun]: function ignored because the pubsub emulator does not exist or is not running.
+[info] i  functions[sendReminderEmailsWhenLivestreamStarts]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[scheduleTestLivestreamDeletion]: function ignored because the pubsub emulator does not exist or is not running.
+[info] i  functions[setFirstCommentOfQuestionOnCreate]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[assertLivestreamRegistrationWasCompleted]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[assertLivestreamDeregistrationWasCompleted]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[addToIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[updateIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[deleteFromIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[addToStreamIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[updateStreamIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[deleteStreamFromIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[updateUserDataAnalytcicsOnWrite]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[updateBreakoutRoomStatusOnWrite]: function ignored because the firestore emulator does not exist or is not running.
+[debug] [2021-06-24T11:28:35.309Z] [worker-~diagnostic~-11a38d86-ed7f-4b03-b7cb-e34a8be91197]: IDLE
+[debug] [2021-06-24T11:30:22.243Z] [work-queue] {"queueLength":1,"workRunningCount":0}
+[debug] [2021-06-24T11:30:22.243Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2021-06-24T11:30:22.243Z] Accepted request POST /careerfairy-e1fd9/us-central1/stopRecordingLivestreamApi --> stopRecordingLivestreamApi
+[debug] [2021-06-24T11:30:22.251Z] [worker-pool] addWorker(stopRecordingLivestreamApi)
+[debug] [2021-06-24T11:30:22.251Z] [worker-pool] Adding worker with key stopRecordingLivestreamApi, total=1
+[debug] [2021-06-24T11:30:22.251Z] [worker-pool] submitWork(triggerId=stopRecordingLivestreamApi)
+[debug] [2021-06-24T11:30:22.251Z] [worker-stopRecordingLivestreamApi-69689a4d-bf86-45b8-b12e-583c0253432f]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_20663.sock
+[debug] [2021-06-24T11:30:22.251Z] [worker-stopRecordingLivestreamApi-69689a4d-bf86-45b8-b12e-583c0253432f]: BUSY
+[debug] [2021-06-24T11:30:22.623Z] [runtime-status] [20663] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2021-06-24T11:30:22.625Z] [runtime-status] [20663] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2021-06-24T11:30:22.629Z] [runtime-status] [20663] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.13.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2021-06-24T11:30:22.630Z] [runtime-status] [20663] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.14.1","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2021-06-24T11:30:22.631Z] [runtime-status] [20663] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.14.1","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2021-06-24T11:30:23.091Z] [runtime-status] [20663] Trigger "stopRecordingLivestreamApi" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "stopRecordingLivestreamApi"
+[debug] [2021-06-24T11:30:23.091Z] [runtime-status] [20663] triggerDefinition {"httpsTrigger":{},"name":"stopRecordingLivestreamApi","entryPoint":"stopRecordingLivestreamApi"}
+[debug] [2021-06-24T11:30:23.092Z] [runtime-status] [20663] Running stopRecordingLivestreamApi in mode HTTPS
+[debug] [2021-06-24T11:30:23.092Z] [runtime-status] [20663] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_20663.sock
+[debug] [2021-06-24T11:30:23.093Z] [functions] Runtime ready! Sending request!
+[debug] [2021-06-24T11:30:23.115Z] [runtime-status] [20663] Ephemeral server handling POST request
+[info] >  IqCWKgW2CD0KqnZm0lcCzQisVFotYiClVu2jIxWs5RomR0HCSl1WQNhFodf5JCwuOdO4oiFRi-e7LE57mJh2iOo0v9v-VXaXoZMR8eHZBw3Y7IzXSysPf6PEZdiaFifVXAIVvqjsZwj2JrEdPfNYP0J5jhR6gzls1IhdIgnV6ABGOgeoXQSzP19wBt6vhaIRqX7LdtTrp7Intp2svKs2PfFWTrXWvracVnX_Hk56ZzgT8l95bmYVzLG_5m8jtlMb0rv5fWqsdTBZRhC1ErSFaKPHEyXHNPDUoxZ1i5uIvq3qvBJtapmj-r2R-6EDrUeKcXPxUEOL0ZV8_DyLS1Eg5NxU7x33GOrAA68PRGKgYK2ef8MDgQTJZYnmcBhh8Uv6NO5CQuPbZXuuBvRqrECBkPPMeSjwJT4Bzyl6Ouvg3YVYl8x0QcPo5flvNMF8Mpb- 7de1ddc3124ec75aca5c0e80cfa2c892
+[debug] [2021-06-24T11:30:23.976Z] [runtime-status] [20663] Ephemeral server survived.
+[info] >  { status: 206,
+[info] >    statusText: 'Partial Content',
+[info] >    headers:
+[info] >     { 'content-type': 'application/json',
+[info] >       'content-length': '507',
+[info] >       connection: 'close',
+[info] >       'accept-ranges': 'bytes',
+[info] >       'access-control-allow-origin': '*',
+[info] >       'x-session-id': '7de1ddc3124ec75aca5c0e80cfa2c892',
+[info] >       'x-request-id': 'beeb575c931743d8a127a381d091847e',
+[info] >       'x-kong-upstream-latency': '20052',
+[info] >       'x-kong-proxy-latency': '1',
+[info] >       via: 'kong/1.2.1' },
+[info] >    config:
+[info] >     { url:
+[info] >        'https://api.agora.io/v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/IqCWKgW2CD0KqnZm0lcCzQisVFotYiClVu2jIxWs5RomR0HCSl1WQNhFodf5JCwuOdO4oiFRi-e7LE57mJh2iOo0v9v-VXaXoZMR8eHZBw3Y7IzXSysPf6PEZdiaFifVXAIVvqjsZwj2JrEdPfNYP0J5jhR6gzls1IhdIgnV6ABGOgeoXQSzP19wBt6vhaIRqX7LdtTrp7Intp2svKs2PfFWTrXWvracVnX_Hk56ZzgT8l95bmYVzLG_5m8jtlMb0rv5fWqsdTBZRhC1ErSFaKPHEyXHNPDUoxZ1i5uIvq3qvBJtapmj-r2R-6EDrUeKcXPxUEOL0ZV8_DyLS1Eg5NxU7x33GOrAA68PRGKgYK2ef8MDgQTJZYnmcBhh8Uv6NO5CQuPbZXuuBvRqrECBkPPMeSjwJT4Bzyl6Ouvg3YVYl8x0QcPo5flvNMF8Mpb-/sid/7de1ddc3124ec75aca5c0e80cfa2c892/mode/web/stop',
+[info] >       method: 'post',
+[info] >       data:
+[info] >        '{"cname":"LeusjZOvUvMK4zaXCrdX","uid":"1234232","clientRequest":{}}',
+[info] >       headers:
+[info] >        { Accept: 'application/json, text/plain, */*',
+[info] >          'Content-Type': 'application/json',
+[info] >          Authorization:
+[info] >           'Basic ZmQ0NWU4NmM2ZmZlNDQ1ZWJiODc1NzEzNDRlOTQ1YjE6M2U1NmVjZjBhNWVmNGVhYWE1ZDI2Y2Y4NTQzOTUyZDA=',
+[info] >          'User-Agent': 'axios/0.19.2',
+[info] >          'Content-Length': 67 },
+[info] >       transformRequest: [ [Function: transformRequest] ],
+[info] >       transformResponse: [ [Function: transformResponse] ],
+[info] >       timeout: 0,
+[info] >       adapter: [Function: httpAdapter],
+[info] >       xsrfCookieName: 'XSRF-TOKEN',
+[info] >       xsrfHeaderName: 'X-XSRF-TOKEN',
+[info] >       maxContentLength: -1,
+[info] >       validateStatus: [Function: validateStatus] },
+[info] >    request:
+[info] >     ClientRequest {
+[info] >       _events:
+[info] >        [Object: null prototype] {
+[info] >          socket: [Function],
+[info] >          abort: [Function],
+[info] >          aborted: [Function],
+[info] >          error: [Function],
+[info] >          timeout: [Function],
+[info] >          prefinish: [Function: requestOnPrefinish] },
+[info] >       _eventsCount: 6,
+[info] >       _maxListeners: undefined,
+[info] >       output: [],
+[info] >       outputEncodings: [],
+[info] >       outputCallbacks: [],
+[info] >       outputSize: 0,
+[info] >       writable: true,
+[info] >       _last: true,
+[info] >       chunkedEncoding: false,
+[info] >       shouldKeepAlive: false,
+[info] >       useChunkedEncodingByDefault: true,
+[info] >       sendDate: false,
+[info] >       _removedConnection: false,
+[info] >       _removedContLen: false,
+[info] >       _removedTE: false,
+[info] >       _contentLength: null,
+[info] >       _hasBody: true,
+[info] >       _trailer: '',
+[info] >       finished: true,
+[info] >       _headerSent: true,
+[info] >       socket:
+[info] >        TLSSocket {
+[info] >          _tlsOptions: [Object],
+[info] >          _secureEstablished: true,
+[info] >          _securePending: false,
+[info] >          _newSessionPending: false,
+[info] >          _controlReleased: true,
+[info] >          _SNICallback: null,
+[info] >          servername: 'api.agora.io',
+[info] >          alpnProtocol: false,
+[info] >          authorized: true,
+[info] >          authorizationError: null,
+[info] >          encrypted: true,
+[info] >          _events: [Object],
+[info] >          _eventsCount: 8,
+[info] >          connecting: false,
+[info] >          _hadError: false,
+[info] >          _handle: [TLSWrap],
+[info] >          _parent: null,
+[info] >          _host: 'api.agora.io',
+[info] >          _readableState: [ReadableState],
+[info] >          readable: true,
+[info] >          _maxListeners: undefined,
+[info] >          _writableState: [WritableState],
+[info] >          writable: false,
+[info] >          allowHalfOpen: false,
+[info] >          _sockname: null,
+[info] >          _pendingData: null,
+[info] >          _pendingEncoding: '',
+[info] >          server: undefined,
+[info] >          _server: null,
+[info] >          ssl: [TLSWrap],
+[info] >          _requestCert: true,
+[info] >          _rejectUnauthorized: true,
+[info] >          parser: null,
+[info] >          _httpMessage: [Circular],
+[info] >          [Symbol(res)]: [TLSWrap],
+[info] >          [Symbol(asyncId)]: 189,
+[info] >          [Symbol(lastWriteQueueSize)]: 0,
+[info] >          [Symbol(timeout)]: null,
+[info] >          [Symbol(kBytesRead)]: 0,
+[info] >          [Symbol(kBytesWritten)]: 0,
+[info] >          [Symbol(connect-options)]: [Object] },
+[info] >       connection:
+[info] >        TLSSocket {
+[info] >          _tlsOptions: [Object],
+[info] >          _secureEstablished: true,
+[info] >          _securePending: false,
+[info] >          _newSessionPending: false,
+[info] >          _controlReleased: true,
+[info] >          _SNICallback: null,
+[info] >          servername: 'api.agora.io',
+[info] >          alpnProtocol: false,
+[info] >          authorized: true,
+[info] >          authorizationError: null,
+[info] >          encrypted: true,
+[info] >          _events: [Object],
+[info] >          _eventsCount: 8,
+[info] >          connecting: false,
+[info] >          _hadError: false,
+[info] >          _handle: [TLSWrap],
+[info] >          _parent: null,
+[info] >          _host: 'api.agora.io',
+[info] >          _readableState: [ReadableState],
+[info] >          readable: true,
+[info] >          _maxListeners: undefined,
+[info] >          _writableState: [WritableState],
+[info] >          writable: false,
+[info] >          allowHalfOpen: false,
+[info] >          _sockname: null,
+[info] >          _pendingData: null,
+[info] >          _pendingEncoding: '',
+[info] >          server: undefined,
+[info] >          _server: null,
+[info] >          ssl: [TLSWrap],
+[info] >          _requestCert: true,
+[info] >          _rejectUnauthorized: true,
+[info] >          parser: null,
+[info] >          _httpMessage: [Circular],
+[info] >          [Symbol(res)]: [TLSWrap],
+[info] >          [Symbol(asyncId)]: 189,
+[info] >          [Symbol(lastWriteQueueSize)]: 0,
+[info] >          [Symbol(timeout)]: null,
+[info] >          [Symbol(kBytesRead)]: 0,
+[info] >          [Symbol(kBytesWritten)]: 0,
+[info] >          [Symbol(connect-options)]: [Object] },
+[info] >       _header:
+[info] >        'POST /v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/IqCWKgW2CD0KqnZm0lcCzQisVFotYiClVu2jIxWs5RomR0HCSl1WQNhFodf5JCwuOdO4oiFRi-e7LE57mJh2iOo0v9v-VXaXoZMR8eHZBw3Y7IzXSysPf6PEZdiaFifVXAIVvqjsZwj2JrEdPfNYP0J5jhR6gzls1IhdIgnV6ABGOgeoXQSzP19wBt6vhaIRqX7LdtTrp7Intp2svKs2PfFWTrXWvracVnX_Hk56ZzgT8l95bmYVzLG_5m8jtlMb0rv5fWqsdTBZRhC1ErSFaKPHEyXHNPDUoxZ1i5uIvq3qvBJtapmj-r2R-6EDrUeKcXPxUEOL0ZV8_DyLS1Eg5NxU7x33GOrAA68PRGKgYK2ef8MDgQTJZYnmcBhh8Uv6NO5CQuPbZXuuBvRqrECBkPPMeSjwJT4Bzyl6Ouvg3YVYl8x0QcPo5flvNMF8Mpb-/sid/7de1ddc3124ec75aca5c0e80cfa2c892/mode/web/stop HTTP/1.1\r\nAccept: application/json, text/plain, */*\r\nContent-Type: application/json\r\nAuthorization: Basic ZmQ0NWU4NmM2ZmZlNDQ1ZWJiODc1NzEzNDRlOTQ1YjE6M2U1NmVjZjBhNWVmNGVhYWE1ZDI2Y2Y4NTQzOTUyZDA=\r\nUser-Agent: axios/0.19.2\r\nContent-Length: 67\r\nHost: api.agora.io\r\nConnection: close\r\n\r\n',
+[info] >       _onPendingData: [Function: noopPendingOutput],
+[info] >       agent:
+[info] >        Agent {
+[info] >          _events: [Object],
+[info] >          _eventsCount: 1,
+[info] >          _maxListeners: undefined,
+[info] >          defaultPort: 443,
+[info] >          protocol: 'https:',
+[info] >          options: [Object],
+[info] >          requests: {},
+[info] >          sockets: [Object],
+[info] >          freeSockets: {},
+[info] >          keepAliveMsecs: 1000,
+[info] >          keepAlive: false,
+[info] >          maxSockets: Infinity,
+[info] >          maxFreeSockets: 256,
+[info] >          maxCachedSessions: 100,
+[info] >          _sessionCache: [Object] },
+[info] >       socketPath: undefined,
+[info] >       timeout: undefined,
+[info] >       method: 'POST',
+[info] >       insecureHTTPParser: undefined,
+[info] >       path:
+[info] >        '/v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/IqCWKgW2CD0KqnZm0lcCzQisVFotYiClVu2jIxWs5RomR0HCSl1WQNhFodf5JCwuOdO4oiFRi-e7LE57mJh2iOo0v9v-VXaXoZMR8eHZBw3Y7IzXSysPf6PEZdiaFifVXAIVvqjsZwj2JrEdPfNYP0J5jhR6gzls1IhdIgnV6ABGOgeoXQSzP19wBt6vhaIRqX7LdtTrp7Intp2svKs2PfFWTrXWvracVnX_Hk56ZzgT8l95bmYVzLG_5m8jtlMb0rv5fWqsdTBZRhC1ErSFaKPHEyXHNPDUoxZ1i5uIvq3qvBJtapmj-r2R-6EDrUeKcXPxUEOL0ZV8_DyLS1Eg5NxU7x33GOrAA68PRGKgYK2ef8MDgQTJZYnmcBhh8Uv6NO5CQuPbZXuuBvRqrECBkPPMeSjwJT4Bzyl6Ouvg3YVYl8x0QcPo5flvNMF8Mpb-/sid/7de1ddc3124ec75aca5c0e80cfa2c892/mode/web/stop',
+[info] >       _ended: true,
+[info] >       res:
+[info] >        IncomingMessage {
+[info] >          _readableState: [ReadableState],
+[info] >          readable: false,
+[info] >          _events: [Object],
+[info] >          _eventsCount: 3,
+[info] >          _maxListeners: undefined,
+[info] >          socket: [TLSSocket],
+[info] >          connection: [TLSSocket],
+[info] >          httpVersionMajor: 1,
+[info] >          httpVersionMinor: 1,
+[info] >          httpVersion: '1.1',
+[info] >          complete: true,
+[info] >          headers: [Object],
+[info] >          rawHeaders: [Array],
+[info] >          trailers: {},
+[info] >          rawTrailers: [],
+[info] >          aborted: false,
+[info] >          upgrade: false,
+[info] >          url: '',
+[info] >          method: null,
+[info] >          statusCode: 206,
+[info] >          statusMessage: 'Partial Content',
+[info] >          client: [TLSSocket],
+[info] >          _consuming: false,
+[info] >          _dumped: false,
+[info] >          req: [Circular],
+[info] >          responseUrl:
+[info] >           'https://api.agora.io/v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/IqCWKgW2CD0KqnZm0lcCzQisVFotYiClVu2jIxWs5RomR0HCSl1WQNhFodf5JCwuOdO4oiFRi-e7LE57mJh2iOo0v9v-VXaXoZMR8eHZBw3Y7IzXSysPf6PEZdiaFifVXAIVvqjsZwj2JrEdPfNYP0J5jhR6gzls1IhdIgnV6ABGOgeoXQSzP19wBt6vhaIRqX7LdtTrp7Intp2svKs2PfFWTrXWvracVnX_Hk56ZzgT8l95bmYVzLG_5m8jtlMb0rv5fWqsdTBZRhC1ErSFaKPHEyXHNPDUoxZ1i5uIvq3qvBJtapmj-r2R-6EDrUeKcXPxUEOL0ZV8_DyLS1Eg5NxU7x33GOrAA68PRGKgYK2ef8MDgQTJZYnmcBhh8Uv6NO5CQuPbZXuuBvRqrECBkPPMeSjwJT4Bzyl6Ouvg3YVYl8x0QcPo5flvNMF8Mpb-/sid/7de1ddc3124ec75aca5c0e80cfa2c892/mode/web/stop',
+[info] >          redirects: [] },
+[info] >       aborted: undefined,
+[info] >       timeoutCb: null,
+[info] >       upgradeOrConnect: false,
+[info] >       parser: null,
+[info] >       maxHeadersCount: null,
+[info] >       _redirectable:
+[info] >        Writable {
+[info] >          _writableState: [WritableState],
+[info] >          writable: true,
+[info] >          _events: [Object],
+[info] >          _eventsCount: 2,
+[info] >          _maxListeners: undefined,
+[info] >          _options: [Object],
+[info] >          _redirectCount: 0,
+[info] >          _redirects: [],
+[info] >          _requestBodyLength: 67,
+[info] >          _requestBodyBuffers: [],
+[info] >          _onNativeResponse: [Function],
+[info] >          _currentRequest: [Circular],
+[info] >          _currentUrl:
+[info] >           'https://api.agora.io/v1/apps/53675bc6d3884026a72ecb1de3d19eb1/cloud_recording/resourceid/IqCWKgW2CD0KqnZm0lcCzQisVFotYiClVu2jIxWs5RomR0HCSl1WQNhFodf5JCwuOdO4oiFRi-e7LE57mJh2iOo0v9v-VXaXoZMR8eHZBw3Y7IzXSysPf6PEZdiaFifVXAIVvqjsZwj2JrEdPfNYP0J5jhR6gzls1IhdIgnV6ABGOgeoXQSzP19wBt6vhaIRqX7LdtTrp7Intp2svKs2PfFWTrXWvracVnX_Hk56ZzgT8l95bmYVzLG_5m8jtlMb0rv5fWqsdTBZRhC1ErSFaKPHEyXHNPDUoxZ1i5uIvq3qvBJtapmj-r2R-6EDrUeKcXPxUEOL0ZV8_DyLS1Eg5NxU7x33GOrAA68PRGKgYK2ef8MDgQTJZYnmcBhh8Uv6NO5CQuPbZXuuBvRqrECBkPPMeSjwJT4Bzyl6Ouvg3YVYl8x0QcPo5flvNMF8Mpb-/sid/7de1ddc3124ec75aca5c0e80cfa2c892/mode/web/stop' },
+[info] >       [Symbol(isCorked)]: false,
+[info] >       [Symbol(outHeadersKey)]:
+[info] >        [Object: null prototype] {
+[info] >          accept: [Array],
+[info] >          'content-type': [Array],
+[info] >          authorization: [Array],
+[info] >          'user-agent': [Array],
+[info] >          'content-length': [Array],
+[info] >          host: [Array] } },
+[info] >    data:
+[info] >     { resourceId:
+[info] >        'IqCWKgW2CD0KqnZm0lcCzQisVFotYiClVu2jIxWs5RomR0HCSl1WQNhFodf5JCwuOdO4oiFRi-e7LE57mJh2iOo0v9v-VXaXoZMR8eHZBw3Y7IzXSysPf6PEZdiaFifVXAIVvqjsZwj2JrEdPfNYP0J5jhR6gzls1IhdIgnV6ABGOgeoXQSzP19wBt6vhaIRqX7LdtTrp7Intp2svKs2PfFWTrXWvracVnX_Hk56ZzgT8l95bmYVzLG_5m8jtlMb0rv5fWqsdTBZRhC1ErSFaKPHEyXHNPDUoxZ1i5uIvq3qvBJtapmj-r2R-6EDrUeKcXPxUEOL0ZV8_DyLS1Eg5NxU7x33GOrAA68PRGKgYK2ef8MDgQTJZYnmcBhh8Uv6NO5CQuPbZXuuBvRqrECBkPPMeSjwJT4Bzyl6Ouvg3YVYl8x0QcPo5flvNMF8Mpb-',
+[info] >       sid: '7de1ddc3124ec75aca5c0e80cfa2c892' } }
+[info] i  functions: Finished "stopRecordingLivestreamApi" in ~21s
+[debug] [2021-06-24T11:30:44.325Z] [worker-stopRecordingLivestreamApi-69689a4d-bf86-45b8-b12e-583c0253432f]: IDLE
+[debug] [2021-06-24T11:30:44.325Z] [work-queue] {"queueLength":0,"workRunningCount":0}

@@ -193,16 +193,6 @@ const UsersTable = ({
       }
    };
 
-   const shouldHide = () => {
-      const userProp = userType.propertyName;
-      return Boolean(
-         !group.universityCode &&
-            (userProp === "registeredUsers" ||
-               userProp === "participatingStudents") &&
-            !userData?.isAdmin
-      );
-   };
-
    const handleMenuItemClick = (event, index) => {
       setUserType(userTypes[index]);
    };
@@ -300,7 +290,7 @@ const UsersTable = ({
    );
 
    return (
-      <Slide direction="up" unmountOnExit mountOnEnter in={!shouldHide()}>
+      <Slide direction="up" unmountOnExit mountOnEnter in={true}>
          <Card
             raised={Boolean(currentStream)}
             className={clsx(classes.root, className)}
