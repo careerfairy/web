@@ -567,6 +567,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                question={question}
                user={user}
                livestream={currentLivestream}
+               isPastEvent={isPastEvent}
             />
          </Grid>
       );
@@ -813,7 +814,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
             </Container>
          </div>
          ;
-         {!isPastEvent && (
             <div className="grey-container">
                <Container>
                   <div className="container-title">
@@ -865,7 +865,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                   </div>
                </Container>
             </div>
-         )}
          <div
             className={
                "white-container " +

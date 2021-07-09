@@ -76,7 +76,7 @@ function QuestionVotingBox(props) {
             </CardContent>
             <CardActions className={classes.actions} disableSpacing>
                 <Button disabled={userHasVotedOnQuestion(props.user, props.question)}
-                        variant="contained" fullWidth
+                        variant="contained" fullWidth disabled={props.isPastEvent}
                         onClick={() => upvoteLivestreamQuestion(props.user, props.question)}
                         color="primary" startIcon={<ThumbUpIcon/>}>
                     upvote
@@ -90,6 +90,7 @@ QuestionVotingBox.propTypes =
     {
         firebase: PropTypes.object,
         livestream: PropTypes.object,
+        isPastEvent: PropTypes.bool,
         question: PropTypes.shape({
             title: PropTypes.string,
             votes: PropTypes.number
