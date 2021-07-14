@@ -68,6 +68,7 @@ const UserInnerTable = ({firstName, lastName, streams, group, registered, fireba
                         render: rowData => prettyDate(rowData.start)
                     },
                 ]}
+                data={streams}
                 detailPanel={[
                     {
                         icon: tableIcons.SettingsIcon,
@@ -85,7 +86,6 @@ const UserInnerTable = ({firstName, lastName, streams, group, registered, fireba
                         }
                     }
                 ]}
-                data={streams}
             />
         </Collapse>
     )

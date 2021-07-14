@@ -30,6 +30,8 @@ import useTimeFrames from "../../../../custom-hook/useTimeFrames";
 import useUserDataSet from "../../../../custom-hook/useUserDataSet";
 import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDictionary";
 import { repositionElement } from "../../../../helperFunctions/HelperFunctions";
+import StreamFilterModal from "./StreamFilterModal";
+import { SET_STREAMS_FROM_TIMEFRAME } from "../../../../../store/actions/actionTypes";
 
 const useStyles = makeStyles((theme) => ({
    indicator: {
@@ -162,6 +164,7 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
    const [groupOptions, setGroupOptions] = useState([]);
    const [currentStream, setCurrentStream] = useState(null);
    const [fetchingQuestions, setFetchingQuestions] = useState(false);
+   const [streamFilterModalOpen, setStreamFilterModalOpen] = useState(false);
    const [fetchingRatings, setFetchingRatings] = useState(false);
    const [fetchingPolls, setFetchingPolls] = useState(false);
    const [limitedUserTypes, setLimitedUserTypes] = useState(userTypes);
@@ -170,6 +173,15 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
    );
    const [streamsMounted, setStreamsMounted] = useState(false);
    const [groups, setGroups] = useState([]);
+
+   const [hiddenStreamIds, setHiddenStreamIds] = useState({});
+   console.log("-> hiddenStreamIds", hiddenStreamIds);
+
+   const streamsFromTimeFrame = useSelector((state) =>
+      state.analyticsReducer.streams.fromTimeframe.filter(
+         (stream) => !hiddenStreamIds[stream.id]
+      )
+   );
 
    const query = useMemo(
       () => [
@@ -437,10 +449,34 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
 
    const getStreamsFromTimeFrame = (timeframe) => {
       const targetTime = new Date(timeframe);
-      return livestreams.filter((stream) => {
+      const streamsFromTimeFrame = livestreams.filter((stream) => {
          const streamStart = stream.start?.toDate();
          return streamStart > targetTime && streamStart < now;
       });
+      dispatch(actions.setStreamsFromTimeframe(streamsFromTimeFrame));
+   };
+
+   const clearHiddenStreams = () => setHiddenStreamIds({});
+
+   const toggleStreamHidden = (streamId) =>
+      setHiddenStreamIds({
+         ...hiddenStreamIds,
+         [streamId]: !Boolean(hiddenStreamIds[streamId]),
+      });
+
+   const hideAllStreams = () => {
+      const allStreamIds = {};
+      streamsFromTimeFrame.forEach(
+         (stream) => (allStreamIds[stream.id] = true)
+      );
+      setHiddenStreamIds(allStreamIds);
+   };
+
+   const handleCloseStreamFilterModal = () => {
+      setStreamFilterModalOpen(false);
+   };
+   const handleOpenStreamFilterModal = () => {
+      setStreamFilterModalOpen(true);
    };
 
    const getStreamsFromBeforeTimeFrame = () => {
@@ -459,10 +495,12 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
       setUserType(userTypes[0]);
    };
 
-   const streamsFromTimeFrame = useMemo(
-      () => getStreamsFromTimeFrame(globalTimeFrame.globalDate),
-      [livestreams]
-   );
+   useEffect(() => {
+      getStreamsFromTimeFrame(globalTimeFrame.globalDate);
+      return () => {
+         dispatch(actions.clearStreamsFromTimeframe());
+      };
+   }, [livestreams]);
 
    const streamsFromBeforeTimeFrame = useMemo(
       () => getStreamsFromBeforeTimeFrame(globalTimeFrame.globalDate),
@@ -538,6 +576,8 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
                   globalTimeFrames={globalTimeFrames}
                   group={group}
                   globalTimeFrame={globalTimeFrame}
+                  handleOpenStreamFilterModal={handleOpenStreamFilterModal}
+                  streamFilterModalOpen={streamFilterModalOpen}
                />
             </Box>
             <Tabs
@@ -570,6 +610,15 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
                <Feedback {...getTabProps("feedback")} />
             </SwipeablePanel>
          </SwipeableViews>
+         <StreamFilterModal
+            hiddenStreamIds={hiddenStreamIds}
+            onClose={handleCloseStreamFilterModal}
+            clearHiddenStreams={clearHiddenStreams}
+            hideAllStreams={hideAllStreams}
+            toggleStreamHidden={toggleStreamHidden}
+            timeFrameName={globalTimeFrame.name}
+            open={streamFilterModalOpen}
+         />
       </Fragment>
    );
 };
