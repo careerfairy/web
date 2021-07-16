@@ -14,10 +14,10 @@ import { useSelector } from "react-redux";
 import { createSelector } from "reselect";
 
 const useStyles = makeStyles((theme) => ({
-   dialogPaper:{
+   dialogPaper: {
       // background: "none",
       // boxShadow: "none"
-   }
+   },
 }));
 
 const getDefaultCheckedStreams = (streams, hiddenStreamIds) => {
@@ -30,34 +30,36 @@ const getDefaultCheckedStreams = (streams, hiddenStreamIds) => {
    }));
 };
 const streamsSelector = createSelector(
-  (state) => state.analyticsReducer.streams.fromTimeframe,
-  (_, { hiddenStreamIds }) => hiddenStreamIds,
-  (streams, hiddenStreamIds) =>
-    getDefaultCheckedStreams(streams, hiddenStreamIds)
+   (state) => state.analyticsReducer.streams.fromTimeframeAndFuture,
+   (_, { hiddenStreamIds }) => hiddenStreamIds,
+   (streams, hiddenStreamIds) =>
+      getDefaultCheckedStreams(streams, hiddenStreamIds)
 );
 const Content = ({
    handleClose,
-                    onClose,
+   onClose,
    hiddenStreamIds,
    timeFrameName,
-                    selectVisibleStreams
+   selectVisibleStreams,
 }) => {
    const streamsFromStore = useSelector((state) =>
-     streamsSelector(state, { hiddenStreamIds })
+    state.analyticsReducer.streams.fromTimeframeAndFuture
    );
    const classes = useStyles();
 
    const [newVisibleStreamSelection, setNewVisibleStreamSelection] = useState(
-     []
+      []
    );
 
-   useEffect(() => {
-      setNewVisibleStreamSelection(streamsFromStore.filter(stream => !hiddenStreamIds[stream.id]))
-   }, []);
+   // useEffect(() => {
+   //    setNewVisibleStreamSelection(
+   //       streamsFromStore.filter((stream) => !hiddenStreamIds[stream.id])
+   //    );
+   // }, []);
 
    const handleApply = () => {
       // Apply new hidden streams
-      selectVisibleStreams(newVisibleStreamSelection)
+      selectVisibleStreams(newVisibleStreamSelection);
       onClose();
    };
 
@@ -85,21 +87,18 @@ const Content = ({
    );
 };
 
-
-
 const StreamFilterModal = ({
    open,
    onClose,
    hiddenStreamIds,
    timeFrameName,
-                              selectVisibleStreams
+   selectVisibleStreams,
 }) => {
    const classes = useStyles();
 
    const handleClose = () => {
       onClose();
    };
-
 
    return (
       <Dialog
@@ -108,7 +107,7 @@ const StreamFilterModal = ({
          scroll="body"
          maxWidth={"lg"}
          PaperProps={{
-            className: classes.dialogPaper
+            className: classes.dialogPaper,
          }}
          onClose={handleClose}
          open={open}

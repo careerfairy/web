@@ -23,16 +23,12 @@ import AnalyticsUtil, {
 } from "../../../../../data/util/AnalyticsUtil";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import { createSelector } from "reselect";
-import PollUtil, {
-   getCorrectPollOptionData,
-} from "../../../../../data/util/PollUtil";
+import { getCorrectPollOptionData } from "../../../../../data/util/PollUtil";
 import useTimeFrames from "../../../../custom-hook/useTimeFrames";
 import useUserDataSet from "../../../../custom-hook/useUserDataSet";
 import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDictionary";
 import { repositionElement } from "../../../../helperFunctions/HelperFunctions";
 import StreamFilterModal from "./StreamFilterModal";
-import { SET_STREAMS_FROM_TIMEFRAME } from "../../../../../store/actions/actionTypes";
-import { setStreamsInStore } from "../../../../../store/actions";
 
 const useStyles = makeStyles((theme) => ({
    indicator: {
@@ -177,22 +173,31 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
 
    const [hiddenStreamIds, setHiddenStreamIds] = useState({});
 
+   const handleFilter = (stream) => !hiddenStreamIds[stream.id]
+
    const streamsFromTimeFrame = useSelector((state) =>
       state.analyticsReducer.streams.fromTimeframe.filter(
-         (stream) => !hiddenStreamIds[stream.id]
+        handleFilter
       )
    );
 
+
    const streamsFromTimeFrameAndFuture = useSelector(
-      (state) => state.analyticsReducer.streams.fromTimeframeAndFuture
+      (state) => state.analyticsReducer.streams.fromTimeframeAndFuture.filter(
+        handleFilter
+      )
    );
 
    const streamsFromBeforeTimeFrame = useSelector(
-      (state) => state.analyticsReducer.streams.fromBeforeTimeframe
+      (state) => state.analyticsReducer.streams.fromBeforeTimeframe.filter(
+        handleFilter
+      )
    );
 
    const futureStreams = useSelector(
-      (state) => state.analyticsReducer.streams.fromFuture
+      (state) => state.analyticsReducer.streams.fromFuture.filter(
+        handleFilter
+      )
    );
 
    const query = useMemo(
@@ -464,7 +469,7 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
             newHiddenStreamIds[stream.id] = true;
          }
       });
-      console.log("-> newHiddenStreamIds", newHiddenStreamIds);
+      console.log("-> selectVisibleStreams is called", newHiddenStreamIds);
       setHiddenStreamIds(newHiddenStreamIds);
    };
 

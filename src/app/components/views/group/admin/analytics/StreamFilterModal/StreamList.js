@@ -50,7 +50,11 @@ const StreamList = ({
    const classes = useStyles();
 
 
-   const [streams, setStreams] = useState(streamsFromStore);
+   const [streams, setStreams] = useState([]);
+
+   // useEffect(() => {
+   //    setStreams(streamsFromStore)
+   // },[])
    // console.log("-> streams on mount", streams);
 
    // console.log("-> streams in list", streams);
@@ -153,7 +157,7 @@ const StreamList = ({
                render: (rowData) => prettyDate(rowData.start),
             },
          ]}
-         data={streams}
+         data={streamsFromStore}
       />
    );
 };
