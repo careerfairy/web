@@ -32,6 +32,7 @@ import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDict
 import { repositionElement } from "../../../../helperFunctions/HelperFunctions";
 import StreamFilterModal from "./StreamFilterModal";
 import { SET_STREAMS_FROM_TIMEFRAME } from "../../../../../store/actions/actionTypes";
+import { setStreamsInStore } from "../../../../../store/actions";
 
 const useStyles = makeStyles((theme) => ({
    indicator: {
@@ -175,12 +176,23 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
    const [groups, setGroups] = useState([]);
 
    const [hiddenStreamIds, setHiddenStreamIds] = useState({});
-   console.log("-> hiddenStreamIds", hiddenStreamIds);
 
    const streamsFromTimeFrame = useSelector((state) =>
       state.analyticsReducer.streams.fromTimeframe.filter(
          (stream) => !hiddenStreamIds[stream.id]
       )
+   );
+
+   const streamsFromTimeFrameAndFuture = useSelector(
+      (state) => state.analyticsReducer.streams.fromTimeframeAndFuture
+   );
+
+   const streamsFromBeforeTimeFrame = useSelector(
+      (state) => state.analyticsReducer.streams.fromBeforeTimeframe
+   );
+
+   const futureStreams = useSelector(
+      (state) => state.analyticsReducer.streams.fromFuture
    );
 
    const query = useMemo(
@@ -424,14 +436,6 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
       setValue(index);
    };
 
-   const getFutureEvents = () => {
-      return livestreams.filter((stream) => {
-         if (stream.start?.toDate() > now) {
-            return stream;
-         }
-      });
-   };
-
    const handleScrollToBreakdown = () => {
       if (breakdownRef.current) {
          breakdownRef.current.scrollIntoView({
@@ -447,22 +451,22 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
       return total ? Number(total / ratingVotes.length).toFixed(2) : 0;
    };
 
-   const getStreamsFromTimeFrame = (timeframe) => {
-      const targetTime = new Date(timeframe);
-      const streamsFromTimeFrame = livestreams.filter((stream) => {
-         const streamStart = stream.start?.toDate();
-         return streamStart > targetTime && streamStart < now;
-      });
-      dispatch(actions.setStreamsFromTimeframe(streamsFromTimeFrame));
-   };
-
    const clearHiddenStreams = () => setHiddenStreamIds({});
 
-   const toggleStreamHidden = (streamId) =>
-      setHiddenStreamIds({
-         ...hiddenStreamIds,
-         [streamId]: !Boolean(hiddenStreamIds[streamId]),
+   const selectVisibleStreams = (arrayOfNewVisibleStreams) => {
+      const newHiddenStreamIds = {};
+      streamsFromTimeFrame.forEach((stream) => {
+         if (
+            arrayOfNewVisibleStreams.some(
+               (visibleStream) => visibleStream.id === stream.id
+            )
+         ) {
+            newHiddenStreamIds[stream.id] = true;
+         }
       });
+      console.log("-> newHiddenStreamIds", newHiddenStreamIds);
+      setHiddenStreamIds(newHiddenStreamIds);
+   };
 
    const hideAllStreams = () => {
       const allStreamIds = {};
@@ -479,13 +483,6 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
       setStreamFilterModalOpen(true);
    };
 
-   const getStreamsFromBeforeTimeFrame = () => {
-      return livestreams.filter((stream) => {
-         const streamStart = stream.start?.toDate();
-         return streamStart < globalTimeFrame.globalDate;
-      });
-   };
-
    const handleToggleBar = () => {
       setShowBar(!showBar);
    };
@@ -496,26 +493,17 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
    };
 
    useEffect(() => {
-      getStreamsFromTimeFrame(globalTimeFrame.globalDate);
+      dispatch(
+         actions.setStreamsInAnalyticsStore(
+            livestreams,
+            globalTimeFrame.globalDate
+         )
+      );
       return () => {
-         dispatch(actions.clearStreamsFromTimeframe());
+         dispatch(actions.clearStreamsInAnalyticsStore());
       };
    }, [livestreams]);
 
-   const streamsFromBeforeTimeFrame = useMemo(
-      () => getStreamsFromBeforeTimeFrame(globalTimeFrame.globalDate),
-      [livestreams]
-   );
-
-   const futureStreams = useMemo(
-      () => getFutureEvents(globalTimeFrame.globalDate),
-      [livestreams]
-   );
-
-   const streamsFromTimeFrameAndFuture = useMemo(
-      () => [...streamsFromTimeFrame, ...futureStreams],
-      [futureStreams, streamsFromTimeFrame]
-   );
    const isFollowers = useMemo(
       () => currentUserDataSet.dataSet === "followers",
       [currentUserDataSet]
@@ -612,10 +600,10 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
          </SwipeableViews>
          <StreamFilterModal
             hiddenStreamIds={hiddenStreamIds}
+            selectVisibleStreams={selectVisibleStreams}
             onClose={handleCloseStreamFilterModal}
             clearHiddenStreams={clearHiddenStreams}
             hideAllStreams={hideAllStreams}
-            toggleStreamHidden={toggleStreamHidden}
             timeFrameName={globalTimeFrame.name}
             open={streamFilterModalOpen}
          />

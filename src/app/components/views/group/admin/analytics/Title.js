@@ -202,7 +202,7 @@ const Title = ({
                      onClick={handleOpenStreamFilterModal}
                      color="primary"
                      disabled={streamFilterModalOpen}
-                     variant="contained"
+                     variant="outlined"
                   >
                      Filter
                   </Button>
