@@ -499,10 +499,13 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
             globalTimeFrame.globalDate
          )
       );
+   }, [livestreams]);
+
+   useEffect(() => {
       return () => {
          dispatch(actions.clearStreamsInAnalyticsStore());
       };
-   }, [livestreams]);
+   },[])
 
    const isFollowers = useMemo(
       () => currentUserDataSet.dataSet === "followers",
