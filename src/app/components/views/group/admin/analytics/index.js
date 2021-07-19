@@ -233,7 +233,11 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
          );
 
          if (!areEqual) {
-            const newGroups = newGroupIds.map((groupId) => {
+            const newGroups = newGroupIds
+            .filter(groupId => {
+               return Object.keys(allGroupsDictionary).includes(groupId)
+            })
+            .map(groupId => {
                const group = allGroupsDictionary[groupId];
                return {
                   ...group,
