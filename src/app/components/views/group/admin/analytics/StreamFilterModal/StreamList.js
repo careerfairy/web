@@ -8,8 +8,12 @@ import { Checkbox, ListItemAvatar, Typography } from "@material-ui/core";
 import Avatar from "@material-ui/core/Avatar";
 import MaterialTable from "material-table";
 import { tableIcons, defaultTableOptions } from "../common/TableUtils";
-import { prettyDate } from "../../../../../helperFunctions/HelperFunctions";
+import {
+   getResizedUrl,
+   prettyDate,
+} from "../../../../../helperFunctions/HelperFunctions";
 import { createSelector } from "reselect";
+import { DataGrid } from "@material-ui/data-grid";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -27,138 +31,66 @@ const useStyles = makeStyles((theme) => ({
       // background: theme.palette.common.white
    },
    avatar: {
-      height: 70,
-      width: "80%",
+      // height: 70,
+      // width: "80%",
       "& img": {
          objectFit: "contain",
       },
-      boxShadow: theme.shadows[1],
-      padding: theme.spacing(1),
       background: theme.palette.common.white,
    },
 }));
 
+const columns = [
+   {
+      field: "title",
+      headerName: "Title",
+      description: "Title of the event",
+      flex: 1,
+   },
+   { field: "age", headerName: "Age" },
+   { field: "noOfParticipating", headerName: "Participating" },
+   { field: "noOfRegistered", headerName: "Registered" },
+   { field: "noOfTalentPool", headerName: "Talent Pool" },
+];
 
+const getSelectedStreamIds = (streams, hiddenStreamIds) => {
+   return streams.filter((stream) => !hiddenStreamIds[stream.id]).map(stream => stream.id);
+};
 
 const StreamList = ({
    hiddenStreamIds,
    timeFrameName,
    selectVisibleStreams,
    setNewVisibleStreamSelection,
-  streamsFromStore
+   streamsFromStore,
+   toggleStreamHidden,
 }) => {
    const classes = useStyles();
 
+   const [selectionModel, setSelectionModel] = useState([]);
 
-   const [streams, setStreams] = useState([]);
-
-   // useEffect(() => {
-   //    setStreams(streamsFromStore)
-   // },[])
-   // console.log("-> streams on mount", streams);
-
-   // console.log("-> streams in list", streams);
-
-   // Good example of a virtualized list
-   // function renderRow(props) {
-   //    const { index, style } = props;
-   //    const stream = streams[index];
-   //    const handleToggle = () => {
-   //       console.log("-> key", stream.id);
-   //       toggleStreamHidden(stream.id);
-   //    };
-   //
-   //    return (
-   //       <ListItem onClick={handleToggle} style={style} key={stream.id} button>
-   //          <Checkbox
-   //             edge="start"
-   //             onChange={handleToggle}
-   //             checked={!hiddenStreamIds[stream.id]}
-   //             inputProps={{ "aria-labelledby": stream.id }}
-   //          />
-   //          <ListItemAvatar>
-   //             <Avatar
-   //                className={classes.streamCompanyLogo}
-   //                alt={`${stream.company} Logo`}
-   //                src={stream.companyLogoUrl}
-   //             />
-   //          </ListItemAvatar>
-   //          <ListItemText
-   //             id={stream.id}
-   //             primary={
-   //                <Typography noWrap variant="inherit">
-   //                   {stream.title}
-   //                </Typography>
-   //             }
-   //          />
-   //       </ListItem>
-   //    );
-   // }
-   // return (
-   //   <div className={classes.root}>
-   //      <FixedSizeList
-   //        height={400}
-   //        width="100%"
-   //        itemSize={46}
-   //        itemCount={streams.length}
-   //      >
-   //         {renderRow}
-   //      </FixedSizeList>
-   //   </div>
-   // );
+   useEffect(() => {
+      const selectedStreamIds = getSelectedStreamIds(
+         streamsFromStore,
+         hiddenStreamIds
+      );
+      setSelectionModel(selectedStreamIds)
+      setNewVisibleStreamSelection(selectedStreamIds)
+   }, []);
 
    return (
-      <MaterialTable
-         icons={tableIcons}
-         style={{
-            boxShadow: "none",
-         }}
-         title={`Filter out streams over the past ${timeFrameName}`}
-         onSelectionChange={(rowData) => {
-            setNewVisibleStreamSelection(rowData);
-         }}
-         localization={{
-            toolbar: {
-               nRowsSelected: (rowCount) => `${rowCount} event(s) selected`,
-            },
-            pagination: {
-               labelRowsSelect: "Events",
-            },
-         }}
-         options={defaultTableOptions}
-         columns={[
-            {
-               field: "companyLogoUrl",
-               title: "Logo",
-               export: false,
-               render: (rowData) => (
-                  <Avatar
-                     className={classes.avatar}
-                     variant="rounded"
-                     src={rowData.companyLogoUrl}
-                  />
-               ),
-            },
-            {
-               field: "company",
-               title: "Company",
-            },
-            {
-               field: "title",
-               title: "Title",
-            },
-            { field: "noOfRegistered", title: "Registered", type: "numeric" },
-            { field: "noOfTalentPool", title: "Talent Pool", type: "numeric" },
-            { field: "noOfParticipating", title: "Participants", type: "numeric" },
-            {
-               field: "date",
-               title: "Date",
-               type: "date",
-               render: (rowData) => prettyDate(rowData.start),
-            },
-         ]}
-         data={streamsFromStore}
-      />
+      <div className={classes.root}>
+         <DataGrid
+            checkboxSelection
+            onSelectionModelChange={(selectionObj) => {
+               // console.log("-> newSelectionModel", newSelectionModel);
+               setNewVisibleStreamSelection(selectionObj.selectionModel);
+            }}
+            selectionModel={selectionModel}
+            columns={columns}
+            rows={streamsFromStore}
+         />
+      </div>
    );
 };
 export default StreamList;

@@ -2,32 +2,19 @@ import * as actions from "../actions/actionTypes";
 
 const initialState = {
    streams: {
-      fromBeforeTimeframe: [],
-      fromTimeframe: [],
       fromTimeframeAndFuture: [],
-      fromFuture: []
    },
 };
 
 const groupAnalyticsReducer = (state = initialState, { type, payload }) => {
    switch (type) {
-      case actions.SET_ALL_STREAMS_ANALYTICS_STORE:
+      case actions.SET_STREAMS_FROM_TIMEFRAME_AND_FUTURE:
          return {
             ...state,
-            streams: { ...state.streams, ...payload },
+            streams: { ...state.streams, fromTimeframeAndFuture: payload },
          };
-      case actions.CLEAR_STREAMS_IN_ANALYTICS_STORE:
-         return {
-            ...state,
-            streams: { ...state.streams, ...initialState.streams },
-         };
-      case actions.SET_STREAMS_FROM_TIMEFRAME:
-         return {
-            ...state,
-            streams: { ...state.streams, fromTimeframe: payload },
-         };
-      case actions.CLEAR_STREAMS_FROM_TIMEFRAME:
-         return { ...state, streams: { ...state.streams, fromTimeframe: [] } };
+      case actions.CLEAR_STREAMS_FROM_TIMEFRAME_AND_FUTURE:
+         return { ...state, streams: { ...state.streams, fromTimeframeAndFuture: [] } };
       default:
          return state;
    }

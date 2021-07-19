@@ -9,6 +9,7 @@ import {
    MenuItem,
    Box,
    Typography,
+   Tooltip,
 } from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import {
@@ -16,6 +17,7 @@ import {
    TooltipHighlight,
 } from "../../../../../materialUI/GlobalTooltips";
 import FilterStreamsIcon from "@material-ui/icons/Tune";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -49,10 +51,14 @@ const Title = ({
    setCurrentUserDataSet,
    setStreamsMounted,
    streamsMounted,
+                  clearHiddenStreams,
    globalTimeFrame,
    handleOpenStreamFilterModal,
    streamFilterModalOpen,
 }) => {
+   const hasStreamsToFilter = useSelector((state) =>
+      Boolean(state.analyticsReducer.streams.fromTimeframeAndFuture.length > 1)
+   );
    const classes = useStyles();
    const [dateAnchorEl, setDateAnchorEl] = useState(null);
    const [studentAnchorEl, setStudentAnchorEl] = useState(null);
@@ -70,6 +76,7 @@ const Title = ({
    };
 
    const handleDateMenuItemClick = (event, index) => {
+      clearHiddenStreams()
       if (streamsMounted) {
          setStreamsMounted(false);
       }
@@ -197,15 +204,27 @@ const Title = ({
                         </MenuItem>
                      ))}
                   </Menu>
-                  <Button
-                     startIcon={<FilterStreamsIcon />}
-                     onClick={handleOpenStreamFilterModal}
-                     color="primary"
-                     disabled={streamFilterModalOpen}
-                     variant="outlined"
+                  <Tooltip
+                     title={
+                        hasStreamsToFilter
+                           ? "Click here to filter out events from the chosen timeframe"
+                           : "You need at least more than one event to be able to filter"
+                     }
                   >
-                     Filter
-                  </Button>
+                     <span>
+                        <Button
+                           startIcon={<FilterStreamsIcon />}
+                           onClick={handleOpenStreamFilterModal}
+                           color="primary"
+                           disabled={
+                              streamFilterModalOpen || !hasStreamsToFilter
+                           }
+                           variant="outlined"
+                        >
+                           Filter
+                        </Button>
+                     </span>
+                  </Tooltip>
                </Box>
             }
          />

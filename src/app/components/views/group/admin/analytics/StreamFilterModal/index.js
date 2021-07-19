@@ -41,9 +41,10 @@ const Content = ({
    hiddenStreamIds,
    timeFrameName,
    selectVisibleStreams,
+   toggleStreamHidden,
 }) => {
-   const streamsFromStore = useSelector((state) =>
-    state.analyticsReducer.streams.fromTimeframeAndFuture
+   const streamsFromStore = useSelector(
+      (state) => state.analyticsReducer.streams.fromTimeframeAndFuture
    );
    const classes = useStyles();
 
@@ -65,9 +66,9 @@ const Content = ({
 
    return (
       <React.Fragment>
-         {/*<DialogTitle>*/}
-         {/*   Filter out streams over the past {timeFrameName}*/}
-         {/*</DialogTitle>*/}
+         <DialogTitle>
+            Filter out streams over the past {timeFrameName}
+         </DialogTitle>
          <DialogContent>
             <StreamList
                hiddenStreamIds={hiddenStreamIds}
@@ -75,11 +76,12 @@ const Content = ({
                setNewVisibleStreamSelection={setNewVisibleStreamSelection}
                selectVisibleStreams={selectVisibleStreams}
                timeFrameName={timeFrameName}
+               toggleStreamHidden={toggleStreamHidden}
             />
          </DialogContent>
          <DialogActions>
             <Button onClick={handleClose}>Close</Button>
-            <Button variant="contained" color="secondary" onClick={handleApply}>
+            <Button disabled={Boolean(!newVisibleStreamSelection?.length)} variant="contained" color="primary" onClick={handleApply}>
                Apply
             </Button>
          </DialogActions>
@@ -93,6 +95,7 @@ const StreamFilterModal = ({
    hiddenStreamIds,
    timeFrameName,
    selectVisibleStreams,
+   toggleStreamHidden,
 }) => {
    const classes = useStyles();
 
@@ -115,6 +118,7 @@ const StreamFilterModal = ({
          <Content
             hiddenStreamIds={hiddenStreamIds}
             onClose={onClose}
+            toggleStreamHidden={toggleStreamHidden}
             selectVisibleStreams={selectVisibleStreams}
             timeFrameName={timeFrameName}
             handleClose={handleClose}
