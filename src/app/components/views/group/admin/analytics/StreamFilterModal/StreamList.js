@@ -1,18 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import { FixedSizeList } from "react-window";
-import { useSelector } from "react-redux";
-import { Checkbox, ListItemAvatar, Typography } from "@material-ui/core";
-import Avatar from "@material-ui/core/Avatar";
-import MaterialTable from "material-table";
-import { tableIcons, defaultTableOptions } from "../common/TableUtils";
-import {
-   getResizedUrl,
-   prettyDate,
-} from "../../../../../helperFunctions/HelperFunctions";
-import { createSelector } from "reselect";
+import { prettyDate } from "../../../../../helperFunctions/HelperFunctions";
 import { DataGrid } from "@material-ui/data-grid";
 
 const useStyles = makeStyles((theme) => ({
@@ -47,10 +35,15 @@ const columns = [
       description: "Title of the event",
       flex: 1,
    },
-   { field: "age", headerName: "Age" },
-   { field: "noOfParticipating", headerName: "Participating" },
-   { field: "noOfRegistered", headerName: "Registered" },
-   { field: "noOfTalentPool", headerName: "Talent Pool" },
+   {
+      field: "date",
+      headerName: "Date",
+      flex: 0.2,
+      renderCell: (params) => {
+         return prettyDate(params.row.start)
+      },
+      type: "date",
+   },
 ];
 
 const getSelectedStreamIds = (streams, hiddenStreamIds) => {
@@ -59,8 +52,6 @@ const getSelectedStreamIds = (streams, hiddenStreamIds) => {
 
 const StreamList = ({
    hiddenStreamIds,
-   timeFrameName,
-   selectVisibleStreams,
    setNewVisibleStreamSelection,
    streamsFromStore,
 }) => {
@@ -73,6 +64,7 @@ const StreamList = ({
          streamsFromStore,
          hiddenStreamIds
       );
+      console.log("-> streamsFromStore", streamsFromStore);
       setSelectionModel(selectedStreamIds)
       setNewVisibleStreamSelection(selectedStreamIds)
    }, []);

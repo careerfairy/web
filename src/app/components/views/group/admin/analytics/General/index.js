@@ -15,6 +15,7 @@ import {
    getUniqueIds,
 } from "../../../../../../data/util/AnalyticsUtil";
 import useUserDataSet from "../../../../../custom-hook/useUserDataSet";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -46,6 +47,9 @@ const General = ({
                      currentStream,
                      showBar
                  }) => {
+  const hiddenStreamIds = useSelector(
+    (state) => state.analyticsReducer.hiddenStreamIds
+  );
     const classes = useStyles()
     const [localUserType, setLocalUserType] = useState(userTypes[0]);
     const theme = useTheme()
@@ -78,7 +82,7 @@ const General = ({
         return {
             positive,
             percentage: `${percentage}%`,
-            dataToCompare: Boolean(registrationsFromBeforeTimeFrame && registrationsFromTimeFrame)
+            dataToCompare: !hiddenStreamIds && Boolean(registrationsFromBeforeTimeFrame && registrationsFromTimeFrame)
         }
     }
 
@@ -95,7 +99,7 @@ const General = ({
         return {
             positive,
             percentage: `${percentage}%`,
-            dataToCompare: Boolean(uniqueUsersFromBeforeTimeFrame && uniqueUsersFromTimeFrame)
+            dataToCompare: !hiddenStreamIds && Boolean(uniqueUsersFromBeforeTimeFrame && uniqueUsersFromTimeFrame)
         }
     }
 

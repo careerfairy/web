@@ -51,13 +51,17 @@ const Title = ({
    setCurrentUserDataSet,
    setStreamsMounted,
    streamsMounted,
-                  clearHiddenStreams,
+   clearHiddenStreams,
    globalTimeFrame,
    handleOpenStreamFilterModal,
    streamFilterModalOpen,
 }) => {
    const hasStreamsToFilter = useSelector((state) =>
       Boolean(state.analyticsReducer.streams.fromTimeframeAndFuture.length > 1)
+   );
+
+   const hiddenStreamIds = useSelector(
+      (state) => state.analyticsReducer.hiddenStreamIds
    );
    const classes = useStyles();
    const [dateAnchorEl, setDateAnchorEl] = useState(null);
@@ -76,7 +80,7 @@ const Title = ({
    };
 
    const handleDateMenuItemClick = (event, index) => {
-      clearHiddenStreams()
+      clearHiddenStreams();
       if (streamsMounted) {
          setStreamsMounted(false);
       }
@@ -216,12 +220,13 @@ const Title = ({
                            startIcon={<FilterStreamsIcon />}
                            onClick={handleOpenStreamFilterModal}
                            color="primary"
+                           size="large"
                            disabled={
                               streamFilterModalOpen || !hasStreamsToFilter
                            }
-                           variant="outlined"
+                           variant={hiddenStreamIds ? "contained" : "outlined"}
                         >
-                           Filter
+                           {hiddenStreamIds ? `Filter is active` : "Filter"}
                         </Button>
                      </span>
                   </Tooltip>

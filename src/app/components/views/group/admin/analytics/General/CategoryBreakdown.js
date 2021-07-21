@@ -43,7 +43,7 @@ const audienceSelector = createSelector(
     (state, currentUserDataSet, currentGroup, currentStream, localUserType, streamsFromTimeFrameAndFuture) => {
         const totalUsers = currentUserDataSet.dataSet === "groupUniversityStudents" ?
             state.firestore.ordered[currentUserDataSet.dataSet]
-            : state.userDataSet.ordered
+            : state.userDataSet.filtered.ordered
         if (currentStream) {
             return totalUsers?.filter(user => currentStream[localUserType.propertyName]?.includes(user.userEmail) && StatsUtil.studentFollowsGroup(user, currentGroup))
         } else {

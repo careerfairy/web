@@ -76,7 +76,7 @@ const mergeArrayOfUsers = (arr1, arr2) => {
 
 const getTotalUniqueIds = (streams = [], hiddenStreamIds = {}) => {
     const totalIds = streams.reduce((mainAcc, stream) => {
-        if(hiddenStreamIds[stream.id]) return mainAcc
+        if(hiddenStreamIds?.[stream.id]) return mainAcc
         const filteredStreamUserSets = [stream.participatingStudents, stream.registeredUsers, stream.talentPool].filter(userSet => userSet?.length)
         const ids = filteredStreamUserSets.reduce((acc, curr) => [...acc, ...curr], [])
         return [...mainAcc, ...ids]

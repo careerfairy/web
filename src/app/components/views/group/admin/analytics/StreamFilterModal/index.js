@@ -51,11 +51,6 @@ const Content = ({
       []
    );
 
-   // useEffect(() => {
-   //    setNewVisibleStreamSelection(
-   //       streamsFromStore.filter((stream) => !hiddenStreamIds[stream.id])
-   //    );
-   // }, []);
 
    const handleApply = () => {
       // Apply new hidden streams
@@ -71,10 +66,8 @@ const Content = ({
          <DialogContent>
             <StreamList
                hiddenStreamIds={hiddenStreamIds}
-               streamsFromStore={streamsFromStore}
                setNewVisibleStreamSelection={setNewVisibleStreamSelection}
-               selectVisibleStreams={selectVisibleStreams}
-               timeFrameName={timeFrameName}
+               streamsFromStore={streamsFromStore}
             />
          </DialogContent>
          <DialogActions>
