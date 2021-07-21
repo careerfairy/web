@@ -230,7 +230,7 @@ const Title = ({
                            }
                            variant={hiddenStreamIds ? "contained" : "outlined"}
                         >
-                           {hiddenStreamIds ? `${noOfVisibleStreamIds} events selected` : "Filter"}
+                           {hiddenStreamIds ? `${noOfVisibleStreamIds} events selected` : "Filter Events"}
                         </Button>
                      </span>
                   </Tooltip>
