@@ -108,6 +108,12 @@ const CategoryBreakdown = ({
     const [value, setValue] = useState(0);
     const [currentGroup, setCurrentGroup] = useState(groups?.[0] || {});
     const [typesOfOptions, setTypesOfOptions] = useState([]);
+    const hiddenStreamIds = useSelector(
+      (state) => state.analyticsReducer.hiddenStreamIds
+    );
+    const noOfVisibleStreamIds = useSelector(
+      (state) => state.analyticsReducer.visibleStreamIds?.length || 0
+    );
     const [currentCategory, setCurrentCategory] = useState(initialCurrentCategory);
     const audience = useSelector(state =>
         audienceSelector(state, {
@@ -255,7 +261,9 @@ const CategoryBreakdown = ({
                 title={`${localUserType.displayName}`}
                 ref={breakdownRef}
                 subheader={
-                    currentStream ? `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}` : "For All Events"
+                    currentStream ? `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}`    : hiddenStreamIds
+                      ? `For the ${noOfVisibleStreamIds} selected events`
+                      : "For all events"
                 }
                 action={
                     currentStream &&

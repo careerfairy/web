@@ -51,7 +51,6 @@ const Content = ({
       []
    );
 
-
    const handleApply = () => {
       // Apply new hidden streams
       selectVisibleStreams(newVisibleStreamSelection);
@@ -72,7 +71,12 @@ const Content = ({
          </DialogContent>
          <DialogActions>
             <Button onClick={handleClose}>Close</Button>
-            <Button disabled={Boolean(!newVisibleStreamSelection?.length)} variant="contained" color="primary" onClick={handleApply}>
+            <Button
+               disabled={Boolean(!newVisibleStreamSelection?.length)}
+               variant="contained"
+               color="primary"
+               onClick={handleApply}
+            >
                Apply
             </Button>
          </DialogActions>
@@ -86,6 +90,7 @@ const StreamFilterModal = ({
    hiddenStreamIds,
    timeFrameName,
    selectVisibleStreams,
+  clearHiddenStreams
 }) => {
    const classes = useStyles();
 
@@ -111,6 +116,7 @@ const StreamFilterModal = ({
             selectVisibleStreams={selectVisibleStreams}
             timeFrameName={timeFrameName}
             handleClose={handleClose}
+            clearHiddenStreams={clearHiddenStreams}
          />
       </Dialog>
    );

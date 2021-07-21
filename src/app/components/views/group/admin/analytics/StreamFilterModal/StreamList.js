@@ -64,7 +64,6 @@ const StreamList = ({
          streamsFromStore,
          hiddenStreamIds
       );
-      console.log("-> streamsFromStore", streamsFromStore);
       setSelectionModel(selectedStreamIds)
       setNewVisibleStreamSelection(selectedStreamIds)
    }, []);

@@ -24,5 +24,8 @@ export const selectVisibleStreams  = (arrayOfNewVisibleStreamIds) => async (disp
             newHiddenStreamIds[stream.id] = true;
         }
     });
-    dispatch({type: actions.SET_VISIBLE_STREAM_IDS, payload: Object.keys(newHiddenStreamIds).length? newHiddenStreamIds: null})
+    dispatch({type: actions.SET_VISIBLE_STREAM_IDS, payload: {
+            hiddenStreamIds: Object.keys(newHiddenStreamIds).length ? newHiddenStreamIds : null,
+            visibleStreamIds: arrayOfNewVisibleStreamIds
+        }})
 };

@@ -63,6 +63,10 @@ const Title = ({
    const hiddenStreamIds = useSelector(
       (state) => state.analyticsReducer.hiddenStreamIds
    );
+
+   const noOfVisibleStreamIds = useSelector(
+     (state) => state.analyticsReducer.visibleStreamIds?.length || 0
+   );
    const classes = useStyles();
    const [dateAnchorEl, setDateAnchorEl] = useState(null);
    const [studentAnchorEl, setStudentAnchorEl] = useState(null);
@@ -226,7 +230,7 @@ const Title = ({
                            }
                            variant={hiddenStreamIds ? "contained" : "outlined"}
                         >
-                           {hiddenStreamIds ? `Filter is active` : "Filter"}
+                           {hiddenStreamIds ? `${noOfVisibleStreamIds} events selected` : "Filter"}
                         </Button>
                      </span>
                   </Tooltip>
