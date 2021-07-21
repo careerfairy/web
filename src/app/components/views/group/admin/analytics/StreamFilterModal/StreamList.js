@@ -63,7 +63,6 @@ const StreamList = ({
    selectVisibleStreams,
    setNewVisibleStreamSelection,
    streamsFromStore,
-   toggleStreamHidden,
 }) => {
    const classes = useStyles();
 

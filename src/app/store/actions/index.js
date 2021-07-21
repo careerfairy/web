@@ -55,4 +55,4 @@ export {
 } from "./streamActions";
 
 export {openNavDrawer, closeNavDrawer, toggleNavDrawer} from './generalLayoutActions'
-export {clearStreamsFromTimeframeAndFuture, setStreamsFromTimeframeAndFuture} from './groupAnalyticsActions'
+export {clearStreamsFromTimeframeAndFuture, setStreamsFromTimeframeAndFuture, selectVisibleStreams, clearHiddenStreamIds} from './groupAnalyticsActions'

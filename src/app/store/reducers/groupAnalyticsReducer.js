@@ -4,6 +4,7 @@ const initialState = {
    streams: {
       fromTimeframeAndFuture: [],
    },
+   hiddenStreamIds:{}
 };
 
 const groupAnalyticsReducer = (state = initialState, { type, payload }) => {
@@ -15,6 +16,10 @@ const groupAnalyticsReducer = (state = initialState, { type, payload }) => {
          };
       case actions.CLEAR_STREAMS_FROM_TIMEFRAME_AND_FUTURE:
          return { ...state, streams: { ...state.streams, fromTimeframeAndFuture: [] } };
+      case actions.CLEAR_HIDDEN_STREAM_IDS:
+         return { ...state, hiddenStreamIds: {} };
+      case actions.SET_VISIBLE_STREAM_IDS:
+         return { ...state, hiddenStreamIds: payload };
       default:
          return state;
    }

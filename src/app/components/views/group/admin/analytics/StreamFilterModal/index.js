@@ -41,7 +41,6 @@ const Content = ({
    hiddenStreamIds,
    timeFrameName,
    selectVisibleStreams,
-   toggleStreamHidden,
 }) => {
    const streamsFromStore = useSelector(
       (state) => state.analyticsReducer.streams.fromTimeframeAndFuture
@@ -76,7 +75,6 @@ const Content = ({
                setNewVisibleStreamSelection={setNewVisibleStreamSelection}
                selectVisibleStreams={selectVisibleStreams}
                timeFrameName={timeFrameName}
-               toggleStreamHidden={toggleStreamHidden}
             />
          </DialogContent>
          <DialogActions>
@@ -95,7 +93,6 @@ const StreamFilterModal = ({
    hiddenStreamIds,
    timeFrameName,
    selectVisibleStreams,
-   toggleStreamHidden,
 }) => {
    const classes = useStyles();
 
@@ -118,7 +115,6 @@ const StreamFilterModal = ({
          <Content
             hiddenStreamIds={hiddenStreamIds}
             onClose={onClose}
-            toggleStreamHidden={toggleStreamHidden}
             selectVisibleStreams={selectVisibleStreams}
             timeFrameName={timeFrameName}
             handleClose={handleClose}

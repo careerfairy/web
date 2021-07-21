@@ -28,10 +28,11 @@ export const setUserDataSet = (getUsersByEmail) => async (
    });
 };
 
-export const setFilteredUserDataSet = (hiddenStreamIds) => async (
+export const setFilteredUserDataSet = () => async (
    dispatch, getState
 ) => {
    const state = getState()
+   const hiddenStreamIds = state.analyticsReducer.hiddenStreamIds
    const nonFilteredStreamsFromTimeFrameAndFuture = state.analyticsReducer.streams.fromTimeframeAndFuture
    const userDataSetDictionary = state.userDataSet["total"].mapped
    const totalFilteredIds = AnalyticsUtil.getTotalUniqueIds(
