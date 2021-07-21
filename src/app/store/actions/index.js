@@ -15,7 +15,7 @@ export {addTodo, deleteTodo, editTodo} from './todoActions.js';
 export {createEmote, setEmote} from './emotesActions.js';
 
 export {
-    removeMappedUserDataSet, removeOrderedUserDataSet, setMapUserDataSet, setOrderedUserDataSet
+    clearUserDataSet, setUserDataSet, setFilteredUserDataSet
 } from './userDataSetActions.js';
 
 export {

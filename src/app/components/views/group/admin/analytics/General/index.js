@@ -1,27 +1,30 @@
-import React, {useMemo, useState} from "react";
-import {Container, Grid, Tooltip} from "@material-ui/core";
+import React, { useMemo, useState } from "react";
+import { Container, Grid, Tooltip } from "@material-ui/core";
 import TotalRegistrations from "./TotalRegistrations";
 import TotalUniqueRegistrations from "./TotalUniqueRegistrations";
 import CategoryBreakdown from "./CategoryBreakdown";
 import AverageRegistrations from "./AverageRegistrations";
-import {mustBeNumber} from "../../../../../helperFunctions/HelperFunctions";
-import {makeStyles, useTheme} from "@material-ui/core/styles";
+import { mustBeNumber } from "../../../../../helperFunctions/HelperFunctions";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 import UserCount from "./UserCount";
 import TotalUniqueParticipatingStudents from "./TotalUniqueParticipatingStudents";
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import {getTotalEmailsFromStreamsByProperty, getUniqueIds} from "../../../../../../data/util/AnalyticsUtil";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import {
+   getTotalEmailsFromStreamsByProperty,
+   getUniqueIds,
+} from "../../../../../../data/util/AnalyticsUtil";
+import useUserDataSet from "../../../../../custom-hook/useUserDataSet";
 
-
-const useStyles = makeStyles(theme => ({
-    root: {
-        backgroundColor: theme.palette.background.dark,
-        minHeight: "100%",
-        paddingBottom: theme.spacing(3),
-        paddingTop: theme.spacing(3),
-        width: "100%"
-    }
-}))
+const useStyles = makeStyles((theme) => ({
+   root: {
+      backgroundColor: theme.palette.background.dark,
+      minHeight: "100%",
+      paddingBottom: theme.spacing(3),
+      paddingTop: theme.spacing(3),
+      width: "100%",
+   },
+}));
 const General = ({
                      group,
                      loading,
@@ -32,7 +35,6 @@ const General = ({
                      streamsFromTimeFrameAndFuture,
                      handleScrollToBreakdown,
                      handleReset,
-                     userDataSet,
                      groups,
                      userTypes,
                      userType,
@@ -48,7 +50,7 @@ const General = ({
     const [localUserType, setLocalUserType] = useState(userTypes[0]);
     const theme = useTheme()
     const mediumScreen = useMediaQuery(theme.breakpoints.down('md'));
-
+    const userDataSet = useUserDataSet(currentUserDataSet, {isFiltered: true});
 
     const getTotalRegisteredUsers = (streamsArray) => {
         const total = streamsArray.reduce(

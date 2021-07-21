@@ -30,6 +30,7 @@ import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDict
 import { repositionElement } from "../../../../helperFunctions/HelperFunctions";
 import StreamFilterModal from "./StreamFilterModal";
 import { clearStreamsFromTimeframeAndFuture } from "../../../../../store/actions/groupAnalyticsActions";
+import { setUserDataSet } from "../../../../../store/actions";
 
 const useStyles = makeStyles((theme) => ({
    indicator: {
@@ -99,10 +100,11 @@ const streamsSelector = createSelector(
       let streams = [];
       if (livestreams) {
          streams = livestreams.map((streamObj) => {
-            const livestream = { ...streamObj,
+            const livestream = {
+               ...streamObj,
                noOfParticipating: streamObj.participatingStudents?.length || 0,
-               noOfRegistered:  streamObj.registeredUsers?.length || 0,
-               noOfTalentPool:  streamObj.talentPool?.length || 0,
+               noOfRegistered: streamObj.registeredUsers?.length || 0,
+               noOfTalentPool: streamObj.talentPool?.length || 0,
             };
 
             livestream.date = livestream.start?.toDate();
@@ -197,8 +199,8 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
 
    useFirestoreConnect(query);
 
-   const nonFilteredStreamsFromTimeFrameAndFuture = useSelector((state) =>
-     state.analyticsReducer.streams.fromTimeframeAndFuture
+   const nonFilteredStreamsFromTimeFrameAndFuture = useSelector(
+      (state) => state.analyticsReducer.streams.fromTimeframeAndFuture
    );
    const allGroups = useSelector((state) => state.firestore.ordered?.allGroups);
    const allGroupsDictionary = useSelector(
@@ -290,27 +292,15 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
       }
    }, []);
 
-   useEffect(() => {
-      if (
-         streamsMounted &&
-         !uniStudents &&
-         (!userDataSetDictionary || !userDataSet)
-      ) {
-         (async function getTotalEngagedUsers() {
-            try {
-               const totalIds = AnalyticsUtil.getTotalUniqueIds(livestreams);
-               const totalUsers = await firebase.getUsersByEmail(totalIds);
-               const dictionaryOfUsers = AnalyticsUtil.convertArrayOfUserObjectsToDictionary(
-                  totalUsers
-               );
-               dispatch(actions.setOrderedUserDataSet(totalUsers));
-               dispatch(actions.setMapUserDataSet(dictionaryOfUsers));
-            } catch (e) {
-               console.log("-> e in getting followers", e);
-            }
-         })();
-      }
-   }, [streamsMounted, uniStudents]);
+   const handleSetUserdataSet = async () => {
+      dispatch(actions.setUserDataSet(firebase.getUsersByEmail))
+   };
+
+   const handleFilterUserdataSet = async (hiddenStreamIds) => {
+      dispatch(actions.setFilteredUserDataSet(hiddenStreamIds))
+   };
+
+
 
    useEffect(() => {
       if (currentUserDataSet.dataSet === "followers" && !userData?.isAdmin) {
@@ -449,15 +439,15 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
 
    const getStreamsFromTimeFrame = (timeframe) => {
       const targetTime = new Date(timeframe);
-     return  livestreams.filter((stream) => {
+      return livestreams.filter((stream) => {
          const streamStart = stream.start?.toDate();
-         return streamStart > targetTime && streamStart < now && isVisible(stream);
+         return (
+            streamStart > targetTime && streamStart < now && isVisible(stream)
+         );
       });
    };
 
    const clearHiddenStreams = () => setHiddenStreamIds({});
-
-
 
    const hideAllStreams = () => {
       const allStreamIds = {};
@@ -468,10 +458,10 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
    };
 
    const toggleStreamHidden = (streamId) =>
-     setHiddenStreamIds({
-        ...hiddenStreamIds,
-        [streamId]: !Boolean(hiddenStreamIds[streamId]),
-     });
+      setHiddenStreamIds({
+         ...hiddenStreamIds,
+         [streamId]: !Boolean(hiddenStreamIds[streamId]),
+      });
 
    const handleCloseStreamFilterModal = () => {
       setStreamFilterModalOpen(false);
@@ -481,8 +471,8 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
    };
 
    const isVisible = (stream) => {
-      return Boolean(!hiddenStreamIds[stream.id])
-   }
+      return Boolean(!hiddenStreamIds[stream.id]);
+   };
 
    const getStreamsFromBeforeTimeFrame = () => {
       return livestreams.filter((stream) => {
@@ -516,9 +506,9 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
       [livestreams, hiddenStreamIds]
    );
 
-   const streamsFromTimeFrame =  useMemo(
-     () => getStreamsFromTimeFrame(globalTimeFrame.globalDate),
-     [livestreams, hiddenStreamIds]
+   const streamsFromTimeFrame = useMemo(
+      () => getStreamsFromTimeFrame(globalTimeFrame.globalDate),
+      [livestreams, hiddenStreamIds]
    );
 
    const streamsFromTimeFrameAndFuture = useMemo(
@@ -532,19 +522,50 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
 
    useEffect(() => {
       const targetTime = new Date(globalTimeFrame.globalDate);
-      const nonFilteredStreamsFromTimeFrameAndFuture = livestreams.filter((stream) => {
-         const streamStart = stream.start?.toDate();
-         return streamStart > targetTime;
-      });
-      dispatch(actions.setStreamsFromTimeframeAndFuture(nonFilteredStreamsFromTimeFrameAndFuture));
-   },[livestreams, globalTimeFrame.globalDate])
+      const nonFilteredStreamsFromTimeFrameAndFuture = livestreams.filter(
+         (stream) => {
+            const streamStart = stream.start?.toDate();
+            return streamStart > targetTime;
+         }
+      );
+      dispatch(
+         actions.setStreamsFromTimeframeAndFuture(
+            nonFilteredStreamsFromTimeFrameAndFuture
+         )
+      );
+   }, [livestreams, globalTimeFrame.globalDate]);
+
+   useEffect(() => {
+      if (
+        streamsMounted &&
+        !uniStudents &&
+        (!userDataSetDictionary || !userDataSet)
+      ) {
+         (async function getTotalEngagedUsers() {
+            try {
+               await handleSetUserdataSet(nonFilteredStreamsFromTimeFrameAndFuture);
+            } catch (e) {
+               console.log("-> e in getting followers", e);
+            }
+         })();
+      }
+   }, [streamsMounted, uniStudents]);
+
+   useEffect(() => {
+      if (currentUserDataSet.dataSet === "groupUniversityStudents") return;
+      (async function getTotalFilteredEngagedUsers() {
+         try {
+            await handleFilterUserdataSet(nonFilteredStreamsFromTimeFrameAndFuture, hiddenStreamIds, userDataSetDictionary);
+         } catch (e) {
+            console.log("-> e in getting followers", e);
+         }
+      })();
+   }, [hiddenStreamIds, nonFilteredStreamsFromTimeFrameAndFuture, userDataSetDictionary]);
 
    const selectVisibleStreams = (arrayOfNewVisibleStreamIds) => {
       const newHiddenStreamIds = {};
       nonFilteredStreamsFromTimeFrameAndFuture.forEach((stream) => {
-         if (
-           !arrayOfNewVisibleStreamIds.includes(stream.id)
-         ) {
+         if (!arrayOfNewVisibleStreamIds.includes(stream.id)) {
             newHiddenStreamIds[stream.id] = true;
          }
       });
@@ -586,7 +607,6 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
       }),
       ...(tabName === "general" && {
          streamsFromBeforeTimeFrame,
-         userDataSet,
          currentUserDataSet,
          groups,
       }),
