@@ -54,7 +54,7 @@ const columns = [
 ];
 
 const getSelectedStreamIds = (streams, hiddenStreamIds) => {
-   return streams.filter((stream) => !hiddenStreamIds[stream.id]).map(stream => stream.id);
+   return streams.filter((stream) => !hiddenStreamIds?.[stream.id]).map(stream => stream.id);
 };
 
 const StreamList = ({

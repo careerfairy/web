@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import * as actions from "../../../../../store/actions";
 import { AppBar, Box, Tab, Tabs } from "@material-ui/core";
-import AnalyticsUtil, {
+import {
    arraysOfIdsEqual,
    getTotalUniqueStreamGroupIdsFromStreams,
 } from "../../../../../data/util/AnalyticsUtil";
@@ -29,8 +29,6 @@ import useUserDataSet from "../../../../custom-hook/useUserDataSet";
 import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDictionary";
 import { repositionElement } from "../../../../helperFunctions/HelperFunctions";
 import StreamFilterModal from "./StreamFilterModal";
-import { clearStreamsFromTimeframeAndFuture } from "../../../../../store/actions/groupAnalyticsActions";
-import { setUserDataSet } from "../../../../../store/actions";
 
 const useStyles = makeStyles((theme) => ({
    indicator: {
@@ -465,7 +463,7 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
    };
 
    const isVisible = (stream) => {
-      return Boolean(!hiddenStreamIds[stream.id]);
+      return Boolean(!hiddenStreamIds?.[stream.id]);
    };
 
    const getStreamsFromBeforeTimeFrame = () => {

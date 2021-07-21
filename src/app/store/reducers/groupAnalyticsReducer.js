@@ -4,7 +4,7 @@ const initialState = {
    streams: {
       fromTimeframeAndFuture: [],
    },
-   hiddenStreamIds:{}
+   hiddenStreamIds: null
 };
 
 const groupAnalyticsReducer = (state = initialState, { type, payload }) => {
