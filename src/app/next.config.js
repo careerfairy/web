@@ -38,6 +38,7 @@ module.exports = (phase, {defaultConfig}) => {
             return config
         }
     }
+    // Only uncomment if you want to host build on firebase, keep commented out if hosting on Vercel
     // if (phase === PHASE_PRODUCTION_BUILD) {
     //     config.distDir = '../../dist/client'
     // }
