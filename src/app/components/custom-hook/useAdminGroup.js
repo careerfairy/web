@@ -5,6 +5,7 @@ import {useAuth} from "../../HOCs/AuthProvider";
 import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import GroupsUtil from "../../data/util/GroupsUtil";
 import * as actions from '../../store/actions'
+import { clearUserDataSet } from "../../store/actions/userDataSetActions";
 
 const populates = [
     {child: 'adminEmails', root: 'userData', childAlias: 'admins'} // replace owner with user object
@@ -18,8 +19,7 @@ const useAdminGroup = (groupId) => {
     useEffect(() => {
 
         return () => {
-            dispatch(actions.removeOrderedUserDataSet())
-            dispatch(actions.removeMappedUserDataSet())
+            dispatch(actions.clearUserDataSet())
         }
     },[])
 
