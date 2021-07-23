@@ -472,7 +472,7 @@ const DraftStreamForm = ({
                               value={values.duration}
                               start={values.start}
                               disabled={isSubmitting}
-                              label="Estimated Duration (optional)"
+                              label="Estimated Duration"
                               setFieldValue={setFieldValue}
                               fullWidth
                               variant="outlined"
