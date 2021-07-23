@@ -31,6 +31,7 @@ const durations = [
    },
 ];
 
+//TODO add validation for min (15) and maximum(180) stream duration
 const StreamDurationSelect = (props) => {
    const { disabled, label, setFieldValue, variant, value, fullWidth } = props;
    const theme = useTheme();
