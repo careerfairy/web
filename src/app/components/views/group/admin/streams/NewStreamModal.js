@@ -42,6 +42,11 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "column",
         alignItems: "center",
     },
+    contentRoot:{
+        [theme.breakpoints.down("sm")]:{
+            padding: 0
+        }
+    },
     whiteBtn: {
         color: theme.palette.primary.main,
         background: "white",
@@ -266,10 +271,10 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                     </CardActions>
                 </Toolbar>
             </AppBar>
-            <DialogContent>
+            <DialogContent className={classes.contentRoot}>
                 {/*Have to nest DialogContent Elements in order for scroll to top in Dialogs to work (weird MUI bug: github.com/mui-org/material-ui/issues/9186)*/}
                 <div ref={dialogRef}>
-                    <DialogContent className={classes.content}>
+                    <DialogContent className={`${classes.content} ${classes.contentRoot}`}>
                         <DraftStreamForm
                             formRef={formRef}
                             group={group}

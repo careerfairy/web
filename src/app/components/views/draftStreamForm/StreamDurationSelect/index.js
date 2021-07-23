@@ -1,0 +1,77 @@
+import React from "react";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+
+const useStyles = makeStyles((theme) => ({
+   root: {},
+}));
+
+const durations = [
+   { minutes: 15, label: "15m" },
+   { minutes: 30, label: "30m" },
+   { minutes: 45, label: "45m" },
+   {
+      minutes: 60,
+      label: "1h",
+   },
+   { minutes: 75, label: "1h15m" },
+   { minutes: 90, label: "1h30m" },
+   { minutes: 105, label: "1h45m" },
+   {
+      minutes: 120,
+      label: "2h",
+   },
+   { minutes: 135, label: "2h15m" },
+   { minutes: 150, label: "2h30m" },
+   { minutes: 165, label: "2h45m" },
+   {
+      minutes: 180,
+      label: "3h",
+   },
+];
+
+//TODO add validation for min (15) and maximum(180) stream duration
+const StreamDurationSelect = (props) => {
+   const { disabled, label, setFieldValue, variant, value, fullWidth } = props;
+   const theme = useTheme();
+   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+   const classes = useStyles();
+
+   return (
+      <FormControl
+         variant={variant}
+         fullWidth={fullWidth}
+         disabled={disabled}
+         className={classes.root}
+      >
+         <InputLabel id="duration-label">{label}</InputLabel>
+         <Select
+            labelId="duration-label"
+            id="duration"
+            name="duration"
+            label={label}
+            native={mobile}
+            onChange={(event, secondArg) => {
+               const value = event.target.value
+               setFieldValue("duration", Number(value))
+            }}
+            value={Number(value || 60)}
+         >
+            {durations.map((duration) =>
+               mobile ? (
+                  <option key={duration.minutes} value={duration.minutes}>
+                     {duration.label}
+                  </option>
+               ) : (
+                  <MenuItem key={duration.minutes} value={duration.minutes}>
+                     {duration.label}
+                  </MenuItem>
+               )
+            )}
+         </Select>
+      </FormControl>
+   );
+};
+
+export default StreamDurationSelect;
