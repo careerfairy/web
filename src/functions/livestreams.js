@@ -5,6 +5,9 @@ const {client} = require('./api/postmark')
 
 const {setHeaders} = require("./util");
 
+const {DateTime} = require("luxon");
+const ical = require("ical-generator");
+
 exports.assertLivestreamRegistrationWasCompleted = functions.firestore
     .document('livestreams/{livestreamId}/registeredStudents/{studentId}')
     .onCreate((snapshot, context) => {
@@ -46,6 +49,26 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every sunday
 exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onRequest(async (req, res) => {
     setHeaders(req, res)
 
+    const cal = ical({ domain: "careerfairy.io", name: "Live Stream Invite" });
+    const start = DateTime.fromJSDate(new Date(req.body.regular_date))
+
+    cal.createEvent({
+        start: start,
+        end: start.plus({minutes: 45}),
+        summary: `Live stream with ${req.body.company_name}`,
+        description: req.body.livestream_title,
+        location: "On CareerFairy",
+        timezone: 'Europe/Zurich',
+        organizer: {
+            name: "CareerFairy",
+            mailto: "noreply@careerfairy.io"
+        },
+        url: req.body.livestream_link,
+    });
+
+    let calStr = cal.toString();
+    let calBase64Str = Buffer.from(calStr).toString('base64')
+
     const email = {
         "TemplateId": 16533319,
         "From": 'CareerFairy <noreply@careerfairy.io>',
@@ -57,7 +80,14 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onRequest(
             company_logo_url: req.body.company_logo_url,
             livestream_title: req.body.livestream_title,
             livestream_link: req.body.livestream_link
-        }
+        }, 
+        "Attachments": [
+            {
+                "Name": "livestream.ics",
+                "Content": calBase64Str,
+                "ContentType": "text/calendar; charset=utf-8; method=REQUEST"
+            }
+        ]
     };
 
     client.sendEmailWithTemplate(email).then(response => {
