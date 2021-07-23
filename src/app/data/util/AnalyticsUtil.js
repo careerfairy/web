@@ -1,19 +1,25 @@
-import {toTitleCase} from "../../components/helperFunctions/HelperFunctions";
+import { toTitleCase } from "../../components/helperFunctions/HelperFunctions";
 
 const getCategoryOptionName = (targetCategoryId, user, groupContext) => {
-    if (user.registeredGroups) {
-        const targetGroup = user.registeredGroups.find(groupObj => groupObj.groupId === groupContext.groupId)
-        if (targetGroup?.categories) {
-            const targetCategory = targetGroup.categories.find(categoryObj => categoryObj.id === targetCategoryId)
-            if (targetCategory?.selectedValueId) {
-                const targetOption = groupContext.options.find(option => option.id === targetCategory.selectedValueId)
-                if (targetOption?.name) {
-                    return targetOption.name
-                }
+   if (user.registeredGroups) {
+      const targetGroup = user.registeredGroups.find(
+         (groupObj) => groupObj.groupId === groupContext.groupId
+      );
+      if (targetGroup?.categories) {
+         const targetCategory = targetGroup.categories.find(
+            (categoryObj) => categoryObj.id === targetCategoryId
+         );
+         if (targetCategory?.selectedValueId) {
+            const targetOption = groupContext.options.find(
+               (option) => option.id === targetCategory.selectedValueId
+            );
+            if (targetOption?.name) {
+               return targetOption.name;
             }
-        }
-    }
-}
+         }
+      }
+   }
+};
 
 const mapUserCategories = (user, group) => {
     group.categories.forEach(category => {
@@ -68,12 +74,14 @@ const mergeArrayOfUsers = (arr1, arr2) => {
     return Array.from(hash.values());
 }
 
-const getTotalUniqueIds = (streams = []) => {
-    const totalIds = streams.reduce((mainAcc, {participatingStudents, registeredUsers, talentPool}) => {
-        const ids = [participatingStudents, registeredUsers, talentPool].filter(array => array).reduce((acc, curr) => [...acc, ...curr], [])
+const getTotalUniqueIds = (streams = [], hiddenStreamIds = {}) => {
+    const totalIds = streams.reduce((mainAcc, stream) => {
+        if(hiddenStreamIds?.[stream.id]) return mainAcc
+        const filteredStreamUserSets = [stream.participatingStudents, stream.registeredUsers, stream.talentPool].filter(userSet => userSet?.length)
+        const ids = filteredStreamUserSets.reduce((acc, curr) => [...acc, ...curr], [])
         return [...mainAcc, ...ids]
     }, [])
-    return [...new Set(totalIds)]
+    return [...new Set(totalIds)];
 }
 
 const convertArrayOfUserObjectsToDictionary = (arrayOfUsers) => {
@@ -169,6 +177,13 @@ const arraysOfIdsEqual = (array1, array2) => {
     return true;
 }
 
+const getUsersFromDictionaryWithIds = (arrayOfIds = [], dictionary = {}) => {
+    return arrayOfIds.reduce((acc, id) => {
+        if(!dictionary[id]) return acc
+        return acc.concat(dictionary[id])
+    },[])
+}
+
 module.exports = {
     mapUserEngagement,
     getUniqueIds,
@@ -184,5 +199,6 @@ module.exports = {
     getTotalUniqueStreamGroupIdsFromStreams,
     arraysOfIdsEqual,
     getUniqueUsersByEmailWithArrayOfUsers,
-    convertArrayOfObjectsToDictionaryByProp
+    convertArrayOfObjectsToDictionaryByProp,
+    getUsersFromDictionaryWithIds
 }

@@ -77,6 +77,12 @@ const UsersTable = ({
    const [users, setUsers] = useState([]);
    const [targetGroups, setTargetGroups] = useState([]);
    const [processingCVs, setProcessingCVs] = useState(false);
+   const hiddenStreamIds = useSelector(
+      (state) => state.analyticsReducer.hiddenStreamIds
+   );
+   const noOfVisibleStreamIds = useSelector(
+      (state) => state.analyticsReducer.visibleStreamIds?.length || 0
+   );
    const dispatch = useDispatch();
 
    const categoryFields = () => {
@@ -270,7 +276,9 @@ const UsersTable = ({
    const getTitle = () =>
       currentStream
          ? `For ${currentStream.company} on ${prettyDate(currentStream.start)}`
-         : "For all Events";
+         : hiddenStreamIds
+         ? `For the ${noOfVisibleStreamIds} selected events`
+         : "For all events";
 
    const getFileName = (userData) =>
       `${userData.firstName} ${userData.lastName} CV - ${prettyLocalizedDate(
