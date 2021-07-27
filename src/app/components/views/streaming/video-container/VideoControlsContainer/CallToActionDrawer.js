@@ -30,15 +30,16 @@ const useStyles = makeStyles((theme) => ({
    fullScreenDrawerContent: {
       width: "100vw",
    },
-   ctaTitle:{
-     fontSize: "1.5rem",
-      fontWeight: 500
+   ctaTitle: {
+      fontSize: "1.5rem",
+      fontWeight: 500,
+      flex: 1,
    },
    headerWrapper: {
       padding: theme.spacing(3),
       display: "flex",
       width: "100%",
-      alignItems: "center"
+      alignItems: "center",
    },
    titleWrapper: {
       flex: 1,
@@ -49,15 +50,26 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
+const MAX_BUTTON_TEXT_LENGTH = 45;
+const MAX_MESSAGE_LENGTH = 1000;
+
+const getMaxLengthError = (maxLength) => [
+   maxLength,
+   `This value is too long. It should have ${maxLength} characters or fewer.`,
+];
+
 const validationSchema = yup.object({
-   message: yup.string("Enter your email"),
+   message: yup
+      .string("Enter your email")
+      .max(...getMaxLengthError(MAX_MESSAGE_LENGTH)),
    buttonText: yup
       .string("Enter your password")
+      .max(...getMaxLengthError(MAX_BUTTON_TEXT_LENGTH))
       .required("This value is required"),
    buttonUrl: yup
       .string("Enter your password")
-      .matches(URL_REGEX, {message: "This value is required"})
-      .required("This value is required"),
+      .matches(URL_REGEX, { message: "Must be a valid url" })
+      .required("Must be a valid url"),
 });
 
 const Content = ({ handleClose, handleSend, loading, fullScreen }) => {
@@ -82,11 +94,9 @@ const Content = ({ handleClose, handleSend, loading, fullScreen }) => {
          })}
       >
          <div className={classes.headerWrapper}>
-            {/*<div className={classes.titleWrapper}>*/}
-               <Typography noWrap className={classes.ctaTitle} variant="h4">
-                  Send a call to action
-               </Typography>
-            {/*</div>*/}
+            <Typography noWrap className={classes.ctaTitle} variant="h4">
+               Send a call to action
+            </Typography>
             <IconButton onClick={handleClose}>
                <CloseIcon />
             </IconButton>
@@ -108,6 +118,9 @@ const Content = ({ handleClose, handleSend, loading, fullScreen }) => {
                      multiline
                      autoFocus
                      rows={3}
+                     inputProps={{
+                        maxLength: MAX_MESSAGE_LENGTH,
+                     }}
                      placeholder="Click here to see our open positions"
                      label="message"
                      value={formik.values.message}
@@ -125,6 +138,9 @@ const Content = ({ handleClose, handleSend, loading, fullScreen }) => {
                      fullWidth
                      variant="outlined"
                      id="buttonText"
+                     inputProps={{
+                        maxLength: MAX_BUTTON_TEXT_LENGTH,
+                     }}
                      placeholder="Click Here"
                      name="buttonText"
                      label="Button Text*"
@@ -184,7 +200,6 @@ Content.propTypes = {
    fullScreen: PropTypes.bool,
 };
 const CallToActionDrawer = ({ open, onClose }) => {
-   const classes = useStyles();
    const theme = useTheme();
    const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
    const [loading, setLoading] = useState(false);
