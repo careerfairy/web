@@ -61,7 +61,7 @@ const ShareMenu = ({ anchorEl, onClose, shareActions }) => {
 };
 
 ShareMenu.propTypes = {
-   anchorEl: PropTypes.bool,
+   anchorEl: PropTypes.object,
    onClose: PropTypes.func,
    shareActions: PropTypes.arrayOf(
       PropTypes.shape({
