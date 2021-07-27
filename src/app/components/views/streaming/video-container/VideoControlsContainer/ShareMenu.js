@@ -15,6 +15,10 @@ const useStyles = makeStyles((theme) => ({
       maxWidth: 360,
       backgroundColor: theme.palette.background.paper,
    },
+  listIconWrapper:{
+     minWidth: "auto",
+    paddingRight: theme.spacing(2)
+  }
 }));
 
 const ShareMenu = ({ anchorEl, onClose, shareActions }) => {
@@ -45,7 +49,9 @@ const ShareMenu = ({ anchorEl, onClose, shareActions }) => {
                   }}
                   button
                >
-                  <ListItemIcon>{action.icon}</ListItemIcon>
+                  <ListItemIcon className={classes.listIconWrapper}>
+                    {action.icon}
+                  </ListItemIcon>
                   <ListItemText primary={action.name} />
                </ListItem>
             ))}

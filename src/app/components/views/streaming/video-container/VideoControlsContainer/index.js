@@ -23,7 +23,7 @@ import PropTypes from "prop-types";
 import useStreamRef from "components/custom-hook/useStreamRef";
 import { CallToActionIcon, ShareIcon, SharePdfIcon } from "./Icons";
 import ShareMenu from "./ShareMenu";
-import CallToActionModal from "./CallToActionModal";
+import CallToActionDrawer from "./CallToActionDrawer";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -97,7 +97,7 @@ function VideoControlsContainer({
    const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
    const [isVideoInactive, setIsVideoInactive] = useState(false);
    const [shareMenuAnchorEl, setShareMenuAnchorEl] = useState(false);
-   const [callToActionModalOpen, setCallToActionModalOpen] = useState(false);
+   const [callToActionDrawerOpen, setCallToActionDrawerOpen] = useState(false);
    const presentMode = mode === "presentation";
    const automaticMode = speakerSwitchMode === "automatic";
    const desktopMode = mode === "desktop";
@@ -196,11 +196,11 @@ function VideoControlsContainer({
       }
    };
 
-   const handleOpenCallToActionModal = () => {
-      setCallToActionModalOpen(true);
+   const handleOpenCallToActionDrawer = () => {
+      setCallToActionDrawerOpen(true);
    };
-   const handleCloseCallToActionModal = () => {
-      setCallToActionModalOpen(false);
+   const handleCloseCallToActionDrawer = () => {
+      setCallToActionDrawerOpen(false);
    };
 
    const actions = [
@@ -233,7 +233,7 @@ function VideoControlsContainer({
       {
          icon: <CallToActionIcon />,
          name: "Send a call to action",
-         onClick: () => handleOpenCallToActionModal(),
+         onClick: () => handleOpenCallToActionDrawer(),
       },
    ];
 
@@ -255,8 +255,8 @@ function VideoControlsContainer({
 
    if (showShareButton()) {
       actions.unshift({
-         icon: <ShareIcon color={desktopMode ? "primary" : "inherit"} />,
-         name: !desktopMode || presentMode ? "Share" : "Stop sharing",
+         icon: <ShareIcon />,
+         name: "Share",
          onClick: handleClickShare,
       });
    }
@@ -334,7 +334,10 @@ function VideoControlsContainer({
                onClose={handleCloseShareMenu}
                shareActions={shareActions}
             />
-            <CallToActionModal/>
+            <CallToActionDrawer
+               onClose={handleCloseCallToActionDrawer}
+               open={callToActionDrawerOpen}
+            />
          </div>
       </ClickAwayListener>
    );
