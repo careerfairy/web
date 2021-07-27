@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import {
+   Box,
    Button,
    DialogActions,
    DialogContent,
@@ -41,7 +42,7 @@ const Content = ({ handleClose, handleSend, loading, fullScreen }) => {
          [classes.fullScreenDrawerContent]: fullScreen
       })}>
          <div className={classes.titleWrapper}>
-         <Typography variant="h4">
+         <Typography noWrap variant="h4">
             Send a call to action
          </Typography>
          </div>
@@ -58,6 +59,7 @@ const Content = ({ handleClose, handleSend, loading, fullScreen }) => {
                   link
                </Grid>
                <Grid xs={12} item>
+                  <Box display="flex" justifyContent="flex-end">
                   <Button
                     disabled={loading}
                     onClick={handleSend}
@@ -66,6 +68,7 @@ const Content = ({ handleClose, handleSend, loading, fullScreen }) => {
                   >
                      Send
                   </Button>
+                  </Box>
                </Grid>
 
             </Grid>
