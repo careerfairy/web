@@ -96,7 +96,7 @@ function VideoControlsContainer({
    const [delayHandler, setDelayHandler] = useState(null);
    const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
    const [isVideoInactive, setIsVideoInactive] = useState(false);
-   const [shareMenuAnchorEl, setShareMenuAnchorEl] = useState(false);
+   const [shareMenuAnchorEl, setShareMenuAnchorEl] = useState(null);
    const [callToActionDrawerOpen, setCallToActionDrawerOpen] = useState(false);
    const presentMode = mode === "presentation";
    const automaticMode = speakerSwitchMode === "automatic";

@@ -5,17 +5,20 @@ import {
    Button,
    Divider,
    Drawer,
-   Grid, TextField,
-   Typography
+   Grid,
+   IconButton,
+   TextField,
+   Typography,
 } from "@material-ui/core";
 import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import { useFormik } from "formik";
 import * as actions from "store/actions";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import CloseIcon from "@material-ui/icons/ChevronLeft";
 import clsx from "clsx";
-import * as yup from 'yup';
-
+import * as yup from "yup";
+import { URL_REGEX } from "components/util/constants";
 
 const useStyles = makeStyles((theme) => ({
    drawerContent: {
@@ -27,8 +30,18 @@ const useStyles = makeStyles((theme) => ({
    fullScreenDrawerContent: {
       width: "100vw",
    },
-   titleWrapper: {
+   ctaTitle:{
+     fontSize: "1.5rem",
+      fontWeight: 500
+   },
+   headerWrapper: {
       padding: theme.spacing(3),
+      display: "flex",
+      width: "100%",
+      alignItems: "center"
+   },
+   titleWrapper: {
+      flex: 1,
    },
    callToActionContentWrapper: {
       padding: theme.spacing(3),
@@ -37,105 +50,127 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = yup.object({
-   message: yup
-     .string('Enter your email'),
+   message: yup.string("Enter your email"),
    buttonText: yup
-     .string('Enter your password')
-     .required('This value is required'),
+      .string("Enter your password")
+      .required("This value is required"),
    buttonUrl: yup
-     .string('Enter your password')
-     .url('You must enter a valid link')
-     .required('This value is required'),
+      .string("Enter your password")
+      .matches(URL_REGEX, {message: "This value is required"})
+      .required("This value is required"),
 });
 
 const Content = ({ handleClose, handleSend, loading, fullScreen }) => {
-
-   const classes = useStyles()
+   const classes = useStyles();
    const formik = useFormik({
       initialValues: {
-         message: '',
-         buttonText: '',
-         buttonUrl: '',
+         message: "",
+         buttonText: "",
+         buttonUrl: "",
       },
       validationSchema: validationSchema,
       onSubmit: async (values) => {
          alert(JSON.stringify(values, null, 2));
-         handleClose()
+         handleClose();
       },
    });
 
-
    return (
-      <div className={clsx(classes.drawerContent, {
-         [classes.fullScreenDrawerContent]: fullScreen
-      })}>
-         <div className={classes.titleWrapper}>
-         <Typography noWrap variant="h4">
-            Send a call to action
-         </Typography>
+      <div
+         className={clsx(classes.drawerContent, {
+            [classes.fullScreenDrawerContent]: fullScreen,
+         })}
+      >
+         <div className={classes.headerWrapper}>
+            {/*<div className={classes.titleWrapper}>*/}
+               <Typography noWrap className={classes.ctaTitle} variant="h4">
+                  Send a call to action
+               </Typography>
+            {/*</div>*/}
+            <IconButton onClick={handleClose}>
+               <CloseIcon />
+            </IconButton>
          </div>
-         <Divider/>
+         <Divider />
          <div className={classes.callToActionContentWrapper}>
-            <Grid onSubmit={formik.handleSubmit} container spacing={3} component="form">
+            <Grid
+               onSubmit={formik.handleSubmit}
+               container
+               spacing={3}
+               component="form"
+            >
                <Grid xs={12} item>
                   <TextField
-                    fullWidth
-                    variant="outlined"
-                    id="message"
-                    name="message"
-                    multiline
-                    autoFocus
-                    rows={3}
-                    placeholder="Click here to see our open positions"
-                    label="message"
-                    value={formik.values.message}
-                    onChange={formik.handleChange}
-                    error={formik.touched.message && Boolean(formik.errors.message)}
-                    helperText={formik.touched.message && formik.errors.message}
+                     fullWidth
+                     variant="outlined"
+                     id="message"
+                     name="message"
+                     multiline
+                     autoFocus
+                     rows={3}
+                     placeholder="Click here to see our open positions"
+                     label="message"
+                     value={formik.values.message}
+                     onChange={formik.handleChange}
+                     error={
+                        formik.touched.message && Boolean(formik.errors.message)
+                     }
+                     helperText={
+                        formik.touched.message && formik.errors.message
+                     }
                   />
                </Grid>
                <Grid xs={12} item>
                   <TextField
-                    fullWidth
-                    variant="outlined"
-                    id="buttonText"
-                    placeholder="Click Here"
-                    name="buttonText"
-                    label="Button Text*"
-                    value={formik.values.buttonText}
-                    onChange={formik.handleChange}
-                    error={formik.touched.buttonText && Boolean(formik.errors.buttonText)}
-                    helperText={formik.touched.buttonText && formik.errors.buttonText}
+                     fullWidth
+                     variant="outlined"
+                     id="buttonText"
+                     placeholder="Click Here"
+                     name="buttonText"
+                     label="Button Text*"
+                     value={formik.values.buttonText}
+                     onChange={formik.handleChange}
+                     error={
+                        formik.touched.buttonText &&
+                        Boolean(formik.errors.buttonText)
+                     }
+                     helperText={
+                        formik.touched.buttonText && formik.errors.buttonText
+                     }
                   />
                </Grid>
                <Grid xs={12} item>
                   <TextField
-                    fullWidth
-                    variant="outlined"
-                    id="buttonUrl"
-                    name="buttonUrl"
-                    placeholder="https://mywebsite.com/careers/"
-                    label="Button Url*"
-                    value={formik.values.buttonUrl}
-                    onChange={formik.handleChange}
-                    error={formik.touched.buttonUrl && Boolean(formik.errors.buttonUrl)}
-                    helperText={formik.touched.buttonUrl && formik.errors.buttonUrl}
+                     fullWidth
+                     variant="outlined"
+                     id="buttonUrl"
+                     name="buttonUrl"
+                     placeholder="https://mywebsite.com/careers/"
+                     label="Button Url*"
+                     value={formik.values.buttonUrl}
+                     onChange={formik.handleChange}
+                     error={
+                        formik.touched.buttonUrl &&
+                        Boolean(formik.errors.buttonUrl)
+                     }
+                     helperText={
+                        formik.touched.buttonUrl && formik.errors.buttonUrl
+                     }
                   />
                </Grid>
                <Grid xs={12} item>
                   <Box display="flex" justifyContent="flex-end">
-                  <Button
-                    type="submit"
-                    disabled={loading}
-                    onClick={handleSend}
-                    variant="contained"
-                    color="primary"
-                  >
-                     Send
-                  </Button>
+                     <Button
+                        type="submit"
+                        disabled={loading}
+                        onClick={handleSend}
+                        variant="contained"
+                        color="primary"
+                     >
+                        Send call to action
+                     </Button>
                   </Box>
                </Grid>
-
             </Grid>
          </div>
       </div>
@@ -146,15 +181,15 @@ Content.propTypes = {
    handleClose: PropTypes.func,
    handleSend: PropTypes.func,
    loading: PropTypes.bool,
-   fullScreen: PropTypes.bool
+   fullScreen: PropTypes.bool,
 };
 const CallToActionDrawer = ({ open, onClose }) => {
    const classes = useStyles();
-   const theme = useTheme()
+   const theme = useTheme();
    const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
    const [loading, setLoading] = useState(false);
 
-   const dispatch = useDispatch()
+   const dispatch = useDispatch();
 
    const handleClose = () => {
       onClose();
@@ -163,28 +198,28 @@ const CallToActionDrawer = ({ open, onClose }) => {
    const handleSend = async () => {
       try {
          setLoading(true);
-         console.log("CTA SENT!!! ;)")
+         console.log("CTA SENT!!! ;)");
       } catch (e) {
-         dispatch(actions.sendGeneralError(e))
+         dispatch(actions.sendGeneralError(e));
       }
       setLoading(false);
    };
 
    return (
-     <Drawer anchor="left" open={open} onClose={handleClose}>
+      <Drawer anchor="left" open={open} onClose={handleClose}>
          <Content
-           handleSend={handleSend}
-           fullScreen={fullScreen}
-           loading={loading}
-           handleClose={handleClose} />
-     </Drawer>
-     )
+            handleSend={handleSend}
+            fullScreen={fullScreen}
+            loading={loading}
+            handleClose={handleClose}
+         />
+      </Drawer>
+   );
 };
 
 CallToActionDrawer.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  open: PropTypes.bool
-}
+   onClose: PropTypes.func.isRequired,
+   open: PropTypes.bool,
+};
 
 export default CallToActionDrawer;
-

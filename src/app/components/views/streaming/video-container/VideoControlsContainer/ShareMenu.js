@@ -71,8 +71,8 @@ ShareMenu.propTypes = {
       })
    ),
 };
-export default ShareMenu;
-
 ShareMenu.defaultProps = {
    shareActions: [],
 };
+export default ShareMenu;
+
