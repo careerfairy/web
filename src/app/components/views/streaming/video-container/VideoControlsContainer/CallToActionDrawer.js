@@ -1,12 +1,17 @@
-import React from "react";
+import React, { memo, useMemo, useState } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { Divider, Drawer, IconButton } from "@material-ui/core";
+import { Box, Button, Divider, Drawer, IconButton, Typography } from "@material-ui/core";
 import PropTypes from "prop-types";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import CloseIcon from "@material-ui/icons/ChevronLeft";
 import clsx from "clsx";
 import { QuestionContainerTitle } from "materialUI/GlobalContainers";
 import CallToActionForm from "./CallToActionForm";
+import { useFirestore, useFirestoreConnect } from "react-redux-firebase";
+import useStreamQuery from "../../../../custom-hook/useQuery";
+import { useSelector } from "react-redux";
+import { createSelector } from "reselect";
+import CallToActionFormModal from "./CallToActionFormModal";
 
 const useStyles = makeStyles((theme) => ({
    drawerContent: {
@@ -26,8 +31,14 @@ const useStyles = makeStyles((theme) => ({
    headerWrapper: {
       padding: theme.spacing(3),
       display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
       width: "100%",
-      alignItems: "center",
+   },
+   headerTitleWrapper:{
+      display: "flex",
+      width: "100%",
+
    },
    titleWrapper: {
       flex: 1,
@@ -38,41 +49,80 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
+const callToActionSelector = createSelector(
+   (state) => state.firestore.ordered["callToActions"],
+   (callToActions) => (callToActions?.length ? callToActions : null)
+);
 const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
    const classes = useStyles();
+   const [callToActionModalOpen, setCallToActionModalOpen] = useState(false);
+   const callToActions = useSelector((state) => callToActionSelector(state));
+   console.log("-> callToActions", callToActions);
+   const query = useStreamQuery({
+      storeAs: "callToActions",
+      subcollections: [
+         {
+            collection: "callToActions",
+         },
+      ],
+   });
+
+   const handleCloseCallToActionFormDialog = () => {
+      setCallToActionModalOpen(false);
+   };
+   const handleOpenCallToActionFormDialog = () => {
+      setCallToActionModalOpen(true);
+   };
+   console.log("-> query", query);
+
+   console.log("-> Content");
+
+   useFirestoreConnect(query);
 
    return (
-      <div
-         className={clsx(classes.drawerContent, {
-            [classes.fullScreenDrawerContent]: fullScreen,
-         })}
-      >
-         <div className={classes.headerWrapper}>
-            {/*<Typography noWrap className={classes.ctaTitle} variant="h4">*/}
-            {/*   Send a call to action*/}
-            {/*</Typography>*/}
-            <QuestionContainerTitle>
-               Send a call to action
-            </QuestionContainerTitle>
-            <IconButton onClick={handleClose}>
-               <CloseIcon />
-            </IconButton>
+      <React.Fragment>
+         <div
+            className={clsx(classes.drawerContent, {
+               [classes.fullScreenDrawerContent]: fullScreen,
+            })}
+         >
+            <div className={classes.headerWrapper}>
+            <div className={classes.headerTitleWrapper}>
+               <Typography noWrap className={classes.ctaTitle} variant="h4">
+                  Send a call to action
+               </Typography>
+               {/*<QuestionContainerTitle>*/}
+               {/*   Send a call to action*/}
+               {/*</QuestionContainerTitle>*/}
+               <IconButton onClick={handleClose}>
+                  <CloseIcon />
+               </IconButton>
+            </div>
+            <Box display="flex" >
+               <Button onClick={handleOpenCallToActionFormDialog} variant="contained" color="primary">
+                  Create call to action
+               </Button>
+            </Box>
+            </div>
+            <Divider />
+            <div className={classes.callToActionContentWrapper}>
+            </div>
          </div>
-         <Divider />
-         <div className={classes.callToActionContentWrapper}>
-            <CallToActionForm handleSave={handleSave} handleSend={handleSend} />
-         </div>
-      </div>
+         <CallToActionFormModal
+            open={callToActionModalOpen}
+            onClose={handleCloseCallToActionFormDialog}
+         />
+      </React.Fragment>
    );
 };
 
 Content.propTypes = {
    handleClose: PropTypes.func,
    fullScreen: PropTypes.bool,
-   handleSave: PropTypes.func,
 };
 
 const CallToActionDrawer = ({ open, onClose }) => {
+   console.log("-> CallToActionDrawer");
    const theme = useTheme();
    const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
 
@@ -80,23 +130,9 @@ const CallToActionDrawer = ({ open, onClose }) => {
       onClose();
    };
 
-   const handleSend = async (values) => {
-      console.log("CTA SENT!!! ;)");
-      return alert(JSON.stringify(values, null, 2));
-   };
-   const handleSave = async (values) => {
-      console.log("CTA SAVED!!! ;)");
-      return alert(JSON.stringify(values, null, 2));
-   };
-
    return (
       <Drawer anchor="left" open={open} onClose={handleClose}>
-         <Content
-            handleSend={handleSend}
-            fullScreen={fullScreen}
-            handleClose={handleClose}
-            handleSave={handleSave}
-         />
+         <Content fullScreen={fullScreen} handleClose={handleClose} />
       </Drawer>
    );
 };
@@ -106,4 +142,4 @@ CallToActionDrawer.propTypes = {
    open: PropTypes.bool,
 };
 
-export default CallToActionDrawer;
+export default memo(CallToActionDrawer);

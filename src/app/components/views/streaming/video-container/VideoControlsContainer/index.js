@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import MicOffIcon from "@material-ui/icons/MicOff";
 import MicIcon from "@material-ui/icons/Mic";
 import DynamicFeedIcon from "@material-ui/icons/DynamicFeed";
@@ -199,9 +199,9 @@ function VideoControlsContainer({
    const handleOpenCallToActionDrawer = () => {
       setCallToActionDrawerOpen(true);
    };
-   const handleCloseCallToActionDrawer = () => {
+   const handleCloseCallToActionDrawer = useCallback( () => {
       setCallToActionDrawerOpen(false);
-   };
+   },[]);
 
    const actions = [
       {

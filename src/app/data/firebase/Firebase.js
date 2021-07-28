@@ -1328,6 +1328,50 @@ class Firebase {
         return batch.commit();
     };
 
+    /*
+    * Call to action methods
+    * */
+
+    createCallToAction = async (streamRef, values) => {
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc()
+
+        await callToActionRef.set({
+            buttonText: values.buttonText,
+            buttonUrl: values.buttonUrl,
+            message: values.message,
+            created: this.getServerTimestamp(),
+            numberOfUsersWhoClicked: 0,
+            numberOfUsersWhoDismissed: 0,
+            updated: null,
+            sent: null
+        })
+
+        return callToActionRef.id
+    }
+
+    updateCallToAction = (streamRef, callToActionId, newValues) => {
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc(callToActionId)
+        return callToActionRef.update({
+            buttonText: newValues.buttonText,
+            buttonUrl: newValues.buttonUrl,
+            message: newValues.message,
+            updated: this.getServerTimestamp(),
+        })
+    }
+
+    sendCallToAction = (streamRef, callToActionId) => {
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc(callToActionId)
+        return callToActionRef.update({
+            sent: this.getServerTimestamp()
+        })
+    }
+
     rateLivestreamOverallQuality = (livestreamId, userEmail, rating) => {
         let ref = this.firestore
             .collection("livestreams")

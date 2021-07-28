@@ -1,11 +1,20 @@
 import PropTypes from "prop-types";
-import { Box, Button, Grid, TextField } from "@material-ui/core";
+import {
+   Box,
+   Button,
+   DialogActions,
+   DialogContent,
+   Grid,
+   TextField
+} from "@material-ui/core";
 import React from "react";
 import * as yup from "yup";
 import { URL_REGEX } from "../../../../util/constants";
 import { useFormik } from "formik";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
+import { makeStyles } from "@material-ui/core/styles";
+import { useFirebase } from "context/firebase";
 
 const MAX_BUTTON_TEXT_LENGTH = 45;
 const MAX_MESSAGE_LENGTH = 1000;
@@ -28,8 +37,18 @@ const validationSchema = yup.object({
       .matches(URL_REGEX, { message: "Must be a valid url" })
       .required("Must be a valid url"),
 });
-const CallToActionForm = ({ handleClose, handleSend, handleSave }) => {
+
+const useStyles = makeStyles((theme) => ({
+   dialogContent:{
+      overflowY: "hidden"
+   }
+}));
+
+const CallToActionForm = ({ handleClose }) => {
+   const classes = useStyles();
    const dispatch = useDispatch();
+   const firebase = useFirebase()
+
    const formik = useFormik({
       initialValues: {
          message: "",
@@ -51,105 +70,124 @@ const CallToActionForm = ({ handleClose, handleSend, handleSave }) => {
             console.error("-> Error: failed in submitting CTA", e);
          }
          setSubmitting(false);
+         handleClose();
       },
    });
 
+   const handleSend = async (values) => {
+      console.log("CTA SENT!!! ;)");
+      return alert(JSON.stringify(values, null, 2));
+   };
+   const handleSave = async (values) => {
+      console.log("CTA SAVED!!! ;)");
+      return alert(JSON.stringify(values, null, 2));
+   };
+
    return (
-      <Grid container spacing={3} component="form">
-         <Grid xs={12} item>
-            <TextField
-               fullWidth
-               variant="outlined"
-               id="message"
-               name="message"
+      <React.Fragment>
+         <DialogContent className={classes.dialogContent}>
+               <Grid container spacing={3} component="form">
+                  <Grid xs={12} item>
+                     <TextField
+                        fullWidth
+                        variant="outlined"
+                        id="message"
+                        name="message"
+                        disabled={formik.isSubmitting}
+                        multiline
+                        autoFocus
+                        rows={3}
+                        inputProps={{
+                           maxLength: MAX_MESSAGE_LENGTH,
+                        }}
+                        placeholder="Click here to see our open positions"
+                        label="message"
+                        value={formik.values.message}
+                        onChange={formik.handleChange}
+                        error={
+                           formik.touched.message &&
+                           Boolean(formik.errors.message)
+                        }
+                        helperText={
+                           formik.touched.message && formik.errors.message
+                        }
+                     />
+                  </Grid>
+                  <Grid xs={12} item>
+                     <TextField
+                        fullWidth
+                        variant="outlined"
+                        disabled={formik.isSubmitting}
+                        id="buttonText"
+                        inputProps={{
+                           maxLength: MAX_BUTTON_TEXT_LENGTH,
+                        }}
+                        placeholder="Click Here"
+                        name="buttonText"
+                        label="Button Text*"
+                        value={formik.values.buttonText}
+                        onChange={formik.handleChange}
+                        error={
+                           formik.touched.buttonText &&
+                           Boolean(formik.errors.buttonText)
+                        }
+                        helperText={
+                           formik.touched.buttonText && formik.errors.buttonText
+                        }
+                     />
+                  </Grid>
+                  <Grid xs={12} item>
+                     <TextField
+                        fullWidth
+                        variant="outlined"
+                        id="buttonUrl"
+                        name="buttonUrl"
+                        disabled={formik.isSubmitting}
+                        placeholder="https://mywebsite.com/careers/"
+                        label="Button Url*"
+                        value={formik.values.buttonUrl}
+                        onChange={formik.handleChange}
+                        error={
+                           formik.touched.buttonUrl &&
+                           Boolean(formik.errors.buttonUrl)
+                        }
+                        helperText={
+                           formik.touched.buttonUrl && formik.errors.buttonUrl
+                        }
+                     />
+                  </Grid>
+               </Grid>
+         </DialogContent>
+         <DialogActions>
+            <Button
                disabled={formik.isSubmitting}
-               multiline
-               autoFocus
-               rows={3}
-               inputProps={{
-                  maxLength: MAX_MESSAGE_LENGTH,
+               onClick={async () => {
+                  await formik.setFieldValue("isToBeSaved", true);
+                  await formik.handleSubmit();
                }}
-               placeholder="Click here to see our open positions"
-               label="message"
-               value={formik.values.message}
-               onChange={formik.handleChange}
-               error={formik.touched.message && Boolean(formik.errors.message)}
-               helperText={formik.touched.message && formik.errors.message}
-            />
-         </Grid>
-         <Grid xs={12} item>
-            <TextField
-               fullWidth
                variant="outlined"
+               color="secondary"
+            >
+               Save as draft
+            </Button>
+            <Button
                disabled={formik.isSubmitting}
-               id="buttonText"
-               inputProps={{
-                  maxLength: MAX_BUTTON_TEXT_LENGTH,
+               onClick={async () => {
+                  await formik.setFieldValue("isToBeSaved", false);
+                  await formik.handleSubmit();
                }}
-               placeholder="Click Here"
-               name="buttonText"
-               label="Button Text*"
-               value={formik.values.buttonText}
-               onChange={formik.handleChange}
-               error={
-                  formik.touched.buttonText && Boolean(formik.errors.buttonText)
-               }
-               helperText={
-                  formik.touched.buttonText && formik.errors.buttonText
-               }
-            />
-         </Grid>
-         <Grid xs={12} item>
-            <TextField
-               fullWidth
-               variant="outlined"
-               id="buttonUrl"
-               name="buttonUrl"
-               disabled={formik.isSubmitting}
-               placeholder="https://mywebsite.com/careers/"
-               label="Button Url*"
-               value={formik.values.buttonUrl}
-               onChange={formik.handleChange}
-               error={
-                  formik.touched.buttonUrl && Boolean(formik.errors.buttonUrl)
-               }
-               helperText={formik.touched.buttonUrl && formik.errors.buttonUrl}
-            />
-         </Grid>
-         <Grid xs={12} item>
-            <Box display="flex" justifyContent="flex-end">
-               <Button
-                  disabled={formik.isSubmitting}
-                  onClick={async () => {
-                     await formik.setFieldValue("isToBeSaved", true);
-                     await formik.handleSubmit();
-                  }}
-                  variant="contained"
-                  color="secondary"
-               >
-                  Save
-               </Button>
-               <Button
-                  disabled={formik.isSubmitting}
-                  onClick={async () => {
-                     await formik.setFieldValue("isToBeSaved", false);
-                     await formik.handleSubmit();
-                  }}
-                  variant="contained"
-                  color="primary"
-               >
-                  Send call to action
-               </Button>
-            </Box>
-         </Grid>
-      </Grid>
+               variant="contained"
+               color="primary"
+            >
+               Send call to action
+            </Button>
+         </DialogActions>
+      </React.Fragment>
    );
 };
 
 CallToActionForm.propTypes = {
    handleClose: PropTypes.func,
-   handleSave: PropTypes.func,
-   handleSend: PropTypes.func,
 };
 
 export default CallToActionForm;

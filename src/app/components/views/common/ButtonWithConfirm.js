@@ -51,12 +51,12 @@ function ButtonWithConfirm({
     return (
         <Fragment>
             <Tooltip title={tooltipTitle}>
+                    <span>
                 {extraSmallScreen ?
                     <IconButton className={classes.iconInButton} disabled={disabled} onClick={() => setModalOpen(true)}>
                         {rest.startIcon}
                     </IconButton>
                     :
-                    <span>
                     <Button
                         style={{background: color}} color="primary" variant="contained"
                         startIcon={rest.startIcon}
@@ -65,8 +65,8 @@ function ButtonWithConfirm({
                     >
                         {buttonLabel}
                     </Button>
-                    </span>
                 }
+                    </span>
             </Tooltip>
             <GlassDialog open={modalOpen} onClose={() => setModalOpen(false)}>
                 <DialogTitle>
