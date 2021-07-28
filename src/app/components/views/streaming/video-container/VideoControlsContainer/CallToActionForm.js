@@ -15,6 +15,7 @@ import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { useFirebase } from "context/firebase";
+import useStreamRef from "../../../../custom-hook/useStreamRef";
 
 const MAX_BUTTON_TEXT_LENGTH = 45;
 const MAX_MESSAGE_LENGTH = 1000;
@@ -45,9 +46,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CallToActionForm = ({ handleClose }) => {
+   const streamRef = useStreamRef()
    const classes = useStyles();
    const dispatch = useDispatch();
-   const firebase = useFirebase()
+   const { createCallToAction, updateCallToAction, sendCallToAction } = useFirebase();
 
    const formik = useFormik({
       initialValues: {
@@ -75,11 +77,13 @@ const CallToActionForm = ({ handleClose }) => {
    });
 
    const handleSend = async (values) => {
-      console.log("CTA SENT!!! ;)");
+      const callToActionId = await createCallToAction(streamRef, values)
+      console.log("-> callToActionId", callToActionId);
+      await sendCallToAction(streamRef, callToActionId)
       return alert(JSON.stringify(values, null, 2));
    };
    const handleSave = async (values) => {
-      console.log("CTA SAVED!!! ;)");
+      await createCallToAction(streamRef, values)
       return alert(JSON.stringify(values, null, 2));
    };
 
