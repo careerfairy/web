@@ -3,8 +3,13 @@ import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import Card from "@material-ui/core/Card";
-import PropTypes from 'prop-types'
-import { Button, IconButton, LinearProgress, Typography } from "@material-ui/core";
+import PropTypes from "prop-types";
+import {
+   Button,
+   IconButton,
+   LinearProgress,
+   Typography,
+} from "@material-ui/core";
 import SettingsIcon from "@material-ui/icons/MoreVert";
 
 const useStyles = makeStyles(({ palette }) => ({
@@ -56,26 +61,7 @@ const useStyles = makeStyles(({ palette }) => ({
    },
 }));
 
-const useSliderStyles = makeStyles(() => ({
-   root: {
-      height: 4,
-   },
-   rail: {
-      borderRadius: 10,
-      height: 4,
-      backgroundColor: "rgb(202,211,216)",
-   },
-   track: {
-      borderRadius: 10,
-      height: 4,
-      backgroundColor: "rgb(117,156,250)",
-   },
-   thumb: {
-      display: "none",
-   },
-}));
-
-function LinearProgressWithLabel({ engagementData:{percentage} }) {
+const LinearProgressWithLabel = ({ engagementData: { percentage } }) => {
    return (
       <Box width="100%" display="flex" alignItems="center">
          <Box width="100%" mr={1}>
@@ -88,7 +74,7 @@ function LinearProgressWithLabel({ engagementData:{percentage} }) {
          </Box>
       </Box>
    );
-}
+};
 
 LinearProgressWithLabel.propTypes = {
    /**
@@ -97,8 +83,6 @@ LinearProgressWithLabel.propTypes = {
     */
    value: PropTypes.number.isRequired,
 };
-
-
 
 export const CallToActionItem = React.memo(
    ({
@@ -158,7 +142,10 @@ export const CallToActionItem = React.memo(
                         >
                            Message
                         </Typography>
-                        <Typography gutterBottom className={classes.description}>
+                        <Typography
+                           gutterBottom
+                           className={classes.description}
+                        >
                            {message}
                         </Typography>
                      </>
@@ -167,7 +154,10 @@ export const CallToActionItem = React.memo(
                      Engagement:
                   </Typography>
                   <Box display={"flex"} alignItems={"center"}>
-                     <LinearProgressWithLabel engagementData={engagementData} value={engagementData.percentage} />
+                     <LinearProgressWithLabel
+                        engagementData={engagementData}
+                        value={engagementData.percentage}
+                     />
                   </Box>
                </Box>
                <Button
