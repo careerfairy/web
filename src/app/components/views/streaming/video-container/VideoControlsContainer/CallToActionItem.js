@@ -11,6 +11,7 @@ import {
    Typography,
 } from "@material-ui/core";
 import SettingsIcon from "@material-ui/icons/MoreVert";
+import LinkifyText from "../../../../util/LinkifyText";
 
 const useStyles = makeStyles(({ palette }) => ({
    root: {
@@ -84,6 +85,23 @@ LinearProgressWithLabel.propTypes = {
    value: PropTypes.number.isRequired,
 };
 
+const Section = ({ label, description }) => {
+   const classes = useStyles();
+
+   return (
+      <React.Fragment>
+         <Typography noWrap className={classes.label} color="textSecondary">
+            {label}
+         </Typography>
+         <Typography noWrap gutterBottom className={classes.description}>
+            <LinkifyText>
+               {description}
+            </LinkifyText>
+         </Typography>
+      </React.Fragment>
+   );
+};
+
 export const CallToActionItem = React.memo(
    ({
       style,
@@ -127,28 +145,10 @@ export const CallToActionItem = React.memo(
                   <IconButton size="small" className={classes.settingBtn}>
                      <SettingsIcon />
                   </IconButton>
-                  <Typography className={classes.label} color="textSecondary">
-                     Button Text:
-                  </Typography>
-                  <Typography gutterBottom className={classes.description}>
-                     {buttonText}
-                  </Typography>
+                  <Section label={"Button Text:"} description={buttonText} />
+                  <Section label={"Button Url:"} description={buttonUrl} />
                   {message ? (
-                     <>
-                        <Typography
-                           className={classes.label}
-                           color="textSecondary"
-                           gutterBottom
-                        >
-                           Message
-                        </Typography>
-                        <Typography
-                           gutterBottom
-                           className={classes.description}
-                        >
-                           {message}
-                        </Typography>
-                     </>
+                     <Section label={"Message:"} description={message} />
                   ) : null}
                   <Typography className={classes.label} color="textSecondary">
                      Engagement:

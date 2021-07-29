@@ -131,7 +131,7 @@ const CallToActionList = ({}) => {
          <AutoSizer>
             {({ height, width }) => (
                <FixedSizeList
-                  itemSize={200}
+                  itemSize={218}
                   itemCount={callToActions.length}
                   height={height}
                   width={width}
