@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 
 /**
  * Create a react-redux-firebase query for a stream, this hook automatically detects of the stream is normal or a breakout room.
- * @param {({storeAs: String, [subcollections]: Array<Object>, [deps]: Array, [populates]: Array<String>})} arrayOfEmails – Array of email strings
+ * @param {({storeAs: String, [subcollections]: Array<Object>, [deps]: Array, [populates]: Array<String>, [orderBy]: Array<String>})} arrayOfEmails – Array of email strings
  * @return {Array<Object>} Returns an array of a single memoized query for the useFirestoreConnect Hook.
  */
 const useStreamQuery = ({
@@ -11,6 +11,7 @@ const useStreamQuery = ({
    subcollections,
    deps,
    populates,
+                           orderBy
 }) => {
    const {
       query: { livestreamId, breakoutRoomId },
@@ -32,6 +33,7 @@ const useStreamQuery = ({
                ],
                populates,
                storeAs: storeAs,
+               orderBy
             },
          ];
       } else {
@@ -42,6 +44,7 @@ const useStreamQuery = ({
                subcollections,
                populates,
                storeAs: storeAs,
+               orderBy,
             },
          ];
       }

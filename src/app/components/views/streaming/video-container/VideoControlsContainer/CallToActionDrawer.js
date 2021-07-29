@@ -1,17 +1,19 @@
-import React, { memo, useMemo, useState } from "react";
+import React, { memo, useState } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { Box, Button, Divider, Drawer, IconButton, Typography } from "@material-ui/core";
+import {
+   Box,
+   Button,
+   Divider,
+   Drawer,
+   IconButton,
+   Typography,
+} from "@material-ui/core";
 import PropTypes from "prop-types";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import CloseIcon from "@material-ui/icons/ChevronLeft";
 import clsx from "clsx";
-import { QuestionContainerTitle } from "materialUI/GlobalContainers";
-import CallToActionForm from "./CallToActionForm";
-import { useFirestore, useFirestoreConnect } from "react-redux-firebase";
-import useStreamQuery from "../../../../custom-hook/useQuery";
-import { useSelector } from "react-redux";
-import { createSelector } from "reselect";
 import CallToActionFormModal from "./CallToActionFormModal";
+import CallToActionList from "./CallToActionList";
 
 const useStyles = makeStyles((theme) => ({
    drawerContent: {
@@ -35,10 +37,9 @@ const useStyles = makeStyles((theme) => ({
       justifyContent: "center",
       width: "100%",
    },
-   headerTitleWrapper:{
+   headerTitleWrapper: {
       display: "flex",
       width: "100%",
-
    },
    titleWrapper: {
       flex: 1,
@@ -46,26 +47,15 @@ const useStyles = makeStyles((theme) => ({
    callToActionContentWrapper: {
       padding: theme.spacing(3),
       flex: 1,
+      display: "flex",
    },
 }));
 
-const callToActionSelector = createSelector(
-   (state) => state.firestore.ordered["callToActions"],
-   (callToActions) => (callToActions?.length ? callToActions : null)
-);
+
 const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
    const classes = useStyles();
    const [callToActionModalOpen, setCallToActionModalOpen] = useState(false);
-   const callToActions = useSelector((state) => callToActionSelector(state));
-   console.log("-> callToActions", callToActions);
-   const query = useStreamQuery({
-      storeAs: "callToActions",
-      subcollections: [
-         {
-            collection: "callToActions",
-         },
-      ],
-   });
+
 
    const handleCloseCallToActionFormDialog = () => {
       setCallToActionModalOpen(false);
@@ -73,11 +63,7 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
    const handleOpenCallToActionFormDialog = () => {
       setCallToActionModalOpen(true);
    };
-   console.log("-> query", query);
 
-   console.log("-> Content");
-
-   useFirestoreConnect(query);
 
    return (
       <React.Fragment>
@@ -91,9 +77,6 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
                <Typography noWrap className={classes.ctaTitle} variant="h4">
                   Send a call to action
                </Typography>
-               {/*<QuestionContainerTitle>*/}
-               {/*   Send a call to action*/}
-               {/*</QuestionContainerTitle>*/}
                <IconButton onClick={handleClose}>
                   <CloseIcon />
                </IconButton>
@@ -106,6 +89,7 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
             </div>
             <Divider />
             <div className={classes.callToActionContentWrapper}>
+               <CallToActionList/>
             </div>
          </div>
          <CallToActionFormModal
