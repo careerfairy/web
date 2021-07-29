@@ -1,12 +1,12 @@
 import React from 'react';
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 import {Container, Grid, Typography} from "@material-ui/core";
 import Link from "next/link";
 import footerLinks from "./footerLinks";
 import icons from "./icons";
 
 const useStyles = makeStyles(theme => {
-    const greyColor = fade(theme.palette.text.secondary, 0.5)
+    const greyColor = alpha(theme.palette.text.secondary, 0.5)
     return ({
         root: {
             background: theme.palette.common.white
@@ -69,7 +69,7 @@ const FooterV2 = ({}) => {
                     </Typography>
                 </div>
                 <div>
-                    <Grid justify="center" container>
+                    <Grid justifyContent="center" container>
                         {footerLinks.map(({links, category}) =>
                             (<Grid key={category} item xs={12} sm={4} md={3} lg={2}>
                                     {links.map(({label, href}) => (

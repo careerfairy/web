@@ -29,7 +29,7 @@ const AverageRegistrations = ({fetchingStreams, averageRegistrations, timeFrames
             <CardContent>
                 <Grid
                     container
-                    justify="space-between"
+                    justifyContent="space-between"
                     spacing={3}
                 >
                     <Grid item>

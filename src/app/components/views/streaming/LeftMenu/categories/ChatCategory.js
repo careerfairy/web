@@ -3,7 +3,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import {grey} from "@material-ui/core/colors";
 import {IconButton, TextField, Typography} from "@material-ui/core";
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
 import ChatEntryContainer from './chat/ChatEntryContainer';
@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme => ({
     sendBtn: {
         width: 30,
         height: 30,
-        background: fade(theme.palette.primary.main, 0.5),
+        background: alpha(theme.palette.primary.main, 0.5),
         "&$buttonDisabled": {
             color: grey[800]
         },

@@ -1,4 +1,4 @@
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 
 const usePulseStyles = makeStyles(theme => ({
     pulseAnimate: {
@@ -6,16 +6,16 @@ const usePulseStyles = makeStyles(theme => ({
     },
     "@keyframes pulse": {
         "0%": {
-            MozBoxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 1)}`,
-            boxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 1)}`
+            MozBoxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 1)}`,
+            boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 1)}`
         },
         "70%": {
-            MozBoxShadow: `0 0 0 15px ${fade(theme.palette.primary.main, 0)}`,
-            boxShadow: `0 0 0 15px ${fade(theme.palette.primary.main, 0)}`
+            MozBoxShadow: `0 0 0 15px ${alpha(theme.palette.primary.main, 0)}`,
+            boxShadow: `0 0 0 15px ${alpha(theme.palette.primary.main, 0)}`
         },
         "100%": {
-            MozBoxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 0)}`,
-            boxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 0)}`
+            MozBoxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0)}`,
+            boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0)}`
         }
     },
 }));

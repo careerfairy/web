@@ -5,15 +5,15 @@ import HeroButton from "../HeroButton";
 import Link from "materialUI/NextNavLink";
 import { calendarIcon, playIcon } from "constants/images";
 import React from "react";
-import { fade, makeStyles } from "@material-ui/core/styles";
+import { alpha, makeStyles } from "@material-ui/core/styles";
 import SvgIcon from "@material-ui/core/SvgIcon";
 
 const useStyles = makeStyles((theme) => ({
    linkButton: {
       textDecoration: "none !important",
-      background: fade(theme.palette.common.white, 0.8),
+      background: alpha(theme.palette.common.white, 0.8),
       "&:hover": {
-         background: fade(theme.palette.background.paper, 0.8),
+         background: alpha(theme.palette.background.paper, 0.8),
       },
    },
    buttonsWrapper: {

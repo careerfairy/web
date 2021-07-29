@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import {useFirestoreConnect} from "react-redux-firebase";
 import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector";
@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
     },
     selectedItem: {},
     glass: {
-        backgroundColor: fade(theme.palette.common.black, 0.4),
+        backgroundColor: alpha(theme.palette.common.black, 0.4),
         backdropFilter: "blur(5px)",
     },
     title: {

@@ -36,7 +36,7 @@ const UserCount = ({fetching, currentUserDataSet, group, totalUsers, timeFrames,
             <CardContent>
                 <Grid
                     container
-                    justify="space-between"
+                    justifyContent="space-between"
                     spacing={3}
                 >
                     <Grid item>

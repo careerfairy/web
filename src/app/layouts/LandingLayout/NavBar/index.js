@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
       borderRight: "none",
       backgroundSize: "cover",
       backgroundPosition: "center center",
-      // background: `linear-gradient(0deg, ${fade(theme.palette.common.black, 0.3)}, ${fade(theme.palette.common.black, 0.3)}), url(/next-livestreams-side.jpg)`,
+      // background: `linear-gradient(0deg, ${alpha(theme.palette.common.black, 0.3)}, ${alpha(theme.palette.common.black, 0.3)}), url(/next-livestreams-side.jpg)`,
    },
    name: {
       marginTop: theme.spacing(1),

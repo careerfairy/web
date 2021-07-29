@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types'
 import React from 'react';
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 import {Dialog} from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     glass: {
-        backgroundColor: theme.palette.type === "dark" ? fade(theme.palette.common.black, 0.4) : theme.palette.background.default,
+        backgroundColor: theme.palette.type === "dark" ? alpha(theme.palette.common.black, 0.4) : theme.palette.background.default,
         backdropFilter: "blur(5px)",
     }
 }));

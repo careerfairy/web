@@ -12,7 +12,7 @@ import {
 } from "../../common/TableUtils";
 import MaterialTable from "material-table";
 import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
-import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
+import {alpha, makeStyles, useTheme} from "@material-ui/core/styles";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -85,7 +85,7 @@ const RatingSideTable = ({
     }
 
     const customOptions = {...defaultTableOptions}
-    const innerTableStyle = {background: fade(theme.palette.navyBlue.main, 0.05)}
+    const innerTableStyle = {background: alpha(theme.palette.navyBlue.main, 0.05)}
     customOptions.selection = false
     customOptions.headerStyle = innerTableStyle
     customOptions.exportButton.pdf = true

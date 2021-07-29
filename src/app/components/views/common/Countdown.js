@@ -67,7 +67,7 @@ export default function CountdownTimer(props) {
   });
 
   return (
-      <Grid container justify="center" alignItems="center">
+      <Grid container justifyContent="center" alignItems="center">
       {timerComponents.length ? timerComponents : <span style={{ margin: '30px' }}>{ props.children }</span>}
       </Grid>
   );

@@ -7,7 +7,7 @@ import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import ScreenShareIcon from "@material-ui/icons/ScreenShare";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { withFirebasePage } from "context/firebase";
-import { fade, makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
 import { ClickAwayListener } from "@material-ui/core";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: theme.palette.primary.main,
       color: "white",
       "&:disabled": {
-         backgroundColor: fade(theme.palette.primary.main, 0.5),
+         backgroundColor: alpha(theme.palette.primary.main, 0.5),
          color: "white",
       },
       "&:hover": {

@@ -1342,13 +1342,76 @@ class Firebase {
             buttonUrl: values.buttonUrl,
             message: values.message,
             created: this.getServerTimestamp(),
-            numberOfUsersWhoClicked: 0,
+            numberOfUsersWhoClickedLink: 0,
             numberOfUsersWhoDismissed: 0,
             updated: null,
             sent: null
         })
 
         return callToActionRef.id
+    }
+
+    clickOnCallToAction = async (streamRef, callToActionId, userId, {isDismissAction = false}) => {
+        let batch = this.firestore.batch();
+        let userRef = this.firestore.collection("userData").doc(userId);
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc(callToActionId)
+
+        let userInUsersWhoClickedLinkRef = callToActionRef
+          .collection("usersWhoClickedLink")
+          .doc(userId)
+
+        let userInUsersWhoDismissedRef = callToActionRef
+          .collection("usersWhoDismissed")
+          .doc(userId)
+
+
+        const userSnap = await userRef.get()
+        if(userSnap.exists){
+            const userData = userSnap.data();
+            const userInUsersWhoDismissedSnap = await userInUsersWhoDismissedRef.get()
+            const userInUsersWhoClickedSnap = await userInUsersWhoClickedLinkRef.get()
+            const hasAlreadyDismissed = userInUsersWhoDismissedSnap.exists
+            const hasAlreadyClicked = userInUsersWhoClickedSnap.exists
+            let callToActionUpdateData = {}
+            if(isDismissAction){
+                batch.set(userInUsersWhoDismissedRef, {
+                    ...userData,
+                    dismissedCallToActionAt: this.getServerTimestamp()
+                })
+                if(!hasAlreadyDismissed){
+                    callToActionUpdateData["numberOfUsersWhoDismissed"] = firebase.firestore.FieldValue.increment(1)
+                }
+
+            if(hasAlreadyClicked){
+                callToActionUpdateData["numberOfUsersWhoClickedLink"] = firebase.firestore.FieldValue.increment(-1)
+                batch.delete(userInUsersWhoClickedLinkRef)
+            }
+            } else {
+                batch.set(userInUsersWhoClickedLinkRef, {
+                    ...userData,
+                    clickedCallToActionLinkAt: this.getServerTimestamp()
+                })
+                if(!hasAlreadyClicked){
+                    callToActionUpdateData["numberOfUsersWhoClickedLink"] = firebase.firestore.FieldValue.increment(1)
+                }
+
+                if(hasAlreadyDismissed){
+                    callToActionUpdateData["numberOfUsersWhoDismissed"] = firebase.firestore.FieldValue.increment(-1)
+                    batch.delete(userInUsersWhoClickedLinkRef)
+                }
+            }
+                    batch.update(callToActionRef, callToActionUpdateData)
+
+
+            return await batch.commit()
+        }
+
+    }
+
+    dismissCallToAction = async (streamRef, callToActionId, userId) => {
+        return await this.clickOnCallToAction(streamRef, callToActionId, userId, {isDismissAction: true})
     }
 
     updateCallToAction = (streamRef, callToActionId, newValues) => {

@@ -2,7 +2,7 @@ import React, {memo, useCallback, useEffect, useState} from 'react';
 import {Box, CircularProgress, ClickAwayListener, Fab} from "@material-ui/core";
 import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 import {amber, deepOrange, grey, red} from "@material-ui/core/colors";
 import ClappingSVG from "../../util/CustomSVGs";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: red["A400"],
         color: "white",
         "&:disabled": {
-            backgroundColor: fade(red["A400"], 0.5),
+            backgroundColor: alpha(red["A400"], 0.5),
             color: "white",
         },
         "&:hover": {
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: deepOrange[400],
         color: "white",
         "&:disabled": {
-            backgroundColor: fade(deepOrange[400], 0.5),
+            backgroundColor: alpha(deepOrange[400], 0.5),
             color: "white",
         },
         "&:hover": {
@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: amber[400],
         color: "white",
         "&:disabled": {
-            backgroundColor: fade(amber[400], 0.5),
+            backgroundColor: alpha(amber[400], 0.5),
             color: "white",
         },
         "&:hover": {
@@ -129,7 +129,7 @@ const useStyles = makeStyles((theme) => ({
         position: 'relative',
     },
     fabProgress: {
-        color: fade(grey[500], 0.5),
+        color: alpha(grey[500], 0.5),
         position: 'absolute',
         zIndex: 1,
         top: 0,

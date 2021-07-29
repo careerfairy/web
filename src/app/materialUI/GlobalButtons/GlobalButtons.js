@@ -1,6 +1,6 @@
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import React from "react";
-import {makeStyles, fade, useTheme} from "@material-ui/core/styles";
+import {makeStyles, alpha, useTheme} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import PropTypes from 'prop-types';
@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
     sendBtn: {
         width: 30,
         height: 30,
-        background: fade(theme.palette.primary.main, 0.5),
+        background: alpha(theme.palette.primary.main, 0.5),
         "&$buttonDisabled": {
             color: grey[800]
         },
@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
         color: `${theme.palette.action.disabled} !important`
     },
     dynamicButtonRoot: {
-        background: ({color}) => `linear-gradient(45deg, ${color || theme.palette.primary.main} 30%, ${fade(color || theme.palette.primary.main, 0.8)} 90%)`,
+        background: ({color}) => `linear-gradient(45deg, ${color || theme.palette.primary.main} 30%, ${alpha(color || theme.palette.primary.main, 0.8)} 90%)`,
         color: 'white',
     },
 

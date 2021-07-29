@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react';
-import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
+import {alpha, makeStyles, useTheme} from "@material-ui/core/styles";
 import SwipeableViews from "react-swipeable-views";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
 import {Drawer, Fab} from "@material-ui/core";
@@ -39,7 +39,7 @@ const useStyles = makeStyles(theme => ({
         // overflow: "visible !important"
     },
     blur: {
-        backgroundColor: fade(theme.palette.common.black, 0.2),
+        backgroundColor: alpha(theme.palette.common.black, 0.2),
         backdropFilter: "blur(5px)",
     },
     mobileDrawer: {
