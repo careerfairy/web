@@ -1345,7 +1345,9 @@ class Firebase {
             numberOfUsersWhoClickedLink: 0,
             numberOfUsersWhoDismissed: 0,
             updated: null,
-            sent: null
+            sent: null,
+            stopped: null,
+            active: false
         })
 
         return callToActionRef.id
@@ -1440,7 +1442,8 @@ class Firebase {
        })
 
     }
-    sendCallToAction = async (streamRef, callToActionId) => {
+
+    activateCallToAction = async (streamRef, callToActionId) => {
         let batch = this.firestore.batch()
 
         let callToActionRef = streamRef
@@ -1452,7 +1455,8 @@ class Firebase {
         if(callToActionSnap.exists){
 
         batch.update(callToActionRef, {
-            sent: this.getServerTimestamp()
+            sent: this.getServerTimestamp(),
+            active: true
         })
 
         batch.update(streamRef, {
@@ -1462,6 +1466,29 @@ class Firebase {
         return await batch.commit()
         }
 
+    }
+
+    deactivateCallToAction = async (streamRef, callToActionId) => {
+        let batch = this.firestore.batch()
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc(callToActionId)
+
+        const callToActionSnap = await callToActionRef.get()
+
+        if(callToActionSnap.exists){
+
+            batch.update(callToActionRef, {
+                stopped: this.getServerTimestamp(),
+                active: false
+            })
+
+            batch.update(streamRef, {
+                activeCallToActionIds: firebase.firestore.FieldValue.arrayRemove(callToActionId)
+            })
+
+            return await batch.commit()
+        }
     }
 
     rateLivestreamOverallQuality = (livestreamId, userEmail, rating) => {

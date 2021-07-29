@@ -49,7 +49,7 @@ const CallToActionForm = ({ handleClose }) => {
    const streamRef = useStreamRef()
    const classes = useStyles();
    const dispatch = useDispatch();
-   const { createCallToAction, updateCallToAction, sendCallToAction } = useFirebase();
+   const { createCallToAction, updateCallToAction, activateCallToAction } = useFirebase();
 
    const formik = useFormik({
       initialValues: {
@@ -79,7 +79,7 @@ const CallToActionForm = ({ handleClose }) => {
    const handleSend = async (values) => {
       const callToActionId = await createCallToAction(streamRef, values)
       console.log("-> callToActionId", callToActionId);
-      await sendCallToAction(streamRef, callToActionId)
+      await activateCallToAction(streamRef, callToActionId)
       return alert(JSON.stringify(values, null, 2));
    };
    const handleSave = async (values) => {
