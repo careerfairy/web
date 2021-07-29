@@ -1363,13 +1363,42 @@ class Firebase {
         })
     }
 
-    sendCallToAction = (streamRef, callToActionId) => {
+    deleteCallToAction = (streamRef, callToActionId) => {
+       let batch = this.firestore.batch()
+
+       let callToActionRef = streamRef
+         .collection("callToActions")
+         .doc(callToActionId)
+
+       batch.delete(callToActionRef)
+
+       batch.update(streamRef,{
+          activeCallToActionIds: firebase.firestore.FieldValue.arrayRemove(callToActionId)
+       })
+
+    }
+    sendCallToAction = async (streamRef, callToActionId) => {
+        let batch = this.firestore.batch()
+
         let callToActionRef = streamRef
           .collection("callToActions")
           .doc(callToActionId)
-        return callToActionRef.update({
+
+        const callToActionSnap = await callToActionRef.get()
+
+        if(callToActionSnap.exists){
+
+        batch.update(callToActionRef, {
             sent: this.getServerTimestamp()
         })
+
+        batch.update(streamRef, {
+            activeCallToActionIds: firebase.firestore.FieldValue.arrayUnion(callToActionId)
+        })
+
+        return await batch.commit()
+        }
+
     }
 
     rateLivestreamOverallQuality = (livestreamId, userEmail, rating) => {
