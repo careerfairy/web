@@ -1,14 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-   Box,
-   Dialog,
-   DialogContent,
-   DialogTitle,
-   IconButton,
-} from "@material-ui/core";
-import CallToActionForm from "../CallToActionForm";
+import { Box, Dialog, DialogTitle, IconButton } from "@material-ui/core";
+import CustomCallToActionForm from "./CustomCallToActionForm";
 import CloseIcon from "@material-ui/icons/Close";
+import ContextualCallToActionForm from "./ContextualCallToActionForm";
+import CallToActionTypeMenu from "./CallToActionTypeMenu";
 
 const useStyles = makeStyles((theme) => ({
    closeBtn: {
@@ -17,18 +13,24 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CallToActionFormModal = ({ onClose, open }) => {
+   const [initialValues, setInitialValues] = useState({
+      message: "",
+      buttonText: "",
+      buttonUrl: "",
+      isToBeSaved: false,
+      type: "",
+   });
+
    const classes = useStyles();
    const handleClose = () => {
       onClose();
    };
 
    return (
-      <Dialog onClose={handleClose} open={open}>
+      <Dialog maxWidth="md" fullWidth onClose={handleClose} open={open}>
          <DialogTitle>
             <Box display="flex" alignItems="center">
-               <Box flexGrow={1}>
-                  Create call to action
-               </Box>
+               <Box flexGrow={1}>Create call to action</Box>
                <Box>
                   <IconButton onClick={handleClose}>
                      <CloseIcon />
@@ -36,7 +38,15 @@ const CallToActionFormModal = ({ onClose, open }) => {
                </Box>
             </Box>
          </DialogTitle>
-         <CallToActionForm handleClose={handleClose} />
+         <CallToActionTypeMenu/>
+         {/*<ContextualCallToActionForm*/}
+         {/*   initialValues={initialValues}*/}
+         {/*   handleClose={handleClose}*/}
+         {/*/>*/}
+         {/*<CustomCallToActionForm*/}
+         {/*   initialValues={initialValues}*/}
+         {/*   handleClose={handleClose}*/}
+         {/*/>*/}
       </Dialog>
    );
 };

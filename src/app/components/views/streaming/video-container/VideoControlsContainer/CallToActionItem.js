@@ -82,7 +82,7 @@ LinearProgressWithLabel.propTypes = {
     * The value of the progress indicator for the determinate and buffer variants.
     * Value between 0 and 100.
     */
-   value: PropTypes.number.isRequired,
+   engagementData: PropTypes.object.isRequired,
 };
 
 const Section = ({ label, description }) => {
@@ -94,9 +94,7 @@ const Section = ({ label, description }) => {
             {label}
          </Typography>
          <Typography noWrap gutterBottom className={classes.description}>
-            <LinkifyText>
-               {description}
-            </LinkifyText>
+            <LinkifyText>{description}</LinkifyText>
          </Typography>
       </React.Fragment>
    );
@@ -105,6 +103,7 @@ const Section = ({ label, description }) => {
 export const CallToActionItem = React.memo(
    ({
       style,
+      index,
       callToAction: {
          active,
          id,
@@ -163,12 +162,12 @@ export const CallToActionItem = React.memo(
                <Button
                   color="primary"
                   fullWidth
-                  variant={active ? "contained" : "text"}
+                  variant={active ? "text" : "contained"}
                   onClick={() => {
                      handleToggleActive(id, active);
                   }}
                >
-                  {active ? "Send Call To Action" : "Deactivate Call To Action"}
+                  {active ? "Deactivate Call To Action" : "Send Call To Action"}
                </Button>
             </Card>
          </div>

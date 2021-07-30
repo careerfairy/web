@@ -1,21 +1,20 @@
 import PropTypes from "prop-types";
 import {
-   Box,
    Button,
    DialogActions,
    DialogContent,
    Grid,
-   TextField
+   TextField,
 } from "@material-ui/core";
 import React from "react";
 import * as yup from "yup";
-import { URL_REGEX } from "../../../../util/constants";
+import { URL_REGEX } from "components/util/constants";
 import { useFormik } from "formik";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { useFirebase } from "context/firebase";
-import useStreamRef from "../../../../custom-hook/useStreamRef";
+import useStreamRef from "components/custom-hook/useStreamRef";
 
 const MAX_BUTTON_TEXT_LENGTH = 45;
 const MAX_MESSAGE_LENGTH = 1000;
@@ -45,19 +44,15 @@ const useStyles = makeStyles((theme) => ({
    }
 }));
 
-const CallToActionForm = ({ handleClose }) => {
+const CustomCallToActionForm = ({ handleClose, initialValues }) => {
    const streamRef = useStreamRef()
    const classes = useStyles();
    const dispatch = useDispatch();
    const { createCallToAction, updateCallToAction, activateCallToAction } = useFirebase();
 
    const formik = useFormik({
-      initialValues: {
-         message: "",
-         buttonText: "",
-         buttonUrl: "",
-         isToBeSaved: false,
-      },
+      initialValues,
+      enableReinitialize: true,
       validationSchema: validationSchema,
       onSubmit: async (values, { setSubmitting }) => {
          try {
@@ -78,13 +73,10 @@ const CallToActionForm = ({ handleClose }) => {
 
    const handleSend = async (values) => {
       const callToActionId = await createCallToAction(streamRef, values)
-      console.log("-> callToActionId", callToActionId);
-      await activateCallToAction(streamRef, callToActionId)
-      return alert(JSON.stringify(values, null, 2));
+      return await activateCallToAction(streamRef, callToActionId)
    };
    const handleSave = async (values) => {
-      await createCallToAction(streamRef, values)
-      return alert(JSON.stringify(values, null, 2));
+      return await createCallToAction(streamRef, values)
    };
 
    return (
@@ -190,8 +182,9 @@ const CallToActionForm = ({ handleClose }) => {
    );
 };
 
-CallToActionForm.propTypes = {
-   handleClose: PropTypes.func,
-};
+CustomCallToActionForm.propTypes = {
+  handleClose: PropTypes.func,
+  initialValues: PropTypes.object.isRequired
+}
 
-export default CallToActionForm;
+export default CustomCallToActionForm;

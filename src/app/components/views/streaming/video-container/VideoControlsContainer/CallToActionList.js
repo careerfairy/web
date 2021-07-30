@@ -139,6 +139,7 @@ const CallToActionList = ({}) => {
                   {({ style, index }) => (
                      <CallToActionItem
                         style={style}
+                        index={index}
                         key={callToActions[index].id}
                         callToAction={callToActions[index]}
                         handleToggleActive={handleToggleActive}
