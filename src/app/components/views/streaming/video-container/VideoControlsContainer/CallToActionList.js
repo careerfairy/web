@@ -19,7 +19,6 @@ import {
 import { isEmpty, isLoaded } from "react-redux-firebase";
 import { useFirebase } from "../../../../../context/firebase";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
-import KanbanCardDemo from "./CallToActionItem";
 import CallToActionItem from "./CallToActionItem";
 
 const useStyles = makeStyles((theme) => ({
@@ -78,12 +77,11 @@ const CallToActionItemTemp = ({
       </ListItem>
    );
 };
-const CallToActionList = ({}) => {
+const CallToActionList = ({handleClickEditCallToAction}) => {
    const classes = useStyles();
    const streamRef = useStreamRef();
    const { activateCallToAction, deactivateCallToAction } = useFirebase();
    const callToActions = useSelector((state) => callToActionSelector(state));
-   console.log("-> callToActions", callToActions);
    const query = useStreamQuery({
       storeAs: "callToActions",
       subcollections: [
@@ -142,6 +140,7 @@ const CallToActionList = ({}) => {
                         index={index}
                         key={callToActions[index].id}
                         callToAction={callToActions[index]}
+                        handleClickEditCallToAction={handleClickEditCallToAction}
                         handleToggleActive={handleToggleActive}
                      />
                   )}

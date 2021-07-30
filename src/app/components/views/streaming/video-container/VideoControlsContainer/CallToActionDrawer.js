@@ -55,6 +55,8 @@ const useStyles = makeStyles((theme) => ({
 const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
    const classes = useStyles();
    const [callToActionModalOpen, setCallToActionModalOpen] = useState(false);
+   const [callToActionToEdit, setCallToActionToEdit] = useState(null);
+   console.log("-> callToActionToEdit", callToActionToEdit);
 
 
    const handleCloseCallToActionFormDialog = () => {
@@ -63,6 +65,10 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
    const handleOpenCallToActionFormDialog = () => {
       setCallToActionModalOpen(true);
    };
+
+   const handleClickEditCallToAction = (newCallToActionToEditData) => {
+      setCallToActionToEdit(newCallToActionToEditData)
+   }
 
 
    return (
@@ -89,12 +95,15 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
             </div>
             <Divider />
             <div className={classes.callToActionContentWrapper}>
-               <CallToActionList/>
+               <CallToActionList
+            handleClickEditCallToAction={handleClickEditCallToAction}
+               />
             </div>
          </div>
          <CallToActionFormModal
             open={callToActionModalOpen}
             onClose={handleCloseCallToActionFormDialog}
+            callToActionToEdit={callToActionToEdit}
          />
       </React.Fragment>
    );

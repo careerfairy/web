@@ -8,10 +8,15 @@ import {
    Button,
    IconButton,
    LinearProgress,
+   ListItemIcon,
+   Menu,
+   MenuItem,
    Typography,
 } from "@material-ui/core";
 import SettingsIcon from "@material-ui/icons/MoreVert";
 import LinkifyText from "../../../../util/LinkifyText";
+import EditIcon from "@material-ui/icons/Edit";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 const useStyles = makeStyles(({ palette }) => ({
    root: {
@@ -100,8 +105,56 @@ const Section = ({ label, description }) => {
    );
 };
 
-export const CallToActionItem = React.memo(
-   ({
+const SettingsDropdown = ({
+   className,
+   callToAction,
+   handleClickEditCallToAction,
+}) => {
+   const [anchorEl, setAnchorEl] = useState(null);
+
+   const handleOpen = (event) => {
+      setAnchorEl(event.currentTarget);
+   };
+
+   const handleClose = () => {
+      setAnchorEl(null);
+   };
+
+   return (
+      <React.Fragment>
+         <IconButton onClick={handleOpen} size="small" className={className}>
+            <SettingsIcon />
+         </IconButton>
+         <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+         >
+            <MenuItem
+               onClick={() => {
+                  handleClickEditCallToAction(callToAction);
+               }}
+            >
+               <ListItemIcon>
+                  <EditIcon />
+               </ListItemIcon>
+               <Typography variant="inherit">Edit</Typography>
+            </MenuItem>
+            <MenuItem>
+               <ListItemIcon>
+                  <DeleteIcon />
+               </ListItemIcon>
+               <Typography variant="inherit">Delete</Typography>
+            </MenuItem>
+         </Menu>
+      </React.Fragment>
+   );
+};
+
+export const CallToActionItem = React.memo((props) => {
+   const {
       style,
       index,
       callToAction: {
@@ -115,64 +168,67 @@ export const CallToActionItem = React.memo(
          buttonText,
       },
       handleToggleActive,
-   }) => {
-      const classes = useStyles();
-      const [engagementData, setEngagementData] = useState({
-         total: 0,
-         percentage: 0,
-         noOfEngagement: 0,
-         noOfDismissal: 0,
-      });
+      handleClickEditCallToAction,
+   } = props;
 
-      useEffect(() => {
-         const noOfEngagement = numberOfUsersWhoClickedLink || 0;
-         const noOfDismissal = numberOfUsersWhoDismissed || 0;
-         const totalEngagement = Math.round(noOfDismissal + noOfEngagement);
-         const percentage =
-            Math.round((noOfEngagement / totalEngagement) * 100) || 0;
-         setEngagementData({
-            total: totalEngagement,
-            percentage: percentage,
-            noOfEngagement: noOfEngagement,
-            noOfDismissal: noOfDismissal,
-         });
-      }, [numberOfUsersWhoClickedLink, numberOfUsersWhoDismissed]);
-      return (
-         <div style={style} className={classes.root}>
-            <Card className={clsx(classes.card)} elevation={2}>
-               <Box position="relative" p={2} flexGrow={1}>
-                  <IconButton size="small" className={classes.settingBtn}>
-                     <SettingsIcon />
-                  </IconButton>
-                  <Section label={"Button Text:"} description={buttonText} />
-                  <Section label={"Button Url:"} description={buttonUrl} />
-                  {message ? (
-                     <Section label={"Message:"} description={message} />
-                  ) : null}
-                  <Typography className={classes.label} color="textSecondary">
-                     Engagement:
-                  </Typography>
-                  <Box display={"flex"} alignItems={"center"}>
-                     <LinearProgressWithLabel
-                        engagementData={engagementData}
-                        value={engagementData.percentage}
-                     />
-                  </Box>
+   const classes = useStyles();
+   const [engagementData, setEngagementData] = useState({
+      total: 0,
+      percentage: 0,
+      noOfEngagement: 0,
+      noOfDismissal: 0,
+   });
+
+   useEffect(() => {
+      const noOfEngagement = numberOfUsersWhoClickedLink || 0;
+      const noOfDismissal = numberOfUsersWhoDismissed || 0;
+      const totalEngagement = Math.round(noOfDismissal + noOfEngagement);
+      const percentage =
+         Math.round((noOfEngagement / totalEngagement) * 100) || 0;
+      setEngagementData({
+         total: totalEngagement,
+         percentage: percentage,
+         noOfEngagement: noOfEngagement,
+         noOfDismissal: noOfDismissal,
+      });
+   }, [numberOfUsersWhoClickedLink, numberOfUsersWhoDismissed]);
+   return (
+      <div style={style} className={classes.root}>
+         <Card className={clsx(classes.card)} elevation={2}>
+            <Box position="relative" p={2} flexGrow={1}>
+               <SettingsDropdown
+                  handleClickEditCallToAction={handleClickEditCallToAction}
+                  callToAction={props.callToAction}
+                  className={classes.settingBtn}
+               />
+               <Section label={"Button Text:"} description={buttonText} />
+               <Section label={"Button Url:"} description={buttonUrl} />
+               {message ? (
+                  <Section label={"Message:"} description={message} />
+               ) : null}
+               <Typography className={classes.label} color="textSecondary">
+                  Engagement:
+               </Typography>
+               <Box display={"flex"} alignItems={"center"}>
+                  <LinearProgressWithLabel
+                     engagementData={engagementData}
+                     value={engagementData.percentage}
+                  />
                </Box>
-               <Button
-                  color="primary"
-                  fullWidth
-                  variant={active ? "text" : "contained"}
-                  onClick={() => {
-                     handleToggleActive(id, active);
-                  }}
-               >
-                  {active ? "Deactivate Call To Action" : "Send Call To Action"}
-               </Button>
-            </Card>
-         </div>
-      );
-   }
-);
+            </Box>
+            <Button
+               color="primary"
+               fullWidth
+               variant={active ? "text" : "contained"}
+               onClick={() => {
+                  handleToggleActive(id, active);
+               }}
+            >
+               {active ? "Deactivate Call To Action" : "Send Call To Action"}
+            </Button>
+         </Card>
+      </div>
+   );
+});
 
 export default CallToActionItem;

@@ -1,5 +1,6 @@
+import PropTypes from 'prop-types'
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
 import {
    Card,
    CardActionArea,
@@ -15,7 +16,11 @@ import FacebookIcon from "@material-ui/icons/Facebook";
 import LinkedInIcon from "@material-ui/icons/LinkedIn";
 import JobPostingIcon from "@material-ui/icons/Work";
 import CustomCtaIcon from "@material-ui/icons/ControlPoint";
-import { FACEBOOK_COLOR, LINKEDIN_COLOR, TWITTER_COLOR } from "../../../../../util/colors";
+import {
+   FACEBOOK_COLOR,
+   LINKEDIN_COLOR,
+   TWITTER_COLOR,
+} from "../../../../../util/colors";
 
 const useStyles = makeStyles((theme) => ({
    gridContainer: {},
@@ -25,26 +30,30 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const useCtaCardStyles = makeStyles((theme) => ({
+   cardRoot: {},
    media: {
+      backgroundColor: (props) => alpha(props.color, 0.1),
+      borderRadius: 5,
       height: 120,
       display: "grid",
-      placeItems:"center",
+      placeItems: "center",
       backgroundSize: "contain",
       maxWidth: "90%",
       marginTop: theme.spacing(2),
-      '& svg': {
-         fontSize: 100
-      }
+      "& svg": {
+         fontSize: 100,
+         color: (props) => props.color,
+      },
    },
 }));
 
-const CallToActionTypeCard = ({ type, description, title, icon }) => {
-   const classes = useCtaCardStyles();
+const CallToActionTypeCard = ({ type, description, title, icon, color, handleSetCallToActionType }) => {
+   const classes = useCtaCardStyles({ color });
 
    return (
       <Tooltip title={description}>
-         <Card align="center">
-            <CardActionArea>
+         <Card className={classes.cardRoot} align="center">
+            <CardActionArea onClick={() => handleSetCallToActionType(type)}>
                <CardMedia
                   className={classes.media}
                   title="Contemplative Reptile"
@@ -52,9 +61,6 @@ const CallToActionTypeCard = ({ type, description, title, icon }) => {
                   {icon}
                </CardMedia>
                <CardHeader title={title} />
-               {/*<CardContent>*/}
-               {/*   <Typography variant="body1">{description}</Typography>*/}
-               {/*</CardContent>*/}
             </CardActionArea>
          </Card>
       </Tooltip>
@@ -65,10 +71,10 @@ const ctaTypes = [
    {
       icon: <LinkedInIcon />,
       color: LINKEDIN_COLOR,
-      title: "Promote your linkedIn",
+      title: "Promote your LinkedIn",
       type: "linkedIn",
       description:
-         "Help promote your linkedIn page by sending a call to action to your live viewers.",
+         "Help promote your LinkedIn page by sending a call to action to your live viewers.",
    },
    {
       icon: <FacebookIcon />,
@@ -76,7 +82,7 @@ const ctaTypes = [
       title: "Promote your Facebook",
       type: "facebook",
       description:
-         "Help promote your facebook page by sending a call to action to your live viewers.",
+         "Help promote your Facebook page by sending a call to action to your live viewers.",
    },
    {
       icon: <TwitterIcon />,
@@ -84,7 +90,7 @@ const ctaTypes = [
       title: "Promote your Twitter",
       type: "twitter",
       description:
-         "Help promote your twitter page by sending a call to action to your live viewers.",
+         "Help promote your Twitter page by sending a call to action to your live viewers.",
    },
    {
       icon: <JobPostingIcon />,
@@ -95,8 +101,8 @@ const ctaTypes = [
          "Help promote an open position to your live viewers with a link to the job posting.",
    },
    {
-      icon: <CustomCtaIcon style={{color: LINKEDIN_COLOR}} />,
-      color: "",
+      icon: <CustomCtaIcon />,
+      color: "primary",
       title: "Custom",
       type: "custom",
       description:
@@ -104,17 +110,35 @@ const ctaTypes = [
    },
 ];
 
-const CallToActionTypeMenu = ({}) => {
+const CallToActionTypeMenu = ({handleSetCallToActionType}) => {
    const classes = useStyles();
+   const {
+      palette: { grey, primary },
+   } = useTheme();
 
    return (
       <React.Fragment>
          <DialogContent className={classes.dialogContent}>
-            <Grid className={classes.gridContainer} container spacing={2}>
-               {ctaTypes.map(({ type, description, title, icon }) => (
+            <Grid
+               className={classes.gridContainer}
+               container
+               justifyContent="center"
+               spacing={2}
+            >
+               {ctaTypes.map(({ type, description, title, icon, color }) => (
                   <Grid item xs={12} md={6} key={type} lg={4}>
                      <CallToActionTypeCard
-                        {...{ type, description, title, icon }}
+                        {...{
+                           type,
+                           description,
+                           handleSetCallToActionType,
+                           title,
+                           icon,
+                           color:
+                              color === "primary"
+                                 ? primary.main
+                                 : color || grey["500"],
+                        }}
                      />
                   </Grid>
                ))}
@@ -125,3 +149,7 @@ const CallToActionTypeMenu = ({}) => {
 };
 
 export default CallToActionTypeMenu;
+
+CallToActionTypeMenu.propTypes = {
+  handleSetCallToActionType: PropTypes.func.isRequired
+}
