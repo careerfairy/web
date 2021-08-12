@@ -100,22 +100,27 @@ const defaultInitialValues = {
 const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
    const [initialValues, setInitialValues] = useState(defaultInitialValues);
 
+
    useEffect(() => {
       if (callToActionToEdit) {
-         setInitialValues({
+         const newInitialValues = {
             message: callToActionToEdit.message,
             color:
                ctaTypes.find(({ type }) => type === callToActionToEdit.type)
-                  ?.color || "",
+                  ?.color || defaultInitialValues.color,
             value:
                ctaTypes.find(({ type }) => type === callToActionToEdit.type)
-                  ?.value || 0,
+                  ?.value || defaultInitialValues.value,
             buttonUrl: callToActionToEdit.buttonUrl,
             type: callToActionToEdit.type,
             id: callToActionToEdit.id,
             buttonText: callToActionToEdit.buttonText,
             isToBeSaved: true,
-         });
+            title:
+               ctaTypes.find(({ type }) => type === callToActionToEdit.type)
+                  ?.title || defaultInitialValues.title,
+         };
+         setInitialValues(newInitialValues);
       }
    }, [callToActionToEdit]);
 
@@ -139,7 +144,7 @@ const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
          buttonText: newButtonText,
          value: newValue,
          color: newColor,
-         title: newTitle
+         title: newTitle,
       });
    };
 
@@ -151,17 +156,14 @@ const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
    };
 
    return (
-      <Dialog
-         maxWidth="md"
-         fullWidth
-         onClose={handleClose}
-         open={open}
-      >
+      <Dialog maxWidth="md" fullWidth onClose={handleClose} open={open}>
          <DialogTitle>
             <Box display="flex" alignItems="center">
                <Box flexGrow={1}>
                   <Typography variant="h4">
-                     Create a call to action and promote
+                     {initialValues.id
+                        ? "Update call to action"
+                        : "Create a call to action and promote your"}
                   </Typography>
                </Box>
                <Box>

@@ -51,7 +51,6 @@ const CallToActionForm = ({
    isCustom,
    isJobPosting,
 }) => {
-   console.log("-> initialValues in form", initialValues);
    const streamRef = useStreamRef();
    const classes = useStyles();
    const dispatch = useDispatch();
@@ -88,12 +87,17 @@ const CallToActionForm = ({
    });
 
    const handleSend = async (values) => {
+      if (values.id) {
+         await updateCallToAction(streamRef, values.id, values);
+         return await activateCallToAction(streamRef, values.id);
+      }
       const callToActionId = await createCallToAction(streamRef, values);
       return await activateCallToAction(streamRef, callToActionId);
    };
+
    const handleSave = async (values) => {
-      if(values.id){
-         return await updateCallToAction(streamRef, values.id, values)
+      if (values.id) {
+         return await updateCallToAction(streamRef, values.id, values);
       }
       return await createCallToAction(streamRef, values);
    };
@@ -101,7 +105,7 @@ const CallToActionForm = ({
    return (
       <React.Fragment>
          <DialogContent className={classes.dialogContent}>
-            <Grid container spacing={3} component="form">
+            <Grid container spacing={3}>
                <Grid xs={12} style={{ padding: !canChangeMessage && "0" }} item>
                   <Collapse unmountOnExit in={canChangeMessage}>
                      <TextField
@@ -163,7 +167,7 @@ const CallToActionForm = ({
                      name="buttonUrl"
                      disabled={formik.isSubmitting}
                      placeholder="https://mywebsite.com/careers/"
-                     label={`${initialValues.title} Button Url*`}
+                     label={`${initialValues.title} Url*`}
                      // label="Button Url*"
                      value={formik.values.buttonUrl}
                      onChange={formik.handleChange}
@@ -188,7 +192,7 @@ const CallToActionForm = ({
                variant="outlined"
                color="secondary"
             >
-               Save
+               {initialValues.id ? "Update" : "Save"}
             </Button>
             <Button
                disabled={formik.isSubmitting}

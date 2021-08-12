@@ -77,7 +77,7 @@ const CallToActionItemTemp = ({
       </ListItem>
    );
 };
-const CallToActionList = ({handleClickEditCallToAction}) => {
+const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToAction}) => {
    const classes = useStyles();
    const streamRef = useStreamRef();
    const { activateCallToAction, deactivateCallToAction } = useFirebase();
@@ -102,12 +102,9 @@ const CallToActionList = ({handleClickEditCallToAction}) => {
    }
 
    const handleToggleActive = async (callToActionId, active) => {
-      console.log("-> active in method", active);
       if (active) {
-         console.log("-> deactivateCallToAction");
          return await deactivateCallToAction(streamRef, callToActionId);
       } else {
-         console.log("-> activateCallToAction");
          return await activateCallToAction(streamRef, callToActionId);
       }
    };
@@ -141,6 +138,7 @@ const CallToActionList = ({handleClickEditCallToAction}) => {
                         key={callToActions[index].id}
                         callToAction={callToActions[index]}
                         handleClickEditCallToAction={handleClickEditCallToAction}
+                        handleClickDeleteCallToAction={handleClickDeleteCallToAction}
                         handleToggleActive={handleToggleActive}
                      />
                   )}

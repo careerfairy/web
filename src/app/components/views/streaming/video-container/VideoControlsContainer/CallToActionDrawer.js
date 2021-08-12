@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import {
    Box,
@@ -14,6 +14,8 @@ import CloseIcon from "@material-ui/icons/ChevronLeft";
 import clsx from "clsx";
 import CallToActionFormModal from "./CallToActionFormModal";
 import CallToActionList from "./CallToActionList";
+import { useFirebase } from "../../../../../context/firebase";
+import useStreamRef from "../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles((theme) => ({
    drawerContent: {
@@ -51,13 +53,18 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-
 const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
    const classes = useStyles();
+   const streamRef = useStreamRef();
+   const { deleteCallToAction } = useFirebase();
    const [callToActionModalOpen, setCallToActionModalOpen] = useState(false);
    const [callToActionToEdit, setCallToActionToEdit] = useState(null);
-   console.log("-> callToActionToEdit", callToActionToEdit);
 
+   useEffect(()=> {
+      if(callToActionToEdit){
+         setCallToActionModalOpen(true)
+      }
+   },[callToActionToEdit])
 
    const handleCloseCallToActionFormDialog = () => {
       setCallToActionModalOpen(false);
@@ -66,10 +73,16 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
       setCallToActionModalOpen(true);
    };
 
+   const handleClickDeleteCallToAction = async (callToActionId) => {
+      try {
+         await deleteCallToAction(streamRef, callToActionId);
+      } catch (e) {
+         console.error("error deleting callToAction", e);
+      }
+   };
    const handleClickEditCallToAction = (newCallToActionToEditData) => {
-      setCallToActionToEdit(newCallToActionToEditData)
-   }
-
+      setCallToActionToEdit(newCallToActionToEditData);
+   };
 
    return (
       <React.Fragment>
@@ -79,24 +92,29 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
             })}
          >
             <div className={classes.headerWrapper}>
-            <div className={classes.headerTitleWrapper}>
-               <Typography noWrap className={classes.ctaTitle} variant="h4">
-                  Send a call to action
-               </Typography>
-               <IconButton onClick={handleClose}>
-                  <CloseIcon />
-               </IconButton>
-            </div>
-            <Box display="flex" >
-               <Button onClick={handleOpenCallToActionFormDialog} variant="contained" color="primary">
-                  Create call to action
-               </Button>
-            </Box>
+               <div className={classes.headerTitleWrapper}>
+                  <Typography noWrap className={classes.ctaTitle} variant="h4">
+                     Send a call to action
+                  </Typography>
+                  <IconButton onClick={handleClose}>
+                     <CloseIcon />
+                  </IconButton>
+               </div>
+               <Box display="flex">
+                  <Button
+                     onClick={handleOpenCallToActionFormDialog}
+                     variant="contained"
+                     color="primary"
+                  >
+                     Create call to action
+                  </Button>
+               </Box>
             </div>
             <Divider />
             <div className={classes.callToActionContentWrapper}>
                <CallToActionList
-            handleClickEditCallToAction={handleClickEditCallToAction}
+                  handleClickDeleteCallToAction={handleClickDeleteCallToAction}
+                  handleClickEditCallToAction={handleClickEditCallToAction}
                />
             </div>
          </div>
@@ -115,7 +133,6 @@ Content.propTypes = {
 };
 
 const CallToActionDrawer = ({ open, onClose }) => {
-   console.log("-> CallToActionDrawer");
    const theme = useTheme();
    const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
 

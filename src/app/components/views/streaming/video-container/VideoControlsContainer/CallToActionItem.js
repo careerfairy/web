@@ -109,6 +109,7 @@ const SettingsDropdown = ({
    className,
    callToAction,
    handleClickEditCallToAction,
+                             handleClickDeleteCallToAction
 }) => {
    const [anchorEl, setAnchorEl] = useState(null);
 
@@ -142,7 +143,9 @@ const SettingsDropdown = ({
                </ListItemIcon>
                <Typography variant="inherit">Edit</Typography>
             </MenuItem>
-            <MenuItem>
+            <MenuItem onClick={() => {
+               handleClickDeleteCallToAction(callToAction.id)
+            }}>
                <ListItemIcon>
                   <DeleteIcon />
                </ListItemIcon>
@@ -169,6 +172,7 @@ export const CallToActionItem = React.memo((props) => {
       },
       handleToggleActive,
       handleClickEditCallToAction,
+      handleClickDeleteCallToAction
    } = props;
 
    const classes = useStyles();
@@ -198,6 +202,7 @@ export const CallToActionItem = React.memo((props) => {
             <Box position="relative" p={2} flexGrow={1}>
                <SettingsDropdown
                   handleClickEditCallToAction={handleClickEditCallToAction}
+                  handleClickDeleteCallToAction={handleClickDeleteCallToAction}
                   callToAction={props.callToAction}
                   className={classes.settingBtn}
                />

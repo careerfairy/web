@@ -1340,6 +1340,7 @@ class Firebase {
         await callToActionRef.set({
             buttonText: values.buttonText,
             buttonUrl: values.buttonUrl,
+            type: values.type,
             message: values.message,
             created: this.getServerTimestamp(),
             numberOfUsersWhoClickedLink: 0,
@@ -1424,6 +1425,7 @@ class Firebase {
             buttonText: newValues.buttonText,
             buttonUrl: newValues.buttonUrl,
             message: newValues.message,
+            type: newValues.type,
             updated: this.getServerTimestamp(),
         })
     }
@@ -1441,6 +1443,7 @@ class Firebase {
           activeCallToActionIds: firebase.firestore.FieldValue.arrayRemove(callToActionId)
        })
 
+        return batch.commit()
     }
 
     activateCallToAction = async (streamRef, callToActionId) => {
