@@ -1,12 +1,13 @@
 import PropTypes from "prop-types";
 import {
    Button,
+   Collapse,
    DialogActions,
    DialogContent,
    Grid,
    TextField,
 } from "@material-ui/core";
-import React from "react";
+import React, { useMemo } from "react";
 import * as yup from "yup";
 import { URL_REGEX } from "components/util/constants";
 import { useFormik } from "formik";
@@ -39,16 +40,31 @@ const validationSchema = yup.object({
 });
 
 const useStyles = makeStyles((theme) => ({
-   dialogContent:{
-      overflowY: "hidden"
-   }
+   dialogContent: {
+      overflowY: "hidden",
+   },
 }));
 
-const CustomCallToActionForm = ({ handleClose, initialValues }) => {
-   const streamRef = useStreamRef()
+const CallToActionForm = ({
+   handleClose,
+   initialValues,
+   isCustom,
+   isJobPosting,
+}) => {
+   console.log("-> initialValues in form", initialValues);
+   const streamRef = useStreamRef();
    const classes = useStyles();
    const dispatch = useDispatch();
-   const { createCallToAction, updateCallToAction, activateCallToAction } = useFirebase();
+   const {
+      createCallToAction,
+      updateCallToAction,
+      activateCallToAction,
+   } = useFirebase();
+
+   const canChangeMessage = useMemo(() => Boolean(isCustom || isJobPosting), [
+      isCustom,
+      isJobPosting,
+   ]);
 
    const formik = useFormik({
       initialValues,
@@ -72,18 +88,22 @@ const CustomCallToActionForm = ({ handleClose, initialValues }) => {
    });
 
    const handleSend = async (values) => {
-      const callToActionId = await createCallToAction(streamRef, values)
-      return await activateCallToAction(streamRef, callToActionId)
+      const callToActionId = await createCallToAction(streamRef, values);
+      return await activateCallToAction(streamRef, callToActionId);
    };
    const handleSave = async (values) => {
-      return await createCallToAction(streamRef, values)
+      if(values.id){
+         return await updateCallToAction(streamRef, values.id, values)
+      }
+      return await createCallToAction(streamRef, values);
    };
 
    return (
       <React.Fragment>
          <DialogContent className={classes.dialogContent}>
-               <Grid container spacing={3} component="form">
-                  <Grid xs={12} item>
+            <Grid container spacing={3} component="form">
+               <Grid xs={12} style={{ padding: !canChangeMessage && "0" }} item>
+                  <Collapse unmountOnExit in={canChangeMessage}>
                      <TextField
                         fullWidth
                         variant="outlined"
@@ -108,8 +128,10 @@ const CustomCallToActionForm = ({ handleClose, initialValues }) => {
                            formik.touched.message && formik.errors.message
                         }
                      />
-                  </Grid>
-                  <Grid xs={12} item>
+                  </Collapse>
+               </Grid>
+               <Grid xs={12} style={{ padding: !isCustom && "0" }} item>
+                  <Collapse unmountOnExit in={isCustom}>
                      <TextField
                         fullWidth
                         variant="outlined"
@@ -131,28 +153,30 @@ const CustomCallToActionForm = ({ handleClose, initialValues }) => {
                            formik.touched.buttonText && formik.errors.buttonText
                         }
                      />
-                  </Grid>
-                  <Grid xs={12} item>
-                     <TextField
-                        fullWidth
-                        variant="outlined"
-                        id="buttonUrl"
-                        name="buttonUrl"
-                        disabled={formik.isSubmitting}
-                        placeholder="https://mywebsite.com/careers/"
-                        label="Button Url*"
-                        value={formik.values.buttonUrl}
-                        onChange={formik.handleChange}
-                        error={
-                           formik.touched.buttonUrl &&
-                           Boolean(formik.errors.buttonUrl)
-                        }
-                        helperText={
-                           formik.touched.buttonUrl && formik.errors.buttonUrl
-                        }
-                     />
-                  </Grid>
+                  </Collapse>
                </Grid>
+               <Grid xs={12} item>
+                  <TextField
+                     fullWidth
+                     variant="outlined"
+                     id="buttonUrl"
+                     name="buttonUrl"
+                     disabled={formik.isSubmitting}
+                     placeholder="https://mywebsite.com/careers/"
+                     label={`${initialValues.title} Button Url*`}
+                     // label="Button Url*"
+                     value={formik.values.buttonUrl}
+                     onChange={formik.handleChange}
+                     error={
+                        formik.touched.buttonUrl &&
+                        Boolean(formik.errors.buttonUrl)
+                     }
+                     helperText={
+                        formik.touched.buttonUrl && formik.errors.buttonUrl
+                     }
+                  />
+               </Grid>
+            </Grid>
          </DialogContent>
          <DialogActions>
             <Button
@@ -164,7 +188,7 @@ const CustomCallToActionForm = ({ handleClose, initialValues }) => {
                variant="outlined"
                color="secondary"
             >
-               Save as draft
+               Save
             </Button>
             <Button
                disabled={formik.isSubmitting}
@@ -175,16 +199,18 @@ const CustomCallToActionForm = ({ handleClose, initialValues }) => {
                variant="contained"
                color="primary"
             >
-               Send call to action
+               Send now
             </Button>
          </DialogActions>
       </React.Fragment>
    );
 };
 
-CustomCallToActionForm.propTypes = {
-  handleClose: PropTypes.func,
-  initialValues: PropTypes.object.isRequired
-}
+CallToActionForm.propTypes = {
+   handleClose: PropTypes.func,
+   initialValues: PropTypes.object.isRequired,
+   isCustom: PropTypes.bool,
+   isJobPosting: PropTypes.bool,
+};
 
-export default CustomCallToActionForm;
+export default CallToActionForm;
