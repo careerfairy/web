@@ -220,7 +220,7 @@ const EmoteButtons = ({createEmote}) => {
                     <div className={classes.wrapper}>
                         <Fab disabled={iconsDisabled} onClick={handleLike} className={classes.miniLike}
                              aria-label="like">
-                            <ThumbUpAltOutlinedIcon fontSize="default"/>
+                            <ThumbUpAltOutlinedIcon fontSize="medium"/>
                         </Fab>
                         {iconsDisabled &&
                         <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
@@ -228,7 +228,7 @@ const EmoteButtons = ({createEmote}) => {
                     <div className={classes.wrapper}>
                         <Fab disabled={iconsDisabled} onClick={handleClap} className={classes.miniClap}
                              aria-label="clap">
-                            <ClappingSVG style={{width: 21, height: 21}} fontSize="default"/>
+                            <ClappingSVG style={{width: 21, height: 21}} fontSize="medium"/>
                         </Fab>
                         {iconsDisabled &&
                         <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
@@ -236,7 +236,7 @@ const EmoteButtons = ({createEmote}) => {
                     <div className={classes.wrapper}>
                         <Fab disabled={iconsDisabled} onClick={handleHeart} className={classes.miniHeart}
                              aria-label="heart">
-                            <FavoriteBorderOutlinedIcon fontSize="default"/>
+                            <FavoriteBorderOutlinedIcon fontSize="medium"/>
                         </Fab>
                         {iconsDisabled &&
                         <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}

@@ -1494,6 +1494,41 @@ class Firebase {
         }
     }
 
+    checkIfUserInteractedWithCallToAction = async (callToActionRef, userId) => {
+
+        let userInUsersWhoClickedLinkRef = callToActionRef
+          .collection("usersWhoClickedLink")
+          .doc(userId)
+
+        let userInUsersWhoDismissedRef = callToActionRef
+          .collection("usersWhoDismissed")
+          .doc(userId)
+
+        const userWhoClickedSnap = await userInUsersWhoClickedLinkRef.get()
+        const userWhoDismissedSnap = await userInUsersWhoDismissedRef.get()
+
+        return Boolean(userWhoClickedSnap.exists || userWhoDismissedSnap.exists  )
+    }
+
+    getActiveCallToActionsWithAnArrayOfIds = async (streamRef, callToActionIds) => {
+        const callToActionsRef = streamRef.collection("callToActions")
+        const callToActionSnaps = await Promise.all(callToActionIds.map(id => callToActionsRef.doc(id).get()))
+        const callToActionData = callToActionSnaps
+          .filter((doc) => doc.exists)
+          .map((doc) => ({ id: doc.id, ...doc.data() }));
+        console.log("-> callToActionData", callToActionData);
+    }
+
+    getCtaIdsThatUserHasNotInteractedWith = async (streamRef, activeCallToActionIds, userId) => {
+        const callToActionsRef = streamRef.collection("callToActions")
+        const arrayOfCallToActionIdsThatUserHasNotInteractedWith = await Promise.all( activeCallToActionIds.map(async id =>{
+            const callToActionRef = callToActionsRef.doc(id)
+            const hasChecked = await this.checkIfUserInteractedWithCallToAction(callToActionRef, userId)
+            return hasChecked ? undefined: id
+        }).filter(id => id))
+        console.log("-> arrayOfCallToActionIdsThatUserHasNotInteractedWith", arrayOfCallToActionIdsThatUserHasNotInteractedWith);
+    }
+
     rateLivestreamOverallQuality = (livestreamId, userEmail, rating) => {
         let ref = this.firestore
             .collection("livestreams")
