@@ -62,11 +62,11 @@ const ActionButton = React.memo(({iconName, color, getRandomDuration, getRandomH
 
     const renderIcon = () => {
         if (iconName === "like") {
-            return <ThumbUpAltOutlinedIcon className={classes.image} fontSize="default"/>
+            return <ThumbUpAltOutlinedIcon className={classes.image} fontSize="medium"/>
         } else if (iconName === "clapping") {
             return <ClappingSVG className={classes.image}/>
         } else {
-            return <FavoriteBorderOutlinedIcon className={classes.image} fontSize="default"/>
+            return <FavoriteBorderOutlinedIcon className={classes.image} fontSize="medium"/>
         }
     }
 

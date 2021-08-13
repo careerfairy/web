@@ -20,7 +20,7 @@ import LinkedInIcon from "@material-ui/icons/LinkedIn";
 import FacebookIcon from "@material-ui/icons/Facebook";
 import TwitterIcon from "@material-ui/icons/Twitter";
 import JobPostingIcon from "@material-ui/icons/Work";
-import CustomCtaIcon from "@material-ui/icons/ControlPoint";
+import CustomCtaIcon from '@material-ui/icons/Info';
 
 const useStyles = makeStyles((theme) => ({
    closeBtn: {

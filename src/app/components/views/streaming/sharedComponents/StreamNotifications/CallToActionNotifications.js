@@ -6,18 +6,9 @@ import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 import { makeExternalLink } from "../../../../helperFunctions/HelperFunctions";
 
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import TwitterIcon from "@material-ui/icons/Twitter";
-import JobPostingIcon from "@material-ui/icons/Work";
 import CallToActionSnackbar from "./CallToActionSnackbar";
-import InfoIcon from '@material-ui/icons/Info';
-const iconsDict = {
-   linkedin: <LinkedInIcon />,
-   facebook: <FacebookIcon />,
-   twitter: <TwitterIcon />,
-   jobPosting: <JobPostingIcon />,
-};
+import { callToActionsIconsDictionary } from "../../../../util/constants/callToActions";
+
 
 const CallToActionNotifications = ({
    isStreamer,
@@ -48,7 +39,10 @@ const CallToActionNotifications = ({
                   prevLocalCallToActionIds,
                   currentActiveCallToActionIds
                );
-               if (!isStreamer && userData?.id) {
+               if (!isStreamer
+                 // && userData?.id
+                 // disabled to allow non authenticated users on testing to see the call to actions
+               ) {
                   handleCheckForCallToActionIds(newlyActiveCtaIds);
                }
                setCallToActionsToCheck(newlyActiveCtaIds);
@@ -103,7 +97,7 @@ const CallToActionNotifications = ({
       const newCallToActionIds = await getCtaIdsThatUserHasNotInteractedWith(
          streamRef,
          arrayOfCtaIds,
-         userData.id
+         userData?.id
       );
       if (newCallToActionIds.length) {
          const callToActionsData = await getCallToActionsWithAnArrayOfIds(
@@ -133,7 +127,7 @@ const CallToActionNotifications = ({
                         onDismiss={() =>
                            handleDismissCallToAction(callToActionId)
                         }
-                        icon={iconsDict[type] || <InfoIcon/>}
+                        icon={callToActionsIconsDictionary[type]?.icon || callToActionsIconsDictionary.custom.icon}
                         buttonText={buttonText}
                         isJobPosting={type === "jobPosting"}
                         loading={loading}

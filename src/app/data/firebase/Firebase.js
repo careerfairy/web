@@ -1527,6 +1527,7 @@ class Firebase {
     getCtaIdsThatUserHasNotInteractedWith = async (streamRef, activeCallToActionIds, userId) => {
         const callToActionsRef = streamRef.collection("callToActions")
         const arrayOfCallToActionIdsThatUserHasNotInteractedWith = await Promise.all( activeCallToActionIds.map(async id =>{
+            if(!userId) return id
             const callToActionRef = callToActionsRef.doc(id)
             const hasChecked = await this.checkIfUserInteractedWithCallToAction(callToActionRef, userId)
             return hasChecked ? undefined: id

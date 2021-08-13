@@ -340,30 +340,30 @@ function VideoContainer(props) {
             speakerSource={speakerSource}
             setSpeakerSource={updateSpeakerSource}
          />
-         {/*<StreamPreparationModalV2*/}
-         {/*   readyToConnect={Boolean(*/}
-         {/*      props.currentLivestream && props.currentLivestream.id*/}
-         {/*   )}*/}
-         {/*   audioSource={audioSource}*/}
-         {/*   updateAudioSource={updateAudioSource}*/}
-         {/*   videoSource={videoSource}*/}
-         {/*   updateVideoSource={updateVideoSource}*/}
-         {/*   speakerSource={speakerSource}*/}
-         {/*   setSpeakerSource={updateSpeakerSource}*/}
-         {/*   audioLevel={audioLevel}*/}
-         {/*   streamerConnected={streamerConnected}*/}
-         {/*   streamerReady={streamerReady}*/}
-         {/*   setStreamerReady={setStreamerReady}*/}
-         {/*   localStream={displayableMediaStream}*/}
-         {/*   connectionEstablished={connectionEstablished}*/}
-         {/*   isTest={props.currentLivestream.test}*/}
-         {/*   viewer={props.viewer}*/}
-         {/*   handleOpenDemoIntroModal={handleOpenDemoIntroModal}*/}
-         {/*   devices={devices}*/}
-         {/*   setConnectionEstablished={setConnectionEstablished}*/}
-         {/*   errorMessage={errorMessage}*/}
-         {/*   isStreaming={isStreaming}*/}
-         {/*/>*/}
+         <StreamPreparationModalV2
+            readyToConnect={Boolean(
+               props.currentLivestream && props.currentLivestream.id
+            )}
+            audioSource={audioSource}
+            updateAudioSource={updateAudioSource}
+            videoSource={videoSource}
+            updateVideoSource={updateVideoSource}
+            speakerSource={speakerSource}
+            setSpeakerSource={updateSpeakerSource}
+            audioLevel={audioLevel}
+            streamerConnected={streamerConnected}
+            streamerReady={streamerReady}
+            setStreamerReady={setStreamerReady}
+            localStream={displayableMediaStream}
+            connectionEstablished={connectionEstablished}
+            isTest={props.currentLivestream.test}
+            viewer={props.viewer}
+            handleOpenDemoIntroModal={handleOpenDemoIntroModal}
+            devices={devices}
+            setConnectionEstablished={setConnectionEstablished}
+            errorMessage={errorMessage}
+            isStreaming={isStreaming}
+         />
          <LoadingModal agoraRtcStatus={agoraRtcStatus} />
          <ErrorModal
             agoraRtcStatus={agoraRtcStatus}

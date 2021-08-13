@@ -126,7 +126,7 @@ const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToA
          <AutoSizer>
             {({ height, width }) => (
                <FixedSizeList
-                  itemSize={218}
+                  itemSize={200}
                   itemCount={callToActions.length}
                   height={height}
                   width={width}

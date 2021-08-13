@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
       flex: 1,
    },
    callToActionContentWrapper: {
-      padding: theme.spacing(3),
+      // padding: theme.spacing(3),
       flex: 1,
       display: "flex",
    },
