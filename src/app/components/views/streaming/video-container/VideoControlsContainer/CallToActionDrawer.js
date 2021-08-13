@@ -59,7 +59,6 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
    const { deleteCallToAction } = useFirebase();
    const [callToActionModalOpen, setCallToActionModalOpen] = useState(false);
    const [callToActionToEdit, setCallToActionToEdit] = useState(null);
-   console.log("-> callToActionToEdit", callToActionToEdit);
 
    useEffect(()=> {
       if(callToActionToEdit){
