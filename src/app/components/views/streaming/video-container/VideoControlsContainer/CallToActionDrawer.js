@@ -59,6 +59,7 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
    const { deleteCallToAction } = useFirebase();
    const [callToActionModalOpen, setCallToActionModalOpen] = useState(false);
    const [callToActionToEdit, setCallToActionToEdit] = useState(null);
+   console.log("-> callToActionToEdit", callToActionToEdit);
 
    useEffect(()=> {
       if(callToActionToEdit){
@@ -67,6 +68,7 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
    },[callToActionToEdit])
 
    const handleCloseCallToActionFormDialog = () => {
+      setCallToActionToEdit(null)
       setCallToActionModalOpen(false);
    };
    const handleOpenCallToActionFormDialog = () => {
@@ -79,6 +81,7 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
       } catch (e) {
          console.error("error deleting callToAction", e);
       }
+      setCallToActionToEdit(null)
    };
    const handleClickEditCallToAction = (newCallToActionToEditData) => {
       setCallToActionToEdit(newCallToActionToEditData);

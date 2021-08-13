@@ -121,6 +121,8 @@ const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
                   ?.title || defaultInitialValues.title,
          };
          setInitialValues(newInitialValues);
+      } else {
+         setInitialValues({ ...defaultInitialValues });
       }
    }, [callToActionToEdit]);
 
