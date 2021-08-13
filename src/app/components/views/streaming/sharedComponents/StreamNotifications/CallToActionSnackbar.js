@@ -30,9 +30,13 @@ const useStyles = makeStyles(theme => ({
     color: "inherit"
   },
   card: {
-    // backgroundColor: '#fddc6c',
     width: '100%',
     borderLeft: `4mm ridge ${alpha(theme.palette.primary.main, 0.6)}`
+  },
+  messageWrapper:{
+    display: "flex",
+    // border: "1px solid pink",
+    flex: 1
   },
   typography: {
     fontWeight: 'bold',
@@ -77,7 +81,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const CallToActionSnackbar = forwardRef(({ message, id, onClick, onDismiss, icon, loading, buttonText }, ref) => {
+const CallToActionSnackbar = forwardRef(({ message, id, onClick, onDismiss, icon, loading, buttonText, isJobPosting }, ref) => {
    const classes = useStyles();
    const [expanded, setExpanded] = useState(false);
    const handleExpandClick = useCallback(() => {
@@ -92,21 +96,17 @@ const CallToActionSnackbar = forwardRef(({ message, id, onClick, onDismiss, icon
               <span className={classes.mainIconWrapper}>
               {icon && icon}
               </span>
+              <div className={classes.messageWrapper}>
                <Typography variant="subtitle2" className={classes.typography}>
                   {message}
                </Typography>
+              </div>
                <div className={classes.icons}>
                    <Button
                      className={classes.mainButton}
                      onClick={onClick}
-                     // startIcon={
-                     //   loading ? (
-                     //     <CircularProgress size={20} color="inherit" />
-                     //   ): icon
-                     // }
                      disabled={loading}
                      size="small"
-                     // color="primary"
                    >
                      {loading ? "" : buttonText}
                    </Button>

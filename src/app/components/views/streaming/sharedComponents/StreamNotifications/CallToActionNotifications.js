@@ -11,12 +11,12 @@ import FacebookIcon from "@material-ui/icons/Facebook";
 import TwitterIcon from "@material-ui/icons/Twitter";
 import JobPostingIcon from "@material-ui/icons/Work";
 import CallToActionSnackbar from "./CallToActionSnackbar";
-
+import InfoIcon from '@material-ui/icons/Info';
 const iconsDict = {
    linkedin: <LinkedInIcon />,
    facebook: <FacebookIcon />,
    twitter: <TwitterIcon />,
-   jonPosting: <JobPostingIcon />,
+   jobPosting: <JobPostingIcon />,
 };
 
 const CallToActionNotifications = ({
@@ -112,6 +112,7 @@ const CallToActionNotifications = ({
          );
 
          callToActionsData.forEach((callToAction) => {
+            console.log("-> callToAction", callToAction);
             const message = callToAction.message || "";
             const buttonText = callToAction.buttonText || "Click here";
             const buttonUrl = callToAction.buttonUrl
@@ -132,8 +133,9 @@ const CallToActionNotifications = ({
                         onDismiss={() =>
                            handleDismissCallToAction(callToActionId)
                         }
-                        icon={iconsDict[type]}
+                        icon={iconsDict[type] || <InfoIcon/>}
                         buttonText={buttonText}
+                        isJobPosting={type === "jobPosting"}
                         loading={loading}
                         message={message}
                      />
