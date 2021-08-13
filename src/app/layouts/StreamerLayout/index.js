@@ -213,15 +213,15 @@ const StreamerLayout = (props) => {
         return <Loader/>
     }
 
-    // if (!streamerReady && tokenIsValidated()) {
-    //     return (
-    //         <PreparationOverlay
-    //             livestream={currentLivestream}
-    //             streamerUuid={streamerId}
-    //             setStreamerReady={setStreamerReady}
-    //         />
-    //     )
-    // }
+    if (!streamerReady && tokenIsValidated()) {
+        return (
+            <PreparationOverlay
+                livestream={currentLivestream}
+                streamerUuid={streamerId}
+                setStreamerReady={setStreamerReady}
+            />
+        )
+    }
 
 
     return (
