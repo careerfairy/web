@@ -1354,9 +1354,11 @@ class Firebase {
         return callToActionRef.id
     }
 
-    clickOnCallToAction = async (streamRef, callToActionId, userId, {isDismissAction = false}) => {
+    clickOnCallToAction = async (streamRef, callToActionId, userId, options = {isDismissAction: false} ) => {
+        if(!userId) return
         let batch = this.firestore.batch();
         let userRef = this.firestore.collection("userData").doc(userId);
+        const isDismissAction = options.isDismissAction
         let callToActionRef = streamRef
           .collection("callToActions")
           .doc(callToActionId)
@@ -1378,6 +1380,8 @@ class Firebase {
             const hasAlreadyDismissed = userInUsersWhoDismissedSnap.exists
             const hasAlreadyClicked = userInUsersWhoClickedSnap.exists
             let callToActionUpdateData = {}
+            if(isDismissAction && hasAlreadyDismissed) return
+            if(!isDismissAction && hasAlreadyClicked) return
             if(isDismissAction){
                 batch.set(userInUsersWhoDismissedRef, {
                     ...userData,
@@ -1402,7 +1406,7 @@ class Firebase {
 
                 if(hasAlreadyDismissed){
                     callToActionUpdateData["numberOfUsersWhoDismissed"] = firebase.firestore.FieldValue.increment(-1)
-                    batch.delete(userInUsersWhoClickedLinkRef)
+                    batch.delete(userInUsersWhoDismissedRef)
                 }
             }
                     batch.update(callToActionRef, callToActionUpdateData)
@@ -1510,13 +1514,14 @@ class Firebase {
         return Boolean(userWhoClickedSnap.exists || userWhoDismissedSnap.exists  )
     }
 
-    getActiveCallToActionsWithAnArrayOfIds = async (streamRef, callToActionIds) => {
+    getCallToActionsWithAnArrayOfIds = async (streamRef, callToActionIds) => {
         const callToActionsRef = streamRef.collection("callToActions")
         const callToActionSnaps = await Promise.all(callToActionIds.map(id => callToActionsRef.doc(id).get()))
         const callToActionData = callToActionSnaps
           .filter((doc) => doc.exists)
           .map((doc) => ({ id: doc.id, ...doc.data() }));
-        console.log("-> callToActionData", callToActionData);
+
+        return callToActionData
     }
 
     getCtaIdsThatUserHasNotInteractedWith = async (streamRef, activeCallToActionIds, userId) => {
@@ -1525,8 +1530,8 @@ class Firebase {
             const callToActionRef = callToActionsRef.doc(id)
             const hasChecked = await this.checkIfUserInteractedWithCallToAction(callToActionRef, userId)
             return hasChecked ? undefined: id
-        }).filter(id => id))
-        console.log("-> arrayOfCallToActionIdsThatUserHasNotInteractedWith", arrayOfCallToActionIdsThatUserHasNotInteractedWith);
+        }))
+        return arrayOfCallToActionIdsThatUserHasNotInteractedWith.filter(id => id)
     }
 
     rateLivestreamOverallQuality = (livestreamId, userEmail, rating) => {

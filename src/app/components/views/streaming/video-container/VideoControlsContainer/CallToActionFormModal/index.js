@@ -11,12 +11,12 @@ import {
 import CallToActionForm from "./CallToActionForm";
 import CloseIcon from "@material-ui/icons/Close";
 import CallToActionTypeMenu from "./CallToActionTypeMenu";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
 import {
    FACEBOOK_COLOR,
    LINKEDIN_COLOR,
    TWITTER_COLOR,
 } from "components/util/colors";
+import LinkedInIcon from "@material-ui/icons/LinkedIn";
 import FacebookIcon from "@material-ui/icons/Facebook";
 import TwitterIcon from "@material-ui/icons/Twitter";
 import JobPostingIcon from "@material-ui/icons/Work";
