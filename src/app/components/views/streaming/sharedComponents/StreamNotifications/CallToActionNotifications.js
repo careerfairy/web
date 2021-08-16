@@ -54,7 +54,7 @@ const CallToActionNotifications = ({
             });
          }
       })();
-   }, [currentActiveCallToActionIds, isStreamer, userData?.id, isLoggedOut]);
+   }, [currentActiveCallToActionIds, isStreamer]);
 
    useEffect(() => {
       // Only check for call to actions on page load if you're logged in

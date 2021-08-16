@@ -252,7 +252,7 @@ const SettingsDropdown = ({
 const EngagementChart = ({ percentage, noOfEngagement, total, ...props }) => {
    return (
       <Tooltip
-         title={`Of the ${total} interactions ${noOfEngagement}(${percentage}%) users clicked on the call to action`}
+         title={`Of the ${total} interactions ${noOfEngagement}(${percentage}%) of users clicked on the call to action`}
       >
          <Box position="relative" display="inline-flex">
             <CircularProgress

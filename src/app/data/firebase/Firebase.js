@@ -1355,14 +1355,26 @@ class Firebase {
     }
 
     clickOnCallToAction = async (streamRef, callToActionId, userId, options = {isDismissAction: false} ) => {
-        console.log("-> userId", userId);
-        if(!userId) return
-        let batch = this.firestore.batch();
-        let userRef = this.firestore.collection("userData").doc(userId);
-        const isDismissAction = options.isDismissAction
         let callToActionRef = streamRef
           .collection("callToActions")
           .doc(callToActionId)
+
+        const isDismissAction = options.isDismissAction
+
+        if(!userId) {
+            // Return early and only increment fields when the user is not logged in
+            if(isDismissAction){
+                return await callToActionRef.update({
+                    numberOfUsersWhoDismissed: firebase.firestore.FieldValue.increment(1)
+                })
+            }
+            return await callToActionRef.update({
+                numberOfUsersWhoClickedLink: firebase.firestore.FieldValue.increment(1)
+            })
+        }
+        let batch = this.firestore.batch();
+        let userRef = this.firestore.collection("userData").doc(userId);
+
 
         let userInUsersWhoClickedLinkRef = callToActionRef
           .collection("usersWhoClickedLink")
