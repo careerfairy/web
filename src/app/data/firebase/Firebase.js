@@ -1855,10 +1855,16 @@ class Firebase {
                         .doc(groupId)
                         .collection("usersInPolicy")
                         .doc(userId)
-                    transaction.set(userInPolicyRef, user)
+                    transaction.set(userInPolicyRef, {
+                        ...user,
+                        dateAgreed: this.getServerTimestamp()
+                    });
                 }
 
-                transaction.set(registeredUsersRef, user);
+                transaction.set(registeredUsersRef, {
+                    ...user,
+                    dateRegistered: this.getServerTimestamp()
+                });
             });
         });
     };
@@ -1898,7 +1904,10 @@ class Firebase {
                     transaction.update(streamRef, {
                         talentPool: firebase.firestore.FieldValue.arrayUnion(userId),
                     });
-                    transaction.set(userInTalentPoolCollectionRef, userData)
+                    transaction.set(userInTalentPoolCollectionRef, {
+                       ...userData,
+                        dateJoinedTalentPool: this.getServerTimestamp()
+                    });
                 }
             });
         });

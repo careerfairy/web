@@ -220,7 +220,7 @@ const DraftStreamForm = ({
                         targetCategories: {},
                         groupIds: livestream.groupIds || [],
                         start: livestream.start.toDate() || new Date(),
-                        duration: livestream.duration, DEFAULT_STREAM_DURATION_MINUTES,
+                        duration: livestream.duration || DEFAULT_STREAM_DURATION_MINUTES,
                         hidden: livestream.hidden || false,
                         summary: livestream.summary || "",
                         speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery),
