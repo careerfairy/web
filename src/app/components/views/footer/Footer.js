@@ -30,7 +30,7 @@ function Footer(props) {
     return (
         <div className={classes.root}>
             <Container>
-                <Grid container justify="center">
+                <Grid container justifyContent="center">
                     <Grid item xs={2}>
                         <div className='social-icon-container'>
                             <a href='https://www.linkedin.com/company/careerfairy/' target='_blank'

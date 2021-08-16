@@ -1,5 +1,5 @@
 import React from 'react';
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import PropTypes from 'prop-types';
 import {IconButton, Tooltip} from '@material-ui/core';
@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
         textAlign: "left",
         color: theme.palette.common.white,
         boxShadow: theme.shadows[2],
-        backgroundColor: fade(theme.palette.common.black, 0.4),
+        backgroundColor: alpha(theme.palette.common.black, 0.4),
         backdropFilter: "blur(5px)",
         display: "flex",
         flexDirection: "row",

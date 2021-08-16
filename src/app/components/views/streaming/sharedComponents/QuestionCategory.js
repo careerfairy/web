@@ -28,7 +28,7 @@ import {
 import * as actions from '../../../../store/actions'
 import SwipeableViews from "react-swipeable-views";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
-import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
+import {alpha, makeStyles, useTheme} from "@material-ui/core/styles";
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import {useAuth} from "../../../../HOCs/AuthProvider";
@@ -72,11 +72,11 @@ const useStyles = makeStyles(theme => ({
         width: "100%"
     },
     dialog: {
-        backgroundColor: fade(theme.palette.common.black, 0.2),
+        backgroundColor: alpha(theme.palette.common.black, 0.2),
         backdropFilter: "blur(5px)",
     },
     dialogInput: {
-        background: fade(theme.palette.background.paper, 0.5),
+        background: alpha(theme.palette.background.paper, 0.5),
     },
     bar: {
         width: "100%",

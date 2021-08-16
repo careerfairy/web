@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 import {
     AppBar,
     CardActions,
@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
         flex: 1,
     },
     background: {
-        backgroundColor: fade(theme.palette.primary.dark, 0.7),
+        backgroundColor: alpha(theme.palette.primary.dark, 0.7),
     },
     appBar: {
         backgroundColor: theme.palette.navyBlue.main,

@@ -1328,6 +1328,226 @@ class Firebase {
         return batch.commit();
     };
 
+    /*
+    * Call to action methods
+    * */
+
+    createCallToAction = async (streamRef, values) => {
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc()
+
+        await callToActionRef.set({
+            buttonText: values.buttonText,
+            buttonUrl: values.buttonUrl,
+            type: values.type,
+            message: values.message,
+            created: this.getServerTimestamp(),
+            numberOfUsersWhoClickedLink: 0,
+            numberOfUsersWhoDismissed: 0,
+            updated: null,
+            sent: null,
+            stopped: null,
+            active: false
+        })
+
+        return callToActionRef.id
+    }
+
+    clickOnCallToAction = async (streamRef, callToActionId, userId, options = {isDismissAction: false} ) => {
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc(callToActionId)
+
+        const isDismissAction = options.isDismissAction
+
+        if(!userId) {
+            // Return early and only increment fields when the user is not logged in
+            if(isDismissAction){
+                return await callToActionRef.update({
+                    numberOfUsersWhoDismissed: firebase.firestore.FieldValue.increment(1)
+                })
+            }
+            return await callToActionRef.update({
+                numberOfUsersWhoClickedLink: firebase.firestore.FieldValue.increment(1)
+            })
+        }
+        let batch = this.firestore.batch();
+        let userRef = this.firestore.collection("userData").doc(userId);
+
+
+        let userInUsersWhoClickedLinkRef = callToActionRef
+          .collection("usersWhoClickedLink")
+          .doc(userId)
+
+        let userInUsersWhoDismissedRef = callToActionRef
+          .collection("usersWhoDismissed")
+          .doc(userId)
+
+
+        const userSnap = await userRef.get()
+        if(userSnap.exists){
+            const userData = userSnap.data();
+            const userInUsersWhoDismissedSnap = await userInUsersWhoDismissedRef.get()
+            const userInUsersWhoClickedSnap = await userInUsersWhoClickedLinkRef.get()
+            const hasAlreadyDismissed = userInUsersWhoDismissedSnap.exists
+            const hasAlreadyClicked = userInUsersWhoClickedSnap.exists
+            let callToActionUpdateData = {}
+            if(isDismissAction && hasAlreadyDismissed) return
+            if(!isDismissAction && hasAlreadyClicked) return
+            if(isDismissAction){
+                batch.set(userInUsersWhoDismissedRef, {
+                    ...userData,
+                    dismissedCallToActionAt: this.getServerTimestamp()
+                })
+                if(!hasAlreadyDismissed){
+                    callToActionUpdateData["numberOfUsersWhoDismissed"] = firebase.firestore.FieldValue.increment(1)
+                }
+
+            if(hasAlreadyClicked){
+                callToActionUpdateData["numberOfUsersWhoClickedLink"] = firebase.firestore.FieldValue.increment(-1)
+                batch.delete(userInUsersWhoClickedLinkRef)
+            }
+            } else {
+                batch.set(userInUsersWhoClickedLinkRef, {
+                    ...userData,
+                    clickedCallToActionLinkAt: this.getServerTimestamp()
+                })
+                if(!hasAlreadyClicked){
+                    callToActionUpdateData["numberOfUsersWhoClickedLink"] = firebase.firestore.FieldValue.increment(1)
+                }
+
+                if(hasAlreadyDismissed){
+                    callToActionUpdateData["numberOfUsersWhoDismissed"] = firebase.firestore.FieldValue.increment(-1)
+                    batch.delete(userInUsersWhoDismissedRef)
+                }
+            }
+                    batch.update(callToActionRef, callToActionUpdateData)
+
+
+            return await batch.commit()
+        }
+
+    }
+
+    dismissCallToAction = async (streamRef, callToActionId, userId) => {
+        return await this.clickOnCallToAction(streamRef, callToActionId, userId, {isDismissAction: true})
+    }
+
+    updateCallToAction = (streamRef, callToActionId, newValues) => {
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc(callToActionId)
+        return callToActionRef.update({
+            buttonText: newValues.buttonText,
+            buttonUrl: newValues.buttonUrl,
+            message: newValues.message,
+            type: newValues.type,
+            updated: this.getServerTimestamp(),
+        })
+    }
+
+    deleteCallToAction = (streamRef, callToActionId) => {
+       let batch = this.firestore.batch()
+
+       let callToActionRef = streamRef
+         .collection("callToActions")
+         .doc(callToActionId)
+
+       batch.delete(callToActionRef)
+
+       batch.update(streamRef,{
+          activeCallToActionIds: firebase.firestore.FieldValue.arrayRemove(callToActionId)
+       })
+
+        return batch.commit()
+    }
+
+    activateCallToAction = async (streamRef, callToActionId) => {
+        let batch = this.firestore.batch()
+
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc(callToActionId)
+
+        const callToActionSnap = await callToActionRef.get()
+
+        if(callToActionSnap.exists){
+
+        batch.update(callToActionRef, {
+            sent: this.getServerTimestamp(),
+            active: true
+        })
+
+        batch.update(streamRef, {
+            activeCallToActionIds: firebase.firestore.FieldValue.arrayUnion(callToActionId)
+        })
+
+        return await batch.commit()
+        }
+
+    }
+
+    deactivateCallToAction = async (streamRef, callToActionId) => {
+        let batch = this.firestore.batch()
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc(callToActionId)
+
+        const callToActionSnap = await callToActionRef.get()
+
+        if(callToActionSnap.exists){
+
+            batch.update(callToActionRef, {
+                stopped: this.getServerTimestamp(),
+                active: false
+            })
+
+            batch.update(streamRef, {
+                activeCallToActionIds: firebase.firestore.FieldValue.arrayRemove(callToActionId)
+            })
+
+            return await batch.commit()
+        }
+    }
+
+    checkIfUserInteractedWithCallToAction = async (callToActionRef, userId) => {
+
+        let userInUsersWhoClickedLinkRef = callToActionRef
+          .collection("usersWhoClickedLink")
+          .doc(userId)
+
+        let userInUsersWhoDismissedRef = callToActionRef
+          .collection("usersWhoDismissed")
+          .doc(userId)
+
+        const userWhoClickedSnap = await userInUsersWhoClickedLinkRef.get()
+        const userWhoDismissedSnap = await userInUsersWhoDismissedRef.get()
+
+        return Boolean(userWhoClickedSnap.exists || userWhoDismissedSnap.exists  )
+    }
+
+    getCallToActionsWithAnArrayOfIds = async (streamRef, callToActionIds) => {
+        const callToActionsRef = streamRef.collection("callToActions")
+        const callToActionSnaps = await Promise.all(callToActionIds.map(id => callToActionsRef.doc(id).get()))
+        const callToActionData = callToActionSnaps
+          .filter((doc) => doc.exists)
+          .map((doc) => ({ id: doc.id, ...doc.data() }));
+
+        return callToActionData
+    }
+
+    getCtaIdsThatUserHasNotInteractedWith = async (streamRef, activeCallToActionIds, userId) => {
+        const callToActionsRef = streamRef.collection("callToActions")
+        const arrayOfCallToActionIdsThatUserHasNotInteractedWith = await Promise.all( activeCallToActionIds.map(async id =>{
+            if(!userId) return id
+            const callToActionRef = callToActionsRef.doc(id)
+            const hasChecked = await this.checkIfUserInteractedWithCallToAction(callToActionRef, userId)
+            return hasChecked ? undefined: id
+        }))
+        return arrayOfCallToActionIdsThatUserHasNotInteractedWith.filter(id => id)
+    }
+
     rateLivestreamOverallQuality = (livestreamId, userEmail, rating) => {
         let ref = this.firestore
             .collection("livestreams")

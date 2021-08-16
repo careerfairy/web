@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import SwipeableViews from "react-swipeable-views";
 import General from "./General";
-import { fade, makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
 import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels";
 import Audience from "./Audience";
 import Title from "./Title";
@@ -41,13 +41,13 @@ const useStyles = makeStyles((theme) => ({
    appBar: {
       boxShadow: "none",
       background: theme.palette.common.white,
-      borderBottom: `1px solid ${fade(theme.palette.text.secondary, 0.3)}`,
+      borderBottom: `1px solid ${alpha(theme.palette.text.secondary, 0.3)}`,
    },
    title: {
       background: theme.palette.common.white,
    },
    slide: {
-      // background: `linear-gradient(45deg, ${theme.palette.primary.main} 45%, ${fade(theme.palette.secondary.main, 1)} 75%)`
+      // background: `linear-gradient(45deg, ${theme.palette.primary.main} 45%, ${alpha(theme.palette.secondary.main, 1)} 75%)`
    },
 }));
 

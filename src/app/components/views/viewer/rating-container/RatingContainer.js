@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: theme.spacing(1)
     },
     emptyIcon: {
-        // color: fade(theme.palette.background.default, 0.5)
+        // color: alpha(theme.palette.background.default, 0.5)
     },
 }));
 

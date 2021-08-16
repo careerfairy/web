@@ -55,7 +55,7 @@ function HowItWorks(props) {
             <div className='company-icons'>
                 <Container>
                 <div className='company-icons-label'>How it works</div>
-                    <Grid container justify="center" style={{ textAlign: "center" }}>
+                    <Grid container justifyContent="center" style={{ textAlign: "center" }}>
                         <Grid item xs={3} style={{ padding: '0 25px' }}>
                             <h1 style={{ fontSize: '4em', color: 'rgb(0, 210, 170)'}}>1</h1>
                             <h2 className='careerStep'>Register to your favorite events</h2>

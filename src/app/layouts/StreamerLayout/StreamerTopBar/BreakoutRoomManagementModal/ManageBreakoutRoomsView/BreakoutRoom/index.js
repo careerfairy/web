@@ -352,7 +352,7 @@ const BreakoutRoom = ({
                     <Box display="flex" width="100%" alignItems="center" justifyContent="space-between">
                         <Grid container spacing={1}
                               direction="row"
-                              justify="space-between"
+                              justifyContent="space-between"
                               alignItems="center"
 
                         >

@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useMemo, useState} from 'react';
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 import SignalWifi0BarRoundedIcon from '@material-ui/icons/SignalWifi0BarRounded';
 import SignalWifi1BarRoundedIcon from '@material-ui/icons/SignalWifi1BarRounded';
 import SignalWifi2BarRoundedIcon from '@material-ui/icons/SignalWifi2BarRounded';
@@ -37,7 +37,7 @@ const useStyles = makeStyles(theme => ({
         borderRadius: theme.spacing(2),
         padding: theme.spacing(1),
         boxShadow: theme.shadows[2],
-        backgroundColor: fade(theme.palette.common.black, 0.1),
+        backgroundColor: alpha(theme.palette.common.black, 0.1),
         backdropFilter: "blur(5px)",
         transition: theme.transitions.create("transform", {
             easing: theme.transitions.easing.easeInOut,

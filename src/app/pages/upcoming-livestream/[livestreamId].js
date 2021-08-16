@@ -693,7 +693,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                                  className={classes.companyLogo}
                               />
                      </div>
-                     <Grid container justify="center" align="center">
+                     <Grid container justifyContent="center" align="center">
                         {speakerElements}
                      </Grid>
                      <div style={{ margin: "40px 0", width: "100%" }}>
@@ -900,7 +900,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                </div>
                <Grid
                   container
-                  justify="center"
+                  justifyContent="center"
                   alignItems="center"
                   style={{ margin: "50px 0 0 0" }}
                >

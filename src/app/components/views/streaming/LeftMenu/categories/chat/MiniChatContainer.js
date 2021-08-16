@@ -14,7 +14,7 @@ import {
     Typography,
     IconButton, Button,
 } from "@material-ui/core";
-import {makeStyles, fade, useTheme} from "@material-ui/core/styles";
+import {makeStyles, alpha, useTheme} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
 import TutorialContext from "../../../../../../context/tutorials/TutorialContext";
 import {
@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
     sendBtn: {
         width: 30,
         height: 30,
-        background: fade(theme.palette.primary.main, 0.5),
+        background: alpha(theme.palette.primary.main, 0.5),
         "&$buttonDisabled": {
             color: grey[800]
         },

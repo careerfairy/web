@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useMemo } from "react";
-import { fade, makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
 import clsx from "clsx";
 
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
          `linear-gradient(-24deg, ${props.colors[0]} 1%, ${props.colors[1]} 100%)`,
       color: theme.palette.common.white,
       "&:hover": {
-         boxShadow: (props) => `0 3px 5px 2px  ${fade(props.colors[1], 0.3)}`,
+         boxShadow: (props) => `0 3px 5px 2px  ${alpha(props.colors[1], 0.3)}`,
       },
    },
 }));

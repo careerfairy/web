@@ -1,5 +1,9 @@
-import {CLOSE_SNACKBAR, ENQUEUE_SNACKBAR, REMOVE_SNACKBAR} from "./actionTypes";
-import {GENERAL_ERROR} from "../../components/util/constants";
+import {
+   CLOSE_SNACKBAR,
+   ENQUEUE_SNACKBAR,
+   REMOVE_SNACKBAR,
+} from "./actionTypes";
+import { GENERAL_ERROR } from "../../components/util/constants";
 
 /**
  * Enqueue a snackbar managed in redux state.
@@ -13,68 +17,100 @@ import {GENERAL_ERROR} from "../../components/util/constants";
  * message: string
  * }} [notification]
  */
-export const enqueueSnackbar = (notification = {message: "", options: {}}) => {
-    const key = notification.options && notification.options.key;
+export const enqueueSnackbar = (
+   notification = { message: "", options: {} }
+) => {
+   const key = notification.options && notification.options.key;
 
-    return {
-        type: ENQUEUE_SNACKBAR,
-        notification: {
-            ...notification,
-            key: key || new Date().getTime() + Math.random(),
-        },
-    };
+   return {
+      type: ENQUEUE_SNACKBAR,
+      notification: {
+         ...notification,
+         key: key || new Date().getTime() + Math.random(),
+      },
+   };
 };
 
-export const closeSnackbar = key => ({
-    type: CLOSE_SNACKBAR,
-    dismissAll: !key, // dismiss all if no key has been defined
-    key,
+export const closeSnackbar = (key) => ({
+   type: CLOSE_SNACKBAR,
+   dismissAll: !key, // dismiss all if no key has been defined
+   key,
 });
 
-export const removeSnackbar = key => ({
-    type: REMOVE_SNACKBAR,
-    key,
+export const removeSnackbar = (key) => ({
+   type: REMOVE_SNACKBAR,
+   key,
 });
 
 export const sendGeneralError = (error = "") => async (dispatch) => {
-    console.error("error", error)
-    dispatch(enqueueSnackbar({
-        message: GENERAL_ERROR,
-        options: {
+   console.error("error", error);
+   dispatch(
+      enqueueSnackbar({
+         message: GENERAL_ERROR,
+         options: {
             variant: "error",
-            preventDuplicate: true
-        }
-    }))
-}
-export const enqueueBroadcastMessage = (message = "", action) => async (dispatch) => {
-    dispatch(enqueueSnackbar({
-        message: message,
-        options: {
+            preventDuplicate: true,
+         },
+      })
+   );
+};
+export const enqueueBroadcastMessage = (message = "", action) => async (
+   dispatch
+) => {
+   dispatch(
+      enqueueSnackbar({
+         message: message,
+         options: {
             variant: "warning",
             preventDuplicate: true,
             key: message,
             action,
-            anchorOrigin:{
-                vertical: "top",
-                horizontal: "center"
-            }
-        }
-    }))
-}
+            anchorOrigin: {
+               vertical: "top",
+               horizontal: "center",
+            },
+         },
+      })
+   );
+};
+export const enqueueCallToAction = ({
+   message = "",
+   content,
+   type,
+   callToActionId,
+}) => async (dispatch) => {
+   dispatch(
+      enqueueSnackbar({
+         // message: message,
+         options: {
+            variant: "info",
+            preventDuplicate: true,
+            persist: true,
+            key: callToActionId,
+            content,
+            anchorOrigin: {
+               vertical: "top",
+               horizontal: "center",
+            },
+         },
+      })
+   );
+};
 
 /**
  * Call an on call cloud function to generate a secure agora token.
  * @param {{options: {anchorOrigin: {horizontal: string, vertical: string}, key: string}, message: string}} data
  */
 export const sendCustomError = (data = {}) => async (dispatch) => {
-    console.error("error", data.message)
-    dispatch(enqueueSnackbar({
-        message: data.message,
-        options: {
+   console.error("error", data.message);
+   dispatch(
+      enqueueSnackbar({
+         message: data.message,
+         options: {
             variant: "error",
             preventDuplicate: true,
             ...data.options,
-        }
-    }))
-}
-
+         },
+      })
+   );
+};

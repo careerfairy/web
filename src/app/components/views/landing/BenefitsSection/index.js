@@ -49,7 +49,7 @@ const BenefitsSection = (props) => {
                     subtitle={props.subtitle}
                 />
                 <Grid
-                    justify="space-around"
+                  justifyContent="space-around"
                     container
                     spacing={5}
                     className={classes.benefitsWrapper}

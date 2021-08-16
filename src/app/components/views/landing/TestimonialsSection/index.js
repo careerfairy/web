@@ -47,7 +47,7 @@ const TestimonialsSection = (props) => {
             />
             <Grid
                container
-               justify="center"
+               justifyContent="center"
                className={classes.testimonialsWrapper}
             >
                <Grid item xs={12} md={12}>
