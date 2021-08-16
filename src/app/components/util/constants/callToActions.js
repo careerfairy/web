@@ -8,7 +8,7 @@ import { FACEBOOK_COLOR, LINKEDIN_COLOR, TWITTER_COLOR } from "../colors";
 import { baseThemeObj } from "../../../materialUI";
 
 export const callToActionsIconsDictionary = {
-   linkedin: {
+   linkedIn: {
       icon: <LinkedInIcon />,
       color: LINKEDIN_COLOR,
    },
