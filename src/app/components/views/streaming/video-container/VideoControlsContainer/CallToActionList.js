@@ -7,6 +7,7 @@ import { createSelector } from "reselect";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList } from "react-window";
 import {
+   Box,
    Button,
    CircularProgress,
    List,
@@ -14,7 +15,7 @@ import {
    ListItemSecondaryAction,
    ListItemText,
    Switch,
-   Typography,
+   Typography
 } from "@material-ui/core";
 import { isEmpty, isLoaded } from "react-redux-firebase";
 import { useFirebase } from "../../../../../context/firebase";
@@ -98,7 +99,11 @@ const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToA
    }
 
    if (isEmpty(callToActions)) {
-      return <Typography>Add some call to actions</Typography>;
+      return (
+      <Box p={2}>
+        <Typography>Add some call to actions</Typography>
+      </Box>
+      );
    }
 
    const handleToggleActive = async (callToActionId, active) => {
@@ -109,17 +114,6 @@ const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToA
       }
    };
 
-   // return (
-   //   <List>
-   //      {callToActions.map(ctaData => (
-   //        <CallToActionItem
-   //          key={ctaData.id}
-   //          callToAction={ctaData}
-   //          handleToggleActive={handleToggleActive}
-   //        />
-   //      ))}
-   //   </List>
-   // )
 
    return (
       <div style={{ flex: "1 1 auto" }}>

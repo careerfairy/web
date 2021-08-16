@@ -8,13 +8,14 @@ import { makeExternalLink } from "../../../../helperFunctions/HelperFunctions";
 
 import CallToActionSnackbar from "./CallToActionSnackbar";
 import { callToActionsIconsDictionary } from "../../../../util/constants/callToActions";
-
+import { useCurrentStream } from "../../../../../context/stream/StreamContext";
 
 const CallToActionNotifications = ({
    isStreamer,
    currentActiveCallToActionIds,
 }) => {
-   const { userData } = useAuth();
+   const { currentLivestream } = useCurrentStream();
+   const { userData, authenticatedUser } = useAuth();
    const dispatch = useDispatch();
    const streamRef = useStreamRef();
    const {
@@ -26,7 +27,7 @@ const CallToActionNotifications = ({
    const [dismissing, setDismissing] = useState(false);
    const [engaging, setEngaging] = useState(false);
    const loading = Boolean(dismissing || engaging);
-
+   const isLoggedOut = authenticatedUser.isLoaded && authenticatedUser.isEmpty;
    const [localCallToActionIds, setLocalCallToActionIds] = useState([]);
 
    const [callToActionsToCheck, setCallToActionsToCheck] = useState([]);
@@ -39,9 +40,12 @@ const CallToActionNotifications = ({
                   prevLocalCallToActionIds,
                   currentActiveCallToActionIds
                );
-               if (!isStreamer
-                 // && userData?.id
-                 // disabled to allow non authenticated users on testing to see the call to actions
+               if (
+                  !isStreamer &&
+                  (userData?.id ||
+                    (isLoggedOut && currentLivestream?.test)
+                    // Actively Check for CTAs when logged in, or when logged out during a test stream
+                  )
                ) {
                   handleCheckForCallToActionIds(newlyActiveCtaIds);
                }
@@ -50,9 +54,10 @@ const CallToActionNotifications = ({
             });
          }
       })();
-   }, [currentActiveCallToActionIds, isStreamer, userData?.id]);
+   }, [currentActiveCallToActionIds, isStreamer, userData?.id, isLoggedOut]);
 
    useEffect(() => {
+      // Only check for call to actions on page load if you're logged in
       (async function handleCheckForInitialActiveCtasOnMount() {
          if (!isStreamer && userData?.id) {
             await handleCheckForCallToActionIds(currentActiveCallToActionIds);
@@ -106,7 +111,6 @@ const CallToActionNotifications = ({
          );
 
          callToActionsData.forEach((callToAction) => {
-            console.log("-> callToAction", callToAction);
             const message = callToAction.message || "";
             const buttonText = callToAction.buttonText || "Click here";
             const buttonUrl = callToAction.buttonUrl
@@ -127,7 +131,10 @@ const CallToActionNotifications = ({
                         onDismiss={() =>
                            handleDismissCallToAction(callToActionId)
                         }
-                        icon={callToActionsIconsDictionary[type]?.icon || callToActionsIconsDictionary.custom.icon}
+                        icon={
+                           callToActionsIconsDictionary[type]?.icon ||
+                           callToActionsIconsDictionary.custom.icon
+                        }
                         buttonText={buttonText}
                         isJobPosting={type === "jobPosting"}
                         loading={loading}

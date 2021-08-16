@@ -1355,6 +1355,7 @@ class Firebase {
     }
 
     clickOnCallToAction = async (streamRef, callToActionId, userId, options = {isDismissAction: false} ) => {
+        console.log("-> userId", userId);
         if(!userId) return
         let batch = this.firestore.batch();
         let userRef = this.firestore.collection("userData").doc(userId);

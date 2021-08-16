@@ -3,11 +3,11 @@ import Tab from "@material-ui/core/Tab";
 import React from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 
-const useCtaCardStyles = makeStyles((theme) => ({
+const useCtaCardStyles = makeStyles(({ palette: { type, common } }) => ({
    cardRoot: {},
    ctaButton: {
       backgroundColor: (props) => alpha(props.color, 0.1),
-      color: (props) => props.color,
+      color: (props) => type === "dark" ? common.white :props.color,
       "& svg": {
          color: (props) => props.color,
       },
