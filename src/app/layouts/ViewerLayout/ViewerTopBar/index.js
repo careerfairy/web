@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import {AppBar, Badge, Box, Button, Checkbox, IconButton, Toolbar, Tooltip} from "@material-ui/core";
 import {MainLogo} from "../../../components/logos";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
@@ -65,7 +65,7 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
     const dispatch = useDispatch()
     const {toggleTheme, themeMode} = useThemeToggle()
     const links = useStreamToken({forStreamType: "mainLivestream"})
-
+    const theme = useTheme()
     const {currentLivestream} = useCurrentStream()
     const numberOfViewers = useSelector(state => currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0)
     const {userIsInTalentPool, handlers: {joinTalentPool, leaveTalentPool}} = useJoinTalentPool()
@@ -150,7 +150,7 @@ const ViewerTopBar = ({mobile, showAudience, showMenu}) => {
         <React.Fragment>
             <AppBar elevation={1} color="transparent">
                 <Toolbar className={classes.toolbar}>
-                    <MainLogo/>
+                    <MainLogo white={theme.palette.type === "dark"} />
                     {logoElements}
                     <Box flexGrow={1}/>
                     {currentLivestream.companyLogoUrl && <Logo

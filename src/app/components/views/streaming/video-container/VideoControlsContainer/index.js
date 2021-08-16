@@ -188,7 +188,7 @@ function VideoControlsContainer({
       firebase.setLivestreamMode(streamRef, mode);
    }
 
-   const showShareButton = () => {
+   const showScreenShareButtons = () => {
       if (desktopMode) {
          return isMainStreamer || streamerId === screenSharerId;
       } else {
@@ -225,17 +225,15 @@ function VideoControlsContainer({
    ];
 
    const shareActions = [
-      {
+   ];
+
+   if (showScreenShareButtons()) {
+      shareActions.unshift(   {
          icon: <ScreenShareIcon color={desktopMode ? "primary" : "inherit"} />,
          name: desktopMode ? "Stop sharing screen" : "Share screen",
          onClick: () => handleClickScreenShareButton(),
-      },
-      {
-         icon: <CallToActionIcon />,
-         name: "Send a call to action",
-         onClick: () => handleOpenCallToActionDrawer(),
-      },
-   ];
+      });
+   }
 
    if (!viewer) {
       shareActions.unshift({
@@ -250,16 +248,21 @@ function VideoControlsContainer({
             : "Share PDF presentation",
          onClick: () =>
             setLivestreamMode(presentMode ? "default" : "presentation"),
+      }, {
+         icon: <CallToActionIcon />,
+         name: "Send a call to action",
+         onClick: () => handleOpenCallToActionDrawer(),
       });
    }
 
-   if (showShareButton()) {
-      actions.unshift({
+   if(shareActions.length){
+      actions.unshift( {
          icon: <ShareIcon />,
          name: "Share",
          onClick: handleClickShare,
-      });
+      })
    }
+
 
    actions.unshift({
       icon: <SettingsIcon fontSize="large" />,

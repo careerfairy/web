@@ -2,15 +2,13 @@ import React from 'react'
 import { makeStyles } from "@material-ui/core/styles";
 import { withFirebase } from "context/firebase";
 import Head from "next/head";
-import Footer from "../components/views/footer/Footer";
 import ProfileNav from "../components/views/profile/ProfileNav";
 import { useAuth } from "../HOCs/AuthProvider";
 import GeneralLayout from "../layouts/GeneralLayout";
 
 const useStyles = makeStyles((theme) => ({
    content: {
-      minHeight: "20vh",
-      flexGrow: 1,
+      minHeight: "60vh",
    },
 }));
 
