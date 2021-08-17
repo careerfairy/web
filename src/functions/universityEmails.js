@@ -9,9 +9,9 @@ const {setHeaders} = require("./util");
 exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(async (req, res) => {
     setHeaders(req, res)
 
-    // const recipientsGroupsAndCategories = req.body.recipientsGroupsAndCategories;
-    // console.log(req.body);
-    const groups = req.body.groups;
+    const recipientsGroupsAndCategories = req.body.recipientsGroupsAndCategories;
+    console.log(req.body);
+    const groups = Object.keys(recipientsGroupsAndCategories)
 
     console.log(groups)
     let recipients = new Set();
@@ -24,15 +24,15 @@ exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(async
     snapshot.forEach(doc => {
         let student = doc.data()
         groups.forEach(group => {
-            // let registeredGroup = student.registeredGroups.find(registeredGroup => registeredGroup.groupId === group)
-            // if (registeredGroup) {
-            //     let categoryId = recipientsGroupsAndCategories[group].categoryId;
-            //     let selectedOptions = recipientsGroupsAndCategories[group].selectedOptions;
-            //     let registeredCategory = registeredGroup.categories.find(category => category.id === categoryId);
-                 if (!emailsToRemove.includes(student.userEmail) && !student.unsubscribed) {
+            let registeredGroup = student.registeredGroups.find(registeredGroup => registeredGroup.groupId === group)
+            if (registeredGroup) {
+                let categoryId = recipientsGroupsAndCategories[group].categoryId;
+                let selectedOptions = recipientsGroupsAndCategories[group].selectedOptions;
+                let registeredCategory = registeredGroup.categories.find(category => category.id === categoryId);
+                 if (registeredCategory && selectedOptions.includes(registeredCategory.selectedValueId) && !emailsToRemove.includes(student.userEmail) && !student.unsubscribed) {
                     recipients.add(student.userEmail);
                  }
-            // }
+            }
         })
     })
     console.log(recipients.size)
