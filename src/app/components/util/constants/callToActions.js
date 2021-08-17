@@ -29,3 +29,6 @@ export const callToActionsIconsDictionary = {
       color: baseThemeObj.palette.primary.main,
    },
 };
+
+export const defaultDeadlineDate = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
+
