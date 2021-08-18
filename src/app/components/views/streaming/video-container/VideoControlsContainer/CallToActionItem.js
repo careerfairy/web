@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
-import clsx from "clsx";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
-import Card from "@material-ui/core/Card";
 import PropTypes from "prop-types";
 import {
-   Avatar,
    Button,
-   CardContent,
    CircularProgress,
-   Divider,
    IconButton,
    LinearProgress,
    ListItem,
@@ -25,6 +20,7 @@ import SettingsIcon from "@material-ui/icons/MoreVert";
 import LinkifyText from "../../../../util/LinkifyText";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import ResendIcon from '@material-ui/icons/Repeat';
 import { callToActionsIconsDictionary } from "../../../../util/constants/callToActions";
 
 const useStyles = makeStyles(({ palette }) => ({
@@ -200,6 +196,7 @@ const SettingsDropdown = ({
    callToAction,
    handleClickEditCallToAction,
    handleClickDeleteCallToAction,
+                             handleClickResendCallToAction
 }) => {
    const [anchorEl, setAnchorEl] = useState(null);
 
@@ -242,6 +239,16 @@ const SettingsDropdown = ({
                   <DeleteIcon />
                </ListItemIcon>
                <Typography variant="inherit">Delete</Typography>
+            </MenuItem>
+            <MenuItem
+               onClick={() => {
+                  handleClickResendCallToAction(callToAction.id);
+               }}
+            >
+               <ListItemIcon>
+                  <ResendIcon />
+               </ListItemIcon>
+               <Typography variant="inherit">Resend</Typography>
             </MenuItem>
          </Menu>
       </React.Fragment>
@@ -301,6 +308,7 @@ export const CallToActionItem = React.memo((props) => {
       handleToggleActive,
       handleClickEditCallToAction,
       handleClickDeleteCallToAction,
+      handleClickResendCallToAction,
    } = props;
 
    const isJobPosting = type === "jobPosting"
@@ -379,6 +387,7 @@ export const CallToActionItem = React.memo((props) => {
                <div className={classes.headerActionsWrapper}>
                   <SettingsDropdown
                      handleClickEditCallToAction={handleClickEditCallToAction}
+                     handleClickResendCallToAction={handleClickResendCallToAction}
                      handleClickDeleteCallToAction={
                         handleClickDeleteCallToAction
                      }

@@ -78,7 +78,7 @@ const CallToActionItemTemp = ({
       </ListItem>
    );
 };
-const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToAction}) => {
+const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToAction, handleClickResendCallToAction}) => {
    const classes = useStyles();
    const streamRef = useStreamRef();
    const { activateCallToAction, deactivateCallToAction } = useFirebase();
@@ -131,6 +131,7 @@ const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToA
                         index={index}
                         key={callToActions[index].id}
                         callToAction={callToActions[index]}
+                        handleClickResendCallToAction={handleClickResendCallToAction}
                         handleClickEditCallToAction={handleClickEditCallToAction}
                         handleClickDeleteCallToAction={handleClickDeleteCallToAction}
                         handleToggleActive={handleToggleActive}

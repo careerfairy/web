@@ -1388,6 +1388,24 @@ class Firebase {
         return callToActionRef.update(updateData)
     }
 
+    resendCallToAction = async (streamRef, callToActionId) => {
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc(callToActionId)
+        try {
+            await this.deactivateCallToAction(streamRef, callToActionId)
+
+            await callToActionRef.update({
+                resentAt: this.getServerTimestamp(),
+            })
+
+          return await this.activateCallToAction(streamRef, callToActionId)
+        } catch (e) {
+
+        }
+
+    }
+
     clickOnCallToAction = async (streamRef, callToActionId, userId, options = {isDismissAction: false} ) => {
         let callToActionRef = streamRef
           .collection("callToActions")
@@ -1432,7 +1450,7 @@ class Firebase {
             if(isDismissAction){
                 batch.set(userInUsersWhoDismissedRef, {
                     ...userData,
-                    dismissedCallToActionAt: this.getServerTimestamp()
+                    dismissedCallToActionAt: this.getServerTimestamp(),
                 })
                 if(!hasAlreadyDismissed){
                     callToActionUpdateData["numberOfUsersWhoDismissed"] = firebase.firestore.FieldValue.increment(1)
@@ -1445,7 +1463,7 @@ class Firebase {
             } else {
                 batch.set(userInUsersWhoClickedLinkRef, {
                     ...userData,
-                    clickedCallToActionLinkAt: this.getServerTimestamp()
+                    clickedCallToActionLinkAt: this.getServerTimestamp(),
                 })
                 if(!hasAlreadyClicked){
                     callToActionUpdateData["numberOfUsersWhoClickedLink"] = firebase.firestore.FieldValue.increment(1)
@@ -1543,10 +1561,30 @@ class Firebase {
           .collection("usersWhoDismissed")
           .doc(userId)
 
+        const callToActionSnap = await callToActionRef.get()
+        if(!callToActionSnap.exists){
+            return true
+        }
+
+        const callToActionData = callToActionSnap.data()
         const userWhoClickedSnap = await userInUsersWhoClickedLinkRef.get()
         const userWhoDismissedSnap = await userInUsersWhoDismissedRef.get()
 
+        const resentDate = callToActionData.resentAt?.toDate?.() || null
+
+        if(!resentDate){
         return Boolean(userWhoClickedSnap.exists || userWhoDismissedSnap.exists  )
+        }
+        const userDismissDate = userWhoDismissedSnap?.data?.()?.dismissedCallToActionAt?.toDate?.() || null
+        const userClickDate = userWhoClickedSnap?.data?.()?.clickedCallToActionLinkAt?.toDate?.() || null
+
+        const mostRecentDate = new Date(userDismissDate) > new Date(userClickDate) ? userDismissDate : userClickDate
+        console.log("-> resentDate", resentDate);
+        console.log("-> mostRecentDate", mostRecentDate);
+        console.log("-> userDismissDate", userDismissDate);
+        console.log("-> userClickDate", userClickDate);
+
+
     }
 
     getCallToActionsWithAnArrayOfIds = async (streamRef, callToActionIds) => {
