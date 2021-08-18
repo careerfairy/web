@@ -16,27 +16,44 @@ import { useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { useFirebase } from "context/firebase";
 import useStreamRef from "components/custom-hook/useStreamRef";
+import { DateTimePicker } from "@material-ui/pickers";
 
 const MAX_BUTTON_TEXT_LENGTH = 45;
 const MAX_MESSAGE_LENGTH = 1000;
+const MAX_JOB_TITLE_LENGTH = 1000;
+const MAX_SALARY_LENGTH = 200;
 
 const getMaxLengthError = (maxLength) => [
    maxLength,
    `This value is too long. It should have ${maxLength} characters or fewer.`,
 ];
 
-const validationSchema = yup.object({
+const now = new Date();
+const validationSchema = (type) => yup.object({
    message: yup
-      .string("Enter your email")
+      .string("Enter your message")
       .max(...getMaxLengthError(MAX_MESSAGE_LENGTH)),
    buttonText: yup
-      .string("Enter your password")
+      .string("Enter the button text")
       .max(...getMaxLengthError(MAX_BUTTON_TEXT_LENGTH))
       .required("This value is required"),
    buttonUrl: yup
-      .string("Enter your password")
+      .string("Enter the call to action url")
       .matches(URL_REGEX, { message: "Must be a valid url" })
       .required("Must be a valid url"),
+   imageUrl: yup
+      .string("Enter the image url")
+      .matches(URL_REGEX, { message: "Must be a valid url" }),
+   jobData: yup.object().shape({
+      jobTitle: type === "jobPosting" ? yup.string()
+          .max(...getMaxLengthError(MAX_JOB_TITLE_LENGTH))
+          .required("This value is required"): yup.string(),
+      salary: yup.string().max(...getMaxLengthError(MAX_SALARY_LENGTH)),
+      applicationDeadline: yup
+         .date()
+         .nullable()
+         .min(now, `The date must be in the future`),
+   }),
 });
 
 const useStyles = makeStyles((theme) => ({
@@ -68,7 +85,7 @@ const CallToActionForm = ({
    const formik = useFormik({
       initialValues,
       enableReinitialize: true,
-      validationSchema: validationSchema,
+      validationSchema: validationSchema(initialValues.type),
       onSubmit: async (values, { setSubmitting }) => {
          try {
             setSubmitting(true);
@@ -85,6 +102,7 @@ const CallToActionForm = ({
          handleClose();
       },
    });
+
 
    const handleSend = async (values) => {
       if (values.id) {
@@ -106,6 +124,102 @@ const CallToActionForm = ({
       <React.Fragment>
          <DialogContent className={classes.dialogContent}>
             <Grid container spacing={3}>
+               <Grid xs={12} style={{ padding: !isJobPosting && "0" }} item>
+                  <Collapse unmountOnExit in={canChangeMessage}>
+                     <TextField
+                        fullWidth
+                        variant="outlined"
+                        id="jobTitle"
+                        name="jobData.jobTitle"
+                        disabled={formik.isSubmitting}
+                        autoFocus={isJobPosting}
+                        inputProps={{
+                           maxLength: MAX_MESSAGE_LENGTH,
+                        }}
+                        placeholder="Click here to see our open positions"
+                        label="Job Title*"
+                        value={formik.values.jobData.jobTitle}
+                        onChange={formik.handleChange}
+                        error={
+                           formik.touched.jobData?.jobTitle &&
+                           Boolean(formik.errors.jobData?.jobTitle)
+                        }
+                        helperText={
+                           formik.touched.jobData?.jobTitle &&
+                           formik.errors.jobData?.jobTitle
+                        }
+                     />
+                  </Collapse>
+               </Grid>
+               <Grid
+                  xs={12}
+                  sm={8}
+                  style={{ padding: !isJobPosting && "0" }}
+                  item
+               >
+                  <Collapse unmountOnExit in={canChangeMessage}>
+                     <TextField
+                        fullWidth
+                        variant="outlined"
+                        id="salary"
+                        name="jobData.salary"
+                        disabled={formik.isSubmitting}
+                        autoFocus={isJobPosting}
+                        inputProps={{
+                           maxLength: MAX_MESSAGE_LENGTH,
+                        }}
+                        placeholder="Click here to see our open positions"
+                        label="Salary"
+                        value={formik.values.jobData.salary}
+                        onChange={formik.handleChange}
+                        error={
+                           formik.touched.jobData?.salary &&
+                           Boolean(formik.errors.jobData?.salary)
+                        }
+                        helperText={
+                           formik.touched.jobData?.salary &&
+                           formik.errors.jobData?.salary
+                        }
+                     />
+                  </Collapse>
+               </Grid>
+               <Grid
+                  xs={12}
+                  sm={4}
+                  style={{ padding: !isJobPosting && "0" }}
+                  item
+               >
+                  <Collapse unmountOnExit in={canChangeMessage}>
+                     <DateTimePicker
+                        id="applicationDeadline"
+                        clearable
+                        disablePast
+                        label="Application deadline"
+                        value={formik.values.jobData.applicationDeadline}
+                        name="jobData.applicationDeadline"
+                        onChange={(value) => {
+                           const newValue = value ? new Date(value) : null;
+                           formik.setFieldValue(
+                              "jobData.applicationDeadline",
+                              newValue,
+                              true
+                           );
+                        }}
+                        disabled={formik.isSubmitting}
+                        minDate={now}
+                        inputVariant="outlined"
+                        fullWidth
+                        error={
+                           formik.touched.jobData?.applicationDeadline &&
+                           Boolean(formik.errors.jobData?.applicationDeadline)
+                        }
+                        helperText={
+                           formik.touched.jobData?.applicationDeadline &&
+                           formik.errors.jobData?.applicationDeadline
+                        }
+                     />
+                  </Collapse>
+               </Grid>
                <Grid xs={12} style={{ padding: !canChangeMessage && "0" }} item>
                   <Collapse unmountOnExit in={canChangeMessage}>
                      <TextField
@@ -116,12 +230,13 @@ const CallToActionForm = ({
                         disabled={formik.isSubmitting}
                         multiline
                         autoFocus
-                        rows={3}
+                        minRows={3}
+                        maxRows={12}
                         inputProps={{
                            maxLength: MAX_MESSAGE_LENGTH,
                         }}
                         placeholder="Click here to see our open positions"
-                        label="message"
+                        label={isJobPosting ? "Job Description" : "message"}
                         value={formik.values.message}
                         onChange={formik.handleChange}
                         error={
@@ -168,7 +283,6 @@ const CallToActionForm = ({
                      disabled={formik.isSubmitting}
                      placeholder="https://mywebsite.com/careers/"
                      label={`${initialValues.title} Url*`}
-                     // label="Button Url*"
                      value={formik.values.buttonUrl}
                      onChange={formik.handleChange}
                      error={

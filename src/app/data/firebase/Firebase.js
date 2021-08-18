@@ -1337,9 +1337,10 @@ class Firebase {
           .collection("callToActions")
           .doc()
 
-        await callToActionRef.set({
+        const callToActionData = {
             buttonText: values.buttonText,
             buttonUrl: values.buttonUrl,
+            imageUrl: values.imageUrl || null,
             type: values.type,
             message: values.message,
             created: this.getServerTimestamp(),
@@ -1349,9 +1350,42 @@ class Firebase {
             sent: null,
             stopped: null,
             active: false
-        })
+        }
+        if(values.type === "jobPosting"){
+            const deadline = values.jobData.applicationDeadline ? firebase.firestore.Timestamp.fromDate(values.jobData.applicationDeadline) : null
+            callToActionData.jobData = {
+                applicationDeadline: deadline,
+                jobTitle: values.jobData?.jobTitle,
+                salary: values.jobData?.salary
+            }
+        }
+
+        await callToActionRef.set(callToActionData)
 
         return callToActionRef.id
+    }
+
+    updateCallToAction = (streamRef, callToActionId, newValues) => {
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc(callToActionId)
+        const updateData = {
+            buttonText: newValues.buttonText,
+            buttonUrl: newValues.buttonUrl,
+            imageUrl: newValues.imageUrl || null,
+            message: newValues.message,
+            type: newValues.type,
+            updated: this.getServerTimestamp(),
+        }
+        if(newValues.type === "jobPosting"){
+            const deadline = newValues.jobData.applicationDeadline ? firebase.firestore.Timestamp.fromDate(newValues.jobData.applicationDeadline) : null
+            updateData.jobData = {
+                applicationDeadline: deadline,
+                jobTitle: newValues.jobData.jobTitle,
+                salary: newValues.jobData.salary
+            }
+        }
+        return callToActionRef.update(updateData)
     }
 
     clickOnCallToAction = async (streamRef, callToActionId, userId, options = {isDismissAction: false} ) => {
@@ -1434,18 +1468,6 @@ class Firebase {
         return await this.clickOnCallToAction(streamRef, callToActionId, userId, {isDismissAction: true})
     }
 
-    updateCallToAction = (streamRef, callToActionId, newValues) => {
-        let callToActionRef = streamRef
-          .collection("callToActions")
-          .doc(callToActionId)
-        return callToActionRef.update({
-            buttonText: newValues.buttonText,
-            buttonUrl: newValues.buttonUrl,
-            message: newValues.message,
-            type: newValues.type,
-            updated: this.getServerTimestamp(),
-        })
-    }
 
     deleteCallToAction = (streamRef, callToActionId) => {
        let batch = this.firestore.batch()

@@ -118,6 +118,12 @@ const CallToActionNotifications = ({
                : "https://careerfairy.io/";
             const callToActionId = callToAction.id;
             const type = callToAction.type;
+            const jobData = callToAction.jobData || null
+
+            const jobTitle = callToAction.jobData?.jobTitle || ""
+            const salary = callToAction.jobData?.salary || ""
+            const applicationDeadline = callToAction.jobData?.applicationDeadline?.toDate?.() || null
+            const snackBarImage = callToAction.imageUrl || currentLivestream.backgroundImageUrl
 
             dispatch(
                actions.enqueueCallToAction({
@@ -136,6 +142,10 @@ const CallToActionNotifications = ({
                            callToActionsIconsDictionary.custom.icon
                         }
                         buttonText={buttonText}
+                        jobTitle={jobTitle}
+                        salary={salary}
+                        snackBarImage={snackBarImage}
+                        applicationDeadline={applicationDeadline}
                         isJobPosting={type === "jobPosting"}
                         loading={loading}
                         message={message}
