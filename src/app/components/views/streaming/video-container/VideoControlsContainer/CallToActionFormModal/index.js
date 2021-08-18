@@ -70,7 +70,7 @@ const ctaTypes = [
       type: "jobPosting",
       description:
          "Help promote an open position to your live viewers with a link to the job posting.",
-      buttonText: "Apply",
+      buttonText: "Apply now",
       message: "Open position",
       value: 3,
    },
@@ -128,10 +128,10 @@ const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
                ctaTypes.find(({ type }) => type === callToActionToEdit.type)
                   ?.title || defaultInitialValues.title,
             jobData: {
-               jobTitle: callToActionToEdit.jobData.jobTitle || "",
-               salary: callToActionToEdit.jobData.salary || "",
+               jobTitle: callToActionToEdit.jobData?.jobTitle || "",
+               salary: callToActionToEdit.jobData?.salary || "",
                applicationDeadline:
-                  callToActionToEdit.jobData.applicationDeadline || "",
+                  callToActionToEdit.jobData?.applicationDeadline?.toDate?.() || null,
             },
          };
          setInitialValues(newInitialValues);

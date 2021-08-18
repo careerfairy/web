@@ -1340,6 +1340,7 @@ class Firebase {
         const callToActionData = {
             buttonText: values.buttonText,
             buttonUrl: values.buttonUrl,
+            imageUrl: values.imageUrl || null,
             type: values.type,
             message: values.message,
             created: this.getServerTimestamp(),
@@ -1351,8 +1352,9 @@ class Firebase {
             active: false
         }
         if(values.type === "jobPosting"){
+            const deadline = values.jobData.applicationDeadline ? firebase.firestore.Timestamp.fromDate(values.jobData.applicationDeadline) : null
             callToActionData.jobData = {
-                applicationDeadline: values.jobData?.applicationDeadline,
+                applicationDeadline: deadline,
                 jobTitle: values.jobData?.jobTitle,
                 salary: values.jobData?.salary
             }
@@ -1370,13 +1372,15 @@ class Firebase {
         const updateData = {
             buttonText: newValues.buttonText,
             buttonUrl: newValues.buttonUrl,
+            imageUrl: newValues.imageUrl || null,
             message: newValues.message,
             type: newValues.type,
             updated: this.getServerTimestamp(),
         }
         if(newValues.type === "jobPosting"){
+            const deadline = newValues.jobData.applicationDeadline ? firebase.firestore.Timestamp.fromDate(newValues.jobData.applicationDeadline) : null
             updateData.jobData = {
-                applicationDeadline: newValues.jobData.applicationDeadline,
+                applicationDeadline: deadline,
                 jobTitle: newValues.jobData.jobTitle,
                 salary: newValues.jobData.salary
             }

@@ -103,8 +103,6 @@ const CallToActionForm = ({
       },
    });
 
-   console.log("-> formik.values", formik.values);
-   console.log("-> formik.errors", formik.errors);
 
    const handleSend = async (values) => {
       if (values.id) {
@@ -232,7 +230,8 @@ const CallToActionForm = ({
                         disabled={formik.isSubmitting}
                         multiline
                         autoFocus
-                        rows={3}
+                        minRows={3}
+                        maxRows={12}
                         inputProps={{
                            maxLength: MAX_MESSAGE_LENGTH,
                         }}
