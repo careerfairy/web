@@ -1,6 +1,6 @@
-import firebase from '../../Firebase/Firebase';
-import {v4 as uuidv4} from 'uuid';
-import {FORTY_FIVE_MINUTES_IN_MILLISECONDS, START_DATE_FOR_REPORTED_EVENTS} from "../constants/streamContants";
+import firebase from "../../Firebase/Firebase";
+import { v4 as uuidv4 } from "uuid";
+import { FORTY_FIVE_MINUTES_IN_MILLISECONDS, START_DATE_FOR_REPORTED_EVENTS } from "../constants/streamContants";
 
 // import firebase from "firebase/app";
 // import "firebase/auth";
@@ -1445,8 +1445,29 @@ class Firebase {
             const hasAlreadyDismissed = userInUsersWhoDismissedSnap.exists
             const hasAlreadyClicked = userInUsersWhoClickedSnap.exists
             let callToActionUpdateData = {}
-            if(isDismissAction && hasAlreadyDismissed) return
-            if(!isDismissAction && hasAlreadyClicked) return
+            if(isDismissAction && hasAlreadyDismissed) {
+                let batch = this.firestore.batch()
+                batch.update(userInUsersWhoDismissedRef, {
+                    ...userData,
+                    dismissedCallToActionAt: this.getServerTimestamp(),
+                })
+                batch.update(callToActionRef, {
+                    numberOfUsersWhoDismissed:  firebase.firestore.FieldValue.increment(1)
+                })
+
+                return await batch.commit()
+            }
+            if(!isDismissAction && hasAlreadyClicked) {
+                let batch = this.firestore.batch()
+                batch.update(userInUsersWhoClickedLinkRef, {
+                    ...userData,
+                    clickedCallToActionLinkAt: this.getServerTimestamp(),
+                })
+                batch.update(callToActionRef, {
+                    numberOfUsersWhoClickedLink:  firebase.firestore.FieldValue.increment(1)
+                })
+                return await batch.commit()
+            }
             if(isDismissAction){
                 batch.set(userInUsersWhoDismissedRef, {
                     ...userData,
@@ -1572,18 +1593,19 @@ class Firebase {
 
         const resentDate = callToActionData.resentAt?.toDate?.() || null
 
-        if(!resentDate){
-        return Boolean(userWhoClickedSnap.exists || userWhoDismissedSnap.exists  )
-        }
         const userDismissDate = userWhoDismissedSnap?.data?.()?.dismissedCallToActionAt?.toDate?.() || null
         const userClickDate = userWhoClickedSnap?.data?.()?.clickedCallToActionLinkAt?.toDate?.() || null
 
-        const mostRecentDate = new Date(userDismissDate) > new Date(userClickDate) ? userDismissDate : userClickDate
-        console.log("-> resentDate", resentDate);
-        console.log("-> mostRecentDate", mostRecentDate);
-        console.log("-> userDismissDate", userDismissDate);
-        console.log("-> userClickDate", userClickDate);
+        const mostRecentInteraction = new Date(userDismissDate) > new Date(userClickDate) ? userDismissDate : userClickDate
 
+        if(!mostRecentInteraction) return false
+        if(!resentDate){
+            return Boolean(
+               userWhoClickedSnap.exists || userWhoDismissedSnap.exists
+            );
+        }
+
+        return resentDate < mostRecentInteraction
 
     }
 
