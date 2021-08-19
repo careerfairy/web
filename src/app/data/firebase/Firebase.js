@@ -1385,6 +1385,7 @@ class Firebase {
                 salary: newValues.jobData.salary
             }
         }
+        console.log("-> updateData", updateData);
         return callToActionRef.update(updateData)
     }
 

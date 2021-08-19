@@ -87,6 +87,7 @@ const CallToActionForm = ({
       enableReinitialize: true,
       validationSchema: validationSchema(initialValues.type),
       onSubmit: async (values, { setSubmitting }) => {
+         console.log("-> in the submit", values);
          try {
             setSubmitting(true);
             if (values.isToBeSaved) {
