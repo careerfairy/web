@@ -123,7 +123,7 @@ const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
             id: callToActionToEdit.id,
             buttonText: callToActionToEdit.buttonText,
             isToBeSaved: true,
-            imageUrl: callToActionToEdit.imageUrl,
+            imageUrl: callToActionToEdit.imageUrl || "",
             title:
                ctaTypes.find(({ type }) => type === callToActionToEdit.type)
                   ?.title || defaultInitialValues.title,
