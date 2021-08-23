@@ -1,11 +1,18 @@
 
-import { Container } from "@material-ui/core";
+import { Button, Container } from "@material-ui/core";
 import Header from "../components/views/header/Header";
+import { Cookies } from "react-cookie-consent";
+import GeneralLayout from "layouts/GeneralLayout";
 
 function CookiePolicy(props) {
+
+    const resetCookieConsent = () => {
+        Cookies.remove('CookieConsent');
+        window.location.reload();
+    }
+
     return (
-        <div>
-            <Header color="teal" fullpageApi={props.fullpageApi}/>
+        <GeneralLayout>
             <div className='cookies-background'>
                 <Container>
                     <h1>Cookie Policy</h1>
@@ -51,9 +58,10 @@ function CookiePolicy(props) {
                             <p>We use adverts to offset the costs of running this site and provide funding for further development. The behavioural advertising cookies used by this site are designed to ensure that we provide you with the most relevant adverts where possible by anonymously tracking your interests and presenting similar things that may be of interest.</p>
                         </li>
                         <li>
-                            <p>We also use social media buttons and/or plugins on this site that allow you to connect with your social network in various ways. For these to work the following social media sites including; LinkedIn, Google, Facebook, will set cookies through our site which may be used to enhance your profile on their site or contribute to the data they hold for various purposes outlined in their respective privacy policies.</p>
+                            <p>We also use social media buttons and/or plugins on this site that allow you to connect with your social network in various ways. For these to work the following social media sites including; LinkedIn, Google, Facebook, Calendly will set cookies through our site which may be used to enhance your profile on their site or contribute to the data they hold for various purposes outlined in their respective privacy policies.</p>
                         </li>
                     </ul>
+                    <Button color="primary" variant='contained' onClick={resetCookieConsent}>Reset Cookie Permissions</Button>
                     <h3>More Information</h3>
                     <p>Hopefully that has clarified things for you and as was previously mentioned if there is something that you aren't sure whether you need or not it's usually safer to leave cookies enabled in case it does interact with one of the features you use on our site.</p>
                     <h3>Contact</h3>
@@ -80,7 +88,7 @@ function CookiePolicy(props) {
                     color: rgb(0, 210, 170);
                 }
             `}</style>
-        </div>
+        </GeneralLayout>
 
     );
 }

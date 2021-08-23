@@ -2,10 +2,17 @@ import Header from "../components/views/header/Header";
 import { withFirebase } from '../context/firebase';
 
 import Head from 'next/head';
-import { Container } from "@material-ui/core";
+import { Button, Container } from "@material-ui/core";
 import GeneralLayout from "../layouts/GeneralLayout";
+import {Cookies} from "react-cookie-consent";
 
 const PrivacyPolicy = (props) => {
+
+    const resetCookieConsent = () => {
+        Cookies.remove('CookieConsent');
+        window.location.reload();
+    }
+
     return (
         <>
             <Head>
@@ -103,7 +110,8 @@ const PrivacyPolicy = (props) => {
                     <p>In some special cases, we also use cookies provided by third parties. The following section tells you which third party cookies you may encounter through this website.</p>
                     <p>You can accept or decline cookies, but if you choose to decline cookies, some parts of the CareerFairy website may not function properly on your computer. To learn more about cookies and how to manage them, visit allaboutcookies.org.</p>
 
-                    
+                    <Button color="primary" variant='contained' onClick={resetCookieConsent}>Reset Cookie Permissions</Button>
+
                     <h4>Other applications</h4>
                     <h4>Google Analytics</h4>
                     <p>On our website we use the tool "Google Analytics" of the company Google Ireland Limited (Google Building Gordon House, 4 Barrow St, Dublin, D04 E5W5, Ireland).
