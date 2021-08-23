@@ -1,18 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import clsx from 'clsx';
-import PropTypes from 'prop-types';
-import {Avatar, Badge, Box, Card, Container, Typography} from '@material-ui/core';
-import MaterialTable from "material-table";
-import {makeStyles} from "@material-ui/core/styles";
-import {defaultTableOptions, tableIcons} from "../../../../util/tableUtils";
-import {useSelector} from "react-redux";
-import {exportSelectionAction} from "../analytics/common/TableUtils";
-import {useAuth} from "../../../../../HOCs/AuthProvider";
-import {convertCamelToSentence} from "../../../../helperFunctions/HelperFunctions";
+import React, { useEffect, useState } from "react";
+import clsx from "clsx";
+import PropTypes from "prop-types";
+import { Avatar, Badge, Box, Card, Typography } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import { defaultTableOptions, tableIcons } from "../../../../util/tableUtils";
+import { useSelector } from "react-redux";
+import { exportSelectionAction } from "../analytics/common/TableUtils";
+import { useAuth } from "../../../../../HOCs/AuthProvider";
+import { convertCamelToSentence } from "../../../../helperFunctions/HelperFunctions";
 import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal";
+import ExportTable from "../../../common/Tables/ExportTable";
 
-
-const customOptions = {...defaultTableOptions}
+const customOptions = { ...defaultTableOptions };
 customOptions.selection = false
 
 const useStyles = makeStyles((theme) => ({
@@ -168,7 +167,7 @@ const MembersTable = ({
             className={clsx(classes.root, className)}
             {...rest}
         >
-            <MaterialTable
+            <ExportTable
                 icons={tableIcons}
                 data={data}
                 columns={columns}

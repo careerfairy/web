@@ -39,6 +39,7 @@ exports.createNewUserAccount = functions.https.onCall( async (data, context) => 
                     userEmail: recipient_email,
                     university: userData.university,
                     universityCountryCode: userData.universityCountryCode,
+                    unsubscribed: !userData.subscribed
                 }).then( async () => {
                     console.log(`Starting sending email for ${recipient_email}`)
                     const email = {
