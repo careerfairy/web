@@ -1336,16 +1336,9 @@ class Firebase {
             stopped: null,
             active: false
         }
-        if(values.type === "jobPosting"){
-            const deadline = values.jobData.applicationDeadline ? firebase.firestore.Timestamp.fromDate(values.jobData.applicationDeadline) : null
-            callToActionData.jobData = {
-                applicationDeadline: deadline,
-                jobTitle: values.jobData?.jobTitle,
-                salary: values.jobData?.salary
-            }
-        }
+        const enhancedCallToActionData = this.addCtaExtraData(callToActionData, values)
 
-        await callToActionRef.set(callToActionData)
+        await callToActionRef.set(enhancedCallToActionData)
 
         return callToActionRef.id
     }
@@ -1362,15 +1355,44 @@ class Firebase {
             type: newValues.type,
             updated: this.getServerTimestamp(),
         }
+        return callToActionRef.update(this.addCtaExtraData(updateData, newValues))
+    }
+
+    addCtaExtraData = (cleanedData, newValues) => {
+        const callToActionData = {...cleanedData}
+        if(newValues.type === "social"){
+            callToActionData.socialData = {
+               socialType: newValues.socialData?.socialType ,
+            };
+        }
         if(newValues.type === "jobPosting"){
             const deadline = newValues.jobData.applicationDeadline ? firebase.firestore.Timestamp.fromDate(newValues.jobData.applicationDeadline) : null
-            updateData.jobData = {
+            callToActionData.jobData = {
                 applicationDeadline: deadline,
-                jobTitle: newValues.jobData.jobTitle,
-                salary: newValues.jobData.salary
+                jobTitle: newValues.jobData?.jobTitle,
+                salary: newValues.jobData?.salary
             }
         }
-        return callToActionRef.update(updateData)
+
+        return callToActionData
+    }
+
+    resendCallToAction = async (streamRef, callToActionId) => {
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc(callToActionId)
+        try {
+            await this.deactivateCallToAction(streamRef, callToActionId)
+
+            await callToActionRef.update({
+                resentAt: this.getServerTimestamp(),
+            })
+
+          return await this.activateCallToAction(streamRef, callToActionId)
+        } catch (e) {
+
+        }
+
     }
 
     clickOnCallToAction = async (streamRef, callToActionId, userId, options = {isDismissAction: false} ) => {
@@ -1412,12 +1434,33 @@ class Firebase {
             const hasAlreadyDismissed = userInUsersWhoDismissedSnap.exists
             const hasAlreadyClicked = userInUsersWhoClickedSnap.exists
             let callToActionUpdateData = {}
-            if(isDismissAction && hasAlreadyDismissed) return
-            if(!isDismissAction && hasAlreadyClicked) return
+            if(isDismissAction && hasAlreadyDismissed) {
+                let batch = this.firestore.batch()
+                batch.update(userInUsersWhoDismissedRef, {
+                    ...userData,
+                    dismissedCallToActionAt: this.getServerTimestamp(),
+                })
+                batch.update(callToActionRef, {
+                    numberOfUsersWhoDismissed:  firebase.firestore.FieldValue.increment(1)
+                })
+
+                return await batch.commit()
+            }
+            if(!isDismissAction && hasAlreadyClicked) {
+                let batch = this.firestore.batch()
+                batch.update(userInUsersWhoClickedLinkRef, {
+                    ...userData,
+                    clickedCallToActionLinkAt: this.getServerTimestamp(),
+                })
+                batch.update(callToActionRef, {
+                    numberOfUsersWhoClickedLink:  firebase.firestore.FieldValue.increment(1)
+                })
+                return await batch.commit()
+            }
             if(isDismissAction){
                 batch.set(userInUsersWhoDismissedRef, {
                     ...userData,
-                    dismissedCallToActionAt: this.getServerTimestamp()
+                    dismissedCallToActionAt: this.getServerTimestamp(),
                 })
                 if(!hasAlreadyDismissed){
                     callToActionUpdateData["numberOfUsersWhoDismissed"] = firebase.firestore.FieldValue.increment(1)
@@ -1430,7 +1473,7 @@ class Firebase {
             } else {
                 batch.set(userInUsersWhoClickedLinkRef, {
                     ...userData,
-                    clickedCallToActionLinkAt: this.getServerTimestamp()
+                    clickedCallToActionLinkAt: this.getServerTimestamp(),
                 })
                 if(!hasAlreadyClicked){
                     callToActionUpdateData["numberOfUsersWhoClickedLink"] = firebase.firestore.FieldValue.increment(1)
@@ -1528,10 +1571,31 @@ class Firebase {
           .collection("usersWhoDismissed")
           .doc(userId)
 
+        const callToActionSnap = await callToActionRef.get()
+        if(!callToActionSnap.exists){
+            return true
+        }
+
+        const callToActionData = callToActionSnap.data()
         const userWhoClickedSnap = await userInUsersWhoClickedLinkRef.get()
         const userWhoDismissedSnap = await userInUsersWhoDismissedRef.get()
 
-        return Boolean(userWhoClickedSnap.exists || userWhoDismissedSnap.exists  )
+        const resentDate = callToActionData.resentAt?.toDate?.() || null
+
+        const userDismissDate = userWhoDismissedSnap?.data?.()?.dismissedCallToActionAt?.toDate?.() || null
+        const userClickDate = userWhoClickedSnap?.data?.()?.clickedCallToActionLinkAt?.toDate?.() || null
+
+        const mostRecentInteraction = new Date(userDismissDate) > new Date(userClickDate) ? userDismissDate : userClickDate
+
+        if(!mostRecentInteraction) return false
+        if(!resentDate){
+            return Boolean(
+               userWhoClickedSnap.exists || userWhoDismissedSnap.exists
+            );
+        }
+
+        return resentDate < mostRecentInteraction
+
     }
 
     getCallToActionsWithAnArrayOfIds = async (streamRef, callToActionIds) => {

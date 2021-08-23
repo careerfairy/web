@@ -5,6 +5,7 @@ import { DialogContent, Grid, useMediaQuery } from "@material-ui/core";
 
 import Tabs from "@material-ui/core/Tabs";
 import CallToActionTypeButton from "./CallToActionTypeButton";
+import { callToActionsArray } from "../../../../../../util/constants/callToActions";
 
 const useStyles = makeStyles((theme) => ({
    gridContainer: {},
@@ -19,7 +20,6 @@ const useStyles = makeStyles((theme) => ({
 const CallToActionTypeMenu = ({
    initialValues,
    handleSetCallToActionType,
-   ctaTypes,
 }) => {
    const {
       palette: { grey, primary },
@@ -41,7 +41,7 @@ const CallToActionTypeMenu = ({
          <DialogContent className={classes.dialogContent}>
             {mobile ? (
                <Grid className={classes.gridContainer} container spacing={2}>
-                  {ctaTypes.map((ctaType) => (
+                  {callToActionsArray.map((ctaType) => (
                      <Grid item xs={12} key={ctaType.type}>
                         <CallToActionTypeButton
                            data={ctaType}
@@ -69,7 +69,7 @@ const CallToActionTypeMenu = ({
                   textColor="secondary"
                   aria-label="icon label tabs example"
                >
-                  {ctaTypes.map((ctaType) => (
+                  {callToActionsArray.map((ctaType) => (
                      <CallToActionTypeButton
                         key={ctaType.type}
                         data={ctaType}
@@ -88,5 +88,4 @@ export default CallToActionTypeMenu;
 
 CallToActionTypeMenu.propTypes = {
    handleSetCallToActionType: PropTypes.func.isRequired,
-   ctaTypes: PropTypes.array,
 };

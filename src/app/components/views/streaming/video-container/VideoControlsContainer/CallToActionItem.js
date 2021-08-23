@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
-import clsx from "clsx";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
-import Card from "@material-ui/core/Card";
 import PropTypes from "prop-types";
 import {
-   Avatar,
    Button,
-   CardContent,
    CircularProgress,
-   Divider,
    IconButton,
    LinearProgress,
    ListItem,
@@ -25,7 +20,11 @@ import SettingsIcon from "@material-ui/icons/MoreVert";
 import LinkifyText from "../../../../util/LinkifyText";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { callToActionsIconsDictionary } from "../../../../util/constants/callToActions";
+import ResendIcon from "@material-ui/icons/Repeat";
+import {
+   callToActionsDictionary,
+   callToActionsSocialsDictionary,
+} from "../../../../util/constants/callToActions";
 
 const useStyles = makeStyles(({ palette }) => ({
    root: {
@@ -104,52 +103,6 @@ const useStyles = makeStyles(({ palette }) => ({
    },
 }));
 
-const useSecondaryStyles = makeStyles(({ palette }) => ({
-   card: {
-      borderRadius: 12,
-      textAlign: "center",
-      minWidth: 270,
-      width: "100%",
-   },
-   cardContent: {
-      backgroundColor: (props) => alpha(props.color, 0.3),
-   },
-   icon: {
-      margin: "auto",
-      "& svg": {
-         fontSize: 40,
-         color: palette.common.white,
-         // color: props => props.color,
-      },
-   },
-   heading: {
-      fontSize: "1.2rem",
-      fontWeight: "bold",
-      letterSpacing: "0.5px",
-      marginTop: 8,
-      marginBottom: 0,
-   },
-   subheader: {
-      fontSize: 14,
-      color: palette.grey[500],
-      marginBottom: "0.875em",
-   },
-   statLabel: {
-      fontSize: 12,
-      color: palette.grey[500],
-      fontWeight: 500,
-      fontFamily:
-         '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
-      margin: 0,
-   },
-   statValue: {
-      fontSize: 20,
-      fontWeight: "bold",
-      marginBottom: 4,
-      letterSpacing: "1px",
-   },
-}));
-
 const LinearProgressWithLabel = ({
    engagementData: { total, percentage, noOfEngagement, noOfDismissal },
 }) => {
@@ -200,6 +153,7 @@ const SettingsDropdown = ({
    callToAction,
    handleClickEditCallToAction,
    handleClickDeleteCallToAction,
+   handleClickResendCallToAction,
 }) => {
    const [anchorEl, setAnchorEl] = useState(null);
 
@@ -242,6 +196,16 @@ const SettingsDropdown = ({
                   <DeleteIcon />
                </ListItemIcon>
                <Typography variant="inherit">Delete</Typography>
+            </MenuItem>
+            <MenuItem
+               onClick={() => {
+                  handleClickResendCallToAction(callToAction.id);
+               }}
+            >
+               <ListItemIcon>
+                  <ResendIcon />
+               </ListItemIcon>
+               <Typography variant="inherit">Resend</Typography>
             </MenuItem>
          </Menu>
       </React.Fragment>
@@ -296,30 +260,32 @@ export const CallToActionItem = React.memo((props) => {
          numberOfUsersWhoDismissed,
          buttonText,
          type,
-        jobData
+         jobData,
+         socialData,
       },
       handleToggleActive,
       handleClickEditCallToAction,
       handleClickDeleteCallToAction,
+      handleClickResendCallToAction,
    } = props;
 
-   const isJobPosting = type === "jobPosting"
-   const styles = useSecondaryStyles({
-      color:
-         callToActionsIconsDictionary[type]?.color ||
-         callToActionsIconsDictionary.custom.color,
-   });
-   const classes = useStyles({
-      color:
-         callToActionsIconsDictionary[type]?.color ||
-         callToActionsIconsDictionary.custom.color,
-   });
+   const isJobPosting = type === "jobPosting";
+
+   const [color, setColor] = useState(
+      callToActionsDictionary[type]?.color ||
+         callToActionsDictionary.custom.color
+   );
+
+   const classes = useStyles({ color });
+
    const [engagementData, setEngagementData] = useState({
       total: 0,
       percentage: 0,
       noOfEngagement: 0,
       noOfDismissal: 0,
    });
+
+   const [icon, setIcon] = useState(callToActionsDictionary.custom.icon);
 
    useEffect(() => {
       const noOfEngagement = numberOfUsersWhoClickedLink || 0;
@@ -335,11 +301,34 @@ export const CallToActionItem = React.memo((props) => {
       });
    }, [numberOfUsersWhoClickedLink, numberOfUsersWhoDismissed]);
 
+   useEffect(() => {
+      (function handleSetIcon() {
+         const isSocial = type === "social";
+         let newIcon = callToActionsDictionary.custom.icon;
+         let newColor =
+            callToActionsDictionary[type]?.color ||
+            callToActionsDictionary.custom.color;
+         // console.log("-> newColor", newColor);
+         if (isSocial) {
+            if (socialData.socialType) {
+               newIcon =
+                  callToActionsSocialsDictionary[socialData.socialType].icon;
+               newColor =
+                  callToActionsSocialsDictionary[socialData.socialType].color;
+            }
+         } else if (callToActionsDictionary[type]) {
+            newIcon = callToActionsDictionary[type].icon;
+            newColor = callToActionsDictionary[type].color;
+         }
+         setColor(newColor);
+         setIcon(newIcon);
+      })();
+   }, [type, socialData]);
+
    return (
       <ListItem divider style={style}>
          <ListItemAvatar className={classes.listItemAvatar}>
-            {callToActionsIconsDictionary[type]?.icon ||
-               callToActionsIconsDictionary.custom.icon}
+            {icon}
          </ListItemAvatar>
          <Box flexGrow={1} minWidth={0} p={1} pr={0}>
             <Box display={"flex"}>
@@ -369,7 +358,7 @@ export const CallToActionItem = React.memo((props) => {
                      secondary={<LinkifyText>{buttonUrl}</LinkifyText>}
                   />
                   <ListItemText
-                     primary={isJobPosting ?"Job Description": "Message"}
+                     primary={isJobPosting ? "Job Description" : "Message"}
                      secondaryTypographyProps={{
                         noWrap: true,
                      }}
@@ -379,6 +368,9 @@ export const CallToActionItem = React.memo((props) => {
                <div className={classes.headerActionsWrapper}>
                   <SettingsDropdown
                      handleClickEditCallToAction={handleClickEditCallToAction}
+                     handleClickResendCallToAction={
+                        handleClickResendCallToAction
+                     }
                      handleClickDeleteCallToAction={
                         handleClickDeleteCallToAction
                      }
@@ -412,7 +404,6 @@ export const CallToActionItem = React.memo((props) => {
          </Box>
       </ListItem>
    );
-
 });
 
 export default CallToActionItem;

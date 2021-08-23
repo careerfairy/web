@@ -11,17 +11,7 @@ import {
 import CallToActionForm from "./CallToActionForm";
 import CloseIcon from "@material-ui/icons/Close";
 import CallToActionTypeMenu from "./CallToActionTypeMenu";
-import {
-   FACEBOOK_COLOR,
-   LINKEDIN_COLOR,
-   TWITTER_COLOR,
-} from "components/util/colors";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import TwitterIcon from "@material-ui/icons/Twitter";
-import JobPostingIcon from "@material-ui/icons/Work";
-import CustomCtaIcon from "@material-ui/icons/Info";
-import { defaultDeadlineDate } from "../../../../../util/constants/callToActions";
+import { callToActionsDictionary } from "../../../../../util/constants/callToActions";
 
 const useStyles = makeStyles((theme) => ({
    closeBtn: {
@@ -29,73 +19,16 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const ctaTypes = [
-   {
-      icon: <LinkedInIcon />,
-      color: LINKEDIN_COLOR,
-      title: "LinkedIn",
-      type: "linkedIn",
-      description:
-         "Help promote your LinkedIn page by sending a call to action to your live viewers.",
-      buttonText: "Follow now",
-      message: "Follow us on LinkedIn",
-      value: 0,
-   },
-   {
-      icon: <FacebookIcon />,
-      color: FACEBOOK_COLOR,
-      title: "Facebook",
-      type: "facebook",
-      description:
-         "Help promote your Facebook page by sending a call to action to your live viewers.",
-      buttonText: "Follow now",
-      message: "Follow us on Facebook",
-      value: 1,
-   },
-   {
-      icon: <TwitterIcon />,
-      color: TWITTER_COLOR,
-      title: "Twitter",
-      type: "twitter",
-      description:
-         "Help promote your Twitter page by sending a call to action to your live viewers.",
-      buttonText: "Follow now",
-      message: "Follow us on Twitter",
-      value: 2,
-   },
-   {
-      icon: <JobPostingIcon />,
-      color: "",
-      title: "Job posting",
-      type: "jobPosting",
-      description:
-         "Help promote an open position to your live viewers with a link to the job posting.",
-      buttonText: "Apply now",
-      message: "Open position",
-      value: 3,
-   },
-   {
-      icon: <CustomCtaIcon />,
-      color: "primary",
-      title: "Custom message",
-      type: "custom",
-      description:
-         "Create a custom call to action with a customized message, button text and link",
-      buttonText: "Click here",
-      message: "",
-      value: 4,
-   },
-];
-
+const {social} = callToActionsDictionary
 
 const defaultInitialValues = {
-   message: ctaTypes[0].message,
-   value: ctaTypes[0].value,
-   buttonText: ctaTypes[0].buttonText,
-   title: ctaTypes[0].title,
+   message: social.message,
+   value: social.value,
+   buttonText: social.buttonText,
+   title: social.title,
    buttonUrl: "",
    isToBeSaved: false,
-   type: ctaTypes[0].type,
+   type: social.type,
    id: "",
    imageUrl: "",
    jobData: {
@@ -103,7 +36,11 @@ const defaultInitialValues = {
       salary: "",
       applicationDeadline: null
    },
+   socialData:{
+      socialType: social.socialTypes.linkedIn.socialType,
+   }
 };
+
 
 const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
    const [initialValues, setInitialValues] = useState(defaultInitialValues);
@@ -113,26 +50,26 @@ const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
          const newInitialValues = {
             message: callToActionToEdit.message,
             color:
-               ctaTypes.find(({ type }) => type === callToActionToEdit.type)
-                  ?.color || defaultInitialValues.color,
+               callToActionsDictionary[callToActionToEdit.type]?.color || defaultInitialValues.color,
             value:
-               ctaTypes.find(({ type }) => type === callToActionToEdit.type)
-                  ?.value || defaultInitialValues.value,
-            buttonUrl: callToActionToEdit.buttonUrl,
+              callToActionsDictionary[callToActionToEdit.type]?.value || defaultInitialValues.value,
+            buttonUrl: callToActionToEdit.buttonUrl || "",
             type: callToActionToEdit.type,
             id: callToActionToEdit.id,
             buttonText: callToActionToEdit.buttonText,
             isToBeSaved: true,
             imageUrl: callToActionToEdit.imageUrl || "",
             title:
-               ctaTypes.find(({ type }) => type === callToActionToEdit.type)
-                  ?.title || defaultInitialValues.title,
+              callToActionsDictionary[callToActionToEdit.type]?.title || defaultInitialValues.title,
             jobData: {
                jobTitle: callToActionToEdit.jobData?.jobTitle || "",
                salary: callToActionToEdit.jobData?.salary || "",
                applicationDeadline:
                   callToActionToEdit.jobData?.applicationDeadline?.toDate?.() || null,
             },
+            socialData:{
+               socialType: callToActionToEdit.socialData?.socialType || defaultInitialValues.socialData.socialType
+            }
          };
          setInitialValues(newInitialValues);
       } else {
@@ -192,10 +129,10 @@ const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
          <CallToActionTypeMenu
             initialValues={initialValues}
             handleSetCallToActionType={handleSetCallToActionType}
-            ctaTypes={ctaTypes}
          />
          <CallToActionForm
             initialValues={initialValues}
+            isSocial={initialValues.type === "social"}
             handleClose={handleClose}
             isCustom={initialValues.type === "custom"}
             isJobPosting={initialValues.type === "jobPosting"}
