@@ -18,6 +18,7 @@ export default class DataAccessUtil {
             data: {
                 recipientEmail: user.email,
                 user_first_name: userData.firstName,
+                regular_date: livestream.start.toDate().toString(),
                 livestream_date: DateUtil.getPrettyDate(livestream.start.toDate()),
                 company_name: livestream.company,
                 company_logo_url: livestream.companyLogoUrl,

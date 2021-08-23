@@ -4,7 +4,7 @@ import {Avatar, Box, Divider, Drawer, Hidden, List, Typography} from '@material-
 import {LogOut as LogoutIcon} from 'react-feather';
 import NavItem from './NavItem';
 import {useRouter} from "next/router";
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 import clsx from "clsx";
 import * as actions from "../../../store/actions";
 import {compose} from "redux";
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
         borderRight: "none",
         backgroundSize: "cover",
         backgroundPosition: "center center",
-        background: `linear-gradient(0deg, ${fade(theme.palette.common.black, 0.7)}, ${fade(theme.palette.common.black, 0.7)}), url(/sidebar.jpg)`,
+        background: `linear-gradient(0deg, ${alpha(theme.palette.common.black, 0.7)}, ${alpha(theme.palette.common.black, 0.7)}), url(/sidebar.jpg)`,
     },
     name: {
         marginTop: theme.spacing(1)

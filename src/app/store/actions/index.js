@@ -1,3 +1,5 @@
+import {openNavDrawer} from "./generalLayoutActions";
+
 export {
     signUp,
     signOut,
@@ -13,10 +15,13 @@ export {addTodo, deleteTodo, editTodo} from './todoActions.js';
 export {createEmote, setEmote} from './emotesActions.js';
 
 export {
-    removeMappedUserDataSet, removeOrderedUserDataSet, setMapUserDataSet, setOrderedUserDataSet
+    clearUserDataSet, setUserDataSet, setFilteredUserDataSet
 } from './userDataSetActions.js';
 
-export {closeSnackbar, enqueueSnackbar, removeSnackbar, sendGeneralError} from './snackbarActions.js'
+export {
+    closeSnackbar, enqueueSnackbar, removeSnackbar, sendGeneralError, sendCustomError, enqueueBroadcastMessage,
+    enqueueCallToAction
+} from './snackbarActions.js'
 export {
     deleteFilterGroup,
     setFilters,
@@ -41,3 +46,14 @@ export {
 export {
     toggleNextLivestreamsFilter, closeNextLivestreamsFilter, openNextLivestreamsFilter
 } from './nextLivestreamsActions'
+
+export {
+    openStreamerBreakoutModal,
+    closeStreamerBreakoutModal,
+    setNumberOfViewers,
+    closeViewerBreakoutModal,
+    openViewerBreakoutModal
+} from "./streamActions";
+
+export {openNavDrawer, closeNavDrawer, toggleNavDrawer} from './generalLayoutActions'
+export {clearStreamsFromTimeframeAndFuture, setStreamsFromTimeframeAndFuture, selectVisibleStreams, clearHiddenStreamIds} from './groupAnalyticsActions'

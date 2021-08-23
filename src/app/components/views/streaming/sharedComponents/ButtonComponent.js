@@ -3,7 +3,7 @@ import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import HelpIcon from '@material-ui/icons/Help';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
-import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
+import {alpha, makeStyles, useTheme} from "@material-ui/core/styles";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: theme.palette.primary.main,
         color: "white",
         "&:disabled": {
-            backgroundColor: fade(theme.palette.primary.main, 0.5),
+            backgroundColor: alpha(theme.palette.primary.main, 0.5),
             color: "white",
         },
         "&:hover": {
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: theme.palette.background.paper,
         color: theme.palette.grey["400"],
         "&:disabled": {
-            backgroundColor: fade(theme.palette.background.paper, 0.5),
+            backgroundColor: alpha(theme.palette.background.paper, 0.5),
             color: theme.palette.primary.main,
         },
         "&:hover": {
@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: theme.palette.secondary.main,
         color: "white",
         "&:disabled": {
-            backgroundColor: fade(theme.palette.secondary.main, 0.5),
+            backgroundColor: alpha(theme.palette.secondary.main, 0.5),
             color: "white",
         },
         "&:hover": {
@@ -94,7 +94,7 @@ const useStyles = makeStyles((theme) => ({
         animation: "$blink .5s step-end infinite alternate",
         color: "white",
         "&:disabled": {
-            backgroundColor: fade(theme.palette.primary.main, 0.5),
+            backgroundColor: alpha(theme.palette.primary.main, 0.5),
             color: "white",
         },
         "&:hover": {

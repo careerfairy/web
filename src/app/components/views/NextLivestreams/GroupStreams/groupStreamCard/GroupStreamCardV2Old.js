@@ -1,6 +1,6 @@
 import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
 import {
     Avatar,
@@ -89,7 +89,7 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             justifyContent: "center",
             borderRadius: ({cardHovered}) => cardHovered && `${theme.spacing(2)}px 0px`,
-            background: fade(theme.palette.common.white, 1),
+            background: alpha(theme.palette.common.white, 1),
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
         dateTimeWrapper: {
@@ -361,18 +361,18 @@ const useStyles = makeStyles((theme) => {
         "@keyframes pulse": {
             "0%": {
                 borderRadius: theme.spacing(2.5),
-                MozBoxShadow: `0 0 0 0 ${fade(themeColor, 1)}`,
-                boxShadow: `0 0 0 0 ${fade(themeColor, 1)}`
+                MozBoxShadow: `0 0 0 0 ${alpha(themeColor, 1)}`,
+                boxShadow: `0 0 0 0 ${alpha(themeColor, 1)}`
             },
             "70%": {
                 borderRadius: theme.spacing(2.5),
-                MozBoxShadow: `0 0 0 15px ${fade(themeColor, 0)}`,
-                boxShadow: `0 0 0 15px ${fade(themeColor, 0)}`
+                MozBoxShadow: `0 0 0 15px ${alpha(themeColor, 0)}`,
+                boxShadow: `0 0 0 15px ${alpha(themeColor, 0)}`
             },
             "100%": {
                 borderRadius: theme.spacing(2.5),
-                MozBoxShadow: `0 0 0 0 ${fade(themeColor, 0)}`,
-                boxShadow: `0 0 0 0 ${fade(themeColor, 0)}`
+                MozBoxShadow: `0 0 0 0 ${alpha(themeColor, 0)}`,
+                boxShadow: `0 0 0 0 ${alpha(themeColor, 0)}`
             }
         },
     })

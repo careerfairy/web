@@ -72,7 +72,7 @@ const LocalVideoContainer = ({currentLivestream, height, localSpeaker, localStre
     const classes = useStyles()
 
     useEffect(() => {
-        console.log(localStream);
+        // console.log(localStream);
     }, [localStream]);
 
 

@@ -6,8 +6,7 @@ import * as Sentry from '@sentry/browser';
 import config from 'react-reveal/globals';
 import DateFnsUtils from '@date-io/date-fns';
 import {newStore, wrapper} from '../store';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+
 import firebase from '../Firebase/Firebase';
 import Head from 'next/head';
 import TagManager from 'react-gtm-module'
@@ -22,6 +21,8 @@ import {Provider} from "react-redux";
 import {ThemeProviderWrapper} from "../context/theme/ThemeContext";
 import {CssBaseline} from '@material-ui/core';
 import Notifier from "../components/views/notifier";
+import { getCookieConsentValue } from "react-cookie-consent";
+import CFCookieConsent from 'components/views/common/cookie-consent/CFCookieConsent';
 
 
 config({ssrFadeout: true});
@@ -74,9 +75,13 @@ function MyApp({Component, pageProps}) {
         gtmId: 'GTM-P29VCWC'
     }
 
+    const cookieValue = getCookieConsentValue()
+
     useEffect(() => {
-        TagManager.initialize(tagManagerArgs);
-    }, []);
+        if (Boolean(cookieValue === 'true')) {
+            TagManager.initialize(tagManagerArgs);
+        }
+    }, [cookieValue]);
 
     const getActiveTutorialStepKey = () => {
         const activeStep = Object.keys(tutorialSteps).find((key) => {
@@ -99,6 +104,7 @@ function MyApp({Component, pageProps}) {
         const activeStep = getActiveTutorialStepKey()
         return Boolean(activeStep === property)
     }
+
     return (
         <Fragment>
             <Head>
@@ -123,6 +129,7 @@ function MyApp({Component, pageProps}) {
                                         <ErrorContext.Provider value={{generalError, setGeneralError}}>
                                             {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                                             <CssBaseline/>
+                                            <CFCookieConsent/>
                                             <Component {...pageProps} />
                                             <Notifier/>
                                             <ErrorSnackBar handleClose={() => setGeneralError("")}

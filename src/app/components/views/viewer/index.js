@@ -13,6 +13,7 @@ import clsx from "clsx";
 import StreamNotifications from "../streaming/sharedComponents/StreamNotifications";
 import AudienceDrawer from "../streaming/AudienceDrawer";
 import ButtonComponent from "../streaming/sharedComponents/ButtonComponent";
+import StreamClosedCountdown from "../streaming/sharedComponents/StreamClosedCountdown";
 
 const useStyles = makeStyles(theme => ({
     iconsContainer: {
@@ -68,12 +69,11 @@ const ViewerOverview = ({
                             handleStateChange,
                             selectedState,
                             showMenu,
-                            setNumberOfViewers,
                             setShowVideoButton,
                             hideAudience,
                             audienceDrawerOpen,
                         }) => {
-    const {currentLivestream} = useCurrentStream()
+    const {currentLivestream, isBreakout} = useCurrentStream()
 
     const classes = useStyles({mobile})
     return (
@@ -95,15 +95,16 @@ const ViewerOverview = ({
                 />
                 <ViewerComponent
                     livestreamId={currentLivestream.id} streamerId={streamerId}
-                    setNumberOfViewers={setNumberOfViewers}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     showVideoButton={showVideoButton}
+                    isBreakout={isBreakout}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}
                 />
 
-                {!mobile &&
-                <MiniChatContainer className={classes.miniChatContainer} livestream={currentLivestream}
-                                   isStreamer={false}/>}
+                { <MiniChatContainer mobile={mobile} className={classes.miniChatContainer}
+                                                livestream={currentLivestream}
+                                                isStreamer={false}/> }
+
 
             </div>
             <IconsContainer className={classes.iconsContainer}
@@ -131,6 +132,7 @@ const ViewerOverview = ({
                     <div>Click to play</div>
                 </div>
             </Backdrop>
+            <StreamClosedCountdown/>
         </Fragment>
     );
 };

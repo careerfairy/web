@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import {withFirebase} from "../../context/firebase";
 import StreamerTopBar from "./StreamerTopBar";
@@ -10,9 +10,10 @@ import {useRouter} from "next/router";
 import NotificationsContext from "../../context/notifications/NotificationsContext";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import {v4 as uuidv4} from "uuid";
-import {isLoaded} from "react-redux-firebase";
+import {isEmpty, isLoaded} from "react-redux-firebase";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
+import useStreamRef from "../../components/custom-hook/useStreamRef";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -63,14 +64,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+
 const StreamerLayout = (props) => {
-
-    const {children, firebase} = props
-    const {query: {token, livestreamId}, pathname} = useRouter()
+    const {children, firebase, isBreakout, isMainStreamer} = props
+    const {query: {token, livestreamId: baseStreamId, breakoutRoomId, auto}} = useRouter()
+    const livestreamId = breakoutRoomId || baseStreamId
     const router = useRouter();
+    const streamRef = useStreamRef();
     const smallScreen = useMediaQuery('(max-width:700px)');
-
-    const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [newNotification, setNewNotification] = useState(null);
     const [notificationToRemove, setNotificationToRemove] = useState(null);
     const [notifications, setNotifications] = useState([]);
@@ -87,16 +88,8 @@ const StreamerLayout = (props) => {
     const [play, setPlay] = useState(false);
     const [unmute, setUnmute] = useState(true);
 
-    const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
-    const isMainStreamer = useMemo(() => pathname === "/streaming/[livestreamId]/main-streamer", [pathname])
 
     const currentLivestream = useStreamConnect()
-
-
-    // const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
-    //     ...populate(firestore, "currentLivestream", populates),
-    //     id: livestreamId
-    // }, shallowEqual)
 
     const classes = useStyles({
         showMenu,
@@ -104,14 +97,13 @@ const StreamerLayout = (props) => {
         smallScreen
     });
 
-
     useEffect(() => {
         if (router && router.query && currentLivestream && !currentLivestream.test) {
             if (!token) {
                 router.push('/streaming/error')
 
             } else {
-                firebase.getLivestreamSecureToken(currentLivestream.id).then(doc => {
+                firebase.getLivestreamSecureTokenWithRef(streamRef).then(doc => {
                     if (!doc.exists) {
                         router.push('/streaming/error')
                     }
@@ -125,6 +117,18 @@ const StreamerLayout = (props) => {
             }
         }
     }, [router, token, currentLivestream?.test, currentLivestream?.id]);
+
+    useEffect(() => {
+        function checkIfStreamerHasInfo() {
+            let storedUuid = localStorage.getItem('streamingUuid')
+            const hasStreamerInfo = currentLivestream?.liveSpeakers?.some(speaker => speaker.speakerUuid.replace(currentLivestream.id, "") === storedUuid)
+            setStreamerReady(Boolean(hasStreamerInfo))
+        }
+
+        if (currentLivestream && auto === "true") {
+            checkIfStreamerHasInfo()
+        }
+    }, [currentLivestream?.liveSpeakers, auto])
 
     useEffect(() => {
         const regex = /-/g;
@@ -155,6 +159,7 @@ const StreamerLayout = (props) => {
             setShowMenu(false)
         }
     }, [smallScreen])
+
 
     useEffect(() => {
         if (notificationToRemove) {
@@ -194,17 +199,17 @@ const StreamerLayout = (props) => {
     }, [showMenu])
 
     const tokenIsValidated = () => {
-        if (currentLivestream.test) {
+        if (currentLivestream?.test) {
             return true;
         } else {
             return tokenChecked;
         }
     }
-    const toggleShowMenu = useCallback( () => {
+    const toggleShowMenu = useCallback(() => {
         setShowMenu(!showMenu)
-    },[showMenu])
+    }, [showMenu])
 
-    if (!isLoaded(currentLivestream) || !tokenIsValidated()) {
+    if (!isLoaded(currentLivestream) || !tokenIsValidated() || isEmpty(currentLivestream)) {
         return <Loader/>
     }
 
@@ -221,13 +226,11 @@ const StreamerLayout = (props) => {
 
     return (
         <NotificationsContext.Provider value={{setNewNotification, setNotificationToRemove}}>
-            <CurrentStreamContext.Provider value={{currentLivestream}}>
+            <CurrentStreamContext.Provider value={{currentLivestream, isBreakout, isMainStreamer, isStreamer: true, streamerId}}>
                 <div className={classes.root}>
                     <StreamerTopBar
                         firebase={firebase}
                         showAudience={showAudience}
-                        isMainStreamer={isMainStreamer}
-                        numberOfViewers={numberOfViewers}
                     />
                     <LeftMenu
                         handleStateChange={handleStateChange}
@@ -266,7 +269,6 @@ const StreamerLayout = (props) => {
                                     showMenu,
                                     notifications,
                                     streamerId,
-                                    setNumberOfViewers: handleSetNumberOfViewers
                                 })}
                             </div>
                         </div>

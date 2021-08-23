@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
-const {setHeaders} = require("./util");
+const {setHeaders, getArrayDifference} = require("./util");
 const {client} = require('./api/postmark')
+const {admin} = require('./api/firestoreAdmin')
 
 
 exports.sendDraftApprovalRequestEmail = functions.https.onRequest(async (req, res) => {
@@ -55,5 +56,37 @@ exports.sendDashboardInviteEmail = functions.https.onRequest(async (req, res) =>
         console.log('error:' + error);
         return res.status(400).send(error);
     });
+});
+
+exports.updateUserDocAdminStatus = functions.firestore.document('careerCenterData/{careerCenter}')
+    .onUpdate(async (change) => {
+        try {
+            const careerCenterAfter = change.after.data();
+            const careerCenterBefore = change.before.data();
+            const newAdmins = getArrayDifference(careerCenterBefore.adminEmails, careerCenterAfter.adminEmails)
+            const oldAdmins = getArrayDifference(careerCenterAfter.adminEmails, careerCenterBefore.adminEmails)
+
+            if (newAdmins.length === 0 && oldAdmins.length === 0) {
+                functions.logger.info(`No new admin has been added or removed`)
+                return
+            }
+
+            newAdmins.forEach( async (adminEmail) => {
+                await admin.firestore().collection("userData").doc(adminEmail).update({
+                    adminIds: admin.firestore.FieldValue.arrayUnion(careerCenterAfter.groupId)
+                })
+                functions.logger.info(`New group ${careerCenterAfter.groupId} has been added to user admin ${adminEmail}`)
+            })
+
+            oldAdmins.forEach( async (adminEmail) => {
+                await admin.firestore().collection("userData").doc(adminEmail).update({
+                    adminIds: admin.firestore.FieldValue.arrayRemove(careerCenterAfter.groupId)
+                })
+                functions.logger.info(`New group ${careerCenterAfter.groupId} has been removed from user admin ${adminEmail}`)
+            })
+        } catch (error) {
+            functions.logger.error("failed to update admin email doc:", error)
+        }
+
 });
 

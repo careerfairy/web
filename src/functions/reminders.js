@@ -64,24 +64,31 @@ exports.sendReminderEmailToRegistrants = functions.https.onRequest(async (req, r
     admin.firestore().collection("livestreams").doc(req.body.livestreamId).get()
         .then((doc) => {
             registeredUsers = doc.data().registeredUsers;
-            var itemsProcessed = 0;
-            registeredUsers.forEach(userEmail => {
+            let testEmails = ["maximilian@careerfairy.io"]
+            let templates = []
+            registeredUsers.forEach(recipient => {
                 const email = {
                     "TemplateId": req.body.templateId,
                     "From": 'CareerFairy <noreply@careerfairy.io>',
-                    "To": userEmail,
+                    "To": recipient,
                     "TemplateModel": {}
                 };
-                client.sendEmailWithTemplate(email).then(() => {
-                    console.log("email sent to: " + userEmail);
-                    itemsProcessed++;
-                    if (itemsProcessed === registeredUsers.length) {
-                        return res.status(200).send();
-                    }
+                templates.push(email)   
+            })
+            let arraysOfTemplates = []
+            for (index = 0; index < templates.length; index += 500) {
+                myChunk = templates.slice(index, index+500);
+                // Do something if you want with the group
+                arraysOfTemplates.push(myChunk);
+            }
+            console.log(arraysOfTemplates.length)
+            arraysOfTemplates.forEach(arrayOfTemplates => {
+                client.sendEmailBatchWithTemplates(arrayOfTemplates).then(response => {
+                    console.log(`Successfully sent email to ${arrayOfTemplates.length}`);
                 }, error => {
-                    console.log('error:' + error);
+                    console.error(`Error sending email to ${arrayOfTemplates.length}`, error);
                 });
-            });
+            })
         }).catch(() => {
         return res.status(400).send();
     })

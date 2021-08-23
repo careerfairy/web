@@ -10,11 +10,12 @@ import {
     TooltipTitle,
     WhiteTooltip
 } from "../../../../../../../materialUI/GlobalTooltips";
+import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 
 function HandRaiseInactive({firebase, livestream, showMenu, selectedState, sliding}) {
 
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
-
+    const streamRef = useStreamRef();
     const isOpen = (property) => {
         return Boolean(livestream.test
             && showMenu
@@ -41,11 +42,11 @@ function HandRaiseInactive({firebase, livestream, showMenu, selectedState, slidi
     }
 
     function setHandRaiseModeActive() {
-        firebase.setHandRaiseMode(livestream.id, true);
+        firebase.setHandRaiseMode(streamRef, true);
     }
 
     function createDemoHandRaiseRequest() {
-        firebase.createHandRaiseRequest(livestream.id, "demo@careerfairy.io", { firstName: 'Demoman', lastName: 'Test'});
+        firebase.createHandRaiseRequest(streamRef, "demo@careerfairy.io", { firstName: 'Demoman', lastName: 'Test'});
     }
 
     return (

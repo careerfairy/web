@@ -2,6 +2,7 @@ import { Document, Page, View, Text, Font, Image } from '@react-pdf/renderer';
 import styled from '@react-pdf/styled-components';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import StatsUtil from 'data/util/StatsUtil';
+import { Fragment } from 'react';
 import { useEffect, useState } from 'react';
 import DateUtil from 'util/DateUtil';
 
@@ -337,12 +338,25 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, overallRating, c
                     <SubTitle>Speakers</SubTitle>
                     <SpeakersViewElement speakers={speakers}/>
                     <SubTitle>Your Audience</SubTitle>
-                    <TotalViewer>
-                        Total Number Of Participating Students from {group.universityName}: { totalViewerFromETH }
-                    </TotalViewer>
-                    <TotalViewer>
-                        Total Number Of Participating Students from outside {group.universityName}: { totalViewerFromOutsideETH }
-                    </TotalViewer>
+                    {
+                        group.universityCode &&
+                        <Fragment>
+                            <TotalViewer>
+                                Total Number Of Participating Students from {group.universityName}: { totalViewerFromETH }
+                            </TotalViewer>
+                            <TotalViewer>
+                                Total Number Of Participating Students from outside {group.universityName}: { totalViewerFromOutsideETH }
+                            </TotalViewer>
+                        </Fragment>
+                    }
+                    {
+                        !group.universityCode &&
+                        <Fragment>
+                            <TotalViewer>
+                                Total Number Of Participating Students: { totalViewerFromETH + totalViewerFromOutsideETH }
+                            </TotalViewer>
+                        </Fragment>
+                    }
                     <TotalViewer>
                         Total Number Of Students registered to the Talent Pool: { totalStudentsInTalentPool }
                     </TotalViewer>

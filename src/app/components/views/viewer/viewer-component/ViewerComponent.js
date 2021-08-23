@@ -13,8 +13,12 @@ import {Typography} from '@material-ui/core';
 import ScreenShareModal from "../../streaming/video-container/ScreenShareModal";
 import LoadingModal from 'components/views/streaming/modal/LoadingModal';
 import ErrorModal from 'components/views/streaming/modal/ErrorModal';
+import useStreamRef from "../../../custom-hook/useStreamRef";
 import EmoteButtons from "../EmoteButtons";
-
+import {useDispatch, useSelector} from "react-redux";
+import {useRouter} from "next/router";
+import * as actions from 'store/actions'
+import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 
 const useStyles = makeStyles(theme => ({
     waitingOverlay: {
@@ -40,18 +44,20 @@ const useStyles = makeStyles(theme => ({
 
 function ViewerComponent(props) {
     const classes = useStyles()
+    const dispatch = useDispatch()
     const [showSettings, setShowSettings] = useState(false);
     const [showScreenShareModal, setShowScreenShareModal] = useState(false);
     const [optimizationMode, setOptimizationMode] = useState("detail");
-
+    const streamRef = useStreamRef();
+    const {query: {livestreamId}} = useRouter()
     const {authenticatedUser} = useAuth();
-
+    const hasActiveRooms = useSelector(state => Boolean(state.firestore.ordered?.[`Active BreakoutRooms of ${livestreamId}`]?.length))
     const streamerReady = true;
 
     const screenSharingMode = (props.currentLivestream.screenSharerId === authenticatedUser?.email &&
         props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
 
-    const {externalUsers, numberOfViewers, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus, createEmote} =
+    const {externalUsers, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus, createEmote, joinedChannel} =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
@@ -81,45 +87,28 @@ function ViewerComponent(props) {
         if (props.handRaiseActive && agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
             if (props.currentLivestream) {
                 if (props.currentLivestream.test) {
-                    props.firebase.updateHandRaiseRequest(props.currentLivestream.id, 'streamerEmail', "connected");
+                    props.firebase.updateHandRaiseRequest(streamRef, 'streamerEmail', "connected");
                 } else {
-                    props.firebase.updateHandRaiseRequest(props.currentLivestream.id, authenticatedUser.email, "connected");
+                    props.firebase.updateHandRaiseRequest(streamRef, authenticatedUser.email, "connected");
                 }
             }
         }
     }, [agoraRtcStatus])
 
     useEffect(() => {
-        if (numberOfViewers && props.currentLivestream.hasStarted) {
-            props.setNumberOfViewers(numberOfViewers)
-        } else {
-            props.setNumberOfViewers(0)
-        }
-    }, [numberOfViewers, props.currentLivestream.hasStarted]);
+        if (joinedChannel && !props.isBreakout && !externalUsers?.length && hasActiveRooms) {
+            const timout = setTimeout(function() { //Start the timer
+            dispatch(actions.openViewerBreakoutModal())
+            }, 3000) // Only open modal If no streams appear after 3 seconds
 
-
-    const attachSinkId = (element, sinkId) => {
-        if (typeof element.sinkId !== 'undefined') {
-            element.setSinkId(sinkId)
-                .then(() => {
-                    console.log(`Success, audio output device attached: ${sinkId}`);
-                })
-                .catch(error => {
-                    let errorMessage = error;
-                    if (error.name === 'SecurityError') {
-                        errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
-                    }
-                    console.error(errorMessage);
-                    // Jump back to first output device in the list as it's the default.
-                });
-        } else {
-            console.warn('Browser does not support output device selection.');
+            return () => clearTimeout(timout) // Cancel opening modal if streams appear before 3 seconds
         }
-    }
+
+    }, [Boolean(externalUsers?.length), props.isBreakout, hasActiveRooms, joinedChannel])
 
     const setDesktopMode = async (mode, initiatorId) => {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;
-        await props.firebase.setDesktopMode(props.currentLivestream.id, mode, screenSharerId);
+        await props.firebase.setDesktopMode(streamRef, mode, screenSharerId);
     }
 
     const shareDesktopOrSlides = () => (props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop')
@@ -145,13 +134,15 @@ function ViewerComponent(props) {
     }
 
     return (
-        <div>
+        <React.Fragment>
             <EmoteButtons createEmote={createEmote}/>
             <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive}
                                      smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}
-                                     speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
+                                     speakerSwitchModeActive={false} localStream={null} 
                                      streams={externalUsers} localId={props.streamerId}
                                      isViewer={true}
+                                     joinedChannel={joinedChannel}
+                                     isBreakout={props.isBreakout}
                                      currentSpeaker={props.currentLivestream.currentSpeakerId}
                                      muted={!props.currentLivestream.hasStarted} {...props}/>
             {shareDesktopOrSlides() &&
@@ -162,7 +153,7 @@ function ViewerComponent(props) {
                 isStreamer={true}
                 externalMediaStreams={externalUsers}
                 isLocalScreen={false}
-                attachSinkId={attachSinkId}
+                isBreakout={props.isBreakout}
                 {...props}
                 presenter={false}/>}
             {props.handRaiseActive &&
@@ -185,7 +176,7 @@ function ViewerComponent(props) {
                                audioSource={audioSource} updateAudioSource={updateAudioSource}
                                videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                                speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                               attachSinkId={attachSinkId}/>
+                            />
                 <ScreenShareModal
                     open={showScreenShareModal}
                     handleClose={handleCloseScreenShareModal}
@@ -195,14 +186,15 @@ function ViewerComponent(props) {
                 <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus} />
             </Fragment>
             }
-
-            {!props.currentLivestream.hasStarted &&
-            <div className={classes.waitingOverlay}>
-                <Typography className={classes.waitingText}>
-                    {props.currentLivestream.test ? 'The streamer has to press Start Streaming to be visible to students' : 'Thank you for joining!'}
-                </Typography>
-            </div>}
-        </div>
+            {
+            !props.currentLivestream.hasStarted &&
+                <div className={classes.waitingOverlay}>
+                    <Typography className={classes.waitingText}>
+                        {props.currentLivestream.test ? 'The streamer has to press Start Streaming to be visible to students' : 'Thank you for joining!'}
+                    </Typography>
+                </div>
+            }
+        </React.Fragment>
     );
 }
 

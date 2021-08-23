@@ -22,7 +22,9 @@ import {PlayIconButton} from "materialUI/GlobalButtons/GlobalButtons";
 import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "materialUI/GlobalTooltips";
 import TutorialContext from "context/tutorials/TutorialContext";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
+import useStreamRef from "../../../../custom-hook/useStreamRef";
 import {compose} from "redux"
+import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
@@ -108,7 +110,6 @@ const ReactionsToggle = ({handleToggle, showAllReactions, loading, active}) => {
 const QuestionContainer = memo(({
                                     sliding,
                                     user,
-                                    livestream,
                                     streamer,
                                     question,
                                     firebase,
@@ -120,7 +121,8 @@ const QuestionContainer = memo(({
                                     openQuestionId,
                                     showMenu
                                 }) => {
-
+    const streamRef = useStreamRef()
+    const {currentLivestream: livestream, isBreakout} = useCurrentStream()
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
@@ -136,7 +138,7 @@ const QuestionContainer = memo(({
     useEffect(() => {
         if (livestream.id && question.id && showAllReactions) {
             setLoading(true)
-            const unsubscribe = firebase.listenToQuestionComments(livestream.id, question.id, querySnapshot => {
+            const unsubscribe = firebase.listenToQuestionComments(streamRef, question.id, querySnapshot => {
                 setComments(querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()})));
                 setLoading(false)
             });
@@ -159,27 +161,33 @@ const QuestionContainer = memo(({
         }
     }, [active, question.type])
 
-    function addNewComment() {
-        if (!(newCommentTitle.trim()) || (!userData && !livestream?.test && !streamer)) {
-            return;
+    async function addNewComment() {
+        try {
+
+            if (!(newCommentTitle.trim()) || (!userData && !livestream?.test && !streamer)) {
+                return;
+            }
+
+
+            const newComment = streamer ? {
+                title: newCommentTitle,
+                author: 'Streamer'
+            } : {
+                title: newCommentTitle,
+                author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous'
+            }
+
+            if (isBreakout) {
+                await firebase.putQuestionCommentWithTransaction(streamRef, question.id, newComment)
+            } else {
+                await firebase.putQuestionComment(streamRef, question.id, newComment)
+            }
+
+            setNewCommentTitle("");
+            makeGloballyActive()
+        } catch (error) {
+            console.log("Error: " + error);
         }
-
-
-        const newComment = streamer ? {
-            title: newCommentTitle,
-            author: 'Streamer'
-        } : {
-            title: newCommentTitle,
-            author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous'
-        }
-
-        firebase.putQuestionComment(livestream.id, question.id, newComment)
-            .then(() => {
-                setNewCommentTitle("");
-                makeGloballyActive()
-            }, error => {
-                console.log("Error: " + error);
-            })
     }
 
     function addNewCommentOnEnter(target) {
@@ -191,7 +199,7 @@ const QuestionContainer = memo(({
 
     function upvoteLivestreamQuestion() {
         let authEmail = livestream.test ? 'streamerEmail' : authenticatedUser.email;
-        firebase.upvoteLivestreamQuestion(livestream.id, question, authEmail);
+        firebase.upvoteLivestreamQuestionWithRef(streamRef, question, authEmail);
     }
 
     const isOpen = (property) => {
@@ -404,7 +412,6 @@ QuestionContainer.propTypes = {
     goToThisQuestion: PropTypes.func.isRequired,
     index: PropTypes.number.isRequired,
     isNextQuestions: PropTypes.bool.isRequired,
-    livestream: PropTypes.object.isRequired,
     question: PropTypes.object.isRequired,
     selectedState: PropTypes.any,
     showMenu: PropTypes.bool,

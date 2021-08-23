@@ -1,9 +1,16 @@
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import RemoteVideoContainer from './RemoteVideoContainer';
 import {useWindowSize} from '../../../custom-hook/useWindowSize';
 import {makeStyles} from "@material-ui/core/styles";
-import SpeakerInfoOverlay from './SpeakerInfoOverlay';
 import LocalVideoContainer from './LocalVideoContainer';
+import Typography from "@material-ui/core/Typography";
+import {Button, CircularProgress, Tooltip} from "@material-ui/core";
+import {BREAKOUT_BANNER_HEIGHT} from "../../../../constants/breakoutRooms";
+import Alert from '@material-ui/lab/Alert';
+import {TOP_BAR_HEIGHT} from "constants/streamLayout";
+import useStreamToken from "../../../custom-hook/useStreamToken";
+import {useCurrentStream} from "../../../../context/stream/StreamContext";
+import useTextOverflow from "../../../custom-hook/useTextOverflow";
 
 
 const useStyles = makeStyles(theme => ({
@@ -74,7 +81,16 @@ const useStyles = makeStyles(theme => ({
     relativeContainer: {
         position: "relative",
         height: "100%",
-        minHeight: "calc(100vh - 55px)"
+        minHeight: (props) => `calc(100vh - ${props.topDisplacement}px)`,
+    },
+    noStreamOverlayWrapper: {
+        position: "relative",
+        height: "100%",
+        minHeight: "calc(100vh - 55px)",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+
     },
     relativeContainerVideos: {
         margin: "0",
@@ -99,11 +115,26 @@ const useStyles = makeStyles(theme => ({
             background: theme.palette.primary.main
         }
     },
+    alertMessage: {
+        display: "grid"
+    }
 }))
 
 function CurrentSpeakerDisplayer(props) {
-    const classes = useStyles()
     const windowSize = useWindowSize();
+    const [topDisplacement, setTopDisplacement] = useState(TOP_BAR_HEIGHT);
+    const classes = useStyles({topDisplacement})
+    const [showBreakoutAlert, setShowBreakoutAlert] = useState(false);
+
+    useEffect(() => {
+        setShowBreakoutAlert(Boolean(props.isStreamer && props.isBreakout))
+        if (props.isStreamer && props.isBreakout) {
+            setTopDisplacement(TOP_BAR_HEIGHT + BREAKOUT_BANNER_HEIGHT)
+        } else {
+            setTopDisplacement(TOP_BAR_HEIGHT)
+        }
+    }, [props.isStreamer, props.isBreakout]);
+
 
     function getVideoContainerHeight(streamId) {
         if (props.isPlayMode) {
@@ -113,14 +144,14 @@ function CurrentSpeakerDisplayer(props) {
             }
             if (props.streams.length > 1) {
                 if (streamId === props.currentSpeaker) {
-                    return windowSize.width > 768 ? 'calc(80vh - 55px)' : '80vh';
+                    return windowSize.width > 768 ? `calc(80vh - ${topDisplacement}px)` : `calc(80vh)`;
                     // return windowSize.width > 768 ? 'calc(80vh - 55px)' : '45vh';
                 } else {
                     return "20vh";
                     // return windowSize.width > 768 ? '20vh' : '15vh';
                 }
             } else {
-                return windowSize.width > 768 ? 'calc(100vh - 55px)' : props.isViewer ? '100vh' : '60vh';
+                return windowSize.width > 768 ? `calc(100vh - ${topDisplacement}px)` : props.isViewer ? '100vh' : '60vh';
             }
         } else {
             if (props.smallScreenMode) {
@@ -128,12 +159,12 @@ function CurrentSpeakerDisplayer(props) {
             }
             if (props.streams.length > 0) {
                 if (streamId === props.currentSpeaker) {
-                    return (windowSize.width > 768 || !props.isViewer) ? 'calc(80vh - 55px)' : '80vh';
+                    return (windowSize.width > 768 || !props.isViewer) ? `calc(80vh - ${topDisplacement}px)` : '80vh';
                 } else {
                     return '20vh';
                 }
             } else {
-                return 'calc(100vh - 55px)';
+                return `calc(100vh - ${topDisplacement}px)`;
             }
         }
     }
@@ -222,15 +253,66 @@ function CurrentSpeakerDisplayer(props) {
         externalVideoElements.unshift(localVideoElement);
     }
 
+    if (!externalVideoElements.length && !props.isStreamer) {
+        return (
+            <div className={classes.noStreamOverlayWrapper}>
+                {props.joinedChannel ? (
+                    <Typography variant="h5" style={{color: "white", margin: "auto"}}>
+                        Waiting for streamer
+                    </Typography>
+                ) : (
+                    <CircularProgress style={{margin: "auto"}}/>
+                )}
+            </div>)
+    }
+
     //TO BE TESTED
 
     return (
-        <div className={classes.relativeContainer}>
-            <div className={classes.relativeContainerVideos} style={{height: getMinimizedSpeakersGridHeight()}}>
-                {externalVideoElements}
+        <React.Fragment>
+            {showBreakoutAlert &&
+            <BreakoutRoomBanner
+                windowWidth={windowSize.width}
+            />
+            }
+            <div className={classes.relativeContainer}>
+                <div className={classes.relativeContainerVideos} style={{height: getMinimizedSpeakersGridHeight()}}>
+                    {externalVideoElements}
+                </div>
             </div>
-        </div>
+        </React.Fragment>
     );
+}
+
+const BreakoutRoomBanner = ({windowWidth}) => {
+    const classes = useStyles()
+    const links = useStreamToken({forStreamType: "mainLivestream"})
+    const {isStreamer, isMainStreamer, currentLivestream: {title}} = useCurrentStream()
+    const [isOverFlowing, labelRef] = useTextOverflow([windowWidth])
+
+    const handleBackToMainRoom = () => {
+        window.location.href = isMainStreamer ? links.mainStreamerLink : isStreamer ? links.joiningStreamerLink : links.viewerLink
+    }
+
+    return (
+        <Alert
+            classes={{message: classes.alertMessage}}
+            action={
+                <Tooltip title="Back to main room">
+                    <Button onClick={handleBackToMainRoom} variant="contained" color="primary" size="small">
+                        Back
+                    </Button>
+                </Tooltip>
+            }
+            severity="info"
+        >
+            <Tooltip title={isOverFlowing ? title : ""}>
+                <Typography ref={labelRef} noWrap>
+                    ROOM: {title}
+                </Typography>
+            </Tooltip>
+        </Alert>
+    )
 }
 
 export default CurrentSpeakerDisplayer;

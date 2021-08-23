@@ -1,91 +1,95 @@
-import React, {Fragment, useEffect, useRef, useState} from 'react';
-import DeleteIcon from '@material-ui/icons/Delete';
+import React, { Fragment, useEffect, useRef, useState } from "react";
+import DeleteIcon from "@material-ui/icons/Delete";
 import {
-    Button,
-    CircularProgress,
-    Collapse,
-    Container,
-    FormControl,
-    FormControlLabel,
-    Grid,
-    Switch,
-    TextField,
-    Tooltip,
-    Typography,
-    Fab,
-    ButtonGroup,
-    Box,
+   Box,
+   Button,
+   ButtonGroup,
+   CircularProgress,
+   Collapse,
+   Container,
+   Fab,
+   FormControl,
+   FormControlLabel,
+   Grid,
+   Switch,
+   TextField,
+   Tooltip,
+   Typography,
 } from "@material-ui/core";
-import {Formik} from 'formik';
-import {v4 as uuidv4} from 'uuid';
-import {withFirebase} from "../../../context/firebase";
+import { Formik } from "formik";
+import { v4 as uuidv4 } from "uuid";
+import { withFirebase } from "../../../context/firebase";
 import ImageSelect from "./ImageSelect/ImageSelect";
-import {makeStyles} from "@material-ui/core/styles";
-import {DateTimePicker, MuiPickersUtilsProvider,} from "@material-ui/pickers";
+import { makeStyles } from "@material-ui/core/styles";
+import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import SpeakerForm from "./SpeakerForm/SpeakerForm";
 import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 import FormGroup from "./FormGroup";
-import WarningIcon from '@material-ui/icons/Warning';
+import WarningIcon from "@material-ui/icons/Warning";
 import {
-    getStreamSubCollectionSpeakers,
-    handleAddSpeaker,
-    handleDeleteSpeaker,
-    handleError,
-    handleFlattenOptions,
-    languageCodes,
-    validateStreamForm
+   getStreamSubCollectionSpeakers,
+   handleAddSpeaker,
+   handleDeleteSpeaker,
+   handleError,
+   handleFlattenOptions,
+   languageCodes,
+   validateStreamForm,
 } from "../../helperFunctions/streamFormFunctions";
-import {copyStringToClipboard} from "../../helperFunctions/HelperFunctions";
-import {useSnackbar} from "notistack";
-import {SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../../util/constants";
-import {LanguageSelect} from "../../helperFunctions/streamFormFunctions/components";
-import {useAuth} from "../../../HOCs/AuthProvider";
+import { copyStringToClipboard } from "../../helperFunctions/HelperFunctions";
+import { useSnackbar } from "notistack";
+import {
+   SAVE_WITH_NO_VALIDATION,
+   SUBMIT_FOR_APPROVAL,
+} from "../../util/constants";
+import { LanguageSelect } from "../../helperFunctions/streamFormFunctions/components";
+import { useAuth } from "../../../HOCs/AuthProvider";
+import StreamDurationSelect from "./StreamDurationSelect";
+import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams";
 
-
-const useStyles = makeStyles(theme => ({
-    root: {
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        minHeight: "20vh",
-        borderRadius: 5,
-        marginBottom: ({isGroupAdmin}) => !isGroupAdmin && 30
-    },
-    form: {
-        width: "100%"
-    },
-    speakersLabel: {
-        color: "white",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between"
-    },
-    submit: {
-        color: theme.palette.primary.main,
-        background: "white",
-        marginTop: theme.spacing(2),
-        "&:hover": {
-            color: 'white',
-            background: theme.palette.primary.main,
-        }
-    },
-    whiteBtn: {
-        color: theme.palette.primary.main,
-        background: "white",
-        margin: theme.spacing(1),
-        "&:hover": {
-            color: 'white',
-            background: theme.palette.primary.main,
-        }
-    },
-    buttonGroup: {
-        visibility: ({isGroupAdmin}) => isGroupAdmin && "hidden",
-        position: ({isGroupAdmin}) => isGroupAdmin && "fixed",
-    }
+const useStyles = makeStyles((theme) => ({
+   root: {
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      minHeight: "20vh",
+      borderRadius: 5,
+      marginBottom: ({ isGroupAdmin }) => !isGroupAdmin && 30,
+   },
+   form: {
+      width: "100%",
+   },
+   speakersLabel: {
+      color: "white",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+   },
+   submit: {
+      color: theme.palette.primary.main,
+      background: "white",
+      marginTop: theme.spacing(2),
+      "&:hover": {
+         color: "white",
+         background: theme.palette.primary.main,
+      },
+   },
+   whiteBtn: {
+      color: theme.palette.primary.main,
+      background: "white",
+      margin: theme.spacing(1),
+      "&:hover": {
+         color: "white",
+         background: theme.palette.primary.main,
+      },
+   },
+   buttonGroup: {
+      visibility: ({ isGroupAdmin }) => isGroupAdmin && "hidden",
+      position: ({ isGroupAdmin }) => isGroupAdmin && "fixed",
+   },
 }));
 
 const speakerObj = {
@@ -143,6 +147,7 @@ const DraftStreamForm = ({
         targetCategories: {},
         groupIds: [],
         start: new Date(),
+        duration: 60,
         hidden: false,
         summary: '',
         speakers: {[uuidv4()]: speakerObj},
@@ -158,7 +163,13 @@ const DraftStreamForm = ({
             mergedGroups = [...new Set([...mergedGroups, ...group.partnerGroupIds])]
         }
         if (mergedGroups.length) {
-            const totalExistingGroups = await firebase.getCareerCentersByGroupId(mergedGroups)
+            let totalExistingGroups
+            if (userData?.isAdmin) {
+                const allGroupSnaps = await firebase.getAllCareerCenters()
+                totalExistingGroups = allGroupSnaps.docs.map(doc => ({id: doc.id, ...doc.data()}))
+            } else {
+                totalExistingGroups = await firebase.getCareerCentersByGroupId(mergedGroups)
+            }
             const totalFlattenedGroups = totalExistingGroups.map(group => ({
                 ...group,
                 selected: false,
@@ -209,6 +220,7 @@ const DraftStreamForm = ({
                         targetCategories: {},
                         groupIds: livestream.groupIds || [],
                         start: livestream.start.toDate() || new Date(),
+                        duration: livestream.duration || DEFAULT_STREAM_DURATION_MINUTES,
                         hidden: livestream.hidden || false,
                         summary: livestream.summary || "",
                         speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery),
@@ -444,7 +456,7 @@ const DraftStreamForm = ({
                                 value={values.backgroundImageUrl}
                                 error={errors.backgroundImageUrl && touched.backgroundImageUrl && errors.backgroundImageUrl}/>
                         </Grid>
-                        <Grid xs={12} sm={7} md={8} item>
+                        <Grid xs={12} sm={6} md={4} item>
                             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                 <DateTimePicker
                                     inputVariant="outlined" fullWidth variant="outlined"
@@ -455,7 +467,18 @@ const DraftStreamForm = ({
                                     }}/>
                             </MuiPickersUtilsProvider>
                         </Grid>
-                        <Grid xs={12} sm={5} md={4} item>
+                        <Grid xs={12} sm={6} md={4} item>
+                            <StreamDurationSelect
+                              value={values.duration}
+                              start={values.start}
+                              disabled={isSubmitting}
+                              label="Estimated Duration"
+                              setFieldValue={setFieldValue}
+                              fullWidth
+                              variant="outlined"
+                            />
+                        </Grid>
+                        <Grid xs={12} sm={12} md={4} item>
                             <LanguageSelect
                                 value={values.language}
                                 setFieldValue={setFieldValue}

@@ -113,7 +113,7 @@ function BookingModal({modalOpen, user, careerCenters, livestream, registration,
     let questionElements = CommonUtil.getRandom(upcomingQuestions, 9).map((question, index) => {
         return (
             <Grid item key={index} xs={12} sm={4}>
-                <QuestionVotingBox question={question} user={user} livestream={livestream}/>
+                <QuestionVotingBox question={question} user={user} livestream={livestream} isPastEvent={false}/>
             </Grid>
         );
     });

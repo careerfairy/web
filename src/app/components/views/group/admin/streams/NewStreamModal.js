@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 import {
     AppBar,
     CardActions,
@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
         flex: 1,
     },
     background: {
-        backgroundColor: fade(theme.palette.primary.dark, 0.7),
+        backgroundColor: alpha(theme.palette.primary.dark, 0.7),
     },
     appBar: {
         backgroundColor: theme.palette.navyBlue.main,
@@ -41,6 +41,11 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+    },
+    contentRoot:{
+        [theme.breakpoints.down("sm")]:{
+            padding: 0
+        }
     },
     whiteBtn: {
         color: theme.palette.primary.main,
@@ -234,7 +239,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                     startIcon={currentStream && <SaveIcon fontSize={size}/>} variant="contained" autoFocus
                     color="primary"
                     onClick={handleSaveOrUpdate}>
-                <Typography variant={size === "large" && "h5"}>
+                <Typography variant={size === "large" ? "h5": undefined}>
                     {!currentStream ? "Create draft" : isActualLivestream() ? "update and close" : "save changes and close"}
                 </Typography>
             </Button>
@@ -266,10 +271,10 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                     </CardActions>
                 </Toolbar>
             </AppBar>
-            <DialogContent>
+            <DialogContent className={classes.contentRoot}>
                 {/*Have to nest DialogContent Elements in order for scroll to top in Dialogs to work (weird MUI bug: github.com/mui-org/material-ui/issues/9186)*/}
                 <div ref={dialogRef}>
-                    <DialogContent className={classes.content}>
+                    <DialogContent className={`${classes.content} ${classes.contentRoot}`}>
                         <DraftStreamForm
                             formRef={formRef}
                             group={group}

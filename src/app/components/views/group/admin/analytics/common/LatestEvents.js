@@ -16,7 +16,7 @@ import {
 import {withFirebase} from "../../../../../../context/firebase";
 import {colorsArray} from "../../../../../util/colors";
 import {getLength, prettyDate, truncate} from "../../../../../helperFunctions/HelperFunctions";
-import {makeStyles, useTheme, fade} from "@material-ui/core/styles";
+import {makeStyles, useTheme, alpha} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -131,8 +131,8 @@ const LatestEvents = ({
                     pointHoverBorderColor: 'rgba(220,220,220,1)',
                     pointBorderColor: colorsArray[0],
                     pointBackgroundColor: colorsArray[0],
-                    backgroundColor: fade(theme.palette.primary.dark, 0.5),
-                    borderColor: fade(colorsArray[0], 0.5),
+                    backgroundColor: alpha(theme.palette.primary.dark, 0.5),
+                    borderColor: alpha(colorsArray[0], 0.5),
                     data: handleFutureStreams("registeredUsers"),
                     label: "Registrations (upcoming event)",
                     spanGaps: true,
@@ -144,8 +144,8 @@ const LatestEvents = ({
                     pointHoverBorderColor: 'rgba(220,220,220,1)',
                     pointBorderColor: colorsArray[2],
                     pointBackgroundColor: colorsArray[2],
-                    backgroundColor: fade(colorsArray[2], 0.5),
-                    borderColor: fade(colorsArray[2], 0.5),
+                    backgroundColor: alpha(colorsArray[2], 0.5),
+                    borderColor: alpha(colorsArray[2], 0.5),
                     data: handleFutureStreams("talentPool"),
                     label: "Talent Pool (upcoming event)",
                     spanGaps: true,

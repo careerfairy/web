@@ -4,7 +4,7 @@ import ButtonComponent from "../sharedComponents/ButtonComponent";
 import PollCategory from "./categories/PollCategory";
 import HandRaiseCategory from "./categories/HandRaiseCategory";
 import QuestionCategory from "../sharedComponents/QuestionCategory";
-import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
+import {alpha, makeStyles, useTheme} from "@material-ui/core/styles";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import SwipeableViews from "react-swipeable-views";
 import clsx from "clsx";
@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
         width: "100%",
         top: 0,
         height: "100%",
-        backgroundColor: fade(theme.palette.common.black, 0.2),
+        backgroundColor: alpha(theme.palette.common.black, 0.2),
         backdropFilter: "blur(5px)",
     },
     closeBtnSmallScreen: {

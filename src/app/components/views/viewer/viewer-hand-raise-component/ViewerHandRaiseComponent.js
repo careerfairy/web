@@ -4,16 +4,17 @@ import { withFirebasePage } from 'context/firebase';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
 import { v4 as uuidv4 } from 'uuid';
 import {useAuth} from "../../../../HOCs/AuthProvider";
+import useStreamRef from "../../../custom-hook/useStreamRef";
 
 function ViewerHandRaiseComponent(props) {
 
     const { authenticatedUser, userData } = useAuth();
-
+    const streamRef = useStreamRef();
     const [streamerId, setStreamerId] = useState(uuidv4())
 
     function updateHandRaiseRequest(state) {
         let authEmail = props.currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
-        props.firebase.updateHandRaiseRequest(props.currentLivestream.id, authEmail, state);
+        props.firebase.updateHandRaiseRequest(streamRef, authEmail, state);
     }
 
     let streamingCallbacks = {

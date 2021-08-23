@@ -1,31 +1,41 @@
-import PropTypes from 'prop-types'
-import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
-import {withFirebase} from "context/firebase";
-import {fade, makeStyles} from "@material-ui/core/styles";
+import PropTypes from "prop-types";
+import React, { Fragment, memo, useEffect, useMemo, useState } from "react";
+import { withFirebase } from "context/firebase";
+import { alpha, makeStyles } from "@material-ui/core/styles";
 import UserUtil from "../../../../../data/util/UserUtil";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
-import {dynamicSort, getResizedUrl, getResponsiveResizedUrl} from "../../../../helperFunctions/HelperFunctions";
-import {Card, CardHeader, ClickAwayListener, Collapse, Grow} from "@material-ui/core";
-import Avatar from '@material-ui/core/Avatar';
-import Box from '@material-ui/core/Box';
-import CardMedia from '@material-ui/core/CardMedia';
-import Typography from '@material-ui/core/Typography';
-import {Item, Row} from '@mui-treasury/components/flex';
-import {Info, InfoSubtitle, InfoTitle} from '@mui-treasury/components/info';
-import {useNewsInfoStyles} from '@mui-treasury/styles/info/news';
-import {useCoverCardMediaStyles} from '@mui-treasury/styles/cardMedia/cover';
-import {AvatarGroup} from "@material-ui/lab";
-import {speakerPlaceholder} from "../../../../util/constants";
+import {
+   dynamicSort,
+   getResizedUrl,
+   getResponsiveResizedUrl,
+} from "../../../../helperFunctions/HelperFunctions";
+import {
+   Card,
+   CardHeader,
+   ClickAwayListener,
+   Collapse,
+   Grow,
+} from "@material-ui/core";
+import Avatar from "@material-ui/core/Avatar";
+import Box from "@material-ui/core/Box";
+import CardMedia from "@material-ui/core/CardMedia";
+import Typography from "@material-ui/core/Typography";
+import { Item, Row } from "@mui-treasury/components/flex";
+import { Info, InfoSubtitle, InfoTitle } from "@mui-treasury/components/info";
+import { useNewsInfoStyles } from "@mui-treasury/styles/info/news";
+import { useCoverCardMediaStyles } from "@mui-treasury/styles/cardMedia/cover";
+import { AvatarGroup } from "@material-ui/lab";
+import { speakerPlaceholder } from "../../../../util/constants";
 import Tag from "./Tag";
-import Fade from 'react-reveal/Fade';
+import Fade from "react-reveal/Fade";
 import clsx from "clsx";
 import CopyToClipboard from "../../../common/CopyToClipboard";
-import {DateTimeDisplay} from "./TimeDisplay";
-import {AttendButton, DetailsButton} from "./actionButtons";
+import { DateTimeDisplay } from "./TimeDisplay";
+import { AttendButton, DetailsButton } from "./actionButtons";
 import LogoElement from "../LogoElement";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 
@@ -170,10 +180,13 @@ const useStyles = makeStyles(theme => ({
         // flexDirection: "column",
         justifyContent: "center",
         flexWrap: "inherit",
-        alignItems: "center"
+        alignItems: "center",
+
     },
     avaLogoWrapperHovered:{
         flexWrap: "wrap",
+        maxHeight: 300,
+        overflow: "auto"
     },
     top: {
         zIndex: 995
@@ -201,16 +214,16 @@ const useStyles = makeStyles(theme => ({
     },
     "@keyframes pulse": {
         "0%": {
-            MozBoxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 1)}`,
-            boxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 1)}`
+            MozBoxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 1)}`,
+            boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 1)}`
         },
         "70%": {
-            MozBoxShadow: `0 0 0 15px ${fade(theme.palette.primary.main, 0)}`,
-            boxShadow: `0 0 0 15px ${fade(theme.palette.primary.main, 0)}`
+            MozBoxShadow: `0 0 0 15px ${alpha(theme.palette.primary.main, 0)}`,
+            boxShadow: `0 0 0 15px ${alpha(theme.palette.primary.main, 0)}`
         },
         "100%": {
-            MozBoxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 0)}`,
-            boxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 0)}`
+            MozBoxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0)}`,
+            boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0)}`
         }
     },
     bookedIcon: {
@@ -260,419 +273,524 @@ const GroupStreamCardV2 = memo(({
     function userIsRegistered() {
         if (user.isLoaded && user.isEmpty || !livestream.registeredUsers || isAdmin) {
             return false;
-        }
-        return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
-    }
+         }
+         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1);
+      }
 
+      const registered = useMemo(() => userIsRegistered(), [
+         livestream.registeredUsers,
+      ]);
 
-    const registered = useMemo(() => userIsRegistered(), [livestream.registeredUsers])
+      const [cardHovered, setCardHovered] = useState(false);
+      const [targetOptions, setTargetOptions] = useState([]);
+      const [careerCenters, setCareerCenters] = useState([]);
+      const [bookingModalOpen, setBookingModalOpen] = useState(false);
+      const [isHighlighted, setIsHighlighted] = useState(false);
+      const [openJoinModal, setOpenJoinModal] = useState(false);
+      const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
 
-    const [cardHovered, setCardHovered] = useState(false)
-    const [targetOptions, setTargetOptions] = useState([])
-    const [careerCenters, setCareerCenters] = useState([])
-    const [bookingModalOpen, setBookingModalOpen] = useState(false);
-    const [isHighlighted, setIsHighlighted] = useState(false)
-    const [openJoinModal, setOpenJoinModal] = useState(false);
-    const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
-
-    useEffect(() => {
-        if (checkIfHighlighted() && !isHighlighted) {
-            setIsHighlighted(true)
+      useEffect(() => {
+         if (checkIfHighlighted() && !isHighlighted) {
+            setIsHighlighted(true);
             // setGlobalCardHighlighted?.(true)
             // setCardHovered(true)
-        } else if (checkIfHighlighted() && isHighlighted) {
-            setIsHighlighted(false)
-        }
-    }, [livestreamId, id, careerCenterId, groupData.groupId]);
+         } else if (checkIfHighlighted() && isHighlighted) {
+            setIsHighlighted(false);
+         }
+      }, [livestreamId, id, careerCenterId, groupData.groupId]);
 
-    useEffect(() => {
-        if (groupData.categories && livestream.targetCategories) {
-            const {groupId, categories} = groupData
-            let totalOptions = []
-            categories.forEach(category => totalOptions.push(category.options))
+      useEffect(() => {
+         if (groupData.categories && livestream.targetCategories) {
+            const { groupId, categories } = groupData;
+            let totalOptions = [];
+            categories.forEach((category) =>
+               totalOptions.push(category.options)
+            );
             const flattenedOptions = totalOptions.reduce(function (a, b) {
-                return a.concat(b);
+               return a.concat(b);
             }, []);
-            const matchedOptions = livestream.targetCategories[groupId]
+            const matchedOptions = livestream.targetCategories[groupId];
             if (matchedOptions) {
-                const filteredOptions = flattenedOptions.filter(option => matchedOptions.includes(option.id)).sort(dynamicSort("name")).reverse()
-                setTargetOptions(filteredOptions)
+               const filteredOptions = flattenedOptions
+                  .filter((option) => matchedOptions.includes(option.id))
+                  .sort(dynamicSort("name"))
+                  .reverse();
+               setTargetOptions(filteredOptions);
             }
-        }
-    }, [groupData, livestream])
+         }
+      }, [groupData, livestream]);
 
-    useEffect(() => {
-        if (!careerCenters.length && livestream && livestream.groupIds && livestream.groupIds.length) {
-            firebase.getDetailLivestreamCareerCenters(livestream.groupIds)
-                .then((querySnapshot) => {
-                    let groupList = [];
-                    querySnapshot.forEach((doc) => {
-                        let group = doc.data();
-                        group.id = doc.id;
-                        groupList.push(group);
-                    });
-                    setCareerCenters(groupList);
-                }).catch((e) => {
-                console.log("error", e)
-            })
-        }
-    }, []);
+      useEffect(() => {
+         if (
+            !careerCenters.length &&
+            livestream &&
+            livestream.groupIds &&
+            livestream.groupIds.length
+         ) {
+            firebase
+               .getDetailLivestreamCareerCenters(livestream.groupIds)
+               .then((querySnapshot) => {
+                  let groupList = [];
+                  querySnapshot.forEach((doc) => {
+                     let group = doc.data();
+                     group.id = doc.id;
+                     groupList.push(group);
+                  });
+                  setCareerCenters(groupList);
+               })
+               .catch((e) => {
+                  console.log("error", e);
+               });
+         }
+      }, []);
 
+      const handleMouseEntered = () => {
+         if (!cardHovered && !globalCardHighlighted) {
+            setCardHovered(true);
+         }
+      };
 
-    const handleMouseEntered = () => {
-        if (
-            !cardHovered && !globalCardHighlighted) {
-            setCardHovered(true)
-        }
-    }
-
-    const handleMouseLeft = () => {
-        if (isHighlighted) {
+      const handleMouseLeft = () => {
+         if (isHighlighted) {
             // setGlobalCardHighlighted?.(false)
-        }
-        cardHovered && setCardHovered(false)
-    }
+         }
+         cardHovered && setCardHovered(false);
+      };
 
-    const checkIfHighlighted = () => {
-        if (isTargetDraft) return true
-        if ((careerCenterId) && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
-            return true
-        } else return livestreamId && !careerCenterId && livestreamId === id;
-    }
+      const checkIfHighlighted = () => {
+         if (isTargetDraft) return true;
+         if (
+            careerCenterId &&
+            livestreamId &&
+            id &&
+            livestreamId === id &&
+            groupData.groupId === careerCenterId
+         ) {
+            return true;
+         } else return livestreamId && !careerCenterId && livestreamId === id;
+      };
 
-    const checkIfUserFollows = (careerCenter) => {
-        if (user.isLoaded && !user.isEmpty && userData && userData.groupIds) {
-            const {groupId} = careerCenter
-            return userData.groupIds.includes(groupId)
-        } else {
-            return false
-        }
-    }
+      const checkIfUserFollows = (careerCenter) => {
+         if (user.isLoaded && !user.isEmpty && userData && userData.groupIds) {
+            const { groupId } = careerCenter;
+            return userData.groupIds.includes(groupId);
+         } else {
+            return false;
+         }
+      };
 
-    function deregisterFromLivestream() {
-        if (user.isLoaded && user.isEmpty) {
+      function deregisterFromLivestream() {
+         if (user.isLoaded && user.isEmpty) {
             return push({
-                pathname: '/login',
-                query: {absolutePath}
+               pathname: "/login",
+               query: { absolutePath },
             });
-        }
+         }
 
-        firebase.deregisterFromLivestream(livestream.id, user.email);
-    }
+         firebase.deregisterFromLivestream(livestream.id, user.email);
+      }
 
-    async function startRegistrationProcess() {
-        if (user.isLoaded && user.isEmpty || !user.emailVerified) {
+      async function startRegistrationProcess() {
+         if ((user.isLoaded && user.isEmpty) || !user.emailVerified) {
             return push({
-                pathname: `/login`,
-                query: {absolutePath: linkToStream},
+               pathname: `/login`,
+               query: { absolutePath: linkToStream },
             });
-        }
+         }
 
-        if (!userData || !UserUtil.userProfileIsComplete(userData)) {
+         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
             return push({
-                pathname: '/profile',
-                query: "profile"
+               pathname: "/profile",
+               query: "profile",
             });
-        }
-        const {
+         }
+         const {
             hasAgreedToAll,
-            groupsWithPolicies
-        } = await GroupsUtil.getPolicyStatus(careerCenters, user.email, firebase)
-        if (!hasAgreedToAll) {
-            setOpenJoinModal(true)
-            setGroupsWithPolicies(groupsWithPolicies)
-        } else if (listenToUpcoming) {// If on next livestreams tab...
+            groupsWithPolicies,
+         } = await GroupsUtil.getPolicyStatus(
+            careerCenters,
+            user.email,
+            firebase
+         );
+         if (!hasAgreedToAll) {
+            setOpenJoinModal(true);
+            setGroupsWithPolicies(groupsWithPolicies);
+         } else if (listenToUpcoming) {
+            // If on next livestreams tab...
             if (!userFollowingAnyGroup() && livestream.groupIds?.length) {
-                setOpenJoinModal(true)
+               setOpenJoinModal(true);
             } else {
-                firebase.registerToLivestream(livestream.id, user.email, groupsWithPolicies).then(() => {
-                    setCardHovered(false)
-                    setBookingModalOpen(true);
-                    sendEmailRegistrationConfirmation();
-                })
+               firebase
+                  .registerToLivestream(
+                     livestream.id,
+                     user.email,
+                     groupsWithPolicies
+                  )
+                  .then(() => {
+                     setCardHovered(false);
+                     setBookingModalOpen(true);
+                     sendEmailRegistrationConfirmation();
+                  });
             }
-        } else { // if on any other tab that isn't next livestreams...
+         } else {
+            // if on any other tab that isn't next livestreams...
             if (!userFollowingCurrentGroup()) {
-                setOpenJoinModal(true)
+               setOpenJoinModal(true);
             } else {
-                firebase.registerToLivestream(livestream.id, user.email, groupsWithPolicies).then(() => {
-                    setCardHovered(false)
-                    setBookingModalOpen(true);
-                    sendEmailRegistrationConfirmation();
-                })
+               firebase
+                  .registerToLivestream(
+                     livestream.id,
+                     user.email,
+                     groupsWithPolicies
+                  )
+                  .then(() => {
+                     setCardHovered(false);
+                     setBookingModalOpen(true);
+                     sendEmailRegistrationConfirmation();
+                  });
             }
-        }
+         }
+      }
 
-    }
+      function completeRegistrationProcess() {
+         firebase
+            .registerToLivestream(livestream.id, user.email, groupsWithPolicies)
+            .then(() => {
+               setCardHovered(false);
+               setBookingModalOpen(true);
+               sendEmailRegistrationConfirmation();
+            });
+      }
 
-    function completeRegistrationProcess() {
-        firebase.registerToLivestream(livestream.id, user.email, groupsWithPolicies).then(() => {
-            setCardHovered(false)
-            setBookingModalOpen(true);
-            sendEmailRegistrationConfirmation();
-        })
-    }
+      function handleCloseJoinModal() {
+         setOpenJoinModal(false);
+      }
 
-    function handleCloseJoinModal() {
-        setOpenJoinModal(false);
-    }
+      function sendEmailRegistrationConfirmation() {
+         return DataAccessUtil.sendRegistrationConfirmationEmail(
+            user,
+            userData,
+            livestream
+         );
+      }
 
-    function sendEmailRegistrationConfirmation() {
-        return DataAccessUtil.sendRegistrationConfirmationEmail(user, userData, livestream);
-    }
+      const userFollowingAnyGroup = () => {
+         if (userData.groupIds && livestream.groupIds) {
+            // are you following any group thats part of this livstream?
+            return userData.groupIds.some(
+               (id) => livestream.groupIds.indexOf(id) >= 0
+            );
+         } else {
+            return false;
+         }
+      };
 
-    const userFollowingAnyGroup = () => {
-        if (userData.groupIds && livestream.groupIds) { // are you following any group thats part of this livstream?
-            return userData.groupIds.some(id => livestream.groupIds.indexOf(id) >= 0)
-        } else {
-            return false
-        }
-    }
+      const userFollowingCurrentGroup = () => {
+         if (userData.groupIds && groupData.groupId) {
+            // Are you following the group in group tab?
+            return userData.groupIds.includes(groupData.groupId);
+         } else {
+            return false;
+         }
+      };
 
-    const userFollowingCurrentGroup = () => {
-        if (userData.groupIds && groupData.groupId) { // Are you following the group in group tab?
-            return userData.groupIds.includes(groupData.groupId)
-        } else {
-            return false
-        }
-    }
+      const handleRegisterClick = () => {
+         if (user && livestream.registeredUsers?.indexOf(user.email) > -1) {
+            deregisterFromLivestream();
+         } else {
+            startRegistrationProcess();
+         }
+      };
 
-    const handleRegisterClick = () => {
-        if (user && livestream.registeredUsers?.indexOf(user.email) > -1) {
-            deregisterFromLivestream()
-        } else {
-            startRegistrationProcess()
-        }
-    }
+      const checkIfRegistered = () => {
+         if (isAdmin) {
+            return false;
+         }
+         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1);
+      };
 
-    const checkIfRegistered = () => {
-        if (isAdmin) {
-            return false
-        }
-        return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
-    }
+      const getGroups = () => {
+         if (groupData.groupId) {
+            return [groupData];
+         } else {
+            return careerCenters;
+         }
+      };
 
+      const handleCardClick = () => {
+         if (mobile) {
+            setCardHovered(true);
+         }
+      };
 
-    const getGroups = () => {
-        if (groupData.groupId) {
-            return [groupData]
-        } else {
-            return careerCenters
-        }
-    }
+      const handleClickAwayDetails = () => {
+         if (mobile) {
+            setCardHovered(false);
+         }
+      };
 
-    const handleCardClick = () => {
-        if (mobile) {
-            setCardHovered(true)
-        }
-    }
-
-    const handleClickAwayDetails = () => {
-        if (mobile) {
-            setCardHovered(false)
-        }
-    }
-
-    return (
-        <Fragment>
+      return (
+         <Fragment>
             <ClickAwayListener onClickAway={handleClickAwayDetails}>
-                <Card
-                    onClick={handleCardClick}
-                    onMouseEnter={handleMouseEntered}
-                    onMouseLeave={handleMouseLeft}
-                    className={clsx(classes.card, {
-                        [classes.top]: cardHovered,
-                        [classes.cardHovered]: cardHovered,
-                        [classes.pulseAnimate]: isHighlighted
-                    })}
-                >
-                    <Box className={clsx(classes.main, {
-                        [classes.mainBooked]: registered
-                    })}
-                         position={'relative'}>
-
-                        <CardMedia
-                            classes={mediaStyles}
-                            image={getResponsiveResizedUrl(livestream.backgroundImageUrl, mobile, "sm", "md")}
+               <Card
+                  onClick={handleCardClick}
+                  onMouseEnter={handleMouseEntered}
+                  onMouseLeave={handleMouseLeft}
+                  className={clsx(classes.card, {
+                     [classes.top]: cardHovered,
+                     [classes.cardHovered]: cardHovered,
+                     [classes.pulseAnimate]: isHighlighted,
+                  })}
+               >
+                  <Box
+                     className={clsx(classes.main, {
+                        [classes.mainBooked]: registered,
+                     })}
+                     position={"relative"}
+                  >
+                     <CardMedia
+                        classes={mediaStyles}
+                        image={getResponsiveResizedUrl(
+                           livestream.backgroundImageUrl,
+                           mobile,
+                           "sm",
+                           "md"
+                        )}
+                     />
+                     <div className={classes.content}>
+                        <CardHeader
+                           avatar={
+                              <DateTimeDisplay
+                                 mobile={mobile}
+                                 date={livestream.start.toDate()}
+                              />
+                           }
+                           title={
+                              <Avatar
+                                 variant="rounded"
+                                 className={classes.livestreamCompanyAva}
+                                 src={getResizedUrl(livestream.companyLogoUrl)}
+                                 alt={livestream.company}
+                              />
+                           }
+                           action={
+                              <CopyToClipboard
+                                 color="white"
+                                 value={linkToStream}
+                              />
+                           }
                         />
-                        <div className={classes.content}>
-                            <CardHeader
-                                avatar={
-                                    <DateTimeDisplay mobile={mobile}
-                                                     date={livestream.start.toDate()}/>
-                                }
-                                title={
-                                    <Avatar
-                                        variant="rounded"
-                                        className={classes.livestreamCompanyAva}
-                                        src={getResizedUrl(livestream.companyLogoUrl)}
-                                        alt={livestream.company}
-                                    />
-                                }
-                                action={
-                                    <CopyToClipboard
-                                        color="white"
-                                        value={linkToStream}/>
-                                }
-                            />
-                            <Collapse collapsedHeight={80} in={cardHovered}>
-                                <Typography
-                                    variant={'h4'}
-                                    className={clsx(classes.title, {
-                                        [classes.titleHovered]: cardHovered
-                                    })}
-                                >
-                                    {livestream.title}
-                                </Typography>
-                            </Collapse>
-                            <Box style={{maxHeight: 165, overflow: "auto", overflowX: "hidden"}}>
-                                {targetOptions.slice(0, cardHovered ? -1 : maxOptions).map(option =>
-                                    <Tag key={option.id} option={option}/>
-                                )}
-                                {(targetOptions.length > maxOptions && !cardHovered) &&
-                                <Tag option={{id: "hasMore", name: "..."}}/>}
-                            </Box>
-                            {!isPastLivestreams ? (<Box marginTop={1}>
-                                <DetailsButton
-                                    size="small"
-                                    mobile={mobile}
-                                    groupData={groupData}
-                                    listenToUpcoming={listenToUpcoming}
-                                    livestream={livestream}/>
-                                <AttendButton
-                                    size="small"
-                                    mobile={mobile}
-                                    handleRegisterClick={handleRegisterClick}
-                                    checkIfRegistered={checkIfRegistered}
-                                    user={user}/>
-                                <Grow in={Boolean(userIsRegistered())}>
-                                    <div className={classes.bookedIcon}>
-                                        <CheckCircleRoundedIcon/>
-                                        <Typography variant="h6" className={classes.bookedText}>
-                                            Booked
-                                        </Typography>
-                                    </div>
-                                </Grow>
-                            </Box>) : null}
-                        </div>
-                    </Box>
-                    <Row
-                        className={clsx(classes.author,{
-                            [classes.authorHovered]: cardHovered
-                        })}
-                        m={0}
-                        p={1}
-                        py={1}
-                        gap={mobile ? 1 : 2}
-                        bgcolor={'common.white'}
-                    >
-                        <Collapse unmountOnExit in={!cardHovered}>
-                            <Fade timeout={300} unmountOnExit in={!cardHovered}>
-                                <Row style={{justifyContent: "space-evenly"}}
-                                     className={classes.avaLogoWrapper}
-                                >
-                                    <Item>
-                                        <AvatarGroup>
-                                            {livestream.speakers?.map(speaker => (
-                                                <Avatar
-                                                    key={speaker.id}
-                                                    className={classes.avatar}
-                                                    src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
-                                                    alt={speaker.firstName}
-                                                />
-                                            ))}
-                                        </AvatarGroup>
-                                    </Item>
-                                    <Item>
-                                        <AvatarGroup>
-                                            {careerCenters.map(careerCenter => (
-                                                <Avatar
-                                                    variant="rounded"
-                                                    key={careerCenter.id}
-                                                    className={clsx(classes.groupLogo, classes.groupLogoStacked)}
-                                                    src={getResizedUrl(careerCenter.logoUrl, "xs")}
-                                                    alt={careerCenter.universityName}
-                                                />
-                                            ))}
-                                        </AvatarGroup>
-                                    </Item>
-                                </Row>
-                            </Fade>
+                        <Collapse collapsedHeight={80} in={cardHovered}>
+                           <Typography
+                              variant={"h4"}
+                              className={clsx(classes.title, {
+                                 [classes.titleHovered]: cardHovered,
+                              })}
+                           >
+                              {livestream.title}
+                           </Typography>
                         </Collapse>
-                        <Collapse unmountOnExit in={cardHovered}>
-                            <div
-                                className={clsx(classes.avaLogoWrapper,{
-                                    [classes.avaLogoWrapperHovered]: cardHovered
-                                })}
-                            >
-                                {livestream.speakers?.map(speaker => (
-                                    <Row className={classes.previewRow} key={speaker.id}>
-                                        <Item>
-                                            <Avatar
+                        <Box
+                           style={{
+                              maxHeight: 165,
+                              overflow: "auto",
+                              overflowX: "hidden",
+                           }}
+                        >
+                           {targetOptions
+                              .slice(0, cardHovered ? -1 : maxOptions)
+                              .map((option) => (
+                                 <Tag key={option.id} option={option} />
+                              ))}
+                           {targetOptions.length > maxOptions &&
+                              !cardHovered && (
+                                 <Tag option={{ id: "hasMore", name: "..." }} />
+                              )}
+                        </Box>
+                        <Box marginTop={1}>
+                           <DetailsButton
+                              size="small"
+                              mobile={mobile}
+                              groupData={groupData}
+                              listenToUpcoming={listenToUpcoming}
+                              livestream={livestream}
+                           />
 
-                                                className={classes.avatar}
-                                                src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
-                                                alt={speaker.firstName}
-                                            />
-                                        </Item>
-                                        <Info style={{marginRight: "auto"}} useStyles={useNewsInfoStyles}>
-                                            <InfoTitle>{`${speaker.firstName} ${speaker.lastName}`}</InfoTitle>
-                                            <InfoSubtitle>{speaker.position}</InfoSubtitle>
-                                        </Info>
-                                    </Row>
-                                ))}
-                                <Row p={1} style={{width: "100%"}} className={classes.groupLogos}>
-                                    {careerCenters.map(careerCenter => (
-                                        <LogoElement
-                                            className={classes.groupLogo}
-                                            hideFollow={(!cardHovered && !mobile) || isAdmin} key={careerCenter.groupId}
-                                            livestreamId={livestream.id}
-                                            userFollows={checkIfUserFollows(careerCenter)}
-                                            careerCenter={careerCenter} userData={userData} user={user}
-                                        />
+                           {!isPastLivestreams && (
+                              <AttendButton
+                                 size="small"
+                                 mobile={mobile}
+                                 handleRegisterClick={handleRegisterClick}
+                                 checkIfRegistered={checkIfRegistered}
+                                 user={user}
+                              />
+                           )}
+                           <Grow in={Boolean(userIsRegistered())}>
+                              <div className={classes.bookedIcon}>
+                                 <CheckCircleRoundedIcon />
+                                 <Typography
+                                    variant="h6"
+                                    className={classes.bookedText}
+                                 >
+                                    Booked
+                                 </Typography>
+                              </div>
+                           </Grow>
+                        </Box>
+                     </div>
+                  </Box>
+                  <Row
+                     className={clsx(classes.author, {
+                        [classes.authorHovered]: cardHovered,
+                     })}
+                     m={0}
+                     p={1}
+                     py={1}
+                     gap={mobile ? 1 : 2}
+                     bgcolor={"common.white"}
+                  >
+                     <Collapse unmountOnExit in={!cardHovered}>
+                        <Fade timeout={300} unmountOnExit in={!cardHovered}>
+                           <Row
+                              style={{ justifyContent: "space-evenly" }}
+                              className={classes.avaLogoWrapper}
+                           >
+                              <Item>
+                                 <AvatarGroup>
+                                    {livestream.speakers?.map((speaker) => (
+                                       <Avatar
+                                          key={speaker.id}
+                                          className={classes.avatar}
+                                          src={
+                                             getResizedUrl(
+                                                speaker.avatar,
+                                                "xs"
+                                             ) || speakerPlaceholder
+                                          }
+                                          alt={speaker.firstName}
+                                       />
                                     ))}
-                                </Row>
-                            </div>
-                        </Collapse>
-                    </Row>
-                    <div className={classes.shadow}/>
-                    <div className={`${classes.shadow} ${classes.shadow2}`}/>
-                </Card>
+                                 </AvatarGroup>
+                              </Item>
+                              <Item>
+                                 <AvatarGroup>
+                                    {careerCenters.map((careerCenter) => (
+                                       <Avatar
+                                          variant="rounded"
+                                          key={careerCenter.id}
+                                          className={clsx(
+                                             classes.groupLogo,
+                                             classes.groupLogoStacked
+                                          )}
+                                          src={getResizedUrl(
+                                             careerCenter.logoUrl,
+                                             "xs"
+                                          )}
+                                          alt={careerCenter.universityName}
+                                       />
+                                    ))}
+                                 </AvatarGroup>
+                              </Item>
+                           </Row>
+                        </Fade>
+                     </Collapse>
+                     <Collapse unmountOnExit in={cardHovered}>
+                        <div
+                           className={clsx(classes.avaLogoWrapper, {
+                              [classes.avaLogoWrapperHovered]: cardHovered,
+                           })}
+                        >
+                           {livestream.speakers?.map((speaker) => (
+                              <Row
+                                 className={classes.previewRow}
+                                 key={speaker.id}
+                              >
+                                 <Item>
+                                    <Avatar
+                                       className={classes.avatar}
+                                       src={
+                                          getResizedUrl(speaker.avatar, "xs") ||
+                                          speakerPlaceholder
+                                       }
+                                       alt={speaker.firstName}
+                                    />
+                                 </Item>
+                                 <Info
+                                    style={{ marginRight: "auto" }}
+                                    useStyles={useNewsInfoStyles}
+                                 >
+                                    <InfoTitle>{`${speaker.firstName} ${speaker.lastName}`}</InfoTitle>
+                                    <InfoSubtitle>
+                                       {speaker.position}
+                                    </InfoSubtitle>
+                                 </Info>
+                              </Row>
+                           ))}
+                           <Row
+                              p={1}
+                              style={{ width: "100%" }}
+                              className={classes.groupLogos}
+                           >
+                              {careerCenters.map((careerCenter) => (
+                                 <LogoElement
+                                    className={classes.groupLogo}
+                                    hideFollow={
+                                       (!cardHovered && !mobile) || isAdmin
+                                    }
+                                    key={careerCenter.groupId}
+                                    livestreamId={livestream.id}
+                                    userFollows={checkIfUserFollows(
+                                       careerCenter
+                                    )}
+                                    careerCenter={careerCenter}
+                                    userData={userData}
+                                    user={user}
+                                 />
+                              ))}
+                           </Row>
+                        </div>
+                     </Collapse>
+                  </Row>
+                  <div className={classes.shadow} />
+                  <div className={`${classes.shadow} ${classes.shadow2}`} />
+               </Card>
             </ClickAwayListener>
             <GroupJoinToAttendModal
-                open={openJoinModal}
-                groups={getGroups()}
-                groupsWithPolicies={groupsWithPolicies}
-                alreadyJoined={false}
-                userData={userData}
-                onConfirm={completeRegistrationProcess}
-                closeModal={handleCloseJoinModal}/>
+               open={openJoinModal}
+               groups={getGroups()}
+               groupsWithPolicies={groupsWithPolicies}
+               alreadyJoined={false}
+               userData={userData}
+               onConfirm={completeRegistrationProcess}
+               closeModal={handleCloseJoinModal}
+            />
             <BookingModal
-                livestream={livestream}
-                modalOpen={bookingModalOpen}
-                setModalOpen={setBookingModalOpen}
-                user={user}/>
-        </Fragment>
-    )
-})
+               livestream={livestream}
+               modalOpen={bookingModalOpen}
+               setModalOpen={setBookingModalOpen}
+               user={user}
+            />
+         </Fragment>
+      );
+   }
+);
 
 GroupStreamCardV2.propTypes = {
-    careerCenterId: PropTypes.string,
-    firebase: PropTypes.object,
-    globalCardHighlighted: PropTypes.bool,
-    groupData: PropTypes.object,
-    id: PropTypes.string,
-    isAdmin: PropTypes.bool,
-    isTargetDraft: PropTypes.bool,
-    listenToUpcoming: PropTypes.bool,
-    livestream: PropTypes.object.isRequired,
-    livestreamId: PropTypes.string,
-    mobile: PropTypes.bool,
-    setGlobalCardHighlighted: PropTypes.func,
-    user: PropTypes.object,
-    userData: PropTypes.object,
-    isPastLivestreams: PropTypes.bool,
-}
+   careerCenterId: PropTypes.string,
+   firebase: PropTypes.object,
+   globalCardHighlighted: PropTypes.bool,
+   groupData: PropTypes.object,
+   id: PropTypes.string,
+   isAdmin: PropTypes.bool,
+   isTargetDraft: PropTypes.bool,
+   listenToUpcoming: PropTypes.bool,
+   livestream: PropTypes.object.isRequired,
+   livestreamId: PropTypes.string,
+   mobile: PropTypes.bool,
+   setGlobalCardHighlighted: PropTypes.func,
+   user: PropTypes.object,
+   userData: PropTypes.object,
+   isPastLivestreams: PropTypes.bool,
+};
 
 export default withFirebase(GroupStreamCardV2);
-

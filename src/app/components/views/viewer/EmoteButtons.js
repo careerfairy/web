@@ -1,16 +1,15 @@
 import React, {memo, useCallback, useEffect, useState} from 'react';
-import {Box, ClickAwayListener, Fab, CircularProgress} from "@material-ui/core";
+import {Box, CircularProgress, ClickAwayListener, Fab} from "@material-ui/core";
 import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
-import {makeStyles, fade} from "@material-ui/core/styles";
+import {alpha, makeStyles} from "@material-ui/core/styles";
 import {amber, deepOrange, grey, red} from "@material-ui/core/colors";
 import ClappingSVG from "../../util/CustomSVGs";
-import * as actions from "../../../store/actions";
-import {useDispatch} from "react-redux";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import {useAuth} from "../../../HOCs/AuthProvider";
-import {withFirebase} from "context/firebase";
+import {useFirebase} from "context/firebase";
 import {TEST_EMAIL} from "../streaming/LeftMenu/categories/chat/EmotesModal/utils";
+import {useRouter} from "next/router";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -26,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: red["A400"],
         color: "white",
         "&:disabled": {
-            backgroundColor: fade(red["A400"], 0.5),
+            backgroundColor: alpha(red["A400"], 0.5),
             color: "white",
         },
         "&:hover": {
@@ -39,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: deepOrange[400],
         color: "white",
         "&:disabled": {
-            backgroundColor: fade(deepOrange[400], 0.5),
+            backgroundColor: alpha(deepOrange[400], 0.5),
             color: "white",
         },
         "&:hover": {
@@ -52,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: amber[400],
         color: "white",
         "&:disabled": {
-            backgroundColor: fade(amber[400], 0.5),
+            backgroundColor: alpha(amber[400], 0.5),
             color: "white",
         },
         "&:hover": {
@@ -130,7 +129,7 @@ const useStyles = makeStyles((theme) => ({
         position: 'relative',
     },
     fabProgress: {
-        color: fade(grey[500], 0.5),
+        color: alpha(grey[500], 0.5),
         position: 'absolute',
         zIndex: 1,
         top: 0,
@@ -142,8 +141,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 const delay = 3000; //3 seconds
 const smoothness = 2
-const EmoteButtons = memo( ({firebase, createEmote}) => {
-    const dispatch = useDispatch()
+const EmoteButtons = ({createEmote}) => {
+    const firebase = useFirebase()
     const {currentLivestream: {id: livestreamId}} = useCurrentStream()
     const {authenticatedUser} = useAuth()
     const classes = useStyles({handRaiseActive: false});
@@ -221,7 +220,7 @@ const EmoteButtons = memo( ({firebase, createEmote}) => {
                     <div className={classes.wrapper}>
                         <Fab disabled={iconsDisabled} onClick={handleLike} className={classes.miniLike}
                              aria-label="like">
-                            <ThumbUpAltOutlinedIcon fontSize="default"/>
+                            <ThumbUpAltOutlinedIcon fontSize="medium"/>
                         </Fab>
                         {iconsDisabled &&
                         <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
@@ -229,7 +228,7 @@ const EmoteButtons = memo( ({firebase, createEmote}) => {
                     <div className={classes.wrapper}>
                         <Fab disabled={iconsDisabled} onClick={handleClap} className={classes.miniClap}
                              aria-label="clap">
-                            <ClappingSVG style={{width: 21, height: 21}} fontSize="default"/>
+                            <ClappingSVG style={{width: 21, height: 21}} fontSize="medium"/>
                         </Fab>
                         {iconsDisabled &&
                         <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
@@ -237,7 +236,7 @@ const EmoteButtons = memo( ({firebase, createEmote}) => {
                     <div className={classes.wrapper}>
                         <Fab disabled={iconsDisabled} onClick={handleHeart} className={classes.miniHeart}
                              aria-label="heart">
-                            <FavoriteBorderOutlinedIcon fontSize="default"/>
+                            <FavoriteBorderOutlinedIcon fontSize="medium"/>
                         </Fab>
                         {iconsDisabled &&
                         <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
@@ -246,6 +245,6 @@ const EmoteButtons = memo( ({firebase, createEmote}) => {
             </div>
         </ClickAwayListener>
     );
-});
+};
 
-export default withFirebase(EmoteButtons);
+export default memo(EmoteButtons);

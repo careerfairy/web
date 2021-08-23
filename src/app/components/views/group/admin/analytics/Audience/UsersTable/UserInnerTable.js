@@ -1,5 +1,5 @@
 import React from 'react';
-import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
+import {alpha, makeStyles, useTheme} from "@material-ui/core/styles";
 import {Avatar, Collapse, Paper} from "@material-ui/core";
 import MaterialTable from "material-table";
 import {defaultTableOptions, getPageSize, tableIcons} from "../../common/TableUtils";
@@ -30,7 +30,7 @@ const UserInnerTable = ({firstName, lastName, streams, group, registered, fireba
     const theme = useTheme()
     const router = useRouter()
     const customOptions = {...defaultTableOptions}
-    const innerTableStyle = {background: fade(theme.palette.navyBlue.main, 0.05)}
+    const innerTableStyle = {background: alpha(theme.palette.navyBlue.main, 0.05)}
     customOptions.selection = false
     customOptions.pageSize = getPageSize(customOptions.pageSizeOptions, streams)
     customOptions.headerStyle = innerTableStyle
@@ -68,6 +68,7 @@ const UserInnerTable = ({firstName, lastName, streams, group, registered, fireba
                         render: rowData => prettyDate(rowData.start)
                     },
                 ]}
+                data={streams}
                 detailPanel={[
                     {
                         icon: tableIcons.SettingsIcon,
@@ -85,7 +86,6 @@ const UserInnerTable = ({firstName, lastName, streams, group, registered, fireba
                         }
                     }
                 ]}
-                data={streams}
             />
         </Collapse>
     )

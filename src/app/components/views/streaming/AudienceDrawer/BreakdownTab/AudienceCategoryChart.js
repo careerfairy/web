@@ -55,7 +55,7 @@ const AudienceCategoryChart = ({className, audience, firebase, ...rest}) => {
     const theme = useTheme()
     const classes = useStyles()
     const {currentLivestream} = useCurrentStream()
-    const unfilteredCareerCenters = useStreamGroups(currentLivestream?.groupIds, firebase)
+    const unfilteredCareerCenters = useStreamGroups(currentLivestream?.groupIds)
     const [careerCenters, setCareerCenters] = useState([]);
 
     const chartRef = useRef()

@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "NODE_OPTIONS=--max_old_space_size=8192 next",
+    "dev:windows": "next",
     "build": "next build --debug",
     "start": "next start"
   },
@@ -39,6 +40,7 @@
     "date-fns": "^2.0.0",
     "dayjs": "^1.9.3",
     "dotenv": "^8.2.0",
+    "file-loader": "^6.2.0",
     "filefy": "^0.1.10",
     "firebase": "^7.24.0",
     "firebase-functions": "^3.13.2",
@@ -46,6 +48,7 @@
     "firestore-parser": "^0.9.0",
     "formik": "^2.1.2",
     "global": "^4.4.0",
+    "jszip": "^3.6.0",
     "lodash": "^4.17.20",
     "lodash.clonedeep": "^4.5.0",
     "lodash.debounce": "^4.0.8",
@@ -56,7 +59,10 @@
     "next-redux-wrapper": "^6.0.2",
     "notistack": "^1.0.1",
     "react": "^16.14.0",
+    "react-calendly": "^2.0.2",
     "react-chartjs-2": "^2.10.0",
+    "react-cookie-consent": "^6.2.4",
+    "react-countdown-circle-timer": "^2.5.3",
     "react-csv": "^2.0.3",
     "react-dom": "^16.12.0",
     "react-draggable": "^4.4.3",
@@ -86,6 +92,7 @@
     "react-transition-group": "^4.4.1",
     "react-virtualized-auto-sizer": "^1.0.4",
     "react-window": "^1.8.6",
+    "react-window-infinite-loader": "^1.0.7",
     "redux": "^4.0.5",
     "redux-firestore": "^0.14.0",
     "redux-thunk": "^2.3.0",
@@ -93,7 +100,8 @@
     "slick-carousel": "^1.8.1",
     "use-pagination-firestore": "0.0.2",
     "uuid": "^8.3.0",
-    "validate-color": "^2.1.1"
+    "validate-color": "^2.1.1",
+    "yup": "^0.32.9"
   },
   "browserslist": [
     "defaults",
@@ -105,6 +113,7 @@
     "@babel/plugin-proposal-throw-expressions": "^7.12.13",
     "@material-ui/codemod": "^4.5.0",
     "@next/bundle-analyzer": "^10.0.6",
+    "@svgr/webpack": "^5.5.0",
     "clsx": "^1.1.1",
     "jscodeshift": "^0.11.0",
     "node-sass": "^5.0.0",

@@ -10,6 +10,7 @@ import clsx from "clsx";
 import * as actions from '../../../../store/actions'
 import {getMinutesPassed} from "../../../helperFunctions/HelperFunctions";
 import {useDispatch} from "react-redux";
+import useStreamRef from "../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles((theme) => ({
     snackbar: {
@@ -42,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: theme.spacing(1)
     },
     emptyIcon: {
-        // color: fade(theme.palette.background.default, 0.5)
+        // color: alpha(theme.palette.background.default, 0.5)
     },
 }));
 
@@ -201,6 +202,7 @@ ActionComponent.propTypes = {
 const RatingContainer = ({firebase, livestream, livestreamId}) => {
     const {authenticatedUser} = useAuth();
     const classes = useStyles();
+    const streamRef = useStreamRef();
     const dispatch = useDispatch()
     const enqueueSnackbar = (...args) => dispatch(actions.enqueueSnackbar(...args))
     const [minutesPassed, setMinutesPassed] = useState(null);
@@ -208,8 +210,8 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
 
     useEffect(() => {
         if (livestream?.id) {
-            const unsubscribeRatings = firebase.listenToLivestreamRatings(
-                livestream.id,
+            const unsubscribeRatings = firebase.listenToLivestreamRatingsWithStreamRef(
+                streamRef,
                 async (querySnapshot) => {
                     setRatings(prevState => {
                         return querySnapshot.docs.map((doc) => {

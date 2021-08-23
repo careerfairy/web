@@ -8,6 +8,7 @@ import {useTheme, withStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
 import {useCurrentStream} from "../../../../context/stream/StreamContext";
 import useMapPollVoters from "../../../custom-hook/useMapPollVoters";
+import useStreamRef from "../../../custom-hook/useStreamRef";
 
 const GraphWrapper = withStyles(theme => ({
     root: {
@@ -32,6 +33,7 @@ const CountWrapper = withStyles(theme => ({
 const CurrentPollGraph = ({currentPoll: {options, question, id: pollId, demoVotes}, firebase}) => {
     const chartRef = useRef()
     const theme = useTheme()
+    const streamRef = useStreamRef();
     const {currentLivestream} = useCurrentStream()
     const [legendElements, setLegendElements] = useState([])
     const [legendLabels, setLegendLabels] = useState([])
@@ -39,7 +41,6 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId, demoVote
         labels: [],
         datasets: [],
     })
-
     const [optionsObj, setOptionsObj] = useState({
         maintainAspectRatio: true,
         legend: {
@@ -65,7 +66,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, id: pollId, demoVote
         }
     })
 
-    useMapPollVoters(pollId, currentLivestream.id, setChartData, firebase, demoVotes)
+    useMapPollVoters(pollId, currentLivestream.id, setChartData, firebase, demoVotes, streamRef)
 
     useEffect(() => {
         setOptionsObj({

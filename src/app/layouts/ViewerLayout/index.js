@@ -12,6 +12,8 @@ import {v4 as uuidv4} from "uuid";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 import PropTypes from "prop-types";
+import useStreamRef from "../../components/custom-hook/useStreamRef";
+import StreamClosedCountdown from "../../components/views/streaming/sharedComponents/StreamClosedCountdown";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -60,15 +62,13 @@ const useStyles = makeStyles((theme) => ({
 
 
 const ViewerLayout = (props) => {
-
-    const {children, firebase} = props
-    const {query: {livestreamId}, replace, asPath} = useRouter()
+    const {children, firebase, isBreakout} = props
+    const {query: {livestreamId, breakoutRoomId}, replace, asPath} = useRouter()
     const {authenticatedUser, userData} = useAuth();
     const {breakpoints: {values}} = useTheme()
     const mobile = useMediaQuery(`(max-width:${values.mobile}px)`)
-
+    const streamRef = useStreamRef();
     const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
-    const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [showVideoButton, setShowVideoButton] = useState({paused: false, muted: false});
     const [play, setPlay] = useState(false);
     const [unmute, setUnmute] = useState(false);
@@ -83,6 +83,7 @@ const ViewerLayout = (props) => {
 
     const currentLivestream = useStreamConnect()
 
+
     const notAuthorized = currentLivestream && !currentLivestream.test && authenticatedUser?.isLoaded && authenticatedUser?.isEmpty
 
     useEffect(() => {
@@ -94,14 +95,22 @@ const ViewerLayout = (props) => {
     }, [mobile]);
 
     useEffect(() => {
-        if (userData?.userEmail && livestreamId) {
-            firebase.setUserIsParticipating(livestreamId, userData);
+        if (userData?.userEmail) {
+            if (livestreamId) {
+                firebase.setUserIsParticipating(livestreamId, userData);
+            }
+            if (breakoutRoomId) {
+                firebase.setUserIsParticipatingWithRef(streamRef, userData);
+            }
+
         }
-    }, [livestreamId, userData?.email, userData?.linkedinUrl, userData?.firstName, userData?.lastName]);
+    }, [livestreamId, userData?.email, userData?.linkedinUrl, userData?.firstName, userData?.lastName, breakoutRoomId]);
 
     useEffect(() => {
         if (currentLivestream && !streamerId) {
-            if (currentLivestream.test) {
+            if (currentLivestream.test && authenticatedUser?.email) {
+                setStreamerId(currentLivestream.id + authenticatedUser.email)
+            } else if (currentLivestream.test) {
                 let uuid = uuidv4()
                 let joiningId = uuid.replace(/-/g, '')
                 setStreamerId(currentLivestream.id + joiningId)
@@ -118,13 +127,13 @@ const ViewerLayout = (props) => {
         });
     }
 
-    const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
     const handleStateChange = useCallback((state) => {
         if (!showMenu) {
             setShowMenu(true);
         }
         setSelectedState(state);
     }, [showMenu])
+
     const showAudience = useCallback(() => {
         setAudienceDrawerOpen(true)
     }, []);
@@ -158,12 +167,12 @@ const ViewerLayout = (props) => {
 
 
     return (
-        <CurrentStreamContext.Provider value={{currentLivestream}}>
+        <CurrentStreamContext.Provider value={{currentLivestream, isBreakout}}>
             <div className={`${classes.root} notranslate`}>
                 <ViewerTopBar
                     showAudience={showAudience}
                     showMenu={showMenu}
-                    numberOfViewers={numberOfViewers}
+                    audienceDrawerOpen={audienceDrawerOpen}
                     mobile={mobile}
                 />
                 <LeftMenu
@@ -197,7 +206,6 @@ const ViewerLayout = (props) => {
                                 streamerId,
                                 mobile,
                                 showAudience,
-                                setNumberOfViewers: handleSetNumberOfViewers,
                                 hideAudience,
                                 audienceDrawerOpen,
                                 setShowVideoButton,

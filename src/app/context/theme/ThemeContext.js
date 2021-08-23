@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import {baseThemeObj, darkThemeObj} from "../../materialUI";
-import {createMuiTheme, responsiveFontSizes, ThemeProvider, makeStyles} from '@material-ui/core/styles';
+import {createTheme, responsiveFontSizes, ThemeProvider, makeStyles} from '@material-ui/core/styles';
 import {SnackbarProvider} from "notistack";
 import {useRouter} from "next/router";
 
@@ -8,9 +8,14 @@ const ThemeContext = createContext();
 const pathsReadyForDarkMode = [
     "/streaming/[livestreamId]/joining-streamer",
     "/streaming/[livestreamId]/main-streamer",
-    "/streaming/[livestreamId]/viewer"
+    "/streaming/[livestreamId]/viewer",
+    "/streaming/[livestreamId]/breakout-room/[breakoutRoomId]/joining-streamer",
+    "/streaming/[livestreamId]/breakout-room/[breakoutRoomId]/main-streamer",
+    "/streaming/[livestreamId]/breakout-room/[breakoutRoomId]/viewer"
 ];
-const initialTheme = responsiveFontSizes(createMuiTheme(baseThemeObj))
+
+const initialTheme = responsiveFontSizes(createTheme(baseThemeObj))
+
 const ThemeProviderWrapper = ({children}) => {
     const {pathname} = useRouter()
 
@@ -23,7 +28,7 @@ const ThemeProviderWrapper = ({children}) => {
     const toggleTheme = () => {
         const newThemeObj = theme.palette.type === "dark" ? baseThemeObj : darkThemeObj
         localStorage.setItem("themeMode", newThemeObj.palette.type)
-        const createdTheme = createMuiTheme(newThemeObj);
+        const createdTheme = createTheme(newThemeObj);
         setTheme(responsiveFontSizes(createdTheme))
     }
 
@@ -40,7 +45,7 @@ const ThemeProviderWrapper = ({children}) => {
             }
         }
 
-        const createdTheme = createMuiTheme(newThemeObj);
+        const createdTheme = createTheme(newThemeObj);
         setTheme(responsiveFontSizes(createdTheme))
     }
 

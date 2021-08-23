@@ -1,13 +1,12 @@
-import PropTypes from 'prop-types'
-import React, {useState} from 'react';
-import {makeStyles, useTheme} from '@material-ui/core/styles';
-import NavBar from './NavBar';
-import {withFirebase} from "../../context/firebase";
+import PropTypes from "prop-types";
+import React, { useState } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import NavBar from "./NavBar";
+import { withFirebase } from "../../context/firebase";
 import styles from "../../materialUI/styles/layoutStyles/nextLivestreamsLayoutStyles";
 import TopBar from "./TopBar";
-import Head from "next/head";
-import Footer from "../../components/views/footer/Footer";
 import useGeneralLinks from "../../components/custom-hook/useGeneralLinks";
+import FooterV2 from "../../components/views/footer/FooterV2";
 
 const useStyles = makeStyles(styles);
 
@@ -15,10 +14,10 @@ const NextLivestreamsLayout = (props) => {
     const {children, currentGroup} = props
     const drawerWidth = 300
     const classes = useStyles({drawerWidth});
-    const [isMobileNavOpen, setMobileNavOpen] = useState(false);
 
     const {mainLinks, secondaryLinks} = useGeneralLinks()
 
+    const [isMobileNavOpen, setMobileNavOpen] = useState(false);
     const handleDrawerOpen = () => setMobileNavOpen(true)
     const handleDrawerClose = () => setMobileNavOpen(false)
     const handleDrawerToggle = () => setMobileNavOpen(!isMobileNavOpen)
@@ -43,11 +42,8 @@ const NextLivestreamsLayout = (props) => {
                 <div className={classes.wrapper}>
                     <div className={classes.contentContainer}>
                         <div className={classes.content}>
-                            {/*{React.Children.map(children, child => React.cloneElement(child, {*/}
-                            {/*    ...props*/}
-                            {/*}))}*/}
                             {children}
-                            <Footer/>
+                            <FooterV2 />
                         </div>
                     </div>
                 </div>
