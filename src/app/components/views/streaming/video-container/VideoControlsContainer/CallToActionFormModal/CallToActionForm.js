@@ -122,7 +122,7 @@ const CallToActionForm = ({
       },
    });
 
-   // console.log("-> formik.values", formik.values);
+   console.log("-> formik.errors", formik.errors);
    // console.log("-> callToActionSocialsArray", callToActionSocialsArray);
 
    const handleSend = async (values) => {

@@ -53,12 +53,12 @@ const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
                callToActionsDictionary[callToActionToEdit.type]?.color || defaultInitialValues.color,
             value:
               callToActionsDictionary[callToActionToEdit.type]?.value || defaultInitialValues.value,
-            buttonUrl: callToActionToEdit.buttonUrl,
+            buttonUrl: callToActionToEdit.buttonUrl || "",
             type: callToActionToEdit.type,
             id: callToActionToEdit.id,
             buttonText: callToActionToEdit.buttonText,
             isToBeSaved: true,
-            imageUrl: callToActionToEdit.imageUrl,
+            imageUrl: callToActionToEdit.imageUrl || "",
             title:
               callToActionsDictionary[callToActionToEdit.type]?.title || defaultInitialValues.title,
             jobData: {
