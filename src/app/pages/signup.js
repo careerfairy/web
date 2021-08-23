@@ -216,6 +216,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                     password: '',
                     confirmPassword: '',
                     agreeTerm: false,
+                    subscribed: true,
                     university: { code: 'other', name: 'Other' },
                     universityCountryCode: ''
                 }}
@@ -289,6 +290,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                       isSubmitting,
                       /* and other goodies */
                   }) => (
+
                     <form id='signUpForm' onSubmit={handleSubmit}>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
@@ -437,19 +439,37 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                                         placeholder='Confirm Password'
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.agreeTerm}
+                                        checked={values.agreeTerm}
                                         disabled={submitting(isSubmitting)}
                                         color="primary"
                                     />}
-                                    label={<>I agree to
+                                    label={<Typography style={{ fontSize: 12 }}>
+                                        I agree to
                                         the <Link href='/terms'><a>Terms & Conditions</a></Link> and I have taken note of the <Link
-                                            href='/privacy'><a>Data Protection Notice</a></Link></>}
+                                            href='/privacy'><a>Data Protection Notice</a></Link>
+                                    </Typography>}
                                 />
                                 <Collapse in={Boolean(errors.agreeTerm && touched.agreeTerm && errors.agreeTerm)}>
                                     <FormHelperText error>
                                         {errors.agreeTerm}
                                     </FormHelperText>
                                 </Collapse>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <FormControlLabel
+                                    control={<Checkbox
+                                        name='subscribed'
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        defaultValue={true}
+                                        checked={values.subscribed}
+                                        disabled={submitting(isSubmitting)}
+                                        color="primary"
+                                    />}
+                                    label={<Typography style={{ fontSize: 12 }}>
+                                        I don’t want to miss out on events from exciting companies and would like to receive occasional email announcements from CareerFairy. 🚀
+                                    </Typography>}
+                                />
                             </Grid>
                         </Grid>
                         <Button
