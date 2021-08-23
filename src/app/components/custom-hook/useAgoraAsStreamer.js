@@ -180,6 +180,88 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         setScreenShareRtcStream(null)
     }
 
+    useEffect(() => {
+        handleSwitchRooms()
+    }, [router.asPath])
+
+    useEffect(() => {
+        if (timeoutNumber) {
+            clearTimeout(timeoutNumber)
+        }
+        if (agoraRtcStatus.msg === "RTC_JOINING_CHANNEL" || agoraRtcStatus.msg === "RTC_PUBLISHING_STREAM") {
+            let number = setTimeout(() => {
+                setAgoraRtcStatus({
+                    type: "ERROR",
+                    msg: "RTC_CONNECTION_ERROR"
+                })
+            }, 15000);
+            setTimeoutNumber(number)
+        }   
+    }, [agoraRtcStatus])
+
+    const agoraHandlers = useMemo(() => ({
+        getChannelMemberCount: async (channelIds) => {
+            return await rtmClient.getChannelMemberCount(channelIds)
+        },
+        handleDisconnect: async () => {
+            if (rtmChannel) {
+                rtmChannel.removeAllListeners()
+                await rtmChannel.leave()
+            }
+            if (rtmClient) {
+                rtmClient.removeAllListeners()
+                await rtmClient.logout()
+            }
+            if (rtcClient) {
+                await rtcClient.leave()
+            }
+        },
+        joinChannel: async (targetRoomId, handleMemberJoined, handleMemberLeft, updateMemberCount) => {
+            let newChannel
+            if (targetRoomId === roomId) { // Dont re-join the current stream channel pls
+                newChannel = rtmChannel
+            } else {
+                newChannel = rtmClient.createChannel(targetRoomId)
+                await newChannel.join()
+            }
+            newChannel.on("MemberJoined", handleMemberJoined)
+            newChannel.on("MemberLeft", handleMemberLeft)
+            newChannel.on("MemberCountUpdated", newCount => {
+                updateMemberCount(roomId, newCount - 1)
+            })
+            return newChannel
+
+        },
+        getChannelMembers: async (channel) => {
+            return await channel.getMembers()
+        },
+        leaveChannel: async (channel) => {
+            if(channel.channelId === roomId) return // Dont leave the current stream channel pls
+            channel.removeAllListeners()
+            await channel.leave()
+        }
+    }), [rtmClient, rtmChannel, rtcClient, roomId])
+
+    const handleConnectClients = () => {
+        console.log("-> Connecting Clients");
+        connectAgoraRTC()
+        connectAgoraRTM()
+    }
+    const handleSwitchRooms = async () => {
+        if (rtcClient || rtmClient || rtmChannel) {
+            console.log("-> CLOSING CONNECTIONS");
+            removeAllClients()
+            console.log("-> CLOSING CONNECTIONS FINISHED");
+        }
+        setExternalMediaStreams([])
+    }
+
+    const removeAllClients = () => {
+        setAgoraRTC(null)
+        setScreenShareRtcClient(null)
+        setScreenShareRtcStream(null)
+    }
+
     const createEmote = useCallback(async (emoteType) => {
         try {
             const messageToSend = await dispatch(actions.createEmote(emoteType))

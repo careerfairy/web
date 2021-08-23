@@ -1,41 +1,48 @@
-import PropTypes from 'prop-types'
-import ThumbUpIcon from '@material-ui/icons/ThumbUp';
-import {useRouter} from 'next/router';
-import {withFirebasePage} from "context/firebase";
-import {Button, Card, CardActions, CardContent, CardHeader, Typography} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
+import PropTypes from "prop-types";
+import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import { useRouter } from "next/router";
+import { withFirebasePage } from "context/firebase";
+import {
+   Button,
+   Card,
+   CardActions,
+   CardContent,
+   CardHeader,
+   Typography,
+} from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles(theme => ({
-    root: {
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        padding: theme.spacing(1)
-    },
-    questionTitle: {
-        fontSize: "1.2em",
-        fontWeight: 500,
-        wordBreak: "break-word"
-    },
-    actions: {
-        marginTop: "auto",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center"
-    },
-    icon: {
-        marginLeft: theme.spacing(0.5)
-    },
-    voteCount: {
-        display: "flex",
-        alignItems: "center",
-        color: theme.palette.action.disabled
-    },
-    voteText: {
-        fontWeight: 700,
-        marginTop: `${theme.spacing(0.5)}px !important`,
-    }
-}))
+const useStyles = makeStyles((theme) => ({
+   root: {
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      padding: theme.spacing(1),
+   },
+   questionTitle: {
+      fontSize: "1.2em",
+      fontWeight: 500,
+      wordBreak: "break-word",
+   },
+   actions: {
+      marginTop: "auto",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+   },
+   icon: {
+      marginLeft: theme.spacing(0.5),
+   },
+   voteCount: {
+      display: "flex",
+      alignItems: "center",
+      color: theme.palette.action.disabled,
+   },
+   voteText: {
+      fontWeight: 700,
+      marginTop: `${theme.spacing(0.5)}px !important`,
+   },
+}));
 
 function QuestionVotingBox(props) {
     const classes = useStyles()
@@ -75,8 +82,8 @@ function QuestionVotingBox(props) {
                 </Typography>
             </CardContent>
             <CardActions className={classes.actions} disableSpacing>
-                <Button disabled={userHasVotedOnQuestion(props.user, props.question)}
-                        variant="contained" fullWidth disabled={props.isPastEvent}
+                <Button disabled={userHasVotedOnQuestion(props.user, props.question) || props.isPastEvent }
+                        variant="contained" fullWidth 
                         onClick={() => upvoteLivestreamQuestion(props.user, props.question)}
                         color="primary" startIcon={<ThumbUpIcon/>}>
                     upvote

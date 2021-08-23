@@ -95,6 +95,8 @@ function ViewerComponent(props) {
         }
     }, [agoraRtcStatus])
 
+    const currentSpeakerId = useCurrentSpeaker(localMediaStream, externalUsers)
+
     useEffect(() => {
         if (joinedChannel && !props.isBreakout && !externalUsers?.length && hasActiveRooms) {
             const timout = setTimeout(function() { //Start the timer
@@ -137,14 +139,15 @@ function ViewerComponent(props) {
         <React.Fragment>
             <EmoteButtons createEmote={createEmote}/>
             <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive}
-                                     smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}
-                                     speakerSwitchModeActive={false} localStream={null} 
-                                     streams={externalUsers} localId={props.streamerId}
-                                     isViewer={true}
-                                     joinedChannel={joinedChannel}
-                                     isBreakout={props.isBreakout}
-                                     currentSpeaker={props.currentLivestream.currentSpeakerId}
-                                     muted={!props.currentLivestream.hasStarted} {...props}/>
+                smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}
+                speakerSwitchModeActive={false} localStream={null} 
+                streams={externalUsers} localId={props.streamerId}
+                streamTitle={props.currentLivestream.title}
+                isViewer={true}
+                joinedChannel={joinedChannel}
+                isBreakout={props.isBreakout}
+                currentSpeaker={currentSpeakerId}
+                muted={!props.currentLivestream.hasStarted} {...props}/>
             {shareDesktopOrSlides() &&
             <SmallStreamerVideoDisplayer
                 livestreamId={props.currentLivestream.id}

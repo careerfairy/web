@@ -31,7 +31,6 @@ import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 const useStyles = makeStyles((theme) => ({}));
 
 function VideoContainer(props) {
-
    const {
       tutorialSteps,
       setTutorialSteps,
@@ -254,7 +253,7 @@ function VideoContainer(props) {
             isStreamer={props.isStreamer}
             isBreakout={props.isBreakout}
             streams={externalUsers}
-            currentSpeaker={props.currentLivestream.currentSpeakerId}
+            currentSpeaker={currentSpeakerId}
             setRemovedStream={setRemovedStream}
             {...props}
             muted={false}

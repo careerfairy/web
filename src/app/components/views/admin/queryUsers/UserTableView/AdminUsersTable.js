@@ -1,10 +1,10 @@
 import React from 'react';
 import {Card} from "@material-ui/core";
-import MaterialTable from "material-table";
 import {defaultTableOptions, exportSelectionAction, tableIcons} from "../../../../util/tableUtils";
 import useUserTable from "../../../../custom-hook/useUserTable";
 import {useSelector} from "react-redux";
 import PropTypes from 'prop-types'
+import ExportTable from "../../../common/Tables/ExportTable";
 
 const customTableOptions = {...defaultTableOptions}
 
@@ -18,7 +18,7 @@ const AdminUsersTable = ({users, isFiltered}) => {
 
     return (
         <Card>
-            <MaterialTable
+            <ExportTable
                 icons={tableIcons}
                 isLoading={loading}
                 data={users}

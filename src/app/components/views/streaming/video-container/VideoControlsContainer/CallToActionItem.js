@@ -18,7 +18,6 @@ import {
    ListItemText,
    Menu,
    MenuItem,
-   TextField,
    Tooltip,
    Typography,
 } from "@material-ui/core";
@@ -297,11 +296,14 @@ export const CallToActionItem = React.memo((props) => {
          numberOfUsersWhoDismissed,
          buttonText,
          type,
+        jobData
       },
       handleToggleActive,
       handleClickEditCallToAction,
       handleClickDeleteCallToAction,
    } = props;
+
+   const isJobPosting = type === "jobPosting"
    const styles = useSecondaryStyles({
       color:
          callToActionsIconsDictionary[type]?.color ||
@@ -342,7 +344,23 @@ export const CallToActionItem = React.memo((props) => {
          <Box flexGrow={1} minWidth={0} p={1} pr={0}>
             <Box display={"flex"}>
                <div className={classes.detailsWrapper}>
-                  <ListItemText primary="Button Text" secondary={buttonText} />
+                  {isJobPosting ? (
+                     <ListItemText
+                        primary="Job Title"
+                        secondaryTypographyProps={{
+                           noWrap: true,
+                        }}
+                        secondary={jobData?.jobTitle}
+                     />
+                  ) : (
+                     <ListItemText
+                        primary="Button Text"
+                        secondaryTypographyProps={{
+                           noWrap: true,
+                        }}
+                        secondary={buttonText}
+                     />
+                  )}
                   <ListItemText
                      primary="Button Url"
                      secondaryTypographyProps={{
@@ -351,7 +369,7 @@ export const CallToActionItem = React.memo((props) => {
                      secondary={<LinkifyText>{buttonUrl}</LinkifyText>}
                   />
                   <ListItemText
-                     primary="Message"
+                     primary={isJobPosting ?"Job Description": "Message"}
                      secondaryTypographyProps={{
                         noWrap: true,
                      }}
@@ -393,109 +411,6 @@ export const CallToActionItem = React.memo((props) => {
             </Box>
          </Box>
       </ListItem>
-   );
-   return (
-      <div style={style} className={classes.root}>
-         <Card elevation={2} className={clsx(styles.card)}>
-            <CardContent className={styles.cardContent}>
-               <Box position="relative">
-                  <div className={styles.icon}>
-                     {callToActionsIconsDictionary[type]?.icon ||
-                        callToActionsIconsDictionary.custom.icon}
-                  </div>
-                  <TextField
-                     id="button-text"
-                     label="Button Text"
-                     defaultValue={buttonText}
-                     disabled
-                     InputProps={{
-                        readOnly: true,
-                     }}
-                  />
-                  <TextField
-                     id="button-url"
-                     type="url"
-                     label="Button Url"
-                     disabled
-                     defaultValue={buttonUrl}
-                     InputProps={{
-                        readOnly: true,
-                     }}
-                  />
-                  <TextField
-                     id="message"
-                     label="Message"
-                     disabled
-                     defaultValue={message}
-                     InputProps={{
-                        readOnly: true,
-                     }}
-                  />
-               </Box>
-            </CardContent>
-            <Divider light />
-            <Box display={"flex"}>
-               <Box
-                  p={1}
-                  flex={"auto"}
-                  // className={borderedGridStyles.item}
-               >
-                  <p className={styles.statLabel}>Engagement</p>
-                  <p className={styles.statValue}>
-                     {engagementData.noOfEngagement}
-                  </p>
-               </Box>
-               <Divider variant="fullWidth" orientation="vertical" flexItem />
-               <Box
-                  p={1}
-                  flex={"auto"}
-                  // className={borderedGridStyles.item}
-               >
-                  <p className={styles.statLabel}>Total Interactions</p>
-                  <p className={styles.statValue}>{engagementData.total}</p>
-               </Box>
-            </Box>
-         </Card>
-      </div>
-   );
-
-   return (
-      <div style={style} className={classes.root}>
-         <Card className={clsx(classes.card)} elevation={2}>
-            <Box position="relative" p={2} flexGrow={1}>
-               <SettingsDropdown
-                  handleClickEditCallToAction={handleClickEditCallToAction}
-                  handleClickDeleteCallToAction={handleClickDeleteCallToAction}
-                  callToAction={props.callToAction}
-                  className={classes.settingBtn}
-               />
-               <Section label={"Button Text:"} description={buttonText} />
-               <Section label={"Button Url:"} description={buttonUrl} />
-               {message ? (
-                  <Section label={"Message:"} description={message} />
-               ) : null}
-               <Typography className={classes.label} color="textSecondary">
-                  Engagement:
-               </Typography>
-               <Box display={"flex"} alignItems={"center"}>
-                  <LinearProgressWithLabel
-                     engagementData={engagementData}
-                     value={engagementData.percentage}
-                  />
-               </Box>
-            </Box>
-            <Button
-               color="primary"
-               fullWidth
-               variant={active ? "text" : "contained"}
-               onClick={() => {
-                  handleToggleActive(id, active);
-               }}
-            >
-               {active ? "Deactivate Call To Action" : "Send Call To Action"}
-            </Button>
-         </Card>
-      </div>
    );
 });
 

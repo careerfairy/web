@@ -20,7 +20,8 @@ import LinkedInIcon from "@material-ui/icons/LinkedIn";
 import FacebookIcon from "@material-ui/icons/Facebook";
 import TwitterIcon from "@material-ui/icons/Twitter";
 import JobPostingIcon from "@material-ui/icons/Work";
-import CustomCtaIcon from '@material-ui/icons/Info';
+import CustomCtaIcon from "@material-ui/icons/Info";
+import { defaultDeadlineDate } from "../../../../../util/constants/callToActions";
 
 const useStyles = makeStyles((theme) => ({
    closeBtn: {
@@ -95,11 +96,16 @@ const defaultInitialValues = {
    isToBeSaved: false,
    type: ctaTypes[0].type,
    id: "",
+   imageUrl: "",
+   jobData: {
+      jobTitle: "",
+      salary: "",
+      applicationDeadline: null
+   },
 };
 
 const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
    const [initialValues, setInitialValues] = useState(defaultInitialValues);
-
 
    useEffect(() => {
       if (callToActionToEdit) {
@@ -116,9 +122,16 @@ const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
             id: callToActionToEdit.id,
             buttonText: callToActionToEdit.buttonText,
             isToBeSaved: true,
+            imageUrl: callToActionToEdit.imageUrl || "",
             title:
                ctaTypes.find(({ type }) => type === callToActionToEdit.type)
                   ?.title || defaultInitialValues.title,
+            jobData: {
+               jobTitle: callToActionToEdit.jobData?.jobTitle || "",
+               salary: callToActionToEdit.jobData?.salary || "",
+               applicationDeadline:
+                  callToActionToEdit.jobData?.applicationDeadline?.toDate?.() || null,
+            },
          };
          setInitialValues(newInitialValues);
       } else {

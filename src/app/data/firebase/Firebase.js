@@ -1,21 +1,6 @@
 import firebase from '../../Firebase/Firebase';
 import {v4 as uuidv4} from 'uuid';
 import {FORTY_FIVE_MINUTES_IN_MILLISECONDS, START_DATE_FOR_REPORTED_EVENTS} from "../constants/streamContants";
-
-// import firebase from "firebase/app";
-// import "firebase/auth";
-// import "firebase/firestore";
-// import "firebase/storage";
-//
-// const config = {
-//     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-//     authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-//     databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
-//     projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-//     storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-//     messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-// };
-
 class Firebase {
     constructor() {
         // if (!firebase.apps.length) {
@@ -1337,9 +1322,10 @@ class Firebase {
           .collection("callToActions")
           .doc()
 
-        await callToActionRef.set({
+        const callToActionData = {
             buttonText: values.buttonText,
             buttonUrl: values.buttonUrl,
+            imageUrl: values.imageUrl || null,
             type: values.type,
             message: values.message,
             created: this.getServerTimestamp(),
@@ -1349,9 +1335,42 @@ class Firebase {
             sent: null,
             stopped: null,
             active: false
-        })
+        }
+        if (values.type === "jobPosting"){
+            const deadline = values.jobData.applicationDeadline ? firebase.firestore.Timestamp.fromDate(values.jobData.applicationDeadline) : null
+            callToActionData.jobData = {
+                applicationDeadline: deadline,
+                jobTitle: values.jobData?.jobTitle,
+                salary: values.jobData?.salary
+            }
+        }
+
+        await callToActionRef.set(callToActionData)
 
         return callToActionRef.id
+    }
+
+    updateCallToAction = (streamRef, callToActionId, newValues) => {
+        let callToActionRef = streamRef
+          .collection("callToActions")
+          .doc(callToActionId)
+        const updateData = {
+            buttonText: newValues.buttonText,
+            buttonUrl: newValues.buttonUrl,
+            imageUrl: newValues.imageUrl || null,
+            message: newValues.message,
+            type: newValues.type,
+            updated: this.getServerTimestamp(),
+        }
+        if(newValues.type === "jobPosting"){
+            const deadline = newValues.jobData.applicationDeadline ? firebase.firestore.Timestamp.fromDate(newValues.jobData.applicationDeadline) : null
+            updateData.jobData = {
+                applicationDeadline: deadline,
+                jobTitle: newValues.jobData.jobTitle,
+                salary: newValues.jobData.salary
+            }
+        }
+        return callToActionRef.update(updateData)
     }
 
     clickOnCallToAction = async (streamRef, callToActionId, userId, options = {isDismissAction: false} ) => {
@@ -1434,18 +1453,6 @@ class Firebase {
         return await this.clickOnCallToAction(streamRef, callToActionId, userId, {isDismissAction: true})
     }
 
-    updateCallToAction = (streamRef, callToActionId, newValues) => {
-        let callToActionRef = streamRef
-          .collection("callToActions")
-          .doc(callToActionId)
-        return callToActionRef.update({
-            buttonText: newValues.buttonText,
-            buttonUrl: newValues.buttonUrl,
-            message: newValues.message,
-            type: newValues.type,
-            updated: this.getServerTimestamp(),
-        })
-    }
 
     deleteCallToAction = (streamRef, callToActionId) => {
        let batch = this.firestore.batch()
