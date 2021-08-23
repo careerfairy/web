@@ -1,11 +1,11 @@
 import React from 'react';
 import {alpha, makeStyles, useTheme} from "@material-ui/core/styles";
 import {Avatar, Collapse, Paper} from "@material-ui/core";
-import MaterialTable from "material-table";
 import {defaultTableOptions, getPageSize, tableIcons} from "../../common/TableUtils";
 import EnhancedGroupStreamCard from "../../../events/enhanced-group-stream-card/EnhancedGroupStreamCard";
 import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useRouter} from "next/router";
+import ExportTable from "../../../../../common/Tables/ExportTable";
 
 
 const useStyles = makeStyles(theme => ({
@@ -37,7 +37,7 @@ const UserInnerTable = ({firstName, lastName, streams, group, registered, fireba
 
     return (
         <Collapse in mountOnEnter unmountOnExit>
-            <MaterialTable
+            <ExportTable
                 style={innerTableStyle}
                 icons={tableIcons}
                 title={`Events that ${firstName} ${lastName} ${registered ? "registered to" : "participated in"}:`}
