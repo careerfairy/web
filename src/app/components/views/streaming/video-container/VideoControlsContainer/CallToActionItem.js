@@ -275,10 +275,7 @@ export const CallToActionItem = React.memo((props) => {
       callToActionsDictionary[type]?.color ||
          callToActionsDictionary.custom.color
    );
-   console.log("-> type", type);
-   console.log("-> callToActionsDictionary.custom.color", callToActionsDictionary.custom.color);
-   console.log("-> callToActionsDictionary[type]?.color", callToActionsDictionary[type]?.color);
-   console.log("-> color", color);
+
    const classes = useStyles({ color });
 
    const [engagementData, setEngagementData] = useState({
