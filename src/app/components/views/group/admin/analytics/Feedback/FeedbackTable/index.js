@@ -15,10 +15,10 @@ import {
 import EditFeedbackModal from "./EditFeedbackModal";
 import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import {useSnackbar} from "notistack";
-import MaterialTable from "material-table";
 import FeedbackGraph from "../FeedbackGraph";
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import {makeStyles} from "@material-ui/core/styles";
+import ExportTable from "../../../../../common/Tables/ExportTable";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -290,115 +290,127 @@ const FeedbackTable = ({
 
 
     return (
-        <>
-            <Card
-                raised={active()}
-                className={clsx(classes.root, className)}
-                ref={breakdownRef}
-                {...rest}
-            >
-                <Tabs
-                    value={streamDataType.propertyName}
-                    indicatorColor="primary"
-                    textColor="primary"
-                    scrollButtons="auto"
-                    aria-label="disabled tabs example"
-                >
-                    {streamDataTypes.map(({displayName, propertyName}, index) => (
-                            <Tab
-                                key={propertyName}
-                                value={propertyName}
-                                onClick={(event) => handleMenuItemClick(event, index)}
-                                label={`${displayName} - ${fetchingStreams ? "..." : currentStream?.[propertyName]?.length || 0}`}
-                            />
-                        )
-                    )}
-                </Tabs>
-                <Divider/>
-                <MaterialTable
-                    icons={tableIcons}
-                    {...tableData}
-                    isLoading={fetchingStreams}
-                    options={customOptions}
-                    actions={[
-                        exportSelectionAction(tableData.columns),
-                        rowData => ({
-                            icon: tableIcons.ThemedEditIcon,
-                            iconProps: {color: "primary"},
-                            hidden: !isFeedback() || !canEdit(rowData),
-                            disabled: !canEdit(rowData),
-                            position: "row",
-                            tooltip: 'Edit',
-                            onClick: (event, rowData) => handleEditFeedback(rowData),
-                        })
-                        , {
-                            icon: tableIcons.RedDeleteForeverIcon,
-                            iconProps: {color: "primary"},
-                            hidden: !isFeedback(),
-                            position: "row",
-                            tooltip: 'Delete',
-                            onClick: (event, rowData) => handleOpenAreYouSureModal(rowData)
-                        },
-                        {
-                            icon: tableIcons.ThemedAdd,
-                            hidden: !isFeedback(),
-                            isFreeAction: true,
-                            iconProps: {color: "primary"},
-                            tooltip: 'Add Question',
-                            onClick: handleCreateFeedback
-
-                        },
-                        (rowData) => ({
-                            icon: tableIcons.ArrowDownwardIcon,
-                            hidden: !isFeedback(),
-                            position: "row",
-                            disabled: rowData?.votes === 0,
-                            iconProps: {color: "green"},
-                            tooltip: 'Display Table',
-                            onClick: (event, rowData) => handleDisplayTable(rowData)
-                        })
-                    ]}
-                    title={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
-                    detailPanel={
-                        isPoll() ? [{
-                            tooltip: "Show Chart",
-                            icon: tableIcons.InsertChartOutlinedIcon,
-                            openIcon: tableIcons.InsertChartIcon,
-                            render: rowData => {
-                                return (
+       <>
+          <Card
+             raised={active()}
+             className={clsx(classes.root, className)}
+             ref={breakdownRef}
+             {...rest}
+          >
+             <Tabs
+                value={streamDataType.propertyName}
+                indicatorColor="primary"
+                textColor="primary"
+                scrollButtons="auto"
+                aria-label="disabled tabs example"
+             >
+                {streamDataTypes.map(({ displayName, propertyName }, index) => (
+                   <Tab
+                      key={propertyName}
+                      value={propertyName}
+                      onClick={(event) => handleMenuItemClick(event, index)}
+                      label={`${displayName} - ${
+                         fetchingStreams
+                            ? "..."
+                            : currentStream?.[propertyName]?.length || 0
+                      }`}
+                   />
+                ))}
+             </Tabs>
+             <Divider />
+             <ExportTable
+                icons={tableIcons}
+                {...tableData}
+                isLoading={fetchingStreams}
+                options={customOptions}
+                actions={[
+                   exportSelectionAction(tableData.columns),
+                   (rowData) => ({
+                      icon: tableIcons.ThemedEditIcon,
+                      iconProps: { color: "primary" },
+                      hidden: !isFeedback() || !canEdit(rowData),
+                      disabled: !canEdit(rowData),
+                      position: "row",
+                      tooltip: "Edit",
+                      onClick: (event, rowData) => handleEditFeedback(rowData),
+                   }),
+                   {
+                      icon: tableIcons.RedDeleteForeverIcon,
+                      iconProps: { color: "primary" },
+                      hidden: !isFeedback(),
+                      position: "row",
+                      tooltip: "Delete",
+                      onClick: (event, rowData) =>
+                         handleOpenAreYouSureModal(rowData),
+                   },
+                   {
+                      icon: tableIcons.ThemedAdd,
+                      hidden: !isFeedback(),
+                      isFreeAction: true,
+                      iconProps: { color: "primary" },
+                      tooltip: "Add Question",
+                      onClick: handleCreateFeedback,
+                   },
+                   (rowData) => ({
+                      icon: tableIcons.ArrowDownwardIcon,
+                      hidden: !isFeedback(),
+                      position: "row",
+                      disabled: rowData?.votes === 0,
+                      iconProps: { color: "green" },
+                      tooltip: "Display Table",
+                      onClick: (event, rowData) => handleDisplayTable(rowData),
+                   }),
+                ]}
+                title={
+                   currentStream &&
+                   `For ${currentStream.company} on ${prettyDate(
+                      currentStream.start
+                   )}`
+                }
+                detailPanel={
+                   isPoll()
+                      ? [
+                           {
+                              tooltip: "Show Chart",
+                              icon: tableIcons.InsertChartOutlinedIcon,
+                              openIcon: tableIcons.InsertChartIcon,
+                              render: ({ rowData }) => {
+                                 return (
                                     <Grow in>
-                                        <FeedbackGraph
-                                            group={group}
-                                            setCurrentStream={setCurrentStream}
-                                            currentStream={currentStream}
-                                            typesOfOptions={typesOfOptions}
-                                            userTypes={userTypes}
-                                            setUserType={setUserType}
-                                            currentPoll={rowData}
-                                            userType={userType}
-                                            streamDataType={streamDataType}
-                                        />
+                                       <FeedbackGraph
+                                          group={group}
+                                          setCurrentStream={setCurrentStream}
+                                          currentStream={currentStream}
+                                          typesOfOptions={typesOfOptions}
+                                          userTypes={userTypes}
+                                          setUserType={setUserType}
+                                          currentPoll={rowData}
+                                          userType={userType}
+                                          streamDataType={streamDataType}
+                                       />
                                     </Grow>
-                                )
-                            },
-                        }] : null
-                    }
-                />
-            </Card>
-            <EditFeedbackModal
-                currentStream={currentStream}
-                handleClose={handleCloseFeedbackModal}
-                state={feedbackModal}
-            />
-            <AreYouSureModal
-                open={areYouSureModal.open}
-                message={areYouSureModal.warning}
-                handleConfirm={handleDeleteFeedback}
-                loading={deletingFeedback}
-                handleClose={handleCloseAreYouSureModal}
-                title="Warning"
-            />
-        </>
+                                 );
+                              },
+                           },
+                        ]
+                      : []
+                }
+             />
+          </Card>
+          <EditFeedbackModal
+             currentStream={currentStream}
+             handleClose={handleCloseFeedbackModal}
+             state={feedbackModal}
+          />
+          <AreYouSureModal
+             open={areYouSureModal.open}
+             message={areYouSureModal.warning}
+             handleConfirm={handleDeleteFeedback}
+             loading={deletingFeedback}
+             handleClose={handleCloseAreYouSureModal}
+             title="Warning"
+          />
+       </>
     );
 };
 

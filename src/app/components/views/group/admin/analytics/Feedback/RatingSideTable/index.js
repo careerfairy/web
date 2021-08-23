@@ -10,9 +10,9 @@ import {
     StarRatingInputValue,
     tableIcons
 } from "../../common/TableUtils";
-import MaterialTable from "material-table";
 import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {alpha, makeStyles, useTheme} from "@material-ui/core/styles";
+import ExportTable from "../../../../../common/Tables/ExportTable";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -99,7 +99,7 @@ const RatingSideTable = ({
             className={clsx(classes.root, className)}
             {...rest}
         >
-            <MaterialTable
+            <ExportTable
                 key={data.length}
                 icons={tableIcons}
                 tableRef={dataTableRef}

@@ -10,14 +10,13 @@ import {
    toTitleCase,
 } from "../../../../../../helperFunctions/HelperFunctions";
 import { useSnackbar } from "notistack";
-import MaterialTable from "material-table";
+
 import {
-   defaultTableOptions,
    exportSelectionAction,
    LinkifyText,
    tableIcons,
 } from "../../common/TableUtils";
-import UserInnerTable from "./UserInnerTable";
+// import UserInnerTable from "./UserInnerTable";
 import { useAuth } from "../../../../../../../HOCs/AuthProvider";
 import { makeStyles } from "@material-ui/core/styles";
 import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil";
@@ -29,8 +28,9 @@ import PDFIcon from "@material-ui/icons/PictureAsPdf";
 import Link from "materialUI/NextNavLink";
 import JSZip from "jszip";
 import * as actions from "store/actions";
+import ExportTable from "../../../../../common/Tables/ExportTable";
 
-const customTableOptions = { ...defaultTableOptions };
+
 const useStyles = makeStyles((theme) => ({
    root: {},
    actions: {
@@ -322,12 +322,11 @@ const UsersTable = ({
                ))}
                {dataPrivacyTab}
             </Tabs>
-            <MaterialTable
+            <ExportTable
                icons={tableIcons}
                tableRef={dataTableRef}
                isLoading={fetchingStreams || processingCVs}
                data={users}
-               options={customTableOptions}
                columns={[
                   {
                      field: "firstName",
@@ -409,53 +408,53 @@ const UsersTable = ({
                      hidden: Boolean(!currentStream),
                   },
                ]}
-               detailPanel={[
-                  ({
-                     numberOfStreamsRegistered,
-                     streamsRegistered,
-                     firstName,
-                     lastName,
-                  }) => ({
-                     icon: tableIcons.LibraryAddOutlinedIcon,
-                     openIcon: tableIcons.AddToPhotosIcon,
-                     tooltip:
-                        !(numberOfStreamsRegistered === 0) &&
-                        `See streams ${firstName} registered to`,
-                     disabled: numberOfStreamsRegistered === 0,
-                     render: () => (
-                        <UserInnerTable
-                           firstName={firstName}
-                           lastName={lastName}
-                           group={group}
-                           streams={streamsRegistered}
-                           firebase={firebase}
-                           registered
-                        />
-                     ),
-                  }),
-                  ({
-                     numberOfStreamsWatched,
-                     streamsWatched,
-                     firstName,
-                     lastName,
-                  }) => ({
-                     icon: tableIcons.VideoLibraryOutlinedIcon,
-                     openIcon: tableIcons.VideoLibraryIcon,
-                     tooltip:
-                        !(numberOfStreamsWatched === 0) &&
-                        `See streams ${firstName} watched`,
-                     disabled: numberOfStreamsWatched === 0,
-                     render: () => (
-                        <UserInnerTable
-                           firstName={firstName}
-                           lastName={lastName}
-                           firebase={firebase}
-                           group={group}
-                           streams={streamsWatched}
-                        />
-                     ),
-                  }),
-               ]}
+               // detailPanel={[
+               //    ({
+               //       numberOfStreamsRegistered,
+               //       streamsRegistered,
+               //       firstName,
+               //       lastName,
+               //    }) => ({
+               //       icon: tableIcons.LibraryAddOutlinedIcon,
+               //       openIcon: tableIcons.AddToPhotosIcon,
+               //       tooltip:
+               //          !(numberOfStreamsRegistered === 0) &&
+               //          `See streams ${firstName} registered to`,
+               //       disabled: numberOfStreamsRegistered === 0,
+               //       render: () => (
+               //          <UserInnerTable
+               //             firstName={firstName}
+               //             lastName={lastName}
+               //             group={group}
+               //             streams={streamsRegistered}
+               //             firebase={firebase}
+               //             registered
+               //          />
+               //       ),
+               //    }),
+               //    ({
+               //       numberOfStreamsWatched,
+               //       streamsWatched,
+               //       firstName,
+               //       lastName,
+               //    }) => ({
+               //       icon: tableIcons.VideoLibraryOutlinedIcon,
+               //       openIcon: tableIcons.VideoLibraryIcon,
+               //       tooltip:
+               //          !(numberOfStreamsWatched === 0) &&
+               //          `See streams ${firstName} watched`,
+               //       disabled: numberOfStreamsWatched === 0,
+               //       render: () => (
+               //          <UserInnerTable
+               //             firstName={firstName}
+               //             lastName={lastName}
+               //             firebase={firebase}
+               //             group={group}
+               //             streams={streamsWatched}
+               //          />
+               //       ),
+               //    }),
+               // ]}
                actions={[
                   exportSelectionAction(
                      dataTableRef?.current?.props?.columns || [],
