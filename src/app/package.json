@@ -54,7 +54,6 @@
     "lodash": "^4.17.20",
     "lodash.clonedeep": "^4.5.0",
     "lodash.debounce": "^4.0.8",
-    "material-table": "^1.69.2",
     "memoize-one": "^5.1.1",
     "moment": "^2.29.1",
     "next": "^10.1.3",

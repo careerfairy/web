@@ -10,15 +10,13 @@ import {
    toTitleCase,
 } from "../../../../../../helperFunctions/HelperFunctions";
 import { useSnackbar } from "notistack";
-import MaterialTable from "@material-table/core";
 
 import {
-   defaultTableOptions,
    exportSelectionAction,
    LinkifyText,
    tableIcons,
 } from "../../common/TableUtils";
-import UserInnerTable from "./UserInnerTable";
+// import UserInnerTable from "./UserInnerTable";
 import { useAuth } from "../../../../../../../HOCs/AuthProvider";
 import { makeStyles } from "@material-ui/core/styles";
 import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil";
@@ -30,7 +28,7 @@ import PDFIcon from "@material-ui/icons/PictureAsPdf";
 import Link from "materialUI/NextNavLink";
 import JSZip from "jszip";
 import * as actions from "store/actions";
-import { ExportCsv, ExportPdf } from '@material-table/exporters';
+import ExportTable from "../../../../../common/Tables/ExportTable";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -71,7 +69,6 @@ const UsersTable = ({
    className,
    ...rest
 }) => {
-   const [tableOptions, setTableOptions] = useState(defaultTableOptions);
    const dataTableRef = useRef(null);
    const { userData } = useAuth();
    const classes = useStyles();
@@ -126,24 +123,6 @@ const UsersTable = ({
       (state) => state.firestore.data?.allGroups || {}
    );
 
-   useEffect(() => {
-      setTableOptions({
-         ...defaultTableOptions,
-         exportMenu: [
-            {
-               label: "Export PDF",
-               exportFunc(cols, data) {
-                  return ExportPdf(cols, data, getTitle());
-               },
-            },
-            {
-               label: "Export CSV",
-               exportFunc: (cols, data) => ExportCsv(cols, data, getTitle(), ";"),
-            },
-         ],
-      })
-
-   },[currentStream])
    useEffect(() => {
       let newTargetGroups = [];
       if (
@@ -343,12 +322,11 @@ const UsersTable = ({
                ))}
                {dataPrivacyTab}
             </Tabs>
-            <MaterialTable
+            <ExportTable
                icons={tableIcons}
                tableRef={dataTableRef}
                isLoading={fetchingStreams || processingCVs}
                data={users}
-               options={tableOptions}
                columns={[
                   {
                      field: "firstName",

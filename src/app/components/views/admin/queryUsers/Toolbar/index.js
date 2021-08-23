@@ -66,7 +66,6 @@ const Toolbar = ({queryDataSet, loading}) => {
             color: error.main
         },
     ].filter(({hide}) => !hide)
-    console.log("-> currentFilterGroup", currentFilterGroup);
 
     return (
         <Card>
