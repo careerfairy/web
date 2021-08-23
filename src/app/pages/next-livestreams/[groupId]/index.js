@@ -1,18 +1,18 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTheme} from "@material-ui/core/styles";
-import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
-import GroupBannerSection from "../../components/views/NextLivestreams/GroupBannerSection";
-import useListenToGroupStreams from "../../components/custom-hook/useGroupUpcomingStreams";
+import NextLivestreamsLayout from "layouts/NextLivestreamsLayout";
+import GroupBannerSection from "components/views/NextLivestreams/GroupBannerSection";
+import useListenToGroupStreams from "components/custom-hook/useGroupUpcomingStreams";
 import {useFirestoreConnect} from "react-redux-firebase";
-import {PAST_LIVESTREAMS_NAME} from "../../data/constants/streamContants";
-import HeadWithMeta from "../../components/page/HeadWithMeta";
-import {NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL} from "../../constants/routes";
-import {StreamsSection} from "../../components/views/NextLivestreams/StreamsSection";
+import {PAST_LIVESTREAMS_NAME} from "data/constants/streamContants";
+import HeadWithMeta from "components/page/HeadWithMeta";
+import {NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL} from "constants/routes";
+import {StreamsSection} from "components/views/NextLivestreams/StreamsSection";
 import {useDispatch, useSelector} from "react-redux";
-import * as actions from '../../store/actions'
-import {getServerSideGroup, getServerSideStream} from "../../util/serverUtil";
-import {getResizedUrl} from "../../components/helperFunctions/HelperFunctions";
-import ScrollToTop from "../../components/views/common/ScrollToTop";
+import * as actions from 'store/actions'
+import {getServerSideGroup, getServerSideStream} from "util/serverUtil";
+import {getResizedUrl} from "components/helperFunctions/HelperFunctions";
+import ScrollToTop from "components/views/common/ScrollToTop";
 
 const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
 
