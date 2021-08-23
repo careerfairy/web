@@ -1351,16 +1351,9 @@ class Firebase {
             stopped: null,
             active: false
         }
-        if(values.type === "jobPosting"){
-            const deadline = values.jobData.applicationDeadline ? firebase.firestore.Timestamp.fromDate(values.jobData.applicationDeadline) : null
-            callToActionData.jobData = {
-                applicationDeadline: deadline,
-                jobTitle: values.jobData?.jobTitle,
-                salary: values.jobData?.salary
-            }
-        }
+        const enhancedCallToActionData = this.addCtaExtraData(callToActionData, values)
 
-        await callToActionRef.set(callToActionData)
+        await callToActionRef.set(enhancedCallToActionData)
 
         return callToActionRef.id
     }
@@ -1377,16 +1370,26 @@ class Firebase {
             type: newValues.type,
             updated: this.getServerTimestamp(),
         }
+        return callToActionRef.update(this.addCtaExtraData(updateData, newValues))
+    }
+
+    addCtaExtraData = (cleanedData, newValues) => {
+        const callToActionData = {...cleanedData}
+        if(newValues.type === "social"){
+            callToActionData.socialData = {
+               socialType: newValues.socialData?.socialType ,
+            };
+        }
         if(newValues.type === "jobPosting"){
             const deadline = newValues.jobData.applicationDeadline ? firebase.firestore.Timestamp.fromDate(newValues.jobData.applicationDeadline) : null
-            updateData.jobData = {
+            callToActionData.jobData = {
                 applicationDeadline: deadline,
-                jobTitle: newValues.jobData.jobTitle,
-                salary: newValues.jobData.salary
+                jobTitle: newValues.jobData?.jobTitle,
+                salary: newValues.jobData?.salary
             }
         }
-        console.log("-> updateData", updateData);
-        return callToActionRef.update(updateData)
+
+        return callToActionData
     }
 
     resendCallToAction = async (streamRef, callToActionId) => {

@@ -7,7 +7,7 @@ import * as actions from "store/actions";
 import { makeExternalLink } from "../../../../helperFunctions/HelperFunctions";
 
 import CallToActionSnackbar from "./CallToActionSnackbar";
-import { callToActionsIconsDictionary } from "../../../../util/constants/callToActions";
+import { callToActionsDictionary } from "../../../../util/constants/callToActions";
 import { useCurrentStream } from "../../../../../context/stream/StreamContext";
 
 const CallToActionNotifications = ({
@@ -137,8 +137,8 @@ const CallToActionNotifications = ({
                            handleDismissCallToAction(callToActionId)
                         }
                         icon={
-                           callToActionsIconsDictionary[type]?.icon ||
-                           callToActionsIconsDictionary.custom.icon
+                           callToActionsDictionary[type]?.icon ||
+                           callToActionsDictionary.custom.icon
                         }
                         buttonText={buttonText}
                         jobTitle={jobTitle}

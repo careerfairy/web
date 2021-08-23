@@ -20,8 +20,11 @@ import SettingsIcon from "@material-ui/icons/MoreVert";
 import LinkifyText from "../../../../util/LinkifyText";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import ResendIcon from '@material-ui/icons/Repeat';
-import { callToActionsIconsDictionary } from "../../../../util/constants/callToActions";
+import ResendIcon from "@material-ui/icons/Repeat";
+import {
+   callToActionsDictionary,
+   callToActionsSocialsDictionary,
+} from "../../../../util/constants/callToActions";
 
 const useStyles = makeStyles(({ palette }) => ({
    root: {
@@ -100,52 +103,6 @@ const useStyles = makeStyles(({ palette }) => ({
    },
 }));
 
-const useSecondaryStyles = makeStyles(({ palette }) => ({
-   card: {
-      borderRadius: 12,
-      textAlign: "center",
-      minWidth: 270,
-      width: "100%",
-   },
-   cardContent: {
-      backgroundColor: (props) => alpha(props.color, 0.3),
-   },
-   icon: {
-      margin: "auto",
-      "& svg": {
-         fontSize: 40,
-         color: palette.common.white,
-         // color: props => props.color,
-      },
-   },
-   heading: {
-      fontSize: "1.2rem",
-      fontWeight: "bold",
-      letterSpacing: "0.5px",
-      marginTop: 8,
-      marginBottom: 0,
-   },
-   subheader: {
-      fontSize: 14,
-      color: palette.grey[500],
-      marginBottom: "0.875em",
-   },
-   statLabel: {
-      fontSize: 12,
-      color: palette.grey[500],
-      fontWeight: 500,
-      fontFamily:
-         '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
-      margin: 0,
-   },
-   statValue: {
-      fontSize: 20,
-      fontWeight: "bold",
-      marginBottom: 4,
-      letterSpacing: "1px",
-   },
-}));
-
 const LinearProgressWithLabel = ({
    engagementData: { total, percentage, noOfEngagement, noOfDismissal },
 }) => {
@@ -196,7 +153,7 @@ const SettingsDropdown = ({
    callToAction,
    handleClickEditCallToAction,
    handleClickDeleteCallToAction,
-                             handleClickResendCallToAction
+   handleClickResendCallToAction,
 }) => {
    const [anchorEl, setAnchorEl] = useState(null);
 
@@ -303,7 +260,8 @@ export const CallToActionItem = React.memo((props) => {
          numberOfUsersWhoDismissed,
          buttonText,
          type,
-        jobData
+         jobData,
+         socialData,
       },
       handleToggleActive,
       handleClickEditCallToAction,
@@ -311,23 +269,26 @@ export const CallToActionItem = React.memo((props) => {
       handleClickResendCallToAction,
    } = props;
 
-   const isJobPosting = type === "jobPosting"
-   const styles = useSecondaryStyles({
-      color:
-         callToActionsIconsDictionary[type]?.color ||
-         callToActionsIconsDictionary.custom.color,
-   });
-   const classes = useStyles({
-      color:
-         callToActionsIconsDictionary[type]?.color ||
-         callToActionsIconsDictionary.custom.color,
-   });
+   const isJobPosting = type === "jobPosting";
+
+   const [color, setColor] = useState(
+      callToActionsDictionary[type]?.color ||
+         callToActionsDictionary.custom.color
+   );
+   console.log("-> type", type);
+   console.log("-> callToActionsDictionary.custom.color", callToActionsDictionary.custom.color);
+   console.log("-> callToActionsDictionary[type]?.color", callToActionsDictionary[type]?.color);
+   console.log("-> color", color);
+   const classes = useStyles({ color });
+
    const [engagementData, setEngagementData] = useState({
       total: 0,
       percentage: 0,
       noOfEngagement: 0,
       noOfDismissal: 0,
    });
+
+   const [icon, setIcon] = useState(callToActionsDictionary.custom.icon);
 
    useEffect(() => {
       const noOfEngagement = numberOfUsersWhoClickedLink || 0;
@@ -343,11 +304,34 @@ export const CallToActionItem = React.memo((props) => {
       });
    }, [numberOfUsersWhoClickedLink, numberOfUsersWhoDismissed]);
 
+   useEffect(() => {
+      (function handleSetIcon() {
+         const isSocial = type === "social";
+         let newIcon = callToActionsDictionary.custom.icon;
+         let newColor =
+            callToActionsDictionary[type]?.color ||
+            callToActionsDictionary.custom.color;
+         // console.log("-> newColor", newColor);
+         if (isSocial) {
+            if (socialData.socialType) {
+               newIcon =
+                  callToActionsSocialsDictionary[socialData.socialType].icon;
+               newColor =
+                  callToActionsSocialsDictionary[socialData.socialType].color;
+            }
+         } else if (callToActionsDictionary[type]) {
+            newIcon = callToActionsDictionary[type].icon;
+            newColor = callToActionsDictionary[type].color;
+         }
+         setColor(newColor);
+         setIcon(newIcon);
+      })();
+   }, [type, socialData]);
+
    return (
       <ListItem divider style={style}>
          <ListItemAvatar className={classes.listItemAvatar}>
-            {callToActionsIconsDictionary[type]?.icon ||
-               callToActionsIconsDictionary.custom.icon}
+            {icon}
          </ListItemAvatar>
          <Box flexGrow={1} minWidth={0} p={1} pr={0}>
             <Box display={"flex"}>
@@ -377,7 +361,7 @@ export const CallToActionItem = React.memo((props) => {
                      secondary={<LinkifyText>{buttonUrl}</LinkifyText>}
                   />
                   <ListItemText
-                     primary={isJobPosting ?"Job Description": "Message"}
+                     primary={isJobPosting ? "Job Description" : "Message"}
                      secondaryTypographyProps={{
                         noWrap: true,
                      }}
@@ -387,7 +371,9 @@ export const CallToActionItem = React.memo((props) => {
                <div className={classes.headerActionsWrapper}>
                   <SettingsDropdown
                      handleClickEditCallToAction={handleClickEditCallToAction}
-                     handleClickResendCallToAction={handleClickResendCallToAction}
+                     handleClickResendCallToAction={
+                        handleClickResendCallToAction
+                     }
                      handleClickDeleteCallToAction={
                         handleClickDeleteCallToAction
                      }
@@ -421,7 +407,6 @@ export const CallToActionItem = React.memo((props) => {
          </Box>
       </ListItem>
    );
-
 });
 
 export default CallToActionItem;

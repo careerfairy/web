@@ -1,11 +1,17 @@
 import PropTypes from "prop-types";
 import {
+   Box,
    Button,
    Collapse,
    DialogActions,
    DialogContent,
+   FormControl,
+   FormHelperText,
    Grid,
+   MenuItem,
+   Select,
    TextField,
+   Typography,
 } from "@material-ui/core";
 import React, { useMemo } from "react";
 import * as yup from "yup";
@@ -17,6 +23,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useFirebase } from "context/firebase";
 import useStreamRef from "components/custom-hook/useStreamRef";
 import { DateTimePicker } from "@material-ui/pickers";
+import { callToActionSocialsArray } from "../../../../../util/constants/callToActions";
 
 const MAX_BUTTON_TEXT_LENGTH = 45;
 const MAX_MESSAGE_LENGTH = 1000;
@@ -29,36 +36,46 @@ const getMaxLengthError = (maxLength) => [
 ];
 
 const now = new Date();
-const validationSchema = (type) => yup.object({
-   message: yup
-      .string("Enter your message")
-      .max(...getMaxLengthError(MAX_MESSAGE_LENGTH)),
-   buttonText: yup
-      .string("Enter the button text")
-      .max(...getMaxLengthError(MAX_BUTTON_TEXT_LENGTH))
-      .required("This value is required"),
-   buttonUrl: yup
-      .string("Enter the call to action url")
-      .matches(URL_REGEX, { message: "Must be a valid url" })
-      .required("Must be a valid url"),
-   imageUrl: yup
-      .string("Enter the image url")
-      .matches(URL_REGEX, { message: "Must be a valid url" }),
-   jobData: yup.object().shape({
-      jobTitle: type === "jobPosting" ? yup.string()
-          .max(...getMaxLengthError(MAX_JOB_TITLE_LENGTH))
-          .required("This value is required"): yup.string(),
-      salary: yup.string().max(...getMaxLengthError(MAX_SALARY_LENGTH)),
-      applicationDeadline: yup
-         .date()
-         .nullable()
-         .min(now, `The date must be in the future`),
-   }),
-});
+const validationSchema = (type) =>
+   yup.object({
+      message: yup
+         .string("Enter your message")
+         .max(...getMaxLengthError(MAX_MESSAGE_LENGTH)),
+      buttonText: yup
+         .string("Enter the button text")
+         .max(...getMaxLengthError(MAX_BUTTON_TEXT_LENGTH))
+         .required("This value is required"),
+      buttonUrl: yup
+         .string("Enter the call to action url")
+         .matches(URL_REGEX, { message: "Must be a valid url" })
+         .required("Must be a valid url"),
+      imageUrl: yup
+         .string("Enter the image url")
+         .matches(URL_REGEX, { message: "Must be a valid url" }),
+      jobData: yup.object().shape({
+         jobTitle:
+            type === "jobPosting"
+               ? yup
+                    .string()
+                    .max(...getMaxLengthError(MAX_JOB_TITLE_LENGTH))
+                    .required("This value is required")
+               : yup.string(),
+         salary: yup.string().max(...getMaxLengthError(MAX_SALARY_LENGTH)),
+         applicationDeadline: yup
+            .date()
+            .nullable()
+            .min(now, `The date must be in the future`),
+      }),
+   });
 
 const useStyles = makeStyles((theme) => ({
    dialogContent: {
       overflowY: "hidden",
+   },
+   socialMenuItemBox: {
+      "& svg": {
+         marginRight: "0.5em",
+      },
    },
 }));
 
@@ -67,6 +84,7 @@ const CallToActionForm = ({
    initialValues,
    isCustom,
    isJobPosting,
+   isSocial,
 }) => {
    const streamRef = useStreamRef();
    const classes = useStyles();
@@ -104,8 +122,11 @@ const CallToActionForm = ({
       },
    });
 
+   // console.log("-> formik.values", formik.values);
+   // console.log("-> callToActionSocialsArray", callToActionSocialsArray);
 
    const handleSend = async (values) => {
+      console.log("-> values", values);
       if (values.id) {
          await updateCallToAction(streamRef, values.id, values);
          return await activateCallToAction(streamRef, values.id);
@@ -126,7 +147,7 @@ const CallToActionForm = ({
          <DialogContent className={classes.dialogContent}>
             <Grid container spacing={3}>
                <Grid xs={12} style={{ padding: !isJobPosting && "0" }} item>
-                  <Collapse unmountOnExit in={canChangeMessage}>
+                  <Collapse unmountOnExit in={canChangeMessage && isJobPosting}>
                      <TextField
                         fullWidth
                         variant="outlined"
@@ -158,7 +179,7 @@ const CallToActionForm = ({
                   style={{ padding: !isJobPosting && "0" }}
                   item
                >
-                  <Collapse unmountOnExit in={canChangeMessage}>
+                  <Collapse unmountOnExit in={canChangeMessage && isJobPosting}>
                      <TextField
                         fullWidth
                         variant="outlined"
@@ -190,7 +211,7 @@ const CallToActionForm = ({
                   style={{ padding: !isJobPosting && "0" }}
                   item
                >
-                  <Collapse unmountOnExit in={canChangeMessage}>
+                  <Collapse unmountOnExit in={canChangeMessage && isJobPosting}>
                      <DateTimePicker
                         id="applicationDeadline"
                         clearable
@@ -275,7 +296,48 @@ const CallToActionForm = ({
                      />
                   </Collapse>
                </Grid>
-               <Grid xs={12} item>
+               <Grid
+                  xs={12}
+                  sm={isSocial ? 4 : 12}
+                  style={{ padding: !isSocial && "0" }}
+                  item
+               >
+                  <Collapse unmountOnExit in={isSocial}>
+                     <FormControl fullWidth variant="outlined">
+                        <Select
+                           value={
+                              formik.values.socialData?.socialType ||
+                              callToActionSocialsArray[0].socialType
+                           }
+                           onChange={formik.handleChange}
+                           displayEmpty
+                           id="socialData"
+                           name="socialData.socialType"
+                           inputProps={{ "aria-label": "Social type selector" }}
+                        >
+                           {callToActionSocialsArray.map((social) => (
+                              <MenuItem
+                                 key={social.socialType}
+                                 value={social.socialType}
+                              >
+                                 <Box
+                                    display="flex"
+                                    flexWrap="no-wrap"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    height={20}
+                                    className={classes.socialMenuItemBox}
+                                 >
+                                    {social.icon}
+                                    <Typography>{social.name}</Typography>
+                                 </Box>
+                              </MenuItem>
+                           ))}
+                        </Select>
+                     </FormControl>
+                  </Collapse>
+               </Grid>
+               <Grid xs={12} sm={isSocial ? 8 : 12} item>
                   <TextField
                      fullWidth
                      variant="outlined"
