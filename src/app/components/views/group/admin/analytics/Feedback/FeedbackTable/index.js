@@ -247,8 +247,8 @@ const FeedbackTable = ({
         },
     ]
 
-    const customOptions = {...defaultTableOptions}
-    customOptions.selection = false
+    // const customOptions = {...defaultTableOptions}
+    // customOptions.selection = false
 
 
     const handleMenuItemClick = (event, index) => {
@@ -322,7 +322,7 @@ const FeedbackTable = ({
                 icons={tableIcons}
                 {...tableData}
                 isLoading={fetchingStreams}
-                options={customOptions}
+                // options={customOptions}
                 actions={[
                    exportSelectionAction(tableData.columns),
                    (rowData) => ({
