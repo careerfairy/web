@@ -105,7 +105,6 @@ const CallToActionForm = ({
       enableReinitialize: true,
       validationSchema: validationSchema(initialValues.type),
       onSubmit: async (values, { setSubmitting }) => {
-         console.log("-> in the submit", values);
          try {
             setSubmitting(true);
             if (values.isToBeSaved) {
@@ -122,11 +121,8 @@ const CallToActionForm = ({
       },
    });
 
-   console.log("-> formik.errors", formik.errors);
-   // console.log("-> callToActionSocialsArray", callToActionSocialsArray);
 
    const handleSend = async (values) => {
-      console.log("-> values", values);
       if (values.id) {
          await updateCallToAction(streamRef, values.id, values);
          return await activateCallToAction(streamRef, values.id);
