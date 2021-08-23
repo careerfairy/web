@@ -53,6 +53,21 @@ export const serializeServerSideStream = (serverSideStream) => {
 
     return serverSideLivestream
 }
+
+export const parseStreamDates = (stream) => {
+    if (stream.createdDateString) {
+        stream.createdDate = new Date(Date.parse(stream.createdDateString));
+    }
+    if (stream.lastUpdatedDateString) {
+        stream.lastUpdatedDate = new Date(
+          Date.parse(stream.lastUpdatedDateString)
+        );
+    }
+    if (stream.startDateString) {
+        stream.startDate = new Date(Date.parse(stream.startDateString));
+    }
+    return stream;
+};
 export const getServerSideGroup = async (groupId) => {
     let serverSideGroup = {}
     const snap = await store.firestore.get({collection: "careerCenterData", doc: groupId, storeAs: `group ${groupId}`})
