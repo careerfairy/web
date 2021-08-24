@@ -563,8 +563,7 @@ const GroupStreamCardV2 = memo(({
                               <DateTimeDisplay
                                  mobile={mobile}
                                  date={
-                                    livestream.start?.toDate?.() ||
-                                    livestream.startDate
+                                    livestream.start?.toDate()
                                  }
                               />
                            }

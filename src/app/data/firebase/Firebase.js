@@ -2707,6 +2707,10 @@ class Firebase {
         return firebase.firestore.FieldValue.serverTimestamp()
     }
 
+    convertJsDateToTimestamp = (jsDate) => {
+      return firebase.firestore.Timestamp.fromDate(jsDate)
+    }
+
 }
 
 export default Firebase;

@@ -5,9 +5,9 @@ import {Grid, LinearProgress, Typography} from "@material-ui/core";
 import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 import LazyLoad from 'react-lazyload'
 import Spinner from "./groupStreamCard/Spinner";
-import useInfiniteScrollClient from "../../../custom-hook/useInfiniteScrollClient";
 import clsx from "clsx";
 import {useAuth} from "../../../../HOCs/AuthProvider";
+import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers";
 
 const gridItemHeight = 530
 const useStyles = makeStyles((theme) => ({
@@ -75,24 +75,9 @@ const GroupStreams = ({
         const {userData, authenticatedUser: user} = useAuth()
         const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
         const searchedButNoResults = selectedOptions?.length && !searching && !livestreams?.length
-        const [slicedLivestreams, loadMoreLivestreams, hasMoreLivestreams, totalLivestreams] = useInfiniteScrollClient(livestreams, 6, 3);
+        const [slicedLivestreams] = useInfiniteScrollClientWithHandlers(livestreams, 6, 3);
 
-        const handleScroll = () => {
-            const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight * 0.6
-            if (bottom && hasMoreLivestreams) {
-                loadMoreLivestreams()
-            }
-        };
 
-        useEffect(() => {
-            window.addEventListener('scroll', handleScroll, {
-                passive: true
-            });
-
-            return () => {
-                window.removeEventListener('scroll', handleScroll);
-            };
-        }, [totalLivestreams, slicedLivestreams]);
 
         useEffect(() => {
             if (globalCardHighlighted) {

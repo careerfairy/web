@@ -12,6 +12,8 @@ export default class DataAccessUtil {
     }
 
     static sendLivestreamEmailRegistrationConfirmation(user, userData, livestream) {
+        console.log("-> userData", userData);
+        console.log("-> user", user);
         return axios({
             method: 'post',
             url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendLivestreamRegistrationConfirmationEmail',

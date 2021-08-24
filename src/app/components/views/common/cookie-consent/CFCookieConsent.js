@@ -18,14 +18,15 @@ const useStyles = makeStyles((theme) => ({
 const CFCookieConsent = () => {
 
     const theme = useTheme()
-    const classes = useStyles(theme)
+    const classes = useStyles()
 
     const cookieConsentStyle = {
         zIndex: '9999',
         background: theme.palette.navyBlue.main, 
         color: theme.palette.common.white,
-        padding: '50px 30px',
-        boxShadow: '0 0 10px grey'
+        // padding: '50px 30px',
+        boxShadow: theme.shadows[10],
+        alignItems: 'center',
     }
 
     const buttonStyle = useCallback((decline) => {
@@ -35,9 +36,10 @@ const CFCookieConsent = () => {
             fontWeight: 500,
             fontFamily: 'Poppins',
             background: decline ? theme.palette.background.default : theme.palette.primary.main,
-            color: decline ? 'grey' : theme.palette.common.white
+            color: decline ? 'grey' : theme.palette.common.white,
+            margin: 15
         }
-    })
+    },[theme])
     
     return (
         <CookieConsent

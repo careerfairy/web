@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react';
 import {Fab, Grow} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
@@ -18,7 +19,7 @@ const useStyles = makeStyles(theme => ({
 
     },
 }));
-const ScrollToTop = () => {
+const ScrollToTop = ({fontSize = "large", size}) => {
     const classes = useStyles()
     const [showScroll, setShowScroll] = useState(false)
 
@@ -40,19 +41,25 @@ const ScrollToTop = () => {
         window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
-
     return (
-        <Grow in={showScroll}>
-            <Fab
-                className={classes.scrollTop}
-                onClick={scrollTop}
-                color="primary"
-                aria-label="scroll-to-top"
-            >
-                <ScrollToTopIcon fontSize="large"/>
-            </Fab>
-        </Grow>
+       <Grow in={showScroll}>
+          <Fab
+             className={classes.scrollTop}
+             onClick={scrollTop}
+             color="primary"
+             size={size}
+             aria-label="scroll-to-top"
+          >
+             <ScrollToTopIcon fontSize={fontSize} />
+          </Fab>
+       </Grow>
     );
 }
 
+ScrollToTop.propTypes = {
+  fontSize: PropTypes.oneOf(["small", "medium", "large"]),
+    size: PropTypes.oneOf(["small", "medium", "large"])
+}
+
 export default ScrollToTop;
+
