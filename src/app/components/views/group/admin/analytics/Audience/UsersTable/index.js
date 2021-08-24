@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
 import { Button, Card, Slide, Tab, Tabs } from "@material-ui/core";
@@ -85,7 +85,7 @@ const UsersTable = ({
    );
    const dispatch = useDispatch();
 
-   const categoryFields = () => {
+   const categoryFields = useMemo( () => {
       const arrayOfGroups = targetGroups.length ? targetGroups : [group];
       const tableFieldsMap = arrayOfGroups.reduce((acc, { categories }) => {
          if (categories?.length) {
@@ -116,8 +116,9 @@ const UsersTable = ({
             title: titledLabel,
             lookup,
          };
-      });
-   };
+      }).map((e) => e);
+   },[targetGroups, group]);
+   // console.table(categoryFields);
 
    const allGroupsMap = useSelector(
       (state) => state.firestore.data?.allGroups || {}
@@ -145,7 +146,8 @@ const UsersTable = ({
                const relevantGroup = StatsUtil.getFirstGroupThatUserBelongsTo(
                   user,
                   targetGroups,
-                  group
+                  group,
+                 true
                );
                return AnalyticsUtil.mapUserEngagement(
                   user,
@@ -345,7 +347,7 @@ const UsersTable = ({
                      title: "University Country",
                      lookup: universityCountriesMap,
                   },
-                  ...categoryFields().map((e) => e),
+                  ...categoryFields,
                   {
                      field: "numberOfStreamsWatched",
                      title: "Events Attended",
