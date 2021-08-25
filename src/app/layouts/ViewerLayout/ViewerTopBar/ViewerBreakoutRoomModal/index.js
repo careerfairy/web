@@ -103,7 +103,7 @@ const Content = ({breakoutRooms, fullyOpened, handleClose, handleBackToMainRoom,
                 </Button>)}
             </Box>
             <Box p={1}>
-                <Zoom duration={250} left opposite cascade when={Boolean(fullyOpened)}>
+                <Zoom duration={250} opposite cascade when={Boolean(fullyOpened)}>
                     <div>
                         {breakoutRooms.map(room => {
                             const activeRoom = room.id === breakoutRoomId
@@ -126,9 +126,8 @@ const Content = ({breakoutRooms, fullyOpened, handleClose, handleBackToMainRoom,
                                         label="Live"
                                     />
                                 </ListItem>
-                            );
+                            )
                         })}
-
                     </div>
                 </Zoom>
             </Box>

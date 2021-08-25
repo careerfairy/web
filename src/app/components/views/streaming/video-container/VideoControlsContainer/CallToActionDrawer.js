@@ -50,6 +50,7 @@ const useStyles = makeStyles((theme) => ({
       // padding: theme.spacing(3),
       flex: 1,
       display: "flex",
+      flexDirection: "column"
    },
 }));
 

@@ -1467,8 +1467,8 @@ class Firebase {
                 }
 
             if(hasAlreadyClicked){
-                callToActionUpdateData["numberOfUsersWhoClickedLink"] = firebase.firestore.FieldValue.increment(-1)
-                batch.delete(userInUsersWhoClickedLinkRef)
+                // callToActionUpdateData["numberOfUsersWhoClickedLink"] = firebase.firestore.FieldValue.increment(-1)
+                // batch.delete(userInUsersWhoClickedLinkRef)
             }
             } else {
                 batch.set(userInUsersWhoClickedLinkRef, {
@@ -1480,8 +1480,8 @@ class Firebase {
                 }
 
                 if(hasAlreadyDismissed){
-                    callToActionUpdateData["numberOfUsersWhoDismissed"] = firebase.firestore.FieldValue.increment(-1)
-                    batch.delete(userInUsersWhoDismissedRef)
+                //     callToActionUpdateData["numberOfUsersWhoDismissed"] = firebase.firestore.FieldValue.increment(-1)
+                //     batch.delete(userInUsersWhoDismissedRef)
                 }
             }
                     batch.update(callToActionRef, callToActionUpdateData)
@@ -1526,7 +1526,8 @@ class Firebase {
 
         batch.update(callToActionRef, {
             sent: this.getServerTimestamp(),
-            active: true
+            active: true,
+            resentAt: this.getServerTimestamp(),
         })
 
         batch.update(streamRef, {
@@ -1599,6 +1600,7 @@ class Firebase {
     }
 
     getCallToActionsWithAnArrayOfIds = async (streamRef, callToActionIds) => {
+        if(!callToActionIds?.length) return []
         const callToActionsRef = streamRef.collection("callToActions")
         const callToActionSnaps = await Promise.all(callToActionIds.map(id => callToActionsRef.doc(id).get()))
         const callToActionData = callToActionSnaps

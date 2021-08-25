@@ -2,84 +2,20 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import useStreamQuery from "../../../../custom-hook/useQuery";
-import { useFirestoreConnect } from "react-redux-firebase";
+import { isEmpty, isLoaded, useFirestoreConnect } from "react-redux-firebase";
 import { createSelector } from "reselect";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { FixedSizeList } from "react-window";
-import {
-   Box,
-   Button,
-   CircularProgress,
-   List,
-   ListItem,
-   ListItemSecondaryAction,
-   ListItemText,
-   Switch,
-   Typography
-} from "@material-ui/core";
-import { isEmpty, isLoaded } from "react-redux-firebase";
+import { Box, CircularProgress, Typography } from "@material-ui/core";
 import { useFirebase } from "../../../../../context/firebase";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 import CallToActionItem from "./CallToActionItem";
 
-const useStyles = makeStyles((theme) => ({
-   inline: {
-      display: 'inline',
-   },
-}));
 
 const callToActionSelector = createSelector(
    (state) => state.firestore.ordered["callToActions"],
    (callToActions) => callToActions
 );
 
-const CallToActionItemTemp = ({
-   style,
-   callToAction: {
-      active,
-      id,
-      buttonUrl,
-      created,
-      message,
-      numberOfUsersWhoClickedLink,
-      numberOfUsersWhoDismissed,
-     buttonText
-   },
-   handleToggleActive,
-}) => {
-   const classes = useStyles();
-   return (
-      <ListItem style={style}>
-         <ListItemText
-            primary={`Button Text: ${buttonText}`}
-            secondary={
-               <React.Fragment>
-                  <Typography
-                     component="span"
-                     variant="body2"
-                     className={classes.inline}
-                     color="textPrimary"
-                  >
-                     Button Message:
-                  </Typography>
-                  {message}
-               </React.Fragment>
-            }
-         />
-         <Button
-            color="secondary"
-            variant={active ? "outlined" : "contained"}
-            onClick={() => {
-               handleToggleActive(id, active);
-            }}
-         >
-            {active ? "Send" : "Deactivate"}
-         </Button>
-      </ListItem>
-   );
-};
 const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToAction, handleClickResendCallToAction}) => {
-   const classes = useStyles();
    const streamRef = useStreamRef();
    const { activateCallToAction, deactivateCallToAction } = useFirebase();
    const callToActions = useSelector((state) => callToActionSelector(state));
@@ -114,34 +50,49 @@ const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToA
       }
    };
 
-
    return (
-      <div style={{ flex: "1 1 auto" }}>
-         <AutoSizer>
-            {({ height, width }) => (
-               <FixedSizeList
-                  itemSize={200}
-                  itemCount={callToActions.length}
-                  height={height}
-                  width={width}
-               >
-                  {({ style, index }) => (
-                     <CallToActionItem
-                        style={style}
-                        index={index}
-                        key={callToActions[index].id}
-                        callToAction={callToActions[index]}
-                        handleClickResendCallToAction={handleClickResendCallToAction}
-                        handleClickEditCallToAction={handleClickEditCallToAction}
-                        handleClickDeleteCallToAction={handleClickDeleteCallToAction}
-                        handleToggleActive={handleToggleActive}
-                     />
-                  )}
-               </FixedSizeList>
-            )}
-         </AutoSizer>
-      </div>
-   );
+     <React.Fragment>
+        {callToActions.map(callToAction => (
+          <CallToActionItem
+            key={callToAction.id}
+            callToAction={callToAction}
+            handleClickResendCallToAction={handleClickResendCallToAction}
+            handleClickEditCallToAction={handleClickEditCallToAction}
+            handleClickDeleteCallToAction={handleClickDeleteCallToAction}
+            handleToggleActive={handleToggleActive}
+          />
+        ))}
+     </React.Fragment>
+   )
+
+   // return (
+   //    <div style={{ flex: "1 1 auto" }}>
+   //       <AutoSizer>
+   //          {({ height, width }) => (
+   //             <FixedSizeList
+   //                itemSize={200}
+   //                itemCount={callToActions.length}
+   //                height={height}
+   //                width={width}
+   //             >
+   //                {({ style, index }) => (
+   //                   <CallToActionItem
+   //                      style={style}
+   //                      index={index}
+   //                      key={callToActions[index].id}
+   //                      itemKey={callToActions[index].id}
+   //                      callToAction={callToActions[index]}
+   //                      handleClickResendCallToAction={handleClickResendCallToAction}
+   //                      handleClickEditCallToAction={handleClickEditCallToAction}
+   //                      handleClickDeleteCallToAction={handleClickDeleteCallToAction}
+   //                      handleToggleActive={handleToggleActive}
+   //                   />
+   //                )}
+   //             </FixedSizeList>
+   //          )}
+   //       </AutoSizer>
+   //    </div>
+   // );
 };
 
 export default CallToActionList;
