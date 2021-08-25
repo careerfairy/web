@@ -31,6 +31,7 @@ import { useDispatch, useSelector } from "react-redux";
 import breakoutRoomsSelector from "../../../components/selectors/breakoutRoomsSelector";
 import * as actions from "store/actions";
 import useStreamGroups from "../../../components/custom-hook/useStreamGroups";
+import ViewerCtaModal from "./ViewerCtaModal";
 
 const useStyles = makeStyles((theme) => ({
    joinButton: {
@@ -145,6 +146,17 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                      </IconButton>
                   </Tooltip>
                )}
+               {ctaStatus.active && (
+                 <Tooltip title="Checkout active call to actions">
+                    <IconButton
+                      onClick={handleOpenCtaModal}
+                    >
+                       <Badge color="secondary" badgeContent={ctaStatus.numberActive}>
+                          <CallToActionIcon />
+                       </Badge>
+                    </IconButton>
+                 </Tooltip>
+               )}
                <Tooltip title="See who joined">
                   <IconButton
                      onClick={showAudience}
@@ -172,6 +184,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                localStorageAudienceDrawerKey={localStorageAudienceDrawerKey}
                handleBackToMainRoom={handleBackToMainRoom}
             />
+            <ViewerCtaModal mobile={mobile} />
          </React.Fragment>
       );
    }
@@ -225,7 +238,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                         <IconButton
                            onClick={handleOpenCtaModal}
                         >
-                           <Badge color="secondary" badgeContent={"!"}>
+                           <Badge color="secondary" badgeContent={ctaStatus.numberActive}>
                               <CallToActionIcon />
                            </Badge>
                         </IconButton>
@@ -300,8 +313,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
             localStorageAudienceDrawerKey={localStorageAudienceDrawerKey}
             handleBackToMainRoom={handleBackToMainRoom}
          />
-         <ViewerCtaModal
-         />
+         <ViewerCtaModal mobile={mobile} />
       </React.Fragment>
    );
 };
