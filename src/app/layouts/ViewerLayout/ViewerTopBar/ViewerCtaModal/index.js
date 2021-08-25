@@ -113,7 +113,7 @@ const Content = ({ fullyOpened, handleClose, mobile }) => {
         display="flex"
       >
         <ThemedPermanentMarker className={classes.title}>
-          Live Call to Actions
+          Live Messages {currentLivestream?.company ? `From ${currentLivestream?.company}`: null}
         </ThemedPermanentMarker>
         <Box flex={1} />
         {mobile ? (
