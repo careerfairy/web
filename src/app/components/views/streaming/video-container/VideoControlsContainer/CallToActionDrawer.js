@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
 const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
    const classes = useStyles();
    const streamRef = useStreamRef();
-   const { deleteCallToAction } = useFirebase();
+   const { deleteCallToAction, resendCallToAction } = useFirebase();
    const [callToActionModalOpen, setCallToActionModalOpen] = useState(false);
    const [callToActionToEdit, setCallToActionToEdit] = useState(null);
 
@@ -85,6 +85,14 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
    const handleClickEditCallToAction = (newCallToActionToEditData) => {
       setCallToActionToEdit(newCallToActionToEditData);
    };
+
+   const handleClickResendCallToAction = async (callToActionId) => {
+      try {
+         await resendCallToAction(streamRef, callToActionId)
+      } catch (e) {
+         console.error("error resending callToAction", e);
+      }
+   }
 
    return (
       <React.Fragment>
@@ -117,6 +125,7 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
                <CallToActionList
                   handleClickDeleteCallToAction={handleClickDeleteCallToAction}
                   handleClickEditCallToAction={handleClickEditCallToAction}
+                  handleClickResendCallToAction={handleClickResendCallToAction}
                />
             </div>
          </div>
