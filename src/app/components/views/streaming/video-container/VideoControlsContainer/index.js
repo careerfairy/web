@@ -156,12 +156,12 @@ function VideoControlsContainer({
 
    function toggleMicrophone() {
       if (isLocalMicMuted) {
-         localMediaStream.unmuteAudio();
+         localMediaStream.audioTrack.setEnabled(true);
          let localMediaStreamCopy = { ...localMediaStream };
          localMediaStreamCopy.audioMuted = false;
          setLocalMediaStream(localMediaStreamCopy);
       } else {
-         localMediaStream.muteAudio();
+         localMediaStream.audioTrack.setEnabled(false);
          let localMediaStreamCopy = { ...localMediaStream };
          localMediaStreamCopy.audioMuted = true;
          setLocalMediaStream(localMediaStreamCopy);
@@ -171,12 +171,12 @@ function VideoControlsContainer({
 
    function toggleVideo() {
       if (isVideoInactive) {
-         localMediaStream.unmuteVideo();
+         localMediaStream.videoTrack.setEnabled(true);
          let localMediaStreamCopy = { ...localMediaStream };
          localMediaStreamCopy.videoMuted = false;
          setLocalMediaStream(localMediaStreamCopy);
       } else {
-         localMediaStream.muteVideo();
+         localMediaStream.videoTrack.setEnabled(false);
          let localMediaStreamCopy = { ...localMediaStream };
          localMediaStreamCopy.videoMuted = true;
          setLocalMediaStream(localMediaStreamCopy);
@@ -199,9 +199,9 @@ function VideoControlsContainer({
    const handleOpenCallToActionDrawer = () => {
       setCallToActionDrawerOpen(true);
    };
-   const handleCloseCallToActionDrawer = useCallback( () => {
+   const handleCloseCallToActionDrawer = useCallback(() => {
       setCallToActionDrawerOpen(false);
-   },[]);
+   }, []);
 
    const actions = [
       {
@@ -224,11 +224,10 @@ function VideoControlsContainer({
       },
    ];
 
-   const shareActions = [
-   ];
+   const shareActions = [];
 
    if (showScreenShareButtons()) {
-      shareActions.unshift(   {
+      shareActions.unshift({
          icon: <ScreenShareIcon color={desktopMode ? "primary" : "inherit"} />,
          name: desktopMode ? "Stop sharing screen" : "Share screen",
          onClick: () => handleClickScreenShareButton(),
@@ -236,33 +235,35 @@ function VideoControlsContainer({
    }
 
    if (!viewer) {
-      shareActions.unshift({
-         icon: (
-            <SharePdfIcon
-               // fontSize="small"
-               color={presentMode ? "primary" : "inherit"}
-            />
-         ),
-         name: presentMode
-            ? "Stop Sharing PDF presentation"
-            : "Share PDF presentation",
-         onClick: () =>
-            setLivestreamMode(presentMode ? "default" : "presentation"),
-      }, {
-         icon: <CallToActionIcon />,
-         name: "Send a call to action",
-         onClick: () => handleOpenCallToActionDrawer(),
-      });
+      shareActions.unshift(
+         {
+            icon: (
+               <SharePdfIcon
+                  // fontSize="small"
+                  color={presentMode ? "primary" : "inherit"}
+               />
+            ),
+            name: presentMode
+               ? "Stop Sharing PDF presentation"
+               : "Share PDF presentation",
+            onClick: () =>
+               setLivestreamMode(presentMode ? "default" : "presentation"),
+         },
+         {
+            icon: <CallToActionIcon />,
+            name: "Send a call to action",
+            onClick: () => handleOpenCallToActionDrawer(),
+         }
+      );
    }
 
-   if(shareActions.length){
-      actions.unshift( {
+   if (shareActions.length) {
+      actions.unshift({
          icon: <ShareIcon />,
          name: "Share",
          onClick: handleClickShare,
-      })
+      });
    }
-
 
    actions.unshift({
       icon: <SettingsIcon fontSize="large" />,

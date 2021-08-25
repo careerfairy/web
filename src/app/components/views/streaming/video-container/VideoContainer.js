@@ -37,29 +37,31 @@ function VideoContainer(props) {
       showBubbles,
       setShowBubbles,
       handleConfirmStep,
-      getActiveTutorialStepKey
-  } = useContext(TutorialContext);
-  const classes = useStyles();
-  const localVideoId = 'localVideo';
-  const isMainStreamer = props.streamerId === props.currentLivestream.id;
-  const streamRef = useStreamRef();
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
-  
-  const [streamerConnected, setStreamerConnected] = useState(false);
-  const [streamerReady, setStreamerReady] = useState(false);
-  
-  const [connectionEstablished, setConnectionEstablished] = useState(false);
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [showScreenShareModal, setShowScreenShareModal] = useState(false);
-  const [optimizationMode, setOptimizationMode] = useState("detail");
-  
-  const [showSettings, setShowSettings] = useState(false);
-  
-  const screenSharingMode = (props.currentLivestream.screenSharerId === props.streamerId &&
-      props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
-  
-  const {
+      getActiveTutorialStepKey,
+   } = useContext(TutorialContext);
+   const localVideoId = "localVideo";
+   const isMainStreamer = props.streamerId === props.currentLivestream.id;
+   const streamRef = useStreamRef();
+   const [errorMessage, setErrorMessage] = useState(null);
+   const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
+
+   const [streamerConnected, setStreamerConnected] = useState(false);
+   const [streamerReady, setStreamerReady] = useState(false);
+
+   const [connectionEstablished, setConnectionEstablished] = useState(false);
+   const [isStreaming, setIsStreaming] = useState(false);
+   const [showScreenShareModal, setShowScreenShareModal] = useState(false);
+   const [optimizationMode, setOptimizationMode] = useState("detail");
+
+   const [showSettings, setShowSettings] = useState(false);
+
+   const screenSharingMode =
+      props.currentLivestream.screenSharerId === props.streamerId &&
+      props.currentLivestream.mode === "desktop"
+         ? optimizationMode
+         : "";
+
+   const {
       localMediaStream,
       setLocalMediaStream,
       externalUsers,
@@ -68,8 +70,8 @@ function VideoContainer(props) {
       networkQuality,
       agoraHandlers,
       setAddedStream,
-      setRemovedStream
-  } = useAgoraAsStreamer(
+      setRemovedStream,
+   } = useAgoraAsStreamer(
       true,
       false,
       localVideoId,
@@ -78,10 +80,12 @@ function VideoContainer(props) {
       props.streamerId,
       props.viewer
    );
-  
-  const devices = useDevices(agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED");
-  
-  const {
+
+   const devices = useDevices(
+      agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
+   );
+
+   const {
       audioSource,
       updateAudioSource,
       videoSource,
@@ -96,93 +100,109 @@ function VideoContainer(props) {
       localMediaStream,
       !streamerReady || showSettings
    );
-  
-   const currentSpeakerId = useCurrentSpeaker(
-      localMediaStream,
-      externalUsers
-   );
-  
-  useEffect(() => {
-      if (agoraRtcStatus && agoraRtcStatus.type === "INFO" && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
-          setStreamerConnected(true)
-      }
-  }, [agoraRtcStatus])
-  
-  useEffect(() => {
+
+   const currentSpeakerId = useCurrentSpeaker(localMediaStream, externalUsers);
+
+   useEffect(() => {
       if (
-           agoraRtcStatus && 
-           (agoraRtcStatus.msg === "RTC_SCREEN_SHARE_STOPPED" || 
-           agoraRtcStatus.msg === "RTC_SCREEN_SHARE_NOT_ALLOWED") && 
-       props.currentLivestream.mode === 'desktop' && 
-       props.currentLivestream.screenSharerId === props.streamerId
+         agoraRtcStatus &&
+         agoraRtcStatus.type === "INFO" &&
+         agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
       ) {
-         setDesktopMode("default", props.streamerId)
+         setStreamerConnected(true);
       }
-  }, [agoraRtcStatus])
-  
-  useEffect(() => {
+   }, [agoraRtcStatus]);
+
+   useEffect(() => {
+      if (
+         agoraRtcStatus &&
+         (agoraRtcStatus.msg === "RTC_SCREEN_SHARE_STOPPED" ||
+            agoraRtcStatus.msg === "RTC_SCREEN_SHARE_NOT_ALLOWED") &&
+         props.currentLivestream.mode === "desktop" &&
+         props.currentLivestream.screenSharerId === props.streamerId
+      ) {
+         setDesktopMode("default", props.streamerId);
+      }
+   }, [agoraRtcStatus]);
+
+   useEffect(() => {
       if (props.streamerId && props.currentLivestream.id) {
-          if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
-              setDesktopMode("default", props.streamerId);
-          }
+         if (
+            props.currentLivestream.mode === "desktop" &&
+            props.currentLivestream.screenSharerId === props.streamerId
+         ) {
+            setDesktopMode("default", props.streamerId);
+         }
       }
-  }, [props.streamerId, props.currentLivestream.id])
-  
-  const [timeoutState, setTimeoutState] = useState(null);
-  
-  useEffect(() => {
-      dynamicallyUpdateVideoProfile()
-  }, [localMediaStream, externalUsers, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
-  
-  const dynamicallyUpdateVideoProfile = async () => {
+   }, [props.streamerId, props.currentLivestream.id]);
+
+   const [timeoutState, setTimeoutState] = useState(null);
+
+   useEffect(() => {
+      dynamicallyUpdateVideoProfile();
+   }, [
+      localMediaStream,
+      externalUsers,
+      props.currentLivestream.currentSpeakerId,
+      props.currentLivestream.mode,
+   ]);
+
+   const dynamicallyUpdateVideoProfile = async () => {
       if (localMediaStream && externalUsers) {
-          if (externalUsers.length > 3) {
-              if (props.streamerId === props.currentLivestream.currentSpeakerId && props.currentLivestream.mode !== "desktop" && props.currentLivestream.mode !== "presentation") {
-                  if (timeoutState) {
-                      clearTimeout(timeoutState);
-                  }
-                  let newTimeout = setTimeout(() => {
-                      localMediaStream.videoTrack.setEncoderConfiguration("480p_9")
-                  }, 20000);
-                  setTimeoutState(newTimeout)
-              } else {
-                  if (timeoutState) {
-                      clearTimeout(timeoutState);
-                  }
-                  let newTimeout = setTimeout(() => {
-                      localMediaStream.videoTrack.setEncoderConfiguration("180p")
-                  }, 20000);
-                  setTimeoutState(newTimeout)
-              }
-          } else {
-              localMediaStream.videoTrack.setEncoderConfiguration("480p_9")
-          }
+         if (externalUsers.length > 3) {
+            if (
+               props.streamerId === props.currentLivestream.currentSpeakerId &&
+               props.currentLivestream.mode !== "desktop" &&
+               props.currentLivestream.mode !== "presentation"
+            ) {
+               if (timeoutState) {
+                  clearTimeout(timeoutState);
+               }
+               let newTimeout = setTimeout(() => {
+                  localMediaStream.videoTrack.setEncoderConfiguration("480p_9");
+               }, 20000);
+               setTimeoutState(newTimeout);
+            } else {
+               if (timeoutState) {
+                  clearTimeout(timeoutState);
+               }
+               let newTimeout = setTimeout(() => {
+                  localMediaStream.videoTrack.setEncoderConfiguration("180p");
+               }, 20000);
+               setTimeoutState(newTimeout);
+            }
+         } else {
+            localMediaStream.videoTrack.setEncoderConfiguration("480p_9");
+         }
       }
-  }
-  
-  
-  const setDesktopMode = async (mode, initiatorId) => {
-      let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;
-      await props.firebase.setDesktopMode(props.currentLivestream.id, mode, screenSharerId);
-  }
-  
-  
-  useEffect(() => {
+   };
+
+   const setDesktopMode = async (mode, initiatorId) => {
+      let screenSharerId =
+         mode === "desktop"
+            ? initiatorId
+            : props.currentLivestream.screenSharerId;
+      await props.firebase.setDesktopMode(streamRef, mode, screenSharerId);
+   };
+
+   useEffect(() => {
       const activeStep = getActiveTutorialStepKey();
       if (localMediaStream && activeStep > 0) {
-          if (activeStep > 10 && activeStep < 13) {
-              if (!externalUsers.some(stream => stream.streamId === 'demoStream')) {
-                  setAddedStream({
-                      streamId: "demoStream",
-                      url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media"
-                  })
-              }
+         if (activeStep > 10 && activeStep < 13) {
+            if (
+               !externalUsers.some((stream) => stream.streamId === "demoStream")
+            ) {
+               setAddedStream({
+                  streamId: "demoStream",
+                  url:
+                     "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media",
+               });
+            }
          } else {
-              setRemovedStream("demoStream");
+            setRemovedStream("demoStream");
          }
       }
    }, [tutorialSteps]);
-
 
    const isOpen = (property) => {
       return Boolean(
@@ -245,7 +265,10 @@ function VideoContainer(props) {
          <BreakoutRoomManagementModal agoraHandlers={agoraHandlers} />
          <CurrentSpeakerDisplayer
             isPlayMode={false}
-            smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}
+            smallScreenMode={
+               props.currentLivestream.mode === "presentation" ||
+               props.currentLivestream.mode === "desktop"
+            }
             speakerSwitchModeActive={isMainStreamer}
             localId={props.streamerId}
             localStream={localMediaStream}
@@ -258,33 +281,35 @@ function VideoContainer(props) {
             {...props}
             muted={false}
          />
-         {sharingContent() &&
+         {sharingContent() && (
             <SmallStreamerVideoDisplayer
                livestreamId={props.currentLivestream.id}
                isBreakout={props.isBreakout}
-               presentation={props.currentLivestream.mode === 'presentation'}
+               presentation={props.currentLivestream.mode === "presentation"}
                showMenu={props.showMenu}
                externalMediaStreams={externalUsers}
                isLocalScreen={screenSharingMode}
-               presenter={true}/>}
-            <VideoControlsContainer
-               currentLivestream={props.currentLivestream}
-               viewer={props.viewer}
-               streamerId={props.streamerId}
-               joining={!isMainStreamer}
-               handleClickScreenShareButton={handleClickScreenShareButton}
-               localMediaStream={localMediaStream}
-               setLocalMediaStream={setLocalMediaStream}
-               isMainStreamer={isMainStreamer}
-               showSettings={showSettings}
-               setShowSettings={setShowSettings}
+               presenter={true}
             />
-            <WifiIndicator
-               uplink={networkQuality.uplinkNetworkQuality}
-               downlink={networkQuality.downlinkNetworkQuality}
-               agoraRtcStatus={agoraRtcStatus}
-               agoraRtmStatus={agoraRtmStatus}
-            />
+         )}
+         <VideoControlsContainer
+            currentLivestream={props.currentLivestream}
+            viewer={props.viewer}
+            streamerId={props.streamerId}
+            joining={!isMainStreamer}
+            handleClickScreenShareButton={handleClickScreenShareButton}
+            localMediaStream={localMediaStream}
+            setLocalMediaStream={setLocalMediaStream}
+            isMainStreamer={isMainStreamer}
+            showSettings={showSettings}
+            setShowSettings={setShowSettings}
+         />
+         <WifiIndicator
+            uplink={networkQuality.uplinkNetworkQuality}
+            downlink={networkQuality.downlinkNetworkQuality}
+            agoraRtcStatus={agoraRtcStatus}
+            agoraRtmStatus={agoraRtmStatus}
+         />
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}
