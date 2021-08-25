@@ -1526,7 +1526,8 @@ class Firebase {
 
         batch.update(callToActionRef, {
             sent: this.getServerTimestamp(),
-            active: true
+            active: true,
+            resentAt: this.getServerTimestamp(),
         })
 
         batch.update(streamRef, {

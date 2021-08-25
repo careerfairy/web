@@ -20,6 +20,16 @@ export const closeViewerBreakoutModal = () => async (dispatch) => {
     dispatch({type: actions.CLOSE_VIEWER_BREAKOUT_MODAL})
 };
 
+// Toggle the open state of the viewer call to action modal
+export const openViewerCtaModal = () => async (dispatch) => {
+    dispatch({type: actions.OPEN_VIEWER_CTA_MODAL})
+};
+
+// Close the viewer call to action modal
+export const closeViewerCtaModal = () => async (dispatch) => {
+    dispatch({type: actions.CLOSE_VIEWER_CTA_MODAL})
+};
+
 // Close the streamer breakoutModal
 /**
  * @param {number} numberOfViewers
