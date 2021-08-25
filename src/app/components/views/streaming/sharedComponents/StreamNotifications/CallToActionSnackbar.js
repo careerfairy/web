@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.common.white,
    },
    mainButton: {
-      // color: "inherit",
+      color: theme.palette.common.white,
    },
    card: {
       width: "100%",

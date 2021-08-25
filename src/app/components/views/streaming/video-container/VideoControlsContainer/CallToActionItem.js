@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
-import PropTypes from "prop-types";
 import {
   Button,
-  CircularProgress,
   IconButton,
-  LinearProgress,
   ListItem,
   ListItemAvatar,
   ListItemIcon,
@@ -25,13 +22,10 @@ import {
   callToActionsDictionary,
   callToActionsSocialsDictionary,
 } from "../../../../util/constants/callToActions";
-import Shake from "react-reveal/Shake";
+import RubberBand from "react-reveal/RubberBand";
 
 const useStyles = makeStyles(({ palette }) => ({
-  root: {
-    display: "flex",
-    padding: 4,
-  },
+  root: {},
   detailsWrapper: {
     display: "flex",
     flexDirection: "column",
@@ -45,20 +39,6 @@ const useStyles = makeStyles(({ palette }) => ({
     justifyContent: "center",
     alignItems: "center",
   },
-  card: {
-    display: "flex",
-    flexDirection: "column",
-    minWidth: 270,
-    width: "100%",
-    borderRadius: 12,
-    "& > *:nth-child(1)": {
-      // marginRight: spacing(2),
-    },
-    "& > *:nth-child(2)": {
-      flex: "auto",
-    },
-  },
-  avatar: {},
   listItemAvatar: {
     height: "100%",
     backgroundColor: (props) => alpha(props.color, 0.3),
@@ -68,34 +48,7 @@ const useStyles = makeStyles(({ palette }) => ({
     "& svg": {
       fontSize: 40,
       color: palette.common.white,
-      // color: props => props.color,
     },
-  },
-  icon: {
-    // margin: "auto",
-  },
-  heading: {
-    // fontFamily: family,
-    fontSize: 16,
-    marginBottom: 0,
-  },
-  subheader: {
-    // fontFamily: family,
-    fontSize: 14,
-    color: palette.grey[600],
-    letterSpacing: "1px",
-    marginBottom: 4,
-  },
-  value: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: palette.grey[500],
-  },
-  label: {
-    fontSize: 12,
-  },
-  description: {
-    fontSize: 10,
   },
   settingBtn: {
     position: "absolute",
@@ -103,51 +56,6 @@ const useStyles = makeStyles(({ palette }) => ({
     top: 0,
   },
 }));
-
-const LinearProgressWithLabel = ({
-  engagementData: { total, percentage, noOfEngagement, noOfDismissal },
-}) => {
-  return (
-    <Tooltip title="This bar shows you the number of individuals who clicked on the call to action">
-      <Box width="100%" display="flex" alignItems="center">
-        <Box width="100%" mr={1}>
-          <LinearProgress variant="determinate" value={percentage} />
-        </Box>
-        <Box minWidth={35}>
-          <Typography variant="body2" color="textSecondary">
-            {/*   {`${Math.round(*/}
-            {/*   percentage*/}
-            {/*)}%`}*/}
-            {`${noOfEngagement}/${total}`}
-          </Typography>
-        </Box>
-      </Box>
-    </Tooltip>
-  );
-};
-
-LinearProgressWithLabel.propTypes = {
-  /**
-   * The value of the progress indicator for the determinate and buffer variants.
-   * Value between 0 and 100.
-   */
-  engagementData: PropTypes.object.isRequired,
-};
-
-const Section = ({ label, description }) => {
-  const classes = useStyles();
-
-  return (
-    <React.Fragment>
-      <Typography noWrap className={classes.label} color="textSecondary">
-        {label}
-      </Typography>
-      <Typography noWrap gutterBottom className={classes.description}>
-        <LinkifyText>{description}</LinkifyText>
-      </Typography>
-    </React.Fragment>
-  );
-};
 
 const SettingsDropdown = ({
   className,
@@ -213,38 +121,31 @@ const SettingsDropdown = ({
   );
 };
 
-const EngagementChart = ({ percentage, noOfEngagement, total, ...props }) => {
+const EngagementChart = memo(({ percentage, noOfEngagement, total }) => {
   return (
-    <Tooltip
-      title={`Of the ${total} interactions ${noOfEngagement}(${percentage}%) of users clicked on the call to action`}
-    >
-      <Box position="relative" display="inline-flex">
-        <CircularProgress variant="determinate" value={percentage} {...props} />
-        <Box
-          top={0}
-          left={0}
-          bottom={0}
-          right={0}
-          position="absolute"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Shake spy={noOfEngagement}>
-            <Typography variant="caption" component="div" color="textSecondary">
-              {noOfEngagement}
-            </Typography>
-          </Shake>
-        </Box>
+    <Box position="relative" display="inline-flex">
+      <Box
+        top={0}
+        left={0}
+        bottom={0}
+        right={0}
+        position="absolute"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <RubberBand spy={noOfEngagement}>
+          <Typography variant="h6" component="div" color="textSecondary">
+            {noOfEngagement}
+          </Typography>
+        </RubberBand>
       </Box>
-    </Tooltip>
+    </Box>
   );
-};
+});
 
 export const CallToActionItem = React.memo((props) => {
   const {
-    style,
-    index,
     callToAction: {
       active,
       id,
@@ -302,7 +203,6 @@ export const CallToActionItem = React.memo((props) => {
       let newColor =
         callToActionsDictionary[type]?.color ||
         callToActionsDictionary.custom.color;
-      // console.log("-> newColor", newColor);
       if (isSocial) {
         if (socialData.socialType) {
           newIcon = callToActionsSocialsDictionary[socialData.socialType].icon;
@@ -319,7 +219,12 @@ export const CallToActionItem = React.memo((props) => {
   }, [type, socialData]);
 
   return (
-    <ListItem divider style={style}>
+    <ListItem
+      divider
+      style={{
+        height: 200,
+      }}
+    >
       <ListItemAvatar className={classes.listItemAvatar}>{icon}</ListItemAvatar>
       <Box flexGrow={1} minWidth={0} p={1} pr={0}>
         <Box display={"flex"}>

@@ -151,7 +151,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                     <IconButton
                       onClick={handleOpenCtaModal}
                     >
-                       <Badge color="secondary" badgeContent={ctaStatus.numberActive}>
+                       <Badge color="secondary" badgeContent={ctaStatus.numberActive && "!"}>
                           <CallToActionIcon />
                        </Badge>
                     </IconButton>
@@ -238,7 +238,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                         <IconButton
                            onClick={handleOpenCtaModal}
                         >
-                           <Badge color="secondary" badgeContent={ctaStatus.numberActive}>
+                           <Badge color="secondary" badgeContent={ctaStatus.numberActive && "!"}>
                               <CallToActionIcon />
                            </Badge>
                         </IconButton>

@@ -66,6 +66,10 @@ const Content = ({ fullyOpened, handleClose, mobile }) => {
   const classes = useStyles();
 
   useEffect(() => {
+    return () => dispatch(actions.closeViewerCtaModal())
+  },[])
+
+  useEffect(() => {
     (async function getAndSetCallToActions() {
       const newCallToActions = await getCallToActionsWithAnArrayOfIds(
         streamRef,
@@ -73,6 +77,9 @@ const Content = ({ fullyOpened, handleClose, mobile }) => {
       );
 
       setCallToActions(newCallToActions);
+      if(!newCallToActions.length){
+        dispatch(actions.closeViewerCtaModal())
+      }
     })();
   }, [currentLivestream?.activeCallToActionIds]);
 
@@ -85,10 +92,10 @@ const Content = ({ fullyOpened, handleClose, mobile }) => {
     setLoading(true);
     try {
       await clickOnCallToAction(streamRef, callToActionId, userData?.id);
-      // if (window) {
-      //   window.open(buttonUrl, "_blank");
-      //   // .focus() DOnt know if we should focus the new tab automatically
-      // }
+      if (window) {
+        window.open(buttonUrl, "_blank");
+        // .focus() DOnt know if we should focus the new tab automatically
+      }
     } catch (e) {
       dispatch(actions.sendGeneralError(e));
     }
@@ -134,6 +141,7 @@ const Content = ({ fullyOpened, handleClose, mobile }) => {
                         ctaSnackProps.buttonUrl
                       )
                     }
+                    loading={loading}
                     hideClose
                     {...ctaSnackProps}
                   />
