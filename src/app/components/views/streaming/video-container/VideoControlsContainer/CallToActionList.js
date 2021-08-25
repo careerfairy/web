@@ -33,53 +33,7 @@ const callToActionSelector = createSelector(
    (callToActions) => callToActions
 );
 
-const CallToActionItemTemp = ({
-   style,
-   callToAction: {
-      active,
-      id,
-      buttonUrl,
-      created,
-      message,
-      numberOfUsersWhoClickedLink,
-      numberOfUsersWhoDismissed,
-     buttonText
-   },
-   handleToggleActive,
-}) => {
-   const classes = useStyles();
-   return (
-      <ListItem style={style}>
-         <ListItemText
-            primary={`Button Text: ${buttonText}`}
-            secondary={
-               <React.Fragment>
-                  <Typography
-                     component="span"
-                     variant="body2"
-                     className={classes.inline}
-                     color="textPrimary"
-                  >
-                     Button Message:
-                  </Typography>
-                  {message}
-               </React.Fragment>
-            }
-         />
-         <Button
-            color="secondary"
-            variant={active ? "outlined" : "contained"}
-            onClick={() => {
-               handleToggleActive(id, active);
-            }}
-         >
-            {active ? "Send" : "Deactivate"}
-         </Button>
-      </ListItem>
-   );
-};
 const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToAction, handleClickResendCallToAction}) => {
-   const classes = useStyles();
    const streamRef = useStreamRef();
    const { activateCallToAction, deactivateCallToAction } = useFirebase();
    const callToActions = useSelector((state) => callToActionSelector(state));

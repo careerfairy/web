@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.common.white,
    },
    mainButton: {
-      color: "inherit",
+      // color: "inherit",
    },
    card: {
       width: "100%",
@@ -134,6 +134,7 @@ const CallToActionSnackbar = forwardRef(
          salary,
          applicationDeadline,
          snackBarImage,
+        hideClose
       },
       ref
    ) => {
@@ -144,104 +145,88 @@ const CallToActionSnackbar = forwardRef(
       }, []);
 
       return (
-         <SnackbarContent ref={ref} className={classes.root}>
-            <Card className={clsx(classes.card, classes.glass)}>
-               <CardActions classes={{ root: classes.actionRoot }}>
-                  <span className={classes.mainIconWrapper}>
-                     {icon && icon}
-                  </span>
-                  <div className={classes.messageWrapper}>
-                     <Typography
-                        variant="subtitle2"
-                        className={classes.typography}
-                     >
-                        {isJobPosting ? jobTitle : message}
-                     </Typography>
-                  </div>
-                  <div className={classes.icons}>
-                     {isJobPosting && message ? (
-                        <Button
-                           className={classes.close}
-                           disabled={loading}
-                           startIcon={
-                              expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />
-                           }
-                           onClick={handleExpandClick}
-                        >
-                           {expanded ? "Less info" : "More info"}
-                        </Button>
-                     ) : (
-                        <Button
-                           className={classes.mainButton}
-                           onClick={onClick}
-                           disabled={loading}
-                           size="small"
-                        >
-                           {loading ? "" : buttonText}
-                        </Button>
-                     )}
-                     <IconButton
-                        className={classes.close}
-                        disabled={loading}
-                        onClick={onDismiss}
-                     >
-                        <CloseIcon />
-                     </IconButton>
-                  </div>
-               </CardActions>
-               <Collapse in={expanded} timeout="auto" unmountOnExit>
-                  <Card className={classes.jobCard}>
-                     {snackBarImage && (
-                        <CardMedia
-                          className={classes.imageBackground}
-                        >
-                           <img
-                             className={classes.image}
-                           src={getResizedUrl(snackBarImage, "sm")}
-                           alt="company logo"
-                           />
-                        </CardMedia>
-                     )}
-                     <CardContent>
-                        {jobTitle &&
-                           <JobDetailSection
-                              title="Job Title"
-                              body={jobTitle}
-                           />
-                        }
-                        <JobDetailSection
-                           title="Job Description"
-                           body={message}
-                        />
-                        {salary &&
-                           <JobDetailSection
-                              title="Salary"
-                              body={salary}
-                           />
-                        }
-                        {applicationDeadline &&
-                           <JobDetailSection
-                              title="Application Deadline"
-                              body={prettyLocalizedDate(applicationDeadline)}
-                           />
-                        }
-                     </CardContent>
-                     <CardActions>
-                        <Button
-                           className={classes.mainButton}
-                           onClick={onClick}
-                           disabled={loading}
-                           size="small"
-                           variant="contained"
-                           color="primary"
-                        >
-                           {loading ? "" : buttonText}
-                        </Button>
-                     </CardActions>
-                  </Card>
-               </Collapse>
-            </Card>
-         </SnackbarContent>
+        <SnackbarContent ref={ref} className={classes.root}>
+          <Card className={clsx(classes.card, classes.glass)}>
+            <CardActions classes={{ root: classes.actionRoot }}>
+              <span className={classes.mainIconWrapper}>{icon && icon}</span>
+              <div className={classes.messageWrapper}>
+                <Typography variant="subtitle2" className={classes.typography}>
+                  {isJobPosting ? jobTitle : message}
+                </Typography>
+              </div>
+              <div className={classes.icons}>
+                {isJobPosting && message ? (
+                  <Button
+                    className={classes.close}
+                    disabled={loading}
+                    startIcon={
+                      expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />
+                    }
+                    onClick={handleExpandClick}
+                  >
+                    {expanded ? "Less info" : "More info"}
+                  </Button>
+                ) : (
+                  <Button
+                    className={classes.mainButton}
+                    onClick={onClick}
+                    disabled={loading}
+                    size="small"
+                  >
+                    {loading ? "" : buttonText}
+                  </Button>
+                )}
+                {!hideClose &&
+                  <IconButton
+                    className={classes.close}
+                    disabled={loading}
+                    onClick={onDismiss}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                }
+              </div>
+            </CardActions>
+            <Collapse in={expanded} timeout="auto" unmountOnExit>
+              <Card className={classes.jobCard}>
+                {snackBarImage && (
+                  <CardMedia className={classes.imageBackground}>
+                    <img
+                      className={classes.image}
+                      src={getResizedUrl(snackBarImage, "sm")}
+                      alt="company logo"
+                    />
+                  </CardMedia>
+                )}
+                <CardContent>
+                  {jobTitle && (
+                    <JobDetailSection title="Job Title" body={jobTitle} />
+                  )}
+                  <JobDetailSection title="Job Description" body={message} />
+                  {salary && <JobDetailSection title="Salary" body={salary} />}
+                  {applicationDeadline && (
+                    <JobDetailSection
+                      title="Application Deadline"
+                      body={prettyLocalizedDate(applicationDeadline)}
+                    />
+                  )}
+                </CardContent>
+                <CardActions>
+                  <Button
+                    className={classes.mainButton}
+                    onClick={onClick}
+                    disabled={loading}
+                    size="small"
+                    variant="contained"
+                    color="primary"
+                  >
+                    {loading ? "" : buttonText}
+                  </Button>
+                </CardActions>
+              </Card>
+            </Collapse>
+          </Card>
+        </SnackbarContent>
       );
    }
 );

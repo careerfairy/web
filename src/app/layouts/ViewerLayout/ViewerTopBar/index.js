@@ -72,7 +72,6 @@ const localStorageAudienceDrawerKey = "hasSeenAudienceDrawer";
 const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
    const classes = useStyles();
    const [ctaStatus, setCtaStatus] = useState({ active: false, numberActive: 0 });
-   console.log("-> ctaStatus", ctaStatus);
    const {
       query: { livestreamId, breakoutRoomId },
    } = useRouter();
@@ -114,6 +113,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
       dispatch(actions.openViewerBreakoutModal());
    };
    const handleOpenCtaModal = () => {
+      setCtaStatus({...ctaStatus, numberActive: 0})
       dispatch(actions.openViewerCtaModal());
    };
 
