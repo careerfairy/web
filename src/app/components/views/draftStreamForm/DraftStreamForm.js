@@ -221,7 +221,7 @@ const DraftStreamForm = ({
                         groupIds: livestream.groupIds || [],
                         start: livestream.start.toDate() || new Date(),
                         duration: livestream.duration || DEFAULT_STREAM_DURATION_MINUTES,
-                        hidden: livestream.hidden || false,
+                        hidden: Boolean(livestream.hidden),
                         summary: livestream.summary || "",
                         speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery),
                         status: livestream.status || {},
@@ -422,7 +422,7 @@ const DraftStreamForm = ({
                                     disabled={Boolean(!selectedGroups.length)}
                                     control={
                                         <Switch
-                                            checked={values.hidden}
+                                            checked={Boolean(values.hidden)}
                                             onChange={handleChange}
                                             disabled={Boolean(!selectedGroups.length || isSubmitting)}
                                             color="primary"
@@ -514,7 +514,7 @@ const DraftStreamForm = ({
                                     multiline
                                     id="summary"
                                     label="Summary"
-                                    rowsMax={10}
+                                    maxRows={10}
                                     inputProps={{maxLength: 5000}}
                                     onBlur={handleBlur}
                                     value={values.summary}
