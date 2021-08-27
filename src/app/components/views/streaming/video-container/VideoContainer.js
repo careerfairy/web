@@ -66,6 +66,7 @@ function VideoContainer(props) {
       setLocalMediaStream,
       externalUsers,
       agoraRtcStatus,
+      agoraRtcConnectionStatus,
       agoraRtmStatus,
       networkQuality,
       agoraHandlers,
@@ -309,6 +310,7 @@ function VideoContainer(props) {
             downlink={networkQuality.downlinkNetworkQuality}
             agoraRtcStatus={agoraRtcStatus}
             agoraRtmStatus={agoraRtmStatus}
+            agoraRtcConnectionStatus={agoraRtcConnectionStatus}
          />
          <SettingsModal
             open={showSettings}
