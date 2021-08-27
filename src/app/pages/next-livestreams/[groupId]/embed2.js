@@ -5,21 +5,20 @@ import { getResizedUrl } from "components/helperFunctions/HelperFunctions";
 import { NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL } from "constants/routes";
 import HeadWithMeta from "components/page/HeadWithMeta";
 import { useTheme } from "@material-ui/core/styles";
-import GroupBannerSection from "../../../components/views/NextLivestreams/GroupBannerSection";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../store/actions";
 import { useFirestoreConnect } from "react-redux-firebase";
 import useListenToGroupStreams from "../../../components/custom-hook/useGroupUpcomingStreams";
 import { PAST_LIVESTREAMS_NAME } from "../../../data/constants/streamContants";
-import NextLivestreamsLayout from "../../../layouts/NextLivestreamsLayout";
-import { StreamsSection } from "../../../components/views/NextLivestreams/StreamsSection";
 import ScrollToTop from "../../../components/views/common/ScrollToTop";
+import EmbedBannerSection from "../../../components/views/NextLivestreams/emebed/EmbedBannerSection";
+import EmbedStreamsSection from "../../../components/views/NextLivestreams/emebed/EmbedStreamsSection";
 
 const placeholderBanner =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0";
+  "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/embed-media%2Fstreamer-streaming.svg?alt=media&token=1dfd1b73-b516-471f-911f-7f11f0d0ef3a";
 
 const EmbeddedGroupStreamsPage = ({ serverSideGroup, groupId }) => {
-   const {palette: {common: {white}, navyBlue}} = useTheme()
+   const {palette: {common: {white}, navyBlue, primary}} = useTheme()
    const [value, setValue] = useState("upcomingEvents");
 
    const [selectedOptions, setSelectedOptions] = useState([]);
@@ -66,33 +65,27 @@ const EmbeddedGroupStreamsPage = ({ serverSideGroup, groupId }) => {
 
    return (
      <React.Fragment>
-        <HeadWithMeta
-          {...metaInfo}
-        />
-           <div>
-              <GroupBannerSection
-                color={white}
-                backgroundImageClassName=""
-                backgroundColor={navyBlue.main}
-                groupLogo={currentGroup.logoUrl}
-                backgroundImage={placeholderBanner}
-                groupBio={currentGroup.extraInfo}
-                backgroundImageOpacity={0.2}
-                title={currentGroup.universityName}
-                subtitle={currentGroup.description}
-                handleChange={handleChange}
-                value={value}
-              />
-              <StreamsSection
-                value={value}
-                upcomingLivestreams={upcomingLivestreams}
-                setSelectedOptions={setSelectedOptions}
-                selectedOptions={selectedOptions}
-                currentGroup={currentGroup}
-                pastLivestreams={pastLivestreams}
-              />
-           </div>
-        <ScrollToTop size="small"/>
+       <HeadWithMeta {...metaInfo} />
+       <div>
+         <EmbedBannerSection
+           color={white}
+           backgroundColor={primary.dark}
+           // backgroundImage={placeholderBanner}
+           // backgroundImageOpacity={0.8}
+           title={`CareerFairy Events of ${currentGroup.universityName}`}
+           handleChange={handleChange}
+           value={value}
+         />
+         <EmbedStreamsSection
+           value={value}
+           upcomingLivestreams={upcomingLivestreams}
+           setSelectedOptions={setSelectedOptions}
+           selectedOptions={selectedOptions}
+           currentGroup={currentGroup}
+           pastLivestreams={pastLivestreams}
+         />
+       </div>
+       <ScrollToTop size="small" />
      </React.Fragment>
    );
 };

@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from "next/link";
 import {makeStyles} from "@material-ui/core/styles";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
     mainLogo: {
@@ -14,14 +15,14 @@ const useStyles = makeStyles(theme => ({
         display: "flex"
     }
 }))
-export const MainLogo = ({white}) => {
+export const MainLogo = ({white, className}) => {
     const classes = useStyles()
     return (
         <Link href='/'>
             <a className={classes.logoLink}>
                 <img alt="CareerFairy Logo"
                      src={white ? '/logo_white.svg' : '/logo_teal.svg'}
-                     className={classes.mainLogo}/>
+                     className={clsx(classes.mainLogo, className)}/>
             </a>
         </Link>
     )

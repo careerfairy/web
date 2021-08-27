@@ -1,0 +1,270 @@
+import React, { useCallback, useState } from "react";
+import cx from "clsx";
+import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+import Avatar from "@material-ui/core/Avatar";
+import Box from "@material-ui/core/Box";
+import CardMedia from "@material-ui/core/CardMedia";
+import { useCoverCardMediaStyles } from "@mui-treasury/styles/cardMedia/cover";
+import { Row, Item } from "@mui-treasury/components/flex";
+import {
+  getResizedUrl,
+  prettyDate,
+} from "../../../helperFunctions/HelperFunctions";
+import { Button, CardActionArea, Tooltip, Typography } from "@material-ui/core";
+import { AvatarGroup } from "@material-ui/lab";
+import { MainLogo } from "../../../logos";
+import RegisterIcon from "@material-ui/icons/AddToPhotosRounded";
+import { EmbedTimeDisplay } from "./EmbedTimeDisplay";
+import clsx from "clsx";
+
+
+const useStyles = makeStyles((theme) => ({
+  color: ({ color }) => ({
+    "&:before": {
+      backgroundColor: color,
+    },
+  }),
+  root: {
+    position: "relative",
+    borderRadius: "1rem",
+    // minWidth: 320,
+    "&:before": {
+      transition: "0.2s",
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+      content: '""',
+      display: "block",
+      borderRadius: "1rem",
+      zIndex: 0,
+      bottom: 0,
+    },
+    "&:hover": {
+      "&:before": {
+        bottom: -6,
+      },
+      "& $logo": {
+        transform: "scale(1.1)",
+        boxShadow: "0 6px 20px 0 rgba(0,0,0,0.38)",
+      },
+    },
+  },
+  cover: {
+    borderRadius: "1rem",
+    "&:before": {
+      content: '""',
+      borderRadius: "1rem",
+      position: "absolute",
+      left: "0",
+      right: "0",
+      top: "0",
+      bottom: "0",
+      background: alpha(theme.palette.common.black, 0.7),
+    },
+  },
+  graphicHovered: {
+    backgroundColor: `${theme.palette.primary.main} !important`,
+  },
+  graphic:{
+    transition: theme.transitions.create(['background-color'], {
+      easing: theme.transitions.easing.easeInOut,
+      duration: theme.transitions.duration.standard,
+    }),
+    content: '""',
+    display: "inline-block",
+    position: "absolute",
+    left: 0,
+    top: 0,
+    zIndex: 0,
+    width: "100%",
+    height: "100%",
+    clipPath:
+      "polygon(0% 100%, 0% 35%, 0.3% 33%, 1% 31%, 1.5% 30%, 2% 29%, 2.5% 28.4%, 3% 27.9%, 3.3% 27.6%, 5% 27%,95% 0%,100% 0%, 100% 100%)",
+    borderRadius: "1rem",
+      // backgroundColor: alpha(theme.palette.common.black, 0.4),
+    //   backdropFilter: "blur(5px)",
+    //   color: palette.common.white,
+    // background: `linear-gradient(to top, ${palette.primary.main}, ${palette.primary.gradient})`,
+    // .rotate(24)
+    // .lighten(0.12)})`,
+  },
+  content: ({ color }) => ({
+    position: "relative",
+    zIndex: 1,
+    borderRadius: "1rem",
+    boxShadow: (theme.shadows)[3],
+    // boxShadow: `0 2px 5px 0 ${alpha(color, 0.5)}`,
+    "&:before": {
+
+    },
+  }),
+  title: {
+    // fontFamily: "comic Sans",
+    fontSize: "1.25rem",
+    fontWeight: 500,
+    color: theme.palette.common.white,
+    // color: alpha(palette.common.black, 0.7),
+    margin: 0,
+    display: "-webkit-box",
+    boxOrient: "vertical",
+    lineClamp: 2,
+    WebkitLineClamp: 2,
+    wordBreak: "break-word",
+    overflow: "hidden",
+  },
+  logo: {
+    transition: `${theme.transitions.duration.standard}ms`,
+    width: 100,
+    height: 100,
+    boxShadow: "0 4px 12px 0 rgba(0,0,0,0.24)",
+    borderRadius: "1rem",
+    background: theme.palette.common.white,
+    "& img": {
+      objectFit: "contain",
+      maxWidth: "90%",
+    },
+  },
+  miniAvatar: {
+    // border: "2px solid rgb(255,255,255)"
+    height: 50,
+    width: 50,
+    boxShadow: (theme.shadows)[10],
+  },
+  team: {
+    fontSize: "0.75rem",
+    color: theme.palette.primary.dark,
+  },
+  date: {
+    color: theme.palette.common.white,
+    // fontWeight: 600,
+    // backgroundColor: palette.secondary.main,
+    backgroundColor: ({ color }) => color,
+    opacity: 1,
+    fontSize: "1rem",
+    padding: "0.5rem",
+    borderRadius: 12,
+    border: "2px solid rgba(255,255,255, 1)",
+  },
+  careerFairyLogo: {
+    width: 80,
+  },
+}));
+
+const CustomCard = ({ classes, cover, logo, title, brand, date, speakers, handleMouseEnter, handleMouseLeave, hovered}) => {
+  const mediaStyles = useCoverCardMediaStyles();
+
+
+  return (
+    <CardActionArea
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <Box className={cx(classes.root, classes.color)}>
+        <Box position="absolute" zIndex={2} top={10} right={10}>
+          <Item position={"right"}>
+            <EmbedTimeDisplay date={date} />
+            {/*<div className={classes.date}>{date}</div>*/}
+          </Item>
+        </Box>
+        <CardMedia
+          image={cover}
+          className={classes.cover}
+          classes={mediaStyles}
+        />
+        <Box
+          style={{
+            paddingLeft: 20,
+          }}
+          height={150}
+          display="flex"
+          alignItems="flex-end"
+        >
+          <AvatarGroup max={4}>
+            {speakers.map((speaker) => (
+              <Avatar
+                className={classes.miniAvatar}
+                alt={`${speaker.firstName}'s photo`}
+                src={getResizedUrl(speaker.avatar, "xs")}
+              />
+            ))}
+          </AvatarGroup>
+        </Box>
+        <Box className={classes.content} p={2}>
+          <div
+            className={classes.graphic}
+          />
+          <Box position={"relative"} zIndex={1}>
+            <Row p={0} alignItems="center" gap={2}>
+              <Item>
+                <Avatar className={classes.logo} src={logo} />
+              </Item>
+              <Item position={"middle"}>
+                <Tooltip title={title}>
+                  <Typography variant="h2" className={classes.title}>
+                    {title}
+                  </Typography>
+                </Tooltip>
+              </Item>
+            </Row>
+            <Row
+              mt={4}
+              p={1}
+              justifyContent="space-between"
+              alignItems={"center"}
+            >
+              <Item>
+                <div className={classes.team}>{brand}</div>
+              </Item>
+              <Item>
+                <Button
+                  startIcon={<RegisterIcon />}
+                  variant={"contained"}
+                  color="primary"
+                >
+                  Register
+                </Button>
+              </Item>
+            </Row>
+          </Box>
+        </Box>
+      </Box>
+    </CardActionArea>
+  );
+};
+
+const EmbedStreamCard = React.memo(({ stream }) => {
+  console.log("-> stream", stream);
+  const {
+    palette: { primary, secondary },
+  } = useTheme();
+  const [hovered, setHovered] = useState(false);
+  console.log("-> hovered", hovered);
+  const classes = useStyles({ color: primary.dark, hovered });
+
+
+  const handleMouseEnter = useCallback(
+    () => setHovered(true),
+    []
+  );
+  const handleMouseLeave = useCallback(
+    () => setHovered(false),
+    []
+  );
+
+  return (
+    <CustomCard
+      classes={classes}
+      handleMouseEnter={handleMouseEnter}
+      handleMouseLeave={handleMouseLeave}
+      speakers={stream.speakers}
+      hovered={hovered}
+      brand={<MainLogo white  className={classes.careerFairyLogo} />}
+      date={stream.start.toDate()}
+      cover={getResizedUrl(stream.backgroundImageUrl, "md")}
+      logo={getResizedUrl(stream.companyLogoUrl, "xs")}
+      title={stream.title}
+    />
+  );
+});
+
+export default EmbedStreamCard;
