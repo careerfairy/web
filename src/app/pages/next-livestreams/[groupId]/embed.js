@@ -1,174 +1,88 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { store } from "pages/_app";
-import {
-   convertStreamJsDatesToTimestamps,
-   getServerSideGroup,
-   parseStreamDates,
-   serializeServerSideStream,
-} from "util/serverUtil";
+import { getServerSideGroup, serializeServerSideStream } from "util/serverUtil";
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions";
 import { NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL } from "constants/routes";
 import HeadWithMeta from "components/page/HeadWithMeta";
-import { Container, Grid, useMediaQuery } from "@material-ui/core";
-import GroupStreamCardV2 from "components/views/NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
-import { useAuth } from "HOCs/AuthProvider";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { useFirebase } from "context/firebase";
-import useInfiniteScrollClientWithHandlers from "../../../components/custom-hook/useInfiniteScrollClientWithHandlers";
-import EmbedLayout from "../../../layouts/EmbedLayout";
-import LazyLoad from "react-lazyload";
-import Spinner from "../../../components/views/NextLivestreams/GroupStreams/groupStreamCard/Spinner";
-import clsx from "clsx";
-import GroupBannerSection from "../../../components/views/NextLivestreams/GroupBannerSection";
-const placeholderBanner = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
+import { useTheme } from "@material-ui/core/styles";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "../../../store/actions";
+import { useFirestoreConnect } from "react-redux-firebase";
+import useListenToGroupStreams from "../../../components/custom-hook/useGroupUpcomingStreams";
+import { PAST_LIVESTREAMS_NAME } from "../../../data/constants/streamContants";
+import ScrollToTop from "../../../components/views/common/ScrollToTop";
+import EmbedBannerSection from "../../../components/views/NextLivestreams/emebed/EmbedBannerSection";
+import StreamsSwipeableView from "../../../components/views/NextLivestreams/emebed/StreamsSwipeableView";
 
-const gridItemHeight = 530
 
-const useStyles = makeStyles((theme) => ({
-   root: {
-      flex: 1,
-      paddingTop: 0,
-      display: "flex",
-      flexDirection: "column",
-   },
-   followButton: {
-      position: "sticky",
-      top: 165,
-      zIndex: 101,
-      marginBottom: 14
-   },
-   emptyMessage: {
-      maxWidth: "400px",
-      margin: "0 auto",
-      color: "rgb(130,130,130)"
-   },
-   loaderWrapper: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      minHeight: "50vh"
-   },
-   streamGridItem: {
-      height: gridItemHeight,
-      display: "flex"
-   },
-   dynamicHeight: {
-      height: "auto"
-   }
-}));
-
-const Wrapper = ({children, streamId}) => {
-
-   return (
-     <LazyLoad
-       style={{flex: 1, display: "flex", width: "-webkit-fill-available"}}
-       key={streamId}
-       height={gridItemHeight}
-       // unmountIfInvisible
-       scroll
-       offset={[0, 0]}
-       placeholder={<Spinner/>}>
-        {children}
-     </LazyLoad>
-   )
-}
-
-const EmbeddedGroupStreamsPage = ({ group, streams, groupId }) => {
-   const handleStreamDates = (serverSideStream) => {
-      const parsedStream = parseStreamDates(serverSideStream);
-      const streamWithTimestamp = convertStreamJsDatesToTimestamps(
-        parsedStream,
-        convertJsDateToTimestamp
-      );
-      return convertStreamJsDatesToTimestamps(
-        streamWithTimestamp,
-        convertJsDateToTimestamp
-      );
-   };
-
-   const { userData, authenticatedUser: user } = useAuth();
-   const theme = useTheme();
-   const classes = useStyles()
-   const {palette: {common: {white}, navyBlue}} = useTheme()
-
-   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
-   const { convertJsDateToTimestamp } = useFirebase();
+const EmbeddedGroupStreamsPage = ({ serverSideGroup, groupId }) => {
+   const {palette: {common: {white}, navyBlue, primary}} = useTheme()
    const [value, setValue] = useState("upcomingEvents");
 
-   const [totalStreams, setTotalStreams] = useState(streams.map(stream => handleStreamDates(stream)));
-   // console.log("-> totalStreams", totalStreams);
-   const [slicedLivestreams] = useInfiniteScrollClientWithHandlers(totalStreams, 6, 3);
-   console.log("-> slicedLivestreams", slicedLivestreams);
+   const [selectedOptions, setSelectedOptions] = useState([]);
+   const currentGroup = useSelector(state => state.firestore.data[`group ${serverSideGroup.groupId}`] || serverSideGroup)
+   const dispatch = useDispatch()
+
+   useEffect(() => {
+      dispatch(actions.closeNextLivestreamsFilter())
+   }, [currentGroup.groupId])
+
+   useFirestoreConnect(() => [{
+      collection: "careerCenterData",
+      doc: currentGroup.groupId,
+      storeAs: "currentGroup"
+   }])
+   const upcomingLivestreams = useListenToGroupStreams(undefined, currentGroup.groupId, selectedOptions)
+   const pastLivestreams = useListenToGroupStreams(undefined, currentGroup.groupId, selectedOptions, PAST_LIVESTREAMS_NAME)
+
+   useEffect(() => {
+      // Only find tab with streams if there isn't a livestreamId in query
+         (function handleFindTabWithStreams() {
+            if (!upcomingLivestreams?.length && pastLivestreams?.length) {
+               setPastEvents()
+            } else {
+               setUpcomingEvents()
+            }
+         })();
+   }, [Boolean(upcomingLivestreams), Boolean(pastLivestreams), currentGroup.groupId])
+
+   const setPastEvents = () => setValue("pastEvents")
+   const setUpcomingEvents = () => setValue("upcomingEvents")
+
+
+   const metaInfo = useMemo( () => ({
+      description: currentGroup.description,
+      title: `CareerFairy | Next Livestreams of ${currentGroup.universityName}`,
+      image: getResizedUrl(currentGroup.logoUrl, "lg"),
+      fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}`,
+   }), [currentGroup])
 
    const handleChange = useCallback((event, newValue) => {
       setValue(newValue);
    }, []);
 
-   const metaInfo = useMemo(
-      () => ({
-         description: group.description,
-         title: `CareerFairy | Next Livestreams of ${group.universityName}`,
-         image: getResizedUrl(group.logoUrl, "lg"),
-         fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${group.groupId}`,
-      }),
-      [group]
-   );
-
    return (
      <React.Fragment>
-        <GroupBannerSection
-          color={white}
-          backgroundImageClassName=""
-          backgroundColor={navyBlue.main}
-          groupLogo={group.logoUrl}
-          backgroundImage={placeholderBanner}
-          groupBio={group.extraInfo}
-          backgroundImageOpacity={0.2}
-          title={group.universityName}
-          subtitle={group.description}
-          handleChange={handleChange}
-          value={value}
-        />
+       <HeadWithMeta {...metaInfo} />
+       <div>
+         <EmbedBannerSection
+           color={white}
+           backgroundColor={primary.dark}
+           // title={`CareerFairy Events of ${currentGroup.universityName}`}
+           handleChange={handleChange}
+           value={value}
+         />
+         <StreamsSwipeableView
+           value={value}
+           upcomingLivestreams={upcomingLivestreams}
+           setSelectedOptions={setSelectedOptions}
+           selectedOptions={selectedOptions}
+           currentGroup={currentGroup}
+           pastLivestreams={pastLivestreams}
+         />
+       </div>
+       <ScrollToTop size="small" />
      </React.Fragment>
-   )
-
-   // return <div>
-   //    hi
-   // </div>
-
-   return (
-      <React.Fragment>
-         {/*<EmbedLayout>*/}
-         <HeadWithMeta {...metaInfo} />
-         <Container >
-            <Grid container spacing={2}>
-               {slicedLivestreams.map((stream, index) => {
-                  return (
-                     <Grid
-                       className={clsx(classes.streamGridItem, {
-                          [classes.dynamicHeight]: mobile
-                       })}
-                       key={stream.id} xs={12} sm={6} lg={4} item>
-                        <Wrapper
-                          index={index}
-                          streamId={stream.id}
-                        >
-                        <GroupStreamCardV2
-                           mobile={mobile}
-                           groupData={group}
-                           user={user}
-                           userData={userData}
-                           id={stream.id}
-                           livestream={stream}
-                        />
-                        </Wrapper>
-                     </Grid>
-                  );
-               })}
-            </Grid>
-         </Container>
-         {/*</EmbedLayout>*/}
-      </React.Fragment>
    );
 };
 
@@ -197,7 +111,7 @@ export async function getServerSideProps({ query: { groupId } }) {
       );
 
    return {
-      props: { group: serverSideGroup, streams: groupStreams, groupId },
+      props: { serverSideGroup: serverSideGroup, streams: groupStreams, groupId },
    };
 }
 

@@ -1,8 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import GroupBannerSection from "../GroupBannerSection";
-
-const useStyles = makeStyles((theme) => ({}));
 
 const EmbedBannerSection = ({
   color,
@@ -14,8 +11,6 @@ const EmbedBannerSection = ({
   backgroundImage,
   backgroundImageOpacity,
 }) => {
-  const classes = useStyles();
-
   return (
     <GroupBannerSection
       color={color}

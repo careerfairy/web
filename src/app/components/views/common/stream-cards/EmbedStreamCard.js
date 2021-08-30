@@ -14,9 +14,7 @@ import { Button, CardActionArea, Tooltip, Typography } from "@material-ui/core";
 import { AvatarGroup } from "@material-ui/lab";
 import { MainLogo } from "../../../logos";
 import RegisterIcon from "@material-ui/icons/AddToPhotosRounded";
-import { EmbedTimeDisplay } from "./EmbedTimeDisplay";
-import clsx from "clsx";
-
+import EmbedTimeDisplay from "../time-display/EmbedTimeDisplay";
 
 const useStyles = makeStyles((theme) => ({
   color: ({ color }) => ({
@@ -27,7 +25,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     position: "relative",
     borderRadius: "1rem",
-    // minWidth: 320,
     "&:before": {
       transition: "0.2s",
       position: "absolute",
@@ -65,8 +62,8 @@ const useStyles = makeStyles((theme) => ({
   graphicHovered: {
     backgroundColor: `${theme.palette.primary.main} !important`,
   },
-  graphic:{
-    transition: theme.transitions.create(['background-color'], {
+  graphic: {
+    transition: theme.transitions.create(["background-color"], {
       easing: theme.transitions.easing.easeInOut,
       duration: theme.transitions.duration.standard,
     }),
@@ -81,29 +78,21 @@ const useStyles = makeStyles((theme) => ({
     clipPath:
       "polygon(0% 100%, 0% 35%, 0.3% 33%, 1% 31%, 1.5% 30%, 2% 29%, 2.5% 28.4%, 3% 27.9%, 3.3% 27.6%, 5% 27%,95% 0%,100% 0%, 100% 100%)",
     borderRadius: "1rem",
-      // backgroundColor: alpha(theme.palette.common.black, 0.4),
+    // backgroundColor: alpha(theme.palette.common.black, 0.4),
     //   backdropFilter: "blur(5px)",
-    //   color: palette.common.white,
-    // background: `linear-gradient(to top, ${palette.primary.main}, ${palette.primary.gradient})`,
-    // .rotate(24)
-    // .lighten(0.12)})`,
   },
   content: ({ color }) => ({
     position: "relative",
     zIndex: 1,
     borderRadius: "1rem",
-    boxShadow: (theme.shadows)[3],
+    boxShadow: theme.shadows[3],
     // boxShadow: `0 2px 5px 0 ${alpha(color, 0.5)}`,
-    "&:before": {
-
-    },
+    "&:before": {},
   }),
   title: {
-    // fontFamily: "comic Sans",
     fontSize: "1.25rem",
     fontWeight: 500,
     color: theme.palette.common.white,
-    // color: alpha(palette.common.black, 0.7),
     margin: 0,
     display: "-webkit-box",
     boxOrient: "vertical",
@@ -128,7 +117,7 @@ const useStyles = makeStyles((theme) => ({
     // border: "2px solid rgb(255,255,255)"
     height: 50,
     width: 50,
-    boxShadow: (theme.shadows)[10],
+    boxShadow: theme.shadows[10],
   },
   team: {
     fontSize: "0.75rem",
@@ -150,106 +139,109 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CustomCard = ({ classes, cover, logo, title, brand, date, speakers, handleMouseEnter, handleMouseLeave, hovered}) => {
+const CustomCard = ({
+                      classes,
+                      cover,
+                      logo,
+                      title,
+                      brand,
+                      date,
+                      speakers,
+                      handleMouseEnter,
+                      handleMouseLeave,
+                      hovered,
+                      isPast,
+                      logoTooltip,
+                    }) => {
   const mediaStyles = useCoverCardMediaStyles();
 
-
   return (
-    <CardActionArea
+    <Box
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      className={cx(classes.root, classes.color)}
     >
-      <Box className={cx(classes.root, classes.color)}>
-        <Box position="absolute" zIndex={2} top={10} right={10}>
-          <Item position={"right"}>
-            <EmbedTimeDisplay date={date} />
-            {/*<div className={classes.date}>{date}</div>*/}
-          </Item>
-        </Box>
-        <CardMedia
-          image={cover}
-          className={classes.cover}
-          classes={mediaStyles}
-        />
-        <Box
-          style={{
-            paddingLeft: 20,
-          }}
-          height={150}
-          display="flex"
-          alignItems="flex-end"
-        >
-          <AvatarGroup max={4}>
-            {speakers.map((speaker) => (
-              <Avatar
-                className={classes.miniAvatar}
-                alt={`${speaker.firstName}'s photo`}
-                src={getResizedUrl(speaker.avatar, "xs")}
-              />
-            ))}
-          </AvatarGroup>
-        </Box>
-        <Box className={classes.content} p={2}>
-          <div
-            className={classes.graphic}
-          />
-          <Box position={"relative"} zIndex={1}>
-            <Row p={0} alignItems="center" gap={2}>
-              <Item>
+      <Box position="absolute" zIndex={2} top={10} right={10}>
+        <Item position={"right"}>
+          <EmbedTimeDisplay date={date} />
+        </Item>
+      </Box>
+      <CardMedia
+        image={cover}
+        className={classes.cover}
+        classes={mediaStyles}
+      />
+      <Box
+        style={{
+          paddingLeft: 20,
+        }}
+        height={150}
+        display="flex"
+        alignItems="flex-end"
+      >
+        <AvatarGroup max={4}>
+          {speakers.map((speaker) => (
+            <Avatar
+              className={classes.miniAvatar}
+              alt={`${speaker.firstName}'s photo`}
+              src={getResizedUrl(speaker.avatar, "xs")}
+            />
+          ))}
+        </AvatarGroup>
+      </Box>
+      <Box className={classes.content} p={2}>
+        <div className={classes.graphic} />
+        <Box position={"relative"} zIndex={1}>
+          <Row p={0} alignItems="center" gap={2}>
+            <Item>
+              <Tooltip title={logoTooltip}>
                 <Avatar className={classes.logo} src={logo} />
-              </Item>
-              <Item position={"middle"}>
-                <Tooltip title={title}>
-                  <Typography variant="h2" className={classes.title}>
-                    {title}
-                  </Typography>
-                </Tooltip>
-              </Item>
-            </Row>
-            <Row
-              mt={4}
-              p={1}
-              justifyContent="space-between"
-              alignItems={"center"}
-            >
-              <Item>
-                <div className={classes.team}>{brand}</div>
-              </Item>
-              <Item>
-                <Button
-                  startIcon={<RegisterIcon />}
-                  variant={"contained"}
-                  color="primary"
-                >
-                  Register
-                </Button>
-              </Item>
-            </Row>
-          </Box>
+              </Tooltip>
+            </Item>
+            <Item position={"middle"}>
+              <Tooltip title={title}>
+                <Typography variant="h2" className={classes.title}>
+                  {title}
+                </Typography>
+              </Tooltip>
+            </Item>
+          </Row>
+          <Row
+            mt={4}
+            p={1}
+            justifyContent="space-between"
+            alignItems={"center"}
+          >
+            <Item>
+              <div className={classes.team}>{brand}</div>
+            </Item>
+            <Item>
+              <Button
+                startIcon={<RegisterIcon />}
+                variant={"contained"}
+                color="primary"
+              >
+                Register
+              </Button>
+            </Item>
+          </Row>
         </Box>
       </Box>
-    </CardActionArea>
+    </Box>
   );
 };
 
-const EmbedStreamCard = React.memo(({ stream }) => {
-  console.log("-> stream", stream);
+const EmbedStreamCard = React.memo(({ stream, isPast }) => {
   const {
     palette: { primary, secondary },
   } = useTheme();
   const [hovered, setHovered] = useState(false);
-  console.log("-> hovered", hovered);
+  // console.log("-> hovered", hovered);
+  // console.log("-> isPast", isPast);
   const classes = useStyles({ color: primary.dark, hovered });
 
-
-  const handleMouseEnter = useCallback(
-    () => setHovered(true),
-    []
-  );
-  const handleMouseLeave = useCallback(
-    () => setHovered(false),
-    []
-  );
+  const handleMouseEnter = useCallback(() => setHovered(true), []);
+  const handleMouseLeave = useCallback(() => setHovered(false), []);
 
   return (
     <CustomCard
@@ -257,8 +249,10 @@ const EmbedStreamCard = React.memo(({ stream }) => {
       handleMouseEnter={handleMouseEnter}
       handleMouseLeave={handleMouseLeave}
       speakers={stream.speakers}
+      isPast={isPast}
+      logoTooltip={stream.company}
       hovered={hovered}
-      brand={<MainLogo white  className={classes.careerFairyLogo} />}
+      brand={<MainLogo white className={classes.careerFairyLogo} />}
       date={stream.start.toDate()}
       cover={getResizedUrl(stream.backgroundImageUrl, "md")}
       logo={getResizedUrl(stream.companyLogoUrl, "xs")}
