@@ -14,7 +14,9 @@ import ScrollToTop from "../../../components/views/common/ScrollToTop";
 import EmbedBannerSection from "../../../components/views/NextLivestreams/emebed/EmbedBannerSection";
 import StreamsSwipeableView from "../../../components/views/NextLivestreams/emebed/StreamsSwipeableView";
 
-
+{/*TODO Example link for embedding here*/}
+{/*TODO fix speaker info text overflow*/}
+{/*<iframe frameBorder="0" height="600" src="https://a5d1-194-230-148-197.ngrok.io/next-livestreams/GXW3MtpTehSmAe0aP1J4/embed" title="Events"/>*/}
 const EmbeddedGroupStreamsPage = ({ serverSideGroup, groupId }) => {
    const {palette: {common: {white}, primary}} = useTheme()
    const [value, setValue] = useState("upcomingEvents");

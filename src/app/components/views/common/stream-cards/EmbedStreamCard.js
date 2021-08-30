@@ -109,8 +109,8 @@ const useStyles = makeStyles((theme) => ({
   },
   logo: {
     transition: `${theme.transitions.duration.standard}ms`,
-    width: 100,
-    height: 100,
+    width: 70,
+    height: 70,
     boxShadow: "0 4px 12px 0 rgba(0,0,0,0.24)",
     borderRadius: "1rem",
     background: theme.palette.common.white,
@@ -126,7 +126,6 @@ const useStyles = makeStyles((theme) => ({
   },
   team: {
     fontSize: "0.75rem",
-    // color: theme.palette.primary.dark,
   },
   date: {
     color: theme.palette.common.white,
@@ -142,7 +141,7 @@ const useStyles = makeStyles((theme) => ({
   },
   carouselWrapper: {
     zIndex: 1,
-    height: 150,
+    height: 100,
     width: "calc(100% - 72px)",
     display: "flex",
     alignItems: "flex-end",
@@ -188,7 +187,7 @@ const CustomCard = ({
           paddingLeft: 20,
           overflow: "hidden",
         }}
-        height={150}
+        height={100}
         display="flex"
         alignItems="flex-end"
         position="relative"
@@ -196,7 +195,8 @@ const CustomCard = ({
         <Box position="absolute" className={classes.carouselWrapper}>
           <Slide direction="left" in={showCarousel} mountOnEnter unmountOnExit>
             <span>
-              <MobileCarousel title="Speakers" data={speakers} />
+              <MobileCarousel
+                              data={speakers} />
             </span>
           </Slide>
         </Box>
@@ -244,6 +244,8 @@ const CustomCard = ({
                 startIcon={isPast ? <LibraryBooksIcon /> : <RegisterIcon />}
                 variant={"contained"}
                 href={actionLink}
+                target="_blank"
+                size="small"
                 color={isPast ? "secondary" : "primary"}
               >
                 {isPast ? "Details" : "Register"}
@@ -301,6 +303,7 @@ const EmbedStreamCard = React.memo(({ stream, isPast, currentGroup }) => {
   return (
     <CustomCard
       classes={classes}
+      // showCarousel
       showCarousel={showCarousel}
       handleMouseEnter={handleMouseEnter}
       handleMouseLeave={handleMouseLeave}

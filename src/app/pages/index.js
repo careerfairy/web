@@ -80,7 +80,7 @@ const LandingPage = ({}) => {
             backgroundImage={rectangle1}
             subtitle="Evaluate the success of your events, gather live feedback from your audience and follow up easily with interesting candidates"
          />
-         <TestimonialsSection
+        <TestimonialsSection
             title="What They Are Saying"
             backgroundColor={grey["200"]}
          />

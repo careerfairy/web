@@ -54,6 +54,10 @@ const MobileCarousel = ({ data, title }) => {
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={activeStep}
         onChangeIndex={handleStepChange}
+        slideStyle={{
+          display: "flex",
+          alignItems: "flex-end"
+        }}
         enableMouseEvents
       >
         {data.map((speaker, index) => (
