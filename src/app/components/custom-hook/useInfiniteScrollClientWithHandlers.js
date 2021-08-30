@@ -1,11 +1,11 @@
 import {useEffect, useState} from "react";
 
-
-const useInfiniteScrollClientWithHandlers = (data = [], limit = 3, loadAdditional = 0) => {
+const initialTotal = []
+const useInfiniteScrollClientWithHandlers = (data , limit = 3, loadAdditional = 0) => {
   const [hasMore, setHasMore] = useState(true)
-  const [totalItems, setTotalItems] = useState(data)
+  const [totalItems, setTotalItems] = useState(initialTotal)
   const [end, setEnd] = useState(limit)
-  const [items, setItems] = useState(data.slice(0, end))
+  const [items, setItems] = useState([])
 
   useEffect(() => {
     const paginatedItems = totalItems.slice(0, end)
@@ -18,7 +18,7 @@ const useInfiniteScrollClientWithHandlers = (data = [], limit = 3, loadAdditiona
 
 
   useEffect(() => {
-    setTotalItems(data)
+    setTotalItems(data || initialTotal)
   }, [data])
 
   useEffect(() => {

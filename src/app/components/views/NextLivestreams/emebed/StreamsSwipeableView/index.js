@@ -22,7 +22,6 @@ const StreamsSwipeableView = ({
   useEffect(() => {
     forceCheck();
   }, [value]);
-
   return (
     <Container className={classes.wrapper}>
       <SwipeablePanel value={value} index={"upcomingEvents"}>

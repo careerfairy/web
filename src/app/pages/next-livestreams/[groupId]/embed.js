@@ -16,7 +16,7 @@ import StreamsSwipeableView from "../../../components/views/NextLivestreams/emeb
 
 
 const EmbeddedGroupStreamsPage = ({ serverSideGroup, groupId }) => {
-   const {palette: {common: {white}, navyBlue, primary}} = useTheme()
+   const {palette: {common: {white}, primary}} = useTheme()
    const [value, setValue] = useState("upcomingEvents");
 
    const [selectedOptions, setSelectedOptions] = useState([]);

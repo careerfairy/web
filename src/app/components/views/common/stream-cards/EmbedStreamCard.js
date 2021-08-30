@@ -1,16 +1,16 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import cx from "clsx";
 import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
 import CardMedia from "@material-ui/core/CardMedia";
 import { useCoverCardMediaStyles } from "@mui-treasury/styles/cardMedia/cover";
-import { Row, Item } from "@mui-treasury/components/flex";
+import { Item, Row } from "@mui-treasury/components/flex";
 import {
+  getBaseUrl,
   getResizedUrl,
-  prettyDate,
 } from "../../../helperFunctions/HelperFunctions";
-import { Button, CardActionArea, Tooltip, Typography } from "@material-ui/core";
+import { Button, Tooltip, Typography } from "@material-ui/core";
 import { AvatarGroup } from "@material-ui/lab";
 import { MainLogo } from "../../../logos";
 import RegisterIcon from "@material-ui/icons/AddToPhotosRounded";
@@ -140,19 +140,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CustomCard = ({
-                      classes,
-                      cover,
-                      logo,
-                      title,
-                      brand,
-                      date,
-                      speakers,
-                      handleMouseEnter,
-                      handleMouseLeave,
-                      hovered,
-                      isPast,
-                      logoTooltip,
-                    }) => {
+  classes,
+  cover,
+  logo,
+  title,
+  brand,
+  date,
+  speakers,
+  handleMouseEnter,
+  handleMouseLeave,
+  hovered,
+  isPast,
+  logoTooltip,
+  actionLink,
+}) => {
   const mediaStyles = useCoverCardMediaStyles();
 
   return (
@@ -182,6 +183,7 @@ const CustomCard = ({
         <AvatarGroup max={4}>
           {speakers.map((speaker) => (
             <Avatar
+              key={speaker.id}
               className={classes.miniAvatar}
               alt={`${speaker.firstName}'s photo`}
               src={getResizedUrl(speaker.avatar, "xs")}
@@ -219,6 +221,7 @@ const CustomCard = ({
               <Button
                 startIcon={<RegisterIcon />}
                 variant={"contained"}
+                href={actionLink}
                 color="primary"
               >
                 Register
@@ -231,7 +234,7 @@ const CustomCard = ({
   );
 };
 
-const EmbedStreamCard = React.memo(({ stream, isPast }) => {
+const EmbedStreamCard = React.memo(({ stream, isPast, currentGroup }) => {
   const {
     palette: { primary, secondary },
   } = useTheme();
@@ -243,6 +246,16 @@ const EmbedStreamCard = React.memo(({ stream, isPast }) => {
   const handleMouseEnter = useCallback(() => setHovered(true), []);
   const handleMouseLeave = useCallback(() => setHovered(false), []);
 
+  const getStreamLink = useCallback((groupId, streamId) => {
+    let link = getBaseUrl();
+    if (groupId) {
+      link += `/upcoming-livestream/${streamId}?groupId=${groupId}`;
+    } else {
+      link += `/upcoming-livestream/${streamId}`;
+    }
+    return link;
+  }, []);
+
   return (
     <CustomCard
       classes={classes}
@@ -250,6 +263,7 @@ const EmbedStreamCard = React.memo(({ stream, isPast }) => {
       handleMouseLeave={handleMouseLeave}
       speakers={stream.speakers}
       isPast={isPast}
+      actionLink={getStreamLink(currentGroup.id, stream.id)}
       logoTooltip={stream.company}
       hovered={hovered}
       brand={<MainLogo white className={classes.careerFairyLogo} />}
