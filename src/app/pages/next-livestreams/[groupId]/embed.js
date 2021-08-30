@@ -66,8 +66,8 @@ const EmbeddedGroupStreamsPage = ({ serverSideGroup, groupId }) => {
        <HeadWithMeta {...metaInfo} />
        <div>
          <EmbedBannerSection
-           color={white}
-           backgroundColor={primary.dark}
+           tabsColor={primary.dark}
+           backgroundColor={"transparent"}
            // title={`CareerFairy Events of ${currentGroup.universityName}`}
            handleChange={handleChange}
            value={value}

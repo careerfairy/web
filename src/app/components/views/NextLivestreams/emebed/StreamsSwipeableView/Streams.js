@@ -4,7 +4,6 @@ import { CircularProgress, Grid, Typography } from "@material-ui/core";
 import { isEmpty, isLoaded } from "react-redux-firebase";
 import EmbedStreamCard from "../../../common/stream-cards/EmbedStreamCard";
 import useInfiniteScrollClientWithHandlers from "../../../../custom-hook/useInfiniteScrollClientWithHandlers";
-import useTraceUpdate from "../../../../custom-hook/useTraceUpdate";
 
 const useStyles = makeStyles((theme) => ({
   streamsContainer: {
@@ -19,12 +18,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Streams = (props) => {
-  useTraceUpdate(props)
-  const { streams, currentGroup, isPastLivestreams } = props
+  const { streams, currentGroup, isPast } = props;
   const classes = useStyles();
-
-  const [slicedLivestreams] = useInfiniteScrollClientWithHandlers(streams , 6, 3);
-
+  const [slicedLivestreams] = useInfiniteScrollClientWithHandlers(
+    streams,
+    6,
+    3
+  );
 
   if (!isLoaded(streams)) {
     return (
@@ -40,13 +40,17 @@ const Streams = (props) => {
         <Grid item xs={12}>
           <Typography variant="h5" color="textSecondary" align="center">
             {currentGroup.universityName} currently has no{" "}
-            {isPastLivestreams ? "past" : "scheduled"} live streams
+            {isPast ? "past" : "scheduled"} live streams
           </Typography>
         </Grid>
       ) : (
         slicedLivestreams.map((stream) => (
-          <Grid key={stream.id} xs={12} sm={6} lg={4} item>
-            <EmbedStreamCard currentGroup={currentGroup} isPast={isPastLivestreams} stream={stream} />
+          <Grid key={stream.id} xs={12} md={6} lg={4} item>
+            <EmbedStreamCard
+              currentGroup={currentGroup}
+              isPast={isPast}
+              stream={stream}
+            />
           </Grid>
         ))
       )}

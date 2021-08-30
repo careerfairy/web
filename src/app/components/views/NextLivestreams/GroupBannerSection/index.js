@@ -5,6 +5,7 @@ import Section from "../../common/Section";
 import StreamsTab from "../StreamsTab";
 import GroupBio from "./groupBio";
 import { makeStyles } from "@material-ui/core/styles";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -31,12 +32,16 @@ const useStyles = makeStyles((theme) => ({
   section: {
     paddingBottom: theme.spacing(1),
   },
+  disableSectionPadding: {
+    paddingTop: 0,
+  },
 }));
 
 const GroupBannerSection = ({
   backgroundColor,
   backgroundImage,
   backgroundImageClassName,
+  disableSectionPadding,
   backgroundImageOpacity,
   big,
   color,
@@ -45,13 +50,16 @@ const GroupBannerSection = ({
   handleChange,
   subtitle,
   title,
+                              tabsColor,
   value,
 }) => {
   const classes = useStyles();
 
   return (
     <Section
-      className={classes.section}
+      className={clsx(classes.section, {
+        [classes.disableSectionPadding]: disableSectionPadding,
+      })}
       big={big}
       color={color}
       backgroundImageClassName={backgroundImageClassName}
@@ -71,7 +79,7 @@ const GroupBannerSection = ({
         )}
         <SectionHeader color={color} title={title} subtitle={subtitle} />
         {groupBio && <GroupBio groupBio={groupBio} />}
-        <StreamsTab handleChange={handleChange} value={value} />
+        <StreamsTab tabsColor={tabsColor} handleChange={handleChange} value={value} />
       </Container>
     </Section>
   );

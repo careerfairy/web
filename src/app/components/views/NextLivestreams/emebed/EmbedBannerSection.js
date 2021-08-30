@@ -9,6 +9,7 @@ const EmbedBannerSection = ({
   handleChange,
   backgroundColor,
   backgroundImage,
+                              tabsColor,
   backgroundImageOpacity,
 }) => {
   return (
@@ -17,7 +18,9 @@ const EmbedBannerSection = ({
       title={title}
       value={value}
       big={false}
+      disableSectionPadding
       groupLogo={groupLogo}
+      tabsColor={tabsColor}
       handleChange={handleChange}
       backgroundColor={backgroundColor}
       backgroundImage={backgroundImage}

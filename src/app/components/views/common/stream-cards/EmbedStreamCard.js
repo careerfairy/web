@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import cx from "clsx";
 import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
@@ -10,11 +10,19 @@ import {
   getBaseUrl,
   getResizedUrl,
 } from "../../../helperFunctions/HelperFunctions";
-import { Button, Tooltip, Typography } from "@material-ui/core";
+import {
+  Button,
+  Slide,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+} from "@material-ui/core";
 import { AvatarGroup } from "@material-ui/lab";
 import { MainLogo } from "../../../logos";
 import RegisterIcon from "@material-ui/icons/AddToPhotosRounded";
+import LibraryBooksIcon from "@material-ui/icons/LibraryBooks";
 import EmbedTimeDisplay from "../time-display/EmbedTimeDisplay";
+import MobileCarousel from "../carousels/MobileCarousel";
 
 const useStyles = makeStyles((theme) => ({
   color: ({ color }) => ({
@@ -85,8 +93,6 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
     zIndex: 1,
     borderRadius: "1rem",
-    boxShadow: theme.shadows[3],
-    // boxShadow: `0 2px 5px 0 ${alpha(color, 0.5)}`,
     "&:before": {},
   }),
   title: {
@@ -114,19 +120,16 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   miniAvatar: {
-    // border: "2px solid rgb(255,255,255)"
     height: 50,
     width: 50,
     boxShadow: theme.shadows[10],
   },
   team: {
     fontSize: "0.75rem",
-    color: theme.palette.primary.dark,
+    // color: theme.palette.primary.dark,
   },
   date: {
     color: theme.palette.common.white,
-    // fontWeight: 600,
-    // backgroundColor: palette.secondary.main,
     backgroundColor: ({ color }) => color,
     opacity: 1,
     fontSize: "1rem",
@@ -136,6 +139,13 @@ const useStyles = makeStyles((theme) => ({
   },
   careerFairyLogo: {
     width: 80,
+  },
+  carouselWrapper: {
+    zIndex: 1,
+    height: 150,
+    width: "calc(100% - 72px)",
+    display: "flex",
+    alignItems: "flex-end",
   },
 }));
 
@@ -152,6 +162,7 @@ const CustomCard = ({
   hovered,
   isPast,
   logoTooltip,
+  showCarousel,
   actionLink,
 }) => {
   const mediaStyles = useCoverCardMediaStyles();
@@ -175,21 +186,32 @@ const CustomCard = ({
       <Box
         style={{
           paddingLeft: 20,
+          overflow: "hidden",
         }}
         height={150}
         display="flex"
         alignItems="flex-end"
+        position="relative"
       >
-        <AvatarGroup max={4}>
-          {speakers.map((speaker) => (
-            <Avatar
-              key={speaker.id}
-              className={classes.miniAvatar}
-              alt={`${speaker.firstName}'s photo`}
-              src={getResizedUrl(speaker.avatar, "xs")}
-            />
-          ))}
-        </AvatarGroup>
+        <Box position="absolute" className={classes.carouselWrapper}>
+          <Slide direction="left" in={showCarousel} mountOnEnter unmountOnExit>
+            <span>
+              <MobileCarousel title="Speakers" data={speakers} />
+            </span>
+          </Slide>
+        </Box>
+        <Slide direction="right" in={!showCarousel} mountOnEnter unmountOnExit>
+          <AvatarGroup max={4}>
+            {speakers.map((speaker, index) => (
+              <Avatar
+                key={`${speaker.imgPath}-${index}`}
+                className={classes.miniAvatar}
+                alt={`${speaker.label}'s photo`}
+                src={speaker.imgPath}
+              />
+            ))}
+          </AvatarGroup>
+        </Slide>
       </Box>
       <Box className={classes.content} p={2}>
         <div className={classes.graphic} />
@@ -219,12 +241,12 @@ const CustomCard = ({
             </Item>
             <Item>
               <Button
-                startIcon={<RegisterIcon />}
+                startIcon={isPast ? <LibraryBooksIcon /> : <RegisterIcon />}
                 variant={"contained"}
                 href={actionLink}
-                color="primary"
+                color={isPast ? "secondary" : "primary"}
               >
-                Register
+                {isPast ? "Details" : "Register"}
               </Button>
             </Item>
           </Row>
@@ -237,11 +259,18 @@ const CustomCard = ({
 const EmbedStreamCard = React.memo(({ stream, isPast, currentGroup }) => {
   const {
     palette: { primary, secondary },
+    breakpoints,
   } = useTheme();
+  const mobile = useMediaQuery(breakpoints.down("sm"));
+
   const [hovered, setHovered] = useState(false);
-  // console.log("-> hovered", hovered);
-  // console.log("-> isPast", isPast);
-  const classes = useStyles({ color: primary.dark, hovered });
+
+  const [speakers, setSpeakers] = useState([]);
+  const [showCarousel, setShowCarousel] = useState(false);
+  const classes = useStyles({
+    color: isPast ? secondary.main : primary.dark,
+    hovered,
+  });
 
   const handleMouseEnter = useCallback(() => setHovered(true), []);
   const handleMouseLeave = useCallback(() => setHovered(false), []);
@@ -256,12 +285,26 @@ const EmbedStreamCard = React.memo(({ stream, isPast, currentGroup }) => {
     return link;
   }, []);
 
+  useEffect(() => {
+    const newSpeakers = stream.speakers?.map((speaker) => ({
+      label: `${speaker.firstName} ${speaker.lastName}`,
+      imgPath: getResizedUrl(speaker.avatar, "sm"),
+      subLabel: `${speaker.position}`,
+    }));
+    setSpeakers(newSpeakers || []);
+  }, [stream?.speakers]);
+
+  useEffect(() => {
+    setShowCarousel(Boolean(hovered && !mobile));
+  }, [speakers, mobile, hovered]);
+
   return (
     <CustomCard
       classes={classes}
+      showCarousel={showCarousel}
       handleMouseEnter={handleMouseEnter}
       handleMouseLeave={handleMouseLeave}
-      speakers={stream.speakers}
+      speakers={speakers}
       isPast={isPast}
       actionLink={getStreamLink(currentGroup.id, stream.id)}
       logoTooltip={stream.company}
