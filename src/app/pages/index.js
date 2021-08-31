@@ -62,7 +62,8 @@ const LandingPage = ({}) => {
             title={"Some of the universities we work with"}
             subtitle="Reach students at multiple universities with a single event. No travel, no logistics, no days off work."
          />
-         <StreamSection
+        <iframe frameBorder="0" height="600" src="https://personal-habib.web.app/next-livestreams/GXW3MtpTehSmAe0aP1J4/embed" title="Events"/>
+        <StreamSection
             title={
                <>
                   Showcase your best ambassadors <b>- your employees.</b>
