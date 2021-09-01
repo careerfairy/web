@@ -50,8 +50,8 @@ exports.sendPostmarkEmailUserDataAndUniWithName =
    auth.sendPostmarkEmailUserDataAndUniWithName;
 exports.resendPostmarkEmailVerificationEmailWithPin =
    auth.resendPostmarkEmailVerificationEmailWithPin;
-exports.updateUsersCollectionOnUserDataUpdating =
-   auth.updateUsersCollectionOnUserDataUpdating;
+exports.updateUsersCollectionOnUserDataUpdated =
+   auth.updateUsersCollectionOnUserDataUpdated;
 
 // Agora
 exports.generateAgoraToken = agora.generateAgoraToken;

@@ -344,24 +344,24 @@ exports.updateFakeUser = functions.https.onRequest(async (req, res) => {
       });
 });
 
-exports.updateUsersCollectionOnUserDataUpdating = functions.https.onRequest(
-   async (req, res) => {
-      setHeaders(req, res);
+exports.updateUsersCollectionOnUserDataUpdated = functions.firestore
+   .document("userData/{userData}")
+   .onUpdate((change) => {
+      let newData = change.after.data();
 
       admin
-         .auth()
-         .updateUser(req.body.uid, {
-            emailVerified: true,
-         })
-         .then(function (userRecord) {
+         .firestore()
+         .collection("users")
+         .doc(newData.authId)
+         .set(newData)
+         .then(() => {
             // See the UserRecord reference doc for the contents of userRecord.
-            console.log("Successfully updated user", userRecord.toJSON());
+            console.log("Successfully updated user", newData.userEmail);
          })
          .catch(function (error) {
             console.log("Error updating user:", error);
          });
-   }
-);
+   });
 
 exports.createUserCopy = functions.https.onRequest(async (req, res) => {
    setHeaders(req, res);
