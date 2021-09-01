@@ -52,7 +52,9 @@ export {
     closeStreamerBreakoutModal,
     setNumberOfViewers,
     closeViewerBreakoutModal,
-    openViewerBreakoutModal
+    openViewerBreakoutModal,
+  closeViewerCtaModal,
+  openViewerCtaModal
 } from "./streamActions";
 
 export {openNavDrawer, closeNavDrawer, toggleNavDrawer} from './generalLayoutActions'
