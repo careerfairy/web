@@ -26,6 +26,10 @@ import { DateTimePicker } from "@material-ui/pickers";
 import { callToActionSocialsArray } from "../../../../../util/constants/callToActions";
 import TutorialContext from "../../../../../../context/tutorials/TutorialContext";
 import { StyledTooltipWithButton } from "../../../../../../materialUI/GlobalTooltips";
+import { enqueueJobPostingCta } from "store/actions";
+import { v4 as uuid } from "uuid";
+import { useAuth } from "../../../../../../HOCs/AuthProvider";
+import { jobDescription } from "./exampleFormData";
 
 const MAX_BUTTON_TEXT_LENGTH = 45;
 const MAX_MESSAGE_LENGTH = 1000;
@@ -81,7 +85,6 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-
 const CallToActionForm = memo(
    ({
       handleClose,
@@ -94,8 +97,6 @@ const CallToActionForm = memo(
       const { handleConfirmStep, isOpen } = useContext(TutorialContext);
       const isActiveTutorialStep = isOpen(20, isTestStream);
 
-
-
       const streamRef = useStreamRef();
       const classes = useStyles();
       const dispatch = useDispatch();
@@ -103,6 +104,8 @@ const CallToActionForm = memo(
          createCallToAction,
          updateCallToAction,
          activateCallToAction,
+         clickOnCallToAction,
+         dismissCallToAction,
       } = useFirebase();
 
       const canChangeMessage = useMemo(
@@ -110,19 +113,31 @@ const CallToActionForm = memo(
          [isCustom, isJobPosting]
       );
 
-      const getInitialValues = (isJobPosting, isActiveTutorialStep, initialValues) => {
-         if(isJobPosting && isActiveTutorialStep){
+      const getInitialValues = (
+         isJobPosting,
+         isActiveTutorialStep,
+         initialValues
+      ) => {
+         if (isJobPosting && isActiveTutorialStep) {
             return {
                ...initialValues,
-               jobData: { salary: "CHF - 82'000", jobTitle: "Mechanical Engineer" },
-               buttonUrl: "https://www.linkedin.com/jobs/"
+               jobData: {
+                  salary: "CHF - 82'000",
+                  jobTitle: "Mechanical Engineer",
+               },
+               buttonUrl: "https://www.linkedin.com/jobs/",
+               message: jobDescription,
             };
          }
          return { ...initialValues };
-      }
+      };
 
       const formik = useFormik({
-         initialValues: getInitialValues(isJobPosting, isActiveTutorialStep, initialValues),
+         initialValues: getInitialValues(
+            isJobPosting,
+            isActiveTutorialStep,
+            initialValues
+         ),
          enableReinitialize: true,
          validationSchema: validationSchema(initialValues.type),
          onSubmit: async (values, { setSubmitting }) => {
@@ -149,18 +164,45 @@ const CallToActionForm = memo(
       const handleSubmitTutorialJobPosting = async () => {
          try {
             await formik.handleSubmit();
-            handleConfirmStep(20);
          } catch (e) {
             console.error("-> Error: failed in submitting tutorial CTA", e);
          }
       };
 
-      const handleSend = async (values) => {
+      const handleSend = async (formData) => {
+         let values = { ...formData };
          if (values.id) {
             await updateCallToAction(streamRef, values.id, values);
             return await activateCallToAction(streamRef, values.id);
          }
          const callToActionId = await createCallToAction(streamRef, values);
+         if (isActiveTutorialStep) {
+            const closeSnack = () =>
+               dispatch(actions.closeSnackbar(callToActionId));
+            const handleDismissCallToAction = async () => {
+               await dismissCallToAction(streamRef, callToActionId);
+               closeSnack();
+            };
+
+            const handleClickCallToAction = async () => {
+               await clickOnCallToAction(streamRef, callToActionId);
+               closeSnack();
+               if (window) {
+                  window.open(values.buttonUrl, "_blank");
+               }
+            };
+            dispatch(
+               actions.enqueueJobPostingCta(
+                  {
+                     ...values,
+                     id: callToActionId,
+                     isForTutorial: true,
+                  },
+                  handleClickCallToAction,
+                  handleDismissCallToAction
+               )
+            );
+         }
          return await activateCallToAction(streamRef, callToActionId);
       };
 
@@ -171,17 +213,16 @@ const CallToActionForm = memo(
          return await createCallToAction(streamRef, values);
       };
 
-
       return (
          <React.Fragment>
             <StyledTooltipWithButton
                open={isActiveTutorialStep}
-               tooltipTitle="Sharing (4/)"
+               tooltipTitle="Share Job Posts (4/5)"
                buttonDisabled={formik.isSubmitting}
                placement="top"
                buttonText="Send Job Posting!"
                onConfirm={handleSubmitTutorialJobPosting}
-               tooltipText="Lets now create a job posting for our audience to engage with."
+               tooltipText="Here, we have pre-filled an imaginary job posting for your audience. Go ahead and send this job posting so that your audience can engage with it."
             >
                <DialogContent className={classes.dialogContent}>
                   <Grid container spacing={3}>
@@ -438,7 +479,7 @@ const CallToActionForm = memo(
                      {initialValues.id ? "Update" : "Save"}
                   </Button>
                   <Button
-                     disabled={formik.isSubmitting || isActiveTutorialStep}
+                     disabled={formik.isSubmitting || !isActiveTutorialStep}
                      onClick={async () => {
                         await formik.setFieldValue("isToBeSaved", false);
                         await formik.handleSubmit();

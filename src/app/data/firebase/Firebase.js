@@ -490,10 +490,11 @@ class Firebase {
 
         let batch = this.firestore.batch();
 
-        // reset hand raise and current speaker
+        // reset hand raise and current speaker and activeCallToActionIds
         batch.update(streamRef, {
             handRaiseActive: false,
-            currentSpeakerId: streamRef.id
+            currentSpeakerId: streamRef.id,
+            activeCallToActionIds: []
         });
 
         // Declare all the refs
@@ -503,6 +504,8 @@ class Firebase {
             .collection("questions");
         let pollsRef = streamRef
             .collection("polls");
+        let callToActionsRef = streamRef
+          .collection("callToActions");
 
         // Delete all existing docs
         const questionsDocs = await questionsRef.get()
@@ -524,6 +527,14 @@ class Firebase {
         const pollsDocs = await pollsRef.get()
         if (!pollsDocs.empty) {
             pollsDocs.forEach(doc => {
+                let docRef = doc.ref
+                batch.delete(docRef)
+            })
+        }
+
+        const callToActionDocs = await callToActionsRef.get()
+        if(!callToActionDocs.empty){
+            callToActionDocs.forEach(doc => {
                 let docRef = doc.ref
                 batch.delete(docRef)
             })
@@ -1334,7 +1345,7 @@ class Firebase {
             updated: null,
             sent: null,
             stopped: null,
-            active: false
+            active: false,
         }
         const enhancedCallToActionData = this.addCtaExtraData(callToActionData, values)
 

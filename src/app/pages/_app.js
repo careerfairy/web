@@ -74,11 +74,16 @@ function MyApp({ Component, pageProps }) {
       19: false,
       20: false,
       21: false,
+      22: false,
+      23: false,
+      24: false,
       streamerReady: false,
    };
 
    const [showBubbles, setShowBubbles] = useState(false);
    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState);
+   console.log("-> tutorialSteps", tutorialSteps);
+
 
    useEffect(() => {
       // Remove the server-side injected CSS.

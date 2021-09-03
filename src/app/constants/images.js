@@ -27,8 +27,8 @@ export const ipad = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1f
 export const livestream = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flivestream.svg?alt=media&token=e7da7142-ce12-48ba-8937-b1e2be132720"
 export const wallet = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fwallet.svg?alt=media&token=f05c1fa4-b193-46a3-8888-95a5c0b5e016"
 
-
-
+export const company_building = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/placeholders%2Fcompany-banner.webp?alt=media&token=d50893e1-11cb-43b3-845f-f66a22c55f73"
+export const careerfairyLogo = "/logo_teal.svg"
 
 
 

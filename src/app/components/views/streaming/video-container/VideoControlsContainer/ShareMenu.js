@@ -56,14 +56,14 @@ const ShareMenu = ({
          <StyledTooltipWithButton
             open={isOpen(17)}
             buttonText="ok"
-            tooltipTitle="Sharing (1/)"
+            tooltipTitle="Share Job Posts (1/5)"
             placement="left"
             onConfirm={() => {
                handleConfirm(17);
                handleOpenCallToActionDrawer();
                onClose();
             }}
-            tooltipText="Click here to see the sharing options"
+            tooltipText="Click here to share your job posts or social media channels."
          >
             <List dense className={classes.list}>
                {shareActions.map((action) => {

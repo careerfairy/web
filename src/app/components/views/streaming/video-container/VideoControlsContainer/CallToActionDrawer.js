@@ -122,13 +122,13 @@ const Content = ({
                   <StyledTooltipWithButton
                      open={tutorialStepOpen}
                      buttonText="ok"
-                     tooltipTitle="Sharing (2/)"
+                     tooltipTitle="Share Job Posts (2/5)"
                      placement="right"
                      onConfirm={() => {
                         handleConfirmTutorialStep();
                         handleOpenCallToActionFormDialog();
                      }}
-                     tooltipText="Lets now create a job posting for our audience to engage with."
+                     tooltipText="Let's now create a job posting for your audience to engage with."
                   >
                      <Button
                         onClick={() => {
@@ -150,6 +150,8 @@ const Content = ({
                <CallToActionList
                   handleClickDeleteCallToAction={handleClickDeleteCallToAction}
                   handleClickEditCallToAction={handleClickEditCallToAction}
+                  isTestStream={isTestStream}
+                  handleClose={handleClose}
                   handleClickResendCallToAction={handleClickResendCallToAction}
                />
             </div>

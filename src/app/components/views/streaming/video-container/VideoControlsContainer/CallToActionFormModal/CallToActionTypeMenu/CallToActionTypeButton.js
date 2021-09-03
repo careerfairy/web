@@ -61,10 +61,11 @@ const CallToActionTypeButton = ({
          wrapper={(children) => (
             <StyledTooltipWithButton
                open={tutorialStepOpen}
-               tooltipTitle="Sharing (3/)"
-               placement="right"
+               tooltipTitle="Share Job Posts (3/5)"
+               placement="top"
+               buttonText="Share a job posting"
                onConfirm={handleButtonClick}
-               tooltipText="Lets now create a job posting for our audience to engage with."
+               tooltipText="Choose between sharing job posts, social media channels or custom messages."
             >
                {children}
             </StyledTooltipWithButton>
