@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
    Box,
@@ -42,8 +42,10 @@ const defaultInitialValues = {
 };
 
 
-const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
+const CallToActionFormModal = memo( ({ onClose, open, callToActionToEdit, isTestStream }) => {
    const [initialValues, setInitialValues] = useState(defaultInitialValues);
+
+
 
    useEffect(() => {
       if (callToActionToEdit) {
@@ -78,9 +80,9 @@ const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
    }, [callToActionToEdit]);
 
    const classes = useStyles();
-   const handleClose = () => {
+   const handleClose = useCallback( () => {
       onClose();
-   };
+   }, [onClose]);
 
    const handleSetCallToActionType = ({
       newType,
@@ -132,6 +134,7 @@ const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
          />
          <CallToActionForm
             initialValues={initialValues}
+            isTestStream={isTestStream}
             isSocial={initialValues.type === "social"}
             handleClose={handleClose}
             isCustom={initialValues.type === "custom"}
@@ -139,7 +142,7 @@ const CallToActionFormModal = ({ onClose, open, callToActionToEdit }) => {
          />
       </Dialog>
    );
-};
+});
 
 CallToActionFormModal.propTypes = {
    callToActionToEdit: PropTypes.shape({

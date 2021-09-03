@@ -1,13 +1,17 @@
 import { Button } from "@material-ui/core";
 import Tab from "@material-ui/core/Tab";
-import React from "react";
+import React, { useContext } from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
+import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
+import { StyledTooltipWithButton } from "../../../../../../../materialUI/GlobalTooltips";
+import { useCurrentStream } from "../../../../../../../context/stream/StreamContext";
+import ConditionalWrapper from "../../../../../common/ConditionalWrapper";
 
 const useCtaCardStyles = makeStyles(({ palette: { type, common } }) => ({
    cardRoot: {},
    ctaButton: {
       backgroundColor: (props) => alpha(props.color, 0.1),
-      color: (props) => type === "dark" ? common.white :props.color,
+      color: (props) => (type === "dark" ? common.white : props.color),
       "& svg": {
          color: (props) => props.color,
       },
@@ -17,11 +21,21 @@ const useCtaCardStyles = makeStyles(({ palette: { type, common } }) => ({
 const CallToActionTypeButton = ({
    mobile,
    active,
+   isJobPosting,
    data: { type, description, title, icon, buttonText, message, value },
    color,
    handleSetCallToActionType,
 }) => {
+   const { handleConfirmStep, isOpen } = useContext(TutorialContext);
+   const {
+      currentLivestream: { test },
+   } = useCurrentStream();
+
    const classes = useCtaCardStyles({ color });
+
+   const tutorialStepOpen = isOpen(19, test) && isJobPosting;
+
+   const buttonDisabled = (isOpen(19, test) || isOpen(20, test)) && !isJobPosting
 
    const handleClick = () => {
       handleSetCallToActionType({
@@ -34,24 +48,50 @@ const CallToActionTypeButton = ({
       });
    };
 
-   return mobile ? (
-      <Button
-         className={classes.ctaButton}
-         fullWidth
-         onClick={handleClick}
-         startIcon={icon}
-         variant={active ? "outlined" : "text"}
+   const handleButtonClick = () => {
+      if(tutorialStepOpen){
+         handleConfirmStep(19)
+      }
+      handleClick()
+   }
+
+   return (
+      <ConditionalWrapper
+         condition={tutorialStepOpen}
+         wrapper={(children) => (
+            <StyledTooltipWithButton
+               open={tutorialStepOpen}
+               tooltipTitle="Sharing (3/)"
+               placement="right"
+               onConfirm={handleButtonClick}
+               tooltipText="Lets now create a job posting for our audience to engage with."
+            >
+               {children}
+            </StyledTooltipWithButton>
+         )}
       >
-         {title}
-      </Button>
-   ) : (
-      <Tab
-         className={classes.ctaButton}
-         value={type}
-         onClick={handleClick}
-         icon={icon}
-         label={title}
-      />
+         {mobile ? (
+            <Button
+               className={classes.ctaButton}
+               disabled={buttonDisabled}
+               fullWidth
+               onClick={handleButtonClick}
+               startIcon={icon}
+               variant={active ? "outlined" : "text"}
+            >
+               {title}
+            </Button>
+         ) : (
+            <Tab
+               className={classes.ctaButton}
+               value={type}
+               disabled={buttonDisabled}
+               onClick={handleButtonClick}
+               icon={icon}
+               label={title}
+            />
+         )}
+      </ConditionalWrapper>
    );
 };
 

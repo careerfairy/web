@@ -8,6 +8,13 @@ import {
    ListItemText,
    Popover,
 } from "@material-ui/core";
+import {
+   StyledTooltipWithButton,
+   TooltipButtonComponent,
+   TooltipText,
+   TooltipTitle,
+   WhiteTooltip,
+} from "../../../../../materialUI/GlobalTooltips";
 
 const useStyles = makeStyles((theme) => ({
    list: {
@@ -15,21 +22,28 @@ const useStyles = makeStyles((theme) => ({
       maxWidth: 360,
       backgroundColor: theme.palette.background.paper,
    },
-  listIconWrapper:{
-     minWidth: "auto",
-    paddingRight: theme.spacing(2)
-  }
+   listIconWrapper: {
+      minWidth: "auto",
+      paddingRight: theme.spacing(2),
+   },
 }));
 
-const ShareMenu = ({ anchorEl, onClose, shareActions }) => {
+const ShareMenu = ({
+   anchorEl,
+   onClose,
+   shareActions,
+   isOpen,
+   handleConfirm,
+   handleOpenCallToActionDrawer,
+}) => {
    const classes = useStyles();
    const open = Boolean(anchorEl);
 
    return (
       <Popover
-         open={open}
+         open={open || isOpen(17)}
          anchorEl={anchorEl}
-         onClose={onClose}
+         onClose={isOpen(17) ? () => {} : onClose}
          anchorOrigin={{
             vertical: "center",
             horizontal: "left",
@@ -39,23 +53,44 @@ const ShareMenu = ({ anchorEl, onClose, shareActions }) => {
             horizontal: "right",
          }}
       >
-         <List dense className={classes.list}>
-            {shareActions.map((action) => (
-               <ListItem
-                 key={action.name}
-                  onClick={() => {
-                     action.onClick();
-                     onClose();
-                  }}
-                  button
-               >
-                  <ListItemIcon className={classes.listIconWrapper}>
-                    {action.icon}
-                  </ListItemIcon>
-                  <ListItemText primary={action.name} />
-               </ListItem>
-            ))}
-         </List>
+         <StyledTooltipWithButton
+            open={isOpen(17)}
+            buttonText="ok"
+            tooltipTitle="Sharing (1/)"
+            placement="left"
+            onConfirm={() => {
+               handleConfirm(17);
+               handleOpenCallToActionDrawer();
+               onClose();
+            }}
+            tooltipText="Click here to see the sharing options"
+         >
+            <List dense className={classes.list}>
+               {shareActions.map((action) => {
+                  const isCtaTutorialButton =
+                     isOpen(17) && action.id === "sendCtaAction";
+                  return (
+                     <ListItem
+                        key={action.name}
+                        disabled={!isCtaTutorialButton}
+                        onClick={() => {
+                           if (isCtaTutorialButton) {
+                              handleConfirm(17);
+                           }
+                           action.onClick();
+                           onClose();
+                        }}
+                        button
+                     >
+                        <ListItemIcon className={classes.listIconWrapper}>
+                           {action.icon}
+                        </ListItemIcon>
+                        <ListItemText primary={action.name} />
+                     </ListItem>
+                  );
+               })}
+            </List>
+         </StyledTooltipWithButton>
       </Popover>
    );
 };
@@ -75,4 +110,3 @@ ShareMenu.defaultProps = {
    shareActions: [],
 };
 export default ShareMenu;
-

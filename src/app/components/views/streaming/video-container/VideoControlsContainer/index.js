@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import MicOffIcon from "@material-ui/icons/MicOff";
 import MicIcon from "@material-ui/icons/Mic";
 import DynamicFeedIcon from "@material-ui/icons/DynamicFeed";
@@ -14,6 +14,7 @@ import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import TutorialContext from "context/tutorials/TutorialContext";
 import {
+   StyledTooltipWithButton,
    TooltipButtonComponent,
    TooltipText,
    TooltipTitle,
@@ -87,6 +88,7 @@ function VideoControlsContainer({
    localMediaStream,
    setLocalMediaStream,
 }) {
+   const shareButtonRef = useRef()
    const streamRef = useStreamRef();
    const { tutorialSteps, setTutorialSteps } = useContext(TutorialContext);
    const theme = useTheme();
@@ -107,6 +109,10 @@ function VideoControlsContainer({
          setOpen(true);
       }
    }, [tutorialSteps]);
+
+   const handleOpenShare = (shareButtonRef) => {
+      setShareMenuAnchorEl(shareButtonRef.current)
+   }
 
    const handleClickShare = (event) => {
       setShareMenuAnchorEl(event.currentTarget);
@@ -199,9 +205,9 @@ function VideoControlsContainer({
    const handleOpenCallToActionDrawer = () => {
       setCallToActionDrawerOpen(true);
    };
-   const handleCloseCallToActionDrawer = useCallback( () => {
+   const handleCloseCallToActionDrawer = useCallback(() => {
       setCallToActionDrawerOpen(false);
-   },[]);
+   }, []);
 
    const actions = [
       {
@@ -224,51 +230,57 @@ function VideoControlsContainer({
       },
    ];
 
-   const shareActions = [
-   ];
+   const shareActions = [];
 
    if (showScreenShareButtons()) {
-      shareActions.unshift(   {
+      shareActions.unshift({
          icon: <ScreenShareIcon color={desktopMode ? "primary" : "inherit"} />,
          name: desktopMode ? "Stop sharing screen" : "Share screen",
          onClick: () => handleClickScreenShareButton(),
+         id: "shareScreenAction"
       });
    }
 
    if (!viewer) {
-      shareActions.unshift({
-         icon: (
-            <SharePdfIcon
-               // fontSize="small"
-               color={presentMode ? "primary" : "inherit"}
-            />
-         ),
-         name: presentMode
-            ? "Stop Sharing PDF presentation"
-            : "Share PDF presentation",
-         onClick: () =>
-            setLivestreamMode(presentMode ? "default" : "presentation"),
-      }, {
-         icon: <CallToActionIcon />,
-         name: "Send a call to action",
-         onClick: () => handleOpenCallToActionDrawer(),
-      });
+      shareActions.unshift(
+         {
+            icon: (
+               <SharePdfIcon
+                  // fontSize="small"
+                  color={presentMode ? "primary" : "inherit"}
+               />
+            ),
+            name: presentMode
+               ? "Stop Sharing PDF presentation"
+               : "Share PDF presentation",
+            onClick: () =>
+               setLivestreamMode(presentMode ? "default" : "presentation"),
+              id: "sharePdfAction"
+         },
+         {
+            icon: <CallToActionIcon />,
+            name: "Send a call to action",
+            onClick: () => handleOpenCallToActionDrawer(),
+              id: "sendCtaAction"
+         }
+      );
    }
 
-   if(shareActions.length){
-      actions.unshift( {
+   if (shareActions.length) {
+      actions.unshift({
          icon: <ShareIcon />,
          name: "Share",
          onClick: handleClickShare,
-      })
+      });
    }
-
 
    actions.unshift({
       icon: <SettingsIcon fontSize="large" />,
       name: "Settings",
       onClick: () => setShowSettings(!showSettings),
    });
+
+
 
    return (
       <ClickAwayListener onClickAway={handleClose}>
@@ -290,13 +302,14 @@ function VideoControlsContainer({
                   <React.Fragment>
                      <TooltipTitle>Video Controls</TooltipTitle>
                      <TooltipText>
-                        You can mute, share slides and toggle between automatic
-                        voice activated switching here.
+                        You can mute, share slides, promote links and job
+                        postings.
                      </TooltipText>
                      <TooltipButtonComponent
                         onConfirm={() => {
                            handleOpen();
                            handleConfirm(16);
+                           handleOpenShare(shareButtonRef)
                         }}
                         buttonText="Ok"
                      />
@@ -315,29 +328,38 @@ function VideoControlsContainer({
                   onFocus={handleOpen}
                   open
                >
-                  {actions.map((action) => (
-                     <SpeedDialAction
-                        key={action.name}
-                        icon={action.icon}
-                        tooltipPlacement="left"
-                        tooltipTitle={action.name}
-                        classes={{ staticTooltipLabel: classes.tooltip }}
-                        tooltipOpen={Boolean(action.name.length)}
-                        FabProps={{
-                           size: "large",
-                           // classes: {root:  classes.actionButton},
-                        }}
-                        onClick={action.onClick}
-                     />
-                  ))}
+                  {actions.map((action) => {
+                     return (
+                           <SpeedDialAction
+                              key={action.name}
+                              ref={action.name === "Share" ? shareButtonRef: undefined}
+                              icon={action.icon}
+                              tooltipPlacement="left"
+                              tooltipTitle={action.name}
+                              classes={{ staticTooltipLabel: classes.tooltip }}
+                              tooltipOpen={Boolean(action.name.length)}
+                              FabProps={{
+                                 size: "large",
+                                 // classes: {root:  classes.actionButton},
+                              }}
+                              onClick={action.onClick}
+                           />
+                     );
+                  })}
                </SpeedDial>
             </WhiteTooltip>
             <ShareMenu
                anchorEl={shareMenuAnchorEl}
                onClose={handleCloseShareMenu}
+               isOpen={isOpen}
                shareActions={shareActions}
+               handleOpenCallToActionDrawer={handleOpenCallToActionDrawer}
+               handleConfirm={handleConfirm}
             />
             <CallToActionDrawer
+               isOpen={isOpen}
+               isTestStream={test}
+               handleConfirm={handleConfirm}
                onClose={handleCloseCallToActionDrawer}
                open={callToActionDrawerOpen}
             />

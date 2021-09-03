@@ -383,7 +383,7 @@ function VideoContainer(props) {
             handleClose={handleCloseDemoIntroModal}
          />
          <DemoEndModal
-            open={isOpen(17)}
+            // open={isOpen(17)}
             handleClose={handleCloseDemoEndModal}
          />
       </Fragment>

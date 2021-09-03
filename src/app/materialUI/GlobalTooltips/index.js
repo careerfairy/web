@@ -130,6 +130,7 @@ export const StyledTooltipWithButton = ({
                                             children,
                                             open = false,
                                             tooltipTitle = "",
+  buttonDisabled = false,
                                             tooltipText = "",
                                             buttonText = "Ok",
                                             placement = "top",
@@ -149,7 +150,7 @@ export const StyledTooltipWithButton = ({
                     <TooltipText>
                         {tooltipText}
                     </TooltipText>
-                    <TooltipButtonComponent onConfirm={onConfirm} buttonText={buttonText}/>
+                    <TooltipButtonComponent disabled={buttonDisabled} onConfirm={onConfirm} buttonText={buttonText}/>
                 </React.Fragment>
             }
         >

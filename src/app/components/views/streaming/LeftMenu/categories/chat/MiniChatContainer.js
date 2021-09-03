@@ -287,7 +287,7 @@ function MiniChatContainer({isStreamer, livestream, className, mobile}) {
                         <CustomScrollToBottom scrollViewClassName={classes.entriesWrapper}
                                               className={classes.scrollToBottom} scrollItems={chatElements}/>
                         <WhiteTooltip
-                            placement="right-start"
+                            placement="top"
                             title={
                                 <React.Fragment>
                                     <TooltipTitle>Chat (2/2)</TooltipTitle>
