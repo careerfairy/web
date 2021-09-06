@@ -10,7 +10,17 @@ import CompaniesSection from "../components/views/landing/CompaniesSection";
 import HeroSection from "../components/views/landing/HeroSection";
 import CalendlyModal from "../components/views/landing/CalendlyModal";
 import ScrollToTop from "../components/views/common/ScrollToTop";
-import { star, mouse, wallet, phone, livestream, promote, trackAnalytics, alternateBackground, engageShape } from "../constants/images";
+import {
+   star,
+   mouse,
+   wallet,
+   phone,
+   livestream,
+   promote,
+   trackAnalytics,
+   alternateBackground,
+   engageShape,
+} from "../constants/images";
 import ExperienceSection from "components/views/landing/ExperienceSection";
 
 const CareerCenterLandingPage = ({}) => {
@@ -28,87 +38,94 @@ const CareerCenterLandingPage = ({}) => {
 
    const careerCenterBenefitsData = [
       {
-          name: "Open new doors for your students",
-          description:
-              "Enable companies on CareerFairy " +
-              "to book live streams with you to " +
-              "engage with your student " + 
-              "community",
-          imageUrl: star,
+         name: "Open new doors for your students",
+         description:
+            "Enable companies on CareerFairy " +
+            "to book live streams with you to " +
+            "engage with your student " +
+            "community",
+         imageUrl: star,
       },
       {
-          name: "Forget the hassle",
-          description:
-              "Set up and manage your live " +
-              "streams in a few clicks. No room to " +
-              "book, no complex logistics to " + 
-              "deal with.",
-          imageUrl: mouse,
+         name: "Forget the hassle",
+         description:
+            "Set up and manage your live " +
+            "streams in a few clicks. No room to " +
+            "book, no complex logistics to " +
+            "deal with.",
+         imageUrl: mouse,
       },
       {
-          name: "Generate additional revenue",
-          description:
-              "Don't compromise your current " +
-              "offering. Set the price of the live streams " +
-              "yourself and organize the number " + 
-              "of events that you want to offer ",
-          imageUrl: wallet,
+         name: "Generate additional revenue",
+         description:
+            "Don't compromise your current " +
+            "offering. Set the price of the live streams " +
+            "yourself and organize the number " +
+            "of events that you want to offer ",
+         imageUrl: wallet,
       },
       {
-          name: "Get feedback from your students",
-          description:
-              "CareerFairy provides detailed analytics" +
-              "to help you understand what your students " +
-              "are looking for",
-          imageUrl: trackAnalytics,
-      }
-  ];
+         name: "Get feedback from your students",
+         description:
+            "CareerFairy provides detailed analytics" +
+            "to help you understand what your students " +
+            "are looking for",
+         imageUrl: trackAnalytics,
+      },
+   ];
 
-  const careerCenterBenefitsData2 = [
-   {
-       name: "Plan a livestream",
-       description:
-           "Manage your livestream requests " +
-           "from companies and setup future " +
-           "events",
-       imageUrl: livestream,
-   },
-   {
-       name: "Promote the event",
-       description:
-           "Once a livestream event is scheduled, " +
-           "you notify your students about the event ",
-       imageUrl: promote,
-   },
-   {
-       name: "Track analytics",
-       description:
-           "Access relevant audience data in " +
-           "real-time and provide feedback to " +
-           "your corporate partners",
-       imageUrl: trackAnalytics,
-   }
-];
+   const careerCenterBenefitsData2 = [
+      {
+         name: "Plan a livestream",
+         description:
+            "Manage your livestream requests " +
+            "from companies and setup future " +
+            "events",
+         imageUrl: livestream,
+      },
+      {
+         name: "Promote the event",
+         description:
+            "Once a livestream event is scheduled, " +
+            "you notify your students about the event ",
+         imageUrl: promote,
+      },
+      {
+         name: "Track analytics",
+         description:
+            "Access relevant audience data in " +
+            "real-time and provide feedback to " +
+            "your corporate partners",
+         imageUrl: trackAnalytics,
+      },
+   ];
 
    return (
       <LandingLayout backgroundImage={alternateBackground}>
          <HeroSection
             title={
-              <div><b>Boost</b> student & employer interactions with our <b>career live streams</b></div>
+               <div>
+                  <b>Boost</b> student & employer interactions with our{" "}
+                  <b>career live streams</b>
+               </div>
             }
             big
             handleOpenCalendly={handleOpenCalendly}
          />
-         <BenefitsSection title={"Why join CareerFairy?"} benefits={careerCenterBenefitsData} />
+         <BenefitsSection
+            title={"Why join CareerFairy?"}
+            benefits={careerCenterBenefitsData}
+         />
          <UniversitySection
             subtitle=""
             title="Some of the universities we work with"
          />
-         <ExperienceSection
-            handleOpenCalendly={handleOpenCalendly}
+         <ExperienceSection handleOpenCalendly={handleOpenCalendly} />
+         <BenefitsSection
+            title={"Simple setup"}
+            benefits={careerCenterBenefitsData2}
          />
-         <BenefitsSection title={"Simple setup"} benefits={careerCenterBenefitsData2} />
-         <CompaniesSection  overheadText="Access our network of 200+ employers"/>
+         <CompaniesSection overheadText="Access our network of 200+ employers" />
          <TestimonialsSection
             title="What Companies Are Saying"
             backgroundColor={grey["200"]}

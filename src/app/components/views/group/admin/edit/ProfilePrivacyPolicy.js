@@ -104,96 +104,96 @@ const ProfilePrivacyPolicy = ({ group, firebase, className, ...rest }) => {
             /* and other goodies */
          }) => {
             return (
-              <form className={isActive ? pulseClasses.pulseAnimate : ""}>
-               <Card >
-                  <CardHeader
-                     subheader="Choose weather or not you want registrants to agree to your privacy policy"
-                     title="Privacy Policy"
-                     id={privacyPolicySectionID}
-                  />
-                  <Divider />
-                  <CardContent>
-                     <Grid container spacing={3}>
-                        <Grid item lg={10} md={9} sm={9} xs={12}>
-                           <FormControl fullWidth>
-                              <TextField
-                                 variant="outlined"
-                                 fullWidth
-                                 onBlur={handleBlur}
-                                 id="privacyPolicyUrl"
-                                 label="Link to privacy Policy"
-                                 name="privacyPolicyUrl"
-                                 placeholder="Privacy Policy Url"
-                                 disabled={isSubmitting}
-                                 value={values.privacyPolicyUrl}
-                                 error={Boolean(errors.privacyPolicyUrl)}
-                                 onChange={handleChange}
-                              />
-                              <Collapse
-                                 in={Boolean(
-                                    errors.privacyPolicyUrl &&
-                                       touched.privacyPolicyUrl &&
-                                       errors.privacyPolicyUrl
-                                 )}
-                              >
-                                 <FormHelperText error>
-                                    {errors.privacyPolicyUrl}
-                                 </FormHelperText>
-                              </Collapse>
-                           </FormControl>
-                        </Grid>
-                        <Grid
-                           item
-                           lg={2}
-                           md={3}
-                           sm={3}
-                           xs={12}
-                           className={classes.centeredGrid}
-                        >
-                           <FormControl
-                              disabled={isSubmitting}
-                              error={Boolean(errors.privacyPolicyActive)}
+               <form className={isActive ? pulseClasses.pulseAnimate : ""}>
+                  <Card>
+                     <CardHeader
+                        subheader="Choose weather or not you want registrants to agree to your privacy policy"
+                        title="Privacy Policy"
+                        id={privacyPolicySectionID}
+                     />
+                     <Divider />
+                     <CardContent>
+                        <Grid container spacing={3}>
+                           <Grid item lg={10} md={9} sm={9} xs={12}>
+                              <FormControl fullWidth>
+                                 <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    onBlur={handleBlur}
+                                    id="privacyPolicyUrl"
+                                    label="Link to privacy Policy"
+                                    name="privacyPolicyUrl"
+                                    placeholder="Privacy Policy Url"
+                                    disabled={isSubmitting}
+                                    value={values.privacyPolicyUrl}
+                                    error={Boolean(errors.privacyPolicyUrl)}
+                                    onChange={handleChange}
+                                 />
+                                 <Collapse
+                                    in={Boolean(
+                                       errors.privacyPolicyUrl &&
+                                          touched.privacyPolicyUrl &&
+                                          errors.privacyPolicyUrl
+                                    )}
+                                 >
+                                    <FormHelperText error>
+                                       {errors.privacyPolicyUrl}
+                                    </FormHelperText>
+                                 </Collapse>
+                              </FormControl>
+                           </Grid>
+                           <Grid
+                              item
+                              lg={2}
+                              md={3}
+                              sm={3}
+                              xs={12}
+                              className={classes.centeredGrid}
                            >
-                              <FormControlLabel
-                                 label="Activate"
-                                 control={
-                                    <Switch
-                                       checked={values.privacyPolicyActive}
-                                       onChange={handleChange}
-                                       color="primary"
-                                       name="privacyPolicyActive"
-                                    />
-                                 }
-                              />
-                              <Collapse
-                                 in={Boolean(errors.privacyPolicyActive)}
+                              <FormControl
+                                 disabled={isSubmitting}
+                                 error={Boolean(errors.privacyPolicyActive)}
                               >
-                                 <FormHelperText>
-                                    {errors.privacyPolicyActive}
-                                 </FormHelperText>
-                              </Collapse>
-                           </FormControl>
+                                 <FormControlLabel
+                                    label="Activate"
+                                    control={
+                                       <Switch
+                                          checked={values.privacyPolicyActive}
+                                          onChange={handleChange}
+                                          color="primary"
+                                          name="privacyPolicyActive"
+                                       />
+                                    }
+                                 />
+                                 <Collapse
+                                    in={Boolean(errors.privacyPolicyActive)}
+                                 >
+                                    <FormHelperText>
+                                       {errors.privacyPolicyActive}
+                                    </FormHelperText>
+                                 </Collapse>
+                              </FormControl>
+                           </Grid>
                         </Grid>
-                     </Grid>
-                  </CardContent>
-                  <Divider />
-                  <Box display="flex" justifyContent="flex-end" p={2}>
-                     <Button
-                        disabled={!dirty || isSubmitting || !isValid}
-                        onClick={handleSubmit}
-                        color="primary"
-                        variant="contained"
-                        endIcon={
-                           isSubmitting && (
-                              <CircularProgress size={20} color="inherit" />
-                           )
-                        }
-                     >
-                        {isSubmitting ? "Updating" : "Update Policy"}
-                     </Button>
-                  </Box>
-               </Card>
-              </form>
+                     </CardContent>
+                     <Divider />
+                     <Box display="flex" justifyContent="flex-end" p={2}>
+                        <Button
+                           disabled={!dirty || isSubmitting || !isValid}
+                           onClick={handleSubmit}
+                           color="primary"
+                           variant="contained"
+                           endIcon={
+                              isSubmitting && (
+                                 <CircularProgress size={20} color="inherit" />
+                              )
+                           }
+                        >
+                           {isSubmitting ? "Updating" : "Update Policy"}
+                        </Button>
+                     </Box>
+                  </Card>
+               </form>
             );
          }}
       </Formik>

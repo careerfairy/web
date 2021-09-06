@@ -92,8 +92,8 @@ const NavBar = memo(({ drawerWidth }) => {
    const handleDrawerToggle = () => dispatch(actions.toggleNavDrawer());
 
    useEffect(() => {
-      return () => handleDrawerClose()
-   },[])
+      return () => handleDrawerClose();
+   }, []);
 
    const content = (
       <Box height="100%" display="flex" flexDirection="column">

@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const HighlightText = ({text}) => {
+const HighlightText = ({ text }) => {
    const classes = useStyles();
    return (
       <div className={classes.root}>
@@ -28,7 +28,7 @@ const HighlightText = ({text}) => {
 };
 
 HighlightText.propTypes = {
-  text: PropTypes.string.isRequired
-}
+   text: PropTypes.string.isRequired,
+};
 
 export default HighlightText;

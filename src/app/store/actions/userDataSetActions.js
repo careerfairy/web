@@ -8,46 +8,54 @@ import AnalyticsUtil from "../../data/util/AnalyticsUtil";
  * @param {function} getUsersByEmail - firebase method of getting users by email
  */
 export const setUserDataSet = (getUsersByEmail) => async (
-   dispatch, getState
+   dispatch,
+   getState
 ) => {
-   const state = getState()
-   const nonFilteredStreamsFromTimeFrameAndFuture = state.analyticsReducer.streams.fromTimeframeAndFuture
+   const state = getState();
+   const nonFilteredStreamsFromTimeFrameAndFuture =
+      state.analyticsReducer.streams.fromTimeframeAndFuture;
    const totalIds = AnalyticsUtil.getTotalUniqueIds(
-     nonFilteredStreamsFromTimeFrameAndFuture,
+      nonFilteredStreamsFromTimeFrameAndFuture
    );
    const totalUsers = await getUsersByEmail(totalIds);
    const dictionaryOfUsers = AnalyticsUtil.convertArrayOfUserObjectsToDictionary(
-     totalUsers
+      totalUsers
    );
    dispatch({
       type: actions.SET_USER_DATA_SET,
       payload: {
-         mapped: Object.keys(dictionaryOfUsers)?.length ? dictionaryOfUsers : null,
-         ordered:totalUsers?.length ? totalUsers : null
+         mapped: Object.keys(dictionaryOfUsers)?.length
+            ? dictionaryOfUsers
+            : null,
+         ordered: totalUsers?.length ? totalUsers : null,
       },
    });
 };
 
-export const setFilteredUserDataSet = () => async (
-   dispatch, getState
-) => {
-   const state = getState()
-   const hiddenStreamIds = state.analyticsReducer.hiddenStreamIds
-   const nonFilteredStreamsFromTimeFrameAndFuture = state.analyticsReducer.streams.fromTimeframeAndFuture
-   const userDataSetDictionary = state.userDataSet["total"].mapped
+export const setFilteredUserDataSet = () => async (dispatch, getState) => {
+   const state = getState();
+   const hiddenStreamIds = state.analyticsReducer.hiddenStreamIds;
+   const nonFilteredStreamsFromTimeFrameAndFuture =
+      state.analyticsReducer.streams.fromTimeframeAndFuture;
+   const userDataSetDictionary = state.userDataSet["total"].mapped;
    const totalFilteredIds = AnalyticsUtil.getTotalUniqueIds(
-     nonFilteredStreamsFromTimeFrameAndFuture,
-     hiddenStreamIds
+      nonFilteredStreamsFromTimeFrameAndFuture,
+      hiddenStreamIds
    );
-   const totalFilteredUsers = AnalyticsUtil.getUsersFromDictionaryWithIds(totalFilteredIds, userDataSetDictionary)
+   const totalFilteredUsers = AnalyticsUtil.getUsersFromDictionaryWithIds(
+      totalFilteredIds,
+      userDataSetDictionary
+   );
    const dictionaryOfFilteredUsers = AnalyticsUtil.convertArrayOfUserObjectsToDictionary(
-     totalFilteredUsers
+      totalFilteredUsers
    );
    dispatch({
       type: actions.SET_FILTERED_USER_DATA_SET,
       payload: {
-         mapped: Object.keys(dictionaryOfFilteredUsers)?.length ? dictionaryOfFilteredUsers : null,
-         ordered:totalFilteredUsers?.length ? totalFilteredUsers : null
+         mapped: Object.keys(dictionaryOfFilteredUsers)?.length
+            ? dictionaryOfFilteredUsers
+            : null,
+         ordered: totalFilteredUsers?.length ? totalFilteredUsers : null,
       },
    });
 };

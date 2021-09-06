@@ -24,9 +24,7 @@ const useStyles = makeStyles((theme) => ({
       height: "auto",
       maxWidth: 600,
    },
-   analyticsPreviewImage: {
-
-   },
+   analyticsPreviewImage: {},
    videoWrapper: {
       zIndex: 1,
       width: "100%",
@@ -84,13 +82,13 @@ const AnalyticsSection = (props) => {
          {/*/>*/}
          <SectionContainer>
             <Fade right>
-            <SectionHeader
-               color={props.color}
-               subTitleClassName={classes.subTitle}
-               titleClassName={classes.title}
-               title={props.title}
-               subtitle={props.subtitle}
-            />
+               <SectionHeader
+                  color={props.color}
+                  subTitleClassName={classes.subTitle}
+                  titleClassName={classes.title}
+                  title={props.title}
+                  subtitle={props.subtitle}
+               />
             </Fade>
             <div className={classes.imagesWrapper}>
                <LightSpeed left>

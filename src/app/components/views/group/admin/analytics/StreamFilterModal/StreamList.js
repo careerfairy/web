@@ -76,7 +76,7 @@ const StreamList = ({
 
    useEffect(() => {
       let newStreamsWithSelections;
-      const selectionModelMap = new Set(selectionModel)
+      const selectionModelMap = new Set(selectionModel);
       if (!streamsFromStore?.length) {
          newStreamsWithSelections = [];
       } else {
@@ -102,7 +102,9 @@ const StreamList = ({
             options={defaultTableOptions}
             icons={tableIcons}
             onSelectionChange={(selectedStreams) => {
-               setNewVisibleStreamSelection(selectedStreams.map(stream => stream.id));
+               setNewVisibleStreamSelection(
+                  selectedStreams.map((stream) => stream.id)
+               );
             }}
          />
       </div>

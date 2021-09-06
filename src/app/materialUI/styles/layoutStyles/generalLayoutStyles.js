@@ -7,4 +7,4 @@ const generalLayoutStyles = (theme) => ({
    },
 });
 
-export default generalLayoutStyles
+export default generalLayoutStyles;

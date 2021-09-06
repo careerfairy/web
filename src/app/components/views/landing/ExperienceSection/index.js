@@ -29,20 +29,20 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      marginTop: theme.spacing(2)
+      marginTop: theme.spacing(2),
    },
    imageText: {
-        margin: 50,
-        textAlign: 'center',
-        fontSize: '1rem'
+      margin: 50,
+      textAlign: "center",
+      fontSize: "1rem",
    },
    bookingButton: {
-    background: theme.palette.common.white,
-    color: theme.palette.secondary.main,
-    "&:hover": {
-       color: theme.palette.common.white,
-    },
- },
+      background: theme.palette.common.white,
+      color: theme.palette.secondary.main,
+      "&:hover": {
+         color: theme.palette.common.white,
+      },
+   },
    backgroundRectangle: {
       top: 0,
       position: "absolute",
@@ -86,7 +86,11 @@ const ExperienceSection = (props) => {
                </div>
             </Fade>
             <Fade left>
-               <p className={classes.imageText}>During a livestream, one or more employees of a company gives students insights into their daily work and answer all of their questions about the reality on the job.</p>
+               <p className={classes.imageText}>
+                  During a livestream, one or more employees of a company gives
+                  students insights into their daily work and answer all of
+                  their questions about the reality on the job.
+               </p>
                <HeroButton
                   color="secondary"
                   fullWidth

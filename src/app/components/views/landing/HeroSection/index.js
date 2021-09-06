@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
       alignItems: (props) => (props.mobile ? "flex-start" : "center"),
    },
    heroContainer: {
-      maxWidth: "90%"
+      maxWidth: "90%",
    },
    subTitle: {
       color: theme.palette.text.secondary,
@@ -42,15 +42,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const HeroSection = ({
-                        backgroundColor,
-                        backgroundImage,
-                        backgroundImageClassName,
-                        backgroundImageOpacity,
-                        big,
-                        color,
-                        handleOpenCalendly,
-                        title
-                     }) => {
+   backgroundColor,
+   backgroundImage,
+   backgroundImageClassName,
+   backgroundImageOpacity,
+   big,
+   color,
+   handleOpenCalendly,
+   title,
+}) => {
    const theme = useTheme();
    const mobile = useMediaQuery(theme.breakpoints.down("sm"));
    const classes = useStyles({ mobile });

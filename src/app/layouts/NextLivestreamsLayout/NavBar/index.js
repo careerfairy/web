@@ -21,7 +21,7 @@ import NavPrompt from "./navPrompt";
 import { signInImage } from "../../../constants/images";
 import { withFirebase } from "context/firebase";
 import useFollowingGroups from "../../../components/custom-hook/useFollowingGroups";
-import LoginButtonComponent from 'components/views/common/LoginButton'
+import LoginButtonComponent from "components/views/common/LoginButton";
 
 const useStyles = makeStyles((theme) => ({
    mobileDrawer: {
@@ -67,7 +67,7 @@ const ListItemWrapper = ({ active, children }) =>
 function LoginButton() {
    return (
       <ListItem>
-         <LoginButtonComponent/>
+         <LoginButtonComponent />
       </ListItem>
    );
 }

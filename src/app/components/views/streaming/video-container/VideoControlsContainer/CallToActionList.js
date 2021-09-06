@@ -20,10 +20,12 @@ const CallToActionList = ({
    handleClickDeleteCallToAction,
    handleClickResendCallToAction,
    isTestStream,
-                             handleClose,
+   handleClose,
 }) => {
    const streamRef = useStreamRef();
-   const { handleConfirmStep, isOpen, tutorialSteps } = useContext(TutorialContext);
+   const { handleConfirmStep, isOpen, tutorialSteps } = useContext(
+      TutorialContext
+   );
    const { activateCallToAction, deactivateCallToAction } = useFirebase();
    const callToActions = useSelector((state) => callToActionSelector(state));
    const [tutorialCtaId, setTutorialCtaId] = useState("");

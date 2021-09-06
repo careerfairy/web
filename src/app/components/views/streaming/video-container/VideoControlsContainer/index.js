@@ -332,7 +332,7 @@ function VideoControlsContainer({
                   }}
                   TransitionProps={{
                      onEntered,
-                     onExited
+                     onExited,
                   }}
                   icon={<SpeedDialIcon />}
                   onFocus={handleOpen}

@@ -1,21 +1,19 @@
-import React, {Fragment} from 'react';
+import React, { Fragment } from "react";
 import StreamSnackBar from "./notification/StreamSnackBar";
-import {withFirebase} from "../../../../context/firebase";
+import { withFirebase } from "../../../../context/firebase";
 
-function NotificationsContainer({notifications}) {
+function NotificationsContainer({ notifications }) {
+   let streamSnackElements = notifications.map((notification, index) => {
+      return (
+         <StreamSnackBar
+            key={index}
+            notification={notification}
+            index={index}
+         />
+      );
+   });
 
-    let streamSnackElements = notifications.map((notification, index) => {
-        return (
-            <StreamSnackBar key={index} notification={notification} index={index}/>
-        )
-    })
-
-    return (
-        <Fragment>
-            {streamSnackElements}
-        </Fragment>
-    )
-
+   return <Fragment>{streamSnackElements}</Fragment>;
 }
 
 export default withFirebase(NotificationsContainer);

@@ -11,7 +11,7 @@ const setHeaders = (req, res) => {
       res.set("Access-Control-Max-Age", "3600");
       return res.status(204).send("");
    }
-   return;
+
 };
 
 const getStreamLink = (streamId) => {

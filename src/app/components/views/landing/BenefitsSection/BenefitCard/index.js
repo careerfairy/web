@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
       position: "absolute",
       top: "50%",
       maxWidth: rectLength * 0.6,
-      maxHeight:  rectLength * 0.6,
+      maxHeight: rectLength * 0.6,
       height: "auto",
       left: "50%",
       transform: `translate(-50%,-50%)`,
@@ -74,11 +74,18 @@ const BenefitCard = ({ description, imageUrl, name }) => {
             />
             <img className={classes.graphic} src={imageUrl} alt={name} />
          </div>
-         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 100 }}>
+         <div
+            style={{
+               display: "flex",
+               justifyContent: "center",
+               alignItems: "center",
+               minHeight: 100,
+            }}
+         >
             <Typography gutterBottom component="h5" align="center" variant="h5">
                <b>{name}</b>
             </Typography>
-         </div>     
+         </div>
          <Typography variant="body1" color="textSecondary" align="center">
             {description}
          </Typography>

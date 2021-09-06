@@ -1,16 +1,13 @@
-import React from 'react';
+import React from "react";
 import StreamerOverview from "../../../components/views/streaming";
 import StreamerLayout from "../../../layouts/StreamerLayout";
 
-
 const StreamerPage = () => {
+   return (
+      <StreamerLayout>
+         <StreamerOverview />
+      </StreamerLayout>
+   );
+};
 
-    return (
-        <StreamerLayout>
-            <StreamerOverview/>
-        </StreamerLayout>
-    )
-}
-
-
-export default StreamerPage
+export default StreamerPage;
