@@ -8,7 +8,8 @@ export default [
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/testimonial-avatars%2Fkristina.webp?alt=media&token=12032166-f2a0-456f-890c-afdd443a7f17",
       position: "Employer Branding Expert @Accenture Germany",
       name: "Kristina Neidert",
-      companyUrl: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/testimonial-companies%2Faccenture.png?alt=media&token=743787d1-6ccc-4f60-9489-ac2fc42fdb89"
+      companyUrl:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/testimonial-companies%2Faccenture.png?alt=media&token=743787d1-6ccc-4f60-9489-ac2fc42fdb89",
    },
    {
       rating: 0,
@@ -19,7 +20,8 @@ export default [
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/testimonial-avatars%2Fcarolyn.webp?alt=media&token=b6213aed-2921-4c20-a07d-9a471bd14c6e",
       position: "Senior HR Marketing Specialist @KPMG Switzerland",
       name: "Carolyn Hoechle",
-      companyUrl: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/testimonial-companies%2Fkpmg.png?alt=media&token=3d03398b-3ebe-453b-9807-f581314f4357"
+      companyUrl:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/testimonial-companies%2Fkpmg.png?alt=media&token=3d03398b-3ebe-453b-9807-f581314f4357",
    },
    {
       rating: 0,
@@ -31,6 +33,7 @@ export default [
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/testimonial-avatars%2Fsabina.webp?alt=media&token=ecfe5169-ab5d-4e5d-9c4a-9166d8d0a40a",
       position: "Dep. Head Personal Marketing @Swiss Federal Administration",
       name: "Sabina Marra",
-      companyUrl: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/testimonial-companies%2Fswiss-federal.webp?alt=media&token=fa4c7c45-7648-44aa-b764-7de07cad1ec6"
+      companyUrl:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/testimonial-companies%2Fswiss-federal.webp?alt=media&token=fa4c7c45-7648-44aa-b764-7de07cad1ec6",
    },
 ];

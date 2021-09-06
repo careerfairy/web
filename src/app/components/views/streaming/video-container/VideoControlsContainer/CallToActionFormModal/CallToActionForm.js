@@ -178,7 +178,10 @@ const CallToActionForm = memo(
             await updateCallToAction(streamRef, values.id, values);
             return await activateCallToAction(streamRef, values.id);
          }
-         const callToActionId = await createCallToAction(streamRef, { ...values, isForTutorial:  Boolean(isActiveTutorialStep)});
+         const callToActionId = await createCallToAction(streamRef, {
+            ...values,
+            isForTutorial: Boolean(isActiveTutorialStep),
+         });
          if (isActiveTutorialStep) {
             const closeSnack = () =>
                dispatch(actions.closeSnackbar(callToActionId));
@@ -203,7 +206,7 @@ const CallToActionForm = memo(
                      isForTutorial: true,
                   },
                   handleClickCallToAction,
-                  handleDismissCallToAction,
+                  handleDismissCallToAction
                )
             );
          }

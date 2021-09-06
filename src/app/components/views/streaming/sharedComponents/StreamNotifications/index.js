@@ -150,7 +150,7 @@ const StreamNotifications = ({ isStreamer, firebase }) => {
 
    return (
       <CallToActionNotifications
-        currentActiveCallToActionIds={currentLivestream.activeCallToActionIds}
+         currentActiveCallToActionIds={currentLivestream.activeCallToActionIds}
          isStreamer={isStreamer}
       />
    );

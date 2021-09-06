@@ -30,7 +30,7 @@ const GlassDialog = ({
    forceGlass,
    ...rest
 }) => {
-   const paperClasses = useGlassStyles( );
+   const paperClasses = useGlassStyles();
    return (
       <Dialog
          PaperProps={{ ...PaperProps, className: paperClasses.glass }}

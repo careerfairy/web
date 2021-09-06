@@ -38,7 +38,7 @@ function VideoContainer(props) {
       setShowBubbles,
       handleConfirmStep,
       getActiveTutorialStepKey,
-      endTutorial
+      endTutorial,
    } = useContext(TutorialContext);
    const classes = useStyles();
    const localVideoId = "localVideo";
@@ -53,7 +53,6 @@ function VideoContainer(props) {
    // console.count("-> VideoContainer");
    const [streamerConnected, setStreamerConnected] = useState(false);
    const [streamerReady, setStreamerReady] = useState(false);
-
 
    const [connectionEstablished, setConnectionEstablished] = useState(false);
    const [isStreaming, setIsStreaming] = useState(false);
@@ -213,7 +212,6 @@ function VideoContainer(props) {
       }
    }, [tutorialSteps]);
 
-
    const isOpen = (property) => {
       return Boolean(
          props.currentLivestream.test &&
@@ -241,7 +239,7 @@ function VideoContainer(props) {
 
    const handleCloseDemoEndModal = () => {
       handleConfirmStep(23);
-      endTutorial()
+      endTutorial();
       setShowBubbles(true);
    };
 

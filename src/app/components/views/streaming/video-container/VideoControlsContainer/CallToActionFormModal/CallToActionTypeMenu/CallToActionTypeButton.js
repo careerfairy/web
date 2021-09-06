@@ -35,7 +35,8 @@ const CallToActionTypeButton = ({
 
    const tutorialStepOpen = isOpen(19, test) && isJobPosting;
 
-   const buttonDisabled = (isOpen(19, test) || isOpen(20, test)) && !isJobPosting
+   const buttonDisabled =
+      (isOpen(19, test) || isOpen(20, test)) && !isJobPosting;
 
    const handleClick = () => {
       handleSetCallToActionType({
@@ -49,11 +50,11 @@ const CallToActionTypeButton = ({
    };
 
    const handleButtonClick = () => {
-      if(tutorialStepOpen){
-         handleConfirmStep(19)
+      if (tutorialStepOpen) {
+         handleConfirmStep(19);
       }
-      handleClick()
-   }
+      handleClick();
+   };
 
    return (
       <ConditionalWrapper

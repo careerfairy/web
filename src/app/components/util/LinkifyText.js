@@ -7,14 +7,8 @@ const componentDecorator = (href, text, key) => (
    </a>
 );
 
-const LinkifyText = ({children}) => {
-
-
-  return (
-    <Linkify componentDecorator={componentDecorator}>
-      {children}
-    </Linkify>
-  );
+const LinkifyText = ({ children }) => {
+   return <Linkify componentDecorator={componentDecorator}>{children}</Linkify>;
 };
 
 export default LinkifyText;

@@ -95,7 +95,7 @@ const TopBar = ({ className, ...rest }) => {
    const classes = useStyles({
       navLinksColor: theme.palette.grey["800"],
    });
-   const {pathname} = useRouter()
+   const { pathname } = useRouter();
 
    const { landingLinks } = useGeneralLinks();
    const dispatch = useDispatch();

@@ -51,7 +51,7 @@ const TestimonialsSection = (props) => {
                className={classes.testimonialsWrapper}
             >
                <Grid item xs={12} md={12}>
-                  <TestimonialCarousel/>
+                  <TestimonialCarousel />
                </Grid>
             </Grid>
          </SectionContainer>

@@ -66,7 +66,7 @@ const SettingsDropdown = ({
    handleClickEditCallToAction,
    handleClickDeleteCallToAction,
    handleClickResendCallToAction,
-  disabled,
+   disabled,
 }) => {
    const [anchorEl, setAnchorEl] = useState(null);
 
@@ -91,10 +91,10 @@ const SettingsDropdown = ({
             onClose={handleClose}
          >
             <MenuItem
-              disabled={disabled}
+               disabled={disabled}
                onClick={() => {
                   handleClickEditCallToAction(callToAction);
-                  handleClose()
+                  handleClose();
                }}
             >
                <ListItemIcon>
@@ -103,10 +103,10 @@ const SettingsDropdown = ({
                <Typography variant="inherit">Edit</Typography>
             </MenuItem>
             <MenuItem
-              disabled={disabled}
+               disabled={disabled}
                onClick={() => {
                   handleClickDeleteCallToAction(callToAction.id);
-                  handleClose()
+                  handleClose();
                }}
             >
                <ListItemIcon>
@@ -115,10 +115,10 @@ const SettingsDropdown = ({
                <Typography variant="inherit">Delete</Typography>
             </MenuItem>
             <MenuItem
-              disabled={disabled}
+               disabled={disabled}
                onClick={() => {
                   handleClickResendCallToAction(callToAction.id);
-                  handleClose()
+                  handleClose();
                }}
             >
                <ListItemIcon>
@@ -322,7 +322,7 @@ export const CallToActionItem = React.memo((props) => {
                   </div>
                   <div className={classes.headerActionsWrapper}>
                      <SettingsDropdown
-                       disabled={isTutorialCta}
+                        disabled={isTutorialCta}
                         handleClickEditCallToAction={
                            handleClickEditCallToAction
                         }

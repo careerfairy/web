@@ -159,7 +159,7 @@ const CallToActionSnackbar = forwardRef(
 
       const handleClearSnackTutorialState = () => {
          if (isForTutorial) {
-            handleConfirmStep(21)
+            handleConfirmStep(21);
          }
          setTutorialState("");
       };
@@ -281,8 +281,8 @@ const CallToActionSnackbar = forwardRef(
                            <Button
                               className={classes.mainButton}
                               onClick={() => {
-                                 onClick()
-                                 handleClearSnackTutorialState()
+                                 onClick();
+                                 handleClearSnackTutorialState();
                               }}
                               disabled={loading}
                               size="small"
