@@ -39,239 +39,243 @@ import { AttendButton, DetailsButton } from "./actionButtons";
 import LogoElement from "../LogoElement";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 
-const useStyles = makeStyles(theme => ({
-    cardHovered: {
-        height: "fit-content",
-        transform: 'translateY(-2px)',
-        '& $shadow': {
-            bottom: '-1.5rem',
-        },
-        '& $shadow2': {
-            bottom: '-2.5rem',
-        },
-    },
-    card: {
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        width: "-webkit-fill-available",
-        justifyContent: "space-between",
-        position: 'relative',
-        overflow: 'visible',
-        borderRadius: '1.5rem',
-        transition: '0.4s',
-        '&:before': {
-            content: '""',
-            position: 'absolute',
-            zIndex: 0,
-            display: 'block',
-            width: '100%',
-            bottom: -1,
-            height: '100%',
-            borderRadius: '1.5rem',
-            backgroundColor: 'rgba(0,0,0,0.08)',
-        },
-    },
-    main: {
-        display: "flex",
-        flex: 1,
-        minHeight: 406,
-        overflow: 'hidden',
-        borderTopLeftRadius: '1.5rem',
-        borderTopRightRadius: '1.5rem',
-        zIndex: 1,
-        '&:after': {
-            content: '""',
-            position: 'absolute',
-            bottom: 0,
-            display: 'block',
-            width: '100%',
-            height: '100%',
-            background: `linear-gradient(to top, ${theme.palette.navyBlue.main}, rgba(0,0,0,0))`,
-        },
-    },
-    mainBooked: {
-        '&:after': {
-            background: theme.palette.primary.dark,
-            opacity: 0.8
-        },
-    },
-    content: {
-        bottom: 0,
-        width: '100%',
-        zIndex: 1,
-        padding: theme.spacing(2, 2, 2),
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-evenly"
-    },
-    avatar: {
-        width: 48,
-        height: 48,
-    },
-    groupLogo: {
-        width: 75,
-        height: 75,
-        background: theme.palette.common.white,
-        "& img": {
-            objectFit: "contain",
-            maxWidth: "90%",
-            maxHeight: "90%"
-        }
-    },
-    groupLogoStacked: {
-        width: 60,
-        height: 60,
-    },
-    tag: {
-        display: 'inline-block',
-        backgroundColor: '#ff5dac',
-        borderRadius: '0.5rem',
-        padding: '2px 0.5rem',
-        color: '#fff',
-        marginBottom: '0.5rem',
-    },
-    title: {
-        fontWeight: 800,
-        color: theme.palette.common.white,
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        display: "-webkit-box",
-        WebkitLineClamp: "2",
-        WebkitBoxOrient: "vertical"
-    },
-    titleHovered:{
-        WebkitLineClamp: "inherit",
-    },
-    author: {
-        zIndex: 1,
-        position: 'relative',
-        borderBottomLeftRadius: '1.5rem',
-        borderBottomRightRadius: '1.5rem',
-        display: "flex",
-        flexDirection: "column",
-    },
-    authorHovered: {
-        boxShadow: theme.shadows[3]
-    },
-    shadow: {
-        transition: '0.2s',
-        position: 'absolute',
-        zIndex: 0,
-        width: '88%',
-        height: '100%',
-        bottom: 0,
-        borderRadius: '1.5rem',
-        backgroundColor: 'rgba(0,0,0,0.06)',
-        left: '50%',
-        transform: 'translateX(-50%)',
-    },
-    shadow2: {
-        bottom: 0,
-        width: '72%',
-        backgroundColor: 'rgba(0,0,0,0.04)',
-    },
-    previewRow: {
-        width: "100%",
-        justifyContent: "space-evenly"
-    },
-    avaLogoWrapper: {
-        display: "flex",
-        // flexDirection: "column",
-        justifyContent: "center",
-        flexWrap: "inherit",
-        alignItems: "center",
+const useStyles = makeStyles((theme) => ({
+   cardHovered: {
+      height: "fit-content",
+      transform: "translateY(-2px)",
+      "& $shadow": {
+         bottom: "-1.5rem",
+      },
+      "& $shadow2": {
+         bottom: "-2.5rem",
+      },
+   },
+   card: {
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      width: "-webkit-fill-available",
+      justifyContent: "space-between",
+      position: "relative",
+      overflow: "visible",
+      borderRadius: "1.5rem",
+      transition: "0.4s",
+      "&:before": {
+         content: '""',
+         position: "absolute",
+         zIndex: 0,
+         display: "block",
+         width: "100%",
+         bottom: -1,
+         height: "100%",
+         borderRadius: "1.5rem",
+         backgroundColor: "rgba(0,0,0,0.08)",
+      },
+   },
+   main: {
+      display: "flex",
+      flex: 1,
+      minHeight: 406,
+      overflow: "hidden",
+      borderTopLeftRadius: "1.5rem",
+      borderTopRightRadius: "1.5rem",
+      zIndex: 1,
+      "&:after": {
+         content: '""',
+         position: "absolute",
+         bottom: 0,
+         display: "block",
+         width: "100%",
+         height: "100%",
+         background: `linear-gradient(to top, ${theme.palette.navyBlue.main}, rgba(0,0,0,0))`,
+      },
+   },
+   mainBooked: {
+      "&:after": {
+         background: theme.palette.primary.dark,
+         opacity: 0.8,
+      },
+   },
+   content: {
+      bottom: 0,
+      width: "100%",
+      zIndex: 1,
+      padding: theme.spacing(2, 2, 2),
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-evenly",
+   },
+   avatar: {
+      width: 48,
+      height: 48,
+   },
+   groupLogo: {
+      width: 75,
+      height: 75,
+      background: theme.palette.common.white,
+      "& img": {
+         objectFit: "contain",
+         maxWidth: "90%",
+         maxHeight: "90%",
+      },
+   },
+   groupLogoStacked: {
+      width: 60,
+      height: 60,
+   },
+   tag: {
+      display: "inline-block",
+      backgroundColor: "#ff5dac",
+      borderRadius: "0.5rem",
+      padding: "2px 0.5rem",
+      color: "#fff",
+      marginBottom: "0.5rem",
+   },
+   title: {
+      fontWeight: 800,
+      color: theme.palette.common.white,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      display: "-webkit-box",
+      WebkitLineClamp: "2",
+      WebkitBoxOrient: "vertical",
+   },
+   titleHovered: {
+      WebkitLineClamp: "inherit",
+   },
+   author: {
+      zIndex: 1,
+      position: "relative",
+      borderBottomLeftRadius: "1.5rem",
+      borderBottomRightRadius: "1.5rem",
+      display: "flex",
+      flexDirection: "column",
+   },
+   authorHovered: {
+      boxShadow: theme.shadows[3],
+   },
+   shadow: {
+      transition: "0.2s",
+      position: "absolute",
+      zIndex: 0,
+      width: "88%",
+      height: "100%",
+      bottom: 0,
+      borderRadius: "1.5rem",
+      backgroundColor: "rgba(0,0,0,0.06)",
+      left: "50%",
+      transform: "translateX(-50%)",
+   },
+   shadow2: {
+      bottom: 0,
+      width: "72%",
+      backgroundColor: "rgba(0,0,0,0.04)",
+   },
+   previewRow: {
+      width: "100%",
+      justifyContent: "space-evenly",
+   },
+   avaLogoWrapper: {
+      display: "flex",
+      // flexDirection: "column",
+      justifyContent: "center",
+      flexWrap: "inherit",
+      alignItems: "center",
+   },
+   avaLogoWrapperHovered: {
+      flexWrap: "wrap",
+      maxHeight: 300,
+      overflow: "auto",
+   },
+   top: {
+      zIndex: 995,
+   },
+   groupLogos: {
+      justifyContent: "space-evenly",
+      display: "flex",
+      flexWrap: "wrap",
+   },
+   livestreamCompanyAva: {
+      borderBottomRightRadius: `${theme.spacing(2.5)}px !important`,
+      borderTopLeftRadius: `${theme.spacing(2.5)}px !important`,
+      width: "100%",
+      height: 100,
+      boxShadow: theme.shadows[5],
+      background: theme.palette.common.white,
+      "& img": {
+         objectFit: "contain",
+         maxWidth: "90%",
+         maxHeight: "90%",
+      },
+   },
+   pulseAnimate: {
+      animation: `$pulse 1.2s infinite`,
+   },
+   "@keyframes pulse": {
+      "0%": {
+         MozBoxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 1)}`,
+         boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 1)}`,
+      },
+      "70%": {
+         MozBoxShadow: `0 0 0 15px ${alpha(theme.palette.primary.main, 0)}`,
+         boxShadow: `0 0 0 15px ${alpha(theme.palette.primary.main, 0)}`,
+      },
+      "100%": {
+         MozBoxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0)}`,
+         boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0)}`,
+      },
+   },
+   bookedIcon: {
+      color: "white",
+      position: "absolute",
+      left: theme.spacing(1),
+      top: 5,
+      display: "flex",
+      alignItems: "center",
+   },
+   bookedText: {
+      marginLeft: theme.spacing(1),
+      fontWeight: "bold",
+      color: theme.palette.common.white,
+   },
+}));
 
-    },
-    avaLogoWrapperHovered:{
-        flexWrap: "wrap",
-        maxHeight: 300,
-        overflow: "auto"
-    },
-    top: {
-        zIndex: 995
-    },
-    groupLogos: {
-        justifyContent: "space-evenly",
-        display: "flex",
-        flexWrap: "wrap",
-    },
-    livestreamCompanyAva: {
-        borderBottomRightRadius: `${theme.spacing(2.5)}px !important`,
-        borderTopLeftRadius: `${theme.spacing(2.5)}px !important`,
-        width: "100%",
-        height: 100,
-        boxShadow: theme.shadows[5],
-        background: theme.palette.common.white,
-        "& img": {
-            objectFit: "contain",
-            maxWidth: "90%",
-            maxHeight: "90%"
-        }
-    },
-    pulseAnimate: {
-        animation: `$pulse 1.2s infinite`
-    },
-    "@keyframes pulse": {
-        "0%": {
-            MozBoxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 1)}`,
-            boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 1)}`
-        },
-        "70%": {
-            MozBoxShadow: `0 0 0 15px ${alpha(theme.palette.primary.main, 0)}`,
-            boxShadow: `0 0 0 15px ${alpha(theme.palette.primary.main, 0)}`
-        },
-        "100%": {
-            MozBoxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0)}`,
-            boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0)}`
-        }
-    },
-    bookedIcon: {
-        color: "white",
-        position: "absolute",
-        left: theme.spacing(1),
-        top: 5,
-        display: "flex",
-        alignItems: "center"
-    },
-    bookedText: {
-        marginLeft: theme.spacing(1),
-        fontWeight: "bold",
-        color: theme.palette.common.white,
+const maxOptions = 2;
+const GroupStreamCardV2 = memo(
+   ({
+      livestream,
+      user,
+      mobile,
+      userData,
+      firebase,
+      livestreamId,
+      id,
+      careerCenterId,
+      groupData,
+      listenToUpcoming,
+      isTargetDraft,
+      setGlobalCardHighlighted,
+      isPastLivestreams,
+      globalCardHighlighted,
+      isAdmin,
+   }) => {
+      const mediaStyles = useCoverCardMediaStyles();
+      const classes = useStyles();
+      const { pathname, absolutePath, push } = useRouter();
+      const linkToStream = useMemo(
+         () =>
+            pathname === "/next-livestreams/[groupId]"
+               ? `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}`
+               : `/next-livestreams?livestreamId=${livestream.id}`,
+         [pathname, livestream?.id, groupData?.groupId]
+      );
 
-    },
-}))
-
-
-const maxOptions = 2
-const GroupStreamCardV2 = memo(({
-                                    livestream,
-                                    user,
-                                    mobile,
-                                    userData,
-                                    firebase,
-                                    livestreamId,
-                                    id,
-                                    careerCenterId,
-                                    groupData,
-                                    listenToUpcoming,
-                                    isTargetDraft,
-                                    setGlobalCardHighlighted,
-                                    isPastLivestreams,
-                                    globalCardHighlighted,
-                                    isAdmin,
-                                }) => {
-    const mediaStyles = useCoverCardMediaStyles();
-    const classes = useStyles()
-    const {pathname, absolutePath, push} = useRouter();
-    const linkToStream = useMemo(() => pathname === "/next-livestreams/[groupId]" ?
-        `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}` :
-        `/next-livestreams?livestreamId=${livestream.id}`,
-        [pathname, livestream?.id, groupData?.groupId]
-    )
-
-    function userIsRegistered() {
-        if (user.isLoaded && user.isEmpty || !livestream.registeredUsers || isAdmin) {
+      function userIsRegistered() {
+         if (
+            (user.isLoaded && user.isEmpty) ||
+            !livestream.registeredUsers ||
+            isAdmin
+         ) {
             return false;
          }
          return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1);
@@ -467,7 +471,7 @@ const GroupStreamCardV2 = memo(({
       }
 
       function sendEmailRegistrationConfirmation() {
-         return DataAccessUtil.sendRegistrationConfirmationEmail(
+         return firebase.sendRegistrationConfirmationEmail(
             user,
             userData,
             livestream

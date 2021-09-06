@@ -54,51 +54,48 @@ const useStyles = makeStyles((theme) => ({
       background: theme.palette.background.paper,
    },
    logoElementImage: {
-     maxHeight: 100,
-      maxWidth: 180
+      maxHeight: 100,
+      maxWidth: 180,
    },
    logoGrid: {
       height: "100%",
-      "& img":{
-
-      width: "100%",
-      objectFit: "contain",
-      maxHeight: 60,
-      maxWidth: 250,
-      }
+      "& img": {
+         width: "100%",
+         objectFit: "contain",
+         maxHeight: 60,
+         maxWidth: 250,
+      },
    },
-   companyLogo:{
+   companyLogo: {
       padding: theme.spacing(0.5),
       borderRadius: "0.3rem",
       margin: "0 auto",
       maxHeight: "150px",
       maxWidth: "280px",
       boxShadow: theme.shadows[4],
-      background: theme.palette.common.white
+      background: theme.palette.common.white,
    },
-   imageGrid:{
+   imageGrid: {
       display: "flex",
       justifyContent: "center",
-      alignItems: "center"
+      alignItems: "center",
    },
-   logosGridContainerWrapper:{
+   logosGridContainerWrapper: {
       maxWidth: "80%",
       margin: "0 auto",
-display: "flex",
+      display: "flex",
       justifyContent: "center",
-      alignItems: "center"
+      alignItems: "center",
    },
-   logoElementsRow:{
-     justifyContent: "space-around",
-     flexWrap: "wrap",
+   logoElementsRow: {
+      justifyContent: "space-around",
+      flexWrap: "wrap",
       background: theme.palette.background.paper,
       borderRadius: "0.5rem",
       boxShadow: theme.shadows[2],
-      width: "fit-content"
+      width: "fit-content",
    },
-   logosGridContainer:{
-
-   }
+   logosGridContainer: {},
 }));
 
 const parseDates = (stream) => {
@@ -341,7 +338,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    }
 
    function sendEmailRegistrationConfirmation() {
-      return DataAccessUtil.sendRegistrationConfirmationEmail(
+      return firebase.sendRegistrationConfirmationEmail(
          user,
          userData,
          currentLivestream
@@ -575,7 +572,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    let logoElements = careerCenters.map((careerCenter, index) => {
       return (
-         <Item className={classes.imageGrid} >
+         <Item className={classes.imageGrid}>
             <img
                src={getResizedUrl(careerCenter.logoUrl, "lg")}
                className={classes.logoElementImage}
@@ -685,13 +682,13 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                         </div>
                      )}
                      <div style={{ margin: "50px 0", display: "flex" }}>
-                              <img
-                                 src={getResizedUrl(
-                                    currentLivestream.companyLogoUrl,
-                                    "md"
-                                 )}
-                                 className={classes.companyLogo}
-                              />
+                        <img
+                           src={getResizedUrl(
+                              currentLivestream.companyLogoUrl,
+                              "md"
+                           )}
+                           className={classes.companyLogo}
+                        />
                      </div>
                      <Grid container justifyContent="center" align="center">
                         {speakerElements}
@@ -745,13 +742,13 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                      </div>
                      <div style={{ textAlign: "center", marginBottom: "20px" }}>
                         <div className={classes.logosGridContainerWrapper}>
-                        <Row
-                          style={{ justifyContent: "space-evenly" }}
-                          gap={1.5}
-                          className={classes.logoElementsRow}
-                        >
-                           {logoElements}
-                        </Row>
+                           <Row
+                              style={{ justifyContent: "space-evenly" }}
+                              gap={1.5}
+                              className={classes.logoElementsRow}
+                           >
+                              {logoElements}
+                           </Row>
                         </div>
                      </div>
                      {!isPastEvent && (
@@ -814,57 +811,53 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
             </Container>
          </div>
          ;
-            <div className="grey-container">
-               <Container>
-                  <div className="container-title">
-                     Which questions should the speaker answer during the
-                     livestream?
-                  </div>
-                  <div style={{ textAlign: "center" }}>
-                     <TextField
-                        variant="outlined"
-                        fullWidth
-                        value={newQuestionTitle}
-                        className={classes.input}
-                        onChange={(event) =>
-                           setNewQuestionTitle(event.target.value)
-                        }
-                        maxLength="170"
-                     />
-                     <Button
-                        size="large"
-                        variant="contained"
-                        children="Submit Your Question"
-                        style={{ margin: "20px 0 0 0" }}
-                        onClick={() => addNewQuestion()}
-                        color="primary"
-                     />
-                  </div>
-                  <div
-                     className={
-                        "container-title " +
-                        (questionElements.length === 0 ? "hidden" : "")
+         <div className="grey-container">
+            <Container>
+               <div className="container-title">
+                  Which questions should the speaker answer during the
+                  livestream?
+               </div>
+               <div style={{ textAlign: "center" }}>
+                  <TextField
+                     variant="outlined"
+                     fullWidth
+                     value={newQuestionTitle}
+                     className={classes.input}
+                     onChange={(event) =>
+                        setNewQuestionTitle(event.target.value)
                      }
-                     style={{ margin: "30px 0 0 0" }}
-                  >
-                     Upvote questions from your peers
-                  </div>
-                  <Grid
-                     container
-                     spacing={3}
-                     style={{ margin: "5px 0 30px 0" }}
-                  >
-                     {questionElements}
-                  </Grid>
-                  <div
-                     className={user ? "" : "hidden"}
-                     style={{ textAlign: "center" }}
-                     className={questionElements.length === 0 ? "" : "hidden"}
-                  >
-                     The speaker is eagerly waiting for your input!
-                  </div>
-               </Container>
-            </div>
+                     maxLength="170"
+                  />
+                  <Button
+                     size="large"
+                     variant="contained"
+                     children="Submit Your Question"
+                     style={{ margin: "20px 0 0 0" }}
+                     onClick={() => addNewQuestion()}
+                     color="primary"
+                  />
+               </div>
+               <div
+                  className={
+                     "container-title " +
+                     (questionElements.length === 0 ? "hidden" : "")
+                  }
+                  style={{ margin: "30px 0 0 0" }}
+               >
+                  Upvote questions from your peers
+               </div>
+               <Grid container spacing={3} style={{ margin: "5px 0 30px 0" }}>
+                  {questionElements}
+               </Grid>
+               <div
+                  className={user ? "" : "hidden"}
+                  style={{ textAlign: "center" }}
+                  className={questionElements.length === 0 ? "" : "hidden"}
+               >
+                  The speaker is eagerly waiting for your input!
+               </div>
+            </Container>
+         </div>
          <div
             className={
                "white-container " +
@@ -885,17 +878,17 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                </div>
                <div>
                   <Box display="flex" justifyContent="center">
-                        <img
-                           src={
-                              currentLivestream.companyLogoUrl
-                                 ? getResizedUrl(
-                                      currentLivestream.companyLogoUrl,
-                                      "md"
-                                   )
-                                 : companyLogoPlaceholder
-                           }
-                           className={classes.companyLogo}
-                        />
+                     <img
+                        src={
+                           currentLivestream.companyLogoUrl
+                              ? getResizedUrl(
+                                   currentLivestream.companyLogoUrl,
+                                   "md"
+                                )
+                              : companyLogoPlaceholder
+                        }
+                        className={classes.companyLogo}
+                     />
                   </Box>
                </div>
                <Grid
