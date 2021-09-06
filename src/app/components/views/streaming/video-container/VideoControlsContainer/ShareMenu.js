@@ -8,13 +8,7 @@ import {
    ListItemText,
    Popover,
 } from "@material-ui/core";
-import {
-   StyledTooltipWithButton,
-   TooltipButtonComponent,
-   TooltipText,
-   TooltipTitle,
-   WhiteTooltip,
-} from "../../../../../materialUI/GlobalTooltips";
+import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips";
 
 const useStyles = makeStyles((theme) => ({
    list: {
@@ -27,6 +21,40 @@ const useStyles = makeStyles((theme) => ({
       paddingRight: theme.spacing(2),
    },
 }));
+
+const ShareItem = ({
+   disabled,
+   name,
+   onClick,
+   listIconWrapperClassName,
+   icon,
+   isCtaTutorialButton,
+   handleConfirmTutorialStep,
+}) => {
+   const item = (
+      <ListItem key={name} disabled={disabled} onClick={onClick} button>
+         <ListItemIcon className={listIconWrapperClassName}>
+            {icon}
+         </ListItemIcon>
+         <ListItemText primary={name} />
+      </ListItem>
+   );
+
+   return isCtaTutorialButton ? (
+      <StyledTooltipWithButton
+         open={isCtaTutorialButton}
+         buttonText="ok"
+         tooltipTitle="Share Job Posts (1/5)"
+         placement="left"
+         onConfirm={handleConfirmTutorialStep}
+         tooltipText="Click here to share your job posts or social media channels."
+      >
+         {item}
+      </StyledTooltipWithButton>
+   ) : (
+      item
+   );
+};
 
 const ShareMenu = ({
    anchorEl,
@@ -53,44 +81,33 @@ const ShareMenu = ({
             horizontal: "right",
          }}
       >
-         <StyledTooltipWithButton
-            open={isOpen(17)}
-            buttonText="ok"
-            tooltipTitle="Share Job Posts (1/5)"
-            placement="left"
-            onConfirm={() => {
-               handleConfirm(17);
-               handleOpenCallToActionDrawer();
-               onClose();
-            }}
-            tooltipText="Click here to share your job posts or social media channels."
-         >
-            <List dense className={classes.list}>
-               {shareActions.map((action) => {
-                  const isCtaTutorialButton =
-                     isOpen(17) && action.id === "sendCtaAction";
-                  return (
-                     <ListItem
-                        key={action.name}
-                        disabled={!isCtaTutorialButton}
-                        onClick={() => {
-                           if (isCtaTutorialButton) {
-                              handleConfirm(17);
-                           }
-                           action.onClick();
-                           onClose();
-                        }}
-                        button
-                     >
-                        <ListItemIcon className={classes.listIconWrapper}>
-                           {action.icon}
-                        </ListItemIcon>
-                        <ListItemText primary={action.name} />
-                     </ListItem>
-                  );
-               })}
-            </List>
-         </StyledTooltipWithButton>
+         <List dense className={classes.list}>
+            {shareActions.map((action) => {
+               const isCtaTutorialButton =
+                  isOpen(17) && action.id === "sendCtaAction";
+               return (
+                  <ShareItem
+                     onClick={() => {
+                        if (isCtaTutorialButton) {
+                           handleConfirm(17);
+                        }
+                        action.onClick();
+                        onClose();
+                     }}
+                     isCtaTutorialButton={isCtaTutorialButton}
+                     handleConfirmTutorialStep={() => {
+                        handleConfirm(17);
+                        handleOpenCallToActionDrawer();
+                        onClose();
+                     }}
+                     name={action.name}
+                     icon={action.icon}
+                     listIconWrapperClassName={classes.listIconWrapper}
+                     disabled={!isCtaTutorialButton}
+                  />
+               );
+            })}
+         </List>
       </Popover>
    );
 };
