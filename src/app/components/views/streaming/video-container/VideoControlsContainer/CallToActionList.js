@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import useStreamQuery from "../../../../custom-hook/useQuery";
@@ -8,17 +8,26 @@ import { Box, CircularProgress, Typography } from "@material-ui/core";
 import { useFirebase } from "../../../../../context/firebase";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 import CallToActionItem from "./CallToActionItem";
-
+import TutorialContext from "../../../../../context/tutorials/TutorialContext";
 
 const callToActionSelector = createSelector(
    (state) => state.firestore.ordered["callToActions"],
    (callToActions) => callToActions
 );
 
-const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToAction, handleClickResendCallToAction}) => {
+const CallToActionList = ({
+   handleClickEditCallToAction,
+   handleClickDeleteCallToAction,
+   handleClickResendCallToAction,
+   isTestStream,
+                             handleClose,
+}) => {
    const streamRef = useStreamRef();
+   const { handleConfirmStep, isOpen, tutorialSteps } = useContext(TutorialContext);
    const { activateCallToAction, deactivateCallToAction } = useFirebase();
    const callToActions = useSelector((state) => callToActionSelector(state));
+   const [tutorialCtaId, setTutorialCtaId] = useState("");
+
    const query = useStreamQuery({
       storeAs: "callToActions",
       subcollections: [
@@ -30,15 +39,21 @@ const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToA
    });
    useFirestoreConnect(query);
 
+   useEffect(() => {
+      const targetTutorialCtaId =
+         callToActions?.find((cta) => cta.isForTutorial)?.id || "";
+      setTutorialCtaId(isOpen(22) ? targetTutorialCtaId : "");
+   }, [callToActions, Boolean(isOpen(22))]);
+
    if (!isLoaded(callToActions)) {
       return <CircularProgress />;
    }
 
    if (isEmpty(callToActions)) {
       return (
-      <Box p={2}>
-        <Typography>Add some call to actions</Typography>
-      </Box>
+         <Box p={2}>
+            <Typography>Add some call to actions</Typography>
+         </Box>
       );
    }
 
@@ -51,19 +66,23 @@ const CallToActionList = ({handleClickEditCallToAction, handleClickDeleteCallToA
    };
 
    return (
-     <React.Fragment>
-        {callToActions.map(callToAction => (
-          <CallToActionItem
-            key={callToAction.id}
-            callToAction={callToAction}
-            handleClickResendCallToAction={handleClickResendCallToAction}
-            handleClickEditCallToAction={handleClickEditCallToAction}
-            handleClickDeleteCallToAction={handleClickDeleteCallToAction}
-            handleToggleActive={handleToggleActive}
-          />
-        ))}
-     </React.Fragment>
-   )
+      <React.Fragment>
+         {callToActions.map((callToAction) => (
+            <CallToActionItem
+               key={callToAction.id}
+               tutorialCtaId={tutorialCtaId}
+               isTestStream={isTestStream}
+               callToAction={callToAction}
+               handleClose={handleClose}
+               setTutorialCtaId={setTutorialCtaId}
+               handleClickResendCallToAction={handleClickResendCallToAction}
+               handleClickEditCallToAction={handleClickEditCallToAction}
+               handleClickDeleteCallToAction={handleClickDeleteCallToAction}
+               handleToggleActive={handleToggleActive}
+            />
+         ))}
+      </React.Fragment>
+   );
 
    // return (
    //    <div style={{ flex: "1 1 auto" }}>
