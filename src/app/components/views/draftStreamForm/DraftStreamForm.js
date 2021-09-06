@@ -402,7 +402,7 @@ const DraftStreamForm = ({
                                     disabled={isSubmitting}
                                     error={Boolean(errors.title && touched.title && errors.title)}
                                     onChange={handleChange}/>
-                                <Collapse style={{color: "red"}} in={Boolean(errors.title && touched.title)}>
+                                <Collapse  style={{color: "red"}} in={Boolean(errors.title && touched.title)}>
                                     {errors.title}
                                 </Collapse>
                             </FormControl>

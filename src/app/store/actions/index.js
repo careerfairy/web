@@ -20,7 +20,8 @@ export {
 
 export {
     closeSnackbar, enqueueSnackbar, removeSnackbar, sendGeneralError, sendCustomError, enqueueBroadcastMessage,
-    enqueueCallToAction
+    enqueueCallToAction,
+  enqueueJobPostingCta
 } from './snackbarActions.js'
 export {
     deleteFilterGroup,

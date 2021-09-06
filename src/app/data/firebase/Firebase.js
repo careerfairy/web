@@ -566,16 +566,22 @@ class Firebase {
    resetTestStream = async (streamRef, testChats, testQuestions, testPolls) => {
       let batch = this.firestore.batch();
 
-      // reset hand raise and current speaker
-      batch.update(streamRef, {
-         handRaiseActive: false,
-         currentSpeakerId: streamRef.id,
-      });
+        // reset hand raise and current speaker and activeCallToActionIds
+        batch.update(streamRef, {
+            handRaiseActive: false,
+            currentSpeakerId: streamRef.id,
+            activeCallToActionIds: []
+        });
 
-      // Declare all the refs
-      let chatsRef = streamRef.collection("chatEntries");
-      let questionsRef = streamRef.collection("questions");
-      let pollsRef = streamRef.collection("polls");
+        // Declare all the refs
+        let chatsRef = streamRef
+            .collection("chatEntries");
+        let questionsRef = streamRef
+            .collection("questions");
+        let pollsRef = streamRef
+            .collection("polls");
+        let callToActionsRef = streamRef
+          .collection("callToActions");
 
       // Delete all existing docs
       const questionsDocs = await questionsRef.get();
@@ -594,13 +600,21 @@ class Firebase {
          });
       }
 
-      const pollsDocs = await pollsRef.get();
-      if (!pollsDocs.empty) {
-         pollsDocs.forEach((doc) => {
-            let docRef = doc.ref;
-            batch.delete(docRef);
-         });
-      }
+        const pollsDocs = await pollsRef.get()
+        if (!pollsDocs.empty) {
+            pollsDocs.forEach(doc => {
+                let docRef = doc.ref
+                batch.delete(docRef)
+            })
+        }
+
+        const callToActionDocs = await callToActionsRef.get()
+        if(!callToActionDocs.empty){
+            callToActionDocs.forEach(doc => {
+                let docRef = doc.ref
+                batch.delete(docRef)
+            })
+        }
 
       // Add in the new Docs
 
@@ -1457,24 +1471,22 @@ class Firebase {
    createCallToAction = async (streamRef, values) => {
       let callToActionRef = streamRef.collection("callToActions").doc();
 
-      const callToActionData = {
-         buttonText: values.buttonText,
-         buttonUrl: values.buttonUrl,
-         imageUrl: values.imageUrl || null,
-         type: values.type,
-         message: values.message,
-         created: this.getServerTimestamp(),
-         numberOfUsersWhoClickedLink: 0,
-         numberOfUsersWhoDismissed: 0,
-         updated: null,
-         sent: null,
-         stopped: null,
-         active: false,
-      };
-      const enhancedCallToActionData = this.addCtaExtraData(
-         callToActionData,
-         values
-      );
+        const callToActionData = {
+            buttonText: values.buttonText,
+            buttonUrl: values.buttonUrl,
+            imageUrl: values.imageUrl || null,
+            type: values.type,
+            message: values.message,
+            created: this.getServerTimestamp(),
+            numberOfUsersWhoClickedLink: 0,
+            numberOfUsersWhoDismissed: 0,
+            updated: null,
+            sent: null,
+            stopped: null,
+            active: false,
+            isForTutorial: values.isForTutorial,
+        }
+        const enhancedCallToActionData = this.addCtaExtraData(callToActionData, values)
 
       await callToActionRef.set(enhancedCallToActionData);
 

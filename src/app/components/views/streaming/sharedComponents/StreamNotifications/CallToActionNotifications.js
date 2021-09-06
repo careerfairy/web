@@ -8,6 +8,7 @@ import * as actions from "store/actions";
 import CallToActionSnackbar from "./CallToActionSnackbar";
 import { getCtaSnackBarProps } from "../../../../util/constants/callToActions";
 import { useCurrentStream } from "../../../../../context/stream/StreamContext";
+import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
 
 const CallToActionNotifications = ({
   isStreamer,
@@ -124,7 +125,7 @@ const CallToActionNotifications = ({
           isJobPosting,
         } = getCtaSnackBarProps(
           callToAction,
-          currentLivestream.backgroundImageUrl
+          getResizedUrl(currentLivestream.companyLogoUrl, "md")
         );
 
         dispatch(

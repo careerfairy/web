@@ -108,6 +108,7 @@ export const getCtaSnackBarProps = (callToAction, fallBackImage) => {
   return {
     buttonText,
     buttonUrl,
+    isForTutorial: Boolean(callToAction.isForTutorial),
     isJobPosting: type === "jobPosting",
     message,
     icon,

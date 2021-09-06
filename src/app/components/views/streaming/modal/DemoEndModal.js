@@ -20,8 +20,8 @@ import {GlassDialog} from "../../../../materialUI/GlobalModals";
 const pdfLink = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-documents%2FExampleReport.pdf?alt=media&token=bbec2b79-a30d-48f7-927f-bd0941ec5d73"
 const DemoEndModal = ({open, handleClose}) => {
 
-    const [activePage, setActivePage] = useState(0)
-    const [hasClickedDownload, setHasClickedDownload] = useState(false)
+    const [activePage, setActivePage] = useState(2)
+    const [hasClickedDownload, setHasClickedDownload] = useState(true)
     const [hasJoinedTalentPool, setHasJoinedTalentPool] = useState(false)
 
     const handleNext = () => {
