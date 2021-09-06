@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, {
+   useCallback,
+   useContext,
+   useEffect,
+   useRef,
+   useState,
+} from "react";
 import MicOffIcon from "@material-ui/icons/MicOff";
 import MicIcon from "@material-ui/icons/Mic";
 import DynamicFeedIcon from "@material-ui/icons/DynamicFeed";
@@ -25,6 +31,7 @@ import useStreamRef from "components/custom-hook/useStreamRef";
 import { CallToActionIcon, ShareIcon, SharePdfIcon } from "./Icons";
 import ShareMenu from "./ShareMenu";
 import CallToActionDrawer from "./CallToActionDrawer";
+import useSliderFullyOpened from "../../../../custom-hook/useSliderFullyOpened";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -88,7 +95,7 @@ function VideoControlsContainer({
    localMediaStream,
    setLocalMediaStream,
 }) {
-   const shareButtonRef = useRef()
+   const shareButtonRef = useRef();
    const streamRef = useStreamRef();
    const { tutorialSteps, setTutorialSteps } = useContext(TutorialContext);
    const theme = useTheme();
@@ -100,6 +107,7 @@ function VideoControlsContainer({
    const [isVideoInactive, setIsVideoInactive] = useState(false);
    const [shareMenuAnchorEl, setShareMenuAnchorEl] = useState(null);
    const [callToActionDrawerOpen, setCallToActionDrawerOpen] = useState(false);
+   const [fullyOpened, onEntered, onExited] = useSliderFullyOpened();
    const presentMode = mode === "presentation";
    const automaticMode = speakerSwitchMode === "automatic";
    const desktopMode = mode === "desktop";
@@ -111,8 +119,8 @@ function VideoControlsContainer({
    }, [tutorialSteps]);
 
    const handleOpenShare = (shareButtonRef) => {
-      setShareMenuAnchorEl(shareButtonRef.current)
-   }
+      setShareMenuAnchorEl(shareButtonRef.current);
+   };
 
    const handleClickShare = (event) => {
       setShareMenuAnchorEl(event.currentTarget);
@@ -237,7 +245,7 @@ function VideoControlsContainer({
          icon: <ScreenShareIcon color={desktopMode ? "primary" : "inherit"} />,
          name: desktopMode ? "Stop sharing screen" : "Share screen",
          onClick: () => handleClickScreenShareButton(),
-         id: "shareScreenAction"
+         id: "shareScreenAction",
       });
    }
 
@@ -255,13 +263,13 @@ function VideoControlsContainer({
                : "Share PDF presentation",
             onClick: () =>
                setLivestreamMode(presentMode ? "default" : "presentation"),
-              id: "sharePdfAction"
+            id: "sharePdfAction",
          },
          {
             icon: <CallToActionIcon />,
             name: "Send a call to action",
             onClick: () => handleOpenCallToActionDrawer(),
-              id: "sendCtaAction"
+            id: "sendCtaAction",
          }
       );
    }
@@ -279,8 +287,6 @@ function VideoControlsContainer({
       name: "Settings",
       onClick: () => setShowSettings(!showSettings),
    });
-
-
 
    return (
       <ClickAwayListener onClickAway={handleClose}>
@@ -309,13 +315,13 @@ function VideoControlsContainer({
                         onConfirm={() => {
                            handleOpen();
                            handleConfirm(16);
-                           handleOpenShare(shareButtonRef)
+                           handleOpenShare(shareButtonRef);
                         }}
                         buttonText="Ok"
                      />
                   </React.Fragment>
                }
-               open={isOpen(16)}
+               open={isOpen(16) && fullyOpened}
             >
                <SpeedDial
                   ariaLabel="interaction-selector"
@@ -324,26 +330,34 @@ function VideoControlsContainer({
                      onClick: handleToggle,
                      className: classes.dialButton,
                   }}
+                  TransitionProps={{
+                     onEntered,
+                     onExited
+                  }}
                   icon={<SpeedDialIcon />}
                   onFocus={handleOpen}
                   open
                >
                   {actions.map((action) => {
                      return (
-                           <SpeedDialAction
-                              key={action.name}
-                              ref={action.name === "Share" ? shareButtonRef: undefined}
-                              icon={action.icon}
-                              tooltipPlacement="left"
-                              tooltipTitle={action.name}
-                              classes={{ staticTooltipLabel: classes.tooltip }}
-                              tooltipOpen={Boolean(action.name.length)}
-                              FabProps={{
-                                 size: "large",
-                                 // classes: {root:  classes.actionButton},
-                              }}
-                              onClick={action.onClick}
-                           />
+                        <SpeedDialAction
+                           key={action.name}
+                           ref={
+                              action.name === "Share"
+                                 ? shareButtonRef
+                                 : undefined
+                           }
+                           icon={action.icon}
+                           tooltipPlacement="left"
+                           tooltipTitle={action.name}
+                           classes={{ staticTooltipLabel: classes.tooltip }}
+                           tooltipOpen={Boolean(action.name.length)}
+                           FabProps={{
+                              size: "large",
+                              // classes: {root:  classes.actionButton},
+                           }}
+                           onClick={action.onClick}
+                        />
                      );
                   })}
                </SpeedDial>

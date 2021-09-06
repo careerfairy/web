@@ -1,4 +1,4 @@
-import React, { memo, useContext, useEffect, useState } from "react";
+import React, { memo, useContext, useEffect, useMemo, useState } from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import {
@@ -66,6 +66,7 @@ const SettingsDropdown = ({
    handleClickEditCallToAction,
    handleClickDeleteCallToAction,
    handleClickResendCallToAction,
+  disabled,
 }) => {
    const [anchorEl, setAnchorEl] = useState(null);
 
@@ -90,8 +91,10 @@ const SettingsDropdown = ({
             onClose={handleClose}
          >
             <MenuItem
+              disabled={disabled}
                onClick={() => {
                   handleClickEditCallToAction(callToAction);
+                  handleClose()
                }}
             >
                <ListItemIcon>
@@ -100,8 +103,10 @@ const SettingsDropdown = ({
                <Typography variant="inherit">Edit</Typography>
             </MenuItem>
             <MenuItem
+              disabled={disabled}
                onClick={() => {
                   handleClickDeleteCallToAction(callToAction.id);
+                  handleClose()
                }}
             >
                <ListItemIcon>
@@ -110,8 +115,10 @@ const SettingsDropdown = ({
                <Typography variant="inherit">Delete</Typography>
             </MenuItem>
             <MenuItem
+              disabled={disabled}
                onClick={() => {
                   handleClickResendCallToAction(callToAction.id);
+                  handleClose()
                }}
             >
                <ListItemIcon>
@@ -147,6 +154,7 @@ const EngagementChart = memo(({ percentage, noOfEngagement, total }) => {
    );
 });
 const numberOfTicks = 20;
+let count = 0;
 export const CallToActionItem = React.memo((props) => {
    const {
       callToAction: {
@@ -172,7 +180,11 @@ export const CallToActionItem = React.memo((props) => {
    } = props;
 
    const { handleConfirmStep, isOpen } = useContext(TutorialContext);
-   const isTutorialCta = isOpen(21) && tutorialCtaId === id;
+   const isTutorialCta = useMemo(() => isOpen(22) && tutorialCtaId === id, [
+      tutorialCtaId,
+      id,
+      isOpen(22),
+   ]);
 
    const isJobPosting = type === "jobPosting";
 
@@ -193,12 +205,15 @@ export const CallToActionItem = React.memo((props) => {
    const [icon, setIcon] = useState(callToActionsDictionary.custom.icon);
 
    useEffect(() => {
-      if (numberOfUsersWhoClickedLink < 2 && isTutorialCta) {
-         let count = 0;
+      if (
+         numberOfUsersWhoClickedLink < 2 &&
+         isTutorialCta &&
+         count < numberOfTicks
+      ) {
          const interval = setInterval(() => {
             count = count + 1;
-            if (count === numberOfTicks) {
-               setTutorialCtaId("");
+            if (count >= numberOfTicks) {
+               clearInterval(interval);
             }
             simulateEngagement();
          }, 200);
@@ -253,11 +268,11 @@ export const CallToActionItem = React.memo((props) => {
    return (
       <StyledTooltipWithButton
          open={isTutorialCta}
-         tooltipTitle="Sharing (5/)"
+         tooltipTitle="Share Job Posts (8/8)"
          placement="right"
          onConfirm={() => {
-            handleClose()
-            handleConfirmStep(21);
+            handleClose();
+            handleConfirmStep(22);
          }}
          tooltipText="Here you can see and track how many users have interacted with you job posting."
       >
@@ -307,6 +322,7 @@ export const CallToActionItem = React.memo((props) => {
                   </div>
                   <div className={classes.headerActionsWrapper}>
                      <SettingsDropdown
+                       disabled={isTutorialCta}
                         handleClickEditCallToAction={
                            handleClickEditCallToAction
                         }
@@ -335,6 +351,7 @@ export const CallToActionItem = React.memo((props) => {
                   <Button
                      color="primary"
                      fullWidth
+                     disabled={isTutorialCta}
                      variant={active ? "contained" : "outlined"}
                      onClick={() => {
                         handleToggleActive(id, active);

@@ -1346,6 +1346,7 @@ class Firebase {
             sent: null,
             stopped: null,
             active: false,
+            isForTutorial: values.isForTutorial,
         }
         const enhancedCallToActionData = this.addCtaExtraData(callToActionData, values)
 

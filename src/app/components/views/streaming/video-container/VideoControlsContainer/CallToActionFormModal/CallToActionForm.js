@@ -30,6 +30,7 @@ import { enqueueJobPostingCta } from "store/actions";
 import { v4 as uuid } from "uuid";
 import { useAuth } from "../../../../../../HOCs/AuthProvider";
 import { jobDescription } from "./exampleFormData";
+import useSliderFullyOpened from "../../../../../custom-hook/useSliderFullyOpened";
 
 const MAX_BUTTON_TEXT_LENGTH = 45;
 const MAX_MESSAGE_LENGTH = 1000;
@@ -94,6 +95,8 @@ const CallToActionForm = memo(
       isJobPosting,
       isSocial,
    }) => {
+      const [fullyOpened, onEntered, onExited] = useSliderFullyOpened();
+
       const { handleConfirmStep, isOpen } = useContext(TutorialContext);
       const isActiveTutorialStep = isOpen(20, isTestStream);
 
@@ -175,7 +178,7 @@ const CallToActionForm = memo(
             await updateCallToAction(streamRef, values.id, values);
             return await activateCallToAction(streamRef, values.id);
          }
-         const callToActionId = await createCallToAction(streamRef, values);
+         const callToActionId = await createCallToAction(streamRef, { ...values, isForTutorial:  Boolean(isActiveTutorialStep)});
          if (isActiveTutorialStep) {
             const closeSnack = () =>
                dispatch(actions.closeSnackbar(callToActionId));
@@ -191,6 +194,7 @@ const CallToActionForm = memo(
                   window.open(values.buttonUrl, "_blank");
                }
             };
+
             dispatch(
                actions.enqueueJobPostingCta(
                   {
@@ -199,7 +203,7 @@ const CallToActionForm = memo(
                      isForTutorial: true,
                   },
                   handleClickCallToAction,
-                  handleDismissCallToAction
+                  handleDismissCallToAction,
                )
             );
          }
@@ -216,8 +220,8 @@ const CallToActionForm = memo(
       return (
          <React.Fragment>
             <StyledTooltipWithButton
-               open={isActiveTutorialStep}
-               tooltipTitle="Share Job Posts (4/5)"
+               open={isActiveTutorialStep && fullyOpened}
+               tooltipTitle="Share Job Posts (4/8)"
                buttonDisabled={formik.isSubmitting}
                placement="top"
                buttonText="Send Job Posting!"
@@ -344,7 +348,12 @@ const CallToActionForm = memo(
                         style={{ padding: !canChangeMessage && "0" }}
                         item
                      >
-                        <Collapse unmountOnExit in={canChangeMessage}>
+                        <Collapse
+                           onEntered={onEntered}
+                           onExited={onExited}
+                           unmountOnExit
+                           in={canChangeMessage}
+                        >
                            <TextField
                               fullWidth
                               variant="outlined"
@@ -479,7 +488,7 @@ const CallToActionForm = memo(
                      {initialValues.id ? "Update" : "Save"}
                   </Button>
                   <Button
-                     disabled={formik.isSubmitting || !isActiveTutorialStep}
+                     disabled={formik.isSubmitting}
                      onClick={async () => {
                         await formik.setFieldValue("isToBeSaved", false);
                         await formik.handleSubmit();

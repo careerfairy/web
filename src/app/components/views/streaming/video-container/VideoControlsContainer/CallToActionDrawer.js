@@ -17,6 +17,7 @@ import CallToActionList from "./CallToActionList";
 import { useFirebase } from "../../../../../context/firebase";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips";
+import useSliderFullyOpened from "../../../../custom-hook/useSliderFullyOpened";
 
 const useStyles = makeStyles((theme) => ({
    drawerContent: {
@@ -60,7 +61,7 @@ const Content = ({
    tutorialStepOpen,
    handleConfirmTutorialStep,
    fullScreen,
-                    isTestStream
+   isTestStream,
 }) => {
    const classes = useStyles();
    const streamRef = useStreamRef();
@@ -74,7 +75,7 @@ const Content = ({
       }
    }, [callToActionToEdit]);
 
-   const handleCloseCallToActionFormDialog = useCallback( () => {
+   const handleCloseCallToActionFormDialog = useCallback(() => {
       setCallToActionToEdit(null);
       setCallToActionModalOpen(false);
    }, []);
@@ -122,7 +123,7 @@ const Content = ({
                   <StyledTooltipWithButton
                      open={tutorialStepOpen}
                      buttonText="ok"
-                     tooltipTitle="Share Job Posts (2/5)"
+                     tooltipTitle="Share Job Posts (2/8)"
                      placement="right"
                      onConfirm={() => {
                         handleConfirmTutorialStep();
@@ -171,20 +172,37 @@ Content.propTypes = {
    fullScreen: PropTypes.bool,
 };
 
-const CallToActionDrawer = ({ open, onClose, isOpen, handleConfirm, isTestStream }) => {
+const CallToActionDrawer = ({
+   open,
+   onClose,
+   isOpen,
+   handleConfirm,
+   isTestStream,
+}) => {
    const theme = useTheme();
    const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
+
+   const [fullyOpened, onEntered, onExited] = useSliderFullyOpened();
 
    const handleClose = () => {
       onClose();
    };
+
    return (
-      <Drawer anchor="left" open={open || isOpen(18)} onClose={handleClose}>
+      <Drawer
+         SlideProps={{
+            onEntered,
+            onExited,
+         }}
+         anchor="left"
+         open={open || isOpen(18)}
+         onClose={handleClose}
+      >
          <Content
             fullScreen={fullScreen}
             isTestStream={isTestStream}
             handleConfirmTutorialStep={() => handleConfirm(18)}
-            tutorialStepOpen={isOpen(18)}
+            tutorialStepOpen={isOpen(18) && fullyOpened}
             handleClose={handleClose}
          />
       </Drawer>

@@ -52,7 +52,7 @@ function MyApp({ Component, pageProps }) {
    const [generalError, setGeneralError] = useState("");
 
    const initialTutorialState = {
-      0: false,
+      0: true,
       1: false,
       2: false,
       3: false,
@@ -68,7 +68,8 @@ function MyApp({ Component, pageProps }) {
       13: false,
       14: false,
       15: false,
-      16: true,
+      16: false,
+      // ^ start of video controls tutorial ^
       17: false,
       18: false,
       19: false,
@@ -82,8 +83,6 @@ function MyApp({ Component, pageProps }) {
 
    const [showBubbles, setShowBubbles] = useState(false);
    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState);
-   console.log("-> tutorialSteps", tutorialSteps);
-
 
    useEffect(() => {
       // Remove the server-side injected CSS.
@@ -114,6 +113,13 @@ function MyApp({ Component, pageProps }) {
       return Number(activeStep);
    };
 
+   const endTutorial = () => {
+      setTutorialSteps((prevState) => ({
+         ...prevState,
+         streamerReady: true,
+      }));
+   };
+
    const handleConfirmStep = (property) => {
       setTutorialSteps({
          ...tutorialSteps,
@@ -137,21 +143,22 @@ function MyApp({ Component, pageProps }) {
          </Head>
          <Provider store={store}>
             <ReactReduxFirebaseProvider {...rrfProps}>
-               <ThemeProviderWrapper>
-                  <AuthProvider>
-                     <FirebaseContext.Provider value={firebase}>
-                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                           <TutorialContext.Provider
-                              value={{
-                                 tutorialSteps,
-                                 setTutorialSteps,
-                                 showBubbles,
-                                 setShowBubbles,
-                                 getActiveTutorialStepKey,
-                                 handleConfirmStep,
-                                 isOpen,
-                              }}
-                           >
+               <TutorialContext.Provider
+                  value={{
+                     tutorialSteps,
+                     setTutorialSteps,
+                     showBubbles,
+                     setShowBubbles,
+                     getActiveTutorialStepKey,
+                     handleConfirmStep,
+                     isOpen,
+                     endTutorial,
+                  }}
+               >
+                  <ThemeProviderWrapper>
+                     <AuthProvider>
+                        <FirebaseContext.Provider value={firebase}>
+                           <MuiPickersUtilsProvider utils={DateFnsUtils}>
                               <ErrorContext.Provider
                                  value={{ generalError, setGeneralError }}
                               >
@@ -165,11 +172,11 @@ function MyApp({ Component, pageProps }) {
                                     errorMessage={generalError}
                                  />
                               </ErrorContext.Provider>
-                           </TutorialContext.Provider>
-                        </MuiPickersUtilsProvider>
-                     </FirebaseContext.Provider>
-                  </AuthProvider>
-               </ThemeProviderWrapper>
+                           </MuiPickersUtilsProvider>
+                        </FirebaseContext.Provider>
+                     </AuthProvider>
+                  </ThemeProviderWrapper>
+               </TutorialContext.Provider>
             </ReactReduxFirebaseProvider>
          </Provider>
       </Fragment>

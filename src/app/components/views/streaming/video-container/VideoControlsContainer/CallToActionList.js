@@ -23,7 +23,7 @@ const CallToActionList = ({
                              handleClose,
 }) => {
    const streamRef = useStreamRef();
-   const { handleConfirmStep, isOpen } = useContext(TutorialContext);
+   const { handleConfirmStep, isOpen, tutorialSteps } = useContext(TutorialContext);
    const { activateCallToAction, deactivateCallToAction } = useFirebase();
    const callToActions = useSelector((state) => callToActionSelector(state));
    const [tutorialCtaId, setTutorialCtaId] = useState("");
@@ -42,8 +42,8 @@ const CallToActionList = ({
    useEffect(() => {
       const targetTutorialCtaId =
          callToActions?.find((cta) => cta.isForTutorial)?.id || "";
-      setTutorialCtaId(isOpen(21) ? targetTutorialCtaId : "");
-   }, [callToActions, Boolean(isOpen(21))]);
+      setTutorialCtaId(isOpen(22) ? targetTutorialCtaId : "");
+   }, [callToActions, Boolean(isOpen(22))]);
 
    if (!isLoaded(callToActions)) {
       return <CircularProgress />;

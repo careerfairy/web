@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useCallback } from "react";
+import React, { useState, forwardRef, useCallback, useContext } from "react";
 import clsx from "clsx";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import { SnackbarContent } from "notistack";
@@ -18,6 +18,7 @@ import {
 } from "../../../../helperFunctions/HelperFunctions";
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips";
 import { useFirebase } from "../../../../../context/firebase";
+import TutorialContext from "../../../../../context/tutorials/TutorialContext";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -141,25 +142,31 @@ const CallToActionSnackbar = forwardRef(
       },
       ref
    ) => {
+      const { handleConfirmStep, isOpen } = useContext(TutorialContext);
       const classes = useStyles();
       const [expanded, setExpanded] = useState(false);
 
-      const [tutorialState, setTutorialState] = useState(isForTutorial ? "expand": "");
+      const [tutorialState, setTutorialState] = useState(
+         isForTutorial ? "expand" : ""
+      );
 
       const handleExpandClick = useCallback(() => {
-         if(tutorialState === "expand"){
-            handleSetTutorialStateToApply()
+         if (tutorialState === "expand") {
+            handleSetTutorialStateToApply();
          }
          setExpanded((oldExpanded) => !oldExpanded);
       }, [tutorialState]);
-      
+
       const handleClearSnackTutorialState = () => {
+         if (isForTutorial) {
+            handleConfirmStep(21)
+         }
          setTutorialState("");
-      }
+      };
 
       const handleSetTutorialStateToApply = () => {
-         setTutorialState("apply")
-      }
+         setTutorialState("apply");
+      };
 
       return (
          <SnackbarContent ref={ref} className={classes.root}>
@@ -180,7 +187,7 @@ const CallToActionSnackbar = forwardRef(
                      {isJobPosting && message ? (
                         <StyledTooltipWithButton
                            open={tutorialState === "expand"}
-                           tooltipTitle="Hint"
+                           tooltipTitle="Share Job Posts (6/8)"
                            placement="right"
                            buttonText="See job posting details"
                            onConfirm={() => {
@@ -218,8 +225,8 @@ const CallToActionSnackbar = forwardRef(
                            className={classes.close}
                            disabled={loading}
                            onClick={() => {
-                              handleClearSnackTutorialState()
-                              onDismiss()
+                              handleClearSnackTutorialState();
+                              onDismiss();
                            }}
                         >
                            <CloseIcon />
@@ -262,18 +269,21 @@ const CallToActionSnackbar = forwardRef(
                      <CardActions>
                         <StyledTooltipWithButton
                            open={tutorialState === "apply"}
-                           tooltipTitle="Hint"
+                           tooltipTitle="Share Job Posts (7/8)"
                            placement="right"
-                           buttonText="See job posting details"
+                           buttonText="Checkout"
                            onConfirm={() => {
                               handleClearSnackTutorialState();
                               onClick();
                            }}
-                           tooltipText="Click here to see the details of this particular job posting."
+                           tooltipText="Clicking apply will take your audience to the page of the job posting."
                         >
                            <Button
                               className={classes.mainButton}
-                              onClick={onClick}
+                              onClick={() => {
+                                 onClick()
+                                 handleClearSnackTutorialState()
+                              }}
                               disabled={loading}
                               size="small"
                               variant="contained"

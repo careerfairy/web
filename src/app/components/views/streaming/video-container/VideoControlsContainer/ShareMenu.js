@@ -9,6 +9,7 @@ import {
    Popover,
 } from "@material-ui/core";
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips";
+import useSliderFullyOpened from "../../../../custom-hook/useSliderFullyOpened";
 
 const useStyles = makeStyles((theme) => ({
    list: {
@@ -44,7 +45,7 @@ const ShareItem = ({
       <StyledTooltipWithButton
          open={isCtaTutorialButton}
          buttonText="ok"
-         tooltipTitle="Share Job Posts (1/5)"
+         tooltipTitle="Share Job Posts (1/8)"
          placement="left"
          onConfirm={handleConfirmTutorialStep}
          tooltipText="Click here to share your job posts or social media channels."
@@ -64,6 +65,8 @@ const ShareMenu = ({
    handleConfirm,
    handleOpenCallToActionDrawer,
 }) => {
+   const [fullyOpened, onEntered, onExited] = useSliderFullyOpened();
+
    const classes = useStyles();
    const open = Boolean(anchorEl);
 
@@ -71,10 +74,15 @@ const ShareMenu = ({
       <Popover
          open={open || isOpen(17)}
          anchorEl={anchorEl}
+
          onClose={isOpen(17) ? () => {} : onClose}
          anchorOrigin={{
             vertical: "center",
             horizontal: "left",
+         }}
+         TransitionProps={{
+            onEntered,
+            onExited
          }}
          transformOrigin={{
             vertical: "center",
@@ -84,7 +92,7 @@ const ShareMenu = ({
          <List dense className={classes.list}>
             {shareActions.map((action) => {
                const isCtaTutorialButton =
-                  isOpen(17) && action.id === "sendCtaAction";
+                  isOpen(17) && action.id === "sendCtaAction" && fullyOpened
                return (
                   <ShareItem
                      onClick={() => {
@@ -103,7 +111,7 @@ const ShareMenu = ({
                      name={action.name}
                      icon={action.icon}
                      listIconWrapperClassName={classes.listIconWrapper}
-                     disabled={!isCtaTutorialButton}
+                     disabled={  isOpen(17) &&!isCtaTutorialButton}
                   />
                );
             })}
