@@ -53,8 +53,8 @@ const StreamDurationSelect = (props) => {
             label={label}
             native={mobile}
             onChange={(event, secondArg) => {
-               const value = event.target.value
-               setFieldValue("duration", Number(value))
+               const value = event.target.value;
+               setFieldValue("duration", Number(value));
             }}
             value={Number(value || 60)}
          >

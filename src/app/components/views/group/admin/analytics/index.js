@@ -177,7 +177,6 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
    const [streamsMounted, setStreamsMounted] = useState(false);
    const [groups, setGroups] = useState([]);
 
-
    const query = useMemo(
       () => [
          {
@@ -200,7 +199,9 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
       (state) => state.analyticsReducer.streams.fromTimeframeAndFuture
    );
 
-   const hiddenStreamIds = useSelector((state) => state.analyticsReducer.hiddenStreamIds)
+   const hiddenStreamIds = useSelector(
+      (state) => state.analyticsReducer.hiddenStreamIds
+   );
    const allGroups = useSelector((state) => state.firestore.ordered?.allGroups);
    const allGroupsDictionary = useSelector(
       (state) => state.firestore.data?.allGroups
@@ -222,9 +223,9 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
 
    useEffect(() => {
       return () => {
-         dispatch(actions.clearHiddenStreamIds())
-      }
-   },[])
+         dispatch(actions.clearHiddenStreamIds());
+      };
+   }, []);
 
    useEffect(() => {
       return () => setStreamsMounted(false);
@@ -253,17 +254,17 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
 
          if (!areEqual) {
             const newGroups = newGroupIds
-            .filter(groupId => {
-               return Object.keys(allGroupsDictionary).includes(groupId)
-            })
-            .map(groupId => {
-               const group = allGroupsDictionary[groupId];
-               return {
-                  ...group,
-                  id: group.groupId,
-                  options: GroupsUtil.handleFlattenOptions(group),
-               };
-            });
+               .filter((groupId) => {
+                  return Object.keys(allGroupsDictionary).includes(groupId);
+               })
+               .map((groupId) => {
+                  const group = allGroupsDictionary[groupId];
+                  return {
+                     ...group,
+                     id: group.groupId,
+                     options: GroupsUtil.handleFlattenOptions(group),
+                  };
+               });
             setGroups(newGroups);
          }
       }
@@ -302,14 +303,12 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
    }, []);
 
    const handleSetUserdataSet = async () => {
-      dispatch(actions.setUserDataSet(firebase.getUsersByEmail))
+      dispatch(actions.setUserDataSet(firebase.getUsersByEmail));
    };
 
    const handleFilterUserdataSet = async (hiddenStreamIds) => {
-      dispatch(actions.setFilteredUserDataSet(hiddenStreamIds))
+      dispatch(actions.setFilteredUserDataSet(hiddenStreamIds));
    };
-
-
 
    useEffect(() => {
       if (currentUserDataSet.dataSet === "followers" && !userData?.isAdmin) {
@@ -458,7 +457,6 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
 
    const clearHiddenStreams = () => dispatch(actions.clearHiddenStreamIds());
 
-
    const handleCloseStreamFilterModal = () => {
       setStreamFilterModalOpen(false);
    };
@@ -533,13 +531,15 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
 
    useEffect(() => {
       if (
-        streamsMounted &&
-        !uniStudents &&
-        (!userDataSetDictionary || !userDataSet)
+         streamsMounted &&
+         !uniStudents &&
+         (!userDataSetDictionary || !userDataSet)
       ) {
          (async function getTotalEngagedUsers() {
             try {
-               await handleSetUserdataSet(nonFilteredStreamsFromTimeFrameAndFuture);
+               await handleSetUserdataSet(
+                  nonFilteredStreamsFromTimeFrameAndFuture
+               );
             } catch (e) {
                console.log("-> e in getting followers", e);
             }
@@ -556,10 +556,14 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
             console.log("-> e in setting filtered followers", e);
          }
       })();
-   }, [hiddenStreamIds, nonFilteredStreamsFromTimeFrameAndFuture, userDataSetDictionary]);
+   }, [
+      hiddenStreamIds,
+      nonFilteredStreamsFromTimeFrameAndFuture,
+      userDataSetDictionary,
+   ]);
 
    const selectVisibleStreams = (arrayOfNewVisibleStreamIds) => {
-   dispatch(actions.selectVisibleStreams(arrayOfNewVisibleStreamIds))
+      dispatch(actions.selectVisibleStreams(arrayOfNewVisibleStreamIds));
    };
 
    const getTabProps = (tabName) => ({

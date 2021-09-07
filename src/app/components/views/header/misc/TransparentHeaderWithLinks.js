@@ -75,65 +75,65 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const TransparentHeaderWithLinks = ({ className, ...rest }) => {
-  const theme = useTheme();
-  const classes = useStyles({
-    navLinksColor: theme.palette.common.white,
-  });
+   const theme = useTheme();
+   const classes = useStyles({
+      navLinksColor: theme.palette.common.white,
+   });
 
-  const { mainLinks } = useGeneralLinks();
-  const dispatch = useDispatch();
-  const handleDrawerOpen = () => dispatch(actions.openNavDrawer());
-  const { authenticatedUser } = useAuth();
+   const { mainLinks } = useGeneralLinks();
+   const dispatch = useDispatch();
+   const handleDrawerOpen = () => dispatch(actions.openNavDrawer());
+   const { authenticatedUser } = useAuth();
 
-  return (
-    <GeneralHeader >
-      <MainLogo />
-      <Hidden smDown>
-        <Tabs value={false} classes={{ indicator: classes.indicator }}>
-          {mainLinks.map((item) => {
-            return (
-              <Tab
-                key={item.title}
-                className={classes.navLinks}
-                label={item.title}
-                href={item.href}
-              />
-            );
-          })}
-        </Tabs>
-      </Hidden>
-      <Box>
-        <Hidden mdDown>
-          {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
-            <LoginButton />
-          ) : (
-            <IconButton
-              component={Link}
-              className={classes.navIconButton}
-              color="primary"
-              href="/profile"
-            >
-              <AccountCircleOutlinedIcon />
-            </IconButton>
-          )}
-        </Hidden>
-        <Hidden lgUp>
-          <IconButton color="primary" onClick={handleDrawerOpen}>
-            <MenuIcon />
-          </IconButton>
-        </Hidden>
-      </Box>
-    </GeneralHeader>
-  );
+   return (
+      <GeneralHeader>
+         <MainLogo />
+         <Hidden smDown>
+            <Tabs value={false} classes={{ indicator: classes.indicator }}>
+               {mainLinks.map((item) => {
+                  return (
+                     <Tab
+                        key={item.title}
+                        className={classes.navLinks}
+                        label={item.title}
+                        href={item.href}
+                     />
+                  );
+               })}
+            </Tabs>
+         </Hidden>
+         <Box>
+            <Hidden mdDown>
+               {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
+                  <LoginButton />
+               ) : (
+                  <IconButton
+                     component={Link}
+                     className={classes.navIconButton}
+                     color="primary"
+                     href="/profile"
+                  >
+                     <AccountCircleOutlinedIcon />
+                  </IconButton>
+               )}
+            </Hidden>
+            <Hidden lgUp>
+               <IconButton color="primary" onClick={handleDrawerOpen}>
+                  <MenuIcon />
+               </IconButton>
+            </Hidden>
+         </Box>
+      </GeneralHeader>
+   );
 };
 
 TransparentHeaderWithLinks.propTypes = {
-  className: PropTypes.string,
-  links: PropTypes.array,
-  onMobileNavOpen: PropTypes.func,
+   className: PropTypes.string,
+   links: PropTypes.array,
+   onMobileNavOpen: PropTypes.func,
 };
 
 TransparentHeaderWithLinks.defaultProps = {
-  links: [],
+   links: [],
 };
 export default TransparentHeaderWithLinks;

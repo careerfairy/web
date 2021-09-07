@@ -47,10 +47,12 @@ const JoinGroup = (props) => {
             <title key="title">CareerFairy | Join Groups</title>
          </Head>
          <GeneralLayout>
-            <Container style={{
-               marginTop: "2rem",
-               minHeight: "60vh"
-            }}>
+            <Container
+               style={{
+                  marginTop: "2rem",
+                  minHeight: "60vh",
+               }}
+            >
                <Groups userData={userData} groups={groups} />
             </Container>
          </GeneralLayout>

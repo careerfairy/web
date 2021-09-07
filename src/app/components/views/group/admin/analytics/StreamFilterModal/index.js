@@ -90,7 +90,7 @@ const StreamFilterModal = ({
    hiddenStreamIds,
    timeFrameName,
    selectVisibleStreams,
-  clearHiddenStreams
+   clearHiddenStreams,
 }) => {
    const classes = useStyles();
 

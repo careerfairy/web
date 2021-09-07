@@ -1,104 +1,112 @@
-import React, {useMemo} from "react";
-import {Container, Grid} from "@material-ui/core";
+import React, { useMemo } from "react";
+import { Container, Grid } from "@material-ui/core";
 
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 import UsersTable from "./UsersTable";
-import {getUniqueUsersByEmailWithArrayOfUsers} from "../../../../../../data/util/AnalyticsUtil";
+import { getUniqueUsersByEmailWithArrayOfUsers } from "../../../../../../data/util/AnalyticsUtil";
 
-
-const useStyles = makeStyles(theme => ({
-    root: {
-        backgroundColor: theme.palette.background.dark,
-        minHeight: "100%",
-        paddingBottom: theme.spacing(3),
-        paddingTop: theme.spacing(3),
-        width: "100%"
-    }
-}))
+const useStyles = makeStyles((theme) => ({
+   root: {
+      backgroundColor: theme.palette.background.dark,
+      minHeight: "100%",
+      paddingBottom: theme.spacing(3),
+      paddingTop: theme.spacing(3),
+      width: "100%",
+   },
+}));
 const Audience = ({
-                      group,
-                      globalTimeFrame,
-                      futureStreams,
-                      loading,
-                      isFollowers,
-                      userType,
-                      setUserType,
-                      limitedUserTypes,
-                      streamsFromTimeFrame,
-                      currentUserDataSet,
-                      handleReset,
-                      streamsFromTimeFrameAndFuture,
-                      groupOptions,
-                      handleToggleBar,
-                      breakdownRef,
-                      setCurrentStream,
-                      handleScrollToBreakdown,
-                      currentStream,
-                      showBar
-                  }) => {
-    const classes = useStyles()
-    const getUsers = () => {
-        if (currentStream) {
-            const updatedStream = streamsFromTimeFrameAndFuture.find(stream => stream.id === currentStream.id)
-            return updatedStream?.[userType.propertyDataName] || currentStream[userType.propertyDataName]
-        } else {
-            const totalViewers = streamsFromTimeFrameAndFuture.reduce(
-                (accumulator, livestream) => {
-                    return livestream?.[userType.propertyDataName] ? accumulator.concat(livestream[userType.propertyDataName]) : accumulator
-                },
-                []
-            );
-            return getUniqueUsersByEmailWithArrayOfUsers(totalViewers)
-        }
-    };
-    const totalUniqueUsers = useMemo(() => getUsers(), [
-        streamsFromTimeFrameAndFuture, currentStream, userType
-    ]);
-    // console.log("-> streamsFromTimeFrameAndFuture", streamsFromTimeFrameAndFuture);
-    // console.log("-> totalUniqueUsers", totalUniqueUsers);
+   group,
+   globalTimeFrame,
+   futureStreams,
+   loading,
+   isFollowers,
+   userType,
+   setUserType,
+   limitedUserTypes,
+   streamsFromTimeFrame,
+   currentUserDataSet,
+   handleReset,
+   streamsFromTimeFrameAndFuture,
+   groupOptions,
+   handleToggleBar,
+   breakdownRef,
+   setCurrentStream,
+   handleScrollToBreakdown,
+   currentStream,
+   showBar,
+}) => {
+   const classes = useStyles();
+   const getUsers = () => {
+      if (currentStream) {
+         const updatedStream = streamsFromTimeFrameAndFuture.find(
+            (stream) => stream.id === currentStream.id
+         );
+         return (
+            updatedStream?.[userType.propertyDataName] ||
+            currentStream[userType.propertyDataName]
+         );
+      } else {
+         const totalViewers = streamsFromTimeFrameAndFuture.reduce(
+            (accumulator, livestream) => {
+               return livestream?.[userType.propertyDataName]
+                  ? accumulator.concat(livestream[userType.propertyDataName])
+                  : accumulator;
+            },
+            []
+         );
+         return getUniqueUsersByEmailWithArrayOfUsers(totalViewers);
+      }
+   };
+   const totalUniqueUsers = useMemo(() => getUsers(), [
+      streamsFromTimeFrameAndFuture,
+      currentStream,
+      userType,
+   ]);
+   // console.log("-> streamsFromTimeFrameAndFuture", streamsFromTimeFrameAndFuture);
+   // console.log("-> totalUniqueUsers", totalUniqueUsers);
 
-
-    return (
-        <Container className={classes.root} maxWidth={false}>
-            <Grid container spacing={3}>
-                <Grid item lg={12} md={12} xl={12} xs={12}>
-                    <LatestEvents
-                        timeFrames={globalTimeFrame.timeFrames}
-                        setCurrentStream={setCurrentStream}
-                        futureStreams={futureStreams}
-                        fetchingStreams={loading}
-                        streamsFromTimeFrame={streamsFromTimeFrame}
-                        userType={userType}
-                        userTypes={limitedUserTypes}
-                        currentStream={currentStream}
-                        handleToggleBar={handleToggleBar}
-                        showBar={showBar}
-                        handleScrollToBreakdown={handleScrollToBreakdown}
-                        setUserType={setUserType}
-                        group={group}
-                    />
-                </Grid>
-                <Grid item lg={12} md={12} xl={12} xs={12}>
-                    <UsersTable
-                        totalUniqueUsers={totalUniqueUsers}
-                        currentStream={currentStream}
-                        fetchingStreams={loading}
-                        userTypes={limitedUserTypes}
-                        handleReset={handleReset}
-                        currentUserDataSet={currentUserDataSet}
-                        setUserType={setUserType}
-                        groupOptions={groupOptions}
-                        isFollowers={isFollowers}
-                        breakdownRef={breakdownRef}
-                        futureStreams={futureStreams}
-                        streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}
-                        userType={userType}
-                        group={group}/>
-                </Grid>
+   return (
+      <Container className={classes.root} maxWidth={false}>
+         <Grid container spacing={3}>
+            <Grid item lg={12} md={12} xl={12} xs={12}>
+               <LatestEvents
+                  timeFrames={globalTimeFrame.timeFrames}
+                  setCurrentStream={setCurrentStream}
+                  futureStreams={futureStreams}
+                  fetchingStreams={loading}
+                  streamsFromTimeFrame={streamsFromTimeFrame}
+                  userType={userType}
+                  userTypes={limitedUserTypes}
+                  currentStream={currentStream}
+                  handleToggleBar={handleToggleBar}
+                  showBar={showBar}
+                  handleScrollToBreakdown={handleScrollToBreakdown}
+                  setUserType={setUserType}
+                  group={group}
+               />
             </Grid>
-        </Container>
-    );
+            <Grid item lg={12} md={12} xl={12} xs={12}>
+               <UsersTable
+                  totalUniqueUsers={totalUniqueUsers}
+                  currentStream={currentStream}
+                  fetchingStreams={loading}
+                  userTypes={limitedUserTypes}
+                  handleReset={handleReset}
+                  currentUserDataSet={currentUserDataSet}
+                  setUserType={setUserType}
+                  groupOptions={groupOptions}
+                  isFollowers={isFollowers}
+                  breakdownRef={breakdownRef}
+                  futureStreams={futureStreams}
+                  streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}
+                  userType={userType}
+                  group={group}
+               />
+            </Grid>
+         </Grid>
+      </Container>
+   );
 };
 
 export default Audience;

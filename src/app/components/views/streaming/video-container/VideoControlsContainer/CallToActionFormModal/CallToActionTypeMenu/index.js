@@ -5,7 +5,10 @@ import { DialogContent, Grid, useMediaQuery } from "@material-ui/core";
 
 import Tabs from "@material-ui/core/Tabs";
 import CallToActionTypeButton from "./CallToActionTypeButton";
-import { callToActionsArray, callToActionsDictionary } from "../../../../../../util/constants/callToActions";
+import {
+   callToActionsArray,
+   callToActionsDictionary,
+} from "../../../../../../util/constants/callToActions";
 
 const useStyles = makeStyles((theme) => ({
    gridContainer: {},
@@ -17,10 +20,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const CallToActionTypeMenu = ({
-   initialValues,
-   handleSetCallToActionType,
-}) => {
+const CallToActionTypeMenu = ({ initialValues, handleSetCallToActionType }) => {
    const {
       palette: { grey, primary },
       breakpoints,
@@ -46,7 +46,10 @@ const CallToActionTypeMenu = ({
                         <CallToActionTypeButton
                            data={ctaType}
                            mobile={true}
-                           isJobPosting={ctaType.type === callToActionsDictionary.jobPosting.type}
+                           isJobPosting={
+                              ctaType.type ===
+                              callToActionsDictionary.jobPosting.type
+                           }
                            active={initialValues.type === ctaType.type}
                            handleSetCallToActionType={handleSetCallToActionType}
                            color={
@@ -73,7 +76,10 @@ const CallToActionTypeMenu = ({
                   {callToActionsArray.map((ctaType) => (
                      <CallToActionTypeButton
                         key={ctaType.type}
-                        isJobPosting={ctaType.type === callToActionsDictionary.jobPosting.type}
+                        isJobPosting={
+                           ctaType.type ===
+                           callToActionsDictionary.jobPosting.type
+                        }
                         data={ctaType}
                         handleSetCallToActionType={handleSetCallToActionType}
                         color={getColor(ctaType.color)}

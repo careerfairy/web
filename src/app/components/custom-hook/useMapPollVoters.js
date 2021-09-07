@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from "react";
 
 /**
  * The callback function that is used to set the chart data for the graph
@@ -16,62 +16,73 @@ import React, {useEffect} from 'react';
  * @param {object} [streamRef] - Direct firestore reference of the stream, ref will be used instead of livestreamId if provided
  */
 const useMapPollVoters = (
-    pollId,
-    livestreamId,
-    setChartData,
-    firebase,
-    demoVotes,
-    streamRef
+   pollId,
+   livestreamId,
+   setChartData,
+   firebase,
+   demoVotes,
+   streamRef
 ) => {
-
-    useEffect(() => {
-
-        // listen to option data
-        if (pollId && streamRef && !demoVotes) {
-            const unsubscribe = firebase.listenToPollVotersWithStreamRef(streamRef, pollId, querySnapshot => {
-                setQuerySnapShotData(querySnapshot)
-            })
-            return () => unsubscribe()
-        } else if (pollId && livestreamId && !demoVotes) {
-            const unsubscribe = firebase.listenToPollVoters(livestreamId, pollId, querySnapshot => {
-                setQuerySnapShotData(querySnapshot)
-            })
-            return () => unsubscribe()
-        }
-    }, [pollId, livestreamId, demoVotes])
-
-    useEffect(() => {
-        if (demoVotes) {
-            setChartData(prevState => {
-                const newData = prevState.ids.map(optionId => {
-                    return demoVotes.filter(vote => vote?.optionId === optionId).length
-                })
-                return {
-                    ...prevState,
-                    datasets: prevState.datasets.map(dataset => ({
-                        ...dataset,
-                        data: newData
-                    }))
-                }
-            })
-        }
-    }, [demoVotes])
-
-    const setQuerySnapShotData = (querySnapshot) => {
-        const totalVotes = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
-        setChartData(prevState => {
-            const newData = prevState.ids.map(optionId => {
-                return totalVotes.filter(vote => vote?.optionId === optionId).length
-            })
-            return {
-                ...prevState,
-                datasets: prevState.datasets.map(dataset => ({
-                    ...dataset,
-                    data: newData
-                }))
+   useEffect(() => {
+      // listen to option data
+      if (pollId && streamRef && !demoVotes) {
+         const unsubscribe = firebase.listenToPollVotersWithStreamRef(
+            streamRef,
+            pollId,
+            (querySnapshot) => {
+               setQuerySnapShotData(querySnapshot);
             }
-        })
-    }
+         );
+         return () => unsubscribe();
+      } else if (pollId && livestreamId && !demoVotes) {
+         const unsubscribe = firebase.listenToPollVoters(
+            livestreamId,
+            pollId,
+            (querySnapshot) => {
+               setQuerySnapShotData(querySnapshot);
+            }
+         );
+         return () => unsubscribe();
+      }
+   }, [pollId, livestreamId, demoVotes]);
+
+   useEffect(() => {
+      if (demoVotes) {
+         setChartData((prevState) => {
+            const newData = prevState.ids.map((optionId) => {
+               return demoVotes.filter((vote) => vote?.optionId === optionId)
+                  .length;
+            });
+            return {
+               ...prevState,
+               datasets: prevState.datasets.map((dataset) => ({
+                  ...dataset,
+                  data: newData,
+               })),
+            };
+         });
+      }
+   }, [demoVotes]);
+
+   const setQuerySnapShotData = (querySnapshot) => {
+      const totalVotes = querySnapshot.docs.map((doc) => ({
+         id: doc.id,
+         ...doc.data(),
+      }));
+      setChartData((prevState) => {
+         const newData = prevState.ids.map((optionId) => {
+            return totalVotes.filter((vote) => vote?.optionId === optionId)
+               .length;
+         });
+         return {
+            ...prevState,
+            datasets: prevState.datasets.map((dataset) => ({
+               ...dataset,
+               data: newData,
+            })),
+         };
+      });
+   };
 };
 
 export default useMapPollVoters;

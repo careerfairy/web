@@ -29,60 +29,57 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const BenefitsSection = (props) => {
-    const classes = useStyles();
+   const classes = useStyles();
 
-    return (
-        <Section
-            big={props.big}
-            color={props.color}
-            backgroundImageClassName={props.backgroundImageClassName}
-            backgroundImage={props.backgroundImage}
-            backgroundImageOpacity={props.backgroundImageOpacity}
-            backgroundColor={props.backgroundColor}
-        >
-            <SectionContainer>
-                <SectionHeader
-                    color={props.color}
-                    // titleClassName={classes.title}
-                    subTitleClassName={classes.subTitle}
-                    title={props.title}
-                    subtitle={props.subtitle}
-                />
-                <Grid
-                  justifyContent="space-around"
-                    container
-                    spacing={5}
-                    className={classes.benefitsWrapper}
-                >
-                    {props.benefits.map(({name, imageUrl, description}, index) => (
-                        <Grid item xs={12} sm={6} md={3} key={name}>
-                            <MuiGridFade
-                              index={index}
-                              up
-                            >
-                                <BenefitCard
-                                    name={name}
-                                    imageUrl={imageUrl}
-                                    description={description}
-                                />
-                            </MuiGridFade>
-                        </Grid>
-                    ))}
-                </Grid>
-            </SectionContainer>
-        </Section>
-    );
+   return (
+      <Section
+         big={props.big}
+         color={props.color}
+         backgroundImageClassName={props.backgroundImageClassName}
+         backgroundImage={props.backgroundImage}
+         backgroundImageOpacity={props.backgroundImageOpacity}
+         backgroundColor={props.backgroundColor}
+      >
+         <SectionContainer>
+            <SectionHeader
+               color={props.color}
+               // titleClassName={classes.title}
+               subTitleClassName={classes.subTitle}
+               title={props.title}
+               subtitle={props.subtitle}
+            />
+            <Grid
+               justifyContent="space-around"
+               container
+               spacing={5}
+               className={classes.benefitsWrapper}
+            >
+               {props.benefits.map(({ name, imageUrl, description }, index) => (
+                  <Grid item xs={12} sm={6} md={3} key={name}>
+                     <MuiGridFade index={index} up>
+                        <BenefitCard
+                           name={name}
+                           imageUrl={imageUrl}
+                           description={description}
+                        />
+                     </MuiGridFade>
+                  </Grid>
+               ))}
+            </Grid>
+         </SectionContainer>
+      </Section>
+   );
 };
 
 export default BenefitsSection;
 
 BenefitsSection.propTypes = {
-    backgroundColor: PropTypes.any,
-    backgroundImage: PropTypes.any,
-    backgroundImageClassName: PropTypes.any,
-    backgroundImageOpacity: PropTypes.any,
-    big: PropTypes.any,
-    color: PropTypes.any,
-    subtitle: PropTypes.any,
-    title: PropTypes.any,
+   backgroundColor: PropTypes.any,
+   backgroundImage: PropTypes.any,
+   backgroundImageClassName: PropTypes.any,
+   backgroundImageOpacity: PropTypes.any,
+   big: PropTypes.any,
+   color: PropTypes.any,
+   subtitle: PropTypes.any,
+   title: PropTypes.any,
 };

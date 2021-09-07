@@ -166,9 +166,11 @@ function WishFactoryPlay(props) {
             <title key="title">CareerFairy | Wishlist</title>
          </Head>
          <GeneralLayout>
-            <Container style={{
-              minHeight: "60vh"
-            }}>
+            <Container
+               style={{
+                  minHeight: "60vh",
+               }}
+            >
                <Typography
                   textAlign="center"
                   variant="h1"

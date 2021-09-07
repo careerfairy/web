@@ -87,7 +87,7 @@ const useStyles = makeStyles((theme) => ({
       },
       padding: theme.spacing(1.5),
       boxShadow: theme.shadows[2],
-      marginTop:theme.spacing(2)
+      marginTop: theme.spacing(2),
    },
 }));
 

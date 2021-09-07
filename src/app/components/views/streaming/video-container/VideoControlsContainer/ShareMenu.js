@@ -74,7 +74,6 @@ const ShareMenu = ({
       <Popover
          open={open || isOpen(17)}
          anchorEl={anchorEl}
-
          onClose={isOpen(17) ? () => {} : onClose}
          anchorOrigin={{
             vertical: "center",
@@ -82,7 +81,7 @@ const ShareMenu = ({
          }}
          TransitionProps={{
             onEntered,
-            onExited
+            onExited,
          }}
          transformOrigin={{
             vertical: "center",
@@ -92,7 +91,7 @@ const ShareMenu = ({
          <List dense className={classes.list}>
             {shareActions.map((action) => {
                const isCtaTutorialButton =
-                  isOpen(17) && action.id === "sendCtaAction" && fullyOpened
+                  isOpen(17) && action.id === "sendCtaAction" && fullyOpened;
                return (
                   <ShareItem
                      onClick={() => {
@@ -111,7 +110,7 @@ const ShareMenu = ({
                      name={action.name}
                      icon={action.icon}
                      listIconWrapperClassName={classes.listIconWrapper}
-                     disabled={  isOpen(17) &&!isCtaTutorialButton}
+                     disabled={isOpen(17) && !isCtaTutorialButton}
                   />
                );
             })}

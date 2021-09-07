@@ -1,86 +1,137 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {useRouter} from "next/router";
-import {useFirebase} from "context/firebase";
-import {useAuth} from "../../HOCs/AuthProvider";
-import {useCurrentStream} from "../../context/stream/StreamContext";
-import {useDispatch} from "react-redux";
-import * as actions from '../../store/actions'
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/router";
+import { useFirebase } from "context/firebase";
+import { useAuth } from "../../HOCs/AuthProvider";
+import { useCurrentStream } from "../../context/stream/StreamContext";
+import { useDispatch } from "react-redux";
+import * as actions from "../../store/actions";
 
 const useJoinTalentPool = () => {
-    const {query: {livestreamId}, push, asPath} = useRouter()
-    const {userData} = useAuth()
-    const dispatch = useDispatch()
-    const {
-        listenToUserInTalentPool,
-        getLivestreamCompanyId,
-        joinCompanyTalentPool,
-        leaveCompanyTalentPool
-    } = useFirebase()
-    const {isBreakout, currentLivestream} = useCurrentStream()
-    const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
-    const [loading, setLoading] = useState(false);
+   const {
+      query: { livestreamId },
+      push,
+      asPath,
+   } = useRouter();
+   const { userData } = useAuth();
+   const dispatch = useDispatch();
+   const {
+      listenToUserInTalentPool,
+      getLivestreamCompanyId,
+      joinCompanyTalentPool,
+      leaveCompanyTalentPool,
+   } = useFirebase();
+   const { isBreakout, currentLivestream } = useCurrentStream();
+   const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
+   const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (!isBreakout) {
-            if (userData?.talentPools && currentLivestream && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
-                setUserIsInTalentPool(true);
-            } else {
-                setUserIsInTalentPool(false);
+   useEffect(() => {
+      if (!isBreakout) {
+         if (
+            userData?.talentPools &&
+            currentLivestream &&
+            userData.talentPools.indexOf(currentLivestream.companyId) > -1
+         ) {
+            setUserIsInTalentPool(true);
+         } else {
+            setUserIsInTalentPool(false);
+         }
+      } else if (livestreamId && userData?.userEmail) {
+         const unsubscribe = listenToUserInTalentPool(
+            livestreamId,
+            userData.userEmail,
+            (querySnapshot) => {
+               setUserIsInTalentPool(querySnapshot.exists);
             }
-        } else if (livestreamId && userData?.userEmail) {
-            const unsubscribe = listenToUserInTalentPool(livestreamId, userData.userEmail, querySnapshot => {
-                setUserIsInTalentPool(querySnapshot.exists)
-            })
-            return () => unsubscribe()
-        } else {
-            setUserIsInTalentPool(false)
-        }
-    }, [livestreamId, userData?.userEmail, userData, isBreakout, userData?.talentPools, currentLivestream?.companyId])
+         );
+         return () => unsubscribe();
+      } else {
+         setUserIsInTalentPool(false);
+      }
+   }, [
+      livestreamId,
+      userData?.userEmail,
+      userData,
+      isBreakout,
+      userData?.talentPools,
+      currentLivestream?.companyId,
+   ]);
 
-    const handlers = useMemo(() => ({
-        joinTalentPool: async () => {
+   const handlers = useMemo(
+      () => ({
+         joinTalentPool: async () => {
             try {
-                if (!userData) {
-                    return push({query: {absolutePath: asPath}, pathname: "/login"});
-                }
-                setLoading(true)
-                const companyId = await getCompanyId(isBreakout, livestreamId, currentLivestream)
-                await joinCompanyTalentPool(companyId, userData.userEmail, livestreamId);
+               if (!userData) {
+                  return push({
+                     query: { absolutePath: asPath },
+                     pathname: "/login",
+                  });
+               }
+               setLoading(true);
+               const companyId = await getCompanyId(
+                  isBreakout,
+                  livestreamId,
+                  currentLivestream
+               );
+               await joinCompanyTalentPool(
+                  companyId,
+                  userData.userEmail,
+                  livestreamId
+               );
             } catch (e) {
-                dispatch(actions.sendGeneralError(e))
+               dispatch(actions.sendGeneralError(e));
             }
-            setLoading(false)
-
-        },
-        leaveTalentPool: async () => {
+            setLoading(false);
+         },
+         leaveTalentPool: async () => {
             try {
-                if (!userData) {
-                    return push({query: {absolutePath: asPath}, pathname: "/login"});
-                }
-                setLoading(true)
-                const companyId = await getCompanyId(isBreakout, livestreamId, currentLivestream)
+               if (!userData) {
+                  return push({
+                     query: { absolutePath: asPath },
+                     pathname: "/login",
+                  });
+               }
+               setLoading(true);
+               const companyId = await getCompanyId(
+                  isBreakout,
+                  livestreamId,
+                  currentLivestream
+               );
 
-                await leaveCompanyTalentPool(companyId, userData.userEmail, livestreamId);
+               await leaveCompanyTalentPool(
+                  companyId,
+                  userData.userEmail,
+                  livestreamId
+               );
             } catch (e) {
-                dispatch(actions.sendGeneralError(e))
+               dispatch(actions.sendGeneralError(e));
             }
-            setLoading(false)
+            setLoading(false);
+         },
+      }),
+      [
+         livestreamId,
+         userData?.userEmail,
+         loading,
+         asPath,
+         isBreakout,
+         currentLivestream.companyId,
+      ]
+   );
 
-        }
-    }), [livestreamId, userData?.userEmail, loading, asPath, isBreakout, currentLivestream.companyId]);
+   const getCompanyId = useCallback(
+      async (isBreakout, livestreamId, currentLivestream) => {
+         let companyId;
+         if (isBreakout) {
+            companyId = await getLivestreamCompanyId(livestreamId);
+         } else {
+            companyId = currentLivestream.companyId;
+         }
+         return companyId;
+      },
+      []
+   );
 
-
-    const getCompanyId = useCallback(async (isBreakout, livestreamId, currentLivestream) => {
-        let companyId
-        if (isBreakout) {
-            companyId = await getLivestreamCompanyId(livestreamId)
-        } else {
-            companyId = currentLivestream.companyId
-        }
-        return companyId
-    }, [])
-
-    return {handlers, userIsInTalentPool, loading};
-}
+   return { handlers, userIsInTalentPool, loading };
+};
 
 export default useJoinTalentPool;
