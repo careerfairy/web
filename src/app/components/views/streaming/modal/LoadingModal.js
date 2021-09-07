@@ -47,17 +47,6 @@ function LoadingModal({ agoraRtcStatus }) {
       "RTM_RECONNECTING",
    ];
 
-   const LOADING_AGORA_STATI = [
-      "RTC_INITIAL",
-      "RTC_INITIALIZING",
-      "RTC_JOINING_CHANNEL",
-      "RTC_JOINED_CHANNEL",
-      "RTC_REQUEST_MEDIA_ACCESS",
-      "RTC_PUBLISH_STREAM",
-      "RTM_DISCONNECTED",
-      "RTM_RECONNECTING",
-   ];
-
    return (
       <Dialog
          open={
