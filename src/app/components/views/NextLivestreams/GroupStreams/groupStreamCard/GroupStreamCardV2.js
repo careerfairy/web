@@ -38,6 +38,10 @@ import { DateTimeDisplay } from "./TimeDisplay";
 import { AttendButton, DetailsButton } from "./actionButtons";
 import LogoElement from "../LogoElement";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
+import WhatshotIcon from "@material-ui/icons/Whatshot";
+import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
+import { Chip } from "@material-ui/core";
+import { InPersonEventBadge, LimitedRegistrationsBadge } from "./badges";
 
 const useStyles = makeStyles((theme) => ({
    cardHovered: {
@@ -137,7 +141,8 @@ const useStyles = makeStyles((theme) => ({
       overflow: "hidden",
       textOverflow: "ellipsis",
       display: "-webkit-box",
-      WebkitLineClamp: "2",
+      WebkitLineClamp: "3",
+      fontSize: "1.5rem",
       WebkitBoxOrient: "vertical",
    },
    titleHovered: {
@@ -533,6 +538,45 @@ const GroupStreamCardV2 = memo(
          }
       };
 
+      const registrationDisabled = useMemo(() => {
+         if (isPastLivestreams) return true;
+         //User should always be able to cancel registration
+         if (userIsRegistered()) return false;
+         //Disable registration if max number of registrants is reached
+         if (livestream.maxRegistrants && livestream.maxRegistrants > 0) {
+            return livestream.registeredUsers
+               ? livestream.maxRegistrants <= livestream.registeredUsers.length
+               : false;
+         }
+         return false;
+      }, [isPastLivestreams, livestream, user, registered]);
+
+      const mainButtonLabel = useMemo(() => {
+         if (userIsRegistered()) return "Cancel";
+         if (
+            livestream.maxRegistrants &&
+            livestream.maxRegistrants > 0 &&
+            livestream.registeredUsers &&
+            livestream.maxRegistrants <= livestream.registeredUsers.length
+         ) {
+            return "No spots left";
+         } else if (user) {
+            return "I'll attend";
+         } else {
+            return "Join to attend";
+         }
+      }, [user, registered, livestream]);
+
+      const numberOfSpotsRemaining = useMemo(() => {
+         if (!livestream.maxRegistrants) return 0;
+         else if (!livestream.registeredUsers) return livestream.maxRegistrants;
+         else {
+            return (
+               livestream.maxRegistrants - livestream.registeredUsers.length
+            );
+         }
+      });
+
       return (
          <Fragment>
             <ClickAwayListener onClickAway={handleClickAwayDetails}>
@@ -546,6 +590,18 @@ const GroupStreamCardV2 = memo(
                      [classes.pulseAnimate]: isHighlighted,
                   })}
                >
+                  {livestream.isFaceToFace && (
+                     <Box position="absolute" top={5} right={5} zIndex={200}>
+                        <InPersonEventBadge />
+                     </Box>
+                  )}
+                  {livestream.maxRegistrants && (
+                     <Box position="absolute" top={5} left={5} zIndex={200}>
+                        <LimitedRegistrationsBadge
+                           numberOfSpotsRemaining={numberOfSpotsRemaining}
+                        />
+                     </Box>
+                  )}
                   <Box
                      className={clsx(classes.main, {
                         [classes.mainBooked]: registered,
@@ -624,6 +680,8 @@ const GroupStreamCardV2 = memo(
                               <AttendButton
                                  size="small"
                                  mobile={mobile}
+                                 disabled={registrationDisabled}
+                                 attendButtonLabel={mainButtonLabel}
                                  handleRegisterClick={handleRegisterClick}
                                  checkIfRegistered={checkIfRegistered}
                                  user={user}
