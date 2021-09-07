@@ -36,6 +36,8 @@ function LoadingModal({ agoraRtcStatus }) {
       }
    }, [agoraRtcStatus]);
 
+   const classes = useStyles();
+
    const LOADING_AGORA_STATI = [
       "RTC_INITIAL",
       "RTC_INITIALIZING",

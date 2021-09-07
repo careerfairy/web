@@ -64,8 +64,11 @@ export default function useDevices(refreshDevices) {
          audioOutputList: audioOutputList,
          videoDeviceList: videoDeviceList,
       };
-      debugger;
       setDeviceList(newDevices);
+   }
+
+   function handleError(error) {
+      console.log("error: ", error.message, error.name);
    }
 
    function isEmpty(devicesObject) {

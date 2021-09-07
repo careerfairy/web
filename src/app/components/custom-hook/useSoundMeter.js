@@ -50,8 +50,6 @@ export function useSoundMeter(showAudioMeter, audioTrack, update) {
          .catch((error) => {
             console.error(error);
          });
-
-      setSoundMeterInterval(newInterval);
    }
 
    return audioValue;
