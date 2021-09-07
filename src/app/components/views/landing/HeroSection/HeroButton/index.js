@@ -24,10 +24,10 @@ const useStyles = makeStyles((theme) => ({
       whiteSpace: "nowrap",
       [theme.breakpoints.down("md")]: {
          filter: (props) =>
-           `drop-shadow(4.092px 4.39px 9.5px ${alpha(
-             props.buttonColor,
-             0.7
-           )})`,
+            `drop-shadow(4.092px 4.39px 9.5px ${alpha(
+               props.buttonColor,
+               0.7
+            )})`,
       },
       filter: (props) =>
          `drop-shadow(17.092px 15.39px 36.5px ${alpha(

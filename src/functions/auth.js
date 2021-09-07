@@ -39,6 +39,7 @@ exports.createNewUserAccount = functions.https.onCall(async (data, context) => {
             .collection("userData")
             .doc(recipient_email)
             .set({
+               authId: user.uid,
                id: recipient_email,
                validationPin: pinCode,
                firstName: userData.firstName,

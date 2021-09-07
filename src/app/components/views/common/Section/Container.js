@@ -13,20 +13,18 @@ const useStyles = makeStyles((theme) => ({
       flexDirection: "column",
       alignItems: "center",
    },
-   customMaxWidth:{
-
-   }
+   customMaxWidth: {},
 }));
 
 const SectionContainer = ({ children, ...props }) => {
    const classes = useStyles();
    return (
       <Container
-        classes={{
-           maxWidthLg: classes.customMaxWidth
-        }}
+         classes={{
+            maxWidthLg: classes.customMaxWidth,
+         }}
          className={classes.root}
-        maxWidth="md"
+         maxWidth="md"
          {...props}
          children={children}
       />

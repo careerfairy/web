@@ -1,76 +1,41 @@
-import axios from 'axios';
-import DateUtil from './DateUtil';
+import axios from "axios";
+import DateUtil from "./DateUtil";
 
 export default class DataAccessUtil {
+   static sendDashboardInvite(recipientEmail, userData, group, invite_link) {
+      return axios({
+         method: "post",
+         url:
+            "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDashboardInviteEmail",
+         data: {
+            recipientEmail: recipientEmail,
+            sender_first_name: userData.firstName,
+            group_name: group.universityName,
+            invite_link: invite_link,
+         },
+      });
+   }
 
-    static sendRegistrationConfirmationEmail(user, userData, livestream) {
-        if (livestream.isFaceToFace) {
-            return this.sendPhysicalEventEmailRegistrationConfirmation(user, userData, livestream);
-        } else {
-            return this.sendLivestreamEmailRegistrationConfirmation(user, userData, livestream);
-        }
-    }
-
-    static sendLivestreamEmailRegistrationConfirmation(user, userData, livestream) {
-        return axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendLivestreamRegistrationConfirmationEmail',
-            data: {
-                recipientEmail: user.email,
-                user_first_name: userData.firstName,
-                regular_date: livestream.start.toDate().toString(),
-                livestream_date: DateUtil.getPrettyDate(livestream.start.toDate()),
-                company_name: livestream.company,
-                company_logo_url: livestream.companyLogoUrl,
-                livestream_title: livestream.title,
-                livestream_link: ('https://careerfairy.io/upcoming-livestream/' + livestream.id)
-            }
-        });
-    }
-    static sendDashboardInvite(recipientEmail, userData, group, invite_link) {
-        return axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDashboardInviteEmail',
-            data: {
-                recipientEmail: recipientEmail,
-                sender_first_name: userData.firstName,
-                group_name: group.universityName,
-                invite_link: invite_link
-            }
-        });
-    }
-
-    static sendDraftApprovalRequestEmail(adminsInfo, senderName, stream, submitTime, senderEmail) {
-        // TODO Update the cloud function to send the sender an email of the draft they submitted
-        return axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDraftApprovalRequestEmail',
-            data: {
-                adminsInfo: adminsInfo,
-                sender_name: senderName,
-                livestream_title: stream.title,
-                livestream_company_name: stream.company,
-                submit_time: submitTime,
-                sender_email: senderEmail
-            }
-        });
-    }
-
-    static sendPhysicalEventEmailRegistrationConfirmation(user, userData, event) {
-        return axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPhysicalEventRegistrationConfirmationEmail',
-            data: {
-                recipientEmail: user.email,
-                user_first_name: userData.firstName,
-                event_date: DateUtil.getPrettyDate(event.start.toDate()),
-                company_name: event.company,
-                company_logo_url: event.companyLogoUrl,
-                event_title: event.title,
-                event_address: event.address
-            }
-        });
-    }
+   static sendDraftApprovalRequestEmail(
+      adminsInfo,
+      senderName,
+      stream,
+      submitTime,
+      senderEmail
+   ) {
+      // TODO Update the cloud function to send the sender an email of the draft they submitted
+      return axios({
+         method: "post",
+         url:
+            "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDraftApprovalRequestEmail",
+         data: {
+            adminsInfo: adminsInfo,
+            sender_name: senderName,
+            livestream_title: stream.title,
+            livestream_company_name: stream.company,
+            submit_time: submitTime,
+            sender_email: senderEmail,
+         },
+      });
+   }
 }
-
-

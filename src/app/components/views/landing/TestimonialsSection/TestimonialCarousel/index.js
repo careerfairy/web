@@ -71,15 +71,15 @@ const TestimonialCarousel = ({}) => {
       autoplay: true,
       autoplaySpeed: 10000,
       pauseOnHover: true,
-      appendDots: dots => (
-        <div
-          style={{
-             borderRadius: "10px",
-             padding: "10px"
-          }}
-        >
-           <ul style={{ margin: "0px" }}> {dots} </ul>
-        </div>
+      appendDots: (dots) => (
+         <div
+            style={{
+               borderRadius: "10px",
+               padding: "10px",
+            }}
+         >
+            <ul style={{ margin: "0px" }}> {dots} </ul>
+         </div>
       ),
    });
 
@@ -87,7 +87,18 @@ const TestimonialCarousel = ({}) => {
       <div className={classes.root}>
          <Slider {...settings}>
             {testimonialData.map(
-               ({ name, reviewText, title, rating, position, avatarUrl, companyUrl }, index) => (
+               (
+                  {
+                     name,
+                     reviewText,
+                     title,
+                     rating,
+                     position,
+                     avatarUrl,
+                     companyUrl,
+                  },
+                  index
+               ) => (
                   <TestimonialCard
                      key={avatarUrl}
                      {...{
@@ -97,8 +108,8 @@ const TestimonialCarousel = ({}) => {
                         rating,
                         position,
                         avatarUrl,
-                       companyUrl,
-                        index
+                        companyUrl,
+                        index,
                      }}
                   />
                )

@@ -45,65 +45,91 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function QuestionVotingBox(props) {
-    const classes = useStyles()
-    const router = useRouter();
+   const classes = useStyles();
+   const router = useRouter();
 
-    function upvoteLivestreamQuestion(user, question) {
+   function upvoteLivestreamQuestion(user, question) {
+      if (!user) {
+         return router.push("/signup");
+      }
 
-        if (!user) {
-            return router.push('/signup');
-        }
+      props.firebase.upvoteLivestreamQuestion(
+         props.livestream.id,
+         question,
+         user.email
+      );
+   }
 
-        props.firebase.upvoteLivestreamQuestion(props.livestream.id, question, user.email);
-    }
+   function userHasVotedOnQuestion(user, question) {
+      if (!user || !question.emailOfVoters) {
+         return false;
+      }
+      return question.emailOfVoters.indexOf(user.email) > -1;
+   }
 
-    function userHasVotedOnQuestion(user, question) {
-        if (!user || !question.emailOfVoters) {
-            return false;
-        }
-        return question.emailOfVoters.indexOf(user.email) > -1;
-    }
+   function userHasVotedOnQuestion(user, question) {
+      if (!user || !question.emailOfVoters) {
+         return false;
+      }
+      return question.emailOfVoters.indexOf(user.email) > -1;
+   }
 
-    return (
-        <Card elevation={2} className={classes.root}>
-            <CardHeader
-                action={
-                    <div className={classes.voteCount}>
-                        <Typography color="inherit" className={classes.voteText} variant="body1">
-                            {props.question.votes}
-                        </Typography>
-                        <ThumbUpIcon className={classes.icon} color="inherit"/>
-                    </div>
-                }
-            />
-            <CardContent>
-                <Typography align="center" className={classes.questionTitle} variant="body2" component="p">
-                    {props.question.title}
-                </Typography>
-            </CardContent>
-            <CardActions className={classes.actions} disableSpacing>
-                <Button disabled={userHasVotedOnQuestion(props.user, props.question) || props.isPastEvent }
-                        variant="contained" fullWidth 
-                        onClick={() => upvoteLivestreamQuestion(props.user, props.question)}
-                        color="primary" startIcon={<ThumbUpIcon/>}>
-                    upvote
-                </Button>
-            </CardActions>
-        </Card>
-    )
+   return (
+      <Card elevation={2} className={classes.root}>
+         <CardHeader
+            action={
+               <div className={classes.voteCount}>
+                  <Typography
+                     color="inherit"
+                     className={classes.voteText}
+                     variant="body1"
+                  >
+                     {props.question.votes}
+                  </Typography>
+                  <ThumbUpIcon className={classes.icon} color="inherit" />
+               </div>
+            }
+         />
+         <CardContent>
+            <Typography
+               align="center"
+               className={classes.questionTitle}
+               variant="body2"
+               component="p"
+            >
+               {props.question.title}
+            </Typography>
+         </CardContent>
+         <CardActions className={classes.actions} disableSpacing>
+            <Button
+               disabled={
+                  userHasVotedOnQuestion(props.user, props.question) ||
+                  props.isPastEvent
+               }
+               variant="contained"
+               fullWidth
+               onClick={() =>
+                  upvoteLivestreamQuestion(props.user, props.question)
+               }
+               color="primary"
+               startIcon={<ThumbUpIcon />}
+            >
+               upvote
+            </Button>
+         </CardActions>
+      </Card>
+   );
 }
 
-QuestionVotingBox.propTypes =
-    {
-        firebase: PropTypes.object,
-        livestream: PropTypes.object,
-        isPastEvent: PropTypes.bool,
-        question: PropTypes.shape({
-            title: PropTypes.string,
-            votes: PropTypes.number
-        }),
-        user: PropTypes.object
-    }
+QuestionVotingBox.propTypes = {
+   firebase: PropTypes.object,
+   livestream: PropTypes.object,
+   isPastEvent: PropTypes.bool,
+   question: PropTypes.shape({
+      title: PropTypes.string,
+      votes: PropTypes.number,
+   }),
+   user: PropTypes.object,
+};
 
 export default withFirebasePage(QuestionVotingBox);
-

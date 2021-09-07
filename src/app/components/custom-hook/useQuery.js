@@ -11,7 +11,7 @@ const useStreamQuery = ({
    subcollections,
    deps,
    populates,
-                           orderBy
+   orderBy,
 }) => {
    const {
       query: { livestreamId, breakoutRoomId },
@@ -33,7 +33,7 @@ const useStreamQuery = ({
                ],
                populates,
                storeAs: storeAs,
-               orderBy
+               orderBy,
             },
          ];
       } else {

@@ -30,7 +30,6 @@ import JSZip from "jszip";
 import * as actions from "store/actions";
 import ExportTable from "../../../../../common/Tables/ExportTable";
 
-
 const useStyles = makeStyles((theme) => ({
    root: {},
    actions: {
@@ -85,7 +84,7 @@ const UsersTable = ({
    );
    const dispatch = useDispatch();
 
-   const categoryFields = useMemo( () => {
+   const categoryFields = useMemo(() => {
       const arrayOfGroups = targetGroups.length ? targetGroups : [group];
       const tableFieldsMap = arrayOfGroups.reduce((acc, { categories }) => {
          if (categories?.length) {
@@ -102,22 +101,24 @@ const UsersTable = ({
          }
          return acc;
       }, {});
-      return Object.keys(tableFieldsMap).map((key) => {
-         const titledLabel = toTitleCase(key);
-         const lookup = tableFieldsMap[key].reduce(
-            (acc, curr) => {
-               acc[curr] = curr;
-               return acc;
-            },
-            { "": "none" }
-         );
-         return {
-            field: titledLabel,
-            title: titledLabel,
-            lookup,
-         };
-      }).map((e) => e);
-   },[targetGroups, group]);
+      return Object.keys(tableFieldsMap)
+         .map((key) => {
+            const titledLabel = toTitleCase(key);
+            const lookup = tableFieldsMap[key].reduce(
+               (acc, curr) => {
+                  acc[curr] = curr;
+                  return acc;
+               },
+               { "": "none" }
+            );
+            return {
+               field: titledLabel,
+               title: titledLabel,
+               lookup,
+            };
+         })
+         .map((e) => e);
+   }, [targetGroups, group]);
    // console.table(categoryFields);
 
    const allGroupsMap = useSelector(
@@ -147,7 +148,7 @@ const UsersTable = ({
                   user,
                   targetGroups,
                   group,
-                 true
+                  true
                );
                return AnalyticsUtil.mapUserEngagement(
                   user,

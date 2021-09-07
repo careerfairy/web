@@ -24,7 +24,10 @@ const DashboardDemo = ({}) => {
          positive: true,
       },
    });
-   const [totalUniqueRegistrationsProps, setTotalUniqueRegistrationsProps] = useState({
+   const [
+      totalUniqueRegistrationsProps,
+      setTotalUniqueRegistrationsProps,
+   ] = useState({
       totalRegistrations: 789,
       registrationsStatus: {
          dataToCompare: true,
@@ -67,8 +70,12 @@ const DashboardDemo = ({}) => {
                </Grid>
                <Grid {...getCategoryProps()}>
                   <TotalUniqueRegistrationsDemo
-                     uniqueRegistrationsStatus={totalUniqueRegistrationsProps.registrationsStatus}
-                     totalUniqueRegistrations={totalUniqueRegistrationsProps.totalRegistrations}
+                     uniqueRegistrationsStatus={
+                        totalUniqueRegistrationsProps.registrationsStatus
+                     }
+                     totalUniqueRegistrations={
+                        totalUniqueRegistrationsProps.totalRegistrations
+                     }
                      timeFrames={globalTimeFrame.timeFrames}
                      globalTimeFrame={globalTimeFrame}
                      group={group}

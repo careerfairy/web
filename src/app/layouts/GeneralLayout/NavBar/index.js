@@ -88,28 +88,28 @@ const NavBar = memo(({ drawerWidth }) => {
    const handleDrawerClose = () => dispatch(actions.closeNavDrawer());
 
    useEffect(() => {
-      return () => handleDrawerClose()
-   },[])
+      return () => handleDrawerClose();
+   }, []);
 
    const content = (
       <Box height="100%" display="flex" flexDirection="column">
-            <Box p={2}>
-               <List>
-                  {authenticatedUser.isLoaded && authenticatedUser.isEmpty && (
-                     <LoginButton />
-                  )}
-                  {mainLinks.map(({ title, href, icon }) => (
-                     <NavItem
-                        href={href}
-                        key={title}
-                        title={title}
-                        icon={icon}
-                        black
-                     />
-                  ))}
-                  <Divider />
-               </List>
-            </Box>
+         <Box p={2}>
+            <List>
+               {authenticatedUser.isLoaded && authenticatedUser.isEmpty && (
+                  <LoginButton />
+               )}
+               {mainLinks.map(({ title, href, icon }) => (
+                  <NavItem
+                     href={href}
+                     key={title}
+                     title={title}
+                     icon={icon}
+                     black
+                  />
+               ))}
+               <Divider />
+            </List>
+         </Box>
          <Box flexGrow={1} />
          <Box p={2}>
             <List>

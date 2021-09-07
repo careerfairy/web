@@ -1,151 +1,226 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {withFirebase} from 'context/firebase';
-import HandRaiseElement from './hand-raise-element/HandRaiseElement';
-import NotificationsContext from 'context/notifications/NotificationsContext';
-import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
-import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
+import React, { useContext, useEffect, useState } from "react";
+import { withFirebase } from "context/firebase";
+import HandRaiseElement from "./hand-raise-element/HandRaiseElement";
+import NotificationsContext from "context/notifications/NotificationsContext";
+import CloseRoundedIcon from "@material-ui/icons/CloseRounded";
+import PanToolOutlinedIcon from "@material-ui/icons/PanToolOutlined";
 
 import { Box, Button, Typography, Grow, Paper } from "@material-ui/core";
-import {CategoryContainerCentered, CategoryContainerTopAligned} from "../../../../../../../materialUI/GlobalContainers";
-import {ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
+import {
+   CategoryContainerCentered,
+   CategoryContainerTopAligned,
+} from "../../../../../../../materialUI/GlobalContainers";
+import { ThemedPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
 import {
-    TooltipButtonComponent,
-    TooltipText,
-    TooltipTitle,
-    WhiteTooltip
+   TooltipButtonComponent,
+   TooltipText,
+   TooltipTitle,
+   WhiteTooltip,
 } from "../../../../../../../materialUI/GlobalTooltips";
-import {makeStyles} from "@material-ui/core/styles";
-import {useSnackbar} from "notistack";
+import { makeStyles } from "@material-ui/core/styles";
+import { useSnackbar } from "notistack";
 import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 
-const useStyles = makeStyles(theme => ({
-    activeHandRaiseContainer: {
-        padding: theme.spacing(1)
-    }
-}))
+const useStyles = makeStyles((theme) => ({
+   activeHandRaiseContainer: {
+      padding: theme.spacing(1),
+   },
+}));
 
-function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding}) {
-    const classes = useStyles()
-    const streamRef = useStreamRef();
-    const {closeSnackbar} = useSnackbar()
-    const {setNewNotification, setNotificationToRemove} = useContext(NotificationsContext);
-    const {tutorialSteps, setTutorialSteps, getActiveTutorialStepKey, isOpen: isStepOpen} = useContext(TutorialContext);
-    const [handRaises, setHandRaises] = useState([]);
-    const [hasEntered, setHasEntered] = useState(false);
-    const [hasExited, setHasExited] = useState(false);
+function HandRaiseActive({
+   firebase,
+   livestream,
+   showMenu,
+   selectedState,
+   sliding,
+}) {
+   const classes = useStyles();
+   const streamRef = useStreamRef();
+   const { closeSnackbar } = useSnackbar();
+   const { setNewNotification, setNotificationToRemove } = useContext(
+      NotificationsContext
+   );
+   const {
+      tutorialSteps,
+      setTutorialSteps,
+      getActiveTutorialStepKey,
+      isOpen: isStepOpen,
+   } = useContext(TutorialContext);
+   const [handRaises, setHandRaises] = useState([]);
+   const [hasEntered, setHasEntered] = useState(false);
+   const [hasExited, setHasExited] = useState(false);
 
-
-    useEffect(() => {
-        if (livestream) {
-            firebase.listenToHandRaises(streamRef, querySnapshot => {
-                var handRaiseList = [];
-                querySnapshot.forEach(doc => {
-                    let handRaise = doc.data();
-                    handRaise.id = doc.id;
-                    handRaiseList.push(handRaise);
-                });
-                setHandRaises(handRaiseList);
+   useEffect(() => {
+      if (livestream) {
+         firebase.listenToHandRaises(streamRef, (querySnapshot) => {
+            var handRaiseList = [];
+            querySnapshot.forEach((doc) => {
+               let handRaise = doc.data();
+               handRaise.id = doc.id;
+               handRaiseList.push(handRaise);
             });
-        }
-    }, [livestream]);
+            setHandRaises(handRaiseList);
+         });
+      }
+   }, [livestream]);
 
-    const activeStep = getActiveTutorialStepKey()
+   const activeStep = getActiveTutorialStepKey();
 
-    const isOpen = (property) => {
-        return Boolean(livestream.test
-            && showMenu
-            && tutorialSteps.streamerReady
-            && (tutorialSteps[property] || activeStep === 13)
-            && selectedState === "hand"
-            && !sliding
-        )
-    }
+   const isOpen = (property) => {
+      return Boolean(
+         livestream.test &&
+            showMenu &&
+            tutorialSteps.streamerReady &&
+            (tutorialSteps[property] || activeStep === 13) &&
+            selectedState === "hand" &&
+            !sliding
+      );
+   };
 
-    const handleConfirm = (property) => {
-        setTutorialSteps({
-            ...tutorialSteps,
-            [property]: false,
-            [property + 1]: true,
-        })
-    }
+   const handleConfirm = (property) => {
+      setTutorialSteps({
+         ...tutorialSteps,
+         [property]: false,
+         [property + 1]: true,
+      });
+   };
 
+   function setHandRaiseModeInactive() {
+      firebase.setHandRaiseMode(streamRef, false);
+   }
 
-    function setHandRaiseModeInactive() {
-        firebase.setHandRaiseMode(streamRef, false);
-    }
+   function updateHandRaiseRequest(handRaiseId, state) {
+      firebase.updateHandRaiseRequest(streamRef, handRaiseId, state);
+   }
 
-    function updateHandRaiseRequest(handRaiseId, state) {
-        firebase.updateHandRaiseRequest(streamRef, handRaiseId, state);
-    }
+   let numberOfActiveHandRaisers = handRaises.filter(
+      (handRaise) =>
+         handRaise.state === "connected" ||
+         handRaise.state === "connecting" ||
+         handRaise.state === "invited"
+   ).length;
 
-    let numberOfActiveHandRaisers = handRaises.filter(handRaise => (handRaise.state === 'connected' || handRaise.state === 'connecting' || handRaise.state === 'invited' )).length
+   let handRaiseElements = handRaises
+      .filter(
+         (handRaise) =>
+            handRaise.state !== "unrequested" && handRaise.state !== "denied"
+      )
+      .map((handRaise) => {
+         return (
+            <HandRaiseElement
+               request={handRaise}
+               hasEntered={hasEntered}
+               key={handRaise.timestamp.toMillis()}
+               updateHandRaiseRequest={updateHandRaiseRequest}
+               setNewNotification={setNewNotification}
+               closeSnackbar={closeSnackbar}
+               numberOfActiveHandRaisers={numberOfActiveHandRaisers}
+               setNotificationToRemove={setNotificationToRemove}
+            />
+         );
+      });
 
-    let handRaiseElements = handRaises.filter(handRaise => (handRaise.state !== 'unrequested' && handRaise.state !== 'denied')).map(handRaise => {
-        return (
-            <HandRaiseElement request={handRaise} hasEntered={hasEntered}
-                              key={handRaise.timestamp.toMillis()}
-                              updateHandRaiseRequest={updateHandRaiseRequest}
-                              setNewNotification={setNewNotification}
-                              closeSnackbar={closeSnackbar} numberOfActiveHandRaisers={numberOfActiveHandRaisers}
-                              setNotificationToRemove={setNotificationToRemove}/>
-        );
-    })
+   if (!livestream.handRaiseActive) {
+      return null;
+   }
+   return (
+      <>
+         <Grow
+            timeout={tutorialSteps.streamerReady ? 0 : "auto"}
+            onEntered={() => setHasEntered(true)}
+            onExited={() => setHasExited(true)}
+            mountOnEnter
+            unmountOnExit
+            in={Boolean(handRaiseElements.length)}
+         >
+            <CategoryContainerTopAligned
+               className={classes.activeHandRaiseContainer}
+            >
+               {handRaiseElements}
+               <Button
+                  style={{ margin: "auto 0 2rem 0" }}
+                  startIcon={<CloseRoundedIcon />}
+                  variant="contained"
+                  children="Deactivate Hand Raise"
+                  disabled={isStepOpen(11)}
+                  onClick={() => setHandRaiseModeInactive()}
+               />
+            </CategoryContainerTopAligned>
+         </Grow>
 
-    if (!livestream.handRaiseActive) {
-        return null;
-    }
-    return (
-        <>
-            <Grow timeout={tutorialSteps.streamerReady ? 0 : 'auto'} onEntered={() => setHasEntered(true)}
-                  onExited={() => setHasExited(true)} mountOnEnter unmountOnExit in={Boolean(handRaiseElements.length)}>
-                <CategoryContainerTopAligned className={classes.activeHandRaiseContainer}>
-                    {handRaiseElements}
-                    <Button style={{margin: "auto 0 2rem 0"}} startIcon={<CloseRoundedIcon/>} variant="contained"
-                            children='Deactivate Hand Raise'
-                            disabled={isStepOpen(11)}
-                            onClick={() => setHandRaiseModeInactive()}/>
-                </CategoryContainerTopAligned>
-            </Grow>
-
-            <Grow mountOnEnter unmountOnExit in={Boolean(!handRaiseElements.length)}>
-                <CategoryContainerCentered>
-                    <Box p={2} component={Paper} style={{width: "90%", display: "grid", placeItems: "center"}}>
-                        <PanToolOutlinedIcon color="primary" style={{fontSize: 40}}/>
-                        <ThemedPermanentMarker gutterBottom>Waiting for viewers to raise their
-                            hands...</ThemedPermanentMarker>
-                        <Typography style={{marginBottom: "1rem"}} align="center">Your viewers can now request to join
-                            the stream. Don't forget to
-                            remind them
-                            to join in!</Typography>
-                        <Typography style={{marginBottom: "0.8rem", textTransform: "uppercase"}} align="center">You can invite up to 8 hand raisers</Typography>
-                        <WhiteTooltip
-                            placement="right-end"
-                            title={
-                                <React.Fragment>
-                                    <TooltipTitle>Hand Raise (5/5)</TooltipTitle>
-                                    <TooltipText>
-                                        You can de-activate the Hand Raise mode to
-                                        prevent viewers from making subsequent requests.
-                                    </TooltipText>
-                                    {activeStep === 13 && < TooltipButtonComponent onConfirm={() => {
-                                        setHandRaiseModeInactive()
-                                        handleConfirm(13)
-                                    }} buttonText="Ok"/>}
-                                </React.Fragment>
-                            } open={hasExited && isOpen(13)}>
-                            <Button variant="contained" startIcon={<CloseRoundedIcon/>}
-                                    children='Deactivate Hand Raise'
-                                    onClick={() => {
-                                        setHandRaiseModeInactive()
-                                        isOpen(13) && activeStep === 13 && handleConfirm(13)
-                                    }}/>
-                        </WhiteTooltip>
-                    </Box>
-                </CategoryContainerCentered>
-            </Grow>
-        </>
-    );
+         <Grow
+            mountOnEnter
+            unmountOnExit
+            in={Boolean(!handRaiseElements.length)}
+         >
+            <CategoryContainerCentered>
+               <Box
+                  p={2}
+                  component={Paper}
+                  style={{
+                     width: "90%",
+                     display: "grid",
+                     placeItems: "center",
+                  }}
+               >
+                  <PanToolOutlinedIcon
+                     color="primary"
+                     style={{ fontSize: 40 }}
+                  />
+                  <ThemedPermanentMarker gutterBottom>
+                     Waiting for viewers to raise their hands...
+                  </ThemedPermanentMarker>
+                  <Typography style={{ marginBottom: "1rem" }} align="center">
+                     Your viewers can now request to join the stream. Don't
+                     forget to remind them to join in!
+                  </Typography>
+                  <Typography
+                     style={{
+                        marginBottom: "0.8rem",
+                        textTransform: "uppercase",
+                     }}
+                     align="center"
+                  >
+                     You can invite up to 8 hand raisers
+                  </Typography>
+                  <WhiteTooltip
+                     placement="right-end"
+                     title={
+                        <React.Fragment>
+                           <TooltipTitle>Hand Raise (5/5)</TooltipTitle>
+                           <TooltipText>
+                              You can de-activate the Hand Raise mode to prevent
+                              viewers from making subsequent requests.
+                           </TooltipText>
+                           {activeStep === 13 && (
+                              <TooltipButtonComponent
+                                 onConfirm={() => {
+                                    setHandRaiseModeInactive();
+                                    handleConfirm(13);
+                                 }}
+                                 buttonText="Ok"
+                              />
+                           )}
+                        </React.Fragment>
+                     }
+                     open={hasExited && isOpen(13)}
+                  >
+                     <Button
+                        variant="contained"
+                        startIcon={<CloseRoundedIcon />}
+                        children="Deactivate Hand Raise"
+                        onClick={() => {
+                           setHandRaiseModeInactive();
+                           isOpen(13) && activeStep === 13 && handleConfirm(13);
+                        }}
+                     />
+                  </WhiteTooltip>
+               </Box>
+            </CategoryContainerCentered>
+         </Grow>
+      </>
+   );
 }
 
 export default withFirebase(HandRaiseActive);

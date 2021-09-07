@@ -49,7 +49,10 @@ export function useSoundMeter(showAudioMeter, audioTrack, update) {
             console.error(error)
         })
 
-    }
+         setSoundMeterInterval(newInterval);
+      });
+      setSoundMeter(soundMeter);
+   }
 
-    return audioValue;
-  }
+   return audioValue;
+}

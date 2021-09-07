@@ -4,6 +4,7 @@ import {
    FORTY_FIVE_MINUTES_IN_MILLISECONDS,
    START_DATE_FOR_REPORTED_EVENTS,
 } from "../constants/streamContants";
+import DateUtil from "util/DateUtil";
 class Firebase {
    constructor() {
       // if (!firebase.apps.length) {
@@ -72,6 +73,57 @@ class Firebase {
          "createNewUserAccount"
       );
       return createUserInAuthAndFirebase({ userData });
+   };
+
+   sendRegistrationConfirmationEmail = (user, userData, livestream) => {
+      if (livestream.isFaceToFace) {
+         return this.sendPhysicalEventEmailRegistrationConfirmation(
+            user,
+            userData,
+            livestream
+         );
+      } else {
+         return this.sendLivestreamEmailRegistrationConfirmation(
+            user,
+            userData,
+            livestream
+         );
+      }
+   };
+
+   sendLivestreamEmailRegistrationConfirmation = (
+      user,
+      userData,
+      livestream
+   ) => {
+      const sendLivestreamRegistrationConfirmationEmail = this.functions.httpsCallable(
+         "sendLivestreamRegistrationConfirmationEmail"
+      );
+      return sendLivestreamRegistrationConfirmationEmail({
+         recipientEmail: user.email,
+         user_first_name: userData.firstName,
+         regular_date: livestream.start.toDate().toString(),
+         livestream_date: DateUtil.getPrettyDate(livestream.start.toDate()),
+         company_name: livestream.company,
+         company_logo_url: livestream.companyLogoUrl,
+         livestream_title: livestream.title,
+         livestream_link: `https://careerfairy.io/upcoming-livestream/${livestream.id}`,
+      });
+   };
+
+   sendPhysicalEventEmailRegistrationConfirmation = (user, userData, event) => {
+      const sendPhysicalEventRegistrationConfirmation = this.functions.httpsCallable(
+         "sendPhysicalEventRegistrationConfirmationEmail"
+      );
+      return sendPhysicalEventRegistrationConfirmation({
+         recipientEmail: user.email,
+         user_first_name: userData.firstName,
+         event_date: DateUtil.getPrettyDate(event.start.toDate()),
+         company_name: event.company,
+         company_logo_url: event.companyLogoUrl,
+         event_title: event.title,
+         event_address: event.address,
+      });
    };
 
    // *** Auth API ***
@@ -514,16 +566,18 @@ class Firebase {
    resetTestStream = async (streamRef, testChats, testQuestions, testPolls) => {
       let batch = this.firestore.batch();
 
-      // reset hand raise and current speaker
+      // reset hand raise and current speaker and activeCallToActionIds
       batch.update(streamRef, {
          handRaiseActive: false,
          currentSpeakerId: streamRef.id,
+         activeCallToActionIds: [],
       });
 
       // Declare all the refs
       let chatsRef = streamRef.collection("chatEntries");
       let questionsRef = streamRef.collection("questions");
       let pollsRef = streamRef.collection("polls");
+      let callToActionsRef = streamRef.collection("callToActions");
 
       // Delete all existing docs
       const questionsDocs = await questionsRef.get();
@@ -545,6 +599,14 @@ class Firebase {
       const pollsDocs = await pollsRef.get();
       if (!pollsDocs.empty) {
          pollsDocs.forEach((doc) => {
+            let docRef = doc.ref;
+            batch.delete(docRef);
+         });
+      }
+
+      const callToActionDocs = await callToActionsRef.get();
+      if (!callToActionDocs.empty) {
+         callToActionDocs.forEach((doc) => {
             let docRef = doc.ref;
             batch.delete(docRef);
          });
@@ -1418,6 +1480,7 @@ class Firebase {
          sent: null,
          stopped: null,
          active: false,
+         isForTutorial: values.isForTutorial,
       };
       const enhancedCallToActionData = this.addCtaExtraData(
          callToActionData,
@@ -1567,39 +1630,25 @@ class Firebase {
                   "numberOfUsersWhoDismissed"
                ] = firebase.firestore.FieldValue.increment(1);
             }
-            if(isDismissAction){
-                batch.set(userInUsersWhoDismissedRef, {
-                    ...userData,
-                    dismissedCallToActionAt: this.getServerTimestamp(),
-                })
-                if(!hasAlreadyDismissed){
-                    callToActionUpdateData["numberOfUsersWhoDismissed"] = firebase.firestore.FieldValue.increment(1)
-                }
 
-            if(hasAlreadyClicked){
-                // callToActionUpdateData["numberOfUsersWhoClickedLink"] = firebase.firestore.FieldValue.increment(-1)
-                // batch.delete(userInUsersWhoClickedLinkRef)
+            if (hasAlreadyClicked) {
+               // callToActionUpdateData["numberOfUsersWhoClickedLink"] = firebase.firestore.FieldValue.increment(-1)
+               // batch.delete(userInUsersWhoClickedLinkRef)
             }
-            } else {
-                batch.set(userInUsersWhoClickedLinkRef, {
-                    ...userData,
-                    clickedCallToActionLinkAt: this.getServerTimestamp(),
-                })
-                if(!hasAlreadyClicked){
-                    callToActionUpdateData["numberOfUsersWhoClickedLink"] = firebase.firestore.FieldValue.increment(1)
-                }
-
-                if(hasAlreadyDismissed){
-                //     callToActionUpdateData["numberOfUsersWhoDismissed"] = firebase.firestore.FieldValue.increment(-1)
-                //     batch.delete(userInUsersWhoDismissedRef)
-                }
+         } else {
+            batch.set(userInUsersWhoClickedLinkRef, {
+               ...userData,
+               clickedCallToActionLinkAt: this.getServerTimestamp(),
+            });
+            if (!hasAlreadyClicked) {
+               callToActionUpdateData[
+                  "numberOfUsersWhoClickedLink"
+               ] = firebase.firestore.FieldValue.increment(1);
             }
 
             if (hasAlreadyDismissed) {
-               callToActionUpdateData[
-                  "numberOfUsersWhoDismissed"
-               ] = firebase.firestore.FieldValue.increment(-1);
-               batch.delete(userInUsersWhoDismissedRef);
+               //     callToActionUpdateData["numberOfUsersWhoDismissed"] = firebase.firestore.FieldValue.increment(-1)
+               //     batch.delete(userInUsersWhoDismissedRef)
             }
          }
          batch.update(callToActionRef, callToActionUpdateData);
@@ -1646,101 +1695,191 @@ class Firebase {
             sent: this.getServerTimestamp(),
             active: true,
             resentAt: this.getServerTimestamp(),
-        })
+         });
 
-        batch.update(streamRef, {
-            activeCallToActionIds: firebase.firestore.FieldValue.arrayUnion(callToActionId)
-        })
+         batch.update(streamRef, {
+            activeCallToActionIds: firebase.firestore.FieldValue.arrayUnion(
+               callToActionId
+            ),
+         });
 
-        return await batch.commit()
-        }
+         return await batch.commit();
+      }
+   };
 
-    }
+   deactivateCallToAction = async (streamRef, callToActionId) => {
+      let batch = this.firestore.batch();
+      let callToActionRef = streamRef
+         .collection("callToActions")
+         .doc(callToActionId);
 
-    deactivateCallToAction = async (streamRef, callToActionId) => {
-        let batch = this.firestore.batch()
-        let callToActionRef = streamRef
-          .collection("callToActions")
-          .doc(callToActionId)
+      const callToActionSnap = await callToActionRef.get();
 
-        const callToActionSnap = await callToActionRef.get()
+      if (callToActionSnap.exists) {
+         batch.update(callToActionRef, {
+            stopped: this.getServerTimestamp(),
+            active: false,
+         });
 
-        if(callToActionSnap.exists){
+         batch.update(streamRef, {
+            activeCallToActionIds: firebase.firestore.FieldValue.arrayRemove(
+               callToActionId
+            ),
+         });
 
-            batch.update(callToActionRef, {
-                stopped: this.getServerTimestamp(),
-                active: false
-            })
+         return await batch.commit();
+      }
+   };
 
-            batch.update(streamRef, {
-                activeCallToActionIds: firebase.firestore.FieldValue.arrayRemove(callToActionId)
-            })
+   checkIfUserInteractedWithCallToAction = async (callToActionRef, userId) => {
+      let userInUsersWhoClickedLinkRef = callToActionRef
+         .collection("usersWhoClickedLink")
+         .doc(userId);
 
-            return await batch.commit()
-        }
-    }
+      let userInUsersWhoDismissedRef = callToActionRef
+         .collection("usersWhoDismissed")
+         .doc(userId);
 
-    checkIfUserInteractedWithCallToAction = async (callToActionRef, userId) => {
+      const callToActionSnap = await callToActionRef.get();
+      if (!callToActionSnap.exists) {
+         return true;
+      }
 
-        let userInUsersWhoClickedLinkRef = callToActionRef
-          .collection("usersWhoClickedLink")
-          .doc(userId)
+      const callToActionData = callToActionSnap.data();
+      const userWhoClickedSnap = await userInUsersWhoClickedLinkRef.get();
+      const userWhoDismissedSnap = await userInUsersWhoDismissedRef.get();
 
-        let userInUsersWhoDismissedRef = callToActionRef
-          .collection("usersWhoDismissed")
-          .doc(userId)
+      const resentDate = callToActionData.resentAt?.toDate?.() || null;
 
-        const callToActionSnap = await callToActionRef.get()
-        if(!callToActionSnap.exists){
-            return true
-        }
+      const userDismissDate =
+         userWhoDismissedSnap?.data?.()?.dismissedCallToActionAt?.toDate?.() ||
+         null;
+      const userClickDate =
+         userWhoClickedSnap?.data?.()?.clickedCallToActionLinkAt?.toDate?.() ||
+         null;
 
-        const callToActionData = callToActionSnap.data()
-        const userWhoClickedSnap = await userInUsersWhoClickedLinkRef.get()
-        const userWhoDismissedSnap = await userInUsersWhoDismissedRef.get()
+      const mostRecentInteraction =
+         new Date(userDismissDate) > new Date(userClickDate)
+            ? userDismissDate
+            : userClickDate;
 
-        const resentDate = callToActionData.resentAt?.toDate?.() || null
+      if (!mostRecentInteraction) return false;
+      if (!resentDate) {
+         return Boolean(
+            userWhoClickedSnap.exists || userWhoDismissedSnap.exists
+         );
+      }
 
-        const userDismissDate = userWhoDismissedSnap?.data?.()?.dismissedCallToActionAt?.toDate?.() || null
-        const userClickDate = userWhoClickedSnap?.data?.()?.clickedCallToActionLinkAt?.toDate?.() || null
+      return resentDate < mostRecentInteraction;
+   };
 
-        const mostRecentInteraction = new Date(userDismissDate) > new Date(userClickDate) ? userDismissDate : userClickDate
+   getCallToActionsWithAnArrayOfIds = async (streamRef, callToActionIds) => {
+      if (!callToActionIds?.length) return [];
+      const callToActionsRef = streamRef.collection("callToActions");
+      const callToActionSnaps = await Promise.all(
+         callToActionIds.map((id) => callToActionsRef.doc(id).get())
+      );
+      const callToActionData = callToActionSnaps
+         .filter((doc) => doc.exists)
+         .map((doc) => ({ id: doc.id, ...doc.data() }));
 
-        if(!mostRecentInteraction) return false
-        if(!resentDate){
-            return Boolean(
-               userWhoClickedSnap.exists || userWhoDismissedSnap.exists
+      return callToActionData;
+   };
+
+   getCtaIdsThatUserHasNotInteractedWith = async (
+      streamRef,
+      activeCallToActionIds,
+      userId
+   ) => {
+      const callToActionsRef = streamRef.collection("callToActions");
+      const arrayOfCallToActionIdsThatUserHasNotInteractedWith = await Promise.all(
+         activeCallToActionIds.map(async (id) => {
+            if (!userId) return id;
+            const callToActionRef = callToActionsRef.doc(id);
+            const hasChecked = await this.checkIfUserInteractedWithCallToAction(
+               callToActionRef,
+               userId
             );
-        }
+            return hasChecked ? undefined : id;
+         })
+      );
+      return arrayOfCallToActionIdsThatUserHasNotInteractedWith.filter(
+         (id) => id
+      );
+   };
 
-        return resentDate < mostRecentInteraction
+   rateLivestreamOverallQuality = (livestreamId, userEmail, rating) => {
+      let ref = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("rating")
+         .doc("overall")
+         .collection("voters")
+         .doc(userEmail);
+      return ref.set({
+         rating: rating,
+         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+      });
+   };
 
-    }
+   rateLivestream = (livestreamId, userEmail, rating, ratingId) => {
+      let ref = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("rating")
+         .doc(ratingId)
+         .collection("voters")
+         .doc(userEmail);
+      return ref.set({
+         ...rating,
+         timestamp: this.getServerTimestamp(),
+      });
+   };
 
-    getCallToActionsWithAnArrayOfIds = async (streamRef, callToActionIds) => {
-        if(!callToActionIds?.length) return []
-        const callToActionsRef = streamRef.collection("callToActions")
-        const callToActionSnaps = await Promise.all(callToActionIds.map(id => callToActionsRef.doc(id).get()))
-        const callToActionData = callToActionSnaps
-          .filter((doc) => doc.exists)
-          .map((doc) => ({ id: doc.id, ...doc.data() }));
+   optOutOfRating = (livestreamId, userEmail, ratingId) => {
+      let ref = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("rating")
+         .doc(ratingId)
+         .collection("nonVoters")
+         .doc(userEmail);
+      return ref.set({
+         timestamp: this.getServerTimestamp(),
+      });
+   };
 
-        return callToActionData
-    }
+   rateStreamingCompany = (livestreamId, userEmail, rating) => {
+      let ref = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("rating")
+         .doc("company")
+         .collection("voters")
+         .doc(userEmail);
+      return ref.set({
+         rating: rating,
+         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+      });
+   };
 
-    getCtaIdsThatUserHasNotInteractedWith = async (streamRef, activeCallToActionIds, userId) => {
-        const callToActionsRef = streamRef.collection("callToActions")
-        const arrayOfCallToActionIdsThatUserHasNotInteractedWith = await Promise.all( activeCallToActionIds.map(async id =>{
-            if(!userId) return id
-            const callToActionRef = callToActionsRef.doc(id)
-            const hasChecked = await this.checkIfUserInteractedWithCallToAction(callToActionRef, userId)
-            return hasChecked ? undefined: id
-        }))
-        return arrayOfCallToActionIdsThatUserHasNotInteractedWith.filter(id => id)
-    }
+   rateStreamWillingnessToApply = (livestreamId, userEmail, rating) => {
+      let ref = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("rating")
+         .doc("willingnessToApply")
+         .collection("voters")
+         .doc(userEmail);
+      return ref.set({
+         rating: rating,
+         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+      });
+   };
 
-    rateLivestreamOverallQuality = (livestreamId, userEmail, rating) => {
-        let ref = this.firestore
+   checkIfUserRated = async (livestreamId, userEmail, typeOfRating) => {
+      try {
+         let voterInVotersRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("rating")
@@ -1959,6 +2098,9 @@ class Firebase {
          return transaction.get(userRef).then((userDoc) => {
             const user = userDoc.data();
             transaction.update(livestreamRef, {
+               registrants: firebase.firestore.FieldValue.arrayUnion(
+                  user.authId
+               ),
                registeredUsers: firebase.firestore.FieldValue.arrayUnion(
                   userId
                ),

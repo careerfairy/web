@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import {
    Box,
@@ -16,6 +16,8 @@ import CallToActionFormModal from "./CallToActionFormModal";
 import CallToActionList from "./CallToActionList";
 import { useFirebase } from "../../../../../context/firebase";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
+import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips";
+import useSliderFullyOpened from "../../../../custom-hook/useSliderFullyOpened";
 
 const useStyles = makeStyles((theme) => ({
    drawerContent: {
@@ -50,27 +52,33 @@ const useStyles = makeStyles((theme) => ({
       // padding: theme.spacing(3),
       flex: 1,
       display: "flex",
-      flexDirection: "column"
+      flexDirection: "column",
    },
 }));
 
-const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
+const Content = ({
+   handleClose,
+   tutorialStepOpen,
+   handleConfirmTutorialStep,
+   fullScreen,
+   isTestStream,
+}) => {
    const classes = useStyles();
    const streamRef = useStreamRef();
    const { deleteCallToAction, resendCallToAction } = useFirebase();
    const [callToActionModalOpen, setCallToActionModalOpen] = useState(false);
    const [callToActionToEdit, setCallToActionToEdit] = useState(null);
 
-   useEffect(()=> {
-      if(callToActionToEdit){
-         setCallToActionModalOpen(true)
+   useEffect(() => {
+      if (callToActionToEdit) {
+         setCallToActionModalOpen(true);
       }
-   },[callToActionToEdit])
+   }, [callToActionToEdit]);
 
-   const handleCloseCallToActionFormDialog = () => {
-      setCallToActionToEdit(null)
+   const handleCloseCallToActionFormDialog = useCallback(() => {
+      setCallToActionToEdit(null);
       setCallToActionModalOpen(false);
-   };
+   }, []);
    const handleOpenCallToActionFormDialog = () => {
       setCallToActionModalOpen(true);
    };
@@ -81,7 +89,7 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
       } catch (e) {
          console.error("error deleting callToAction", e);
       }
-      setCallToActionToEdit(null)
+      setCallToActionToEdit(null);
    };
    const handleClickEditCallToAction = (newCallToActionToEditData) => {
       setCallToActionToEdit(newCallToActionToEditData);
@@ -89,11 +97,11 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
 
    const handleClickResendCallToAction = async (callToActionId) => {
       try {
-         await resendCallToAction(streamRef, callToActionId)
+         await resendCallToAction(streamRef, callToActionId);
       } catch (e) {
          console.error("error resending callToAction", e);
       }
-   }
+   };
 
    return (
       <React.Fragment>
@@ -112,13 +120,30 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
                   </IconButton>
                </div>
                <Box display="flex">
-                  <Button
-                     onClick={handleOpenCallToActionFormDialog}
-                     variant="contained"
-                     color="primary"
+                  <StyledTooltipWithButton
+                     open={tutorialStepOpen}
+                     buttonText="ok"
+                     tooltipTitle="Share Job Posts (2/8)"
+                     placement="right"
+                     onConfirm={() => {
+                        handleConfirmTutorialStep();
+                        handleOpenCallToActionFormDialog();
+                     }}
+                     tooltipText="Let's now create a job posting for your audience to engage with."
                   >
-                     Create call to action
-                  </Button>
+                     <Button
+                        onClick={() => {
+                           if (tutorialStepOpen) {
+                              handleConfirmTutorialStep();
+                           }
+                           handleOpenCallToActionFormDialog();
+                        }}
+                        variant="contained"
+                        color="primary"
+                     >
+                        Create call to action
+                     </Button>
+                  </StyledTooltipWithButton>
                </Box>
             </div>
             <Divider />
@@ -126,12 +151,15 @@ const Content = ({ handleClose, handleSave, handleSend, fullScreen }) => {
                <CallToActionList
                   handleClickDeleteCallToAction={handleClickDeleteCallToAction}
                   handleClickEditCallToAction={handleClickEditCallToAction}
+                  isTestStream={isTestStream}
+                  handleClose={handleClose}
                   handleClickResendCallToAction={handleClickResendCallToAction}
                />
             </div>
          </div>
          <CallToActionFormModal
             open={callToActionModalOpen}
+            isTestStream={isTestStream}
             onClose={handleCloseCallToActionFormDialog}
             callToActionToEdit={callToActionToEdit}
          />
@@ -144,17 +172,39 @@ Content.propTypes = {
    fullScreen: PropTypes.bool,
 };
 
-const CallToActionDrawer = ({ open, onClose }) => {
+const CallToActionDrawer = ({
+   open,
+   onClose,
+   isOpen,
+   handleConfirm,
+   isTestStream,
+}) => {
    const theme = useTheme();
    const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
+
+   const [fullyOpened, onEntered, onExited] = useSliderFullyOpened();
 
    const handleClose = () => {
       onClose();
    };
 
    return (
-      <Drawer anchor="left" open={open} onClose={handleClose}>
-         <Content fullScreen={fullScreen} handleClose={handleClose} />
+      <Drawer
+         SlideProps={{
+            onEntered,
+            onExited,
+         }}
+         anchor="left"
+         open={open || isOpen(18)}
+         onClose={handleClose}
+      >
+         <Content
+            fullScreen={fullScreen}
+            isTestStream={isTestStream}
+            handleConfirmTutorialStep={() => handleConfirm(18)}
+            tutorialStepOpen={isOpen(18) && fullyOpened}
+            handleClose={handleClose}
+         />
       </Drawer>
    );
 };

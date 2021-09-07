@@ -38,6 +38,7 @@ function VideoContainer(props) {
       setShowBubbles,
       handleConfirmStep,
       getActiveTutorialStepKey,
+      endTutorial,
    } = useContext(TutorialContext);
    const localVideoId = "localVideo";
    const isMainStreamer = props.streamerId === props.currentLivestream.id;
@@ -231,7 +232,8 @@ function VideoContainer(props) {
    };
 
    const handleCloseDemoEndModal = () => {
-      handleConfirmStep(17);
+      handleConfirmStep(23);
+      endTutorial();
       setShowBubbles(true);
    };
 
@@ -370,7 +372,7 @@ function VideoContainer(props) {
             handleClose={handleCloseDemoIntroModal}
          />
          <DemoEndModal
-            open={isOpen(17)}
+            open={isOpen(23)}
             handleClose={handleCloseDemoEndModal}
          />
       </Fragment>
