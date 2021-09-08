@@ -23,14 +23,15 @@ import { CssBaseline } from "@material-ui/core";
 import Notifier from "../components/views/notifier";
 import { getCookieConsentValue } from "react-cookie-consent";
 import CFCookieConsent from "components/views/common/cookie-consent/CFCookieConsent";
+import { useRouter } from "next/router";
 
 config({ ssrFadeout: true });
 
 // react-redux-firebase config
 const rrfConfig = {
-   // userProfile: 'userData',
-   useFirestoreForProfile: true, // Firestore for Profile instead of Realtime DB
-   attachAuthIsReady: true, // attaches auth is ready promise to store
+  // userProfile: 'userData',
+  useFirestoreForProfile: true, // Firestore for Profile instead of Realtime DB
+  attachAuthIsReady: true, // attaches auth is ready promise to store
 };
 
 export const store = newStore();
@@ -42,14 +43,16 @@ const rrfProps = {
 };
 
 function MyApp({ Component, pageProps }) {
-   // const classes = useStyles()
-   Sentry.init({
-      dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031",
-   });
+  // const classes = useStyles()
+  Sentry.init({
+    dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031",
+  });
 
-   const firebase = new Firebase();
+  const { pathname } = useRouter();
+  const firebase = new Firebase();
 
-   const [generalError, setGeneralError] = useState("");
+  const [generalError, setGeneralError] = useState("");
+  const [disableCookies, setDisableCookies] = useState(false);
 
    const initialTutorialState = {
       0: true,
@@ -98,11 +101,17 @@ function MyApp({ Component, pageProps }) {
 
    const cookieValue = getCookieConsentValue();
 
-   useEffect(() => {
-      if (Boolean(cookieValue === "true")) {
-         TagManager.initialize(tagManagerArgs);
-      }
-   }, [cookieValue]);
+  useEffect(() => {
+    if (Boolean(cookieValue === "true" && !disableCookies)) {
+      TagManager.initialize(tagManagerArgs);
+    }
+  }, [cookieValue, disableCookies]);
+
+  useEffect(() => {
+    setDisableCookies(
+      Boolean(pathname === "/next-livestreams/[groupId]/embed")
+    );
+  }, [pathname]);
 
    const getActiveTutorialStepKey = () => {
       const activeStep = Object.keys(tutorialSteps).find((key) => {
@@ -164,7 +173,8 @@ function MyApp({ Component, pageProps }) {
                               >
                                  {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                                  <CssBaseline />
-                                 <CFCookieConsent />
+                                  {disableCookies ? null: <CFCookieConsent />}
+                                  <CFCookieConsent />
                                  <Component {...pageProps} />
                                  <Notifier />
                                  <ErrorSnackBar

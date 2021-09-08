@@ -71,7 +71,8 @@ const LandingPage = ({}) => {
             title={"Some of the universities we work with"}
             subtitle="Reach students at multiple universities with a single event. No travel, no logistics, no days off work."
          />
-         <StreamSection
+        {/*<iframe frameBorder="0" height="600" src="https://personal-habib.web.app/next-livestreams/GXW3MtpTehSmAe0aP1J4/embed" title="Events"/>*/}
+        <StreamSection
             title={
                <>
                   Showcase your best ambassadors <b>- your employees.</b>
@@ -90,7 +91,7 @@ const LandingPage = ({}) => {
             backgroundImage={rectangle1}
             subtitle="Evaluate the success of your events, gather live feedback from your audience and follow up easily with interesting candidates"
          />
-         <TestimonialsSection
+        <TestimonialsSection
             title="What They Are Saying"
             backgroundColor={grey["200"]}
          />
