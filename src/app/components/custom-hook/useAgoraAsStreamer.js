@@ -595,7 +595,9 @@ export default function useAgoraAsStreamer(
                   msg: "RTC_REQUEST_MEDIA_ACCESS",
                });
 
-               const localAudio = await agoraRTC.createMicrophoneAudioTrack();
+               const localAudio = await agoraRTC.createMicrophoneAudioTrack({
+                  encoderConfig: "speech_standard",
+               });
                const localVideo = await agoraRTC.createCameraVideoTrack({
                   encoderConfig: "480p_9",
                });
