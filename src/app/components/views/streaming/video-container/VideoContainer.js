@@ -3,6 +3,7 @@ import React, {
    useCallback,
    useContext,
    useEffect,
+   useMemo,
    useState,
 } from "react";
 
@@ -266,17 +267,21 @@ function VideoContainer(props) {
       [optimizationMode, props.currentLivestream?.mode, props.streamerId]
    );
 
-   const sharingContent = () =>
-      props.currentLivestream.mode === "presentation" ||
-      props.currentLivestream.mode === "desktop";
+   const sharingContent = useMemo(
+      () =>
+         props.currentLivestream.mode === "presentation" ||
+         props.currentLivestream.mode === "desktop",
+      [props.currentLivestream.mode]
+   );
 
    return (
       <Fragment>
          <BreakoutRoomManagementModal agoraHandlers={agoraHandlers} />
          <Streams
-           externalMediaStreams={externalMediaStreams}
+            externalMediaStreams={externalMediaStreams}
             localMediaStream={localMediaStream}
             currentSpeakerId={currentSpeakerId}
+            sharingContent={sharingContent}
          />
          {/*<div>*/}
          {/*   <CurrentSpeakerDisplayer*/}
