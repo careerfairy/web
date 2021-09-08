@@ -1,228 +1,239 @@
-import React, {Fragment, useEffect, useState} from "react";
-import {withFirebase} from "context/firebase";
+import React, { Fragment, useEffect, useState } from "react";
+import { withFirebase } from "context/firebase";
 import UserCategorySelector from "components/views/profile/UserCategorySelector";
 import {
-    Box,
-    Button,
-    CardMedia,
-    Checkbox,
-    CircularProgress,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    FormControlLabel,
-    Typography,
+   Box,
+   Button,
+   CardMedia,
+   Checkbox,
+   CircularProgress,
+   Dialog,
+   DialogActions,
+   DialogContent,
+   DialogContentText,
+   DialogTitle,
+   FormControlLabel,
+   Typography,
 } from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import LogoButtons from "./LogoButtons";
 
 const useStyles = makeStyles((theme) => ({
-    media: {
-        display: "flex",
-        justifyContent: "center",
-        padding: "1.5em 1em 1em 1em",
-        height: "120px",
-    },
-    image: {
-        objectFit: "contain",
-        maxWidth: "80%",
-    },
-    actions: {
-        display: "flex",
-        flexFlow: "column",
-        alignItems: "center",
-    },
+   media: {
+      display: "flex",
+      justifyContent: "center",
+      padding: "1.5em 1em 1em 1em",
+      height: "120px",
+   },
+   image: {
+      objectFit: "contain",
+      maxWidth: "80%",
+   },
+   actions: {
+      display: "flex",
+      flexFlow: "column",
+      alignItems: "center",
+   },
 }));
 
 const GroupJoinToAttendModal = ({
-                                    groups,
-                                    firebase,
-                                    open,
-                                    closeModal,
-                                    groupsWithPolicies,
-                                    userData,
-                                    onConfirm,
-                                    alreadyJoined,
-                                }) => {
-    const classes = useStyles();
-    const [categories, setCategories] = useState([]);
-    const [group, setGroup] = useState({})
-    const [allSelected, setAllSelected] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
-    const [localGroupsWithPolicies, setLocalGroupsWithPolicies] = useState([]);
-    useEffect(() => {
-        setLocalGroupsWithPolicies(groupsWithPolicies)
-    }, [groupsWithPolicies])
+   groups,
+   firebase,
+   open,
+   closeModal,
+   groupsWithPolicies,
+   userData,
+   onConfirm,
+   alreadyJoined,
+}) => {
+   const classes = useStyles();
+   const [categories, setCategories] = useState([]);
+   const [group, setGroup] = useState({});
+   const [allSelected, setAllSelected] = useState(false);
+   const [submitting, setSubmitting] = useState(false);
+   const [localGroupsWithPolicies, setLocalGroupsWithPolicies] = useState([]);
+   useEffect(() => {
+      setLocalGroupsWithPolicies(groupsWithPolicies);
+   }, [groupsWithPolicies]);
 
-    useEffect(() => {
-        if (groups && groups.length && groups.length === 1) {
-            setGroup(groups[0])
-        } else {
-            setGroup({})
-        }
-    }, [groups])
+   useEffect(() => {
+      if (groups && groups.length && groups.length === 1) {
+         setGroup(groups[0]);
+      } else {
+         setGroup({});
+      }
+   }, [groups]);
 
-    useEffect(() => {
-        if (group.categories) {
-            const groupCategories = group.categories.map((obj) => ({
-                ...obj,
-                selectedValueId: "",
-            }));
-            if (userData && alreadyJoined) {
-                const userCategories = userData.registeredGroups.find(
-                    (el) => el.groupId === group.id
-                ).categories;
-                userCategories.forEach((category, index) => {
-                    groupCategories.forEach((groupCategory) => {
-                        const exists = groupCategory.options.some(
-                            (option) => option.id === category.selectedValueId
-                        );
-                        if (exists) {
-                            groupCategory.selectedValueId = category.selectedValueId;
-                        }
-                    });
-                });
-            }
-            setCategories(groupCategories);
-        }
-    }, [group]);
-
-    useEffect(() => {
-        if (categories && open) {
-            const notAllSelected = !categories.some(
-                (category) => category.selectedValueId === ""
-            );
-            setAllSelected(notAllSelected);
-        }
-    }, [categories, open]);
-
-    const handleSetSelected = (categoryId, event) => {
-        const newCategories = [...categories];
-        const index = newCategories.findIndex((el) => el.id === categoryId);
-        newCategories[index].selectedValueId = event.target.value;
-        setCategories(newCategories);
-    };
-
-    const handleJoinGroup = async () => {
-        try {
-            setSubmitting(true);
-            const newCategories = categories.map((categoryObj) => {
-                return {
-                    id: categoryObj.id,
-                    selectedValueId: categoryObj.selectedValueId,
-                };
+   useEffect(() => {
+      if (group.categories) {
+         const groupCategories = group.categories.map((obj) => ({
+            ...obj,
+            selectedValueId: "",
+         }));
+         if (userData && alreadyJoined) {
+            const userCategories = userData.registeredGroups.find(
+               (el) => el.groupId === group.id
+            ).categories;
+            userCategories.forEach((category, index) => {
+               groupCategories.forEach((groupCategory) => {
+                  const exists = groupCategory.options.some(
+                     (option) => option.id === category.selectedValueId
+                  );
+                  if (exists) {
+                     groupCategory.selectedValueId = category.selectedValueId;
+                  }
+               });
             });
-            const groupObj = {
-                groupId: group.id,
-                categories: newCategories,
+         }
+         setCategories(groupCategories);
+      }
+   }, [group]);
+
+   useEffect(() => {
+      if (categories && open) {
+         const notAllSelected = !categories.some(
+            (category) => category.selectedValueId === ""
+         );
+         setAllSelected(notAllSelected);
+      }
+   }, [categories, open]);
+
+   const handleSetSelected = (categoryId, event) => {
+      const newCategories = [...categories];
+      const index = newCategories.findIndex((el) => el.id === categoryId);
+      newCategories[index].selectedValueId = event.target.value;
+      setCategories(newCategories);
+   };
+
+   const handleJoinGroup = async () => {
+      try {
+         setSubmitting(true);
+         const newCategories = categories.map((categoryObj) => {
+            return {
+               id: categoryObj.id,
+               selectedValueId: categoryObj.selectedValueId,
             };
-            let arrayOfGroupObjects = [];
-            let arrayOfGroupIds = [];
-            if (userData.groupIds && userData.registeredGroups) {
-                if (alreadyJoined) {
-                    arrayOfGroupIds = [...userData.groupIds];
-                    const index = userData.registeredGroups.findIndex(
-                        (group) => group.groupId === groupObj.groupId
-                    );
-                    arrayOfGroupObjects = [...userData.registeredGroups];
-                    arrayOfGroupObjects[index] = groupObj;
-                } else {
-                    arrayOfGroupObjects = [...userData.registeredGroups, groupObj];
-                    arrayOfGroupIds = arrayOfGroupObjects.map((obj) => obj.groupId);
-                }
+         });
+         const groupObj = {
+            groupId: group.id,
+            categories: newCategories,
+         };
+         let arrayOfGroupObjects = [];
+         let arrayOfGroupIds = [];
+         if (userData.groupIds && userData.registeredGroups) {
+            if (alreadyJoined) {
+               arrayOfGroupIds = [...userData.groupIds];
+               const index = userData.registeredGroups.findIndex(
+                  (group) => group.groupId === groupObj.groupId
+               );
+               arrayOfGroupObjects = [...userData.registeredGroups];
+               arrayOfGroupObjects[index] = groupObj;
             } else {
-                arrayOfGroupObjects.push(groupObj);
-                arrayOfGroupIds.push(groupObj.groupId);
+               arrayOfGroupObjects = [...userData.registeredGroups, groupObj];
+               arrayOfGroupIds = arrayOfGroupObjects.map((obj) => obj.groupId);
             }
-            const userId = userData.id || userData.userEmail;
-            await firebase.setgroups(userId, arrayOfGroupIds, arrayOfGroupObjects);
-            setSubmitting(false);
-            if (onConfirm) {
-                onConfirm();
-            }
-            handleClose();
-        } catch (e) {
-            console.log("error in handle join", e);
-            setSubmitting(false);
-        }
-    };
+         } else {
+            arrayOfGroupObjects.push(groupObj);
+            arrayOfGroupIds.push(groupObj.groupId);
+         }
+         const userId = userData.id || userData.userEmail;
+         await firebase.setgroups(userId, arrayOfGroupIds, arrayOfGroupObjects);
+         setSubmitting(false);
+         if (onConfirm) {
+            onConfirm();
+         }
+         handleClose();
+      } catch (e) {
+         console.log("error in handle join", e);
+         setSubmitting(false);
+      }
+   };
 
-    const renderCategories = categories.map((category, index) => {
-        return (
-            <Fragment key={category.id}>
-                <UserCategorySelector
-                    handleSetSelected={handleSetSelected}
-                    index={index}
-                    category={category}
-                />
-            </Fragment>
-        );
-    });
+   const renderCategories = categories.map((category, index) => {
+      return (
+         <Fragment key={category.id}>
+            <UserCategorySelector
+               handleSetSelected={handleSetSelected}
+               index={index}
+               category={category}
+            />
+         </Fragment>
+      );
+   });
 
-    const handleClose = () => {
-        closeModal()
-    }
+   const handleClose = () => {
+      closeModal();
+   };
 
-    return (
-        <Dialog
-            open={open}
-            onClose={handleClose} fullWidth maxWidth="sm">
-            {!group.universityName ?
-                <>
-                    <DialogTitle align="center">Please follow one of the following groups in order to
-                        register:</DialogTitle>
-                    <LogoButtons setGroup={setGroup} groups={groups}/>
-                </>
-                :
-                <>
-                    <DialogTitle align="center">Join live streams from</DialogTitle>
-                    <CardMedia className={classes.media}>
-                        <img src={group.logoUrl} className={classes.image} alt=""/>
-                    </CardMedia>
-                    <DialogContent>
-                        <DialogContentText align="center" noWrap>
-                            {group.description}
-                        </DialogContentText>
-                        <Box p={2} className={classes.actions}>
-                            {!!categories.length && renderCategories}
-                        </Box>
-                        <Box p={2} className={classes.actions}>
-                            {localGroupsWithPolicies.map((group, index) => (
-                                <Typography style={{ fontSize: '0.8rem'}}>
-                                    Your participant information (surname, first name, university affiliation) and the data above will be transferred to the organizer when you register for the event. The data protection notice of the organizer applies. You can find it                      
-                                     <a  target="_blank" style={{ marginLeft: 4 }}
-                                        href={group.privacyPolicyUrl}>
-                                     here</a>.
-                                </Typography>
-                            ))}
-                        </Box>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button size="large" onClick={handleClose}>
-                            Cancel
-                        </Button>
-                        {((alreadyJoined && group.categories) || !alreadyJoined) && (
-                            <Button
-                                disabled={!allSelected || submitting}
-                                variant="contained"
-                                size="large"
-                                endIcon={
-                                    submitting && <CircularProgress size={20} color="inherit"/>
-                                }
-                                onClick={handleJoinGroup}
-                                color="primary"
-                                autoFocus
-                            >
-                                I'll attend
-                            </Button>
-                        )}
-                    </DialogActions>
-                </>
-            }
-        </Dialog>
-    );
+   return (
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+         {!group.universityName ? (
+            <>
+               <DialogTitle align="center">
+                  Please follow one of the following groups in order to
+                  register:
+               </DialogTitle>
+               <LogoButtons setGroup={setGroup} groups={groups} />
+            </>
+         ) : (
+            <>
+               <DialogTitle align="center">Join live streams from</DialogTitle>
+               <CardMedia className={classes.media}>
+                  <img src={group.logoUrl} className={classes.image} alt="" />
+               </CardMedia>
+               <DialogContent>
+                  <DialogContentText align="center" noWrap>
+                     {group.description}
+                  </DialogContentText>
+                  <Box p={2} className={classes.actions}>
+                     {!!categories.length && renderCategories}
+                  </Box>
+                  <Box p={2} className={classes.actions}>
+                     {localGroupsWithPolicies.map((group, index) => (
+                        <Typography style={{ fontSize: "0.8rem" }}>
+                           Your participant information (surname, first name,
+                           university affiliation) and the data above will be
+                           transferred to the organizer when you register for
+                           the event. The data protection notice of the
+                           organizer applies. You can find it
+                           <a
+                              target="_blank"
+                              style={{ marginLeft: 4 }}
+                              href={group.privacyPolicyUrl}
+                           >
+                              here
+                           </a>
+                           .
+                        </Typography>
+                     ))}
+                  </Box>
+               </DialogContent>
+               <DialogActions>
+                  <Button size="large" onClick={handleClose}>
+                     Cancel
+                  </Button>
+                  {((alreadyJoined && group.categories) || !alreadyJoined) && (
+                     <Button
+                        disabled={!allSelected || submitting}
+                        variant="contained"
+                        size="large"
+                        endIcon={
+                           submitting && (
+                              <CircularProgress size={20} color="inherit" />
+                           )
+                        }
+                        onClick={handleJoinGroup}
+                        color="primary"
+                        autoFocus
+                     >
+                        I'll attend
+                     </Button>
+                  )}
+               </DialogActions>
+            </>
+         )}
+      </Dialog>
+   );
 };
 
 export default withFirebase(GroupJoinToAttendModal);

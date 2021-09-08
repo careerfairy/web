@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
    navLinks: {
       fontWeight: 600,
       opacity: 1,
-      color: props =>`${props.navLinksColor} !important`,
+      color: (props) => `${props.navLinksColor} !important`,
       "&:hover": {
          textDecoration: "none !important",
       },
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
          height: 2,
          bottom: 0,
          left: "0",
-         backgroundColor: props => props.navLinksColor,
+         backgroundColor: (props) => props.navLinksColor,
          visibility: "hidden",
          WebkitTransform: "scaleX(0)",
          transform: "scaleX(0)",
@@ -62,8 +62,8 @@ const useStyles = makeStyles((theme) => ({
       },
    },
    indicator: {
-      background: props => props.navLinksColor,
-      color: props => props.navLinksColor,
+      background: (props) => props.navLinksColor,
+      color: (props) => props.navLinksColor,
    },
    navIconButton: {
       // color: "white !important",
@@ -91,7 +91,7 @@ const TopBar = ({ links, className, onMobileNavOpen, currentGroup }) => {
    const theme = useTheme();
    const showHeaderLinks = useMediaQuery(theme.breakpoints.up("md"));
    const { GeneralHeader, headerColors } = useGeneralHeader();
-   const classes = useStyles({navLinksColor: headerColors.navLinksColor});
+   const classes = useStyles({ navLinksColor: headerColors.navLinksColor });
    const { pathname } = useRouter();
    const dispatch = useDispatch();
    const { authenticatedUser } = useAuth();

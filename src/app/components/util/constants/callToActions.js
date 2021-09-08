@@ -6,6 +6,7 @@ import CustomIcon from "@material-ui/icons/Info";
 import React from "react";
 import { FACEBOOK_COLOR, LINKEDIN_COLOR, TWITTER_COLOR } from "../colors";
 import { baseThemeObj } from "../../../materialUI";
+import { makeExternalLink } from "../../helperFunctions/HelperFunctions";
 
 export const defaultDeadlineDate = new Date(
    new Date().getTime() + 7 * 24 * 60 * 60 * 1000
@@ -76,3 +77,47 @@ export const callToActionsSocialsDictionary =
 export const callToActionSocialsArray = Object.keys(
    callToActionsSocialsDictionary
 ).map((key) => callToActionsSocialsDictionary[key]);
+
+export const getCtaSnackBarProps = (callToAction, fallBackImage) => {
+   let message = callToAction.message || "";
+   const type = callToAction.type;
+   const socialType = callToAction.socialData?.socialType || "";
+   if (type === "social") {
+      const socialName = callToActionsSocialsDictionary[socialType].name;
+      message = socialName ? `Follow us on ${socialName}` : "Follow us";
+   }
+   const buttonText = callToAction.buttonText || "Click here";
+   const buttonUrl = callToAction.buttonUrl
+      ? makeExternalLink(callToAction.buttonUrl)
+      : "https://careerfairy.io/";
+   const callToActionId = callToAction.id;
+
+   const jobTitle = callToAction.jobData?.jobTitle || "";
+   const salary = callToAction.jobData?.salary || "";
+   const applicationDeadline =
+      callToAction.jobData?.applicationDeadline?.toDate?.() || null;
+   const snackBarImage = callToAction.imageUrl || fallBackImage;
+   let icon = callToActionsDictionary.custom.icon;
+   const socialIcon = callToActionsSocialsDictionary?.[socialType]?.icon;
+   const baseIcon = callToActionsDictionary[type]?.icon;
+   if (type === "social" && socialIcon) {
+      icon = socialIcon;
+   } else if (baseIcon) {
+      icon = baseIcon;
+   }
+   return {
+      buttonText,
+      buttonUrl,
+      isForTutorial: Boolean(callToAction.isForTutorial),
+      isJobPosting: type === "jobPosting",
+      message,
+      icon,
+      callToActionId,
+      jobTitle,
+      salary,
+      applicationDeadline,
+      snackBarImage,
+      type,
+      id: callToActionId,
+   };
+};

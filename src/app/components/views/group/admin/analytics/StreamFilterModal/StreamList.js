@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { prettyDate } from "../../../../../helperFunctions/HelperFunctions";
-import { DataGrid } from "@material-ui/data-grid";
+import MaterialTable from "@material-table/core";
+import {
+   defaultTableOptions,
+   tableIcons,
+} from "../../../../../util/tableUtils";
 
 const useStyles = makeStyles((theme) => ({
    root: {
       width: "100%",
-      height: 400,
+      height: 500,
       backgroundColor: theme.palette.background.paper,
    },
    streamCompanyLogo: {
@@ -31,23 +35,25 @@ const useStyles = makeStyles((theme) => ({
 const columns = [
    {
       field: "title",
-      headerName: "Title",
+      title: "Title",
       description: "Title of the event",
       flex: 1,
    },
    {
       field: "date",
-      headerName: "Date",
+      title: "Date",
       flex: 0.2,
-      renderCell: (params) => {
-         return prettyDate(params.row.start)
+      render: (params) => {
+         return prettyDate(params.start);
       },
       type: "date",
    },
 ];
 
 const getSelectedStreamIds = (streams, hiddenStreamIds) => {
-   return streams.filter((stream) => !hiddenStreamIds?.[stream.id]).map(stream => stream.id);
+   return streams
+      .filter((stream) => !hiddenStreamIds?.[stream.id])
+      .map((stream) => stream.id);
 };
 
 const StreamList = ({
@@ -56,29 +62,50 @@ const StreamList = ({
    streamsFromStore,
 }) => {
    const classes = useStyles();
-
    const [selectionModel, setSelectionModel] = useState([]);
+   const [streamsWithSelections, setStreamsWithSelections] = useState([]);
 
    useEffect(() => {
       const selectedStreamIds = getSelectedStreamIds(
          streamsFromStore,
          hiddenStreamIds
       );
-      setSelectionModel(selectedStreamIds)
-      setNewVisibleStreamSelection(selectedStreamIds)
+      setSelectionModel(selectedStreamIds);
+      setNewVisibleStreamSelection(selectedStreamIds);
    }, []);
+
+   useEffect(() => {
+      let newStreamsWithSelections;
+      const selectionModelMap = new Set(selectionModel);
+      if (!streamsFromStore?.length) {
+         newStreamsWithSelections = [];
+      } else {
+         newStreamsWithSelections = streamsFromStore.map((stream) => ({
+            ...stream,
+            tableData: {
+               ...(stream.tableData && stream.tableData),
+               checked: selectionModelMap.has(stream.id),
+            },
+         }));
+      }
+      setStreamsWithSelections(newStreamsWithSelections);
+   }, [streamsFromStore, selectionModel]);
 
    return (
       <div className={classes.root}>
-         <DataGrid
-            checkboxSelection
-            onSelectionModelChange={(selectionObj) => {
-               // console.log("-> newSelectionModel", newSelectionModel);
-               setNewVisibleStreamSelection(selectionObj.selectionModel);
+         <MaterialTable
+            style={{
+               boxShadow: "none",
             }}
-            selectionModel={selectionModel}
             columns={columns}
-            rows={streamsFromStore}
+            data={streamsWithSelections}
+            options={defaultTableOptions}
+            icons={tableIcons}
+            onSelectionChange={(selectedStreams) => {
+               setNewVisibleStreamSelection(
+                  selectedStreams.map((stream) => stream.id)
+               );
+            }}
          />
       </div>
    );

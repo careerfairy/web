@@ -1,17 +1,12 @@
-import React from 'react';
-import {makeStyles} from "@material-ui/core/styles";
+import React from "react";
+import { makeStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles(theme => ({}));
+const useStyles = makeStyles((theme) => ({}));
 
 const UserJoinedBar = ({}) => {
+   const classes = useStyles();
 
-    const classes = useStyles()
-
-    return (
-        <div>
-            
-        </div>
-    );
+   return <div></div>;
 };
 
 export default UserJoinedBar;

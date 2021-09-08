@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useContext, useEffect, useMemo, useState } from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
-import PropTypes from "prop-types";
 import {
    Button,
-   CircularProgress,
    IconButton,
-   LinearProgress,
    ListItem,
    ListItemAvatar,
    ListItemIcon,
@@ -25,12 +22,13 @@ import {
    callToActionsDictionary,
    callToActionsSocialsDictionary,
 } from "../../../../util/constants/callToActions";
+import RubberBand from "react-reveal/RubberBand";
+import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips";
+import TutorialContext from "../../../../../context/tutorials/TutorialContext";
+import { getRandomInt } from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(({ palette }) => ({
-   root: {
-      display: "flex",
-      padding: 4,
-   },
+   root: {},
    detailsWrapper: {
       display: "flex",
       flexDirection: "column",
@@ -44,20 +42,6 @@ const useStyles = makeStyles(({ palette }) => ({
       justifyContent: "center",
       alignItems: "center",
    },
-   card: {
-      display: "flex",
-      flexDirection: "column",
-      minWidth: 270,
-      width: "100%",
-      borderRadius: 12,
-      "& > *:nth-child(1)": {
-         // marginRight: spacing(2),
-      },
-      "& > *:nth-child(2)": {
-         flex: "auto",
-      },
-   },
-   avatar: {},
    listItemAvatar: {
       height: "100%",
       backgroundColor: (props) => alpha(props.color, 0.3),
@@ -67,34 +51,7 @@ const useStyles = makeStyles(({ palette }) => ({
       "& svg": {
          fontSize: 40,
          color: palette.common.white,
-         // color: props => props.color,
       },
-   },
-   icon: {
-      // margin: "auto",
-   },
-   heading: {
-      // fontFamily: family,
-      fontSize: 16,
-      marginBottom: 0,
-   },
-   subheader: {
-      // fontFamily: family,
-      fontSize: 14,
-      color: palette.grey[600],
-      letterSpacing: "1px",
-      marginBottom: 4,
-   },
-   value: {
-      marginLeft: 8,
-      fontSize: 14,
-      color: palette.grey[500],
-   },
-   label: {
-      fontSize: 12,
-   },
-   description: {
-      fontSize: 10,
    },
    settingBtn: {
       position: "absolute",
@@ -103,57 +60,13 @@ const useStyles = makeStyles(({ palette }) => ({
    },
 }));
 
-const LinearProgressWithLabel = ({
-   engagementData: { total, percentage, noOfEngagement, noOfDismissal },
-}) => {
-   return (
-      <Tooltip title="This bar shows you the number of individuals who clicked on the call to action">
-         <Box width="100%" display="flex" alignItems="center">
-            <Box width="100%" mr={1}>
-               <LinearProgress variant="determinate" value={percentage} />
-            </Box>
-            <Box minWidth={35}>
-               <Typography variant="body2" color="textSecondary">
-                  {/*   {`${Math.round(*/}
-                  {/*   percentage*/}
-                  {/*)}%`}*/}
-                  {`${noOfEngagement}/${total}`}
-               </Typography>
-            </Box>
-         </Box>
-      </Tooltip>
-   );
-};
-
-LinearProgressWithLabel.propTypes = {
-   /**
-    * The value of the progress indicator for the determinate and buffer variants.
-    * Value between 0 and 100.
-    */
-   engagementData: PropTypes.object.isRequired,
-};
-
-const Section = ({ label, description }) => {
-   const classes = useStyles();
-
-   return (
-      <React.Fragment>
-         <Typography noWrap className={classes.label} color="textSecondary">
-            {label}
-         </Typography>
-         <Typography noWrap gutterBottom className={classes.description}>
-            <LinkifyText>{description}</LinkifyText>
-         </Typography>
-      </React.Fragment>
-   );
-};
-
 const SettingsDropdown = ({
    className,
    callToAction,
    handleClickEditCallToAction,
    handleClickDeleteCallToAction,
    handleClickResendCallToAction,
+   disabled,
 }) => {
    const [anchorEl, setAnchorEl] = useState(null);
 
@@ -178,8 +91,10 @@ const SettingsDropdown = ({
             onClose={handleClose}
          >
             <MenuItem
+               disabled={disabled}
                onClick={() => {
                   handleClickEditCallToAction(callToAction);
+                  handleClose();
                }}
             >
                <ListItemIcon>
@@ -188,8 +103,10 @@ const SettingsDropdown = ({
                <Typography variant="inherit">Edit</Typography>
             </MenuItem>
             <MenuItem
+               disabled={disabled}
                onClick={() => {
                   handleClickDeleteCallToAction(callToAction.id);
+                  handleClose();
                }}
             >
                <ListItemIcon>
@@ -198,8 +115,10 @@ const SettingsDropdown = ({
                <Typography variant="inherit">Delete</Typography>
             </MenuItem>
             <MenuItem
+               disabled={disabled}
                onClick={() => {
                   handleClickResendCallToAction(callToAction.id);
+                  handleClose();
                }}
             >
                <ListItemIcon>
@@ -212,44 +131,32 @@ const SettingsDropdown = ({
    );
 };
 
-const EngagementChart = ({ percentage, noOfEngagement, total, ...props }) => {
+const EngagementChart = memo(({ percentage, noOfEngagement, total }) => {
    return (
-      <Tooltip
-         title={`Of the ${total} interactions ${noOfEngagement}(${percentage}%) of users clicked on the call to action`}
-      >
-         <Box position="relative" display="inline-flex">
-            <CircularProgress
-               variant="determinate"
-               value={percentage}
-               {...props}
-            />
-            <Box
-               top={0}
-               left={0}
-               bottom={0}
-               right={0}
-               position="absolute"
-               display="flex"
-               alignItems="center"
-               justifyContent="center"
-            >
-               <Typography
-                  variant="caption"
-                  component="div"
-                  color="textSecondary"
-               >
+      <Box position="relative" display="inline-flex">
+         <Box
+            top={0}
+            left={0}
+            bottom={0}
+            right={0}
+            position="absolute"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+         >
+            <RubberBand spy={noOfEngagement}>
+               <Typography variant="h6" component="div" color="textSecondary">
                   {noOfEngagement}
                </Typography>
-            </Box>
+            </RubberBand>
          </Box>
-      </Tooltip>
+      </Box>
    );
-};
-
+});
+const numberOfTicks = 20;
+let count = 0;
 export const CallToActionItem = React.memo((props) => {
    const {
-      style,
-      index,
       callToAction: {
          active,
          id,
@@ -267,7 +174,17 @@ export const CallToActionItem = React.memo((props) => {
       handleClickEditCallToAction,
       handleClickDeleteCallToAction,
       handleClickResendCallToAction,
+      handleClose,
+      setTutorialCtaId,
+      tutorialCtaId,
    } = props;
+
+   const { handleConfirmStep, isOpen } = useContext(TutorialContext);
+   const isTutorialCta = useMemo(() => isOpen(22) && tutorialCtaId === id, [
+      tutorialCtaId,
+      id,
+      isOpen(22),
+   ]);
 
    const isJobPosting = type === "jobPosting";
 
@@ -286,6 +203,30 @@ export const CallToActionItem = React.memo((props) => {
    });
 
    const [icon, setIcon] = useState(callToActionsDictionary.custom.icon);
+
+   useEffect(() => {
+      if (
+         numberOfUsersWhoClickedLink < 2 &&
+         isTutorialCta &&
+         count < numberOfTicks
+      ) {
+         const interval = setInterval(() => {
+            count = count + 1;
+            if (count >= numberOfTicks) {
+               clearInterval(interval);
+            }
+            simulateEngagement();
+         }, 200);
+         return () => clearInterval(interval);
+      }
+   }, [Boolean(numberOfUsersWhoClickedLink), isTutorialCta]);
+
+   const simulateEngagement = () => {
+      setEngagementData({
+         ...engagementData,
+         noOfEngagement: (engagementData.noOfEngagement += getRandomInt(1, 3)),
+      });
+   };
 
    useEffect(() => {
       const noOfEngagement = numberOfUsersWhoClickedLink || 0;
@@ -308,7 +249,6 @@ export const CallToActionItem = React.memo((props) => {
          let newColor =
             callToActionsDictionary[type]?.color ||
             callToActionsDictionary.custom.color;
-         // console.log("-> newColor", newColor);
          if (isSocial) {
             if (socialData.socialType) {
                newIcon =
@@ -326,83 +266,105 @@ export const CallToActionItem = React.memo((props) => {
    }, [type, socialData]);
 
    return (
-      <ListItem divider style={style}>
-         <ListItemAvatar className={classes.listItemAvatar}>
-            {icon}
-         </ListItemAvatar>
-         <Box flexGrow={1} minWidth={0} p={1} pr={0}>
-            <Box display={"flex"}>
-               <div className={classes.detailsWrapper}>
-                  {isJobPosting ? (
+      <StyledTooltipWithButton
+         open={isTutorialCta}
+         tooltipTitle="Share Job Posts (8/8)"
+         placement="right"
+         onConfirm={() => {
+            handleClose();
+            handleConfirmStep(22);
+         }}
+         tooltipText="Here you can see and track how many users have interacted with you job posting."
+      >
+         <ListItem
+            divider
+            style={{
+               height: 200,
+            }}
+         >
+            <ListItemAvatar className={classes.listItemAvatar}>
+               {icon}
+            </ListItemAvatar>
+            <Box flexGrow={1} minWidth={0} p={1} pr={0}>
+               <Box display={"flex"}>
+                  <div className={classes.detailsWrapper}>
+                     {isJobPosting ? (
+                        <ListItemText
+                           primary="Job Title"
+                           secondaryTypographyProps={{
+                              noWrap: true,
+                           }}
+                           secondary={jobData?.jobTitle}
+                        />
+                     ) : (
+                        <ListItemText
+                           primary="Button Text"
+                           secondaryTypographyProps={{
+                              noWrap: true,
+                           }}
+                           secondary={buttonText}
+                        />
+                     )}
                      <ListItemText
-                        primary="Job Title"
+                        primary="Button Url"
                         secondaryTypographyProps={{
                            noWrap: true,
                         }}
-                        secondary={jobData?.jobTitle}
+                        secondary={<LinkifyText>{buttonUrl}</LinkifyText>}
                      />
-                  ) : (
                      <ListItemText
-                        primary="Button Text"
+                        primary={isJobPosting ? "Job Description" : "Message"}
                         secondaryTypographyProps={{
                            noWrap: true,
                         }}
-                        secondary={buttonText}
-                     />
-                  )}
-                  <ListItemText
-                     primary="Button Url"
-                     secondaryTypographyProps={{
-                        noWrap: true,
-                     }}
-                     secondary={<LinkifyText>{buttonUrl}</LinkifyText>}
-                  />
-                  <ListItemText
-                     primary={isJobPosting ? "Job Description" : "Message"}
-                     secondaryTypographyProps={{
-                        noWrap: true,
-                     }}
-                     secondary={message}
-                  />
-               </div>
-               <div className={classes.headerActionsWrapper}>
-                  <SettingsDropdown
-                     handleClickEditCallToAction={handleClickEditCallToAction}
-                     handleClickResendCallToAction={
-                        handleClickResendCallToAction
-                     }
-                     handleClickDeleteCallToAction={
-                        handleClickDeleteCallToAction
-                     }
-                     callToAction={props.callToAction}
-                     className={classes.settingBtn}
-                  />
-                  <Typography gutterBottom color="textSecondary">
-                     Clicks
-                  </Typography>
-                  <div>
-                     <EngagementChart
-                        noOfEngagement={engagementData.noOfEngagement}
-                        percentage={engagementData.percentage}
-                        total={engagementData.total}
+                        secondary={message}
                      />
                   </div>
-               </div>
+                  <div className={classes.headerActionsWrapper}>
+                     <SettingsDropdown
+                        disabled={isTutorialCta}
+                        handleClickEditCallToAction={
+                           handleClickEditCallToAction
+                        }
+                        handleClickResendCallToAction={
+                           handleClickResendCallToAction
+                        }
+                        handleClickDeleteCallToAction={
+                           handleClickDeleteCallToAction
+                        }
+                        callToAction={props.callToAction}
+                        className={classes.settingBtn}
+                     />
+                     <Typography gutterBottom color="textSecondary">
+                        Clicks
+                     </Typography>
+                     <div>
+                        <EngagementChart
+                           noOfEngagement={engagementData.noOfEngagement}
+                           percentage={engagementData.percentage}
+                           total={engagementData.total}
+                        />
+                     </div>
+                  </div>
+               </Box>
+               <Box>
+                  <Button
+                     color="primary"
+                     fullWidth
+                     disabled={isTutorialCta}
+                     variant={active ? "contained" : "outlined"}
+                     onClick={() => {
+                        handleToggleActive(id, active);
+                     }}
+                  >
+                     {active
+                        ? "Deactivate Call To Action"
+                        : "Send Call To Action"}
+                  </Button>
+               </Box>
             </Box>
-            <Box>
-               <Button
-                  color="primary"
-                  fullWidth
-                  variant={active ? "contained" : "outlined"}
-                  onClick={() => {
-                     handleToggleActive(id, active);
-                  }}
-               >
-                  {active ? "Deactivate Call To Action" : "Send Call To Action"}
-               </Button>
-            </Box>
-         </Box>
-      </ListItem>
+         </ListItem>
+      </StyledTooltipWithButton>
    );
 });
 

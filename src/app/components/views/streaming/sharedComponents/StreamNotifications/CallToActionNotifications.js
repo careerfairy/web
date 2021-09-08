@@ -2,16 +2,13 @@ import React, { memo, useEffect, useState } from "react";
 import { useFirebase } from "context/firebase";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
-import { makeExternalLink } from "../../../../helperFunctions/HelperFunctions";
 
 import CallToActionSnackbar from "./CallToActionSnackbar";
-import {
-   callToActionsDictionary,
-   callToActionsSocialsDictionary,
-} from "../../../../util/constants/callToActions";
+import { getCtaSnackBarProps } from "../../../../util/constants/callToActions";
 import { useCurrentStream } from "../../../../../context/stream/StreamContext";
+import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
 
 const CallToActionNotifications = ({
    isStreamer,
@@ -27,15 +24,18 @@ const CallToActionNotifications = ({
       dismissCallToAction,
       clickOnCallToAction,
    } = useFirebase();
+   const viewerCallToActionModalOpen = useSelector(
+      (state) => state.stream.layout.viewerCtaModalOpen
+   );
+
    const [dismissing, setDismissing] = useState(false);
    const [engaging, setEngaging] = useState(false);
    const loading = Boolean(dismissing || engaging);
    const isLoggedOut = authenticatedUser.isLoaded && authenticatedUser.isEmpty;
    const [localCallToActionIds, setLocalCallToActionIds] = useState([]);
 
-   const [callToActionsToCheck, setCallToActionsToCheck] = useState([]);
-
    useEffect(() => {
+      if (viewerCallToActionModalOpen) return;
       (async function handleCheckAndEnqueueActiveCallToActions() {
          if (currentActiveCallToActionIds && !isStreamer) {
             setLocalCallToActionIds((prevLocalCallToActionIds) => {
@@ -44,13 +44,13 @@ const CallToActionNotifications = ({
                   currentActiveCallToActionIds
                );
                if (
+                  !viewerCallToActionModalOpen &&
                   !isStreamer &&
                   (userData?.id || (isLoggedOut && currentLivestream?.test))
                   // Actively Check for CTAs when logged in, or when logged out during a test stream
                ) {
                   handleCheckForCallToActionIds(newlyActiveCtaIds);
                }
-               setCallToActionsToCheck(newlyActiveCtaIds);
                return currentActiveCallToActionIds;
             });
          }
@@ -112,37 +112,21 @@ const CallToActionNotifications = ({
          );
 
          callToActionsData.forEach((callToAction) => {
-            let message = callToAction.message || "";
-            const type = callToAction.type;
-            const socialType = callToAction.socialData?.socialType || "";
-            if (type === "social") {
-               const socialName =
-                  callToActionsSocialsDictionary[socialType].name;
-               message = socialName
-                  ? `Follow us on ${socialName}`
-                  : "Follow us";
-            }
-            const buttonText = callToAction.buttonText || "Click here";
-            const buttonUrl = callToAction.buttonUrl
-               ? makeExternalLink(callToAction.buttonUrl)
-               : "https://careerfairy.io/";
-            const callToActionId = callToAction.id;
-
-            const jobTitle = callToAction.jobData?.jobTitle || "";
-            const salary = callToAction.jobData?.salary || "";
-            const applicationDeadline =
-               callToAction.jobData?.applicationDeadline?.toDate?.() || null;
-            const snackBarImage =
-               callToAction.imageUrl || currentLivestream.backgroundImageUrl;
-            let icon = callToActionsDictionary.custom.icon;
-            const socialIcon =
-               callToActionsSocialsDictionary?.[socialType]?.icon;
-            const baseIcon = callToActionsDictionary[type]?.icon;
-            if (type === "social" && socialIcon) {
-               icon = socialIcon;
-            } else if (baseIcon) {
-               icon = baseIcon;
-            }
+            const {
+               icon,
+               buttonUrl,
+               buttonText,
+               callToActionId,
+               salary,
+               applicationDeadline,
+               snackBarImage,
+               message,
+               jobTitle,
+               isJobPosting,
+            } = getCtaSnackBarProps(
+               callToAction,
+               getResizedUrl(currentLivestream.companyLogoUrl, "md")
+            );
 
             dispatch(
                actions.enqueueCallToAction({
@@ -162,7 +146,7 @@ const CallToActionNotifications = ({
                         salary={salary}
                         snackBarImage={snackBarImage}
                         applicationDeadline={applicationDeadline}
-                        isJobPosting={type === "jobPosting"}
+                        isJobPosting={isJobPosting}
                         loading={loading}
                         message={message}
                      />

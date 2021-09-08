@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types";
 import React from "react";
 import Fade from "react-reveal/Fade";
 
@@ -7,7 +7,6 @@ const MuiGridFade = ({ index, ...props }) => {
 };
 
 MuiGridFade.propTypes = {
-  index: PropTypes.number.isRequired
-}
+   index: PropTypes.number.isRequired,
+};
 export default MuiGridFade;
-

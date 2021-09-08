@@ -36,10 +36,10 @@ const rrfConfig = {
 
 export const store = newStore();
 const rrfProps = {
-  firebase,
-  config: rrfConfig,
-  dispatch: store.dispatch,
-  createFirestoreInstance,
+   firebase,
+   config: rrfConfig,
+   dispatch: store.dispatch,
+   createFirestoreInstance,
 };
 
 function MyApp({ Component, pageProps }) {
@@ -54,44 +54,52 @@ function MyApp({ Component, pageProps }) {
   const [generalError, setGeneralError] = useState("");
   const [disableCookies, setDisableCookies] = useState(false);
 
-  const initialTutorialState = {
-    0: true,
-    1: false,
-    2: false,
-    3: false,
-    4: false,
-    5: false,
-    6: false,
-    7: false,
-    8: false,
-    9: false,
-    10: false,
-    11: false,
-    12: false,
-    13: false,
-    14: false,
-    15: false,
-    16: false,
-    17: false,
-    streamerReady: false,
-  };
+   const initialTutorialState = {
+      0: true,
+      1: false,
+      2: false,
+      3: false,
+      4: false,
+      5: false,
+      6: false,
+      7: false,
+      8: false,
+      9: false,
+      10: false,
+      11: false,
+      12: false,
+      13: false,
+      14: false,
+      15: false,
+      16: false,
+      // ^ start of video controls tutorial ^
+      17: false,
+      18: false,
+      19: false,
+      20: false,
+      21: false,
+      22: false,
+      23: false,
+      24: false,
+      streamerReady: false,
+   };
 
-  const [showBubbles, setShowBubbles] = useState(false);
-  const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState);
+   const [showBubbles, setShowBubbles] = useState(false);
+   const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState);
 
-  useEffect(() => {
-    // Remove the server-side injected CSS.
-    const jssStyles = document.querySelector("#jss-server-side");
-    if (jssStyles) {
-      jssStyles.parentElement.removeChild(jssStyles);
-    }
-  }, []);
+   useEffect(() => {
+      // Remove the server-side injected CSS.
+      const jssStyles = document.querySelector("#jss-server-side");
+      if (jssStyles) {
+         jssStyles.parentElement.removeChild(jssStyles);
+      }
+   }, []);
 
-  const tagManagerArgs = {
-    gtmId: "GTM-P29VCWC",
-  };
+   const tagManagerArgs = {
+      gtmId: "GTM-P29VCWC",
+   };
 
-  const cookieValue = getCookieConsentValue();
+   const cookieValue = getCookieConsentValue();
 
   useEffect(() => {
     if (Boolean(cookieValue === "true" && !disableCookies)) {
@@ -105,72 +113,84 @@ function MyApp({ Component, pageProps }) {
     );
   }, [pathname]);
 
-  const getActiveTutorialStepKey = () => {
-    const activeStep = Object.keys(tutorialSteps).find((key) => {
-      if (tutorialSteps[key]) {
-        return key;
+   const getActiveTutorialStepKey = () => {
+      const activeStep = Object.keys(tutorialSteps).find((key) => {
+         if (tutorialSteps[key]) {
+            return key;
+         }
+      });
+      return Number(activeStep);
+   };
+
+   const endTutorial = () => {
+      setTutorialSteps((prevState) => ({
+         ...prevState,
+         streamerReady: true,
+      }));
+   };
+
+   const handleConfirmStep = (property) => {
+      setTutorialSteps({
+         ...tutorialSteps,
+         [property]: false,
+         [property + 1]: true,
+      });
+   };
+
+   const isOpen = (property, isTest) => {
+      const activeStep = getActiveTutorialStepKey();
+      if (isTest) {
+         return Boolean(activeStep === property);
       }
-    });
-    return Number(activeStep);
-  };
+      return Boolean(activeStep === property);
+   };
 
-  const handleConfirmStep = (property) => {
-    setTutorialSteps({
-      ...tutorialSteps,
-      [property]: false,
-      [property + 1]: true,
-    });
-  };
-
-  const isOpen = (property) => {
-    const activeStep = getActiveTutorialStepKey();
-    return Boolean(activeStep === property);
-  };
-
-  return (
-    <Fragment>
-      <Head>
-        <title>CareerFairy | Watch live streams. Get hired.</title>
-      </Head>
-      <Provider store={store}>
-        <ReactReduxFirebaseProvider {...rrfProps}>
-          <ThemeProviderWrapper>
-            <AuthProvider>
-              <FirebaseContext.Provider value={firebase}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <TutorialContext.Provider
-                    value={{
-                      tutorialSteps,
-                      setTutorialSteps,
-                      showBubbles,
-                      setShowBubbles,
-                      getActiveTutorialStepKey,
-                      handleConfirmStep,
-                      isOpen,
-                    }}
-                  >
-                    <ErrorContext.Provider
-                      value={{ generalError, setGeneralError }}
-                    >
-                      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                      <CssBaseline />
-                      {disableCookies ? null: <CFCookieConsent />}
-                      <Component {...pageProps} />
-                      <Notifier />
-                      <ErrorSnackBar
-                        handleClose={() => setGeneralError("")}
-                        errorMessage={generalError}
-                      />
-                    </ErrorContext.Provider>
-                  </TutorialContext.Provider>
-                </MuiPickersUtilsProvider>
-              </FirebaseContext.Provider>
-            </AuthProvider>
-          </ThemeProviderWrapper>
-        </ReactReduxFirebaseProvider>
-      </Provider>
-    </Fragment>
-  );
+   return (
+      <Fragment>
+         <Head>
+            <title>CareerFairy | Watch live streams. Get hired.</title>
+         </Head>
+         <Provider store={store}>
+            <ReactReduxFirebaseProvider {...rrfProps}>
+               <TutorialContext.Provider
+                  value={{
+                     tutorialSteps,
+                     setTutorialSteps,
+                     showBubbles,
+                     setShowBubbles,
+                     getActiveTutorialStepKey,
+                     handleConfirmStep,
+                     isOpen,
+                     endTutorial,
+                  }}
+               >
+                  <ThemeProviderWrapper>
+                     <AuthProvider>
+                        <FirebaseContext.Provider value={firebase}>
+                           <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                              <ErrorContext.Provider
+                                 value={{ generalError, setGeneralError }}
+                              >
+                                 {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                 <CssBaseline />
+                                  {disableCookies ? null: <CFCookieConsent />}
+                                  <CFCookieConsent />
+                                 <Component {...pageProps} />
+                                 <Notifier />
+                                 <ErrorSnackBar
+                                    handleClose={() => setGeneralError("")}
+                                    errorMessage={generalError}
+                                 />
+                              </ErrorContext.Provider>
+                           </MuiPickersUtilsProvider>
+                        </FirebaseContext.Provider>
+                     </AuthProvider>
+                  </ThemeProviderWrapper>
+               </TutorialContext.Provider>
+            </ReactReduxFirebaseProvider>
+         </Provider>
+      </Fragment>
+   );
 }
 
 // Only uncomment this method if you have blocking data requirements for

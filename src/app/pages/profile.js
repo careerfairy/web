@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { withFirebase } from "context/firebase";
 import Head from "next/head";

@@ -11,7 +11,13 @@ import CompaniesSection from "../components/views/landing/CompaniesSection";
 import HeroSection from "../components/views/landing/HeroSection";
 import CalendlyModal from "../components/views/landing/CalendlyModal";
 import ScrollToTop from "../components/views/common/ScrollToTop";
-import { rectangle1, mainBackground, engageShape, reachShape, measureShape } from "../constants/images";
+import {
+   rectangle1,
+   mainBackground,
+   engageShape,
+   reachShape,
+   measureShape,
+} from "../constants/images";
 
 const LandingPage = ({}) => {
    const {
@@ -27,37 +33,40 @@ const LandingPage = ({}) => {
    const handleCloseCalendly = () => setCalendlyModalOpen(false);
 
    const companyBenefitsData = [
-    {
-        name: "Create fun career events",
-        description:
+      {
+         name: "Create fun career events",
+         description:
             "A highly interactive format " +
             "developed for a young " +
             "audience worldwide",
-        imageUrl: engageShape,
-    },
-    {
-        name: "Reach more talents",
-        description:
+         imageUrl: engageShape,
+      },
+      {
+         name: "Reach more talents",
+         description:
             "We promote your events to " +
             "the CareerFairy community " +
             "and universities",
-        imageUrl: reachShape,
-    },
-    {
-        name: "Easily measure success",
-        description:
+         imageUrl: reachShape,
+      },
+      {
+         name: "Easily measure success",
+         description:
             "Demonstrate the success of " +
             "your events through " +
             "detailed analytics",
-        imageUrl: measureShape,
-    },
-];
+         imageUrl: measureShape,
+      },
+   ];
 
    return (
       <LandingLayout backgroundImage={mainBackground}>
          <HeroSection big handleOpenCalendly={handleOpenCalendly} />
-         <CompaniesSection overheadText="Over 200+ happy customers"/>
-         <BenefitsSection title={"Why CareerFairy?"} benefits={companyBenefitsData} />
+         <CompaniesSection overheadText="Over 200+ happy customers" />
+         <BenefitsSection
+            title={"Why CareerFairy?"}
+            benefits={companyBenefitsData}
+         />
          <UniversitySection
             title={"Some of the universities we work with"}
             subtitle="Reach students at multiple universities with a single event. No travel, no logistics, no days off work."
@@ -75,7 +84,8 @@ const LandingPage = ({}) => {
          <AnalyticsSection
             title={
                <>
-                 Boost your <b>employer brand</b>, measure the results with <b>data</b>
+                  Boost your <b>employer brand</b>, measure the results with{" "}
+                  <b>data</b>
                </>
             }
             backgroundImage={rectangle1}
@@ -96,7 +106,7 @@ const LandingPage = ({}) => {
             open={calendlyModalOpen}
             onClose={handleCloseCalendly}
          />
-        <ScrollToTop/>
+         <ScrollToTop />
       </LandingLayout>
    );
 };

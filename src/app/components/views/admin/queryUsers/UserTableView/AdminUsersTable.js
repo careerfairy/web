@@ -1,51 +1,62 @@
-import React from 'react';
-import {Card} from "@material-ui/core";
-import {defaultTableOptions, exportSelectionAction, tableIcons} from "../../../../util/tableUtils";
+import React from "react";
+import { Card } from "@material-ui/core";
+import {
+   defaultTableOptions,
+   exportSelectionAction,
+   tableIcons,
+} from "../../../../util/tableUtils";
 import useUserTable from "../../../../custom-hook/useUserTable";
-import {useSelector} from "react-redux";
-import PropTypes from 'prop-types'
+import { useSelector } from "react-redux";
+import PropTypes from "prop-types";
 import ExportTable from "../../../common/Tables/ExportTable";
 
-const customTableOptions = {...defaultTableOptions}
+const customTableOptions = { ...defaultTableOptions };
 
-const AdminUsersTable = ({users, isFiltered}) => {
+const AdminUsersTable = ({ users, isFiltered }) => {
+   const {
+      setSelection,
+      selection,
+      handlers,
+      columns,
+      tableActions,
+   } = useUserTable();
 
-    const {setSelection, selection, handlers, columns, tableActions} = useUserTable()
+   const loading = useSelector((state) => state.currentFilterGroup.loading);
 
-    const loading = useSelector(state => state.currentFilterGroup.loading)
+   const title = React.useMemo(
+      () => `${isFiltered ? "Filtered" : "Total"} Users - ${users.length}`,
+      [users.length, isFiltered]
+   );
 
-    const title = React.useMemo(() => `${isFiltered ? "Filtered" : "Total"} Users - ${users.length}`, [users.length, isFiltered])
-
-    return (
-        <Card>
-            <ExportTable
-                icons={tableIcons}
-                isLoading={loading}
-                data={users}
-                options={customTableOptions}
-                columns={columns()}
-                actions={[
-                    exportSelectionAction(columns(), title),
-                    tableActions.copyEmails,
-                    tableActions.copyLinkedIn
-                ]}
-                onSelectionChange={(rows) => {
-                    setSelection(rows);
-                }}
-                title={title}
-            />
-        </Card>
-    )
+   return (
+      <Card>
+         <ExportTable
+            icons={tableIcons}
+            isLoading={loading}
+            data={users}
+            options={customTableOptions}
+            columns={columns()}
+            actions={[
+               exportSelectionAction(columns(), title),
+               tableActions.copyEmails,
+               tableActions.copyLinkedIn,
+            ]}
+            onSelectionChange={(rows) => {
+               setSelection(rows);
+            }}
+            title={title}
+         />
+      </Card>
+   );
 };
 
 AdminUsersTable.propTypes = {
-    users: PropTypes.arrayOf(PropTypes.shape({})),
-    isFiltered: PropTypes.bool
-}
+   users: PropTypes.arrayOf(PropTypes.shape({})),
+   isFiltered: PropTypes.bool,
+};
 
 AdminUsersTable.defaultProps = {
-    loading: false,
-    users: [],
-}
+   loading: false,
+   users: [],
+};
 export default AdminUsersTable;
-

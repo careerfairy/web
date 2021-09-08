@@ -1,27 +1,24 @@
-import React, {useEffect, useState} from 'react';
-import {useFirebase} from "context/firebase";
+import React, { useEffect, useState } from "react";
+import { useFirebase } from "context/firebase";
 
 const useStreamGroups = (groupIds) => {
-    const [careerCenters, setCareerCenters] = useState([]);
-    const {getGroupsWithIds} = useFirebase()
+   const [careerCenters, setCareerCenters] = useState([]);
+   const { getGroupsWithIds } = useFirebase();
 
-    useEffect(() => {
+   useEffect(() => {
+      async function getCareerCenters() {
+         try {
+            const newCareerCenters = await getGroupsWithIds(groupIds);
+            setCareerCenters(newCareerCenters);
+         } catch (e) {}
+      }
 
-        async function getCareerCenters() {
-            try {
-                const newCareerCenters = await getGroupsWithIds(groupIds)
-                setCareerCenters(newCareerCenters)
-            } catch (e) {
-            }
-        }
+      if (groupIds?.length) {
+         getCareerCenters();
+      }
+   }, [groupIds]);
 
-        if (groupIds?.length) {
-            getCareerCenters()
-        }
-
-    }, [groupIds])
-
-    return careerCenters;
-}
+   return careerCenters;
+};
 
 export default useStreamGroups;

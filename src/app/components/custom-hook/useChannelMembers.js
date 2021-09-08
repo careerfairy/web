@@ -1,8 +1,7 @@
-import React from 'react';
+import React from "react";
 
-const useChannelMembers = (totalChannelMembers ) => {
-
-    return {};
-}
+const useChannelMembers = (totalChannelMembers) => {
+   return {};
+};
 
 export default useChannelMembers;

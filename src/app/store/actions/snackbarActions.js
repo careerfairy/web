@@ -4,6 +4,11 @@ import {
    REMOVE_SNACKBAR,
 } from "./actionTypes";
 import { GENERAL_ERROR } from "../../components/util/constants";
+import { getCtaSnackBarProps } from "../../components/util/constants/callToActions";
+import { careerfairyLogo } from "../../constants/images";
+import * as actions from "./index";
+import CallToActionSnackbar from "../../components/views/streaming/sharedComponents/StreamNotifications/CallToActionSnackbar";
+import React from "react";
 
 /**
  * Enqueue a snackbar managed in redux state.
@@ -73,15 +78,11 @@ export const enqueueBroadcastMessage = (message = "", action) => async (
       })
    );
 };
-export const enqueueCallToAction = ({
-   message = "",
-   content,
-   type,
-   callToActionId,
-}) => async (dispatch) => {
+export const enqueueCallToAction = ({ content, callToActionId }) => async (
+   dispatch
+) => {
    dispatch(
       enqueueSnackbar({
-         // message: message,
          options: {
             variant: "info",
             preventDuplicate: true,
@@ -93,6 +94,48 @@ export const enqueueCallToAction = ({
                horizontal: "center",
             },
          },
+      })
+   );
+};
+
+export const enqueueJobPostingCta = (
+   callToActionDataWithId,
+   handleClick,
+   handleDismiss
+) => async (dispatch) => {
+   const {
+      icon,
+      buttonUrl,
+      buttonText,
+      callToActionId,
+      salary,
+      applicationDeadline,
+      snackBarImage,
+      message,
+      jobTitle,
+      isJobPosting,
+      isForTutorial,
+   } = getCtaSnackBarProps(callToActionDataWithId, careerfairyLogo);
+
+   dispatch(
+      actions.enqueueCallToAction({
+         message,
+         callToActionId,
+         content: (
+            <CallToActionSnackbar
+               onClick={handleClick}
+               onDismiss={handleDismiss}
+               icon={icon}
+               isForTutorial={isForTutorial}
+               buttonText={buttonText}
+               jobTitle={jobTitle}
+               salary={salary}
+               snackBarImage={snackBarImage}
+               applicationDeadline={applicationDeadline}
+               isJobPosting={isJobPosting}
+               message={message}
+            />
+         ),
       })
    );
 };

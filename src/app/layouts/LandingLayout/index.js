@@ -12,7 +12,10 @@ const LandingLayout = ({ backgroundImage, children }) => {
    const classes = useStyles();
 
    return (
-      <div className={classes.root} style={{ backgroundImage: `url(${backgroundImage})` }}>
+      <div
+         className={classes.root}
+         style={{ backgroundImage: `url(${backgroundImage})` }}
+      >
          <TopBar />
          <NavBar drawerWidth={drawerWidth} />
          <div className={classes.wrapper}>

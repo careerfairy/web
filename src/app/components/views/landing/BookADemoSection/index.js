@@ -27,11 +27,11 @@ const useStyles = makeStyles((theme) => ({
 
 const BookADemoSection = (props) => {
    const classes = useStyles();
-  const [hovered, setHovered] = useState(false);
+   const [hovered, setHovered] = useState(false);
 
-  const handleToggle = () => setHovered(!hovered)
+   const handleToggle = () => setHovered(!hovered);
 
-  return (
+   return (
       <Section
          className={classes.section}
          big={props.big}
@@ -48,19 +48,19 @@ const BookADemoSection = (props) => {
                title={props.title}
                subtitle={props.subtitle}
             />
-           <Pulse forever>
-            <RoundButton
-               className={classes.bookingButton}
-               // onMouseEnter={handleToggle}
-               // onMouseLeave={handleToggle}
-               color="secondary"
-               size="large"
-               variant="contained"
-               onClick={props.handleOpenCalendly}
-            >
-               Book a Demo
-            </RoundButton>
-           </Pulse>
+            <Pulse forever>
+               <RoundButton
+                  className={classes.bookingButton}
+                  // onMouseEnter={handleToggle}
+                  // onMouseLeave={handleToggle}
+                  color="secondary"
+                  size="large"
+                  variant="contained"
+                  onClick={props.handleOpenCalendly}
+               >
+                  Book a Demo
+               </RoundButton>
+            </Pulse>
          </SectionContainer>
       </Section>
    );
@@ -69,13 +69,13 @@ const BookADemoSection = (props) => {
 export default BookADemoSection;
 
 BookADemoSection.propTypes = {
-  backgroundColor: PropTypes.any,
-  backgroundImage: PropTypes.any,
-  backgroundImageClassName: PropTypes.any,
-  backgroundImageOpacity: PropTypes.any,
-  big: PropTypes.any,
-  color: PropTypes.any,
-  handleOpenCalendly: PropTypes.func,
-  subtitle: PropTypes.any,
-  title: PropTypes.any
-}
+   backgroundColor: PropTypes.any,
+   backgroundImage: PropTypes.any,
+   backgroundImageClassName: PropTypes.any,
+   backgroundImageOpacity: PropTypes.any,
+   big: PropTypes.any,
+   color: PropTypes.any,
+   handleOpenCalendly: PropTypes.func,
+   subtitle: PropTypes.any,
+   title: PropTypes.any,
+};
