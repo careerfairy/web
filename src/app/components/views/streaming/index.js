@@ -14,24 +14,10 @@ import { Backdrop } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
-      position: "absolute",
-      left: "0",
-      right: "0",
-      bottom: "0",
-      // left: ({showMenu}) => showMenu ? 280 : 0,
-      // transition: "left 0.3s",
       transitionTimingFunction: theme.transitions.easeInOut,
-      // position: "relative",
-      // top: 55,
-      // right: 0,
-      // left:0,
-      // minWidth: 345,
-      // height: "calc(100% - 55px)",
       zIndex: 10,
-      backgroundColor: "black",
-      // flex: '1 1 auto',
-      // height: '100%',
-      // overflow: 'auto'
+      display: "flex",
+      height: "inherit",
    },
    miniChatContainer: {
       position: "absolute",

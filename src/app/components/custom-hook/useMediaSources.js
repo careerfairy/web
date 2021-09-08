@@ -7,7 +7,7 @@ import { useSoundMeter } from "./useSoundMeter";
 export default function useMediaSources(
    devices,
    streamId,
-   localStream,
+   localStreamData,
    showSoundMeter
 ) {
    const [audioSource, setAudioSource] = useState(null);
@@ -18,13 +18,13 @@ export default function useMediaSources(
    const [localMediaStream, setLocalMediaStream] = useState(null);
 
    useEffect(() => {
-      if (localStream) {
+      if (localStreamData) {
          const mediaStream = new MediaStream();
-         mediaStream.addTrack(localStream.getAudioTrack());
-         mediaStream.addTrack(localStream.getVideoTrack());
+         mediaStream.addTrack(localStreamData.stream.getAudioTrack());
+         mediaStream.addTrack(localStreamData.stream.getVideoTrack());
          setLocalMediaStream(mediaStream);
       }
-   }, [localStream, audioSource, videoSource]);
+   }, [localStreamData, audioSource, videoSource]);
 
    const audioLevel = useSoundMeter(
       showSoundMeter,
@@ -33,7 +33,7 @@ export default function useMediaSources(
    );
 
    useEffect(() => {
-      if (devices && localStream) {
+      if (devices && localStreamData) {
          if (
             devices.audioInputList &&
             devices.audioInputList.length > 0 &&
@@ -64,25 +64,25 @@ export default function useMediaSources(
             updateSpeakerSource(devices.audioOutputList[0].value);
          }
       }
-   }, [devices, localStream]);
+   }, [devices, localStreamData]);
 
    const initalizeAudioAndVideoSources = (audioDeviceId, videoDeviceId) => {
-      localStream.switchDevice("audio", audioDeviceId, () => {
+      localStreamData.stream.switchDevice("audio", audioDeviceId, () => {
          setAudioSource(audioDeviceId);
-         localStream.switchDevice("video", videoDeviceId, () => {
+         localStreamData.stream.switchDevice("video", videoDeviceId, () => {
             setVideoSource(videoDeviceId);
          });
       });
    };
 
    function updateAudioSource(deviceId) {
-      localStream.switchDevice("audio", deviceId, () => {
+      localStreamData.stream.switchDevice("audio", deviceId, () => {
          setAudioSource(deviceId);
       });
    }
 
    function updateVideoSource(deviceId) {
-      localStream.switchDevice("video", deviceId, () => {
+      localStreamData.stream.switchDevice("video", deviceId, () => {
          setVideoSource(deviceId);
       });
    }

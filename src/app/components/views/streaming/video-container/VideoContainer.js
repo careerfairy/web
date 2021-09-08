@@ -27,6 +27,7 @@ import ScreenShareModal from "./ScreenShareModal";
 import useStreamRef from "../../../custom-hook/useStreamRef";
 import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/StreamerTopBar/BreakoutRoomManagementModal";
 import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
+import Streams from "./Streams";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -160,7 +161,7 @@ function VideoContainer(props) {
                   clearTimeout(timeoutState);
                }
                let newTimeout = setTimeout(() => {
-                  localMediaStream.setVideoProfile("480p_9");
+                  localMediaStream.stream.setVideoProfile("480p_9");
                }, 20000);
                setTimeoutState(newTimeout);
             } else {
@@ -168,12 +169,12 @@ function VideoContainer(props) {
                   clearTimeout(timeoutState);
                }
                let newTimeout = setTimeout(() => {
-                  localMediaStream.setVideoProfile("180p");
+                  localMediaStream.stream.setVideoProfile("180p");
                }, 20000);
                setTimeoutState(newTimeout);
             }
          } else {
-            localMediaStream.setVideoProfile("480p_9");
+            localMediaStream.stream.setVideoProfile("480p_9");
          }
       }
    }, [
@@ -272,58 +273,61 @@ function VideoContainer(props) {
    return (
       <Fragment>
          <BreakoutRoomManagementModal agoraHandlers={agoraHandlers} />
-         <div>
-            <div>
-               <CurrentSpeakerDisplayer
-                  isPlayMode={false}
-                  streamTitle={props.currentLivestream.title}
-                  smallScreenMode={
-                     props.currentLivestream.mode === "presentation" ||
-                     props.currentLivestream.mode === "desktop"
-                  }
-                  speakerSwitchModeActive={isMainStreamer}
-                  localId={props.streamerId}
-                  localStream={localMediaStream}
-                  speakerSource={speakerSource}
-                  isStreamer={props.isStreamer}
-                  isBreakout={props.isBreakout}
-                  streams={externalMediaStreams}
-                  currentSpeaker={currentSpeakerId}
-                  setRemovedStream={setRemovedStream}
-                  {...props}
-                  muted={false}
-               />
-            </div>
-            {sharingContent() && (
-               <SmallStreamerVideoDisplayer
-                  livestreamId={props.currentLivestream.id}
-                  isBreakout={props.isBreakout}
-                  presentation={props.currentLivestream.mode === "presentation"}
-                  showMenu={props.showMenu}
-                  externalMediaStreams={externalMediaStreams}
-                  isLocalScreen={screenSharingMode}
-                  presenter={true}
-               />
-            )}
-            <VideoControlsContainer
-               currentLivestream={props.currentLivestream}
-               viewer={props.viewer}
-               streamerId={props.streamerId}
-               joining={!isMainStreamer}
-               handleClickScreenShareButton={handleClickScreenShareButton}
-               localMediaStream={localMediaStream}
-               setLocalMediaStream={setLocalMediaStream}
-               isMainStreamer={isMainStreamer}
-               showSettings={showSettings}
-               setShowSettings={setShowSettings}
-            />
-            <WifiIndicator
-               uplink={networkQuality.uplinkNetworkQuality}
-               downlink={networkQuality.downlinkNetworkQuality}
-               agoraRtcConnectionStatus={agoraRtcConnectionStatus}
-               agoraRtmStatus={agoraRtmStatus}
-            />
-         </div>
+         <Streams
+           externalMediaStreams={externalMediaStreams}
+            localMediaStream={localMediaStream}
+            currentSpeakerId={currentSpeakerId}
+         />
+         {/*<div>*/}
+         {/*   <CurrentSpeakerDisplayer*/}
+         {/*      isPlayMode={false}*/}
+         {/*      streamTitle={props.currentLivestream.title}*/}
+         {/*      smallScreenMode={*/}
+         {/*         props.currentLivestream.mode === "presentation" ||*/}
+         {/*         props.currentLivestream.mode === "desktop"*/}
+         {/*      }*/}
+         {/*      speakerSwitchModeActive={isMainStreamer}*/}
+         {/*      localId={props.streamerId}*/}
+         {/*      localStream={localMediaStream}*/}
+         {/*      speakerSource={speakerSource}*/}
+         {/*      isStreamer={props.isStreamer}*/}
+         {/*      isBreakout={props.isBreakout}*/}
+         {/*      streams={externalMediaStreams}*/}
+         {/*      currentSpeaker={currentSpeakerId}*/}
+         {/*      setRemovedStream={setRemovedStream}*/}
+         {/*      {...props}*/}
+         {/*      muted={false}*/}
+         {/*   />*/}
+         {/*</div>*/}
+         {/*{sharingContent() && (*/}
+         {/*   <SmallStreamerVideoDisplayer*/}
+         {/*      livestreamId={props.currentLivestream.id}*/}
+         {/*      isBreakout={props.isBreakout}*/}
+         {/*      presentation={props.currentLivestream.mode === "presentation"}*/}
+         {/*      showMenu={props.showMenu}*/}
+         {/*      externalMediaStreams={externalMediaStreams}*/}
+         {/*      isLocalScreen={screenSharingMode}*/}
+         {/*      presenter={true}*/}
+         {/*   />*/}
+         {/*)}*/}
+         <VideoControlsContainer
+            currentLivestream={props.currentLivestream}
+            viewer={props.viewer}
+            streamerId={props.streamerId}
+            joining={!isMainStreamer}
+            handleClickScreenShareButton={handleClickScreenShareButton}
+            localMediaStream={localMediaStream}
+            setLocalMediaStream={setLocalMediaStream}
+            isMainStreamer={isMainStreamer}
+            showSettings={showSettings}
+            setShowSettings={setShowSettings}
+         />
+         <WifiIndicator
+            uplink={networkQuality.uplinkNetworkQuality}
+            downlink={networkQuality.downlinkNetworkQuality}
+            agoraRtcConnectionStatus={agoraRtcConnectionStatus}
+            agoraRtmStatus={agoraRtmStatus}
+         />
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}

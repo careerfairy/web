@@ -6,7 +6,7 @@ import useStreamRef from "./useStreamRef";
 
 /**
  * @param {(null | Object)} localMediaStream - The employee who is responsible for the project.
- * @param {string} localMediaStream.streamId - The name of the employee.
+ * @param {string} localMediaStream.stream.streamId - The name of the employee.
  * @param {Object[]} externalMediaStreams - An Array of external stream Objects
  * @returns {{}} Returns the 3 stream link types
  */
@@ -54,8 +54,8 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
          });
          if (localMediaStream) {
             audioLevels.push({
-               streamId: localMediaStream.getId(),
-               audioLevel: localMediaStream.getAudioLevel(),
+               streamId: localMediaStream.stream.getId(),
+               audioLevel: localMediaStream.stream.getAudioLevel(),
             });
          }
          if (audioLevels && audioLevels.length > 1) {

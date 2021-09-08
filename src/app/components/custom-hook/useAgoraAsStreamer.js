@@ -348,7 +348,11 @@ export default function useAgoraAsStreamer(
             localStream.init(() => {
                localStream.play(videoId);
                rtcClient.publish(localStream, handleError);
-               setLocalMediaStream(localStream);
+               setLocalMediaStream({
+                  streamId: streamId,
+                  stream: localStream,
+                  isLocal: true
+               })
             }, handleStreamInitializationError);
          }
          if (role === "audience") {
@@ -378,7 +382,7 @@ export default function useAgoraAsStreamer(
          let streamToUpdate = {
             streamId: evt.uid,
             propertiesToUpdate: {
-               fallbackToAudio: evt.attr === 1 ? true : false,
+               fallbackToAudio: evt.attr === 1,
             },
          };
          setUpdatedStream(streamToUpdate);
@@ -488,9 +492,14 @@ export default function useAgoraAsStreamer(
                      msg: "RTC_PUBLISH_STREAM",
                   });
 
-                  localStream.play(videoId);
+                  // TODO disabled for development purposes since the video element does not exist
+                  // localStream.play(videoId);
                   rtcClient.publish(localStream, handleStreamPublishingError);
-                  setLocalMediaStream(localStream);
+                  setLocalMediaStream({
+                     streamId: streamId,
+                     stream: localStream,
+                     isLocal: true
+                  });
                   // Publish the local stream
                }, handleStreamInitializationError);
             },
