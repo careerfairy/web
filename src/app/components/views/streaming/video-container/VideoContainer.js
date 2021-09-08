@@ -304,7 +304,7 @@ function VideoContainer(props) {
          {/*      muted={false}*/}
          {/*   />*/}
          {/*</div>*/}
-         {/*{sharingContent() && (*/}
+         {/*{sharingContent && (*/}
          {/*   <SmallStreamerVideoDisplayer*/}
          {/*      livestreamId={props.currentLivestream.id}*/}
          {/*      isBreakout={props.isBreakout}*/}

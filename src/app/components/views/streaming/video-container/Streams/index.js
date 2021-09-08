@@ -13,7 +13,9 @@ const useStyles = makeStyles((theme) => ({
   videoElementsWrapper: {
     backgroundColor: "orange",
     // width: "100%",
-    flex: 1
+    // flex: 1,
+    // flexGrow: 1
+    height: 500
   },
 }));
 
@@ -26,13 +28,13 @@ const Streams = memo(
    }) => {
     const classes = useStyles();
     const [streamData, setStreamData] = useState({
-      large: null,
-      small: [],
+      largeStream: null,
+      smallStreams: [],
     });
     console.log("-> streamData", streamData);
 
     useEffect(() => {
-      setStreamData(({ large, small }) => {
+      setStreamData(({ largeStream, smallStreams }) => {
         const allStreams = [...externalMediaStreams];
         const hasManySpeakers = Boolean(externalMediaStreams?.length > 4);
         if (localMediaStream) {
@@ -54,8 +56,8 @@ const Streams = memo(
         );
 
         return {
-          large: newLargeStream,
-          small: newSmallStreams,
+          largeStream: newLargeStream,
+          smallStreams: newSmallStreams,
         };
       });
     }, [
@@ -137,9 +139,9 @@ const Streams = memo(
 
     return (
       <div className={classes.root}>
-        <Button variant="contained">
-          dfwefew
-        </Button>
+        {/*<Button variant="contained">*/}
+        {/*  dfwefew*/}
+        {/*</Button>*/}
         <div className={classes.videoElementsWrapper}>
           <StreamsLayout
             streamData={streamData}
