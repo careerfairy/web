@@ -27,7 +27,9 @@ const HeadWithMetaData = ({
          <meta property="og:url" content={fullPath} />
          <meta property="og:title" key="title" content={title} />
          <meta property="og:site_name" content="CareerFairy" />
-         <meta property="og:description" content={description} />
+         {description && (
+            <meta property="og:description" content={description} />
+         )}
          {image && <meta property="og:image" content={image} />}
 
          {/*Twitter*/}
@@ -35,7 +37,9 @@ const HeadWithMetaData = ({
          {/*<meta property="twitter:card" content="summary_large_image"/>*/}
          <meta property="twitter:url" content={fullPath} />
          <meta property="twitter:title" content={title} />
-         <meta property="twitter:description" content={description} />
+         {description && (
+            <meta property="twitter:description" content={description} />
+         )}
          {image && <meta property="twitter:image" content={image} />}
          {author && <meta name="author" content={author} />}
       </Head>
