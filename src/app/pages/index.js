@@ -19,7 +19,6 @@ import {
    measureShape,
 } from "../constants/images";
 import HeadWithMeta from "../components/page/HeadWithMeta";
-import { getResizedUrl } from "../components/helperFunctions/HelperFunctions";
 
 const LandingPage = ({}) => {
    const {
