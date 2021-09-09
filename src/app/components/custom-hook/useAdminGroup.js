@@ -23,8 +23,6 @@ const useAdminGroup = (groupId) => {
       );
    }, [pathname, query.dashboardInviteId]);
 
-   console.log("isvalidating", isvalidating);
-
    useEffect(() => {
       return () => {
          dispatch(actions.clearUserDataSet());
@@ -77,7 +75,6 @@ const useAdminGroup = (groupId) => {
             });
          }
       }
-      console.log(queriesArray);
       return queriesArray;
    }, [authenticatedUser?.email, groupId, isvalidating]);
 
