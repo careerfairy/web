@@ -137,44 +137,56 @@ exports.resendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(
    }
 );
 
-exports.verifyEmailWithPin = functions.https.onRequest(async (req, res) => {
-   setHeaders(req, res);
+exports.validateUserEmailWithPin = functions
+   .runWith({
+      minInstances: 1,
+   })
+   .https.onCall(async (data, context) => {
+      const recipient_email = data.userInfo.recipientEmail;
+      const pinCode = data.userInfo.pinCode;
 
-   const recipient_email = req.body.recipientEmail;
-   const pinCode = req.body.pinCode;
+      console.log("data", data);
+      console.log("recipient_email", recipient_email);
+      console.log("pinCode", pinCode);
 
-   admin
-      .firestore()
-      .collection("userData")
-      .doc(recipient_email)
-      .get()
-      .then((querySnapshot) => {
-         if (!querySnapshot.isEmpty) {
-            let user = querySnapshot.data();
-            if (user.validationPin === pinCode) {
-               admin
-                  .auth()
-                  .getUserByEmail(recipient_email)
-                  .then((userRecord) => {
-                     admin
-                        .auth()
-                        .updateUser(userRecord.uid, {
-                           emailVerified: true,
-                        })
-                        .then((userRecord) => {
-                           console.log(userRecord);
-                           res.sendStatus(200);
-                        });
-                  });
-            } else {
-               res.sendStatus(403);
+      admin
+         .firestore()
+         .collection("userData")
+         .doc(recipient_email)
+         .get()
+         .then((querySnapshot) => {
+            if (!querySnapshot.isEmpty) {
+               let user = querySnapshot.data();
+               console.log("user", user);
+               if (user.validationPin === pinCode) {
+                  admin
+                     .auth()
+                     .getUserByEmail(recipient_email)
+                     .then((userRecord) => {
+                        admin
+                           .auth()
+                           .updateUser(userRecord.uid, {
+                              emailVerified: true,
+                           })
+                           .then((userRecord) => {
+                              console.log(userRecord);
+                              return { status: 200 };
+                              //res.sendStatus(200);
+                           });
+                     });
+               } else {
+                  console.log("error", "no user");
+                  return { status: 403 };
+                  //res.sendStatus(403);
+               }
             }
-         }
-      })
-      .catch((error) => {
-         res.sendStatus(500);
-      });
-});
+         })
+         .catch((error) => {
+            console.log("error", error);
+            return { status: 500 };
+            //res.sendStatus(500);
+         });
+   });
 
 exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(
    async (req, res) => {

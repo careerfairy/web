@@ -43,6 +43,7 @@ exports.personalHabib = hosting.personalHabib;
 exports.createNewUserAccount = auth.createNewUserAccount;
 exports.updateFakeUser = auth.updateFakeUser;
 exports.verifyEmailWithPin = auth.verifyEmailWithPin;
+exports.validateUserEmailWithPin = auth.validateUserEmailWithPin;
 exports.sendPostmarkResetPasswordEmail = auth.sendPostmarkResetPasswordEmail;
 exports.sendPostmarkEmailUserDataAndUni = auth.sendPostmarkEmailUserDataAndUni;
 exports.sendPostmarkEmailUserDataAndUniWithName =

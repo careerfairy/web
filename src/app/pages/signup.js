@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect, useContext } from "react";
-import { withFirebase } from "context/firebase";
+import { useFirebase, withFirebase } from "context/firebase";
 import TheatersRoundedIcon from "@material-ui/icons/TheatersRounded";
 import ArrowForwardIosRoundedIcon from "@material-ui/icons/ArrowForwardIosRounded";
 import BusinessCenterRoundedIcon from "@material-ui/icons/BusinessCenterRounded";
@@ -656,6 +656,7 @@ function SignUpFormValidate({
 }) {
    const classes = useStyles();
    const router = useRouter();
+   const firebase = useFirebase();
 
    const [errorMessageShown, setErrorMessageShown] = useState(false);
    const [incorrectPin, setIncorrectPin] = useState(false);
@@ -698,16 +699,14 @@ function SignUpFormValidate({
             }}
             onSubmit={(values, { setSubmitting }) => {
                setIncorrectPin(false);
-               axios({
-                  method: "post",
-                  url:
-                     "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/verifyEmailWithPin",
-                  data: {
-                     recipientEmail: user.email,
-                     pinCode: parseInt(values.pinCode),
-                  },
-               })
+               const userInfo = {
+                  recipientEmail: user.email,
+                  pinCode: parseInt(values.pinCode),
+               };
+               firebase
+                  .validateUserEmailWithPin(userInfo)
                   .then((response) => {
+                     debugger;
                      reloadAuth()
                         .then(() => {
                            if (absolutePath) {
