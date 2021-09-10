@@ -4,20 +4,26 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
 import StreamsLayout from "./StreamsLayout";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: "100%",
-    display: "flex",
-    flexDirection: "column"
-  },
-  videoElementsWrapper: {
-    backgroundColor: "orange",
-    // width: "100%",
-    // flex: 1,
-    // flexGrow: 1
-    height: 500
-  },
-}));
+const useStyles = makeStyles((theme) => {
+  console.log("-> theme", theme);
+   return {
+      root: {
+         width: "100%",
+         display: "flex",
+         flexDirection: "column",
+         backgroundColor: theme.palette.grey["800"],
+        // make 900 before push to prod
+         // backgroundColor: theme.palette.grey["900"],
+      },
+      videoElementsWrapper: {
+         // width: "100%",
+         flex: 1,
+         display: "flex",
+         // flexGrow: 1
+         // height: 500
+      },
+   };
+});
 
 const Streams = memo(
   ({
@@ -25,22 +31,20 @@ const Streams = memo(
      localMediaStream,
      currentSpeakerId,
      sharingContent,
+    isBroadCasting
    }) => {
     const classes = useStyles();
     const [streamData, setStreamData] = useState({
       largeStream: null,
       smallStreams: [],
     });
-    console.log("-> streamData", streamData);
-
     useEffect(() => {
       setStreamData(({ largeStream, smallStreams }) => {
         const allStreams = [...externalMediaStreams];
         const hasManySpeakers = Boolean(externalMediaStreams?.length > 4);
-        if (localMediaStream) {
+        if (localMediaStream && isBroadCasting) {
           allStreams.push(localMediaStream);
         }
-        console.log("-> allStreams base", allStreams);
 
         let newLargeStream = handleGetLargeStream(
           allStreams,
@@ -65,6 +69,7 @@ const Streams = memo(
       localMediaStream,
       currentSpeakerId,
       sharingContent,
+      isBroadCasting
     ]);
 
     const handleGetLargeStream = (

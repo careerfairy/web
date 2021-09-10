@@ -10,7 +10,6 @@ import useStreamRef from "./useStreamRef";
 export default function useAgoraAsStreamer(
    streamerReady,
    isPlayMode,
-   videoId,
    screenSharingMode,
    roomId,
    streamId,
@@ -346,7 +345,7 @@ export default function useAgoraAsStreamer(
             });
             localStream.setVideoProfile("480p_9");
             localStream.init(() => {
-               localStream.play(videoId);
+               localStream.play(streamId);
                rtcClient.publish(localStream, handleError);
                setLocalMediaStream({
                   streamId: streamId,
@@ -493,7 +492,8 @@ export default function useAgoraAsStreamer(
                   });
 
                   // TODO disabled for development purposes since the video element does not exist
-                  // localStream.play(videoId);
+                  console.log("-> streamId in hook", streamId);
+                  localStream.play(streamId);
                   rtcClient.publish(localStream, handleStreamPublishingError);
                   setLocalMediaStream({
                      streamId: streamId,

@@ -1,0 +1,95 @@
+import React, { useEffect } from "react";
+import StreamItem from "./StreamItem";
+
+const RemoteStreamItem = ({
+   currentLivestream,
+   muted,
+   play,
+   setRemovedStream,
+   setShowVideoButton,
+   stream,
+   unmute,
+   big,
+}) => {
+   const isScreenShareVideo = stream.streamId.includes("screen");
+
+   useEffect(() => {
+      if (stream.streamId === "demoStream") {
+         generateDemoHandRaiser();
+      } else {
+         if (!stream.stream.isPlaying()) {
+            stream?.stream?.play(
+               stream.streamId,
+               { fit: isScreenShareVideo ? "contain" : "cover" },
+               (err) => {
+                  if (err) {
+                     setShowVideoButton({ paused: false, muted: true });
+                  }
+               }
+            );
+         }
+      }
+   }, [stream.streamId]);
+
+   useEffect(() => {
+      if (unmute) {
+         stream.stream?.play(stream.streamId, { muted: false });
+      }
+   }, [unmute]);
+
+   useEffect(() => {
+      if (play) {
+         playVideo();
+      }
+   }, [play]);
+
+   useEffect(() => {
+      if (muted) {
+         stream?.stream?.muteAudio();
+      } else {
+         stream?.stream?.unmuteAudio();
+      }
+   }, [muted]);
+
+   useEffect(() => {
+      if (stream?.stream?.audio === false && stream?.stream?.video === false) {
+         setRemovedStream(stream.streamId);
+      }
+   }, [stream?.stream?.audio, stream?.stream?.video]);
+
+   function generateDemoHandRaiser() {
+      let video = document.createElement("video");
+      const videoContainer = document.querySelector("#" + stream.streamId);
+      videoContainer.appendChild(video);
+      video.src = stream.url;
+      video.loop = true;
+      video.play();
+   }
+
+   function playVideo() {
+      if (!stream.stream.isPlaying()) {
+         stream.stream.play(
+            stream.streamId,
+            {
+               fit: isScreenShareVideo ? "contain" : "cover",
+               muted: true,
+            },
+            (err) => {
+               if (err) {
+                  setShowVideoButton({ paused: false, muted: true });
+               }
+            }
+         );
+      }
+   }
+
+   const speaker = !isScreenShareVideo
+      ? currentLivestream.liveSpeakers?.find(
+           (speaker) => speaker.speakerUuid === stream.streamId
+        )
+      : null;
+
+   return <StreamItem stream={stream} big={big} />;
+};
+
+export default RemoteStreamItem;

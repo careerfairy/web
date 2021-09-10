@@ -83,7 +83,6 @@ function VideoContainer(props) {
    } = useAgoraAsStreamer(
       true,
       false,
-      localVideoId,
       screenSharingMode,
       props.currentLivestream.id,
       props.streamerId,
@@ -274,14 +273,18 @@ function VideoContainer(props) {
       [props.currentLivestream.mode]
    );
 
+   const defaultLocalStream = useMemo(() => ({isLocal: true, streamId:props.streamerId }), [props.streamerId])
+
    return (
       <Fragment>
          <BreakoutRoomManagementModal agoraHandlers={agoraHandlers} />
          <Streams
             externalMediaStreams={externalMediaStreams}
-            localMediaStream={localMediaStream}
+            localMediaStream={localMediaStream || defaultLocalStream}
             currentSpeakerId={currentSpeakerId}
             sharingContent={sharingContent}
+            streamerId={props.streamerId}
+            isBroadCasting={!props.isPlayMode}
          />
          {/*<div>*/}
          {/*   <CurrentSpeakerDisplayer*/}

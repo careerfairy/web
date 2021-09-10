@@ -82,7 +82,6 @@ function ViewerComponent(props) {
    } = useAgoraAsStreamer(
       streamerReady,
       !props.handRaiseActive,
-      "localVideo",
       screenSharingMode,
       props.livestreamId,
       props.streamerId,
