@@ -697,35 +697,27 @@ function SignUpFormValidate({
                }
                return errors;
             }}
-            onSubmit={(values, { setSubmitting }) => {
+            onSubmit={async (values, { setSubmitting }) => {
                setIncorrectPin(false);
                const userInfo = {
                   recipientEmail: user.email,
                   pinCode: parseInt(values.pinCode),
                };
-               firebase
-                  .validateUserEmailWithPin(userInfo)
-                  .then((response) => {
-                     debugger;
-                     reloadAuth()
-                        .then(() => {
-                           if (absolutePath) {
-                              router.push(absolutePath);
-                           } else {
-                              setActiveStep(2);
-                           }
-                        })
-                        .catch((error) => {
-                           router.push("/login");
-                        });
-                  })
-                  .catch((error) => {
-                     console.log("error", error);
-                     setIncorrectPin(true);
-                     setGeneralLoading(false);
-                     setSubmitting(false);
-                     return;
-                  });
+               try {
+                  await firebase.validateUserEmailWithPin(userInfo);
+                  await reloadAuth();
+                  if (absolutePath) {
+                     router.push(absolutePath);
+                  } else {
+                     setActiveStep(2);
+                  }
+               } catch (error) {
+                  console.log("error", error);
+                  setIncorrectPin(true);
+                  setGeneralLoading(false);
+                  setSubmitting(false);
+                  return;
+               }
             }}
          >
             {({
