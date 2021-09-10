@@ -174,7 +174,6 @@ function MyApp({ Component, pageProps }) {
                                  {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                                  <CssBaseline />
                                   {disableCookies ? null: <CFCookieConsent />}
-                                  <CFCookieConsent />
                                  <Component {...pageProps} />
                                  <Notifier />
                                  <ErrorSnackBar
