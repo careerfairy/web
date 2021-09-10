@@ -145,47 +145,38 @@ exports.validateUserEmailWithPin = functions
       const recipient_email = data.userInfo.recipientEmail;
       const pinCode = data.userInfo.pinCode;
 
-      console.log("data", data);
-      console.log("recipient_email", recipient_email);
-      console.log("pinCode", pinCode);
-
-      admin
-         .firestore()
-         .collection("userData")
-         .doc(recipient_email)
-         .get()
-         .then((querySnapshot) => {
-            if (!querySnapshot.isEmpty) {
-               let user = querySnapshot.data();
-               console.log("user", user);
-               if (user.validationPin === pinCode) {
-                  admin
-                     .auth()
-                     .getUserByEmail(recipient_email)
-                     .then((userRecord) => {
-                        admin
-                           .auth()
-                           .updateUser(userRecord.uid, {
-                              emailVerified: true,
-                           })
-                           .then((userRecord) => {
-                              console.log(userRecord);
-                              return { status: 200 };
-                              //res.sendStatus(200);
-                           });
-                     });
-               } else {
-                  console.log("error", "no user");
-                  return { status: 403 };
-                  //res.sendStatus(403);
-               }
+      try {
+         let querySnapshot = await admin
+            .firestore()
+            .collection("userData")
+            .doc(recipient_email)
+            .get();
+         if (!querySnapshot.isEmpty) {
+            let user = querySnapshot.data();
+            if (user.validationPin === pinCode) {
+               admin
+                  .auth()
+                  .getUserByEmail(recipient_email)
+                  .then((userRecord) => {
+                     admin
+                        .auth()
+                        .updateUser(userRecord.uid, {
+                           emailVerified: true,
+                        })
+                        .then((userRecord) => {
+                           console.log(userRecord);
+                           return;
+                           //res.sendStatus(200);
+                        });
+                  });
+            } else {
+               console.log("error", "no user");
+               throw new functions.https.HttpsError("permission-denied");
             }
-         })
-         .catch((error) => {
-            console.log("error", error);
-            return { status: 500 };
-            //res.sendStatus(500);
-         });
+         }
+      } catch (error) {
+         throw new functions.https.HttpsError("unknown");
+      }
    });
 
 exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(

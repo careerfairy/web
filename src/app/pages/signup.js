@@ -97,7 +97,7 @@ function getSteps(absolutePath) {
       : ["Credentials", "Email Verification", "Join Groups"];
 }
 
-function SignUpPage({ firebase }) {
+function SignUpPage() {
    const classes = useStyles();
    const router = useRouter();
    const { absolutePath } = router.query;
@@ -207,7 +207,7 @@ function SignUpPage({ firebase }) {
    );
 }
 
-export default withFirebase(SignUpPage);
+export default SignUpPage;
 
 const SignUpForm = withFirebase(SignUpFormBase);
 
@@ -683,6 +683,12 @@ function SignUpFormValidate({
          });
    }
 
+   const updateActiveStep = (nextStep) => {
+      setTimeout(() => {
+         setActiveStep(nextStep);
+      }, 500);
+   };
+
    return (
       <Fragment>
          <Formik
@@ -697,27 +703,29 @@ function SignUpFormValidate({
                }
                return errors;
             }}
-            onSubmit={async (values, { setSubmitting }) => {
+            onSubmit={(values, { setSubmitting }) => {
                setIncorrectPin(false);
                const userInfo = {
                   recipientEmail: user.email,
                   pinCode: parseInt(values.pinCode),
                };
-               try {
-                  await firebase.validateUserEmailWithPin(userInfo);
-                  await reloadAuth();
-                  if (absolutePath) {
-                     router.push(absolutePath);
-                  } else {
-                     setActiveStep(2);
-                  }
-               } catch (error) {
-                  console.log("error", error);
-                  setIncorrectPin(true);
-                  setGeneralLoading(false);
-                  setSubmitting(false);
-                  return;
-               }
+               firebase
+                  .validateUserEmailWithPin(userInfo)
+                  .then(async () => {
+                     await reloadAuth();
+                     if (absolutePath) {
+                        router.push(absolutePath);
+                     } else {
+                        updateActiveStep(2);
+                     }
+                  })
+                  .catch((error) => {
+                     console.log("error", error);
+                     setIncorrectPin(true);
+                     setGeneralLoading(false);
+                     setSubmitting(false);
+                     return;
+                  });
             }}
          >
             {({
