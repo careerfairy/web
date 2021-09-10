@@ -109,7 +109,7 @@ function SignUpPage() {
 
    useEffect(() => {
       verifyUserState();
-   }, [user, userData]);
+   }, [user.emailVerified, userData?.userEmail]);
 
    const verifyUserState = async () => {
       if (user.isLoaded && !user.isEmpty) {
@@ -711,13 +711,14 @@ function SignUpFormValidate({
                };
                firebase
                   .validateUserEmailWithPin(userInfo)
-                  .then(async () => {
-                     await reloadAuth();
-                     if (absolutePath) {
-                        router.push(absolutePath);
-                     } else {
-                        updateActiveStep(2);
-                     }
+                  .then(() => {
+                     reloadAuth().then(() => {
+                        if (absolutePath) {
+                           router.push(absolutePath);
+                        } else {
+                           updateActiveStep(2);
+                        }
+                     });
                   })
                   .catch((error) => {
                      console.log("error", error);
