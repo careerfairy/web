@@ -712,13 +712,15 @@ function SignUpFormValidate({
                firebase
                   .validateUserEmailWithPin(userInfo)
                   .then(() => {
-                     reloadAuth().then(() => {
-                        if (absolutePath) {
-                           router.push(absolutePath);
-                        } else {
-                           updateActiveStep(2);
-                        }
-                     });
+                     setTimeout(() => {
+                        reloadAuth().then(() => {
+                           if (absolutePath) {
+                              router.push(absolutePath);
+                           } else {
+                              updateActiveStep(2);
+                           }
+                        });
+                     }, 200);
                   })
                   .catch((error) => {
                      console.log("error", error);
