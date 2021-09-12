@@ -700,7 +700,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                            />
                         )}
                      </Box>
-                     {!isPastEvent && (
+                     {!isPastEvent && !currentLivestream.isFaceToFace && (
                         <div
                            className={
                               "topDescriptionContainer " +
@@ -746,6 +746,43 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                      <Grid container justifyContent="center" align="center">
                         {speakerElements}
                      </Grid>
+
+                     {currentLivestream.isFaceToFace && (
+                        <div
+                           style={{
+                              display: "flex",
+                              justifyContent: "center",
+                           }}
+                        >
+                           <Box>
+                              <div
+                                 style={{
+                                    backgroundColor: "white",
+                                    padding: 20,
+                                    borderRadius: 5,
+                                 }}
+                              >
+                                 <Typography>
+                                    This event will take place at the following
+                                    location:
+                                 </Typography>
+                                 <Typography
+                                    style={{ fontWeight: "600", marginTop: 10 }}
+                                 >
+                                    {currentLivestream.address}
+                                 </Typography>
+                                 <Typography
+                                    style={{
+                                       fontSize: "0.8rem",
+                                       marginTop: 10,
+                                    }}
+                                 >
+                                    Please make sure you are able to attend
+                                 </Typography>
+                              </div>
+                           </Box>
+                        </div>
+                     )}
                      <div style={{ margin: "40px 0", width: "100%" }}>
                         <div>
                            {!isPastEvent && (
@@ -784,6 +821,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                            />
                         </div>
                      </div>
+
                      <div style={{ textAlign: "center", marginBottom: "20px" }}>
                         <TargetOptions options={targetOptions} />
                      </div>
@@ -798,7 +836,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                            </Row>
                         </div>
                      </div>
-                     {!isPastEvent && (
+                     {!isPastEvent && !currentLivestream.isFaceToFace && (
                         <div className="topDescriptionContainer">
                            <div
                               className="countdown-title"

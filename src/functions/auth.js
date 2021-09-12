@@ -145,6 +145,10 @@ exports.validateUserEmailWithPin = functions
       const recipient_email = data.userInfo.recipientEmail;
       const pinCode = data.userInfo.pinCode;
 
+      functions.logger.log(
+         `Starting user email validation for ${recipient_email}`
+      );
+
       try {
          let querySnapshot = await admin
             .firestore()
@@ -153,7 +157,11 @@ exports.validateUserEmailWithPin = functions
             .get();
          if (!querySnapshot.isEmpty) {
             let user = querySnapshot.data();
+            functions.logger.log(`Acquired user data for ${recipient_email}`);
             if (user.validationPin === pinCode) {
+               functions.logger.log(
+                  `Provided Pin code for ${recipient_email} is correct`
+               );
                admin
                   .auth()
                   .getUserByEmail(recipient_email)
@@ -164,17 +172,24 @@ exports.validateUserEmailWithPin = functions
                            emailVerified: true,
                         })
                         .then((userRecord) => {
-                           console.log(userRecord);
+                           functions.logger.log(
+                              `Auth user ${recipient_email} has been validated`
+                           );
                            return;
                            //res.sendStatus(200);
                         });
                   });
             } else {
-               console.log("error", "no user");
+               functions.logger.warn(
+                  `User ${recipient_email} has failed to provide the correct Pin code, provided ${pinCode} instead of ${user.validationPin}`
+               );
                throw new functions.https.HttpsError("permission-denied");
             }
          }
       } catch (error) {
+         functions.logger.warn(
+            `An error has occured fetching userData for ${recipient_email}`
+         );
          throw new functions.https.HttpsError("unknown");
       }
    });
