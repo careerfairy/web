@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import StreamItem from "./StreamItem";
 
 const RemoteStreamItem = ({
-   currentLivestream,
+   speaker,
    muted,
    play,
    setRemovedStream,
@@ -11,7 +11,7 @@ const RemoteStreamItem = ({
    unmute,
    big,
 }) => {
-   const isScreenShareVideo = stream.streamId.includes("screen");
+   const isScreenShareVideo = stream.isScreenShareVideo;
 
    useEffect(() => {
       if (stream.streamId === "demoStream") {
@@ -23,6 +23,7 @@ const RemoteStreamItem = ({
                { fit: isScreenShareVideo ? "contain" : "cover" },
                (err) => {
                   if (err) {
+                     console.log("-> err", err);
                      setShowVideoButton({ paused: false, muted: true });
                   }
                }
@@ -83,13 +84,14 @@ const RemoteStreamItem = ({
       }
    }
 
-   const speaker = !isScreenShareVideo
-      ? currentLivestream.liveSpeakers?.find(
-           (speaker) => speaker.speakerUuid === stream.streamId
-        )
-      : null;
 
-   return <StreamItem stream={stream} big={big} />;
+   return (
+      <StreamItem
+         speaker={speaker}
+         stream={stream}
+         big={big}
+      />
+   );
 };
 
 export default RemoteStreamItem;

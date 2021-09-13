@@ -72,6 +72,7 @@ const LocalVideoContainer = ({
    localSpeaker,
    localStream,
    small,
+
 }) => {
    const classes = useStyles();
 

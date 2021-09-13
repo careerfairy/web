@@ -1,24 +1,27 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Paper } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Item, Row } from "@mui-treasury/components/flex";
-import StreamItem from "./StreamItem";
+import StreamContainer from "./StreamContainer";
+
+const SPACING = 1;
 
 const useStyles = makeStyles((theme) => ({
    root: {
-      padding: theme.spacing(2),
-      flex: 1
+      padding: theme.spacing(SPACING),
+      flex: 1,
    },
    smallStreamsContainerGridItem: {
       // height: 180,
       display: "flex",
-      height: "20%"
+      height: "20%",
    },
    largeStreamContainerGridItem: {
       height: "80%",
       display: "flex",
+      flex: 1
    },
    smallStreamsWrapper: {
       display: "flex",
@@ -26,11 +29,11 @@ const useStyles = makeStyles((theme) => ({
       justifyContent: "space-between",
       "& > :first-child": {
          marginLeft: "auto",
-         paddingLeft: 0
+         paddingLeft: 0,
       },
       "& > :last-child": {
          marginRight: "auto",
-         paddingRight: 0
+         paddingRight: 0,
       },
       "&::-webkit-scrollbar": {
          height: 5,
@@ -46,20 +49,24 @@ const useStyles = makeStyles((theme) => ({
    smallStreamItem: {
       minWidth: 180,
       maxWidth: 200,
-      // flexGrow: 1,
       paddingTop: 0,
       paddingBottom: 0,
       display: "flex",
    },
 }));
 
-const StreamsLayout = ({ streamData: { largeStream, smallStreams } }) => {
+const StreamsLayout = ({
+   streamData: { largeStream, smallStreams },
+   liveSpeakers,
+}) => {
    const classes = useStyles();
-   console.log("-> largeStream", largeStream);
-   console.log("-> smallStreams", smallStreams);
+   // console.log("-> largeStream", largeStream);
+   // console.log("-> smallStreams", smallStreams);
+
+   const hasSmallStreams = Boolean(smallStreams.length)
    return (
-      <Grid className={classes.root} container spacing={2}>
-         {Boolean(smallStreams.length) && (
+      <Grid className={classes.root} container spacing={SPACING}>
+         { hasSmallStreams && (
             <Grid
                className={classes.smallStreamsContainerGridItem}
                item
@@ -69,22 +76,24 @@ const StreamsLayout = ({ streamData: { largeStream, smallStreams } }) => {
                   {({ height, width }) => (
                      <Row
                         p={0}
-                        gap={2}
+                        gap={SPACING}
                         className={classes.smallStreamsWrapper}
                         style={{
                            width,
                            height,
                         }}
                      >
-                        {[...smallStreams, ...smallStreams].map(
-                           (stream, index) => (
+                        {smallStreams.map(
+                           // {[...smallStreams, ...smallStreams].map(
+                           (stream) => (
                               <Item
                                  className={classes.smallStreamItem}
-                                 key={`${stream.streamId}-${index}`}
+                                 // key={`${stream.streamId}-${index}`}
+                                 key={stream.streamId}
                               >
-                                 <StreamItem
-                                   stream={stream}
-                                   videoId={stream.isLocal? "localVideo": stream.streamId}
+                                 <StreamContainer
+                                    stream={stream}
+                                    liveSpeakers={liveSpeakers}
                                  />
                               </Item>
                            )
@@ -95,10 +104,10 @@ const StreamsLayout = ({ streamData: { largeStream, smallStreams } }) => {
             </Grid>
          )}
          <Grid className={classes.largeStreamContainerGridItem} item xs={12}>
-            <StreamItem
-              stream={largeStream}
-              videoId={(largeStream?.isLocal || !largeStream)? "localVideo": largeStream?.streamId}
-              big
+            <StreamContainer
+               stream={largeStream}
+               big
+               liveSpeakers={liveSpeakers}
             />
          </Grid>
       </Grid>

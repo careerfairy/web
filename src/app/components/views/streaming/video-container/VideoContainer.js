@@ -284,6 +284,7 @@ function VideoContainer(props) {
             currentSpeakerId={currentSpeakerId}
             sharingContent={sharingContent}
             streamerId={props.streamerId}
+            liveSpeakers={props.currentLivestream.liveSpeakers}
             isBroadCasting={!props.isPlayMode}
          />
          {/*<div>*/}
