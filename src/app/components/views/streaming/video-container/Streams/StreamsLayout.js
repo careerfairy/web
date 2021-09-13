@@ -5,6 +5,7 @@ import { Grid } from "@material-ui/core";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Item, Row } from "@mui-treasury/components/flex";
 import StreamContainer from "./StreamContainer";
+import clsx from "clsx";
 
 const SPACING = 1;
 
@@ -14,14 +15,27 @@ const useStyles = makeStyles((theme) => ({
       flex: 1,
    },
    smallStreamsContainerGridItem: {
-      // height: 180,
       display: "flex",
+      height: 0,
+      transition: theme.transitions.create(["height"], {
+         duration: theme.transitions.duration.complex,
+         easing: theme.transitions.easing.easeInOut,
+      }),
+   },
+   grow: {
       height: "20%",
    },
    largeStreamContainerGridItem: {
-      height: "80%",
+      height: "100%",
       display: "flex",
-      flex: 1
+      flex: 1,
+      transition: theme.transitions.create(["height"], {
+         duration: theme.transitions.duration.complex,
+         easing: theme.transitions.easing.easeInOut,
+      }),
+   },
+   squished: {
+      height: "80%",
    },
    smallStreamsWrapper: {
       display: "flex",
@@ -53,25 +67,37 @@ const useStyles = makeStyles((theme) => ({
       paddingBottom: 0,
       display: "flex",
    },
+   videoElement: {
+      width: "100%",
+      height: "100%",
+      position: "absolute",
+      "& > *": {
+         borderRadius: 10,
+         boxShadow: theme.shadows[5],
+      },
+   },
 }));
 
 const StreamsLayout = ({
    streamData: { largeStream, smallStreams },
    liveSpeakers,
+   play,
+   unmute,
 }) => {
    const classes = useStyles();
-   // console.log("-> largeStream", largeStream);
-   // console.log("-> smallStreams", smallStreams);
 
-   const hasSmallStreams = Boolean(smallStreams.length)
+   const hasSmallStreams = Boolean(smallStreams.length);
    return (
       <Grid className={classes.root} container spacing={SPACING}>
-         { hasSmallStreams && (
-            <Grid
-               className={classes.smallStreamsContainerGridItem}
-               item
-               xs={12}
-            >
+         <Grid
+            className={clsx(classes.smallStreamsContainerGridItem, {
+               [classes.grow]: hasSmallStreams,
+            })}
+            style={{ padding: !hasSmallStreams && 0 }}
+            item
+            xs={12}
+         >
+            {hasSmallStreams && (
                <AutoSizer>
                   {({ height, width }) => (
                      <Row
@@ -83,30 +109,36 @@ const StreamsLayout = ({
                            height,
                         }}
                      >
-                        {smallStreams.map(
-                           // {[...smallStreams, ...smallStreams].map(
-                           (stream) => (
-                              <Item
-                                 className={classes.smallStreamItem}
-                                 // key={`${stream.streamId}-${index}`}
-                                 key={stream.streamId}
-                              >
-                                 <StreamContainer
-                                    stream={stream}
-                                    liveSpeakers={liveSpeakers}
-                                 />
-                              </Item>
-                           )
-                        )}
+                        {smallStreams.map((stream) => (
+                           <Item
+                              className={classes.smallStreamItem}
+                              key={stream.streamId}
+                           >
+                              <StreamContainer
+                                 stream={stream}
+                                 liveSpeakers={liveSpeakers}
+                                 play={play}
+                                 unmute={unmute}
+                              />
+                           </Item>
+                        ))}
                      </Row>
                   )}
                </AutoSizer>
-            </Grid>
-         )}
-         <Grid className={classes.largeStreamContainerGridItem} item xs={12}>
+            )}
+         </Grid>
+         <Grid
+            className={clsx(classes.largeStreamContainerGridItem, {
+               [classes.squished]: hasSmallStreams,
+            })}
+            item
+            xs={12}
+         >
             <StreamContainer
                stream={largeStream}
                big
+               play={play}
+               unmute={unmute}
                liveSpeakers={liveSpeakers}
             />
          </Grid>
@@ -117,6 +149,8 @@ const StreamsLayout = ({
 export default StreamsLayout;
 
 StreamsLayout.propTypes = {
+   play: PropTypes.bool,
+   unmute: PropTypes.bool,
    streamData: PropTypes.shape({
       largeStream: PropTypes.object,
       smallStreams: PropTypes.arrayOf(PropTypes.object),

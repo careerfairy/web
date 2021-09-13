@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
 import SpeakerInfoOverlay from "../../SpeakerInfoOverlay";
@@ -54,15 +54,33 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
+const StreamItem = ({
+   stream,
+   big,
+   speaker,
+   videoMutedBackgroundImg,
+   videoElementDiv,
+}) => {
    const classes = useStyles();
-   if (big) {
-      console.log("-> streamId in big", stream.streamId);
-   }
-   // console.log("-> stream", stream);
+   const vidDiv = useRef(null);
+
+   useEffect(() => {
+      if (!stream?.stream?.isPlaying()) {
+         stream?.stream?.play(stream.streamId);
+      }
+      return () => {
+         stream?.stream?.stop();
+      };
+
+   }, [stream?.stream]);
+
    return (
       <div className={classes.root}>
-         <div id={stream.streamId} className={classes.videoElement} />
+         <div
+            id={stream.streamId}
+            className={classes.videoElement}
+            ref={vidDiv}
+         />
          {speaker && <SpeakerInfoOverlay speaker={speaker} small={!big} />}
          {stream?.videoMuted && (
             <div className={classes.mutedOverlay}>
@@ -111,7 +129,7 @@ StreamItem.propTypes = {
       fallbackToAudio: PropTypes.bool,
       streamId: PropTypes.string,
       streamQuality: PropTypes.oneOf(["high"]),
-      videoMuted: PropTypes.string,
+      videoMuted: PropTypes.bool,
       stream: PropTypes.shape({
          play: PropTypes.func,
          isPlaying: PropTypes.func,

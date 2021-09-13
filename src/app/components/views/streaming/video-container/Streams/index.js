@@ -30,39 +30,42 @@ const Streams = memo(
       sharingContent,
       isBroadCasting,
       liveSpeakers,
+     play,
+     unmute
    }) => {
       const classes = useStyles();
       const [streamData, setStreamData] = useState({
          largeStream: localMediaStream,
          smallStreams: [],
       });
+      const [streams, setStreams] = useState({
+
+      });
       console.log("-> streamData", streamData);
       useEffect(() => {
-         setStreamData(({ largeStream, smallStreams }) => {
-            const allStreams = [...externalMediaStreams];
-            const hasManySpeakers = Boolean(externalMediaStreams?.length > 4);
-            if (localMediaStream && isBroadCasting) {
-               allStreams.push(localMediaStream);
-            }
+         const allStreams = [...externalMediaStreams];
+         const hasManySpeakers = Boolean(externalMediaStreams?.length > 4);
+         if (localMediaStream && isBroadCasting) {
+            allStreams.push(localMediaStream);
+         }
 
-            let newLargeStream = handleGetLargeStream(
-               allStreams,
-               currentSpeakerId,
-               sharingContent
-            );
-            let newSmallStreams = handleGetSmallStream(
-               allStreams,
-               newLargeStream,
-               sharingContent,
-               hasManySpeakers,
-               currentSpeakerId
-            );
-
-            return {
-               largeStream: newLargeStream,
-               smallStreams: newSmallStreams,
-            };
-         });
+         let newLargeStream = handleGetLargeStream(
+            allStreams,
+            currentSpeakerId,
+            sharingContent
+         );
+         let newSmallStreams = handleGetSmallStream(
+            allStreams,
+            newLargeStream,
+            sharingContent,
+            hasManySpeakers,
+            currentSpeakerId
+         );
+         const newStreamData = {
+            largeStream: newLargeStream,
+            smallStreams: newSmallStreams,
+         };
+         setStreamData(newStreamData);
       }, [
          externalMediaStreams,
          localMediaStream,
@@ -150,6 +153,8 @@ const Streams = memo(
                <StreamsLayout
                   streamData={streamData}
                   liveSpeakers={liveSpeakers}
+                  play={play}
+                  unmute={unmute}
                />
             </div>
          </div>
@@ -164,7 +169,7 @@ Streams.propTypes = {
          fallbackToAudio: PropTypes.bool,
          streamId: PropTypes.string,
          streamQuality: PropTypes.oneOf(["high"]),
-         videoMuted: PropTypes.string,
+         videoMuted: PropTypes.bool,
          stream: PropTypes.shape({
             play: PropTypes.func,
             isPlaying: PropTypes.func,
@@ -174,12 +179,14 @@ Streams.propTypes = {
    localMediaStream: PropTypes.shape({
       audioMuted: PropTypes.bool,
       streamId: PropTypes.string,
-      videoMuted: PropTypes.string,
+      videoMuted: PropTypes.bool,
       stream: PropTypes.shape({
          play: PropTypes.func,
          isPlaying: PropTypes.func,
       }),
    }),
+   play: PropTypes.bool,
+   unmute: PropTypes.bool,
 };
 
 export default Streams;

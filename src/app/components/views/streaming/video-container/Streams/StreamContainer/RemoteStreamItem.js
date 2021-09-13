@@ -9,28 +9,34 @@ const RemoteStreamItem = ({
    setShowVideoButton,
    stream,
    unmute,
+                             videoElementDiv,
    big,
 }) => {
-   const isScreenShareVideo = stream.isScreenShareVideo;
 
-   useEffect(() => {
-      if (stream.streamId === "demoStream") {
-         generateDemoHandRaiser();
-      } else {
-         if (!stream.stream.isPlaying()) {
-            stream?.stream?.play(
-               stream.streamId,
-               { fit: isScreenShareVideo ? "contain" : "cover" },
-               (err) => {
-                  if (err) {
-                     console.log("-> err", err);
-                     setShowVideoButton({ paused: false, muted: true });
-                  }
-               }
-            );
-         }
-      }
-   }, [stream.streamId]);
+   // useEffect(() => {
+   //    if (stream.streamId === "demoStream") {
+   //       generateDemoHandRaiser();
+   //    } else {
+   //       console.log("-> STARTING TO PLAY", stream.streamId);
+   //       // if (!stream.stream.isPlaying()) {
+   //          stream?.stream?.play(
+   //             stream.streamId,
+   //             { fit: stream.isScreenShareVideo ? "contain" : "cover" },
+   //             (err) => {
+   //                if (err) {
+   //                   console.log("-> err", err);
+   //                   setShowVideoButton({ paused: false, muted: true });
+   //                }
+   //             }
+   //          );
+   //
+   //          // NEW
+   //          return () => {
+   //             stream?.stream?.stop()
+   //          }
+   //       // }
+   //    }
+   // }, [stream.streamId]);
 
    useEffect(() => {
       if (unmute) {
@@ -53,6 +59,8 @@ const RemoteStreamItem = ({
    }, [muted]);
 
    useEffect(() => {
+      console.log("-> stream?.stream?.audio", stream?.stream?.audio);
+      console.log("-> stream?.stream?.video", stream?.stream?.video);
       if (stream?.stream?.audio === false && stream?.stream?.video === false) {
          setRemovedStream(stream.streamId);
       }
@@ -72,7 +80,7 @@ const RemoteStreamItem = ({
          stream.stream.play(
             stream.streamId,
             {
-               fit: isScreenShareVideo ? "contain" : "cover",
+               fit: stream.isScreenShareVideo ? "contain" : "cover",
                muted: true,
             },
             (err) => {
@@ -88,6 +96,7 @@ const RemoteStreamItem = ({
    return (
       <StreamItem
          speaker={speaker}
+         videoElementDiv={videoElementDiv}
          stream={stream}
          big={big}
       />

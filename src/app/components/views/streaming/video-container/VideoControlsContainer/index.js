@@ -170,12 +170,12 @@ function VideoControlsContainer({
 
    function toggleMicrophone() {
       if (isLocalMicMuted) {
-         localMediaStream.unmuteAudio();
+         localMediaStream.stream.unmuteAudio();
          let localMediaStreamCopy = { ...localMediaStream };
          localMediaStreamCopy.audioMuted = false;
          setLocalMediaStream(localMediaStreamCopy);
       } else {
-         localMediaStream.muteAudio();
+         localMediaStream.stream.muteAudio();
          let localMediaStreamCopy = { ...localMediaStream };
          localMediaStreamCopy.audioMuted = true;
          setLocalMediaStream(localMediaStreamCopy);
@@ -185,12 +185,12 @@ function VideoControlsContainer({
 
    function toggleVideo() {
       if (isVideoInactive) {
-         localMediaStream.unmuteVideo();
+         localMediaStream.stream.unmuteVideo();
          let localMediaStreamCopy = { ...localMediaStream };
          localMediaStreamCopy.videoMuted = false;
          setLocalMediaStream(localMediaStreamCopy);
       } else {
-         localMediaStream.muteVideo();
+         localMediaStream.stream.muteVideo();
          let localMediaStreamCopy = { ...localMediaStream };
          localMediaStreamCopy.videoMuted = true;
          setLocalMediaStream(localMediaStreamCopy);

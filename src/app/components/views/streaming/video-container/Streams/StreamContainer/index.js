@@ -1,8 +1,21 @@
 import React, { useMemo } from "react";
 import LocalStreamItem from "./LocalStreamItem";
 import RemoteStreamItem from "./RemoteStreamItem";
+import { makeStyles } from "@material-ui/core/styles";
 
-const StreamContainer = ({ stream, big, liveSpeakers }) => {
+const useStyles = makeStyles(theme => ({
+   videoElement: {
+      width: "100%",
+      height: "100%",
+      position: "absolute",
+      "& > *": {
+         borderRadius: 10,
+         boxShadow: theme.shadows[5],
+      },
+   },
+}));
+const StreamContainer = ({ stream, big, liveSpeakers , play, unmute}) => {
+   const classes = useStyles();
 
    const speaker = useMemo(
       () =>
@@ -11,18 +24,29 @@ const StreamContainer = ({ stream, big, liveSpeakers }) => {
                  (speaker) => speaker.speakerUuid === stream.streamId
               )
             : null,
-      [stream.isScreenShareVideo, liveSpeakers]
+      [stream.isScreenShareVideo, liveSpeakers, stream.streamId]
    );
+
+   const videoElementDiv = useMemo(() =>    <div
+     id={stream.streamId}
+     className={classes.videoElement}
+   />, [stream.streamId])
 
    return stream.isLocal ? (
       <LocalStreamItem
          big={big}
          stream={stream}
+         videoElementDiv={videoElementDiv}
          speaker={speaker}
+         unmute={unmute}
+         play={play}
       />
    ) : (
       <RemoteStreamItem
          big={big}
+         play={play}
+         videoElementDiv={videoElementDiv}
+         unmute={unmute}
          stream={stream}
          speaker={speaker}
       />

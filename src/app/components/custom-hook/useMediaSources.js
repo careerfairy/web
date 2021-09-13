@@ -33,6 +33,7 @@ export default function useMediaSources(
    );
 
    useEffect(() => {
+      console.log("-> localStreamData", localStreamData);
       if (devices && localStreamData) {
          if (
             devices.audioInputList &&

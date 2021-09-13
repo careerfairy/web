@@ -108,7 +108,6 @@ function VideoContainer(props) {
       localMediaStream,
       !streamerReady || showSettings
    );
-
    const currentSpeakerId = useCurrentSpeaker(
       localMediaStream,
       externalMediaStreams
@@ -284,6 +283,8 @@ function VideoContainer(props) {
             currentSpeakerId={currentSpeakerId}
             sharingContent={sharingContent}
             streamerId={props.streamerId}
+            play={props.play}
+            unmute={props.unmute}
             liveSpeakers={props.currentLivestream.liveSpeakers}
             isBroadCasting={!props.isPlayMode}
          />
