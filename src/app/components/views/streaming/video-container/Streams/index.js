@@ -86,11 +86,9 @@ const Streams = memo(
          for (const stream of allStreams) {
             if (stream.streamId.includes("screen")) {
                screenShareStream = { ...stream, isScreenShareVideo: true };
-               break;
             }
             if (stream.streamId === currentSpeakerId) {
                currentSpeakerStream = stream;
-               break;
             }
 
             if (stream.isLocal) {

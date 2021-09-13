@@ -59,19 +59,19 @@ const StreamItem = ({
    big,
    speaker,
    videoMutedBackgroundImg,
-   videoElementDiv,
 }) => {
    const classes = useStyles();
    const vidDiv = useRef(null);
 
    useEffect(() => {
       if (!stream?.stream?.isPlaying()) {
-         stream?.stream?.play(stream.streamId);
+         stream?.stream?.play(stream.streamId, {
+            fit: stream.isScreenShareVideo ? "contain" : "cover",
+         });
       }
       return () => {
          stream?.stream?.stop();
       };
-
    }, [stream?.stream]);
 
    return (

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import StreamItem from "./StreamItem";
 
 
-const LocalStreamItem = ({ stream, big, speaker, videoElementDiv}) => {
+const LocalStreamItem = ({ stream, big, speaker}) => {
 
    // useEffect(() => {
    //       console.log("-> STARTING TO PLAY", stream.streamId);
@@ -24,7 +24,7 @@ const LocalStreamItem = ({ stream, big, speaker, videoElementDiv}) => {
    //       }
    // }, [stream.streamId]);
 
-   return <StreamItem videoElementDiv={videoElementDiv} speaker={speaker} stream={stream} big={big} />;
+   return <StreamItem speaker={speaker} stream={stream} big={big} />;
 };
 
 export default LocalStreamItem;

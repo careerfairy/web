@@ -9,7 +9,6 @@ const RemoteStreamItem = ({
    setShowVideoButton,
    stream,
    unmute,
-                             videoElementDiv,
    big,
 }) => {
 
@@ -62,7 +61,7 @@ const RemoteStreamItem = ({
       console.log("-> stream?.stream?.audio", stream?.stream?.audio);
       console.log("-> stream?.stream?.video", stream?.stream?.video);
       if (stream?.stream?.audio === false && stream?.stream?.video === false) {
-         setRemovedStream(stream.streamId);
+         // setRemovedStream(stream.streamId);
       }
    }, [stream?.stream?.audio, stream?.stream?.video]);
 
@@ -96,7 +95,6 @@ const RemoteStreamItem = ({
    return (
       <StreamItem
          speaker={speaker}
-         videoElementDiv={videoElementDiv}
          stream={stream}
          big={big}
       />

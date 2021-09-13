@@ -27,16 +27,11 @@ const StreamContainer = ({ stream, big, liveSpeakers , play, unmute}) => {
       [stream.isScreenShareVideo, liveSpeakers, stream.streamId]
    );
 
-   const videoElementDiv = useMemo(() =>    <div
-     id={stream.streamId}
-     className={classes.videoElement}
-   />, [stream.streamId])
 
    return stream.isLocal ? (
       <LocalStreamItem
          big={big}
          stream={stream}
-         videoElementDiv={videoElementDiv}
          speaker={speaker}
          unmute={unmute}
          play={play}
@@ -45,7 +40,6 @@ const StreamContainer = ({ stream, big, liveSpeakers , play, unmute}) => {
       <RemoteStreamItem
          big={big}
          play={play}
-         videoElementDiv={videoElementDiv}
          unmute={unmute}
          stream={stream}
          speaker={speaker}
