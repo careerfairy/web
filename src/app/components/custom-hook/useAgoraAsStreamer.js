@@ -491,8 +491,6 @@ export default function useAgoraAsStreamer(
                      msg: "RTC_PUBLISH_STREAM",
                   });
 
-                  // TODO disabled for development purposes since the video element does not exist
-                  console.log("-> streamId in hook", streamId);
                   // localStream.play(streamId);
                   rtcClient.publish(localStream, handleStreamPublishingError);
                   setLocalMediaStream({
