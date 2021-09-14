@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import SignalWifi0BarRoundedIcon from "@material-ui/icons/SignalWifi0BarRounded";
 import SignalWifi1BarRoundedIcon from "@material-ui/icons/SignalWifi1BarRounded";
@@ -9,10 +9,10 @@ import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import CachedIcon from "@material-ui/icons/Cached";
 import WarningIcon from "@material-ui/icons/Warning";
-import { ArrowUp, ArrowDown } from "react-feather";
+import { ArrowDown, ArrowUp } from "react-feather";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { Tooltip, Box, Badge, Typography } from "@material-ui/core";
+import { Box, Tooltip } from "@material-ui/core";
 import Draggable from "react-draggable";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -33,7 +33,6 @@ const useStyles = makeStyles((theme) => ({
       // cursor: "move",
       right: "3%",
       top: "2%",
-      zIndex: 9999,
       borderRadius: theme.spacing(2),
       padding: theme.spacing(1),
       boxShadow: theme.shadows[2],

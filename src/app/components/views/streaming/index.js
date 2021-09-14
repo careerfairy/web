@@ -15,7 +15,7 @@ import { Backdrop } from "@material-ui/core";
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
       transitionTimingFunction: theme.transitions.easeInOut,
-      zIndex: 10,
+      // zIndex: 10,
       display: "flex",
       height: "inherit",
    },
@@ -25,13 +25,13 @@ const useStyles = makeStyles((theme) => ({
       right: 40,
       width: "20%",
       minWidth: 250,
-      zIndex: 100,
+      zIndex: 1,
    },
    iconsContainer: {
       position: "absolute",
       bottom: 60,
       right: 100,
-      zIndex: 100,
+      zIndex: 1,
       width: 80,
    },
    backdrop: {

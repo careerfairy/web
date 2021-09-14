@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       alignItems: "center",
       justifyContent: "flex-end",
-      zIndex: 9999,
+      zIndex: 1,
    },
    speedDial: {
       transition: "transform 0.2s",

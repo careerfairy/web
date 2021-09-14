@@ -10,15 +10,10 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       flexDirection: "column",
       backgroundColor: theme.palette.grey["900"],
-      // make 900 before push to prod
-      // backgroundColor: theme.palette.grey["900"],
    },
    videoElementsWrapper: {
-      // width: "100%",
       flex: 1,
       display: "flex",
-      // flexGrow: 1
-      // height: 500
    },
 }));
 
