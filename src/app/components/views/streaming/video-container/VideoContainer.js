@@ -272,7 +272,6 @@ function VideoContainer(props) {
       [props.currentLivestream.mode]
    );
 
-   const defaultLocalStream = useMemo(() => ({isLocal: true, streamId:props.streamerId }), [props.streamerId])
 
    return (
       <Fragment>
@@ -282,6 +281,7 @@ function VideoContainer(props) {
             localMediaStream={localMediaStream }
             currentSpeakerId={currentSpeakerId}
             sharingContent={sharingContent}
+            sharingPdf={props.currentLivestream.mode === "presentation"}
             streamerId={props.streamerId}
             play={props.play}
             unmute={props.unmute}

@@ -25,9 +25,11 @@ const Streams = memo(
       sharingContent,
       isBroadCasting,
       liveSpeakers,
+     sharingPdf,
      play,
      unmute
    }) => {
+      console.log("-> sharingPdf", sharingPdf);
       const classes = useStyles();
       const [streamData, setStreamData] = useState([]);
 
@@ -141,6 +143,7 @@ const Streams = memo(
                   streamData={streamData}
                   liveSpeakers={liveSpeakers}
                   play={play}
+                  sharingPdf={sharingPdf}
                   unmute={unmute}
                />
             </div>
@@ -174,6 +177,7 @@ Streams.propTypes = {
    }),
    play: PropTypes.bool,
    unmute: PropTypes.bool,
+   sharingPdf: PropTypes.bool
 };
 
 export default Streams;

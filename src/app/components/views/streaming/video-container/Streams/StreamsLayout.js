@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const StreamsLayout = ({ streamData, liveSpeakers, play, unmute }) => {
+const StreamsLayout = ({ streamData, liveSpeakers, play, unmute , sharingPdf}) => {
    const hasSmallStreams = streamData.length > 1;
 
    const classes = useStyles({ hasSmallStreams });
