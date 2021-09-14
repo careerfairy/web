@@ -34,15 +34,8 @@ const Streams = memo(
      unmute
    }) => {
       const classes = useStyles();
-      const [streamData, setStreamData] = useState([localMediaStream]);
-      // const [streamData, setStreamData] = useState({
-      //    largeStream: localMediaStream,
-      //    smallStreams: [],
-      // });
-      const [streams, setStreams] = useState({
+      const [streamData, setStreamData] = useState([]);
 
-      });
-      console.log("-> streamData", streamData);
       useEffect(() => {
          const allStreams = [...externalMediaStreams];
          const hasManySpeakers = Boolean(externalMediaStreams?.length > 4);
@@ -55,6 +48,10 @@ const Streams = memo(
             currentSpeakerId,
             sharingContent
          );
+         if(!newLargeStream){
+            setStreamData([])
+            return
+         }
          let newSmallStreams = handleGetSmallStream(
             allStreams,
             newLargeStream,
@@ -62,10 +59,6 @@ const Streams = memo(
             hasManySpeakers,
             currentSpeakerId
          );
-         // const newStreamData = {
-         //    largeStream: newLargeStream,
-         //    smallStreams: newSmallStreams,
-         // };
          setStreamData([...newSmallStreams, newLargeStream]);
       }, [
          externalMediaStreams,

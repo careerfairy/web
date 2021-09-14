@@ -54,18 +54,26 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg , index}) => {
+const StreamItem = ({
+   stream,
+   big,
+   speaker,
+   videoMutedBackgroundImg,
+   index,
+}) => {
    const classes = useStyles();
    const vidDiv = useRef(null);
 
    useEffect(() => {
-      stream?.stream?.play(stream.streamId, {
-         fit: stream.isScreenShareVideo ? "contain" : "cover",
-      });
+      if (stream?.stream?.isPlaying() === false) {
+         stream?.stream?.play(stream.streamId, {
+            fit: stream.isScreenShareVideo ? "contain" : "cover",
+         });
+      }
       return () => {
          stream?.stream?.stop();
       };
-   }, [stream?.stream]);
+   }, [stream?.stream, stream?.stream?.isPlaying()]);
 
    return (
       <div className={classes.root}>
@@ -74,10 +82,8 @@ const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg , index}) =>
             className={classes.videoElement}
             ref={vidDiv}
          />
-         <Paper style={{zIndex: 1}}>
-            <Typography variant="h4">
-            {index}
-            </Typography>
+         <Paper style={{ zIndex: 1 }}>
+            <Typography variant="h4">{index}</Typography>
          </Paper>
          {speaker && <SpeakerInfoOverlay speaker={speaker} small={!big} />}
          {stream?.videoMuted && (

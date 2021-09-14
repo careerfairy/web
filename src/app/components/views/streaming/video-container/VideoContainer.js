@@ -279,7 +279,7 @@ function VideoContainer(props) {
          <BreakoutRoomManagementModal agoraHandlers={agoraHandlers} />
          <Streams
             externalMediaStreams={externalMediaStreams}
-            localMediaStream={localMediaStream || defaultLocalStream}
+            localMediaStream={localMediaStream }
             currentSpeakerId={currentSpeakerId}
             sharingContent={sharingContent}
             streamerId={props.streamerId}
