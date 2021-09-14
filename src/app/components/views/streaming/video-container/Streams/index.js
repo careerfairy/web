@@ -34,10 +34,11 @@ const Streams = memo(
      unmute
    }) => {
       const classes = useStyles();
-      const [streamData, setStreamData] = useState({
-         largeStream: localMediaStream,
-         smallStreams: [],
-      });
+      const [streamData, setStreamData] = useState([localMediaStream]);
+      // const [streamData, setStreamData] = useState({
+      //    largeStream: localMediaStream,
+      //    smallStreams: [],
+      // });
       const [streams, setStreams] = useState({
 
       });
@@ -61,11 +62,11 @@ const Streams = memo(
             hasManySpeakers,
             currentSpeakerId
          );
-         const newStreamData = {
-            largeStream: newLargeStream,
-            smallStreams: newSmallStreams,
-         };
-         setStreamData(newStreamData);
+         // const newStreamData = {
+         //    largeStream: newLargeStream,
+         //    smallStreams: newSmallStreams,
+         // };
+         setStreamData([...newSmallStreams, newLargeStream]);
       }, [
          externalMediaStreams,
          localMediaStream,
@@ -166,7 +167,7 @@ Streams.propTypes = {
          audioMuted: PropTypes.bool,
          fallbackToAudio: PropTypes.bool,
          streamId: PropTypes.string,
-         streamQuality: PropTypes.oneOf(["high"]),
+         streamQuality: PropTypes.oneOf(["high", "low"]),
          videoMuted: PropTypes.bool,
          stream: PropTypes.shape({
             play: PropTypes.func,

@@ -14,9 +14,8 @@ const useStyles = makeStyles(theme => ({
       },
    },
 }));
-const StreamContainer = ({ stream, big, liveSpeakers , play, unmute}) => {
+const StreamContainer = ({ stream, big, liveSpeakers , play, unmute, index}) => {
    const classes = useStyles();
-
    const speaker = useMemo(
       () =>
          !stream.isScreenShareVideo
@@ -32,6 +31,7 @@ const StreamContainer = ({ stream, big, liveSpeakers , play, unmute}) => {
       <LocalStreamItem
          big={big}
          stream={stream}
+         index={index}
          speaker={speaker}
          unmute={unmute}
          play={play}
@@ -39,6 +39,7 @@ const StreamContainer = ({ stream, big, liveSpeakers , play, unmute}) => {
    ) : (
       <RemoteStreamItem
          big={big}
+         index={index}
          play={play}
          unmute={unmute}
          stream={stream}

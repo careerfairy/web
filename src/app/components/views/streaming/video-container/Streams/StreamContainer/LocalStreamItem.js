@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import StreamItem from "./StreamItem";
 
 
-const LocalStreamItem = ({ stream, big, speaker}) => {
+const LocalStreamItem = ({ stream, big, speaker, index}) => {
 
    // useEffect(() => {
    //       console.log("-> STARTING TO PLAY", stream.streamId);
@@ -24,7 +24,7 @@ const LocalStreamItem = ({ stream, big, speaker}) => {
    //       }
    // }, [stream.streamId]);
 
-   return <StreamItem speaker={speaker} stream={stream} big={big} />;
+   return <StreamItem speaker={speaker} stream={stream} big={big} index={index} />;
 };
 
 export default LocalStreamItem;

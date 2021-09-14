@@ -10,6 +10,7 @@ const RemoteStreamItem = ({
    stream,
    unmute,
    big,
+                             index,
 }) => {
 
    // useEffect(() => {
@@ -96,6 +97,7 @@ const RemoteStreamItem = ({
       <StreamItem
          speaker={speaker}
          stream={stream}
+         index={index}
          big={big}
       />
    );

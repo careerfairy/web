@@ -6,6 +6,8 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { Item, Row } from "@mui-treasury/components/flex";
 import StreamContainer from "./StreamContainer";
 import clsx from "clsx";
+import Box from "@material-ui/core/Box";
+import { useMeasure } from 'react-use';
 
 const SPACING = 1;
 
@@ -41,14 +43,14 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       overflowX: "auto",
       justifyContent: "space-between",
-      "& > :first-child": {
-         marginLeft: "auto",
-         paddingLeft: 0,
-      },
-      "& > :last-child": {
-         marginRight: "auto",
-         paddingRight: 0,
-      },
+      // "& > :first-child": {
+      //    marginLeft: "auto",
+      //    paddingLeft: 0,
+      // },
+      // "& > :last-child": {
+      //    marginRight: "auto",
+      //    paddingRight: 0,
+      // },
       "&::-webkit-scrollbar": {
          height: 5,
       },
@@ -76,17 +78,28 @@ const useStyles = makeStyles((theme) => ({
          boxShadow: theme.shadows[5],
       },
    },
+   largeAbsoluteStream: {
+      position: "absolute",
+      zIndex: 1,
+      display: "flex",
+      top: "20%",
+      left: 0,
+      right: 0,
+      bottom: 0,
+      padding: theme.spacing(SPACING)
+   },
 }));
 
 const StreamsLayout = ({
-   streamData: { largeStream, smallStreams },
+   streamData,
    liveSpeakers,
    play,
    unmute,
 }) => {
    const classes = useStyles();
 
-   const hasSmallStreams = Boolean(smallStreams.length);
+
+   const hasSmallStreams = Boolean(streamData.length > 1);
    return (
       <Grid className={classes.root} container spacing={SPACING}>
          <Grid
@@ -98,50 +111,73 @@ const StreamsLayout = ({
             xs={12}
          >
             {hasSmallStreams && (
-               <AutoSizer>
-                  {({ height, width }) => (
-                     <Row
-                        p={0}
-                        gap={SPACING}
-                        className={classes.smallStreamsWrapper}
-                        style={{
-                           width,
-                           height,
-                        }}
-                     >
-                        {smallStreams.map((stream) => (
-                           <Item
-                              className={classes.smallStreamItem}
-                              key={stream.streamId}
-                           >
+               // <AutoSizer>
+               //    {({ height, width }) => (
+               <Row
+                  p={0}
+                  gap={SPACING}
+                  className={classes.smallStreamsWrapper}
+                  // style={{
+                  //    width,
+                  //    height
+                  // }}
+               >
+                  {/*<Box order={0} marginLeft="auto" />*/}
+                  {streamData.map((stream, index) => {
+                     const isLast = index === streamData.length - 1;
+
+                     if (isLast) {
+                        return (
+                           <div key={stream.streamId} style={{
+                           }} className={classes.largeAbsoluteStream}>
                               <StreamContainer
                                  stream={stream}
-                                 liveSpeakers={liveSpeakers}
+                                 big
                                  play={play}
                                  unmute={unmute}
+                                 liveSpeakers={liveSpeakers}
                               />
-                           </Item>
-                        ))}
-                     </Row>
-                  )}
-               </AutoSizer>
+                           </div>
+                        );
+                     }
+                     return (
+                        <Item
+                           className={classes.smallStreamItem}
+                           style={{
+                              order: index + 10,
+                           }}
+                           key={stream.streamId}
+                        >
+                           <StreamContainer
+                              stream={stream}
+                              liveSpeakers={liveSpeakers}
+                              play={play}
+                              unmute={unmute}
+                           />
+                        </Item>
+                     );
+                  })}
+                  {/*<Box order={999} marginRight="auto" />*/}
+               </Row>
             )}
+            {/*</AutoSizer>*/}
+            {/*)}*/}
          </Grid>
-         <Grid
-            className={clsx(classes.largeStreamContainerGridItem, {
-               [classes.squished]: hasSmallStreams,
-            })}
-            item
-            xs={12}
-         >
-            <StreamContainer
-               stream={largeStream}
-               big
-               play={play}
-               unmute={unmute}
-               liveSpeakers={liveSpeakers}
-            />
-         </Grid>
+         {/*<Grid*/}
+         {/*   className={clsx(classes.largeStreamContainerGridItem, {*/}
+         {/*      [classes.squished]: hasSmallStreams,*/}
+         {/*   })}*/}
+         {/*   item*/}
+         {/*   xs={12}*/}
+         {/*>*/}
+         {/*   <StreamContainer*/}
+         {/*      stream={largeStream}*/}
+         {/*      big*/}
+         {/*      play={play}*/}
+         {/*      unmute={unmute}*/}
+         {/*      liveSpeakers={liveSpeakers}*/}
+         {/*   />*/}
+         {/*</Grid>*/}
       </Grid>
    );
 };
@@ -151,8 +187,5 @@ export default StreamsLayout;
 StreamsLayout.propTypes = {
    play: PropTypes.bool,
    unmute: PropTypes.bool,
-   streamData: PropTypes.shape({
-      largeStream: PropTypes.object,
-      smallStreams: PropTypes.arrayOf(PropTypes.object),
-   }),
+   streamData: PropTypes.arrayOf(PropTypes.object),
 };

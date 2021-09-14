@@ -3,8 +3,8 @@ import React, { useEffect, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
 import SpeakerInfoOverlay from "../../SpeakerInfoOverlay";
-import { Tooltip } from "@material-ui/core";
-import VideocamOffIcon from "@material-ui/icons/VideocamOff";
+import { Paper, Tooltip, Typography } from "@material-ui/core";
+import VideoCamOffIcon from "@material-ui/icons/VideocamOff";
 import VolumeOffIcon from "@material-ui/icons/MicOff";
 
 const useStyles = makeStyles((theme) => ({
@@ -54,21 +54,14 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const StreamItem = ({
-   stream,
-   big,
-   speaker,
-   videoMutedBackgroundImg,
-}) => {
+const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg , index}) => {
    const classes = useStyles();
    const vidDiv = useRef(null);
 
    useEffect(() => {
-      if (!stream?.stream?.isPlaying()) {
-         stream?.stream?.play(stream.streamId, {
-            fit: stream.isScreenShareVideo ? "contain" : "cover",
-         });
-      }
+      stream?.stream?.play(stream.streamId, {
+         fit: stream.isScreenShareVideo ? "contain" : "cover",
+      });
       return () => {
          stream?.stream?.stop();
       };
@@ -81,6 +74,11 @@ const StreamItem = ({
             className={classes.videoElement}
             ref={vidDiv}
          />
+         <Paper style={{zIndex: 1}}>
+            <Typography variant="h4">
+            {index}
+            </Typography>
+         </Paper>
          {speaker && <SpeakerInfoOverlay speaker={speaker} small={!big} />}
          {stream?.videoMuted && (
             <div className={classes.mutedOverlay}>
@@ -93,7 +91,7 @@ const StreamItem = ({
                      />
                   </div>
                   <Tooltip title={"The streamer has turned the camera off"}>
-                     <VideocamOffIcon
+                     <VideoCamOffIcon
                         className={classes.svgShadow}
                         fontSize="large"
                         color="error"
