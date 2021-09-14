@@ -42,6 +42,7 @@
     "@next/bundle-analyzer": "^10.0.6",
     "@react-pdf/renderer": "^1.6.13",
     "@react-pdf/styled-components": "^1.4.0",
+    "@reactivers/use-measure": "^1.0.0",
     "@sentry/browser": "^5.13.2",
     "agora-access-token": "^2.0.4",
     "agora-rtc-sdk": "^3.4.0",

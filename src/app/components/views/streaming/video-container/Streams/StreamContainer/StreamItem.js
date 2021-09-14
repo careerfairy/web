@@ -132,7 +132,7 @@ StreamItem.propTypes = {
       audioMuted: PropTypes.bool,
       fallbackToAudio: PropTypes.bool,
       streamId: PropTypes.string,
-      streamQuality: PropTypes.oneOf(["high"]),
+      streamQuality: PropTypes.oneOf(["high", "low"]),
       videoMuted: PropTypes.bool,
       stream: PropTypes.shape({
          play: PropTypes.func,

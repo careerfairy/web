@@ -28,6 +28,7 @@
     "@mui-treasury/styles": "^1.13.1",
     "@react-pdf/renderer": "^1.6.13",
     "@react-pdf/styled-components": "^1.4.0",
+    "@reactivers/use-measure": "^1.0.0",
     "@sentry/browser": "^5.13.2",
     "agora-rtc-sdk": "^3.4.0",
     "agora-rtm-sdk": "^1.4.1",
