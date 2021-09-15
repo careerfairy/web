@@ -45,8 +45,6 @@ const Streams = memo(
          let newLargeStream = handleGetLargeStream(
             allStreams,
             currentSpeakerId,
-            sharingScreen,
-           sharingPdf
          );
          if(!newLargeStream){
             setStreamData([])
@@ -73,13 +71,10 @@ const Streams = memo(
       const handleGetLargeStream = (
          allStreams,
          currentSpeakerId,
-         sharingScreen,
-         sharingPdf
       ) => {
          let screenShareStream;
          let currentSpeakerStream;
          let localStream;
-         let isSharingScreen
 
          for (const stream of allStreams) {
             if (stream.streamId.includes("screen")) {
@@ -97,8 +92,6 @@ const Streams = memo(
          if (screenShareStream) return screenShareStream;
 
          if (currentSpeakerStream) return currentSpeakerStream;
-
-         if (sharingScreen) return { loadingShare: true };
 
          if (localStream) return localStream;
 

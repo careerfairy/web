@@ -106,7 +106,6 @@ const StreamsLayout = ({
    currentSpeakerId,
 }) => {
    const hasSmallStreams = streamData.length > 1;
-   console.log("-> streamData", streamData);
    const classes = useStyles({ hasSmallStreams });
 
    return (

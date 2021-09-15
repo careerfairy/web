@@ -2,9 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
    Button,
-   Card,
-   CardActions,
-   CardHeader,
+   Divider,
+   Grid,
+   ListItem,
+   ListItemText,
    Tooltip,
 } from "@material-ui/core";
 import TutorialContext from "context/tutorials/TutorialContext";
@@ -14,24 +15,86 @@ import {
    TooltipTitle,
    WhiteTooltip,
 } from "materialUI/GlobalTooltips";
-import { makeStyles } from "@material-ui/core/styles";
+import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
-   handRaiseContainerInvited: {
-      width: "100%",
-      background: theme.palette.primary.main,
-      marginBottom: theme.spacing(1),
-      color: theme.palette.common.white,
-      minHeight: 140,
-   },
-   handRaiseContainerRequested: {
-      width: "100%",
-      marginBottom: theme.spacing(1),
+   root: {
+      flexDirection: "column",
+      alignItems: "flex-start",
+      backgroundColor: ({ backgroundColor }) => backgroundColor && alpha(backgroundColor, 0.5),
+      borderRadius: 5
    },
 }));
 
+const HandRaiseListItem = ({
+   title,
+   subtitle,
+   primaryOnClick,
+   primaryButtonText,
+   primaryButtonDisabled,
+   secondaryOnClick,
+   secondaryButtonText,
+   secondaryButtonDisabled,
+   primaryDisabledMessage,
+  backgroundColor
+}) => {
+   const classes = useStyles({backgroundColor});
+   return (
+      <React.Fragment>
+         <ListItem color="blue" className={classes.root}>
+            <Grid container spacing={1}>
+               <Grid xs={12} item>
+                  <ListItemText
+                     primary={title}
+                     primaryTypographyProps={{
+                        noWrap: true,
+                     }}
+                     secondaryTypographyProps={{
+                        noWrap: true,
+                     }}
+                     secondary={subtitle}
+                  />
+               </Grid>
+               {primaryOnClick && (
+                  <Grid item>
+                     <Tooltip
+                        title={
+                           (primaryButtonDisabled && primaryDisabledMessage) ||
+                           ""
+                        }
+                     >
+                        <Button
+                           size="small"
+                           onClick={primaryOnClick}
+                           color="primary"
+                           disabled={primaryButtonDisabled}
+                           variant="outlined"
+                        >
+                           {primaryButtonText}
+                        </Button>
+                     </Tooltip>
+                  </Grid>
+               )}
+               {secondaryOnClick && (
+                  <Grid item>
+                     <Button
+                        size="small"
+                        onClick={secondaryOnClick}
+                        disabled={secondaryButtonDisabled}
+                        variant="outlined"
+                     >
+                        {secondaryButtonText}
+                     </Button>
+                  </Grid>
+               )}
+            </Grid>
+         </ListItem>
+         <Divider component="li" />
+      </React.Fragment>
+   );
+};
+
 function RequestedHandRaiseElement(props) {
-   const classes = useStyles();
    const [notificationId] = useState(uuidv4());
    const { getActiveTutorialStepKey, handleConfirmStep, isOpen } = useContext(
       TutorialContext
@@ -89,74 +152,46 @@ function RequestedHandRaiseElement(props) {
          }
          open={Boolean(props.hasEntered && isOpen(10))}
       >
-         <Card className={classes.handRaiseContainerRequested}>
-            <CardHeader title="HAND RAISED" subheader={props.request.name} />
-            <CardActions>
-               {props.numberOfActiveHandRaisers > 7 ? (
-                  <Tooltip title="You cannot invite more than 8 people simultaneously in hand raise">
-                     <div>
-                        <Button
-                           variant="contained"
-                           style={{ marginRight: "1rem" }}
-                           children="Invite to speak"
-                           disabled
-                           size="small"
-                           color="primary"
-                        />
-                     </div>
-                  </Tooltip>
-               ) : (
-                  <Button
-                     variant="contained"
-                     style={{ marginRight: "1rem" }}
-                     children="Invite to speak"
-                     size="small"
-                     onClick={() => {
-                        if (isOpen(10)) {
-                           handleConfirmStep(10);
-                           updateHandRaiseRequest("connected");
-                        } else {
-                           updateHandRaiseRequest("invited");
-                        }
-                     }}
-                     color="primary"
-                  />
-               )}
-               <Button
-                  variant="contained"
-                  color="default"
-                  children="Deny"
-                  size="small"
-                  disabled={isOpen(10)}
-                  onClick={() => updateHandRaiseRequest("denied")}
-               />
-            </CardActions>
-         </Card>
+         <HandRaiseListItem
+            primaryOnClick={() => {
+               if (isOpen(10)) {
+                  handleConfirmStep(10);
+                  updateHandRaiseRequest("connected");
+               } else {
+                  updateHandRaiseRequest("invited");
+               }
+            }}
+            primaryButtonText={"Invite to speak"}
+            primaryButtonDisabled={props.numberOfActiveHandRaisers > 7}
+            title={"HAND RAISED"}
+            secondaryOnClick={() => updateHandRaiseRequest("denied")}
+            secondaryButtonText={"Deny"}
+            secondaryButtonDisabled={isOpen(10)}
+            primaryDisabledMessage={
+               "You cannot invite more than 8 people simultaneously in hand raise"
+            }
+            subtitle={props.request.name}
+         />
       </WhiteTooltip>
    );
 }
 
 function InvitedHandRaiseElement(props) {
-   const classes = useStyles();
+   const theme = useTheme()
    return (
-      <Card className={classes.handRaiseContainerInvited}>
-         <CardHeader title="INVITED" subheader={props.request.name} />
-         <CardActions>
-            <Button
-               variant="contained"
-               children="Remove"
-               size="small"
-               onClick={() =>
-                  props.updateHandRaiseRequest(props.request.id, "denied")
-               }
-            />
-         </CardActions>
-      </Card>
+      <HandRaiseListItem
+         title={"INVITED"}
+         backgroundColor={theme.palette.primary.main}
+         secondaryOnClick={() =>
+            props.updateHandRaiseRequest(props.request.id, "denied")
+         }
+         subtitle={props.request.name}
+         secondaryButtonText={"Remove"}
+      />
    );
 }
 
 function ConnectingHandRaiseElement(props) {
-   const classes = useStyles();
    const [notificationId] = useState(uuidv4());
 
    useEffect(() => {
@@ -179,22 +214,16 @@ function ConnectingHandRaiseElement(props) {
    }
 
    return (
-      <Card className={classes.handRaiseContainerInvited}>
-         <CardHeader title="CONNECTING" subheader={props.request.name} />
-         <CardActions>
-            <Button
-               variant="contained"
-               children="Remove"
-               size="small"
-               onClick={() => updateHandRaiseRequest("denied")}
-            />
-         </CardActions>
-      </Card>
+      <HandRaiseListItem
+         title={"CONNECTING"}
+         secondaryOnClick={() => updateHandRaiseRequest("denied")}
+         subtitle={props.request.name}
+         secondaryButtonText={"Remove"}
+      />
    );
 }
 
 function ConnectedHandRaiseElement(props) {
-   const classes = useStyles();
 
    const [notificationId] = useState(uuidv4());
    const { getActiveTutorialStepKey, handleConfirmStep, isOpen } = useContext(
@@ -246,23 +275,18 @@ function ConnectedHandRaiseElement(props) {
          }
          open={isOpen(12)}
       >
-         <Card className={classes.handRaiseContainerInvited}>
-            <CardHeader title="CONNECTED" subheader={props.request.name} />
-            <CardActions>
-               <Button
-                  variant="contained"
-                  children="Remove"
-                  size="small"
-                  onClick={() => {
-                     if (isOpen(12)) {
-                        handleConfirmStep(12);
-                     }
-                     updateHandRaiseRequest("denied");
-                  }}
-                  disabled={isOpen(11)}
-               />
-            </CardActions>
-         </Card>
+         <HandRaiseListItem
+            title={"CONNECTED"}
+            primaryOnClick={() => {
+               if (isOpen(12)) {
+                  handleConfirmStep(12);
+               }
+               updateHandRaiseRequest("denied");
+            }}
+            subtitle={props.request.name}
+            primaryButtonText={"Remove"}
+            primaryButtonDisabled={isOpen(11)}
+         />
       </WhiteTooltip>
    );
 }

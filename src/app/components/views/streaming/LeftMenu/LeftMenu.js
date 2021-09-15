@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
       transitionTimingFunction: theme.transitions.easeInOut,
       left: 0,
       bottom: 0,
-      // zIndex: 20,
+      zIndex: 1,
       background: theme.palette.background.default,
    },
    drawerSmallScreen: {

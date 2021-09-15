@@ -3,14 +3,11 @@ import React, {
    useCallback,
    useContext,
    useEffect,
-   useMemo,
    useState,
 } from "react";
 
 import { withFirebasePage } from "context/firebase";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
-import CurrentSpeakerDisplayer from "./CurrentSpeakerDisplayer";
-import SmallStreamerVideoDisplayer from "./SmallStreamerVideoDisplayer";
 import VideoControlsContainer from "./VideoControlsContainer";
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
 import useDevices from "components/custom-hook/useDevices";
@@ -285,38 +282,6 @@ function VideoContainer(props) {
             livestreamId={props.currentLivestream.id}
             presenter
          />
-         {/*<div>*/}
-         {/*   <CurrentSpeakerDisplayer*/}
-         {/*      isPlayMode={false}*/}
-         {/*      streamTitle={props.currentLivestream.title}*/}
-         {/*      smallScreenMode={*/}
-         {/*         props.currentLivestream.mode === "presentation" ||*/}
-         {/*         props.currentLivestream.mode === "desktop"*/}
-         {/*      }*/}
-         {/*      speakerSwitchModeActive={isMainStreamer}*/}
-         {/*      localId={props.streamerId}*/}
-         {/*      localStream={localMediaStream}*/}
-         {/*      speakerSource={speakerSource}*/}
-         {/*      isStreamer={props.isStreamer}*/}
-         {/*      isBreakout={props.isBreakout}*/}
-         {/*      streams={externalMediaStreams}*/}
-         {/*      currentSpeaker={currentSpeakerId}*/}
-         {/*      setRemovedStream={setRemovedStream}*/}
-         {/*      {...props}*/}
-         {/*      muted={false}*/}
-         {/*   />*/}
-         {/*</div>*/}
-         {/*{sharingContent && (*/}
-         {/*   <SmallStreamerVideoDisplayer*/}
-         {/*      livestreamId={props.currentLivestream.id}*/}
-         {/*      isBreakout={props.isBreakout}*/}
-         {/*      presentation={props.currentLivestream.mode === "presentation"}*/}
-         {/*      showMenu={props.showMenu}*/}
-         {/*      externalMediaStreams={externalMediaStreams}*/}
-         {/*      isLocalScreen={screenSharingMode}*/}
-         {/*      presenter={true}*/}
-         {/*   />*/}
-         {/*)}*/}
          <VideoControlsContainer
             currentLivestream={props.currentLivestream}
             viewer={props.viewer}

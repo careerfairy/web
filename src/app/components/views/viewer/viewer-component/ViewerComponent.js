@@ -1,8 +1,6 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { withFirebasePage } from "context/firebase";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
-import CurrentSpeakerDisplayer from "components/views/streaming/video-container/CurrentSpeakerDisplayer";
-import SmallStreamerVideoDisplayer from "components/views/streaming/video-container/SmallStreamerVideoDisplayer";
 import useDevices from "components/custom-hook/useDevices";
 import useMediaSources from "components/custom-hook/useMediaSources";
 import VideoControlsContainer from "components/views/streaming/video-container/VideoControlsContainer";
@@ -224,37 +222,6 @@ function ViewerComponent({
             showMenu={showMenu}
             livestreamId={currentLivestream.id}
          />
-         {/*<CurrentSpeakerDisplayer*/}
-         {/*   isPlayMode={!props.handRaiseActive}*/}
-         {/*   smallScreenMode={*/}
-         {/*      props.currentLivestream.mode === "presentation" ||*/}
-         {/*      props.currentLivestream.mode === "desktop"*/}
-         {/*   }*/}
-         {/*   speakerSwitchModeActive={false}*/}
-         {/*   localStream={null}*/}
-         {/*   streams={externalMediaStreams}*/}
-         {/*   localId={props.streamerId}*/}
-         {/*   isViewer={true}*/}
-         {/*   streamTitle={props.currentLivestream.title}*/}
-         {/*   joinedChannel={joinedChannel}*/}
-         {/*   isBreakout={props.isBreakout}*/}
-         {/*   currentSpeaker={currentSpeakerId}*/}
-         {/*   muted={!props.currentLivestream.hasStarted}*/}
-         {/*   {...props}*/}
-         {/*/>*/}
-         {/*{shareDesktopOrSlides() && (*/}
-         {/*   <SmallStreamerVideoDisplayer*/}
-         {/*      livestreamId={props.currentLivestream.id}*/}
-         {/*      presentation={props.currentLivestream.mode === "presentation"}*/}
-         {/*      showMenu={props.showMenu}*/}
-         {/*      isStreamer={true}*/}
-         {/*      isBreakout={props.isBreakout}*/}
-         {/*      externalMediaStreams={externalMediaStreams}*/}
-         {/*      isLocalScreen={false}*/}
-         {/*      {...props}*/}
-         {/*      presenter={false}*/}
-         {/*   />*/}
-         {/*)}*/}
          {handRaiseActive && (
             <Fragment>
                <VideoControlsContainer

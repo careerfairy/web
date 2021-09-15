@@ -5,7 +5,20 @@ import NotificationsContext from "context/notifications/NotificationsContext";
 import CloseRoundedIcon from "@material-ui/icons/CloseRounded";
 import PanToolOutlinedIcon from "@material-ui/icons/PanToolOutlined";
 
-import { Box, Button, Typography, Grow, Paper } from "@material-ui/core";
+import {
+   Box,
+   Button,
+   Typography,
+   Grow,
+   Paper,
+   List,
+   Collapse,
+   Grid,
+   InputLabel,
+   FormControl,
+   Select,
+   MenuItem,
+} from "@material-ui/core";
 import {
    CategoryContainerCentered,
    CategoryContainerTopAligned,
@@ -21,12 +34,36 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import { useSnackbar } from "notistack";
 import useStreamRef from "../../../../../../custom-hook/useStreamRef";
+import { TransitionGroup } from "react-transition-group";
+import { dynamicSort } from "../../../../../../helperFunctions/HelperFunctions";
+import OrderIcon from "@material-ui/icons/KeyboardArrowUpRounded";
 
 const useStyles = makeStyles((theme) => ({
    activeHandRaiseContainer: {
       padding: theme.spacing(1),
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+   },
+   filterGrid: {
+      padding: theme.spacing(1, 2),
+   },
+   orderIcon: {
+      transition: theme.transitions.create(["transform"], {
+         duration: theme.transitions.duration.complex,
+         easing: theme.transitions.easing.easeInOut,
+      }),
+      transform: ({ up }) => up && `rotate(180deg)`,
    },
 }));
+
+const FILTER_MAP = {
+   All: () => true,
+   Requested: (handRaise) => handRaise.state === "requested",
+   Invited: (handRaise) => handRaise.state === "invited",
+   Connecting: (handRaise) => handRaise.state === "connecting",
+   Connected: (handRaise) => handRaise.state === "connected",
+};
 
 function HandRaiseActive({
    firebase,
@@ -35,7 +72,6 @@ function HandRaiseActive({
    selectedState,
    sliding,
 }) {
-   const classes = useStyles();
    const streamRef = useStreamRef();
    const { closeSnackbar } = useSnackbar();
    const { setNewNotification, setNotificationToRemove } = useContext(
@@ -50,22 +86,49 @@ function HandRaiseActive({
    const [handRaises, setHandRaises] = useState([]);
    const [hasEntered, setHasEntered] = useState(false);
    const [hasExited, setHasExited] = useState(false);
+   const [sortByNew, setSortByNew] = useState(true);
+   const [filterMapProperty, setFilterMapProperty] = useState("All");
+   const [filteredHandRaises, setFilteredHandRaises] = useState([]);
+   const classes = useStyles({ up: sortByNew });
 
    useEffect(() => {
       if (livestream) {
-         firebase.listenToHandRaises(streamRef, (querySnapshot) => {
-            var handRaiseList = [];
-            querySnapshot.forEach((doc) => {
-               let handRaise = doc.data();
-               handRaise.id = doc.id;
-               handRaiseList.push(handRaise);
-            });
-            setHandRaises(handRaiseList);
+         firebase.listenToActiveHandRaises(streamRef, (querySnapshot) => {
+            setHandRaises(
+               querySnapshot.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+                  date: doc.data().timestamp?.toDate?.(),
+               }))
+            );
          });
       }
    }, [livestream]);
 
+   useEffect(() => {
+      handleFilterHandRaises(handRaises, filterMapProperty, sortByNew);
+   }, [handRaises, sortByNew, filterMapProperty]);
+
    const activeStep = getActiveTutorialStepKey();
+
+   const handleFilterHandRaises = (
+      arrayOfHandRaises,
+      filterMapProperty,
+      sortByNew
+   ) => {
+      const newFilteredHandRaises = arrayOfHandRaises
+         .filter((handRaise) => FILTER_MAP[filterMapProperty](handRaise))
+         .sort(dynamicSort("date", sortByNew));
+      setFilteredHandRaises(newFilteredHandRaises);
+   };
+
+   const handleChangeFilterMapProperty = (event) => {
+      setFilterMapProperty(event.target.value);
+   };
+
+   const handleToggleOrder = () => {
+      setSortByNew(!sortByNew);
+   };
 
    const isOpen = (property) => {
       return Boolean(
@@ -94,33 +157,6 @@ function HandRaiseActive({
       firebase.updateHandRaiseRequest(streamRef, handRaiseId, state);
    }
 
-   let numberOfActiveHandRaisers = handRaises.filter(
-      (handRaise) =>
-         handRaise.state === "connected" ||
-         handRaise.state === "connecting" ||
-         handRaise.state === "invited"
-   ).length;
-
-   let handRaiseElements = handRaises
-      .filter(
-         (handRaise) =>
-            handRaise.state !== "unrequested" && handRaise.state !== "denied"
-      )
-      .map((handRaise) => {
-         return (
-            <HandRaiseElement
-               request={handRaise}
-               hasEntered={hasEntered}
-               key={handRaise.timestamp.toMillis()}
-               updateHandRaiseRequest={updateHandRaiseRequest}
-               setNewNotification={setNewNotification}
-               closeSnackbar={closeSnackbar}
-               numberOfActiveHandRaisers={numberOfActiveHandRaisers}
-               setNotificationToRemove={setNotificationToRemove}
-            />
-         );
-      });
-
    if (!livestream.handRaiseActive) {
       return null;
    }
@@ -132,12 +168,61 @@ function HandRaiseActive({
             onExited={() => setHasExited(true)}
             mountOnEnter
             unmountOnExit
-            in={Boolean(handRaiseElements.length)}
+            in={Boolean(handRaises.length)}
          >
-            <CategoryContainerTopAligned
-               className={classes.activeHandRaiseContainer}
-            >
-               {handRaiseElements}
+            <List className={classes.activeHandRaiseContainer}>
+               <Grid className={classes.filterGrid} container spacing={1}>
+                  <Grid xs={8} item>
+                     <FormControl fullWidth>
+                        <InputLabel id="hand-raise-filter-select-label">
+                           Sort by:
+                        </InputLabel>
+                        <Select
+                           labelId="hand-raise-filter-select-label"
+                           id="hand-raise-filter-select"
+                           value={filterMapProperty}
+                           onChange={handleChangeFilterMapProperty}
+                        >
+                           {Object.keys(FILTER_MAP).map((key) => (
+                              <MenuItem key={key} value={key}>
+                                 {key}
+                              </MenuItem>
+                           ))}
+                        </Select>
+                     </FormControl>
+                  </Grid>
+                  <Grid xs={4} item>
+                     <Box display="flex" height="100%">
+                        <Button
+                           onClick={handleToggleOrder}
+                           endIcon={<OrderIcon className={classes.orderIcon} />}
+                        >
+                           {sortByNew ? "new" : "old"}
+                        </Button>
+                     </Box>
+                  </Grid>
+               </Grid>
+               {!Boolean(filteredHandRaises.length) && (
+                  <Box p={2}>
+                     <Typography>no results</Typography>
+                  </Box>
+               )}
+               <TransitionGroup>
+                  {filteredHandRaises.map((handRaise) => (
+                     <Collapse key={handRaise.timestamp.toMillis()}>
+                        <HandRaiseElement
+                           request={handRaise}
+                           hasEntered={hasEntered}
+                           updateHandRaiseRequest={updateHandRaiseRequest}
+                           setNewNotification={setNewNotification}
+                           closeSnackbar={closeSnackbar}
+                           numberOfActiveHandRaisers={handRaises.length}
+                           setNotificationToRemove={setNotificationToRemove}
+                        />
+                     </Collapse>
+                  ))}
+               </TransitionGroup>
+               <Box flexGrow={1} />
                <Button
                   style={{ margin: "auto 0 2rem 0" }}
                   startIcon={<CloseRoundedIcon />}
@@ -146,14 +231,10 @@ function HandRaiseActive({
                   disabled={isStepOpen(11)}
                   onClick={() => setHandRaiseModeInactive()}
                />
-            </CategoryContainerTopAligned>
+            </List>
          </Grow>
 
-         <Grow
-            mountOnEnter
-            unmountOnExit
-            in={Boolean(!handRaiseElements.length)}
-         >
+         <Grow mountOnEnter unmountOnExit in={Boolean(!handRaises.length)}>
             <CategoryContainerCentered>
                <Box
                   p={2}
