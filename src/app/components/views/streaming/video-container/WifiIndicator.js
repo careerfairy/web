@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
    root: {
       position: "absolute",
       // cursor: "move",
+      zIndex:1,
       right: "3%",
       top: "2%",
       borderRadius: theme.spacing(2),

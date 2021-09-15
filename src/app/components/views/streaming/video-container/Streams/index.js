@@ -22,14 +22,16 @@ const Streams = memo(
       externalMediaStreams,
       localMediaStream,
       currentSpeakerId,
-      sharingContent,
+      sharingScreen,
       isBroadCasting,
       liveSpeakers,
      sharingPdf,
      play,
-     unmute
+     unmute,
+       showMenu,
+       livestreamId,
+       presenter
    }) => {
-      console.log("-> sharingPdf", sharingPdf);
       const classes = useStyles();
       const [streamData, setStreamData] = useState([]);
 
@@ -43,7 +45,8 @@ const Streams = memo(
          let newLargeStream = handleGetLargeStream(
             allStreams,
             currentSpeakerId,
-            sharingContent
+            sharingScreen,
+           sharingPdf
          );
          if(!newLargeStream){
             setStreamData([])
@@ -52,27 +55,31 @@ const Streams = memo(
          let newSmallStreams = handleGetSmallStream(
             allStreams,
             newLargeStream,
-            sharingContent,
             hasManySpeakers,
-            currentSpeakerId
+            currentSpeakerId,
+            sharingScreen,
+           sharingPdf
          );
          setStreamData([...newSmallStreams, newLargeStream]);
       }, [
          externalMediaStreams,
          localMediaStream,
          currentSpeakerId,
-         sharingContent,
          isBroadCasting,
+         sharingScreen,
+         sharingPdf
       ]);
 
       const handleGetLargeStream = (
          allStreams,
          currentSpeakerId,
-         sharingContent
+         sharingScreen,
+         sharingPdf
       ) => {
          let screenShareStream;
          let currentSpeakerStream;
          let localStream;
+         let isSharingScreen
 
          for (const stream of allStreams) {
             if (stream.streamId.includes("screen")) {
@@ -91,7 +98,7 @@ const Streams = memo(
 
          if (currentSpeakerStream) return currentSpeakerStream;
 
-         if (sharingContent) return { loadingShare: true };
+         if (sharingScreen) return { loadingShare: true };
 
          if (localStream) return localStream;
 
@@ -104,14 +111,14 @@ const Streams = memo(
       const handleGetSmallStream = (
          allStreams,
          largeStream,
-         sharingContent,
+         sharingScreen,
          hasManySpeakers,
          currentSpeakerId
       ) => {
          const filteredStreams = allStreams.filter(
             (stream) => stream.streamId !== largeStream.streamId
          );
-         if (sharingContent && hasManySpeakers) {
+         if (sharingScreen && hasManySpeakers) {
             return makeCurrentSpeakerFirstInStream(
                filteredStreams,
                currentSpeakerId
@@ -145,6 +152,10 @@ const Streams = memo(
                   play={play}
                   sharingPdf={sharingPdf}
                   unmute={unmute}
+                  currentSpeakerId={currentSpeakerId}
+                  showMenu={showMenu}
+                  livestreamId={livestreamId}
+                  presenter={presenter}
                />
             </div>
          </div>

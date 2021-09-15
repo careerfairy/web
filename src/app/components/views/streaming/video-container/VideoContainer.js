@@ -265,12 +265,6 @@ function VideoContainer(props) {
       [optimizationMode, props.currentLivestream?.mode, props.streamerId]
    );
 
-   const sharingContent = useMemo(
-      () =>
-         props.currentLivestream.mode === "presentation" ||
-         props.currentLivestream.mode === "desktop",
-      [props.currentLivestream.mode]
-   );
 
 
    return (
@@ -280,13 +274,16 @@ function VideoContainer(props) {
             externalMediaStreams={externalMediaStreams}
             localMediaStream={localMediaStream }
             currentSpeakerId={currentSpeakerId}
-            sharingContent={sharingContent}
-            sharingPdf={props.currentLivestream.mode === "presentation"}
             streamerId={props.streamerId}
             play={props.play}
             unmute={props.unmute}
             liveSpeakers={props.currentLivestream.liveSpeakers}
             isBroadCasting={!props.isPlayMode}
+            sharingScreen={props.currentLivestream.mode === "desktop"}
+            sharingPdf={props.currentLivestream.mode === "presentation"}
+            showMenu={props.showMenu}
+            livestreamId={props.currentLivestream.id}
+            presenter
          />
          {/*<div>*/}
          {/*   <CurrentSpeakerDisplayer*/}

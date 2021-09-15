@@ -6,6 +6,7 @@ import { Item, Row } from "@mui-treasury/components/flex";
 import StreamContainer from "./StreamContainer";
 import clsx from "clsx";
 import Box from "@material-ui/core/Box";
+import LivestreamPdfViewer from "../../../../util/LivestreamPdfViewer";
 
 const SPACING = 1;
 const STREAMS_ROW_HEIGHT = 180;
@@ -29,14 +30,6 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       overflowX: "auto",
       justifyContent: "space-between",
-      // "& > :first-child": {
-      //    marginLeft: "auto",
-      //    paddingLeft: 0,
-      // },
-      // "& > :last-child": {
-      //    marginRight: "auto",
-      //    paddingRight: 0,
-      // },
       "&::-webkit-scrollbar": {
          height: 5,
       },
@@ -68,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
       position: "absolute",
       zIndex: 1,
       display: "flex",
-      top: (props) => (props.hasSmallStreams ? STREAMS_ROW_HEIGHT : 0),
+      top: 0,
       left: 0,
       right: 0,
       bottom: 0,
@@ -78,11 +71,42 @@ const useStyles = makeStyles((theme) => ({
          easing: theme.transitions.easing.easeInOut,
       }),
    },
+   largeSquished: {
+      top: STREAMS_ROW_HEIGHT,
+   },
 }));
 
-const StreamsLayout = ({ streamData, liveSpeakers, play, unmute , sharingPdf}) => {
-   const hasSmallStreams = streamData.length > 1;
+const StreamElementWrapper = ({ children, large, index, squished, first }) => {
+   const classes = useStyles();
+   return (
+      <Item
+         className={clsx({
+            [classes.largeSquished]: squished,
+            [classes.largeAbsoluteStream]: large,
+            [classes.smallFlexStream]: !large,
+         })}
+         style={{
+            order: first ? 0 : large ? undefined : index + 10,
+         }}
+      >
+         {children}
+      </Item>
+   );
+};
 
+const StreamsLayout = ({
+   streamData,
+   liveSpeakers,
+   play,
+   unmute,
+   sharingPdf,
+   showMenu,
+   livestreamId,
+   presenter,
+   currentSpeakerId,
+}) => {
+   const hasSmallStreams = streamData.length > 1;
+   console.log("-> streamData", streamData);
    const classes = useStyles({ hasSmallStreams });
 
    return (
@@ -97,7 +121,8 @@ const StreamsLayout = ({ streamData, liveSpeakers, play, unmute , sharingPdf}) =
             >
                <div
                   className={clsx(classes.smallStreamsContainerGridItem, {
-                     [classes.grow]: hasSmallStreams,
+                     [classes.grow]:
+                        hasSmallStreams || (sharingPdf && streamData.length),
                   })}
                >
                   <Row
@@ -111,27 +136,41 @@ const StreamsLayout = ({ streamData, liveSpeakers, play, unmute , sharingPdf}) =
                      <Box order={0} marginLeft="auto" />
                      {streamData.map((stream, index) => {
                         const isLast = index === streamData.length - 1;
+                        const isLarge = isLast && !sharingPdf;
                         return (
-                           <Item
-                              className={clsx({
-                                 [classes.largeAbsoluteStream]: isLast,
-                                 [classes.smallFlexStream]: !isLast,
-                              })}
-                              style={{
-                                 order: isLast ? undefined : index + 10,
-                              }}
+                           <StreamElementWrapper
+                              index={index}
+                              first={
+                                 currentSpeakerId === stream.streamId &&
+                                 sharingPdf
+                              }
+                              large={isLarge}
                               key={stream.streamId}
+                              squished={hasSmallStreams}
                            >
                               <StreamContainer
                                  stream={stream}
-                                 big={isLast}
+                                 big={isLarge}
                                  liveSpeakers={liveSpeakers}
                                  play={play}
                                  unmute={unmute}
                               />
-                           </Item>
+                           </StreamElementWrapper>
                         );
                      })}
+                     {sharingPdf && (
+                        <StreamElementWrapper
+                           index={1}
+                           large
+                           squished={streamData.length}
+                        >
+                           <LivestreamPdfViewer
+                              livestreamId={livestreamId}
+                              presenter={presenter}
+                              showMenu={showMenu}
+                           />
+                        </StreamElementWrapper>
+                     )}
                      <Box order={999} marginRight="auto" />
                   </Row>
                </div>
@@ -141,10 +180,11 @@ const StreamsLayout = ({ streamData, liveSpeakers, play, unmute , sharingPdf}) =
    );
 };
 
-export default StreamsLayout;
-
 StreamsLayout.propTypes = {
    play: PropTypes.bool,
    unmute: PropTypes.bool,
    streamData: PropTypes.arrayOf(PropTypes.object),
 };
+
+export default StreamsLayout;
+
