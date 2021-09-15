@@ -40,13 +40,16 @@ import OrderIcon from "@material-ui/icons/KeyboardArrowUpRounded";
 
 const useStyles = makeStyles((theme) => ({
    activeHandRaiseContainer: {
-      padding: theme.spacing(1),
+      padding: theme.spacing(0, 0, 1),
       height: "100%",
       display: "flex",
       flexDirection: "column",
    },
    filterGrid: {
       padding: theme.spacing(1, 2),
+      backgroundColor: theme.palette.background.paper,
+      boxShadow: theme.shadows[1],
+      margin: 0
    },
    orderIcon: {
       transition: theme.transitions.create(["transform"], {
@@ -55,6 +58,9 @@ const useStyles = makeStyles((theme) => ({
       }),
       transform: ({ up }) => up && `rotate(180deg)`,
    },
+   activeHandRaisesWrapper:{
+      background: theme.palette.background.default,
+   }
 }));
 
 const FILTER_MAP = {
@@ -71,6 +77,7 @@ function HandRaiseActive({
    showMenu,
    selectedState,
    sliding,
+                            isGlass
 }) {
    const streamRef = useStreamRef();
    const { closeSnackbar } = useSnackbar();
@@ -169,11 +176,10 @@ function HandRaiseActive({
             mountOnEnter
             unmountOnExit
             in={Boolean(handRaises.length)}
-         >
-            <List className={classes.activeHandRaiseContainer}>
+         ><Box className={classes.activeHandRaisesWrapper}  display="flex" flexDirection="column" height="100%">
                <Grid className={classes.filterGrid} container spacing={1}>
                   <Grid xs={8} item>
-                     <FormControl fullWidth>
+                     <FormControl size="small" fullWidth>
                         <InputLabel id="hand-raise-filter-select-label">
                            Sort by:
                         </InputLabel>
@@ -194,14 +200,16 @@ function HandRaiseActive({
                   <Grid xs={4} item>
                      <Box display="flex" height="100%">
                         <Button
+                          size="small"
                            onClick={handleToggleOrder}
                            endIcon={<OrderIcon className={classes.orderIcon} />}
                         >
-                           {sortByNew ? "new" : "old"}
+                           {sortByNew ? "oldest" : "newest"}
                         </Button>
                      </Box>
                   </Grid>
                </Grid>
+            <List className={classes.activeHandRaiseContainer}>
                {!Boolean(filteredHandRaises.length) && (
                   <Box p={2}>
                      <Typography>no results</Typography>
@@ -232,6 +240,7 @@ function HandRaiseActive({
                   onClick={() => setHandRaiseModeInactive()}
                />
             </List>
+         </Box>
          </Grow>
 
          <Grow mountOnEnter unmountOnExit in={Boolean(!handRaises.length)}>

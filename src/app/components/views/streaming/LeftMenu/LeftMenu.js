@@ -67,7 +67,7 @@ const LeftMenu = ({
    const theme = useTheme();
    const classes = useStyles();
    const [value, setValue] = useState(0);
-
+   const isGlass = showMenu && smallScreen;
    useEffect(() => {
       if (!typeof window === "object") {
          return false;
@@ -125,6 +125,7 @@ const LeftMenu = ({
          <HandRaiseCategory
             sliding={sliding}
             showMenu={showMenu}
+            isGlass={isGlass}
             livestream={livestream}
             selectedState={selectedState}
          />
@@ -136,7 +137,7 @@ const LeftMenu = ({
          anchor="left"
          classes={{
             paper: clsx(classes.desktopDrawer, {
-               [classes.drawerSmallScreen]: showMenu && smallScreen,
+               [classes.drawerSmallScreen]: isGlass,
             }),
          }}
          open={showMenu}
@@ -145,7 +146,7 @@ const LeftMenu = ({
          {showMenu && smallScreen && (
             <Fab
                className={classes.closeBtn}
-               size="large"
+               size="small"
                color="secondary"
                onClick={toggleShowMenu}
             >

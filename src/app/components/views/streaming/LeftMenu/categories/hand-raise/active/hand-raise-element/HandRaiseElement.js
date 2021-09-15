@@ -21,9 +21,21 @@ const useStyles = makeStyles((theme) => ({
    root: {
       flexDirection: "column",
       alignItems: "flex-start",
-      backgroundColor: ({ backgroundColor }) => backgroundColor && alpha(backgroundColor, 0.5),
-      borderRadius: 5
+      color: ({ backgroundColor }) => backgroundColor && theme.palette.common.white,
+      backgroundColor: ({ backgroundColor }) => backgroundColor && alpha(backgroundColor, 0.7),
+      "& .MuiListItemText-secondary":{
+      color: ({ backgroundColor }) => backgroundColor && alpha(theme.palette.common.white, 1),
+      },
+      "& button":{
+      color: ({ backgroundColor }) => backgroundColor && theme.palette.common.white,
+      borderColor:({ backgroundColor }) => backgroundColor && alpha(theme.palette.common.white, 0.7)
+
+      }
+      // borderRadius: 5
    },
+   handRaiseListItemDivider:{
+      // backgroundColor: ({ backgroundColor }) => backgroundColor && alpha(theme.palette.common.white, 0.8)
+   }
 }));
 
 const HandRaiseListItem = ({
@@ -89,7 +101,7 @@ const HandRaiseListItem = ({
                )}
             </Grid>
          </ListItem>
-         <Divider component="li" />
+         <Divider className={classes.handRaiseListItemDivider} component="li" />
       </React.Fragment>
    );
 };
