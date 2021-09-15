@@ -90,11 +90,13 @@ const StreamItem = ({
             <div className={classes.mutedOverlay}>
                <div className={classes.mutedOverlayContent}>
                   <div>
-                     <img
-                        src={videoMutedBackgroundImg}
-                        alt={speaker.firstName || "Streamer"}
-                        className={classes.companyIcon}
-                     />
+                     {videoMutedBackgroundImg &&
+                        <img
+                           src={videoMutedBackgroundImg}
+                           alt={speaker?.firstName || "Streamer"}
+                           className={classes.companyIcon}
+                        />
+                     }
                   </div>
                   <Tooltip title={"The streamer has turned the camera off"}>
                      <VideoCamOffIcon

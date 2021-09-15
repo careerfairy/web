@@ -43,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 7250,
    },
    blackFrame: {
+      display: "flex",
       zIndex: 10,
       backgroundColor: "black",
       position: "absolute",
@@ -79,9 +80,7 @@ const ViewerOverview = ({
    return (
       <Fragment>
          <div
-            className={clsx({
-               [classes.blackFrame]: true,
-            })}
+            className={classes.blackFrame}
          >
             <AudienceDrawer
                hideAudience={hideAudience}
@@ -99,6 +98,7 @@ const ViewerOverview = ({
             <ViewerComponent
                livestreamId={currentLivestream.id}
                streamerId={streamerId}
+               mobile={mobile}
                currentLivestream={currentLivestream}
                handRaiseActive={handRaiseActive}
                showVideoButton={showVideoButton}

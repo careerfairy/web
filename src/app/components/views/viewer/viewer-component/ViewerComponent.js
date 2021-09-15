@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import * as actions from "store/actions";
 import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
+import Streams from "../../streaming/video-container/Streams";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -45,7 +46,17 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-function ViewerComponent(props) {
+function ViewerComponent({
+                            currentLivestream,
+                            firebase,
+                            handRaiseActive,
+                            isBreakout,
+                            play,
+                            showMenu,
+                            streamerId,
+                            unmute,
+                            mobile
+                         }) {
    const classes = useStyles();
    const dispatch = useDispatch();
    const [showSettings, setShowSettings] = useState(false);
@@ -65,8 +76,8 @@ function ViewerComponent(props) {
    const streamerReady = true;
 
    const screenSharingMode =
-      props.currentLivestream.screenSharerId === authenticatedUser?.email &&
-      props.currentLivestream.mode === "desktop"
+      currentLivestream.screenSharerId === authenticatedUser?.email &&
+      currentLivestream.mode === "desktop"
          ? optimizationMode
          : "";
 
@@ -81,10 +92,10 @@ function ViewerComponent(props) {
       joinedChannel,
    } = useAgoraAsStreamer(
       streamerReady,
-      !props.handRaiseActive,
+      !handRaiseActive,
       screenSharingMode,
-      props.livestreamId,
-      props.streamerId,
+      livestreamId,
+      streamerId,
       true
    );
 
@@ -110,19 +121,19 @@ function ViewerComponent(props) {
 
    useEffect(() => {
       if (
-         props.handRaiseActive &&
+         handRaiseActive &&
          agoraRtcStatus &&
          agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
       ) {
-         if (props.currentLivestream) {
-            if (props.currentLivestream.test) {
-               props.firebase.updateHandRaiseRequest(
+         if (currentLivestream) {
+            if (currentLivestream.test) {
+               firebase.updateHandRaiseRequest(
                   streamRef,
                   "streamerEmail",
                   "connected"
                );
             } else {
-               props.firebase.updateHandRaiseRequest(
+               firebase.updateHandRaiseRequest(
                   streamRef,
                   authenticatedUser.email,
                   "connected"
@@ -140,7 +151,7 @@ function ViewerComponent(props) {
    useEffect(() => {
       if (
          joinedChannel &&
-         !props.isBreakout &&
+         !isBreakout &&
          !externalMediaStreams?.length &&
          hasActiveRooms
       ) {
@@ -153,7 +164,7 @@ function ViewerComponent(props) {
       }
    }, [
       Boolean(externalMediaStreams?.length),
-      props.isBreakout,
+      isBreakout,
       hasActiveRooms,
       joinedChannel,
    ]);
@@ -162,20 +173,20 @@ function ViewerComponent(props) {
       let screenSharerId =
          mode === "desktop"
             ? initiatorId
-            : props.currentLivestream.screenSharerId;
-      await props.firebase.setDesktopMode(streamRef, mode, screenSharerId);
+            : currentLivestream.screenSharerId;
+      await firebase.setDesktopMode(streamRef, mode, screenSharerId);
    };
 
    const shareDesktopOrSlides = () =>
-      props.currentLivestream.mode === "presentation" ||
-      props.currentLivestream.mode === "desktop";
+      currentLivestream.mode === "presentation" ||
+      currentLivestream.mode === "desktop";
 
    const handleCloseScreenShareModal = useCallback(() => {
       setShowScreenShareModal(false);
    }, []);
 
    const handleClickScreenShareButton = async () => {
-      if (props.currentLivestream.mode === "desktop") {
+      if (currentLivestream.mode === "desktop") {
          return await setDesktopMode("default", authenticatedUser.email);
       }
       setShowScreenShareModal(true);
@@ -185,105 +196,117 @@ function ViewerComponent(props) {
       async (optimizationMode = "detail") => {
          setOptimizationMode(optimizationMode);
          await setDesktopMode(
-            props.currentLivestream.mode === "desktop" ? "default" : "desktop",
+            currentLivestream.mode === "desktop" ? "default" : "desktop",
             authenticatedUser.email
          );
       },
-      [props.currentLivestream?.mode, optimizationMode, props.streamerId]
+      [currentLivestream?.mode, optimizationMode, streamerId]
    );
 
-   if (!props.currentLivestream) {
+   if (!currentLivestream) {
       return null;
    }
 
    return (
       <React.Fragment>
-         <EmoteButtons createEmote={createEmote} />
-         <div>
-            <CurrentSpeakerDisplayer
-               isPlayMode={!props.handRaiseActive}
-               smallScreenMode={
-                  props.currentLivestream.mode === "presentation" ||
-                  props.currentLivestream.mode === "desktop"
-               }
-               speakerSwitchModeActive={false}
-               localStream={null}
-               streams={externalMediaStreams}
-               localId={props.streamerId}
-               isViewer={true}
-               streamTitle={props.currentLivestream.title}
-               joinedChannel={joinedChannel}
-               isBreakout={props.isBreakout}
-               currentSpeaker={currentSpeakerId}
-               muted={!props.currentLivestream.hasStarted}
-               {...props}
-            />
-            {shareDesktopOrSlides() && (
-               <SmallStreamerVideoDisplayer
-                  livestreamId={props.currentLivestream.id}
-                  presentation={props.currentLivestream.mode === "presentation"}
-                  showMenu={props.showMenu}
-                  isStreamer={true}
-                  isBreakout={props.isBreakout}
-                  externalMediaStreams={externalMediaStreams}
-                  isLocalScreen={false}
-                  {...props}
-                  presenter={false}
+         {!Boolean(mobile && handRaiseActive) && <EmoteButtons createEmote={createEmote} />}
+         <Streams
+            externalMediaStreams={externalMediaStreams}
+            localMediaStream={localMediaStream}
+            currentSpeakerId={currentSpeakerId}
+            streamerId={streamerId}
+            play={play}
+            unmute={unmute}
+            liveSpeakers={currentLivestream.liveSpeakers}
+            isBroadCasting={handRaiseActive}
+            sharingScreen={currentLivestream.mode === "desktop"}
+            sharingPdf={currentLivestream.mode === "presentation"}
+            showMenu={showMenu}
+            livestreamId={currentLivestream.id}
+         />
+         {/*<CurrentSpeakerDisplayer*/}
+         {/*   isPlayMode={!props.handRaiseActive}*/}
+         {/*   smallScreenMode={*/}
+         {/*      props.currentLivestream.mode === "presentation" ||*/}
+         {/*      props.currentLivestream.mode === "desktop"*/}
+         {/*   }*/}
+         {/*   speakerSwitchModeActive={false}*/}
+         {/*   localStream={null}*/}
+         {/*   streams={externalMediaStreams}*/}
+         {/*   localId={props.streamerId}*/}
+         {/*   isViewer={true}*/}
+         {/*   streamTitle={props.currentLivestream.title}*/}
+         {/*   joinedChannel={joinedChannel}*/}
+         {/*   isBreakout={props.isBreakout}*/}
+         {/*   currentSpeaker={currentSpeakerId}*/}
+         {/*   muted={!props.currentLivestream.hasStarted}*/}
+         {/*   {...props}*/}
+         {/*/>*/}
+         {/*{shareDesktopOrSlides() && (*/}
+         {/*   <SmallStreamerVideoDisplayer*/}
+         {/*      livestreamId={props.currentLivestream.id}*/}
+         {/*      presentation={props.currentLivestream.mode === "presentation"}*/}
+         {/*      showMenu={props.showMenu}*/}
+         {/*      isStreamer={true}*/}
+         {/*      isBreakout={props.isBreakout}*/}
+         {/*      externalMediaStreams={externalMediaStreams}*/}
+         {/*      isLocalScreen={false}*/}
+         {/*      {...props}*/}
+         {/*      presenter={false}*/}
+         {/*   />*/}
+         {/*)}*/}
+         {handRaiseActive && (
+            <Fragment>
+               <VideoControlsContainer
+                  currentLivestream={currentLivestream}
+                  viewer={true}
+                  streamerId={authenticatedUser.email}
+                  joining={true}
+                  localMediaStream={localMediaStream}
+                  setLocalMediaStream={setLocalMediaStream}
+                  handleClickScreenShareButton={handleClickScreenShareButton}
+                  isMainStreamer={false}
+                  showSettings={showSettings}
+                  setShowSettings={setShowSettings}
                />
-            )}
-            {props.handRaiseActive && (
-               <Fragment>
-                  <VideoControlsContainer
-                     currentLivestream={props.currentLivestream}
-                     viewer={true}
-                     streamerId={authenticatedUser.email}
-                     joining={true}
-                     localMediaStream={localMediaStream}
-                     setLocalMediaStream={setLocalMediaStream}
-                     handleClickScreenShareButton={handleClickScreenShareButton}
-                     isMainStreamer={false}
-                     showSettings={showSettings}
-                     setShowSettings={setShowSettings}
-                  />
-                  <SettingsModal
-                     open={showSettings}
-                     close={() => setShowSettings(false)}
-                     streamId={authenticatedUser.email}
-                     devices={devices}
-                     localStream={localMediaStream}
-                     displayableMediaStream={displayableMediaStream}
-                     audioSource={audioSource}
-                     updateAudioSource={updateAudioSource}
-                     videoSource={videoSource}
-                     updateVideoSource={updateVideoSource}
-                     audioLevel={audioLevel}
-                     speakerSource={speakerSource}
-                     setSpeakerSource={updateSpeakerSource}
-                  />
-                  <ScreenShareModal
-                     open={showScreenShareModal}
-                     handleClose={handleCloseScreenShareModal}
-                     handleScreenShare={handleScreenShare}
-                  />
-                  <LoadingModal agoraRtcStatus={agoraRtcStatus} />
-                  <ErrorModal
-                     agoraRtcStatus={agoraRtcStatus}
-                     agoraRtmStatus={agoraRtmStatus}
-                     agoraRtcConnectionStatus={agoraRtcConnectionStatus}
-                  />
-               </Fragment>
-            )}
+               <SettingsModal
+                  open={showSettings}
+                  close={() => setShowSettings(false)}
+                  streamId={authenticatedUser.email}
+                  devices={devices}
+                  localStream={localMediaStream}
+                  displayableMediaStream={displayableMediaStream}
+                  audioSource={audioSource}
+                  updateAudioSource={updateAudioSource}
+                  videoSource={videoSource}
+                  updateVideoSource={updateVideoSource}
+                  audioLevel={audioLevel}
+                  speakerSource={speakerSource}
+                  setSpeakerSource={updateSpeakerSource}
+               />
+               <ScreenShareModal
+                  open={showScreenShareModal}
+                  handleClose={handleCloseScreenShareModal}
+                  handleScreenShare={handleScreenShare}
+               />
+               <LoadingModal agoraRtcStatus={agoraRtcStatus} />
+               <ErrorModal
+                  agoraRtcStatus={agoraRtcStatus}
+                  agoraRtmStatus={agoraRtmStatus}
+                  agoraRtcConnectionStatus={agoraRtcConnectionStatus}
+               />
+            </Fragment>
+         )}
 
-            {!props.currentLivestream.hasStarted && (
-               <div className={classes.waitingOverlay}>
-                  <Typography className={classes.waitingText}>
-                     {props.currentLivestream.test
-                        ? "The streamer has to press Start Streaming to be visible to students"
-                        : "Thank you for joining!"}
-                  </Typography>
-               </div>
-            )}
-         </div>
+         {!currentLivestream.hasStarted && (
+            <div className={classes.waitingOverlay}>
+               <Typography className={classes.waitingText}>
+                  {currentLivestream.test
+                     ? "The streamer has to press Start Streaming to be visible to students"
+                     : "Thank you for joining!"}
+               </Typography>
+            </div>
+         )}
       </React.Fragment>
    );
 }

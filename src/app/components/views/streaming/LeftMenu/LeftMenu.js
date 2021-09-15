@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
       top: 10,
       right: 10,
       textAlign: "center",
-      // zIndex: 9100,
+      zIndex: 1,
    },
    desktopDrawer: {
       width: 280,

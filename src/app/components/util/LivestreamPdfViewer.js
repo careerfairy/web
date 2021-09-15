@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import { Document, Page } from "react-pdf";
 import * as PDFJS from "pdfjs-dist/build/pdf";
-
 import { useWindowSize } from "components/custom-hook/useWindowSize";
 import {
    Button,
+   CircularProgress,
    Dialog,
    DialogContent,
    IconButton,
@@ -14,21 +14,12 @@ import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
 
 import FilePickerContainer from "components/ssr/FilePickerContainer";
-import { withFirebase } from "context/firebase";
-import { CircularProgress } from "@material-ui/core";
-import { Fragment } from "react";
+import { useFirebase } from "context/firebase";
 import Box from "@material-ui/core/Box";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { makeStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles(theme => ({
-  pdfPage:{
-    maxWidth: 200,
-    maxHeight: 150
-  }
-}));
-function LivestreamPdfViewer(props) {
-  const classes = useStyles()
+const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
+   const firebase = useFirebase();
    PDFJS.GlobalWorkerOptions.workerSrc =
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js";
 
@@ -45,10 +36,10 @@ function LivestreamPdfViewer(props) {
    const [progress, setProgress] = useState(0);
 
    useEffect(() => {
-      if (props.livestreamId) {
+      if (livestreamId) {
          setLoading(true);
-         props.firebase.listenToLivestreamPresentation(
-            props.livestreamId,
+         firebase.listenToLivestreamPresentation(
+            livestreamId,
             (querySnapshot) => {
                if (querySnapshot.exists) {
                   setPdfObject(querySnapshot.data());
@@ -58,14 +49,14 @@ function LivestreamPdfViewer(props) {
             }
          );
       }
-   }, [props.livestreamId]);
+   }, [livestreamId]);
 
    function uploadLogo(logoFile) {
       setLoading(true);
       setUploadingPresentation(true);
-      var storageRef = props.firebase.getStorageRef();
+      var storageRef = firebase.getStorageRef();
       let presentationRef = storageRef.child(
-         "company_documents/" + props.livestreamId + ".pdf"
+         "company_documents/" + livestreamId + ".pdf"
       );
 
       var uploadTask = presentationRef.put(logoFile);
@@ -105,10 +96,7 @@ function LivestreamPdfViewer(props) {
             uploadTask.snapshot.ref
                .getDownloadURL()
                .then(function (downloadURL) {
-                  props.firebase.setLivestreamPresentation(
-                     props.livestreamId,
-                     downloadURL
-                  );
+                  firebase.setLivestreamPresentation(livestreamId, downloadURL);
                   console.log("File available at", downloadURL);
                   setUploadingPresentation(false);
                });
@@ -117,8 +105,8 @@ function LivestreamPdfViewer(props) {
    }
 
    function getPageHeight() {
-      if (props.presenter) {
-         if (props.showMenu) {
+      if (presenter) {
+         if (showMenu) {
             if (windowSize.height > windowSize.width - 480) {
                return windowSize.width * 0.4;
             }
@@ -139,8 +127,8 @@ function LivestreamPdfViewer(props) {
 
    function increasePdfPageNumber() {
       setGoingToNextPage(true);
-      props.firebase
-         .increaseLivestreamPresentationPageNumber(props.livestreamId)
+      firebase
+         .increaseLivestreamPresentationPageNumber(livestreamId)
          .then(() => {
             setGoingToNextPage(false);
          });
@@ -148,8 +136,8 @@ function LivestreamPdfViewer(props) {
 
    function decreasePdfPageNumber() {
       setGoingToPreviousPage(true);
-      props.firebase
-         .decreaseLivestreamPresentationPageNumber(props.livestreamId)
+      firebase
+         .decreaseLivestreamPresentationPageNumber(livestreamId)
          .then(() => {
             setGoingToPreviousPage(false);
          });
@@ -160,20 +148,19 @@ function LivestreamPdfViewer(props) {
    );
 
    const nav = (
-      <Box >
+      <Box>
          <IconButton
-           size="small"
+            size="small"
             variant="contained"
             disabled={
                goingToNextPage ||
                goingToPreviousPage ||
                (pdfObject ? pdfObject.page === 1 : false)
             }
-
             onClick={() => decreasePdfPageNumber()}
          >
             {goingToPreviousPage ? (
-               <CircularProgress   size={20} color="inherit"/>
+               <CircularProgress size={20} color="inherit" />
             ) : (
                <KeyboardArrowLeftIcon fontSize="large" />
             )}
@@ -189,7 +176,7 @@ function LivestreamPdfViewer(props) {
             onClick={() => increasePdfPageNumber()}
          >
             {goingToNextPage ? (
-               <CircularProgress  size={20} color="inherit" />
+               <CircularProgress size={20} color="inherit" />
             ) : (
                <KeyboardArrowRightIcon fontSize="large" />
             )}
@@ -221,7 +208,7 @@ function LivestreamPdfViewer(props) {
          file={pdfObject ? pdfObject.downloadUrl : ""}
       >
          <Page
-           height={getPageHeight()}
+            height={getPageHeight()}
             renderTextLayer={false}
             renderAnnotationLayer={false}
             pageNumber={pdfObject ? pdfObject.page : 1}
@@ -314,7 +301,7 @@ function LivestreamPdfViewer(props) {
                            zIndex: "1000",
                            width: "100%",
                            padding: "25px",
-                           display: props.presenter ? "block" : "none",
+                           display: presenter ? "block" : "none",
                            backgroundColor: "rgba(110,110,110, 0.8)",
                         }}
                      >
@@ -336,7 +323,7 @@ function LivestreamPdfViewer(props) {
                            top: "10px",
                            right: "10px",
                            zIndex: "1000",
-                           display: props.presenter ? "block" : "none",
+                           display: presenter ? "block" : "none",
                         }}
                      >
                         {picker}
@@ -358,7 +345,7 @@ function LivestreamPdfViewer(props) {
                         <div
                            style={{
                               textAlign: "center",
-                              display: props.presenter ? "block" : "none",
+                              display: presenter ? "block" : "none",
                            }}
                         >
                            {emptyPage}
@@ -366,7 +353,7 @@ function LivestreamPdfViewer(props) {
                         <div
                            style={{
                               textAlign: "center",
-                              display: props.presenter ? "none" : "block",
+                              display: presenter ? "none" : "block",
                            }}
                         >
                            {waitingOverlay}
@@ -387,6 +374,6 @@ function LivestreamPdfViewer(props) {
          )}
       </AutoSizer>
    );
-}
+};
 
-export default withFirebase(LivestreamPdfViewer);
+export default memo(LivestreamPdfViewer);
