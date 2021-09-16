@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
       right: "40px",
       width: "20%",
       minWidth: "250px",
-      zIndex: 7250,
+      zIndex: 998,
    },
    blackFrame: {
       display: "flex",

@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
          theme.palette.type === "dark"
             ? theme.palette.common.black
             : theme.palette.background.paper,
-      zIndex: "9999",
+      zIndex: 999,
       display: "flex",
       justifyContent: "center",
       alignItems: "center",

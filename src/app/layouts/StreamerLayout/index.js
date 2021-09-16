@@ -18,14 +18,11 @@ import useStreamRef from "../../components/custom-hook/useStreamRef";
 const useStyles = makeStyles((theme) => ({
    root: {
       position: "relative",
-      // minHeight: "100vh",
       height: "100vh",
       width: "100%",
       touchAction: "manipulation",
-      // border: "6px solid pink",
       backgroundColor: theme.palette.background.dark,
       display: "flex",
-      // height: '100vh',
       overflow: "hidden",
    },
    wrapper: {
