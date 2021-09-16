@@ -90,7 +90,7 @@ function ViewerComponent({
       streamerReady,
       !handRaiseActive,
       screenSharingMode,
-      livestreamId,
+     currentLivestream.id,
       streamerId,
       true
    );

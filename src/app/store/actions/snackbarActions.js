@@ -12,15 +12,15 @@ import React from "react";
 
 /**
  * Enqueue a snackbar managed in redux state.
- * @param {{
- * options: {
+ * options: ({
  * anchorOrigin: {horizontal: string, vertical: string},
  * variant: ('default' | 'error' | 'success' | 'warning' | 'info')
  * key: string,
  * action: object
- * },
+ * }),
  * message: string
  * }} [notification]
+ * @param notification
  */
 export const enqueueSnackbar = (
    notification = { message: "", options: {} }

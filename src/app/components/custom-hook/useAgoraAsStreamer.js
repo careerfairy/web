@@ -506,6 +506,7 @@ export default function useAgoraAsStreamer(
       } else {
          // rtcClient.startProxyServer(3);
          rtcClient.setClientRole("audience");
+         console.log("-> roomId", roomId);
          rtcClient.join(
             agoraToken.rtcToken,
             roomId,

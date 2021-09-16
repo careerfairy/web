@@ -1,7 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import PropTypes from "prop-types";
+import React, { useContext, useState } from "react";
 import {
+   Box,
    Button,
+   Chip,
    Divider,
    Grid,
    ListItem,
@@ -16,28 +18,55 @@ import {
    WhiteTooltip,
 } from "materialUI/GlobalTooltips";
 import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+import { getTimeFromNow } from "../../../../../../../helperFunctions/HelperFunctions";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
    root: {
       flexDirection: "column",
       alignItems: "flex-start",
-      color: ({ backgroundColor }) => backgroundColor && theme.palette.common.white,
-      backgroundColor: ({ backgroundColor }) => backgroundColor && alpha(backgroundColor, 0.7),
-      "& .MuiListItemText-secondary":{
-      color: ({ backgroundColor }) => backgroundColor && alpha(theme.palette.common.white, 1),
+      position: "relative",
+      color: ({ backgroundColor }) =>
+         backgroundColor && theme.palette.common.white,
+      backgroundColor: ({ backgroundColor }) =>
+         backgroundColor && alpha(backgroundColor, 0.7),
+      "& .MuiListItemText-secondary": {
+         color: ({ backgroundColor }) =>
+            backgroundColor && alpha(theme.palette.common.white, 1),
       },
-      "& button":{
-      color: ({ backgroundColor }) => backgroundColor && theme.palette.common.white,
-      borderColor:({ backgroundColor }) => backgroundColor && alpha(theme.palette.common.white, 0.7)
-
-      }
-      // borderRadius: 5
+      "& button": {
+         color: ({ backgroundColor }) =>
+            backgroundColor && theme.palette.common.white,
+         borderColor: ({ backgroundColor }) =>
+            backgroundColor && alpha(theme.palette.common.white, 0.7),
+      },
    },
-   handRaiseListItemDivider:{
-      // backgroundColor: ({ backgroundColor }) => backgroundColor && alpha(theme.palette.common.white, 0.8)
-   }
+   handRaiseListItemDivider: {},
+   statusChip: {
+      "& .MuiChip-label": {
+         fontSize: "0.7rem",
+      },
+      backgroundColor: ({ color }) => color && theme.palette[color]?.main,
+   },
+   whiteChip: {
+      borderColor: theme.palette.common.white,
+      color: theme.palette.common.white,
+   },
 }));
 
+const StatusChip = ({ label, color, backgroundColor }) => {
+   const classes = useStyles({ color });
+   return (
+      <Chip
+         className={clsx(classes.statusChip, {
+            [classes.whiteChip]: backgroundColor,
+         })}
+         variant={color ? "default" : "outlined"}
+         size="small"
+         label={label}
+      />
+   );
+};
 const HandRaiseListItem = ({
    title,
    subtitle,
@@ -48,25 +77,43 @@ const HandRaiseListItem = ({
    secondaryButtonText,
    secondaryButtonDisabled,
    primaryDisabledMessage,
-  backgroundColor
+   backgroundColor,
+   isNew,
+   timestamp,
 }) => {
-   const classes = useStyles({backgroundColor});
+   const classes = useStyles({ backgroundColor });
+
    return (
       <React.Fragment>
          <ListItem color="blue" className={classes.root}>
+            <ListItemText
+               primary={title}
+               primaryTypographyProps={{
+                  noWrap: true,
+               }}
+               secondaryTypographyProps={{
+                  noWrap: true,
+               }}
+               secondary={subtitle}
+            />
+            {(isNew || timestamp) && (
+               <Box position="absolute" right="0" top="0">
+                  {isNew && (
+                     <StatusChip
+                        backgroundColor={backgroundColor}
+                        color="warning"
+                        label={"new"}
+                     />
+                  )}
+                  {timestamp && (
+                     <StatusChip
+                        backgroundColor={backgroundColor}
+                        label={getTimeFromNow(timestamp)}
+                     />
+                  )}
+               </Box>
+            )}
             <Grid container spacing={1}>
-               <Grid xs={12} item>
-                  <ListItemText
-                     primary={title}
-                     primaryTypographyProps={{
-                        noWrap: true,
-                     }}
-                     secondaryTypographyProps={{
-                        noWrap: true,
-                     }}
-                     secondary={subtitle}
-                  />
-               </Grid>
                {primaryOnClick && (
                   <Grid item>
                      <Tooltip
@@ -105,9 +152,25 @@ const HandRaiseListItem = ({
       </React.Fragment>
    );
 };
-const getId = ({ request:{id, timestamp} }) => {
-   return `${id}-${timestamp.seconds}`
+
+HandRaiseListItem.propTypes = {
+   backgroundColor: PropTypes.string,
+   primaryButtonDisabled: PropTypes.bool,
+   primaryButtonText: PropTypes.string,
+   primaryDisabledMessage: PropTypes.string,
+   primaryOnClick: PropTypes.func,
+   secondaryButtonDisabled: PropTypes.bool,
+   secondaryButtonText: PropTypes.string,
+   secondaryOnClick: PropTypes.func,
+   subtitle: PropTypes.string,
+   title: PropTypes.string,
+   isNew: PropTypes.bool,
+   timestamp: PropTypes.object,
 };
+const getId = ({ request: { id, timestamp } }) => {
+   return `${id}-${timestamp.seconds}`;
+};
+
 function RequestedHandRaiseElement(props) {
    const [notificationId] = useState(getId(props));
    const { getActiveTutorialStepKey, handleConfirmStep, isOpen } = useContext(
@@ -146,6 +209,7 @@ function RequestedHandRaiseElement(props) {
          open={Boolean(props.hasEntered && isOpen(10))}
       >
          <HandRaiseListItem
+            timestamp={props.request.timestamp}
             primaryOnClick={() => {
                if (isOpen(10)) {
                   handleConfirmStep(10);
@@ -170,10 +234,11 @@ function RequestedHandRaiseElement(props) {
 }
 
 function InvitedHandRaiseElement(props) {
-   const theme = useTheme()
+   const theme = useTheme();
    return (
       <HandRaiseListItem
          title={"INVITED"}
+         timestamp={props.request.timestamp}
          backgroundColor={theme.palette.primary.main}
          secondaryOnClick={() =>
             props.updateHandRaiseRequest(props.request.id, "denied")
@@ -195,6 +260,7 @@ function ConnectingHandRaiseElement(props) {
    return (
       <HandRaiseListItem
          title={"CONNECTING"}
+         timestamp={props.request.timestamp}
          secondaryOnClick={() => updateHandRaiseRequest("denied")}
          subtitle={props.request.name}
          secondaryButtonText={"Remove"}
@@ -203,7 +269,6 @@ function ConnectingHandRaiseElement(props) {
 }
 
 function ConnectedHandRaiseElement(props) {
-
    const [notificationId] = useState(getId(props));
    const { getActiveTutorialStepKey, handleConfirmStep, isOpen } = useContext(
       TutorialContext
@@ -242,6 +307,7 @@ function ConnectedHandRaiseElement(props) {
       >
          <HandRaiseListItem
             title={"CONNECTED"}
+            timestamp={props.request.timestamp}
             primaryOnClick={() => {
                if (isOpen(12)) {
                   handleConfirmStep(12);

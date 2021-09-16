@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { withFirebase } from "context/firebase";
+import { useFirebase } from "context/firebase";
 import HandRaisePriorRequest from "./hand-raise/active/HandRaisePriorRequest";
 import HandRaiseRequested from "./hand-raise/active/HandRaiseRequested";
 import HandRaiseDenied from "./hand-raise/active/HandRaiseDenied";
@@ -8,76 +8,102 @@ import HandRaiseConnected from "./hand-raise/active/HandRaiseConnected";
 import HandRaiseInactive from "./hand-raise/inactive/HandRaiseInactive";
 import {
    Button,
-   Typography,
    DialogActions,
    DialogContent,
+   Typography,
 } from "@material-ui/core";
 import { useTheme } from "@material-ui/core/styles";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import { GlassDialog } from "../../../../../materialUI/GlobalModals";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 
-function HandRaiseCategory(props) {
+const HandRaiseCategory = ({
+   livestream,
+   selectedState,
+   setHandRaiseActive,
+}) => {
+   const {
+      createHandRaiseRequest,
+      listenToHandRaiseState,
+      updateHandRaiseRequest: updateHandRaiseRequestFirebaseClassMethod,
+   } = useFirebase();
+
    const theme = useTheme();
    const { authenticatedUser, userData } = useAuth();
-   const [handRaiseState, setHandRaiseState] = useState(null);
+   const [handRaiseState, setHandRaiseState] = useState(undefined);
    const streamRef = useStreamRef();
 
    useEffect(() => {
-      if (props.livestream.test || authenticatedUser) {
-         let authEmail = props.livestream.test
+      if (livestream.test || authenticatedUser) {
+         let authEmail = livestream.test
             ? "streamerEmail"
             : authenticatedUser.email;
-         if (props.livestream && authEmail) {
-            props.firebase.listenToHandRaiseState(
-               streamRef,
-               authEmail,
-               (querySnapshot) => {
-                  if (querySnapshot.exists) {
-                     let request = querySnapshot.data();
-                     setHandRaiseState(request);
-                  }
+         if (livestream && authEmail) {
+            listenToHandRaiseState(streamRef, authEmail, (querySnapshot) => {
+               if (querySnapshot.exists) {
+                  let request = {
+                     ...querySnapshot.data(),
+                     id: querySnapshot.id,
+                  };
+                  setHandRaiseState(request);
+               } else {
+                  setHandRaiseState(null);
                }
-            );
+            });
          }
       }
-   }, [props.livestream, authenticatedUser]);
+   }, [livestream, authenticatedUser]);
+
+   useEffect(() => {
+      const hasNotRaisedHandYet =
+         handRaiseState === null
+      if (hasNotRaisedHandYet && livestream?.handRaiseActive) {
+         requestHandRaise();
+      }
+   }, [livestream?.handRaiseActive, handRaiseState]);
 
    useEffect(() => {
       if (
-         props.livestream.handRaiseActive &&
+         livestream.handRaiseActive &&
          handRaiseState &&
          (handRaiseState.state === "connecting" ||
             handRaiseState.state === "connected")
       ) {
-         props.setHandRaiseActive(true);
+         setHandRaiseActive(true);
       } else {
-         props.setHandRaiseActive(false);
+         setHandRaiseActive(false);
       }
    }, [handRaiseState]);
 
    function updateHandRaiseRequest(state) {
-      if (props.livestream.test || authenticatedUser.email) {
-         let authEmail = props.livestream.test
+      if (livestream.test || authenticatedUser.email) {
+         let authEmail = livestream.test
             ? "streamerEmail"
             : authenticatedUser.email;
-         let checkedUserData = props.livestream.test
+         let checkedUserData = livestream.test
             ? { firstName: "Test", lastName: "Streamer" }
             : userData;
          if (handRaiseState) {
-            props.firebase.updateHandRaiseRequest(streamRef, authEmail, state);
-         } else {
-            props.firebase.createHandRaiseRequest(
+            updateHandRaiseRequestFirebaseClassMethod(
                streamRef,
                authEmail,
-               checkedUserData
+               state
             );
+         } else {
+            createHandRaiseRequest(streamRef, authEmail, checkedUserData);
          }
       }
    }
 
-   if (!props.livestream.handRaiseActive) {
-      return <HandRaiseInactive selectedState={props.selectedState} />;
+   const requestHandRaise = () => {
+      return updateHandRaiseRequest("requested");
+   };
+   const unRequestHandRaise = () => {
+      return updateHandRaiseRequest("requested");
+   };
+
+   if (!livestream.handRaiseActive) {
+      return <HandRaiseInactive selectedState={selectedState} />;
    }
 
    return (
@@ -85,10 +111,13 @@ function HandRaiseCategory(props) {
          <HandRaisePriorRequest
             handRaiseState={handRaiseState}
             updateHandRaiseRequest={updateHandRaiseRequest}
+            handRaiseActive={livestream.handRaiseActive}
          />
          <HandRaiseRequested
             handRaiseState={handRaiseState}
-            updateHandRaiseRequest={updateHandRaiseRequest}
+            requestHandRaise={requestHandRaise}
+            unRequestHandRaise={unRequestHandRaise}
+            handRaiseActive={livestream.handRaiseActive}
          />
          <HandRaiseDenied
             handRaiseState={handRaiseState}
@@ -97,10 +126,12 @@ function HandRaiseCategory(props) {
          <HandRaiseConnecting
             handRaiseState={handRaiseState}
             updateHandRaiseRequest={updateHandRaiseRequest}
+            handRaiseActive={livestream.handRaiseActive}
          />
          <HandRaiseConnected
             handRaiseState={handRaiseState}
             updateHandRaiseRequest={updateHandRaiseRequest}
+            handRaiseActive={livestream.handRaiseActive}
          />
          <GlassDialog
             open={Boolean(handRaiseState && handRaiseState.state === "invited")}
@@ -132,6 +163,6 @@ function HandRaiseCategory(props) {
          </GlassDialog>
       </>
    );
-}
+};
 
-export default withFirebase(HandRaiseCategory);
+export default HandRaiseCategory;

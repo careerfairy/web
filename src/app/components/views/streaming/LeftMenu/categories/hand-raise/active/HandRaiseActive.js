@@ -220,7 +220,7 @@ function HandRaiseActive({
                            onClick={handleToggleOrder}
                            endIcon={<OrderIcon className={classes.orderIcon} />}
                         >
-                           {sortByNew ? "oldest" : "newest"}
+                           {sortByNew ? "oldest (desc)" : "newest (desc)"}
                         </Button>
                      </Box>
                   </Grid>
@@ -239,7 +239,7 @@ function HandRaiseActive({
                   )}
                   <TransitionGroup>
                      {filteredHandRaises.map((handRaise) => (
-                        <Collapse key={handRaise.timestamp.toMillis()}>
+                        <Collapse key={handRaise.id}>
                            <HandRaiseElement
                               request={handRaise}
                               hasEntered={hasEntered}
