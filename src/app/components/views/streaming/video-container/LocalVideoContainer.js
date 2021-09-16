@@ -78,7 +78,6 @@ const LocalVideoContainer = ({
 
    useEffect(() => {
    }, [localStream]);
-      console.log("-> localStream", localStream);
 
    return (
       <div className={classes.localVideoContainer} style={{ height: height }}>

@@ -14,6 +14,8 @@ import StreamNotifications from "../streaming/sharedComponents/StreamNotificatio
 import AudienceDrawer from "../streaming/AudienceDrawer";
 import ButtonComponent from "../streaming/sharedComponents/ButtonComponent";
 import StreamClosedCountdown from "../streaming/sharedComponents/StreamClosedCountdown";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({
    iconsContainer: {
@@ -61,11 +63,7 @@ const ViewerOverview = ({
    handRaiseActive,
    streamerId,
    showVideoButton,
-   unmute,
-   play,
-   playVideos,
    mobile,
-   unmuteVideos,
    setShowMenu,
    handleStateChange,
    selectedState,
@@ -75,13 +73,15 @@ const ViewerOverview = ({
    audienceDrawerOpen,
 }) => {
    const { currentLivestream, isBreakout } = useCurrentStream();
+   const dispatch = useDispatch();
+   const { videoIsMuted, videoIsPaused } = useSelector(
+      (state) => state.stream.streaming
+   );
 
    const classes = useStyles({ mobile });
    return (
       <Fragment>
-         <div
-            className={classes.blackFrame}
-         >
+         <div className={classes.blackFrame}>
             <AudienceDrawer
                hideAudience={hideAudience}
                audienceDrawerOpen={audienceDrawerOpen}
@@ -104,8 +104,6 @@ const ViewerOverview = ({
                showVideoButton={showVideoButton}
                isBreakout={isBreakout}
                setShowVideoButton={setShowVideoButton}
-               unmute={unmute}
-               play={play}
             />
 
             {
@@ -130,9 +128,9 @@ const ViewerOverview = ({
          )}
          <StreamNotifications isStreamer={false} />
          <Backdrop
-            open={Boolean(showVideoButton.muted)}
+            open={videoIsMuted}
             className={classes.backdrop}
-            onClick={unmuteVideos}
+            onClick={() => dispatch(actions.unmuteAllRemoteVideos())}
          >
             <div className={classes.backdropContent}>
                <VolumeUpRoundedIcon style={{ fontSize: "3rem" }} />
@@ -140,9 +138,9 @@ const ViewerOverview = ({
             </div>
          </Backdrop>
          <Backdrop
-            open={Boolean(showVideoButton.paused)}
+            open={videoIsPaused}
             className={classes.backdrop}
-            onClick={playVideos}
+            onClick={() => dispatch(actions.playAllRemoteVideos())}
          >
             <div className={classes.backdropContent}>
                <PlayArrowRoundedIcon style={{ fontSize: "3rem" }} />

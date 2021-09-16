@@ -272,8 +272,7 @@ function VideoContainer(props) {
             localMediaStream={localMediaStream }
             currentSpeakerId={currentSpeakerId}
             streamerId={props.streamerId}
-            play={props.play}
-            unmute={props.unmute}
+            setRemovedStream={setRemovedStream}
             liveSpeakers={props.currentLivestream.liveSpeakers}
             isBroadCasting={!props.isPlayMode}
             sharingScreen={props.currentLivestream.mode === "desktop"}

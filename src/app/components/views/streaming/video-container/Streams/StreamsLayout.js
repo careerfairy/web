@@ -97,8 +97,7 @@ const StreamElementWrapper = ({ children, large, index, squished, first }) => {
 const StreamsLayout = ({
    streamData,
    liveSpeakers,
-   play,
-   unmute,
+   setRemovedStream,
    sharingPdf,
    showMenu,
    livestreamId,
@@ -150,9 +149,8 @@ const StreamsLayout = ({
                               <StreamContainer
                                  stream={stream}
                                  big={isLarge}
+                                 setRemovedStream={setRemovedStream}
                                  liveSpeakers={liveSpeakers}
-                                 play={play}
-                                 unmute={unmute}
                               />
                            </StreamElementWrapper>
                         );
@@ -180,10 +178,7 @@ const StreamsLayout = ({
 };
 
 StreamsLayout.propTypes = {
-   play: PropTypes.bool,
-   unmute: PropTypes.bool,
    streamData: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default StreamsLayout;
-

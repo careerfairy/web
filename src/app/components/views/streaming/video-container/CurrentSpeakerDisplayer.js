@@ -241,7 +241,6 @@ function CurrentSpeakerDisplayer(props) {
                   <RemoteVideoContainer
                      {...props}
                      isPlayMode={props.isPlayMode}
-                     muted={props.muted}
                      stream={stream}
                      height={getVideoContainerHeight(stream.streamId)}
                      small={videoClass.includes("QuarterWidth")}
@@ -267,7 +266,6 @@ function CurrentSpeakerDisplayer(props) {
                   <RemoteVideoContainer
                      {...props}
                      isPlayMode={props.isPlayMode}
-                     muted={props.muted}
                      stream={stream}
                      height={getVideoContainerHeight(stream.streamId)}
                      small={videoClass.includes("QuarterWidth")}

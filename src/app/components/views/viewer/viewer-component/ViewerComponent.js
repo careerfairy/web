@@ -49,10 +49,8 @@ function ViewerComponent({
                             firebase,
                             handRaiseActive,
                             isBreakout,
-                            play,
                             showMenu,
                             streamerId,
-                            unmute,
                             mobile
                          }) {
    const classes = useStyles();
@@ -213,8 +211,6 @@ function ViewerComponent({
             localMediaStream={localMediaStream}
             currentSpeakerId={currentSpeakerId}
             streamerId={streamerId}
-            play={play}
-            unmute={unmute}
             liveSpeakers={currentLivestream.liveSpeakers}
             isBroadCasting={handRaiseActive}
             sharingScreen={currentLivestream.mode === "desktop"}

@@ -65,6 +65,13 @@ export {
    openViewerBreakoutModal,
    closeViewerCtaModal,
    openViewerCtaModal,
+   playAllRemoteVideos,
+   setVideoIsMuted,
+   unmuteAllRemoteVideos,
+   setVideoIsPaused,
+   muteAllRemoteVideos,
+   toggleLocalVideo,
+   toggleLocalAudio,
 } from "./streamActions";
 
 export {

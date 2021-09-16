@@ -26,11 +26,10 @@ const Streams = memo(
       isBroadCasting,
       liveSpeakers,
      sharingPdf,
-     play,
-     unmute,
        showMenu,
        livestreamId,
-       presenter
+       setRemovedStream,
+       presenter,
    }) => {
       const classes = useStyles();
       const [streamData, setStreamData] = useState([]);
@@ -142,9 +141,8 @@ const Streams = memo(
                <StreamsLayout
                   streamData={streamData}
                   liveSpeakers={liveSpeakers}
-                  play={play}
                   sharingPdf={sharingPdf}
-                  unmute={unmute}
+                  setRemovedStream={setRemovedStream}
                   currentSpeakerId={currentSpeakerId}
                   showMenu={showMenu}
                   livestreamId={livestreamId}
@@ -179,8 +177,6 @@ Streams.propTypes = {
          isPlaying: PropTypes.func,
       }),
    }),
-   play: PropTypes.bool,
-   unmute: PropTypes.bool,
    sharingPdf: PropTypes.bool
 };
 

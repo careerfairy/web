@@ -5,14 +5,83 @@ const initialState = {
       streamerBreakoutRoomModalOpen: false,
       viewerBreakoutRoomModalOpen: false,
       viewerCtaModalOpen: false,
+      videoPaused: false,
+      videoMuted: false,
    },
    stats: {
       numberOfViewers: 0,
+   },
+   streaming: {
+      videoIsPaused: false,
+      videoIsMuted: false,
+      playAllRemoteVideos: false,
+      muteAllRemoteVideos: false,
+      playLocalVideo: true,
+      playLocalAudio: true
    },
 };
 
 const streamReducer = (state = initialState, { type, payload }) => {
    switch (type) {
+      case actions.TOGGLE_LOCAL_VIDEO:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               playLocalVideo: !state.streaming.playLocalVideo,
+            },
+         };
+      case actions.TOGGLE_LOCAL_AUDIO:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               playLocalAudio: !state.streaming.playLocalAudio,
+            },
+         };
+      case actions.PLAY_ALL_REMOTE_VIDEOS:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               videoIsMuted: false,
+               videoIsPaused: false,
+               playAllRemoteVideos: true,
+            },
+         };
+      case actions.MUTE_ALL_REMOTE_VIDEOS:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               muteAllRemoteVideos: true,
+            },
+         };
+      case actions.UNMUTE_ALL_REMOTE_VIDEOS:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               videoIsMuted: false,
+               muteAllRemoteVideos: false
+            },
+         };
+      case actions.SET_VIDEO_IS_MUTED:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               videoIsMuted: true,
+            },
+         };
+      case actions.SET_VIDEO_IS_PAUSED:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               videoIsPaused: true
+            },
+         };
       case actions.OPEN_STREAMER_BREAKOUT_MODAL:
          return {
             ...state,

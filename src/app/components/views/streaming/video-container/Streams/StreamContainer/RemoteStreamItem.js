@@ -1,17 +1,16 @@
 import React, { useEffect } from "react";
 import StreamItem from "./StreamItem";
+import { useSelector } from "react-redux";
 
 const RemoteStreamItem = ({
    speaker,
-   muted,
-   play,
    setRemovedStream,
    setShowVideoButton,
    stream,
-   unmute,
    big,
-                             index,
+   index,
 }) => {
+   const { playAllRemoteVideos, muteAllRemoteVideos } = useSelector((state) => state.stream.streaming);
 
    // useEffect(() => {
    //    if (stream.streamId === "demoStream") {
@@ -39,30 +38,28 @@ const RemoteStreamItem = ({
    // }, [stream.streamId]);
 
    useEffect(() => {
-      if (unmute) {
+      if (!muteAllRemoteVideos) {
          stream.stream?.play(stream.streamId, { muted: false });
       }
-   }, [unmute]);
+   }, [muteAllRemoteVideos]);
 
    useEffect(() => {
-      if (play) {
+      if (playAllRemoteVideos) {
          playVideo();
       }
-   }, [play]);
+   }, [playAllRemoteVideos]);
 
    useEffect(() => {
-      if (muted) {
+      if (muteAllRemoteVideos) {
          stream?.stream?.muteAudio();
       } else {
          stream?.stream?.unmuteAudio();
       }
-   }, [muted]);
+   }, [muteAllRemoteVideos]);
 
    useEffect(() => {
-      console.log("-> stream?.stream?.audio", stream?.stream?.audio);
-      console.log("-> stream?.stream?.video", stream?.stream?.video);
       if (stream?.stream?.audio === false && stream?.stream?.video === false) {
-         // setRemovedStream(stream.streamId);
+         setRemovedStream(stream.streamId);
       }
    }, [stream?.stream?.audio, stream?.stream?.video]);
 
@@ -92,14 +89,8 @@ const RemoteStreamItem = ({
       }
    }
 
-
    return (
-      <StreamItem
-         speaker={speaker}
-         stream={stream}
-         index={index}
-         big={big}
-      />
+      <StreamItem speaker={speaker} stream={stream} index={index} big={big} />
    );
 };
 
