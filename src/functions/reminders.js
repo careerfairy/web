@@ -138,16 +138,29 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub
             console.log("querysnapshot size: " + querySnapshot.size);
             querySnapshot.forEach((doc) => {
                const livestream = doc.data();
-               livestream.id = doc.id;
-               console.log("livestream company: " + livestream.company);
-               console.log(
-                  "number of emails: " + livestream.registeredUsers.length
-               );
-               const data = generateEmailData(livestream.id, livestream, false);
-               messageSender.send(data, (error, body) => {
-                  console.log("error:" + error);
-                  console.log("body:" + JSON.stringify(body));
-               });
+               if (!livestream.isFaceToFace) {
+                  livestream.id = doc.id;
+                  functions.logger.log(
+                     `Livestream with ${livestream.company}: prepare emails`
+                  );
+
+                  console.log(
+                     "number of emails: " + livestream.registeredUsers.length
+                  );
+                  const data = generateEmailData(
+                     livestream.id,
+                     livestream,
+                     false
+                  );
+                  messageSender.send(data, (error, body) => {
+                     console.log("error:" + error);
+                     console.log("body:" + JSON.stringify(body));
+                  });
+               } else {
+                  functions.logger.log(
+                     `Livestream with ${livestream.company} is F2F, no reminder email sent out`
+                  );
+               }
             });
          })
          .catch((error) => {

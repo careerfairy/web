@@ -116,6 +116,37 @@ const CallToActionForm = memo(
          return { ...initialValues };
       };
 
+      const buildFormikForm = (type, validationSchema) => {
+         return useFormik({
+            initialValues: getInitialValues(
+               isJobPosting,
+               isActiveTutorialStep,
+               initialValues
+            ),
+            enableReinitialize: true,
+            validationSchema: validationSchema,
+            onSubmit: async (values, { setSubmitting }) => {
+               try {
+                  setSubmitting(true);
+                  if (values.isToBeSaved) {
+                     await handleSave(values);
+                  } else {
+                     await handleSend(values);
+                  }
+
+                  if (isActiveTutorialStep) {
+                     handleConfirmStep(20);
+                  }
+               } catch (e) {
+                  dispatch(actions.sendGeneralError(e));
+                  console.error("-> Error: failed in submitting CTA", e);
+               }
+               setSubmitting(false);
+               handleClose();
+            },
+         });
+      };
+
       const formik = useFormik({
          initialValues: getInitialValues(
             isJobPosting,
@@ -132,7 +163,6 @@ const CallToActionForm = memo(
                } else {
                   await handleSend(values);
                }
-
                if (isActiveTutorialStep) {
                   handleConfirmStep(20);
                }
