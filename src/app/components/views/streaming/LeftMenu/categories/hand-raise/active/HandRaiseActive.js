@@ -37,6 +37,7 @@ import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 import { TransitionGroup } from "react-transition-group";
 import { dynamicSort } from "../../../../../../helperFunctions/HelperFunctions";
 import OrderIcon from "@material-ui/icons/KeyboardArrowUpRounded";
+import HandRaiseNotifier from "./HandRaiseNotifier";
 
 const useStyles = makeStyles((theme) => ({
    activeHandRaiseContainer: {
@@ -49,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(1, 2),
       backgroundColor: theme.palette.background.paper,
       boxShadow: theme.shadows[1],
-      margin: 0
+      margin: 0,
    },
    orderIcon: {
       transition: theme.transitions.create(["transform"], {
@@ -58,9 +59,9 @@ const useStyles = makeStyles((theme) => ({
       }),
       transform: ({ up }) => up && `rotate(180deg)`,
    },
-   activeHandRaisesWrapper:{
+   activeHandRaisesWrapper: {
       background: theme.palette.background.default,
-   }
+   },
 }));
 
 const FILTER_MAP = {
@@ -77,7 +78,7 @@ function HandRaiseActive({
    showMenu,
    selectedState,
    sliding,
-                            isGlass
+   isGlass,
 }) {
    const streamRef = useStreamRef();
    const { closeSnackbar } = useSnackbar();
@@ -169,6 +170,15 @@ function HandRaiseActive({
    }
    return (
       <>
+         <HandRaiseNotifier
+           handRaises={handRaises}
+           hasEntered={hasEntered}
+           updateHandRaiseRequest={updateHandRaiseRequest}
+           closeSnackbar={closeSnackbar}
+           setNewNotification={setNewNotification}
+           numberOfActiveHandRaisers={handRaises.length}
+           setNotificationToRemove={setNotificationToRemove}
+         />
          <Grow
             timeout={tutorialSteps.streamerReady ? 0 : "auto"}
             onEntered={() => setHasEntered(true)}
@@ -176,7 +186,13 @@ function HandRaiseActive({
             mountOnEnter
             unmountOnExit
             in={Boolean(handRaises.length)}
-         ><Box className={classes.activeHandRaisesWrapper}  display="flex" flexDirection="column" height="100%">
+         >
+            <Box
+               className={classes.activeHandRaisesWrapper}
+               display="flex"
+               flexDirection="column"
+               height="100%"
+            >
                <Grid className={classes.filterGrid} container spacing={1}>
                   <Grid xs={8} item>
                      <FormControl size="small" fullWidth>
@@ -200,7 +216,7 @@ function HandRaiseActive({
                   <Grid xs={4} item>
                      <Box display="flex" height="100%">
                         <Button
-                          size="small"
+                           size="small"
                            onClick={handleToggleOrder}
                            endIcon={<OrderIcon className={classes.orderIcon} />}
                         >
@@ -209,40 +225,46 @@ function HandRaiseActive({
                      </Box>
                   </Grid>
                </Grid>
-            <List className={classes.activeHandRaiseContainer}>
-               {!Boolean(filteredHandRaises.length) && (
-                  <Box p={2}>
-                     <Typography>no results</Typography>
+               <List className={classes.activeHandRaiseContainer}>
+                  {!Boolean(filteredHandRaises.length) && (
+                     <Box
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                        p={2}
+                     >
+                        <Typography>no results</Typography>
+                        <Button onClick={() => setFilterMapProperty("All")}>Back to all</Button>
+                     </Box>
+                  )}
+                  <TransitionGroup>
+                     {filteredHandRaises.map((handRaise) => (
+                        <Collapse key={handRaise.timestamp.toMillis()}>
+                           <HandRaiseElement
+                              request={handRaise}
+                              hasEntered={hasEntered}
+                              updateHandRaiseRequest={updateHandRaiseRequest}
+                              closeSnackbar={closeSnackbar}
+                              setNewNotification={setNewNotification}
+                              numberOfActiveHandRaisers={handRaises.length}
+                              setNotificationToRemove={setNotificationToRemove}
+                           />
+                        </Collapse>
+                     ))}
+                  </TransitionGroup>
+                  <Box flexGrow={1} />
+                  <Box width="100%" display="grid" placeItems="center" px={2}>
+                     <Button
+                        style={{ margin: "auto 0 2rem 0" }}
+                        startIcon={<CloseRoundedIcon />}
+                        variant="contained"
+                        children="Deactivate Hand Raise"
+                        disabled={isStepOpen(11)}
+                        onClick={() => setHandRaiseModeInactive()}
+                     />
                   </Box>
-               )}
-               <TransitionGroup>
-                  {filteredHandRaises.map((handRaise) => (
-                     <Collapse key={handRaise.timestamp.toMillis()}>
-                        <HandRaiseElement
-                           request={handRaise}
-                           hasEntered={hasEntered}
-                           updateHandRaiseRequest={updateHandRaiseRequest}
-                           setNewNotification={setNewNotification}
-                           closeSnackbar={closeSnackbar}
-                           numberOfActiveHandRaisers={handRaises.length}
-                           setNotificationToRemove={setNotificationToRemove}
-                        />
-                     </Collapse>
-                  ))}
-               </TransitionGroup>
-               <Box flexGrow={1} />
-               <Box width="100%" display="grid" placeItems="center" px={2}>
-               <Button
-                  style={{ margin: "auto 0 2rem 0" }}
-                  startIcon={<CloseRoundedIcon />}
-                  variant="contained"
-                  children="Deactivate Hand Raise"
-                  disabled={isStepOpen(11)}
-                  onClick={() => setHandRaiseModeInactive()}
-               />
-               </Box>
-            </List>
-         </Box>
+               </List>
+            </Box>
          </Grow>
 
          <Grow mountOnEnter unmountOnExit in={Boolean(!handRaises.length)}>

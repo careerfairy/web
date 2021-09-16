@@ -10,13 +10,12 @@ const StreamSnackBar = ({ notification }) => {
    const enqueueSnackbar = (...args) =>
       dispatch(actions.enqueueSnackbar(...args));
    const closeSnackbar = (...args) => dispatch(actions.closeSnackbar(...args));
-
    useEffect(() => {
       enqueueSnackbar({
          message: notification.message,
          options: {
             variant: "info",
-            persist: notification.status !== "connected",
+            // persist: notification.status !== "connected",
             action,
             key: notification.id,
             preventDuplicate: true,
