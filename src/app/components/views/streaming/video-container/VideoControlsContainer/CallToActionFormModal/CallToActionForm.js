@@ -132,7 +132,7 @@ const CallToActionForm = memo(
                message: jobDescription,
             };
          }
-         return { ...initialValues };
+         return { ...initialValues, isForTutorial: false };
       };
 
       const formik = useFormik({
