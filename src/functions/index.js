@@ -75,6 +75,8 @@ exports.sendReminderEmailToUserFromUniversity =
    reminders.sendReminderEmailToUserFromUniversity;
 exports.sendReminderEmailsWhenLivestreamStarts =
    reminders.sendReminderEmailsWhenLivestreamStarts;
+exports.sendReminderEmailAboutApplicationLink =
+   reminders.sendReminderEmailAboutApplicationLink;
 
 // Livestreams
 exports.scheduleTestLivestreamDeletion =

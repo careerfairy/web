@@ -4,6 +4,7 @@ const { generateEmailData, setHeaders } = require("./util");
 const { mailgun } = require("./api/mailgun");
 const { client } = require("./api/postmark");
 const { admin } = require("./api/firestoreAdmin");
+const { functionsIn } = require("lodash");
 
 exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(
    async (req, res) => {
@@ -120,6 +121,37 @@ exports.sendReminderEmailToRegistrants = functions.https.onRequest(
          });
    }
 );
+
+exports.sendReminderEmailAboutApplicationLink = functions
+   .runWith({
+      minInstances: 1,
+   })
+   .https.onCall(async (data, context) => {
+      const TEMPLATE_ID = "25152103";
+
+      functions.logger.log("data", data);
+      const email = {
+         TemplateId: TEMPLATE_ID,
+         From: "CareerFairy <noreply@careerfairy.io>",
+         To: data.recipient,
+         TemplateModel: {
+            recipient_name: data.recipient_name,
+            application_link: data.application_link,
+            position_name: data.position_name,
+            company_name: data.company_name,
+         },
+      };
+
+      client.sendEmailWithTemplate(email).then(
+         (response) => {
+            return null;
+         },
+         (error) => {
+            console.error(`Error sending email to ${data.recipient}`, error);
+            throw new functions.https.HttpsError("unknown");
+         }
+      );
+   });
 
 exports.scheduleReminderEmailSendTestOnRun = functions.pubsub
    .schedule("every 45 minutes")
