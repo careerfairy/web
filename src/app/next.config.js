@@ -19,7 +19,7 @@ const securityHeaders = [
          "default-src 'self' *.googleapis.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net; script-src 'self' *.googleapis.com *.googletagmanager.com *.google-analytics.com 'unsafe-eval' 'unsafe-inline' ; style-src 'self' *.googleapis.com 'unsafe-inline'; connect-src 'self' wss: *.googleapis.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:*",
    },
    {
-      key: "Referer-Policy",
+      key: "Referrer-Policy",
       value: "origin-when-cross-origin",
    },
    {
