@@ -76,7 +76,6 @@ function ViewerComponent({
       currentLivestream.mode === "desktop"
          ? optimizationMode
          : "";
-
    const {
       externalMediaStreams,
       localMediaStream,

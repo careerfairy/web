@@ -118,7 +118,6 @@ export default function useAgoraAsStreamer(
       }
       setRemovedStream(null);
    }, [removedStream]);
-
    useEffect(() => {
       setReadyToConnect(
          Boolean(
@@ -224,7 +223,6 @@ export default function useAgoraAsStreamer(
    );
 
    const handleConnectClients = () => {
-      console.log("-> Connecting Clients");
       connectAgoraRTC();
       connectAgoraRTM();
    };
@@ -337,6 +335,7 @@ export default function useAgoraAsStreamer(
 
       let localStream = null;
       rtcClient.on("client-role-changed", function (evt) {
+         console.log("-> client-role-changed", evt);
          let role = evt.role;
          if (role === "host") {
             localStream = AgoraRTC.createStream({
@@ -505,8 +504,8 @@ export default function useAgoraAsStreamer(
          );
       } else {
          // rtcClient.startProxyServer(3);
-         rtcClient.setClientRole("audience");
-         console.log("-> roomId", roomId);
+         console.log("-> SETTING CLIENT ROLE AS AUDIENCE IN CONNECT RTC FN");
+         rtcClient.setClientRole("audience")
          rtcClient.join(
             agoraToken.rtcToken,
             roomId,
@@ -516,6 +515,7 @@ export default function useAgoraAsStreamer(
                   type: "INFO",
                   msg: "RTC_STREAM_JOINED_AS_VIEWER",
                });
+               if(!isPlayMode) rtcClient.setClientRole("host")
             },
             handleClientJoinChannelError
          );
@@ -720,12 +720,14 @@ export default function useAgoraAsStreamer(
    useEffect(() => {
       if (isViewer && agoraRTC && rtcClient) {
          if (!isPlayMode) {
+            console.log("-> SETTING ROLE AS HOST IN USE EFFECT");
             rtcClient.setClientRole("host");
          } else {
+            console.log("-> SETTING ROLE AS VIEWER IN USE EFFECT");
             rtcClient.setClientRole("audience");
          }
       }
-   }, [isPlayMode]);
+   }, [isPlayMode, agoraRTC, rtcClient]);
 
    const removeStreamFromList = (streamId, streamList) => {
       const streamListCopy = [...streamList];
