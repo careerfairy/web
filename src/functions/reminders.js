@@ -144,7 +144,7 @@ exports.sendReminderEmailAboutApplicationLink = functions
 
       client.sendEmailWithTemplate(email).then(
          (response) => {
-            return null;
+            functions.logger.log(`Sent reminder email to ${data.recipient}`);
          },
          (error) => {
             console.error(`Error sending email to ${data.recipient}`, error);

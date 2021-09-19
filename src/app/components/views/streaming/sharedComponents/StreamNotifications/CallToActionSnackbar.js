@@ -1,4 +1,11 @@
-import React, { useState, forwardRef, useCallback, useContext } from "react";
+import React, {
+   useState,
+   forwardRef,
+   useCallback,
+   useContext,
+   useMemo,
+   useEffect,
+} from "react";
 import clsx from "clsx";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import { SnackbarContent } from "notistack";
@@ -12,11 +19,20 @@ import CloseIcon from "@material-ui/icons/Close";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import { CardContent, CardMedia } from "@material-ui/core";
+import {
+   CardContent,
+   CardMedia,
+   Dialog,
+   DialogActions,
+   DialogTitle,
+   DialogContent,
+   DialogContentText,
+} from "@material-ui/core";
 import { prettyLocalizedDate } from "../../../../helperFunctions/HelperFunctions";
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips";
 import TutorialContext from "../../../../../context/tutorials/TutorialContext";
 import { useFirebase } from "context/firebase";
+import { useAuth } from "HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -123,7 +139,6 @@ const JobDetailSection = ({ title, body }) => (
 const CallToActionSnackbar = forwardRef(
    (
       {
-         authenticatedUser,
          message,
          onClick,
          onDismiss,
@@ -143,10 +158,14 @@ const CallToActionSnackbar = forwardRef(
       ref
    ) => {
       const { handleConfirmStep, isOpen } = useContext(TutorialContext);
+      const { authenticatedUser, userData } = useAuth();
+
       const classes = useStyles();
       const firebase = useFirebase();
       const [expanded, setExpanded] = useState(false);
+
       const [isSendingEmail, setIsSendingEmail] = useState(false);
+      const [showEmailMessage, setShowEmailMessage] = useState(false);
 
       const [tutorialState, setTutorialState] = useState(
          isForTutorial ? "expand" : ""
@@ -170,21 +189,26 @@ const CallToActionSnackbar = forwardRef(
          setTutorialState("apply");
       };
 
-      const sendEmailReminderForApplication = async () => {
+      const sendEmailReminderForApplication = useCallback(async () => {
          setIsSendingEmail(true);
          try {
             await firebase.sendReminderEmailAboutApplicationLink({
                recipient: authenticatedUser.email,
-               recipient_name: authenticatedUser.email,
+               recipient_name: userData.firstName,
                company_name: currentLivestream.company,
                position_name: jobTitle,
                application_link: buttonUrl,
             });
             setIsSendingEmail(false);
+            setShowEmailMessage(true);
          } catch (error) {
             console.log(error);
             setIsSendingEmail(false);
          }
+      }, [authenticatedUser, userData, currentLivestream, jobTitle, buttonUrl]);
+
+      const handleCloseDialog = () => {
+         setShowEmailMessage(false);
       };
 
       return (
@@ -311,7 +335,7 @@ const CallToActionSnackbar = forwardRef(
                               {loading ? "" : buttonText}
                            </Button>
                         </StyledTooltipWithButton>
-                        {isJobPosting && (
+                        {isJobPosting && authenticatedUser && (
                            <Button
                               className={classes.mainButton}
                               onClick={sendEmailReminderForApplication}
@@ -328,6 +352,28 @@ const CallToActionSnackbar = forwardRef(
                               Send Email Reminder
                            </Button>
                         )}
+                        <Dialog
+                           open={showEmailMessage}
+                           onClose={handleCloseDialog}
+                        >
+                           <DialogTitle>Check your inbox!</DialogTitle>
+                           <DialogContent>
+                              <DialogContentText>
+                                 We just sent you an email so that you can
+                                 comfortably complete your application after
+                                 this live stream.
+                              </DialogContentText>
+                           </DialogContent>
+                           <DialogActions>
+                              <Button
+                                 color="primary"
+                                 autoFocus
+                                 onClick={handleCloseDialog}
+                              >
+                                 Close
+                              </Button>
+                           </DialogActions>
+                        </Dialog>
                      </CardActions>
                   </Card>
                </Collapse>
