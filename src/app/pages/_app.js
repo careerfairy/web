@@ -29,9 +29,9 @@ config({ ssrFadeout: true });
 
 // react-redux-firebase config
 const rrfConfig = {
-  // userProfile: 'userData',
-  useFirestoreForProfile: true, // Firestore for Profile instead of Realtime DB
-  attachAuthIsReady: true, // attaches auth is ready promise to store
+   // userProfile: 'userData',
+   useFirestoreForProfile: true, // Firestore for Profile instead of Realtime DB
+   attachAuthIsReady: true, // attaches auth is ready promise to store
 };
 
 export const store = newStore();
@@ -43,16 +43,16 @@ const rrfProps = {
 };
 
 function MyApp({ Component, pageProps }) {
-  // const classes = useStyles()
-  Sentry.init({
-    dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031",
-  });
+   // const classes = useStyles()
+   Sentry.init({
+      dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031",
+   });
 
-  const { pathname } = useRouter();
-  const firebase = new Firebase();
+   const { pathname } = useRouter();
+   const firebase = new Firebase();
 
-  const [generalError, setGeneralError] = useState("");
-  const [disableCookies, setDisableCookies] = useState(false);
+   const [generalError, setGeneralError] = useState("");
+   const [disableCookies, setDisableCookies] = useState(false);
 
    const initialTutorialState = {
       0: true,
@@ -101,17 +101,17 @@ function MyApp({ Component, pageProps }) {
 
    const cookieValue = getCookieConsentValue();
 
-  useEffect(() => {
-    if (Boolean(cookieValue === "true" && !disableCookies)) {
-      TagManager.initialize(tagManagerArgs);
-    }
-  }, [cookieValue, disableCookies]);
+   useEffect(() => {
+      if (Boolean(cookieValue === "true" && !disableCookies)) {
+         TagManager.initialize(tagManagerArgs);
+      }
+   }, [cookieValue, disableCookies]);
 
-  useEffect(() => {
-    setDisableCookies(
-      Boolean(pathname === "/next-livestreams/[groupId]/embed")
-    );
-  }, [pathname]);
+   useEffect(() => {
+      setDisableCookies(
+         Boolean(pathname === "/next-livestreams/[groupId]/embed")
+      );
+   }, [pathname]);
 
    const getActiveTutorialStepKey = () => {
       const activeStep = Object.keys(tutorialSteps).find((key) => {
@@ -164,8 +164,8 @@ function MyApp({ Component, pageProps }) {
                      endTutorial,
                   }}
                >
-                  <ThemeProviderWrapper>
-                     <AuthProvider>
+                  <AuthProvider>
+                     <ThemeProviderWrapper>
                         <FirebaseContext.Provider value={firebase}>
                            <MuiPickersUtilsProvider utils={DateFnsUtils}>
                               <ErrorContext.Provider
@@ -173,7 +173,7 @@ function MyApp({ Component, pageProps }) {
                               >
                                  {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                                  <CssBaseline />
-                                  {disableCookies ? null: <CFCookieConsent />}
+                                 {disableCookies ? null : <CFCookieConsent />}
                                  <Component {...pageProps} />
                                  <Notifier />
                                  <ErrorSnackBar
@@ -183,8 +183,8 @@ function MyApp({ Component, pageProps }) {
                               </ErrorContext.Provider>
                            </MuiPickersUtilsProvider>
                         </FirebaseContext.Provider>
-                     </AuthProvider>
-                  </ThemeProviderWrapper>
+                     </ThemeProviderWrapper>
+                  </AuthProvider>
                </TutorialContext.Provider>
             </ReactReduxFirebaseProvider>
          </Provider>

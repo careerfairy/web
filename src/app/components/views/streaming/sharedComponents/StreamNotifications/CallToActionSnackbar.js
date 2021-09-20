@@ -33,6 +33,7 @@ import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltip
 import TutorialContext from "../../../../../context/tutorials/TutorialContext";
 import { useFirebase } from "context/firebase";
 import { useAuth } from "HOCs/AuthProvider";
+import { useCurrentStream } from "context/stream/StreamContext";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -149,7 +150,6 @@ const CallToActionSnackbar = forwardRef(
          jobTitle,
          buttonUrl,
          salary,
-         currentLivestream,
          applicationDeadline,
          snackBarImage,
          isForTutorial,
@@ -189,13 +189,12 @@ const CallToActionSnackbar = forwardRef(
          setTutorialState("apply");
       };
 
-      const sendEmailReminderForApplication = useCallback(async () => {
+      const sendEmailReminderForApplication = async () => {
          setIsSendingEmail(true);
          try {
             await firebase.sendReminderEmailAboutApplicationLink({
                recipient: authenticatedUser.email,
                recipient_name: userData.firstName,
-               company_name: currentLivestream.company,
                position_name: jobTitle,
                application_link: buttonUrl,
             });
@@ -205,7 +204,7 @@ const CallToActionSnackbar = forwardRef(
             console.log(error);
             setIsSendingEmail(false);
          }
-      }, [authenticatedUser, userData, currentLivestream, jobTitle, buttonUrl]);
+      };
 
       const handleCloseDialog = () => {
          setShowEmailMessage(false);

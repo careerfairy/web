@@ -138,7 +138,6 @@ exports.sendReminderEmailAboutApplicationLink = functions
             recipient_name: data.recipient_name,
             application_link: data.application_link,
             position_name: data.position_name,
-            company_name: data.company_name,
          },
       };
 
