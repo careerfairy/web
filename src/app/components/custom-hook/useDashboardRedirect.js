@@ -109,7 +109,6 @@ const useDashboardRedirect = (group, firebase) => {
             });
          } else {
             setJoiningGroup(true);
-            await reloadAuth();
             await firebase.joinGroupDashboard(
                group.id,
                userData.userEmail,
