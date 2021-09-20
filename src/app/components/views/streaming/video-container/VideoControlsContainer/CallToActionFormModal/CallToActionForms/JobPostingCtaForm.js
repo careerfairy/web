@@ -17,47 +17,6 @@ import SmartRecruitersDataAccess from "data/dataAccess/SmartRecruitersDataAccess
 const JobPostingCtaForm = memo(
    ({ formik, maxMessageLength, onEntered, onExited }) => {
       const now = new Date();
-      const [atsPositions, setAtsPositions] = useState([]);
-      const [selectedAtsPosition, setSelectedAtsPosition] = useState(null);
-
-      useEffect(() => {
-         const COMPANY_SMARTRECRUITERS_ID = "5241b1d0e4b0ed152cd9d36a";
-         SmartRecruitersDataAccess.getCompanyPositions().then((response) => {
-            let positions = response.data.jobs.filter((job) => {
-               return job.company.cid === COMPANY_SMARTRECRUITERS_ID;
-            });
-            console.log(positions);
-            setAtsPositions(positions);
-         });
-      }, []);
-
-      const atsPositionElements = useMemo(() => {
-         return atsPositions.map((position) => {
-            return (
-               <MenuItem value={position}>
-                  <Typography>{position.name}</Typography>
-               </MenuItem>
-            );
-         });
-      }, [atsPositions]);
-
-      const handleChange = (event) => {
-         setSelectedAtsPosition(event.target.value);
-         formik.setFieldValue(
-            "jobData.jobTitle",
-            event.target.value.name,
-            false
-         );
-         formik.setFieldValue("buttonUrl", event.target.value.applyUrl, false);
-         formik.setFieldValue("isAtsPosition", true, false);
-         formik.setFieldValue("atsUuid", event.target.value.uuid, false);
-      };
-
-      const handleReset = () => {
-         setSelectedAtsPosition(null);
-         formik.setFieldValue("isAtsPosition", false, false);
-         formik.setFieldValue("atsUuid", false, false);
-      };
 
       return (
          <Grid container spacing={3}>
@@ -89,7 +48,7 @@ const JobPostingCtaForm = memo(
                </FormControl>
             </Grid> */}
             <Grid xs={12} item>
-               <Collapse unmountOnExit in={!selectedAtsPosition}>
+               <Collapse unmountOnExit in={true}>
                   {/* <Box>
                      <Typography>
                         - OR SEND VIEWERS TO ANOTHER PLATFORM -
@@ -100,7 +59,7 @@ const JobPostingCtaForm = memo(
                      variant="outlined"
                      id="jobTitle"
                      name="jobData.jobTitle"
-                     disabled={formik.isSubmitting || selectedAtsPosition}
+                     disabled={formik.isSubmitting}
                      autoFocus={true}
                      inputProps={{
                         maxLength: maxMessageLength,
@@ -122,13 +81,13 @@ const JobPostingCtaForm = memo(
             </Grid>
 
             <Grid xs={12} sm={8} item>
-               <Collapse unmountOnExit in={!selectedAtsPosition}>
+               <Collapse unmountOnExit in={true}>
                   <TextField
                      fullWidth
                      variant="outlined"
                      id="salary"
                      name="jobData.salary"
-                     disabled={formik.isSubmitting || selectedAtsPosition}
+                     disabled={formik.isSubmitting}
                      autoFocus={true}
                      inputProps={{
                         maxLength: maxMessageLength,
@@ -149,7 +108,7 @@ const JobPostingCtaForm = memo(
                </Collapse>
             </Grid>
             <Grid xs={12} sm={4} item>
-               <Collapse unmountOnExit in={!selectedAtsPosition}>
+               <Collapse unmountOnExit in={true}>
                   <DateTimePicker
                      id="applicationDeadline"
                      clearable
@@ -165,7 +124,7 @@ const JobPostingCtaForm = memo(
                            true
                         );
                      }}
-                     disabled={formik.isSubmitting || selectedAtsPosition}
+                     disabled={formik.isSubmitting}
                      minDate={now}
                      inputVariant="outlined"
                      fullWidth
@@ -185,14 +144,14 @@ const JobPostingCtaForm = memo(
                   onEntered={onEntered}
                   onExited={onExited}
                   unmountOnExit
-                  in={!selectedAtsPosition}
+                  in={true}
                >
                   <TextField
                      fullWidth
                      variant="outlined"
                      id="message"
                      name="message"
-                     disabled={formik.isSubmitting || selectedAtsPosition}
+                     disabled={formik.isSubmitting}
                      multiline
                      autoFocus
                      minRows={3}
@@ -218,14 +177,14 @@ const JobPostingCtaForm = memo(
                   onEntered={onEntered}
                   onExited={onExited}
                   unmountOnExit
-                  in={!selectedAtsPosition}
+                  in={true}
                >
                   <TextField
                      fullWidth
                      variant="outlined"
                      id="buttonUrl"
                      name="buttonUrl"
-                     disabled={formik.isSubmitting || selectedAtsPosition}
+                     disabled={formik.isSubmitting}
                      placeholder="https://mywebsite.com/careers/"
                      label={`Job Posting Url*`}
                      value={formik.values.buttonUrl}
