@@ -17,7 +17,24 @@ import FilePickerContainer from "components/ssr/FilePickerContainer";
 import { useFirebase } from "context/firebase";
 import Box from "@material-ui/core/Box";
 import AutoSizer from "react-virtualized-auto-sizer";
+import { makeStyles } from "@material-ui/core/styles";
 
+const useStyles = makeStyles((theme) => ({
+   root: {},
+   pdfWrapper: {
+      borderRadius: 10,
+      backgroundColor: theme.palette.common.black,
+      boxShadow: theme.shadows[5],
+      position: "absolute",
+      top: "0",
+      left: "50%",
+      transform: "translate(-50%)",
+      display: ({ pdfObject }) => (pdfObject ? "flex" : "none"),
+      overflow: "hidden",
+      width: "100%",
+      justifyContent: "center",
+   },
+}));
 const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
    const firebase = useFirebase();
    PDFJS.GlobalWorkerOptions.workerSrc =
@@ -34,6 +51,7 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
 
    const [uploadingPresentation, setUploadingPresentation] = useState(false);
    const [progress, setProgress] = useState(0);
+   const classes = useStyles({ pdfObject });
 
    useEffect(() => {
       if (livestreamId) {
@@ -105,18 +123,11 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
    }
 
    function getPageHeight() {
-      if (presenter) {
-         if (showMenu) {
-            if (windowSize.height > windowSize.width - 480) {
-               return windowSize.width * 0.4;
-            }
-            return windowSize.height * 0.8 - 55;
-         } else {
-            if (windowSize.height > windowSize.width - 220) {
-               return windowSize.width * 0.55;
-            }
-            return windowSize.height * 0.8 - 55;
+      if (showMenu) {
+         if (windowSize.height > windowSize.width - 480) {
+            return windowSize.width * 0.4;
          }
+         return windowSize.height * 0.8 - 55;
       } else {
          if (windowSize.height > windowSize.width - 220) {
             return windowSize.width * 0.55;
@@ -253,6 +264,7 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
                display="flex"
                justifyContent="center"
                alignItems="center"
+               className={classes.root}
             >
                <div
                   style={{
@@ -277,22 +289,15 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
                </div>
                <div
                   style={{
-                     display: loading ? "none" : "block",
+                     display: loading ? "none" : "flex",
                      position: "relative",
                      width: "100%",
                      height: "100%",
+                     justifyContent: "center",
+                     alignItems: "center",
                   }}
                >
-                  <div
-                     style={{
-                        position: "absolute",
-                        top: "0",
-                        left: "50%",
-                        transform: "translate(-50%)",
-                        display: pdfObject ? "block" : "none",
-                        overflow: "hidden",
-                     }}
-                  >
+                  <div className={classes.pdfWrapper}>
                      <div
                         style={{
                            position: "absolute",

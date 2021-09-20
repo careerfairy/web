@@ -228,9 +228,7 @@ export default function useAgoraAsStreamer(
    };
    const handleSwitchRooms = async () => {
       if (rtcClient || rtmClient || rtmChannel) {
-         console.log("-> CLOSING CONNECTIONS");
          removeAllClients();
-         console.log("-> CLOSING CONNECTIONS FINISHED");
       }
       setExternalMediaStreams([]);
    };
@@ -504,7 +502,6 @@ export default function useAgoraAsStreamer(
          );
       } else {
          // rtcClient.startProxyServer(3);
-         console.log("-> SETTING CLIENT ROLE AS AUDIENCE IN CONNECT RTC FN");
          rtcClient.setClientRole("audience")
          rtcClient.join(
             agoraToken.rtcToken,
@@ -720,10 +717,8 @@ export default function useAgoraAsStreamer(
    useEffect(() => {
       if (isViewer && agoraRTC && rtcClient) {
          if (!isPlayMode) {
-            console.log("-> SETTING ROLE AS HOST IN USE EFFECT");
             rtcClient.setClientRole("host");
          } else {
-            console.log("-> SETTING ROLE AS VIEWER IN USE EFFECT");
             rtcClient.setClientRole("audience");
          }
       }

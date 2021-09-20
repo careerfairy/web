@@ -8,6 +8,7 @@ const StreamContainer = ({
    liveSpeakers,
    index,
    setRemovedStream,
+   videoMutedBackgroundImg,
 }) => {
    const speaker = useMemo(
       () =>
@@ -25,6 +26,7 @@ const StreamContainer = ({
          stream={stream}
          index={index}
          speaker={speaker}
+         videoMutedBackgroundImg={videoMutedBackgroundImg}
       />
    ) : (
       <RemoteStreamItem
@@ -33,6 +35,7 @@ const StreamContainer = ({
          index={index}
          stream={stream}
          speaker={speaker}
+         videoMutedBackgroundImg={videoMutedBackgroundImg}
       />
    );
 };

@@ -99,6 +99,7 @@ const ViewerOverview = ({
                livestreamId={currentLivestream.id}
                streamerId={streamerId}
                mobile={mobile}
+               showMenu={showMenu}
                currentLivestream={currentLivestream}
                handRaiseActive={handRaiseActive}
                showVideoButton={showVideoButton}

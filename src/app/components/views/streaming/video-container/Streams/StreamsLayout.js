@@ -103,6 +103,7 @@ const StreamsLayout = ({
    livestreamId,
    presenter,
    currentSpeakerId,
+   videoMutedBackgroundImg,
 }) => {
    const hasSmallStreams = streamData.length > 1;
    const classes = useStyles({ hasSmallStreams });
@@ -149,6 +150,9 @@ const StreamsLayout = ({
                               <StreamContainer
                                  stream={stream}
                                  big={isLarge}
+                                 videoMutedBackgroundImg={
+                                    videoMutedBackgroundImg
+                                 }
                                  setRemovedStream={setRemovedStream}
                                  liveSpeakers={liveSpeakers}
                               />

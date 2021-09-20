@@ -9,8 +9,11 @@ const RemoteStreamItem = ({
    stream,
    big,
    index,
+   videoMutedBackgroundImg,
 }) => {
-   const { playAllRemoteVideos, muteAllRemoteVideos } = useSelector((state) => state.stream.streaming);
+   const { playAllRemoteVideos, muteAllRemoteVideos } = useSelector(
+      (state) => state.stream.streaming
+   );
 
    // useEffect(() => {
    //    if (stream.streamId === "demoStream") {
@@ -90,7 +93,13 @@ const RemoteStreamItem = ({
    }
 
    return (
-      <StreamItem speaker={speaker} stream={stream} index={index} big={big} />
+      <StreamItem
+         speaker={speaker}
+         stream={stream}
+         index={index}
+         big={big}
+         videoMutedBackgroundImg={videoMutedBackgroundImg}
+      />
    );
 };
 

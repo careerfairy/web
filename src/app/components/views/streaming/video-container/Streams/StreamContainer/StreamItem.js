@@ -1,9 +1,8 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import clsx from "clsx";
 import SpeakerInfoOverlay from "../../SpeakerInfoOverlay";
-import { Paper, Tooltip, Typography } from "@material-ui/core";
+import { Tooltip } from "@material-ui/core";
 import VideoCamOffIcon from "@material-ui/icons/VideocamOff";
 import VolumeOffIcon from "@material-ui/icons/MicOff";
 
@@ -32,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
       margin: "10px",
    },
    mutedOverlay: {
+      borderRadius: 10,
       position: "absolute",
       top: "0",
       left: "0",
@@ -82,21 +82,18 @@ const StreamItem = ({
             className={classes.videoElement}
             ref={vidDiv}
          />
-         <Paper style={{ zIndex: 1 }}>
-            <Typography variant="h4">{index}</Typography>
-         </Paper>
-         {speaker && <SpeakerInfoOverlay speaker={speaker} small={!big} />}
+         {speaker && <SpeakerInfoOverlay speaker={speaker} zIndex={1} small={!big} />}
          {stream?.videoMuted && (
             <div className={classes.mutedOverlay}>
                <div className={classes.mutedOverlayContent}>
                   <div>
-                     {videoMutedBackgroundImg &&
+                     {videoMutedBackgroundImg && (
                         <img
                            src={videoMutedBackgroundImg}
                            alt={speaker?.firstName || "Streamer"}
                            className={classes.companyIcon}
                         />
-                     }
+                     )}
                   </div>
                   <Tooltip title={"The streamer has turned the camera off"}>
                      <VideoCamOffIcon
@@ -141,4 +138,5 @@ StreamItem.propTypes = {
          isPlaying: PropTypes.func,
       }),
    }),
+   videoMutedBackgroundImg: PropTypes.string,
 };

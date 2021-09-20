@@ -25,11 +25,12 @@ const Streams = memo(
       sharingScreen,
       isBroadCasting,
       liveSpeakers,
-     sharingPdf,
-       showMenu,
-       livestreamId,
-       setRemovedStream,
-       presenter,
+      sharingPdf,
+      showMenu,
+      livestreamId,
+      setRemovedStream,
+      presenter,
+       videoMutedBackgroundImg
    }) => {
       const classes = useStyles();
       const [streamData, setStreamData] = useState([]);
@@ -43,11 +44,11 @@ const Streams = memo(
 
          let newLargeStream = handleGetLargeStream(
             allStreams,
-            currentSpeakerId,
+            currentSpeakerId
          );
-         if(!newLargeStream){
-            setStreamData([])
-            return
+         if (!newLargeStream) {
+            setStreamData([]);
+            return;
          }
          let newSmallStreams = handleGetSmallStream(
             allStreams,
@@ -55,7 +56,7 @@ const Streams = memo(
             hasManySpeakers,
             currentSpeakerId,
             sharingScreen,
-           sharingPdf
+            sharingPdf
          );
          setStreamData([...newSmallStreams, newLargeStream]);
       }, [
@@ -64,13 +65,10 @@ const Streams = memo(
          currentSpeakerId,
          isBroadCasting,
          sharingScreen,
-         sharingPdf
+         sharingPdf,
       ]);
 
-      const handleGetLargeStream = (
-         allStreams,
-         currentSpeakerId,
-      ) => {
+      const handleGetLargeStream = (allStreams, currentSpeakerId) => {
          let screenShareStream;
          let currentSpeakerStream;
          let localStream;
@@ -142,6 +140,7 @@ const Streams = memo(
                   streamData={streamData}
                   liveSpeakers={liveSpeakers}
                   sharingPdf={sharingPdf}
+                  videoMutedBackgroundImg={videoMutedBackgroundImg}
                   setRemovedStream={setRemovedStream}
                   currentSpeakerId={currentSpeakerId}
                   showMenu={showMenu}
@@ -177,7 +176,7 @@ Streams.propTypes = {
          isPlaying: PropTypes.func,
       }),
    }),
-   sharingPdf: PropTypes.bool
+   sharingPdf: PropTypes.bool,
 };
 
 export default Streams;

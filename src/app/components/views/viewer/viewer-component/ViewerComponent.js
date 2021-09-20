@@ -201,7 +201,6 @@ function ViewerComponent({
    if (!currentLivestream) {
       return null;
    }
-
    return (
       <React.Fragment>
          {!Boolean(mobile && handRaiseActive) && <EmoteButtons createEmote={createEmote} />}
@@ -210,6 +209,7 @@ function ViewerComponent({
             localMediaStream={localMediaStream}
             currentSpeakerId={currentSpeakerId}
             streamerId={streamerId}
+            videoMutedBackgroundImg={currentLivestream.companyLogoUrl}
             liveSpeakers={currentLivestream.liveSpeakers}
             isBroadCasting={handRaiseActive}
             sharingScreen={currentLivestream.mode === "desktop"}

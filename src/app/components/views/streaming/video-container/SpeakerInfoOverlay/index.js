@@ -3,7 +3,6 @@ import { alpha, makeStyles } from "@material-ui/core/styles";
 import LinkedInIcon from "@material-ui/icons/LinkedIn";
 import PropTypes from "prop-types";
 import { IconButton, Tooltip } from "@material-ui/core";
-import Link from "next/link";
 
 const useStyles = makeStyles((theme) => ({
    speakerInformation: {

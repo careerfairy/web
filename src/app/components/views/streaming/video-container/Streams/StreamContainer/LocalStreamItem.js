@@ -1,9 +1,13 @@
 import React, { useEffect } from "react";
 import StreamItem from "./StreamItem";
 
-
-const LocalStreamItem = ({ stream, big, speaker, index}) => {
-
+const LocalStreamItem = ({
+   stream,
+   big,
+   speaker,
+   index,
+   videoMutedBackgroundImg,
+}) => {
    // useEffect(() => {
    //       console.log("-> STARTING TO PLAY", stream.streamId);
    //       // if (!stream.stream.isPlaying()) {
@@ -24,7 +28,15 @@ const LocalStreamItem = ({ stream, big, speaker, index}) => {
    //       }
    // }, [stream.streamId]);
 
-   return <StreamItem speaker={speaker} stream={stream} big={big} index={index} />;
+   return (
+      <StreamItem
+         speaker={speaker}
+         videoMutedBackgroundImg={videoMutedBackgroundImg}
+         stream={stream}
+         big={big}
+         index={index}
+      />
+   );
 };
 
 export default LocalStreamItem;
