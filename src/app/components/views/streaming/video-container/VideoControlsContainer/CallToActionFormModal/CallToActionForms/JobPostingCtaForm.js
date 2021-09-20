@@ -61,7 +61,7 @@ const JobPostingCtaForm = memo(
 
       return (
          <Grid container spacing={3}>
-            <Grid xs={12} sm={8} item>
+            {/* <Grid xs={12} sm={8} item>
                <Box>
                   <Typography>
                      - SELECT A JOB TO APPLY TO FROM CAREERFAIRY -
@@ -87,14 +87,14 @@ const JobPostingCtaForm = memo(
                      Reset
                   </Button>
                </FormControl>
-            </Grid>
+            </Grid> */}
             <Grid xs={12} item>
                <Collapse unmountOnExit in={!selectedAtsPosition}>
-                  <Box>
+                  {/* <Box>
                      <Typography>
                         - OR SEND VIEWERS TO ANOTHER PLATFORM -
                      </Typography>
-                  </Box>
+                  </Box> */}
                   <TextField
                      fullWidth
                      variant="outlined"
