@@ -14,8 +14,8 @@ class Firebase {
       this.firestore = firebase.firestore();
       this.storage = firebase.storage();
       this.functions = firebase.functions();
-      // if (process.env.NODE_ENV === 'development') {
-      //     this.functions.useFunctionsEmulator('http://localhost:5001');
+      // if (process.env.NODE_ENV === "development") {
+      //    this.functions.useFunctionsEmulator("http://localhost:5001");
       // }
    }
 
@@ -80,6 +80,13 @@ class Firebase {
          "validateUserEmailWithPin"
       );
       return validateUserEmailWithPin({ userInfo });
+   };
+
+   sendReminderEmailAboutApplicationLink = async (data) => {
+      const sendReminderEmailAboutApplicationLink = this.functions.httpsCallable(
+         "sendReminderEmailAboutApplicationLink"
+      );
+      return sendReminderEmailAboutApplicationLink(data);
    };
 
    sendRegistrationConfirmationEmail = (user, userData, livestream) => {

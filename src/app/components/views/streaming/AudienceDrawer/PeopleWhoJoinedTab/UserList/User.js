@@ -127,7 +127,7 @@ const User = ({ user, style, inTalentPool }) => {
                      vertical: "bottom",
                      horizontal: "right",
                   }}
-                  overlap="circle"
+                  overlap="circular"
                   badgeContent={
                      inTalentPool ? (
                         <SmallAvatar>

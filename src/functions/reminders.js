@@ -4,6 +4,7 @@ const { generateEmailData, setHeaders } = require("./util");
 const { mailgun } = require("./api/mailgun");
 const { client } = require("./api/postmark");
 const { admin } = require("./api/firestoreAdmin");
+const { functionsIn } = require("lodash");
 
 exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(
    async (req, res) => {
@@ -121,6 +122,37 @@ exports.sendReminderEmailToRegistrants = functions.https.onRequest(
    }
 );
 
+exports.sendReminderEmailAboutApplicationLink = functions
+   .runWith({
+      minInstances: 1,
+   })
+   .https.onCall(async (data, context) => {
+      const TEMPLATE_ID = "25152103";
+
+      functions.logger.log("data", data);
+      const email = {
+         TemplateId: TEMPLATE_ID,
+         From: "CareerFairy <noreply@careerfairy.io>",
+         To: data.recipient,
+         TemplateModel: {
+            recipient_name: data.recipient_name,
+            application_link: data.application_link,
+            position_name: data.position_name,
+            company_name: data.company_name,
+         },
+      };
+
+      client.sendEmailWithTemplate(email).then(
+         (response) => {
+            functions.logger.log(`Sent reminder email to ${data.recipient}`);
+         },
+         (error) => {
+            console.error(`Error sending email to ${data.recipient}`, error);
+            throw new functions.https.HttpsError("unknown");
+         }
+      );
+   });
+
 exports.scheduleReminderEmailSendTestOnRun = functions.pubsub
    .schedule("every 45 minutes")
    .timeZone("Europe/Zurich")
@@ -138,16 +170,29 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub
             console.log("querysnapshot size: " + querySnapshot.size);
             querySnapshot.forEach((doc) => {
                const livestream = doc.data();
-               livestream.id = doc.id;
-               console.log("livestream company: " + livestream.company);
-               console.log(
-                  "number of emails: " + livestream.registeredUsers.length
-               );
-               const data = generateEmailData(livestream.id, livestream, false);
-               messageSender.send(data, (error, body) => {
-                  console.log("error:" + error);
-                  console.log("body:" + JSON.stringify(body));
-               });
+               if (!livestream.isFaceToFace) {
+                  livestream.id = doc.id;
+                  functions.logger.log(
+                     `Livestream with ${livestream.company}: prepare emails`
+                  );
+
+                  console.log(
+                     "number of emails: " + livestream.registeredUsers.length
+                  );
+                  const data = generateEmailData(
+                     livestream.id,
+                     livestream,
+                     false
+                  );
+                  messageSender.send(data, (error, body) => {
+                     console.log("error:" + error);
+                     console.log("body:" + JSON.stringify(body));
+                  });
+               } else {
+                  functions.logger.log(
+                     `Livestream with ${livestream.company} is F2F, no reminder email sent out`
+                  );
+               }
             });
          })
          .catch((error) => {
