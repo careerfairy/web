@@ -89,6 +89,13 @@ class Firebase {
       return sendReminderEmailAboutApplicationLink(data);
    };
 
+   joinGroupDashboard = async (data) => {
+      const joinGroupDashboard = this.functions.httpsCallable(
+         "joinGroupDashboard"
+      );
+      return joinGroupDashboard(data);
+   };
+
    sendRegistrationConfirmationEmail = (user, userData, livestream) => {
       if (livestream.isFaceToFace) {
          return this.sendPhysicalEventEmailRegistrationConfirmation(
@@ -2469,39 +2476,6 @@ class Firebase {
          dataArray.push(data);
       });
       return dataArray;
-   };
-
-   //Dashboard Queries
-
-   joinGroupDashboard = (groupId, userEmail, invitationId) => {
-      let groupRef = this.firestore.collection("careerCenterData").doc(groupId);
-
-      let userRef = this.firestore.collection("userData").doc(userEmail);
-
-      let notificationRef = this.firestore
-         .collection("notifications")
-         .doc(invitationId);
-
-      return this.firestore.runTransaction((transaction) => {
-         return transaction.get(userRef).then((userDoc) => {
-            const userData = userDoc.data();
-            transaction.update(groupRef, {
-               adminEmails: firebase.firestore.FieldValue.arrayUnion(
-                  userData.userEmail
-               ),
-            });
-            let groupAdminRef = this.firestore
-               .collection("careerCenterData")
-               .doc(groupId)
-               .collection("admins")
-               .doc(userData.userEmail);
-            transaction.set(groupAdminRef, {
-               role: "subAdmin",
-            });
-
-            transaction.delete(notificationRef);
-         });
-      });
    };
 
    kickFromDashboard = (groupId, userEmail) => {

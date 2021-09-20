@@ -65,6 +65,7 @@ exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail;
 exports.sendDraftApprovalRequestEmail =
    groupAdmin.sendDraftApprovalRequestEmail;
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus;
+exports.joinGroupDashboard = groupAdmin.joinGroupDashboard;
 
 // Reminders
 exports.sendReminderEmailToRegistrants =

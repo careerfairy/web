@@ -109,11 +109,11 @@ const useDashboardRedirect = (group, firebase) => {
             });
          } else {
             setJoiningGroup(true);
-            await firebase.joinGroupDashboard(
-               group.id,
-               userData.userEmail,
-               dashboardInviteId
-            );
+            await firebase.joinGroupDashboard({
+               groupId: group.id,
+               userEmail: userData.userEmail,
+               invitationId: dashboardInviteId,
+            });
             await replace(analyticsPath);
             const message = `Congrats, you are now an admin of ${group.universityName}`;
             enqueueSnackbar({

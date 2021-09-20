@@ -123,3 +123,59 @@ exports.updateUserDocAdminStatus = functions.firestore
          functions.logger.error("failed to update admin email doc:", error);
       }
    });
+
+exports.joinGroupDashboard = functions.https.onCall(async (data, context) => {
+   let authEmail = context.auth.token.email || null;
+
+   if (!authEmail || authEmail !== data.userEmail) {
+      throw new functions.https.HttpsError("permission-denied");
+   }
+
+   let groupRef = admin
+      .firestore()
+      .collection("careerCenterData")
+      .doc(data.groupId);
+
+   let userRef = admin.firestore().collection("userData").doc(data.userEmail);
+
+   let notificationRef = admin
+      .firestore()
+      .collection("notifications")
+      .doc(data.invitationId);
+
+   let notificationDoc = await notificationRef.get();
+   let notification = notificationDoc.data();
+
+   if (
+      notification.details.requester !== data.groupId ||
+      notification.details.receiver !== data.userEmail
+   ) {
+      functions.logger.error(
+         `User ${data.userEmail} trying to connect to group ${data.groupId} did not pass the notification check ${notification.details}`
+      );
+      throw new functions.https.HttpsError("permission-denied");
+   }
+
+   await admin.firestore().runTransaction((transaction) => {
+      return transaction.get(userRef).then((userDoc) => {
+         transaction.update(groupRef, {
+            adminEmails: admin.firestore.FieldValue.arrayUnion(data.userEmail),
+         });
+         transaction.update(userRef, {
+            adminIds: admin.firestore.FieldValue.arrayUnion(data.groupId),
+         });
+         let groupAdminRef = admin
+            .firestore()
+            .collection("careerCenterData")
+            .doc(data.groupId)
+            .collection("admins")
+            .doc(data.userEmail);
+         transaction.set(groupAdminRef, {
+            role: "subAdmin",
+         });
+
+         transaction.delete(notificationRef);
+      });
+   });
+   return;
+});
