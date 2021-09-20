@@ -69,11 +69,11 @@ const useDashboardRedirect = (group, firebase) => {
          }
       })();
    }, [
-      group,
+      group?.groupId,
       authenticatedUser?.isLoaded,
       authenticatedUser?.isEmpty,
       authenticatedUser?.email,
-      userData,
+      userData?.userEmail,
       pathname,
    ]);
 
@@ -109,6 +109,7 @@ const useDashboardRedirect = (group, firebase) => {
             });
          } else {
             setJoiningGroup(true);
+            await reloadAuth();
             await firebase.joinGroupDashboard(
                group.id,
                userData.userEmail,
