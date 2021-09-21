@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useFirebase } from "context/firebase";
+import React, { useEffect } from "react";
 import HandRaisePriorRequest from "./hand-raise/active/HandRaisePriorRequest";
 import HandRaiseRequested from "./hand-raise/active/HandRaiseRequested";
 import HandRaiseDenied from "./hand-raise/active/HandRaiseDenied";
@@ -13,9 +12,7 @@ import {
    Typography,
 } from "@material-ui/core";
 import { useTheme } from "@material-ui/core/styles";
-import { useAuth } from "../../../../../HOCs/AuthProvider";
 import { GlassDialog } from "../../../../../materialUI/GlobalModals";
-import useStreamRef from "../../../../custom-hook/useStreamRef";
 import useHandRaiseState from "../../../../custom-hook/useHandRaiseState";
 
 const HandRaiseCategory = ({
@@ -23,16 +20,8 @@ const HandRaiseCategory = ({
    selectedState,
    setHandRaiseActive,
 }) => {
-   const {
-      createHandRaiseRequest,
-      updateHandRaiseRequest: updateHandRaiseRequestFirebaseClassMethod,
-   } = useFirebase();
-
    const theme = useTheme();
-   const { authenticatedUser, userData } = useAuth();
-   const handRaiseState = useHandRaiseState();
-   console.log("-> handRaiseState", handRaiseState);
-   const streamRef = useStreamRef();
+   const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState();
 
    useEffect(() => {
       const hasNotRaisedHandYet = handRaiseState === null;
@@ -53,26 +42,6 @@ const HandRaiseCategory = ({
          setHandRaiseActive(false);
       }
    }, [handRaiseState]);
-
-   function updateHandRaiseRequest(state) {
-      if (livestream.test || authenticatedUser.email) {
-         let authEmail = livestream.test
-            ? "streamerEmail"
-            : authenticatedUser.email;
-         let checkedUserData = livestream.test
-            ? { firstName: "Test", lastName: "Streamer" }
-            : userData;
-         if (handRaiseState) {
-            updateHandRaiseRequestFirebaseClassMethod(
-               streamRef,
-               authEmail,
-               state
-            );
-         } else {
-            createHandRaiseRequest(streamRef, authEmail, checkedUserData);
-         }
-      }
-   }
 
    const requestHandRaise = () => {
       return updateHandRaiseRequest("requested");

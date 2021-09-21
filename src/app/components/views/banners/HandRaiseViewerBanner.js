@@ -1,35 +1,120 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import StreamBanner from "./StreamBanner";
-import { Button, Tooltip } from "@material-ui/core";
-import { useFirebase } from "../../../context/firebase";
-import useStreamRef from "../../custom-hook/useStreamRef";
+import { Box, Button, Tooltip } from "@material-ui/core";
 import HandRaiseIcon from "@material-ui/icons/PanToolOutlined";
+import useHandRaiseState from "../../custom-hook/useHandRaiseState";
+import { makeStyles } from "@material-ui/core/styles";
 
+const useStyles = makeStyles((theme) => ({
+   actionsWrapper: {
+      "& > :last-child": {
+         marginRight: theme.spacing(0),
+      },
+      "& > *": {
+         marginRight: theme.spacing(0.5),
+      },
+   },
+}));
 const HandRaiseViewerBanner = () => {
-   const [buttonMessage] = useState("Deactivate Hand Raise");
-   const { setHandRaiseMode } = useFirebase();
-   const streamRef = useStreamRef();
+   const classes = useStyles();
+   const [handRaiseState, updateRequest] = useHandRaiseState();
+   const [handRaiseActionData, setHandRaiseActionData] = useState({
+      title: "Hand Raise is not active",
+   });
 
-   const deactivateHandRaise = () => {
-      return setHandRaiseMode(streamRef, false);
-   };
+   useEffect(() => {
+      let newHandRaiseActionData;
+
+      if (handRaiseState.state === "unrequested") {
+         newHandRaiseActionData = {
+            title: "Raise my hand",
+            buttons: [
+               {
+                  onClick: () => updateRequest("requested"),
+                  buttonText: "Raise my hand",
+               },
+            ],
+         };
+      } else if (handRaiseState.state === "requested") {
+         newHandRaiseActionData = {
+            title: "You raised your hand!",
+            buttons: [
+               // {
+               //    onClick: () => updateRequest("requested"),
+               //    buttonText: "Raise again",
+               // },
+               {
+                  onClick: () => updateRequest("unrequested"),
+                  buttonText: "Cancel request",
+                  variant: "text"
+               },
+            ],
+         };
+      } else if (handRaiseState.state === "denied") {
+         newHandRaiseActionData = {
+            title: "Sorry we can't answer your question right now.",
+            buttons: [
+               {
+                  onClick: () => updateRequest("unrequested"),
+                  buttonText: "Cancel",
+               },
+            ],
+         };
+      } else if (handRaiseState.state === "connecting") {
+         newHandRaiseActionData = {
+            title: "Connecting",
+         };
+      } else if (handRaiseState.state === "invited") {
+         newHandRaiseActionData = {
+            title: "Connecting to the stream",
+            buttons: [
+               {
+                  onClick: () => updateRequest("unrequested"),
+                  buttonText: "Cancel",
+               },
+            ],
+         };
+      } else if (handRaiseState.state === "connected") {
+         newHandRaiseActionData = {
+            title: "You are connected",
+            buttons: [
+               {
+                  onClick: () => updateRequest("unrequested"),
+                  buttonText: "Stop streaming",
+               },
+            ],
+         };
+      } else {
+         newHandRaiseActionData = {
+            title: "Hand Raise is not active",
+         };
+      }
+
+      setHandRaiseActionData(newHandRaiseActionData);
+   }, [handRaiseState]);
 
    return (
       <StreamBanner
          severity="success"
          icon={<HandRaiseIcon />}
-         title={`Hand Raise is Active`}
+         title={handRaiseActionData.title}
          action={
-            <Tooltip title={buttonMessage}>
-               <Button
-                  onClick={deactivateHandRaise}
-                  variant="contained"
-                  color="primary"
-                  size="small"
-               >
-                  {buttonMessage}
-               </Button>
-            </Tooltip>
+            <Box className={classes.actionsWrapper}>
+               {handRaiseActionData.buttons?.map(
+                  ({ buttonText, onClick, variant }) => (
+                     <Tooltip key={buttonText} title={buttonText}>
+                        <Button
+                           onClick={onClick}
+                           variant={variant || "contained"}
+                           color="primary"
+                           size="small"
+                        >
+                           {buttonText}
+                        </Button>
+                     </Tooltip>
+                  )
+               )}
+            </Box>
          }
       />
    );
