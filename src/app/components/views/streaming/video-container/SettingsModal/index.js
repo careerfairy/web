@@ -1,5 +1,4 @@
 import React from "react";
-import { withFirebasePage } from "context/firebase";
 import {
    Button,
    DialogActions,
@@ -13,7 +12,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import SettingsIcon from "@material-ui/icons/Settings";
 import VideoTab from "./VideoTab";
 import AudioTab from "./AudioTab";
-import PropTypes from "prop-types";
 import { GlassDialog } from "../../../../../materialUI/GlobalModals";
 
 const useStyles = makeStyles((theme) => ({
@@ -53,15 +51,12 @@ function SettingsModal({
    open,
    close,
    devices,
-   localStream,
    displayableMediaStream,
    audioSource,
    updateAudioSource,
    videoSource,
    updateVideoSource,
-   speakerSource,
    smallScreen,
-   setSpeakerSource,
    audioLevel,
 }) {
    const classes = useStyles();
@@ -93,7 +88,6 @@ function SettingsModal({
                         value={value}
                         onChange={handleChange}
                         aria-label="Vertical tabs example"
-                        className={classes.tabs}
                      >
                         <Tab
                            label="Video"
@@ -111,12 +105,10 @@ function SettingsModal({
                      <TabPanel
                         value={value}
                         index={0}
-                        className={classes.content}
                      >
                         <VideoTab
                            devices={devices}
                            displayableMediaStream={displayableMediaStream}
-                           localStream={localStream}
                            videoSource={videoSource}
                            setVideoSource={updateVideoSource}
                         />
@@ -124,16 +116,12 @@ function SettingsModal({
                      <TabPanel
                         value={value}
                         index={1}
-                        className={classes.content}
                      >
                         <AudioTab
                            devices={devices}
-                           displayableMediaStream={displayableMediaStream}
                            audioLevel={audioLevel}
                            audioSource={audioSource}
                            setAudioSource={updateAudioSource}
-                           speakerSource={speakerSource}
-                           setSpeakerSource={setSpeakerSource}
                         />
                      </TabPanel>
                   </Grid>
@@ -147,4 +135,4 @@ function SettingsModal({
    );
 }
 
-export default withFirebasePage(SettingsModal);
+export default SettingsModal;

@@ -29,11 +29,7 @@ const VideoTab = ({
    videoSource,
    devices,
    setVideoSource,
-   playSound,
-   handleMarkComplete,
-   handleMarkIncomplete,
    displayableMediaStream,
-   isCompleted,
 }) => {
    const classes = useStyles();
 

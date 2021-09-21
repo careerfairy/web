@@ -236,17 +236,13 @@ function ViewerComponent({
                <SettingsModal
                   open={showSettings}
                   close={() => setShowSettings(false)}
-                  streamId={authenticatedUser.email}
                   devices={devices}
-                  localStream={localMediaStream}
                   displayableMediaStream={displayableMediaStream}
                   audioSource={audioSource}
                   updateAudioSource={updateAudioSource}
                   videoSource={videoSource}
                   updateVideoSource={updateVideoSource}
                   audioLevel={audioLevel}
-                  speakerSource={speakerSource}
-                  setSpeakerSource={updateSpeakerSource}
                />
                <ScreenShareModal
                   open={showScreenShareModal}

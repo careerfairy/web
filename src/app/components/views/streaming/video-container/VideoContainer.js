@@ -309,18 +309,14 @@ function VideoContainer({
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}
-            streamId={streamerId}
             smallScreen={smallScreen}
             devices={devices}
-            localStream={localMediaStream}
             displayableMediaStream={displayableMediaStream}
             audioSource={audioSource}
             updateAudioSource={updateAudioSource}
             videoSource={videoSource}
             updateVideoSource={updateVideoSource}
             audioLevel={audioLevel}
-            speakerSource={speakerSource}
-            setSpeakerSource={updateSpeakerSource}
          />
          <StreamPreparationModalV2
             readyToConnect={Boolean(currentLivestream && currentLivestream.id)}

@@ -5,15 +5,9 @@ import HandRaiseDenied from "./hand-raise/active/HandRaiseDenied";
 import HandRaiseConnecting from "./hand-raise/active/HandRaiseConnecting";
 import HandRaiseConnected from "./hand-raise/active/HandRaiseConnected";
 import HandRaiseInactive from "./hand-raise/inactive/HandRaiseInactive";
-import {
-   Button,
-   DialogActions,
-   DialogContent,
-   Typography,
-} from "@material-ui/core";
 import { useTheme } from "@material-ui/core/styles";
-import { GlassDialog } from "../../../../../materialUI/GlobalModals";
 import useHandRaiseState from "../../../../custom-hook/useHandRaiseState";
+import HandRaiseJoinDialog from "./hand-raise/HandRaiseJoinDialog";
 
 const HandRaiseCategory = ({
    livestream,
@@ -81,34 +75,11 @@ const HandRaiseCategory = ({
             updateHandRaiseRequest={updateHandRaiseRequest}
             handRaiseActive={livestream.handRaiseActive}
          />
-         <GlassDialog
+         <HandRaiseJoinDialog
             open={Boolean(handRaiseState && handRaiseState.state === "invited")}
-         >
-            <DialogContent>
-               <Typography
-                  align="center"
-                  style={{
-                     fontFamily: "Permanent Marker",
-                     fontSize: "2em",
-                     color: theme.palette.primary.main,
-                  }}
-               >
-                  You've been invited to join the stream!
-               </Typography>
-            </DialogContent>
-            <DialogActions>
-               <Button
-                  children="Cancel"
-                  onClick={() => updateHandRaiseRequest("unrequested")}
-               />
-               <Button
-                  variant="contained"
-                  children="Join now"
-                  color="primary"
-                  onClick={() => updateHandRaiseRequest("connecting")}
-               />
-            </DialogActions>
-         </GlassDialog>
+            onClose={unRequestHandRaise}
+            requestHandRaise={requestHandRaise}
+         />
       </>
    );
 };
