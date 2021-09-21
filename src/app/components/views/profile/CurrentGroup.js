@@ -248,7 +248,7 @@ const CurrentGroup = ({ firebase, userData, group, isAdmin, groupId }) => {
                            </Button>
                         </Link>
                      )}
-                     <Menu
+                     {/* <Menu
                         id="simple-menu"
                         anchorEl={anchorEl}
                         keepMounted
@@ -266,7 +266,7 @@ const CurrentGroup = ({ firebase, userData, group, isAdmin, groupId }) => {
                               </MenuItem>
                            );
                         })}
-                     </Menu>
+                     </Menu> */}
                   </CardActions>
                </Card>
             </Grid>
