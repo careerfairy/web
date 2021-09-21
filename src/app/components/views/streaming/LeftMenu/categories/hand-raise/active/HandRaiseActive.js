@@ -253,7 +253,7 @@ function HandRaiseActive({
                      ))}
                   </TransitionGroup>
                   <Box flexGrow={1} />
-                  <Box width="100%" display="grid" placeItems="center" px={2}>
+                  <Box width="100%" display="grid" px={2}>
                      <Button
                         style={{ margin: "auto 0 2rem 0" }}
                         startIcon={<CloseRoundedIcon />}

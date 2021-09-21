@@ -150,6 +150,7 @@ const StreamsLayout = ({
                               <StreamContainer
                                  stream={stream}
                                  big={isLarge}
+                                 livestreamId={livestreamId}
                                  videoMutedBackgroundImg={
                                     videoMutedBackgroundImg
                                  }

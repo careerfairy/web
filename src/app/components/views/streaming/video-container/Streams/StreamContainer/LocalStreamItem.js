@@ -34,7 +34,6 @@ const LocalStreamItem = ({
          videoMutedBackgroundImg={videoMutedBackgroundImg}
          stream={stream}
          big={big}
-         index={index}
       />
    );
 };

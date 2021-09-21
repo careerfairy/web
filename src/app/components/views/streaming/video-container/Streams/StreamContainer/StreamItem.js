@@ -61,12 +61,10 @@ const StreamItem = ({
    big,
    speaker,
    videoMutedBackgroundImg,
-   index,
 }) => {
    const classes = useStyles();
    const vidDiv = useRef(null);
    const [handRaiseState] = useHandRaiseState();
-   console.log("-> stream", stream);
    useEffect(() => {
       if (stream?.stream?.isPlaying() === false) {
          play(stream);
@@ -134,6 +132,11 @@ export default StreamItem;
 StreamItem.propTypes = {
    big: PropTypes.any,
    videoId: PropTypes.string,
+   speaker: PropTypes.shape({
+      firstName: PropTypes.string,
+      lastName: PropTypes.string,
+      position: PropTypes.string
+   }),
    stream: PropTypes.shape({
       isScreenShare: PropTypes.bool,
       isLocal: PropTypes.bool,

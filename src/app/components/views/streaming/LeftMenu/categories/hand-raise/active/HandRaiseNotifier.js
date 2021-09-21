@@ -79,20 +79,20 @@ function HandRaiseNotifier({ handRaises, ...props }) {
          {handRaises.map((request) => {
             if (request.state === "requested") {
                return (
-                  <RequestedHandRaiseElement request={request} {...props} />
+                  <RequestedHandRaiseElement key={request.id} request={request} {...props} />
                );
             }
             if (request.state === "invited") {
-               return <InvitedHandRaiseElement request={request} {...props} />;
+               return <InvitedHandRaiseElement key={request.id} request={request} {...props} />;
             }
             if (request.state === "connecting") {
                return (
-                  <ConnectingHandRaiseElement request={request} {...props} />
+                  <ConnectingHandRaiseElement key={request.id} request={request} {...props} />
                );
             }
             if (request.state === "connected") {
                return (
-                  <ConnectedHandRaiseElement request={request} {...props} />
+                  <ConnectedHandRaiseElement key={request.id} request={request} {...props} />
                );
             }
          })}

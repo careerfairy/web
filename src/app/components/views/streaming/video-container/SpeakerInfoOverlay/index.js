@@ -131,7 +131,11 @@ const SpeakerInfoOverlay = ({ speaker, small, zIndex }) => {
    }
 };
 SpeakerInfoOverlay.prototypes = {
-   speaker: PropTypes.string.isRequired,
+   speaker: PropTypes.shape({
+      firstName: PropTypes.string,
+      lastName: PropTypes.string,
+      position: PropTypes.string
+   }).isRequired,
    small: PropTypes.bool.isRequired,
    zIndex: PropTypes.number,
 };
