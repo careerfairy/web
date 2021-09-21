@@ -1,8 +1,13 @@
 import PropTypes from "prop-types";
 import React, { memo, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button } from "@material-ui/core";
+import { Collapse } from "@material-ui/core";
 import StreamsLayout from "./StreamsLayout";
+import { useRouter } from "next/router";
+import BreakoutRoomBanner from "../../../banners/BreakoutRoomBanner";
+import { STREAM_ELEMENT_SPACING } from "constants/streams";
+import HandRaiseStreamerBanner from "../../../banners/HandRaiseStreamerBanner";
+import HandRaiseViewerBanner from "../../../banners/HandRaiseViewerBanner";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -15,6 +20,21 @@ const useStyles = makeStyles((theme) => ({
       flex: 1,
       display: "flex",
    },
+   bannerElementsWrapper: ({ bannerPadding }) => ({
+      "& > :last-child": {
+         paddingBottom: 0,
+      },
+      "& > *": {
+         paddingBottom: theme.spacing(STREAM_ELEMENT_SPACING),
+      },
+      ...(bannerPadding && {
+         padding: theme.spacing(
+            STREAM_ELEMENT_SPACING,
+            STREAM_ELEMENT_SPACING,
+            0
+         ),
+      }),
+   }),
 }));
 
 const Streams = memo(
@@ -30,10 +50,19 @@ const Streams = memo(
       livestreamId,
       setRemovedStream,
       presenter,
-       videoMutedBackgroundImg
+      videoMutedBackgroundImg,
+      handRaiseActive,
    }) => {
-      const classes = useStyles();
+      const {
+         query: { breakoutRoomId },
+      } = useRouter();
       const [streamData, setStreamData] = useState([]);
+      const [showBreakoutBanner, setShowBreakoutBanner] = useState(false);
+      const classes = useStyles({ bannerPadding: showBreakoutBanner || handRaiseActive });
+
+      useEffect(() => {
+         setShowBreakoutBanner(Boolean(presenter && breakoutRoomId));
+      }, [presenter, breakoutRoomId]);
 
       useEffect(() => {
          const allStreams = [...externalMediaStreams];
@@ -132,6 +161,23 @@ const Streams = memo(
 
       return (
          <div className={classes.root}>
+            <div className={classes.bannerElementsWrapper}>
+               <Collapse in={showBreakoutBanner} unmountOnExit>
+                  <BreakoutRoomBanner />
+               </Collapse>
+               <Collapse
+                  in={Boolean(presenter && handRaiseActive)}
+                  unmountOnExit
+               >
+                  <HandRaiseStreamerBanner />
+               </Collapse>
+               <Collapse
+                  in={Boolean(!presenter && handRaiseActive)}
+                  unmountOnExit
+               >
+                  <HandRaiseViewerBanner />
+               </Collapse>
+            </div>
             {/*<Button variant="contained">*/}
             {/*  dfwefew*/}
             {/*</Button>*/}

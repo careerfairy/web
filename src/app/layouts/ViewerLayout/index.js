@@ -13,9 +13,9 @@ import { CurrentStreamContext } from "../../context/stream/StreamContext";
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 import PropTypes from "prop-types";
 import useStreamRef from "../../components/custom-hook/useStreamRef";
-import StreamClosedCountdown from "../../components/views/streaming/sharedComponents/StreamClosedCountdown";
 import { useDispatch } from "react-redux";
-import * as actions from 'store/actions'
+import * as actions from "store/actions";
+import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHandRaiseConnect";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -90,6 +90,7 @@ const ViewerLayout = (props) => {
    const [selectedState, setSelectedState] = useState("questions");
 
    const currentLivestream = useStreamConnect();
+   useViewerHandRaiseConnect(currentLivestream)
 
    const notAuthorized =
       currentLivestream &&

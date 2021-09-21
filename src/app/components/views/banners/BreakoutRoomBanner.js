@@ -1,10 +1,11 @@
-import React from "react";
+import React, { memo } from "react";
 import StreamBanner from "./StreamBanner";
 import useStreamToken from "../../custom-hook/useStreamToken";
 import { useCurrentStream } from "../../../context/stream/StreamContext";
 import { Button, Tooltip } from "@material-ui/core";
+import BreakoutRoomIcon from "@material-ui/icons/Widgets";
 
-const BreakoutRoomBanner = () => {
+const BreakoutRoomBanner = memo(() => {
 
    const links = useStreamToken({ forStreamType: "mainLivestream" });
    const {
@@ -24,6 +25,7 @@ const BreakoutRoomBanner = () => {
    return (
       <StreamBanner
          severity="info"
+         icon={<BreakoutRoomIcon/>}
          title={`ROOM: ${title}`}
          action={
             <Tooltip title="Back to main room">
@@ -33,12 +35,12 @@ const BreakoutRoomBanner = () => {
                   color="primary"
                   size="small"
                >
-                  Back
+                  Back to main room
                </Button>
             </Tooltip>
          }
       />
    );
-};
+});
 
 export default BreakoutRoomBanner;

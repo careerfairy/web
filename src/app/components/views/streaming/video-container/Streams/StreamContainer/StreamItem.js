@@ -5,11 +5,12 @@ import SpeakerInfoOverlay from "../../SpeakerInfoOverlay";
 import { Tooltip } from "@material-ui/core";
 import VideoCamOffIcon from "@material-ui/icons/VideocamOff";
 import VolumeOffIcon from "@material-ui/icons/MicOff";
+import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
 
 const useStyles = makeStyles((theme) => ({
    root: {
       backgroundColor: theme.palette.common.black,
-      borderRadius: 10,
+      borderRadius: STREAM_ELEMENT_BORDER_RADIUS,
       display: "flex",
       flex: 1,
       position: "relative",
@@ -19,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
       height: "100%",
       position: "absolute",
       "& > *": {
-         borderRadius: 10,
+         borderRadius: STREAM_ELEMENT_BORDER_RADIUS,
          boxShadow: theme.shadows[5],
       },
    },
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
       margin: "10px",
    },
    mutedOverlay: {
-      borderRadius: 10,
+      borderRadius: STREAM_ELEMENT_BORDER_RADIUS,
       position: "absolute",
       top: "0",
       left: "0",

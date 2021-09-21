@@ -18,11 +18,12 @@ import { useFirebase } from "context/firebase";
 import Box from "@material-ui/core/Box";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { makeStyles } from "@material-ui/core/styles";
+import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
    pdfWrapper: {
-      borderRadius: 10,
+      borderRadius: STREAM_ELEMENT_BORDER_RADIUS,
       backgroundColor: theme.palette.common.black,
       boxShadow: theme.shadows[5],
       position: "absolute",

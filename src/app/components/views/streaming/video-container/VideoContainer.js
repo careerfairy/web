@@ -277,6 +277,7 @@ function VideoContainer({
             localMediaStream={localMediaStream}
             currentSpeakerId={currentSpeakerId}
             streamerId={streamerId}
+            handRaiseActive={currentLivestream.handRaiseActive}
             videoMutedBackgroundImg={currentLivestream.companyLogoUrl}
             setRemovedStream={setRemovedStream}
             liveSpeakers={currentLivestream.liveSpeakers}

@@ -16,6 +16,7 @@ import { useTheme } from "@material-ui/core/styles";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import { GlassDialog } from "../../../../../materialUI/GlobalModals";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
+import useHandRaiseState from "../../../../custom-hook/useHandRaiseState";
 
 const HandRaiseCategory = ({
    livestream,
@@ -24,39 +25,17 @@ const HandRaiseCategory = ({
 }) => {
    const {
       createHandRaiseRequest,
-      listenToHandRaiseState,
       updateHandRaiseRequest: updateHandRaiseRequestFirebaseClassMethod,
    } = useFirebase();
 
    const theme = useTheme();
    const { authenticatedUser, userData } = useAuth();
-   const [handRaiseState, setHandRaiseState] = useState(undefined);
+   const handRaiseState = useHandRaiseState();
+   console.log("-> handRaiseState", handRaiseState);
    const streamRef = useStreamRef();
 
    useEffect(() => {
-      if (livestream.test || authenticatedUser) {
-         let authEmail = livestream.test
-            ? "streamerEmail"
-            : authenticatedUser.email;
-         if (livestream && authEmail) {
-            listenToHandRaiseState(streamRef, authEmail, (querySnapshot) => {
-               if (querySnapshot.exists) {
-                  let request = {
-                     ...querySnapshot.data(),
-                     id: querySnapshot.id,
-                  };
-                  setHandRaiseState(request);
-               } else {
-                  setHandRaiseState(null);
-               }
-            });
-         }
-      }
-   }, [livestream, authenticatedUser]);
-
-   useEffect(() => {
-      const hasNotRaisedHandYet =
-         handRaiseState === null
+      const hasNotRaisedHandYet = handRaiseState === null;
       if (hasNotRaisedHandYet && livestream?.handRaiseActive) {
          requestHandRaise();
       }
@@ -102,7 +81,7 @@ const HandRaiseCategory = ({
       return updateHandRaiseRequest("requested");
    };
 
-   if (!livestream.handRaiseActive) {
+   if (!livestream.handRaiseActive || !livestream.hasStarted) {
       return <HandRaiseInactive selectedState={selectedState} />;
    }
 

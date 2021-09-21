@@ -7,8 +7,8 @@ import StreamContainer from "./StreamContainer";
 import clsx from "clsx";
 import Box from "@material-ui/core/Box";
 import LivestreamPdfViewer from "../../../../util/LivestreamPdfViewer";
+import { STREAM_ELEMENT_BORDER_RADIUS, STREAM_ELEMENT_SPACING } from "constants/streams";
 
-const SPACING = 1;
 const STREAMS_ROW_HEIGHT = 180;
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
          duration: theme.transitions.duration.complex,
          easing: theme.transitions.easing.easeInOut,
       }),
-      padding: theme.spacing(SPACING, SPACING, 0),
+      padding: theme.spacing(STREAM_ELEMENT_SPACING, STREAM_ELEMENT_SPACING, 0),
    },
    grow: {
       height: STREAMS_ROW_HEIGHT,
@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
          background: theme.palette.common.black,
       },
       "&::-webkit-scrollbar-thumb": {
-         borderRadius: 10,
+         borderRadius: STREAM_ELEMENT_BORDER_RADIUS,
          background: theme.palette.primary.main,
       },
    },
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
       height: "100%",
       position: "absolute",
       "& > *": {
-         borderRadius: 10,
+         borderRadius: STREAM_ELEMENT_BORDER_RADIUS,
          boxShadow: theme.shadows[5],
       },
    },
@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      padding: theme.spacing(SPACING),
+      padding: theme.spacing(STREAM_ELEMENT_SPACING),
       transition: theme.transitions.create(["top"], {
          duration: theme.transitions.duration.complex,
          easing: theme.transitions.easing.easeInOut,
@@ -126,7 +126,7 @@ const StreamsLayout = ({
                >
                   <Row
                      p={0}
-                     gap={SPACING}
+                     gap={STREAM_ELEMENT_SPACING}
                      className={classes.streamsOverflowWrapper}
                      style={{
                         width,
