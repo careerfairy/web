@@ -6,6 +6,7 @@ import { Tooltip } from "@material-ui/core";
 import VideoCamOffIcon from "@material-ui/icons/VideocamOff";
 import VolumeOffIcon from "@material-ui/icons/MicOff";
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
+import useHandRaiseState from "../../../../../custom-hook/useHandRaiseState";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -64,17 +65,22 @@ const StreamItem = ({
 }) => {
    const classes = useStyles();
    const vidDiv = useRef(null);
-
+   const [handRaiseState] = useHandRaiseState();
+   console.log("-> stream", stream);
    useEffect(() => {
       if (stream?.stream?.isPlaying() === false) {
-         stream?.stream?.play(stream.streamId, {
-            fit: stream.isScreenShareVideo ? "contain" : "cover",
-         });
+         play(stream);
       }
       return () => {
          stream?.stream?.stop();
       };
-   }, [stream?.stream, stream?.stream?.isPlaying()]);
+   }, [stream?.stream, stream?.stream?.isPlaying(), handRaiseState?.state]);
+
+   const play = (stream) => {
+      stream?.stream?.play(stream.streamId, {
+         fit: stream.isScreenShareVideo ? "contain" : "cover",
+      });
+   };
 
    return (
       <div className={classes.root}>
@@ -83,7 +89,9 @@ const StreamItem = ({
             className={classes.videoElement}
             ref={vidDiv}
          />
-         {speaker && <SpeakerInfoOverlay speaker={speaker} zIndex={1} small={!big} />}
+         {speaker && (
+            <SpeakerInfoOverlay speaker={speaker} zIndex={1} small={!big} />
+         )}
          {stream?.videoMuted && (
             <div className={classes.mutedOverlay}>
                <div className={classes.mutedOverlayContent}>

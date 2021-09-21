@@ -5,7 +5,6 @@ import HandRaiseDenied from "./hand-raise/active/HandRaiseDenied";
 import HandRaiseConnecting from "./hand-raise/active/HandRaiseConnecting";
 import HandRaiseConnected from "./hand-raise/active/HandRaiseConnected";
 import HandRaiseInactive from "./hand-raise/inactive/HandRaiseInactive";
-import { useTheme } from "@material-ui/core/styles";
 import useHandRaiseState from "../../../../custom-hook/useHandRaiseState";
 import HandRaiseJoinDialog from "./hand-raise/HandRaiseJoinDialog";
 
@@ -14,7 +13,6 @@ const HandRaiseCategory = ({
    selectedState,
    setHandRaiseActive,
 }) => {
-   const theme = useTheme();
    const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState();
 
    useEffect(() => {
@@ -28,8 +26,7 @@ const HandRaiseCategory = ({
       if (
          livestream.handRaiseActive &&
          handRaiseState &&
-         (handRaiseState.state === "connecting" ||
-            handRaiseState.state === "connected")
+         ["connecting", "connected"].includes(handRaiseState.state)
       ) {
          setHandRaiseActive(true);
       } else {
@@ -42,6 +39,9 @@ const HandRaiseCategory = ({
    };
    const unRequestHandRaise = () => {
       return updateHandRaiseRequest("requested");
+   };
+   const startConnectingHandRaise = () => {
+      return updateHandRaiseRequest("connecting");
    };
 
    if (!livestream.handRaiseActive || !livestream.hasStarted) {
@@ -76,9 +76,9 @@ const HandRaiseCategory = ({
             handRaiseActive={livestream.handRaiseActive}
          />
          <HandRaiseJoinDialog
-            open={Boolean(handRaiseState && handRaiseState.state === "invited")}
+            open={handRaiseState?.state === "invited"}
             onClose={unRequestHandRaise}
-            requestHandRaise={requestHandRaise}
+            startConnectingHandRaise={startConnectingHandRaise}
          />
       </>
    );

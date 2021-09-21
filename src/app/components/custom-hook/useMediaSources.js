@@ -1,7 +1,4 @@
-import { useState, useEffect } from "react";
-import { navigator } from "global";
-import { isEmptyArray } from "formik";
-import LocalStorageUtil from "util/LocalStorageUtil";
+import { useCallback, useEffect, useState } from "react";
 import { useSoundMeter } from "./useSoundMeter";
 
 export default function useMediaSources(
@@ -75,21 +72,27 @@ export default function useMediaSources(
       });
    };
 
-   function updateAudioSource(deviceId) {
-      localStreamData.stream.switchDevice("audio", deviceId, () => {
-         setAudioSource(deviceId);
-      });
-   }
+   const updateAudioSource = useCallback(
+      (deviceId) => {
+         localStreamData.stream.switchDevice("audio", deviceId, () => {
+            setAudioSource(deviceId);
+         });
+      },
+      [localStreamData]
+   );
 
-   function updateVideoSource(deviceId) {
-      localStreamData.stream.switchDevice("video", deviceId, () => {
-         setVideoSource(deviceId);
-      });
-   }
+   const updateVideoSource = useCallback(
+      (deviceId) => {
+         localStreamData.stream.switchDevice("video", deviceId, () => {
+            setVideoSource(deviceId);
+         });
+      },
+      [localStreamData]
+   );
 
-   function updateSpeakerSource(deviceId) {
+   const updateSpeakerSource = useCallback((deviceId) => {
       setSpeakerSource(deviceId);
-   }
+   }, []);
 
    return {
       audioSource,

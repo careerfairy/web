@@ -5,25 +5,31 @@ import {
    Button,
    DialogActions,
    DialogContent,
+   DialogTitle,
    Typography,
 } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
    title: {
       fontFamily: "Permanent Marker",
-      fontSize: "2em",
+      fontSize: "2rem",
       color: theme.palette.primary.main,
    },
 }));
 
-const Content = ({ handleClose, requestHandRaise }) => {
+const Content = ({
+   handleClose,
+   startConnectingHandRaise,
+}) => {
    const classes = useStyles();
    return (
       <React.Fragment>
-         <DialogContent>
+         <DialogTitle>
             <Typography className={classes.title} align="center">
                You've been invited to join the stream!
             </Typography>
+         </DialogTitle>
+         <DialogContent>
          </DialogContent>
          <DialogActions>
             <Button children="Cancel" onClick={handleClose} />
@@ -31,14 +37,17 @@ const Content = ({ handleClose, requestHandRaise }) => {
                variant="contained"
                children="Join now"
                color="primary"
-               onClick={requestHandRaise}
+               onClick={startConnectingHandRaise}
             />
          </DialogActions>
       </React.Fragment>
    );
 };
-const HandRaiseJoinDialog = ({ open, onClose, requestHandRaise }) => {
-
+const HandRaiseJoinDialog = ({
+   open,
+   onClose,
+   startConnectingHandRaise,
+}) => {
    const handleClose = () => {
       onClose();
    };
@@ -46,8 +55,8 @@ const HandRaiseJoinDialog = ({ open, onClose, requestHandRaise }) => {
    return (
       <GlassDialog open={open}>
          <Content
-            requestHandRaise={requestHandRaise}
             handleClose={handleClose}
+            startConnectingHandRaise={startConnectingHandRaise}
          />
       </GlassDialog>
    );

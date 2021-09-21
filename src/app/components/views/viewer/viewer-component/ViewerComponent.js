@@ -1,4 +1,10 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, {
+   Fragment,
+   useCallback,
+   useEffect,
+   useMemo,
+   useState,
+} from "react";
 import { withFirebasePage } from "context/firebase";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
 import useDevices from "components/custom-hook/useDevices";
@@ -45,14 +51,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ViewerComponent({
-                            currentLivestream,
-                            firebase,
-                            handRaiseActive,
-                            isBreakout,
-                            showMenu,
-                            streamerId,
-                            mobile
-                         }) {
+   currentLivestream,
+   firebase,
+   handRaiseActive,
+   isBreakout,
+   showMenu,
+   streamerId,
+   mobile,
+}) {
    const classes = useStyles();
    const dispatch = useDispatch();
    const [showSettings, setShowSettings] = useState(false);
@@ -89,14 +95,19 @@ function ViewerComponent({
       streamerReady,
       !handRaiseActive,
       screenSharingMode,
-     currentLivestream.id,
+      currentLivestream.id,
       streamerId,
       true
    );
 
    const devices = useDevices(
-      agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
+      agoraRtcStatus &&
+         ["RTC_STREAM_PUBLISHED"].includes(
+            agoraRtcStatus.msg
+         )
    );
+   // console.log("-> agoraRtcStatus.msg", agoraRtcStatus.msg);
+   // console.log("-> devices from use devices", devices);
 
    const {
       audioSource,
@@ -166,9 +177,7 @@ function ViewerComponent({
 
    const setDesktopMode = async (mode, initiatorId) => {
       let screenSharerId =
-         mode === "desktop"
-            ? initiatorId
-            : currentLivestream.screenSharerId;
+         mode === "desktop" ? initiatorId : currentLivestream.screenSharerId;
       await firebase.setDesktopMode(streamRef, mode, screenSharerId);
    };
 
@@ -201,9 +210,12 @@ function ViewerComponent({
    if (!currentLivestream) {
       return null;
    }
+
    return (
       <React.Fragment>
-         {!Boolean(mobile && handRaiseActive) && <EmoteButtons createEmote={createEmote} />}
+         {!Boolean(mobile && handRaiseActive) && (
+            <EmoteButtons createEmote={createEmote} />
+         )}
          <Streams
             externalMediaStreams={externalMediaStreams}
             localMediaStream={localMediaStream}

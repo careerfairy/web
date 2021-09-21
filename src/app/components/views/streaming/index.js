@@ -12,7 +12,7 @@ import VolumeUpRoundedIcon from "@material-ui/icons/VolumeUpRounded";
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 import { Backdrop } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
-import * as actions from 'store/actions'
+import * as actions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
@@ -69,10 +69,11 @@ const StreamerOverview = ({
    const { currentLivestream, isBreakout } = useCurrentStream();
    const classes = useStyles();
    const dispatch = useDispatch();
-  const { videoIsMuted, videoIsPaused } = useSelector((state) => state.stream.streaming);
+   const { videoIsMuted, videoIsPaused } = useSelector(
+      (state) => state.stream.streaming
+   );
 
-
-  return (
+   return (
       <Fragment>
          <div className={classes.blackFrame}>
             <VideoContainer

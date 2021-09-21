@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, { useEffect, useRef, useState } from "react";
 import {
    Box,
@@ -115,3 +116,10 @@ const AudioTab = ({ audioLevel, audioSource, devices, setAudioSource }) => {
 };
 
 export default AudioTab;
+
+AudioTab.propTypes = {
+  audioLevel: PropTypes.any,
+  audioSource: PropTypes.any,
+  devices: PropTypes.array,
+  setAudioSource: PropTypes.func.isRequired
+}

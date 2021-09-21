@@ -90,6 +90,7 @@ const ViewerLayout = (props) => {
    const [selectedState, setSelectedState] = useState("questions");
 
    const currentLivestream = useStreamConnect();
+
    useViewerHandRaiseConnect(currentLivestream)
 
    const notAuthorized =
