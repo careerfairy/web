@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import LocalStreamItem from "./LocalStreamItem";
 import RemoteStreamItem from "./RemoteStreamItem";
 import { useFirebase } from "context/firebase";
-
+//
 const StreamContainer = ({
    stream,
    big,
