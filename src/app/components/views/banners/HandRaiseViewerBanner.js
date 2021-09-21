@@ -27,17 +27,17 @@ const HandRaiseViewerBanner = () => {
 
       if (handRaiseState?.state === "unrequested") {
          newHandRaiseActionData = {
-            title: "Raise my hand",
+            title: "Connect with video and audio",
             buttons: [
                {
                   onClick: () => updateRequest("requested"),
-                  buttonText: "Raise my hand",
+                  buttonText: "Connect",
                },
             ],
          };
       } else if (handRaiseState?.state === "requested") {
          newHandRaiseActionData = {
-            title: "You raised your hand!",
+            title: "Your connection request has been sent.",
             buttons: [
                // {
                //    onClick: () => updateRequest("requested"),
@@ -52,7 +52,7 @@ const HandRaiseViewerBanner = () => {
          };
       } else if (handRaiseState?.state === "denied") {
          newHandRaiseActionData = {
-            title: "Sorry we can't answer your question right now.",
+            title: "Sorry we can't take your request right now.",
             buttons: [
                {
                   onClick: () => updateRequest("unrequested"),

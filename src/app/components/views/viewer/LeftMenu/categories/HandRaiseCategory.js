@@ -23,6 +23,8 @@ const HandRaiseCategory = ({
    }, [livestream?.handRaiseActive, handRaiseState]);
 
    useEffect(() => {
+     console.log("-> livestream.handRaiseActive", livestream.handRaiseActive);
+     console.log("-> livestream", livestream);
       if (
          livestream.handRaiseActive &&
          handRaiseState &&
@@ -32,7 +34,7 @@ const HandRaiseCategory = ({
       } else {
          setHandRaiseActive(false);
       }
-   }, [handRaiseState]);
+   }, [handRaiseState, livestream.handRaiseActive]);
 
    const requestHandRaise = () => {
       return updateHandRaiseRequest("requested");
