@@ -209,6 +209,7 @@ function ViewerComponent({
             localMediaStream={localMediaStream}
             currentSpeakerId={currentSpeakerId}
             streamerId={streamerId}
+            mobile={mobile}
             handRaiseActive={currentLivestream.handRaiseActive}
             videoMutedBackgroundImg={currentLivestream.companyLogoUrl}
             liveSpeakers={currentLivestream.liveSpeakers}

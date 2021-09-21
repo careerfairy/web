@@ -25,7 +25,7 @@ const HandRaiseViewerBanner = () => {
    useEffect(() => {
       let newHandRaiseActionData;
 
-      if (handRaiseState.state === "unrequested") {
+      if (handRaiseState?.state === "unrequested") {
          newHandRaiseActionData = {
             title: "Raise my hand",
             buttons: [
@@ -35,7 +35,7 @@ const HandRaiseViewerBanner = () => {
                },
             ],
          };
-      } else if (handRaiseState.state === "requested") {
+      } else if (handRaiseState?.state === "requested") {
          newHandRaiseActionData = {
             title: "You raised your hand!",
             buttons: [
@@ -50,7 +50,7 @@ const HandRaiseViewerBanner = () => {
                },
             ],
          };
-      } else if (handRaiseState.state === "denied") {
+      } else if (handRaiseState?.state === "denied") {
          newHandRaiseActionData = {
             title: "Sorry we can't answer your question right now.",
             buttons: [
@@ -60,11 +60,11 @@ const HandRaiseViewerBanner = () => {
                },
             ],
          };
-      } else if (handRaiseState.state === "connecting") {
+      } else if (handRaiseState?.state === "connecting") {
          newHandRaiseActionData = {
             title: "Connecting",
          };
-      } else if (handRaiseState.state === "invited") {
+      } else if (handRaiseState?.state === "invited") {
          newHandRaiseActionData = {
             title: "Connecting to the stream",
             buttons: [
@@ -74,7 +74,7 @@ const HandRaiseViewerBanner = () => {
                },
             ],
          };
-      } else if (handRaiseState.state === "connected") {
+      } else if (handRaiseState?.state === "connected") {
          newHandRaiseActionData = {
             title: "You are connected",
             buttons: [
