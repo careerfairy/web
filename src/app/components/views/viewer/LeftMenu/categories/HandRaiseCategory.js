@@ -21,6 +21,7 @@ const HandRaiseCategory = ({
          requestHandRaise();
       }
    }, [livestream?.handRaiseActive, handRaiseState]);
+
    useEffect(() => {
       if (
          livestream.handRaiseActive &&

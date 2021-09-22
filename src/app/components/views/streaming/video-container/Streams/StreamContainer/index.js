@@ -41,7 +41,7 @@ const StreamContainer = ({
             setSpeaker({
                firstName: userData.firstName || "",
                lastName: userData?.lastName?.[0] || "",
-               position: "Audience",
+               position: "✋ Hand Raiser",
             });
          }
       } catch (e) {}

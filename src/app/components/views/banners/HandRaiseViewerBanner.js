@@ -3,7 +3,7 @@ import StreamBanner from "./StreamBanner";
 import { Box, Button, Tooltip } from "@material-ui/core";
 import HandRaiseIcon from "@material-ui/icons/PanToolOutlined";
 import useHandRaiseState from "../../custom-hook/useHandRaiseState";
-import {  makeStyles, darken } from "@material-ui/core/styles";
+import { makeStyles, darken } from "@material-ui/core/styles";
 import StopStreamingIcon from "@material-ui/icons/Stop";
 
 const useStyles = makeStyles((theme) => ({
@@ -15,12 +15,12 @@ const useStyles = makeStyles((theme) => ({
          marginRight: theme.spacing(0.5),
       },
    },
-   redButton:{
+   redButton: {
       background: theme.palette.error.main,
-      "&:hover":{
-      background: darken(theme.palette.error.main, 0.2),
-      }
-   }
+      "&:hover": {
+         background: darken(theme.palette.error.main, 0.2),
+      },
+   },
 }));
 const HandRaiseViewerBanner = () => {
    const classes = useStyles();
@@ -34,17 +34,19 @@ const HandRaiseViewerBanner = () => {
 
       if (handRaiseState?.state === "unrequested") {
          newHandRaiseActionData = {
-            title: "Connect with video and audio",
+            title: "Hand Raise",
+            subTitle: "Join the stream with your camera and microphone.",
             buttons: [
                {
                   onClick: () => updateRequest("requested"),
-                  buttonText: "Connect",
+                  buttonText: "Join now",
                },
             ],
          };
       } else if (handRaiseState?.state === "requested") {
          newHandRaiseActionData = {
-            title:
+            title: "Hand Raise",
+            subTitle:
                "Your connection request has been sent, please wait to be invited.",
             buttons: [
                {
@@ -56,7 +58,8 @@ const HandRaiseViewerBanner = () => {
          };
       } else if (handRaiseState?.state === "denied") {
          newHandRaiseActionData = {
-            title: "Sorry we can't take your request right now.",
+            title: "Hand Raise",
+            subTitle: "Sorry we can't take your request right now.",
             buttons: [
                {
                   onClick: () => updateRequest("unrequested"),
@@ -66,11 +69,13 @@ const HandRaiseViewerBanner = () => {
          };
       } else if (handRaiseState?.state === "connecting") {
          newHandRaiseActionData = {
-            title: "Connecting",
+            title: "Hand Raise",
+            subTitle: "Connecting",
          };
       } else if (handRaiseState?.state === "invited") {
          newHandRaiseActionData = {
-            title: "Connecting to the stream",
+            title: "Hand Raise",
+            subTitle: "Connecting to the stream",
             buttons: [
                {
                   onClick: () => updateRequest("unrequested"),
@@ -104,10 +109,17 @@ const HandRaiseViewerBanner = () => {
          severity={handRaiseState?.state === "connected" ? "success" : "info"}
          icon={<HandRaiseIcon />}
          title={handRaiseActionData.title}
+         subTitle={handRaiseActionData.subTitle}
          action={
             <Box className={classes.actionsWrapper}>
                {handRaiseActionData.buttons?.map(
-                  ({ buttonText, onClick, variant, buttonIcon, buttonClassName }) => (
+                  ({
+                     buttonText,
+                     onClick,
+                     variant,
+                     buttonIcon,
+                     buttonClassName,
+                  }) => (
                      <Tooltip key={buttonText} title={buttonText}>
                         <Button
                            onClick={onClick}

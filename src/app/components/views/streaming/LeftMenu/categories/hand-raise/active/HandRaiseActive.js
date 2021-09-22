@@ -97,18 +97,27 @@ function HandRaiseActive({
    const [sortByNew, setSortByNew] = useState(true);
    const [filterMapProperty, setFilterMapProperty] = useState("All");
    const [filteredHandRaises, setFilteredHandRaises] = useState([]);
+   const [numberOfActiveHandRaisers, setNumberOfActiveHandRaisers] = useState(
+      0
+   );
    const classes = useStyles({ up: sortByNew });
 
    useEffect(() => {
       if (livestream) {
          firebase.listenToActiveHandRaises(streamRef, (querySnapshot) => {
-            setHandRaises(
-               querySnapshot.docs.map((doc) => ({
-                  id: doc.id,
-                  ...doc.data(),
-                  date: doc.data().timestamp?.toDate?.(),
-               }))
-            );
+            const totalHandRaises = querySnapshot.docs.map((doc) => ({
+               id: doc.id,
+               ...doc.data(),
+               date: doc.data().timestamp?.toDate?.(),
+            }));
+            const newNumberOfActiveHandRaisers =
+               totalHandRaises.filter((handRaise) =>
+                  ["connecting", "connected", "invited"].includes(
+                     handRaise.state
+                  )
+               )?.length || 0;
+            setNumberOfActiveHandRaisers(newNumberOfActiveHandRaisers)
+            setHandRaises(totalHandRaises);
          });
       }
    }, [livestream]);
@@ -171,13 +180,13 @@ function HandRaiseActive({
    return (
       <>
          <HandRaiseNotifier
-           handRaises={handRaises}
-           hasEntered={hasEntered}
-           updateHandRaiseRequest={updateHandRaiseRequest}
-           closeSnackbar={closeSnackbar}
-           setNewNotification={setNewNotification}
-           numberOfActiveHandRaisers={handRaises.length}
-           setNotificationToRemove={setNotificationToRemove}
+            handRaises={handRaises}
+            hasEntered={hasEntered}
+            updateHandRaiseRequest={updateHandRaiseRequest}
+            closeSnackbar={closeSnackbar}
+            setNewNotification={setNewNotification}
+            numberOfActiveHandRaisers={numberOfActiveHandRaisers}
+            setNotificationToRemove={setNotificationToRemove}
          />
          <Grow
             timeout={tutorialSteps.streamerReady ? 0 : "auto"}
@@ -234,7 +243,9 @@ function HandRaiseActive({
                         p={2}
                      >
                         <Typography>no results</Typography>
-                        <Button onClick={() => setFilterMapProperty("All")}>Back to all</Button>
+                        <Button onClick={() => setFilterMapProperty("All")}>
+                           Back to all
+                        </Button>
                      </Box>
                   )}
                   <TransitionGroup>
@@ -246,7 +257,7 @@ function HandRaiseActive({
                               updateHandRaiseRequest={updateHandRaiseRequest}
                               closeSnackbar={closeSnackbar}
                               setNewNotification={setNewNotification}
-                              numberOfActiveHandRaisers={handRaises.length}
+                              numberOfActiveHandRaisers={numberOfActiveHandRaisers}
                               setNotificationToRemove={setNotificationToRemove}
                            />
                         </Collapse>
