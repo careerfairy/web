@@ -3,7 +3,7 @@ import StreamBanner from "./StreamBanner";
 import { Box, Button, Tooltip } from "@material-ui/core";
 import HandRaiseIcon from "@material-ui/icons/PanToolOutlined";
 import useHandRaiseState from "../../custom-hook/useHandRaiseState";
-import { makeStyles } from "@material-ui/core/styles";
+import {  makeStyles, darken } from "@material-ui/core/styles";
 import StopStreamingIcon from "@material-ui/icons/Stop";
 
 const useStyles = makeStyles((theme) => ({
@@ -15,6 +15,12 @@ const useStyles = makeStyles((theme) => ({
          marginRight: theme.spacing(0.5),
       },
    },
+   redButton:{
+      background: theme.palette.error.main,
+      "&:hover":{
+      background: darken(theme.palette.error.main, 0.2),
+      }
+   }
 }));
 const HandRaiseViewerBanner = () => {
    const classes = useStyles();
@@ -80,6 +86,7 @@ const HandRaiseViewerBanner = () => {
                   onClick: () => updateRequest("unrequested"),
                   buttonText: "Stop streaming",
                   buttonIcon: <StopStreamingIcon />,
+                  buttonClassName: classes.redButton,
                },
             ],
          };
@@ -100,11 +107,12 @@ const HandRaiseViewerBanner = () => {
          action={
             <Box className={classes.actionsWrapper}>
                {handRaiseActionData.buttons?.map(
-                  ({ buttonText, onClick, variant, buttonIcon }) => (
+                  ({ buttonText, onClick, variant, buttonIcon, buttonClassName }) => (
                      <Tooltip key={buttonText} title={buttonText}>
                         <Button
                            onClick={onClick}
                            startIcon={buttonIcon}
+                           className={buttonClassName}
                            variant={variant || "contained"}
                            color="primary"
                            size="small"
