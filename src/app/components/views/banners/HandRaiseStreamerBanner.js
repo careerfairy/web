@@ -16,14 +16,14 @@ const HandRaiseStreamerBanner = () => {
 
    return (
       <StreamBanner
-         severity="success"
+         severity="info"
          icon={<HandRaiseIcon />}
          title={`Hand Raise is Active`}
          action={
             <Tooltip title={buttonMessage}>
                <Button
                   onClick={deactivateHandRaise}
-                  variant="contained"
+                  variant="text"
                   color="primary"
                   size="small"
                >

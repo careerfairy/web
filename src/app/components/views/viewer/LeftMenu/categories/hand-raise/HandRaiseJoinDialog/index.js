@@ -4,8 +4,8 @@ import { GlassDialog } from "../../../../../../../materialUI/GlobalModals";
 import {
    Button,
    DialogActions,
-   DialogContent,
    DialogTitle,
+   Grow,
    Typography,
 } from "@material-ui/core";
 
@@ -26,11 +26,9 @@ const Content = ({
       <React.Fragment>
          <DialogTitle>
             <Typography className={classes.title} align="center">
-               You've been invited to join the stream!
+               You've been invited to join with audio and video!
             </Typography>
          </DialogTitle>
-         <DialogContent>
-         </DialogContent>
          <DialogActions>
             <Button children="Cancel" onClick={handleClose} />
             <Button
@@ -53,7 +51,7 @@ const HandRaiseJoinDialog = ({
    };
 
    return (
-      <GlassDialog open={open}>
+      <GlassDialog TransitionComponent={Grow} open={open}>
          <Content
             handleClose={handleClose}
             startConnectingHandRaise={startConnectingHandRaise}

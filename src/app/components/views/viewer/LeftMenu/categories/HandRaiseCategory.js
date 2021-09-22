@@ -21,20 +21,17 @@ const HandRaiseCategory = ({
          requestHandRaise();
       }
    }, [livestream?.handRaiseActive, handRaiseState]);
-
    useEffect(() => {
-     console.log("-> livestream.handRaiseActive", livestream.handRaiseActive);
-     console.log("-> livestream", livestream);
       if (
          livestream.handRaiseActive &&
          handRaiseState &&
-         ["connecting", "connected"].includes(handRaiseState.state)
+         ["connecting", "connected"].includes(handRaiseState?.state)
       ) {
          setHandRaiseActive(true);
       } else {
          setHandRaiseActive(false);
       }
-   }, [handRaiseState, livestream.handRaiseActive]);
+   }, [handRaiseState?.state, livestream.handRaiseActive]);
 
    const requestHandRaise = () => {
       return updateHandRaiseRequest("requested");

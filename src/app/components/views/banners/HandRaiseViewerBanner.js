@@ -4,6 +4,7 @@ import { Box, Button, Tooltip } from "@material-ui/core";
 import HandRaiseIcon from "@material-ui/icons/PanToolOutlined";
 import useHandRaiseState from "../../custom-hook/useHandRaiseState";
 import { makeStyles } from "@material-ui/core/styles";
+import StopStreamingIcon from "@material-ui/icons/Stop";
 
 const useStyles = makeStyles((theme) => ({
    actionsWrapper: {
@@ -37,16 +38,13 @@ const HandRaiseViewerBanner = () => {
          };
       } else if (handRaiseState?.state === "requested") {
          newHandRaiseActionData = {
-            title: "Your connection request has been sent.",
+            title:
+               "Your connection request has been sent, please wait to be invited.",
             buttons: [
-               // {
-               //    onClick: () => updateRequest("requested"),
-               //    buttonText: "Raise again",
-               // },
                {
                   onClick: () => updateRequest("unrequested"),
                   buttonText: "Cancel request",
-                  variant: "text"
+                  variant: "text",
                },
             ],
          };
@@ -81,6 +79,7 @@ const HandRaiseViewerBanner = () => {
                {
                   onClick: () => updateRequest("unrequested"),
                   buttonText: "Stop streaming",
+                  buttonIcon: <StopStreamingIcon />,
                },
             ],
          };
@@ -95,16 +94,17 @@ const HandRaiseViewerBanner = () => {
 
    return (
       <StreamBanner
-         severity="success"
+         severity={handRaiseState?.state === "connected" ? "success" : "info"}
          icon={<HandRaiseIcon />}
          title={handRaiseActionData.title}
          action={
             <Box className={classes.actionsWrapper}>
                {handRaiseActionData.buttons?.map(
-                  ({ buttonText, onClick, variant }) => (
+                  ({ buttonText, onClick, variant, buttonIcon }) => (
                      <Tooltip key={buttonText} title={buttonText}>
                         <Button
                            onClick={onClick}
+                           startIcon={buttonIcon}
                            variant={variant || "contained"}
                            color="primary"
                            size="small"
