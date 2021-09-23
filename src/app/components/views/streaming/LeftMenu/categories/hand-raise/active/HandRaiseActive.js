@@ -8,21 +8,18 @@ import PanToolOutlinedIcon from "@material-ui/icons/PanToolOutlined";
 import {
    Box,
    Button,
-   Typography,
-   Grow,
-   Paper,
-   List,
    Collapse,
-   Grid,
-   InputLabel,
    FormControl,
-   Select,
+   Grid,
+   Grow,
+   InputLabel,
+   List,
    MenuItem,
+   Paper,
+   Select,
+   Typography,
 } from "@material-ui/core";
-import {
-   CategoryContainerCentered,
-   CategoryContainerTopAligned,
-} from "../../../../../../../materialUI/GlobalContainers";
+import { CategoryContainerCentered } from "../../../../../../../materialUI/GlobalContainers";
 import { ThemedPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
 import {
@@ -166,9 +163,9 @@ function HandRaiseActive({
       });
    };
 
-   function setHandRaiseModeInactive() {
-      firebase.setHandRaiseMode(streamRef, false);
-   }
+   const setHandRaiseModeInactive = async () => {
+      return await firebase.setHandRaiseMode(streamRef, false);
+   };
 
    function updateHandRaiseRequest(handRaiseId, state) {
       firebase.updateHandRaiseRequest(streamRef, handRaiseId, state);

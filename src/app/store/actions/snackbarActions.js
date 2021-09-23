@@ -157,3 +157,20 @@ export const sendCustomError = (data = {}) => async (dispatch) => {
       })
    );
 };
+
+// enqueue hand raise request sent
+
+export const enqueueSuccessfulHandRaiseRequest = () => async (dispatch) => {
+   const message =
+      "Your hand raise request has been sent, please wait to be invited.";
+   return dispatch(
+      enqueueSnackbar({
+         message,
+         options: {
+            key: message,
+            variant: "info",
+            preventDuplicate: true,
+         },
+      })
+   );
+};

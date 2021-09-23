@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import HandRaisePriorRequest from "./hand-raise/active/HandRaisePriorRequest";
 import HandRaiseRequested from "./hand-raise/active/HandRaiseRequested";
 import HandRaiseDenied from "./hand-raise/active/HandRaiseDenied";
@@ -7,19 +7,27 @@ import HandRaiseConnected from "./hand-raise/active/HandRaiseConnected";
 import HandRaiseInactive from "./hand-raise/inactive/HandRaiseInactive";
 import useHandRaiseState from "../../../../custom-hook/useHandRaiseState";
 import HandRaiseJoinDialog from "./hand-raise/HandRaiseJoinDialog";
+import HandRaisePromptDialog from "./hand-raise/HandRaisePromptDialog";
+import * as actions from "store/actions";
+import { useDispatch } from "react-redux";
+import { enqueueSuccessfulHandRaiseRequest } from "store/actions";
 
 const HandRaiseCategory = ({
    livestream,
    selectedState,
    setHandRaiseActive,
 }) => {
+   const dispatch = useDispatch();
    const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState();
+   const [handRaisePromptDialogOpen, setHandRaisePromptDialogOpen] = useState(
+      false
+   );
 
    useEffect(() => {
-      const hasNotRaisedHandYet = handRaiseState === null;
-      if (hasNotRaisedHandYet && livestream?.handRaiseActive) {
-         requestHandRaise();
-      }
+      const hasNotRaisedHandYet = Boolean(
+         handRaiseState === null && livestream?.handRaiseActive
+      );
+      setHandRaisePromptDialogOpen(hasNotRaisedHandYet);
    }, [livestream?.handRaiseActive, handRaiseState]);
 
    useEffect(() => {
@@ -34,8 +42,13 @@ const HandRaiseCategory = ({
       }
    }, [handRaiseState?.state, livestream.handRaiseActive]);
 
-   const requestHandRaise = () => {
-      return updateHandRaiseRequest("requested");
+   const requestHandRaise = async () => {
+      try {
+         await updateHandRaiseRequest("requested");
+         dispatch(actions.enqueueSuccessfulHandRaiseRequest());
+      } catch (e) {
+         dispatch(actions.sendGeneralError(e));
+      }
    };
    const unRequestHandRaise = () => {
       return updateHandRaiseRequest("requested");
@@ -43,6 +56,9 @@ const HandRaiseCategory = ({
    const startConnectingHandRaise = () => {
       return updateHandRaiseRequest("connecting");
    };
+
+   const handleCloseHandRaisePromptDialog = () =>
+      setHandRaisePromptDialogOpen(false);
 
    if (!livestream.handRaiseActive || !livestream.hasStarted) {
       return <HandRaiseInactive selectedState={selectedState} />;
@@ -79,6 +95,11 @@ const HandRaiseCategory = ({
             open={handRaiseState?.state === "invited"}
             onClose={unRequestHandRaise}
             startConnectingHandRaise={startConnectingHandRaise}
+         />
+         <HandRaisePromptDialog
+            requestHandRaise={requestHandRaise}
+            onClose={handleCloseHandRaisePromptDialog}
+            open={handRaisePromptDialogOpen}
          />
       </>
    );

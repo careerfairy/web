@@ -5,6 +5,8 @@ import HandRaiseIcon from "@material-ui/icons/PanToolOutlined";
 import useHandRaiseState from "../../custom-hook/useHandRaiseState";
 import { makeStyles, darken } from "@material-ui/core/styles";
 import StopStreamingIcon from "@material-ui/icons/Stop";
+import * as actions from "store/actions";
+import { useDispatch } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
    actionsWrapper: {
@@ -29,16 +31,27 @@ const HandRaiseViewerBanner = () => {
       title: "Hand Raise is not active",
    });
 
+   const dispatch = useDispatch();
+
+   const requestHandRaise = async () => {
+      try {
+         await updateRequest("requested");
+         dispatch(actions.enqueueSuccessfulHandRaiseRequest());
+      } catch (e) {
+         dispatch(actions.sendGeneralError(e));
+      }
+   };
+
    useEffect(() => {
       let newHandRaiseActionData;
 
-      if (handRaiseState?.state === "unrequested") {
+      if (handRaiseState?.state === "unrequested" || !handRaiseState) {
          newHandRaiseActionData = {
             title: "Hand Raise",
             subTitle: "Join the stream with your camera and microphone.",
             buttons: [
                {
-                  onClick: () => updateRequest("requested"),
+                  onClick: () => requestHandRaise(),
                   buttonText: "Join now",
                },
             ],

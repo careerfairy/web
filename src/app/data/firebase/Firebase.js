@@ -2031,10 +2031,28 @@ class Firebase {
       return ref.onSnapshot(callback);
    };
 
-   setHandRaiseMode = (streamRef, mode) => {
-      return streamRef.update({
-         handRaiseActive: mode,
-      });
+   setHandRaiseMode = async (streamRef, mode) => {
+      if (mode === true) {
+         return streamRef.update({
+            handRaiseActive: mode,
+         });
+      }
+      if (mode === false) {
+         const batch = this.firestore.batch();
+         const streamHandRaiseSnaps = await streamRef
+            .collection("handRaises")
+            .get();
+         streamHandRaiseSnaps.docs.forEach((snap) => {
+            const handRaiseRef = streamRef
+               .collection("handRaises")
+               .doc(snap.id);
+            batch.delete(handRaiseRef);
+         });
+         batch.update(streamRef, {
+            handRaiseActive: mode,
+         })
+         return await batch.commit();
+      }
    };
 
    createHandRaiseRequest = (streamRef, userEmail, userData) => {

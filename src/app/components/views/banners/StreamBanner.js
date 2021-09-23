@@ -5,11 +5,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import OverflowTip from "../../views/tooltips/OverflowTip";
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
 import { AlertTitle } from "@material-ui/lab";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
    alertMessage: {
       display: "grid",
-      marginBottom: ({ hasSubtitle }) => (hasSubtitle ? 0 : undefined),
    },
    root: {
       borderRadius: STREAM_ELEMENT_BORDER_RADIUS,
@@ -19,10 +19,14 @@ const useStyles = makeStyles((theme) => ({
       textTransform: "uppercase",
       fontWeight: 600,
    },
+   titleWithNoSubtitle: {
+      marginBottom: 0,
+      marginTop: 0,
+   },
 }));
 
 const StreamBanner = ({ action, severity, title, icon, subTitle }) => {
-   const classes = useStyles({ hasSubtitle: Boolean(subTitle) });
+   const classes = useStyles();
 
    return (
       <Alert
@@ -34,7 +38,12 @@ const StreamBanner = ({ action, severity, title, icon, subTitle }) => {
       >
          {title && (
             <OverflowTip title={title}>
-               <AlertTitle className={classes.title} noWrap>
+               <AlertTitle
+                  className={clsx(classes.title, {
+                     [classes.titleWithNoSubtitle]: !subTitle,
+                  })}
+                  noWrap
+               >
                   {title}
                </AlertTitle>
             </OverflowTip>

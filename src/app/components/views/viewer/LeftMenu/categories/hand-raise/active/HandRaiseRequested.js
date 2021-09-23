@@ -10,8 +10,6 @@ import {
    CategorySubtitle,
    ThemedPermanentMarker,
 } from "../../../../../../../materialUI/GlobalTitles";
-import { useDispatch } from "react-redux";
-import * as actions from "store/actions";
 import useTimeOut from "../../../../../../custom-hook/useTimeOut";
 
 const DELAY_IN_SECONDS = 5;
@@ -25,7 +23,6 @@ const HandRaiseRequested = memo(({
    const { startCountDown, isCountingDown } = useTimeOut({
       delay: DELAY_IN_SECONDS * 1000,
    });
-   const dispatch = useDispatch();
    const shouldRender = () =>
       Boolean(!(!handRaiseState || handRaiseState.state !== "requested"));
 
@@ -33,17 +30,6 @@ const HandRaiseRequested = memo(({
       if (!handRaiseActive) return unRequestHandRaise();
       requestHandRaise();
       startCountDown();
-      const message = "Your hand raised has been resent!";
-      dispatch(
-         actions.enqueueSnackbar({
-            message,
-            options: {
-               preventDuplicate: true,
-               key: message,
-               variant: "info",
-            },
-         })
-      );
    };
 
    return (
