@@ -14,6 +14,7 @@ import { isEmpty, isLoaded } from "react-redux-firebase";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 import useStreamRef from "../../components/custom-hook/useStreamRef";
+import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -89,6 +90,7 @@ const StreamerLayout = (props) => {
    });
 
    const currentLivestream = useStreamConnect();
+   useStreamerActiveHandRaisesConnect()
 
    const classes = useStyles({
       showMenu,

@@ -13,6 +13,7 @@ import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 import { Backdrop } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
+import HandRaiseNotifier from "./LeftMenu/categories/hand-raise/active/HandRaiseNotifier";
 
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
@@ -104,9 +105,11 @@ const StreamerOverview = ({
          />
          <NotificationsContainer
             livestreamId={currentLivestream.id}
+            handRaiseMenuOpen={selectedState === "hand"}
             notifications={notifications}
          />
          <StreamNotifications isStreamer={true} />
+         <HandRaiseNotifier />
          <MiniChatContainer
             className={classes.miniChatContainer}
             livestream={currentLivestream}

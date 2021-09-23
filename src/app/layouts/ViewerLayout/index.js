@@ -91,7 +91,7 @@ const ViewerLayout = (props) => {
 
    const currentLivestream = useStreamConnect();
 
-   useViewerHandRaiseConnect(currentLivestream)
+   useViewerHandRaiseConnect(currentLivestream);
 
    const notAuthorized =
       currentLivestream &&
@@ -144,8 +144,12 @@ const ViewerLayout = (props) => {
    ]);
 
    useEffect(() => {
-      dispatch(currentLivestream?.hasStarted ? actions.unmuteAllRemoteVideos(): actions.muteAllRemoteVideos())
-   },[currentLivestream?.hasStarted])
+      if (currentLivestream?.hasStarted) {
+         dispatch(actions.unmuteAllRemoteVideos());
+      } else {
+         dispatch(actions.muteAllRemoteVideos());
+      }
+   }, [currentLivestream?.hasStarted]);
 
    if (notAuthorized) {
       replace({

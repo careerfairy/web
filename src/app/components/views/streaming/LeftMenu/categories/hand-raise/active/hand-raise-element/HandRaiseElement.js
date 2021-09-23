@@ -335,6 +335,8 @@ function HandRaiseElement(props) {
    if (props.request.state === "connected") {
       return <ConnectedHandRaiseElement {...props} />;
    }
+
+   return null;
 }
 
 export default HandRaiseElement;

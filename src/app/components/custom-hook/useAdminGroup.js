@@ -23,7 +23,7 @@ const useAdminGroup = (groupId) => {
       );
    }, [pathname, query.dashboardInviteId]);
 
-   console.log("isvalidating", isvalidating);
+   // console.log("isvalidating", isvalidating);
 
    useEffect(() => {
       return () => {

@@ -40,11 +40,12 @@ const RemoteStreamItem = ({
    //    }
    // }, [stream.streamId]);
 
-   useEffect(() => {
-      if (!muteAllRemoteVideos) {
-         stream.stream?.play(stream.streamId, { muted: false });
-      }
-   }, [muteAllRemoteVideos]);
+   // useEffect(() => {
+   //    if (!muteAllRemoteVideos) {
+   //       console.log("-> play(stream.streamId, { muted: false })",);
+   //       stream.stream?.play(stream.streamId, { muted: false });
+   //    }
+   // }, [muteAllRemoteVideos]);
 
    useEffect(() => {
       if (playAllRemoteVideos) {

@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import { withFirebase } from "context/firebase";
 import HandRaiseElement from "./hand-raise-element/HandRaiseElement";
 import NotificationsContext from "context/notifications/NotificationsContext";
 import CloseRoundedIcon from "@material-ui/icons/CloseRounded";
@@ -29,12 +28,12 @@ import {
    WhiteTooltip,
 } from "../../../../../../../materialUI/GlobalTooltips";
 import { makeStyles } from "@material-ui/core/styles";
-import { useSnackbar } from "notistack";
-import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 import { TransitionGroup } from "react-transition-group";
 import { dynamicSort } from "../../../../../../helperFunctions/HelperFunctions";
 import OrderIcon from "@material-ui/icons/KeyboardArrowUpRounded";
-import HandRaiseNotifier from "./HandRaiseNotifier";
+import useStreamActiveHandRaises from "../../../../../../custom-hook/useStreamActiveHandRaises";
+import * as actions from "store/actions";
+import { useDispatch } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
    activeHandRaiseContainer: {
@@ -70,15 +69,15 @@ const FILTER_MAP = {
 };
 
 function HandRaiseActive({
-   firebase,
    livestream,
    showMenu,
    selectedState,
    sliding,
-   isGlass,
 }) {
-   const streamRef = useStreamRef();
-   const { closeSnackbar } = useSnackbar();
+   const dispatch = useDispatch();
+
+   const closeSnackbar = (...args) => dispatch(actions.closeSnackbar(...args))
+
    const { setNewNotification, setNotificationToRemove } = useContext(
       NotificationsContext
    );
@@ -88,36 +87,14 @@ function HandRaiseActive({
       getActiveTutorialStepKey,
       isOpen: isStepOpen,
    } = useContext(TutorialContext);
-   const [handRaises, setHandRaises] = useState([]);
+   const { handRaises, handlers, numberOfActiveHandRaisers } = useStreamActiveHandRaises();
    const [hasEntered, setHasEntered] = useState(false);
    const [hasExited, setHasExited] = useState(false);
    const [sortByNew, setSortByNew] = useState(true);
    const [filterMapProperty, setFilterMapProperty] = useState("All");
    const [filteredHandRaises, setFilteredHandRaises] = useState([]);
-   const [numberOfActiveHandRaisers, setNumberOfActiveHandRaisers] = useState(
-      0
-   );
-   const classes = useStyles({ up: sortByNew });
 
-   useEffect(() => {
-      if (livestream) {
-         firebase.listenToActiveHandRaises(streamRef, (querySnapshot) => {
-            const totalHandRaises = querySnapshot.docs.map((doc) => ({
-               id: doc.id,
-               ...doc.data(),
-               date: doc.data().timestamp?.toDate?.(),
-            }));
-            const newNumberOfActiveHandRaisers =
-               totalHandRaises.filter((handRaise) =>
-                  ["connecting", "connected", "invited"].includes(
-                     handRaise.state
-                  )
-               )?.length || 0;
-            setNumberOfActiveHandRaisers(newNumberOfActiveHandRaisers)
-            setHandRaises(totalHandRaises);
-         });
-      }
-   }, [livestream]);
+   const classes = useStyles({ up: sortByNew });
 
    useEffect(() => {
       handleFilterHandRaises(handRaises, filterMapProperty, sortByNew);
@@ -132,6 +109,10 @@ function HandRaiseActive({
    ) => {
       const newFilteredHandRaises = arrayOfHandRaises
          .filter((handRaise) => FILTER_MAP[filterMapProperty](handRaise))
+         .map((handRaise) => ({
+            ...handRaise,
+            date: handRaise.timestamp.toDate(),
+         }))
          .sort(dynamicSort("date", sortByNew));
       setFilteredHandRaises(newFilteredHandRaises);
    };
@@ -163,28 +144,11 @@ function HandRaiseActive({
       });
    };
 
-   const setHandRaiseModeInactive = async () => {
-      return await firebase.setHandRaiseMode(streamRef, false);
-   };
-
-   function updateHandRaiseRequest(handRaiseId, state) {
-      firebase.updateHandRaiseRequest(streamRef, handRaiseId, state);
-   }
-
    if (!livestream.handRaiseActive) {
       return null;
    }
    return (
       <>
-         <HandRaiseNotifier
-            handRaises={handRaises}
-            hasEntered={hasEntered}
-            updateHandRaiseRequest={updateHandRaiseRequest}
-            closeSnackbar={closeSnackbar}
-            setNewNotification={setNewNotification}
-            numberOfActiveHandRaisers={numberOfActiveHandRaisers}
-            setNotificationToRemove={setNotificationToRemove}
-         />
          <Grow
             timeout={tutorialSteps.streamerReady ? 0 : "auto"}
             onEntered={() => setHasEntered(true)}
@@ -251,10 +215,12 @@ function HandRaiseActive({
                            <HandRaiseElement
                               request={handRaise}
                               hasEntered={hasEntered}
-                              updateHandRaiseRequest={updateHandRaiseRequest}
+                              updateHandRaiseRequest={handlers.updateRequest}
                               closeSnackbar={closeSnackbar}
                               setNewNotification={setNewNotification}
-                              numberOfActiveHandRaisers={numberOfActiveHandRaisers}
+                              numberOfActiveHandRaisers={
+                                 numberOfActiveHandRaisers
+                              }
                               setNotificationToRemove={setNotificationToRemove}
                            />
                         </Collapse>
@@ -268,7 +234,7 @@ function HandRaiseActive({
                         variant="contained"
                         children="Deactivate Hand Raise"
                         disabled={isStepOpen(11)}
-                        onClick={() => setHandRaiseModeInactive()}
+                        onClick={handlers.setHandRaiseModeInactive}
                      />
                   </Box>
                </List>
@@ -318,7 +284,7 @@ function HandRaiseActive({
                            {activeStep === 13 && (
                               <TooltipButtonComponent
                                  onConfirm={() => {
-                                    setHandRaiseModeInactive();
+                                    handlers.setHandRaiseModeInactive();
                                     handleConfirm(13);
                                  }}
                                  buttonText="Ok"
@@ -333,7 +299,7 @@ function HandRaiseActive({
                         startIcon={<CloseRoundedIcon />}
                         children="Deactivate Hand Raise"
                         onClick={() => {
-                           setHandRaiseModeInactive();
+                           handlers.setHandRaiseModeInactive();
                            isOpen(13) && activeStep === 13 && handleConfirm(13);
                         }}
                      />
@@ -345,4 +311,4 @@ function HandRaiseActive({
    );
 }
 
-export default withFirebase(HandRaiseActive);
+export default HandRaiseActive;

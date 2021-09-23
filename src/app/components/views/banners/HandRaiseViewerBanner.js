@@ -102,7 +102,7 @@ const HandRaiseViewerBanner = () => {
             buttons: [
                {
                   onClick: () => updateRequest("unrequested"),
-                  buttonText: "Stop streaming",
+                  buttonText: "Leave hand raise",
                   buttonIcon: <StopStreamingIcon />,
                   buttonClassName: classes.redButton,
                },
