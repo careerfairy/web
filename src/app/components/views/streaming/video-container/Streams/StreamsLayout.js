@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useMemo } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Item, Row } from "@mui-treasury/components/flex";
@@ -8,6 +8,7 @@ import clsx from "clsx";
 import Box from "@material-ui/core/Box";
 import LivestreamPdfViewer from "../../../../util/LivestreamPdfViewer";
 import { STREAM_ELEMENT_BORDER_RADIUS, STREAM_ELEMENT_SPACING } from "constants/streams";
+import Typography from "@material-ui/core/Typography";
 
 const STREAMS_ROW_HEIGHT = 125;
 const useStyles = makeStyles((theme) => ({
@@ -107,6 +108,7 @@ const StreamsLayout = ({
 }) => {
    const hasSmallStreams = streamData.length > 1;
    const classes = useStyles({ hasSmallStreams });
+   const waitingForStreamer = useMemo(() => Boolean(!sharingPdf && !streamData.length && !presenter) , [sharingPdf, streamData?.length, presenter]);
 
    return (
       <AutoSizer>
@@ -171,6 +173,20 @@ const StreamsLayout = ({
                               presenter={presenter}
                               showMenu={showMenu}
                            />
+                        </StreamElementWrapper>
+                     )}
+                     {waitingForStreamer && (
+                        <StreamElementWrapper
+                           index={1}
+                           large
+                           squished={streamData.length}
+                        >
+                           <Typography
+                             variant="h5"
+                             style={{ color: "white", margin: "auto" }}
+                           >
+                              Waiting for streamer
+                           </Typography>
                         </StreamElementWrapper>
                      )}
                      <Box order={999} marginRight="auto" />
