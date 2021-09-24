@@ -17,7 +17,7 @@ dayjs.extend(relativeTime);
 
 export const uploadLogo = (location, fileObject, firebase, callback) => {
    var storageRef = firebase.getStorageRef();
-   let splitters = [" ", "(", ")"]; // or ",:;".split("");
+   let splitters = [" ", "(", ")","-"]; // or ",:;".split("");
    let fileName = fileObject.name;
    let imageName = splitters
       .reduce((old, c) => old.map((v) => v.split(c)).flat(), [fileName])
