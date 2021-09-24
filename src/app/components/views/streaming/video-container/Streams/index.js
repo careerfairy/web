@@ -47,7 +47,7 @@ const Streams = memo(
          const allStreams = [...externalMediaStreams];
          const hasManySpeakers = Boolean(externalMediaStreams?.length > 4);
          if (localMediaStream && isBroadCasting) {
-            allStreams.push(localMediaStream);
+            allStreams.unshift(localMediaStream);
          }
 
          let newLargeStream = handleGetLargeStream(
