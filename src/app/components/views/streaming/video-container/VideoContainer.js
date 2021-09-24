@@ -304,7 +304,7 @@ function VideoContainer({
             zIndex={3}
             bounds="parent"
             positionStyle={"absolute"}
-            defaultPosition={ { x: 10, y: 10 }}
+            defaultPosition={{ x: 4, y: 60 }}
             elementId="wifiIndicatorLocation"
          >
             <WifiIndicator

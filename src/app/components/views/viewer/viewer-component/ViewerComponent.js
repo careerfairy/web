@@ -24,6 +24,8 @@ import { useRouter } from "next/router";
 import * as actions from "store/actions";
 import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 import Streams from "../../streaming/video-container/Streams";
+import DraggableComponent from "../../banners/DraggableComponent";
+import WifiIndicator from "../../streaming/video-container/WifiIndicator";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -88,6 +90,7 @@ function ViewerComponent({
       setLocalMediaStream,
       agoraRtcStatus,
       agoraRtmStatus,
+      networkQuality,
       agoraRtcConnectionStatus,
       createEmote,
       joinedChannel,
@@ -101,10 +104,7 @@ function ViewerComponent({
    );
 
    const devices = useDevices(
-      agoraRtcStatus &&
-         ["RTC_STREAM_PUBLISHED"].includes(
-            agoraRtcStatus.msg
-         )
+      agoraRtcStatus && ["RTC_STREAM_PUBLISHED"].includes(agoraRtcStatus.msg)
    );
    // console.log("-> agoraRtcStatus.msg", agoraRtcStatus.msg);
    // console.log("-> devices from use devices", devices);
@@ -233,6 +233,20 @@ function ViewerComponent({
          />
          {handRaiseActive && (
             <Fragment>
+               <DraggableComponent
+                  zIndex={3}
+                  bounds="parent"
+                  positionStyle={"absolute"}
+                  defaultPosition={{ x: 4, y: 60 }}
+                  elementId="wifiIndicatorLocation"
+               >
+                  <WifiIndicator
+                     uplink={networkQuality.uplinkNetworkQuality}
+                     downlink={networkQuality.downlinkNetworkQuality}
+                     agoraRtcConnectionStatus={agoraRtcConnectionStatus}
+                     agoraRtmStatus={agoraRtmStatus}
+                  />
+               </DraggableComponent>
                <VideoControlsContainer
                   currentLivestream={currentLivestream}
                   viewer={true}
