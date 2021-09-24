@@ -3,7 +3,6 @@ import { alpha, makeStyles } from "@material-ui/core/styles";
 import LinkedInIcon from "@material-ui/icons/LinkedIn";
 import PropTypes from "prop-types";
 import { IconButton, Tooltip } from "@material-ui/core";
-import Link from "next/link";
 
 const useStyles = makeStyles((theme) => ({
    speakerInformation: {
@@ -132,7 +131,11 @@ const SpeakerInfoOverlay = ({ speaker, small, zIndex }) => {
    }
 };
 SpeakerInfoOverlay.prototypes = {
-   speaker: PropTypes.string.isRequired,
+   speaker: PropTypes.shape({
+      firstName: PropTypes.string,
+      lastName: PropTypes.string,
+      position: PropTypes.string
+   }).isRequired,
    small: PropTypes.bool.isRequired,
    zIndex: PropTypes.number,
 };

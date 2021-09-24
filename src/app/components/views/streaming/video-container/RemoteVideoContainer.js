@@ -12,6 +12,7 @@ import {
 } from "materialUI/GlobalTooltips";
 import TutorialContext from "context/tutorials/TutorialContext";
 import SpeakerInfoOverlay from "./SpeakerInfoOverlay";
+import { useSelector } from "react-redux";
 
 const mutedOverlayZIndex = 9901;
 
@@ -73,15 +74,12 @@ const RemoteVideoContainer = ({
    currentLivestream,
    height,
    isPlayMode,
-   muted,
-   play,
    setRemovedStream,
-   setShowVideoButton,
    small,
    speakerSource,
    stream,
-   unmute,
 }) => {
+   const { playAllRemoteVideos, muteAllRemoteVideos } = useSelector((state) => state.stream.streaming);
    const { getActiveTutorialStepKey, handleConfirmStep } = useContext(
       TutorialContext
    );
@@ -101,7 +99,6 @@ const RemoteVideoContainer = ({
                { fit: isScreenShareVideo ? "contain" : "cover" },
                (err) => {
                   if (err) {
-                     setShowVideoButton({ paused: false, muted: true });
                   }
                }
             );
@@ -110,24 +107,24 @@ const RemoteVideoContainer = ({
    }, [stream.streamId]);
 
    useEffect(() => {
-      if (unmute) {
+      if (!muteAllRemoteVideos) {
          stream.stream?.play(stream.streamId, { muted: false });
       }
-   }, [unmute]);
+   }, [muteAllRemoteVideos]);
 
    useEffect(() => {
-      if (play) {
+      if (playAllRemoteVideos) {
          playVideo();
       }
-   }, [play]);
+   }, [playAllRemoteVideos]);
 
    useEffect(() => {
-      if (muted) {
+      if (muteAllRemoteVideos) {
          stream?.stream?.muteAudio();
       } else {
          stream?.stream?.unmuteAudio();
       }
-   }, [muted]);
+   }, [muteAllRemoteVideos]);
 
    useEffect(() => {
       if (stream?.stream?.audio === false && stream?.stream?.video === false) {
@@ -154,7 +151,6 @@ const RemoteVideoContainer = ({
             },
             (err) => {
                if (err) {
-                  setShowVideoButton({ paused: false, muted: true });
                }
             }
          );

@@ -108,6 +108,7 @@ const ShareMenu = ({
                         onClose();
                      }}
                      name={action.name}
+                     key={action.name}
                      icon={action.icon}
                      listIconWrapperClassName={classes.listIconWrapper}
                      disabled={isOpen(17) && !isCtaTutorialButton}

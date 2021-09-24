@@ -11,6 +11,7 @@ import { TOP_BAR_HEIGHT } from "constants/streamLayout";
 import useStreamToken from "../../../custom-hook/useStreamToken";
 import { useCurrentStream } from "../../../../context/stream/StreamContext";
 import useTextOverflow from "../../../custom-hook/useTextOverflow";
+import BreakoutRoomBanner from "../../banners/BreakoutRoomBanner";
 
 const useStyles = makeStyles((theme) => ({
    externalQuarterWidth: {
@@ -80,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
       position: "relative",
       height: "100%",
       minHeight: (props) => `calc(100vh - ${props.topDisplacement}px)`,
+      zIndex: 100,
    },
    noStreamOverlayWrapper: {
       position: "relative",
@@ -111,9 +113,6 @@ const useStyles = makeStyles((theme) => ({
       "&::-webkit-scrollbar-thumb": {
          background: theme.palette.primary.main,
       },
-   },
-   alertMessage: {
-      display: "grid",
    },
 }));
 
@@ -242,7 +241,6 @@ function CurrentSpeakerDisplayer(props) {
                   <RemoteVideoContainer
                      {...props}
                      isPlayMode={props.isPlayMode}
-                     muted={props.muted}
                      stream={stream}
                      height={getVideoContainerHeight(stream.streamId)}
                      small={videoClass.includes("QuarterWidth")}
@@ -268,7 +266,6 @@ function CurrentSpeakerDisplayer(props) {
                   <RemoteVideoContainer
                      {...props}
                      isPlayMode={props.isPlayMode}
-                     muted={props.muted}
                      stream={stream}
                      height={getVideoContainerHeight(stream.streamId)}
                      small={videoClass.includes("QuarterWidth")}
@@ -315,14 +312,12 @@ function CurrentSpeakerDisplayer(props) {
          </div>
       );
    }
-
+   console.log("-> external media streams", props.streams);
    //TO BE TESTED
 
    return (
       <React.Fragment>
-         {showBreakoutAlert && (
-            <BreakoutRoomBanner windowWidth={windowSize.width} />
-         )}
+         {showBreakoutAlert && <BreakoutRoomBanner />}
          <div className={classes.relativeContainer}>
             <div
                className={classes.relativeContainerVideos}
@@ -334,49 +329,5 @@ function CurrentSpeakerDisplayer(props) {
       </React.Fragment>
    );
 }
-
-const BreakoutRoomBanner = ({ windowWidth }) => {
-   const classes = useStyles();
-   const links = useStreamToken({ forStreamType: "mainLivestream" });
-   const {
-      isStreamer,
-      isMainStreamer,
-      currentLivestream: { title },
-   } = useCurrentStream();
-   const [isOverFlowing, labelRef] = useTextOverflow([windowWidth]);
-
-   const handleBackToMainRoom = () => {
-      window.location.href = isMainStreamer
-         ? links.mainStreamerLink
-         : isStreamer
-         ? links.joiningStreamerLink
-         : links.viewerLink;
-   };
-
-   return (
-      <Alert
-         classes={{ message: classes.alertMessage }}
-         action={
-            <Tooltip title="Back to main room">
-               <Button
-                  onClick={handleBackToMainRoom}
-                  variant="contained"
-                  color="primary"
-                  size="small"
-               >
-                  Back
-               </Button>
-            </Tooltip>
-         }
-         severity="info"
-      >
-         <Tooltip title={isOverFlowing ? title : ""}>
-            <Typography ref={labelRef} noWrap>
-               ROOM: {title}
-            </Typography>
-         </Tooltip>
-      </Alert>
-   );
-};
 
 export default CurrentSpeakerDisplayer;

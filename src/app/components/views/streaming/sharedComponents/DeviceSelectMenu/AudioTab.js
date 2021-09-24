@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, { useEffect, useRef, useState } from "react";
 import {
    Box,
@@ -58,7 +59,7 @@ const AudioTab = ({ audioLevel, audioSource, devices, setAudioSource }) => {
    };
 
    return (
-      <Grid container spacing={4}>
+      <Grid container spacing={2}>
          {devices.audioInputList.length && (
             <Grid item lg={12} md={12} sm={12} xs={12}>
                <FormControl
@@ -115,3 +116,10 @@ const AudioTab = ({ audioLevel, audioSource, devices, setAudioSource }) => {
 };
 
 export default AudioTab;
+
+AudioTab.propTypes = {
+  audioLevel: PropTypes.any,
+  audioSource: PropTypes.any,
+  devices: PropTypes.array,
+  setAudioSource: PropTypes.func.isRequired
+}

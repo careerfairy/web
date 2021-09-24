@@ -14,18 +14,16 @@ import { isEmpty, isLoaded } from "react-redux-firebase";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 import useStreamRef from "../../components/custom-hook/useStreamRef";
+import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect";
 
 const useStyles = makeStyles((theme) => ({
    root: {
       position: "relative",
-      // minHeight: "100vh",
       height: "100vh",
       width: "100%",
       touchAction: "manipulation",
-      // border: "6px solid pink",
       backgroundColor: theme.palette.background.dark,
       display: "flex",
-      // height: '100vh',
       overflow: "hidden",
    },
    wrapper: {
@@ -60,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
       top: 55,
       left: 0,
       bottom: 0,
-      zIndex: 20,
+      // zIndex: 20,
       boxShadow: theme.shadows[7],
    },
 }));
@@ -85,15 +83,8 @@ const StreamerLayout = (props) => {
    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
    const [selectedState, setSelectedState] = useState("questions");
    const [sliding, setSliding] = useState(false);
-
-   const [showVideoButton, setShowVideoButton] = useState({
-      paused: false,
-      muted: false,
-   });
-   const [play, setPlay] = useState(false);
-   const [unmute, setUnmute] = useState(true);
-
    const currentLivestream = useStreamConnect();
+   useStreamerActiveHandRaisesConnect()
 
    const classes = useStyles({
       showMenu,
@@ -189,19 +180,6 @@ const StreamerLayout = (props) => {
       setAudienceDrawerOpen(false);
    }, []);
 
-   const unmuteVideos = useCallback(() => {
-      setShowVideoButton((prevState) => {
-         return { paused: prevState.paused, muted: false };
-      });
-      setUnmute(true);
-   }, []);
-
-   const playVideos = useCallback(() => {
-      setShowVideoButton((prevState) => {
-         return { paused: false, muted: false };
-      });
-      setPlay(true);
-   }, []);
 
    const handleStateChange = useCallback(
       (state) => {
@@ -279,12 +257,6 @@ const StreamerLayout = (props) => {
                      <div className={classes.content}>
                         {React.cloneElement(children, {
                            ...props,
-                           playVideos,
-                           unmuteVideos,
-                           showVideoButton,
-                           setShowVideoButton,
-                           play,
-                           unmute,
                            newNotification,
                            isMainStreamer,
                            isStreamer: true,

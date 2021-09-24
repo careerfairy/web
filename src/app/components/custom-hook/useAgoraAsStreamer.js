@@ -10,7 +10,6 @@ import useStreamRef from "./useStreamRef";
 export default function useAgoraAsStreamer(
    streamerReady,
    isPlayMode,
-   videoId,
    screenSharingMode,
    roomId,
    streamId,
@@ -121,7 +120,6 @@ export default function useAgoraAsStreamer(
       }
       setRemovedStream(null);
    }, [removedStream]);
-
    useEffect(() => {
       setReadyToConnect(
          Boolean(
@@ -228,15 +226,12 @@ export default function useAgoraAsStreamer(
    );
 
    const handleConnectClients = () => {
-      console.log("-> Connecting Clients");
       connectAgoraRTC();
       connectAgoraRTM();
    };
    const handleSwitchRooms = async () => {
       if (rtcClient || rtmClient || rtmChannel) {
-         console.log("-> CLOSING CONNECTIONS");
          removeAllClients();
-         console.log("-> CLOSING CONNECTIONS FINISHED");
       }
       setExternalMediaStreams([]);
    };
@@ -341,6 +336,7 @@ export default function useAgoraAsStreamer(
 
       let localStream = null;
       rtcClient.on("client-role-changed", function (evt) {
+         console.log("-> client-role-changed", evt);
          let role = evt.role;
          if (role === "host") {
             localStream = AgoraRTC.createStream({
@@ -349,9 +345,13 @@ export default function useAgoraAsStreamer(
             });
             localStream.setVideoProfile("480p_9");
             localStream.init(() => {
-               localStream.play(videoId);
+               // localStream.play(streamId);
                rtcClient.publish(localStream, handleError);
-               setLocalMediaStream(localStream);
+               setLocalMediaStream({
+                  streamId: streamId,
+                  stream: localStream,
+                  isLocal: true,
+               });
             }, handleStreamInitializationError);
          }
          if (role === "audience") {
@@ -381,7 +381,7 @@ export default function useAgoraAsStreamer(
          let streamToUpdate = {
             streamId: evt.uid,
             propertiesToUpdate: {
-               fallbackToAudio: evt.attr === 1 ? true : false,
+               fallbackToAudio: evt.attr === 1,
             },
          };
          setUpdatedStream(streamToUpdate);
@@ -493,9 +493,13 @@ export default function useAgoraAsStreamer(
                      msg: "RTC_PUBLISH_STREAM",
                   });
 
-                  localStream.play(videoId);
+                  // localStream.play(streamId);
                   rtcClient.publish(localStream, handleStreamPublishingError);
-                  setLocalMediaStream(localStream);
+                  setLocalMediaStream({
+                     streamId: streamId,
+                     stream: localStream,
+                     isLocal: true,
+                  });
                   // Publish the local stream
                }, handleStreamInitializationError);
             },
@@ -515,6 +519,7 @@ export default function useAgoraAsStreamer(
                   type: "INFO",
                   msg: "RTC_STREAM_JOINED_AS_VIEWER",
                });
+               if (!isPlayMode) rtcClient.setClientRole("host");
             },
             handleClientJoinChannelError
          );
@@ -523,6 +528,13 @@ export default function useAgoraAsStreamer(
 
       setRtcClient(rtcClient);
    };
+
+   const createDemoStream = useCallback((streamData) => {
+      setAddedStream({
+         ...streamData,
+         isDemo: true,
+      });
+   }, []);
 
    const connectAgoraRTM = () => {
       let AgoraRTM = require("agora-rtm-sdk");
@@ -654,7 +666,17 @@ export default function useAgoraAsStreamer(
 
             screenShareStream.init(
                () => {
-                  screenShareStream.play("Screen");
+                  // screenShareStream.play("Screen");
+                  setAddedStream({
+                     streamId: uid,
+                     audio: false,
+                     video: false,
+                     screen: true,
+                     screenAudio: true,
+                     optimizationMode: screenSharingMode,
+                     isLocal: true,
+                     stream: screenShareStream,
+                  });
                   client.publish(
                      screenShareStream,
                      handleStreamPublishingError
@@ -716,7 +738,7 @@ export default function useAgoraAsStreamer(
             rtcClient.setClientRole("audience");
          }
       }
-   }, [isPlayMode]);
+   }, [isPlayMode, agoraRTC, rtcClient]);
 
    const removeStreamFromList = (streamId, streamList) => {
       const streamListCopy = [...streamList];
@@ -855,6 +877,7 @@ export default function useAgoraAsStreamer(
       agoraRtcConnectionStatus,
       agoraRtmStatus,
       networkQuality,
+      createDemoStream,
       setAddedStream,
       setRemovedStream,
       createEmote,

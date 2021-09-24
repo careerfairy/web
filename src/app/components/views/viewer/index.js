@@ -2,18 +2,18 @@ import React, { Fragment } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import ViewerComponent from "./viewer-component/ViewerComponent";
 import MiniChatContainer from "../streaming/LeftMenu/categories/chat/MiniChatContainer";
-import EmoteButtons from "./EmoteButtons";
 import IconsContainer from "../streaming/icons-container/IconsContainer";
 import RatingContainer from "./rating-container/RatingContainer";
 import { Backdrop } from "@material-ui/core";
 import VolumeUpRoundedIcon from "@material-ui/icons/VolumeUpRounded";
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 import { useCurrentStream } from "../../../context/stream/StreamContext";
-import clsx from "clsx";
 import StreamNotifications from "../streaming/sharedComponents/StreamNotifications";
 import AudienceDrawer from "../streaming/AudienceDrawer";
 import ButtonComponent from "../streaming/sharedComponents/ButtonComponent";
 import StreamClosedCountdown from "../streaming/sharedComponents/StreamClosedCountdown";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({
    iconsContainer: {
@@ -40,9 +40,10 @@ const useStyles = makeStyles((theme) => ({
       right: "40px",
       width: "20%",
       minWidth: "250px",
-      zIndex: 7250,
+      zIndex: 998,
    },
    blackFrame: {
+      display: "flex",
       zIndex: 10,
       backgroundColor: "black",
       position: "absolute",
@@ -59,30 +60,24 @@ const useStyles = makeStyles((theme) => ({
 const ViewerOverview = ({
    handRaiseActive,
    streamerId,
-   showVideoButton,
-   unmute,
-   play,
-   playVideos,
    mobile,
-   unmuteVideos,
    setShowMenu,
    handleStateChange,
    selectedState,
    showMenu,
-   setShowVideoButton,
    hideAudience,
    audienceDrawerOpen,
 }) => {
    const { currentLivestream, isBreakout } = useCurrentStream();
+   const dispatch = useDispatch();
+   const { videoIsMuted, videoIsPaused } = useSelector(
+      (state) => state.stream.streaming
+   );
 
    const classes = useStyles({ mobile });
    return (
       <Fragment>
-         <div
-            className={clsx({
-               [classes.blackFrame]: true,
-            })}
-         >
+         <div className={classes.blackFrame}>
             <AudienceDrawer
                hideAudience={hideAudience}
                audienceDrawerOpen={audienceDrawerOpen}
@@ -99,13 +94,11 @@ const ViewerOverview = ({
             <ViewerComponent
                livestreamId={currentLivestream.id}
                streamerId={streamerId}
+               mobile={mobile}
+               showMenu={showMenu}
                currentLivestream={currentLivestream}
                handRaiseActive={handRaiseActive}
-               showVideoButton={showVideoButton}
                isBreakout={isBreakout}
-               setShowVideoButton={setShowVideoButton}
-               unmute={unmute}
-               play={play}
             />
 
             {
@@ -130,9 +123,9 @@ const ViewerOverview = ({
          )}
          <StreamNotifications isStreamer={false} />
          <Backdrop
-            open={Boolean(showVideoButton.muted)}
+            open={videoIsMuted}
             className={classes.backdrop}
-            onClick={unmuteVideos}
+            onClick={() => dispatch(actions.unmuteMutedRemoteVideosAfterFail())}
          >
             <div className={classes.backdropContent}>
                <VolumeUpRoundedIcon style={{ fontSize: "3rem" }} />
@@ -140,9 +133,9 @@ const ViewerOverview = ({
             </div>
          </Backdrop>
          <Backdrop
-            open={Boolean(showVideoButton.paused)}
+            open={videoIsPaused}
             className={classes.backdrop}
-            onClick={playVideos}
+            onClick={() => dispatch(actions.unpauseRemoteVideosAfterFail())}
          >
             <div className={classes.backdropContent}>
                <PlayArrowRoundedIcon style={{ fontSize: "3rem" }} />

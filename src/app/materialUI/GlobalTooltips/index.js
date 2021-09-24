@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => {
    };
 });
 //
-export const WhiteTooltip = ({ title, children, open, ...props }) => {
+export const WhiteTooltip = ({ title, children, open, style, ...props }) => {
    const classes = useStyles();
 
    return (
@@ -50,7 +50,7 @@ export const WhiteTooltip = ({ title, children, open, ...props }) => {
          classes={{ arrow: classes.arrow, tooltip: classes.tooltip }}
          title={title}
       >
-         <div className={open ? classes.highlight : {}}>{children}</div>
+         <div style={style} className={open ? classes.highlight : {}}>{children}</div>
       </Tooltip>
    );
 };

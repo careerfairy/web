@@ -6,10 +6,8 @@ import React, {
    useState,
 } from "react";
 
-import { withFirebasePage } from "context/firebase";
+import { useFirebase, withFirebasePage } from "context/firebase";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
-import CurrentSpeakerDisplayer from "./CurrentSpeakerDisplayer";
-import SmallStreamerVideoDisplayer from "./SmallStreamerVideoDisplayer";
 import VideoControlsContainer from "./VideoControlsContainer";
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
 import useDevices from "components/custom-hook/useDevices";
@@ -27,10 +25,21 @@ import ScreenShareModal from "./ScreenShareModal";
 import useStreamRef from "../../../custom-hook/useStreamRef";
 import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/StreamerTopBar/BreakoutRoomManagementModal";
 import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
+import Streams from "./Streams";
+import DraggableComponent from "../../banners/DraggableComponent";
 
 const useStyles = makeStyles((theme) => ({}));
 
-function VideoContainer(props) {
+function VideoContainer({
+   currentLivestream,
+   isPlayMode,
+   showMenu,
+   smallScreen,
+   stream,
+   streamerId,
+   viewer,
+}) {
+   const firebase = useFirebase();
    const {
       tutorialSteps,
       setTutorialSteps,
@@ -42,7 +51,7 @@ function VideoContainer(props) {
    } = useContext(TutorialContext);
    const classes = useStyles();
    const localVideoId = "localVideo";
-   const isMainStreamer = props.streamerId === props.currentLivestream.id;
+   const isMainStreamer = streamerId === currentLivestream.id;
    const streamRef = useStreamRef();
    const [errorMessage, setErrorMessage] = useState(null);
    const [
@@ -50,7 +59,6 @@ function VideoContainer(props) {
       setScreenSharePermissionDenied,
    ] = useState(false);
    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
-   // console.count("-> VideoContainer");
    const [streamerConnected, setStreamerConnected] = useState(false);
    const [streamerReady, setStreamerReady] = useState(false);
 
@@ -61,8 +69,8 @@ function VideoContainer(props) {
    const [showSettings, setShowSettings] = useState(false);
 
    const screenSharingMode =
-      props.currentLivestream.screenSharerId === props.streamerId &&
-      props.currentLivestream.mode === "desktop"
+      currentLivestream.screenSharerId === streamerId &&
+      currentLivestream.mode === "desktop"
          ? optimizationMode
          : "";
 
@@ -75,17 +83,17 @@ function VideoContainer(props) {
       agoraRtmStatus,
       networkQuality,
       numberOfViewers,
+      createDemoStream,
       setAddedStream,
       setRemovedStream,
       agoraHandlers,
    } = useAgoraAsStreamer(
       true,
       false,
-      localVideoId,
       screenSharingMode,
-      props.currentLivestream.id,
-      props.streamerId,
-      props.viewer
+      currentLivestream.id,
+      streamerId,
+      viewer
    );
 
    const devices = useDevices(
@@ -103,11 +111,10 @@ function VideoContainer(props) {
       audioLevel,
    } = useMediaSources(
       devices,
-      props.streamerId,
+      streamerId,
       localMediaStream,
       !streamerReady || showSettings
    );
-
    const currentSpeakerId = useCurrentSpeaker(
       localMediaStream,
       externalMediaStreams
@@ -128,23 +135,23 @@ function VideoContainer(props) {
          agoraRtcStatus &&
          (agoraRtcStatus.msg === "RTC_SCREEN_SHARE_STOPPED" ||
             agoraRtcStatus.msg === "RTC_SCREEN_SHARE_NOT_ALLOWED") &&
-         props.currentLivestream.mode === "desktop" &&
-         props.currentLivestream.screenSharerId === props.streamerId
+         currentLivestream.mode === "desktop" &&
+         currentLivestream.screenSharerId === streamerId
       ) {
-         setDesktopMode("default", props.streamerId);
+         setDesktopMode("default", streamerId);
       }
    }, [agoraRtcStatus]);
 
    useEffect(() => {
-      if (props.streamerId && props.currentLivestream.id) {
+      if (streamerId && currentLivestream.id) {
          if (
-            props.currentLivestream.mode === "desktop" &&
-            props.currentLivestream.screenSharerId === props.streamerId
+            currentLivestream.mode === "desktop" &&
+            currentLivestream.screenSharerId === streamerId
          ) {
-            setDesktopMode("default", props.streamerId);
+            setDesktopMode("default", streamerId);
          }
       }
-   }, [props.streamerId, props.currentLivestream.id]);
+   }, [streamerId, currentLivestream.id]);
 
    const [timeoutState, setTimeoutState] = useState(null);
 
@@ -152,15 +159,15 @@ function VideoContainer(props) {
       if (localMediaStream && externalMediaStreams) {
          if (externalMediaStreams.length > 3) {
             if (
-               props.streamerId === props.currentLivestream.currentSpeakerId &&
-               props.currentLivestream.mode !== "desktop" &&
-               props.currentLivestream.mode !== "presentation"
+               streamerId === currentLivestream.currentSpeakerId &&
+               currentLivestream.mode !== "desktop" &&
+               currentLivestream.mode !== "presentation"
             ) {
                if (timeoutState) {
                   clearTimeout(timeoutState);
                }
                let newTimeout = setTimeout(() => {
-                  localMediaStream.setVideoProfile("480p_9");
+                  localMediaStream.stream.setVideoProfile("480p_9");
                }, 20000);
                setTimeoutState(newTimeout);
             } else {
@@ -168,27 +175,25 @@ function VideoContainer(props) {
                   clearTimeout(timeoutState);
                }
                let newTimeout = setTimeout(() => {
-                  localMediaStream.setVideoProfile("180p");
+                  localMediaStream.stream.setVideoProfile("180p");
                }, 20000);
                setTimeoutState(newTimeout);
             }
          } else {
-            localMediaStream.setVideoProfile("480p_9");
+            localMediaStream.stream.setVideoProfile("480p_9");
          }
       }
    }, [
       localMediaStream,
       externalMediaStreams,
-      props.currentLivestream.currentSpeakerId,
-      props.currentLivestream.mode,
+      currentLivestream.currentSpeakerId,
+      currentLivestream.mode,
    ]);
 
    const setDesktopMode = async (mode, initiatorId) => {
       let screenSharerId =
-         mode === "desktop"
-            ? initiatorId
-            : props.currentLivestream.screenSharerId;
-      await props.firebase.setDesktopMode(streamRef, mode, screenSharerId);
+         mode === "desktop" ? initiatorId : currentLivestream.screenSharerId;
+      await firebase.setDesktopMode(streamRef, mode, screenSharerId);
    };
 
    useEffect(() => {
@@ -200,6 +205,11 @@ function VideoContainer(props) {
                   (stream) => stream.streamId === "demoStream"
                )
             ) {
+               createDemoStream({
+                  streamId: "demoStream",
+                  url:
+                     "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media",
+               })
                setAddedStream({
                   streamId: "demoStream",
                   url:
@@ -214,7 +224,7 @@ function VideoContainer(props) {
 
    const isOpen = (property) => {
       return Boolean(
-         props.currentLivestream.test &&
+         currentLivestream.test &&
             tutorialSteps.streamerReady &&
             tutorialSteps[property]
       );
@@ -248,8 +258,8 @@ function VideoContainer(props) {
    }, []);
 
    const handleClickScreenShareButton = async () => {
-      if (props.currentLivestream.mode === "desktop") {
-         return await setDesktopMode("default", props.streamerId);
+      if (currentLivestream.mode === "desktop") {
+         return await setDesktopMode("default", streamerId);
       }
       setShowScreenShareModal(true);
    };
@@ -258,92 +268,72 @@ function VideoContainer(props) {
       async (optimizationMode = "detail") => {
          setOptimizationMode(optimizationMode);
          await setDesktopMode(
-            props.currentLivestream.mode === "desktop" ? "default" : "desktop",
-            props.streamerId
+            currentLivestream.mode === "desktop" ? "default" : "desktop",
+            streamerId
          );
       },
-      [optimizationMode, props.currentLivestream?.mode, props.streamerId]
+      [optimizationMode, currentLivestream?.mode, streamerId]
    );
-
-   const sharingContent = () =>
-      props.currentLivestream.mode === "presentation" ||
-      props.currentLivestream.mode === "desktop";
 
    return (
       <Fragment>
          <BreakoutRoomManagementModal agoraHandlers={agoraHandlers} />
-         <div>
-            <div>
-               <CurrentSpeakerDisplayer
-                  isPlayMode={false}
-                  streamTitle={props.currentLivestream.title}
-                  smallScreenMode={
-                     props.currentLivestream.mode === "presentation" ||
-                     props.currentLivestream.mode === "desktop"
-                  }
-                  speakerSwitchModeActive={isMainStreamer}
-                  localId={props.streamerId}
-                  localStream={localMediaStream}
-                  speakerSource={speakerSource}
-                  isStreamer={props.isStreamer}
-                  isBreakout={props.isBreakout}
-                  streams={externalMediaStreams}
-                  currentSpeaker={currentSpeakerId}
-                  setRemovedStream={setRemovedStream}
-                  {...props}
-                  muted={false}
-               />
-            </div>
-            {sharingContent() && (
-               <SmallStreamerVideoDisplayer
-                  livestreamId={props.currentLivestream.id}
-                  isBreakout={props.isBreakout}
-                  presentation={props.currentLivestream.mode === "presentation"}
-                  showMenu={props.showMenu}
-                  externalMediaStreams={externalMediaStreams}
-                  isLocalScreen={screenSharingMode}
-                  presenter={true}
-               />
-            )}
-            <VideoControlsContainer
-               currentLivestream={props.currentLivestream}
-               viewer={props.viewer}
-               streamerId={props.streamerId}
-               joining={!isMainStreamer}
-               handleClickScreenShareButton={handleClickScreenShareButton}
-               localMediaStream={localMediaStream}
-               setLocalMediaStream={setLocalMediaStream}
-               isMainStreamer={isMainStreamer}
-               showSettings={showSettings}
-               setShowSettings={setShowSettings}
-            />
+         <Streams
+            externalMediaStreams={externalMediaStreams}
+            localMediaStream={localMediaStream}
+            currentSpeakerId={currentSpeakerId}
+            streamerId={streamerId}
+            handRaiseActive={currentLivestream.handRaiseActive}
+            videoMutedBackgroundImg={currentLivestream.companyLogoUrl}
+            setRemovedStream={setRemovedStream}
+            liveSpeakers={currentLivestream.liveSpeakers}
+            isBroadCasting={!isPlayMode}
+            sharingScreen={currentLivestream.mode === "desktop"}
+            sharingPdf={currentLivestream.mode === "presentation"}
+            showMenu={showMenu}
+            livestreamId={currentLivestream.id}
+            presenter
+         />
+         <VideoControlsContainer
+            currentLivestream={currentLivestream}
+            viewer={viewer}
+            streamerId={streamerId}
+            joining={!isMainStreamer}
+            handleClickScreenShareButton={handleClickScreenShareButton}
+            localMediaStream={localMediaStream}
+            setLocalMediaStream={setLocalMediaStream}
+            isMainStreamer={isMainStreamer}
+            showSettings={showSettings}
+            setShowSettings={setShowSettings}
+         />
+         <DraggableComponent
+            zIndex={3}
+            bounds="parent"
+            positionStyle={"absolute"}
+            defaultPosition={{ x: 4, y: 60 }}
+            elementId="wifiIndicatorLocation"
+         >
             <WifiIndicator
                uplink={networkQuality.uplinkNetworkQuality}
                downlink={networkQuality.downlinkNetworkQuality}
                agoraRtcConnectionStatus={agoraRtcConnectionStatus}
                agoraRtmStatus={agoraRtmStatus}
             />
-         </div>
+         </DraggableComponent>
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}
-            streamId={props.streamerId}
-            smallScreen={props.smallScreen}
+            smallScreen={smallScreen}
             devices={devices}
-            localStream={localMediaStream}
             displayableMediaStream={displayableMediaStream}
             audioSource={audioSource}
             updateAudioSource={updateAudioSource}
             videoSource={videoSource}
             updateVideoSource={updateVideoSource}
             audioLevel={audioLevel}
-            speakerSource={speakerSource}
-            setSpeakerSource={updateSpeakerSource}
          />
          <StreamPreparationModalV2
-            readyToConnect={Boolean(
-               props.currentLivestream && props.currentLivestream.id
-            )}
+            readyToConnect={Boolean(currentLivestream && currentLivestream.id)}
             audioSource={audioSource}
             updateAudioSource={updateAudioSource}
             videoSource={videoSource}
@@ -356,8 +346,8 @@ function VideoContainer(props) {
             setStreamerReady={setStreamerReady}
             localStream={displayableMediaStream}
             connectionEstablished={connectionEstablished}
-            isTest={props.currentLivestream.test}
-            viewer={props.viewer}
+            isTest={currentLivestream.test}
+            viewer={viewer}
             handleOpenDemoIntroModal={handleOpenDemoIntroModal}
             devices={devices}
             setConnectionEstablished={setConnectionEstablished}
@@ -372,13 +362,13 @@ function VideoContainer(props) {
          />
          <ScreenShareModal
             open={showScreenShareModal}
-            smallScreen={props.smallScreen}
+            smallScreen={smallScreen}
             handleClose={handleCloseScreenShareModal}
             handleScreenShare={handleScreenShare}
          />
 
          <DemoIntroModal
-            livestreamId={props.currentLivestream.id}
+            livestreamId={currentLivestream.id}
             open={showDemoIntroModal}
             handleClose={handleCloseDemoIntroModal}
          />
@@ -390,4 +380,4 @@ function VideoContainer(props) {
    );
 }
 
-export default withFirebasePage(VideoContainer);
+export default VideoContainer;

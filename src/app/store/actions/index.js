@@ -29,6 +29,7 @@ export {
    enqueueBroadcastMessage,
    enqueueCallToAction,
    enqueueJobPostingCta,
+   enqueueSuccessfulHandRaiseRequest
 } from "./snackbarActions.js";
 export {
    deleteFilterGroup,
@@ -65,6 +66,14 @@ export {
    openViewerBreakoutModal,
    closeViewerCtaModal,
    openViewerCtaModal,
+   setVideoIsMuted,
+   unmuteAllRemoteVideos,
+   setVideoIsPaused,
+   muteAllRemoteVideos,
+   toggleLocalVideo,
+   toggleLocalAudio,
+   unmuteMutedRemoteVideosAfterFail,
+   unpauseRemoteVideosAfterFail
 } from "./streamActions";
 
 export {

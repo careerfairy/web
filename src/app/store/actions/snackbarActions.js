@@ -12,15 +12,15 @@ import React from "react";
 
 /**
  * Enqueue a snackbar managed in redux state.
- * @param {{
- * options: {
+ * options: ({
  * anchorOrigin: {horizontal: string, vertical: string},
  * variant: ('default' | 'error' | 'success' | 'warning' | 'info')
  * key: string,
  * action: object
- * },
+ * }),
  * message: string
  * }} [notification]
+ * @param notification
  */
 export const enqueueSnackbar = (
    notification = { message: "", options: {} }
@@ -154,6 +154,23 @@ export const sendCustomError = (data = {}) => async (dispatch) => {
             variant: "error",
             preventDuplicate: true,
             ...data.options,
+         },
+      })
+   );
+};
+
+// enqueue hand raise request sent
+
+export const enqueueSuccessfulHandRaiseRequest = () => async (dispatch) => {
+   const message =
+      "Your hand raise request has been sent, please wait to be invited.";
+   return dispatch(
+      enqueueSnackbar({
+         message,
+         options: {
+            key: message,
+            variant: "info",
+            preventDuplicate: true,
          },
       })
    );

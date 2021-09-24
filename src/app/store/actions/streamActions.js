@@ -39,3 +39,44 @@ export const setNumberOfViewers = (numberOfViewers) => async (dispatch) => {
       payload: numberOfViewers || 0,
    });
 };
+
+// Toggle your local video
+export const toggleLocalVideo = () => async (dispatch) => {
+   dispatch({ type: actions.TOGGLE_LOCAL_VIDEO });
+};
+
+// Toggle your local audio
+export const toggleLocalAudio = () => async (dispatch) => {
+   dispatch({ type: actions.TOGGLE_LOCAL_AUDIO });
+};
+
+// Mute All videos on the stream
+export const muteAllRemoteVideos = () => async (dispatch) => {
+   dispatch({ type: actions.MUTE_ALL_REMOTE_VIDEOS });
+};
+
+// Unmute All videos on the stream
+export const unmuteAllRemoteVideos = () => async (dispatch) => {
+   dispatch({ type: actions.UNMUTE_ALL_REMOTE_VIDEOS });
+};
+
+// If the error returned from playing a video is audio related let the app know that a video is muted
+export const setVideoIsMuted = () => async (dispatch) => {
+   dispatch({ type: actions.SET_VIDEO_IS_MUTED });
+};
+
+// If the error returned from playing a video is that its not playing, let the app know that the video is paused
+export const setVideoIsPaused = () => async (dispatch) => {
+   dispatch({ type: actions.SET_VIDEO_IS_PAUSED });
+};
+
+// iF A STREAM FAILS TO PLAY AUDIO TRY TO UNMUTE ALL OF THEM
+export const unmuteMutedRemoteVideosAfterFail = () => async (dispatch) => {
+   dispatch({ type: actions.UNMUTE_MUTED_REMOTE_VIDEOS_ON_FAIL });
+};
+// iF A STREAM FAILS TO PLAY AUDIO TRY TO UNMUTE ALL OF THEM
+export const unpauseRemoteVideosAfterFail = () => async (dispatch) => {
+   dispatch({ type: actions.UNPAUSE_PAUSED_REMOTE_VIDEOS_ON_FAIL });
+};
+
+

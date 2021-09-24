@@ -11,27 +11,17 @@ import ButtonComponent from "./sharedComponents/ButtonComponent";
 import VolumeUpRoundedIcon from "@material-ui/icons/VolumeUpRounded";
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 import { Backdrop } from "@material-ui/core";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "store/actions";
+import HandRaiseNotifier from "./LeftMenu/categories/hand-raise/active/HandRaiseNotifier";
 
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
-      position: "absolute",
-      left: "0",
-      right: "0",
-      bottom: "0",
-      // left: ({showMenu}) => showMenu ? 280 : 0,
-      // transition: "left 0.3s",
       transitionTimingFunction: theme.transitions.easeInOut,
-      // position: "relative",
-      // top: 55,
-      // right: 0,
-      // left:0,
-      // minWidth: 345,
-      // height: "calc(100% - 55px)",
-      zIndex: 10,
-      backgroundColor: "black",
-      // flex: '1 1 auto',
-      // height: '100%',
-      // overflow: 'auto'
+      // zIndex: 10,
+      display: "flex",
+      height: "inherit",
+      position: "relative",
    },
    miniChatContainer: {
       position: "absolute",
@@ -39,13 +29,13 @@ const useStyles = makeStyles((theme) => ({
       right: 40,
       width: "20%",
       minWidth: 250,
-      zIndex: 100,
+      zIndex: 1,
    },
    iconsContainer: {
       position: "absolute",
       bottom: 60,
       right: 100,
-      zIndex: 100,
+      zIndex: 1,
       width: 80,
    },
    backdrop: {
@@ -75,19 +65,17 @@ const StreamerOverview = ({
    smallScreen,
    hideAudience,
    audienceDrawerOpen,
-   showVideoButton,
-   setShowVideoButton,
-   play,
-   unmute,
-   playVideos,
-   unmuteVideos,
 }) => {
    const { currentLivestream, isBreakout } = useCurrentStream();
    const classes = useStyles();
+   const dispatch = useDispatch();
+   const { videoIsMuted, videoIsPaused } = useSelector(
+      (state) => state.stream.streaming
+   );
 
    return (
       <Fragment>
-         <div className={classes.blackFrame}>
+         <div id="videoBlackFrame" className={classes.blackFrame}>
             <VideoContainer
                currentLivestream={currentLivestream}
                streamerId={streamerId}
@@ -97,12 +85,6 @@ const StreamerOverview = ({
                isBreakout={isBreakout}
                showMenu={showMenu}
                viewer={false}
-               setShowVideoButton={setShowVideoButton}
-               showVideoButton={showVideoButton}
-               play={play}
-               unmute={unmute}
-               playVideos={playVideos}
-               unmuteVideos={unmuteVideos}
             />
             <ButtonComponent
                setShowMenu={setShowMenu}
@@ -120,9 +102,11 @@ const StreamerOverview = ({
          />
          <NotificationsContainer
             livestreamId={currentLivestream.id}
+            handRaiseMenuOpen={selectedState === "hand"}
             notifications={notifications}
          />
          <StreamNotifications isStreamer={true} />
+         <HandRaiseNotifier />
          <MiniChatContainer
             className={classes.miniChatContainer}
             livestream={currentLivestream}
@@ -135,9 +119,9 @@ const StreamerOverview = ({
             livestreamId={currentLivestream.id}
          />
          <Backdrop
-            open={Boolean(showVideoButton.muted)}
+            open={videoIsMuted}
             className={classes.backdrop}
-            onClick={unmuteVideos}
+            onClick={() => dispatch(actions.unmuteMutedRemoteVideosAfterFail())}
          >
             <div className={classes.backdropContent}>
                <VolumeUpRoundedIcon style={{ fontSize: "3rem" }} />
@@ -145,9 +129,9 @@ const StreamerOverview = ({
             </div>
          </Backdrop>
          <Backdrop
-            open={Boolean(showVideoButton.paused)}
+            open={videoIsPaused}
             className={classes.backdrop}
-            onClick={playVideos}
+            onClick={() => dispatch(actions.unpauseRemoteVideosAfterFail())}
          >
             <div className={classes.backdropContent}>
                <PlayArrowRoundedIcon style={{ fontSize: "3rem" }} />

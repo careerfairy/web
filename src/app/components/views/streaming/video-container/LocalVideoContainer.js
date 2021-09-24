@@ -72,11 +72,11 @@ const LocalVideoContainer = ({
    localSpeaker,
    localStream,
    small,
+
 }) => {
    const classes = useStyles();
 
    useEffect(() => {
-      // console.log(localStream);
    }, [localStream]);
 
    return (
