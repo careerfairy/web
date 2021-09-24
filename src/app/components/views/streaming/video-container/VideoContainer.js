@@ -6,7 +6,7 @@ import React, {
    useState,
 } from "react";
 
-import { withFirebasePage } from "context/firebase";
+import { useFirebase, withFirebasePage } from "context/firebase";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
 import VideoControlsContainer from "./VideoControlsContainer";
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
@@ -32,7 +32,6 @@ const useStyles = makeStyles((theme) => ({}));
 
 function VideoContainer({
    currentLivestream,
-   firebase,
    isPlayMode,
    showMenu,
    smallScreen,
@@ -40,6 +39,7 @@ function VideoContainer({
    streamerId,
    viewer,
 }) {
+   const firebase = useFirebase();
    const {
       tutorialSteps,
       setTutorialSteps,
@@ -300,7 +300,13 @@ function VideoContainer({
             showSettings={showSettings}
             setShowSettings={setShowSettings}
          />
-         <DraggableComponent zIndex={1} bounds="parent" elementId="wifiIndicatorLocation">
+         <DraggableComponent
+            zIndex={3}
+            bounds="parent"
+            positionStyle={"absolute"}
+            defaultPosition={ { x: 10, y: 10 }}
+            elementId="wifiIndicatorLocation"
+         >
             <WifiIndicator
                uplink={networkQuality.uplinkNetworkQuality}
                downlink={networkQuality.downlinkNetworkQuality}
@@ -368,4 +374,4 @@ function VideoContainer({
    );
 }
 
-export default withFirebasePage(VideoContainer);
+export default VideoContainer;

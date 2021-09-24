@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
       position: "absolute",
       alignItems: "center",
       transform: "translateY(50%)",
-      zIndex: 1000,
+      zIndex: 2,
       bottom: "50%",
    },
    speedDial: {

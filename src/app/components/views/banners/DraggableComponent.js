@@ -2,9 +2,15 @@ import PropTypes from "prop-types";
 import React, { useState, useRef, useEffect } from "react";
 import Draggable from "react-draggable";
 
-const DraggableComponent = ({ children, elementId, zIndex, bounds }) => {
+const DraggableComponent = ({
+   children,
+   elementId,
+   zIndex,
+   bounds,
+   positionStyle,
+   defaultPosition = { x: 0, y: 0 },
+}) => {
    const [position, setPosition] = useState(null);
-   console.log("-> position", position);
    const [hasLoaded, setHasLoaded] = useState(false);
    const nodeRef = useRef(null);
 
@@ -13,14 +19,12 @@ const DraggableComponent = ({ children, elementId, zIndex, bounds }) => {
       setPosition(existingDivPositions);
       setHasLoaded(true);
       console.log(existingDivPositions);
-      console.log("-> has loaded");
    }, []);
 
    function handleStop(e, data) {
-      let newPosition = {}
+      let newPosition = {};
       newPosition["x"] = data.x;
       newPosition["y"] = data.y;
-      console.log("-> newPosition", newPosition);
       setPosition(newPosition);
    }
 
@@ -32,9 +36,9 @@ const DraggableComponent = ({ children, elementId, zIndex, bounds }) => {
       <Draggable
          defaultPosition={
             position === null
-               ? { x: 0, y: 0 }
+               ? defaultPosition
                : !position
-               ? { x: 0, y: 0 }
+               ? defaultPosition
                : { x: position.x, y: position.y }
          }
          position={null}
@@ -42,7 +46,7 @@ const DraggableComponent = ({ children, elementId, zIndex, bounds }) => {
          onStop={handleStop}
          bounds={bounds}
       >
-         <div style={{ zIndex }} ref={nodeRef}>
+         <div style={{ zIndex, position: positionStyle }} ref={nodeRef}>
             {children}
          </div>
       </Draggable>

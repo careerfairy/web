@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
       // zIndex: 10,
       display: "flex",
       height: "inherit",
+     position: "relative"
    },
    miniChatContainer: {
       position: "absolute",
@@ -74,7 +75,7 @@ const StreamerOverview = ({
 
    return (
       <Fragment>
-         <div className={classes.blackFrame}>
+         <div id="videoBlackFrame" className={classes.blackFrame}>
             <VideoContainer
                currentLivestream={currentLivestream}
                streamerId={streamerId}
