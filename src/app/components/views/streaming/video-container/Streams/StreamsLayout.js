@@ -9,7 +9,7 @@ import Box from "@material-ui/core/Box";
 import LivestreamPdfViewer from "../../../../util/LivestreamPdfViewer";
 import { STREAM_ELEMENT_BORDER_RADIUS, STREAM_ELEMENT_SPACING } from "constants/streams";
 
-const STREAMS_ROW_HEIGHT = 180;
+const STREAMS_ROW_HEIGHT = 130;
 const useStyles = makeStyles((theme) => ({
    root: {
       flex: 1,
@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
       },
    },
    smallFlexStream: {
-      minWidth: STREAMS_ROW_HEIGHT,
+      minWidth: STREAMS_ROW_HEIGHT * 1.7,
       maxWidth: 200,
       paddingTop: 0,
       paddingBottom: 0,

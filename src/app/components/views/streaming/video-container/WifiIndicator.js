@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
          duration: theme.transitions.duration.standard,
       }),
       "&:hover": {
-         transform: `scale(1.1)`,
+         transform: `scale(1.05)`,
       },
    },
    subBox: {

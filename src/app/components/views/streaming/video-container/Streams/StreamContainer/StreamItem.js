@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useRef } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import SpeakerInfoOverlay from "../../SpeakerInfoOverlay";
-import { Tooltip } from "@material-ui/core";
+import { Tooltip, useMediaQuery } from "@material-ui/core";
 import VideoCamOffIcon from "@material-ui/icons/VideocamOff";
 import VolumeOffIcon from "@material-ui/icons/MicOff";
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
       flex: 1,
       position: "relative",
    },
-   videoElement: {
+   videoElement: ({ big, streamId }) => ({
       width: "100%",
       height: "100%",
       position: "absolute",
@@ -25,7 +25,10 @@ const useStyles = makeStyles((theme) => ({
          borderRadius: STREAM_ELEMENT_BORDER_RADIUS,
          boxShadow: theme.shadows[5],
       },
-   },
+      // [`& video`]: {
+      //    objectFit: big ? "contain !important": "cover !important",
+      // },
+   }),
    svgShadow: {
       filter: `drop-shadow(0px 0px 2px rgba(0,0,0,0.4))`,
    },
@@ -58,22 +61,24 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
-   const classes = useStyles();
+   const classes = useStyles({big, streamId: stream.streamId});
    const vidDiv = useRef(null);
+   // const theme = useTheme();
+   // const wideScreen = useMediaQuery(theme.breakpoints.up("lg"));
 
    const dispatch = useDispatch();
 
    const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted());
    useEffect(() => {
       if (stream?.stream?.isPlaying() === false) {
-         play(stream);
+         play(stream, big);
       }
       return () => {
          stream?.stream?.stop();
       };
-   }, [stream?.stream, stream?.stream?.isPlaying()]);
+   }, [stream?.stream, stream?.stream?.isPlaying(), big]);
 
-   const play = (stream) => {
+   const play = (stream, big) => {
       stream?.stream?.play(
          stream.streamId,
          {
