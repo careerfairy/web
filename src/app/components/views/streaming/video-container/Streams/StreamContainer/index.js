@@ -43,7 +43,11 @@ const StreamContainer = ({
    }, [stream.isScreenShareVideo, liveSpeakers, stream.streamId]);
 
    const getSpeakerInfoFromDB = async (userId) => {
-      let fetchedSpeaker = {};
+      let fetchedSpeaker = {
+         firstName: "",
+         lastName: "",
+         position: "",
+      };
       try {
          setFetching(true);
          const userSnap = await getUserData(userId);
