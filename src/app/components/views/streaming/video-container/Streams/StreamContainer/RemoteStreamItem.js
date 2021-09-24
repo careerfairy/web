@@ -1,7 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import StreamItem from "./StreamItem";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
+import TutorialContext from "../../../../../../context/tutorials/TutorialContext";
+import {
+   TooltipButtonComponent,
+   TooltipText,
+   TooltipTitle,
+   WhiteTooltip
+} from "../../../../../../materialUI/GlobalTooltips";
 
 const RemoteStreamItem = ({
    speaker,
@@ -11,6 +18,10 @@ const RemoteStreamItem = ({
    index,
    videoMutedBackgroundImg,
 }) => {
+   const { getActiveTutorialStepKey, handleConfirmStep } = useContext(
+     TutorialContext
+   );
+   const activeStep = getActiveTutorialStepKey();
    const { playAllRemoteVideos, muteAllRemoteVideos } = useSelector(
       (state) => state.stream.streaming
    );
@@ -47,14 +58,7 @@ const RemoteStreamItem = ({
       }
    }, [stream?.stream?.audio, stream?.stream?.video]);
 
-   function generateDemoHandRaiser() {
-      let video = document.createElement("video");
-      const videoContainer = document.querySelector("#" + stream.streamId);
-      videoContainer.appendChild(video);
-      video.src = stream.url;
-      video.loop = true;
-      video.play();
-   }
+
 
    function playVideo() {
       if (!stream.stream.isPlaying()) {
@@ -74,6 +78,31 @@ const RemoteStreamItem = ({
    }
 
    return (
+     <WhiteTooltip
+       placement="right"
+       title={
+          <React.Fragment>
+             <TooltipTitle>Hand Raise (3/5)</TooltipTitle>
+             <TooltipText>
+                Once connected, the viewer who raised their hand will appear
+                as an additional streamer
+             </TooltipText>
+             {activeStep === 11 && (
+               <TooltipButtonComponent
+                 onConfirm={() => {
+                    handleConfirmStep(11);
+                 }}
+                 buttonText="Ok"
+               />
+             )}
+          </React.Fragment>
+       }
+       open={activeStep === 11 && stream.streamId === "demoStream"}
+     style={{
+        width: "100%",
+        display: "flex",
+     }}
+     >
       <StreamItem
          speaker={speaker}
          stream={stream}
@@ -81,6 +110,7 @@ const RemoteStreamItem = ({
          big={big}
          videoMutedBackgroundImg={videoMutedBackgroundImg}
       />
+     </WhiteTooltip>
    );
 };
 

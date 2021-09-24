@@ -1,13 +1,14 @@
 import PropTypes from "prop-types";
-import React, { useEffect, useRef } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import React, { useCallback, useEffect, useRef } from "react";
+import { makeStyles } from "@material-ui/core/styles";
 import SpeakerInfoOverlay from "../../SpeakerInfoOverlay";
-import { Tooltip, useMediaQuery } from "@material-ui/core";
+import { Tooltip } from "@material-ui/core";
 import VideoCamOffIcon from "@material-ui/icons/VideocamOff";
 import VolumeOffIcon from "@material-ui/icons/MicOff";
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -17,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
       flex: 1,
       position: "relative",
    },
-   videoElement: ({ big, streamId }) => ({
+   videoElement: {
       width: "100%",
       height: "100%",
       position: "absolute",
@@ -25,10 +26,13 @@ const useStyles = makeStyles((theme) => ({
          borderRadius: STREAM_ELEMENT_BORDER_RADIUS,
          boxShadow: theme.shadows[5],
       },
-      // [`& video`]: {
-      //    objectFit: big ? "contain !important": "cover !important",
-      // },
-   }),
+   },
+   demoVideo: {
+      "& > *": {
+         width: "100%",
+         height: "100%",
+      },
+   },
    svgShadow: {
       filter: `drop-shadow(0px 0px 2px rgba(0,0,0,0.4))`,
    },
@@ -61,31 +65,43 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
-   const classes = useStyles({big, streamId: stream.streamId});
+   const classes = useStyles({ big, streamId: stream.streamId });
    const vidDiv = useRef(null);
-   // const theme = useTheme();
-   // const wideScreen = useMediaQuery(theme.breakpoints.up("lg"));
+
 
    const dispatch = useDispatch();
 
    const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted());
    useEffect(() => {
-      if (stream?.stream?.isPlaying() === false) {
-         play(stream, big);
+      if (stream.streamId === "demoStream") {
+         generateDemoHandRaiser();
+      } else {
+         if (stream?.stream?.isPlaying() === false) {
+            play(stream, stream.isLocal);
+         }
       }
       return () => {
          stream?.stream?.stop();
       };
-   }, [stream?.stream, stream?.stream?.isPlaying(), big]);
+   }, [stream?.stream, stream?.stream?.isPlaying(), stream.isLocal]);
 
-   const play = (stream, big) => {
+   const generateDemoHandRaiser = useCallback(() => {
+      let video = document.createElement("video");
+      const videoContainer = document.querySelector("#" + stream.streamId);
+      videoContainer.appendChild(video);
+      video.src = stream.url;
+      video.loop = true;
+      video.play();
+   }, [stream.url]);
+
+   const play = (stream, isLocal) => {
       stream?.stream?.play(
          stream.streamId,
          {
             fit: stream.isScreenShareVideo ? "contain" : "cover",
          },
          (err) => {
-            if (err) {
+            if (err && !isLocal) {
                setAVideoIsMuted();
             }
          }
@@ -96,7 +112,9 @@ const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
       <div className={classes.root}>
          <div
             id={stream.streamId}
-            className={classes.videoElement}
+            className={clsx(classes.videoElement, {
+               [classes.demoVideo]: stream.streamId === "demoStream",
+            })}
             ref={vidDiv}
          />
          {speaker && (

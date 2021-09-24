@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import LocalStreamItem from "./LocalStreamItem";
 import RemoteStreamItem from "./RemoteStreamItem";
 import { useFirebase } from "context/firebase";
+
 const StreamContainer = ({
    stream,
    big,
@@ -18,7 +19,13 @@ const StreamContainer = ({
       (async () => {
          if (speaker || fetching) return;
          let newSpeaker;
-         if (stream.isScreenShareVideo) {
+         if (stream.streamId === "demoStream") {
+            newSpeaker = {
+               firstName: "Demo",
+               lastName: "Speaker",
+               position: "✋ Hand Raiser",
+            };
+         } else if (stream.isScreenShareVideo) {
             newSpeaker = null;
          } else {
             newSpeaker = liveSpeakers?.find(
@@ -49,7 +56,7 @@ const StreamContainer = ({
             };
          }
       } catch (e) {
-         return fetchedSpeaker
+         return fetchedSpeaker;
       }
       setFetching(false);
       return fetchedSpeaker;

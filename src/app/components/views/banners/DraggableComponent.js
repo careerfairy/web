@@ -46,7 +46,7 @@ const DraggableComponent = ({
          onStop={handleStop}
          bounds={bounds}
       >
-         <div style={{ zIndex, position: "absolute",
+         <div style={{ zIndex, position: positionStyle,
             left: "1%",
             top: "1%",
          }} ref={nodeRef}>

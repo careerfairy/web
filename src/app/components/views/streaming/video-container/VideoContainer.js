@@ -83,6 +83,7 @@ function VideoContainer({
       agoraRtmStatus,
       networkQuality,
       numberOfViewers,
+      createDemoStream,
       setAddedStream,
       setRemovedStream,
       agoraHandlers,
@@ -204,6 +205,11 @@ function VideoContainer({
                   (stream) => stream.streamId === "demoStream"
                )
             ) {
+               createDemoStream({
+                  streamId: "demoStream",
+                  url:
+                     "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media",
+               })
                setAddedStream({
                   streamId: "demoStream",
                   url:

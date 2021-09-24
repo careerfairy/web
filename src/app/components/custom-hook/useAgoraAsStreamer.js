@@ -347,8 +347,8 @@ export default function useAgoraAsStreamer(
                setLocalMediaStream({
                   streamId: streamId,
                   stream: localStream,
-                  isLocal: true
-               })
+                  isLocal: true,
+               });
             }, handleStreamInitializationError);
          }
          if (role === "audience") {
@@ -493,7 +493,7 @@ export default function useAgoraAsStreamer(
                   setLocalMediaStream({
                      streamId: streamId,
                      stream: localStream,
-                     isLocal: true
+                     isLocal: true,
                   });
                   // Publish the local stream
                }, handleStreamInitializationError);
@@ -502,7 +502,7 @@ export default function useAgoraAsStreamer(
          );
       } else {
          // rtcClient.startProxyServer(3);
-         rtcClient.setClientRole("audience")
+         rtcClient.setClientRole("audience");
          rtcClient.join(
             agoraToken.rtcToken,
             roomId,
@@ -512,7 +512,7 @@ export default function useAgoraAsStreamer(
                   type: "INFO",
                   msg: "RTC_STREAM_JOINED_AS_VIEWER",
                });
-               if(!isPlayMode) rtcClient.setClientRole("host")
+               if (!isPlayMode) rtcClient.setClientRole("host");
             },
             handleClientJoinChannelError
          );
@@ -521,6 +521,13 @@ export default function useAgoraAsStreamer(
 
       setRtcClient(rtcClient);
    };
+
+   const createDemoStream = useCallback((streamData) => {
+      setAddedStream({
+         ...streamData,
+         isDemo: true,
+      });
+   }, []);
 
    const connectAgoraRTM = () => {
       let AgoraRTM = require("agora-rtm-sdk");
@@ -659,8 +666,8 @@ export default function useAgoraAsStreamer(
                      screenAudio: true,
                      optimizationMode: screenSharingMode,
                      isLocal: true,
-                     stream: screenShareStream
-                  })
+                     stream: screenShareStream,
+                  });
                   client.publish(
                      screenShareStream,
                      handleStreamPublishingError
@@ -861,6 +868,7 @@ export default function useAgoraAsStreamer(
       agoraRtcConnectionStatus,
       agoraRtmStatus,
       networkQuality,
+      createDemoStream,
       setAddedStream,
       setRemovedStream,
       createEmote,
