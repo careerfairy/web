@@ -17,7 +17,8 @@ const initialState = {
       playAllRemoteVideos: false,
       muteAllRemoteVideos: false,
       playLocalVideo: true,
-      playLocalAudio: true
+      playLocalAudio: true,
+      unmuteFailedMutedRemoteVideos: false
    },
 };
 
@@ -57,6 +58,14 @@ const streamReducer = (state = initialState, { type, payload }) => {
                muteAllRemoteVideos: true,
             },
          };
+      case actions.UNMUTE_MUTED_REMOTE_VIDEOS_ON_FAIL:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               unmuteFailedMutedRemoteVideos: true,
+            },
+         };
       case actions.UNMUTE_ALL_REMOTE_VIDEOS:
          return {
             ...state,
@@ -72,6 +81,7 @@ const streamReducer = (state = initialState, { type, payload }) => {
             streaming: {
                ...state.streaming,
                videoIsMuted: true,
+               unmuteFailedMutedRemoteVideos: false
             },
          };
       case actions.SET_VIDEO_IS_PAUSED:
@@ -79,7 +89,7 @@ const streamReducer = (state = initialState, { type, payload }) => {
             ...state,
             streaming: {
                ...state.streaming,
-               videoIsPaused: true
+               videoIsPaused: true,
             },
          };
       case actions.OPEN_STREAMER_BREAKOUT_MODAL:

@@ -127,7 +127,7 @@ const ViewerOverview = ({
          <Backdrop
             open={videoIsMuted}
             className={classes.backdrop}
-            onClick={() => dispatch(actions.unmuteAllRemoteVideos())}
+            onClick={() => dispatch(actions.unmuteMutedRemoteVideosAfterFail())}
          >
             <div className={classes.backdropContent}>
                <VolumeUpRoundedIcon style={{ fontSize: "3rem" }} />

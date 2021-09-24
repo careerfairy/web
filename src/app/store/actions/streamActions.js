@@ -74,3 +74,10 @@ export const setVideoIsMuted = () => async (dispatch) => {
 export const setVideoIsPaused = () => async (dispatch) => {
    dispatch({ type: actions.SET_VIDEO_IS_PAUSED });
 };
+
+// iF A STREAM FAILS TO PLAY AUDIO TRY TO UNMUTE ALL OF THEM
+export const unmuteMutedRemoteVideosAfterFail = () => async (dispatch) => {
+   dispatch({ type: actions.UNMUTE_MUTED_REMOTE_VIDEOS_ON_FAIL });
+};
+
+

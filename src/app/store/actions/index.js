@@ -73,6 +73,7 @@ export {
    muteAllRemoteVideos,
    toggleLocalVideo,
    toggleLocalAudio,
+   unmuteMutedRemoteVideosAfterFail
 } from "./streamActions";
 
 export {

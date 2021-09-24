@@ -1,13 +1,11 @@
 import PropTypes from "prop-types";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import SpeakerInfoOverlay from "../../SpeakerInfoOverlay";
 import { Tooltip } from "@material-ui/core";
 import VideoCamOffIcon from "@material-ui/icons/VideocamOff";
 import VolumeOffIcon from "@material-ui/icons/MicOff";
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
-import { useDispatch } from "react-redux";
-import * as actions from "store/actions";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -67,47 +65,6 @@ const useStyles = makeStyles((theme) => ({
 const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
    const classes = useStyles({ big, streamId: stream.streamId });
    const vidDiv = useRef(null);
-
-
-   const dispatch = useDispatch();
-
-   const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted());
-   useEffect(() => {
-      if (stream.streamId === "demoStream") {
-         generateDemoHandRaiser();
-      } else {
-         if (stream?.stream?.isPlaying() === false) {
-            play(stream, stream.isLocal);
-         }
-      }
-      return () => {
-         stream?.stream?.stop();
-      };
-   }, [stream?.stream, stream?.stream?.isPlaying(), stream.isLocal]);
-
-   const generateDemoHandRaiser = useCallback(() => {
-      let video = document.createElement("video");
-      const videoContainer = document.querySelector("#" + stream.streamId);
-      videoContainer.appendChild(video);
-      video.src = stream.url;
-      video.loop = true;
-      video.play();
-   }, [stream.url]);
-
-   const play = (stream, isLocal) => {
-      stream?.stream?.play(
-         stream.streamId,
-         {
-            fit: stream.isScreenShareVideo ? "contain" : "cover",
-         },
-         (err) => {
-            if (err && !isLocal) {
-               setAVideoIsMuted();
-            }
-         }
-      );
-   };
-
    return (
       <div className={classes.root}>
          <div
