@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
       // zIndex: 10,
       display: "flex",
       height: "inherit",
-     position: "relative"
+      position: "relative",
    },
    miniChatContainer: {
       position: "absolute",
@@ -131,7 +131,7 @@ const StreamerOverview = ({
          <Backdrop
             open={videoIsPaused}
             className={classes.backdrop}
-            onClick={() => dispatch(actions.playAllRemoteVideos())}
+            onClick={() => dispatch(actions.unpauseRemoteVideosAfterFail())}
          >
             <div className={classes.backdropContent}>
                <PlayArrowRoundedIcon style={{ fontSize: "3rem" }} />

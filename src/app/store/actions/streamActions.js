@@ -50,11 +50,6 @@ export const toggleLocalAudio = () => async (dispatch) => {
    dispatch({ type: actions.TOGGLE_LOCAL_AUDIO });
 };
 
-// Play All videos on the stream
-export const playAllRemoteVideos = () => async (dispatch) => {
-   dispatch({ type: actions.PLAY_ALL_REMOTE_VIDEOS });
-};
-
 // Mute All videos on the stream
 export const muteAllRemoteVideos = () => async (dispatch) => {
    dispatch({ type: actions.MUTE_ALL_REMOTE_VIDEOS });
@@ -78,6 +73,10 @@ export const setVideoIsPaused = () => async (dispatch) => {
 // iF A STREAM FAILS TO PLAY AUDIO TRY TO UNMUTE ALL OF THEM
 export const unmuteMutedRemoteVideosAfterFail = () => async (dispatch) => {
    dispatch({ type: actions.UNMUTE_MUTED_REMOTE_VIDEOS_ON_FAIL });
+};
+// iF A STREAM FAILS TO PLAY AUDIO TRY TO UNMUTE ALL OF THEM
+export const unpauseRemoteVideosAfterFail = () => async (dispatch) => {
+   dispatch({ type: actions.UNPAUSE_PAUSED_REMOTE_VIDEOS_ON_FAIL });
 };
 
 

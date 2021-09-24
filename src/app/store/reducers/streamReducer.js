@@ -18,7 +18,8 @@ const initialState = {
       muteAllRemoteVideos: false,
       playLocalVideo: true,
       playLocalAudio: true,
-      unmuteFailedMutedRemoteVideos: false
+      unmuteFailedMutedRemoteVideos: false,
+      unpauseFailedPlayRemoteVideos: false
    },
 };
 
@@ -40,16 +41,6 @@ const streamReducer = (state = initialState, { type, payload }) => {
                playLocalAudio: !state.streaming.playLocalAudio,
             },
          };
-      case actions.PLAY_ALL_REMOTE_VIDEOS:
-         return {
-            ...state,
-            streaming: {
-               ...state.streaming,
-               videoIsMuted: false,
-               videoIsPaused: false,
-               playAllRemoteVideos: true,
-            },
-         };
       case actions.MUTE_ALL_REMOTE_VIDEOS:
          return {
             ...state,
@@ -64,6 +55,16 @@ const streamReducer = (state = initialState, { type, payload }) => {
             streaming: {
                ...state.streaming,
                unmuteFailedMutedRemoteVideos: true,
+               videoIsMuted: true,
+            },
+         };
+      case actions.UNPAUSE_PAUSED_REMOTE_VIDEOS_ON_FAIL:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               unpauseFailedPlayRemoteVideos: true,
+               videoIsPaused: true,
             },
          };
       case actions.UNMUTE_ALL_REMOTE_VIDEOS:
@@ -90,6 +91,7 @@ const streamReducer = (state = initialState, { type, payload }) => {
             streaming: {
                ...state.streaming,
                videoIsPaused: true,
+               unpauseFailedPlayRemoteVideos: false
             },
          };
       case actions.OPEN_STREAMER_BREAKOUT_MODAL:

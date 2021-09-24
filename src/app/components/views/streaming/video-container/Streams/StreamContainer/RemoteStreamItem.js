@@ -22,7 +22,7 @@ const RemoteStreamItem = ({
       TutorialContext
    );
    const activeStep = getActiveTutorialStepKey();
-   const { playAllRemoteVideos, muteAllRemoteVideos, unmuteFailedMutedRemoteVideos } = useSelector(
+   const { playAllRemoteVideos, muteAllRemoteVideos, unmuteFailedMutedRemoteVideos, unpauseFailedPlayRemoteVideos } = useSelector(
       (state) => state.stream.streaming
    );
 

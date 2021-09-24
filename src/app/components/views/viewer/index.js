@@ -2,14 +2,12 @@ import React, { Fragment } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import ViewerComponent from "./viewer-component/ViewerComponent";
 import MiniChatContainer from "../streaming/LeftMenu/categories/chat/MiniChatContainer";
-import EmoteButtons from "./EmoteButtons";
 import IconsContainer from "../streaming/icons-container/IconsContainer";
 import RatingContainer from "./rating-container/RatingContainer";
 import { Backdrop } from "@material-ui/core";
 import VolumeUpRoundedIcon from "@material-ui/icons/VolumeUpRounded";
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 import { useCurrentStream } from "../../../context/stream/StreamContext";
-import clsx from "clsx";
 import StreamNotifications from "../streaming/sharedComponents/StreamNotifications";
 import AudienceDrawer from "../streaming/AudienceDrawer";
 import ButtonComponent from "../streaming/sharedComponents/ButtonComponent";
@@ -137,7 +135,7 @@ const ViewerOverview = ({
          <Backdrop
             open={videoIsPaused}
             className={classes.backdrop}
-            onClick={() => dispatch(actions.playAllRemoteVideos())}
+            onClick={() => dispatch(actions.unpauseRemoteVideosAfterFail())}
          >
             <div className={classes.backdropContent}>
                <PlayArrowRoundedIcon style={{ fontSize: "3rem" }} />
