@@ -142,6 +142,7 @@ const CallToActionNotifications = ({
                         }
                         icon={icon}
                         buttonText={buttonText}
+                        buttonUrl={buttonUrl}
                         jobTitle={jobTitle}
                         salary={salary}
                         snackBarImage={snackBarImage}

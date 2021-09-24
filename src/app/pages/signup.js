@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect, useContext } from "react";
-import { withFirebase } from "context/firebase";
+import { useFirebase, withFirebase } from "context/firebase";
 import TheatersRoundedIcon from "@material-ui/icons/TheatersRounded";
 import ArrowForwardIosRoundedIcon from "@material-ui/icons/ArrowForwardIosRounded";
 import BusinessCenterRoundedIcon from "@material-ui/icons/BusinessCenterRounded";
@@ -97,7 +97,7 @@ function getSteps(absolutePath) {
       : ["Credentials", "Email Verification", "Join Groups"];
 }
 
-function SignUpPage({ firebase }) {
+function SignUpPage() {
    const classes = useStyles();
    const router = useRouter();
    const { absolutePath } = router.query;
@@ -109,7 +109,7 @@ function SignUpPage({ firebase }) {
 
    useEffect(() => {
       verifyUserState();
-   }, [user, userData]);
+   }, [user.emailVerified, userData?.userEmail]);
 
    const verifyUserState = async () => {
       if (user.isLoaded && !user.isEmpty) {
@@ -207,7 +207,7 @@ function SignUpPage({ firebase }) {
    );
 }
 
-export default withFirebase(SignUpPage);
+export default SignUpPage;
 
 const SignUpForm = withFirebase(SignUpFormBase);
 
@@ -656,6 +656,7 @@ function SignUpFormValidate({
 }) {
    const classes = useStyles();
    const router = useRouter();
+   const firebase = useFirebase();
 
    const [errorMessageShown, setErrorMessageShown] = useState(false);
    const [incorrectPin, setIncorrectPin] = useState(false);
@@ -682,6 +683,12 @@ function SignUpFormValidate({
          });
    }
 
+   const updateActiveStep = (nextStep) => {
+      setTimeout(() => {
+         setActiveStep(nextStep);
+      }, 500);
+   };
+
    return (
       <Fragment>
          <Formik
@@ -698,27 +705,22 @@ function SignUpFormValidate({
             }}
             onSubmit={(values, { setSubmitting }) => {
                setIncorrectPin(false);
-               axios({
-                  method: "post",
-                  url:
-                     "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/verifyEmailWithPin",
-                  data: {
-                     recipientEmail: user.email,
-                     pinCode: parseInt(values.pinCode),
-                  },
-               })
-                  .then((response) => {
-                     reloadAuth()
-                        .then(() => {
+               const userInfo = {
+                  recipientEmail: user.email,
+                  pinCode: parseInt(values.pinCode),
+               };
+               firebase
+                  .validateUserEmailWithPin(userInfo)
+                  .then(() => {
+                     setTimeout(() => {
+                        reloadAuth().then(() => {
                            if (absolutePath) {
                               router.push(absolutePath);
                            } else {
-                              setActiveStep(2);
+                              updateActiveStep(2);
                            }
-                        })
-                        .catch((error) => {
-                           router.push("/login");
                         });
+                     }, 200);
                   })
                   .catch((error) => {
                      console.log("error", error);

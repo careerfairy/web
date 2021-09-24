@@ -32,6 +32,8 @@ export default function useAgoraAsStreamer(
    });
 
    const router = useRouter();
+   const { withProxy } = router.query;
+
    const token = router.query.token || "";
 
    const [agoraRTC, setAgoraRTC] = useState(null);
@@ -128,7 +130,8 @@ export default function useAgoraAsStreamer(
                streamId &&
                agoraToken &&
                agoraScreenShareToken &&
-               document
+               document &&
+               router
          )
       );
    }, [
@@ -459,7 +462,9 @@ export default function useAgoraAsStreamer(
       });
 
       if (!isViewer) {
-         //rtcClient.startProxyServer(3);
+         if (withProxy) {
+            rtcClient.startProxyServer(3);
+         }
          rtcClient.setClientRole("host");
          rtcClient.join(
             agoraToken.rtcToken,
@@ -501,7 +506,9 @@ export default function useAgoraAsStreamer(
             handleClientJoinChannelError
          );
       } else {
-         // rtcClient.startProxyServer(3);
+         if (withProxy) {
+            rtcClient.startProxyServer(3);
+         }
          rtcClient.setClientRole("audience");
          rtcClient.join(
             agoraToken.rtcToken,
@@ -604,7 +611,9 @@ export default function useAgoraAsStreamer(
                   codec: "vp8",
                });
                screenShareClient.setClientRole("host");
-               // screenShareClient.startProxyServer(3);
+               if (withProxy) {
+                  screenShareClient.startProxyServer(3);
+               }
 
                screenShareClient.init(AGORA_APP_ID, () => {
                   publishScreenShareStream(screenShareClient);

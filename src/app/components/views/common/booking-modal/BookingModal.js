@@ -132,6 +132,18 @@ function BookingModal({
       );
    }
 
+   const handleFirstStep = () => {
+      if (livestream.isFaceToFace) {
+         setModalStep(4);
+      } else {
+         if (questionElements.length > 0) {
+            setModalStep(1);
+         } else {
+            setModalStep(2);
+         }
+      }
+   };
+
    function joinTalentPool() {
       firebase
          .joinCompanyTalentPool(livestream.companyId, user.email, livestream.id)
@@ -205,11 +217,7 @@ function BookingModal({
                         style={{ margin: "10px 2px" }}
                         color="primary"
                         variant="contained"
-                        onClick={() =>
-                           questionElements.length > 0
-                              ? setModalStep(1)
-                              : setModalStep(2)
-                        }
+                        onClick={handleFirstStep}
                         size="large"
                      >
                         Next

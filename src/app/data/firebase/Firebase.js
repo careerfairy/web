@@ -15,8 +15,8 @@ class Firebase {
       this.firestore = firebase.firestore();
       this.storage = firebase.storage();
       this.functions = firebase.functions();
-      // if (process.env.NODE_ENV === 'development') {
-      //     this.functions.useFunctionsEmulator('http://localhost:5001');
+      // if (process.env.NODE_ENV === "development") {
+      //    this.functions.useFunctionsEmulator("http://localhost:5001");
       // }
    }
 
@@ -74,6 +74,27 @@ class Firebase {
          "createNewUserAccount"
       );
       return createUserInAuthAndFirebase({ userData });
+   };
+
+   validateUserEmailWithPin = async (userInfo) => {
+      const validateUserEmailWithPin = this.functions.httpsCallable(
+         "validateUserEmailWithPin"
+      );
+      return validateUserEmailWithPin({ userInfo });
+   };
+
+   sendReminderEmailAboutApplicationLink = async (data) => {
+      const sendReminderEmailAboutApplicationLink = this.functions.httpsCallable(
+         "sendReminderEmailAboutApplicationLink"
+      );
+      return sendReminderEmailAboutApplicationLink(data);
+   };
+
+   joinGroupDashboard = async (data) => {
+      const joinGroupDashboard = this.functions.httpsCallable(
+         "joinGroupDashboard"
+      );
+      return joinGroupDashboard(data);
    };
 
    sendRegistrationConfirmationEmail = (user, userData, livestream) => {
@@ -2483,39 +2504,6 @@ class Firebase {
       return dataArray;
    };
 
-   //Dashboard Queries
-
-   joinGroupDashboard = (groupId, userEmail, invitationId) => {
-      let groupRef = this.firestore.collection("careerCenterData").doc(groupId);
-
-      let userRef = this.firestore.collection("userData").doc(userEmail);
-
-      let notificationRef = this.firestore
-         .collection("notifications")
-         .doc(invitationId);
-
-      return this.firestore.runTransaction((transaction) => {
-         return transaction.get(userRef).then((userDoc) => {
-            const userData = userDoc.data();
-            transaction.update(groupRef, {
-               adminEmails: firebase.firestore.FieldValue.arrayUnion(
-                  userData.userEmail
-               ),
-            });
-            let groupAdminRef = this.firestore
-               .collection("careerCenterData")
-               .doc(groupId)
-               .collection("admins")
-               .doc(userData.userEmail);
-            transaction.set(groupAdminRef, {
-               role: "subAdmin",
-            });
-
-            transaction.delete(notificationRef);
-         });
-      });
-   };
-
    kickFromDashboard = (groupId, userEmail) => {
       let groupRef = this.firestore.collection("careerCenterData").doc(groupId);
 
@@ -2990,6 +2978,10 @@ class Firebase {
 
    getServerTimestamp = () => {
       return firebase.firestore.FieldValue.serverTimestamp();
+   };
+
+   convertJsDateToTimestamp = (jsDate) => {
+      return firebase.firestore.Timestamp.fromDate(jsDate);
    };
 }
 

@@ -10,6 +10,9 @@ const useStyles = makeStyles((theme) => ({
    actionButton: {
       borderRadius: theme.spacing(1),
       margin: theme.spacing(0.5),
+      "&:disabled": {
+         backgroundColor: theme.palette.background.default,
+      },
    },
 }));
 
@@ -18,16 +21,20 @@ export const AttendButton = ({
    user,
    mobile,
    handleRegisterClick,
+   disabled,
+   attendButtonLabel,
    ...props
 }) => {
    const classes = useStyles();
    return (
       <Button
          className={classes.actionButton}
+         classes={{ disabled: classes.disabledButton }}
          size="large"
          style={{ marginLeft: 5 }}
          variant="contained"
          {...props}
+         disabled={disabled}
          startIcon={
             user && checkIfRegistered() ? (
                <ClearRoundedIcon />
@@ -36,13 +43,7 @@ export const AttendButton = ({
             )
          }
          color={user && checkIfRegistered() ? "default" : "primary"}
-         children={
-            user
-               ? checkIfRegistered()
-                  ? "Cancel"
-                  : "I'll attend"
-               : "Register to attend"
-         }
+         children={attendButtonLabel}
          onClick={handleRegisterClick}
       />
    );

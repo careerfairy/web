@@ -43,6 +43,7 @@ exports.personalHabib = hosting.personalHabib;
 exports.createNewUserAccount = auth.createNewUserAccount;
 exports.updateFakeUser = auth.updateFakeUser;
 exports.verifyEmailWithPin = auth.verifyEmailWithPin;
+exports.validateUserEmailWithPin = auth.validateUserEmailWithPin;
 exports.sendPostmarkResetPasswordEmail = auth.sendPostmarkResetPasswordEmail;
 exports.sendPostmarkEmailUserDataAndUni = auth.sendPostmarkEmailUserDataAndUni;
 exports.sendPostmarkEmailUserDataAndUniWithName =
@@ -64,6 +65,7 @@ exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail;
 exports.sendDraftApprovalRequestEmail =
    groupAdmin.sendDraftApprovalRequestEmail;
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus;
+exports.joinGroupDashboard = groupAdmin.joinGroupDashboard;
 
 // Reminders
 exports.sendReminderEmailToRegistrants =
@@ -74,6 +76,8 @@ exports.sendReminderEmailToUserFromUniversity =
    reminders.sendReminderEmailToUserFromUniversity;
 exports.sendReminderEmailsWhenLivestreamStarts =
    reminders.sendReminderEmailsWhenLivestreamStarts;
+exports.sendReminderEmailAboutApplicationLink =
+   reminders.sendReminderEmailAboutApplicationLink;
 
 // Livestreams
 exports.scheduleTestLivestreamDeletion =

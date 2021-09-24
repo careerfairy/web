@@ -128,6 +128,7 @@ export const enqueueJobPostingCta = (
                icon={icon}
                isForTutorial={isForTutorial}
                buttonText={buttonText}
+               buttonUrl={buttonUrl}
                jobTitle={jobTitle}
                salary={salary}
                snackBarImage={snackBarImage}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Container, TextField, Grid, Hidden } from "@material-ui/core";
 import Header from "../../components/views/header/Header";
 import SettingsIcon from "@material-ui/icons/Settings";
@@ -35,6 +35,10 @@ import Typography from "@material-ui/core/Typography";
 import JoinTalentPoolModal from "../../components/views/common/join-talent-pool-modal/JoinTalentPoolModal";
 import LinkifyText from "../../components/util/LinkifyText";
 import { Item, Row } from "@mui-treasury/components/flex";
+import {
+   InPersonEventBadge,
+   LimitedRegistrationsBadge,
+} from "components/views/NextLivestreams/GroupStreams/groupStreamCard/badges";
 
 const useStyles = makeStyles((theme) => ({
    speakerAvatar: {
@@ -441,12 +445,39 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
       return timeElapsed > minimumTimeElapsed * 60 * 1000;
    }
 
-   const lessThanOneHourAgo = (date) => {
-      const HOUR = 1000 * 60 * 60;
-      const anHourAgo = Date.now() - HOUR;
+   const isRegistrationDisabled = useMemo(() => {
+      if (isPastEvent) return true;
+      //User should always be able to cancel registration
+      if (user && registered) return false;
+      //Disable registration if max number of registrants is reached
+      if (
+         currentLivestream.maxRegistrants &&
+         currentLivestream.maxRegistrants > 0
+      ) {
+         return currentLivestream.registeredUsers
+            ? currentLivestream.maxRegistrants <=
+                 currentLivestream.registeredUsers.length
+            : false;
+      }
+      return false;
+   }, [isPastEvent, currentLivestream, user, registered]);
 
-      return date > anHourAgo;
-   };
+   const getMainButtonLabel = useMemo(() => {
+      if (user && registered) return "Cancel";
+      if (
+         currentLivestream.maxRegistrants &&
+         currentLivestream.maxRegistrants > 0 &&
+         currentLivestream.registeredUsers &&
+         currentLivestream.maxRegistrants <=
+            currentLivestream.registeredUsers.length
+      ) {
+         return "No spots left";
+      } else if (user) {
+         return "I'll attend";
+      } else {
+         return "Join to attend";
+      }
+   }, [user, registered, currentLivestream]);
 
    function addNewQuestion() {
       if (!user || !user.emailVerified) {
@@ -582,6 +613,18 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
       );
    });
 
+   const numberOfSpotsRemaining = useMemo(() => {
+      if (!currentLivestream.maxRegistrants) return 0;
+      else if (!currentLivestream.registeredUsers)
+         return currentLivestream.maxRegistrants;
+      else {
+         return (
+            currentLivestream.maxRegistrants -
+            currentLivestream.registeredUsers.length
+         );
+      }
+   });
+
    if (!currentLivestream.id) {
       return <Loader />;
    }
@@ -647,7 +690,17 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                            {DateUtil.getPrettyDate(currentLivestream.startDate)}
                         </span>
                      </div>
-                     {!isPastEvent && (
+                     <Box zIndex={200}>
+                        {currentLivestream.isFaceToFace && (
+                           <InPersonEventBadge />
+                        )}
+                        {currentLivestream.maxRegistrants && (
+                           <LimitedRegistrationsBadge
+                              numberOfSpotsRemaining={numberOfSpotsRemaining}
+                           />
+                        )}
+                     </Box>
+                     {!isPastEvent && !currentLivestream.isFaceToFace && (
                         <div
                            className={
                               "topDescriptionContainer " +
@@ -693,21 +746,53 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                      <Grid container justifyContent="center" align="center">
                         {speakerElements}
                      </Grid>
+
+                     {currentLivestream.isFaceToFace && (
+                        <div
+                           style={{
+                              display: "flex",
+                              justifyContent: "center",
+                           }}
+                        >
+                           <Box>
+                              <div
+                                 style={{
+                                    backgroundColor: "white",
+                                    padding: 20,
+                                    borderRadius: 5,
+                                 }}
+                              >
+                                 <Typography>
+                                    This event will take place at the following
+                                    location:
+                                 </Typography>
+                                 <Typography
+                                    style={{ fontWeight: "600", marginTop: 10 }}
+                                 >
+                                    {currentLivestream.address}
+                                 </Typography>
+                                 <Typography
+                                    style={{
+                                       fontSize: "0.8rem",
+                                       marginTop: 10,
+                                    }}
+                                 >
+                                    Please make sure you are able to attend
+                                 </Typography>
+                              </div>
+                           </Box>
+                        </div>
+                     )}
                      <div style={{ margin: "40px 0", width: "100%" }}>
                         <div>
                            {!isPastEvent && (
                               <Button
                                  size="large"
                                  id="register-button"
-                                 disabled={isPastEvent}
+                                 disabled={isRegistrationDisabled}
+                                 children={getMainButtonLabel}
+                                 color={registered ? "default" : "primary"}
                                  variant="contained"
-                                 children={
-                                    user
-                                       ? registered
-                                          ? "Cancel"
-                                          : "I'll attend!"
-                                       : "Register to attend"
-                                 }
                                  startIcon={
                                     registered ? <ClearIcon /> : <AddIcon />
                                  }
@@ -723,7 +808,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                                                currentLivestream.id
                                             )
                                  }
-                                 color={registered ? "default" : "primary"}
                               />
                            )}
                            <Button
@@ -737,6 +821,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                            />
                         </div>
                      </div>
+
                      <div style={{ textAlign: "center", marginBottom: "20px" }}>
                         <TargetOptions options={targetOptions} />
                      </div>
@@ -751,7 +836,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                            </Row>
                         </div>
                      </div>
-                     {!isPastEvent && (
+                     {!isPastEvent && !currentLivestream.isFaceToFace && (
                         <div className="topDescriptionContainer">
                            <div
                               className="countdown-title"

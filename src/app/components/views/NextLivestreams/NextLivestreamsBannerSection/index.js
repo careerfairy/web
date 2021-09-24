@@ -16,6 +16,10 @@ const useStyles = makeStyles((theme) => ({
    section: {
       paddingBottom: theme.spacing(1),
    },
+   defaultTitle: {
+      fontSize: "1.8rem",
+      letterSpacing: "8px",
+   },
 }));
 
 const NextLivestreamsBannerSection = (props) => {
@@ -36,6 +40,7 @@ const NextLivestreamsBannerSection = (props) => {
                color={props.color}
                title={props.title}
                subtitle={props.subtitle}
+               titleClassName={classes.defaultTitle}
             />
             <StreamsTab handleChange={props.handleChange} value={props.value} />
          </Container>

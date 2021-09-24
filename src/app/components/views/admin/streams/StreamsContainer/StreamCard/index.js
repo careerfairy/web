@@ -128,7 +128,7 @@ const StreamCard = ({ stream }) => {
                            component="a"
                            target="_blank"
                            onClick={handleClose}
-                           href={`https://console.firebase.google.com/u/0/project/careerfairy-e1fd9/firestore/data~2Flivestreams~2F${stream.id}`}
+                           href={`https://console.firebase.google.com/u/0/project/careerfairy-e1fd9/firestore/data/~2Flivestreams~2F${stream.id}`}
                         >
                            View in firebase
                         </MenuItem>

@@ -99,7 +99,7 @@ const nextLivestreamsPage = ({
                backgroundImageClassName=""
                backgroundColor={navyBlue.main}
                backgroundImage={placeholderBanner}
-               backgroundImageOpacity={0.2}
+               backgroundImageOpacity={0.5}
                title={
                   value === "upcomingEvents"
                      ? "Upcoming Events on CareerFairy"
