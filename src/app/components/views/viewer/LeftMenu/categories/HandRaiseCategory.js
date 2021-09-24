@@ -32,6 +32,7 @@ const HandRaiseCategory = ({
 
    useEffect(() => {
       if (
+         livestream.hasStarted &&
          livestream.handRaiseActive &&
          handRaiseState &&
          ["connecting", "connected"].includes(handRaiseState?.state)
@@ -40,7 +41,7 @@ const HandRaiseCategory = ({
       } else {
          setHandRaiseActive(false);
       }
-   }, [handRaiseState?.state, livestream.handRaiseActive]);
+   }, [handRaiseState?.state, livestream.handRaiseActive, livestream.hasStarted]);
 
    const requestHandRaise = async () => {
       try {

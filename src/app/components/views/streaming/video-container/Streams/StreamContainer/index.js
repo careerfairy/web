@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import LocalStreamItem from "./LocalStreamItem";
 import RemoteStreamItem from "./RemoteStreamItem";
 import { useFirebase } from "context/firebase";
-//
 const StreamContainer = ({
    stream,
    big,
@@ -16,36 +15,44 @@ const StreamContainer = ({
    const [speaker, setSpeaker] = useState(null);
    const [fetching, setFetching] = useState(false);
    useEffect(() => {
-      if (speaker || fetching) return;
-      let newSpeaker;
-      if (stream.isScreenShareVideo) {
-         newSpeaker = null;
-      } else {
-         newSpeaker = liveSpeakers?.find(
-            (speaker) => speaker.speakerUuid === stream.streamId
-         );
-         if (!newSpeaker && stream.streamId && livestreamId) {
-            const userId = stream.streamId.replace(livestreamId, "");
-            if (userId) getSpeakerInfoFromDB(userId);
+      (async () => {
+         if (speaker || fetching) return;
+         let newSpeaker;
+         if (stream.isScreenShareVideo) {
+            newSpeaker = null;
+         } else {
+            newSpeaker = liveSpeakers?.find(
+               (speaker) => speaker.speakerUuid === stream.streamId
+            );
+            if (!newSpeaker && stream.streamId && livestreamId) {
+               const userId = stream.streamId.replace(livestreamId, "");
+               if (userId) {
+                  newSpeaker = await getSpeakerInfoFromDB(userId);
+               }
+            }
          }
-      }
-      setSpeaker(newSpeaker);
+         setSpeaker(newSpeaker);
+      })();
    }, [stream.isScreenShareVideo, liveSpeakers, stream.streamId]);
 
    const getSpeakerInfoFromDB = async (userId) => {
+      let fetchedSpeaker = {};
       try {
          setFetching(true);
          const userSnap = await getUserData(userId);
          if (userSnap.exists) {
             const userData = userSnap.data();
-            setSpeaker({
+            fetchedSpeaker = {
                firstName: userData.firstName || "",
                lastName: userData?.lastName?.[0] || "",
                position: "✋ Hand Raiser",
-            });
+            };
          }
-      } catch (e) {}
+      } catch (e) {
+         return fetchedSpeaker
+      }
       setFetching(false);
+      return fetchedSpeaker;
    };
 
    return stream.isLocal ? (

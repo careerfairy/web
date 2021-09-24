@@ -62,13 +62,11 @@ const useStyles = makeStyles((theme) => ({
 const ViewerOverview = ({
    handRaiseActive,
    streamerId,
-   showVideoButton,
    mobile,
    setShowMenu,
    handleStateChange,
    selectedState,
    showMenu,
-   setShowVideoButton,
    hideAudience,
    audienceDrawerOpen,
 }) => {
@@ -102,9 +100,7 @@ const ViewerOverview = ({
                showMenu={showMenu}
                currentLivestream={currentLivestream}
                handRaiseActive={handRaiseActive}
-               showVideoButton={showVideoButton}
                isBreakout={isBreakout}
-               setShowVideoButton={setShowVideoButton}
             />
 
             {

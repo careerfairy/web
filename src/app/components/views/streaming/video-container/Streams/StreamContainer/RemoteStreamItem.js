@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import StreamItem from "./StreamItem";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "store/actions";
 
 const RemoteStreamItem = ({
    speaker,
    setRemovedStream,
-   setShowVideoButton,
    stream,
    big,
    index,
@@ -15,37 +15,17 @@ const RemoteStreamItem = ({
       (state) => state.stream.streaming
    );
 
-   // useEffect(() => {
-   //    if (stream.streamId === "demoStream") {
-   //       generateDemoHandRaiser();
-   //    } else {
-   //       console.log("-> STARTING TO PLAY", stream.streamId);
-   //       // if (!stream.stream.isPlaying()) {
-   //          stream?.stream?.play(
-   //             stream.streamId,
-   //             { fit: stream.isScreenShareVideo ? "contain" : "cover" },
-   //             (err) => {
-   //                if (err) {
-   //                   console.log("-> err", err);
-   //                   setShowVideoButton({ paused: false, muted: true });
-   //                }
-   //             }
-   //          );
-   //
-   //          // NEW
-   //          return () => {
-   //             stream?.stream?.stop()
-   //          }
-   //       // }
-   //    }
-   // }, [stream.streamId]);
+   const dispatch = useDispatch();
 
-   // useEffect(() => {
-   //    if (!muteAllRemoteVideos) {
-   //       console.log("-> play(stream.streamId, { muted: false })",);
-   //       stream.stream?.play(stream.streamId, { muted: false });
-   //    }
-   // }, [muteAllRemoteVideos]);
+   const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted());
+
+   useEffect(() => {
+      if (muteAllRemoteVideos) {
+         stream.stream?.play(stream.streamId, { muted: true });
+      } else {
+         stream.stream?.play(stream.streamId, { muted: false });
+      }
+   }, [muteAllRemoteVideos]);
 
    useEffect(() => {
       if (playAllRemoteVideos) {
@@ -86,7 +66,7 @@ const RemoteStreamItem = ({
             },
             (err) => {
                if (err) {
-                  setShowVideoButton({ paused: false, muted: true });
+                  setAVideoIsMuted();
                }
             }
          );

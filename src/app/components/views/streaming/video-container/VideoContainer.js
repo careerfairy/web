@@ -26,6 +26,7 @@ import useStreamRef from "../../../custom-hook/useStreamRef";
 import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/StreamerTopBar/BreakoutRoomManagementModal";
 import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 import Streams from "./Streams";
+import DraggableComponent from "../../banners/DraggableComponent";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -58,7 +59,6 @@ function VideoContainer({
       setScreenSharePermissionDenied,
    ] = useState(false);
    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
-   // console.count("-> VideoContainer");
    const [streamerConnected, setStreamerConnected] = useState(false);
    const [streamerReady, setStreamerReady] = useState(false);
 
@@ -300,12 +300,14 @@ function VideoContainer({
             showSettings={showSettings}
             setShowSettings={setShowSettings}
          />
-         <WifiIndicator
-            uplink={networkQuality.uplinkNetworkQuality}
-            downlink={networkQuality.downlinkNetworkQuality}
-            agoraRtcConnectionStatus={agoraRtcConnectionStatus}
-            agoraRtmStatus={agoraRtmStatus}
-         />
+         <DraggableComponent zIndex={1} bounds="parent" elementId="wifiIndicatorLocation">
+            <WifiIndicator
+               uplink={networkQuality.uplinkNetworkQuality}
+               downlink={networkQuality.downlinkNetworkQuality}
+               agoraRtcConnectionStatus={agoraRtcConnectionStatus}
+               agoraRtmStatus={agoraRtmStatus}
+            />
+         </DraggableComponent>
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}

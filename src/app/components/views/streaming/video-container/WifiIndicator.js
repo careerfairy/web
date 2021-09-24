@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import SignalWifi0BarRoundedIcon from "@material-ui/icons/SignalWifi0BarRounded";
 import SignalWifi1BarRoundedIcon from "@material-ui/icons/SignalWifi1BarRounded";
@@ -13,7 +13,6 @@ import { ArrowDown, ArrowUp } from "react-feather";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { Box, Tooltip } from "@material-ui/core";
-import Draggable from "react-draggable";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
 
@@ -30,10 +29,7 @@ const gradient = [
 const useStyles = makeStyles((theme) => ({
    root: {
       position: "absolute",
-      // cursor: "move",
-      zIndex:1,
-      right: "3%",
-      top: "2%",
+      cursor: "move",
       borderRadius: theme.spacing(2),
       padding: theme.spacing(1),
       boxShadow: theme.shadows[2],
@@ -47,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
          transform: `scale(1.2)`,
       },
    },
-   subbox: {
+   subBox: {
       display: "flex",
    },
    uplinkWifiIcon: {
@@ -83,7 +79,6 @@ const WifiIndicator = ({
    className,
    ...rest
 }) => {
-   const [defaultPosition, setDefaultPosition] = useState(undefined);
    const dispatch = useDispatch();
 
    useEffect(() => {
@@ -136,24 +131,11 @@ const WifiIndicator = ({
       };
    }, []);
 
-   useEffect(() => {
-      getSavedPosition();
-   }, []);
-
    const classes = useStyles({
       uplinkIndex: uplink,
       downlinkIndex: downlink,
    });
 
-   const handleSave = (e, data) => {
-      const lastPosition = { x: data.x, y: data.y };
-      localStorage.setItem("wifiIconLocation", JSON.stringify(lastPosition));
-   };
-
-   const getSavedPosition = () => {
-      const lastPosition = localStorage.getItem("wifiIconLocation") || "{}";
-      setDefaultPosition(JSON.parse(lastPosition));
-   };
 
    const getNetWorkInfo = (isUplink) => {
       let newClasses = isUplink
@@ -270,8 +252,8 @@ const WifiIndicator = ({
       }
    };
 
-   const uplinkInfo = useMemo(() => getNetWorkInfo(true)[uplink], [uplink]);
-   const downlinkInfo = useMemo(() => getNetWorkInfo()[downlink], [downlink]);
+   const uplinkInfo = useMemo(() => getNetWorkInfo(true)[uplink], []);
+   const downlinkInfo = useMemo(() => getNetWorkInfo()[downlink], []);
 
    const rtmConnectionInfo = useMemo(
       () => getRtmConnectionInfo(agoraRtmStatus.msg),
@@ -282,12 +264,7 @@ const WifiIndicator = ({
       [agoraRtcConnectionStatus.curState]
    );
 
-   return defaultPosition ? (
-      <Draggable
-         onStop={handleSave}
-         defaultPosition={defaultPosition}
-         bounds="parent"
-      >
+   return  (
          <Box {...rest} className={clsx(classes.root, className)}>
             <Box>
                <Tooltip title={rtmConnectionInfo.message}>
@@ -295,7 +272,7 @@ const WifiIndicator = ({
                      marginRight={1}
                      marginBottom={1}
                      alignItems="left"
-                     className={classes.subbox}
+                     className={classes.subBox}
                   >
                      <Box display="flex" marginRight={1}>
                         {rtmConnectionInfo.icon}
@@ -310,7 +287,7 @@ const WifiIndicator = ({
                      marginRight={1}
                      marginBottom={1}
                      alignItems="left"
-                     className={classes.subbox}
+                     className={classes.subBox}
                   >
                      <Box display="flex" marginRight={1}>
                         {rtcConnectionInfo.icon}
@@ -321,7 +298,7 @@ const WifiIndicator = ({
                   </Box>
                </Tooltip>
             </Box>
-            <Box className={classes.subbox}>
+            <Box className={classes.subBox}>
                <Tooltip
                   style={{ color: uplinkInfo.color }}
                   placement="top"
@@ -354,10 +331,7 @@ const WifiIndicator = ({
                </Tooltip>
             </Box>
          </Box>
-      </Draggable>
-   ) : (
-      <div />
-   );
+   )
 };
 
 WifiIndicator.propTypes = {

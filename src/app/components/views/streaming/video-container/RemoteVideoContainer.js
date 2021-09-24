@@ -75,7 +75,6 @@ const RemoteVideoContainer = ({
    height,
    isPlayMode,
    setRemovedStream,
-   setShowVideoButton,
    small,
    speakerSource,
    stream,
@@ -100,7 +99,6 @@ const RemoteVideoContainer = ({
                { fit: isScreenShareVideo ? "contain" : "cover" },
                (err) => {
                   if (err) {
-                     setShowVideoButton({ paused: false, muted: true });
                   }
                }
             );
@@ -153,7 +151,6 @@ const RemoteVideoContainer = ({
             },
             (err) => {
                if (err) {
-                  setShowVideoButton({ paused: false, muted: true });
                }
             }
          );

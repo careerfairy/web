@@ -83,12 +83,6 @@ const StreamerLayout = (props) => {
    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
    const [selectedState, setSelectedState] = useState("questions");
    const [sliding, setSliding] = useState(false);
-
-   const [showVideoButton, setShowVideoButton] = useState({
-      paused: false,
-      muted: false,
-   });
-
    const currentLivestream = useStreamConnect();
    useStreamerActiveHandRaisesConnect()
 
@@ -263,8 +257,6 @@ const StreamerLayout = (props) => {
                      <div className={classes.content}>
                         {React.cloneElement(children, {
                            ...props,
-                           showVideoButton,
-                           setShowVideoButton,
                            newNotification,
                            isMainStreamer,
                            isStreamer: true,

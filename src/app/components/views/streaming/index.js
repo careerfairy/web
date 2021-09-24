@@ -64,8 +64,6 @@ const StreamerOverview = ({
    smallScreen,
    hideAudience,
    audienceDrawerOpen,
-   showVideoButton,
-   setShowVideoButton,
 }) => {
    const { currentLivestream, isBreakout } = useCurrentStream();
    const classes = useStyles();
@@ -86,8 +84,6 @@ const StreamerOverview = ({
                isBreakout={isBreakout}
                showMenu={showMenu}
                viewer={false}
-               setShowVideoButton={setShowVideoButton}
-               showVideoButton={showVideoButton}
             />
             <ButtonComponent
                setShowMenu={setShowMenu}

@@ -77,11 +77,6 @@ const ViewerLayout = (props) => {
    const mobile = useMediaQuery(`(max-width:${values.mobile}px)`);
    const streamRef = useStreamRef();
    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
-   const [showVideoButton, setShowVideoButton] = useState({
-      paused: false,
-      muted: false,
-   });
-
    const [showMenu, setShowMenu] = useState(false);
    const [handRaiseActive, setHandRaiseActive] = useState(false);
    const [streamerId, setStreamerId] = useState(null);
@@ -212,7 +207,6 @@ const ViewerLayout = (props) => {
                   <div className={classes.content}>
                      {React.cloneElement(children, {
                         handRaiseActive,
-                        showVideoButton,
                         handleStateChange,
                         selectedState,
                         setSelectedState,
@@ -223,7 +217,6 @@ const ViewerLayout = (props) => {
                         showAudience,
                         hideAudience,
                         audienceDrawerOpen,
-                        setShowVideoButton,
                      })}
                   </div>
                </div>

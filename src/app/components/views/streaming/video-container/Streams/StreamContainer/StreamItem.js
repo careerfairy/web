@@ -6,7 +6,8 @@ import { Tooltip } from "@material-ui/core";
 import VideoCamOffIcon from "@material-ui/icons/VideocamOff";
 import VolumeOffIcon from "@material-ui/icons/MicOff";
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
-import useHandRaiseState from "../../../../../custom-hook/useHandRaiseState";
+import { useDispatch } from "react-redux";
+import * as actions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -56,15 +57,13 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const StreamItem = ({
-   stream,
-   big,
-   speaker,
-   videoMutedBackgroundImg,
-}) => {
+const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
    const classes = useStyles();
    const vidDiv = useRef(null);
-   const [handRaiseState] = useHandRaiseState();
+
+   const dispatch = useDispatch();
+
+   const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted());
    useEffect(() => {
       if (stream?.stream?.isPlaying() === false) {
          play(stream);
@@ -72,12 +71,20 @@ const StreamItem = ({
       return () => {
          stream?.stream?.stop();
       };
-   }, [stream?.stream, stream?.stream?.isPlaying(), handRaiseState?.state]);
+   }, [stream?.stream, stream?.stream?.isPlaying()]);
 
    const play = (stream) => {
-      stream?.stream?.play(stream.streamId, {
-         fit: stream.isScreenShareVideo ? "contain" : "cover",
-      });
+      stream?.stream?.play(
+         stream.streamId,
+         {
+            fit: stream.isScreenShareVideo ? "contain" : "cover",
+         },
+         (err) => {
+            if (err) {
+               setAVideoIsMuted();
+            }
+         }
+      );
    };
 
    return (
@@ -135,7 +142,7 @@ StreamItem.propTypes = {
    speaker: PropTypes.shape({
       firstName: PropTypes.string,
       lastName: PropTypes.string,
-      position: PropTypes.string
+      position: PropTypes.string,
    }),
    stream: PropTypes.shape({
       isScreenShare: PropTypes.bool,
