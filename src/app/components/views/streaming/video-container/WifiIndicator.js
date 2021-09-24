@@ -81,7 +81,6 @@ const WifiIndicator = ({
    ...rest
 }) => {
    const dispatch = useDispatch();
-
    useEffect(() => {
       if (agoraRtcConnectionStatus.curState === "CONNECTING") {
          enqueueSnackbar("Connecting...", "ConnectingStatus", "warning", true);
@@ -252,8 +251,8 @@ const WifiIndicator = ({
       }
    };
 
-   const uplinkInfo = useMemo(() => getNetWorkInfo(true)[uplink], []);
-   const downlinkInfo = useMemo(() => getNetWorkInfo()[downlink], []);
+   const uplinkInfo = useMemo(() => getNetWorkInfo(true)[uplink], [uplink]);
+   const downlinkInfo = useMemo(() => getNetWorkInfo()[downlink], [downlink]);
 
    const rtmConnectionInfo = useMemo(
       () => getRtmConnectionInfo(agoraRtmStatus.msg),

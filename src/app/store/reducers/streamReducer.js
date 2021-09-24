@@ -55,7 +55,7 @@ const streamReducer = (state = initialState, { type, payload }) => {
             streaming: {
                ...state.streaming,
                unmuteFailedMutedRemoteVideos: true,
-               videoIsMuted: true,
+               videoIsMuted: false,
             },
          };
       case actions.UNPAUSE_PAUSED_REMOTE_VIDEOS_ON_FAIL:
@@ -64,7 +64,7 @@ const streamReducer = (state = initialState, { type, payload }) => {
             streaming: {
                ...state.streaming,
                unpauseFailedPlayRemoteVideos: true,
-               videoIsPaused: true,
+               videoIsPaused: false,
             },
          };
       case actions.UNMUTE_ALL_REMOTE_VIDEOS:
