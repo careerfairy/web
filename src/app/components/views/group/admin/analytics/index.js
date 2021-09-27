@@ -161,7 +161,7 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
    const [globalTimeFrame, setGlobalTimeFrame] = useState(
       group.universityCode ? globalTimeFrames[2] : globalTimeFrames[0]
    );
-   const [showBar, setShowBar] = useState(false);
+   const [showBar, setShowBar] = useState(true);
    const [userType, setUserType] = useState(userTypes[0]);
    const [streamDataType, setStreamDataType] = useState(streamDataTypes[0]);
    const [groupOptions, setGroupOptions] = useState([]);
