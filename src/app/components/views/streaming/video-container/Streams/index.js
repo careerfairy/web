@@ -39,8 +39,9 @@ const Streams = memo(
      const classes = useStyles();
 
      useEffect(() => {
-       setBannersBottom(Boolean(mobile && !presenter && !mobile))
-     }, [mobile, presenter, mobile]);
+       setBannersBottom(Boolean(mobile && !presenter))
+     }, [mobile, presenter]);
+
      
 
       useEffect(() => {
@@ -144,6 +145,7 @@ const Streams = memo(
                <Banners
                   presenter={presenter}
                   handRaiseActive={handRaiseActive}
+                  mobile={mobile}
                />
             )}
             <div className={classes.videoElementsWrapper}>
@@ -164,6 +166,7 @@ const Streams = memo(
                  isBottom
                   presenter={presenter}
                   handRaiseActive={handRaiseActive}
+                 mobile={mobile}
                />
             }
          </div>
