@@ -157,7 +157,9 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                            : ""
                      }`}
                   >
-                     <IconButton onClick={handleOpenCtaModal}>
+                     <IconButton
+                       className={classes.floatingButton}
+                       onClick={handleOpenCtaModal}>
                         <Badge
                            color="secondary"
                            badgeContent={ctaStatus.numberActive && "!"}

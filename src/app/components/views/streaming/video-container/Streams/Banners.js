@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const Banners = ({ presenter, handRaiseActive, isBottom }) => {
+const Banners = ({ presenter, handRaiseActive, isBottom , mobile}) => {
    const {
       query: { breakoutRoomId },
    } = useRouter();
@@ -51,8 +51,8 @@ const Banners = ({ presenter, handRaiseActive, isBottom }) => {
 
    useEffect(() => {
       setShowStreamerHandRaiseBanner(Boolean(presenter && handRaiseActive));
-      setShowViewerHandRaiseBanner(Boolean(!presenter && handRaiseActive));
-   }, [presenter, handRaiseActive]);
+      setShowViewerHandRaiseBanner(Boolean(!presenter && handRaiseActive && !mobile));
+   }, [presenter, handRaiseActive, mobile]);
 
    return (
       <div className={isBottom ? classes.bannerBottom : classes.bannerTop}>
