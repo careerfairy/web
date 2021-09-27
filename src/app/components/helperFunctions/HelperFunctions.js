@@ -17,11 +17,14 @@ dayjs.extend(relativeTime);
 
 export const uploadLogo = (location, fileObject, firebase, callback) => {
    var storageRef = firebase.getStorageRef();
-   let splitters = [" ", "(", ")","-"]; // or ",:;".split("");
+   let splitters = [" ", "(", ")", "-"];
    let fileName = fileObject.name;
    let imageName = splitters
       .reduce((old, c) => old.map((v) => v.split(c)).flat(), [fileName])
       .join("_");
+   if (imageName.length > 10) {
+      imageName = imageName.slice(-10);
+   }
    let fullPath = `${location}/${uuidv4()}_${imageName}`;
    let companyLogoRef = storageRef.child(fullPath);
    var uploadTask = companyLogoRef.put(fileObject);
