@@ -131,6 +131,7 @@ const LeftMenu = ({
             livestream={livestream}
             selectedState={selectedState}
             user={user}
+            isMobile={isMobile}
             userData={userData}
             handRaiseActive={handRaiseActive}
             setHandRaiseActive={setHandRaiseActive}

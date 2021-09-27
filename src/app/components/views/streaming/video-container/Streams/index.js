@@ -39,8 +39,8 @@ const Streams = memo(
      const classes = useStyles();
 
      useEffect(() => {
-       setBannersBottom(Boolean(mobile && !presenter))
-     }, [mobile, presenter]);
+       setBannersBottom(Boolean(mobile && !presenter && !mobile))
+     }, [mobile, presenter, mobile]);
      
 
       useEffect(() => {

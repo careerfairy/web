@@ -10,12 +10,12 @@ import HandRaiseJoinDialog from "./hand-raise/HandRaiseJoinDialog";
 import HandRaisePromptDialog from "./hand-raise/HandRaisePromptDialog";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
-import { enqueueSuccessfulHandRaiseRequest } from "store/actions";
 
 const HandRaiseCategory = ({
    livestream,
    selectedState,
    setHandRaiseActive,
+   isMobile,
 }) => {
    const dispatch = useDispatch();
    const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState();
@@ -25,13 +25,14 @@ const HandRaiseCategory = ({
 
    useEffect(() => {
       const hasNotRaisedHandYet = Boolean(
-         handRaiseState === null && livestream?.handRaiseActive
+         handRaiseState === null && livestream?.handRaiseActive && !isMobile
       );
       setHandRaisePromptDialogOpen(hasNotRaisedHandYet);
-   }, [livestream?.handRaiseActive, handRaiseState]);
+   }, [livestream?.handRaiseActive, handRaiseState, isMobile]);
 
    useEffect(() => {
       if (
+         !isMobile &&
          livestream.hasStarted &&
          livestream.handRaiseActive &&
          handRaiseState &&
@@ -41,7 +42,12 @@ const HandRaiseCategory = ({
       } else {
          setHandRaiseActive(false);
       }
-   }, [handRaiseState?.state, livestream.handRaiseActive, livestream.hasStarted]);
+   }, [
+      handRaiseState?.state,
+      livestream.handRaiseActive,
+      livestream.hasStarted,
+      isMobile,
+   ]);
 
    const requestHandRaise = async () => {
       try {
