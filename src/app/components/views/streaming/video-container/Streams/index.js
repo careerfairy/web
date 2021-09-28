@@ -45,12 +45,12 @@ const Streams = memo(
 
       useEffect(() => {
          const allStreams = [...externalMediaStreams];
-         const newHasManySpeakers = Boolean(allStreams?.length > 4)
-         setHasManySpeakers(newHasManySpeakers)
+         const newHasManySpeakers = Boolean(allStreams?.length > 4);
+         setHasManySpeakers(newHasManySpeakers);
          if (localMediaStream && isBroadCasting) {
             allStreams.unshift(localMediaStream);
          }
-         if (!hasManySpeakers && (sharingScreen || sharingPdf)) {
+         if (!hasManySpeakers && sharingPdf) {
             setStreamData(allStreams);
             return;
          }
@@ -62,10 +62,7 @@ const Streams = memo(
             setStreamData([]);
             return;
          }
-         let newSmallStreams = handleGetSmallStream(
-            allStreams,
-            newLargeStream,
-         );
+         let newSmallStreams = handleGetSmallStream(allStreams, newLargeStream);
          setStreamData([...newSmallStreams, newLargeStream]);
       }, [
          externalMediaStreams,
@@ -106,10 +103,7 @@ const Streams = memo(
          return null;
       };
 
-      const handleGetSmallStream = (
-         allStreams,
-         largeStream,
-      ) => {
+      const handleGetSmallStream = (allStreams, largeStream) => {
          return allStreams.filter(
             (stream) => stream.streamId !== largeStream.streamId
          );
