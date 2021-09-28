@@ -2,13 +2,13 @@ import React, { useCallback, useContext, useEffect } from "react";
 import StreamItem from "./StreamItem";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
-import TutorialContext from "../../../../../../context/tutorials/TutorialContext";
+import TutorialContext from "context/tutorials/TutorialContext";
 import {
    TooltipButtonComponent,
    TooltipText,
    TooltipTitle,
    WhiteTooltip,
-} from "../../../../../../materialUI/GlobalTooltips";
+} from "materialUI/GlobalTooltips";
 
 const RemoteStreamItem = ({
    speaker,
@@ -22,7 +22,7 @@ const RemoteStreamItem = ({
       TutorialContext
    );
    const activeStep = getActiveTutorialStepKey();
-   const { playAllRemoteVideos, muteAllRemoteVideos, unmuteFailedMutedRemoteVideos, unpauseFailedPlayRemoteVideos } = useSelector(
+   const { playAllRemoteVideos, muteAllRemoteVideos, unmuteFailedMutedRemoteVideos } = useSelector(
       (state) => state.stream.streaming
    );
 
