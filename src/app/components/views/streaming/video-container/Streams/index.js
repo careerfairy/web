@@ -35,22 +35,25 @@ const Streams = memo(
       mobile,
    }) => {
       const [streamData, setStreamData] = useState([]);
-     const [bannersBottom, setBannersBottom] = useState(false);
-     const classes = useStyles();
+      const [bannersBottom, setBannersBottom] = useState(false);
+      const [hasManySpeakers, setHasManySpeakers] = useState(false);
+      const classes = useStyles();
 
-     useEffect(() => {
-       setBannersBottom(Boolean(mobile && !presenter))
-     }, [mobile, presenter]);
-
-     
+      useEffect(() => {
+         setBannersBottom(Boolean(mobile && !presenter));
+      }, [mobile, presenter]);
 
       useEffect(() => {
          const allStreams = [...externalMediaStreams];
-         const hasManySpeakers = Boolean(externalMediaStreams?.length > 4);
+         const newHasManySpeakers = Boolean(allStreams?.length > 4)
+         setHasManySpeakers(newHasManySpeakers)
          if (localMediaStream && isBroadCasting) {
             allStreams.unshift(localMediaStream);
          }
-
+         if (!hasManySpeakers && (sharingScreen || sharingPdf)) {
+            setStreamData(allStreams);
+            return;
+         }
          let newLargeStream = handleGetLargeStream(
             allStreams,
             currentSpeakerId
@@ -62,10 +65,6 @@ const Streams = memo(
          let newSmallStreams = handleGetSmallStream(
             allStreams,
             newLargeStream,
-            hasManySpeakers,
-            currentSpeakerId,
-            sharingScreen,
-            sharingPdf
          );
          setStreamData([...newSmallStreams, newLargeStream]);
       }, [
@@ -84,7 +83,7 @@ const Streams = memo(
 
          for (const stream of allStreams) {
             if (stream.streamId.includes("screen")) {
-               screenShareStream = { ...stream, isScreenShareVideo: true };
+               screenShareStream = stream;
             }
             if (stream.streamId === currentSpeakerId) {
                currentSpeakerStream = stream;
@@ -110,33 +109,10 @@ const Streams = memo(
       const handleGetSmallStream = (
          allStreams,
          largeStream,
-         sharingScreen,
-         hasManySpeakers,
-         currentSpeakerId
       ) => {
-         const filteredStreams = allStreams.filter(
+         return allStreams.filter(
             (stream) => stream.streamId !== largeStream.streamId
          );
-         if (sharingScreen && hasManySpeakers) {
-            return makeCurrentSpeakerFirstInStream(
-               filteredStreams,
-               currentSpeakerId
-            );
-         }
-         return filteredStreams;
-      };
-
-      const makeCurrentSpeakerFirstInStream = (streams, currentSpeakerId) => {
-         let currentSpeakerStream = streams.find(
-            (stream) => stream.streamId === currentSpeakerId
-         );
-         let rearrangedVideoStreams = streams.filter(
-            (stream) => stream.streamId !== currentSpeakerId
-         );
-         if (currentSpeakerStream) {
-            rearrangedVideoStreams.unshift(currentSpeakerStream);
-         }
-         return rearrangedVideoStreams;
       };
 
       return (
@@ -153,6 +129,8 @@ const Streams = memo(
                   streamData={streamData}
                   liveSpeakers={liveSpeakers}
                   sharingPdf={sharingPdf}
+                  hasManySpeakers={hasManySpeakers}
+                  sharingScreen={sharingScreen}
                   videoMutedBackgroundImg={videoMutedBackgroundImg}
                   setRemovedStream={setRemovedStream}
                   currentSpeakerId={currentSpeakerId}
@@ -161,14 +139,14 @@ const Streams = memo(
                   presenter={presenter}
                />
             </div>
-            {bannersBottom &&
+            {bannersBottom && (
                <Banners
-                 isBottom
+                  isBottom
                   presenter={presenter}
                   handRaiseActive={handRaiseActive}
-                 mobile={mobile}
+                  mobile={mobile}
                />
-            }
+            )}
          </div>
       );
    }

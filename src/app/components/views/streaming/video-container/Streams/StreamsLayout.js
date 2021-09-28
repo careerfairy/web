@@ -7,10 +7,14 @@ import StreamContainer from "./StreamContainer";
 import clsx from "clsx";
 import Box from "@material-ui/core/Box";
 import LivestreamPdfViewer from "../../../../util/LivestreamPdfViewer";
-import { STREAM_ELEMENT_BORDER_RADIUS, STREAM_ELEMENT_SPACING } from "constants/streams";
+import {
+   STREAM_ELEMENT_BORDER_RADIUS,
+   STREAM_ELEMENT_SPACING,
+} from "constants/streams";
 import Typography from "@material-ui/core/Typography";
 
 const STREAMS_ROW_HEIGHT = 125;
+const WIDE_SCREEN_ROW_HEIGHT = 180
 const useStyles = makeStyles((theme) => ({
    root: {
       flex: 1,
@@ -26,6 +30,9 @@ const useStyles = makeStyles((theme) => ({
    },
    grow: {
       height: STREAMS_ROW_HEIGHT,
+      [theme.breakpoints.up("lg")]: {
+         height: WIDE_SCREEN_ROW_HEIGHT
+      }
    },
    streamsOverflowWrapper: {
       display: "flex",
@@ -44,6 +51,9 @@ const useStyles = makeStyles((theme) => ({
    },
    smallFlexStream: {
       minWidth: STREAMS_ROW_HEIGHT * 1.7,
+      [theme.breakpoints.up("lg")]: {
+         minWidth: WIDE_SCREEN_ROW_HEIGHT * 1.5
+      },
       maxWidth: 200,
       paddingTop: 0,
       paddingBottom: 0,
@@ -74,6 +84,9 @@ const useStyles = makeStyles((theme) => ({
    },
    largeSquished: {
       top: STREAMS_ROW_HEIGHT,
+      [theme.breakpoints.up("lg")]: {
+         top: WIDE_SCREEN_ROW_HEIGHT
+      }
    },
 }));
 
@@ -105,11 +118,15 @@ const StreamsLayout = ({
    presenter,
    currentSpeakerId,
    videoMutedBackgroundImg,
+   sharingScreen,
+   hasManySpeakers,
 }) => {
    const hasSmallStreams = streamData.length > 1;
    const classes = useStyles({ hasSmallStreams });
-   const waitingForStreamer = useMemo(() => Boolean(!sharingPdf && !streamData.length && !presenter) , [sharingPdf, streamData?.length, presenter]);
-
+   const waitingForStreamer = useMemo(
+      () => Boolean(!sharingPdf && !streamData.length && !presenter),
+      [sharingPdf, streamData?.length, presenter]
+   );
    return (
       <AutoSizer>
          {({ height, width }) => (
@@ -143,7 +160,8 @@ const StreamsLayout = ({
                               index={index}
                               first={
                                  currentSpeakerId === stream.streamId &&
-                                 sharingPdf
+                                 (sharingPdf || sharingScreen) &&
+                                 hasManySpeakers
                               }
                               large={isLarge}
                               key={stream.streamId}
@@ -182,8 +200,8 @@ const StreamsLayout = ({
                            squished={streamData.length}
                         >
                            <Typography
-                             variant="h5"
-                             style={{ color: "white", margin: "auto" }}
+                              variant="h5"
+                              style={{ color: "white", margin: "auto" }}
                            >
                               Waiting for streamer
                            </Typography>
