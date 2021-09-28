@@ -25,7 +25,7 @@ const StreamContainer = ({
                lastName: "Speaker",
                position: "✋ Hand Raiser",
             };
-         } else if (stream.isScreenShareVideo) {
+         } else if (stream.streamId.includes("screen")) {
             newSpeaker = null;
          } else {
             newSpeaker = liveSpeakers?.find(
@@ -40,7 +40,7 @@ const StreamContainer = ({
          }
          setSpeaker(newSpeaker);
       })();
-   }, [stream.isScreenShareVideo, liveSpeakers, stream.streamId]);
+   }, [stream.streamId.includes("screen"), liveSpeakers, stream.streamId]);
 
    const getSpeakerInfoFromDB = async (userId) => {
       let fetchedSpeaker = {

@@ -37,7 +37,7 @@ const RemoteStreamItem = ({
          if (!stream.stream.isPlaying()) {
             stream?.stream?.play(
                stream.streamId,
-               { fit: stream.isScreenShareVideo ? "contain" : "cover" },
+               { fit: stream.streamId.includes("screen") ? "contain" : "cover" },
                (err) => {
                   if (err) {
                      setAVideoIsMuted();
@@ -79,7 +79,7 @@ const RemoteStreamItem = ({
          stream.stream.play(
             stream.streamId,
             {
-               fit: stream.isScreenShareVideo ? "contain" : "cover",
+               fit: stream.streamId.includes("screen") ? "contain" : "cover",
                muted: true,
             },
             (err) => {

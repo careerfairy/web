@@ -123,17 +123,17 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
       );
    }
 
-   function getPageHeight() {
+   function getPageHeight(height, width) {
       if (showMenu) {
          if (windowSize.height > windowSize.width - 480) {
             return windowSize.width * 0.4;
          }
-         return windowSize.height * 0.8 - 55;
+         return height;
       } else {
          if (windowSize.height > windowSize.width - 220) {
             return windowSize.width * 0.55;
          }
-         return windowSize.height * 0.8 - 55;
+         return height;
       }
    }
 
@@ -220,7 +220,7 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
          file={pdfObject ? pdfObject.downloadUrl : ""}
       >
          <Page
-            height={getPageHeight()}
+            height={getPageHeight(height, width)}
             renderTextLayer={false}
             renderAnnotationLayer={false}
             pageNumber={pdfObject ? pdfObject.page : 1}
