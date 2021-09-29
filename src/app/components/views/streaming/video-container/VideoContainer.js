@@ -35,7 +35,6 @@ function VideoContainer({
    isPlayMode,
    showMenu,
    smallScreen,
-   stream,
    streamerId,
    viewer,
 }) {
@@ -310,7 +309,7 @@ function VideoContainer({
             zIndex={3}
             bounds="parent"
             positionStyle={"absolute"}
-            defaultPosition={{ x: 4, y: 60 }}
+            defaultPosition={{ x: 4, y: 70 }}
             elementId="wifiIndicatorLocation"
          >
             <WifiIndicator
@@ -368,7 +367,6 @@ function VideoContainer({
          />
 
          <DemoIntroModal
-            livestreamId={currentLivestream.id}
             open={showDemoIntroModal}
             handleClose={handleCloseDemoIntroModal}
          />

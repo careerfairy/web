@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import VideoContainer from "./video-container/VideoContainer";
 import NotificationsContainer from "./notifications-container/NotificationsContainer";

@@ -10,6 +10,7 @@ import SwipeableViews from "react-swipeable-views";
 import clsx from "clsx";
 import { Drawer, Fab } from "@material-ui/core";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
+import { useLocalStorage } from "react-use";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -68,6 +69,8 @@ const LeftMenu = ({
    const classes = useStyles();
    const [value, setValue] = useState(0);
    const isGlass = showMenu && smallScreen;
+
+
    useEffect(() => {
       if (!typeof window === "object") {
          return false;
@@ -126,6 +129,7 @@ const LeftMenu = ({
             sliding={sliding}
             showMenu={showMenu}
             isGlass={isGlass}
+            handleStateChange={handleStateChange}
             livestream={livestream}
             selectedState={selectedState}
          />
@@ -168,4 +172,4 @@ const LeftMenu = ({
    );
 };
 
-export default withFirebase(LeftMenu);
+export default LeftMenu;
