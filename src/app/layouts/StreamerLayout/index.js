@@ -83,6 +83,8 @@ const StreamerLayout = (props) => {
    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
    const [selectedState, setSelectedState] = useState("questions");
    const [sliding, setSliding] = useState(false);
+
+
    const currentLivestream = useStreamConnect();
    useStreamerActiveHandRaisesConnect()
 

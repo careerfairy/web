@@ -10,6 +10,7 @@ const NewFeatureHint = ({
    tooltipTitle,
    placement,
    onClick,
+  hide
 }) => {
    const [hasSeenTip, setHasSeenTip] = useState(false);
 
@@ -27,13 +28,13 @@ const NewFeatureHint = ({
 
    const handleSeen = () => {
       markAsSeen();
-      onClick();
+      onClick?.();
    };
 
    return (
       <StyledTooltipWithButton
          placement={placement}
-         open={!hasSeenTip}
+         open={!hasSeenTip && !hide}
          tooltipTitle={tooltipTitle}
          onConfirm={handleSeen}
          tooltipText={tooltipText}

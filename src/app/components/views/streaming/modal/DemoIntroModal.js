@@ -1,18 +1,19 @@
 import React, { useState } from "react";
-import { withFirebase } from "context/firebase";
+import { useFirebase } from "context/firebase";
 import {
    Button,
+   CircularProgress,
+   DialogActions,
+   DialogContent,
    DialogContentText,
    DialogTitle,
-   DialogContent,
-   DialogActions,
-   CircularProgress,
 } from "@material-ui/core";
 import { GlassDialog } from "materialUI/GlobalModals";
 import { v4 as uuid } from "uuid";
 import useStreamRef from "../../../custom-hook/useStreamRef";
 
-const DemoIntroModal = ({ firebase, livestreamId, open, handleClose }) => {
+const DemoIntroModal = ({ open, handleClose }) => {
+   const firebase = useFirebase();
    const [loading, setLoading] = useState(false);
    const streamRef = useStreamRef();
 
@@ -124,4 +125,4 @@ const DemoIntroModal = ({ firebase, livestreamId, open, handleClose }) => {
    );
 };
 
-export default withFirebase(DemoIntroModal);
+export default DemoIntroModal;

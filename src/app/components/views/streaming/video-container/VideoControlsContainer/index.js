@@ -32,6 +32,7 @@ import { CallToActionIcon, ShareIcon, SharePdfIcon } from "./Icons";
 import ShareMenu from "./ShareMenu";
 import CallToActionDrawer from "./CallToActionDrawer";
 import useSliderFullyOpened from "../../../../custom-hook/useSliderFullyOpened";
+import NewFeatureHint from "../../../../util/NewFeatureHint";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -82,6 +83,7 @@ const useStyles = makeStyles((theme) => ({
       display: "none",
    },
 }));
+const VIEWER_VIDEO_CONTROLS_HINT_LOCAL_KEY = "hasSeenVideoControlsAsViewer";
 
 function VideoControlsContainer({
    currentLivestream: { mode, id, speakerSwitchMode, screenSharerId, test },
@@ -295,73 +297,81 @@ function VideoControlsContainer({
             onMouseLeave={handleMouseLeave}
             className={classes.root}
          >
-            <WhiteTooltip
-               placement="top"
-               style={{
-                  transition: "transform 0.2s",
-                  transitionTimingFunction: theme.transitions.easeInOut,
-                  transform: open
-                     ? ""
-                     : "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
-               }}
-               title={
-                  <React.Fragment>
-                     <TooltipTitle>Video Controls</TooltipTitle>
-                     <TooltipText>
-                        You can mute, share slides, promote links and job
-                        postings.
-                     </TooltipText>
-                     <TooltipButtonComponent
-                        onConfirm={() => {
-                           handleOpen();
-                           handleConfirm(16);
-                           handleOpenShare(shareButtonRef);
-                        }}
-                        buttonText="Ok"
-                     />
-                  </React.Fragment>
-               }
-               open={isOpen(16) && fullyOpened}
+            <NewFeatureHint
+               localStorageKey={VIEWER_VIDEO_CONTROLS_HINT_LOCAL_KEY}
+               tooltipTitle="Change your device settings"
+               hide={!viewer}
+               tooltipText="You can change device settings here as well as enable and disable your camera and microphone."
+               buttonText={"I understand"}
             >
-               <SpeedDial
-                  ariaLabel="interaction-selector"
-                  className={classes.speedDial}
-                  FabProps={{
-                     onClick: handleToggle,
-                     className: classes.dialButton,
+               <WhiteTooltip
+                  placement="top"
+                  style={{
+                     transition: "transform 0.2s",
+                     transitionTimingFunction: theme.transitions.easeInOut,
+                     transform: open
+                        ? ""
+                        : "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
                   }}
-                  TransitionProps={{
-                     onEntered,
-                     onExited,
-                  }}
-                  icon={<SpeedDialIcon />}
-                  onFocus={handleOpen}
-                  open
-               >
-                  {actions.map((action) => {
-                     return (
-                        <SpeedDialAction
-                           key={action.name}
-                           ref={
-                              action.name === "Share"
-                                 ? shareButtonRef
-                                 : undefined
-                           }
-                           icon={action.icon}
-                           tooltipPlacement="left"
-                           tooltipTitle={action.name}
-                           classes={{ staticTooltipLabel: classes.tooltip }}
-                           tooltipOpen={Boolean(action.name.length)}
-                           FabProps={{
-                              size: "large",
-                              // classes: {root:  classes.actionButton},
+                  title={
+                     <React.Fragment>
+                        <TooltipTitle>Video Controls</TooltipTitle>
+                        <TooltipText>
+                           You can mute, share slides, promote links and job
+                           postings.
+                        </TooltipText>
+                        <TooltipButtonComponent
+                           onConfirm={() => {
+                              handleOpen();
+                              handleConfirm(16);
+                              handleOpenShare(shareButtonRef);
                            }}
-                           onClick={action.onClick}
+                           buttonText="Ok"
                         />
-                     );
-                  })}
-               </SpeedDial>
-            </WhiteTooltip>
+                     </React.Fragment>
+                  }
+                  open={isOpen(16) && fullyOpened}
+               >
+                  <SpeedDial
+                     ariaLabel="interaction-selector"
+                     className={classes.speedDial}
+                     FabProps={{
+                        onClick: handleToggle,
+                        className: classes.dialButton,
+                     }}
+                     TransitionProps={{
+                        onEntered,
+                        onExited,
+                     }}
+                     icon={<SpeedDialIcon />}
+                     onFocus={handleOpen}
+                     open
+                  >
+                     {actions.map((action) => {
+                        return (
+                           <SpeedDialAction
+                              key={action.name}
+                              ref={
+                                 action.name === "Share"
+                                    ? shareButtonRef
+                                    : undefined
+                              }
+                              icon={action.icon}
+                              tooltipPlacement="left"
+                              tooltipTitle={action.name}
+                              classes={{ staticTooltipLabel: classes.tooltip }}
+                              tooltipOpen={Boolean(action.name.length)}
+                              FabProps={{
+                                 size: "large",
+                                 // classes: {root:  classes.actionButton},
+                              }}
+                              onClick={action.onClick}
+                           />
+                        );
+                     })}
+                  </SpeedDial>
+               </WhiteTooltip>
+            </NewFeatureHint>
             <ShareMenu
                anchorEl={shareMenuAnchorEl}
                onClose={handleCloseShareMenu}

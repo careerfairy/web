@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 
-import { withFirebase } from "context/firebase";
 import {
    Button,
    DialogActions,
@@ -18,7 +17,7 @@ import Step2Camera from "./Step2Camera";
 import Step4Mic from "./Step4Mic";
 import Step5Confirm from "./Step5Confirm";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { GlassDialog } from "../../../../../materialUI/GlobalModals";
+import { GlassDialog } from "materialUI/GlobalModals";
 import Step3Speakers from "./Step3Speakers";
 
 const useStyles = makeStyles((theme) => ({
@@ -393,4 +392,4 @@ const Spinner = () => {
    );
 };
 
-export default withFirebase(StreamPreparationModalV2);
+export default StreamPreparationModalV2;

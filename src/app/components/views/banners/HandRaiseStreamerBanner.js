@@ -19,6 +19,7 @@ const HandRaiseStreamerBanner = () => {
          severity="info"
          icon={<HandRaiseIcon />}
          title={`Hand Raise is Active`}
+         subTitle={"Your audience can now request to join via audio and video."}
          action={
             <Tooltip title={buttonMessage}>
                <Button
