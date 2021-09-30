@@ -4,8 +4,7 @@ import { CAREER_CENTER_COLLECTION } from "../util/constants";
 import { useAuth } from "../../HOCs/AuthProvider";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import GroupsUtil from "../../data/util/GroupsUtil";
-import * as actions from "../../store/actions";
-import { clearUserDataSet } from "../../store/actions/userDataSetActions";
+import * as actions from "store/actions";
 import { useRouter } from "next/router";
 
 const populates = [
@@ -17,13 +16,11 @@ const useAdminGroup = (groupId) => {
    const { authenticatedUser } = useAuth();
    const { pathname, query } = useRouter();
 
-   const isvalidating = useMemo(() => {
+   const isValidating = useMemo(() => {
       return Boolean(
          pathname === "/group/[groupId]/admin" && query.dashboardInviteId
       );
    }, [pathname, query.dashboardInviteId]);
-
-   // console.log("isvalidating", isvalidating);
 
    useEffect(() => {
       return () => {
@@ -42,7 +39,7 @@ const useAdminGroup = (groupId) => {
                   collection: targetCollection,
                   doc: targetId,
                   storeAs: "group",
-                  populates: isvalidating ? [] : populates,
+                  populates: isValidating ? [] : populates,
                },
                {
                   collection: targetCollection,
@@ -77,9 +74,8 @@ const useAdminGroup = (groupId) => {
             });
          }
       }
-      console.log(queriesArray);
       return queriesArray;
-   }, [authenticatedUser?.email, groupId, isvalidating]);
+   }, [authenticatedUser?.email, groupId, isValidating]);
 
    useFirestoreConnect(queries);
 
