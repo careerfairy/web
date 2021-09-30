@@ -1,6 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import { Box, Hidden, IconButton, Tab, Tabs } from "@material-ui/core";
+import {
+   Box,
+   Hidden,
+   IconButton,
+   Tab,
+   Tabs,
+   Typography,
+} from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
 import Link from "materialUI/NextNavLink";
@@ -14,6 +21,7 @@ import LoginButton from "../../../components/views/common/LoginButton";
 import GeneralHeader from "../../../components/views/header/GeneralHeader";
 import clsx from "clsx";
 import { useRouter } from "next/router";
+import useScrollTrigger from "@material-ui/core/useScrollTrigger";
 
 const useStyles = makeStyles((theme) => ({
    avatar: {
@@ -35,29 +43,41 @@ const useStyles = makeStyles((theme) => ({
       }),
    },
    navLinks: {
-      fontWeight: 600,
+      // fontWeight: 600,
+      color: theme.palette.common.black,
+      textTransform: "none",
+      padding: 0,
       opacity: 1,
-      // color: `${theme.palette.primary.contrastText} !important`,
+      minWidth: 72,
+      margin: theme.spacing(0, 4),
+      transition: theme.transitions.create(["color"], {
+         easing: theme.transitions.easing.sharp,
+         duration: theme.transitions.duration.short,
+      }),
       "&:before": {
+         borderRadius: theme.spacing(1),
          content: '""',
          position: "absolute",
-         width: "100%",
+         width: 40,
          height: 2,
-         bottom: 4,
-         left: "0",
-         backgroundColor: (props) => props.navLinksColor,
-         visibility: "hidden",
-         WebkitTransform: "scaleX(0)",
-         transform: "scaleX(0)",
-         transition: theme.transitions.create(["all"], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.short,
-         }),
-      },
-      "&:hover:before": {
+         bottom: 12,
+         right: 0,
+         backgroundColor: (props) => theme.palette.primary.main,
          visibility: "visible",
          WebkitTransform: "scaleX(1)",
          transform: "scaleX(1)",
+         transition: theme.transitions.create(["all"], {
+            easing: theme.transitions.easing.easeInOut,
+            duration: theme.transitions.duration.short,
+         }),
+      },
+      "&:hover": {
+         color: theme.palette.primary.main,
+      },
+      "&:hover:before": {
+         bottom: 8,
+         height: 4,
+         width: "100%",
       },
    },
    indicator: {
@@ -67,7 +87,7 @@ const useStyles = makeStyles((theme) => ({
    root: {
       // Ensures top bar's Zindex is always above the drawer
       zIndex: theme.zIndex.drawer + 1,
-      color: (props) => props.navLinksColor,
+      // color: (props) => props.navLinksColor,
       background: "transparent",
    },
    whiteToolbar: {
@@ -75,27 +95,33 @@ const useStyles = makeStyles((theme) => ({
       background: theme.palette.common.white,
    },
    active: {
+      color: theme.palette.primary.main,
       "&:before": {
          content: '""',
          position: "absolute",
          width: "100%",
-         height: 2,
-         bottom: 4,
+         height: 4,
+         bottom: 8,
          left: "0",
-         backgroundColor: theme.palette.common.white,
+         backgroundColor: theme.palette.primary.main,
          visibility: "visible",
          WebkitTransform: "scaleX(1)",
          transform: "scaleX(1)",
       },
+   },
+   tabs: {
+      display: "flex",
+      justifyContent: "space-around",
    },
 }));
 
 const TopBar = ({ className, ...rest }) => {
    const theme = useTheme();
    const classes = useStyles({
-      navLinksColor: theme.palette.grey["800"],
+      navLinksColor: theme.palette.primary.main,
    });
    const { pathname } = useRouter();
+   const isScrolling = useScrollTrigger();
 
    const { landingLinks } = useGeneralLinks();
    const dispatch = useDispatch();
@@ -106,19 +132,21 @@ const TopBar = ({ className, ...rest }) => {
       <GeneralHeader permanent transparent>
          <MainLogo />
          <Hidden smDown>
-            <Tabs value={false} classes={{ indicator: classes.indicator }}>
-               {landingLinks.map((item) => {
-                  return (
-                     <Tab
-                        key={item.title}
-                        className={clsx(classes.navLinks, {
-                           [classes.active]: pathname === item.href,
-                        })}
-                        label={item.title}
-                        href={item.href}
-                     />
-                  );
-               })}
+            <Tabs
+               className={classes.tabs}
+               value={false}
+               classes={{ indicator: classes.indicator }}
+            >
+               {landingLinks.map((item) => (
+                  <Tab
+                     key={item.title}
+                     className={clsx(classes.navLinks, {
+                        [classes.active]: pathname === item.href,
+                     })}
+                     label={<Typography variant="h6">{item.title}</Typography>}
+                     href={item.href}
+                  />
+               ))}
             </Tabs>
          </Hidden>
          <Box display="flex" alignItems="center">
