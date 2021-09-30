@@ -1,26 +1,18 @@
-import React, { Fragment, useEffect, useState } from "react";
-import { Box, Button, Container, Typography } from "@material-ui/core";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import React, { useEffect, useState } from "react";
+import { Box, Button, Grid, Typography } from "@material-ui/core";
 import CategoryEdit from "../admin/settings/Category/CategoryEdit";
 import CategoryElement from "../admin/settings/Category/CategoryElement";
 import AddIcon from "@material-ui/icons/Add";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
    root: {
-      paddingTop: "50px",
-      paddingBottom: "50px",
+      padding: theme.spacing(2, 0),
    },
    title: {
       fontWeight: "300",
       color: "rgb(0, 210, 170)",
       fontSize: "calc(1.2em + 1.5vw)",
-   },
-   categories: {
-      display: "flex",
-      flexDirection: "column",
-      flex: 1,
    },
    error: {
       color: "red",
@@ -37,7 +29,6 @@ const useStyles = makeStyles((theme) => ({
    buttons: {
       display: "flex",
       justifyContent: "space-between",
-      marginTop: "15px",
    },
 }));
 
@@ -66,26 +57,24 @@ const CreateCategories = ({
 
    const groupId = "temp";
 
-   const categoryElements = arrayOfCategories.map((category, index) => {
-      return (
-         <div key={index}>
-            <CategoryElement
-               handleDeleteLocalCategory={handleDeleteLocalCategory}
-               isLocal={true}
-               handleUpdateCategory={handleUpdateCategory}
-               category={category}
-            />
-         </div>
-      );
-   });
+   const categoryElements = arrayOfCategories.map((category, index) => (
+      <Grid key={category.id} item xs={12}>
+         <CategoryElement
+            handleDeleteLocalCategory={handleDeleteLocalCategory}
+            isLocal={true}
+            handleUpdateCategory={handleUpdateCategory}
+            category={category}
+         />
+      </Grid>
+   ));
 
    const verifyNext = () => {
       handleNext();
    };
 
    return (
-      <Container className={classes.root}>
-         <div className={classes.header}>
+      <Grid className={classes.root} container spacing={2}>
+         <Grid item xs={12} className={classes.header}>
             <Typography className={classes.title}>
                Add some Categories
             </Typography>
@@ -101,27 +90,30 @@ const CreateCategories = ({
                   Add
                </Button>
             </Box>
-         </div>
-         <Box className={classes.categories}>
-            {createMode && (
-               <CategoryEdit
-                  handleAddTempCategory={handleAddTempCategory}
-                  groupId={groupId}
-                  isLocal={true}
-                  category={{}}
-                  options={[]}
-                  newCategory={true}
-                  setEditMode={setCreateMode}
-               />
-            )}
-            {categoryElements}
-         </Box>
-         <Box className={classes.buttons}>
+         </Grid>
+         <Grid item xs={12}>
+            <Grid container spacing={2}>
+               {createMode && (
+                  <Grid item xs={12}>
+                     <CategoryEdit
+                        handleAddTempCategory={handleAddTempCategory}
+                        groupId={groupId}
+                        isLocal={true}
+                        category={{}}
+                        options={[]}
+                        newCategory={true}
+                        setEditMode={setCreateMode}
+                     />
+                  </Grid>
+               )}
+               {categoryElements}
+            </Grid>
+         </Grid>
+         <Grid item xs={12} className={classes.buttons}>
             <Button
                variant="contained"
                size="large"
                style={{ marginRight: 5 }}
-               startIcon={<ArrowBackIcon />}
                onClick={handleBack}
             >
                Back
@@ -130,15 +122,14 @@ const CreateCategories = ({
             <Button
                color="primary"
                size="large"
-               variant="contained"
                style={{ marginLeft: 5 }}
-               endIcon={<ArrowForwardIcon />}
+               variant="contained"
                onClick={verifyNext}
             >
-               Next
+               Continue
             </Button>
-         </Box>
-      </Container>
+         </Grid>
+      </Grid>
    );
 };
 

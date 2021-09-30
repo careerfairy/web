@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { withFirebase } from "../../../../context/firebase";
 import PublishIcon from "@material-ui/icons/Publish";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import { Form as UiForm, Formik } from "formik";
 import FilePickerContainer from "../../../../components/ssr/FilePickerContainer";
 import {
@@ -10,8 +9,8 @@ import {
    Container,
    FormControl,
    FormHelperText,
-   Typography,
    TextField,
+   Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useAuth } from "../../../../HOCs/AuthProvider";
@@ -197,11 +196,10 @@ const CreateBaseGroup = ({ handleNext, setBaseGroupInfo, baseGroupInfo }) => {
                      style={{ maxWidth: 500 }}
                      fullWidth
                      disabled={isSubmitting}
-                     endIcon={<ArrowForwardIcon />}
                      color="primary"
                      type="submit"
                   >
-                     Next
+                     Continue
                   </Button>
                </UiForm>
             )}

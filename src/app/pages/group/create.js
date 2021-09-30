@@ -14,6 +14,7 @@ import { useAuth } from "../../HOCs/AuthProvider";
 import { Stepper, Step, StepLabel, Container } from "@material-ui/core";
 import { useSnackbar } from "notistack";
 import { GENERAL_ERROR } from "../../components/util/constants";
+import defaultCategories from "../../components/views/group/create/defaultCategories";
 
 function getSteps() {
    return [
@@ -28,7 +29,9 @@ const CreateGroup = ({ firebase }) => {
    const { enqueueSnackbar } = useSnackbar();
    const [activeStep, setActiveStep] = useState(0);
    const [baseGroupInfo, setBaseGroupInfo] = useState({});
-   const [arrayOfCategories, setArrayOfCategories] = useState([]);
+   const [arrayOfCategories, setArrayOfCategories] = useState(
+      defaultCategories
+   );
    const { userData, authenticatedUser: user, loading } = useAuth();
 
    useEffect(() => {
