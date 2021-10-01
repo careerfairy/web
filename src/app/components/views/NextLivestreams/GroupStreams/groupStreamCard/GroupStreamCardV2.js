@@ -683,6 +683,7 @@ const GroupStreamCardV2 = memo(
                            <DetailsButton
                               size="small"
                               mobile={mobile}
+                              referrerId={referrerId}
                               groupData={groupData}
                               listenToUpcoming={listenToUpcoming}
                               livestream={livestream}

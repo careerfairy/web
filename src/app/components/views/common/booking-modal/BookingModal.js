@@ -33,7 +33,7 @@ function BookingModal({
    const firebase = useFirebase();
    const [modalStep, setModalStep] = useState(0);
    const {
-      query: { groupId },
+      query: { groupId, referrerId },
    } = useRouter();
    const { userData } = useAuth();
 
@@ -95,18 +95,19 @@ function BookingModal({
    }, [upcomingQuestions]);
 
    function handleUrl() {
-      let url = "/next-livestreams";
-      if (groupId) {
-         url = `/next-livestreams/${groupId}?livestreamId=${livestream.id}`;
-      } else if (
-         careerCenters &&
-         careerCenters.length &&
-         careerCenters.length === 1
-      ) {
-         // If there's only one group, please send me to that groups page
-         url = `/next-livestreams/${careerCenters[0].id}?livestreamId=${livestream.id}`;
-      }
-      return url;
+      return {
+         pathname: groupId
+            ? `/next-livestreams/${groupId}`
+            : careerCenters.length === 1
+            ? `/next-livestreams/${careerCenters[0].id}`
+            : "/next-livestreams",
+         query: {
+            ...(referrerId && { referrerId }),
+            ...(livestream?.id && {
+               livestreamId: livestream.id,
+            }),
+         },
+      };
    }
 
    const getRefererUrl = () => {

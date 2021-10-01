@@ -2978,13 +2978,16 @@ class Firebase {
       livestreamId,
       recipientAuthId
    ) => {
-      return this.firestore
+      try {
+      return await this.firestore
          .collection("livestreamReferrals")
          .doc(this.#getReferralDocId(livestreamId, recipientAuthId))
          .update({
             attendedStreamAt: this.getServerTimestamp(),
             recipientAttendedLivestream: true,
          });
+      } catch (e) {
+      }
    };
 
    /**

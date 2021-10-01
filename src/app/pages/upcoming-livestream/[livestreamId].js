@@ -599,7 +599,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    let logoElements = careerCenters.map((careerCenter, index) => {
       return (
-         <Item className={classes.imageGrid}>
+         <Item key={careerCenter.id} className={classes.imageGrid}>
             <img
                src={getResizedUrl(careerCenter.logoUrl, "lg")}
                className={classes.logoElementImage}
