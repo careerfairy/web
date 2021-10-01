@@ -118,6 +118,7 @@ const ViewerLayout = (props) => {
       userData?.firstName,
       userData?.lastName,
       breakoutRoomId,
+      streamRef
    ]);
 
    useEffect(() => {

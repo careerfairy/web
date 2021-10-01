@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Container, TextField, Grid, Hidden } from "@material-ui/core";
+import {
+   Avatar,
+   Box,
+   Button,
+   Container,
+   Grid,
+   TextField,
+} from "@material-ui/core";
 import Header from "../../components/views/header/Header";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { withFirebasePage } from "context/firebase";
@@ -16,7 +23,6 @@ import ClearIcon from "@material-ui/icons/Clear";
 import UserUtil from "../../data/util/UserUtil";
 import TargetOptions from "../../components/views/common/TargetOptions";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
-import DataAccessUtil from "util/DataAccessUtil";
 import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
 import EmailIcon from "@material-ui/icons/Email";
 import RssFeedIcon from "@material-ui/icons/RssFeed";
@@ -27,7 +33,6 @@ import { speakerPlaceholder } from "../../components/util/constants";
 import { useAuth } from "../../HOCs/AuthProvider";
 import GroupsUtil from "../../data/util/GroupsUtil";
 import { store } from "../_app";
-import { Paper, Avatar, Box } from "@material-ui/core";
 import { companyLogoPlaceholder } from "../../constants/images";
 import { getResizedUrl } from "../../components/helperFunctions/HelperFunctions";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
@@ -123,6 +128,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    const { livestreamId } = router.query;
    const absolutePath = router.asPath;
    const summaryRef = useRef();
+   const { referrerId } = router.query;
    const { userData, authenticatedUser: user } = useAuth();
    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
    const [newQuestionTitle, setNewQuestionTitle] = useState("");
@@ -290,18 +296,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
       window.open("http://careerfairy.io" + route, "_blank");
    }
 
-   function deregisterFromLivestream() {
-      if (!user || !user.emailVerified) {
-         return router.replace("/signup");
-      }
-
-      if (!userData) {
-         return router.push("/profile");
-      }
-
-      firebase.deregisterFromLivestream(currentLivestream.id, user.email);
-   }
-
    function joinTalentPool() {
       if (!user || !user.emailVerified) {
          return router.replace("/signup");
@@ -388,8 +382,9 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          firebase
             .registerToLivestream(
                currentLivestream.id,
-               user.email,
-               groupsWithPolicies
+               userData,
+               groupsWithPolicies,
+               referrerId
             )
             .then(() => {
                sendEmailRegistrationConfirmation();
@@ -402,8 +397,9 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
       firebase
          .registerToLivestream(
             currentLivestream.id,
-            user.email,
-            groupsWithPolicies
+            userData,
+            groupsWithPolicies,
+            referrerId
          )
          .then(() => {
             setBookingModalOpen(true);
