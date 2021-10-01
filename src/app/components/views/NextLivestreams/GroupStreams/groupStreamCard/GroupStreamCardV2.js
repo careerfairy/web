@@ -266,7 +266,12 @@ const GroupStreamCardV2 = memo(
    }) => {
       const mediaStyles = useCoverCardMediaStyles();
       const classes = useStyles();
-      const { pathname, absolutePath, push } = useRouter();
+      const {
+         pathname,
+         absolutePath,
+         push,
+         query: { referrerId },
+      } = useRouter();
       const linkToStream = useMemo(
          () =>
             pathname === "/next-livestreams/[groupId]"
@@ -432,8 +437,9 @@ const GroupStreamCardV2 = memo(
                firebase
                   .registerToLivestream(
                      livestream.id,
-                     user.email,
-                     groupsWithPolicies
+                     userData,
+                     groupsWithPolicies,
+                     referrerId
                   )
                   .then(() => {
                      setCardHovered(false);
@@ -449,8 +455,9 @@ const GroupStreamCardV2 = memo(
                firebase
                   .registerToLivestream(
                      livestream.id,
-                     user.email,
-                     groupsWithPolicies
+                     userData,
+                     groupsWithPolicies,
+                     referrerId
                   )
                   .then(() => {
                      setCardHovered(false);
@@ -463,7 +470,12 @@ const GroupStreamCardV2 = memo(
 
       function completeRegistrationProcess() {
          firebase
-            .registerToLivestream(livestream.id, user.email, groupsWithPolicies)
+            .registerToLivestream(
+               livestream.id,
+               userData,
+               groupsWithPolicies,
+               referrerId
+            )
             .then(() => {
                setCardHovered(false);
                setBookingModalOpen(true);
@@ -622,9 +634,7 @@ const GroupStreamCardV2 = memo(
                            avatar={
                               <DateTimeDisplay
                                  mobile={mobile}
-                                 date={
-                                    livestream.start?.toDate()
-                                 }
+                                 date={livestream.start?.toDate()}
                               />
                            }
                            title={
@@ -642,7 +652,7 @@ const GroupStreamCardV2 = memo(
                               />
                            }
                         />
-                        <Collapse collapsedHeight={80} in={cardHovered}>
+                        <Collapse collapsedSize={80} in={cardHovered}>
                            <Typography
                               variant={"h4"}
                               className={clsx(classes.title, {
@@ -673,6 +683,7 @@ const GroupStreamCardV2 = memo(
                            <DetailsButton
                               size="small"
                               mobile={mobile}
+                              referrerId={referrerId}
                               groupData={groupData}
                               listenToUpcoming={listenToUpcoming}
                               livestream={livestream}
