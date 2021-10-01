@@ -6,14 +6,19 @@ import QuestionVotingBox from "components/views/question-voting-box/QuestionVoti
 
 import Link from "next/link";
 
-import { withFirebase } from "context/firebase";
+import { useFirebase, withFirebase } from "context/firebase";
 import {
+   Box,
    Button,
    Dialog,
    DialogContent,
    Grid,
    TextField,
 } from "@material-ui/core";
+import CopyLinkField from "../CopyLinkField";
+import { getBaseUrl } from "../../../helperFunctions/HelperFunctions";
+import { useRouter } from "next/router";
+import { useAuth } from "../../../../HOCs/AuthProvider";
 
 function BookingModal({
    modalOpen,
@@ -21,13 +26,17 @@ function BookingModal({
    careerCenters,
    livestream,
    registration,
-   groupId,
    setModalOpen,
    setRegistration,
    buttonAction,
-   firebase,
 }) {
+   const firebase = useFirebase();
    const [modalStep, setModalStep] = useState(0);
+   const {
+      query: { groupId },
+   } = useRouter();
+   console.log("-> groupId", groupId);
+   const { userData } = useAuth();
 
    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
    const [questionsAvailable, setQuestionsAvailable] = useState(false);
@@ -100,6 +109,20 @@ function BookingModal({
       }
       return url;
    }
+
+   const getRefererUrl = () => {
+      let url = `/next-livestreams?livestreamId=${livestream.id}`;
+      if (userData?.authId) {
+         url = `/next-livestreams?livestreamId=${livestream.id}&referrerId=${userData.authId}`;
+         if (groupId) {
+            url = `/next-livestreams/${groupId}?livestreamId=${livestream.id}&referrerId=${userData.authId}`;
+         } else if (careerCenters?.[0]?.id) {
+            // If there's only one group, please send me to that groups page
+            url = `/next-livestreams/${careerCenters[0].id}?livestreamId=${livestream.id}&referrerId=${userData.authId}`;
+         }
+      }
+      return `${getBaseUrl()}${url}`;
+   };
 
    function addNewQuestion() {
       if (!user) {
@@ -176,6 +199,9 @@ function BookingModal({
             maxWidth={"md"}
          >
             <DialogContent>
+               {/*<Box>*/}
+               {/*   <CopyLinkField linkUrl={getRefererUrl()} />*/}
+               {/*</Box>*/}
                <div
                   style={{ padding: "200px" }}
                   className={registration ? "" : "hidden"}
@@ -466,4 +492,4 @@ function BookingModal({
    );
 }
 
-export default withFirebase(BookingModal);
+export default BookingModal;
