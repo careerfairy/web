@@ -272,13 +272,12 @@ const GroupStreamCardV2 = memo(
          push,
          query: { referrerId },
       } = useRouter();
-      const linkToStream = useMemo(
-         () =>
-            pathname === "/next-livestreams/[groupId]"
-               ? `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}`
-               : `/next-livestreams?livestreamId=${livestream.id}`,
-         [pathname, livestream?.id, groupData?.groupId]
-      );
+      const linkToStream = useMemo(() => {
+         const referrerQuery = referrerId ? `&referrerId=${referrerId}` : "";
+         return pathname === "/next-livestreams/[groupId]"
+            ? `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}${referrerQuery}`
+            : `/next-livestreams?livestreamId=${livestream.id}${referrerQuery}`;
+      }, [pathname, livestream?.id, groupData?.groupId, referrerId]);
 
       function userIsRegistered() {
          if (
@@ -397,7 +396,9 @@ const GroupStreamCardV2 = memo(
          if (user.isLoaded && user.isEmpty) {
             return push({
                pathname: "/login",
-               query: { absolutePath },
+               query: {
+                  absolutePath,
+               },
             });
          }
 
@@ -408,14 +409,15 @@ const GroupStreamCardV2 = memo(
          if ((user.isLoaded && user.isEmpty) || !user.emailVerified) {
             return push({
                pathname: `/login`,
-               query: { absolutePath: linkToStream },
+               query: {
+                  absolutePath: linkToStream,
+               },
             });
          }
 
          if (!userData || !UserUtil.userProfileIsComplete(userData)) {
             return push({
                pathname: "/profile",
-               query: "profile",
             });
          }
          const {
