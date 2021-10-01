@@ -272,7 +272,6 @@ const GroupStreamCardV2 = memo(
          push,
          query: { referrerId },
       } = useRouter();
-      console.log("-> referrerId", referrerId);
       const linkToStream = useMemo(
          () =>
             pathname === "/next-livestreams/[groupId]"

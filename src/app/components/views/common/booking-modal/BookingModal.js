@@ -35,7 +35,6 @@ function BookingModal({
    const {
       query: { groupId },
    } = useRouter();
-   console.log("-> groupId", groupId);
    const { userData } = useAuth();
 
    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
