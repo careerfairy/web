@@ -3002,18 +3002,11 @@ class Firebase {
       livestreamId
    ) => {
       // You should not be able to refer your self so we return early here
-      // console.log("-> referrerAuthId", referrerAuthId);
-      // console.log("-> recipientAuthId", recipientAuthId);
-      // console.log("-> livestreamId", livestreamId);
       if (referrerAuthId === recipientAuthId) {
-         // console.log("-> Cannot refer your self!");
          return false;
       }
 
       if (!referrerAuthId || !recipientAuthId || !livestreamId) {
-         // console.log(
-         //    `-> MISSING ONE OF THE FOLLOWING: referrerAuthId: ${referrerAuthId} recipientAuthId: ${recipientAuthId} livestreamId: ${livestreamId}`
-         // );
          return false;
       }
 
@@ -3024,7 +3017,6 @@ class Firebase {
       );
       // if the livestream has already been attended by the invited that means that the referral if complete, no need to update anything
       if (data?.recipientAttendedLivestream) {
-         // console.log("-> Already attended/completed referral!");
          return false;
       }
 
@@ -3033,14 +3025,11 @@ class Firebase {
          .doc(this.#getReferralDocId(livestreamId, recipientAuthId));
 
       if (refAlreadyExists) {
-         // console.log("-> referral already exists!!");
          // If its the same referer, then just return out of this function, no need to update anything
          if (data.referrerAuthId === referrerAuthId) {
-         // console.log("-> This is the same referrer!!");
             return false;
          }
          // Else if its a new referrer then update the referrerAuthId on the document
-         // console.log("-> updating referral");
          return referralRef.update({
             referrerAuthId,
             updated: this.getServerTimestamp(),
