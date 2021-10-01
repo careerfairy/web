@@ -2140,7 +2140,7 @@ class Firebase {
       groupsWithPolicies = [],
       referrerAuthId
    ) => {
-      const {userId, authId} = userData
+      const { id: userId, authId } = userData;
       const idsOfGroupsWithPolicies = groupsWithPolicies.map(
          (group) => group.id
       );
@@ -2155,7 +2155,7 @@ class Firebase {
          .doc(userId);
       const referralPromise = this.#createLivestreamReferral(
          referrerAuthId,
-        authId,
+         authId,
          livestreamId
       );
       const transactionPromise = this.firestore.runTransaction(
@@ -2998,6 +2998,9 @@ class Firebase {
       recipientAuthId,
       livestreamId
    ) => {
+      // You should not be able to refer your self so we return early here
+      if(referrerAuthId === recipientAuthId) return false
+
       if (!referrerAuthId || !recipientAuthId || !livestreamId) return false;
 
       const [refAlreadyExists, data] = await this.checkIfReferralAlreadyExists(
