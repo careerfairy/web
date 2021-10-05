@@ -720,7 +720,7 @@ const GroupStreamCardV2Old = memo(
       const shouldPulseBackground = () => isHighlighted && cardHovered;
       const shouldPulseForeground = () => isHighlighted && !cardHovered;
 
-      const logoElements = careerCenters.map((careerCenter) => (
+      const logoElements = getGroups().map((careerCenter) => (
          <LogoElement
             className={classes.groupLogo}
             hideFollow={(!cardHovered && !mobile) || isAdmin}

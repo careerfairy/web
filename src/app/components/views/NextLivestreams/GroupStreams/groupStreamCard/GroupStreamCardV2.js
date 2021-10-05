@@ -552,6 +552,12 @@ const GroupStreamCardV2 = memo(
          }
       };
 
+      const filterCurrentGroup = (group) => {
+         return groupData && groupData.groupId
+            ? group.groupId === groupData.groupId
+            : true;
+      };
+
       const registrationDisabled = useMemo(() => {
          if (isPastLivestreams) return true;
          //User should always be able to cancel registration
@@ -751,21 +757,23 @@ const GroupStreamCardV2 = memo(
                               </Item>
                               <Item>
                                  <AvatarGroup>
-                                    {careerCenters.map((careerCenter) => (
-                                       <Avatar
-                                          variant="rounded"
-                                          key={careerCenter.id}
-                                          className={clsx(
-                                             classes.groupLogo,
-                                             classes.groupLogoStacked
-                                          )}
-                                          src={getResizedUrl(
-                                             careerCenter.logoUrl,
-                                             "xs"
-                                          )}
-                                          alt={careerCenter.universityName}
-                                       />
-                                    ))}
+                                    {careerCenters
+                                       .filter(filterCurrentGroup)
+                                       .map((careerCenter) => (
+                                          <Avatar
+                                             variant="rounded"
+                                             key={careerCenter.id}
+                                             className={clsx(
+                                                classes.groupLogo,
+                                                classes.groupLogoStacked
+                                             )}
+                                             src={getResizedUrl(
+                                                careerCenter.logoUrl,
+                                                "xs"
+                                             )}
+                                             alt={careerCenter.universityName}
+                                          />
+                                       ))}
                                  </AvatarGroup>
                               </Item>
                            </Row>
@@ -808,22 +816,24 @@ const GroupStreamCardV2 = memo(
                               style={{ width: "100%" }}
                               className={classes.groupLogos}
                            >
-                              {careerCenters.map((careerCenter) => (
-                                 <LogoElement
-                                    className={classes.groupLogo}
-                                    hideFollow={
-                                       (!cardHovered && !mobile) || isAdmin
-                                    }
-                                    key={careerCenter.groupId}
-                                    livestreamId={livestream.id}
-                                    userFollows={checkIfUserFollows(
-                                       careerCenter
-                                    )}
-                                    careerCenter={careerCenter}
-                                    userData={userData}
-                                    user={user}
-                                 />
-                              ))}
+                              {careerCenters
+                                 .filter(filterCurrentGroup)
+                                 .map((careerCenter) => (
+                                    <LogoElement
+                                       className={classes.groupLogo}
+                                       hideFollow={
+                                          (!cardHovered && !mobile) || isAdmin
+                                       }
+                                       key={careerCenter.groupId}
+                                       livestreamId={livestream.id}
+                                       userFollows={checkIfUserFollows(
+                                          careerCenter
+                                       )}
+                                       careerCenter={careerCenter}
+                                       userData={userData}
+                                       user={user}
+                                    />
+                                 ))}
                            </Row>
                         </div>
                      </Collapse>
