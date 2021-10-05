@@ -169,7 +169,7 @@ function BookingModal({
 
    function joinTalentPool() {
       firebase
-         .joinCompanyTalentPool(livestream.companyId, user.email, livestream.id)
+         .joinCompanyTalentPool(livestream.companyId, userData, livestream.id)
          .then(() => {
             setModalStep(4);
          });

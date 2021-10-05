@@ -307,7 +307,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
       firebase.joinCompanyTalentPool(
          currentLivestream.companyId,
-         user.email,
+         userData,
          currentLivestream.id
       );
    }
@@ -323,7 +323,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
       firebase.leaveCompanyTalentPool(
          currentLivestream.companyId,
-         user.email,
+         userData,
          currentLivestream.id
       );
    }

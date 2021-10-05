@@ -2210,8 +2210,10 @@ class Firebase {
       return batch.commit();
    };
 
-   joinCompanyTalentPool = (companyId, userId, mainStreamId) => {
-      let userRef = this.firestore.collection("userData").doc(userId);
+   joinCompanyTalentPool = (companyId, userData, mainStreamId) => {
+      let userRef = this.firestore
+         .collection("userData")
+         .doc(userData.userEmail);
       let streamRef = this.firestore
          .collection("livestreams")
          .doc(mainStreamId);
@@ -2219,7 +2221,7 @@ class Firebase {
          .collection("livestreams")
          .doc(mainStreamId)
          .collection("talentPool")
-         .doc(userId);
+         .doc(userData.userEmail);
 
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(userRef).then((userSnap) => {
@@ -2231,7 +2233,9 @@ class Firebase {
                   ),
                });
                transaction.update(streamRef, {
-                  talentPool: firebase.firestore.FieldValue.arrayUnion(userId),
+                  talentPool: firebase.firestore.FieldValue.arrayUnion(
+                     userData.userEmail
+                  ),
                   registrants: firebase.firestore.FieldValue.arrayUnion(
                      userData.authId
                   ),
@@ -2257,9 +2261,12 @@ class Firebase {
       return streamData.companyId;
    };
 
-   leaveCompanyTalentPool = (companyId, userId, livestreamId) => {
+   leaveCompanyTalentPool = (companyId, userData, livestreamId) => {
+      debugger;
       let batch = this.firestore.batch();
-      let userRef = this.firestore.collection("userData").doc(userId);
+      let userRef = this.firestore
+         .collection("userData")
+         .doc(userData.userEmail);
       let streamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId);
@@ -2267,13 +2274,15 @@ class Firebase {
          .collection("livestreams")
          .doc(livestreamId)
          .collection("talentPool")
-         .doc(userId);
+         .doc(userData.userEmail);
       batch.update(userRef, {
          talentPools: firebase.firestore.FieldValue.arrayRemove(companyId),
          registrants: firebase.firestore.FieldValue.arrayUnion(userData.authId),
       });
       batch.update(streamRef, {
-         talentPool: firebase.firestore.FieldValue.arrayRemove(userId),
+         talentPool: firebase.firestore.FieldValue.arrayRemove(
+            userData.userEmail
+         ),
       });
 
       batch.delete(userInTalentPoolCollectionRef);
@@ -2979,15 +2988,14 @@ class Firebase {
       recipientAuthId
    ) => {
       try {
-      return await this.firestore
-         .collection("livestreamReferrals")
-         .doc(this.#getReferralDocId(livestreamId, recipientAuthId))
-         .update({
-            attendedStreamAt: this.getServerTimestamp(),
-            recipientAttendedLivestream: true,
-         });
-      } catch (e) {
-      }
+         return await this.firestore
+            .collection("livestreamReferrals")
+            .doc(this.#getReferralDocId(livestreamId, recipientAuthId))
+            .update({
+               attendedStreamAt: this.getServerTimestamp(),
+               recipientAttendedLivestream: true,
+            });
+      } catch (e) {}
    };
 
    /**

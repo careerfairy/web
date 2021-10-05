@@ -72,11 +72,7 @@ const useJoinTalentPool = () => {
                   livestreamId,
                   currentLivestream
                );
-               await joinCompanyTalentPool(
-                  companyId,
-                  userData.userEmail,
-                  livestreamId
-               );
+               await joinCompanyTalentPool(companyId, userData, livestreamId);
             } catch (e) {
                dispatch(actions.sendGeneralError(e));
             }
@@ -97,11 +93,7 @@ const useJoinTalentPool = () => {
                   currentLivestream
                );
 
-               await leaveCompanyTalentPool(
-                  companyId,
-                  userData.userEmail,
-                  livestreamId
-               );
+               await leaveCompanyTalentPool(companyId, userData, livestreamId);
             } catch (e) {
                dispatch(actions.sendGeneralError(e));
             }
