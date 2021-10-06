@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { navigator } from "global";
-import { isEmptyArray } from "formik";
 
 export default function useDevices(refreshDevices) {
    const [deviceList, setDeviceList] = useState({

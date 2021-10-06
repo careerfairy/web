@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AddIcon from "@material-ui/icons/Add";
-import { withFirebase } from "context/firebase";
+import { useFirebase } from "context/firebase";
 import {
    AddCategory,
    DeleteCategory,
@@ -9,22 +9,20 @@ import {
    RenameOption,
 } from "./Option/CategoryEditOption";
 import {
-   Zoom,
    Box,
    Button,
+   Card,
+   CardActions,
+   CardContent,
+   CardHeader,
+   Chip,
+   Divider,
    FormHelperText,
    IconButton,
-   Paper,
-   Typography,
-   TextField,
    Menu,
    MenuItem,
-   Chip,
-   Card,
-   CardContent,
-   Divider,
-   CardHeader,
-   CardActions,
+   TextField,
+   Zoom,
 } from "@material-ui/core";
 import { v4 as uuidv4 } from "uuid";
 import { makeStyles } from "@material-ui/core/styles";
@@ -80,7 +78,6 @@ function CategoryEditModal({
    handleDeleteLocalCategory,
    handleUpdateCategory,
    newCategory,
-   firebase,
    setEditMode,
    handleAddTempCategory,
    group,
@@ -88,7 +85,7 @@ function CategoryEditModal({
    isLocal,
 }) {
    const classes = useStyles();
-
+   const firebase = useFirebase();
    const [categoryName, setCategoryName] = useState("");
 
    const [editableOptions, setEditableOptions] = useState([]);
@@ -265,7 +262,7 @@ function CategoryEditModal({
 
    const optionElements = editableOptions.map((el) => {
       return (
-         <Zoom in={el.id}>
+         <Zoom key={el.id} in={Boolean(el.id)}>
             <Chip
                label={el.name}
                variant="outlined"
@@ -415,4 +412,4 @@ CategoryEditModal.propTypes = {
    newCategory: PropTypes.any,
    setEditMode: PropTypes.func,
 };
-export default withFirebase(CategoryEditModal);
+export default CategoryEditModal;

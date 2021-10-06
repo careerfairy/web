@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, { useEffect, useRef, useState } from "react";
 import {
    Button,
@@ -29,14 +30,11 @@ const VideoTab = ({
    videoSource,
    devices,
    setVideoSource,
-   playSound,
-   handleMarkComplete,
-   handleMarkIncomplete,
    displayableMediaStream,
-   isCompleted,
 }) => {
    const classes = useStyles();
-
+// console.log("-> devices in video Tab", devices);
+// console.log("-> setVideoSource", setVideoSource);
    const testVideoRef = useRef(null);
    const inputLabel = useRef(null);
    const [labelWidth, setLabelWidth] = useState(0);
@@ -119,4 +117,12 @@ const VideoTab = ({
    );
 };
 
+VideoTab.propTypes = {
+  devices: PropTypes.array,
+  displayableMediaStream: PropTypes.object,
+  setVideoSource: PropTypes.func.isRequired,
+  videoSource: PropTypes.any
+}
+
 export default VideoTab;
+

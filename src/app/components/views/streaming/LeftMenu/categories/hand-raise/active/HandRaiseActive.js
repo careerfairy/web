@@ -1,15 +1,24 @@
 import React, { useContext, useEffect, useState } from "react";
-import { withFirebase } from "context/firebase";
 import HandRaiseElement from "./hand-raise-element/HandRaiseElement";
 import NotificationsContext from "context/notifications/NotificationsContext";
 import CloseRoundedIcon from "@material-ui/icons/CloseRounded";
 import PanToolOutlinedIcon from "@material-ui/icons/PanToolOutlined";
 
-import { Box, Button, Typography, Grow, Paper } from "@material-ui/core";
 import {
-   CategoryContainerCentered,
-   CategoryContainerTopAligned,
-} from "../../../../../../../materialUI/GlobalContainers";
+   Box,
+   Button,
+   Collapse,
+   FormControl,
+   Grid,
+   Grow,
+   InputLabel,
+   List,
+   MenuItem,
+   Paper,
+   Select,
+   Typography,
+} from "@material-ui/core";
+import { CategoryContainerCentered } from "../../../../../../../materialUI/GlobalContainers";
 import { ThemedPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
 import {
@@ -19,25 +28,56 @@ import {
    WhiteTooltip,
 } from "../../../../../../../materialUI/GlobalTooltips";
 import { makeStyles } from "@material-ui/core/styles";
-import { useSnackbar } from "notistack";
-import useStreamRef from "../../../../../../custom-hook/useStreamRef";
+import { TransitionGroup } from "react-transition-group";
+import { dynamicSort } from "../../../../../../helperFunctions/HelperFunctions";
+import OrderIcon from "@material-ui/icons/KeyboardArrowUpRounded";
+import useStreamActiveHandRaises from "../../../../../../custom-hook/useStreamActiveHandRaises";
+import * as actions from "store/actions";
+import { useDispatch } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
    activeHandRaiseContainer: {
-      padding: theme.spacing(1),
+      padding: theme.spacing(0, 0, 1),
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+   },
+   filterGrid: {
+      padding: theme.spacing(1, 2),
+      backgroundColor: theme.palette.background.paper,
+      boxShadow: theme.shadows[1],
+      margin: 0,
+   },
+   orderIcon: {
+      transition: theme.transitions.create(["transform"], {
+         duration: theme.transitions.duration.complex,
+         easing: theme.transitions.easing.easeInOut,
+      }),
+      transform: ({ up }) => up && `rotate(180deg)`,
+   },
+   activeHandRaisesWrapper: {
+      background: theme.palette.background.default,
    },
 }));
 
+const FILTER_MAP = {
+   All: () => true,
+   Requested: (handRaise) => handRaise.state === "requested",
+   Invited: (handRaise) => handRaise.state === "invited",
+   Connecting: (handRaise) => handRaise.state === "connecting",
+   Connected: (handRaise) => handRaise.state === "connected",
+};
+
 function HandRaiseActive({
-   firebase,
    livestream,
    showMenu,
    selectedState,
    sliding,
 }) {
-   const classes = useStyles();
-   const streamRef = useStreamRef();
-   const { closeSnackbar } = useSnackbar();
+   const dispatch = useDispatch();
+
+   const closeSnackbar = (...args) => dispatch(actions.closeSnackbar(...args))
+
    const { setNewNotification, setNotificationToRemove } = useContext(
       NotificationsContext
    );
@@ -47,25 +87,43 @@ function HandRaiseActive({
       getActiveTutorialStepKey,
       isOpen: isStepOpen,
    } = useContext(TutorialContext);
-   const [handRaises, setHandRaises] = useState([]);
+   const { handRaises, handlers, numberOfActiveHandRaisers } = useStreamActiveHandRaises();
    const [hasEntered, setHasEntered] = useState(false);
    const [hasExited, setHasExited] = useState(false);
+   const [sortByNew, setSortByNew] = useState(true);
+   const [filterMapProperty, setFilterMapProperty] = useState("All");
+   const [filteredHandRaises, setFilteredHandRaises] = useState([]);
+
+   const classes = useStyles({ up: sortByNew });
 
    useEffect(() => {
-      if (livestream) {
-         firebase.listenToHandRaises(streamRef, (querySnapshot) => {
-            var handRaiseList = [];
-            querySnapshot.forEach((doc) => {
-               let handRaise = doc.data();
-               handRaise.id = doc.id;
-               handRaiseList.push(handRaise);
-            });
-            setHandRaises(handRaiseList);
-         });
-      }
-   }, [livestream]);
+      handleFilterHandRaises(handRaises, filterMapProperty, sortByNew);
+   }, [handRaises, sortByNew, filterMapProperty]);
 
    const activeStep = getActiveTutorialStepKey();
+
+   const handleFilterHandRaises = (
+      arrayOfHandRaises,
+      filterMapProperty,
+      sortByNew
+   ) => {
+      const newFilteredHandRaises = arrayOfHandRaises
+         .filter((handRaise) => FILTER_MAP[filterMapProperty](handRaise))
+         .map((handRaise) => ({
+            ...handRaise,
+            date: handRaise.timestamp.toDate(),
+         }))
+         .sort(dynamicSort("date", sortByNew));
+      setFilteredHandRaises(newFilteredHandRaises);
+   };
+
+   const handleChangeFilterMapProperty = (event) => {
+      setFilterMapProperty(event.target.value);
+   };
+
+   const handleToggleOrder = () => {
+      setSortByNew(!sortByNew);
+   };
 
    const isOpen = (property) => {
       return Boolean(
@@ -86,41 +144,6 @@ function HandRaiseActive({
       });
    };
 
-   function setHandRaiseModeInactive() {
-      firebase.setHandRaiseMode(streamRef, false);
-   }
-
-   function updateHandRaiseRequest(handRaiseId, state) {
-      firebase.updateHandRaiseRequest(streamRef, handRaiseId, state);
-   }
-
-   let numberOfActiveHandRaisers = handRaises.filter(
-      (handRaise) =>
-         handRaise.state === "connected" ||
-         handRaise.state === "connecting" ||
-         handRaise.state === "invited"
-   ).length;
-
-   let handRaiseElements = handRaises
-      .filter(
-         (handRaise) =>
-            handRaise.state !== "unrequested" && handRaise.state !== "denied"
-      )
-      .map((handRaise) => {
-         return (
-            <HandRaiseElement
-               request={handRaise}
-               hasEntered={hasEntered}
-               key={handRaise.timestamp.toMillis()}
-               updateHandRaiseRequest={updateHandRaiseRequest}
-               setNewNotification={setNewNotification}
-               closeSnackbar={closeSnackbar}
-               numberOfActiveHandRaisers={numberOfActiveHandRaisers}
-               setNotificationToRemove={setNotificationToRemove}
-            />
-         );
-      });
-
    if (!livestream.handRaiseActive) {
       return null;
    }
@@ -132,28 +155,93 @@ function HandRaiseActive({
             onExited={() => setHasExited(true)}
             mountOnEnter
             unmountOnExit
-            in={Boolean(handRaiseElements.length)}
+            in={Boolean(handRaises.length)}
          >
-            <CategoryContainerTopAligned
-               className={classes.activeHandRaiseContainer}
+            <Box
+               className={classes.activeHandRaisesWrapper}
+               display="flex"
+               flexDirection="column"
+               height="100%"
             >
-               {handRaiseElements}
-               <Button
-                  style={{ margin: "auto 0 2rem 0" }}
-                  startIcon={<CloseRoundedIcon />}
-                  variant="contained"
-                  children="Deactivate Hand Raise"
-                  disabled={isStepOpen(11)}
-                  onClick={() => setHandRaiseModeInactive()}
-               />
-            </CategoryContainerTopAligned>
+               <Grid className={classes.filterGrid} container spacing={1}>
+                  <Grid xs={8} item>
+                     <FormControl size="small" fullWidth>
+                        <InputLabel id="hand-raise-filter-select-label">
+                           Sort by:
+                        </InputLabel>
+                        <Select
+                           labelId="hand-raise-filter-select-label"
+                           id="hand-raise-filter-select"
+                           value={filterMapProperty}
+                           onChange={handleChangeFilterMapProperty}
+                        >
+                           {Object.keys(FILTER_MAP).map((key) => (
+                              <MenuItem key={key} value={key}>
+                                 {key}
+                              </MenuItem>
+                           ))}
+                        </Select>
+                     </FormControl>
+                  </Grid>
+                  <Grid xs={4} item>
+                     <Box display="flex" height="100%">
+                        <Button
+                           size="small"
+                           onClick={handleToggleOrder}
+                           endIcon={<OrderIcon className={classes.orderIcon} />}
+                        >
+                           {sortByNew ? "oldest (desc)" : "newest (desc)"}
+                        </Button>
+                     </Box>
+                  </Grid>
+               </Grid>
+               <List className={classes.activeHandRaiseContainer}>
+                  {!Boolean(filteredHandRaises.length) && (
+                     <Box
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                        p={2}
+                     >
+                        <Typography>no results</Typography>
+                        <Button onClick={() => setFilterMapProperty("All")}>
+                           Back to all
+                        </Button>
+                     </Box>
+                  )}
+                  <TransitionGroup>
+                     {filteredHandRaises.map((handRaise) => (
+                        <Collapse key={handRaise.id}>
+                           <HandRaiseElement
+                              request={handRaise}
+                              hasEntered={hasEntered}
+                              updateHandRaiseRequest={handlers.updateRequest}
+                              closeSnackbar={closeSnackbar}
+                              setNewNotification={setNewNotification}
+                              numberOfActiveHandRaisers={
+                                 numberOfActiveHandRaisers
+                              }
+                              setNotificationToRemove={setNotificationToRemove}
+                           />
+                        </Collapse>
+                     ))}
+                  </TransitionGroup>
+                  <Box flexGrow={1} />
+                  <Box width="100%" display="grid" px={2}>
+                     <Button
+                        style={{ margin: "auto 0 2rem 0" }}
+                        startIcon={<CloseRoundedIcon />}
+                        variant="contained"
+                        children="Deactivate Hand Raise"
+                        disabled={isStepOpen(11)}
+                        onClick={handlers.setHandRaiseModeInactive}
+                     />
+                  </Box>
+               </List>
+            </Box>
          </Grow>
 
-         <Grow
-            mountOnEnter
-            unmountOnExit
-            in={Boolean(!handRaiseElements.length)}
-         >
+         <Grow mountOnEnter unmountOnExit in={Boolean(!handRaises.length)}>
             <CategoryContainerCentered>
                <Box
                   p={2}
@@ -196,7 +284,7 @@ function HandRaiseActive({
                            {activeStep === 13 && (
                               <TooltipButtonComponent
                                  onConfirm={() => {
-                                    setHandRaiseModeInactive();
+                                    handlers.setHandRaiseModeInactive();
                                     handleConfirm(13);
                                  }}
                                  buttonText="Ok"
@@ -211,7 +299,7 @@ function HandRaiseActive({
                         startIcon={<CloseRoundedIcon />}
                         children="Deactivate Hand Raise"
                         onClick={() => {
-                           setHandRaiseModeInactive();
+                           handlers.setHandRaiseModeInactive();
                            isOpen(13) && activeStep === 13 && handleConfirm(13);
                         }}
                      />
@@ -223,4 +311,4 @@ function HandRaiseActive({
    );
 }
 
-export default withFirebase(HandRaiseActive);
+export default HandRaiseActive;

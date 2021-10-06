@@ -12,6 +12,7 @@ import {
 } from "materialUI/GlobalTooltips";
 import TutorialContext from "context/tutorials/TutorialContext";
 import SpeakerInfoOverlay from "./SpeakerInfoOverlay";
+import { useSelector } from "react-redux";
 
 const mutedOverlayZIndex = 9901;
 
@@ -57,14 +58,14 @@ const RemoteVideoContainer = ({
    currentLivestream,
    height,
    isPlayMode,
-   muted,
-   play,
    setRemovedStream,
    small,
    speakerSource,
    stream,
-   unmute,
 }) => {
+   const { playAllRemoteVideos, muteAllRemoteVideos } = useSelector(
+      (state) => state.stream.streaming
+   );
    const { getActiveTutorialStepKey, handleConfirmStep } = useContext(
       TutorialContext
    );
@@ -87,24 +88,24 @@ const RemoteVideoContainer = ({
    }, [stream.uid, stream.videoTrack]);
 
    useEffect(() => {
-      if (unmute) {
+      if (!muteAllRemoteVideos) {
          stream?.audioTrack?.play();
       }
-   }, [unmute]);
+   }, [muteAllRemoteVideos]);
 
    useEffect(() => {
-      if (play) {
+      if (playAllRemoteVideos) {
          playVideo();
       }
-   }, [play]);
+   }, [playAllRemoteVideos]);
 
    useEffect(() => {
-      if (muted) {
+      if (muteAllRemoteVideos) {
          stream?.stream?.audioTrack?.stop();
       } else {
          stream?.stream?.audioTrack?.play();
       }
-   }, [muted]);
+   }, [muteAllRemoteVideos]);
 
    useEffect(() => {
       if (stream?.stream?.audio === false && stream?.stream?.video === false) {

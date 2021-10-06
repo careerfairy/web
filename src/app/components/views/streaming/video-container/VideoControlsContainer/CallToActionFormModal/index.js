@@ -35,6 +35,8 @@ const defaultInitialValues = {
       jobTitle: "",
       salary: "",
       applicationDeadline: null,
+      isAtsPosition: false,
+      atsUuid: "",
    },
    socialData: {
       socialType: social.socialTypes.linkedIn.socialType,
@@ -45,37 +47,57 @@ const CallToActionFormModal = memo(
    ({ onClose, open, callToActionToEdit, isTestStream }) => {
       const [initialValues, setInitialValues] = useState(defaultInitialValues);
 
+      const buildSocialCtaInitialValues = (cta) => {
+         return {
+            socialData: {
+               socialType:
+                  cta.socialData?.socialType ||
+                  defaultInitialValues.socialData.socialType,
+            },
+         };
+      };
+
+      const buildJobPostingCtaInitialValues = (cta) => {
+         return {
+            imageUrl: cta.imageUrl || "",
+            jobData: {
+               jobTitle: cta.jobData?.jobTitle || "",
+               salary: cta.jobData?.salary || "",
+               applicationDeadline:
+                  cta.jobData?.applicationDeadline?.toDate?.() || null,
+               isAtsPosition: cta.jobData?.isAtsPosition || false,
+               atsUuid: cta.jobData?.atsUuid || "",
+            },
+         };
+      };
+
+      const buildCustomCtaInitialValues = (cta) => {
+         return {
+            buttonText: cta.buttonText,
+         };
+      };
+
       useEffect(() => {
          if (callToActionToEdit) {
+            let cta = callToActionToEdit;
             const newInitialValues = {
-               message: callToActionToEdit.message,
+               type: cta.type,
+               id: cta.id,
+               message: cta.message,
                color:
-                  callToActionsDictionary[callToActionToEdit.type]?.color ||
+                  callToActionsDictionary[cta.type]?.color ||
                   defaultInitialValues.color,
                value:
-                  callToActionsDictionary[callToActionToEdit.type]?.value ||
+                  callToActionsDictionary[cta.type]?.value ||
                   defaultInitialValues.value,
-               buttonUrl: callToActionToEdit.buttonUrl || "",
-               type: callToActionToEdit.type,
-               id: callToActionToEdit.id,
-               buttonText: callToActionToEdit.buttonText,
+               buttonUrl: cta.buttonUrl || "",
                isToBeSaved: true,
-               imageUrl: callToActionToEdit.imageUrl || "",
                title:
-                  callToActionsDictionary[callToActionToEdit.type]?.title ||
+                  callToActionsDictionary[cta.type]?.title ||
                   defaultInitialValues.title,
-               jobData: {
-                  jobTitle: callToActionToEdit.jobData?.jobTitle || "",
-                  salary: callToActionToEdit.jobData?.salary || "",
-                  applicationDeadline:
-                     callToActionToEdit.jobData?.applicationDeadline?.toDate?.() ||
-                     null,
-               },
-               socialData: {
-                  socialType:
-                     callToActionToEdit.socialData?.socialType ||
-                     defaultInitialValues.socialData.socialType,
-               },
+               ...buildSocialCtaInitialValues(cta),
+               ...buildJobPostingCtaInitialValues(cta),
+               ...buildCustomCtaInitialValues(cta),
             };
             setInitialValues(newInitialValues);
          } else {
@@ -83,7 +105,6 @@ const CallToActionFormModal = memo(
          }
       }, [callToActionToEdit]);
 
-      const classes = useStyles();
       const handleClose = useCallback(() => {
          onClose();
       }, [onClose]);
@@ -105,13 +126,6 @@ const CallToActionFormModal = memo(
             color: newColor,
             title: newTitle,
          });
-      };
-
-      const handleBack = () => {
-         handleReset();
-      };
-      const handleReset = () => {
-         setInitialValues(defaultInitialValues);
       };
 
       return (

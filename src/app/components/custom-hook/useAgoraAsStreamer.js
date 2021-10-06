@@ -10,7 +10,6 @@ import useStreamRef from "./useStreamRef";
 export default function useAgoraAsStreamer(
    streamerReady,
    isPlayMode,
-   videoId,
    screenSharingMode,
    roomId,
    streamId,
@@ -37,6 +36,8 @@ export default function useAgoraAsStreamer(
    });
 
    const router = useRouter();
+   const { withProxy } = router.query;
+
    const token = router.query.token || "";
 
    const [agoraRTC, setAgoraRTC] = useState(null);
@@ -209,9 +210,7 @@ export default function useAgoraAsStreamer(
 
    const handleSwitchRooms = async () => {
       if (rtcClient || rtmClient || rtmChannel) {
-         console.log("-> CLOSING CONNECTIONS");
          removeAllClients();
-         console.log("-> CLOSING CONNECTIONS FINISHED");
       }
       setExternalUsers([]);
    };
@@ -341,7 +340,9 @@ export default function useAgoraAsStreamer(
       });
 
       if (!isViewer) {
-         rtcClient.startProxyServer(3);
+         if (withProxy) {
+            rtcClient.startProxyServer(3);
+         }
          rtcClient.setClientRole("host");
          try {
             await rtcClient.join(
@@ -388,6 +389,9 @@ export default function useAgoraAsStreamer(
             handleRtcError(error);
          }
       } else {
+         if (withProxy) {
+            rtcClient.startProxyServer(3);
+         }
          await rtcClient.setClientRole("audience");
          try {
             const uid = await rtcClient.join(
@@ -406,6 +410,13 @@ export default function useAgoraAsStreamer(
          }
       }
    };
+
+   const createDemoStream = useCallback((streamData) => {
+      setAddedStream({
+         ...streamData,
+         isDemo: true,
+      });
+   }, []);
 
    const connectAgoraRTM = () => {
       let AgoraRTM = require("agora-rtm-sdk");
@@ -667,7 +678,7 @@ export default function useAgoraAsStreamer(
       agoraRtmStatus,
       networkQuality,
       numberOfViewers,
-      createEmote,
+      createDemoStream,
       createEmote,
       agoraHandlers,
       joinedChannel,

@@ -137,21 +137,31 @@ exports.resendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(
    }
 );
 
-exports.verifyEmailWithPin = functions.https.onRequest(async (req, res) => {
-   setHeaders(req, res);
+exports.validateUserEmailWithPin = functions
+   .runWith({
+      minInstances: 1,
+   })
+   .https.onCall(async (data, context) => {
+      const recipient_email = data.userInfo.recipientEmail;
+      const pinCode = data.userInfo.pinCode;
 
-   const recipient_email = req.body.recipientEmail;
-   const pinCode = req.body.pinCode;
+      functions.logger.log(
+         `Starting user email validation for ${recipient_email}`
+      );
 
-   admin
-      .firestore()
-      .collection("userData")
-      .doc(recipient_email)
-      .get()
-      .then((querySnapshot) => {
+      try {
+         let querySnapshot = await admin
+            .firestore()
+            .collection("userData")
+            .doc(recipient_email)
+            .get();
          if (!querySnapshot.isEmpty) {
             let user = querySnapshot.data();
+            functions.logger.log(`Acquired user data for ${recipient_email}`);
             if (user.validationPin === pinCode) {
+               functions.logger.log(
+                  `Provided Pin code for ${recipient_email} is correct`
+               );
                admin
                   .auth()
                   .getUserByEmail(recipient_email)
@@ -162,19 +172,27 @@ exports.verifyEmailWithPin = functions.https.onRequest(async (req, res) => {
                            emailVerified: true,
                         })
                         .then((userRecord) => {
-                           console.log(userRecord);
-                           res.sendStatus(200);
+                           functions.logger.log(
+                              `Auth user ${recipient_email} has been validated`
+                           );
+                           return;
+                           //res.sendStatus(200);
                         });
                   });
             } else {
-               res.sendStatus(403);
+               functions.logger.warn(
+                  `User ${recipient_email} has failed to provide the correct Pin code, provided ${pinCode} instead of ${user.validationPin}`
+               );
+               throw new functions.https.HttpsError("permission-denied");
             }
          }
-      })
-      .catch((error) => {
-         res.sendStatus(500);
-      });
-});
+      } catch (error) {
+         functions.logger.warn(
+            `An error has occured fetching userData for ${recipient_email}`
+         );
+         throw new functions.https.HttpsError("unknown");
+      }
+   });
 
 exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(
    async (req, res) => {

@@ -1,6 +1,6 @@
-import React, { useContext } from "react";
-import { withFirebase } from "context/firebase";
-import { Button, Typography, Grow } from "@material-ui/core";
+import React, { useContext, useEffect, useState } from "react";
+import { useFirebase } from "context/firebase";
+import { Button, Grow, Typography } from "@material-ui/core";
 import { CategoryContainerCentered } from "../../../../../../../materialUI/GlobalContainers";
 import { GreyPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
@@ -11,16 +11,33 @@ import {
    WhiteTooltip,
 } from "../../../../../../../materialUI/GlobalTooltips";
 import useStreamRef from "../../../../../../custom-hook/useStreamRef";
+import { useLocalStorage } from "react-use";
+import NewFeatureHint from "../../../../../../util/NewFeatureHint";
+
+const HAND_RAISE_HINT_LOCAL_KEY = "hasSeenHandRaiseTip";
 
 function HandRaiseInactive({
-   firebase,
    livestream,
    showMenu,
    selectedState,
    sliding,
+   handleStateChange,
 }) {
    const { tutorialSteps, setTutorialSteps } = useContext(TutorialContext);
+   const firebase = useFirebase();
    const streamRef = useStreamRef();
+   const [animating, setAnimating] = useState(false);
+   const [hasSeenHandRaiseTip, setHasSeenHandRaiseTip] = useLocalStorage(
+      HAND_RAISE_HINT_LOCAL_KEY,
+      false
+   );
+
+   useEffect(() => {
+      if (hasSeenHandRaiseTip === false && !livestream.test) {
+         handleStateChange("hand");
+      }
+   }, [hasSeenHandRaiseTip, livestream.test]);
+
    const isOpen = (property) => {
       return Boolean(
          livestream.test &&
@@ -48,7 +65,7 @@ function HandRaiseInactive({
    }
 
    function setHandRaiseModeActive() {
-      firebase.setHandRaiseMode(streamRef, true);
+      return firebase.setHandRaiseMode(streamRef, true);
    }
 
    function createDemoHandRaiseRequest() {
@@ -61,6 +78,8 @@ function HandRaiseInactive({
    return (
       <Grow
          mountOnEnter
+         onEntering={() => setAnimating(true)}
+         onEntered={() => setAnimating(false)}
          unmountOnExit
          in={Boolean(!livestream.handRaiseActive)}
       >
@@ -76,7 +95,8 @@ function HandRaiseInactive({
                   align="center"
                   gutterBottom
                >
-                  Allow viewers to join in your stream by activating hand raise.
+                  Allow viewers to join in your stream via audio and video by
+                  activating hand raise feature.
                </Typography>
                <WhiteTooltip
                   placement="right-start"
@@ -98,16 +118,28 @@ function HandRaiseInactive({
                   }
                   open={isOpen(9)}
                >
-                  <Button
-                     variant="contained"
-                     color="primary"
-                     size="large"
-                     children="Activate Hand Raise"
-                     onClick={() => {
-                        setHandRaiseModeActive();
-                        isOpen(9) && handleConfirm(9);
-                     }}
-                  />
+                  <NewFeatureHint
+                     onClick={() => setHasSeenHandRaiseTip(true)}
+                     localStorageKey={HAND_RAISE_HINT_LOCAL_KEY}
+                     tooltipTitle="Allow audience to join with video/audio"
+                     hide={
+                        tutorialSteps.streamerReady || selectedState !== "hand" || animating
+                     }
+                     placement="bottom"
+                     tooltipText="Please activate this feature if you would like your audience to join with video and video."
+                     buttonText={"I understand"}
+                  >
+                     <Button
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        children="Activate Hand Raise"
+                        onClick={() => {
+                           setHandRaiseModeActive();
+                           isOpen(9) && handleConfirm(9);
+                        }}
+                     />
+                  </NewFeatureHint>
                </WhiteTooltip>
             </div>
          </CategoryContainerCentered>
@@ -115,4 +147,4 @@ function HandRaiseInactive({
    );
 }
 
-export default withFirebase(HandRaiseInactive);
+export default HandRaiseInactive;

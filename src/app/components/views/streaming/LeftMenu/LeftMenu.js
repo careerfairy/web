@@ -10,6 +10,7 @@ import SwipeableViews from "react-swipeable-views";
 import clsx from "clsx";
 import { Drawer, Fab } from "@material-ui/core";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
+import { useLocalStorage } from "react-use";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -26,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
       top: 10,
       right: 10,
       textAlign: "center",
-      zIndex: 9100,
+      zIndex: 1,
    },
    desktopDrawer: {
       width: 280,
@@ -38,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
       transitionTimingFunction: theme.transitions.easeInOut,
       left: 0,
       bottom: 0,
-      zIndex: 20,
+      zIndex: 1,
       background: theme.palette.background.default,
    },
    drawerSmallScreen: {
@@ -47,20 +48,6 @@ const useStyles = makeStyles((theme) => ({
       height: "100%",
       backgroundColor: alpha(theme.palette.common.black, 0.2),
       backdropFilter: "blur(5px)",
-   },
-   closeBtnSmallScreen: {
-      position: "fixed",
-      top: 10,
-      right: 10,
-      textAlign: "center",
-      zIndex: 9100,
-      background:
-         theme.palette.type === "dark" && theme.palette.background.paper,
-      "&:hover": {
-         background:
-            theme.palette.type === "dark" && theme.palette.background.default,
-      },
-      color: theme.palette.type === "dark" && theme.palette.secondary.main,
    },
 }));
 
@@ -81,6 +68,8 @@ const LeftMenu = ({
    const theme = useTheme();
    const classes = useStyles();
    const [value, setValue] = useState(0);
+   const isGlass = showMenu && smallScreen;
+
 
    useEffect(() => {
       if (!typeof window === "object") {
@@ -139,6 +128,8 @@ const LeftMenu = ({
          <HandRaiseCategory
             sliding={sliding}
             showMenu={showMenu}
+            isGlass={isGlass}
+            handleStateChange={handleStateChange}
             livestream={livestream}
             selectedState={selectedState}
          />
@@ -150,7 +141,7 @@ const LeftMenu = ({
          anchor="left"
          classes={{
             paper: clsx(classes.desktopDrawer, {
-               [classes.drawerSmallScreen]: showMenu && smallScreen,
+               [classes.drawerSmallScreen]: isGlass,
             }),
          }}
          open={showMenu}
@@ -159,7 +150,7 @@ const LeftMenu = ({
          {showMenu && smallScreen && (
             <Fab
                className={classes.closeBtn}
-               size="large"
+               size="small"
                color="secondary"
                onClick={toggleShowMenu}
             >
@@ -181,4 +172,4 @@ const LeftMenu = ({
    );
 };
 
-export default withFirebase(LeftMenu);
+export default LeftMenu;

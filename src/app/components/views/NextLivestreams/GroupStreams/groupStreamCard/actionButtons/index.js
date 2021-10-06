@@ -54,6 +54,7 @@ export const DetailsButton = ({
    mobile,
    livestream,
    groupData,
+   referrerId,
    ...props
 }) => {
    const classes = useStyles();
@@ -62,7 +63,10 @@ export const DetailsButton = ({
          prefetch={false}
          href={{
             pathname: `/upcoming-livestream/${livestream.id}`,
-            query: listenToUpcoming ? null : { groupId: groupData.groupId },
+            query: {
+               ...(!listenToUpcoming && { groupId: groupData.groupId }),
+               ...(referrerId && { referrerId }),
+            },
          }}
       >
          <a>

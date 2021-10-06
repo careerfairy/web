@@ -116,7 +116,6 @@ const CompleteGroup = ({
                      variant="contained"
                      size="large"
                      style={{ marginRight: 5 }}
-                     startIcon={<ArrowBackIcon />}
                      onClick={handleBack}
                   >
                      Back

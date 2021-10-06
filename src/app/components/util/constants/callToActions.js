@@ -79,24 +79,26 @@ export const callToActionSocialsArray = Object.keys(
 ).map((key) => callToActionsSocialsDictionary[key]);
 
 export const getCtaSnackBarProps = (callToAction, fallBackImage) => {
-   let message = callToAction.message || "";
-   const type = callToAction.type;
-   const socialType = callToAction.socialData?.socialType || "";
+   let cta = callToAction;
+
+   let message = cta.message || "";
+   const type = cta.type;
+   const socialType = cta.socialData?.socialType || "";
    if (type === "social") {
       const socialName = callToActionsSocialsDictionary[socialType].name;
       message = socialName ? `Follow us on ${socialName}` : "Follow us";
    }
-   const buttonText = callToAction.buttonText || "Click here";
-   const buttonUrl = callToAction.buttonUrl
-      ? makeExternalLink(callToAction.buttonUrl)
+   const buttonText = cta.buttonText || "Click here";
+   const buttonUrl = cta.buttonUrl
+      ? makeExternalLink(cta.buttonUrl)
       : "https://careerfairy.io/";
-   const callToActionId = callToAction.id;
+   const callToActionId = cta.id;
 
-   const jobTitle = callToAction.jobData?.jobTitle || "";
-   const salary = callToAction.jobData?.salary || "";
+   const jobTitle = cta.jobData?.jobTitle || "";
+   const salary = cta.jobData?.salary || "";
    const applicationDeadline =
-      callToAction.jobData?.applicationDeadline?.toDate?.() || null;
-   const snackBarImage = callToAction.imageUrl || fallBackImage;
+      cta.jobData?.applicationDeadline?.toDate?.() || null;
+   const snackBarImage = cta.imageUrl || fallBackImage;
    let icon = callToActionsDictionary.custom.icon;
    const socialIcon = callToActionsSocialsDictionary?.[socialType]?.icon;
    const baseIcon = callToActionsDictionary[type]?.icon;
@@ -108,7 +110,7 @@ export const getCtaSnackBarProps = (callToAction, fallBackImage) => {
    return {
       buttonText,
       buttonUrl,
-      isForTutorial: Boolean(callToAction.isForTutorial),
+      isForTutorial: Boolean(cta.isForTutorial),
       isJobPosting: type === "jobPosting",
       message,
       icon,

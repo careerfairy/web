@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import PanToolOutlinedIcon from "@material-ui/icons/PanToolOutlined";
 import { Button, Grow } from "@material-ui/core";
 import {
@@ -10,7 +10,7 @@ import {
    ThemedPermanentMarker,
 } from "../../../../../../../materialUI/GlobalTitles";
 
-function HandRaisePriorRequest({ handRaiseState, updateHandRaiseRequest }) {
+const HandRaisePriorRequest = memo(({ handRaiseState, updateHandRaiseRequest }) => {
    const shouldRender = () =>
       Boolean(!(handRaiseState && handRaiseState.state !== "unrequested"));
    return (
@@ -45,6 +45,6 @@ function HandRaisePriorRequest({ handRaiseState, updateHandRaiseRequest }) {
          </Grow>
       )
    );
-}
+});
 
 export default HandRaisePriorRequest;

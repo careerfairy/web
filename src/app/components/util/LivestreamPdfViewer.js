@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import { Document, Page } from "react-pdf";
 import * as PDFJS from "pdfjs-dist/build/pdf";
-
 import { useWindowSize } from "components/custom-hook/useWindowSize";
 import {
    Button,
+   CircularProgress,
    Dialog,
    DialogContent,
    IconButton,
@@ -14,11 +14,30 @@ import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
 
 import FilePickerContainer from "components/ssr/FilePickerContainer";
-import { withFirebase } from "context/firebase";
-import { CircularProgress } from "@material-ui/core";
-import { Fragment } from "react";
+import { useFirebase } from "context/firebase";
+import Box from "@material-ui/core/Box";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { makeStyles } from "@material-ui/core/styles";
+import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
 
-function LivestreamPdfViewer(props) {
+const useStyles = makeStyles((theme) => ({
+   root: {},
+   pdfWrapper: {
+      borderRadius: STREAM_ELEMENT_BORDER_RADIUS,
+      backgroundColor: theme.palette.common.black,
+      boxShadow: theme.shadows[5],
+      position: "absolute",
+      top: "0",
+      left: "50%",
+      transform: "translate(-50%)",
+      display: ({ pdfObject }) => (pdfObject ? "flex" : "none"),
+      overflow: "hidden",
+      width: "100%",
+      justifyContent: "center",
+   },
+}));
+const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
+   const firebase = useFirebase();
    PDFJS.GlobalWorkerOptions.workerSrc =
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js";
 
@@ -33,12 +52,13 @@ function LivestreamPdfViewer(props) {
 
    const [uploadingPresentation, setUploadingPresentation] = useState(false);
    const [progress, setProgress] = useState(0);
+   const classes = useStyles({ pdfObject });
 
    useEffect(() => {
-      if (props.livestreamId) {
+      if (livestreamId) {
          setLoading(true);
-         props.firebase.listenToLivestreamPresentation(
-            props.livestreamId,
+         firebase.listenToLivestreamPresentation(
+            livestreamId,
             (querySnapshot) => {
                if (querySnapshot.exists) {
                   setPdfObject(querySnapshot.data());
@@ -48,14 +68,14 @@ function LivestreamPdfViewer(props) {
             }
          );
       }
-   }, [props.livestreamId]);
+   }, [livestreamId]);
 
    function uploadLogo(logoFile) {
       setLoading(true);
       setUploadingPresentation(true);
-      var storageRef = props.firebase.getStorageRef();
+      var storageRef = firebase.getStorageRef();
       let presentationRef = storageRef.child(
-         "company_documents/" + props.livestreamId + ".pdf"
+         "company_documents/" + livestreamId + ".pdf"
       );
 
       var uploadTask = presentationRef.put(logoFile);
@@ -95,10 +115,7 @@ function LivestreamPdfViewer(props) {
             uploadTask.snapshot.ref
                .getDownloadURL()
                .then(function (downloadURL) {
-                  props.firebase.setLivestreamPresentation(
-                     props.livestreamId,
-                     downloadURL
-                  );
+                  firebase.setLivestreamPresentation(livestreamId, downloadURL);
                   console.log("File available at", downloadURL);
                   setUploadingPresentation(false);
                });
@@ -106,31 +123,24 @@ function LivestreamPdfViewer(props) {
       );
    }
 
-   function getPageHeight() {
-      if (props.presenter) {
-         if (props.showMenu) {
-            if (windowSize.height > windowSize.width - 480) {
-               return windowSize.width * 0.3;
-            }
-            return windowSize.height * 0.8 - 55;
-         } else {
-            if (windowSize.height > windowSize.width - 220) {
-               return windowSize.width * 0.55;
-            }
-            return windowSize.height * 0.8 - 55;
+   function getPageHeight(height, width) {
+      if (showMenu) {
+         if (windowSize.height > windowSize.width - 480) {
+            return windowSize.width * 0.4;
          }
+         return height;
       } else {
          if (windowSize.height > windowSize.width - 220) {
             return windowSize.width * 0.55;
          }
-         return windowSize.height * 0.8 - 55;
+         return height;
       }
    }
 
    function increasePdfPageNumber() {
       setGoingToNextPage(true);
-      props.firebase
-         .increaseLivestreamPresentationPageNumber(props.livestreamId)
+      firebase
+         .increaseLivestreamPresentationPageNumber(livestreamId)
          .then(() => {
             setGoingToNextPage(false);
          });
@@ -138,205 +148,238 @@ function LivestreamPdfViewer(props) {
 
    function decreasePdfPageNumber() {
       setGoingToPreviousPage(true);
-      props.firebase
-         .decreaseLivestreamPresentationPageNumber(props.livestreamId)
+      firebase
+         .decreaseLivestreamPresentationPageNumber(livestreamId)
          .then(() => {
             setGoingToPreviousPage(false);
          });
    }
 
-   return (
-      <Fragment>
-         <div
-            style={{
-               display: loading ? "block" : "none",
-               position: "relative",
-               width: "100%",
-               height: "calc(80vh - 55px)",
-            }}
+   const loader = (
+      <CircularProgress style={{ maxWidth: "30px", height: "auto" }} />
+   );
+
+   const nav = (
+      <Box>
+         <IconButton
+            size="small"
+            variant="contained"
+            disabled={
+               goingToNextPage ||
+               goingToPreviousPage ||
+               (pdfObject ? pdfObject.page === 1 : false)
+            }
+            onClick={() => decreasePdfPageNumber()}
          >
-            <div
-               style={{
-                  position: "absolute",
-                  width: "30%",
-                  maxWidth: "30px",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
+            {goingToPreviousPage ? (
+               <CircularProgress size={20} color="inherit" />
+            ) : (
+               <KeyboardArrowLeftIcon fontSize="large" />
+            )}
+         </IconButton>
+         <IconButton
+            variant="contained"
+            size="small"
+            disabled={
+               goingToNextPage ||
+               goingToPreviousPage ||
+               (pdfObject ? pdfObject.page === pdfNumberOfPages : false)
+            }
+            onClick={() => increasePdfPageNumber()}
+         >
+            {goingToNextPage ? (
+               <CircularProgress size={20} color="inherit" />
+            ) : (
+               <KeyboardArrowRightIcon fontSize="large" />
+            )}
+         </IconButton>
+      </Box>
+   );
+
+   const picker = (
+      <FilePickerContainer
+         extensions={["pdf"]}
+         onChange={(fileObject) => {
+            uploadLogo(fileObject);
+         }}
+         maxSize={20}
+         onError={(errMsg) => console.log(errMsg)}
+      >
+         <Button color="primary" variant="contained" size="small">
+            Upload Slides [.pdf]
+         </Button>
+      </FilePickerContainer>
+   );
+
+   const page = (height, width) => (
+      <Document
+         onLoadSuccess={({ numPages }) => {
+            setPdfNumberOfPages(numPages);
+            setLoading(false);
+         }}
+         file={pdfObject ? pdfObject.downloadUrl : ""}
+      >
+         <Page
+            height={getPageHeight(height, width)}
+            renderTextLayer={false}
+            renderAnnotationLayer={false}
+            pageNumber={pdfObject ? pdfObject.page : 1}
+         />
+      </Document>
+   );
+
+   const emptyPage = (
+      <div style={{ color: "white", marginBottom: "40px" }}>
+         <p>You currently have no slides to share</p>
+         <div>
+            <FilePickerContainer
+               extensions={["pdf"]}
+               onChange={(fileObject) => {
+                  uploadLogo(fileObject);
                }}
+               maxSize={20}
+               onError={(errMsg) => console.log(errMsg)}
             >
-               <CircularProgress style={{ maxWidth: "30px", height: "auto" }} />
-            </div>
+               <Button
+                  color="primary"
+                  children="Upload Slides [.pdf]"
+                  variant="contained"
+               />
+            </FilePickerContainer>
          </div>
-         <div
-            style={{
-               display: loading ? "none" : "block",
-               position: "relative",
-               width: "100%",
-               height: "calc(80vh - 55px)",
-            }}
-         >
-            <div
-               style={{
-                  position: "absolute",
-                  top: "0",
-                  left: "50%",
-                  transform: "translate(-50%)",
-                  display: pdfObject ? "block" : "none",
-                  overflow: "hidden",
-               }}
+      </div>
+   );
+
+   const waitingOverlay = (
+      <div style={{ color: "white", marginBottom: "40px" }}>
+         Please wait for the presenter to upload slides.
+      </div>
+   );
+
+   return (
+      <AutoSizer>
+         {({ height, width }) => (
+            <Box
+               height={height}
+               width={width}
+               display="flex"
+               justifyContent="center"
+               alignItems="center"
+               className={classes.root}
             >
                <div
                   style={{
-                     position: "absolute",
-                     bottom: "0",
-                     left: "0",
-                     zIndex: "1000",
+                     display: loading ? "block" : "none",
+                     position: "relative",
                      width: "100%",
-                     padding: "30px",
-                     display: props.presenter ? "block" : "none",
-                     backgroundColor: "rgba(110,110,110, 0.8)",
+                     height: "100%",
                   }}
                >
                   <div
                      style={{
-                        display: "inline-block",
                         position: "absolute",
+                        width: "30%",
+                        maxWidth: "30px",
                         top: "50%",
                         left: "50%",
                         transform: "translate(-50%, -50%)",
                      }}
                   >
-                     <IconButton
-                        variant="contained"
-                        disabled={
-                           goingToNextPage ||
-                           goingToPreviousPage ||
-                           (pdfObject ? pdfObject.page === 1 : false)
-                        }
-                        onClick={() => decreasePdfPageNumber()}
-                     >
-                        {goingToPreviousPage ? (
-                           <CircularProgress style={{ width: 20 }} />
-                        ) : (
-                           <KeyboardArrowLeftIcon fontSize="large" />
-                        )}
-                     </IconButton>
-                     <IconButton
-                        variant="contained"
-                        disabled={
-                           goingToNextPage ||
-                           goingToPreviousPage ||
-                           (pdfObject
-                              ? pdfObject.page === pdfNumberOfPages
-                              : false)
-                        }
-                        onClick={() => increasePdfPageNumber()}
-                     >
-                        {goingToNextPage ? (
-                           <CircularProgress style={{ width: 20 }} />
-                        ) : (
-                           <KeyboardArrowRightIcon fontSize="large" />
-                        )}
-                     </IconButton>
+                     {loader}
                   </div>
                </div>
                <div
                   style={{
-                     position: "absolute",
-                     top: "10px",
-                     right: "10px",
-                     zIndex: "1000",
-                     display: props.presenter ? "block" : "none",
+                     display: loading ? "none" : "flex",
+                     position: "relative",
+                     width: "100%",
+                     height: "100%",
+                     justifyContent: "center",
+                     alignItems: "center",
                   }}
                >
-                  <FilePickerContainer
-                     extensions={["pdf"]}
-                     onChange={(fileObject) => {
-                        uploadLogo(fileObject);
-                     }}
-                     maxSize={20}
-                     onError={(errMsg) => console.log(errMsg)}
-                  >
-                     <Button color="primary" variant="contained" size="small">
-                        Upload Slides [.pdf]
-                     </Button>
-                  </FilePickerContainer>
-               </div>
-               <div style={{ position: "relative", textAlign: "center" }}>
-                  <Document
-                     onLoadSuccess={({ numPages }) => {
-                        setPdfNumberOfPages(numPages);
-                        setLoading(false);
-                     }}
-                     file={pdfObject ? pdfObject.downloadUrl : ""}
-                  >
-                     <Page
-                        height={getPageHeight()}
-                        renderTextLayer={false}
-                        renderAnnotationLayer={false}
-                        pageNumber={pdfObject ? pdfObject.page : 1}
-                     />
-                  </Document>
-               </div>
-            </div>
-            <div
-               style={{
-                  position: "absolute",
-                  top: "150px",
-                  left: "50%",
-                  transform: "translate(-50%)",
-                  display: pdfObject ? "none" : "block",
-               }}
-            >
-               <div style={{ marginBottom: "20px", zIndex: "9999" }}>
+                  <div className={classes.pdfWrapper}>
+                     <div
+                        style={{
+                           position: "absolute",
+                           bottom: "0",
+                           left: "0",
+                           zIndex: "1000",
+                           width: "100%",
+                           padding: "25px",
+                           display: presenter ? "block" : "none",
+                           backgroundColor: "rgba(110,110,110, 0.8)",
+                        }}
+                     >
+                        <div
+                           style={{
+                              display: "inline-block",
+                              position: "absolute",
+                              top: "50%",
+                              left: "50%",
+                              transform: "translate(-50%, -50%)",
+                           }}
+                        >
+                           {nav}
+                        </div>
+                     </div>
+                     <div
+                        style={{
+                           position: "absolute",
+                           top: "10px",
+                           right: "10px",
+                           zIndex: "1000",
+                           display: presenter ? "block" : "none",
+                        }}
+                     >
+                        {picker}
+                     </div>
+                     <div style={{ position: "relative", textAlign: "center" }}>
+                        {page(height, width)}
+                     </div>
+                  </div>
                   <div
                      style={{
-                        textAlign: "center",
-                        display: props.presenter ? "block" : "none",
+                        position: "absolute",
+                        top: "150px",
+                        left: "50%",
+                        transform: "translate(-50%)",
+                        display: pdfObject ? "none" : "block",
                      }}
                   >
-                     <div style={{ color: "white", marginBottom: "40px" }}>
-                        <p>You currently have no slides to share</p>
-                        <div>
-                           <FilePickerContainer
-                              extensions={["pdf"]}
-                              onChange={(fileObject) => {
-                                 uploadLogo(fileObject);
-                              }}
-                              maxSize={20}
-                              onError={(errMsg) => console.log(errMsg)}
-                           >
-                              <Button
-                                 color="primary"
-                                 children="Upload Slides [.pdf]"
-                                 variant="contained"
-                              />
-                           </FilePickerContainer>
+                     <div style={{ marginBottom: "20px", zIndex: "9999" }}>
+                        <div
+                           style={{
+                              textAlign: "center",
+                              display: presenter ? "block" : "none",
+                           }}
+                        >
+                           {emptyPage}
+                        </div>
+                        <div
+                           style={{
+                              textAlign: "center",
+                              display: presenter ? "none" : "block",
+                           }}
+                        >
+                           {waitingOverlay}
                         </div>
                      </div>
                   </div>
-                  <div
-                     style={{
-                        textAlign: "center",
-                        display: props.presenter ? "none" : "block",
-                     }}
-                  >
-                     <div style={{ color: "white", marginBottom: "40px" }}>
-                        Please wait for the presenter to upload slides.
-                     </div>
-                  </div>
+                  <Dialog open={uploadingPresentation}>
+                     <DialogContent style={{ padding: 30 }}>
+                        <h3>Uploading presentation...</h3>
+                        <LinearProgress
+                           variant="determinate"
+                           value={progress}
+                        />
+                     </DialogContent>
+                  </Dialog>
                </div>
-            </div>
-            <Dialog open={uploadingPresentation}>
-               <DialogContent style={{ padding: 30 }}>
-                  <h3>Uploading presentation...</h3>
-                  <LinearProgress variant="determinate" value={progress} />
-               </DialogContent>
-            </Dialog>
-         </div>
-      </Fragment>
+            </Box>
+         )}
+      </AutoSizer>
    );
-}
+};
 
-export default withFirebase(LivestreamPdfViewer);
+export default memo(LivestreamPdfViewer);

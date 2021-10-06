@@ -13,7 +13,9 @@ import { CurrentStreamContext } from "../../context/stream/StreamContext";
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 import PropTypes from "prop-types";
 import useStreamRef from "../../components/custom-hook/useStreamRef";
-import StreamClosedCountdown from "../../components/views/streaming/sharedComponents/StreamClosedCountdown";
+import { useDispatch } from "react-redux";
+import * as actions from "store/actions";
+import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHandRaiseConnect";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -67,6 +69,7 @@ const ViewerLayout = (props) => {
       replace,
       asPath,
    } = useRouter();
+   const dispatch = useDispatch();
    const { authenticatedUser, userData } = useAuth();
    const {
       breakpoints: { values },
@@ -74,13 +77,6 @@ const ViewerLayout = (props) => {
    const mobile = useMediaQuery(`(max-width:${values.mobile}px)`);
    const streamRef = useStreamRef();
    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
-   const [showVideoButton, setShowVideoButton] = useState({
-      paused: false,
-      muted: false,
-   });
-   const [play, setPlay] = useState(false);
-   const [unmute, setUnmute] = useState(false);
-
    const [showMenu, setShowMenu] = useState(false);
    const [handRaiseActive, setHandRaiseActive] = useState(false);
    const [streamerId, setStreamerId] = useState(null);
@@ -89,6 +85,8 @@ const ViewerLayout = (props) => {
    const [selectedState, setSelectedState] = useState("questions");
 
    const currentLivestream = useStreamConnect();
+
+   useViewerHandRaiseConnect(currentLivestream);
 
    const notAuthorized =
       currentLivestream &&
@@ -120,6 +118,7 @@ const ViewerLayout = (props) => {
       userData?.firstName,
       userData?.lastName,
       breakoutRoomId,
+      streamRef
    ]);
 
    useEffect(() => {
@@ -139,6 +138,14 @@ const ViewerLayout = (props) => {
       currentLivestream?.id,
       authenticatedUser?.email,
    ]);
+
+   useEffect(() => {
+      if (currentLivestream?.hasStarted) {
+         dispatch(actions.unmuteAllRemoteVideos());
+      } else {
+         dispatch(actions.muteAllRemoteVideos());
+      }
+   }, [currentLivestream?.hasStarted]);
 
    if (notAuthorized) {
       replace({
@@ -163,20 +170,6 @@ const ViewerLayout = (props) => {
 
    const hideAudience = useCallback(() => {
       setAudienceDrawerOpen(false);
-   }, []);
-
-   const unmuteVideos = useCallback(() => {
-      setShowVideoButton((prevState) => {
-         return { paused: prevState.paused, muted: false };
-      });
-      setUnmute(true);
-   }, []);
-
-   const playVideos = useCallback(() => {
-      setShowVideoButton((prevState) => {
-         return { paused: false, muted: false };
-      });
-      setPlay(true);
    }, []);
 
    const toggleShowMenu = useCallback(() => {
@@ -214,15 +207,10 @@ const ViewerLayout = (props) => {
                <div className={classes.contentContainer}>
                   <div className={classes.content}>
                      {React.cloneElement(children, {
-                        playVideos,
                         handRaiseActive,
-                        unmuteVideos,
-                        showVideoButton,
-                        unmute,
                         handleStateChange,
                         selectedState,
                         setSelectedState,
-                        play,
                         showMenu,
                         setShowMenu,
                         streamerId,
@@ -230,7 +218,6 @@ const ViewerLayout = (props) => {
                         showAudience,
                         hideAudience,
                         audienceDrawerOpen,
-                        setShowVideoButton,
                      })}
                   </div>
                </div>

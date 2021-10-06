@@ -7,7 +7,7 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { ErrorOutline } from "@material-ui/icons";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, memo } from "react";
 
 const useStyles = makeStyles((theme) => ({
    container: {
@@ -254,10 +254,9 @@ function ErrorModal({
                      />
                   )}
                </div>
-            </div>
-         </DialogContent>
-      </Dialog>
-   );
-}
+            </DialogContent>
+         </Dialog>
+      );
+   });
 
 export default ErrorModal;

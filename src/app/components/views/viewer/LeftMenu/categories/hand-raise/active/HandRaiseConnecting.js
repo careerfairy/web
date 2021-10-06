@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { Button, Grow } from "@material-ui/core";
 import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
 import {
@@ -7,13 +7,13 @@ import {
 } from "../../../../../../../materialUI/GlobalContainers";
 import { ThemedPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
 
-function HandRaiseRequested(props) {
+const HandRaiseRequested = memo(({ handRaiseState, updateHandRaiseRequest }) => {
    const shouldRender = () =>
       Boolean(
          !(
-            !props.handRaiseState ||
-            (props.handRaiseState.state !== "connecting" &&
-               props.handRaiseState.state !== "invited")
+            !handRaiseState ||
+            (handRaiseState.state !== "connecting" &&
+               handRaiseState.state !== "invited")
          )
       );
    return (
@@ -29,13 +29,13 @@ function HandRaiseRequested(props) {
                      startIcon={<ClearRoundedIcon />}
                      variant="contained"
                      children="Cancel"
-                     onClick={() => props.updateHandRaiseRequest("unrequested")}
+                     onClick={() => updateHandRaiseRequest("unrequested")}
                   />
                </CategoryContainerContent>
             </CategoryContainerCentered>
          </Grow>
       )
    );
-}
+});
 
 export default HandRaiseRequested;

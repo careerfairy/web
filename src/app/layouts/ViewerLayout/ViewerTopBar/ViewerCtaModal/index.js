@@ -56,7 +56,7 @@ const Content = ({ fullyOpened, handleClose, mobile }) => {
 
    const dispatch = useDispatch();
 
-   const { userData } = useAuth();
+   const { userData, authenticatedUser } = useAuth();
 
    const {
       getCallToActionsWithAnArrayOfIds,
@@ -150,6 +150,8 @@ const Content = ({ fullyOpened, handleClose, mobile }) => {
                                  )
                               }
                               loading={loading}
+                              authenticatedUser={authenticatedUser}
+                              currentLivestream={currentLivestream}
                               hideClose
                               {...ctaSnackProps}
                            />

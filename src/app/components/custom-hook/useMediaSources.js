@@ -1,13 +1,10 @@
-import { useState, useEffect } from "react";
-import { navigator } from "global";
-import { isEmptyArray } from "formik";
-import LocalStorageUtil from "util/LocalStorageUtil";
+import { useCallback, useEffect, useState } from "react";
 import { useSoundMeter } from "./useSoundMeter";
 
 export default function useMediaSources(
    devices,
    streamId,
-   localStream,
+   localStreamData,
    showSoundMeter
 ) {
    const [audioSource, setAudioSource] = useState(null);
@@ -18,13 +15,13 @@ export default function useMediaSources(
    const [localMediaStream, setLocalMediaStream] = useState(null);
 
    useEffect(() => {
-      if (localStream) {
+      if (localStreamData) {
          const mediaStream = new MediaStream();
          mediaStream.addTrack(localStream.audioTrack.getMediaStreamTrack());
          mediaStream.addTrack(localStream.videoTrack.getMediaStreamTrack());
          setLocalMediaStream(mediaStream);
       }
-   }, [localStream, audioSource, videoSource]);
+   }, [localStreamData, audioSource, videoSource]);
 
    const audioLevel = useSoundMeter(
       showSoundMeter,
@@ -33,7 +30,7 @@ export default function useMediaSources(
    );
 
    useEffect(() => {
-      if (devices) {
+      if (devices && localStreamData) {
          if (
             devices.audioInputList &&
             devices.audioInputList.length > 0 &&
@@ -49,7 +46,7 @@ export default function useMediaSources(
             updateSpeakerSource(devices.audioOutputList[0].value);
          }
       }
-   }, [devices]);
+   }, [devices, localStreamData]);
 
    const initalizeAudioAndVideoSources = (audioDeviceId, videoDeviceId) => {
       localStream.audioTrack.setDevice(audioDeviceId).then(() => {
@@ -60,21 +57,27 @@ export default function useMediaSources(
       });
    };
 
-   function updateAudioSource(deviceId) {
-      localStream.audioTrack.setDevice(deviceId).then(() => {
-         setAudioSource(deviceId);
-      });
-   }
+   const updateAudioSource = useCallback(
+      (deviceId) => {
+         localStream.audioTrack.setDevice(deviceId).then(() => {
+            setAudioSource(deviceId);
+         });
+      },
+      [localStreamData]
+   );
 
-   function updateVideoSource(deviceId) {
-      localStream.videoTrack.setDevice(deviceId).then(() => {
-         setVideoSource(deviceId);
-      });
-   }
+   const updateVideoSource = useCallback(
+      (deviceId) => {
+         localStream.videoTrack.setDevice(deviceId).then(() => {
+            setVideoSource(deviceId);
+         });
+      },
+      [localStreamData]
+   );
 
-   function updateSpeakerSource(deviceId) {
+   const updateSpeakerSource = useCallback((deviceId) => {
       setSpeakerSource(deviceId);
-   }
+   }, []);
 
    return {
       audioSource,
