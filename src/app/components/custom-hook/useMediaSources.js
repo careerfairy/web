@@ -1,15 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSoundMeter } from "./useSoundMeter";
 
-export default function useMediaSources(
-   devices,
-   streamId,
-   localStream,
-   showSoundMeter
-) {
+export default function useMediaSources(devices, localStream, showSoundMeter) {
    const [audioSource, setAudioSource] = useState(null);
    const [videoSource, setVideoSource] = useState(null);
-   const [speakerSource, setSpeakerSource] = useState(null);
    const [soundMediaUpdateCounter, setSoundMeterUpdateCounter] = useState(0);
 
    const [localMediaStream, setLocalMediaStream] = useState(null);
@@ -42,11 +36,8 @@ export default function useMediaSources(
                devices.videoDeviceList[0].value
             );
          }
-         if (devices.audioOutputList && devices.audioOutputList.length > 0) {
-            updateSpeakerSource(devices.audioOutputList[0].value);
-         }
       }
-   }, [devices, localStream]);
+   }, [devices, localStream?.uid]);
 
    const initalizeAudioAndVideoSources = (audioDeviceId, videoDeviceId) => {
       localStream.audioTrack.setDevice(audioDeviceId).then(() => {
@@ -75,18 +66,14 @@ export default function useMediaSources(
       [localStream]
    );
 
-   const updateSpeakerSource = useCallback((deviceId) => {
-      setSpeakerSource(deviceId);
-   }, []);
-
    return {
-      audioSource,
-      updateAudioSource,
-      videoSource,
-      updateVideoSource,
-      speakerSource,
-      updateSpeakerSource,
+      mediaControls: {
+         audioSource,
+         updateAudioSource,
+         videoSource,
+         updateVideoSource,
+         audioLevel,
+      },
       localMediaStream,
-      audioLevel,
    };
 }

@@ -41,7 +41,6 @@ export function useSoundMeter(showAudioMeter, audioTrack, update) {
                if (event.data.volume) {
                   _volume = event.data.volume;
                   setAudioValue((_volume * 100) / _sensibility);
-                  console.log(_volume);
                }
             };
 

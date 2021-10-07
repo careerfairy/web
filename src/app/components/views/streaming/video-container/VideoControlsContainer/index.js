@@ -95,7 +95,7 @@ function VideoControlsContainer({
    handleClickScreenShareButton,
    isMainStreamer,
    localMediaStream,
-   setLocalMediaStream,
+   localMediaControls,
 }) {
    const shareButtonRef = useRef();
    const streamRef = useStreamRef();
@@ -172,30 +172,18 @@ function VideoControlsContainer({
 
    function toggleMicrophone() {
       if (isLocalMicMuted) {
-         localMediaStream.audioTrack.setEnabled(true);
-         let localMediaStreamCopy = { ...localMediaStream };
-         localMediaStreamCopy.audioMuted = false;
-         setLocalMediaStream(localMediaStreamCopy);
+         localMediaControls.setLocalAudioEnabled(true);
       } else {
-         localMediaStream.audioTrack.setEnabled(false);
-         let localMediaStreamCopy = { ...localMediaStream };
-         localMediaStreamCopy.audioMuted = true;
-         setLocalMediaStream(localMediaStreamCopy);
+         localMediaControls.setLocalAudioEnabled(false);
       }
       setIsLocalMicMuted(!isLocalMicMuted);
    }
 
    function toggleVideo() {
       if (isVideoInactive) {
-         localMediaStream.videoTrack.setEnabled(true);
-         let localMediaStreamCopy = { ...localMediaStream };
-         localMediaStreamCopy.videoMuted = false;
-         setLocalMediaStream(localMediaStreamCopy);
+         localMediaControls.setLocalVideoEnabled(true);
       } else {
-         localMediaStream.videoTrack.setEnabled(false);
-         let localMediaStreamCopy = { ...localMediaStream };
-         localMediaStreamCopy.videoMuted = true;
-         setLocalMediaStream(localMediaStreamCopy);
+         localMediaControls.setLocalVideoEnabled(false);
       }
       setIsVideoInactive(!isVideoInactive);
    }
@@ -395,13 +383,12 @@ function VideoControlsContainer({
 VideoControlsContainer.prototypes = {
    currentLivestream: PropTypes.object.isRequired,
    viewer: PropTypes.bool,
-   setShowSettings: PropTypes.func.isRequired,
    streamerId: PropTypes.string,
    handleClickScreenShareButton: PropTypes.func,
    isMainStreamer: PropTypes.bool,
-   localMediaStream: PropTypes.object,
    showSettings: PropTypes.bool,
-   joining: PropTypes.bool,
+   setShowSettings: PropTypes.func.isRequired,
+   localMediaControls: PropTypes.object,
 };
 
 export default withFirebasePage(VideoControlsContainer);

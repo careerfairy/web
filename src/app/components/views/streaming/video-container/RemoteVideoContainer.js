@@ -109,7 +109,7 @@ const RemoteVideoContainer = ({
 
    useEffect(() => {
       if (stream?.stream?.audio === false && stream?.stream?.video === false) {
-         setRemovedStream(stream.streamId);
+         setRemovedStream(stream.uid);
       }
    }, [stream?.stream?.audio, stream?.stream?.video]);
 

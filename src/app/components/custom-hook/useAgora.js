@@ -93,18 +93,50 @@ export default function useAgora(streamerId, isStreamer) {
       setLocalStream(null);
    };
 
-   const publishStream = async (client, stream) => {
+   const setLocalAudioEnabled = (value) => {
+      localStream.audioTrack.setEnabled(value);
+      setLocalStream({
+         ...localStream,
+         audioMuted: !value,
+      });
+   };
+
+   const setLocalVideoEnabled = (value) => {
+      localStream.videoTrack.setEnabled(value);
+      setLocalStream({
+         ...localStream,
+         videoMuted: !value,
+      });
+   };
+
+   const publishStream = (client, stream) => {
       if (stream && stream.audioTrack && stream.videoTrack) {
-         await client.setClientRole("host");
-         await client.publish([stream.audioTrack, stream.videoTrack]);
-         await client.enableDualStream();
-         client.enableAudioVolumeIndicator();
+         return new Promise(async (resolve, reject) => {
+            try {
+               await client.setClientRole("host");
+               await client.publish([stream.audioTrack, stream.videoTrack]);
+               await client.enableDualStream();
+               client.enableAudioVolumeIndicator();
+               setLocalStream({
+                  ...localStream,
+                  isPublished: true,
+               });
+               resolve();
+            } catch (error) {
+               reject(error);
+            }
+         });
       }
    };
 
    const publishLocalCameraStream = () => {
-      publishStream(rtcClient, localStream);
+      return publishStream(rtcClient, localStream);
    };
 
-   return { localStream, remoteStreams, publishLocalCameraStream };
+   return {
+      localStream,
+      localMediaControls: { setLocalAudioEnabled, setLocalVideoEnabled },
+      remoteStreams,
+      publishLocalCameraStream,
+   };
 }

@@ -28,6 +28,7 @@ import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 import Streams from "./Streams";
 import DraggableComponent from "../../banners/DraggableComponent";
 import useAgora from "components/custom-hook/useAgora";
+import StreamPublishingModal from "../modal/StreamPublishingModal";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -60,6 +61,10 @@ function VideoContainer({
    const [connectionEstablished, setConnectionEstablished] = useState(false);
    const [isStreaming, setIsStreaming] = useState(false);
    const [showScreenShareModal, setShowScreenShareModal] = useState(false);
+   const [
+      showLocalStreamPublishingModal,
+      setShowLocalStreamPublishingModal,
+   ] = useState(true);
    const [optimizationMode, setOptimizationMode] = useState("detail");
 
    const [showSettings, setShowSettings] = useState(false);
@@ -92,25 +97,20 @@ function VideoContainer({
    //    viewer
    // );
 
-   const { localStream, remoteStreams } = useAgora(streamerId, true);
+   const isStreamer = true;
+   const {
+      localStream,
+      localMediaControls,
+      remoteStreams,
+      publishLocalCameraStream,
+   } = useAgora(streamerId, isStreamer);
 
-   const devices = useDevices(true);
+   const devices = useDevices(Boolean(localStream));
 
    const {
-      audioSource,
-      updateAudioSource,
-      videoSource,
-      updateVideoSource,
-      speakerSource,
-      updateSpeakerSource,
+      mediaControls,
       localMediaStream: displayableMediaStream,
-      audioLevel,
-   } = useMediaSources(
-      devices,
-      streamerId,
-      localStream,
-      !streamerReady || showSettings
-   );
+   } = useMediaSources(devices, localStream, !streamerReady || showSettings);
 
    const currentSpeakerId = useCurrentSpeaker(localStream, []);
 
@@ -192,6 +192,14 @@ function VideoContainer({
       let screenSharerId =
          mode === "desktop" ? initiatorId : currentLivestream.screenSharerId;
       await firebase.setDesktopMode(streamRef, mode, screenSharerId);
+   };
+
+   const handlePublishLocalStream = () => {
+      publishLocalCameraStream()
+         .then(() => {
+            setShowLocalStreamPublishingModal(false);
+         })
+         .catch(() => {});
    };
 
    // useEffect(() => {
@@ -281,7 +289,6 @@ function VideoContainer({
             streamerId={streamerId}
             handRaiseActive={currentLivestream.handRaiseActive}
             videoMutedBackgroundImg={currentLivestream.companyLogoUrl}
-            setRemovedStream={() => {}}
             liveSpeakers={currentLivestream.liveSpeakers}
             isBroadCasting={!isPlayMode}
             sharingScreen={currentLivestream.mode === "desktop"}
@@ -290,18 +297,24 @@ function VideoContainer({
             livestreamId={currentLivestream.id}
             presenter
          />
-         {/* <VideoControlsContainer
+         <StreamPublishingModal
+            open={showLocalStreamPublishingModal}
+            setOpen={setShowLocalStreamPublishingModal}
+            displayableMediaStream={displayableMediaStream}
+            devices={devices}
+            mediaControls={mediaControls}
+            onConfirmStream={handlePublishLocalStream}
+         />
+         <VideoControlsContainer
             currentLivestream={currentLivestream}
-            viewer={viewer}
-            streamerId={streamerId}
-            joining={!isMainStreamer}
             handleClickScreenShareButton={handleClickScreenShareButton}
-            localMediaStream={localMediaStream}
-            setLocalMediaStream={setLocalMediaStream}
+            streamerId={streamerId}
             isMainStreamer={isMainStreamer}
+            viewer={viewer}
+            localMediaControls={localMediaControls}
             showSettings={showSettings}
             setShowSettings={setShowSettings}
-         /> */}
+         />
          {/* <DraggableComponent
             zIndex={3}
             bounds="parent"

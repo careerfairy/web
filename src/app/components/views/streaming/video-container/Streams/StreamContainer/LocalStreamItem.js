@@ -13,6 +13,8 @@ const LocalStreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
          speaker={speaker}
          videoMutedBackgroundImg={videoMutedBackgroundImg}
          stream={stream}
+         videoMuted={!stream?.videoTrack.enabled}
+         audioMuted={!stream?.audioTrack.enabled}
          big={big}
       />
    );

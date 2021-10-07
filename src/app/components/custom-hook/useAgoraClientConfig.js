@@ -28,8 +28,11 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
    };
 
    const configureAgoraClient = () => {
-      rtcClient.on("user-joined", async (remoteUser) => {
+      let AgoraRTC = require("agora-rtc-sdk-ng");
+      AgoraRTC.onAudioAutoplayFailed = () => {
          debugger;
+      };
+      rtcClient.on("user-joined", async (remoteUser) => {
          let cleanedRemoteStreams = removeStreamFromList(
             remoteUser.uid,
             remoteStreamsRef.current
@@ -55,7 +58,6 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
       });
 
       rtcClient.on("user-published", async (remoteUser, mediaType) => {
-         debugger;
          if (remoteUser.uid === `${streamerId}screen`) {
             return;
          }

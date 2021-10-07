@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useRef } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import SpeakerInfoOverlay from "../../SpeakerInfoOverlay";
 import { Tooltip } from "@material-ui/core";
@@ -64,7 +64,9 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
    const classes = useStyles({ big, streamId: stream.uid });
+
    const vidDiv = useRef(null);
+
    return (
       <div className={classes.root}>
          <div
@@ -77,7 +79,7 @@ const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
          {speaker && (
             <SpeakerInfoOverlay speaker={speaker} zIndex={1} small={!big} />
          )}
-         {stream?.videoMuted && (
+         {stream && stream.videoMuted && (
             <div className={classes.mutedOverlay}>
                <div className={classes.mutedOverlayContent}>
                   <div>
@@ -99,7 +101,7 @@ const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
                </div>
             </div>
          )}
-         {stream?.audioMuted && (
+         {stream && stream.audioMuted && (
             <div className={classes.audioMuted}>
                <Tooltip title={"The streamer has muted his microphone"}>
                   <VolumeOffIcon
