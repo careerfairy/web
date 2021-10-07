@@ -254,9 +254,10 @@ function ErrorModal({
                      />
                   )}
                </div>
-            </DialogContent>
-         </Dialog>
-      );
-   });
+            </div>
+         </DialogContent>
+      </Dialog>
+   );
+}
 
 export default ErrorModal;
