@@ -11,12 +11,14 @@ import { ClickAwayListener } from "@material-ui/core";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import clsx from "clsx";
+import { useDispatch } from "react-redux";
+import * as storeActions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({
    root: {
       display: "flex",
       top: 0,
-      width: "120px",
+      width: "220px",
       padding: "30px",
       position: "absolute",
       alignItems: "center",
@@ -113,10 +115,10 @@ const ButtonComponent = ({
    isMobile,
    selectedState,
    streamer,
-   setShowMenu,
 }) => {
    const DELAY = 3000; //3 seconds
    const [hasMounted, setHasMounted] = useState(false);
+   const dispatch = useDispatch();
    const theme = useTheme();
    const [open, setOpen] = useState(true);
    const [delayHandler, setDelayHandler] = useState(null);
@@ -219,7 +221,7 @@ const ButtonComponent = ({
             icon: <ChevronLeftRoundedIcon fontSize="large" />,
             name: "",
             disabled: false,
-            onClick: () => setShowMenu(!showMenu),
+            onClick: () => dispatch(storeActions.toggleLeftMenu()),
             tutorialNum: 9999999,
          });
       }

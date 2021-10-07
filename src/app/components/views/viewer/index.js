@@ -61,7 +61,6 @@ const ViewerOverview = ({
    handRaiseActive,
    streamerId,
    mobile,
-   setShowMenu,
    handleStateChange,
    selectedState,
    showMenu,
@@ -85,7 +84,6 @@ const ViewerOverview = ({
             />
             <ButtonComponent
                selectedState={selectedState}
-               setShowMenu={setShowMenu}
                showMenu={showMenu}
                isMobile={mobile}
                handleStateChange={handleStateChange}

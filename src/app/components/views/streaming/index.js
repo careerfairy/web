@@ -58,7 +58,6 @@ const StreamerOverview = ({
    selectedState,
    handleStateChange,
    setNumberOfViewers,
-   setShowMenu,
    showMenu,
    notifications,
    streamerId,
@@ -87,7 +86,6 @@ const StreamerOverview = ({
                viewer={false}
             />
             <ButtonComponent
-               setShowMenu={setShowMenu}
                streamer={true}
                setSliding={setSliding}
                selectedState={selectedState}
