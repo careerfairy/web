@@ -62,6 +62,21 @@ class Firebase {
     * })} data
     * @return {Promise<firebase.functions.HttpsCallableResult>}
     */
+
+   fetchAgoraRtcToken = async (data) => {
+      const fetchAgoraRtcToken = this.functions.httpsCallable(
+         "fetchAgoraRtcToken"
+      );
+      return await fetchAgoraRtcToken(data);
+   };
+
+   fetchAgoraRtmToken = async (data) => {
+      const fetchAgoraRtmToken = this.functions.httpsCallable(
+         "fetchAgoraRtmToken"
+      );
+      return await fetchAgoraRtmToken(data);
+   };
+
    getSecureAgoraToken = async (data) => {
       const getSecureAgoraToken = this.functions.httpsCallable(
          "generateAgoraTokenSecureOnCall"

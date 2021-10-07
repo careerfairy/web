@@ -84,86 +84,7 @@ exports.startRecordingLivestream = functions.https.onRequest(
    }
 );
 
-exports.generateAgoraTokenSecure = functions.https.onRequest(
-   async (req, res) => {
-      setHeaders(req, res);
-
-      const channelName = req.body.channel;
-      const sentToken = req.body.token;
-      const rtcRole = req.body.isStreamer
-         ? RtcRole.PUBLISHER
-         : RtcRole.SUBSCRIBER;
-      const rtmRole = 0;
-      const expirationTimeInSeconds = 21600;
-      const uid = req.body.uid;
-      const currentTimestamp = Math.floor(Date.now() / 1000);
-      const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
-
-      // Build token with uid
-      if (rtcRole === RtcRole.PUBLISHER) {
-         let livestreamDoc = await admin
-            .firestore()
-            .collection("livestreams")
-            .doc(channelName)
-            .get();
-         let livestream = livestreamDoc.data();
-
-         if (!livestream.test) {
-            let storedTokenDoc = await admin
-               .firestore()
-               .collection("livestreams")
-               .doc(channelName)
-               .collection("tokens")
-               .doc("secureToken")
-               .get();
-            let storedToken = storedTokenDoc.data().value;
-            if (storedToken !== sentToken) {
-               return res.status(401).send();
-            }
-         }
-         const rtcToken = RtcTokenBuilder.buildTokenWithUid(
-            appID,
-            appCertificate,
-            channelName,
-            uid,
-            rtcRole,
-            privilegeExpiredTs
-         );
-         const rtmToken = RtmTokenBuilder.buildToken(
-            appID,
-            appCertificate,
-            uid,
-            rtmRole,
-            privilegeExpiredTs
-         );
-         return res
-            .status(200)
-            .send({ rtcToken: rtcToken, rtmToken: rtmToken });
-      } else {
-         const rtcToken = RtcTokenBuilder.buildTokenWithUid(
-            appID,
-            appCertificate,
-            channelName,
-            uid,
-            rtcRole,
-            privilegeExpiredTs
-         );
-         const rtmToken = RtmTokenBuilder.buildToken(
-            appID,
-            appCertificate,
-            uid,
-            rtmRole,
-            privilegeExpiredTs
-         );
-
-         return res
-            .status(200)
-            .send({ rtcToken: rtcToken, rtmToken: rtmToken });
-      }
-   }
-);
-
-exports.generateAgoraTokenSecureOnCall = functions.https.onCall(
+exports.generateAgoraTokenSecure = functions.https.onCall(
    async (data, context) => {
       const {
          isStreamer,
@@ -243,3 +164,78 @@ exports.generateAgoraTokenSecureOnCall = functions.https.onCall(
       }
    }
 );
+
+exports.fetchAgoraRtcToken = functions.https.onCall(async (data, context) => {
+   const { isStreamer, uid, sentToken, channelName, streamDocumentPath } = data;
+   const rtcRole = isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
+   const expirationTimeInSeconds = 21600;
+   const currentTimestamp = Math.floor(Date.now() / 1000);
+   const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+
+   // Build token with uid
+   if (rtcRole === RtcRole.PUBLISHER) {
+      let livestreamDoc = await admin.firestore().doc(streamDocumentPath).get();
+      let livestream = livestreamDoc.data();
+
+      if (!livestream.test) {
+         let storedTokenDoc = await admin
+            .firestore()
+            .doc(streamDocumentPath)
+            .collection("tokens")
+            .doc("secureToken")
+            .get();
+         let storedToken = storedTokenDoc.data().value;
+         console.log("-> storedToken", storedToken);
+         console.log("-> sentToken", sentToken);
+         if (storedToken !== sentToken) {
+            return { status: 400, message: "Invalid token" };
+         }
+      }
+      const rtcToken = RtcTokenBuilder.buildTokenWithUid(
+         appID,
+         appCertificate,
+         channelName,
+         uid,
+         rtcRole,
+         privilegeExpiredTs
+      );
+      return {
+         status: 200,
+         token: { rtcToken: rtcToken },
+      };
+   } else {
+      const rtcToken = RtcTokenBuilder.buildTokenWithUid(
+         appID,
+         appCertificate,
+         channelName,
+         uid,
+         rtcRole,
+         privilegeExpiredTs
+      );
+      return {
+         status: 200,
+         token: { rtcToken: rtcToken },
+      };
+   }
+});
+
+exports.fetchAgoraRtmToken = functions.https.onCall(async (data, context) => {
+   const { uid } = data;
+   const rtmRole = 0;
+   const expirationTimeInSeconds = 21600;
+   const currentTimestamp = Math.floor(Date.now() / 1000);
+   const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+
+   const rtmToken = RtmTokenBuilder.buildToken(
+      appID,
+      appCertificate,
+      uid,
+      rtmRole,
+      privilegeExpiredTs
+   );
+
+   return {
+      status: 200,
+      token: { rtmToken: rtmToken },
+   };
+});

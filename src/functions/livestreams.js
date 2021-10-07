@@ -6,7 +6,6 @@ const { client } = require("./api/postmark");
 const { setHeaders } = require("./util");
 
 const { DateTime } = require("luxon");
-const ical = require("ical-generator");
 
 exports.assertLivestreamRegistrationWasCompleted = functions.firestore
    .document("livestreams/{livestreamId}/registeredStudents/{studentId}")

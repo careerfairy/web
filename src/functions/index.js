@@ -21,7 +21,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // Imported Individual Cloud functions
-const hosting = require("./hosting");
 const auth = require("./auth");
 const agora = require("./agora");
 const backup = require("./backup");
@@ -32,12 +31,6 @@ const universityEmails = require("./universityEmails");
 const algolia = require("./algolia");
 const analytics = require("./analytics");
 const breakoutRooms = require("./breakoutRooms");
-
-// Hosting
-exports.production = hosting.production;
-exports.testing = hosting.testing;
-exports.testing2 = hosting.testing2;
-exports.personalHabib = hosting.personalHabib;
 
 // Auth
 exports.createNewUserAccount = auth.createNewUserAccount;
@@ -56,12 +49,13 @@ exports.updateUsersCollectionOnUserDataUpdated =
 
 // Agora
 exports.generateAgoraToken = agora.generateAgoraToken;
-exports.generateAgoraTokenSecure = agora.generateAgoraTokenSecure;
 exports.generateAgoraTokenSecureOnCall = agora.generateAgoraTokenSecureOnCall;
+exports.fetchAgoraRtcToken = agora.fetchAgoraRtcToken;
+exports.fetchAgoraRtmToken = agora.fetchAgoraRtmToken;
 exports.startRecordingLivestream = agora.startRecordingLivestream;
 
-// Backup
-exports.exportFirestoreBackup = backup.exportFirestoreBackup;
+// // Backup
+// exports.exportFirestoreBackup = backup.exportFirestoreBackup;
 
 // Group Admin
 exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail;
