@@ -6,7 +6,7 @@ import useStreamRef from "./useStreamRef";
 
 /**
  * @param {(null | Object)} localMediaStream - The employee who is responsible for the project.
- * @param {string} localMediaStream.stream.streamId - The name of the employee.
+ * @param {string} localMediaStream.stream.uid - The name of the employee.
  * @param {Object[]} externalMediaStreams - An Array of external stream Objects
  * @returns {{}} Returns the 3 stream link types
  */
@@ -40,7 +40,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
       const isFallback = Boolean(options.isFallback);
       let timeout = setTimeout(() => {
          let audioLevels = externalMediaStreams.map((stream) => {
-            if (stream.streamId !== "demoStream" && stream.audioTrack) {
+            if (stream.uid !== "demoStream" && stream.audioTrack) {
                return {
                   streamId: stream.uid,
                   audioLevel: stream.audioTrack.getVolumeLevel(),
@@ -54,7 +54,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
          });
          if (localMediaStream) {
             audioLevels.push({
-               streamId: localMediaStream.streamId,
+               streamId: localMediaStream.uid,
                audioLevel: localMediaStream.audioTrack.getVolumeLevel(),
             });
          }
@@ -91,7 +91,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
       if (externalMediaStreams && firestoreCurrentSpeaker) {
          // TODO get rid of this
          let existingCurrentSpeaker = externalMediaStreams.find(
-            (stream) => stream.streamId === firestoreCurrentSpeaker
+            (stream) => stream.uid === firestoreCurrentSpeaker
          );
          if (!existingCurrentSpeaker) {
             handleChangeCurrentSpeakerId(streamId);
@@ -126,7 +126,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
 
    const checkIfHasMainStreamer = useCallback(
       (streams) => {
-         return streams.some((stream) => stream.streamId === streamId);
+         return streams.some((stream) => stream.uid === streamId);
       },
       [streamId]
    );

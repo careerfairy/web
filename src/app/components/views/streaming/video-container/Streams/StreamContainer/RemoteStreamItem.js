@@ -22,31 +22,29 @@ const RemoteStreamItem = ({
       TutorialContext
    );
    const activeStep = getActiveTutorialStepKey();
-   const { playAllRemoteVideos, muteAllRemoteVideos, unmuteFailedMutedRemoteVideos } = useSelector(
-      (state) => state.stream.streaming
-   );
+   const isScreenShareVideo = stream.uid.includes("screen");
+
+   const {
+      playAllRemoteVideos,
+      muteAllRemoteVideos,
+      unmuteFailedMutedRemoteVideos,
+   } = useSelector((state) => state.stream.streaming);
 
    const dispatch = useDispatch();
 
    const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted());
 
    useEffect(() => {
-      if (stream.streamId === "demoStream") {
+      if (stream.uid === "demoStream") {
          generateDemoHandRaiser();
       } else {
-         if (!stream.stream.isPlaying()) {
-            stream?.stream?.play(
-               stream.streamId,
-               { fit: stream.streamId.includes("screen") ? "contain" : "cover" },
-               (err) => {
-                  if (err) {
-                     setAVideoIsMuted();
-                  }
-               }
-            );
+         if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
+            stream.videoTrack?.play(stream.uid, {
+               fit: isScreenShareVideo ? "contain" : "cover",
+            });
          }
       }
-   }, [stream.streamId]);
+   }, [stream.uid, stream.videoTrack]);
 
    useEffect(() => {
       if (playAllRemoteVideos) {
@@ -56,44 +54,35 @@ const RemoteStreamItem = ({
 
    useEffect(() => {
       if (unmuteFailedMutedRemoteVideos) {
-         stream.stream?.play(stream.streamId, { muted: false });
+         stream?.audioTrack?.play();
       }
    }, [unmuteFailedMutedRemoteVideos]);
 
    useEffect(() => {
       if (muteAllRemoteVideos) {
-         stream?.stream?.muteAudio();
+         stream?.stream?.audioTrack?.stop();
       } else {
-         stream?.stream?.unmuteAudio();
+         stream?.stream?.audioTrack?.play();
       }
    }, [muteAllRemoteVideos]);
 
-   useEffect(() => {
-      if (stream?.stream?.audio === false && stream?.stream?.video === false) {
-         setRemovedStream(stream.streamId);
-      }
-   }, [stream?.stream?.audio, stream?.stream?.video]);
+   // useEffect(() => {
+   //    if (stream?.stream?.audio === false && stream?.stream?.video === false) {
+   //       setRemovedStream(stream.uid);
+   //    }
+   // }, [stream?.stream?.audio, stream?.stream?.video]);
 
    function playVideo() {
-      if (!stream.stream.isPlaying()) {
-         stream.stream.play(
-            stream.streamId,
-            {
-               fit: stream.streamId.includes("screen") ? "contain" : "cover",
-               muted: true,
-            },
-            (err) => {
-               if (err) {
-                  setAVideoIsMuted();
-               }
-            }
-         );
+      if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
+         stream.videoTrack?.play(stream.uid, {
+            fit: isScreenShareVideo ? "contain" : "cover",
+         });
       }
    }
 
    const generateDemoHandRaiser = useCallback(() => {
       let video = document.createElement("video");
-      const videoContainer = document.querySelector("#" + stream.streamId);
+      const videoContainer = document.querySelector("#" + stream.uid);
       videoContainer.appendChild(video);
       video.src = stream.url;
       video.loop = true;
@@ -120,7 +109,7 @@ const RemoteStreamItem = ({
                )}
             </React.Fragment>
          }
-         open={activeStep === 11 && stream.streamId === "demoStream"}
+         open={activeStep === 11 && stream.uid === "demoStream"}
          style={{
             width: "100%",
             display: "flex",

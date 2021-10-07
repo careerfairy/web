@@ -4,7 +4,7 @@ import { useSoundMeter } from "./useSoundMeter";
 export default function useMediaSources(
    devices,
    streamId,
-   localStreamData,
+   localStream,
    showSoundMeter
 ) {
    const [audioSource, setAudioSource] = useState(null);
@@ -15,13 +15,13 @@ export default function useMediaSources(
    const [localMediaStream, setLocalMediaStream] = useState(null);
 
    useEffect(() => {
-      if (localStreamData) {
+      if (localStream) {
          const mediaStream = new MediaStream();
          mediaStream.addTrack(localStream.audioTrack.getMediaStreamTrack());
          mediaStream.addTrack(localStream.videoTrack.getMediaStreamTrack());
          setLocalMediaStream(mediaStream);
       }
-   }, [localStreamData, audioSource, videoSource]);
+   }, [localStream, audioSource, videoSource]);
 
    const audioLevel = useSoundMeter(
       showSoundMeter,
@@ -30,7 +30,7 @@ export default function useMediaSources(
    );
 
    useEffect(() => {
-      if (devices && localStreamData) {
+      if (devices && localStream) {
          if (
             devices.audioInputList &&
             devices.audioInputList.length > 0 &&
@@ -46,7 +46,7 @@ export default function useMediaSources(
             updateSpeakerSource(devices.audioOutputList[0].value);
          }
       }
-   }, [devices, localStreamData]);
+   }, [devices, localStream]);
 
    const initalizeAudioAndVideoSources = (audioDeviceId, videoDeviceId) => {
       localStream.audioTrack.setDevice(audioDeviceId).then(() => {
@@ -63,7 +63,7 @@ export default function useMediaSources(
             setAudioSource(deviceId);
          });
       },
-      [localStreamData]
+      [localStream]
    );
 
    const updateVideoSource = useCallback(
@@ -72,7 +72,7 @@ export default function useMediaSources(
             setVideoSource(deviceId);
          });
       },
-      [localStreamData]
+      [localStream]
    );
 
    const updateSpeakerSource = useCallback((deviceId) => {

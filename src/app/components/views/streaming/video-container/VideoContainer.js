@@ -27,6 +27,7 @@ import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/Stre
 import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 import Streams from "./Streams";
 import DraggableComponent from "../../banners/DraggableComponent";
+import useAgora from "components/custom-hook/useAgora";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -69,31 +70,31 @@ function VideoContainer({
          ? optimizationMode
          : "";
 
-   const {
-      localMediaStream,
-      setLocalMediaStream,
-      externalUsers,
-      agoraRtcStatus,
-      agoraRtcConnectionStatus,
-      agoraRtmStatus,
-      networkQuality,
-      agoraHandlers,
-      numberOfViewers,
-      createDemoStream,
-      setAddedStream,
-      setRemovedStream,
-   } = useAgoraAsStreamer(
-      true,
-      false,
-      screenSharingMode,
-      currentLivestream.id,
-      streamerId,
-      viewer
-   );
+   // const {
+   //    localMediaStream,
+   //    setLocalMediaStream,
+   //    externalUsers,
+   //    agoraRtcStatus,
+   //    agoraRtcConnectionStatus,
+   //    agoraRtmStatus,
+   //    networkQuality,
+   //    agoraHandlers,
+   //    numberOfViewers,
+   //    createDemoStream,
+   //    setAddedStream,
+   //    setRemovedStream,
+   // } = useAgoraAsStreamer(
+   //    true,
+   //    false,
+   //    screenSharingMode,
+   //    currentLivestream.id,
+   //    streamerId,
+   //    viewer
+   // );
 
-   const devices = useDevices(
-      agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
-   );
+   const { localStream, remoteStreams } = useAgora(streamerId, true);
+
+   const devices = useDevices(true);
 
    const {
       audioSource,
@@ -107,33 +108,33 @@ function VideoContainer({
    } = useMediaSources(
       devices,
       streamerId,
-      localMediaStream,
+      localStream,
       !streamerReady || showSettings
    );
 
-   const currentSpeakerId = useCurrentSpeaker(localMediaStream, externalUsers);
+   const currentSpeakerId = useCurrentSpeaker(localStream, []);
 
-   useEffect(() => {
-      if (
-         agoraRtcStatus &&
-         agoraRtcStatus.type === "INFO" &&
-         agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
-      ) {
-         setStreamerConnected(true);
-      }
-   }, [agoraRtcStatus]);
+   // useEffect(() => {
+   //    if (
+   //       agoraRtcStatus &&
+   //       agoraRtcStatus.type === "INFO" &&
+   //       agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
+   //    ) {
+   //       setStreamerConnected(true);
+   //    }
+   // }, [agoraRtcStatus]);
 
-   useEffect(() => {
-      if (
-         agoraRtcStatus &&
-         (agoraRtcStatus.msg === "RTC_SCREEN_SHARE_STOPPED" ||
-            agoraRtcStatus.msg === "RTC_SCREEN_SHARE_NOT_ALLOWED") &&
-         currentLivestream.mode === "desktop" &&
-         currentLivestream.screenSharerId === streamerId
-      ) {
-         setDesktopMode("default", streamerId);
-      }
-   }, [agoraRtcStatus]);
+   // useEffect(() => {
+   //    if (
+   //       agoraRtcStatus &&
+   //       (agoraRtcStatus.msg === "RTC_SCREEN_SHARE_STOPPED" ||
+   //          agoraRtcStatus.msg === "RTC_SCREEN_SHARE_NOT_ALLOWED") &&
+   //       currentLivestream.mode === "desktop" &&
+   //       currentLivestream.screenSharerId === streamerId
+   //    ) {
+   //       setDesktopMode("default", streamerId);
+   //    }
+   // }, [agoraRtcStatus]);
 
    useEffect(() => {
       if (streamerId && currentLivestream.id) {
@@ -148,44 +149,44 @@ function VideoContainer({
 
    const [timeoutState, setTimeoutState] = useState(null);
 
-   useEffect(() => {
-      dynamicallyUpdateVideoProfile();
-   }, [
-      localMediaStream,
-      externalUsers,
-      props.currentLivestream.currentSpeakerId,
-      props.currentLivestream.mode,
-   ]);
+   // useEffect(() => {
+   //    dynamicallyUpdateVideoProfile();
+   // }, [
+   //    localMediaStream,
+   //    externalUsers,
+   //    props.currentLivestream.currentSpeakerId,
+   //    props.currentLivestream.mode,
+   // ]);
 
-   const dynamicallyUpdateVideoProfile = async () => {
-      if (localMediaStream && externalUsers) {
-         if (externalUsers.length > 3) {
-            if (
-               streamerId === currentLivestream.currentSpeakerId &&
-               currentLivestream.mode !== "desktop" &&
-               currentLivestream.mode !== "presentation"
-            ) {
-               if (timeoutState) {
-                  clearTimeout(timeoutState);
-               }
-               let newTimeout = setTimeout(() => {
-                  localMediaStream.videoTrack.setEncoderConfiguration("480p_9");
-               }, 20000);
-               setTimeoutState(newTimeout);
-            } else {
-               if (timeoutState) {
-                  clearTimeout(timeoutState);
-               }
-               let newTimeout = setTimeout(() => {
-                  localMediaStream.videoTrack.setEncoderConfiguration("180p");
-               }, 20000);
-               setTimeoutState(newTimeout);
-            }
-         } else {
-            localMediaStream.videoTrack.setEncoderConfiguration("480p_9");
-         }
-      }
-   };
+   // const dynamicallyUpdateVideoProfile = async () => {
+   //    if (localMediaStream && externalUsers) {
+   //       if (externalUsers.length > 3) {
+   //          if (
+   //             streamerId === currentLivestream.currentSpeakerId &&
+   //             currentLivestream.mode !== "desktop" &&
+   //             currentLivestream.mode !== "presentation"
+   //          ) {
+   //             if (timeoutState) {
+   //                clearTimeout(timeoutState);
+   //             }
+   //             let newTimeout = setTimeout(() => {
+   //                localMediaStream.videoTrack.setEncoderConfiguration("480p_9");
+   //             }, 20000);
+   //             setTimeoutState(newTimeout);
+   //          } else {
+   //             if (timeoutState) {
+   //                clearTimeout(timeoutState);
+   //             }
+   //             let newTimeout = setTimeout(() => {
+   //                localMediaStream.videoTrack.setEncoderConfiguration("180p");
+   //             }, 20000);
+   //             setTimeoutState(newTimeout);
+   //          }
+   //       } else {
+   //          localMediaStream.videoTrack.setEncoderConfiguration("480p_9");
+   //       }
+   //    }
+   // };
 
    const setDesktopMode = async (mode, initiatorId) => {
       let screenSharerId =
@@ -193,64 +194,64 @@ function VideoContainer({
       await firebase.setDesktopMode(streamRef, mode, screenSharerId);
    };
 
-   useEffect(() => {
-      const activeStep = getActiveTutorialStepKey();
-      if (localMediaStream && activeStep > 0) {
-         if (activeStep > 10 && activeStep < 13) {
-            if (
-               !externalUsers.some((stream) => stream.streamId === "demoStream")
-            ) {
-               createDemoStream({
-                  streamId: "demoStream",
-                  url:
-                     "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media",
-               });
-               setAddedStream({
-                  streamId: "demoStream",
-                  url:
-                     "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media",
-               });
-            }
-         } else {
-            setRemovedStream("demoStream");
-         }
-      }
-   }, [tutorialSteps]);
+   // useEffect(() => {
+   //    const activeStep = getActiveTutorialStepKey();
+   //    if (localMediaStream && activeStep > 0) {
+   //       if (activeStep > 10 && activeStep < 13) {
+   //          if (
+   //             !externalUsers.some((stream) => stream.streamId === "demoStream")
+   //          ) {
+   //             createDemoStream({
+   //                streamId: "demoStream",
+   //                url:
+   //                   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media",
+   //             });
+   //             setAddedStream({
+   //                streamId: "demoStream",
+   //                url:
+   //                   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media",
+   //             });
+   //          }
+   //       } else {
+   //          setRemovedStream("demoStream");
+   //       }
+   //    }
+   // }, [tutorialSteps]);
 
-   const isOpen = (property) => {
-      return Boolean(
-         currentLivestream.test &&
-            tutorialSteps.streamerReady &&
-            tutorialSteps[property]
-      );
-   };
+   // const isOpen = (property) => {
+   //    return Boolean(
+   //       currentLivestream.test &&
+   //          tutorialSteps.streamerReady &&
+   //          tutorialSteps[property]
+   //    );
+   // };
 
-   const handleCloseDemoIntroModal = (wantsDemo) => {
-      setShowDemoIntroModal(false);
-      if (wantsDemo) {
-         setShowBubbles(true);
-         setTutorialSteps({
-            ...tutorialSteps,
-            streamerReady: true,
-         });
-      } else {
-         setShowBubbles(true);
-      }
-   };
+   // const handleCloseDemoIntroModal = (wantsDemo) => {
+   //    setShowDemoIntroModal(false);
+   //    if (wantsDemo) {
+   //       setShowBubbles(true);
+   //       setTutorialSteps({
+   //          ...tutorialSteps,
+   //          streamerReady: true,
+   //       });
+   //    } else {
+   //       setShowBubbles(true);
+   //    }
+   // };
 
-   const handleOpenDemoIntroModal = () => {
-      setShowDemoIntroModal(true);
-   };
+   // const handleOpenDemoIntroModal = () => {
+   //    setShowDemoIntroModal(true);
+   // };
 
-   const handleCloseDemoEndModal = () => {
-      handleConfirmStep(23);
-      endTutorial();
-      setShowBubbles(true);
-   };
+   // const handleCloseDemoEndModal = () => {
+   //    handleConfirmStep(23);
+   //    endTutorial();
+   //    setShowBubbles(true);
+   // };
 
-   const handleCloseScreenShareModal = useCallback(() => {
-      setShowScreenShareModal(false);
-   }, []);
+   // const handleCloseScreenShareModal = useCallback(() => {
+   //    setShowScreenShareModal(false);
+   // }, []);
 
    const handleClickScreenShareButton = async () => {
       if (currentLivestream.mode === "desktop") {
@@ -272,15 +273,15 @@ function VideoContainer({
 
    return (
       <Fragment>
-         <BreakoutRoomManagementModal agoraHandlers={agoraHandlers} />
+         {/* <BreakoutRoomManagementModal agoraHandlers={agoraHandlers} /> */}
          <Streams
-            externalMediaStreams={externalUsers}
-            localMediaStream={localMediaStream}
+            externalMediaStreams={remoteStreams}
+            localMediaStream={localStream}
             currentSpeakerId={currentSpeakerId}
             streamerId={streamerId}
             handRaiseActive={currentLivestream.handRaiseActive}
             videoMutedBackgroundImg={currentLivestream.companyLogoUrl}
-            setRemovedStream={setRemovedStream}
+            setRemovedStream={() => {}}
             liveSpeakers={currentLivestream.liveSpeakers}
             isBroadCasting={!isPlayMode}
             sharingScreen={currentLivestream.mode === "desktop"}
@@ -289,7 +290,7 @@ function VideoContainer({
             livestreamId={currentLivestream.id}
             presenter
          />
-         <VideoControlsContainer
+         {/* <VideoControlsContainer
             currentLivestream={currentLivestream}
             viewer={viewer}
             streamerId={streamerId}
@@ -300,8 +301,8 @@ function VideoContainer({
             isMainStreamer={isMainStreamer}
             showSettings={showSettings}
             setShowSettings={setShowSettings}
-         />
-         <DraggableComponent
+         /> */}
+         {/* <DraggableComponent
             zIndex={3}
             bounds="parent"
             positionStyle={"absolute"}
@@ -353,22 +354,22 @@ function VideoContainer({
          <ErrorModal
             agoraRtcStatus={agoraRtcStatus}
             agoraRtmStatus={agoraRtmStatus}
-         />
-         <ScreenShareModal
+         /> */}
+         {/* <ScreenShareModal
             open={showScreenShareModal}
             smallScreen={smallScreen}
             handleClose={handleCloseScreenShareModal}
             handleScreenShare={handleScreenShare}
-         />
+         /> */}
 
-         <DemoIntroModal
+         {/* <DemoIntroModal
             open={showDemoIntroModal}
             handleClose={handleCloseDemoIntroModal}
          />
          <DemoEndModal
             open={isOpen(23)}
             handleClose={handleCloseDemoEndModal}
-         />
+         /> */}
       </Fragment>
    );
 }

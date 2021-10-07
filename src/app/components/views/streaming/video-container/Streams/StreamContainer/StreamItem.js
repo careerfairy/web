@@ -63,14 +63,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
-   const classes = useStyles({ big, streamId: stream.streamId });
+   const classes = useStyles({ big, streamId: stream.uid });
    const vidDiv = useRef(null);
    return (
       <div className={classes.root}>
          <div
-            id={stream.streamId}
+            id={stream.uid}
             className={clsx(classes.videoElement, {
-               [classes.demoVideo]: stream.streamId === "demoStream",
+               [classes.demoVideo]: stream.uid === "demoStream",
             })}
             ref={vidDiv}
          />

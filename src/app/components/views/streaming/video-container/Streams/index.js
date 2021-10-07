@@ -47,7 +47,11 @@ const Streams = memo(
          const allStreams = [...externalMediaStreams];
          const newHasManySpeakers = Boolean(allStreams?.length > 4);
          setHasManySpeakers(newHasManySpeakers);
-         if (localMediaStream && isBroadCasting) {
+         if (
+            localMediaStream &&
+            localMediaStream.isPublished &&
+            isBroadCasting
+         ) {
             allStreams.unshift(localMediaStream);
          }
          if (!hasManySpeakers && sharingPdf) {
@@ -79,10 +83,10 @@ const Streams = memo(
          let localStream;
 
          for (const stream of allStreams) {
-            if (stream.streamId.includes("screen")) {
+            if (stream.uid.includes("screen")) {
                screenShareStream = stream;
             }
-            if (stream.streamId === currentSpeakerId) {
+            if (stream.uid === currentSpeakerId) {
                currentSpeakerStream = stream;
             }
 
@@ -104,9 +108,7 @@ const Streams = memo(
       };
 
       const handleGetSmallStream = (allStreams, largeStream) => {
-         return allStreams.filter(
-            (stream) => stream.streamId !== largeStream.streamId
-         );
+         return allStreams.filter((stream) => stream.uid !== largeStream.uid);
       };
 
       return (

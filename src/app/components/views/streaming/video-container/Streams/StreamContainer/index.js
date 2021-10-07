@@ -19,20 +19,20 @@ const StreamContainer = ({
       (async () => {
          if (speaker || fetching) return;
          let newSpeaker;
-         if (stream.streamId === "demoStream") {
+         if (stream.uid === "demoStream") {
             newSpeaker = {
                firstName: "Demo",
                lastName: "Speaker",
                position: "✋ Hand Raiser",
             };
-         } else if (stream.streamId.includes("screen")) {
+         } else if (stream.uid.includes("screen")) {
             newSpeaker = null;
          } else {
             newSpeaker = liveSpeakers?.find(
-               (speaker) => speaker.speakerUuid === stream.streamId
+               (speaker) => speaker.speakerUuid === stream.uid
             );
-            if (!newSpeaker && stream.streamId && livestreamId) {
-               const userId = stream.streamId.replace(livestreamId, "");
+            if (!newSpeaker && stream.uid && livestreamId) {
+               const userId = stream.uid.replace(livestreamId, "");
                if (userId) {
                   newSpeaker = await getSpeakerInfoFromDB(userId);
                }
@@ -40,7 +40,7 @@ const StreamContainer = ({
          }
          setSpeaker(newSpeaker);
       })();
-   }, [stream.streamId.includes("screen"), liveSpeakers, stream.streamId]);
+   }, [stream.uid.includes("screen"), liveSpeakers, stream.uid]);
 
    const getSpeakerInfoFromDB = async (userId) => {
       let fetchedSpeaker = {

@@ -14,7 +14,7 @@ import {
 import Typography from "@material-ui/core/Typography";
 
 const STREAMS_ROW_HEIGHT = 125;
-const WIDE_SCREEN_ROW_HEIGHT = 180
+const WIDE_SCREEN_ROW_HEIGHT = 180;
 const useStyles = makeStyles((theme) => ({
    root: {
       flex: 1,
@@ -31,8 +31,8 @@ const useStyles = makeStyles((theme) => ({
    grow: {
       height: STREAMS_ROW_HEIGHT,
       [theme.breakpoints.up("lg")]: {
-         height: WIDE_SCREEN_ROW_HEIGHT
-      }
+         height: WIDE_SCREEN_ROW_HEIGHT,
+      },
    },
    streamsOverflowWrapper: {
       display: "flex",
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
    smallFlexStream: {
       minWidth: STREAMS_ROW_HEIGHT * 1.7,
       [theme.breakpoints.up("lg")]: {
-         minWidth: WIDE_SCREEN_ROW_HEIGHT * 1.5
+         minWidth: WIDE_SCREEN_ROW_HEIGHT * 1.5,
       },
       maxWidth: 200,
       paddingTop: 0,
@@ -85,8 +85,8 @@ const useStyles = makeStyles((theme) => ({
    largeSquished: {
       top: STREAMS_ROW_HEIGHT,
       [theme.breakpoints.up("lg")]: {
-         top: WIDE_SCREEN_ROW_HEIGHT
-      }
+         top: WIDE_SCREEN_ROW_HEIGHT,
+      },
    },
 }));
 
@@ -159,12 +159,12 @@ const StreamsLayout = ({
                            <StreamElementWrapper
                               index={index}
                               first={
-                                 currentSpeakerId === stream.streamId &&
+                                 currentSpeakerId === stream.uid &&
                                  (sharingPdf || sharingScreen) &&
                                  hasManySpeakers
                               }
                               large={isLarge}
-                              key={stream.streamId}
+                              key={stream.uid}
                               squished={hasSmallStreams}
                            >
                               <StreamContainer

@@ -2,12 +2,11 @@ import React, { useEffect } from "react";
 import StreamItem from "./StreamItem";
 
 const LocalStreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
-
    useEffect(() => {
-      if (!stream.stream.isPlaying()) {
-         stream?.stream?.play(stream.streamId);
+      if (!stream.videoTrack.isPlaying) {
+         stream.videoTrack?.play(stream.uid);
       }
-   }, [stream.streamId]);
+   }, [stream.uid]);
 
    return (
       <StreamItem
