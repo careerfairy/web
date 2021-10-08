@@ -11,7 +11,7 @@ import { ClickAwayListener } from "@material-ui/core";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import clsx from "clsx";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as storeActions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({
@@ -26,18 +26,21 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 2,
       bottom: "50%",
    },
-   speedDial: {
-      transition: "transform 0.2s",
-      transitionTimingFunction: theme.transitions.easeInOut,
-      transform: ({ open }) =>
-         open ? "" : "translate(-20px, 0) scale3d(0.8, 0.8, 0.8)",
-      "-moz-transform": ({ open }) =>
-         open ? "" : "translate(-20px, 0) scale3d(0.8, 0.8, 0.8)",
-      "-o-transform": ({ open }) =>
-         open ? "" : "translate(-20px, 0) scale3d(0.8, 0.8, 0.8)",
-      "-webkit-transform": ({ open }) =>
-         open ? "" : "translate(-20px, 0) scale3d(0.8, 0.8, 0.8)",
-   },
+   speedDial: ({ open, focusModeEnabled }) => ({
+      transition: theme.transitions.create(["transform", "opacity"], {
+         duration: theme.transitions.duration.standard,
+         easing: theme.transitions.easing.easeInOut,
+      }),
+      opacity: !open && focusModeEnabled ? 0.5 : 1,
+      transform: open ? "" : "translate(-20px, 0) scale3d(0.8, 0.8, 0.8)",
+      "-moz-transform": open
+         ? ""
+         : "translate(-20px, 0) scale3d(0.8, 0.8, 0.8)",
+      "-o-transform": open ? "" : "translate(-20px, 0) scale3d(0.8, 0.8, 0.8)",
+      "-webkit-transform": open
+         ? ""
+         : "translate(-20px, 0) scale3d(0.8, 0.8, 0.8)",
+   }),
    actionButton: {
       backgroundColor: theme.palette.primary.main,
       color: "white",
@@ -116,6 +119,9 @@ const ButtonComponent = ({
    selectedState,
    streamer,
 }) => {
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
    const DELAY = 3000; //3 seconds
    const [hasMounted, setHasMounted] = useState(false);
    const dispatch = useDispatch();
@@ -145,6 +151,7 @@ const ButtonComponent = ({
       open: open || tutorialStepActive(),
       showMenu,
       isMobile,
+      focusModeEnabled,
    });
 
    const handleMouseEnter = (event) => {
@@ -197,7 +204,7 @@ const ButtonComponent = ({
          },
       ];
 
-      if (isMobile) {
+      if (isMobile || focusModeEnabled) {
          actions.unshift({
             icon: <ForumOutlinedIcon fontSize="large" />,
             name: "Chat",
@@ -216,7 +223,7 @@ const ButtonComponent = ({
          });
       }
 
-      if (streamer && showMenu) {
+      if ((streamer || focusModeEnabled) && showMenu) {
          actions.unshift({
             icon: <ChevronLeftRoundedIcon fontSize="large" />,
             name: "",
@@ -263,7 +270,7 @@ const ButtonComponent = ({
                         FabProps={{
                            size: "large",
                            classes: {
-                              root: clsx({
+                              root: clsx(classes.fab, {
                                  [classes.actionButtonHighlight]: isOpen(
                                     action.tutorialNum,
                                     action.disabled

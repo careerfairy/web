@@ -48,12 +48,12 @@ const useStyles = makeStyles((theme) => ({
    mobileDrawer: {
       width: "100%",
    },
-   desktopDrawer: {
+   desktopDrawer: ({ focusModeEnabled }) => ({
       width: 280,
-      top: 55,
-      height: "calc(100% - 55px)",
+      top: focusModeEnabled ? 0 : 55,
+      height: focusModeEnabled ? "100%" : "calc(100% - 55px)",
       boxShadow: theme.shadows[15],
-   },
+   }),
 }));
 
 const states = ["questions", "polls", "hand", "chat"];
@@ -72,7 +72,7 @@ const LeftMenu = ({
    const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen);
    const { userData, authenticatedUser: user } = useAuth();
    const theme = useTheme();
-   const classes = useStyles({ showMenu, isMobile });
+   const classes = useStyles({ showMenu, isMobile, focusModeEnabled });
    const [value, setValue] = useState(0);
    const dispatch = useDispatch();
 

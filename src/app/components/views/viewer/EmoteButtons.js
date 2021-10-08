@@ -232,73 +232,73 @@ const EmoteButtons = ({ createEmote }) => {
 
    return (
       <ClickAwayListener onClickAway={handleClose}>
-         <Grow in={true} unmountOnExit>
-            <div
-               onMouseEnter={handleMouseEnter}
-               onMouseLeave={handleMouseLeave}
-               className={classes.actionArea}
+         {/*<Grow in={true} unmountOnExit>*/}
+         <div
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            className={classes.actionArea}
+         >
+            <Box
+               className={classes.miniButtons}
+               classes={{ root: open ? classes.cardHovered : "" }}
             >
-               <Box
-                  className={classes.miniButtons}
-                  classes={{ root: open ? classes.cardHovered : "" }}
-               >
-                  <div className={classes.wrapper}>
-                     <Fab
-                        disabled={iconsDisabled}
-                        onClick={handleLike}
-                        className={classes.miniLike}
-                        aria-label="like"
-                     >
-                        <ThumbUpAltOutlinedIcon fontSize="medium" />
-                     </Fab>
-                     {iconsDisabled && (
-                        <CircularProgress
-                           variant="determinate"
-                           value={progress}
-                           className={classes.fabProgress}
-                        />
-                     )}
-                  </div>
-                  <div className={classes.wrapper}>
-                     <Fab
-                        disabled={iconsDisabled}
-                        onClick={handleClap}
-                        className={classes.miniClap}
-                        aria-label="clap"
-                     >
-                        <ClappingSVG
-                           style={{ width: 21, height: 21 }}
-                           fontSize="medium"
-                        />
-                     </Fab>
-                     {iconsDisabled && (
-                        <CircularProgress
-                           variant="determinate"
-                           value={progress}
-                           className={classes.fabProgress}
-                        />
-                     )}
-                  </div>
-                  <div className={classes.wrapper}>
-                     <Fab
-                        disabled={iconsDisabled}
-                        onClick={handleHeart}
-                        className={classes.miniHeart}
-                        aria-label="heart"
-                     >
-                        <FavoriteBorderOutlinedIcon fontSize="medium" />
-                     </Fab>
-                     {iconsDisabled && (
-                        <CircularProgress
-                           variant="determinate"
-                           value={progress}
-                           className={classes.fabProgress}
-                        />
-                     )}
-                  </div>
-               </Box>
-            </div>
-         </Grow>
+               <div className={classes.wrapper}>
+                  <Fab
+                     disabled={iconsDisabled}
+                     onClick={handleLike}
+                     className={classes.miniLike}
+                     aria-label="like"
+                  >
+                     <ThumbUpAltOutlinedIcon fontSize="medium" />
+                  </Fab>
+                  {iconsDisabled && (
+                     <CircularProgress
+                        variant="determinate"
+                        value={progress}
+                        className={classes.fabProgress}
+                     />
+                  )}
+               </div>
+               <div className={classes.wrapper}>
+                  <Fab
+                     disabled={iconsDisabled}
+                     onClick={handleClap}
+                     className={classes.miniClap}
+                     aria-label="clap"
+                  >
+                     <ClappingSVG
+                        style={{ width: 21, height: 21 }}
+                        fontSize="medium"
+                     />
+                  </Fab>
+                  {iconsDisabled && (
+                     <CircularProgress
+                        variant="determinate"
+                        value={progress}
+                        className={classes.fabProgress}
+                     />
+                  )}
+               </div>
+               <div className={classes.wrapper}>
+                  <Fab
+                     disabled={iconsDisabled}
+                     onClick={handleHeart}
+                     className={classes.miniHeart}
+                     aria-label="heart"
+                  >
+                     <FavoriteBorderOutlinedIcon fontSize="medium" />
+                  </Fab>
+                  {iconsDisabled && (
+                     <CircularProgress
+                        variant="determinate"
+                        value={progress}
+                        className={classes.fabProgress}
+                     />
+                  )}
+               </div>
+            </Box>
+         </div>
+         {/*</Grow>*/}
       </ClickAwayListener>
    );
 };

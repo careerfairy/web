@@ -67,6 +67,10 @@ const ViewerOverview = ({
    hideAudience,
    audienceDrawerOpen,
 }) => {
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
+
    const { currentLivestream, isBreakout } = useCurrentStream();
    const dispatch = useDispatch();
    const { videoIsMuted, videoIsPaused } = useSelector(
@@ -98,18 +102,22 @@ const ViewerOverview = ({
                handRaiseActive={handRaiseActive}
                isBreakout={isBreakout}
             />
-            <MiniChatContainer
-               mobile={mobile}
-               className={classes.miniChatContainer}
-               livestream={currentLivestream}
-               isStreamer={false}
-            />
+            {!focusModeEnabled && (
+               <MiniChatContainer
+                  mobile={mobile}
+                  className={classes.miniChatContainer}
+                  livestream={currentLivestream}
+                  isStreamer={false}
+               />
+            )}
          </div>
-         <IconsContainer
-            className={classes.iconsContainer}
-            isTest={currentLivestream.test}
-            livestreamId={currentLivestream.id}
-         />
+         {!focusModeEnabled && (
+            <IconsContainer
+               className={classes.iconsContainer}
+               isTest={currentLivestream.test}
+               livestreamId={currentLivestream.id}
+            />
+         )}
          {currentLivestream && !currentLivestream.hasNoRatings && (
             <RatingContainer
                livestreamId={currentLivestream.id}

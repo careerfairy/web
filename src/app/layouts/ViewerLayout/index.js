@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
          paddingLeft: 0,
       },
       [theme.breakpoints.up("mobile")]: {
-         paddingTop: 55,
+         paddingTop: ({ focusModeEnabled }) => !focusModeEnabled && 55,
       },
    },
    contentContainer: {
@@ -81,10 +81,10 @@ const ViewerLayout = (props) => {
    const [handRaiseActive, setHandRaiseActive] = useState(false);
    const [streamerId, setStreamerId] = useState(null);
    const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen);
-   const classes = useStyles({ showMenu, mobile });
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
    );
+   const classes = useStyles({ showMenu, mobile, focusModeEnabled });
    const [selectedState, setSelectedState] = useState("questions");
 
    const currentLivestream = useStreamConnect();

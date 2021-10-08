@@ -1,29 +1,35 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { IconButton, Tooltip } from "@material-ui/core";
-// import FocusModeActiveIcon from "@material-ui/icons/Brightness2Outlined";
-// import FocusInactiveIcon from "@material-ui/icons/Brightness2";
 import FocusInactiveIcon from "@material-ui/icons/PersonalVideo";
 import FocusModeActiveIcon from "@material-ui/icons/PersonalVideoTwoTone";
 import * as actions from "store/actions";
 import { useDispatch, useSelector } from "react-redux";
 
-const FocusModeButton = () => {
+const FocusModeButton = ({ primary, mobile }) => {
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
    );
    const dispatch = useDispatch();
-   const toggleFocusMode = () => dispatch(actions.setFocusMode());
+   const toggleFocusMode = () => {
+      dispatch(actions.setFocusMode(undefined, mobile));
+   };
 
    return (
-      <Tooltip title="Disable emotes and hide the ui element when not in use.">
+      <Tooltip title="Disable emotes and hide the ui elements when not in use.">
          <IconButton
-            color={focusModeEnabled ? "primary" : "default"}
+            color={focusModeEnabled || primary ? "primary" : "default"}
             onClick={toggleFocusMode}
          >
             {focusModeEnabled ? <FocusModeActiveIcon /> : <FocusInactiveIcon />}
          </IconButton>
       </Tooltip>
    );
+};
+
+FocusModeButton.propTypes = {
+   primary: PropTypes.bool,
+   mobile: PropTypes.bool,
 };
 
 export default FocusModeButton;

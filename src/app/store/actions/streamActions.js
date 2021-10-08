@@ -94,7 +94,7 @@ export const toggleLeftMenu = () => async (dispatch) => {
    dispatch({ type: actions.TOGGLE_LEFT_MENU });
 };
 
-export const setFocusMode = (mode) => async (dispatch, getState) => {
+export const setFocusMode = (mode, mobile) => async (dispatch, getState) => {
    // If mode is null or undefined, the new mode will be the opposite of the current mode
    const newFocusMode = Boolean(
       mode ?? !getState().stream.layout.focusModeEnabled
@@ -107,6 +107,8 @@ export const setFocusMode = (mode) => async (dispatch, getState) => {
    if (newFocusMode) {
       return dispatch(closeLeftMenu());
    } else {
-      return dispatch(openLeftMenu());
+      if (!mobile) {
+         return dispatch(openLeftMenu());
+      }
    }
 };
