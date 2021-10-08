@@ -66,6 +66,9 @@ const LeftMenu = ({
    livestream,
    isMobile,
 }) => {
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
    const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen);
    const { userData, authenticatedUser: user } = useAuth();
    const theme = useTheme();
@@ -193,7 +196,7 @@ const LeftMenu = ({
             <Drawer
                anchor="left"
                classes={{ paper: clsx(classes.desktopDrawer, classes.blur) }}
-               open
+               open={focusModeEnabled ? showMenu : true}
                variant="persistent"
             >
                {content}

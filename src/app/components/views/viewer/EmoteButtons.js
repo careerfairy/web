@@ -4,6 +4,7 @@ import {
    CircularProgress,
    ClickAwayListener,
    Fab,
+   Grow,
 } from "@material-ui/core";
 import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
@@ -14,7 +15,6 @@ import { useCurrentStream } from "../../../context/stream/StreamContext";
 import { useAuth } from "../../../HOCs/AuthProvider";
 import { useFirebase } from "context/firebase";
 import { TEST_EMAIL } from "../streaming/LeftMenu/categories/chat/EmotesModal/utils";
-import { useRouter } from "next/router";
 
 const useStyles = makeStyles((theme) => ({
    image: {
@@ -147,6 +147,7 @@ const delay = 3000; //3 seconds
 const smoothness = 2;
 const EmoteButtons = ({ createEmote }) => {
    const firebase = useFirebase();
+
    const {
       currentLivestream: { id: livestreamId },
    } = useCurrentStream();
@@ -231,71 +232,73 @@ const EmoteButtons = ({ createEmote }) => {
 
    return (
       <ClickAwayListener onClickAway={handleClose}>
-         <div
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            className={classes.actionArea}
-         >
-            <Box
-               className={classes.miniButtons}
-               classes={{ root: open ? classes.cardHovered : "" }}
+         <Grow in={true} unmountOnExit>
+            <div
+               onMouseEnter={handleMouseEnter}
+               onMouseLeave={handleMouseLeave}
+               className={classes.actionArea}
             >
-               <div className={classes.wrapper}>
-                  <Fab
-                     disabled={iconsDisabled}
-                     onClick={handleLike}
-                     className={classes.miniLike}
-                     aria-label="like"
-                  >
-                     <ThumbUpAltOutlinedIcon fontSize="medium" />
-                  </Fab>
-                  {iconsDisabled && (
-                     <CircularProgress
-                        variant="determinate"
-                        value={progress}
-                        className={classes.fabProgress}
-                     />
-                  )}
-               </div>
-               <div className={classes.wrapper}>
-                  <Fab
-                     disabled={iconsDisabled}
-                     onClick={handleClap}
-                     className={classes.miniClap}
-                     aria-label="clap"
-                  >
-                     <ClappingSVG
-                        style={{ width: 21, height: 21 }}
-                        fontSize="medium"
-                     />
-                  </Fab>
-                  {iconsDisabled && (
-                     <CircularProgress
-                        variant="determinate"
-                        value={progress}
-                        className={classes.fabProgress}
-                     />
-                  )}
-               </div>
-               <div className={classes.wrapper}>
-                  <Fab
-                     disabled={iconsDisabled}
-                     onClick={handleHeart}
-                     className={classes.miniHeart}
-                     aria-label="heart"
-                  >
-                     <FavoriteBorderOutlinedIcon fontSize="medium" />
-                  </Fab>
-                  {iconsDisabled && (
-                     <CircularProgress
-                        variant="determinate"
-                        value={progress}
-                        className={classes.fabProgress}
-                     />
-                  )}
-               </div>
-            </Box>
-         </div>
+               <Box
+                  className={classes.miniButtons}
+                  classes={{ root: open ? classes.cardHovered : "" }}
+               >
+                  <div className={classes.wrapper}>
+                     <Fab
+                        disabled={iconsDisabled}
+                        onClick={handleLike}
+                        className={classes.miniLike}
+                        aria-label="like"
+                     >
+                        <ThumbUpAltOutlinedIcon fontSize="medium" />
+                     </Fab>
+                     {iconsDisabled && (
+                        <CircularProgress
+                           variant="determinate"
+                           value={progress}
+                           className={classes.fabProgress}
+                        />
+                     )}
+                  </div>
+                  <div className={classes.wrapper}>
+                     <Fab
+                        disabled={iconsDisabled}
+                        onClick={handleClap}
+                        className={classes.miniClap}
+                        aria-label="clap"
+                     >
+                        <ClappingSVG
+                           style={{ width: 21, height: 21 }}
+                           fontSize="medium"
+                        />
+                     </Fab>
+                     {iconsDisabled && (
+                        <CircularProgress
+                           variant="determinate"
+                           value={progress}
+                           className={classes.fabProgress}
+                        />
+                     )}
+                  </div>
+                  <div className={classes.wrapper}>
+                     <Fab
+                        disabled={iconsDisabled}
+                        onClick={handleHeart}
+                        className={classes.miniHeart}
+                        aria-label="heart"
+                     >
+                        <FavoriteBorderOutlinedIcon fontSize="medium" />
+                     </Fab>
+                     {iconsDisabled && (
+                        <CircularProgress
+                           variant="determinate"
+                           value={progress}
+                           className={classes.fabProgress}
+                        />
+                     )}
+                  </div>
+               </Box>
+            </div>
+         </Grow>
       </ClickAwayListener>
    );
 };

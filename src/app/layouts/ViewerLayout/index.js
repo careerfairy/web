@@ -82,7 +82,9 @@ const ViewerLayout = (props) => {
    const [streamerId, setStreamerId] = useState(null);
    const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen);
    const classes = useStyles({ showMenu, mobile });
-
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
    const [selectedState, setSelectedState] = useState("questions");
 
    const currentLivestream = useStreamConnect();
@@ -99,7 +101,9 @@ const ViewerLayout = (props) => {
       if (mobile) {
          closeLeftMenu();
       } else {
-         openLeftMenu();
+         if (!focusModeEnabled) {
+            openLeftMenu();
+         }
       }
    }, [mobile]);
 

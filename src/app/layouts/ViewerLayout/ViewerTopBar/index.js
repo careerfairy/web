@@ -32,6 +32,8 @@ import breakoutRoomsSelector from "../../../components/selectors/breakoutRoomsSe
 import * as actions from "store/actions";
 import useStreamGroups from "../../../components/custom-hook/useStreamGroups";
 import ViewerCtaModal from "./ViewerCtaModal";
+import FocusModeIcon from "@material-ui/icons/Brightness2Outlined";
+import FocusModeButton from "./buttons/FocusModeButton";
 
 const useStyles = makeStyles((theme) => ({
    joinButton: {
@@ -97,6 +99,10 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
          )?.length
       )
    );
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
+
    const careerCenters = useStreamGroups(currentLivestream?.groupIds);
 
    useEffect(() => {
@@ -137,6 +143,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                      </Button>
                   </Tooltip>
                )}
+
                {breakoutRoomOpen && (
                   <Tooltip title="Checkout breakout rooms">
                      <IconButton
@@ -158,8 +165,9 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                      }`}
                   >
                      <IconButton
-                       className={classes.floatingButton}
-                       onClick={handleOpenCtaModal}>
+                        className={classes.floatingButton}
+                        onClick={handleOpenCtaModal}
+                     >
                         <Badge
                            color="secondary"
                            badgeContent={ctaStatus.numberActive && "!"}
@@ -261,7 +269,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                         </IconButton>
                      </Tooltip>
                   )}
-
+                  <FocusModeButton />
                   <Tooltip
                      title={
                         themeMode === "dark"

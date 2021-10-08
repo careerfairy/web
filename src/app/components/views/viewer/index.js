@@ -98,15 +98,12 @@ const ViewerOverview = ({
                handRaiseActive={handRaiseActive}
                isBreakout={isBreakout}
             />
-
-            {
-               <MiniChatContainer
-                  mobile={mobile}
-                  className={classes.miniChatContainer}
-                  livestream={currentLivestream}
-                  isStreamer={false}
-               />
-            }
+            <MiniChatContainer
+               mobile={mobile}
+               className={classes.miniChatContainer}
+               livestream={currentLivestream}
+               isStreamer={false}
+            />
          </div>
          <IconsContainer
             className={classes.iconsContainer}

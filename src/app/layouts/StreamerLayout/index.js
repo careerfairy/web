@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { withFirebase } from "../../context/firebase";
+import { useFirebase } from "context/firebase";
 import StreamerTopBar from "./StreamerTopBar";
 import PreparationOverlay from "../../components/views/streaming/preparation-overlay/PreparationOverlay";
 import LeftMenu from "../../components/views/streaming/LeftMenu/LeftMenu";
@@ -66,7 +66,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const StreamerLayout = (props) => {
-   const { children, firebase, isBreakout, isMainStreamer } = props;
+   const { children, isBreakout, isMainStreamer } = props;
+   const firebase = useFirebase();
    const {
       query: { token, livestreamId: baseStreamId, breakoutRoomId, auto },
    } = useRouter();
@@ -284,4 +285,4 @@ StreamerLayout.propTypes = {
    children: PropTypes.node.isRequired,
    firebase: PropTypes.object,
 };
-export default withFirebase(StreamerLayout);
+export default StreamerLayout;
