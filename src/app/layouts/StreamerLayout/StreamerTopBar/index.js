@@ -1,271 +1,334 @@
-import React, {Fragment, useEffect, useState} from 'react';
-import {makeStyles, useTheme} from "@material-ui/core/styles";
+import React, { Fragment, useEffect, useState } from "react";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import {
-    AppBar,
-    Badge,
-    Box,
-    Button,
-    Checkbox,
-    CircularProgress,
-    Hidden,
-    IconButton,
-    Toolbar,
-    Tooltip,
-    Typography,
-    useMediaQuery
+   AppBar,
+   Badge,
+   Box,
+   Button,
+   Checkbox,
+   Hidden,
+   IconButton,
+   Toolbar,
+   Tooltip,
+   Typography,
+   useMediaQuery,
 } from "@material-ui/core";
-import {MainLogo, MiniLogo} from "../../../components/logos";
-import {StandartTooltip, TooltipButtonComponent, TooltipText, TooltipTitle} from "../../../materialUI/GlobalTooltips";
+import { MainLogo, MiniLogo } from "../../../components/logos";
+import {
+   StandartTooltip,
+   TooltipButtonComponent,
+   TooltipText,
+   TooltipTitle,
+} from "../../../materialUI/GlobalTooltips";
 import ButtonWithConfirm from "../../../components/views/common/ButtonWithConfirm";
 import StopIcon from "@material-ui/icons/Stop";
 import PlayCircleFilledWhiteIcon from "@material-ui/icons/PlayCircleFilledWhite";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 import OpenInBrowserIcon from "@material-ui/icons/OpenInBrowser";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
-import BreakoutRoomIcon from '@material-ui/icons/Widgets';
+import BreakoutRoomIcon from "@material-ui/icons/Widgets";
 import PeopleIcon from "@material-ui/icons/People";
-import {useThemeToggle} from "../../../context/theme/ThemeContext";
+import { useThemeToggle } from "../../../context/theme/ThemeContext";
 import SpeakerManagementModal from "../../../components/views/streaming/modal/SpeakerManagementModal";
-import {useCurrentStream} from "../../../context/stream/StreamContext";
-import {maybePluralize} from "../../../components/helperFunctions/HelperFunctions";
+import { useCurrentStream } from "../../../context/stream/StreamContext";
+import { maybePluralize } from "../../../components/helperFunctions/HelperFunctions";
 import NewFeatureHint from "../../../components/util/NewFeatureHint";
 import useStreamToken from "../../../components/custom-hook/useStreamToken";
 import useStreamRef from "../../../components/custom-hook/useStreamRef";
-import {useDispatch, useSelector} from "react-redux";
-import * as actions from "store/actions"
-import {TOP_BAR_HEIGHT} from "constants/streamLayout";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "store/actions";
+import { TOP_BAR_HEIGHT } from "constants/streamLayout";
 
-const useStyles = makeStyles(theme => ({
-    toolbar: {
-        minHeight: TOP_BAR_HEIGHT,
-        display: "flex",
-        justifyContent: "space-between"
-    },
-    streamStatusText: {
-        fontWeight: 600,
-        color: ({hasStarted}) => hasStarted ? theme.palette.primary.main : theme.palette.warning.main
-    },
-    viewCount: {
-        // background: theme.palette.primary.main,
-        color: theme.palette.primary.main,
-        padding: theme.spacing(0, 1),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-    },
-    viewCountText: {
-        fontWeight: 600,
-        marginLeft: theme.spacing(0.5),
-
-    },
+const useStyles = makeStyles((theme) => ({
+   toolbar: {
+      minHeight: TOP_BAR_HEIGHT,
+      display: "flex",
+      justifyContent: "space-between",
+   },
+   streamStatusText: {
+      fontWeight: 600,
+      color: ({ hasStarted }) =>
+         hasStarted ? theme.palette.primary.main : theme.palette.warning.main,
+   },
+   viewCount: {
+      // background: theme.palette.primary.main,
+      color: theme.palette.primary.main,
+      padding: theme.spacing(0, 1),
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+   },
+   viewCountText: {
+      fontWeight: 600,
+      marginLeft: theme.spacing(0.5),
+   },
 }));
 
+const StreamerTopBar = ({ firebase, showAudience }) => {
+   const {
+      currentLivestream,
+      isBreakout,
+      isMainStreamer,
+      isStreamer,
+   } = useCurrentStream();
 
-const StreamerTopBar = ({firebase, showAudience, token}) => {
+   const dispatch = useDispatch();
+   const streamRef = useStreamRef();
+   const classes = useStyles({ hasStarted: currentLivestream?.hasStarted });
+   const theme = useTheme();
+   const mobile = useMediaQuery(theme.breakpoints.down("md"));
+   const { toggleTheme, themeMode } = useThemeToggle();
+   const numberOfViewers = useSelector((state) =>
+      currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0
+   );
+   const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
+   const [hideTooltip, setHideTooltip] = useState(false);
+   const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
+   const [
+      openStreamerBreakoutRoomModal,
+      setOpenStreamerBreakoutRoomModal,
+   ] = useState(false);
+   const { joiningStreamerLink, viewerLink } = useStreamToken();
 
-    const {currentLivestream, isBreakout, isMainStreamer, isStreamer} = useCurrentStream()
+   useEffect(() => {
+      if (currentLivestream.start) {
+         let interval = setInterval(() => {
+            if (dateIsInUnder2Minutes(currentLivestream.start.toDate())) {
+               setStreamStartTimeIsNow(true);
+               clearInterval(interval);
+            }
+         }, 1000);
+      }
+   }, [currentLivestream?.start]);
 
-    const dispatch = useDispatch()
-    const streamRef = useStreamRef();
-    const classes = useStyles({hasStarted: currentLivestream?.hasStarted})
-    const theme = useTheme()
-    const mobile = useMediaQuery(theme.breakpoints.down('md'))
-    const {toggleTheme, themeMode} = useThemeToggle()
-    const numberOfViewers = useSelector(state => currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0)
-    const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
-    const [hideTooltip, setHideTooltip] = useState(false);
-    const [loadingRecordingStatus, setLoadingRecordingStatus] = useState(false);
-    const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
-    const [openStreamerBreakoutRoomModal, setOpenStreamerBreakoutRoomModal] = useState(false);
-    const {joiningStreamerLink, viewerLink} = useStreamToken()
+   function dateIsInUnder2Minutes(date) {
+      return (
+         new Date(date).getTime() - Date.now() < 1000 * 60 * 2 ||
+         Date.now() > new Date(date).getTime()
+      );
+   }
 
-    useEffect(() => {
-        if (currentLivestream.start) {
-            let interval = setInterval(() => {
-                if (dateIsInUnder2Minutes(currentLivestream.start.toDate())) {
-                    setStreamStartTimeIsNow(true);
-                    clearInterval(interval);
-                }
-            }, 1000)
-        }
-    }, [currentLivestream?.start]);
+   function setStreamingStarted(started) {
+      firebase.setLivestreamHasStarted(started, streamRef);
+   }
 
-    function dateIsInUnder2Minutes(date) {
-        return new Date(date).getTime() - Date.now() < 1000 * 60 * 2 || Date.now() > new Date(date).getTime();
-    }
+   const handleOpenBreakoutRoomModal = () => {
+      dispatch(actions.openStreamerBreakoutModal());
+   };
 
-    function setStreamingStarted(started) {
-        firebase.setLivestreamHasStarted(started, streamRef);
-    }
-
-    const handleOpenBreakoutRoomModal = () => {
-        dispatch(actions.openStreamerBreakoutModal())
-    }
-
-    const startRecordingLivestream = () => {
-        setLoadingRecordingStatus(true)
-        firebase.startRecordingLivestream(currentLivestream.id, token).then(() => {
-            setLoadingRecordingStatus(false)
-        })
-    }
-
-    const stopRecordingLivestream = () => {
-        setLoadingRecordingStatus(true)
-        firebase.stopRecordingLivestream(currentLivestream.id, token).then(() => {
-            setLoadingRecordingStatus(false)
-        })
-    }
-
-    return (
-        <Fragment>
-            <AppBar elevation={1} color="transparent">
-                <Toolbar className={classes.toolbar}>
-                    <Hidden smDown>
-                        <MainLogo/>
-                    </Hidden>
-                    <Hidden mdUp>
-                        <MiniLogo/>
-                    </Hidden>
-                    {(isMainStreamer || (isStreamer && isBreakout)) &&
-                    <Fragment>
-                        <StandartTooltip
-                            arrow
-                            open={!streamStartTimeIsNow && !hideTooltip}
-                            interactive
-                            placement='bottom'
-                            title={
-                                <React.Fragment>
-                                    <TooltipTitle>Start Streaming</TooltipTitle>
-                                    <TooltipText>
-                                        The Start Streaming button will become active 2 minutes before the stream's
-                                        official start time.
-                                    </TooltipText>
-                                    <TooltipButtonComponent onConfirm={() => setHideTooltip(true)} buttonText="Ok"/>
-                                </React.Fragment>
-                            }
-                        >
-                            <ButtonWithConfirm
-                                color={currentLivestream.hasStarted ? theme.palette.error.main : theme.palette.primary.main}
-                                mobile={mobile}
-                                disabled={!streamStartTimeIsNow}
-                                startIcon={currentLivestream.hasStarted ? <StopIcon/> : <PlayCircleFilledWhiteIcon/>}
-                                buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)}
-                                confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'}
-                                buttonLabel={currentLivestream.hasStarted ? `Stop ${mobile ? "" : "Streaming"}` : `Start ${mobile ? "" : "Streaming"}`}
-                                tooltipTitle={currentLivestream.hasStarted ? `Click here to stop streaming` : `Click here to start streaming`}
-                            />
-                        </StandartTooltip>
-                        {
-                            currentLivestream.hasRecordingOption &&
-                            <ButtonWithConfirm
-                                    color={currentLivestream.isRecording ? theme.palette.error.main : theme.palette.background.level3}
-                                    mobile={mobile}
-                                    disabled={loadingRecordingStatus}
-                                    startIcon={loadingRecordingStatus ? <CircularProgress size={20}/> : <FiberManualRecordIcon />}
-                                    buttonAction={currentLivestream.isRecording ? stopRecordingLivestream : startRecordingLivestream }
-                                    confirmDescription={currentLivestream.isRecording ? 'Are you sure that you want to stop recording this stream?' : 'Are you sure that you want to start recording this stream?'}
-                                    buttonLabel={currentLivestream.isRecording ? `Stop ${mobile ? "" : "Recording"}` : `Start ${mobile ? "" : "Recording"}`}
-                                    tooltipTitle={currentLivestream.isRecording ? `Click here to stop recording` : `Click here to start recording`}
-                                />
+   return (
+      <Fragment>
+         <AppBar elevation={1} color="transparent">
+            <Toolbar className={classes.toolbar}>
+               <Hidden smDown>
+                  <MainLogo white={theme.palette.type === "dark"} />
+               </Hidden>
+               <Hidden mdUp>
+                  <MiniLogo />
+               </Hidden>
+               {(isMainStreamer || (isStreamer && isBreakout)) && (
+                  <Fragment>
+                     <StandartTooltip
+                        arrow
+                        open={!streamStartTimeIsNow && !hideTooltip}
+                        interactive
+                        placement="bottom"
+                        title={
+                           <React.Fragment>
+                              <TooltipTitle>Start Streaming</TooltipTitle>
+                              <TooltipText>
+                                 The Start Streaming button will become active 2
+                                 minutes before the stream's official start
+                                 time.
+                              </TooltipText>
+                              <TooltipButtonComponent
+                                 onConfirm={() => setHideTooltip(true)}
+                                 buttonText="Ok"
+                              />
+                           </React.Fragment>
                         }
-                    </Fragment>
-                    }
-                    {mobile ?
-                        <Tooltip
-                            title={currentLivestream.hasStarted ? 'You are currently actively streaming' : 'You are currently not streaming'}>
-                            <Typography className={classes.streamStatusText} variant="h5">
-                                {currentLivestream.hasStarted ? 'LIVE' : 'NOT LIVE'}
-                            </Typography>
-                        </Tooltip>
-                        :
-                        <Box display="flex"
-                             flexDirection="column"
-                             justifyContent="center"
+                     >
+                        <ButtonWithConfirm
+                           color={
+                              currentLivestream.hasStarted
+                                 ? theme.palette.error.main
+                                 : theme.palette.primary.main
+                           }
+                           hasStarted={currentLivestream.hasStarted}
+                           mobile={mobile}
+                           disabled={!streamStartTimeIsNow}
+                           startIcon={
+                              currentLivestream.hasStarted ? (
+                                 <StopIcon />
+                              ) : (
+                                 <PlayCircleFilledWhiteIcon />
+                              )
+                           }
+                           buttonAction={() =>
+                              setStreamingStarted(!currentLivestream.hasStarted)
+                           }
+                           confirmDescription={
+                              currentLivestream.hasStarted
+                                 ? "Are you sure that you want to end your livestream now?"
+                                 : "Are you sure that you want to start your livestream now?"
+                           }
+                           buttonLabel={
+                              currentLivestream.hasStarted
+                                 ? `Stop ${mobile ? "" : "Streaming"}`
+                                 : `Start ${mobile ? "" : "Streaming"}`
+                           }
+                           tooltipTitle={
+                              currentLivestream.hasStarted
+                                 ? `Click here to stop streaming`
+                                 : `Click here to start streaming`
+                           }
+                        />
+                     </StandartTooltip>
+                  </Fragment>
+               )}
+               {mobile ? (
+                  <Tooltip
+                     title={
+                        currentLivestream.hasStarted
+                           ? "You are currently actively streaming"
+                           : "You are currently not streaming"
+                     }
+                  >
+                     <Typography
+                        className={classes.streamStatusText}
+                        variant="h5"
+                     >
+                        {currentLivestream.hasStarted ? "LIVE" : "NOT LIVE"}
+                     </Typography>
+                  </Tooltip>
+               ) : (
+                  <Box
+                     display="flex"
+                     flexDirection="column"
+                     justifyContent="center"
+                  >
+                     <Typography
+                        className={classes.streamStatusText}
+                        variant="h5"
+                     >
+                        {currentLivestream.hasStarted
+                           ? "YOU ARE LIVE"
+                           : "YOU ARE NOT LIVE"}
+                     </Typography>
+                     {currentLivestream.hasStarted
+                        ? ""
+                        : "Press Start Streaming to begin"}
+                  </Box>
+               )}
+               <Box display="flex" alignItems="center">
+                  {
+                     <Tooltip title="Invite an additional streamer">
+                        <IconButton
+                           onClick={() => {
+                              setSpeakerManagementOpen(true);
+                           }}
                         >
-                            <Typography className={classes.streamStatusText} variant="h5">
-                                {currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}
-                            </Typography>
-                            {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
-                        </Box>}
-                    <Box display="flex" alignItems="center">
-                        {
-                            <Tooltip title="Invite an additional streamer">
-                                <IconButton onClick={() => {
-                                    setSpeakerManagementOpen(true)
-                                }}>
-                                    <PersonAddIcon color="inherit"/>
-                                </IconButton>
-                            </Tooltip>
-                        }
+                           <PersonAddIcon color="inherit" />
+                        </IconButton>
+                     </Tooltip>
+                  }
 
-                        <Tooltip title="Manage breakout rooms">
-                            <IconButton disabled={openStreamerBreakoutRoomModal} onClick={handleOpenBreakoutRoomModal}>
-                                <BreakoutRoomIcon/>
-                            </IconButton>
-                        </Tooltip>
-                        {
-                            <Tooltip title="Open Student View">
-                                <IconButton target="_blank" href={viewerLink}>
-                                    <OpenInBrowserIcon color="inherit"/>
-                                </IconButton>
-                            </Tooltip>
-                        }
-                        <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
-                            <Checkbox
-                                checked={themeMode === "dark"}
-                                onChange={toggleTheme}
-                                icon={<Brightness4Icon/>}
-                                checkedIcon={<Brightness7Icon/>}
-                                color="default"
-                            />
-                        </Tooltip>
-                        <NewFeatureHint
-                            onClick={showAudience}
-                            tooltipText="Click here to see who's joined the stream since the start"
-                            localStorageKey="hasSeenAudienceDrawer"
-                            tooltipTitle="Hint"
-                        >
-                            <Box className={classes.viewCount}>
-                                {mobile ? <Tooltip title="See who joined">
-                                        <IconButton color="inherit" onClick={showAudience}>
-                                            <Badge max={999999} color="secondary"
-                                                   badgeContent={mobile ? numberOfViewers : 0}>
-                                                <PeopleIcon/>
-                                            </Badge>
-                                        </IconButton>
-                                    </Tooltip> :
-                                    <Tooltip
-                                        title={`You currently have ${numberOfViewers} ${maybePluralize(numberOfViewers, "viewer")}`}>
-                                        <Button color="primary" size="large"
-                                                startIcon={
-                                                    <Badge max={999999} color="secondary"
-                                                           anchorOrigin={{
-                                                               vertical: 'top',
-                                                               horizontal: 'right',
-                                                           }}
-
-                                                           badgeContent={numberOfViewers}>
-                                                        <PeopleIcon/>
-                                                    </Badge>
-                                                } onClick={showAudience}>
-                                            See who joined
-                                        </Button>
-                                    </Tooltip>}
-                            </Box>
-                        </NewFeatureHint>
-                    </Box>
-                </Toolbar>
-            </AppBar>
-            <SpeakerManagementModal
-                livestreamId={currentLivestream.id}
-                open={speakerManagementOpen}
-                joiningStreamerLink={joiningStreamerLink}
-                setOpen={setSpeakerManagementOpen}
-            />
-        </Fragment>
-    );
+                  <Tooltip title="Manage breakout rooms">
+                     <IconButton
+                        disabled={openStreamerBreakoutRoomModal}
+                        onClick={handleOpenBreakoutRoomModal}
+                     >
+                        <BreakoutRoomIcon />
+                     </IconButton>
+                  </Tooltip>
+                  {
+                     <Tooltip title="Open Student View">
+                        <IconButton target="_blank" href={viewerLink}>
+                           <OpenInBrowserIcon color="inherit" />
+                        </IconButton>
+                     </Tooltip>
+                  }
+                  <Tooltip
+                     title={
+                        themeMode === "dark"
+                           ? "Switch to light theme"
+                           : "Switch to dark mode"
+                     }
+                  >
+                     <Checkbox
+                        checked={themeMode === "dark"}
+                        onChange={toggleTheme}
+                        icon={<Brightness4Icon />}
+                        checkedIcon={<Brightness7Icon />}
+                        color="default"
+                     />
+                  </Tooltip>
+                  <NewFeatureHint
+                     onClick={showAudience}
+                     tooltipText="Click here to see who's joined the stream since the start"
+                     localStorageKey="hasSeenAudienceDrawer"
+                     tooltipTitle="Hint"
+                  >
+                     <Box className={classes.viewCount}>
+                        {mobile ? (
+                           <Tooltip title="See who joined">
+                              <IconButton
+                                 color="inherit"
+                                 onClick={showAudience}
+                              >
+                                 <Badge
+                                    max={999999}
+                                    color="secondary"
+                                    badgeContent={mobile ? numberOfViewers : 0}
+                                 >
+                                    <PeopleIcon />
+                                 </Badge>
+                              </IconButton>
+                           </Tooltip>
+                        ) : (
+                           <Tooltip
+                              title={`You currently have ${numberOfViewers} ${maybePluralize(
+                                 numberOfViewers,
+                                 "viewer"
+                              )}`}
+                           >
+                              <Button
+                                 color="primary"
+                                 size="large"
+                                 startIcon={
+                                    <Badge
+                                       max={999999}
+                                       color="secondary"
+                                       anchorOrigin={{
+                                          vertical: "top",
+                                          horizontal: "right",
+                                       }}
+                                       badgeContent={numberOfViewers}
+                                    >
+                                       <PeopleIcon />
+                                    </Badge>
+                                 }
+                                 onClick={showAudience}
+                              >
+                                 See who joined
+                              </Button>
+                           </Tooltip>
+                        )}
+                     </Box>
+                  </NewFeatureHint>
+               </Box>
+            </Toolbar>
+         </AppBar>
+         <SpeakerManagementModal
+            livestreamId={currentLivestream.id}
+            open={speakerManagementOpen}
+            joiningStreamerLink={joiningStreamerLink}
+            setOpen={setSpeakerManagementOpen}
+         />
+      </Fragment>
+   );
 };
 
 export default StreamerTopBar;

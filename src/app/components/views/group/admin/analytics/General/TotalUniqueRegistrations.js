@@ -1,81 +1,79 @@
-import React from 'react';
-import clsx from 'clsx';
-import PropTypes from 'prop-types';
-import {Avatar, Card, CardContent, CircularProgress, Grid, Typography} from '@material-ui/core';
-import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
-import {withFirebase} from "../../../../../../context/firebase";
+import React from "react";
+import clsx from "clsx";
+import PropTypes from "prop-types";
+import {
+   Avatar,
+   Card,
+   CardContent,
+   CircularProgress,
+   Grid,
+   Typography,
+} from "@material-ui/core";
+import LibraryAddCheckIcon from "@material-ui/icons/LibraryAddCheck";
+import { withFirebase } from "../../../../../../context/firebase";
 import PercentageDisplay from "./common/PercentageDisplay";
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import green from "@material-ui/core/colors/green";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        height: '100%'
-    },
-    avatar: {
-        backgroundColor: green[600],
-        height: 56,
-        width: 56
-    },
+   root: {
+      height: "100%",
+   },
+   avatar: {
+      backgroundColor: green[600],
+      height: 56,
+      width: 56,
+   },
 }));
 
 const TotalUniqueRegistrations = ({
-                                      globalTimeFrame,
-                                      uniqueRegistrationsStatus,
-                                      fetchingStreams,
-                                      totalUniqueRegistrations,
-                                      timeFrames,
-                                      className,
-                                      ...rest
-                                  }) => {
-    const classes = useStyles();
+   globalTimeFrame,
+   uniqueRegistrationsStatus,
+   fetchingStreams,
+   totalUniqueRegistrations,
+   timeFrames,
+   className,
+   ...rest
+}) => {
+   const classes = useStyles();
 
-    return (
-        <Card
-            className={clsx(classes.root, className)}
-            {...rest}
-        >
-            <CardContent>
-                <Grid
-                    container
-                    justify="space-between"
-                    spacing={3}
-                >
-                    <Grid item>
-                        <Typography
-                            color="textSecondary"
-                            gutterBottom
-                            variant="h6"
-                        >
-                            UNIQUE REGISTRATIONS
-                        </Typography>
-                        <Typography
-                            color="textPrimary"
-                            variant="h3"
-                        >
-                            {fetchingStreams ? <CircularProgress/> : totalUniqueRegistrations}
-                        </Typography>
-                    </Grid>
-                    <Grid item>
-                        <Avatar className={classes.avatar}>
-                            <LibraryAddCheckIcon/>
-                        </Avatar>
-                    </Grid>
-                </Grid>
-                {uniqueRegistrationsStatus.dataToCompare &&
-                <PercentageDisplay
-                    percentage={uniqueRegistrationsStatus.percentage}
-                    fetchingStreams={fetchingStreams}
-                    globalTimeFrame={globalTimeFrame}
-                    positive={uniqueRegistrationsStatus.positive}
-                />}
-            </CardContent>
-        </Card>
-    );
+   return (
+      <Card className={clsx(classes.root, className)} {...rest}>
+         <CardContent>
+            <Grid container justifyContent="space-between" spacing={3}>
+               <Grid item>
+                  <Typography color="textSecondary" gutterBottom variant="h6">
+                     UNIQUE REGISTRATIONS
+                  </Typography>
+                  <Typography color="textPrimary" variant="h3">
+                     {fetchingStreams ? (
+                        <CircularProgress />
+                     ) : (
+                        totalUniqueRegistrations
+                     )}
+                  </Typography>
+               </Grid>
+               <Grid item>
+                  <Avatar className={classes.avatar}>
+                     <LibraryAddCheckIcon />
+                  </Avatar>
+               </Grid>
+            </Grid>
+            {uniqueRegistrationsStatus.dataToCompare && (
+               <PercentageDisplay
+                  percentage={uniqueRegistrationsStatus.percentage}
+                  fetchingStreams={fetchingStreams}
+                  globalTimeFrame={globalTimeFrame}
+                  positive={uniqueRegistrationsStatus.positive}
+               />
+            )}
+         </CardContent>
+      </Card>
+   );
 };
 
 TotalUniqueRegistrations.propTypes = {
-    className: PropTypes.string
+   className: PropTypes.string,
 };
 
 export default withFirebase(TotalUniqueRegistrations);

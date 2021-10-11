@@ -1,24 +1,28 @@
 import React from 'react'
 import Link from "next/link";
 import {makeStyles} from "@material-ui/core/styles";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
     mainLogo: {
         cursor: 'pointer',
         width: '150px',
         display: 'inline-block',
-        marginTop: '10px',
+        // marginTop: '10px',
         // marginLeft: '10px'
+    },
+    logoLink:{
+        display: "flex"
     }
 }))
-export const MainLogo = ({white}) => {
+export const MainLogo = ({white, className}) => {
     const classes = useStyles()
     return (
         <Link href='/'>
-            <a>
+            <a className={classes.logoLink}>
                 <img alt="CareerFairy Logo"
-                     src={white ? '/logo_white.png' : '/logo_teal.png'}
-                     className={classes.mainLogo}/>
+                     src={white ? '/logo_white.svg' : '/logo_teal.svg'}
+                     className={clsx(classes.mainLogo, className)}/>
             </a>
         </Link>
     )

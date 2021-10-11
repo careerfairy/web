@@ -1,111 +1,136 @@
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import React from "react";
-import {makeStyles, fade, useTheme} from "@material-ui/core/styles";
-import {grey} from "@material-ui/core/colors";
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import PropTypes from 'prop-types';
-import {validateHTMLColor} from 'validate-color';
+import { makeStyles, alpha, useTheme } from "@material-ui/core/styles";
+import { grey } from "@material-ui/core/colors";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import PropTypes from "prop-types";
+import { validateHTMLColor } from "validate-color";
 
 import {
-    IconButton,
-    Slide,
-    Button,
-    ButtonGroup,
-    ClickAwayListener,
-    Grow,
-    Paper,
-    Popper,
-    MenuItem,
-    MenuList,
-    CircularProgress,
-} from '@material-ui/core';
+   IconButton,
+   Slide,
+   Button,
+   ButtonGroup,
+   ClickAwayListener,
+   Grow,
+   Paper,
+   Popper,
+   MenuItem,
+   MenuList,
+   CircularProgress,
+} from "@material-ui/core";
 
-const useStyles = makeStyles(theme => ({
-    sendIcon: {
-        background: "white",
-        color: ({isEmpty}) => isEmpty ? "grey" : theme.palette.primary.main,
-        borderRadius: "50%",
-        fontSize: 15
-    },
-    sendBtn: {
-        width: 30,
-        height: 30,
-        background: fade(theme.palette.primary.main, 0.5),
-        "&$buttonDisabled": {
-            color: grey[800]
-        },
-        "&:hover": {
-            backgroundColor: theme.palette.primary.main,
-        },
-        margin: "0.5rem"
-    },
-    buttonDisabled: {},
-    popper: {
-        zIndex: 102
-    },
-    dynamicButtonDisabled: {
-        background: `${theme.palette.action.disabledBackground} !important`,
-        color: `${theme.palette.action.disabled} !important`
-    },
-    dynamicButtonRoot: {
-        background: ({color}) => `linear-gradient(45deg, ${color || theme.palette.primary.main} 30%, ${fade(color || theme.palette.primary.main, 0.8)} 90%)`,
-        color: 'white',
-    },
+const useStyles = makeStyles((theme) => ({
+   sendIcon: {
+      background: "white",
+      color: ({ isEmpty }) => (isEmpty ? "grey" : theme.palette.primary.main),
+      borderRadius: "50%",
+      fontSize: 15,
+   },
+   sendBtn: {
+      width: 30,
+      height: 30,
+      background: alpha(theme.palette.primary.main, 0.5),
+      "&$buttonDisabled": {
+         color: grey[800],
+      },
+      "&:hover": {
+         backgroundColor: theme.palette.primary.main,
+      },
+      margin: "0.5rem",
+   },
+   buttonDisabled: {},
+   popper: {
+      zIndex: 102,
+   },
+   dynamicButtonDisabled: {
+      background: `${theme.palette.action.disabledBackground} !important`,
+      color: `${theme.palette.action.disabled} !important`,
+   },
+   dynamicButtonRoot: {
+      background: ({ color }) =>
+         `linear-gradient(45deg, ${
+            color || theme.palette.primary.main
+         } 30%, ${alpha(color || theme.palette.primary.main, 0.8)} 90%)`,
+      color: "white",
+   },
 
-    dynamicLabel: {
-        textTransform: 'capitalize',
-    },
-}))
+   dynamicLabel: {
+      textTransform: "capitalize",
+   },
+}));
 
-export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonProps, ...props}) => {
-    const classes = useStyles({isEmpty})
+export const PlayIconButton = ({
+   addNewComment,
+   isEmpty,
+   IconProps,
+   IconButtonProps,
+   ...props
+}) => {
+   const classes = useStyles({ isEmpty });
 
-    return (
-        <div {...props}>
-            <IconButton
-                {...IconButtonProps}
-                classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}}
-                disabled={isEmpty}
-                onClick={() => addNewComment()}>
-                <ChevronRightRoundedIcon
-                    {...IconProps}
-                    className={classes.sendIcon}/>
-            </IconButton>
-        </div>
-    )
-}
-const DynamicColorButton = ({disabled, startIcon, loading, color, children, ...rest}) => {
-    const theme = useTheme()
-    color = color === "secondary" ? theme.palette.secondary.main : (color === "primary" || !validateHTMLColor(color)) ? theme.palette.primary.main : color
-    const classes = useStyles({color})
-    return (
-        <Button
-            {...rest}
-            disabled={loading || disabled}
-            startIcon={!loading && startIcon}
+   return (
+      <div {...props}>
+         <IconButton
+            {...IconButtonProps}
             classes={{
-                root: classes.dynamicButtonRoot,
-                label: classes.dynamicLabel,
-                disabled: classes.dynamicButtonDisabled
+               root: classes.sendBtn,
+               disabled: classes.buttonDisabled,
             }}
-        >
-            {loading ? <CircularProgress color="inherit" size={16}/> : children}
-        </Button>
-    )
-}
-
-DynamicColorButton.propTypes = {
-    className: PropTypes.string,
-    color: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.oneOf(['primary', 'secondary']),
-    ]),
-    startIcon: PropTypes.node,
-    disabled: PropTypes.bool,
-    loading: PropTypes.bool,
-    size: PropTypes.oneOf(["small", "medium", "large"])
+            disabled={isEmpty}
+            onClick={() => addNewComment()}
+         >
+            <ChevronRightRoundedIcon
+               {...IconProps}
+               className={classes.sendIcon}
+            />
+         </IconButton>
+      </div>
+   );
+};
+const DynamicColorButton = ({
+   disabled,
+   startIcon,
+   loading,
+   color,
+   children,
+   ...rest
+}) => {
+   const theme = useTheme();
+   color =
+      color === "secondary"
+         ? theme.palette.secondary.main
+         : color === "primary" || !validateHTMLColor(color)
+         ? theme.palette.primary.main
+         : color;
+   const classes = useStyles({ color });
+   return (
+      <Button
+         {...rest}
+         disabled={loading || disabled}
+         startIcon={!loading && startIcon}
+         classes={{
+            root: classes.dynamicButtonRoot,
+            label: classes.dynamicLabel,
+            disabled: classes.dynamicButtonDisabled,
+         }}
+      >
+         {loading ? <CircularProgress color="inherit" size={16} /> : children}
+      </Button>
+   );
 };
 
+DynamicColorButton.propTypes = {
+   className: PropTypes.string,
+   color: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.oneOf(["primary", "secondary"]),
+   ]),
+   startIcon: PropTypes.node,
+   disabled: PropTypes.bool,
+   loading: PropTypes.bool,
+   size: PropTypes.oneOf(["small", "medium", "large"]),
+};
 
 //example
 // const options = [{
@@ -124,89 +149,103 @@ DynamicColorButton.propTypes = {
 // }];
 
 const CustomSplitButton = ({
-                               options = [],
-                               mainButtonProps,
-                               slideDirection = "right",
-                               sideButtonProps,
-                               ...props
-                           }) => {
-    const classes = useStyles()
-    const [open, setOpen] = React.useState(false);
-    const anchorRef = React.useRef(null);
-    const [selectedIndex, setSelectedIndex] = React.useState(0);
+   options = [],
+   mainButtonProps,
+   slideDirection = "right",
+   sideButtonProps,
+   ...props
+}) => {
+   const classes = useStyles();
+   const [open, setOpen] = React.useState(false);
+   const anchorRef = React.useRef(null);
+   const [selectedIndex, setSelectedIndex] = React.useState(0);
 
+   const handleMenuItemClick = (event, index) => {
+      setSelectedIndex(index);
+      setOpen(false);
+   };
 
-    const handleMenuItemClick = (event, index) => {
-        setSelectedIndex(index);
-        setOpen(false);
-    };
+   const handleToggle = () => {
+      setOpen((prevOpen) => !prevOpen);
+   };
 
-    const handleToggle = () => {
-        setOpen((prevOpen) => !prevOpen);
-    };
+   const handleClose = (event) => {
+      if (anchorRef.current && anchorRef.current.contains(event.target)) {
+         return;
+      }
 
-    const handleClose = (event) => {
-        if (anchorRef.current && anchorRef.current.contains(event.target)) {
-            return;
-        }
+      setOpen(false);
+   };
 
-        setOpen(false);
-    };
+   return (
+      <>
+         <Slide timeout={500} in direction={slideDirection}>
+            <ButtonGroup
+               {...props}
+               variant="contained"
+               color="primary"
+               ref={anchorRef}
+               aria-label="split button"
+            >
+               <Button
+                  {...mainButtonProps}
+                  onClick={options[selectedIndex].onClick}
+               >
+                  {options[selectedIndex].label}
+               </Button>
+               <Button
+                  {...sideButtonProps}
+                  color="primary"
+                  aria-controls={open ? "split-button-menu" : undefined}
+                  aria-expanded={open ? "true" : undefined}
+                  aria-label="Select draft create strategy"
+                  aria-haspopup="menu"
+                  startIcon={<ArrowDropDownIcon />}
+                  onClick={handleToggle}
+               >
+                  More options
+               </Button>
+            </ButtonGroup>
+         </Slide>
+         <Popper
+            className={classes.popper}
+            open={open}
+            anchorEl={anchorRef.current}
+            role={undefined}
+            transition
+            disablePortal
+         >
+            {({ TransitionProps, placement }) => (
+               <Grow
+                  {...TransitionProps}
+                  style={{
+                     transformOrigin:
+                        placement === "bottom" ? "center top" : "center top",
+                  }}
+               >
+                  <Paper>
+                     <ClickAwayListener onClickAway={handleClose}>
+                        <MenuList id="split-button-menu">
+                           {options.map((option, index) => (
+                              <MenuItem
+                                 key={option.label}
+                                 selected={index === selectedIndex}
+                                 onClick={(event) => {
+                                    handleMenuItemClick(event, index);
+                                    option.onClick();
+                                 }}
+                              >
+                                 {option.label}
+                              </MenuItem>
+                           ))}
+                        </MenuList>
+                     </ClickAwayListener>
+                  </Paper>
+               </Grow>
+            )}
+         </Popper>
+      </>
+   );
+};
 
-    return (
-        <>
-            <Slide timeout={500} in direction={slideDirection}>
-                <ButtonGroup {...props} variant="contained" color="primary" ref={anchorRef} aria-label="split button">
-                    <Button {...mainButtonProps}
-                            onClick={options[selectedIndex].onClick}>{options[selectedIndex].label}</Button>
-                    <Button
-                        {...sideButtonProps}
-                        color="primary"
-                        aria-controls={open ? 'split-button-menu' : undefined}
-                        aria-expanded={open ? 'true' : undefined}
-                        aria-label="Select draft create strategy"
-                        aria-haspopup="menu"
-                        startIcon={
-                            <ArrowDropDownIcon/>
-                        }
-                        onClick={handleToggle}
-                    >
-                        More options
-                    </Button>
-                </ButtonGroup>
-            </Slide>
-            <Popper className={classes.popper} open={open} anchorEl={anchorRef.current} role={undefined} transition
-                    disablePortal>
-                {({TransitionProps, placement}) => (
-                    <Grow
-                        {...TransitionProps}
-                        style={{
-                            transformOrigin: placement === 'bottom' ? 'center top' : 'center top',
-                        }}
-                    >
-                        <Paper>
-                            <ClickAwayListener onClickAway={handleClose}>
-                                <MenuList id="split-button-menu">
-                                    {options.map((option, index) => (
-                                        <MenuItem
-                                            key={option.label}
-                                            selected={index === selectedIndex}
-                                            onClick={(event) => {
-                                                handleMenuItemClick(event, index)
-                                                option.onClick()
-                                            }}
-                                        >
-                                            {option.label}
-                                        </MenuItem>
-                                    ))}
-                                </MenuList>
-                            </ClickAwayListener>
-                        </Paper>
-                    </Grow>
-                )}
-            </Popper>
-        </>
-    );
-}
-
-export {DynamicColorButton, CustomSplitButton}
+export { DynamicColorButton, CustomSplitButton };

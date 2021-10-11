@@ -1,27 +1,35 @@
-import React from 'react';
-import {Chip, Tooltip, Typography} from "@material-ui/core";
+import React from "react";
+import { Chip, Tooltip, Typography } from "@material-ui/core";
 
-const TargetOptions = ({options, ...props}) => {
-
-    const renderOptions = options.map(option => {
-        return <Tooltip arrow
-                        key={option.id}
-                        style={{maxWidth: "inherit"}}
-                        title={<Typography align="center" variant="body1">{option.name}</Typography>}
-                        placement="top">
+const TargetOptions = ({ options, ...props }) => {
+   const renderOptions = options.map((option) => {
+      return (
+         <Tooltip
+            arrow
+            key={option.id}
+            style={{ maxWidth: "inherit" }}
+            title={
+               <Typography align="center" variant="body1">
+                  {option.name}
+               </Typography>
+            }
+            placement="top"
+         >
             <Chip
-                variant="outlined"
-                size="small"
-                {...props}
-                style={{maxWidth: 300, background: "rgba(255,255,255, 0.5)"}}
-                label={<Typography variant="body1" noWrap>{option.name}</Typography>}/>
-        </Tooltip>
-    })
-    return (
-        <div>
-            {renderOptions}
-        </div>
-    );
+               variant="outlined"
+               size="small"
+               {...props}
+               style={{ maxWidth: 300, background: "rgba(255,255,255, 0.5)" }}
+               label={
+                  <Typography variant="body1" noWrap>
+                     {option.name}
+                  </Typography>
+               }
+            />
+         </Tooltip>
+      );
+   });
+   return <div>{renderOptions}</div>;
 };
 
 export default TargetOptions;

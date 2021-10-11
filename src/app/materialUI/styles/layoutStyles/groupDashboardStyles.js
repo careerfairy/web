@@ -1,7 +1,7 @@
 import basicLayoutStyles from "./basicLayoutStyles";
 
 const groupDashboardLayoutStyles = (theme) => ({
-    ...basicLayoutStyles(theme)
-})
+   ...basicLayoutStyles(theme),
+});
 
-export default groupDashboardLayoutStyles
+export default groupDashboardLayoutStyles;
