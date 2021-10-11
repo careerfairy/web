@@ -2262,7 +2262,6 @@ class Firebase {
    };
 
    leaveCompanyTalentPool = (companyId, userData, livestreamId) => {
-      debugger;
       let batch = this.firestore.batch();
       let userRef = this.firestore
          .collection("userData")

@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { withFirebase } from "../../context/firebase";
+import { useFirebase } from "context/firebase";
 import StreamerTopBar from "./StreamerTopBar";
 import PreparationOverlay from "../../components/views/streaming/preparation-overlay/PreparationOverlay";
 import LeftMenu from "../../components/views/streaming/LeftMenu/LeftMenu";
@@ -15,8 +15,20 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 import useStreamRef from "../../components/custom-hook/useStreamRef";
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({
+   "& ::-webkit-scrollbar": {
+      width: "3px",
+      backgroundColor: "transparent",
+      borderRadius: theme.spacing(1),
+   },
+   "& ::-webkit-scrollbar-thumb": {
+      borderRadius: theme.spacing(1),
+      WebkitBoxShadow: "inset 0 0 6px rgba(0,0,0,.3)",
+      backgroundColor: theme.palette.text.secondary,
+   },
    root: {
       position: "relative",
       height: "100vh",
@@ -64,7 +76,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const StreamerLayout = (props) => {
-   const { children, firebase, isBreakout, isMainStreamer } = props;
+   const { children, isBreakout, isMainStreamer } = props;
+   const firebase = useFirebase();
    const {
       query: { token, livestreamId: baseStreamId, breakoutRoomId, auto },
    } = useRouter();
@@ -76,17 +89,17 @@ const StreamerLayout = (props) => {
    const [notificationToRemove, setNotificationToRemove] = useState(null);
    const [notifications, setNotifications] = useState([]);
    const [streamerId, setStreamerId] = useState(null);
+   const dispatch = useDispatch();
 
    const [streamerReady, setStreamerReady] = useState(false);
    const [tokenChecked, setTokenChecked] = useState(false);
-   const [showMenu, setShowMenu] = useState(true);
+   const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen);
    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
    const [selectedState, setSelectedState] = useState("questions");
    const [sliding, setSliding] = useState(false);
 
-
    const currentLivestream = useStreamConnect();
-   useStreamerActiveHandRaisesConnect()
+   useStreamerActiveHandRaisesConnect();
 
    const classes = useStyles({
       showMenu,
@@ -161,7 +174,7 @@ const StreamerLayout = (props) => {
 
    useEffect(() => {
       if (smallScreen && showMenu) {
-         setShowMenu(false);
+         closeLeftMenu();
       }
    }, [smallScreen]);
 
@@ -174,6 +187,9 @@ const StreamerLayout = (props) => {
       }
    }, [notificationToRemove]);
 
+   const closeLeftMenu = () => dispatch(actions.closeLeftMenu());
+   const openLeftMenu = () => dispatch(actions.openLeftMenu());
+
    const showAudience = useCallback(() => {
       setAudienceDrawerOpen(true);
    }, []);
@@ -182,11 +198,10 @@ const StreamerLayout = (props) => {
       setAudienceDrawerOpen(false);
    }, []);
 
-
    const handleStateChange = useCallback(
       (state) => {
          if (!showMenu) {
-            setShowMenu(true);
+            openLeftMenu();
          }
          setSliding(true);
          setSelectedState(state);
@@ -201,9 +216,6 @@ const StreamerLayout = (props) => {
          return tokenChecked;
       }
    };
-   const toggleShowMenu = useCallback(() => {
-      setShowMenu(!showMenu);
-   }, [showMenu]);
 
    if (
       !isLoaded(currentLivestream) ||
@@ -249,9 +261,6 @@ const StreamerLayout = (props) => {
                   sliding={sliding}
                   setSliding={setSliding}
                   livestream={currentLivestream}
-                  showMenu={showMenu}
-                  setShowMenu={setShowMenu}
-                  toggleShowMenu={toggleShowMenu}
                />
 
                <div className={classes.wrapper}>
@@ -264,7 +273,6 @@ const StreamerLayout = (props) => {
                            isStreamer: true,
                            hideAudience,
                            audienceDrawerOpen,
-                           setShowMenu,
                            setSliding,
                            smallScreen,
                            selectedState,
@@ -287,4 +295,4 @@ StreamerLayout.propTypes = {
    children: PropTypes.node.isRequired,
    firebase: PropTypes.object,
 };
-export default withFirebase(StreamerLayout);
+export default StreamerLayout;

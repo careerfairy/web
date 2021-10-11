@@ -1,10 +1,4 @@
-import React, {
-   Fragment,
-   useCallback,
-   useEffect,
-   useMemo,
-   useState,
-} from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { withFirebasePage } from "context/firebase";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
 import useDevices from "components/custom-hook/useDevices";
@@ -61,6 +55,9 @@ function ViewerComponent({
    streamerId,
    mobile,
 }) {
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
    const classes = useStyles();
    const dispatch = useDispatch();
    const [showSettings, setShowSettings] = useState(false);
@@ -213,7 +210,7 @@ function ViewerComponent({
 
    return (
       <React.Fragment>
-         {!Boolean(mobile && handRaiseActive) && (
+         {!Boolean(mobile && handRaiseActive) && !focusModeEnabled && (
             <EmoteButtons createEmote={createEmote} />
          )}
          <Streams

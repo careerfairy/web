@@ -17,9 +17,9 @@ const useStyles = makeStyles((theme) => ({
       fontSize: "2rem",
       color: theme.palette.primary.main,
    },
-  contentText:{
-     marginBottom: 0
-  }
+   contentText: {
+      marginBottom: 0,
+   },
 }));
 
 const Content = ({ handleClose, requestHandRaise }) => {
@@ -33,14 +33,15 @@ const Content = ({ handleClose, requestHandRaise }) => {
          </DialogTitle>
          <DialogContent dividers>
             <DialogContentText className={classes.contentText}>
-               Would you like to request to join with audio and video?
+               The hosts would like for you to see and hear you, would you like
+               to request to <b>join with audio and video</b>?
             </DialogContentText>
          </DialogContent>
          <DialogActions>
-            <Button children="Cancel" onClick={handleClose} />
+            <Button children="Join without" onClick={handleClose} />
             <Button
                variant="contained"
-               children="Request to Join"
+               children="Request to Join with video and audio"
                color="primary"
                onClick={requestHandRaise}
             />

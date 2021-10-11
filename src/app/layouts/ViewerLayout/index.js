@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { withFirebase } from "../../context/firebase";
+import { useFirebase } from "context/firebase";
 import { useRouter } from "next/router";
 import ViewerTopBar from "./ViewerTopBar";
 import { isLoaded } from "react-redux-firebase";
@@ -13,21 +13,28 @@ import { CurrentStreamContext } from "../../context/stream/StreamContext";
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 import PropTypes from "prop-types";
 import useStreamRef from "../../components/custom-hook/useStreamRef";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHandRaiseConnect";
 
 const useStyles = makeStyles((theme) => ({
    root: {
       position: "relative",
-      // minHeight: "100vh",
+      "& ::-webkit-scrollbar": {
+         width: "3px",
+         backgroundColor: "transparent",
+         borderRadius: theme.spacing(1),
+      },
+      "& ::-webkit-scrollbar-thumb": {
+         borderRadius: theme.spacing(1),
+         WebkitBoxShadow: "inset 0 0 6px rgba(0,0,0,.3)",
+         backgroundColor: theme.palette.text.secondary,
+      },
       height: "100vh",
       width: "100%",
       touchAction: "manipulation",
-      // border: "6px solid pink",
       backgroundColor: theme.palette.background.dark,
       display: "flex",
-      // height: '100vh',
       overflow: "hidden",
    },
    wrapper: {
@@ -45,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
          paddingLeft: 0,
       },
       [theme.breakpoints.up("mobile")]: {
-         paddingTop: 55,
+         paddingTop: ({ focusModeEnabled }) => !focusModeEnabled && 55,
       },
    },
    contentContainer: {
@@ -63,7 +70,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ViewerLayout = (props) => {
-   const { children, firebase, isBreakout } = props;
+   const { children, isBreakout } = props;
+   const firebase = useFirebase();
    const {
       query: { livestreamId, breakoutRoomId },
       replace,
@@ -77,11 +85,13 @@ const ViewerLayout = (props) => {
    const mobile = useMediaQuery(`(max-width:${values.mobile}px)`);
    const streamRef = useStreamRef();
    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
-   const [showMenu, setShowMenu] = useState(false);
    const [handRaiseActive, setHandRaiseActive] = useState(false);
    const [streamerId, setStreamerId] = useState(null);
-   const classes = useStyles({ showMenu, mobile });
-
+   const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen);
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
+   const classes = useStyles({ showMenu, mobile, focusModeEnabled });
    const [selectedState, setSelectedState] = useState("questions");
 
    const currentLivestream = useStreamConnect();
@@ -96,9 +106,11 @@ const ViewerLayout = (props) => {
 
    useEffect(() => {
       if (mobile) {
-         setShowMenu(false);
+         closeLeftMenu();
       } else {
-         setShowMenu(true);
+         if (!focusModeEnabled) {
+            openLeftMenu();
+         }
       }
    }, [mobile]);
 
@@ -118,7 +130,7 @@ const ViewerLayout = (props) => {
       userData?.firstName,
       userData?.lastName,
       breakoutRoomId,
-      streamRef
+      streamRef,
    ]);
 
    useEffect(() => {
@@ -154,10 +166,13 @@ const ViewerLayout = (props) => {
       });
    }
 
+   const closeLeftMenu = () => dispatch(actions.closeLeftMenu());
+   const openLeftMenu = () => dispatch(actions.openLeftMenu());
+
    const handleStateChange = useCallback(
       (state) => {
          if (!showMenu) {
-            setShowMenu(true);
+            openLeftMenu();
          }
          setSelectedState(state);
       },
@@ -171,10 +186,6 @@ const ViewerLayout = (props) => {
    const hideAudience = useCallback(() => {
       setAudienceDrawerOpen(false);
    }, []);
-
-   const toggleShowMenu = useCallback(() => {
-      setShowMenu(!showMenu);
-   }, [showMenu]);
 
    if (!isLoaded(currentLivestream) || notAuthorized) {
       return <Loader />;
@@ -197,10 +208,7 @@ const ViewerLayout = (props) => {
                selectedState={selectedState}
                setSelectedState={setSelectedState}
                livestream={currentLivestream}
-               showMenu={showMenu}
-               setShowMenu={setShowMenu}
                isMobile={mobile}
-               toggleShowMenu={toggleShowMenu}
             />
 
             <div className={classes.wrapper}>
@@ -212,7 +220,6 @@ const ViewerLayout = (props) => {
                         selectedState,
                         setSelectedState,
                         showMenu,
-                        setShowMenu,
                         streamerId,
                         mobile,
                         showAudience,
@@ -229,7 +236,6 @@ const ViewerLayout = (props) => {
 
 ViewerLayout.propTypes = {
    children: PropTypes.node.isRequired,
-   firebase: PropTypes.object,
 };
 
-export default withFirebase(ViewerLayout);
+export default ViewerLayout;
