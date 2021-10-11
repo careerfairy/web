@@ -132,7 +132,7 @@ const ErrorModal = memo(
          (agoraRtcConnectionStatus.curState === "DISCONNECTED" ||
             agoraRtcConnectionStatus.curState === "CONNECTING");
       const showError =
-         errorInRtc || errorInRtm || (errorInRtcConnection && state === "open");
+         (errorInRtc || errorInRtm || errorInRtcConnection) && state === "open";
 
       useEffect(() => {
          setState("open");
