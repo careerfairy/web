@@ -14,8 +14,8 @@ import clsx from "clsx";
 import { Box, Tooltip } from "@material-ui/core";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
-import InternetIcon from '@material-ui/icons/Wifi';
-import ServerIcon from "@material-ui/icons/CheckCircleOutline"
+import InternetIcon from "@material-ui/icons/Wifi";
+import ServerIcon from "@material-ui/icons/CheckCircleOutline";
 const gradient = [
    "rgba(0,0,0,0.5)",
    "#54db00",
@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
       color: ({ downlinkIndex }) => gradient[downlinkIndex],
       width: theme.spacing(2),
    },
-   svg:{
+   svg: {
       fontSize: "1.9em",
    },
    text: {
@@ -207,22 +207,37 @@ const WifiIndicator = ({
       switch (status) {
          case "RTM_CONNECTED":
             return {
-               icon: <InternetIcon  className={classes.svg} style={{ color: "#00F92C" }} />,
+               icon: (
+                  <InternetIcon
+                     className={classes.svg}
+                     style={{ color: "#00F92C" }}
+                  />
+               ),
                message: "You are connected to the internet",
             };
          case "RTM_NETWORK_INTERRUPTED":
             return {
-               icon: <WarningIcon  className={classes.svg} style={{ color: "#FFEF00" }} />,
+               icon: (
+                  <WarningIcon
+                     className={classes.svg}
+                     style={{ color: "#FFEF00" }}
+                  />
+               ),
                message: "Attempting to connect to the internet...",
             };
          case "RTM_DISCONNECTED":
             return {
-               icon: <ErrorOutlineIcon  className={classes.svg} style={{ color: "#FF3200" }} />,
+               icon: (
+                  <ErrorOutlineIcon
+                     className={classes.svg}
+                     style={{ color: "#FF3200" }}
+                  />
+               ),
                message: "You are disconnected from the internet",
             };
          default:
             return {
-               icon: <CachedIcon  className={classes.svg} />,
+               icon: <CachedIcon className={classes.svg} />,
                message: "Waiting for connection status...",
             };
       }
@@ -232,17 +247,32 @@ const WifiIndicator = ({
       switch (status) {
          case "CONNECTED":
             return {
-               icon: <ServerIcon className={classes.svg} style={{ color: "#00F92C" }} />,
+               icon: (
+                  <ServerIcon
+                     className={classes.svg}
+                     style={{ color: "#00F92C" }}
+                  />
+               ),
                message: "You are connected to our streaming server",
             };
          case "CONNECTING":
             return {
-               icon: <WarningIcon className={classes.svg} style={{ color: "#FFEF00" }} />,
+               icon: (
+                  <WarningIcon
+                     className={classes.svg}
+                     style={{ color: "#FFEF00" }}
+                  />
+               ),
                message: "Attempting to connect to our streaming server...",
             };
          case "DISCONNECTED":
             return {
-               icon: <ErrorOutlineIcon className={classes.svg} style={{ color: "#FF3200" }} />,
+               icon: (
+                  <ErrorOutlineIcon
+                     className={classes.svg}
+                     style={{ color: "#FF3200" }}
+                  />
+               ),
                message: "You are disconnected from our streaming server",
             };
          default:
@@ -265,75 +295,74 @@ const WifiIndicator = ({
       [agoraRtcConnectionStatus?.curState]
    );
 
-   return  (
-        <Box  {...rest} className={clsx(classes.root, className)}>
-           <Box>
-              <Tooltip title={rtmConnectionInfo.message}>
-                 <Box
-                   marginRight={1}
-                   marginBottom={1}
-                   alignItems="left"
-                   className={classes.subBox}
-                 >
-                    <Box display="flex" marginRight={1}>
-                       {rtmConnectionInfo.icon}
-                    </Box>
-                    <Box display="flex" className={classes.text}>
-                       Internet
-                    </Box>
-                 </Box>
-              </Tooltip>
-              <Tooltip title={rtcConnectionInfo.message}>
-                 <Box
-                   marginRight={1}
-                   marginBottom={1}
-                   alignItems="left"
-                   className={classes.subBox}
-                 >
-                    <Box display="flex" marginRight={1}>
-                       {rtcConnectionInfo.icon}
-                    </Box>
-                    <Box display="flex" className={classes.text}>
-                       Streaming
-                    </Box>
-                 </Box>
-              </Tooltip>
-           </Box>
-           <Box className={classes.subBox}>
-              <Tooltip
-                style={{ color: uplinkInfo.color }}
-                placement="top"
-                title={uplinkInfo.description}
-              >
-                 <Box marginRight={1} alignItems="center" display="flex">
-                    {uplinkInfo.icon}
-                    <ArrowUp
-                      className={clsx(
+   return (
+      <Box {...rest} className={clsx(classes.root, className)}>
+         <Box>
+            <Tooltip title={rtmConnectionInfo.message}>
+               <Box
+                  marginRight={1}
+                  marginBottom={1}
+                  alignItems="left"
+                  className={classes.subBox}
+               >
+                  <Box display="flex" marginRight={1}>
+                     {rtmConnectionInfo.icon}
+                  </Box>
+                  <Box display="flex" className={classes.text}>
+                     Internet
+                  </Box>
+               </Box>
+            </Tooltip>
+            <Tooltip title={rtcConnectionInfo.message}>
+               <Box
+                  marginRight={1}
+                  marginBottom={1}
+                  alignItems="left"
+                  className={classes.subBox}
+               >
+                  <Box display="flex" marginRight={1}>
+                     {rtcConnectionInfo.icon}
+                  </Box>
+                  <Box display="flex" className={classes.text}>
+                     Streaming
+                  </Box>
+               </Box>
+            </Tooltip>
+         </Box>
+         <Box className={classes.subBox}>
+            <Tooltip
+               style={{ color: uplinkInfo.color }}
+               placement="top"
+               title={uplinkInfo.description}
+            >
+               <Box marginRight={1} alignItems="center" display="flex">
+                  {uplinkInfo.icon}
+                  <ArrowUp
+                     className={clsx(
                         classes.arrowUplinkIcon,
                         classes.svgShadow
-                      )}
-                    />
-                 </Box>
-              </Tooltip>
-              <Tooltip
-                style={{ color: downlinkInfo.color }}
-                placement="top"
-                title={downlinkInfo.description}
-              >
-                 <Box alignItems="center" display="flex">
-                    {downlinkInfo.icon}
-                    <ArrowDown
-                      className={clsx(
+                     )}
+                  />
+               </Box>
+            </Tooltip>
+            <Tooltip
+               style={{ color: downlinkInfo.color }}
+               placement="top"
+               title={downlinkInfo.description}
+            >
+               <Box alignItems="center" display="flex">
+                  {downlinkInfo.icon}
+                  <ArrowDown
+                     className={clsx(
                         classes.arrowDownlinkIcon,
                         classes.svgShadow
-                      )}
-                    />
-                 </Box>
-              </Tooltip>
-           </Box>
-        </Box>
+                     )}
+                  />
+               </Box>
+            </Tooltip>
+         </Box>
+      </Box>
    );
-
 };
 
 WifiIndicator.propTypes = {

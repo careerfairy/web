@@ -2,6 +2,11 @@ import { useEffect, useState, useRef } from "react";
 
 export default function useAgoraClientConfig(rtcClient, streamerId) {
    const [remoteStreams, setRemoteStreams] = useState([]);
+   const [networkQuality, setNetworkQuality] = useState({
+      downlinkNetworkQuality: 0,
+      type: "network-quality",
+      uplinkNetworkQuality: 0,
+   });
 
    const remoteStreamsRef = useRef(remoteStreams);
 
@@ -29,9 +34,7 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
 
    const configureAgoraClient = () => {
       let AgoraRTC = require("agora-rtc-sdk-ng");
-      AgoraRTC.onAudioAutoplayFailed = () => {
-         debugger;
-      };
+      AgoraRTC.onAudioAutoplayFailed = () => {};
       rtcClient.on("user-joined", async (remoteUser) => {
          let cleanedRemoteStreams = removeStreamFromList(
             remoteUser.uid,
@@ -58,9 +61,6 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
       });
 
       rtcClient.on("user-published", async (remoteUser, mediaType) => {
-         if (remoteUser.uid === `${streamerId}screen`) {
-            return;
-         }
          try {
             await rtcClient.subscribe(remoteUser, mediaType);
          } catch (error) {
@@ -99,10 +99,10 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
          updateRemoteStreams(remoteStreams);
       });
 
-      rtcClient.on("network-quality", function (networkStats) {
-         //  setNetworkQuality(networkStats);
+      rtcClient.on("network-quality", (networkStats) => {
+         setNetworkQuality(networkStats);
       });
    };
 
-   return { remoteStreams };
+   return { remoteStreams, networkQuality };
 }

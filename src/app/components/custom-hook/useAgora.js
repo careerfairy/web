@@ -16,28 +16,32 @@ export default function useAgora(streamerId, isStreamer) {
    const cfToken = router.query.token || "";
 
    const [localStream, setLocalStream] = useState(null);
+   const [primaryRtcClient, setPrimaryRtcClient] = useState(null);
 
    const { fetchAgoraRtcToken } = useFirebase();
 
-   const [rtcClient, setRtcClient] = useState(null);
-   const { remoteStreams } = useAgoraClientConfig(rtcClient, streamerId);
+   const [screenShareStream, setScreenShareStream] = useState(null);
+   const screenShareStreamRef = useRef(screenShareStream);
+   const [screenShareRtcClient, setScreenShareRtcClient] = useState(null);
+   const screenShareRtcClientRef = useRef(screenShareRtcClient);
+
+   const { remoteStreams, networkQuality } = useAgoraClientConfig(
+      primaryRtcClient,
+      streamerId
+   );
 
    useEffect(() => {
       if (window) {
-         let AgoraRTC = require("agora-rtc-sdk-ng");
-         let client = AgoraRTC.createClient({
-            mode: "live",
-            codec: "h264",
-         });
-         setRtcClient(client);
+         let client = createAgoraClient();
+         setPrimaryRtcClient(client);
       }
    }, [window]);
 
    useEffect(() => {
-      if (rtcClient) {
-         joinAgoraRoom();
+      if (primaryRtcClient) {
+         joinAgoraRoomWithPrimaryClient();
       }
-   }, [rtcClient]);
+   }, [primaryRtcClient]);
 
    useEffect(() => {
       if (isStreamer) {
@@ -49,25 +53,54 @@ export default function useAgora(streamerId, isStreamer) {
       }
    }, [isStreamer]);
 
-   const joinAgoraRoom = async () => {
-      const roomId = streamerId;
+   const updateScreenShareRtcClient = (newScreenShareRtcClient) => {
+      screenShareRtcClientRef.current = newScreenShareRtcClient;
+      setScreenShareRtcClient(newScreenShareRtcClient);
+   };
+
+   const updateScreenShareStream = (newScreenShareStream) => {
+      screenShareStreamRef.current = newScreenShareStream;
+      setScreenShareStream(newScreenShareStream);
+   };
+
+   const getAgoraRTC = () => {
+      return require("agora-rtc-sdk-ng");
+   };
+
+   const createAgoraClient = () => {
+      let AgoraRTC = getAgoraRTC();
+      return AgoraRTC.createClient({
+         mode: "live",
+         codec: "vp8",
+      });
+   };
+
+   const joinAgoraRoom = async (rtcClient, roomId, userUid, isStreamer) => {
       const { data } = await fetchAgoraRtcToken({
-         isStreamer: true,
-         uid: roomId,
+         isStreamer: isStreamer,
+         uid: userUid,
          sentToken: cfToken,
          channelName: roomId,
          streamDocumentPath: path,
       });
-      await rtcClient.join(
-         AGORA_APP_ID,
-         streamerId,
-         data.token.rtcToken,
-         streamerId
-      );
+      return rtcClient.join(AGORA_APP_ID, roomId, data.token.rtcToken, userUid);
+   };
+
+   const joinAgoraRoomWithPrimaryClient = async () => {
+      try {
+         await joinAgoraRoom(
+            primaryRtcClient,
+            streamerId,
+            streamerId,
+            isStreamer
+         );
+      } catch (error) {
+         // handle join error
+      }
    };
 
    const initializeLocalStream = async () => {
-      let AgoraRTC = require("agora-rtc-sdk-ng");
+      let AgoraRTC = getAgoraRTC();
       const localAudio = await AgoraRTC.createMicrophoneAudioTrack();
       const localVideo = await AgoraRTC.createCameraVideoTrack({
          encoderConfig: "480p_9",
@@ -109,18 +142,16 @@ export default function useAgora(streamerId, isStreamer) {
       });
    };
 
-   const publishStream = (client, stream) => {
-      if (stream && stream.audioTrack && stream.videoTrack) {
+   const publishTracks = (client, tracks, isCameraStream) => {
+      if (tracks) {
          return new Promise(async (resolve, reject) => {
             try {
                await client.setClientRole("host");
-               await client.publish([stream.audioTrack, stream.videoTrack]);
-               await client.enableDualStream();
-               client.enableAudioVolumeIndicator();
-               setLocalStream({
-                  ...localStream,
-                  isPublished: true,
-               });
+               await client.publish(tracks);
+               if (isCameraStream) {
+                  await client.enableDualStream();
+                  client.enableAudioVolumeIndicator();
+               }
                resolve();
             } catch (error) {
                reject(error);
@@ -130,13 +161,122 @@ export default function useAgora(streamerId, isStreamer) {
    };
 
    const publishLocalCameraStream = () => {
-      return publishStream(rtcClient, localStream);
+      return new Promise(async (resolve, reject) => {
+         try {
+            let localStreamTracks = [
+               localStream.audioTrack,
+               localStream.videoTrack,
+            ];
+            await publishTracks(primaryRtcClient, localStreamTracks, true);
+            setLocalStream({
+               ...localStream,
+               isPublished: true,
+            });
+            resolve();
+         } catch (error) {
+            reject(error);
+         }
+      });
+   };
+
+   const publishScreenShareStream = async (
+      screenSharingMode,
+      onScreenShareStopped
+   ) => {
+      return new Promise(async (resolve, reject) => {
+         let screenShareClient = createAgoraClient();
+         try {
+            const screenShareUid = `${streamerId}screen`;
+            await joinAgoraRoom(
+               screenShareClient,
+               streamerId,
+               screenShareUid,
+               true
+            );
+            publishScreenShareTracks(
+               screenShareClient,
+               screenSharingMode,
+               onScreenShareStopped
+            );
+            updateScreenShareRtcClient(screenShareClient);
+            resolve();
+         } catch (error) {
+            reject(error);
+         }
+      });
+   };
+
+   const unpublishScreenShareStream = async () => {
+      return new Promise(async (resolve, reject) => {
+         try {
+            let screenShareRtcClient = screenShareRtcClientRef.current;
+            let screenShareStream = screenShareStreamRef.current;
+            await screenShareRtcClient.unpublish(screenShareStream);
+            if (Array.isArray(screenShareStream)) {
+               screenShareStream.forEach((track) => track.close());
+            } else {
+               screenShareStream.close();
+            }
+            await screenShareRtcClient.leave();
+            updateScreenShareStream(null);
+            resolve();
+         } catch (error) {
+            reject(error);
+         }
+      });
+   };
+
+   const publishScreenShareTracks = async (
+      screenShareClient,
+      screenSharingMode,
+      onScreenShareStopped
+   ) => {
+      let screenShareTracks = await getScreenShareStream(
+         screenSharingMode,
+         onScreenShareStopped
+      );
+      updateScreenShareStream(screenShareTracks);
+      return publishTracks(screenShareClient, screenShareTracks, false);
+   };
+
+   const getScreenShareStream = async (
+      screenSharingMode,
+      onScreenShareStopped
+   ) => {
+      return new Promise(async (resolve, reject) => {
+         let screenShareVideoResolution =
+            screenSharingMode === "motion" ? "720p_2" : "1080p_1";
+         try {
+            const tracksObject = await getAgoraRTC().createScreenVideoTrack(
+               {
+                  encoderConfig: screenShareVideoResolution,
+               },
+               "auto"
+            );
+            const videoTrack = Array.isArray(tracksObject)
+               ? tracksObject[0]
+               : tracksObject;
+            videoTrack.on("track-ended", onScreenShareStopped);
+            resolve(tracksObject);
+         } catch (error) {
+            if (error.code === "PERMISSION_DENIED") {
+               //handle case that user has cancel screen share within browser
+            } else if (error.code === "SHARE_AUDIO_NOT_ALLOWED") {
+               // handle share audio not allowed
+            } else {
+               reject(error);
+            }
+         }
+      });
    };
 
    return {
+      networkQuality,
       localStream,
       localMediaControls: { setLocalAudioEnabled, setLocalVideoEnabled },
       remoteStreams,
       publishLocalCameraStream,
+      publishScreenShareStream,
+      unpublishScreenShareStream,
    };
 }

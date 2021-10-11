@@ -2,14 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import CheckIcon from "@material-ui/icons/Check";
 import {
-   DialogContentText,
    DialogTitle,
    Typography,
    Slide,
    DialogContent as MuiDialogContent,
    DialogActions as MuiDialogActions,
    Dialog,
-   TextField,
    Button,
    FormControl,
    InputLabel,
@@ -105,6 +103,7 @@ function StreamPublishingModal({
                         marginBottom: 20,
                         fontSize: "0.8rem",
                         width: "100%",
+                        maxHeight: 200,
                      }}
                      size="small"
                      variant="outlined"
@@ -144,6 +143,7 @@ function StreamPublishingModal({
                         boxShadow: "0 0 3px rgb(200,200,200)",
                         borderRadius: "5px",
                         width: "100%",
+                        maxHeight: 150,
                         background: "black",
                      }}
                      ref={testVideoRef}
