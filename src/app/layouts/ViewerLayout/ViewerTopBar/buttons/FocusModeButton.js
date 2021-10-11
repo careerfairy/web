@@ -18,7 +18,7 @@ const FocusModeButton = ({ primary, mobile }) => {
    return (
       <Tooltip
          title={`Press to ${
-            focusModeEnabled ? "disable" : "enable"
+            focusModeEnabled ? "enable" : "disable"
          } emotes and hide the ui elements when not in use.`}
       >
          <IconButton

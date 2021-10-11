@@ -51,3 +51,9 @@ export const setEmote = (message, memberId) => async (dispatch, getState) => {
    dispatch(emoteAction);
    return emoteAction;
 };
+
+export const clearAllEmotes = () => async (dispatch) => {
+   return dispatch({
+      type: actions.CLEAR_ALL_EMOTES,
+   });
+};

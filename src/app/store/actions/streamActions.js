@@ -104,6 +104,8 @@ export const setFocusMode = (mode, mobile) => async (dispatch, getState) => {
       type: actions.SET_FOCUS_MODE,
       payload: Boolean(newFocusMode),
    });
+
+   dispatch({ type: actions.CLEAR_ALL_EMOTES });
    if (newFocusMode) {
       return dispatch(closeLeftMenu());
    } else {
