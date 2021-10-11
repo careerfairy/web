@@ -6,7 +6,7 @@ const initialState = {
       viewerBreakoutRoomModalOpen: false,
       viewerCtaModalOpen: false,
       leftMenuOpen: true,
-      focusMode: false,
+      focusModeEnabled: false,
    },
    stats: {
       numberOfViewers: 0,

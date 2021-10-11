@@ -88,7 +88,12 @@ const LeftMenu = ({
       }
    }, [selectedState, showMenu, isMobile]);
    useEffect(() => {
-      if (selectedState === "chat" && showMenu && !isMobile) {
+      if (
+         selectedState === "chat" &&
+         showMenu &&
+         !isMobile &&
+         !focusModeEnabled
+      ) {
          setSelectedState("questions");
          setValue(0);
       }
@@ -139,7 +144,7 @@ const LeftMenu = ({
       </TabPanel>,
    ];
 
-   if (showMenu && isMobile) {
+   if (showMenu && (isMobile || focusModeEnabled)) {
       views.push(
          <TabPanel key={3} value={value} index={3} dir={theme.direction}>
             <ChatCategory

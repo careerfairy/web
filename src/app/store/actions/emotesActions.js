@@ -43,7 +43,10 @@ export const createEmote = (emoteType) => async (dispatch, getState) => {
 };
 
 // set an emote received from the channel socket listener
-export const setEmote = (message, memberId) => async (dispatch) => {
+export const setEmote = (message, memberId) => async (dispatch, getState) => {
+   const focusModeEnabled = getState().stream.layout.focusModeEnabled;
+   // Dont bother sending or storing emotes in redux when focus mode is enabled
+   if (focusModeEnabled) return;
    const emoteAction = buildEmoteAction(message, memberId);
    dispatch(emoteAction);
    return emoteAction;
