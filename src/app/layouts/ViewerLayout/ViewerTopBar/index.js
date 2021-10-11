@@ -65,6 +65,9 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 120,
       display: "flex",
       alignItems: "baseline",
+      "& svg": {
+         filter: `drop-shadow(0px 0px 3px rgba(0,0,0,0.4))`,
+      },
    },
 }));
 

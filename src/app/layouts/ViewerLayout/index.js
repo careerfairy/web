@@ -20,14 +20,21 @@ import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHan
 const useStyles = makeStyles((theme) => ({
    root: {
       position: "relative",
-      // minHeight: "100vh",
+      "& ::-webkit-scrollbar": {
+         width: "3px",
+         backgroundColor: "transparent",
+         borderRadius: theme.spacing(1),
+      },
+      "& ::-webkit-scrollbar-thumb": {
+         borderRadius: theme.spacing(1),
+         WebkitBoxShadow: "inset 0 0 6px rgba(0,0,0,.3)",
+         backgroundColor: theme.palette.text.secondary,
+      },
       height: "100vh",
       width: "100%",
       touchAction: "manipulation",
-      // border: "6px solid pink",
       backgroundColor: theme.palette.background.dark,
       display: "flex",
-      // height: '100vh',
       overflow: "hidden",
    },
    wrapper: {

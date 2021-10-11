@@ -19,6 +19,16 @@ import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({
+   "& ::-webkit-scrollbar": {
+      width: "3px",
+      backgroundColor: "transparent",
+      borderRadius: theme.spacing(1),
+   },
+   "& ::-webkit-scrollbar-thumb": {
+      borderRadius: theme.spacing(1),
+      WebkitBoxShadow: "inset 0 0 6px rgba(0,0,0,.3)",
+      backgroundColor: theme.palette.text.secondary,
+   },
    root: {
       position: "relative",
       height: "100vh",

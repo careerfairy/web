@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { IconButton, Tooltip } from "@material-ui/core";
-import FocusInactiveIcon from "@material-ui/icons/PersonalVideo";
-import FocusModeActiveIcon from "@material-ui/icons/PersonalVideoTwoTone";
+import FocusInactiveIcon from "@material-ui/icons/NotificationsActiveOutlined";
+import FocusModeActiveIcon from "@material-ui/icons/NotificationsOff";
 import * as actions from "store/actions";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -17,9 +17,17 @@ const FocusModeButton = ({ primary, mobile }) => {
 
    return (
       <Tooltip
-         title={`Press to ${
-            focusModeEnabled ? "enable" : "disable"
-         } emotes and hide the ui elements when not in use.`}
+         title={
+            focusModeEnabled ? (
+               <>
+                  Focus Mode <br /> Press to show emoticons and the chat bar
+               </>
+            ) : (
+               <>
+                  Focus Mode <br /> Press to hide emoticons and the chat bar
+               </>
+            )
+         }
       >
          <IconButton
             color={focusModeEnabled || primary ? "primary" : "default"}
