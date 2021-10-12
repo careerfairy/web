@@ -11,7 +11,7 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(
 
       functions.logger.log("admins Info in approval request", adminsInfo);
 
-      const emails = adminsInfo.map(({ email, link }) => ({
+      const emails = adminsInfo.map(({ email, draftDashboardLink }) => ({
          TemplateId: 22299429,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: email,
@@ -19,7 +19,7 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(
             sender_name: req.body.sender_name,
             livestream_title: req.body.livestream_title,
             livestream_company_name: req.body.livestream_company_name,
-            draft_stream_link: link,
+            draft_stream_link: draftDashboardLink,
             submit_time: req.body.submit_time,
          },
       }));
@@ -29,6 +29,49 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(
             responses.forEach((response) =>
                functions.logger.log(
                   "sent batch DraftApprovalRequestEmail email with response:",
+                  response
+               )
+            );
+            return res.send(200);
+         },
+         (error) => {
+            functions.logger.error("error:" + error);
+            console.log("error:" + error);
+            return res.status(400).send(error);
+         }
+      );
+   }
+);
+
+exports.sendNewlyPublishedEventEmail = functions.https.onRequest(
+   async (req, res) => {
+      setHeaders(req, res);
+
+      const adminsInfo = req.body.adminsInfo || [];
+
+      functions.logger.log("admins Info in newly published event", adminsInfo);
+
+      const emails = adminsInfo.map(
+         ({ email, dashboard_link, nextLivestreams_link }) => ({
+            TemplateId: 25484780,
+            From: "CareerFairy <noreply@careerfairy.io>",
+            To: email,
+            TemplateModel: {
+               sender_name: req.body.sender_name,
+               dashboard_link: dashboard_link,
+               next_livestreams_link: nextLivestreams_link,
+               livestream_title: req.body.livestream_title,
+               livestream_company_name: req.body.livestream_company_name,
+               submit_time: req.body.submit_time,
+            },
+         })
+      );
+
+      client.sendEmailBatchWithTemplates(emails).then(
+         (responses) => {
+            responses.forEach((response) =>
+               functions.logger.log(
+                  "sent batch newlyPublishedEventEmail email with response:",
                   response
                )
             );
@@ -90,7 +133,7 @@ exports.updateUserDocAdminStatus = functions.firestore
             return;
          }
 
-         newAdmins.forEach(async (adminEmail) => {
+         for (const adminEmail of newAdmins) {
             await admin
                .firestore()
                .collection("userData")
@@ -103,9 +146,9 @@ exports.updateUserDocAdminStatus = functions.firestore
             functions.logger.info(
                `New group ${careerCenterAfter.groupId} has been added to user admin ${adminEmail}`
             );
-         });
+         }
 
-         oldAdmins.forEach(async (adminEmail) => {
+         for (const adminEmail of oldAdmins) {
             await admin
                .firestore()
                .collection("userData")
@@ -118,7 +161,7 @@ exports.updateUserDocAdminStatus = functions.firestore
             functions.logger.info(
                `New group ${careerCenterAfter.groupId} has been removed from user admin ${adminEmail}`
             );
-         });
+         }
       } catch (error) {
          functions.logger.error("failed to update admin email doc:", error);
       }
@@ -177,5 +220,4 @@ exports.joinGroupDashboard = functions.https.onCall(async (data, context) => {
          transaction.delete(notificationRef);
       });
    });
-   return;
 });

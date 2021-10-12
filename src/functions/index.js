@@ -64,6 +64,7 @@ exports.exportFirestoreBackup = backup.exportFirestoreBackup;
 exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail;
 exports.sendDraftApprovalRequestEmail =
    groupAdmin.sendDraftApprovalRequestEmail;
+exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail;
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus;
 exports.joinGroupDashboard = groupAdmin.joinGroupDashboard;
 
