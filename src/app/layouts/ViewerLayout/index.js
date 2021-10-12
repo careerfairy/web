@@ -167,6 +167,8 @@ const ViewerLayout = (props) => {
             setStreamerId(currentLivestream.id + joiningId);
          } else if (authenticatedUser?.email) {
             setStreamerId(currentLivestream.id + authenticatedUser.email);
+         } else if (isRecordingWindow) {
+            setStreamerId(uuidv4());
          }
       }
    }, [
