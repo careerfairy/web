@@ -32,6 +32,7 @@ const universityEmails = require("./universityEmails");
 const algolia = require("./algolia");
 const analytics = require("./analytics");
 const breakoutRooms = require("./breakoutRooms");
+const recording = require("./recording");
 
 // Hosting
 exports.production = hosting.production;
