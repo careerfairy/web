@@ -39,6 +39,7 @@ import useStreamRef from "../../../components/custom-hook/useStreamRef";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import { TOP_BAR_HEIGHT } from "constants/streamLayout";
+import { localStorageAudienceDrawerKey } from "constants/localStorageKeys";
 
 const useStyles = makeStyles((theme) => ({
    toolbar: {
@@ -265,9 +266,9 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                      />
                   </Tooltip>
                   <NewFeatureHint
-                     onClick={showAudience}
+                     onClickConfirm={showAudience}
                      tooltipText="Click here to see who's joined the stream since the start"
-                     localStorageKey="hasSeenAudienceDrawer"
+                     localStorageKey={localStorageAudienceDrawerKey}
                      tooltipTitle="Hint"
                   >
                      <Box className={classes.viewCount}>

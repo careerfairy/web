@@ -119,11 +119,13 @@ function HandRaiseInactive({
                   open={isOpen(9)}
                >
                   <NewFeatureHint
-                     onClick={() => setHasSeenHandRaiseTip(true)}
+                     onClickConfirm={() => setHasSeenHandRaiseTip(true)}
                      localStorageKey={HAND_RAISE_HINT_LOCAL_KEY}
                      tooltipTitle="Allow audience to join with video/audio"
                      hide={
-                        tutorialSteps.streamerReady || selectedState !== "hand" || animating
+                        tutorialSteps.streamerReady ||
+                        selectedState !== "hand" ||
+                        animating
                      }
                      placement="bottom"
                      tooltipText="Please activate this feature if you would like your audience to join with video and video."
