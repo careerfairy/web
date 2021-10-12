@@ -8,6 +8,8 @@ const initialState = {
 
 const emotesReducer = (state = initialState, { type, payload }) => {
    switch (type) {
+      case actions.CLEAR_ALL_EMOTES:
+         return { ...state, emotesData: [] };
       case actions.SEND_EMOTE_START:
          return { ...state, loading: true };
       case actions.ADD_EMOTE:

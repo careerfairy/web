@@ -3,6 +3,7 @@ import React, { memo, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import StreamsLayout from "./StreamsLayout";
 import Banners from "./Banners";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -34,14 +35,17 @@ const Streams = memo(
       handRaiseActive,
       mobile,
    }) => {
+      const focusModeEnabled = useSelector(
+         (state) => state.stream.layout.focusModeEnabled
+      );
       const [streamData, setStreamData] = useState([]);
       const [bannersBottom, setBannersBottom] = useState(false);
       const [hasManySpeakers, setHasManySpeakers] = useState(false);
       const classes = useStyles();
 
       useEffect(() => {
-         setBannersBottom(Boolean(mobile && !presenter));
-      }, [mobile, presenter]);
+         setBannersBottom(Boolean((mobile || focusModeEnabled) && !presenter));
+      }, [mobile, presenter, focusModeEnabled]);
 
       useEffect(() => {
          const allStreams = [...externalMediaStreams];

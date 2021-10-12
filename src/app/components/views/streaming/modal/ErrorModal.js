@@ -166,98 +166,99 @@ const NetworkError = ({ clearSoundWarning, playWarning, reconnectTimeout }) => {
    );
 };
 
-function ErrorModal({
-   agoraRtcStatus,
-   agoraRtcConnectionStatus,
-   agoraRtmStatus,
-}) {
-   const [state, setState] = useState("open");
-   const [audioCounter, setAudioCounter] = useState(0);
-   const [playWarning, setPlayWarning] = useState(true);
-   const [hasHadInitialConnection, setHasHadInitialConnection] = useState(
-      false
-   );
-   const [soundTimeout, setSoundTimeout] = useState(null);
-   const [reconnectTimeout, setReconnectTimeout] = useState(false);
-   const classes = useStyles();
+const ErrorModal = memo(
+   ({ agoraRtcStatus, agoraRtcConnectionStatus, agoraRtmStatus }) => {
+      const [state, setState] = useState("open");
+      const [audioCounter, setAudioCounter] = useState(0);
+      const [playWarning, setPlayWarning] = useState(true);
+      const [hasHadInitialConnection, setHasHadInitialConnection] = useState(
+         false
+      );
+      const [soundTimeout, setSoundTimeout] = useState(null);
+      const [reconnectTimeout, setReconnectTimeout] = useState(false);
+      const classes = useStyles();
+      const notifyAudio = new Audio(
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/static_files%2Falert_simple.wav?alt=media"
+      );
+      const errorInRtc = agoraRtcStatus && agoraRtcStatus.type === "ERROR";
+      const errorInRtm = agoraRtmStatus && agoraRtmStatus.type === "ERROR";
+      const errorInRtcConnection =
+         hasHadInitialConnection &&
+         (agoraRtcConnectionStatus.curState === "DISCONNECTED" ||
+            agoraRtcConnectionStatus.curState === "CONNECTING");
+      const showError =
+         (errorInRtc || errorInRtm || errorInRtcConnection) && state === "open";
 
-   const notifyAudio = new Audio(
-      "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/static_files%2Falert_simple.wav?alt=media"
-   );
+      useEffect(() => {
+         setState("open");
+      }, [agoraRtcStatus, agoraRtcConnectionStatus, agoraRtmStatus]);
 
-   const errorInRtc = agoraRtcStatus && agoraRtcStatus.type === "ERROR";
-   const errorInRtm = agoraRtmStatus && agoraRtmStatus.type === "ERROR";
-   const errorInRtcConnection =
-      hasHadInitialConnection &&
-      (agoraRtcStatus.curState === "DISCONNECTED" ||
-         agoraRtcStatus.curState === "CONNECTING");
-   const showError =
-      errorInRtc || errorInRtm || (errorInRtcConnection && state === "open");
+      useEffect(() => {
+         if (agoraRtcConnectionStatus.curState === "CONNECTED") {
+            setHasHadInitialConnection(true);
+            setReconnectTimeout(false);
+            setPlayWarning(false);
+         }
+      }, [agoraRtcConnectionStatus]);
 
-   useEffect(() => {
-      setState("open");
-   }, [agoraRtcStatus, agoraRtcConnectionStatus, agoraRtmStatus]);
+      useEffect(() => {
+         if (errorInRtm || errorInRtcConnection) {
+            let timeout = setTimeout(() => {
+               setReconnectTimeout(true);
+            }, 10000);
+            return () => clearTimeout(timeout);
+         }
+      }, [errorInRtm, errorInRtcConnection]);
 
-   useEffect(() => {
-      if (agoraRtcStatus.curState === "CONNECTED") {
-         setHasHadInitialConnection(true);
-         setReconnectTimeout(false);
-         setPlayWarning(false);
-      }
-   }, [agoraRtcStatus]);
+      useEffect(() => {
+         if (showError && playWarning) {
+            let timeout = setTimeout(() => {
+               playSound(notifyAudio);
+               setAudioCounter((prevState) => prevState + 1);
+            }, 2000);
+            setSoundTimeout(timeout);
+            return () => clearTimeout(timeout);
+         } else {
+            if (soundTimeout) clearTimeout(soundTimeout);
+         }
+      }, [
+         agoraRtcStatus,
+         agoraRtmStatus,
+         agoraRtcConnectionStatus,
+         audioCounter,
+         playWarning,
+      ]);
 
-   useEffect(() => {
-      if (errorInRtm || errorInRtcConnection) {
-         let timeout = setTimeout(() => {
-            setReconnectTimeout(true);
-         }, 10000);
-         return () => clearTimeout(timeout);
-      }
-   }, [errorInRtm, errorInRtcConnection]);
+      const playSound = (audioFile) => {
+         audioFile.play();
+      };
 
-   useEffect(() => {
-      if (showError && playWarning) {
-         let timeout = setTimeout(() => {
-            playSound(notifyAudio);
-            setAudioCounter((prevState) => prevState + 1);
-         }, 2000);
-         setSoundTimeout(timeout);
-         return () => clearTimeout(timeout);
-      } else {
-         if (soundTimeout) clearTimeout(soundTimeout);
-      }
-   }, [agoraRtcStatus, agoraRtmStatus, audioCounter, playWarning]);
+      const clearSoundWarning = () => setPlayWarning(false);
 
-   const playSound = (audioFile) => {
-      audioFile.play();
-   };
-
-   const clearSoundWarning = () => setPlayWarning(false);
-
-   return (
-      <Dialog open={showError}>
-         <DialogContent>
-            <div className={classes.container}>
-               <div className={classes.content}>
-                  {errorInRtc && (
-                     <ConnectionError
-                        agoraRtcStatus={agoraRtcStatus}
-                        setState={setState}
-                        classes={classes}
-                     />
-                  )}
-                  {(errorInRtm || errorInRtcConnection) && (
-                     <NetworkError
-                        clearSoundWarning={clearSoundWarning}
-                        playWarning={playWarning}
-                        reconnectTimeout={reconnectTimeout}
-                     />
-                  )}
+      return (
+         <Dialog open={showError}>
+            <DialogContent>
+               <div className={classes.container}>
+                  <div className={classes.content}>
+                     {errorInRtc && (
+                        <ConnectionError
+                           agoraRtcStatus={agoraRtcStatus}
+                           setState={setState}
+                           classes={classes}
+                        />
+                     )}
+                     {(errorInRtm || errorInRtcConnection) && (
+                        <NetworkError
+                           clearSoundWarning={clearSoundWarning}
+                           playWarning={playWarning}
+                           reconnectTimeout={reconnectTimeout}
+                        />
+                     )}
+                  </div>
                </div>
-            </div>
          </DialogContent>
       </Dialog>
-   );
-}
+   )
+});
 
 export default ErrorModal;

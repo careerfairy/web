@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import { StyledTooltipWithButton } from "../../materialUI/GlobalTooltips";
@@ -10,9 +11,12 @@ const NewFeatureHint = ({
    tooltipTitle,
    placement,
    onClick,
-  hide
+   hide,
 }) => {
    const [hasSeenTip, setHasSeenTip] = useState(false);
+   const {
+      query: { isRecordingWindow },
+   } = useRouter();
 
    useEffect(() => {
       const hasSeenDataSetButton = localStorage.getItem(localStorageKey);
@@ -34,7 +38,7 @@ const NewFeatureHint = ({
    return (
       <StyledTooltipWithButton
          placement={placement}
-         open={!hasSeenTip && !hide}
+         open={!hasSeenTip && !hide && !isRecordingWindow}
          tooltipTitle={tooltipTitle}
          onConfirm={handleSeen}
          tooltipText={tooltipText}

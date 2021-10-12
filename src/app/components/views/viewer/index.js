@@ -61,13 +61,16 @@ const ViewerOverview = ({
    handRaiseActive,
    streamerId,
    mobile,
-   setShowMenu,
    handleStateChange,
    selectedState,
    showMenu,
    hideAudience,
    audienceDrawerOpen,
 }) => {
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
+
    const { currentLivestream, isBreakout } = useCurrentStream();
    const dispatch = useDispatch();
    const { videoIsMuted, videoIsPaused } = useSelector(
@@ -85,7 +88,6 @@ const ViewerOverview = ({
             />
             <ButtonComponent
                selectedState={selectedState}
-               setShowMenu={setShowMenu}
                showMenu={showMenu}
                isMobile={mobile}
                handleStateChange={handleStateChange}
@@ -100,21 +102,22 @@ const ViewerOverview = ({
                handRaiseActive={handRaiseActive}
                isBreakout={isBreakout}
             />
-
-            {
+            {!focusModeEnabled && (
                <MiniChatContainer
                   mobile={mobile}
                   className={classes.miniChatContainer}
                   livestream={currentLivestream}
                   isStreamer={false}
                />
-            }
+            )}
          </div>
-         <IconsContainer
-            className={classes.iconsContainer}
-            isTest={currentLivestream.test}
-            livestreamId={currentLivestream.id}
-         />
+         {!focusModeEnabled && (
+            <IconsContainer
+               className={classes.iconsContainer}
+               isTest={currentLivestream.test}
+               livestreamId={currentLivestream.id}
+            />
+         )}
          {currentLivestream && !currentLivestream.hasNoRatings && (
             <RatingContainer
                livestreamId={currentLivestream.id}
