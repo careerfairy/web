@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => {
       },
    };
 });
-const EnhancedGroupStreamCard = ({
+const useAdminStreamActions = ({
    livestream,
    group,
    isPastLivestream,
@@ -490,4 +490,4 @@ const EnhancedGroupStreamCard = ({
    );
 };
 
-export default EnhancedGroupStreamCard;
+export default useAdminStreamActions;

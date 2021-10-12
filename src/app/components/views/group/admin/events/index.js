@@ -1,31 +1,17 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useEffect, useState } from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
-import {
-   AppBar,
-   Box,
-   CircularProgress,
-   Container,
-   Grid,
-   Tabs,
-   Typography,
-} from "@material-ui/core";
+import { AppBar, Box, CircularProgress, Tabs } from "@material-ui/core";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import NewStreamModal from "./NewStreamModal";
 import { useRouter } from "next/router";
 import { repositionElement } from "../../../../helperFunctions/HelperFunctions";
 import Tab from "@material-ui/core/Tab";
 import Header from "./Header";
-import EventsTable from "./EventsTable";
+import EventsTable from "./events-table/EventsTable";
 
 const useStyles = makeStyles((theme) => ({
-   root: {
-      // height: "inherit",
-      // paddingTop: theme.spacing(2),
-      // paddingBottom: theme.spacing(2),
-      // display: "flex",
-      // flexDirection: "column",
-   },
+   root: {},
    streamCard: {},
    highlighted: {},
    appBar: {
@@ -64,6 +50,7 @@ const EventsOverview = ({ group, typeOfStream, query, isAdmin, isDraft }) => {
             const streamsData = querySnapshot.docs.map((doc) => ({
                id: doc.id,
                rowId: doc.id,
+               rowID: doc.id,
                date: doc.data().start?.toDate?.(),
                ...doc.data(),
             }));
@@ -175,7 +162,7 @@ const EventsOverview = ({ group, typeOfStream, query, isAdmin, isDraft }) => {
                </Box>
             ) : (
                <Box width="100%">
-                  <EventsTable streams={streams} />
+                  <EventsTable isDraft={isDraft} streams={streams} />
                </Box>
             )}
             <Box flexGrow={1} />
@@ -192,19 +179,12 @@ const EventsOverview = ({ group, typeOfStream, query, isAdmin, isDraft }) => {
    );
 };
 
-const SearchMessage = ({ message }) => (
-   <Grid sm={12} md={12} lg={12} xl={12} item>
-      <Typography variant="h4" align="center">
-         {message}
-      </Typography>
-   </Grid>
-);
-
 EventsOverview.propTypes = {
    group: PropTypes.object,
    isAdmin: PropTypes.bool,
    query: PropTypes.func.isRequired,
    typeOfStream: PropTypes.string.isRequired,
+   isDraft: PropTypes.bool,
 };
 
 export default EventsOverview;
