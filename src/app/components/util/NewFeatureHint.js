@@ -9,8 +9,8 @@ const NewFeatureHint = ({
    buttonText,
    tooltipTitle,
    placement,
-   onClick,
-  hide
+   onClickConfirm,
+   hide,
 }) => {
    const [hasSeenTip, setHasSeenTip] = useState(false);
 
@@ -28,7 +28,7 @@ const NewFeatureHint = ({
 
    const handleSeen = () => {
       markAsSeen();
-      onClick?.();
+      onClickConfirm?.();
    };
 
    return (
@@ -40,9 +40,9 @@ const NewFeatureHint = ({
          tooltipText={tooltipText}
          buttonText={buttonText}
       >
-         <div onClick={handleSeen} style={{ cursor: "pointer" }}>
+         <span onClick={handleSeen} style={{ cursor: "pointer" }}>
             {children}
-         </div>
+         </span>
       </StyledTooltipWithButton>
    );
 };
@@ -51,7 +51,7 @@ NewFeatureHint.propTypes = {
    buttonText: PropTypes.string,
    children: PropTypes.node.isRequired,
    localStorageKey: PropTypes.string.isRequired,
-   onClick: PropTypes.func,
+   onClickConfirm: PropTypes.func,
    placement: PropTypes.oneOf([
       "bottom-end",
       "bottom-start",
