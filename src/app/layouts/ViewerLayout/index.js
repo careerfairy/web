@@ -73,7 +73,7 @@ const ViewerLayout = (props) => {
    const { children, isBreakout } = props;
    const firebase = useFirebase();
    const {
-      query: { livestreamId, breakoutRoomId },
+      query: { livestreamId, breakoutRoomId, token, isRecordingWindow },
       replace,
       asPath,
    } = useRouter();
@@ -93,16 +93,40 @@ const ViewerLayout = (props) => {
    );
    const classes = useStyles({ showMenu, mobile, focusModeEnabled });
    const [selectedState, setSelectedState] = useState("questions");
+   const [notAuthorized, setNotAuthorized] = useState(false);
 
    const currentLivestream = useStreamConnect();
 
    useViewerHandRaiseConnect(currentLivestream);
 
-   const notAuthorized =
-      currentLivestream &&
-      !currentLivestream.test &&
-      authenticatedUser?.isLoaded &&
-      authenticatedUser?.isEmpty;
+   useEffect(() => {
+      if (currentLivestream && !currentLivestream.test) {
+         if (token) {
+            firebase.getLivestreamSecureTokenWithRef(streamRef).then((doc) => {
+               if (!doc.exists) {
+                  router.push("/streaming/error");
+               }
+               let storedToken = doc.data().value;
+               if (storedToken !== token) {
+                  setNotAuthorized(false);
+               }
+            });
+         } else {
+            setNotAuthorized(
+               currentLivestream &&
+                  !currentLivestream.test &&
+                  authenticatedUser?.isLoaded &&
+                  authenticatedUser?.isEmpty
+            );
+         }
+      }
+   }, [token, currentLivestream?.test, currentLivestream?.id]);
+
+   useEffect(() => {
+      if (Boolean(isRecordingWindow)) {
+         dispatch(actions.setFocusMode(true, mobile));
+      }
+   }, [isRecordingWindow]);
 
    useEffect(() => {
       if (mobile) {
