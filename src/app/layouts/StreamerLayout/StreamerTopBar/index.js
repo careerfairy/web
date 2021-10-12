@@ -24,7 +24,6 @@ import ButtonWithConfirm from "../../../components/views/common/ButtonWithConfir
 import StopIcon from "@material-ui/icons/Stop";
 import PlayCircleFilledWhiteIcon from "@material-ui/icons/PlayCircleFilledWhite";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
-import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 import OpenInBrowserIcon from "@material-ui/icons/OpenInBrowser";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";

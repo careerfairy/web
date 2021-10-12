@@ -87,7 +87,7 @@ exports.startRecordingLivestream = functions.https.onCall(
                            serviceName: "web_recorder_service",
                            errorHandlePolicy: "error_abort",
                            serviceParam: {
-                              url: `https://careerfairy-ssr-webapp-iu5hseak2-careerfairy-ssr.vercel.app/streaming/${streamId}/viewer?token=${token}`,
+                              url: `https://careerfairy.io/streaming/${streamId}/viewer?token=${token}`,
                               audioProfile: 0,
                               videoWidth: 1280,
                               videoHeight: 720,
