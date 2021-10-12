@@ -69,6 +69,20 @@ class Firebase {
       return await getSecureAgoraToken(data);
    };
 
+   startLivestreamRecording = async (data) => {
+      const startLivestreamRecording = this.functions.httpsCallable(
+         "startRecordingLivestream"
+      );
+      return await startLivestreamRecording(data);
+   };
+
+   stopLivestreamRecording = async (data) => {
+      const stopLivestreamRecording = this.functions.httpsCallable(
+         "stopRecordingLivestream"
+      );
+      return await stopLivestreamRecording(data);
+   };
+
    createUserInAuthAndFirebase = async (userData) => {
       const createUserInAuthAndFirebase = this.functions.httpsCallable(
          "createNewUserAccount"

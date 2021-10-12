@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { languageCodes } from "../../../../../helperFunctions/streamFormFunctions";
 import {
@@ -17,6 +17,13 @@ import {
    IconButton,
    Menu,
    MenuItem,
+   Dialog,
+   DialogTitle,
+   DialogContent,
+   DialogActions,
+   Typography,
+   CircularProgress,
+   Box,
 } from "@material-ui/core";
 import {
    getBaseUrl,
@@ -26,11 +33,45 @@ import RegistrationsIcon from "@material-ui/icons/People";
 import ParticipationIcon from "@material-ui/icons/Visibility";
 import JoinIcon from "@material-ui/icons/RecordVoiceOver";
 import { useFirestore } from "react-redux-firebase";
+import { useFirebase } from "context/firebase";
 import { useDispatch } from "react-redux";
 import * as actions from "../../../../../../store/actions/index";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog";
 import { streamType } from "../../../../../../types";
+
+const MenuItemWithConfirm = ({
+   action,
+   confirmText,
+   onConfirm,
+   children,
+   disabled,
+}) => {
+   const [openDialog, setOpenDialog] = useState(false);
+
+   const handleConfirm = () => {
+      onConfirm();
+      setOpenDialog(false);
+   };
+
+   return (
+      <Fragment>
+         <MenuItem disabled={disabled} onClick={() => setOpenDialog(true)}>
+            {children}
+         </MenuItem>
+         <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+            <DialogTitle>Confirm {action}</DialogTitle>
+            <DialogContent>{confirmText}</DialogContent>
+            <DialogActions>
+               <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+               <Button color="primary" onClick={handleConfirm}>
+                  Confirm
+               </Button>
+            </DialogActions>
+         </Dialog>
+      </Fragment>
+   );
+};
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -52,15 +93,25 @@ const useStyles = makeStyles((theme) => ({
          width: "calc(100% - 30px)",
       },
    },
+   recording: {
+      fontSize: "0.8rem",
+      color: "red",
+      textTransform: "uppercase",
+      fontWeight: 800,
+   },
 }));
 
 const StreamCard = ({ stream }) => {
    const classes = useStyles();
    const firestore = useFirestore();
+   const { startLivestreamRecording, stopLivestreamRecording } = useFirebase();
    const dispatch = useDispatch();
 
    const [anchorEl, setAnchorEl] = React.useState(null);
    const [openStreamerLinksDialog, setOpenStreamerLinksDialog] = React.useState(
+      false
+   );
+   const [recordingRequestOngoing, setRecordingRequestOngoing] = useState(
       false
    );
 
@@ -94,6 +145,68 @@ const StreamCard = ({ stream }) => {
             dispatch(actions.sendGeneralError("This stream has no token"));
          }
       } catch (e) {
+         dispatch(actions.sendGeneralError(e));
+      }
+   };
+
+   const handleStartRecording = async () => {
+      setRecordingRequestOngoing(true);
+      try {
+         const tokenDoc = await firestore.get({
+            collection: "livestreams",
+            doc: stream.id,
+            subcollections: [
+               {
+                  collection: "tokens",
+                  doc: "secureToken",
+               },
+            ],
+         });
+         if (tokenDoc.exists) {
+            const secureToken = tokenDoc.data().value;
+            await startLivestreamRecording({
+               streamId: stream.id,
+               token: secureToken,
+            });
+            setRecordingRequestOngoing(false);
+            return;
+         } else {
+            setRecordingRequestOngoing(false);
+            dispatch(actions.sendGeneralError("This stream has no token"));
+         }
+      } catch (e) {
+         setRecordingRequestOngoing(false);
+         dispatch(actions.sendGeneralError(e));
+      }
+   };
+
+   const handleStopRecording = async () => {
+      setRecordingRequestOngoing(true);
+      try {
+         const tokenDoc = await firestore.get({
+            collection: "livestreams",
+            doc: stream.id,
+            subcollections: [
+               {
+                  collection: "tokens",
+                  doc: "secureToken",
+               },
+            ],
+         });
+         if (tokenDoc.exists) {
+            const secureToken = tokenDoc.data().value;
+            await stopLivestreamRecording({
+               streamId: stream.id,
+               token: secureToken,
+            });
+            setRecordingRequestOngoing(false);
+            return;
+         } else {
+            setRecordingRequestOngoing(false);
+            dispatch(actions.sendGeneralError("This stream has no token"));
+         }
+      } catch (e) {
+         setRecordingRequestOngoing(false);
          dispatch(actions.sendGeneralError(e));
       }
    };
@@ -137,12 +250,34 @@ const StreamCard = ({ stream }) => {
                         >
                            Get streamer links
                         </MenuItem>
+                        {stream.isRecording ? (
+                           <MenuItemWithConfirm
+                              confirmText="Are you sure that you want to stop recording this live stream?"
+                              onConfirm={handleStopRecording}
+                              disabled={recordingRequestOngoing}
+                           >
+                              Stop recording stream
+                           </MenuItemWithConfirm>
+                        ) : (
+                           <MenuItemWithConfirm
+                              confirmText="Are you sure that you want to start recording this live stream?"
+                              onConfirm={handleStartRecording}
+                              disabled={recordingRequestOngoing}
+                           >
+                              Start recording stream
+                           </MenuItemWithConfirm>
+                        )}
                      </Menu>
                   }
                </React.Fragment>
             }
          />
          <CardContent>
+            {stream.isRecording && (
+               <Typography className={classes.recording}>
+                  Recording in progress
+               </Typography>
+            )}
             <List dense className={classes.list}>
                <ListItem>
                   <ListItemAvatar>
@@ -194,6 +329,18 @@ const StreamCard = ({ stream }) => {
             openDialog={openStreamerLinksDialog}
             setOpenDialog={setOpenStreamerLinksDialog}
          />
+         <Dialog open={recordingRequestOngoing}>
+            <DialogContent>
+               <Box p={3} textAlign="center">
+                  <div>
+                     <CircularProgress />
+                  </div>
+                  {stream.isRecording
+                     ? "Stopping livestream recording"
+                     : "Starting livestream recording"}
+               </Box>
+            </DialogContent>
+         </Dialog>
       </Card>
    );
 };

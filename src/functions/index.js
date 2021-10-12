@@ -32,6 +32,7 @@ const universityEmails = require("./universityEmails");
 const algolia = require("./algolia");
 const analytics = require("./analytics");
 const breakoutRooms = require("./breakoutRooms");
+const recording = require("./recording");
 
 // Hosting
 exports.production = hosting.production;
@@ -55,7 +56,6 @@ exports.resendPostmarkEmailVerificationEmailWithPin =
 exports.generateAgoraToken = agora.generateAgoraToken;
 exports.generateAgoraTokenSecure = agora.generateAgoraTokenSecure;
 exports.generateAgoraTokenSecureOnCall = agora.generateAgoraTokenSecureOnCall;
-exports.startRecordingLivestream = agora.startRecordingLivestream;
 
 // Backup
 exports.exportFirestoreBackup = backup.exportFirestoreBackup;
@@ -106,8 +106,14 @@ exports.updateStreamIndex = algolia.updateStreamIndex;
 exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex;
 
 // Analytics
-exports.updateUserDataAnalyticsOnWrite =
+exports.updateUserDataAnalytcicsOnWrite =
    analytics.updateUserDataAnalyticsOnWrite;
+
+//Recording
+exports.startRecordingLivestream = recording.startRecordingLivestream;
+exports.stopRecordingLivestream = recording.stopRecordingLivestream;
+exports.startRecordingLivestreamApi = recording.startRecordingLivestreamApi;
+exports.stopRecordingLivestreamApi = recording.stopRecordingLivestreamApi;
 
 // Breakout Rooms
 exports.updateBreakoutRoomStatusOnWrite =
