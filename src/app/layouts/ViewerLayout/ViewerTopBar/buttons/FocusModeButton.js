@@ -5,7 +5,10 @@ import FocusInactiveIcon from "@material-ui/icons/Fullscreen";
 import FocusModeActiveIcon from "@material-ui/icons/FullscreenExit";
 import * as actions from "store/actions";
 import { useDispatch, useSelector } from "react-redux";
-import { hasSeenFocusModeKey } from "../../../../constants/localStorageKeys";
+import {
+   hasSeenFocusModeActivateKey,
+   hasSeenFocusModeDeActivateKey,
+} from "../../../../constants/localStorageKeys";
 import NewFeatureHint from "../../../../components/util/NewFeatureHint";
 
 const FocusModeButton = ({ primary, mobile, audienceDrawerOpen }) => {
@@ -20,8 +23,16 @@ const FocusModeButton = ({ primary, mobile, audienceDrawerOpen }) => {
    return (
       <NewFeatureHint
          onClickConfirm={toggleFocusMode}
-         tooltipText="Click here to hide the chat and emotes to focus more on the stream."
-         localStorageKey={hasSeenFocusModeKey}
+         tooltipText={
+            focusModeEnabled
+               ? "Click again to disable focus mode."
+               : "Click here to hide the chat and emotes to focus more on the stream."
+         }
+         localStorageKey={
+            focusModeEnabled
+               ? hasSeenFocusModeDeActivateKey
+               : hasSeenFocusModeActivateKey
+         }
          tooltipTitle="Hint"
          placement="left"
          hide={audienceDrawerOpen}

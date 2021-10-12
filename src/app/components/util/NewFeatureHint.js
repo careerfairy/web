@@ -20,10 +20,8 @@ const NewFeatureHint = ({
 
    useEffect(() => {
       const hasSeenDataSetButton = localStorage.getItem(localStorageKey);
-      if (JSON.parse(hasSeenDataSetButton)) {
-         setHasSeenTip(true);
-      }
-   }, []);
+      setHasSeenTip(Boolean(JSON.parse(hasSeenDataSetButton)));
+   }, [localStorageKey]);
 
    const markAsSeen = () => {
       localStorage.setItem(localStorageKey, JSON.stringify(true));
