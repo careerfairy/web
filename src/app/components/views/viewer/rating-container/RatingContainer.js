@@ -204,7 +204,7 @@ ActionComponent.propTypes = {
    firebase: PropTypes.object,
    hasText: PropTypes.bool.isRequired,
    livestreamId: PropTypes.string.isRequired,
-   noStars: PropTypes.bool.isRequired,
+   noStars: PropTypes.bool,
    ratingId: PropTypes.string.isRequired,
 };
 

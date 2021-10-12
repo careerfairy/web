@@ -85,7 +85,7 @@ const CustomLegend = ({
                <Slide>
                   <TransitionGroup>
                      {legendLabels.map((option) => (
-                        <Collapse key={option.index}>
+                        <Collapse key={`${option.name}-${option.index}`}>
                            <ListItem
                               dense
                               onClick={(e) =>

@@ -11,6 +11,8 @@ import ChatCategory from "../../streaming/LeftMenu/categories/ChatCategory";
 import { TabPanel } from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import clsx from "clsx";
 import { useAuth } from "../../../../HOCs/AuthProvider";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({
    viewRoot: {
@@ -46,34 +48,33 @@ const useStyles = makeStyles((theme) => ({
    mobileDrawer: {
       width: "100%",
    },
-   desktopDrawer: {
+   desktopDrawer: ({ focusModeEnabled }) => ({
       width: 280,
-      top: 55,
-      height: "calc(100% - 55px)",
+      top: focusModeEnabled ? 0 : 55,
+      height: focusModeEnabled ? "100%" : "calc(100% - 55px)",
       boxShadow: theme.shadows[15],
-   },
+   }),
 }));
 
 const states = ["questions", "polls", "hand", "chat"];
 const LeftMenu = ({
    handRaiseActive,
-   toggleShowMenu,
    setHandRaiseActive,
    streamer,
    setSelectedState,
-   handleStateChange,
    selectedState,
    livestream,
-   setShowMenu,
-   showMenu,
    isMobile,
-   className,
-   ...props
 }) => {
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
+   const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen);
    const { userData, authenticatedUser: user } = useAuth();
    const theme = useTheme();
-   const classes = useStyles({ showMenu, isMobile });
+   const classes = useStyles({ showMenu, isMobile, focusModeEnabled });
    const [value, setValue] = useState(0);
+   const dispatch = useDispatch();
 
    useEffect(() => {
       if (selectedState === "questions") {
@@ -87,7 +88,12 @@ const LeftMenu = ({
       }
    }, [selectedState, showMenu, isMobile]);
    useEffect(() => {
-      if (selectedState === "chat" && showMenu && !isMobile) {
+      if (
+         selectedState === "chat" &&
+         showMenu &&
+         !isMobile &&
+         !focusModeEnabled
+      ) {
          setSelectedState("questions");
          setValue(0);
       }
@@ -99,7 +105,7 @@ const LeftMenu = ({
    };
 
    const handleClose = () => {
-      setShowMenu(false);
+      dispatch(actions.closeLeftMenu());
    };
 
    const views = [
@@ -119,7 +125,6 @@ const LeftMenu = ({
             livestream={livestream}
             selectedState={selectedState}
             setSelectedState={setSelectedState}
-            setShowMenu={setShowMenu}
             streamer={streamer}
             user={user}
             userData={userData}
@@ -139,7 +144,7 @@ const LeftMenu = ({
       </TabPanel>,
    ];
 
-   if (showMenu && isMobile) {
+   if (showMenu && (isMobile || focusModeEnabled)) {
       views.push(
          <TabPanel key={3} value={value} index={3} dir={theme.direction}>
             <ChatCategory
@@ -159,7 +164,7 @@ const LeftMenu = ({
                className={classes.closeBtn}
                size="large"
                color="secondary"
-               onClick={toggleShowMenu}
+               onClick={() => dispatch(actions.toggleLeftMenu())}
             >
                <ChevronLeftRoundedIcon />
             </Fab>
@@ -188,7 +193,6 @@ const LeftMenu = ({
                classes={{ paper: clsx(classes.mobileDrawer, classes.blur) }}
                onClose={handleClose}
                open={showMenu}
-               // keepMounted
                variant="persistent"
             >
                {content}
@@ -196,9 +200,8 @@ const LeftMenu = ({
          ) : (
             <Drawer
                anchor="left"
-               // keepMounted
                classes={{ paper: clsx(classes.desktopDrawer, classes.blur) }}
-               open
+               open={focusModeEnabled ? showMenu : true}
                variant="persistent"
             >
                {content}
@@ -217,10 +220,7 @@ LeftMenu.propTypes = {
    selectedState: PropTypes.string.isRequired,
    setHandRaiseActive: PropTypes.func.isRequired,
    setSelectedState: PropTypes.func.isRequired,
-   setShowMenu: PropTypes.func.isRequired,
-   showMenu: PropTypes.bool.isRequired,
    streamer: PropTypes.any,
-   toggleShowMenu: PropTypes.any,
 };
 
 export default LeftMenu;

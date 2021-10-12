@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { withFirebase } from "../../../../context/firebase";
-import ButtonComponent from "../sharedComponents/ButtonComponent";
 import PollCategory from "./categories/PollCategory";
 import HandRaiseCategory from "./categories/HandRaiseCategory";
 import QuestionCategory from "../sharedComponents/QuestionCategory";
@@ -10,7 +8,8 @@ import SwipeableViews from "react-swipeable-views";
 import clsx from "clsx";
 import { Drawer, Fab } from "@material-ui/core";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
-import { useLocalStorage } from "react-use";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -53,7 +52,6 @@ const useStyles = makeStyles((theme) => ({
 
 const states = ["questions", "polls", "hand"];
 const LeftMenu = ({
-   showMenu,
    livestream,
    streamer,
    handleStateChange,
@@ -61,15 +59,15 @@ const LeftMenu = ({
    setSliding,
    selectedState,
    setSelectedState,
-   setShowMenu,
    smallScreen,
-   toggleShowMenu,
 }) => {
+   const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen);
+
    const theme = useTheme();
    const classes = useStyles();
+   const dispatch = useDispatch();
    const [value, setValue] = useState(0);
    const isGlass = showMenu && smallScreen;
-
 
    useEffect(() => {
       if (!typeof window === "object") {
@@ -78,10 +76,10 @@ const LeftMenu = ({
 
       function handleResize() {
          if (window.innerWidth < 996) {
-            setShowMenu(false);
+            dispatch(actions.closeLeftMenu());
          }
          if (window.innerWidth > 1248) {
-            setShowMenu(true);
+            dispatch(actions.openLeftMenu());
          }
       }
 
@@ -152,7 +150,7 @@ const LeftMenu = ({
                className={classes.closeBtn}
                size="small"
                color="secondary"
-               onClick={toggleShowMenu}
+               onClick={() => dispatch(actions.toggleLeftMenu())}
             >
                <ChevronLeftRoundedIcon />
             </Fab>

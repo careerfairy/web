@@ -5,8 +5,8 @@ const initialState = {
       streamerBreakoutRoomModalOpen: false,
       viewerBreakoutRoomModalOpen: false,
       viewerCtaModalOpen: false,
-      videoPaused: false,
-      videoMuted: false,
+      leftMenuOpen: true,
+      focusModeEnabled: false,
    },
    stats: {
       numberOfViewers: 0,
@@ -19,12 +19,44 @@ const initialState = {
       playLocalVideo: true,
       playLocalAudio: true,
       unmuteFailedMutedRemoteVideos: false,
-      unpauseFailedPlayRemoteVideos: false
+      unpauseFailedPlayRemoteVideos: false,
    },
 };
 
 const streamReducer = (state = initialState, { type, payload }) => {
    switch (type) {
+      case actions.SET_FOCUS_MODE:
+         return {
+            ...state,
+            layout: {
+               ...state.layout,
+               focusModeEnabled: payload,
+            },
+         };
+      case actions.TOGGLE_LEFT_MENU:
+         return {
+            ...state,
+            layout: {
+               ...state.layout,
+               leftMenuOpen: !state.layout.leftMenuOpen,
+            },
+         };
+      case actions.OPEN_LEFT_MENU:
+         return {
+            ...state,
+            layout: {
+               ...state.layout,
+               leftMenuOpen: true,
+            },
+         };
+      case actions.CLOSE_LEFT_MENU:
+         return {
+            ...state,
+            layout: {
+               ...state.layout,
+               leftMenuOpen: false,
+            },
+         };
       case actions.TOGGLE_LOCAL_VIDEO:
          return {
             ...state,
@@ -73,7 +105,7 @@ const streamReducer = (state = initialState, { type, payload }) => {
             streaming: {
                ...state.streaming,
                videoIsMuted: false,
-               muteAllRemoteVideos: false
+               muteAllRemoteVideos: false,
             },
          };
       case actions.SET_VIDEO_IS_MUTED:
@@ -82,7 +114,7 @@ const streamReducer = (state = initialState, { type, payload }) => {
             streaming: {
                ...state.streaming,
                videoIsMuted: true,
-               unmuteFailedMutedRemoteVideos: false
+               unmuteFailedMutedRemoteVideos: false,
             },
          };
       case actions.SET_VIDEO_IS_PAUSED:
@@ -91,7 +123,7 @@ const streamReducer = (state = initialState, { type, payload }) => {
             streaming: {
                ...state.streaming,
                videoIsPaused: true,
-               unpauseFailedPlayRemoteVideos: false
+               unpauseFailedPlayRemoteVideos: false,
             },
          };
       case actions.OPEN_STREAMER_BREAKOUT_MODAL:

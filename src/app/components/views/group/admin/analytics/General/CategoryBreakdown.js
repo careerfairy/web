@@ -201,7 +201,7 @@ const CategoryBreakdown = ({
          labels: typesOfOptions.map((option) => option.name),
          ids: typesOfOptions.map((option) => option.id),
       });
-   }, [typesOfOptions, localColors]);
+   }, [typesOfOptions, localColors, currentGroup]);
 
    const getTypeOfStudents = () => {
       const aggregateCategories = getAggregateCategories(audience);
@@ -436,7 +436,7 @@ const CategoryBreakdown = ({
                            fullWidth
                            hideEmpty
                            chartData={data}
-                           optionDataType="Student"
+                           optionDataType="User"
                            optionValueProp="count"
                         />
                      </Box>

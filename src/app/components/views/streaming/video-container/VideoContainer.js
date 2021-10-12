@@ -6,7 +6,7 @@ import React, {
    useState,
 } from "react";
 
-import { useFirebase, withFirebasePage } from "context/firebase";
+import { useFirebase } from "context/firebase";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
 import VideoControlsContainer from "./VideoControlsContainer";
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
@@ -53,10 +53,6 @@ function VideoContainer({
    const isMainStreamer = streamerId === currentLivestream.id;
    const streamRef = useStreamRef();
    const [errorMessage, setErrorMessage] = useState(null);
-   const [
-      screenSharePermissionDenied,
-      setScreenSharePermissionDenied,
-   ] = useState(false);
    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
    const [streamerConnected, setStreamerConnected] = useState(false);
    const [streamerReady, setStreamerReady] = useState(false);
@@ -208,7 +204,7 @@ function VideoContainer({
                   streamId: "demoStream",
                   url:
                      "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media",
-               })
+               });
                setAddedStream({
                   streamId: "demoStream",
                   url:
