@@ -69,16 +69,10 @@ const useDashboardLinks = (group) => {
          const baseParam = "[groupId]";
          setDrawerTopLinks([
             {
-               href: `/${baseHrefPath}/${group.id}/admin/upcoming-livestreams`,
+               href: `/${baseHrefPath}/${group.id}/admin/events`,
                icon: StreamIcon,
-               title: "Upcoming Streams",
-               basePath: `/${baseHrefPath}/${baseParam}/admin/upcoming-livestreams`,
-            },
-            {
-               href: `/${baseHrefPath}/${group.id}/admin/past-livestreams`,
-               icon: PastStreamIcon,
-               title: "Past Streams",
-               basePath: `/${baseHrefPath}/${baseParam}/admin/past-livestreams`,
+               title: "Events",
+               basePath: `/${baseHrefPath}/${baseParam}/admin/events`,
             },
             {
                href: `/${baseHrefPath}/${group.id}/admin/drafts`,

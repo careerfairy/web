@@ -11,7 +11,7 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(
 
       functions.logger.log("admins Info in approval request", adminsInfo);
 
-      const emails = adminsInfo.map(({ email, draftDashboardLink }) => ({
+      const emails = adminsInfo.map(({ email, draftStreamDashboardLink }) => ({
          TemplateId: 22299429,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: email,
@@ -19,7 +19,7 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(
             sender_name: req.body.sender_name,
             livestream_title: req.body.livestream_title,
             livestream_company_name: req.body.livestream_company_name,
-            draft_stream_link: draftDashboardLink,
+            draft_stream_link: draftStreamDashboardLink,
             submit_time: req.body.submit_time,
          },
       }));
@@ -52,14 +52,14 @@ exports.sendNewlyPublishedEventEmail = functions.https.onRequest(
       functions.logger.log("admins Info in newly published event", adminsInfo);
 
       const emails = adminsInfo.map(
-         ({ email, dashboard_link, nextLivestreams_link }) => ({
+         ({ email, livestreamDashboardLink, nextLivestreamsLink }) => ({
             TemplateId: 25484780,
             From: "CareerFairy <noreply@careerfairy.io>",
             To: email,
             TemplateModel: {
                sender_name: req.body.sender_name,
-               dashboard_link: dashboard_link,
-               next_livestreams_link: nextLivestreams_link,
+               dashboard_link: nextLivestreamsLink,
+               next_livestreams_link: livestreamDashboardLink,
                livestream_title: req.body.livestream_title,
                livestream_company_name: req.body.livestream_company_name,
                submit_time: req.body.submit_time,

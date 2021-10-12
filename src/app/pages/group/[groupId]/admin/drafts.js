@@ -1,6 +1,6 @@
 import React from "react";
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
-import StreamsOverview from "../../../../components/views/group/admin/streams";
+import StreamsOverview from "../../../../components/views/group/admin/events";
 import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead";
 import { withFirebase } from "../../../../context/firebase";
 
@@ -11,6 +11,7 @@ const DraftStreamsPage = ({ firebase }) => {
          <StreamsOverview
             query={firebase.listenToDraftLiveStreamsByGroupId}
             typeOfStream="draft"
+            isDraft
          />
       </GroupDashboardLayout>
    );
