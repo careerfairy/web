@@ -1,3 +1,4 @@
+import { AGORA_RTC_CONNECTION_STATE_DISCONNECTED } from "constants/agora";
 import * as actions from "../actions/actionTypes";
 
 const initialState = {
@@ -22,6 +23,10 @@ const initialState = {
       unmuteFailedMutedRemoteVideos: false,
       unpauseFailedPlayRemoteVideos: false,
    },
+   agoraState: {
+      rtcConnectionState: AGORA_RTC_CONNECTION_STATE_DISCONNECTED,
+      rtcError: null,
+   },
 };
 
 const streamReducer = (state = initialState, { type, payload }) => {
@@ -40,6 +45,22 @@ const streamReducer = (state = initialState, { type, payload }) => {
             layout: {
                ...state.layout,
                focusModeEnabled: payload,
+            },
+         };
+      case actions.SET_AGORA_RTC_CONNECTION_STATE:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               rtcConnectionState: payload,
+            },
+         };
+      case actions.SET_AGORA_RTC_ERROR:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               rtcError: payload,
             },
          };
       case actions.TOGGLE_LEFT_MENU:

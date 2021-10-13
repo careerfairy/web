@@ -1,0 +1,125 @@
+[debug] [2021-10-13T12:01:06.962Z] ----------------------------------------------------------------------
+[debug] [2021-10-13T12:01:06.963Z] Command:       /Users/mvoss/.nvm/versions/node/v10.19.0/bin/node /Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/.bin/firebase serve --only functions,hosting
+[debug] [2021-10-13T12:01:06.963Z] CLI Version:   7.16.2
+[debug] [2021-10-13T12:01:06.963Z] Platform:      darwin
+[debug] [2021-10-13T12:01:06.963Z] Node Version:  v10.19.0
+[debug] [2021-10-13T12:01:06.964Z] Time:          Wed Oct 13 2021 14:01:06 GMT+0200 (Central European Summer Time)
+[debug] [2021-10-13T12:01:06.964Z] ----------------------------------------------------------------------
+[debug] [2021-10-13T12:01:06.964Z] 
+[debug] [2021-10-13T12:01:06.973Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2021-10-13T12:01:06.973Z] > authorizing via signed-in user
+[debug] [2021-10-13T12:01:06.973Z] [iam] checking project careerfairy-e1fd9 for permissions ["firebase.projects.get"]
+[debug] [2021-10-13T12:01:06.975Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/careerfairy-e1fd9:testIamPermissions  
+
+[debug] [2021-10-13T12:01:07.176Z] <<< HTTP RESPONSE 200
+[debug] [2021-10-13T12:01:07.178Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/careerfairy-e1fd9  
+ 
+[debug] [2021-10-13T12:01:07.413Z] <<< HTTP RESPONSE 200
+[debug] [2021-10-13T12:01:07.416Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/careerfairy-e1fd9/webApps/-/config  
+ 
+[info] ✔  functions: Using node@10 from host.
+[info] ✔  functions: functions emulator started at http://localhost:5001
+[debug] [2021-10-13T12:01:07.973Z] <<< HTTP RESPONSE 200
+[info] i  functions: Watching "/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp" for Cloud Functions...
+[debug] [2021-10-13T12:01:08.022Z] [worker-pool] addWorker(~diagnostic~)
+[debug] [2021-10-13T12:01:08.022Z] [worker-pool] Adding worker with key ~diagnostic~, total=1
+[debug] [2021-10-13T12:01:08.022Z] [worker-pool] submitWork(triggerId=)
+[debug] [2021-10-13T12:01:08.023Z] [worker-~diagnostic~-d3811e2e-c546-438e-8e41-9b31562e48bc]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_50859.sock
+[debug] [2021-10-13T12:01:08.023Z] [worker-~diagnostic~-d3811e2e-c546-438e-8e41-9b31562e48bc]: BUSY
+[info] i  hosting[production]: Serving hosting files from: public
+[info] ✔  hosting[production]: Local server: http://localhost:5000
+[info] i  hosting[testing]: Serving hosting files from: public
+[info] ✔  hosting[testing]: Local server: http://localhost:5005
+[info] i  hosting[testing2]: Serving hosting files from: public
+[info] ✔  hosting[testing2]: Local server: http://localhost:5006
+[info] i  hosting[personal-habib]: Serving hosting files from: public
+[info] ✔  hosting[personal-habib]: Local server: http://localhost:5007
+[debug] [2021-10-13T12:01:08.280Z] [runtime-status] [50859] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2021-10-13T12:01:08.282Z] [runtime-status] [50859] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2021-10-13T12:01:08.285Z] [runtime-status] [50859] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.13.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2021-10-13T12:01:08.286Z] [runtime-status] [50859] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.15.4","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2021-10-13T12:01:08.287Z] [runtime-status] [50859] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.15.4","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[info] ✔  functions[createNewUserAccount]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/createNewUserAccount).
+[info] ✔  functions[updateFakeUser]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/updateFakeUser).
+[info] ✔  functions[createUserCopy]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/createUserCopy).
+[info] ✔  functions[validateUserEmailWithPin]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/validateUserEmailWithPin).
+[info] ✔  functions[sendPostmarkResetPasswordEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkResetPasswordEmail).
+[info] ✔  functions[sendPostmarkEmailUserDataAndUni]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkEmailUserDataAndUni).
+[info] ✔  functions[sendPostmarkEmailUserDataAndUniWithName]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkEmailUserDataAndUniWithName).
+[info] ✔  functions[resendPostmarkEmailVerificationEmailWithPin]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/resendPostmarkEmailVerificationEmailWithPin).
+[info] ✔  functions[generateAgoraToken]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/generateAgoraToken).
+[info] ✔  functions[fetchAgoraRtcToken]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/fetchAgoraRtcToken).
+[info] ✔  functions[fetchAgoraRtmToken]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/fetchAgoraRtmToken).
+[info] ✔  functions[startRecordingLivestream]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/startRecordingLivestream).
+[info] ✔  functions[sendDashboardInviteEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendDashboardInviteEmail).
+[info] ✔  functions[sendDraftApprovalRequestEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendDraftApprovalRequestEmail).
+[info] ✔  functions[joinGroupDashboard]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/joinGroupDashboard).
+[info] ✔  functions[sendReminderEmailToRegistrants]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendReminderEmailToRegistrants).
+[info] ✔  functions[sendReminderEmailToUserFromUniversity]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendReminderEmailToUserFromUniversity).
+[info] ✔  functions[sendReminderEmailAboutApplicationLink]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendReminderEmailAboutApplicationLink).
+[info] ✔  functions[sendLivestreamRegistrationConfirmationEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendLivestreamRegistrationConfirmationEmail).
+[info] ✔  functions[sendPhysicalEventRegistrationConfirmationEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPhysicalEventRegistrationConfirmationEmail).
+[info] ✔  functions[sendEmailToStudentOfUniversityAndField]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendEmailToStudentOfUniversityAndField).
+[info] i  functions[updateUsersCollectionOnUserDataUpdated]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[updateUserDocAdminStatus]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[scheduleReminderEmailSendTestOnRun]: function ignored because the pubsub emulator does not exist or is not running.
+[info] i  functions[sendReminderEmailsWhenLivestreamStarts]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[scheduleTestLivestreamDeletion]: function ignored because the pubsub emulator does not exist or is not running.
+[info] i  functions[setFirstCommentOfQuestionOnCreate]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[assertLivestreamRegistrationWasCompleted]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[assertLivestreamDeregistrationWasCompleted]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[addToIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[updateIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[deleteFromIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[addToStreamIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[updateStreamIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[deleteStreamFromIndex]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[updateUserDataAnalyticsOnWrite]: function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions[updateBreakoutRoomStatusOnWrite]: function ignored because the firestore emulator does not exist or is not running.
+[debug] [2021-10-13T12:01:08.637Z] [worker-~diagnostic~-d3811e2e-c546-438e-8e41-9b31562e48bc]: IDLE
+[debug] [2021-10-13T12:01:20.023Z] [work-queue] {"queueLength":1,"workRunningCount":0}
+[debug] [2021-10-13T12:01:20.023Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2021-10-13T12:01:20.024Z] Accepted request POST /careerfairy-e1fd9/us-central1/sendEmailToStudentOfUniversityAndField --> sendEmailToStudentOfUniversityAndField
+[debug] [2021-10-13T12:01:20.028Z] [worker-pool] addWorker(sendEmailToStudentOfUniversityAndField)
+[debug] [2021-10-13T12:01:20.029Z] [worker-pool] Adding worker with key sendEmailToStudentOfUniversityAndField, total=1
+[debug] [2021-10-13T12:01:20.029Z] [worker-pool] submitWork(triggerId=sendEmailToStudentOfUniversityAndField)
+[debug] [2021-10-13T12:01:20.029Z] [worker-sendEmailToStudentOfUniversityAndField-8080508e-46f3-4efd-8859-e186e0b9c13e]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_50869.sock
+[debug] [2021-10-13T12:01:20.029Z] [worker-sendEmailToStudentOfUniversityAndField-8080508e-46f3-4efd-8859-e186e0b9c13e]: BUSY
+[debug] [2021-10-13T12:01:20.305Z] [runtime-status] [50869] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2021-10-13T12:01:20.307Z] [runtime-status] [50869] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2021-10-13T12:01:20.309Z] [runtime-status] [50869] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.13.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2021-10-13T12:01:20.310Z] [runtime-status] [50869] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.15.4","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2021-10-13T12:01:20.311Z] [runtime-status] [50869] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.15.4","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2021-10-13T12:01:20.594Z] [runtime-status] [50869] Trigger "sendEmailToStudentOfUniversityAndField" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "sendEmailToStudentOfUniversityAndField"
+[debug] [2021-10-13T12:01:20.596Z] [runtime-status] [50869] triggerDefinition {"httpsTrigger":{},"name":"sendEmailToStudentOfUniversityAndField","entryPoint":"sendEmailToStudentOfUniversityAndField"}
+[debug] [2021-10-13T12:01:20.596Z] [runtime-status] [50869] Running sendEmailToStudentOfUniversityAndField in mode HTTPS
+[debug] [2021-10-13T12:01:20.596Z] [runtime-status] [50869] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_50869.sock
+[debug] [2021-10-13T12:01:20.597Z] [functions] Runtime ready! Sending request!
+[debug] [2021-10-13T12:01:20.619Z] [runtime-status] [50869] Ephemeral server handling POST request
+[info] >  { recipientsGroupsAndCategories:
+[info] >     { EIIiEzyjmbXGGPjwKdN4:
+[info] >        { categoryId: '17f27dbf-0c95-4a74-86c9-09461a1e8f1a',
+[info] >          selectedOptions: [Array] },
+[info] >       cvS92g08vxRSVyF7Xvyv:
+[info] >        { categoryId: 'd36c9b4f-ed3f-4fa4-8a4b-e2586720110b',
+[info] >          selectedOptions: [Array] },
+[info] >       PB03auIlV2v1v45gisg0:
+[info] >        { categoryId: '10a86307-7423-4e45-b65a-0fd1fd759544',
+[info] >          selectedOptions: [Array] },
+[info] >       '4J6fUA42FtopX1QCyNSm':
+[info] >        { categoryId: '2fe2dc53-8d83-4d37-ad8b-2135b04cb698',
+[info] >          selectedOptions: [Array] },
+[info] >       hzkuuGmwFd2jjov9meUY:
+[info] >        { categoryId: '37a8efdc-49b7-41af-a9e4-18f7ad31ba06',
+[info] >          selectedOptions: [Array] } } }
+[info] >  [ 'EIIiEzyjmbXGGPjwKdN4',
+[info] >    'cvS92g08vxRSVyF7Xvyv',
+[info] >    'PB03auIlV2v1v45gisg0',
+[info] >    '4J6fUA42FtopX1QCyNSm',
+[info] >    'hzkuuGmwFd2jjov9meUY' ]
+[info] >  1595
+[info] >  269
+[info] >  1
+[debug] [2021-10-13T12:01:22.288Z] [runtime-status] [50869] Ephemeral server survived.
+[info] >  Successfully sent email to 269

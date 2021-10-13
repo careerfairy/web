@@ -70,8 +70,6 @@ export {
    unmuteAllRemoteVideos,
    setVideoIsPaused,
    muteAllRemoteVideos,
-   toggleLocalVideo,
-   toggleLocalAudio,
    unmuteMutedRemoteVideosAfterFail,
    unpauseRemoteVideosAfterFail,
    closeLeftMenu,

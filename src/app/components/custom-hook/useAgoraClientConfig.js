@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useDispatch } from "react-redux";
 
 export default function useAgoraClientConfig(rtcClient, streamerId) {
    const [remoteStreams, setRemoteStreams] = useState([]);
@@ -9,6 +10,7 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
    });
 
    const remoteStreamsRef = useRef(remoteStreams);
+   const dispatch = useDispatch()
 
    const updateRemoteStreams = (newRemoteStreams) => {
       remoteStreamsRef.current = newRemoteStreams;
@@ -54,10 +56,7 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
       });
 
       rtcClient.on("connection-state-change", (curState, prevState) => {
-         //  setAgoraRtcConnectionStatus({
-         //     curState,
-         //     prevState,
-         //  });
+         dispatch(actions.setAgoraRtcConnectionState(curState))
       });
 
       rtcClient.on("user-published", async (remoteUser, mediaType) => {

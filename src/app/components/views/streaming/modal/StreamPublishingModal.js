@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import CheckIcon from "@material-ui/icons/Check";
 import {
@@ -18,6 +18,8 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import SoundLevelDisplayer from "components/views/common/SoundLevelDisplayer";
+import { useSelector } from "react-redux";
+import { AGORA_RTC_CONNECTION_STATE_CONNECTED } from "constants/agora";
 
 const useStyles = makeStyles((theme) => ({
    actions: {},
@@ -40,16 +42,28 @@ function StreamPublishingModal({
 
    const classes = useStyles();
 
+   const agoraRtcConnectionState = useSelector((state) => {
+      debugger;
+      return state.stream.agoraState.rtcConnectionState;
+   });
+
+   const openModal = useMemo(() => {
+      return (
+         open &&
+         agoraRtcConnectionState === AGORA_RTC_CONNECTION_STATE_CONNECTED
+      );
+   }, [open, agoraRtcConnectionState]);
+
    useEffect(() => {
       if (
-         open &&
+         openModal &&
          displayableMediaStream &&
          displayableMediaStream.getTracks().length > 1 &&
          devices
       ) {
          testVideoRef.current.srcObject = displayableMediaStream;
       }
-   }, [displayableMediaStream]);
+   }, [displayableMediaStream, openModal]);
 
    useEffect(() => {
       if (inputLabel?.current?.offsetWidth) {
@@ -66,7 +80,7 @@ function StreamPublishingModal({
    };
 
    return (
-      <Dialog TransitionComponent={Slide} open={open} fullWidth>
+      <Dialog TransitionComponent={Slide} open={openModal} fullWidth>
          <DialogTitle
             disableTypography
             style={{

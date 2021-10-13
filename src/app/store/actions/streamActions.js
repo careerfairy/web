@@ -40,16 +40,6 @@ export const setNumberOfViewers = (numberOfViewers) => async (dispatch) => {
    });
 };
 
-// Toggle your local video
-export const toggleLocalVideo = () => async (dispatch) => {
-   dispatch({ type: actions.TOGGLE_LOCAL_VIDEO });
-};
-
-// Toggle your local audio
-export const toggleLocalAudio = () => async (dispatch) => {
-   dispatch({ type: actions.TOGGLE_LOCAL_AUDIO });
-};
-
 // Mute All videos on the stream
 export const muteAllRemoteVideos = () => async (dispatch) => {
    dispatch({ type: actions.MUTE_ALL_REMOTE_VIDEOS });
@@ -113,6 +103,22 @@ export const setFocusMode = (mode, mobile) => async (dispatch, getState) => {
          return dispatch(openLeftMenu());
       }
    }
+};
+
+export const setAgoraRtcConnectionState = (connectionState) => async (
+   dispatch
+) => {
+   dispatch({
+      type: actions.SET_AGORA_RTC_CONNECTION_STATE,
+      payload: connectionState,
+   });
+};
+
+export const setAgoraRtcError = (rtcError) => async (dispatch) => {
+   dispatch({
+      type: actions.SET_AGORA_RTC_ERROR,
+      payload: rtcError,
+   });
 };
 
 // Action to set streamer state, this is to prevent feature hints to show up before the streamer has published
