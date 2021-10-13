@@ -91,6 +91,9 @@ const ViewerLayout = (props) => {
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
    );
+   const spyModeEnabled = useSelector(
+      (state) => state.stream.streaming.spyModeEnabled
+   );
    const classes = useStyles({ showMenu, mobile, focusModeEnabled });
    const [selectedState, setSelectedState] = useState("questions");
    const [notAuthorized, setNotAuthorized] = useState(false);
@@ -178,12 +181,12 @@ const ViewerLayout = (props) => {
    ]);
 
    useEffect(() => {
-      if (currentLivestream?.hasStarted) {
+      if (currentLivestream?.hasStarted || spyModeEnabled) {
          dispatch(actions.unmuteAllRemoteVideos());
       } else {
          dispatch(actions.muteAllRemoteVideos());
       }
-   }, [currentLivestream?.hasStarted]);
+   }, [currentLivestream?.hasStarted, spyModeEnabled]);
 
    if (notAuthorized) {
       replace({

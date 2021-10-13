@@ -3,11 +3,7 @@ import firebase from "../Firebase/Firebase";
 
 import thunk from "redux-thunk";
 import { applyMiddleware, compose, createStore } from "redux";
-import {
-   getFirebase,
-   reactReduxFirebase,
-   useFirestore,
-} from "react-redux-firebase";
+import { getFirebase } from "react-redux-firebase";
 import { getFirestore, reduxFirestore } from "redux-firestore";
 import { createWrapper } from "next-redux-wrapper";
 
