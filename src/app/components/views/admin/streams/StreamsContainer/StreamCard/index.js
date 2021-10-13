@@ -1,29 +1,25 @@
-import PropTypes from "prop-types";
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { languageCodes } from "../../../../../helperFunctions/streamFormFunctions";
 import {
+   Avatar,
+   Box,
+   Button,
+   Card,
+   CardActions,
+   CardContent,
    CardHeader,
+   CardMedia,
+   CircularProgress,
+   Dialog,
+   DialogContent,
+   IconButton,
    List,
    ListItem,
    ListItemAvatar,
    ListItemText,
-   CardActions,
-   CardContent,
-   CardMedia,
-   Button,
-   Card,
-   Avatar,
-   IconButton,
    Menu,
    MenuItem,
-   Dialog,
-   DialogTitle,
-   DialogContent,
-   DialogActions,
    Typography,
-   CircularProgress,
-   Box,
 } from "@material-ui/core";
 import {
    getBaseUrl,
@@ -34,44 +30,12 @@ import ParticipationIcon from "@material-ui/icons/Visibility";
 import JoinIcon from "@material-ui/icons/RecordVoiceOver";
 import { useFirestore } from "react-redux-firebase";
 import { useFirebase } from "context/firebase";
-import { useDispatch } from "react-redux";
-import * as actions from "../../../../../../store/actions/index";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "store/actions/index";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog";
 import { streamType } from "../../../../../../types";
-
-const MenuItemWithConfirm = ({
-   action,
-   confirmText,
-   onConfirm,
-   children,
-   disabled,
-}) => {
-   const [openDialog, setOpenDialog] = useState(false);
-
-   const handleConfirm = () => {
-      onConfirm();
-      setOpenDialog(false);
-   };
-
-   return (
-      <Fragment>
-         <MenuItem disabled={disabled} onClick={() => setOpenDialog(true)}>
-            {children}
-         </MenuItem>
-         <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-            <DialogTitle>Confirm {action}</DialogTitle>
-            <DialogContent>{confirmText}</DialogContent>
-            <DialogActions>
-               <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-               <Button color="primary" onClick={handleConfirm}>
-                  Confirm
-               </Button>
-            </DialogActions>
-         </Dialog>
-      </Fragment>
-   );
-};
+import ConfirmRecordingDialog from "./ConfirmRecordingDialog";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -104,15 +68,18 @@ const useStyles = makeStyles((theme) => ({
 const StreamCard = ({ stream }) => {
    const classes = useStyles();
    const firestore = useFirestore();
-   const { startLivestreamRecording, stopLivestreamRecording } = useFirebase();
+   const firebase = useFirebase();
    const dispatch = useDispatch();
 
+   const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] = useState(
+      false
+   );
    const [anchorEl, setAnchorEl] = React.useState(null);
    const [openStreamerLinksDialog, setOpenStreamerLinksDialog] = React.useState(
       false
    );
-   const [recordingRequestOngoing, setRecordingRequestOngoing] = useState(
-      false
+   const recordingRequestOngoing = useSelector(
+      (state) => state.streamAdmin.recording.recordingRequestOngoing
    );
 
    const handleClick = (event) => {
@@ -121,6 +88,12 @@ const StreamCard = ({ stream }) => {
 
    const handleClose = () => {
       setAnchorEl(null);
+   };
+   const handleOpenConfirmRecordingDialog = () => {
+      setConfirmRecordingDialogOpen(true);
+   };
+   const handleCloseConfirmRecordingDialog = () => {
+      setConfirmRecordingDialogOpen(false);
    };
 
    const handleJoinAsStreamer = async () => {
@@ -150,65 +123,11 @@ const StreamCard = ({ stream }) => {
    };
 
    const handleStartRecording = async () => {
-      setRecordingRequestOngoing(true);
-      try {
-         const tokenDoc = await firestore.get({
-            collection: "livestreams",
-            doc: stream.id,
-            subcollections: [
-               {
-                  collection: "tokens",
-                  doc: "secureToken",
-               },
-            ],
-         });
-         if (tokenDoc.exists) {
-            const secureToken = tokenDoc.data().value;
-            await startLivestreamRecording({
-               streamId: stream.id,
-               token: secureToken,
-            });
-            setRecordingRequestOngoing(false);
-            return;
-         } else {
-            setRecordingRequestOngoing(false);
-            dispatch(actions.sendGeneralError("This stream has no token"));
-         }
-      } catch (e) {
-         setRecordingRequestOngoing(false);
-         dispatch(actions.sendGeneralError(e));
-      }
+      dispatch(actions.handleStartRecording({ firebase, streamId: stream.id }));
    };
 
    const handleStopRecording = async () => {
-      setRecordingRequestOngoing(true);
-      try {
-         const tokenDoc = await firestore.get({
-            collection: "livestreams",
-            doc: stream.id,
-            subcollections: [
-               {
-                  collection: "tokens",
-                  doc: "secureToken",
-               },
-            ],
-         });
-         if (tokenDoc.exists) {
-            const secureToken = tokenDoc.data().value;
-            await stopLivestreamRecording({
-               streamId: stream.id,
-               token: secureToken,
-            });
-            setRecordingRequestOngoing(false);
-            return;
-         } else {
-            setRecordingRequestOngoing(false);
-            dispatch(actions.sendGeneralError("This stream has no token"));
-         }
-      } catch (e) {
-         setRecordingRequestOngoing(false);
-         dispatch(actions.sendGeneralError(e));
-      }
+      dispatch(actions.handleStopRecording({ firebase, streamId: stream.id }));
    };
 
    return (
@@ -250,22 +169,30 @@ const StreamCard = ({ stream }) => {
                         >
                            Get streamer links
                         </MenuItem>
+                        <MenuItem
+                           disabled={recordingRequestOngoing}
+                           onClick={handleOpenConfirmRecordingDialog}
+                        >
+                           {stream.isRecording
+                              ? "Stop recording stream"
+                              : "Start recording stream"}
+                        </MenuItem>
                         {stream.isRecording ? (
-                           <MenuItemWithConfirm
+                           <ConfirmRecordingDialog
                               confirmText="Are you sure that you want to stop recording this live stream?"
                               onConfirm={handleStopRecording}
+                              open={confirmRecordingDialogOpen}
                               disabled={recordingRequestOngoing}
-                           >
-                              Stop recording stream
-                           </MenuItemWithConfirm>
+                              onclose={handleCloseConfirmRecordingDialog}
+                           />
                         ) : (
-                           <MenuItemWithConfirm
+                           <ConfirmRecordingDialog
                               confirmText="Are you sure that you want to start recording this live stream?"
                               onConfirm={handleStartRecording}
+                              open={confirmRecordingDialogOpen}
                               disabled={recordingRequestOngoing}
-                           >
-                              Start recording stream
-                           </MenuItemWithConfirm>
+                              onclose={handleCloseConfirmRecordingDialog}
+                           />
                         )}
                      </Menu>
                   }
@@ -309,7 +236,7 @@ const StreamCard = ({ stream }) => {
                className={classes.spyButton}
                target="_blank"
                startIcon={<ParticipationIcon />}
-               href={`https://testing2-careerfairy.web.app/streaming/${stream.id}/viewer`}
+               href={`${getBaseUrl()}/streaming/${stream.id}/viewer?spy=true`}
                color="primary"
             >
                Spy

@@ -78,7 +78,13 @@ export {
    openLeftMenu,
    toggleLeftMenu,
    setFocusMode,
+   setSpyMode,
 } from "./streamActions";
+
+export {
+   handleStartRecording,
+   handleStopRecording,
+} from "./streamAdminActions";
 
 export {
    openNavDrawer,

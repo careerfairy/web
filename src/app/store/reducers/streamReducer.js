@@ -20,11 +20,20 @@ const initialState = {
       playLocalAudio: true,
       unmuteFailedMutedRemoteVideos: false,
       unpauseFailedPlayRemoteVideos: false,
+      spyModeEnabled: false,
    },
 };
 
 const streamReducer = (state = initialState, { type, payload }) => {
    switch (type) {
+      case actions.SET_SPY_MODE:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               spyModeEnabled: payload,
+            },
+         };
       case actions.SET_FOCUS_MODE:
          return {
             ...state,
