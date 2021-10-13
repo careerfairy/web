@@ -13,7 +13,12 @@ import ConfirmRecordingDialog from "../../../admin/streams/StreamsContainer/Stre
 import StopRecordingIcon from "@material-ui/icons/Stop";
 import StartRecordingIcon from "@material-ui/icons/PlayCircleFilledWhite";
 import { useFirebase } from "context/firebase";
-import { CircularProgress, Typography, useMediaQuery } from "@material-ui/core";
+import {
+   CircularProgress,
+   Tooltip,
+   Typography,
+   useMediaQuery,
+} from "@material-ui/core";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 import SettingsIcon from "@material-ui/icons/Settings";
 import Box from "@material-ui/core/Box";
@@ -21,12 +26,14 @@ import ConfirmStartStreamingDialog from "./ConfirmStartStreamingDialog";
 import JoinAsStreamerIcon from "@material-ui/icons/RecordVoiceOver";
 import useStreamToken from "../../../../custom-hook/useStreamToken";
 import clsx from "clsx";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 const useStyles = makeStyles((theme) => ({
    root: {
       position: "absolute",
       right: theme.spacing(2),
       top: theme.spacing(2),
+      alignItems: "flex-end",
    },
    displaced: {
       top: 65,
@@ -45,6 +52,16 @@ const useStyles = makeStyles((theme) => ({
    },
    overlayText: {
       fontWeight: 900,
+   },
+   expandIcon: {
+      transition: theme.transitions.create(["transform"], {
+         duration: theme.transitions.duration.complex,
+         easing: theme.transitions.easing.easeInOut,
+      }),
+      marginLeft: 5,
+   },
+   rotated: {
+      transform: `rotate(180deg)`,
    },
 }));
 
@@ -238,14 +255,28 @@ const SuperAdminControls = () => {
                [classes.displaced]: focusModeEnabled || mobile,
             })}
             direction="down"
-            title={"Admin Controls"}
             icon={
                mobile ? (
-                  <SpeedDialIcon icon={<SettingsIcon />} />
+                  <Tooltip
+                     title={
+                        open ? "Hide Admin Controls" : "Show Admin Controls"
+                     }
+                  >
+                     {open ? (
+                        <ExpandMoreIcon className={classes.rotated} />
+                     ) : (
+                        <ExpandMoreIcon />
+                     )}
+                  </Tooltip>
                ) : (
                   <>
                      <SettingsIcon style={{ marginRight: 5 }} />
-                     Admin Controls
+                     {open ? "Hide Admin Controls" : "Show Admin Controls"}
+                     <ExpandMoreIcon
+                        className={clsx(classes.expandIcon, {
+                           [classes.rotated]: open,
+                        })}
+                     />
                   </>
                )
             }

@@ -38,7 +38,7 @@ const Content = ({ handleClose, requestHandRaise }) => {
             </DialogContentText>
          </DialogContent>
          <DialogActions>
-            <Button children="Join without" onClick={handleClose} />
+            <Button children="No Thanks" onClick={handleClose} />
             <Button
                variant="contained"
                children="Request to Join with video and audio"

@@ -4,8 +4,10 @@ import {
    Box,
    Button,
    Container,
+   Fab,
    Grid,
    TextField,
+   Tooltip,
 } from "@material-ui/core";
 import Header from "../../components/views/header/Header";
 import SettingsIcon from "@material-ui/icons/Settings";
@@ -44,6 +46,7 @@ import {
    InPersonEventBadge,
    LimitedRegistrationsBadge,
 } from "components/views/NextLivestreams/GroupStreams/groupStreamCard/badges";
+import Link from "materialUI/NextNavLink";
 
 const useStyles = makeStyles((theme) => ({
    speakerAvatar: {
@@ -105,6 +108,13 @@ const useStyles = makeStyles((theme) => ({
       width: "fit-content",
    },
    logosGridContainer: {},
+   adminJoinStreamButton: {
+      position: "fixed",
+      bottom: theme.spacing(4),
+      right: theme.spacing(2),
+      textDecoration: "none !important",
+      zIndex: 201,
+   },
 }));
 
 const parseDates = (stream) => {
@@ -972,6 +982,27 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                      />
                   </Box>
                </div>
+               {userData?.isAdmin && (
+                  <Tooltip
+                     title={
+                        "This button is only present for CareerFairy admins"
+                     }
+                  >
+                     <Fab
+                        className={classes.adminJoinStreamButton}
+                        variant="extended"
+                        color="secondary"
+                        component={Link}
+                        href={
+                           "/streaming/" +
+                           currentLivestream?.id +
+                           "/viewer?spy=true"
+                        }
+                     >
+                        Check Stream now
+                     </Fab>
+                  </Tooltip>
+               )}
                <Grid
                   container
                   justifyContent="center"

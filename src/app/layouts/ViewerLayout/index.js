@@ -142,6 +142,7 @@ const ViewerLayout = (props) => {
    }, [mobile]);
 
    useEffect(() => {
+      if (userData?.isAdmin) return;
       if (userData?.userEmail) {
          if (livestreamId) {
             firebase.setUserIsParticipating(livestreamId, userData);
@@ -153,6 +154,7 @@ const ViewerLayout = (props) => {
    }, [
       livestreamId,
       userData?.email,
+      userData?.isAdmin,
       userData?.linkedinUrl,
       userData?.firstName,
       userData?.lastName,
