@@ -36,6 +36,7 @@ const ManageBreakoutRoomsView = ({
    breakoutRooms,
    handleClose,
    agoraHandlers,
+   leaveAgoraRoom,
 }) => {
    const classes = useStyles();
    const { isMainStreamer } = useCurrentStream();
@@ -105,6 +106,7 @@ const ManageBreakoutRoomsView = ({
 
    const handleDisconnect = async () => {
       await agoraHandlers.handleDisconnect();
+      await leaveAgoraRoom();
    };
 
    const handleBackToMainRoom = async () => {
@@ -186,6 +188,7 @@ const ManageBreakoutRoomsView = ({
                   index={index}
                   isMainStreamer={isMainStreamer}
                   agoraHandlers={agoraHandlers}
+                  leaveAgoraRoom={leaveAgoraRoom}
                   openRoom={openRoom}
                   refreshing={refreshing}
                   mobile={mobile}

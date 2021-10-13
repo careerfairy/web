@@ -172,7 +172,7 @@ export default function useAgoraAsStreamer(
                await rtmClient.logout();
             }
             if (rtcClient) {
-               await rtcClient.leave();
+               await disconnectRtc();
             }
          },
          joinChannel: async (
