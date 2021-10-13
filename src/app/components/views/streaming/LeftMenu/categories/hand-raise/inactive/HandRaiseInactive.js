@@ -13,6 +13,7 @@ import {
 import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 import { useLocalStorage } from "react-use";
 import NewFeatureHint from "../../../../../../util/NewFeatureHint";
+import { useSelector } from "react-redux";
 
 const HAND_RAISE_HINT_LOCAL_KEY = "hasSeenHandRaiseTip";
 
@@ -31,6 +32,9 @@ function HandRaiseInactive({
       HAND_RAISE_HINT_LOCAL_KEY,
       false
    );
+   const streamerIsPublished = useSelector((state) => {
+      return state.stream.streaming.isPublished;
+   });
 
    useEffect(() => {
       if (hasSeenHandRaiseTip === false && !livestream.test) {
@@ -123,7 +127,10 @@ function HandRaiseInactive({
                      localStorageKey={HAND_RAISE_HINT_LOCAL_KEY}
                      tooltipTitle="Allow audience to join with video/audio"
                      hide={
-                        tutorialSteps.streamerReady || selectedState !== "hand" || animating
+                        tutorialSteps.streamerReady ||
+                        selectedState !== "hand" ||
+                        animating ||
+                        !streamerIsPublished
                      }
                      placement="bottom"
                      tooltipText="Please activate this feature if you would like your audience to join with video and video."

@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSoundMeter } from "./useSoundMeter";
 
-export default function useMediaSources(devices, localStream, showSoundMeter) {
+export default function useMediaSources(
+   devices,
+   localStream,
+   showSoundMeter,
+   active
+) {
    const [audioSource, setAudioSource] = useState(null);
    const [videoSource, setVideoSource] = useState(null);
    const [soundMediaUpdateCounter, setSoundMeterUpdateCounter] = useState(0);
@@ -9,13 +14,13 @@ export default function useMediaSources(devices, localStream, showSoundMeter) {
    const [localMediaStream, setLocalMediaStream] = useState(null);
 
    useEffect(() => {
-      if (localStream) {
+      if (active && localStream) {
          const mediaStream = new MediaStream();
          mediaStream.addTrack(localStream.audioTrack.getMediaStreamTrack());
          mediaStream.addTrack(localStream.videoTrack.getMediaStreamTrack());
          setLocalMediaStream(mediaStream);
       }
-   }, [localStream, audioSource, videoSource]);
+   }, [localStream, audioSource, videoSource, active]);
 
    const audioLevel = useSoundMeter(
       showSoundMeter,
@@ -24,7 +29,7 @@ export default function useMediaSources(devices, localStream, showSoundMeter) {
    );
 
    useEffect(() => {
-      if (devices && localStream) {
+      if (active && devices && localStream) {
          if (
             devices.audioInputList &&
             devices.audioInputList.length > 0 &&
@@ -37,7 +42,7 @@ export default function useMediaSources(devices, localStream, showSoundMeter) {
             );
          }
       }
-   }, [devices, localStream?.uid]);
+   }, [devices, localStream?.uid, active]);
 
    const initalizeAudioAndVideoSources = (audioDeviceId, videoDeviceId) => {
       localStream.audioTrack.setDevice(audioDeviceId).then(() => {

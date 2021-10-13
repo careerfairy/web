@@ -114,3 +114,11 @@ export const setFocusMode = (mode, mobile) => async (dispatch, getState) => {
       }
    }
 };
+
+// Action to set streamer state, this is to prevent feature hints to show up before the streamer has published
+export const setStreamerIsPublished = (isPublished) => async (dispatch) => {
+   dispatch({
+      type: actions.SET_STREAMER_PUBLISHED,
+      payload: isPublished,
+   });
+};

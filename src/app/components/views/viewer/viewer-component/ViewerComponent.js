@@ -20,6 +20,8 @@ import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 import Streams from "../../streaming/video-container/Streams";
 import DraggableComponent from "../../banners/DraggableComponent";
 import WifiIndicator from "../../streaming/video-container/WifiIndicator";
+import useAgoraRtc from "components/custom-hook/useAgoraRtc";
+import useAgoraRtm from "components/custom-hook/useAgoraRtm";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -81,80 +83,64 @@ function ViewerComponent({
       currentLivestream.mode === "desktop"
          ? optimizationMode
          : "";
+
    const {
-      externalUsers,
-      localMediaStream,
-      setLocalMediaStream,
-      agoraRtcStatus,
-      agoraRtmStatus,
       networkQuality,
-      agoraRtcConnectionStatus,
-      createEmote,
-      joinedChannel,
-   } = useAgoraAsStreamer(
-      streamerReady,
-      !handRaiseActive,
-      screenSharingMode,
+      localStream,
+      localMediaControls,
+      remoteStreams,
+      publishLocalCameraStream,
+      publishScreenShareStream,
+      unpublishScreenShareStream,
+   } = useAgoraRtc(streamerId, currentLivestream.id, handRaiseActive);
+
+   const { agoraHandlers, createEmote } = useAgoraRtm(
       currentLivestream.id,
-      streamerId,
-      true
+      streamerId
    );
 
-   const devices = useDevices(
-      agoraRtcStatus && ["RTC_STREAM_PUBLISHED"].includes(agoraRtcStatus.msg)
-   );
+   const devices = useDevices(false);
    // console.log("-> agoraRtcStatus.msg", agoraRtcStatus.msg);
    // console.log("-> devices from use devices", devices);
 
    const {
-      audioSource,
-      updateAudioSource,
-      videoSource,
-      updateVideoSource,
-      speakerSource,
-      updateSpeakerSource,
+      mediaControls,
       localMediaStream: displayableMediaStream,
-      audioLevel,
    } = useMediaSources(
       devices,
-      authenticatedUser?.email,
-      localMediaStream,
-      !streamerReady || showSettings
+      localStream,
+      !streamerReady || showSettings,
+      handRaiseActive
    );
 
-   useEffect(() => {
-      if (
-         handRaiseActive &&
-         agoraRtcStatus &&
-         agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
-      ) {
-         if (currentLivestream) {
-            if (currentLivestream.test) {
-               firebase.updateHandRaiseRequest(
-                  streamRef,
-                  "streamerEmail",
-                  "connected"
-               );
-            } else {
-               firebase.updateHandRaiseRequest(
-                  streamRef,
-                  authenticatedUser.email,
-                  "connected"
-               );
-            }
-         }
-      }
-   }, [agoraRtcStatus]);
+   // useEffect(() => {
+   //    if (
+   //       handRaiseActive &&
+   //       agoraRtcStatus &&
+   //       agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
+   //    ) {
+   //       if (currentLivestream) {
+   //          if (currentLivestream.test) {
+   //             firebase.updateHandRaiseRequest(
+   //                streamRef,
+   //                "streamerEmail",
+   //                "connected"
+   //             );
+   //          } else {
+   //             firebase.updateHandRaiseRequest(
+   //                streamRef,
+   //                authenticatedUser.email,
+   //                "connected"
+   //             );
+   //          }
+   //       }
+   //    }
+   // }, [agoraRtcStatus]);
 
-   const currentSpeakerId = useCurrentSpeaker(localMediaStream, externalUsers);
+   const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams);
 
    useEffect(() => {
-      if (
-         joinedChannel &&
-         !props.isBreakout &&
-         !externalUsers?.length &&
-         hasActiveRooms
-      ) {
+      if (!isBreakout && !remoteStreams?.length && hasActiveRooms) {
          const timout = setTimeout(function () {
             //Start the timer
             dispatch(actions.openViewerBreakoutModal());
@@ -162,12 +148,7 @@ function ViewerComponent({
 
          return () => clearTimeout(timout); // Cancel opening modal if streams appear before 3 seconds
       }
-   }, [
-      Boolean(externalUsers?.length),
-      isBreakout,
-      hasActiveRooms,
-      joinedChannel,
-   ]);
+   }, [Boolean(remoteStreams?.length), isBreakout, hasActiveRooms]);
 
    const setDesktopMode = async (mode, initiatorId) => {
       let screenSharerId =
@@ -211,8 +192,8 @@ function ViewerComponent({
             <EmoteButtons createEmote={createEmote} />
          )}
          <Streams
-            externalMediaStreams={externalUsers}
-            localMediaStream={localMediaStream}
+            externalMediaStreams={remoteStreams}
+            localMediaStream={localStream}
             currentSpeakerId={currentSpeakerId}
             streamerId={streamerId}
             mobile={mobile}
@@ -243,38 +224,33 @@ function ViewerComponent({
                </DraggableComponent>
                <VideoControlsContainer
                   currentLivestream={currentLivestream}
-                  viewer={true}
-                  streamerId={authenticatedUser.email}
-                  joining={true}
-                  localMediaStream={localMediaStream}
-                  setLocalMediaStream={setLocalMediaStream}
                   handleClickScreenShareButton={handleClickScreenShareButton}
+                  streamerId={streamerId}
                   isMainStreamer={false}
+                  viewer={true}
+                  localMediaControls={localMediaControls}
                   showSettings={showSettings}
                   setShowSettings={setShowSettings}
                />
+
                <SettingsModal
                   open={showSettings}
                   close={() => setShowSettings(false)}
                   devices={devices}
                   displayableMediaStream={displayableMediaStream}
-                  audioSource={audioSource}
-                  updateAudioSource={updateAudioSource}
-                  videoSource={videoSource}
-                  updateVideoSource={updateVideoSource}
-                  audioLevel={audioLevel}
+                  mediaControls={mediaControls}
                />
                <ScreenShareModal
                   open={showScreenShareModal}
                   handleClose={handleCloseScreenShareModal}
                   handleScreenShare={handleScreenShare}
                />
-               <LoadingModal agoraRtcStatus={agoraRtcStatus} />
-               <ErrorModal
+               {/* <LoadingModal agoraRtcStatus={agoraRtcStatus} /> */}
+               {/* <ErrorModal
                   agoraRtcStatus={agoraRtcStatus}
                   agoraRtmStatus={agoraRtmStatus}
                   agoraRtcConnectionStatus={agoraRtcConnectionStatus}
-               />
+               /> */}
             </Fragment>
          )}
 

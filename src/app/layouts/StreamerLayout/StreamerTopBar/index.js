@@ -91,6 +91,10 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
    ] = useState(false);
    const { joiningStreamerLink, viewerLink } = useStreamToken();
 
+   const streamerIsPublished = useSelector((state) => {
+      return state.stream.streaming.isPublished;
+   });
+
    useEffect(() => {
       if (currentLivestream.start) {
          let interval = setInterval(() => {
@@ -131,7 +135,11 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                   <Fragment>
                      <StandartTooltip
                         arrow
-                        open={!streamStartTimeIsNow && !hideTooltip}
+                        open={
+                           !streamStartTimeIsNow &&
+                           !hideTooltip &&
+                           streamerIsPublished
+                        }
                         interactive
                         placement="bottom"
                         title={
@@ -266,6 +274,7 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                   </Tooltip>
                   <NewFeatureHint
                      onClick={showAudience}
+                     hide={!streamerIsPublished}
                      tooltipText="Click here to see who's joined the stream since the start"
                      localStorageKey="hasSeenAudienceDrawer"
                      tooltipTitle="Hint"

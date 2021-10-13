@@ -21,7 +21,7 @@ import { useTheme } from "@material-ui/core/styles";
 import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector";
 import * as actions from "store/actions";
 
-const Content = ({ handleClose, agoraHandlers }) => {
+const Content = ({ handleClose, agoraHandlers, leaveAgoraRoom }) => {
    const {
       query: { livestreamId },
    } = useRouter();
@@ -94,12 +94,13 @@ const Content = ({ handleClose, agoraHandlers }) => {
    return (
       <ManageBreakoutRoomsView
          agoraHandlers={agoraHandlers}
+         leaveAgoraRoom={leaveAgoraRoom}
          handleClose={handleClose}
          breakoutRooms={breakoutRooms}
       />
    );
 };
-const BreakoutRoomManagementModal = ({ agoraHandlers }) => {
+const BreakoutRoomManagementModal = ({ agoraHandlers, leaveAgoraRoom }) => {
    const open = useSelector(
       (state) => state.stream.layout.streamerBreakoutRoomModalOpen
    );
@@ -123,7 +124,11 @@ const BreakoutRoomManagementModal = ({ agoraHandlers }) => {
          open={open}
          onClose={handleClose}
       >
-         <Content agoraHandlers={agoraHandlers} handleClose={handleClose} />
+         <Content
+            agoraHandlers={agoraHandlers}
+            leaveAgoraRoom={leaveAgoraRoom}
+            handleClose={handleClose}
+         />
       </GlassDialog>
    );
 };

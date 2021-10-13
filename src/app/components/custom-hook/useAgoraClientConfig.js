@@ -71,9 +71,11 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
             if (user.uid === remoteUser.uid) {
                if (mediaType === "audio") {
                   user.audioTrack = remoteUser.audioTrack;
+                  user.audioMuted = false;
                   remoteUser.audioTrack.play();
                } else if (mediaType === "video") {
                   user.videoTrack = remoteUser.videoTrack;
+                  user.videoMuted = false;
                }
             }
          });
@@ -91,8 +93,10 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
             if (user.uid === remoteUser.uid) {
                if (mediaType === "audio") {
                   user.audioTrack = null;
+                  user.audioMuted = true;
                } else if (mediaType === "video") {
                   user.videoTrack = null;
+                  user.videoMuted = true;
                }
             }
          });

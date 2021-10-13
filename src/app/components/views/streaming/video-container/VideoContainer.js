@@ -27,8 +27,11 @@ import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/Stre
 import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 import Streams from "./Streams";
 import DraggableComponent from "../../banners/DraggableComponent";
-import useAgora from "components/custom-hook/useAgora";
+import useAgoraRtc from "components/custom-hook/useAgoraRtc";
+import useAgoraRtm from "components/custom-hook/useAgoraRtm";
 import StreamPublishingModal from "../modal/StreamPublishingModal";
+import { useDispatch } from "react-redux";
+import * as actions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -52,10 +55,8 @@ function VideoContainer({
    } = useContext(TutorialContext);
    const isMainStreamer = streamerId === currentLivestream.id;
    const streamRef = useStreamRef();
-   const [errorMessage, setErrorMessage] = useState(null);
+   const dispatch = useDispatch();
    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
-   const [streamerConnected, setStreamerConnected] = useState(false);
-   const [streamerReady, setStreamerReady] = useState(false);
 
    const [showScreenShareModal, setShowScreenShareModal] = useState(false);
    const [
@@ -75,7 +76,10 @@ function VideoContainer({
       publishLocalCameraStream,
       publishScreenShareStream,
       unpublishScreenShareStream,
-   } = useAgora(streamerId, isStreamer);
+      leaveAgoraRoom,
+   } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer);
+
+   const { agoraHandlers } = useAgoraRtm(currentLivestream.id, streamerId);
 
    const devices = useDevices(Boolean(localStream));
 
@@ -85,7 +89,8 @@ function VideoContainer({
    } = useMediaSources(
       devices,
       localStream,
-      showLocalStreamPublishingModal || showSettings
+      showLocalStreamPublishingModal || showSettings,
+      true
    );
 
    const currentSpeakerId = useCurrentSpeaker(localStream, []);
@@ -152,7 +157,8 @@ function VideoContainer({
 
    const handlePublishLocalStream = () => {
       publishLocalCameraStream()
-         .then(() => {
+         .then(async () => {
+            await dispatch(actions.setStreamerIsPublished(true));
             setShowLocalStreamPublishingModal(false);
          })
          .catch(() => {});
@@ -249,7 +255,10 @@ function VideoContainer({
 
    return (
       <Fragment>
-         {/* <BreakoutRoomManagementModal agoraHandlers={agoraHandlers} /> */}
+         <BreakoutRoomManagementModal
+            leaveAgoraRoom={leaveAgoraRoom}
+            agoraHandlers={agoraHandlers}
+         />
          <Streams
             externalMediaStreams={remoteStreams}
             localMediaStream={localStream}

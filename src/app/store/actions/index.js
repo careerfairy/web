@@ -78,6 +78,7 @@ export {
    openLeftMenu,
    toggleLeftMenu,
    setFocusMode,
+   setStreamerIsPublished,
 } from "./streamActions";
 
 export {

@@ -8,9 +8,8 @@ import useAgoraClientConfig from "./useAgoraClientConfig";
 
 const AGORA_APP_ID = "53675bc6d3884026a72ecb1de3d19eb1";
 
-export default function useAgora(streamerId, isStreamer) {
+export default function useAgoraRtc(streamerId, roomId, isStreamer) {
    const { path } = useStreamRef();
-   const dispatch = useDispatch();
    const router = useRouter();
    const { withProxy } = router.query;
    const cfToken = router.query.token || "";
@@ -86,14 +85,19 @@ export default function useAgora(streamerId, isStreamer) {
       return rtcClient.join(AGORA_APP_ID, roomId, data.token.rtcToken, userUid);
    };
 
+   const leaveAgoraRoom = async () => {
+      try {
+         if (rtcClient) {
+            await rtcClient.leave();
+         }
+      } catch (error) {
+         console.log(error);
+      }
+   };
+
    const joinAgoraRoomWithPrimaryClient = async () => {
       try {
-         await joinAgoraRoom(
-            primaryRtcClient,
-            streamerId,
-            streamerId,
-            isStreamer
-         );
+         await joinAgoraRoom(primaryRtcClient, roomId, streamerId, isStreamer);
       } catch (error) {
          // handle join error
       }
@@ -189,7 +193,7 @@ export default function useAgora(streamerId, isStreamer) {
             const screenShareUid = `${streamerId}screen`;
             await joinAgoraRoom(
                screenShareClient,
-               streamerId,
+               roomId,
                screenShareUid,
                true
             );
@@ -278,5 +282,6 @@ export default function useAgora(streamerId, isStreamer) {
       publishLocalCameraStream,
       publishScreenShareStream,
       unpublishScreenShareStream,
+      leaveAgoraRoom,
    };
 }

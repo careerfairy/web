@@ -12,6 +12,7 @@ const initialState = {
       numberOfViewers: 0,
    },
    streaming: {
+      isPublished: false,
       videoIsPaused: false,
       videoIsMuted: false,
       playAllRemoteVideos: false,
@@ -25,6 +26,14 @@ const initialState = {
 
 const streamReducer = (state = initialState, { type, payload }) => {
    switch (type) {
+      case actions.SET_STREAMER_PUBLISHED:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               isPublished: payload,
+            },
+         };
       case actions.SET_FOCUS_MODE:
          return {
             ...state,
