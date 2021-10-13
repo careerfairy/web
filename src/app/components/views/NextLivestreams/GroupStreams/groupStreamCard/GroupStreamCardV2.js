@@ -100,6 +100,9 @@ const useStyles = makeStyles((theme) => ({
          opacity: 0.8,
       },
    },
+   highlighted: {
+      border: `12px solid ${theme.palette.primary.main}`,
+   },
    content: {
       bottom: 0,
       width: "100%",
@@ -625,6 +628,7 @@ const GroupStreamCardV2 = memo(
                   <Box
                      className={clsx(classes.main, {
                         [classes.mainBooked]: registered,
+                        [classes.highlighted]: livestream.highlighted,
                      })}
                      position={"relative"}
                   >

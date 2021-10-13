@@ -53,38 +53,86 @@ exports.generateAgoraToken = functions.https.onRequest(async (req, res) => {
    return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
 });
 
-exports.startRecordingLivestream = functions.https.onRequest(
+exports.generateAgoraTokenSecure = functions.https.onRequest(
    async (req, res) => {
       setHeaders(req, res);
 
-      const customerKey = "fd45e86c6ffe445ebb87571344e945b1";
-      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0";
+      const channelName = req.body.channel;
+      const sentToken = req.body.token;
+      const rtcRole = req.body.isStreamer
+         ? RtcRole.PUBLISHER
+         : RtcRole.SUBSCRIBER;
+      const rtmRole = 0;
+      const expirationTimeInSeconds = 21600;
+      const uid = req.body.uid;
+      const currentTimestamp = Math.floor(Date.now() / 1000);
+      const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
 
-      let plainCredentials = `${customerKey}:${customerSecret}`;
-      let base64Credentials = Buffer.from(plainCredentials).toString("base64");
+      // Build token with uid
+      if (rtcRole === RtcRole.PUBLISHER) {
+         let livestreamDoc = await admin
+            .firestore()
+            .collection("livestreams")
+            .doc(channelName)
+            .get();
+         let livestream = livestreamDoc.data();
 
-      let authorizationHeader = `Basic ${base64Credentials}`;
+         if (!livestream.test) {
+            let storedTokenDoc = await admin
+               .firestore()
+               .collection("livestreams")
+               .doc(channelName)
+               .collection("tokens")
+               .doc("secureToken")
+               .get();
+            let storedToken = storedTokenDoc.data().value;
+            if (storedToken !== sentToken) {
+               return res.status(401).send();
+            }
+         }
+         const rtcToken = RtcTokenBuilder.buildTokenWithUid(
+            appID,
+            appCertificate,
+            channelName,
+            uid,
+            rtcRole,
+            privilegeExpiredTs
+         );
+         const rtmToken = RtmTokenBuilder.buildToken(
+            appID,
+            appCertificate,
+            uid,
+            rtmRole,
+            privilegeExpiredTs
+         );
+         return res
+            .status(200)
+            .send({ rtcToken: rtcToken, rtmToken: rtmToken });
+      } else {
+         const rtcToken = RtcTokenBuilder.buildTokenWithUid(
+            appID,
+            appCertificate,
+            channelName,
+            uid,
+            rtcRole,
+            privilegeExpiredTs
+         );
+         const rtmToken = RtmTokenBuilder.buildToken(
+            appID,
+            appCertificate,
+            uid,
+            rtmRole,
+            privilegeExpiredTs
+         );
 
-      let acquire = await axios({
-         method: "post",
-         data: {
-            cname: "bnruMEB6DGte14VNaZ9M",
-            uid: 1234232,
-            clientRequest: {},
-         },
-         url: `https://api.agora.io/dev/v1/apps/${appID}/cloud_recording/acquire`,
-         headers: {
-            Authorization: authorizationHeader,
-            "Content-Type": "application/json",
-         },
-      });
-
-      console.log(acquire);
-      functions.logger.info("acquire", acquire);
+         return res
+            .status(200)
+            .send({ rtcToken: rtcToken, rtmToken: rtmToken });
+      }
    }
 );
 
-exports.generateAgoraTokenSecure = functions.https.onCall(
+exports.generateAgoraTokenSecureOnCall = functions.https.onCall(
    async (data, context) => {
       const {
          isStreamer,

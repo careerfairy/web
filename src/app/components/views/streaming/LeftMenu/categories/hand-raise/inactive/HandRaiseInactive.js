@@ -123,7 +123,7 @@ function HandRaiseInactive({
                   open={isOpen(9)}
                >
                   <NewFeatureHint
-                     onClick={() => setHasSeenHandRaiseTip(true)}
+                     onClickConfirm={() => setHasSeenHandRaiseTip(true)}
                      localStorageKey={HAND_RAISE_HINT_LOCAL_KEY}
                      tooltipTitle="Allow audience to join with video/audio"
                      hide={
