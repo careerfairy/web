@@ -20,15 +20,16 @@ import Box from "@material-ui/core/Box";
 import ConfirmStartStreamingDialog from "./ConfirmStartStreamingDialog";
 import JoinAsStreamerIcon from "@material-ui/icons/RecordVoiceOver";
 import useStreamToken from "../../../../custom-hook/useStreamToken";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
    root: {
       position: "absolute",
       right: theme.spacing(2),
       top: theme.spacing(2),
-      [theme.breakpoints.down("sm")]: {
-         top: 65,
-      },
+   },
+   displaced: {
+      top: 65,
    },
    tooltip: {
       whiteSpace: "nowrap",
@@ -78,7 +79,9 @@ const SuperAdminControls = () => {
    const recordingRequestOngoing = useSelector(
       (state) => state.streamAdmin.recording.recordingRequestOngoing
    );
-
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
    const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] = useState(
       false
    );
@@ -179,7 +182,7 @@ const SuperAdminControls = () => {
                disabled: recordingRequestOngoing,
                loading: recordingRequestOngoing,
                active: currentLivestream?.isRecording,
-               hidden: isBreakout,
+               hidden: isBreakout || currentLivestream?.test,
             },
             {
                icon: <SpyIcon color={spyModeEnabled ? "primary" : "action"} />,
@@ -209,6 +212,7 @@ const SuperAdminControls = () => {
          recordingRequestOngoing,
          currentLivestream?.isRecording,
          currentLivestream?.hasStarted,
+         currentLivestream?.test,
          currentLivestream?.id,
          confirmRecordingDialogOpen,
          isStreamer,
@@ -218,6 +222,7 @@ const SuperAdminControls = () => {
          viewerLink,
          joiningStreamerLink,
          isBreakout,
+         mobile,
       ]
    );
 
@@ -229,7 +234,9 @@ const SuperAdminControls = () => {
       <>
          <SpeedDial
             ariaLabel="Admin Stream Controls"
-            className={classes.root}
+            className={clsx(classes.root, {
+               [classes.displaced]: focusModeEnabled || mobile,
+            })}
             direction="down"
             title={"Admin Controls"}
             icon={
