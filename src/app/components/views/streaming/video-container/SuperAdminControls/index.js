@@ -222,6 +222,7 @@ const SuperAdminControls = () => {
          viewerLink,
          joiningStreamerLink,
          isBreakout,
+         mobile,
       ]
    );
 
