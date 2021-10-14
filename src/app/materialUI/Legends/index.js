@@ -61,7 +61,14 @@ const CustomLegend = ({
          }
          setLegendLabels(totalLegends);
       }
-   }, [chartData, colors.length, hideEmpty]);
+   }, [
+      chartData,
+      colors.length,
+      hideEmpty,
+      chartRef?.current,
+      chartRef?.current?.chartInstance,
+      options,
+   ]);
 
    const handleClickLegend = (e, index) => {
       const chart = chartRef?.current?.chartInstance;
