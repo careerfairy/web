@@ -207,6 +207,7 @@ const CategoryBreakdown = ({
          ],
          labels: typesOfOptions.map((option) => option.name),
          ids: typesOfOptions.map((option) => option.id),
+         dataId: currentCategory.id,
       });
    }, [typesOfOptions, localColors, currentGroup]);
 
@@ -429,9 +430,9 @@ const CategoryBreakdown = ({
                      expanded: classes.expanded,
                      root: classes.accordionRoot,
                   }}
-                  onClick={() => setShowLabels(!showLabels)}
                >
                   <AccordionSummary
+                     onClick={() => setShowLabels(!showLabels)}
                      expandIcon={<ExpandMoreIcon />}
                      style={{ minHeight: 45 }}
                   >
@@ -446,6 +447,7 @@ const CategoryBreakdown = ({
                            colors={localColors}
                            chartRef={chartRef}
                            fullWidth
+                           key={data?.dataId || currentCategory?.id}
                            hideEmpty
                            chartData={data}
                            optionDataType="User"
