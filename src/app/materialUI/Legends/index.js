@@ -71,6 +71,7 @@ const CustomLegend = ({
       chartRef?.current,
       chartRef?.current?.chartInstance,
       options,
+      chartRef,
    ]);
 
    const handleClickLegend = (e, index) => {

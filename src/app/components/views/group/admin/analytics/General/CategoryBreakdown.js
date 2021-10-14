@@ -152,6 +152,13 @@ const CategoryBreakdown = ({
    });
 
    useEffect(() => {
+      if (chartRef.current) {
+         const chart = chartRef?.current?.chartInstance;
+         chart?.update?.();
+      }
+   }, [typesOfOptions, currentCategory, currentCategory]);
+
+   useEffect(() => {
       if (groups?.length || !currentGroup?.id) {
          setCurrentGroup(groups[0]);
          setCurrentCategory(
@@ -176,7 +183,7 @@ const CategoryBreakdown = ({
    useEffect(() => {
       const newTypeOfOptions = getTypeOfStudents();
       setTypesOfOptions(newTypeOfOptions);
-   }, [audience, currentCategory]);
+   }, [audience, currentCategory, currentGroup?.categories]);
 
    useEffect(() => {
       if (typesOfOptions.length) {
