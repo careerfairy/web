@@ -414,7 +414,12 @@ const CategoryBreakdown = ({
                      </Button>
                   </>
                ) : (
-                  <Doughnut data={data} ref={chartRef} options={options} />
+                  <Doughnut
+                     key={currentCategory.id}
+                     data={data}
+                     ref={chartRef}
+                     options={options}
+                  />
                )}
             </Box>
             {!hasNoData() && (

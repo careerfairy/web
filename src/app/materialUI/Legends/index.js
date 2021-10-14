@@ -47,6 +47,7 @@ const CustomLegend = ({
          chart.data.datasets.forEach((dataSet, dataSetIndex) => {
             const meta = chart.getDatasetMeta(dataSetIndex);
             const newLegends = meta.data.map((labelMetaData) => {
+               console.log("-> labelMetaData", labelMetaData);
                return {
                   [optionLabelProp]: labelMetaData._view.label,
                   hidden: labelMetaData.hidden,
