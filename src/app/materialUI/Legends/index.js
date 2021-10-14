@@ -36,10 +36,13 @@ const CustomLegend = ({
 }) => {
    const classes = useStyles({ fullWidth });
    const [legendLabels, setLegendLabels] = useState([]);
-
+   console.log("-> legendLabels", legendLabels);
+   console.log("-> chartData", chartData);
+   console.log("-> options", options);
    useEffect(() => {
       const chart = chartRef?.current?.chartInstance;
       if (chart) {
+         console.log("-> options", options);
          let totalLegends = [];
          chart.data.datasets.forEach((dataSet, dataSetIndex) => {
             const meta = chart.getDatasetMeta(dataSetIndex);
