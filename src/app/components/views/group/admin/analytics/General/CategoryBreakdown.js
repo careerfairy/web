@@ -152,6 +152,11 @@ const CategoryBreakdown = ({
    });
 
    useEffect(() => {
+      const chart = chartRef?.current?.chartInstance;
+      console.log("-> chart", chart);
+   }, [chartRef?.current, data]);
+
+   useEffect(() => {
       if (groups?.length || !currentGroup?.id) {
          setCurrentGroup(groups[0]);
          setCurrentCategory(
@@ -192,6 +197,8 @@ const CategoryBreakdown = ({
          datasets: [
             {
                data: typesOfOptions.map((option) => option.count),
+               ids: typesOfOptions.map((option) => option.id),
+               id: typesOfOptions.map((option) => option.id),
                backgroundColor: localColors,
                borderWidth: 8,
                borderColor: theme.palette.common.white,
@@ -237,6 +244,7 @@ const CategoryBreakdown = ({
       layout: { padding: 0 },
       legend: {
          display: false,
+         // position: "bottom",
       },
       maintainAspectRatio: false,
       responsive: true,

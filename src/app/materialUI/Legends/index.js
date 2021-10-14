@@ -36,20 +36,21 @@ const CustomLegend = ({
 }) => {
    const classes = useStyles({ fullWidth });
    const [legendLabels, setLegendLabels] = useState([]);
-   console.log("-> legendLabels", legendLabels);
-   console.log("-> chartData", chartData);
-   console.log("-> options", options);
+   // console.table(legendLabels);
+   // console.table(options);
    useEffect(() => {
       const chart = chartRef?.current?.chartInstance;
       if (chart) {
-         console.log("-> options", options);
+         chart.update();
          let totalLegends = [];
          chart.data.datasets.forEach((dataSet, dataSetIndex) => {
             const meta = chart.getDatasetMeta(dataSetIndex);
             const newLegends = meta.data.map((labelMetaData) => {
+               console.log("-> optionLabelProp", optionLabelProp);
+               console.log("-> optionValueProp", optionValueProp);
                console.log("-> labelMetaData", labelMetaData);
                return {
-                  [optionLabelProp]: labelMetaData._view.label,
+                  [optionLabelProp]: labelMetaData._model.label,
                   hidden: labelMetaData.hidden,
                   [optionValueProp]: dataSet.data[labelMetaData._index],
                   index: labelMetaData._index,
