@@ -152,13 +152,6 @@ const CategoryBreakdown = ({
    });
 
    useEffect(() => {
-      if (chartRef.current) {
-         const chart = chartRef?.current?.chartInstance;
-         chart?.update?.();
-      }
-   }, [typesOfOptions, currentCategory, currentCategory]);
-
-   useEffect(() => {
       if (groups?.length || !currentGroup?.id) {
          setCurrentGroup(groups[0]);
          setCurrentCategory(
@@ -415,12 +408,7 @@ const CategoryBreakdown = ({
                      </Button>
                   </>
                ) : (
-                  <Doughnut
-                     key={currentCategory.id}
-                     data={data}
-                     ref={chartRef}
-                     options={options}
-                  />
+                  <Doughnut data={data} ref={chartRef} options={options} />
                )}
             </Box>
             {!hasNoData() && (
@@ -447,7 +435,6 @@ const CategoryBreakdown = ({
                            colors={localColors}
                            chartRef={chartRef}
                            fullWidth
-                           key={data?.dataId || currentCategory?.id}
                            hideEmpty
                            chartData={data}
                            optionDataType="User"

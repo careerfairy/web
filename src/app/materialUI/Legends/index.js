@@ -67,8 +67,13 @@ const CustomLegend = ({
       }
    }, [
       chartData,
+      chartData?.dataId,
+      colors,
       colors.length,
       hideEmpty,
+      optionValueProp,
+      optionLabelProp,
+      optionDataType,
       chartRef?.current,
       chartRef?.current?.chartInstance,
       options,
