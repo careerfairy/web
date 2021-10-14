@@ -36,8 +36,7 @@ const CustomLegend = ({
 }) => {
    const classes = useStyles({ fullWidth });
    const [legendLabels, setLegendLabels] = useState([]);
-   // console.table(legendLabels);
-   // console.table(options);
+
    useEffect(() => {
       const chart = chartRef?.current?.chartInstance;
       if (chart) {

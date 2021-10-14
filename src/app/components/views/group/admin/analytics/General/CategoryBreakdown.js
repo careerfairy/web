@@ -152,11 +152,6 @@ const CategoryBreakdown = ({
    });
 
    useEffect(() => {
-      const chart = chartRef?.current?.chartInstance;
-      console.log("-> chart", chart);
-   }, [chartRef?.current, data]);
-
-   useEffect(() => {
       if (groups?.length || !currentGroup?.id) {
          setCurrentGroup(groups[0]);
          setCurrentCategory(
@@ -244,7 +239,6 @@ const CategoryBreakdown = ({
       layout: { padding: 0 },
       legend: {
          display: false,
-         // position: "bottom",
       },
       maintainAspectRatio: false,
       responsive: true,
