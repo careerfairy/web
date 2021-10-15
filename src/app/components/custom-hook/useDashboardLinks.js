@@ -75,12 +75,6 @@ const useDashboardLinks = (group) => {
                basePath: `/${baseHrefPath}/${baseParam}/admin/events`,
             },
             {
-               href: `/${baseHrefPath}/${group.id}/admin/drafts`,
-               icon: DraftStreamIcon,
-               title: "Manage and Approve Drafts",
-               basePath: `/${baseHrefPath}/${baseParam}/admin/drafts`,
-            },
-            {
                href: `/${baseHrefPath}/${group.id}/admin/edit`,
                icon: EditGroupIcon,
                title: "Edit Group Profile",

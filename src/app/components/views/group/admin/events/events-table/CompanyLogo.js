@@ -1,6 +1,7 @@
 import React from "react";
 import { Avatar } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -12,7 +13,13 @@ const useStyles = makeStyles((theme) => ({
 
 const CompanyLogo = ({ src }) => {
    const classes = useStyles();
-   return <Avatar className={classes.root} variant="rounded" src={src} />;
+   return (
+      <Avatar
+         className={classes.root}
+         variant="rounded"
+         src={getResizedUrl(src, "xs")}
+      />
+   );
 };
 
 export default CompanyLogo;

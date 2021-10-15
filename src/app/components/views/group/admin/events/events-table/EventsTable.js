@@ -2,7 +2,6 @@ import React, { useCallback, useState } from "react";
 import { defaultTableOptions, tableIcons } from "components/util/tableUtils";
 import MaterialTable from "@material-table/core";
 import { prettyDate } from "../../../../../helperFunctions/HelperFunctions";
-import { Box, IconButton } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import EditIcon from "@material-ui/icons/Edit";
@@ -11,6 +10,8 @@ import Speakers from "./Speakers";
 import CompanyLogo from "./CompanyLogo";
 import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal";
 import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDialog";
+import GetStreamerLinksIcon from "@material-ui/icons/Share";
+
 import { useFirebase } from "context/firebase";
 
 const useStyles = makeStyles((theme) => ({}));
@@ -18,39 +19,25 @@ const customOptions = {
    ...defaultTableOptions,
    actionsColumnIndex: 1,
    selection: false,
+   pageSize: 10,
+   actionsCellStyle: {
+      border: "2px solid green",
+   },
 };
 
-const Actions = ({}) => {
-   return (
-      <Box>
-         <IconButton>
-            <EditIcon />
-         </IconButton>
-         <IconButton>
-            <EditIcon />
-         </IconButton>
-         <IconButton>
-            <EditIcon />
-         </IconButton>
-         <IconButton>
-            <EditIcon />
-         </IconButton>
-         <IconButton>
-            <EditIcon />
-         </IconButton>
-      </Box>
-   );
-};
-
-const EventsTable = ({ streams, isDraft }) => {
+const EventsTable = ({ streams, isDraft, handleEditStream }) => {
    const firebase = useFirebase();
    const [selectedEvents, setSelectedEvents] = useState([]);
    const [targetStreamId, setTargetStreamId] = useState(null);
    const [areYouSureModalOpen, setAreYouSureModalOpen] = useState(false);
+   const [publishingDraft, setPublishingDraft] = useState(false);
    const [deletingEvent, setDeletingEvent] = useState(false);
    const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null);
+   const [
+      targetLivestreamStreamerLinksId,
+      setTargetLivestreamStreamerLinksId,
+   ] = useState("");
    const classes = useStyles();
-   console.log("-> streams", streams);
    const handleSpeakerSearch = useCallback((term, rowData) => {
       return rowData.speakers.some(
          (speaker) =>
@@ -72,28 +59,39 @@ const EventsTable = ({ streams, isDraft }) => {
       setStreamIdToBeDeleted(null);
    };
 
+   const handleOpenStreamerLinksModal = useCallback((event, rowData) => {
+      if (rowData.id) {
+         setTargetLivestreamStreamerLinksId(rowData.id);
+      }
+   }, []);
+   const handleCloseStreamerLinksModal = useCallback(() => {
+      setTargetLivestreamStreamerLinksId("");
+   }, []);
+
    const handleClickDeleteStream = (streamId) => {
       setStreamIdToBeDeleted(streamId);
    };
 
    return (
-      <div>
+      <>
          <MaterialTable
-            style={{
-               boxShadow: "none",
-            }}
             actions={[
                {
                   icon: () => <EditIcon color="action" />,
-                  tooltip: "Edit",
-                  onClick: (event, rowData) =>
-                     alert("You saved " + rowData.name),
+                  tooltip: isDraft ? "Edit Draft" : "Edit Stream",
+                  onClick: (event, rowData) => handleEditStream(rowData),
                },
                {
                   icon: () => <DeleteIcon color="action" />,
                   tooltip: "Delete",
                   onClick: (event, rowData) =>
                      handleClickDeleteStream(rowData.id),
+               },
+               {
+                  icon: () => <GetStreamerLinksIcon color="action" />,
+                  tooltip: "Get Streamer Links",
+                  onClick: handleOpenStreamerLinksModal,
+                  hidden: isDraft,
                },
             ]}
             columns={[
@@ -118,9 +116,6 @@ const EventsTable = ({ streams, isDraft }) => {
                },
                {
                   title: "Speakers",
-                  cellStyle: {
-                     width: 100,
-                  },
                   render: (rowData) => {
                      return <Speakers speakers={rowData.speakers} />;
                   },
@@ -153,11 +148,11 @@ const EventsTable = ({ streams, isDraft }) => {
             }? you will be no longer able to recover it`}
          />
          <StreamerLinksDialog
-            livestreamId={targetStreamId}
-            openDialog={Boolean(targetStreamId)}
-            handleClose={() => setTargetStreamId(null)}
+            livestreamId={targetLivestreamStreamerLinksId}
+            openDialog={Boolean(targetLivestreamStreamerLinksId)}
+            onClose={handleCloseStreamerLinksModal}
          />
-      </div>
+      </>
    );
 };
 

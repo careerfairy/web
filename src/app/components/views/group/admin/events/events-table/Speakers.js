@@ -15,11 +15,9 @@ import { AvatarGroup } from "@material-ui/lab";
 import clsx from "clsx";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { makeStyles } from "@material-ui/core/styles";
+import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
-   avaGrp: {
-      position: "absolute",
-   },
    avaGrpBtn: {
       borderRadius: theme.spacing(1),
       padding: theme.spacing(0.5),
@@ -45,20 +43,16 @@ const Speakers = ({ speakers }) => {
    );
 
    return (
-      <Box position="relative">
+      <Box maxWidth={200} position="relative">
          {!!speakers.length && (
             <>
-               <Box width="100%" display="flex" justifyContent="space-between">
-                  <AvatarGroup
-                     onClick={handleToggleExpand}
-                     classeName={classes.avaGrp}
-                     max={3}
-                  >
+               <Box display="flex" justifyContent="space-between">
+                  <AvatarGroup onClick={handleToggleExpand} max={3}>
                      {speakers.map((speaker) => (
                         <Avatar
                            key={speaker.id}
                            alt={speaker.firstName}
-                           src={speaker.avatar}
+                           src={getResizedUrl(speaker.avatar, "xs")}
                         />
                      ))}
                   </AvatarGroup>
@@ -85,7 +79,7 @@ const Speakers = ({ speakers }) => {
                            <ListItemAvatar>
                               <Avatar
                                  alt={`${speaker.firstName} ${speaker.lastName}`}
-                                 src={speaker.avatar}
+                                 src={getResizedUrl(speaker.avatar, "xs")}
                               >
                                  {speaker.firstName
                                     ? `${
@@ -99,7 +93,6 @@ const Speakers = ({ speakers }) => {
                               disableTypography
                               primary={
                                  <Typography
-                                    noWrap
                                     variant="body1"
                                     className={classes.secondary}
                                  >
@@ -108,7 +101,6 @@ const Speakers = ({ speakers }) => {
                               }
                               secondary={
                                  <Typography
-                                    noWrap
                                     color="textSecondary"
                                     variant="body2"
                                  >

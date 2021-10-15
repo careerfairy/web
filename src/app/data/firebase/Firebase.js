@@ -2565,6 +2565,41 @@ class Firebase {
       });
    };
 
+   findTargetEvent = async (eventId) => {
+      let targetStream = null;
+      let typeOfStream = "";
+      console.log("-> eventId in fn", eventId);
+      try {
+         const streamSnap = await this.firestore
+            .collection("livestreams")
+            .doc(eventId)
+            .get();
+         if (streamSnap.exists) {
+            targetStream = { id: streamSnap.id, ...streamSnap.data() };
+            const startDate = targetStream.start?.toDate?.();
+            typeOfStream = this.isPastEvent(startDate) ? "past" : "upcoming";
+         } else {
+            const draftSnap = await this.firestore
+               .collection("draftLivestreams")
+               .doc(eventId)
+               .get();
+            if (draftSnap.exists) {
+               targetStream = { id: draftSnap.id, ...draftSnap.data() };
+               typeOfStream = "draft";
+            }
+         }
+      } catch (e) {}
+      return { targetStream, typeOfStream };
+   };
+
+   isPastEvent = (eventStartDate) => {
+      return (
+         eventStartDate <
+            new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS) &&
+         eventStartDate > new Date(START_DATE_FOR_REPORTED_EVENTS)
+      );
+   };
+
    promoteToMainAdmin = async (groupId, userEmail) => {
       let batch = this.firestore.batch();
 

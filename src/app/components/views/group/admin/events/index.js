@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useEffect, useState } from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
-import { AppBar, Box, CircularProgress, Tabs } from "@material-ui/core";
+import { AppBar, Box, CircularProgress, Grid, Tabs } from "@material-ui/core";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import NewStreamModal from "./NewStreamModal";
 import { useRouter } from "next/router";
@@ -9,9 +9,12 @@ import { repositionElement } from "../../../../helperFunctions/HelperFunctions";
 import Tab from "@material-ui/core/Tab";
 import Header from "./Header";
 import EventsTable from "./events-table/EventsTable";
+import { useFirebase } from "context/firebase";
 
 const useStyles = makeStyles((theme) => ({
-   root: {},
+   containerRoot: {
+      padding: theme.spacing(3),
+   },
    streamCard: {},
    highlighted: {},
    appBar: {
@@ -31,20 +34,36 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const EventsOverview = ({ group, typeOfStream, query, isAdmin, isDraft }) => {
+const EventsOverview = ({ group }) => {
    const classes = useStyles();
    const { userData, authenticatedUser } = useAuth();
+   const {
+      listenToDraftLiveStreamsByGroupId,
+      listenToUpcomingLiveStreamsByGroupId,
+      listenToPastLiveStreamsByGroupId,
+      findTargetEvent,
+   } = useFirebase();
    const [streams, setStreams] = useState([]);
    const [openNewStreamModal, setOpenNewStreamModal] = useState(false);
-   const [tabValue, setTabValue] = useState(0);
+   const [tabValue, setTabValue] = useState("upcoming");
    const [fetching, setFetching] = useState(false);
    const [currentStream, setCurrentStream] = useState(null);
+   const [fetchingQueryEvent, setFetchingQueryEvent] = useState(false);
+
    const {
-      query: { livestreamId },
+      query: { eventId },
    } = useRouter();
 
    useEffect(() => {
       if (group?.id) {
+         let query;
+         if (tabValue === "upcoming") {
+            query = listenToUpcomingLiveStreamsByGroupId;
+         } else if (tabValue === "past") {
+            query = listenToPastLiveStreamsByGroupId;
+         } else {
+            query = listenToDraftLiveStreamsByGroupId;
+         }
          setFetching(true);
          const unsubscribe = query(group.id, (querySnapshot) => {
             const streamsData = querySnapshot.docs.map((doc) => ({
@@ -54,14 +73,12 @@ const EventsOverview = ({ group, typeOfStream, query, isAdmin, isDraft }) => {
                date: doc.data().start?.toDate?.(),
                ...doc.data(),
             }));
-            if (livestreamId && typeOfStream === "draft") {
-               const currentEventsOverview = streamsData.findEventsOverview(
-                  (el) => el.id === livestreamId
+            if (eventId) {
+               const queryEventIndex = streamsData.findIndex(
+                  (el) => el.id === eventId
                );
-               if (currentEventsOverview > -1) {
-                  if (isTargetDraft(streamsData[currentEventsOverview])) {
-                     repositionElement(streamsData, currentEventsOverview, 0);
-                  }
+               if (queryEventIndex > -1) {
+                  repositionElement(streamsData, queryEventIndex, 0);
                }
             }
             setStreams(streamsData);
@@ -69,7 +86,24 @@ const EventsOverview = ({ group, typeOfStream, query, isAdmin, isDraft }) => {
          });
          return () => unsubscribe();
       }
-   }, [livestreamId, isDraft, tabValue]);
+   }, [tabValue]);
+
+   useEffect(() => {
+      if (eventId) {
+         (async function getQueryEvent() {
+            try {
+               setFetchingQueryEvent(true);
+               const { targetStream, typeOfStream } = await findTargetEvent(
+                  eventId
+               );
+               if (typeOfStream && targetStream) {
+                  setTabValue(typeOfStream);
+               }
+            } catch (e) {}
+            setFetchingQueryEvent(false);
+         })();
+      }
+   }, [eventId]);
 
    const handleChange = (event, newValue) => {
       setTabValue(newValue);
@@ -96,34 +130,6 @@ const EventsOverview = ({ group, typeOfStream, query, isAdmin, isDraft }) => {
          handleOpenNewStreamModal();
       }
    };
-   const isTargetDraft = (livestream) =>
-      isAdmin && typeOfStream === "draft" && livestream.id === livestreamId;
-
-   // const handleFilter = () => {
-   //    const newFilteredStreams = streams?.filter((livestream) => {
-   //       return (
-   //          livestream.title
-   //             .toLowerCase()
-   //             .indexOf(searchParams.toLowerCase()) >= 0 ||
-   //          livestream.company
-   //             .toLowerCase()
-   //             .indexOf(searchParams.toLowerCase()) >= 0 ||
-   //          livestream.summary
-   //             ?.toLowerCase()
-   //             .indexOf(searchParams.toLowerCase()) >= 0 ||
-   //          // Checks speakers
-   //          livestream.speakers.some(
-   //             (speaker) =>
-   //                speaker.firstName
-   //                   .toLowerCase()
-   //                   .indexOf(searchParams.toLowerCase()) >= 0 ||
-   //                speaker.lastName
-   //                   .toLowerCase()
-   //                   .indexOf(searchParams.toLowerCase()) >= 0
-   //          )
-   //       );
-   //    });
-   // };
 
    return (
       <Fragment>
@@ -132,44 +138,52 @@ const EventsOverview = ({ group, typeOfStream, query, isAdmin, isDraft }) => {
                <Header
                   group={group}
                   handleOpenNewStreamModal={handleOpenNewStreamModal}
-                  isDraft={isDraft}
+                  isDraft={tabValue === "draft"}
                />
             </Box>
-            {!isDraft && (
-               <Tabs
-                  value={tabValue}
-                  TabIndicatorProps={{ className: classes.indicator }}
-                  onChange={handleChange}
-                  indicatorColor="primary"
-                  textColor="primary"
-                  aria-label="full width tabs example"
-               >
-                  <Tab className={classes.tab} label="Upcoming" />
-                  <Tab className={classes.tab} label="Past" />
-               </Tabs>
-            )}
+            <Tabs
+               value={tabValue}
+               TabIndicatorProps={{ className: classes.indicator }}
+               onChange={handleChange}
+               indicatorColor="primary"
+               textColor="primary"
+               aria-label="full width tabs example"
+            >
+               <Tab className={classes.tab} label="Upcoming" value="upcoming" />
+               <Tab className={classes.tab} label="Past" value="past" />
+               <Tab className={classes.tab} label="Drafts" value="drafts" />
+            </Tabs>
          </AppBar>
-         <Box className={classes.root}>
-            {fetching ? (
-               <Box
-                  height={150}
-                  width="100%"
-                  alignItems="center"
-                  justifyContent="center"
-                  display="flex"
-               >
-                  <CircularProgress color="primary" />
+         <Grid className={classes.containerRoot} container spacing={3}>
+            <Grid xs={12} item>
+               <Box>
+                  {fetching ? (
+                     <Box
+                        height={150}
+                        width="100%"
+                        alignItems="center"
+                        justifyContent="center"
+                        display="flex"
+                     >
+                        <CircularProgress color="primary" />
+                     </Box>
+                  ) : (
+                     <Box width="100%">
+                        <EventsTable
+                           handleEditStream={handleEditStream}
+                           isDraft={tabValue === "draft"}
+                           streams={streams}
+                           disabled={fetchingQueryEvent || fetching}
+                        />
+                     </Box>
+                  )}
+                  <Box flexGrow={1} />
                </Box>
-            ) : (
-               <Box width="100%">
-                  <EventsTable isDraft={isDraft} streams={streams} />
-               </Box>
-            )}
-            <Box flexGrow={1} />
-         </Box>
+            </Grid>
+         </Grid>
          <NewStreamModal
             group={group}
-            typeOfStream={typeOfStream}
+            typeOfStream={tabValue}
             open={openNewStreamModal}
             handleResetCurrentStream={handleResetCurrentStream}
             currentStream={currentStream}
@@ -182,9 +196,6 @@ const EventsOverview = ({ group, typeOfStream, query, isAdmin, isDraft }) => {
 EventsOverview.propTypes = {
    group: PropTypes.object,
    isAdmin: PropTypes.bool,
-   query: PropTypes.func.isRequired,
-   typeOfStream: PropTypes.string.isRequired,
-   isDraft: PropTypes.bool,
 };
 
 export default EventsOverview;
