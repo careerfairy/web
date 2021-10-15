@@ -1,24 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-   Button,
-   Card,
-   CardHeader,
-   Grid,
-   Menu,
-   MenuItem,
-   Box,
-   Typography,
-   Tooltip,
-} from "@material-ui/core";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-import {
-   StyledTooltipWithButton,
-   TooltipHighlight,
-} from "../../../../../materialUI/GlobalTooltips";
-import FilterStreamsIcon from "@material-ui/icons/Tune";
-import { useSelector } from "react-redux";
+import { Box, Card, CardHeader, Collapse, Typography } from "@material-ui/core";
 import EventsActionButton from "./EventsActionButton";
+import useScrollTrigger from "@material-ui/core/useScrollTrigger";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -43,33 +27,37 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const Header = ({ group, handleOpenNewStreamModal, isDraft }) => {
+const Header = ({ group, handleOpenNewStreamModal, isDraft, scrollRef }) => {
    const classes = useStyles();
+   const isScrolling = useScrollTrigger({ target: scrollRef.current });
+
    return (
-      <Card className={classes.root}>
-         <CardHeader
-            className={classes.header}
-            title={
-               <Box display="flex" flexWrap="wrap" alignItems="center">
-                  <Typography className={classes.title} variant="h4">
-                     {isDraft ? "Drafts" : "Events"}
-                  </Typography>
-               </Box>
-            }
-            subheader={
-               isDraft
-                  ? "Manage and approve your drafts"
-                  : "Manage your upcoming and past events"
-            }
-            action={
-               <EventsActionButton
-                  group={group}
-                  isAdmin={true}
-                  handleOpenNewStreamModal={handleOpenNewStreamModal}
+      <>
+         <Collapse in={!isScrolling}>
+            <Card className={classes.root}>
+               <CardHeader
+                  className={classes.header}
+                  title={
+                     <Box display="flex" flexWrap="wrap" alignItems="center">
+                        <Typography className={classes.title} variant="h4">
+                           {isDraft ? "Drafts" : "Events"}
+                        </Typography>
+                     </Box>
+                  }
+                  subheader={
+                     isDraft
+                        ? "Manage and approve your drafts"
+                        : "Manage your upcoming and past events"
+                  }
                />
-            }
+            </Card>
+         </Collapse>
+         <EventsActionButton
+            group={group}
+            isAdmin={true}
+            handleOpenNewStreamModal={handleOpenNewStreamModal}
          />
-      </Card>
+      </>
    );
 };
 

@@ -19,11 +19,12 @@ const useStyles = makeStyles((theme) => ({
    root: {
       width: 72,
       height: 72,
-   },
-   speedDial: {
       position: "absolute",
       top: 16,
       right: 16,
+   },
+   speedDial: {
+      position: "absolute",
    },
    tooltip: {
       transition: "all 0.8s",

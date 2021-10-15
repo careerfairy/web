@@ -11,8 +11,14 @@ import CompanyLogo from "./CompanyLogo";
 import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal";
 import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDialog";
 import GetStreamerLinksIcon from "@material-ui/icons/Share";
-
+import PublishIcon from "@material-ui/icons/Publish";
+import * as actions from "store/actions";
 import { useFirebase } from "context/firebase";
+import { CircularProgress } from "@material-ui/core";
+import { v4 as uuidv4 } from "uuid";
+import { useDispatch } from "react-redux";
+import { useRouter } from "next/router";
+import { useAuth } from "../../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({}));
 const customOptions = {
@@ -21,18 +27,26 @@ const customOptions = {
    selection: false,
    pageSize: 10,
    actionsCellStyle: {
-      border: "2px solid green",
+      // border: "2px solid green",
    },
 };
 
-const EventsTable = ({ streams, isDraft, handleEditStream }) => {
+const EventsTable = ({
+   streams,
+   isDraft,
+   handleEditStream,
+   group,
+   publishingDraft,
+   handlePublishStream,
+}) => {
    const firebase = useFirebase();
+   const { authenticatedUser, userData } = useAuth();
    const [selectedEvents, setSelectedEvents] = useState([]);
-   const [targetStreamId, setTargetStreamId] = useState(null);
-   const [areYouSureModalOpen, setAreYouSureModalOpen] = useState(false);
-   const [publishingDraft, setPublishingDraft] = useState(false);
    const [deletingEvent, setDeletingEvent] = useState(false);
    const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null);
+   const dispatch = useDispatch();
+   const { push, pathname, asPath } = useRouter();
+
    const [
       targetLivestreamStreamerLinksId,
       setTargetLivestreamStreamerLinksId,
@@ -93,6 +107,24 @@ const EventsTable = ({ streams, isDraft, handleEditStream }) => {
                   onClick: handleOpenStreamerLinksModal,
                   hidden: isDraft,
                },
+               (rowData) => ({
+                  icon: () =>
+                     publishingDraft ? (
+                        <CircularProgress size={20} color="inherit" />
+                     ) : (
+                        <PublishIcon color="action" />
+                     ),
+                  tooltip: publishingDraft
+                     ? "Publishing"
+                     : !rowData.status?.pendingApproval
+                     ? "Cannot publish yet, click to open and approve event"
+                     : "Publish Stream",
+                  onClick: !rowData.status?.pendingApproval
+                     ? () => handleEditStream(rowData)
+                     : () => handlePublishStream(rowData),
+                  hidden: !isDraft,
+                  disabled: publishingDraft,
+               }),
             ]}
             columns={[
                {

@@ -5,8 +5,15 @@ import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
    root: {
-      "& img": {},
-      boxShadow: theme.shadows[1],
+      "& img": {
+         objectFit: "contain",
+         maxWidth: "90%",
+         maxHeight: "90%",
+         borderRadius: theme.spacing(1),
+      },
+      width: 170,
+      height: 70,
+      boxShadow: theme.shadows[2],
       background: theme.palette.common.white,
    },
 }));

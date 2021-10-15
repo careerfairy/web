@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import { AppBar, Box, CircularProgress, Grid, Tabs } from "@material-ui/core";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
@@ -10,10 +10,14 @@ import Tab from "@material-ui/core/Tab";
 import Header from "./Header";
 import EventsTable from "./events-table/EventsTable";
 import { useFirebase } from "context/firebase";
+import useScrollTrigger from "@material-ui/core/useScrollTrigger";
+import { v4 as uuidv4 } from "uuid";
+import * as actions from "store/actions";
+import { useDispatch } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
    containerRoot: {
-      padding: theme.spacing(3),
+      // padding: theme.spacing(3),
    },
    streamCard: {},
    highlighted: {},
@@ -34,14 +38,17 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const EventsOverview = ({ group }) => {
+const EventsOverview = ({ group, scrollRef }) => {
    const classes = useStyles();
+   const dispatch = useDispatch();
    const { userData, authenticatedUser } = useAuth();
    const {
       listenToDraftLiveStreamsByGroupId,
       listenToUpcomingLiveStreamsByGroupId,
       listenToPastLiveStreamsByGroupId,
       findTargetEvent,
+      addLivestream,
+      deleteLivestream,
    } = useFirebase();
    const [streams, setStreams] = useState([]);
    const [openNewStreamModal, setOpenNewStreamModal] = useState(false);
@@ -49,9 +56,13 @@ const EventsOverview = ({ group }) => {
    const [fetching, setFetching] = useState(false);
    const [currentStream, setCurrentStream] = useState(null);
    const [fetchingQueryEvent, setFetchingQueryEvent] = useState(false);
+   const [publishingDraft, setPublishingDraft] = useState(false);
 
    const {
       query: { eventId },
+      push,
+      replace,
+      asPath,
    } = useRouter();
 
    useEffect(() => {
@@ -105,6 +116,40 @@ const EventsOverview = ({ group }) => {
       }
    }, [eventId]);
 
+   const getAuthor = (livestream) => {
+      return livestream?.author?.email
+         ? livestream.author
+         : {
+              email: authenticatedUser.email,
+              ...(group?.id && { groupId: group.id }),
+           };
+   };
+   const handlePublishStream = useCallback(
+      async (streamObj) => {
+         try {
+            setPublishingDraft(true);
+            const newStream = { ...streamObj };
+            newStream.companyId = uuidv4();
+            const author = getAuthor(newStream);
+            const publishedStreamId = await addLivestream(
+               newStream,
+               "livestreams",
+               author
+            );
+            await deleteLivestream(streamObj.id, "draftLivestreams");
+            await replace(
+               asPath,
+               { query: { eventId: publishedStreamId } },
+               { shallow: true }
+            );
+         } catch (e) {
+            setPublishingDraft(false);
+            dispatch(actions.sendGeneralError(e));
+         }
+      },
+      [dispatch]
+   );
+
    const handleChange = (event, newValue) => {
       setTabValue(newValue);
    };
@@ -136,6 +181,7 @@ const EventsOverview = ({ group }) => {
          <AppBar className={classes.appBar} position="sticky" color="default">
             <Box className={classes.title}>
                <Header
+                  scrollRef={scrollRef}
                   group={group}
                   handleOpenNewStreamModal={handleOpenNewStreamModal}
                   isDraft={tabValue === "draft"}
@@ -151,40 +197,37 @@ const EventsOverview = ({ group }) => {
             >
                <Tab className={classes.tab} label="Upcoming" value="upcoming" />
                <Tab className={classes.tab} label="Past" value="past" />
-               <Tab className={classes.tab} label="Drafts" value="drafts" />
+               <Tab className={classes.tab} label="Drafts" value="draft" />
             </Tabs>
          </AppBar>
-         <Grid className={classes.containerRoot} container spacing={3}>
-            <Grid xs={12} item>
-               <Box>
-                  {fetching ? (
-                     <Box
-                        height={150}
-                        width="100%"
-                        alignItems="center"
-                        justifyContent="center"
-                        display="flex"
-                     >
-                        <CircularProgress color="primary" />
-                     </Box>
-                  ) : (
-                     <Box width="100%">
-                        <EventsTable
-                           handleEditStream={handleEditStream}
-                           isDraft={tabValue === "draft"}
-                           streams={streams}
-                           disabled={fetchingQueryEvent || fetching}
-                        />
-                     </Box>
-                  )}
-                  <Box flexGrow={1} />
+         <Box className={classes.containerRoot} p={3}>
+            {fetching ? (
+               <Box
+                  height={150}
+                  width="100%"
+                  alignItems="center"
+                  justifyContent="center"
+                  display="flex"
+               >
+                  <CircularProgress color="primary" />
                </Box>
-            </Grid>
-         </Grid>
+            ) : (
+               <EventsTable
+                  handleEditStream={handleEditStream}
+                  isDraft={tabValue === "draft"}
+                  streams={streams}
+                  group={group}
+                  handlePublishStream={handlePublishStream}
+                  publishingDraft={publishingDraft}
+                  disabled={fetchingQueryEvent || fetching}
+               />
+            )}
+         </Box>
          <NewStreamModal
             group={group}
             typeOfStream={tabValue}
             open={openNewStreamModal}
+            handlePublishStream={handlePublishStream}
             handleResetCurrentStream={handleResetCurrentStream}
             currentStream={currentStream}
             onClose={handleCloseNewStreamModal}
