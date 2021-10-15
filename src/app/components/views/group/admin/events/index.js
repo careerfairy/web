@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
-import { AppBar, Box, CircularProgress, Grid, Tabs } from "@material-ui/core";
+import { AppBar, Box, CircularProgress, Tabs } from "@material-ui/core";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import NewStreamModal from "./NewStreamModal";
 import { useRouter } from "next/router";
@@ -10,7 +10,6 @@ import Tab from "@material-ui/core/Tab";
 import Header from "./Header";
 import EventsTable from "./events-table/EventsTable";
 import { useFirebase } from "context/firebase";
-import useScrollTrigger from "@material-ui/core/useScrollTrigger";
 import { v4 as uuidv4 } from "uuid";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";

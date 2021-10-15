@@ -1,7 +1,11 @@
 import React, { useCallback, useState } from "react";
 import { defaultTableOptions, tableIcons } from "components/util/tableUtils";
 import MaterialTable from "@material-table/core";
-import { prettyDate } from "../../../../../helperFunctions/HelperFunctions";
+import {
+   copyStringToClipboard,
+   getBaseUrl,
+   prettyDate,
+} from "../../../../../helperFunctions/HelperFunctions";
 import { makeStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import EditIcon from "@material-ui/icons/Edit";
@@ -12,13 +16,13 @@ import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal";
 import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDialog";
 import GetStreamerLinksIcon from "@material-ui/icons/Share";
 import PublishIcon from "@material-ui/icons/Publish";
-import * as actions from "store/actions";
 import { useFirebase } from "context/firebase";
 import { CircularProgress } from "@material-ui/core";
-import { v4 as uuidv4 } from "uuid";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import { useAuth } from "../../../../../../HOCs/AuthProvider";
+import DraftLinkIcon from "@material-ui/icons/Link";
+import * as actions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({}));
 const customOptions = {
@@ -82,6 +86,26 @@ const EventsTable = ({
       setTargetLivestreamStreamerLinksId("");
    }, []);
 
+   const handleCreateExternalLink = useCallback(
+      (event, rowData) => {
+         let baseUrl = getBaseUrl();
+         const draftId = rowData.id;
+         const targetPath = `${baseUrl}/draft-stream?draftStreamId=${draftId}`;
+         copyStringToClipboard(targetPath);
+         dispatch(
+            actions.enqueueSnackbar({
+               message: "Link has been copied to your clipboard!",
+               options: {
+                  variant: "success",
+                  preventDuplicate: true,
+                  key: targetPath,
+               },
+            })
+         );
+      },
+      [dispatch]
+   );
+
    const handleClickDeleteStream = (streamId) => {
       setStreamIdToBeDeleted(streamId);
    };
@@ -125,6 +149,12 @@ const EventsTable = ({
                   hidden: !isDraft,
                   disabled: publishingDraft,
                }),
+               {
+                  icon: () => <DraftLinkIcon color="action" />,
+                  tooltip: "Generate external Link to Edit Draft",
+                  onClick: handleCreateExternalLink,
+                  hidden: !isDraft,
+               },
             ]}
             columns={[
                {
