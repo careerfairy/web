@@ -150,13 +150,12 @@ exports.getLivestreamReportData = functions.https.onCall(
          const livestreamData = { id: streamSnap.id, ...streamSnap.data() };
          const requestingGroupData = { id: groupSnap.id, ...groupSnap.data() };
          const livestreamGroupIds = makeRequestingGroupIdFirst(
-            livestreamData.groupIds
+            livestreamData.groupIds,
+            requestingGroupData.id
          );
+         console.log("-> livestreamGroupIds IN FUNC", livestreamGroupIds);
 
          // Declaration of Snaps promises, todo turn into Promise.all()
-         const registeredUsersSnap = await streamSnap.ref
-            .collection("registeredStudents")
-            .get();
          const participatingUsersSnap = await streamSnap.ref
             .collection("participatingStudents")
             .get();
@@ -193,10 +192,6 @@ exports.getLivestreamReportData = functions.https.onCall(
             .get();
 
          // Extraction of snap Data
-         const registeredStudents = registeredUsersSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-         }));
 
          // Its let since this array will be modified
          let participatingStudents = participatingUsersSnap.docs.map((doc) => ({
@@ -228,7 +223,7 @@ exports.getLivestreamReportData = functions.https.onCall(
          const icons = iconsSnap.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
-            options: convertPollOptionsObjectToArray(doc.data().options),
+            options: convertPollOptionsObjectToArray(doc.data().options || {}),
          }));
 
          const contentRatings = contentRatingsSnap.docs.map((doc) => ({
@@ -261,7 +256,7 @@ exports.getLivestreamReportData = functions.https.onCall(
                   .doc(groupId)
                   .get();
                if (!otherGroupSnap.exists) continue;
-               groupData = otherGroupSnap.data();
+               groupData = { id: otherGroupSnap.id, ...otherGroupSnap.data() };
             }
             const participatingStudentsFromGroup = [];
             const listOfStudentsForStats = [];
@@ -273,10 +268,11 @@ exports.getLivestreamReportData = functions.https.onCall(
                   );
                   participatingStudentsFromGroup.push(publishedStudent);
                   if (!student.statsAlreadyInUse) {
-                     listOfStudentsForStats.push(student);
+                     listOfStudentsForStats.push({ ...student });
                      student.statsAlreadyInUse = true;
                   }
                }
+               return { ...student };
             });
             const studentStats = getRegisteredStudentsStats(
                listOfStudentsForStats,
@@ -285,24 +281,32 @@ exports.getLivestreamReportData = functions.https.onCall(
 
             reportData.push({
                group: groupData,
+               groupName: groupData.universityName,
+               groupId: groupData.id,
                livestream: livestreamData,
                studentStats,
                speakers,
                overallRating: overallRatingValue,
                contentRating: contentRatingValue,
                totalStudentsInTalentPool: talentPoolForReport.length,
-               totalViewerFromOutsideETH:
+               totalParticipating: participatingStudents.length,
+               totalViewerFromOutsideGroup:
                   participatingStudents.length -
                   participatingStudentsFromGroup.length,
-               totalViewerFromETH: participatingStudentsFromGroup.length,
+               totalViewerFromGroup: participatingStudentsFromGroup.length,
                questions,
                polls,
-               icons,
+               numberOfIcons: icons.length,
+               requestingGroupId: targetGroupId,
+               participatingStudents,
+               totalWithoutData: participatingStudents.filter(
+                  (student) => !student.statsAlreadyInUse
+               ).length,
             });
          }
 
-         console.log("-> reportData", reportData);
-         functions.logger.log("-> reportData", reportData);
+         // console.log("-> reportData", reportData);
+         // functions.logger.log("-> reportData", reportData);
       } catch (e) {
          console.error(e);
          throw new functions.https.HttpsError(
@@ -310,6 +314,7 @@ exports.getLivestreamReportData = functions.https.onCall(
             `Unhandled error: ${e.message}`
          );
       }
+      return reportData;
       // fetch all cc docs in the groupIds of the streamDoc
       // If use users stats only once per report data, once a users stats are used, flag them as already used
    }

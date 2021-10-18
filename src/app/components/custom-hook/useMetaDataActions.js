@@ -138,7 +138,7 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
 
    const handleGetLivestreamReportData = useCallback(
       async (event, rowData) => {
-         console.log("-> rowData", rowData);
+         console.log("-> rowDataId", rowData.id);
          try {
             if (!userData.userEmail)
                return dispatch(
@@ -148,12 +148,12 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                ...prevState,
                [rowData.id]: true,
             }));
-            const reportData = await firebase.getLivestreamReportData({
+            const { data } = await firebase.getLivestreamReportData({
                targetStreamId: rowData.id,
                userEmail: userData.userEmail,
                targetGroupId: group.id,
             });
-            console.log("-> reportData", reportData);
+            console.table(data);
          } catch (e) {
             dispatch(actions.sendGeneralError(e));
          }

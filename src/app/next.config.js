@@ -16,7 +16,7 @@ const securityHeaders = [
    {
       key: "Content-Security-Policy",
       value:
-         "default-src 'self' blob: *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; script-src 'self' *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-eval' 'unsafe-inline' ; style-src 'self' *.googleapis.com 'unsafe-inline'; connect-src 'self' wss: *.googleapis.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:*",
+         "default-src 'self' blob: *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; script-src 'self' *.googleapis.com *.googletagmanager.com localhost:5001* *.google-analytics.com *.facebook.net 'unsafe-eval' 'unsafe-inline' ; style-src 'self' *.googleapis.com 'unsafe-inline'; connect-src 'self' wss: *.googleapis.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:*",
    },
    {
       key: "Referrer-Policy",
@@ -47,18 +47,18 @@ module.exports = (phase, { defaultConfig }) => {
          REACT_APP_FIREBASE_STORAGE_BUCKET: "careerfairy-e1fd9.appspot.com",
          REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "993933306494",
       },
-      headers: async () => {
-         return [
-            {
-               source: "/(.*)",
-               headers: securityHeaders,
-            },
-            {
-               source: "/next-livestreams/:groupId/embed",
-               headers: iFrameSecurityHeaders,
-            },
-         ];
-      },
+      // headers: async () => {
+      //    return [
+      //       {
+      //          source: "/(.*)",
+      //          headers: securityHeaders,
+      //       },
+      //       {
+      //          source: "/next-livestreams/:groupId/embed",
+      //          headers: iFrameSecurityHeaders,
+      //       },
+      //    ];
+      // },
       webpackDevMiddleware: (config) => {
          config.watchOptions = {
             poll: 1000,

@@ -102,16 +102,29 @@ const makeRequestingGroupIdFirst = (
       (groupId) => requestingGroupId === groupId
    );
    if (!RequestingGroupIsInArray) return newArray;
-   newArray = newArray.filter((groupId) => groupId === requestingGroupId);
+   console.log("-> newArray BEFORE", newArray);
+   newArray = newArray.filter((groupId) => groupId !== requestingGroupId);
+   console.log("-> newArray AFTER", newArray);
    newArray.unshift(requestingGroupId);
+   console.log("-> newArray LAST", newArray);
+   return newArray;
 };
 
 const studentBelongsToGroup = (student, group) => {
-   if (group.universityCode) {
-      return student.university?.code === group.universityCode;
-   } else {
-      return student.groupIds && student.groupIds.includes(group.groupId);
-   }
+   return (
+      student && student.groupIds && student.groupIds.includes(group.groupId)
+   );
+   // if (group.universityCode) {
+   //    return (
+   //       student &&
+   //       student.university &&
+   //       student.university.code === group.universityCode
+   //    );
+   // } else {
+   //    return (
+   //       student && student.groupIds && student.groupIds.includes(group.groupId)
+   //    );
+   // }
 };
 
 const convertPollOptionsObjectToArray = (pollOptionsObject) => {
@@ -122,8 +135,9 @@ const convertPollOptionsObjectToArray = (pollOptionsObject) => {
 };
 
 const getRegisteredGroupById = (student, groupId) => {
-   return student.registeredGroups?.find(
-      (category) => category.groupId === groupId
+   return (
+      student.registeredGroups &&
+      student.registeredGroups.find((category) => category.groupId === groupId)
    );
 };
 
@@ -132,7 +146,7 @@ const getStudentInGroupDataObject = (student, group) => {
       "First Name": student.firstName,
       "Last Name": student.lastName,
       Email: student.userEmail,
-      University: student.university?.name || "N/A",
+      University: (student.university && student.university.name) || "N/A",
    };
    let studentCategoriesForGroup = getRegisteredGroupById(
       student,
@@ -205,12 +219,20 @@ const getSpecializedStudentStats = (registeredStudentsFromGroup, group) => {
    });
    registeredStudentsFromGroup.forEach((student) => {
       let registeredGroup = getRegisteredGroupById(student, group.groupId);
-      let fieldOfStudyOptionId = registeredGroup?.categories.find(
-         (category) => category.id === fieldOfStudyCategory.id
-      )?.selectedValueId;
-      let levelOfStudyOptionId = registeredGroup?.categories.find(
-         (category) => category.id === levelOfStudyCategory.id
-      )?.selectedValueId;
+      let targetFieldOfStudyOption =
+         registeredGroup &&
+         registeredGroup.categories.find(
+            (category) => category.id === fieldOfStudyCategory.id
+         );
+      let fieldOfStudyOptionId =
+         targetFieldOfStudyOption && targetFieldOfStudyOption.selectedValueId;
+      let targetLevelOfStudyOption =
+         registeredGroup &&
+         registeredGroup.categories.find(
+            (category) => category.id === levelOfStudyCategory.id
+         );
+      let levelOfStudyOptionId =
+         targetLevelOfStudyOption && targetLevelOfStudyOption.selectedValueId;
       if (
          categoryStats.options[fieldOfStudyOptionId] &&
          categoryStats.options[fieldOfStudyOptionId].subOptions[
@@ -259,7 +281,9 @@ const getRegisteredStudentsStats = (registeredStudentsFromGroup, group) => {
 };
 
 const getRatingsAverage = (contentRatings) =>
-   contentRatings.reduce((a, b) => a + b) / contentRatings.length;
+   contentRatings.reduce((a, b) => {
+      return a + b.rating || 0;
+   }, 0) / contentRatings.length;
 
 module.exports = {
    setHeaders,
