@@ -214,8 +214,15 @@ const EventsOverview = ({ group, scrollRef }) => {
                <EventsTable
                   handleEditStream={handleEditStream}
                   isDraft={tabValue === "draft"}
+                  isPast={tabValue === "past"}
                   streams={streams}
                   group={group}
+                  hasAccessToRegisteredStudents={
+                     userData?.isAdmin &&
+                     Boolean(
+                        group?.universityCode || group?.privacyPolicyActive
+                     )
+                  }
                   handlePublishStream={handlePublishStream}
                   publishingDraft={publishingDraft}
                   disabled={fetchingQueryEvent || fetching}

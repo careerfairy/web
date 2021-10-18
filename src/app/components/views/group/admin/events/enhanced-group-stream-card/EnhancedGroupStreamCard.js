@@ -84,14 +84,14 @@ const EnhancedGroupStreamCard = ({
    const [startDownloadingTalentPool, setStartDownloadingTalentPool] = useState(
       false
    );
-   const { hasDownloadedTalentPool, talentPool } = useTalentPoolMetadata(
+   const { hasDownloadedTalentPool, talentPool } = useTalentPoolMetadata({
       livestream,
       allGroups,
       group,
       firebase,
       registeredStudentsFromGroup,
-      startDownloadingTalentPool
-   );
+      startDownloadingTalentPool,
+   });
 
    useEffect(() => {
       if (
@@ -402,6 +402,7 @@ const EnhancedGroupStreamCard = ({
                   </CSVLink>
                )}
             </Fragment>
+
             {isPastLivestream && (
                <Fragment>
                   {!startDownloadingReport || !hasDownloadedReport ? (

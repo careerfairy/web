@@ -1,14 +1,15 @@
-import { withFirebase } from "context/firebase";
+import { useFirebase, withFirebase } from "context/firebase";
 import StatsUtil from "data/util/StatsUtil";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import PollUtil from "../../data/util/PollUtil";
 
-export function useLivestreamMetadata(
+export function useLivestreamMetadata({
    livestream,
    group,
-   firebase,
-   userRequestedDownload
-) {
+   userRequestedDownload,
+}) {
+   const firebase = useFirebase();
+   const [metaDataDictionary, setMetaDataDictionary] = useState({});
    const [questions, setQuestions] = useState(undefined);
    const [polls, setPolls] = useState(undefined);
    const [icons, setIcons] = useState(undefined);
@@ -56,120 +57,122 @@ export function useLivestreamMetadata(
    ]);
 
    useEffect(() => {
-      if (livestream && userRequestedDownload) {
+      if (livestream) {
          const unsubscribe = firebase.listenToLivestreamQuestions(
             livestream.id,
             (querySnapshot) => {
-               let questionList = [];
-               querySnapshot.forEach((doc) => {
-                  let cc = doc.data();
-                  cc.id = doc.id;
-                  questionList.push(cc);
-               });
-               setQuestions(questionList);
+               const newQuestionList = querySnapshot.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+               }));
+               setQuestions(newQuestionList);
+               updateMetaDictionary("questions", newQuestionList);
             }
          );
 
          return () => unsubscribe();
       }
-   }, [livestream, userRequestedDownload]);
+   }, [livestream]);
 
    useEffect(() => {
-      if (livestream && userRequestedDownload) {
+      if (livestream) {
          const unsubscribe = firebase.listenToPollEntries(
             livestream.id,
             (querySnapshot) => {
-               let pollList = [];
-               querySnapshot.forEach((doc) => {
-                  let cc = doc.data();
-                  cc.id = doc.id;
-                  cc.options = PollUtil.convertPollOptionsObjectToArray(
-                     cc.options
-                  );
-                  pollList.push(cc);
-               });
-               setPolls(pollList);
+               const newPollList = querySnapshot.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+                  options: PollUtil.convertPollOptionsObjectToArray(
+                     doc.data().options
+                  ),
+               }));
+               setPolls(newPollList);
+               updateMetaDictionary("polls", newPollList);
             }
          );
          return () => unsubscribe();
       }
-   }, [livestream, userRequestedDownload]);
+   }, [livestream]);
 
    useEffect(() => {
-      if (livestream && userRequestedDownload) {
-         firebase.getLivestreamSpeakers(livestream.id).then((querySnapshot) => {
-            var speakerList = [];
-            querySnapshot.forEach((doc) => {
-               let speaker = doc.data();
-               speaker.id = doc.id;
-               speakerList.push(speaker);
-            });
-            setLivestreamSpeakers(speakerList);
-         });
+      if (livestream) {
+         (async function () {
+            const querySnapshot = await firebase.getLivestreamSpeakers(
+               livestream.id
+            );
+            const newSpeakerList = querySnapshot.docs.map((doc) => ({
+               id: doc.id,
+               ...doc.data(),
+            }));
+            setLivestreamSpeakers(newSpeakerList);
+            updateMetaDictionary("livestreamSpeakers", newSpeakerList);
+         })();
       }
-   }, [livestream, userRequestedDownload]);
+   }, [livestream]);
 
    useEffect(() => {
-      if (livestream && userRequestedDownload) {
+      if (livestream) {
          const unsubscribe = firebase.listenToTotalLivestreamIcons(
             livestream.id,
             (querySnapshot) => {
-               let iconList = [];
-               querySnapshot.forEach((doc) => {
-                  let cc = doc.data();
-                  cc.id = doc.id;
-                  iconList.push(cc);
-               });
-               setIcons(iconList);
+               const newIconList = querySnapshot.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+               }));
+               setIcons(newIconList);
+               updateMetaDictionary("icons", newIconList);
             }
          );
          return () => unsubscribe();
       }
-   }, [livestream, userRequestedDownload]);
+   }, [livestream]);
 
    useEffect(() => {
-      if (livestream && group && userRequestedDownload) {
-         firebase
-            .getLivestreamParticipatingStudents(livestream.id)
-            .then((querySnapshot) => {
-               let participatingStudents = [];
-               querySnapshot.forEach((doc) => {
-                  let student = doc.data();
-                  student.id = doc.id;
-                  participatingStudents.push(student);
-               });
-               setParticipatingStudents(participatingStudents);
-            });
+      if (livestream && group) {
+         (async function () {
+            const querySnapshot = await firebase.getLivestreamParticipatingStudents(
+               livestream.id
+            );
+            const newParticipatingStudents = querySnapshot.docs.map((doc) => ({
+               id: doc.id,
+               ...doc.data(),
+            }));
+            setParticipatingStudents(newParticipatingStudents);
+            updateMetaDictionary(
+               "participatingStudents",
+               newParticipatingStudents
+            );
+         })();
       }
-   }, [livestream, group, userRequestedDownload]);
+   }, [livestream, group]);
 
    useEffect(() => {
-      if (
-         participatingStudents &&
-         participatingStudents.length &&
-         userRequestedDownload
-      ) {
-         let studentsOfGroup = [];
-         participatingStudents.forEach((student) => {
+      const targetParticipatingStudents =
+         metaDataDictionary[livestream?.id]?.participatingStudents;
+      if (targetParticipatingStudents?.length) {
+         let newStudentsOfGroup = [];
+         targetParticipatingStudents.forEach((student) => {
             if (studentBelongsToGroup(student)) {
                let publishedStudent = StatsUtil.getStudentInGroupDataObject(
                   student,
                   group
                );
-               studentsOfGroup.push(publishedStudent);
+               newStudentsOfGroup.push(publishedStudent);
             }
          });
-         setParticipatingStudentsFromGroup(studentsOfGroup);
+         setParticipatingStudentsFromGroup(newStudentsOfGroup);
+         updateMetaDictionary(
+            "participatingStudentsFromGroup",
+            newStudentsOfGroup
+         );
       }
-   }, [participatingStudents, userRequestedDownload]);
+   }, [metaDataDictionary[livestream?.id]?.participatingStudents, livestream]);
 
    useEffect(() => {
-      if (
-         participatingStudents &&
-         participatingStudents.length &&
-         userRequestedDownload
-      ) {
-         let listOfStudents = participatingStudents.filter((student) =>
+      const targetParticipatingStudents =
+         metaDataDictionary[livestream?.id]?.participatingStudents;
+      if (targetParticipatingStudents?.length) {
+         let listOfStudents = targetParticipatingStudents.filter((student) =>
             studentBelongsToGroup(student)
          );
          let stats = StatsUtil.getRegisteredStudentsStats(
@@ -177,11 +180,12 @@ export function useLivestreamMetadata(
             group
          );
          setStudentStats(stats);
+         updateMetaDictionary("studentStats", stats);
       }
-   }, [participatingStudents, userRequestedDownload]);
+   }, [metaDataDictionary[livestream?.id]?.participatingStudents, livestream]);
 
    useEffect(() => {
-      if (livestream && userRequestedDownload) {
+      if (livestream) {
          const unsubscribe = firebase.listenToLivestreamOverallRatings(
             livestream.id,
             (querySnapshot) => {
@@ -198,48 +202,59 @@ export function useLivestreamMetadata(
                      ? average(overallRatings).toFixed(2)
                      : "N.A.";
                setOverallRating(value);
+               updateMetaDictionary("overallRating", value);
             }
          );
          return () => unsubscribe();
       }
-   }, [livestream, userRequestedDownload]);
+   }, [livestream]);
 
    useEffect(() => {
-      if (livestream && userRequestedDownload) {
+      if (livestream) {
          const unsubscribe = firebase.listenToLivestreamContentRatings(
             livestream.id,
             (querySnapshot) => {
-               let contentRatings = [];
-               querySnapshot.forEach((doc) => {
-                  let cc = doc.data();
-                  cc.id = doc.id;
-                  contentRatings.push(cc.rating);
-               });
+               const contentRatings = querySnapshot.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+               }));
                let value =
                   contentRatings.length > 0
                      ? average(contentRatings).toFixed(2)
                      : "N.A.";
                setContentRating(value);
+               updateMetaDictionary("contentRating", value);
             }
          );
          return () => unsubscribe();
       }
-   }, [livestream, userRequestedDownload]);
+   }, [livestream]);
 
    useEffect(() => {
-      if (livestream && userRequestedDownload) {
-         firebase
-            .getLivestreamTalentPoolMembers(livestream.companyId)
-            .then((querySnapshot) => {
-               let registeredStudents = [];
-               querySnapshot.forEach((doc) => {
-                  let element = doc.data();
-                  registeredStudents.push(element);
-               });
-               setTalentPoolForReport(registeredStudents);
-            });
+      if (livestream) {
+         (async function () {
+            const querySnapshot = await firebase.getLivestreamTalentPoolMembers(
+               livestream.companyId
+            );
+            const registeredStudents = querySnapshot.docs.map((doc) => ({
+               id: doc.id,
+               ...doc.data(),
+            }));
+            setTalentPoolForReport(registeredStudents);
+            updateMetaDictionary("talentPoolForReport", registeredStudents);
+         })();
       }
-   }, [livestream, userRequestedDownload]);
+   }, [livestream]);
+
+   const updateMetaDictionary = useCallback((prop, newPropData) => {
+      setMetaDataDictionary((prevState) => ({
+         ...prevState,
+         [livestream.id]: {
+            ...prevState[livestream.id],
+            [prop]: newPropData,
+         },
+      }));
+   }, []);
 
    function studentBelongsToGroup(student) {
       if (group.universityCode) {

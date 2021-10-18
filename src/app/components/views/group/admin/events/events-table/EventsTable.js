@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { defaultTableOptions, tableIcons } from "components/util/tableUtils";
 import MaterialTable from "@material-table/core";
 import {
@@ -20,9 +20,10 @@ import { useFirebase } from "context/firebase";
 import { CircularProgress } from "@material-ui/core";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
-import { useAuth } from "../../../../../../HOCs/AuthProvider";
+import { useAuth } from "HOCs/AuthProvider";
 import DraftLinkIcon from "@material-ui/icons/Link";
 import * as actions from "store/actions";
+import { useMetaDataActions } from "components/custom-hook/useMetaDataActions";
 
 const useStyles = makeStyles((theme) => ({}));
 const customOptions = {
@@ -42,12 +43,28 @@ const EventsTable = ({
    group,
    publishingDraft,
    handlePublishStream,
+   hasAccessToRegisteredStudents,
+   isPast,
 }) => {
+   console.count("-> EventsTable");
    const firebase = useFirebase();
    const { authenticatedUser, userData } = useAuth();
    const [selectedEvents, setSelectedEvents] = useState([]);
    const [deletingEvent, setDeletingEvent] = useState(false);
    const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null);
+   const [
+      registeredStudentsFromGroup,
+      setRegisteredStudentsFromGroup,
+   ] = useState([]);
+   const [allGroups, setAllGroups] = useState([]);
+
+   const { talentPoolAction, pdfReportAction } = useMetaDataActions({
+      allGroups,
+      group,
+      isPast,
+   });
+   const [registeredStudents, setRegisteredStudents] = useState([]);
+
    const dispatch = useDispatch();
    const { push, pathname, asPath } = useRouter();
 
@@ -56,6 +73,19 @@ const EventsTable = ({
       setTargetLivestreamStreamerLinksId,
    ] = useState("");
    const classes = useStyles();
+
+   useEffect(() => {
+      firebase.getAllCareerCenters().then((querySnapshot) => {
+         let careerCenters = [];
+         querySnapshot.forEach((doc) => {
+            let cc = doc.data();
+            cc.id = doc.id;
+            careerCenters.push(cc);
+         });
+         setAllGroups(careerCenters);
+      });
+   }, []);
+
    const handleSpeakerSearch = useCallback((term, rowData) => {
       return rowData.speakers.some(
          (speaker) =>
@@ -63,6 +93,18 @@ const EventsTable = ({
             speaker.lastName.toLowerCase().indexOf(term.toLowerCase()) >= 0
       );
    }, []);
+
+   function studentBelongsToGroup(student) {
+      if (group.universityCode) {
+         if (student.university?.code === group.universityCode) {
+            return student.groupIds && student.groupIds.includes(group.groupId);
+         } else {
+            return false;
+         }
+      } else {
+         return student.groupIds && student.groupIds.includes(group.groupId);
+      }
+   }
 
    const handleDeleteStream = async () => {
       try {
@@ -114,6 +156,8 @@ const EventsTable = ({
       <>
          <MaterialTable
             actions={[
+               pdfReportAction,
+               talentPoolAction,
                {
                   icon: () => <EditIcon color="action" />,
                   tooltip: isDraft ? "Edit Draft" : "Edit Stream",
