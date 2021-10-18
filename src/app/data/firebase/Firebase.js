@@ -97,6 +97,22 @@ class Firebase {
       return joinGroupDashboard(data);
    };
 
+   /**
+    * Call an on call cloud function to generate a secure agora token.
+    * @param {({
+    * targetStreamId: string,
+    * targetGroupId: string,
+    * userEmail: string,
+    * })} data
+    * @return {Promise<firebase.functions.HttpsCallableResult>}
+    */
+   getLivestreamReportData = async (data) => {
+      const handleGetLivestreamReportData = this.functions.httpsCallable(
+         "getLivestreamReportData"
+      );
+      return handleGetLivestreamReportData(data);
+   };
+
    sendRegistrationConfirmationEmail = (user, userData, livestream) => {
       if (livestream.isFaceToFace) {
          return this.sendPhysicalEventEmailRegistrationConfirmation(

@@ -6,12 +6,17 @@ import { CircularProgress } from "@material-ui/core";
 import { CSVLink } from "react-csv";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import PDFIcon from "@material-ui/icons/PictureAsPdf";
+import { useAuth } from "../../HOCs/AuthProvider";
+import * as actions from "store/actions";
+import { useDispatch } from "react-redux";
 
 export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    const firebase = useFirebase();
+   const { userData } = useAuth();
+   const dispatch = useDispatch();
    const [talentPoolDictionary, setTalentPoolDictionary] = useState({});
    const [targetStream, setTargetStream] = useState(null);
-
+   const [loadingReportData, setLoadingReportData] = useState({});
    const [loadingTalentPool, setLoadingTalentPool] = useState({});
    const [
       registeredStudentsFromGroupDictionary,
@@ -131,6 +136,35 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
       }
    }, [targetStream, targetStream, registeredStudentsFromGroupDictionary]);
 
+   const handleGetLivestreamReportData = useCallback(
+      async (event, rowData) => {
+         console.log("-> rowData", rowData);
+         try {
+            if (!userData.userEmail)
+               return dispatch(
+                  actions.sendGeneralError("Unable to find user email")
+               );
+            setLoadingReportData((prevState) => ({
+               ...prevState,
+               [rowData.id]: true,
+            }));
+            const reportData = await firebase.getLivestreamReportData({
+               targetStreamId: rowData.id,
+               userEmail: userData.userEmail,
+               targetGroupId: group.id,
+            });
+            console.log("-> reportData", reportData);
+         } catch (e) {
+            dispatch(actions.sendGeneralError(e));
+         }
+         setLoadingReportData((prevState) => ({
+            ...prevState,
+            [rowData.id]: false,
+         }));
+      },
+      [dispatch, group?.id, userData?.userEmail]
+   );
+
    function studentBelongsToGroup(student) {
       if (group.universityCode) {
          if (student.university?.code === group.universityCode) {
@@ -184,13 +218,21 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    );
 
    const pdfReportAction = useCallback(
-      (rowData) => ({
-         icon: () => <PDFIcon />,
-         tooltip: "Download Report",
-         onClick: () => {},
-         hidden: !isPast || isDraft,
-      }),
-      [isDraft, isPast]
+      (rowData) => {
+         const actionLoading = loadingReportData[rowData?.id];
+
+         return {
+            icon: () =>
+               actionLoading ? <CircularProgress size={15} /> : <PDFIcon />,
+            tooltip: actionLoading
+               ? "Downloading Report..."
+               : "Download Report",
+            onClick: handleGetLivestreamReportData,
+            hidden: !isPast || isDraft,
+            disabled: actionLoading,
+         };
+      },
+      [isDraft, isPast, loadingReportData]
    );
 
    return { talentPoolAction, pdfReportAction };
