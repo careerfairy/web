@@ -62,6 +62,7 @@ const EventsTable = ({
       allGroups,
       group,
       isPast,
+      isDraft,
    });
    const [registeredStudents, setRegisteredStudents] = useState([]);
 

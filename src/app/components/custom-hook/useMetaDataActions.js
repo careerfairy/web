@@ -2,26 +2,17 @@ import StatsUtil from "data/util/StatsUtil";
 import React, { useCallback, useEffect, useState } from "react";
 import TalentPoolIcon from "@material-ui/icons/HowToRegRounded";
 import { useFirebase } from "../../context/firebase";
-import { Button, CircularProgress } from "@material-ui/core";
+import { CircularProgress } from "@material-ui/core";
 import { CSVLink } from "react-csv";
 import GetAppIcon from "@material-ui/icons/GetApp";
-import GenerateReportIcon from "@material-ui/icons/PictureAsPdf";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import LivestreamPdfReport from "../views/group/admin/events/enhanced-group-stream-card/LivestreamPdfReport";
-import { useLivestreamMetadata } from "./useLivestreamMetadata";
+import PDFIcon from "@material-ui/icons/PictureAsPdf";
 
-export function useMetaDataActions({ allGroups, group, isPast }) {
+export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    const firebase = useFirebase();
    const [talentPoolDictionary, setTalentPoolDictionary] = useState({});
    const [targetStream, setTargetStream] = useState(null);
 
-   const metaDataDictionary = useLivestreamMetadata({
-      livestream: targetStream,
-      group,
-   });
-
    const [loadingTalentPool, setLoadingTalentPool] = useState({});
-   const [loadingReport, setLoadingReport] = useState({});
    const [
       registeredStudentsFromGroupDictionary,
       setRegisteredStudentsFromGroupDictionary,
@@ -193,76 +184,13 @@ export function useMetaDataActions({ allGroups, group, isPast }) {
    );
 
    const pdfReportAction = useCallback(
-      (rowData) => {
-         const targetReportData = talentPoolDictionary[rowData?.id];
-         const reportLoading = loadingReport[rowData?.id];
-         const targetMetaData = metaDataDictionary[rowData?.id];
-         const downloaded =
-            targetMetaData &&
-            targetMetaData.questions !== undefined &&
-            targetMetaData.polls !== undefined &&
-            targetMetaData.icons !== undefined &&
-            targetMetaData.livestreamSpeakers !== undefined &&
-            targetMetaData.overallRating !== undefined &&
-            targetMetaData.contentRating !== undefined &&
-            targetMetaData.talentPoolForReport !== undefined &&
-            targetMetaData.participatingStudentsFromGroup !== undefined &&
-            targetMetaData.studentStats !== undefined;
-         console.log("-> targetMetaData", targetMetaData);
-         console.log("-> downloaded", downloaded);
-         return {
-            icon: () => {
-               return downloaded ? (
-                  <PDFDownloadLink
-                     fileName={`General Report ${rowData.company} ${rowData.id}.pdf`}
-                     document={
-                        <LivestreamPdfReport
-                           key={rowData.id}
-                           group={group}
-                           livestream={rowData}
-                           studentStats={targetMetaData.studentStats}
-                           speakers={rowData.speakers}
-                           overallRating={targetMetaData.overallRating}
-                           contentRating={targetMetaData.contentRating}
-                           totalStudentsInTalentPool={
-                              targetMetaData.talentPoolForReport?.length
-                           }
-                           totalViewerFromOutsideETH={
-                              targetMetaData.participatingStudents?.length -
-                              targetMetaData.participatingStudentsFromGroup
-                                 ?.length
-                           }
-                           totalViewerFromETH={
-                              targetMetaData.participatingStudentsFromGroup
-                                 ?.length
-                           }
-                           questions={targetMetaData.questions}
-                           polls={targetMetaData.polls}
-                           icons={targetMetaData.icons}
-                        />
-                     }
-                  >
-                     {({ blob, url, loading, error }) => (
-                        <GetAppIcon color="primary" />
-                     )}
-                  </PDFDownloadLink>
-               ) : targetStream?.id === rowData?.id && !downloaded ? (
-                  <CircularProgress size={15} />
-               ) : (
-                  <GenerateReportIcon color="action" />
-               );
-            },
-            hidden: !isPast,
-            onClick: () => setTargetStream(rowData),
-            tooltip: targetReportData
-               ? "Download Report"
-               : reportLoading
-               ? "Generating Report..."
-               : "Generate Report",
-            disabled: reportLoading,
-         };
-      },
-      [targetStream, isPast, loadingReport, metaDataDictionary, group]
+      (rowData) => ({
+         icon: () => <PDFIcon />,
+         tooltip: "Download Report",
+         onClick: () => {},
+         hidden: !isPast || isDraft,
+      }),
+      [isDraft, isPast]
    );
 
    return { talentPoolAction, pdfReportAction };

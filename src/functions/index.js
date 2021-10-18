@@ -65,6 +65,7 @@ exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail;
 exports.sendDraftApprovalRequestEmail =
    groupAdmin.sendDraftApprovalRequestEmail;
 exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail;
+exports.getLivestreamReportData = groupAdmin.getLivestreamReportData;
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus;
 exports.joinGroupDashboard = groupAdmin.joinGroupDashboard;
 

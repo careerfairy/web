@@ -1,5 +1,14 @@
 const functions = require("firebase-functions");
-const { setHeaders, getArrayDifference } = require("./util");
+const {
+   setHeaders,
+   getArrayDifference,
+   makeRequestingGroupIdFirst,
+   convertPollOptionsObjectToArray,
+   studentBelongsToGroup,
+   getStudentInGroupDataObject,
+   getRegisteredStudentsStats,
+   getRatingsAverage,
+} = require("./util");
 const { client } = require("./api/postmark");
 const { admin } = require("./api/firestoreAdmin");
 
@@ -83,6 +92,226 @@ exports.sendNewlyPublishedEventEmail = functions.https.onRequest(
             return res.status(400).send(error);
          }
       );
+   }
+);
+
+exports.getLivestreamReportData = functions.https.onCall(
+   async (data, context) => {
+      const { targetStreamId, targetGroupId, userEmail } = data;
+      const reportData = [];
+
+      const authEmail = context.auth.token.email || null;
+
+      if (!targetStreamId || !targetGroupId || !userEmail) {
+         throw new functions.https.HttpsError(
+            "invalid-argument",
+            "You must provide the following arguments: targetStreamId, targetGroupId, userEmail"
+         );
+      }
+
+      if (!authEmail || authEmail !== userEmail) {
+         throw new functions.https.HttpsError(
+            "permission-denied",
+            "You do not have permission to access this data"
+         );
+      }
+      const groupSnap = await admin
+         .firestore()
+         .collection("careerCenterData")
+         .doc(targetGroupId)
+         .get();
+
+      const streamSnap = await admin
+         .firestore()
+         .collection("livestreams")
+         .doc(targetStreamId)
+         .get();
+
+      const userSnap = await admin
+         .firestore()
+         .collection("userData")
+         .doc(userEmail)
+         .get();
+
+      if (!groupSnap.exists || !streamSnap.exists || !userSnap.exists) {
+         const missingDataType = !groupSnap.exists
+            ? "targetGroupId"
+            : !streamSnap.exists
+            ? "targetStreamId"
+            : "userEmail";
+
+         throw new functions.https.HttpsError(
+            "not-found",
+            `The ${missingDataType} provided does not exist`
+         );
+      }
+
+      try {
+         const livestreamData = { id: streamSnap.id, ...streamSnap.data() };
+         const requestingGroupData = { id: groupSnap.id, ...groupSnap.data() };
+         const livestreamGroupIds = makeRequestingGroupIdFirst(
+            livestreamData.groupIds
+         );
+
+         // Declaration of Snaps promises, todo turn into Promise.all()
+         const registeredUsersSnap = await streamSnap.ref
+            .collection("registeredStudents")
+            .get();
+         const participatingUsersSnap = await streamSnap.ref
+            .collection("participatingStudents")
+            .get();
+         const talentPoolSnap = await admin
+            .firestore()
+            .collection("userData")
+            .where("talentPools", "array-contains", livestreamData.companyId)
+            .get();
+         const speakersSnap = await streamSnap.ref.collection("speakers").get();
+         const pollsSnap = await streamSnap.ref
+            .collection("polls")
+            .orderBy("timestamp", "asc")
+            .get();
+
+         const iconsSnap = await streamSnap.ref
+            .collection("icons")
+            .orderBy("timestamp", "desc")
+            .get();
+         const questionsSnap = await streamSnap.ref
+            .collection("questions")
+            .orderBy("votes", "desc")
+            .get();
+
+         const contentRatingsSnap = await streamSnap.ref
+            .collection("rating")
+            .doc("company")
+            .collection("voters")
+            .get();
+
+         const overallRatingsSnap = await streamSnap.ref
+            .collection("rating")
+            .doc("overall")
+            .collection("voters")
+            .get();
+
+         // Extraction of snap Data
+         const registeredStudents = registeredUsersSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }));
+
+         // Its let since this array will be modified
+         let participatingStudents = participatingUsersSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }));
+
+         const talentPoolForReport = talentPoolSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }));
+
+         const speakers = speakersSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }));
+
+         const questions = questionsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }));
+
+         const polls = pollsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            options: convertPollOptionsObjectToArray(doc.data().options),
+         }));
+
+         const icons = iconsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            options: convertPollOptionsObjectToArray(doc.data().options),
+         }));
+
+         const contentRatings = contentRatingsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }));
+         const overallRatings = overallRatingsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }));
+
+         const overallRatingValue =
+            overallRatings.length > 0
+               ? getRatingsAverage(overallRatings).toFixed(2)
+               : "N.A.";
+
+         const contentRatingValue =
+            contentRatings.length > 0
+               ? getRatingsAverage(contentRatings).toFixed(2)
+               : "N.A.";
+
+         for (const groupId of livestreamGroupIds) {
+            let groupData;
+            if (groupId === requestingGroupData.id) {
+               groupData = requestingGroupData;
+            } else {
+               const otherGroupSnap = await admin
+                  .firestore()
+                  .collection("careerCenterData")
+                  .doc(groupId)
+                  .get();
+               if (!otherGroupSnap.exists) continue;
+               groupData = otherGroupSnap.data();
+            }
+            const participatingStudentsFromGroup = [];
+            const listOfStudentsForStats = [];
+            participatingStudents = participatingStudents.map((student) => {
+               if (studentBelongsToGroup(student, groupData)) {
+                  const publishedStudent = getStudentInGroupDataObject(
+                     student,
+                     groupData
+                  );
+                  participatingStudentsFromGroup.push(publishedStudent);
+                  if (!student.statsAlreadyInUse) {
+                     listOfStudentsForStats.push(student);
+                     student.statsAlreadyInUse = true;
+                  }
+               }
+            });
+            const studentStats = getRegisteredStudentsStats(
+               listOfStudentsForStats,
+               groupData
+            );
+
+            reportData.push({
+               group: groupData,
+               livestream: livestreamData,
+               studentStats,
+               speakers,
+               overallRating: overallRatingValue,
+               contentRating: contentRatingValue,
+               totalStudentsInTalentPool: talentPoolForReport.length,
+               totalViewerFromOutsideETH:
+                  participatingStudents.length -
+                  participatingStudentsFromGroup.length,
+               totalViewerFromETH: participatingStudentsFromGroup.length,
+               questions,
+               polls,
+               icons,
+            });
+         }
+
+         console.log("-> reportData", reportData);
+         functions.logger.log("-> reportData", reportData);
+      } catch (e) {
+         console.error(e);
+         throw new functions.https.HttpsError(
+            "unknown",
+            `Unhandled error: ${e.message}`
+         );
+      }
+      // fetch all cc docs in the groupIds of the streamDoc
+      // If use users stats only once per report data, once a users stats are used, flag them as already used
    }
 );
 
