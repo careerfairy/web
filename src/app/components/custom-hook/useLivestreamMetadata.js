@@ -3,58 +3,37 @@ import StatsUtil from "data/util/StatsUtil";
 import { useState, useEffect, useCallback } from "react";
 import PollUtil from "../../data/util/PollUtil";
 
-export function useLivestreamMetadata({
-   livestream,
-   group,
-   userRequestedDownload,
-}) {
+export function useLivestreamMetadata({ livestream, group }) {
    const firebase = useFirebase();
    const [metaDataDictionary, setMetaDataDictionary] = useState({});
-   const [questions, setQuestions] = useState(undefined);
-   const [polls, setPolls] = useState(undefined);
-   const [icons, setIcons] = useState(undefined);
-   const [livestreamSpeakers, setLivestreamSpeakers] = useState(undefined);
-   const [overallRating, setOverallRating] = useState(undefined);
-   const [contentRating, setContentRating] = useState(undefined);
-   const [talentPoolForReport, setTalentPoolForReport] = useState(undefined);
-   const [participatingStudents, setParticipatingStudents] = useState(
-      undefined
-   );
-   const [
-      participatingStudentsFromGroup,
-      setParticipatingStudentsFromGroup,
-   ] = useState(undefined);
-   const [studentStats, setStudentStats] = useState(undefined);
-
-   const [hasDownloadedReport, setHasDownloadedReport] = useState(false);
-
+   // console.log("-> metaDataDictionary", metaDataDictionary);
    let average = (array) => array.reduce((a, b) => a + b) / array.length;
 
-   useEffect(() => {
-      if (
-         questions !== undefined &&
-         polls !== undefined &&
-         icons !== undefined &&
-         livestreamSpeakers !== undefined &&
-         overallRating !== undefined &&
-         contentRating !== undefined &&
-         talentPoolForReport !== undefined &&
-         participatingStudentsFromGroup !== undefined &&
-         studentStats !== undefined
-      ) {
-         setHasDownloadedReport(true);
-      }
-   }, [
-      questions,
-      polls,
-      icons,
-      livestreamSpeakers,
-      overallRating,
-      contentRating,
-      talentPoolForReport,
-      participatingStudents,
-      studentStats,
-   ]);
+   // useEffect(() => {
+   //    if (
+   //       questions !== undefined &&
+   //       polls !== undefined &&
+   //       icons !== undefined &&
+   //       livestreamSpeakers !== undefined &&
+   //       overallRating !== undefined &&
+   //       contentRating !== undefined &&
+   //       talentPoolForReport !== undefined &&
+   //       participatingStudentsFromGroup !== undefined &&
+   //       studentStats !== undefined
+   //    ) {
+   //       setHasDownloadedReport(true);
+   //    }
+   // }, [
+   //    questions,
+   //    polls,
+   //    icons,
+   //    livestreamSpeakers,
+   //    overallRating,
+   //    contentRating,
+   //    talentPoolForReport,
+   //    participatingStudents,
+   //    studentStats,
+   // ]);
 
    useEffect(() => {
       if (livestream) {
@@ -65,7 +44,6 @@ export function useLivestreamMetadata({
                   id: doc.id,
                   ...doc.data(),
                }));
-               setQuestions(newQuestionList);
                updateMetaDictionary("questions", newQuestionList);
             }
          );
@@ -86,7 +64,6 @@ export function useLivestreamMetadata({
                      doc.data().options
                   ),
                }));
-               setPolls(newPollList);
                updateMetaDictionary("polls", newPollList);
             }
          );
@@ -104,7 +81,6 @@ export function useLivestreamMetadata({
                id: doc.id,
                ...doc.data(),
             }));
-            setLivestreamSpeakers(newSpeakerList);
             updateMetaDictionary("livestreamSpeakers", newSpeakerList);
          })();
       }
@@ -119,7 +95,6 @@ export function useLivestreamMetadata({
                   id: doc.id,
                   ...doc.data(),
                }));
-               setIcons(newIconList);
                updateMetaDictionary("icons", newIconList);
             }
          );
@@ -137,7 +112,6 @@ export function useLivestreamMetadata({
                id: doc.id,
                ...doc.data(),
             }));
-            setParticipatingStudents(newParticipatingStudents);
             updateMetaDictionary(
                "participatingStudents",
                newParticipatingStudents
@@ -160,7 +134,6 @@ export function useLivestreamMetadata({
                newStudentsOfGroup.push(publishedStudent);
             }
          });
-         setParticipatingStudentsFromGroup(newStudentsOfGroup);
          updateMetaDictionary(
             "participatingStudentsFromGroup",
             newStudentsOfGroup
@@ -179,7 +152,6 @@ export function useLivestreamMetadata({
             listOfStudents,
             group
          );
-         setStudentStats(stats);
          updateMetaDictionary("studentStats", stats);
       }
    }, [metaDataDictionary[livestream?.id]?.participatingStudents, livestream]);
@@ -201,7 +173,6 @@ export function useLivestreamMetadata({
                   overallRatings.length > 0
                      ? average(overallRatings).toFixed(2)
                      : "N.A.";
-               setOverallRating(value);
                updateMetaDictionary("overallRating", value);
             }
          );
@@ -222,7 +193,6 @@ export function useLivestreamMetadata({
                   contentRatings.length > 0
                      ? average(contentRatings).toFixed(2)
                      : "N.A.";
-               setContentRating(value);
                updateMetaDictionary("contentRating", value);
             }
          );
@@ -240,21 +210,23 @@ export function useLivestreamMetadata({
                id: doc.id,
                ...doc.data(),
             }));
-            setTalentPoolForReport(registeredStudents);
             updateMetaDictionary("talentPoolForReport", registeredStudents);
          })();
       }
    }, [livestream]);
 
-   const updateMetaDictionary = useCallback((prop, newPropData) => {
-      setMetaDataDictionary((prevState) => ({
-         ...prevState,
-         [livestream.id]: {
-            ...prevState[livestream.id],
-            [prop]: newPropData,
-         },
-      }));
-   }, []);
+   const updateMetaDictionary = useCallback(
+      (prop, newPropData) => {
+         setMetaDataDictionary((prevState) => ({
+            ...prevState,
+            [livestream.id]: {
+               ...(prevState[livestream?.id] && prevState[livestream.id]),
+               [prop]: newPropData,
+            },
+         }));
+      },
+      [livestream]
+   );
 
    function studentBelongsToGroup(student) {
       if (group.universityCode) {
@@ -269,17 +241,5 @@ export function useLivestreamMetadata({
       }
    }
 
-   return {
-      hasDownloadedReport,
-      questions,
-      polls,
-      icons,
-      livestreamSpeakers,
-      overallRating,
-      contentRating,
-      talentPoolForReport,
-      participatingStudents,
-      participatingStudentsFromGroup,
-      studentStats,
-   };
+   return metaDataDictionary;
 }

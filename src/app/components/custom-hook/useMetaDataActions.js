@@ -15,7 +15,10 @@ export function useMetaDataActions({ allGroups, group, isPast }) {
    const [talentPoolDictionary, setTalentPoolDictionary] = useState({});
    const [targetStream, setTargetStream] = useState(null);
 
-   const {} = useLivestreamMetadata({ livestream: targetStream, group });
+   const metaDataDictionary = useLivestreamMetadata({
+      livestream: targetStream,
+      group,
+   });
 
    const [loadingTalentPool, setLoadingTalentPool] = useState({});
    const [loadingReport, setLoadingReport] = useState({});
@@ -193,33 +196,49 @@ export function useMetaDataActions({ allGroups, group, isPast }) {
       (rowData) => {
          const targetReportData = talentPoolDictionary[rowData?.id];
          const reportLoading = loadingReport[rowData?.id];
-
+         const targetMetaData = metaDataDictionary[rowData?.id];
+         const downloaded =
+            targetMetaData &&
+            targetMetaData.questions !== undefined &&
+            targetMetaData.polls !== undefined &&
+            targetMetaData.icons !== undefined &&
+            targetMetaData.livestreamSpeakers !== undefined &&
+            targetMetaData.overallRating !== undefined &&
+            targetMetaData.contentRating !== undefined &&
+            targetMetaData.talentPoolForReport !== undefined &&
+            targetMetaData.participatingStudentsFromGroup !== undefined &&
+            targetMetaData.studentStats !== undefined;
+         console.log("-> targetMetaData", targetMetaData);
+         console.log("-> downloaded", downloaded);
          return {
             icon: () => {
-               return targetReportData ? (
+               return downloaded ? (
                   <PDFDownloadLink
                      fileName={`General Report ${rowData.company} ${rowData.id}.pdf`}
                      document={
                         <LivestreamPdfReport
+                           key={rowData.id}
                            group={group}
                            livestream={rowData}
-                           studentStats={studentStats}
+                           studentStats={targetMetaData.studentStats}
                            speakers={rowData.speakers}
-                           overallRating={overallRating}
-                           contentRating={contentRating}
+                           overallRating={targetMetaData.overallRating}
+                           contentRating={targetMetaData.contentRating}
                            totalStudentsInTalentPool={
-                              talentPoolForReport.length
+                              targetMetaData.talentPoolForReport?.length
                            }
                            totalViewerFromOutsideETH={
-                              participatingStudents.length -
-                              participatingStudentsFromGroup.length
+                              targetMetaData.participatingStudents?.length -
+                              targetMetaData.participatingStudentsFromGroup
+                                 ?.length
                            }
                            totalViewerFromETH={
-                              participatingStudentsFromGroup.length
+                              targetMetaData.participatingStudentsFromGroup
+                                 ?.length
                            }
-                           questions={questions}
-                           polls={polls}
-                           icons={icons}
+                           questions={targetMetaData.questions}
+                           polls={targetMetaData.polls}
+                           icons={targetMetaData.icons}
                         />
                      }
                   >
@@ -227,7 +246,7 @@ export function useMetaDataActions({ allGroups, group, isPast }) {
                         <GetAppIcon color="primary" />
                      )}
                   </PDFDownloadLink>
-               ) : reportLoading ? (
+               ) : targetStream?.id === rowData?.id && !downloaded ? (
                   <CircularProgress size={15} />
                ) : (
                   <GenerateReportIcon color="action" />
@@ -243,7 +262,7 @@ export function useMetaDataActions({ allGroups, group, isPast }) {
             disabled: reportLoading,
          };
       },
-      [targetStream, isPast, loadingReport]
+      [targetStream, isPast, loadingReport, metaDataDictionary, group]
    );
 
    return { talentPoolAction, pdfReportAction };
