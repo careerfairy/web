@@ -60,6 +60,9 @@ function ViewerComponent({
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
    );
+   const spyModeEnabled = useSelector(
+      (state) => state.stream.streaming.spyModeEnabled
+   );
    const classes = useStyles();
    const dispatch = useDispatch();
    const [showSettings, setShowSettings] = useState(false);
@@ -254,7 +257,7 @@ function ViewerComponent({
             </Fragment>
          )}
 
-         {!currentLivestream.hasStarted && (
+         {!currentLivestream.hasStarted && !spyModeEnabled && (
             <div className={classes.waitingOverlay}>
                <Typography className={classes.waitingText}>
                   {currentLivestream.test

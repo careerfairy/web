@@ -4,6 +4,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import StreamsLayout from "./StreamsLayout";
 import Banners from "./Banners";
 import { useSelector } from "react-redux";
+import { useAuth } from "../../../../../HOCs/AuthProvider";
+import SuperAdminControls from "../SuperAdminControls";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -42,6 +44,7 @@ const Streams = memo(
       const [bannersBottom, setBannersBottom] = useState(false);
       const [hasManySpeakers, setHasManySpeakers] = useState(false);
       const classes = useStyles();
+      const { userData } = useAuth();
 
       useEffect(() => {
          setBannersBottom(Boolean((mobile || focusModeEnabled) && !presenter));
@@ -138,6 +141,7 @@ const Streams = memo(
                   livestreamId={livestreamId}
                   presenter={presenter}
                />
+               {userData?.isAdmin && <SuperAdminControls />}
             </div>
             {bannersBottom && (
                <Banners

@@ -22,6 +22,7 @@ const initialState = {
       playLocalAudio: true,
       unmuteFailedMutedRemoteVideos: false,
       unpauseFailedPlayRemoteVideos: false,
+      spyModeEnabled: false,
    },
    agoraState: {
       rtcConnectionState: AGORA_RTC_CONNECTION_STATE_DISCONNECTED,
@@ -37,6 +38,14 @@ const streamReducer = (state = initialState, { type, payload }) => {
             streaming: {
                ...state.streaming,
                isPublished: payload,
+            },
+         };
+      case actions.SET_SPY_MODE:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               spyModeEnabled: payload,
             },
          };
       case actions.SET_FOCUS_MODE:
