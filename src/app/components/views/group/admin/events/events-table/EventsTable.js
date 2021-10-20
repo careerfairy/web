@@ -24,6 +24,8 @@ import { useAuth } from "HOCs/AuthProvider";
 import DraftLinkIcon from "@material-ui/icons/Link";
 import * as actions from "store/actions";
 import { useMetaDataActions } from "components/custom-hook/useMetaDataActions";
+import PdfReportDownloadDialog from "../PdfReportDownloadDialog";
+import { usePDF } from "@react-pdf/renderer";
 
 const useStyles = makeStyles((theme) => ({}));
 const customOptions = {
@@ -58,14 +60,20 @@ const EventsTable = ({
    ] = useState([]);
    const [allGroups, setAllGroups] = useState([]);
 
-   const { talentPoolAction, pdfReportAction } = useMetaDataActions({
+   const {
+      talentPoolAction,
+      pdfReportAction,
+      removeReportPdfData,
+      reportPdfData,
+   } = useMetaDataActions({
       allGroups,
       group,
       isPast,
       isDraft,
    });
-   const [registeredStudents, setRegisteredStudents] = useState([]);
+   const [instance, update] = usePDF({});
 
+   const [registeredStudents, setRegisteredStudents] = useState([]);
    const dispatch = useDispatch();
    const { push, pathname, asPath } = useRouter();
 
@@ -73,7 +81,6 @@ const EventsTable = ({
       targetLivestreamStreamerLinksId,
       setTargetLivestreamStreamerLinksId,
    ] = useState("");
-   const classes = useStyles();
 
    useEffect(() => {
       firebase.getAllCareerCenters().then((querySnapshot) => {
@@ -258,6 +265,11 @@ const EventsTable = ({
             livestreamId={targetLivestreamStreamerLinksId}
             openDialog={Boolean(targetLivestreamStreamerLinksId)}
             onClose={handleCloseStreamerLinksModal}
+         />
+         <PdfReportDownloadDialog
+            openDialog={Boolean(reportPdfData)}
+            onClose={removeReportPdfData}
+            reportPdfData={reportPdfData}
          />
       </>
    );

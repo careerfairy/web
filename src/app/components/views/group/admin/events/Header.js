@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Header = ({ group, handleOpenNewStreamModal, isDraft, scrollRef }) => {
    const classes = useStyles();
-   const isScrolling = useScrollTrigger({ target: scrollRef.current });
+   const isScrolling = useScrollTrigger();
 
    return (
       <>

@@ -18,15 +18,22 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    const [targetStream, setTargetStream] = useState(null);
    const [loadingReportData, setLoadingReportData] = useState({});
    const [loadingTalentPool, setLoadingTalentPool] = useState({});
+
    const [
       registeredStudentsFromGroupDictionary,
       setRegisteredStudentsFromGroupDictionary,
    ] = useState({});
+   const [reportDataDictionary, setReportDataDictionary] = useState({});
+   const [reportPdfData, setReportPdfData] = useState(null);
 
    const [
       registeredStudentsDictionary,
       setRegisteredStudentsDictionary,
    ] = useState({});
+
+   const removeReportPdfData = useCallback(() => {
+      setReportPdfData(null);
+   }, []);
 
    useEffect(() => {
       const targetRegisteredStudents =
@@ -138,22 +145,31 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
 
    const handleGetLivestreamReportData = useCallback(
       async (event, rowData) => {
-         console.log("-> rowDataId", rowData.id);
          try {
             if (!userData.userEmail)
                return dispatch(
                   actions.sendGeneralError("Unable to find user email")
                );
+
+            if (reportDataDictionary[rowData.id]) {
+               return setReportPdfData(reportDataDictionary[rowData.id]);
+            }
             setLoadingReportData((prevState) => ({
                ...prevState,
                [rowData.id]: true,
             }));
-            const { data } = await firebase.getLivestreamReportData({
+            const {
+               data: { groupReports, summary },
+            } = await firebase.getLivestreamReportData({
                targetStreamId: rowData.id,
                userEmail: userData.userEmail,
                targetGroupId: group.id,
             });
-            console.table(data);
+            setReportDataDictionary((prevState) => ({
+               ...prevState,
+               [rowData.id]: { groupReports, summary },
+            }));
+            setReportPdfData({ groupReports, summary });
          } catch (e) {
             dispatch(actions.sendGeneralError(e));
          }
@@ -162,7 +178,7 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
             [rowData.id]: false,
          }));
       },
-      [dispatch, group?.id, userData?.userEmail]
+      [dispatch, group?.id, userData?.userEmail, reportDataDictionary]
    );
 
    function studentBelongsToGroup(student) {
@@ -220,20 +236,34 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    const pdfReportAction = useCallback(
       (rowData) => {
          const actionLoading = loadingReportData[rowData?.id];
+         const reportData = reportDataDictionary[rowData?.id];
 
          return {
             icon: () =>
-               actionLoading ? <CircularProgress size={15} /> : <PDFIcon />,
+               reportData ? (
+                  <PDFIcon color="primary" />
+               ) : actionLoading ? (
+                  <CircularProgress size={15} />
+               ) : (
+                  <PDFIcon />
+               ),
             tooltip: actionLoading
                ? "Downloading Report..."
                : "Download Report",
-            onClick: handleGetLivestreamReportData,
+            onClick: reportData
+               ? () => setReportPdfData(reportData)
+               : handleGetLivestreamReportData,
             hidden: !isPast || isDraft,
             disabled: actionLoading,
          };
       },
-      [isDraft, isPast, loadingReportData]
+      [isDraft, isPast, loadingReportData, reportDataDictionary, group]
    );
 
-   return { talentPoolAction, pdfReportAction };
+   return {
+      talentPoolAction,
+      pdfReportAction,
+      reportPdfData,
+      removeReportPdfData,
+   };
 }

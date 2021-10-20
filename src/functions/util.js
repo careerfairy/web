@@ -102,29 +102,26 @@ const makeRequestingGroupIdFirst = (
       (groupId) => requestingGroupId === groupId
    );
    if (!RequestingGroupIsInArray) return newArray;
-   console.log("-> newArray BEFORE", newArray);
    newArray = newArray.filter((groupId) => groupId !== requestingGroupId);
-   console.log("-> newArray AFTER", newArray);
    newArray.unshift(requestingGroupId);
-   console.log("-> newArray LAST", newArray);
    return newArray;
 };
 
 const studentBelongsToGroup = (student, group) => {
-   return (
-      student && student.groupIds && student.groupIds.includes(group.groupId)
-   );
-   // if (group.universityCode) {
-   //    return (
-   //       student &&
-   //       student.university &&
-   //       student.university.code === group.universityCode
-   //    );
-   // } else {
-   //    return (
-   //       student && student.groupIds && student.groupIds.includes(group.groupId)
-   //    );
-   // }
+   // return (
+   //    student && student.groupIds && student.groupIds.includes(group.groupId)
+   // );
+   if (group.universityCode) {
+      return (
+         student &&
+         student.university &&
+         student.university.code === group.universityCode
+      );
+   } else {
+      return (
+         student && student.groupIds && student.groupIds.includes(group.groupId)
+      );
+   }
 };
 
 const convertPollOptionsObjectToArray = (pollOptionsObject) => {
@@ -138,6 +135,13 @@ const getRegisteredGroupById = (student, groupId) => {
    return (
       student.registeredGroups &&
       student.registeredGroups.find((category) => category.groupId === groupId)
+   );
+};
+
+const stringMatches = (string1, string2) => {
+   return (
+      string1.toLowerCase().replace(/\s/g, "") ===
+      string2.toLowerCase().replace(/\s/g, "")
    );
 };
 
@@ -177,11 +181,11 @@ const getStudentInGroupDataObject = (student, group) => {
 
 const groupHasSpecializedCategories = (group) => {
    if (group.categories) {
-      let fieldOfStudyCategory = group.categories.find(
-         (category) => category.name.toLowerCase() === "field of study"
+      let fieldOfStudyCategory = group.categories.find((category) =>
+         stringMatches(category.name, "field of study")
       );
-      let levelOfStudyCategory = group.categories.find(
-         (category) => category.name.toLowerCase() === "level of study"
+      let levelOfStudyCategory = group.categories.find((category) =>
+         stringMatches(category.name, "level of study")
       );
       return fieldOfStudyCategory && levelOfStudyCategory;
    }
@@ -189,11 +193,11 @@ const groupHasSpecializedCategories = (group) => {
 };
 
 const getSpecializedStudentStats = (registeredStudentsFromGroup, group) => {
-   let fieldOfStudyCategory = group.categories.find(
-      (category) => category.name.toLowerCase() === "field of study"
+   let fieldOfStudyCategory = group.categories.find((category) =>
+      stringMatches(category.name, "field of study")
    );
-   let levelOfStudyCategory = group.categories.find(
-      (category) => category.name.toLowerCase() === "level of study"
+   let levelOfStudyCategory = group.categories.find((category) =>
+      stringMatches(category.name, "level of study")
    );
    let categoryStats = {
       type: "specialized",
@@ -253,11 +257,15 @@ const getSpecializedStudentStats = (registeredStudentsFromGroup, group) => {
 };
 
 const getRegisteredStudentsStats = (registeredStudentsFromGroup, group) => {
+   // console.log(
+   //    `-> groupHasSpecializedCategories for ${group}`,
+   //    groupHasSpecializedCategories(group)
+   // );
    if (groupHasSpecializedCategories(group)) {
       return getSpecializedStudentStats(registeredStudentsFromGroup, group);
    }
    let categoryStats = {};
-   if (group.categories && group.length) {
+   if (group.categories && group.categories.length) {
       group.categories.forEach((category) => {
          category.options.forEach((option) => {
             if (!categoryStats[category.id]) {
@@ -277,6 +285,9 @@ const getRegisteredStudentsStats = (registeredStudentsFromGroup, group) => {
          }
       });
    }
+   // console.log("-> group.categories", group.categories);
+   // console.log("-> group.length", group.length);
+   // console.log(`-> categoryStats for ${group}`, categoryStats);
    return categoryStats;
 };
 
@@ -284,6 +295,15 @@ const getRatingsAverage = (contentRatings) =>
    contentRatings.reduce((a, b) => {
       return a + b.rating || 0;
    }, 0) / contentRatings.length;
+
+const getDateString = (streamData) => {
+   const dateString =
+      streamData &&
+      streamData.start &&
+      streamData.start.toDate &&
+      streamData.start.toDate().toString();
+   return dateString || "";
+};
 
 module.exports = {
    setHeaders,
@@ -298,4 +318,5 @@ module.exports = {
    getStudentInGroupDataObject,
    getRegisteredStudentsStats,
    getRatingsAverage,
+   getDateString,
 };

@@ -8,6 +8,7 @@ const {
    getStudentInGroupDataObject,
    getRegisteredStudentsStats,
    getRatingsAverage,
+   getDateString,
 } = require("./util");
 const { client } = require("./api/postmark");
 const { admin } = require("./api/firestoreAdmin");
@@ -99,6 +100,8 @@ exports.getLivestreamReportData = functions.https.onCall(
    async (data, context) => {
       const { targetStreamId, targetGroupId, userEmail } = data;
       const reportData = [];
+      const universityReports = [];
+      const companyReports = [];
 
       const authEmail = context.auth.token.email || null;
 
@@ -147,13 +150,16 @@ exports.getLivestreamReportData = functions.https.onCall(
       }
 
       try {
-         const livestreamData = { id: streamSnap.id, ...streamSnap.data() };
+         const livestreamData = {
+            ...streamSnap.data(),
+            id: streamSnap.id,
+            startDateString: getDateString(streamSnap.data()),
+         };
          const requestingGroupData = { id: groupSnap.id, ...groupSnap.data() };
          const livestreamGroupIds = makeRequestingGroupIdFirst(
             livestreamData.groupIds,
             requestingGroupData.id
          );
-         console.log("-> livestreamGroupIds IN FUNC", livestreamGroupIds);
 
          // Declaration of Snaps promises, todo turn into Promise.all()
          const participatingUsersSnap = await streamSnap.ref
@@ -164,7 +170,6 @@ exports.getLivestreamReportData = functions.https.onCall(
             .collection("userData")
             .where("talentPools", "array-contains", livestreamData.companyId)
             .get();
-         const speakersSnap = await streamSnap.ref.collection("speakers").get();
          const pollsSnap = await streamSnap.ref
             .collection("polls")
             .orderBy("timestamp", "asc")
@@ -204,10 +209,7 @@ exports.getLivestreamReportData = functions.https.onCall(
             ...doc.data(),
          }));
 
-         const speakers = speakersSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-         }));
+         const speakers = livestreamData.speakers || [];
 
          const questions = questionsSnap.docs.map((doc) => ({
             id: doc.id,
@@ -245,6 +247,8 @@ exports.getLivestreamReportData = functions.https.onCall(
                ? getRatingsAverage(contentRatings).toFixed(2)
                : "N.A.";
 
+         let totalSumOfParticipatingStudentsWithStats = 0;
+         let totalSumOfUniversityStudents = 0;
          for (const groupId of livestreamGroupIds) {
             let groupData;
             if (groupId === requestingGroupData.id) {
@@ -258,55 +262,120 @@ exports.getLivestreamReportData = functions.https.onCall(
                if (!otherGroupSnap.exists) continue;
                groupData = { id: otherGroupSnap.id, ...otherGroupSnap.data() };
             }
-            const participatingStudentsFromGroup = [];
-            const listOfStudentsForStats = [];
-            participatingStudents = participatingStudents.map((student) => {
-               if (studentBelongsToGroup(student, groupData)) {
-                  const publishedStudent = getStudentInGroupDataObject(
-                     student,
-                     groupData
-                  );
-                  participatingStudentsFromGroup.push(publishedStudent);
-                  if (!student.statsAlreadyInUse) {
-                     listOfStudentsForStats.push({ ...student });
-                     student.statsAlreadyInUse = true;
-                  }
-               }
-               return { ...student };
-            });
-            const studentStats = getRegisteredStudentsStats(
-               listOfStudentsForStats,
-               groupData
-            );
+            if (groupData.universityCode) {
+               // Generate university Report Data
+               const studentsFromUniversity = participatingStudents.filter(
+                  (student) =>
+                     student.university &&
+                     student.university.code === groupData.universityCode
+               );
+               const numberOfStudentsFromUniversity =
+                  studentsFromUniversity.length;
+               const listOfStudentsForStats = studentsFromUniversity.filter(
+                  (student) => studentBelongsToGroup(student, groupData)
+               );
+               const studentStats = getRegisteredStudentsStats(
+                  listOfStudentsForStats,
+                  groupData
+               );
 
-            reportData.push({
-               group: groupData,
-               groupName: groupData.universityName,
-               groupId: groupData.id,
-               livestream: livestreamData,
-               studentStats,
+               const universityReport = {
+                  numberOfStudentsFromUniversity,
+                  studentStats,
+                  numberOfUniversityStudentsWithNoStats:
+                     numberOfStudentsFromUniversity -
+                     listOfStudentsForStats.length,
+                  group: groupData,
+                  groupName: groupData.universityName,
+                  groupId: groupData.id,
+                  isUniversity: Boolean(groupData.universityCode),
+               };
+
+               totalSumOfUniversityStudents += numberOfStudentsFromUniversity;
+               universityReports.push(universityReport);
+            } else {
+               // Generate company Data
+               const studentsThatFollowCompany = participatingStudents.filter(
+                  (student) => studentBelongsToGroup(student, groupData)
+               );
+               const numberOfStudentsFollowingCompany =
+                  studentsThatFollowCompany.length;
+
+               const studentStats = getRegisteredStudentsStats(
+                  studentsThatFollowCompany,
+                  groupData
+               );
+               const companyReport = {
+                  numberOfStudentsFollowingCompany,
+                  studentStats,
+                  group: groupData,
+                  groupName: groupData.universityName,
+                  groupId: groupData.id,
+                  isUniversity: Boolean(groupData.universityCode),
+               };
+
+               companyReports.push(companyReport);
+            }
+
+            // const participatingStudentsFromGroup = [];
+            // const listOfStudentsForStats = [];
+            // participatingStudents = participatingStudents.map((student) => {
+            //    if (studentBelongsToGroup(student, groupData)) {
+            //       const publishedStudent = getStudentInGroupDataObject(
+            //          student,
+            //          groupData
+            //       );
+            //       if (!student.statsAlreadyInUse) {
+            //          participatingStudentsFromGroup.push(publishedStudent);
+            //          listOfStudentsForStats.push({ ...student });
+            //          student.statsAlreadyInUse = true;
+            //       }
+            //    }
+            //    return { ...student };
+            // });
+            // const studentStats = getRegisteredStudentsStats(
+            //    listOfStudentsForStats,
+            //    groupData
+            // );
+            //
+            // totalSumOfParticipatingStudentsWithStats +=
+            //    participatingStudentsFromGroup.length;
+            // reportData.push({
+            //    group: groupData,
+            //    groupName: groupData.universityName,
+            //    groupId: groupData.id,
+            //    universityCode: groupData.universityCode || "",
+            //    studentStats,
+            //    totalParticipantsFromOutsideGroupOrWithNoStats:
+            //       participatingStudents.length -
+            //       participatingStudentsFromGroup.length,
+            //    totalParticipantsFromGroup:
+            //       participatingStudentsFromGroup.length,
+            // });
+         }
+
+         return {
+            // groupReports: reportData,
+            universityReports,
+            companyReports,
+            summary: {
+               totalParticipating: participatingStudents.length,
+               // participatingStudentsWithNoStats: participatingStudents.filter(
+               //    (student) => !student.statsAlreadyInUse
+               // ).length,
+               totalSumOfParticipatingStudentsWithStats,
+               requestingGroupId: targetGroupId,
+               requestingGroup: requestingGroupData,
                speakers,
+               totalStudentsInTalentPool: talentPoolForReport.length,
                overallRating: overallRatingValue,
                contentRating: contentRatingValue,
-               totalStudentsInTalentPool: talentPoolForReport.length,
-               totalParticipating: participatingStudents.length,
-               totalViewerFromOutsideGroup:
-                  participatingStudents.length -
-                  participatingStudentsFromGroup.length,
-               totalViewerFromGroup: participatingStudentsFromGroup.length,
+               livestream: livestreamData,
                questions,
                polls,
                numberOfIcons: icons.length,
-               requestingGroupId: targetGroupId,
-               participatingStudents,
-               totalWithoutData: participatingStudents.filter(
-                  (student) => !student.statsAlreadyInUse
-               ).length,
-            });
-         }
-
-         // console.log("-> reportData", reportData);
-         // functions.logger.log("-> reportData", reportData);
+            },
+         };
       } catch (e) {
          console.error(e);
          throw new functions.https.HttpsError(
@@ -314,7 +383,6 @@ exports.getLivestreamReportData = functions.https.onCall(
             `Unhandled error: ${e.message}`
          );
       }
-      return reportData;
       // fetch all cc docs in the groupIds of the streamDoc
       // If use users stats only once per report data, once a users stats are used, flag them as already used
    }

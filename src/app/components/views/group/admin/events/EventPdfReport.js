@@ -1,0 +1,711 @@
+import { Document, Font, Text, View } from "@react-pdf/renderer";
+import styled from "@react-pdf/styled-components";
+import { Fragment } from "react";
+import DateUtil from "util/DateUtil";
+import * as PropTypes from "prop-types";
+import { dynamicSort } from "../../../../helperFunctions/HelperFunctions";
+
+Font.register({
+   family: "Poppins",
+   fonts: [
+      {
+         src:
+            "https://fonts.gstatic.com/s/poppins/v13/pxiByp8kv8JHgFVrLGT9Z1xlEN2JQEk.ttf",
+         fontWeight: "normal",
+      },
+      {
+         src:
+            "https://fonts.gstatic.com/s/poppins/v13/pxiByp8kv8JHgFVrLDD4Z1xlEN2JQEk.ttf",
+         fontWeight: "bold",
+      },
+   ],
+});
+
+const CFPage = styled.Page`
+   font-family: "Poppins";
+   padding: 5vw;
+   position: relative;
+`;
+
+const TopView = styled.View`
+   width: 90vw;
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   margin-bottom: 10vw;
+`;
+
+const CFLogoContainer = styled.View`
+   width: 25vw;
+   display: flex;
+   align-items: center !important;
+   justify-content: flex-start !important;
+   height: 100px;
+`;
+
+const CFLogoContainerSmall = styled(CFLogoContainer)`
+   width: 20vw;
+`;
+
+const CFLogo = styled.Image`
+   min-width: 15vw;
+   width: auto;
+   margin-right: auto;
+   margin-bottom: auto;
+   margin-top: auto;
+`;
+
+const CompanyLogo = styled.Image`
+   max-height: 25vw;
+   width: auto;
+   height: auto;
+`;
+const GroupLogoImage = styled.Image`
+   max-height: 20vw;
+   width: auto;
+   height: auto;
+`;
+
+const GroupLogoView = styled.View`
+   max-width: 20vw;
+   margin-bottom: 5vw;
+`;
+
+const SpeakerAvatar = styled.Image`
+   height: 15vw;
+   border-radius: 50% !important;
+   object-fit: cover;
+`;
+
+const Label = styled.Text`
+   font-family: "Poppins";
+   text-transform: uppercase;
+   font-weight: bold;
+   font-size: 18px;
+   color: #00d2aa;
+`;
+
+const Title = styled.Text`
+   font-family: "Poppins";
+   font-weight: normal;
+   font-size: 22px;
+`;
+
+const InlineView = styled.View`
+   display: flex;
+   flex-direction: row;
+`;
+
+const SubTitle = styled.Text`
+   font-family: "Poppins";
+   font-weight: bold;
+   color: grey;
+   font-size: 10px;
+   margin: 30px 0 5px 0;
+   text-transform: uppercase;
+`;
+
+const CategoriesParent = styled.View`
+   max-width: 100vw !important;
+   margin: 5vw 0;
+`;
+
+const DisclaimerTitle = styled.Text`
+   font-family: "Poppins";
+   font-size: 12px;
+`;
+const GroupDisclaimerText = styled.Text`
+   font-family: "Poppins";
+   font-size: 6px;
+`;
+
+const FlexParent = styled.View`
+   display: flex;
+   flex-direction: row;
+`;
+const PartnersWrapper = styled.View`
+   display: flex;
+   flex-wrap: wrap;
+   flex-direction: row;
+   justify-content: flex-start;
+`;
+
+const PartnerItem = styled.View`
+   width: 30vw;
+   display: flex;
+   flex-direction: column;
+   align-items: flex-start;
+`;
+const PartnerBreakdownItem = styled(PartnerItem)`
+   align-items: center;
+`;
+const PartnerLogo = styled.Image`
+   width: 40%;
+`;
+
+const PartnerName = styled.Text`
+   font-family: "Poppins";
+   font-size: 12px;
+   text-align: center;
+   margin-bottom: 8px;
+`;
+const BreakdownsParent = styled.View`
+   display: flex;
+   flex-direction: column;
+`;
+
+const EngagementChild = styled.View`
+   width: 25vw;
+   margin-right: 5vw;
+`;
+
+const BreakdownPercentageView = styled.View`
+   width: 100vw !important;
+`;
+const RatingChild = styled.View`
+   width: 40vw;
+   margin-right: 5vw;
+`;
+
+const AudienceChild = styled.View`
+   width: 50vw;
+   margin-right: 5vw;
+`;
+
+const PageNumber = styled.Text`
+   font-size: 10px;
+   font-family: "Poppins";
+   position: absolute;
+   bottom: 10px;
+   right: 10px;
+`;
+const RatingText = styled.Text`
+   font-weight: bold;
+   font-size: 12px;
+   color: black;
+`;
+
+const SubHeader = styled(RatingText)``;
+
+const SubCategoryParent = styled.View`
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+`;
+
+const SpeakersView = styled.View`
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+`;
+
+const LargeNumber = styled.Text`
+   font-weight: bold;
+   font-size: 14px;
+   width: 10vw;
+   color: #314150;
+`;
+
+const LargeText = styled.Text`
+   font-size: 8px;
+   width: 15vw;
+   padding: 1px;
+   font-weight: bold;
+   margin-right: 5vw;
+   text-transform: uppercase;
+   color: #314150;
+`;
+
+const TotalViewer = styled.Text`
+   font-size: 11px;
+   color: #555555;
+`;
+const PercentageText = styled.Text`
+   font-size: 11px;
+   font-weight: bold;
+   color: #00d2aa;
+   display: flex;
+   flex-direction: row;
+`;
+
+const SmallNumber = styled.Text`
+   font-weight: bold;
+   font-size: 14px;
+   color: #bbbbbb;
+`;
+
+const SmallText = styled.Text`
+   font-weight: bold;
+   font-size: 8px;
+   color: grey;
+`;
+
+const SmallLabel = styled.Text`
+   font-weight: bold;
+   font-size: 10px;
+   color: grey;
+`;
+
+const DateText = styled.Text`
+   font-size: 14px;
+   text-transform: uppercase;
+   font-weight: bold;
+   color: #bbbbbb;
+`;
+
+const QuestionText = styled.Text`
+   font-size: 14px;
+`;
+
+const GroupSubTitle = styled(QuestionText)`
+   font-family: "Poppins";
+   display: flex;
+   flex-direction: row;
+   color: #555555;
+`;
+
+const AnswerText = styled.Text`
+   font-size: 11px;
+`;
+
+const ColorText = styled.View`
+   font-weight: bold;
+   color: #00d2aa;
+`;
+
+const Poll = styled.View`
+   margin-bottom: 20px;
+`;
+
+const QuestionVotes = styled.Text`
+   font-size: 11px;
+   text-transform: uppercase;
+   color: #00d2aa;
+`;
+
+const Border = styled.View`
+   font-family: "Poppins";
+   font-size: 9px;
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+   vertical-align: middle;
+   margin-bottom: 5px;
+   //height: 40px;
+`;
+
+const SmallView = styled.View`
+   font-family: "Poppins";
+   font-size: 10px;
+   width: 10vw;
+   height: 30px;
+   padding: 0 0 0 2px;
+`;
+
+const SpecializedSubCategoryElement = ({ subOption }) => {
+   return (
+      <SmallView>
+         <SmallNumber>{subOption.entries}</SmallNumber>
+      </SmallView>
+   );
+};
+
+const SpecializedCategoryElement = ({ option, index }) => {
+   let subCategoryElements = Object.keys(option.subOptions).map((entry) => {
+      return (
+         <SpecializedSubCategoryElement subOption={option.subOptions[entry]} />
+      );
+   });
+   return (
+      <Border wrap={false}>
+         <LargeText>{option.name}</LargeText>
+         <LargeNumber>{option.entries}</LargeNumber>
+         <SubCategoryParent>{subCategoryElements}</SubCategoryParent>
+      </Border>
+   );
+};
+
+const QuestionView = ({ question }) => {
+   return (
+      <View>
+         <QuestionText>{question.title}</QuestionText>
+         <View>
+            <QuestionVotes>{question.votes} votes</QuestionVotes>
+         </View>
+      </View>
+   );
+};
+
+const PollOptionView = ({ option }) => {
+   return (
+      <View>
+         <View />
+         <AnswerText>{option.name}</AnswerText>
+         <QuestionVotes>{option.votes} Votes</QuestionVotes>
+      </View>
+   );
+};
+
+const PollView = ({ poll, index }) => {
+   let totalVotes = 0;
+   poll.options.forEach((option) => (totalVotes += option.votes));
+   let pollOptionElements = poll.options.map((option) => {
+      return <PollOptionView option={option} totalVotes={totalVotes} />;
+   });
+
+   return (
+      <Poll>
+         <SmallLabel>Poll {index + 1}</SmallLabel>
+         <QuestionText>{poll.question}</QuestionText>
+         {pollOptionElements}
+      </Poll>
+   );
+};
+
+const SpeakerView = ({ speaker }) => {
+   let avatarUrl =
+      speaker.avatar ||
+      "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media";
+   return (
+      <View>
+         <View
+            style={{
+               width: "15vw",
+               borderRadius: "50%",
+               marginRight: "10vw",
+               marginBottom: "5px",
+               border: "2px solid #00d2aa",
+               display: "flex",
+               justifyContent: "center",
+               alignItems: "center",
+            }}
+         >
+            <SpeakerAvatar source={avatarUrl} />
+         </View>
+         <SmallLabel>
+            {speaker.firstName} {speaker.lastName}
+         </SmallLabel>
+      </View>
+   );
+};
+
+const SpeakersViewElement = ({ speakers }) => {
+   let speakerElements = speakers.map((speaker) => {
+      return <SpeakerView speaker={speaker} />;
+   });
+   return <SpeakersView>{speakerElements}</SpeakersView>;
+};
+
+const getPercentage = (num1, num2) => {
+   return `${((num1 / num2) * 100).toFixed(0)}%`;
+};
+
+const EventPdfReport = ({ summary, groupReports }) => {
+   console.log("-> summary in EventPdfReport", summary);
+   console.log("-> groupReports in EventPdfReport", groupReports);
+   let questionElements = [];
+
+   function compareOptions(optionA, optionB, studentStats) {
+      return (
+         studentStats.options[optionB].entries -
+         studentStats.options[optionA].entries
+      );
+   }
+   const compareParticipants = (group1, group2) => {
+      return (
+         group1.totalParticipantsFromGroup - group2.totalParticipantsFromGroup
+      );
+   };
+
+   const getNameElements = (studentStats) => {
+      let nameElements = [];
+      if (studentStats && studentStats.type === "specialized") {
+         nameElements = studentStats.names.map((name) => {
+            return (
+               <SmallView key={name}>
+                  <SmallText>{name}</SmallText>
+               </SmallView>
+            );
+         });
+      }
+      return nameElements;
+   };
+   const getCategoryElements = (studentStats) => {
+      let categoryElements = [];
+
+      if (studentStats && studentStats.type === "specialized") {
+         categoryElements = Object.keys(studentStats.options)
+            .sort((optionA, optionB) =>
+               compareOptions(optionA, optionB, studentStats)
+            )
+            .filter((option) => studentStats.options[option].entries > 0)
+            .map((option, index) => {
+               return (
+                  <SpecializedCategoryElement
+                     option={studentStats.options[option]}
+                     index={index}
+                  />
+               );
+            });
+      }
+      return categoryElements;
+   };
+
+   const getNumberOfFollowersWithNoCategories = (report) => {
+      const totalEntries = Object.keys(report.studentStats.options).reduce(
+         (acc, curr) => {
+            acc += report.studentStats.options[curr].entries || 0;
+            return acc;
+         },
+         0
+      );
+      return report.totalParticipantsFromGroup - totalEntries;
+   };
+
+   questionElements = summary.questions.slice(0, 3).map((question) => {
+      return <QuestionView question={question} />;
+   });
+
+   let numberOfVotes = 0;
+   summary.questions.forEach((question) => (numberOfVotes += question.votes));
+
+   return (
+      <Document
+         title={`General Report ${summary.livestream.company} ${summary.livestream.id}.pdf`}
+      >
+         <CFPage>
+            <PageNumber
+               render={({ pageNumber, totalPages }) =>
+                  `Page ${pageNumber} / ${totalPages}`
+               }
+               fixed
+            />
+            <TopView>
+               <CFLogoContainer>
+                  <CFLogo source={summary.requestingGroup.logoUrl} />
+               </CFLogoContainer>
+               <CFLogoContainerSmall>
+                  <CFLogo source="https://www.careerfairy.io/logo_teal.png" />
+               </CFLogoContainerSmall>
+            </TopView>
+            <View>
+               <View style={{ maxWidth: "25vw", marginBottom: "20px" }}>
+                  <CompanyLogo source={summary.livestream.companyLogoUrl} />
+               </View>
+               <Label>Live Stream Report </Label>
+               <Title>{summary.livestream.title}</Title>
+               <DateText>
+                  {DateUtil.getPrettyDate(
+                     new Date(Date.parse(summary.livestream.startDateString))
+                  )}
+               </DateText>
+               <SubTitle>Speakers</SubTitle>
+               <SpeakersViewElement speakers={summary.speakers} />
+               {!!groupReports.length && (
+                  <View wrap={false}>
+                     <SubTitle>Hosts</SubTitle>
+                     <PartnersWrapper>
+                        {groupReports.map((report) => (
+                           <PartnerItem key={report.group.id}>
+                              <PartnerLogo source={report.group.logoUrl} />
+                           </PartnerItem>
+                        ))}
+                     </PartnersWrapper>
+                  </View>
+               )}
+               <View break wrap={false}>
+                  <SubTitle>Your Audience</SubTitle>
+                  <View>
+                     <View>
+                        <SubHeader>Total Participating Students: </SubHeader>
+                     </View>
+                     <ColorText>
+                        <Text>{summary.totalParticipating}</Text>
+                     </ColorText>
+                  </View>
+                  <View>
+                     <View>
+                        <SubHeader>
+                           Total Students registered to the Talent Pool:{" "}
+                        </SubHeader>
+                     </View>
+                     <ColorText>
+                        <Text>{summary.totalStudentsInTalentPool}</Text>
+                     </ColorText>
+                  </View>
+               </View>
+               <View wrap={false}>
+                  <SubTitle>Where They Came From</SubTitle>
+                  <PartnersWrapper>
+                     {[...groupReports]
+                        .sort(dynamicSort("totalParticipantsFromGroup"))
+                        .map((report) => (
+                           <PartnerBreakdownItem key={report.group.id}>
+                              <SubHeader>
+                                 {report.group.universityName}
+                              </SubHeader>
+                              <View>
+                                 <ColorText>
+                                    <Text>
+                                       {report.totalParticipantsFromGroup}
+                                    </Text>
+                                 </ColorText>
+                              </View>
+                           </PartnerBreakdownItem>
+                        ))}
+                  </PartnersWrapper>
+               </View>
+               <View wrap={false}>
+                  <SubTitle>Viewer Ratings</SubTitle>
+                  <FlexParent>
+                     <RatingChild>
+                        <View>
+                           <RatingText>
+                              How would you rate this live stream?
+                           </RatingText>
+                        </View>
+                        <ColorText>
+                           <Text>{summary.overallRating} / 5.0</Text>
+                        </ColorText>
+                     </RatingChild>
+                     <RatingChild>
+                        <View>
+                           <RatingText>
+                              How happy are you with the content of this
+                              livestream ?
+                           </RatingText>
+                        </View>
+                        <ColorText>
+                           <Text>{summary.contentRating} / 5.0</Text>
+                        </ColorText>
+                     </RatingChild>
+                  </FlexParent>
+               </View>
+               <View wrap={false}>
+                  <SubTitle>Engagement Figures</SubTitle>
+                  <FlexParent>
+                     <EngagementChild>
+                        <View>
+                           <Text># Questions</Text>
+                        </View>
+                        <ColorText>
+                           <Text>{summary.questions.length}</Text>
+                        </ColorText>
+                     </EngagementChild>
+                     <EngagementChild>
+                        <View>
+                           <Text># Reactions</Text>
+                        </View>
+                        <ColorText>
+                           <Text>{summary.numberOfIcons}</Text>
+                        </ColorText>
+                     </EngagementChild>
+                     <EngagementChild>
+                        <View>
+                           <Text># Upvotes</Text>
+                        </View>
+                        <ColorText>
+                           <Text>{numberOfVotes}</Text>
+                        </ColorText>
+                     </EngagementChild>
+                  </FlexParent>
+               </View>
+               <View wrap={false}>
+                  <SubTitle>Most upvoted questions</SubTitle>
+                  {questionElements}
+               </View>
+               {groupReports.map((report) => {
+                  const followersWithMissingData = getNumberOfFollowersWithNoCategories(
+                     report
+                  );
+                  return (
+                     <Fragment key={report.group.groupId}>
+                        <GroupLogoView break>
+                           <GroupLogoImage source={report.group.logoUrl} />
+                        </GroupLogoView>
+                        <Title>
+                           Your Audience from {report.group.universityName}
+                        </Title>
+                        <Fragment>
+                           <InlineView>
+                              <GroupSubTitle>
+                                 Number Of Participating Students from{" "}
+                                 {report.group.universityName}:{" "}
+                                 {report.totalParticipantsFromGroup}
+                              </GroupSubTitle>
+                           </InlineView>
+                        </Fragment>
+                        {/*)}*/}
+
+                        <CategoriesParent>
+                           <Border>
+                              <LargeText style={{ color: "grey" }}>
+                                 Faculty
+                              </LargeText>
+                              <LargeNumber style={{ color: "grey" }}>
+                                 #
+                              </LargeNumber>
+                              <SubCategoryParent>
+                                 {getNameElements(report.studentStats)}
+                              </SubCategoryParent>
+                           </Border>
+                           {getCategoryElements(report.studentStats)}
+                           {followersWithMissingData > 0 && (
+                              <View>
+                                 <GroupDisclaimerText>
+                                    * {followersWithMissingData} participants
+                                    did not have any data
+                                 </GroupDisclaimerText>
+                              </View>
+                           )}
+                        </CategoriesParent>
+                     </Fragment>
+                  );
+               })}
+               {summary.participatingStudentsWithNoStats > 0 && (
+                  <View break>
+                     <DisclaimerTitle>Disclaimer</DisclaimerTitle>
+                     <GroupDisclaimerText>
+                        * {summary.participatingStudentsWithNoStats} of the
+                        total {summary.totalParticipating} participants came
+                        from other sources
+                     </GroupDisclaimerText>
+                  </View>
+               )}
+               {/* <SubTitle>Your polls</SubTitle>
+                    { pollElements } */}
+            </View>
+         </CFPage>
+      </Document>
+   );
+};
+
+EventPdfReport.propTypes = {
+   summary: PropTypes.shape({
+      requestingGroup: PropTypes.object,
+      totalParticipating: PropTypes.number,
+      participatingStudentsWithNoStats: PropTypes.number,
+      totalSumOfParticipatingStudentsWithStats: PropTypes.number,
+      requestingGroupId: PropTypes.string,
+      speakers: PropTypes.array,
+      totalStudentsInTalentPool: PropTypes.number,
+      overallRating: PropTypes.string,
+      contentRating: PropTypes.string,
+      livestream: PropTypes.object,
+      questions: PropTypes.array,
+      polls: PropTypes.array,
+      numberOfIcons: PropTypes.number,
+   }),
+   groupReports: PropTypes.arrayOf(
+      PropTypes.shape({
+         group: PropTypes.object,
+         groupName: PropTypes.string,
+         groupId: PropTypes.string,
+         studentStats: PropTypes.object,
+         totalParticipantsFromOutsideGroupOrWithNoStats: PropTypes.number,
+         totalParticipantsFromGroup: PropTypes.number,
+      })
+   ),
+};
+
+export default EventPdfReport;

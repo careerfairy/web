@@ -41,7 +41,6 @@ const Speakers = ({ speakers }) => {
       () => setSpeakersExpanded((prevState) => !prevState),
       []
    );
-
    return (
       <Box maxWidth={200} position="relative">
          {!!speakers.length && (
