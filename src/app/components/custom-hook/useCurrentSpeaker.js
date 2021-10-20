@@ -52,7 +52,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
                };
             }
          });
-         if (localMediaStream) {
+         if (localMediaStream && localMediaStream.audioTrack) {
             audioLevels.push({
                streamId: localMediaStream.uid,
                audioLevel: localMediaStream.audioTrack.getVolumeLevel(),

@@ -78,6 +78,8 @@ export {
    setFocusMode,
    setStreamerIsPublished,
    setSpyMode,
+   setAgoraRtcConnectionState,
+   setAgoraRtcError,
 } from "./streamActions";
 
 export {

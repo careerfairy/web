@@ -118,6 +118,8 @@ const RemoteStreamItem = ({
          <StreamItem
             speaker={speaker}
             stream={stream}
+            videoMuted={!stream.videoTrack || stream.videoMuted}
+            audioMuted={stream.audioMuted}
             index={index}
             big={big}
             videoMutedBackgroundImg={videoMutedBackgroundImg}

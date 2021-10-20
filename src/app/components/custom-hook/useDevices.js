@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { navigator } from "global";
 
-export default function useDevices(refreshDevices) {
+export default function useDevices(localStream) {
    const [deviceList, setDeviceList] = useState({
       audioInputList: [],
       audioOutputList: [],
@@ -9,7 +9,7 @@ export default function useDevices(refreshDevices) {
    });
 
    useEffect(() => {
-      if (navigator && isEmpty(deviceList) && refreshDevices) {
+      if (navigator && Boolean(localStream)) {
          navigator.mediaDevices
             .enumerateDevices()
             .then(gotDevices)
@@ -21,7 +21,7 @@ export default function useDevices(refreshDevices) {
                .catch(handleError);
          };
       }
-   }, [refreshDevices]);
+   }, [Boolean(localStream), localStream.audioTrack, localStream.videoTrack]);
 
    function gotDevices(deviceInfos) {
       let audioInputList = [];

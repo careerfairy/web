@@ -3,18 +3,18 @@ import StreamItem from "./StreamItem";
 
 const LocalStreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
    useEffect(() => {
-      if (!stream.videoTrack.isPlaying) {
-         stream.videoTrack?.play(stream.uid);
+      if (stream.videoTrack && !stream.videoTrack.isPlaying) {
+         stream.videoTrack.play(stream.uid);
       }
-   }, [stream.uid]);
+   }, [stream.uid, stream.videoTrack]);
 
    return (
       <StreamItem
          speaker={speaker}
          videoMutedBackgroundImg={videoMutedBackgroundImg}
          stream={stream}
-         videoMuted={!stream?.videoTrack.enabled}
-         audioMuted={!stream?.audioTrack.enabled}
+         videoMuted={!stream.videoTrack || stream.videoMuted}
+         audioMuted={stream.audioMuted}
          big={big}
       />
    );

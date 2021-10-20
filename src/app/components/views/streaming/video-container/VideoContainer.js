@@ -32,6 +32,7 @@ import useAgoraRtm from "components/custom-hook/useAgoraRtm";
 import StreamPublishingModal from "../modal/StreamPublishingModal";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
+import AgoraRtcStateModal from "../modal/AgoraRtcStateModal";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -73,15 +74,16 @@ function VideoContainer({
       localStream,
       localMediaControls,
       remoteStreams,
-      publishLocalCameraStream,
+      publishLocalStreamTracks,
       publishScreenShareStream,
       unpublishScreenShareStream,
       leaveAgoraRoom,
+      localMediaEnabling,
    } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer);
 
    const { agoraHandlers } = useAgoraRtm(currentLivestream.id, streamerId);
 
-   const devices = useDevices(Boolean(localStream));
+   const devices = useDevices(localStream);
 
    const {
       mediaControls,
@@ -89,7 +91,8 @@ function VideoContainer({
    } = useMediaSources(
       devices,
       localStream,
-      showLocalStreamPublishingModal || showSettings,
+      (showLocalStreamPublishingModal || showSettings) &&
+         localStream.audioTrack,
       true
    );
 
@@ -138,14 +141,32 @@ function VideoContainer({
                setTimeoutState(newTimeout);
             }
          } else {
-            localStream.videoTrack.setEncoderConfiguration("480p_9");
+            if (localStream?.isVideoPublished) {
+               try {
+                  await localStream.videoTrack.setEncoderConfiguration(
+                     "480p_9"
+                  );
+               } catch (error) {
+                  if (error.code === "TRACK_IS_DISABLED") {
+                     console.log("Couldn't process encoding configuration");
+                  }
+               }
+            }
          }
       }
    };
 
    const scheduleEncoderConfigurationSwitchTo = (videoResolution) => {
-      return setTimeout(() => {
-         localStream.videoTrack.setEncoderConfiguration(videoResolution);
+      return setTimeout(async () => {
+         try {
+            await localStream.videoTrack.setEncoderConfiguration(
+               videoResolution
+            );
+         } catch (error) {
+            if (error.code === "TRACK_IS_DISABLED") {
+               console.log("Couldn't process encoding configuration");
+            }
+         }
       }, 20000);
    };
 
@@ -155,13 +176,22 @@ function VideoContainer({
       await firebase.setDesktopMode(streamRef, mode, screenSharerId);
    };
 
-   const handlePublishLocalStream = () => {
-      publishLocalCameraStream()
-         .then(async () => {
-            await dispatch(actions.setStreamerIsPublished(true));
-            setShowLocalStreamPublishingModal(false);
-         })
-         .catch(() => {});
+   const handlePublishLocalStream = async () => {
+      if (localStream.audioTrack && !localStream.isAudioPublished) {
+         await publishLocalStreamTracks.publishLocalMicrophoneTrack();
+      }
+      if (localStream.videoTrack && !localStream.isVideoPublished) {
+         await publishLocalStreamTracks.publishLocalCameraTrack();
+      }
+      await dispatch(actions.setStreamerIsPublished(true));
+      setShowLocalStreamPublishingModal(false);
+   };
+
+   const handleJoinAsViewer = async () => {
+      await localMediaEnabling.closeLocalCameraTrack();
+      await localMediaEnabling.closeLocalMicrophoneTrack();
+      await dispatch(actions.setStreamerIsPublished(false));
+      setShowLocalStreamPublishingModal(false);
    };
 
    useEffect(() => {
@@ -277,16 +307,25 @@ function VideoContainer({
          <StreamPublishingModal
             open={showLocalStreamPublishingModal}
             setOpen={setShowLocalStreamPublishingModal}
+            localStream={localStream}
             displayableMediaStream={displayableMediaStream}
             devices={devices}
             mediaControls={mediaControls}
             onConfirmStream={handlePublishLocalStream}
+            onRefuseStream={handleJoinAsViewer}
+            localMediaEnabling={localMediaEnabling}
          />
          <VideoControlsContainer
             currentLivestream={currentLivestream}
             handleClickScreenShareButton={handleClickScreenShareButton}
             streamerId={streamerId}
             isMainStreamer={isMainStreamer}
+            localStreamIsPublished={{
+               audio: localStream?.isAudioPublished,
+               video: localStream?.isVideoPublished,
+            }}
+            openPublishingModal={() => setShowLocalStreamPublishingModal(true)}
+            joinAsViewer={handleJoinAsViewer}
             viewer={viewer}
             localMediaControls={localMediaControls}
             showSettings={showSettings}
@@ -306,6 +345,7 @@ function VideoContainer({
                agoraRtmStatus={{}}
             />
          </DraggableComponent>
+         <AgoraRtcStateModal />
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}

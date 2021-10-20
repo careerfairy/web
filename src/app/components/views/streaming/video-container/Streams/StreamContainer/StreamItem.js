@@ -62,7 +62,14 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
+const StreamItem = ({
+   stream,
+   big,
+   speaker,
+   videoMutedBackgroundImg,
+   videoMuted,
+   audioMuted,
+}) => {
    const classes = useStyles({ big, streamId: stream.uid });
 
    const vidDiv = useRef(null);
@@ -79,7 +86,7 @@ const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
          {speaker && (
             <SpeakerInfoOverlay speaker={speaker} zIndex={1} small={!big} />
          )}
-         {stream && stream.videoMuted && (
+         {videoMuted && (
             <div className={classes.mutedOverlay}>
                <div className={classes.mutedOverlayContent}>
                   <div>
@@ -101,7 +108,7 @@ const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
                </div>
             </div>
          )}
-         {stream && stream.audioMuted && (
+         {audioMuted && (
             <div className={classes.audioMuted}>
                <Tooltip title={"The streamer has muted his microphone"}>
                   <VolumeOffIcon

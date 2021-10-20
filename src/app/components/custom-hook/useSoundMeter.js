@@ -1,27 +1,25 @@
 import { useState, useEffect } from "react";
 import { navigator } from "global";
 
-export function useSoundMeter(showAudioMeter, audioTrack, update) {
+export function useSoundMeter(showAudioMeter, audioTrack) {
    const [audioValue, setAudioValue] = useState(0);
 
    useEffect(() => {
-      if (showAudioMeter) {
-         if (navigator && audioTrack) {
-            try {
-               window.AudioContext =
-                  window.AudioContext || window.webkitAudioContext;
-               window.audioContext = new AudioContext();
-            } catch (e) {
-               console.log("Web Audio API not supported.");
-            }
-            onMicrophoneGranted(audioTrack);
+      if (showAudioMeter && navigator && audioTrack) {
+         try {
+            window.AudioContext =
+               window.AudioContext || window.webkitAudioContext;
+            window.audioContext = new AudioContext();
+         } catch (e) {
+            console.log("Web Audio API not supported.");
          }
+         onMicrophoneGranted(audioTrack);
       } else {
          if (window.audioContext) {
             window.audioContext.suspend();
          }
       }
-   }, [showAudioMeter, audioTrack, navigator, update]);
+   }, [showAudioMeter, audioTrack, navigator]);
 
    async function onMicrophoneGranted(stream) {
       audioContext = new AudioContext();

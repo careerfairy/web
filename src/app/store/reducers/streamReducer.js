@@ -1,4 +1,4 @@
-import { AGORA_RTC_CONNECTION_STATE_DISCONNECTED } from "constants/agora";
+import { AGORA_RTC_CONNECTION_STATE_CONNECTING } from "constants/agora";
 import * as actions from "../actions/actionTypes";
 
 const initialState = {
@@ -25,7 +25,7 @@ const initialState = {
       spyModeEnabled: false,
    },
    agoraState: {
-      rtcConnectionState: AGORA_RTC_CONNECTION_STATE_DISCONNECTED,
+      rtcConnectionState: AGORA_RTC_CONNECTION_STATE_CONNECTING,
       rtcError: null,
    },
 };

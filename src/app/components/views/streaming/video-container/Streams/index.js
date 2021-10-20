@@ -56,7 +56,7 @@ const Streams = memo(
          setHasManySpeakers(newHasManySpeakers);
          if (
             localMediaStream &&
-            localMediaStream.isPublished &&
+            localMediaStream.isAudioPublished &&
             isBroadCasting
          ) {
             allStreams.unshift(localMediaStream);

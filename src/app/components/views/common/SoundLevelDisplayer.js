@@ -27,7 +27,7 @@ function SoundLevelDisplayer({ audioLevel }) {
       <Fragment>
          <div>
             <Typography
-               style={{ fontSize: "0.8rem", marginBottom: 10, marginTop: 20 }}
+               style={{ fontSize: "0.8rem", marginBottom: 10, marginTop: 10 }}
             >
                Talk to ensure that sound is being detected
             </Typography>
