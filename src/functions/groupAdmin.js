@@ -99,7 +99,6 @@ exports.sendNewlyPublishedEventEmail = functions.https.onRequest(
 exports.getLivestreamReportData = functions.https.onCall(
    async (data, context) => {
       const { targetStreamId, targetGroupId, userEmail } = data;
-      const reportData = [];
       const universityReports = [];
       let companyReport = null;
 
@@ -357,53 +356,13 @@ exports.getLivestreamReportData = functions.https.onCall(
                   isUniversity: Boolean(groupData.universityCode),
                };
             }
-
-            // const participatingStudentsFromGroup = [];
-            // const listOfStudentsForStats = [];
-            // participatingStudents = participatingStudents.map((student) => {
-            //    if (studentBelongsToGroup(student, groupData)) {
-            //       const publishedStudent = getStudentInGroupDataObject(
-            //          student,
-            //          groupData
-            //       );
-            //       if (!student.statsAlreadyInUse) {
-            //          participatingStudentsFromGroup.push(publishedStudent);
-            //          listOfStudentsForStats.push({ ...student });
-            //          student.statsAlreadyInUse = true;
-            //       }
-            //    }
-            //    return { ...student };
-            // });
-            // const studentStats = getRegisteredStudentsStats(
-            //    listOfStudentsForStats,
-            //    groupData
-            // );
-            //
-            // totalSumOfParticipatingStudentsWithStats +=
-            //    participatingStudentsFromGroup.length;
-            // reportData.push({
-            //    group: groupData,
-            //    groupName: groupData.universityName,
-            //    groupId: groupData.id,
-            //    universityCode: groupData.universityCode || "",
-            //    studentStats,
-            //    totalParticipantsFromOutsideGroupOrWithNoStats:
-            //       participatingStudents.length -
-            //       participatingStudentsFromGroup.length,
-            //    totalParticipantsFromGroup:
-            //       participatingStudentsFromGroup.length,
-            // });
          }
 
          return {
-            // groupReports: reportData,
             universityReports,
             companyReport,
             summary: {
                totalParticipating: participatingStudents.length,
-               // participatingStudentsWithNoStats: participatingStudents.filter(
-               //    (student) => !student.statsAlreadyInUse
-               // ).length,
                totalSumOfParticipatingStudentsWithStats,
                requestingGroupId: targetGroupId,
                requestingGroup: requestingGroupData,

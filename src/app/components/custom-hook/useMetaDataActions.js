@@ -7,6 +7,7 @@ import { CSVLink } from "react-csv";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import PDFIcon from "@material-ui/icons/PictureAsPdf";
 import { useAuth } from "../../HOCs/AuthProvider";
+import RegisteredUsersIcon from "@material-ui/icons/People";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
 
@@ -17,6 +18,10 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    const [talentPoolDictionary, setTalentPoolDictionary] = useState({});
    const [targetStream, setTargetStream] = useState(null);
    const [loadingReportData, setLoadingReportData] = useState({});
+   const [
+      loadingRegisteredUsersFromGroupData,
+      setLoadingRegisteredUsersFromGroupData,
+   ] = useState({});
    const [loadingTalentPool, setLoadingTalentPool] = useState({});
 
    const [
@@ -36,39 +41,57 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    }, []);
 
    useEffect(() => {
-      const targetRegisteredStudents =
-         registeredStudentsDictionary[targetStream?.id];
-      if (targetRegisteredStudents && targetRegisteredStudents.length) {
-         let newRegisteredStudentsFromGroup;
-         if (group.universityCode) {
-            newRegisteredStudentsFromGroup = targetRegisteredStudents
-               .filter((student) => studentBelongsToGroup(student))
-               .map((filteredStudent) =>
-                  StatsUtil.getStudentInGroupDataObject(filteredStudent, group)
-               );
-         } else {
-            const livestreamGroups = allGroups.filter((group) =>
-               targetStream.groupIds.includes(group.id)
-            );
-            newRegisteredStudentsFromGroup = targetRegisteredStudents.map(
-               (student) => {
-                  const livestreamGroupUserBelongsTo = StatsUtil.getFirstGroupThatUserBelongsTo(
-                     student,
-                     livestreamGroups,
-                     group
+      (function handleGetRegisteredUsersFromGroup() {
+         try {
+            if (!targetStream?.id) return;
+            const targetRegisteredStudents =
+               registeredStudentsDictionary[targetStream?.id];
+            setLoadingRegisteredUsersFromGroupData((prevState) => ({
+               ...prevState,
+               [targetStream.id]: true,
+            }));
+            if (targetRegisteredStudents && targetRegisteredStudents.length) {
+               let newRegisteredStudentsFromGroup;
+               if (group.universityCode) {
+                  newRegisteredStudentsFromGroup = targetRegisteredStudents
+                     .filter((student) => studentBelongsToGroup(student))
+                     .map((filteredStudent) =>
+                        StatsUtil.getStudentInGroupDataObject(
+                           filteredStudent,
+                           group
+                        )
+                     );
+               } else {
+                  const livestreamGroups = allGroups.filter((group) =>
+                     targetStream.groupIds.includes(group.id)
                   );
-                  return StatsUtil.getStudentInGroupDataObject(
-                     student,
-                     livestreamGroupUserBelongsTo || {}
+                  newRegisteredStudentsFromGroup = targetRegisteredStudents.map(
+                     (student) => {
+                        const livestreamGroupUserBelongsTo = StatsUtil.getFirstGroupThatUserBelongsTo(
+                           student,
+                           livestreamGroups,
+                           group
+                        );
+                        return StatsUtil.getStudentInGroupDataObject(
+                           student,
+                           livestreamGroupUserBelongsTo || {}
+                        );
+                     }
                   );
                }
-            );
+               setLoadingRegisteredUsersFromGroupData((prevState) => ({
+                  ...prevState,
+                  [targetStream.id]: false,
+               }));
+               setRegisteredStudentsFromGroupDictionary({
+                  ...registeredStudentsFromGroupDictionary,
+                  [targetStream.id]: newRegisteredStudentsFromGroup,
+               });
+            }
+         } catch (e) {
+            dispatch(actions.sendGeneralError(e));
          }
-         setRegisteredStudentsFromGroupDictionary({
-            ...registeredStudentsFromGroupDictionary,
-            [targetStream.id]: newRegisteredStudentsFromGroup,
-         });
-      }
+      })();
    }, [registeredStudentsDictionary, targetStream, group]);
 
    useEffect(() => {
@@ -93,7 +116,10 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    useEffect(() => {
       if (targetStream) {
          (async function () {
-            setLoadingTalentPool({ [targetStream.id]: true });
+            setLoadingTalentPool((prevState) => ({
+               ...prevState,
+               [targetStream.id]: true,
+            }));
             try {
                const querySnapshot = await firebase.getLivestreamTalentPoolMembers(
                   targetStream.companyId
@@ -138,7 +164,10 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                   [targetStream.id]: registeredStudents,
                });
             } catch (e) {}
-            setLoadingTalentPool({ [targetStream.id]: false });
+            setLoadingTalentPool((prevState) => ({
+               ...prevState,
+               [targetStream.id]: false,
+            }));
          })();
       }
    }, [targetStream, targetStream, registeredStudentsFromGroupDictionary]);
@@ -258,10 +287,63 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
       [isDraft, isPast, loadingReportData, reportDataDictionary, group]
    );
 
+   const registeredStudentsAction = useCallback(
+      (rowData) => {
+         const actionLoading = loadingRegisteredUsersFromGroupData[rowData?.id];
+         const registeredStudentsData =
+            registeredStudentsFromGroupDictionary[rowData?.id];
+         const canDownloadRegisteredStudents = Boolean(
+            group.universityCode ||
+               group.privacyPolicyActive ||
+               userData?.isAdmin
+         );
+         return {
+            icon: () =>
+               registeredStudentsData ? (
+                  <CSVLink
+                     data={registeredStudentsData}
+                     separator={";"}
+                     filename={
+                        "Registered Students " +
+                        rowData.company +
+                        " " +
+                        rowData.id +
+                        ".csv"
+                     }
+                     style={{ color: "red" }}
+                  >
+                     <RegisteredUsersIcon color="primary" />
+                  </CSVLink>
+               ) : actionLoading ? (
+                  <CircularProgress size={15} />
+               ) : (
+                  <RegisteredUsersIcon />
+               ),
+            tooltip: registeredStudentsData
+               ? "Download Registered Users"
+               : actionLoading
+               ? "Generating Registered Users..."
+               : "Generate Registered Users",
+            onClick: () => setTargetStream(rowData),
+            hidden: !canDownloadRegisteredStudents,
+            disabled: actionLoading || !canDownloadRegisteredStudents,
+         };
+      },
+      [
+         isDraft,
+         isPast,
+         registeredStudentsFromGroupDictionary,
+         group,
+         loadingRegisteredUsersFromGroupData,
+         userData?.isAdmin,
+      ]
+   );
+
    return {
       talentPoolAction,
       pdfReportAction,
       reportPdfData,
       removeReportPdfData,
+      registeredStudentsAction,
    };
 }

@@ -466,7 +466,9 @@ const ReportPage = ({
             )}
             {followersWithMissingData > 0 && (
                <Border wrap={false}>
-                  <LargeText style={{ color: "grey" }}>No Data</LargeText>
+                  <LargeText style={{ color: "grey" }}>
+                     Other Study Backgrounds
+                  </LargeText>
                   <LargeNumber style={{ color: "grey" }}>
                      {followersWithMissingData}
                   </LargeNumber>
@@ -503,9 +505,6 @@ const PartnerBreakdown = ({ name, numberOfStudents }) => {
    );
 };
 const EventPdfReport = ({ universityReports, companyReport, summary }) => {
-   console.log("-> summary in EventPdfReport", summary);
-   console.log("-> universityReports", universityReports);
-   console.log("-> companyReport", companyReport);
    let questionElements = [];
 
    function compareOptions(optionA, optionB, studentStats) {
@@ -574,7 +573,9 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                   />
                   {followersWithMissingData > 0 && (
                      <Border wrap={false}>
-                        <LargeText style={{ color: "grey" }}>No Data</LargeText>
+                        <LargeText style={{ color: "grey" }}>
+                           Other Study Backgrounds
+                        </LargeText>
                         <LargeNumber style={{ color: "grey" }}>
                            {followersWithMissingData}
                         </LargeNumber>

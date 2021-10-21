@@ -25,7 +25,6 @@ import DraftLinkIcon from "@material-ui/icons/Link";
 import * as actions from "store/actions";
 import { useMetaDataActions } from "components/custom-hook/useMetaDataActions";
 import PdfReportDownloadDialog from "../PdfReportDownloadDialog";
-import { usePDF } from "@react-pdf/renderer";
 
 const useStyles = makeStyles((theme) => ({}));
 const customOptions = {
@@ -63,6 +62,7 @@ const EventsTable = ({
    const {
       talentPoolAction,
       pdfReportAction,
+      registeredStudentsAction,
       removeReportPdfData,
       reportPdfData,
    } = useMetaDataActions({
@@ -71,7 +71,6 @@ const EventsTable = ({
       isPast,
       isDraft,
    });
-   const [instance, update] = usePDF({});
 
    const [registeredStudents, setRegisteredStudents] = useState([]);
    const dispatch = useDispatch();
@@ -164,6 +163,7 @@ const EventsTable = ({
       <>
          <MaterialTable
             actions={[
+               registeredStudentsAction,
                pdfReportAction,
                talentPoolAction,
                {
