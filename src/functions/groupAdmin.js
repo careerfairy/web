@@ -5,10 +5,10 @@ const {
    makeRequestingGroupIdFirst,
    convertPollOptionsObjectToArray,
    studentBelongsToGroup,
-   getStudentInGroupDataObject,
    getRegisteredStudentsStats,
    getRatingsAverage,
    getDateString,
+   markStudentStatsInUse,
 } = require("./util");
 const { client } = require("./api/postmark");
 const { admin } = require("./api/firestoreAdmin");
@@ -101,7 +101,7 @@ exports.getLivestreamReportData = functions.https.onCall(
       const { targetStreamId, targetGroupId, userEmail } = data;
       const reportData = [];
       const universityReports = [];
-      const companyReports = [];
+      let companyReport = null;
 
       const authEmail = context.auth.token.email || null;
 
@@ -118,6 +118,41 @@ exports.getLivestreamReportData = functions.https.onCall(
             "You do not have permission to access this data"
          );
       }
+
+      const getUsersByEmail = async (
+         arrayOfEmails = [],
+         options = { withEmpty: false }
+      ) => {
+         let totalUsers = [];
+         let i,
+            j,
+            tempArray,
+            chunk = 800;
+         for (i = 0, j = arrayOfEmails.length; i < j; i += chunk) {
+            tempArray = arrayOfEmails.slice(i, i + chunk);
+            const userSnaps = await Promise.all(
+               tempArray
+                  .filter((email) => email)
+                  .map((email) =>
+                     admin.firestore().collection("userData").doc(email).get()
+                  )
+            );
+            let newUsers;
+            if (options.withEmpty) {
+               newUsers = userSnaps.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+               }));
+            } else {
+               newUsers = userSnaps
+                  .filter((doc) => doc.exists)
+                  .map((doc) => ({ id: doc.id, ...doc.data() }));
+            }
+            totalUsers = [...totalUsers, ...newUsers];
+         }
+         return totalUsers;
+      };
+
       const groupSnap = await admin
          .firestore()
          .collection("careerCenterData")
@@ -162,9 +197,6 @@ exports.getLivestreamReportData = functions.https.onCall(
          );
 
          // Declaration of Snaps promises, todo turn into Promise.all()
-         const participatingUsersSnap = await streamSnap.ref
-            .collection("participatingStudents")
-            .get();
          const talentPoolSnap = await admin
             .firestore()
             .collection("userData")
@@ -199,10 +231,9 @@ exports.getLivestreamReportData = functions.https.onCall(
          // Extraction of snap Data
 
          // Its let since this array will be modified
-         let participatingStudents = participatingUsersSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-         }));
+         let participatingStudents = await getUsersByEmail(
+            livestreamData.participatingStudents || []
+         );
 
          const talentPoolForReport = talentPoolSnap.docs.map((doc) => ({
             id: doc.id,
@@ -271,11 +302,16 @@ exports.getLivestreamReportData = functions.https.onCall(
                );
                const numberOfStudentsFromUniversity =
                   studentsFromUniversity.length;
-               const listOfStudentsForStats = studentsFromUniversity.filter(
+               const universityStudentsThatFollowingUniversity = studentsFromUniversity.filter(
                   (student) => studentBelongsToGroup(student, groupData)
                );
+
+               participatingStudents = markStudentStatsInUse(
+                  participatingStudents,
+                  groupData
+               );
                const studentStats = getRegisteredStudentsStats(
-                  listOfStudentsForStats,
+                  universityStudentsThatFollowingUniversity,
                   groupData
                );
 
@@ -284,7 +320,9 @@ exports.getLivestreamReportData = functions.https.onCall(
                   studentStats,
                   numberOfUniversityStudentsWithNoStats:
                      numberOfStudentsFromUniversity -
-                     listOfStudentsForStats.length,
+                     universityStudentsThatFollowingUniversity.length,
+                  numberOfUniversityStudentsThatFollowingUniversity:
+                     universityStudentsThatFollowingUniversity.length,
                   group: groupData,
                   groupName: groupData.universityName,
                   groupId: groupData.id,
@@ -293,11 +331,16 @@ exports.getLivestreamReportData = functions.https.onCall(
 
                totalSumOfUniversityStudents += numberOfStudentsFromUniversity;
                universityReports.push(universityReport);
-            } else {
+            } else if (groupData.id === requestingGroupData.id) {
                // Generate company Data
                const studentsThatFollowCompany = participatingStudents.filter(
                   (student) => studentBelongsToGroup(student, groupData)
                );
+               participatingStudents = markStudentStatsInUse(
+                  participatingStudents,
+                  groupData
+               );
+
                const numberOfStudentsFollowingCompany =
                   studentsThatFollowCompany.length;
 
@@ -305,7 +348,7 @@ exports.getLivestreamReportData = functions.https.onCall(
                   studentsThatFollowCompany,
                   groupData
                );
-               const companyReport = {
+               companyReport = {
                   numberOfStudentsFollowingCompany,
                   studentStats,
                   group: groupData,
@@ -313,8 +356,6 @@ exports.getLivestreamReportData = functions.https.onCall(
                   groupId: groupData.id,
                   isUniversity: Boolean(groupData.universityCode),
                };
-
-               companyReports.push(companyReport);
             }
 
             // const participatingStudentsFromGroup = [];
@@ -357,7 +398,7 @@ exports.getLivestreamReportData = functions.https.onCall(
          return {
             // groupReports: reportData,
             universityReports,
-            companyReports,
+            companyReport,
             summary: {
                totalParticipating: participatingStudents.length,
                // participatingStudentsWithNoStats: participatingStudents.filter(
@@ -374,6 +415,10 @@ exports.getLivestreamReportData = functions.https.onCall(
                questions,
                polls,
                numberOfIcons: icons.length,
+               totalSumOfUniversityStudents,
+               numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent: participatingStudents.filter(
+                  (student) => !student.statsInUse
+               ).length,
             },
          };
       } catch (e) {

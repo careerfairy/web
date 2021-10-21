@@ -158,18 +158,16 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                ...prevState,
                [rowData.id]: true,
             }));
-            const {
-               data: { groupReports, summary },
-            } = await firebase.getLivestreamReportData({
+            const { data } = await firebase.getLivestreamReportData({
                targetStreamId: rowData.id,
                userEmail: userData.userEmail,
                targetGroupId: group.id,
             });
             setReportDataDictionary((prevState) => ({
                ...prevState,
-               [rowData.id]: { groupReports, summary },
+               [rowData.id]: data,
             }));
-            setReportPdfData({ groupReports, summary });
+            setReportPdfData(data);
          } catch (e) {
             dispatch(actions.sendGeneralError(e));
          }

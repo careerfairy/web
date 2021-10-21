@@ -138,10 +138,11 @@ const getRegisteredGroupById = (student, groupId) => {
    );
 };
 
-const stringMatches = (string1, string2) => {
-   return (
-      string1.toLowerCase().replace(/\s/g, "") ===
-      string2.toLowerCase().replace(/\s/g, "")
+const stringMatches = (basString, stringsToMatch) => {
+   return stringsToMatch.some(
+      (stringToMatch) =>
+         stringToMatch.toLowerCase().replace(/\s/g, "") ===
+         basString.toLowerCase().replace(/\s/g, "")
    );
 };
 
@@ -182,10 +183,10 @@ const getStudentInGroupDataObject = (student, group) => {
 const groupHasSpecializedCategories = (group) => {
    if (group.categories) {
       let fieldOfStudyCategory = group.categories.find((category) =>
-         stringMatches(category.name, "field of study")
+         stringMatches(category.name, ["field of study", "Domaine d'étude"])
       );
       let levelOfStudyCategory = group.categories.find((category) =>
-         stringMatches(category.name, "level of study")
+         stringMatches(category.name, ["level of study"])
       );
       return fieldOfStudyCategory && levelOfStudyCategory;
    }
@@ -194,10 +195,10 @@ const groupHasSpecializedCategories = (group) => {
 
 const getSpecializedStudentStats = (registeredStudentsFromGroup, group) => {
    let fieldOfStudyCategory = group.categories.find((category) =>
-      stringMatches(category.name, "field of study")
+      stringMatches(category.name, ["field of study", "Domaine d'étude"])
    );
    let levelOfStudyCategory = group.categories.find((category) =>
-      stringMatches(category.name, "level of study")
+      stringMatches(category.name, ["level of study"])
    );
    let categoryStats = {
       type: "specialized",
@@ -256,39 +257,58 @@ const getSpecializedStudentStats = (registeredStudentsFromGroup, group) => {
    return categoryStats;
 };
 
-const getRegisteredStudentsStats = (registeredStudentsFromGroup, group) => {
-   // console.log(
-   //    `-> groupHasSpecializedCategories for ${group}`,
-   //    groupHasSpecializedCategories(group)
-   // );
-   if (groupHasSpecializedCategories(group)) {
-      return getSpecializedStudentStats(registeredStudentsFromGroup, group);
-   }
-   let categoryStats = {};
-   if (group.categories && group.categories.length) {
-      group.categories.forEach((category) => {
-         category.options.forEach((option) => {
-            if (!categoryStats[category.id]) {
-               categoryStats[category.id] = {};
-            }
-            categoryStats[category.id][option.id] = 0;
-         });
-         categoryStats[category.id].name = category.name;
-      });
-      registeredStudentsFromGroup.forEach((student) => {
-         let registeredGroup = getRegisteredGroupById(student, group.groupId);
-         if (registeredGroup) {
-            registeredGroup.categories.forEach((category) => {
-               categoryStats[category.id][category.selectedValueId] =
-                  categoryStats[category.id][category.selectedValueId] + 1;
-            });
+const getAggregateCategories = (participants, currentGroup) => {
+   let categories = [];
+   if (participants) {
+      participants.forEach((user) => {
+         const matched =
+            user &&
+            user.registeredGroups &&
+            user.registeredGroups.find(
+               (groupData) => groupData.groupId === currentGroup.id
+            );
+         if (matched) {
+            categories.push(matched);
          }
       });
    }
-   // console.log("-> group.categories", group.categories);
-   // console.log("-> group.length", group.length);
-   // console.log(`-> categoryStats for ${group}`, categoryStats);
-   return categoryStats;
+   return categories;
+};
+
+const getTypeOfStudents = (participants, currentCategory, group) => {
+   const aggregateCategories = getAggregateCategories(participants, group);
+   const flattenedGroupOptions = [...currentCategory.options].map((option) => {
+      const entries = aggregateCategories.filter((category) =>
+         category.categories.some(
+            (userOption) => userOption.selectedValueId === option.id
+         )
+      ).length;
+      return { ...option, entries };
+   });
+   return {
+      options: flattenedGroupOptions.sort((a, b) => b.entries - a.entries),
+      categoryName: currentCategory.name,
+      id: currentCategory.groupId,
+   };
+};
+const getNonSpecializedStats = (groupCategories, students, group) => {
+   return {
+      type: "non-specialized",
+      noneSpecializedStats: groupCategories.map((category) =>
+         getTypeOfStudents(students, category, group)
+      ),
+   };
+};
+
+const getRegisteredStudentsStats = (registeredStudentsFromGroup, group) => {
+   if (groupHasSpecializedCategories(group)) {
+      return getSpecializedStudentStats(registeredStudentsFromGroup, group);
+   }
+   return getNonSpecializedStats(
+      group.categories || [],
+      registeredStudentsFromGroup,
+      group
+   );
 };
 
 const getRatingsAverage = (contentRatings) =>
@@ -305,6 +325,18 @@ const getDateString = (streamData) => {
    return dateString || "";
 };
 
+const markStudentStatsInUse = (totalParticipants, groupData) => {
+   return totalParticipants.map((student) => {
+      // Only modify that stats in use prop when it hasn't been assigned yet
+      if (!student.statsInUse) {
+         return {
+            ...student,
+            statsInUse: studentBelongsToGroup(student, groupData),
+         };
+      } else return student;
+   });
+};
+
 module.exports = {
    setHeaders,
    generateEmailData,
@@ -319,4 +351,5 @@ module.exports = {
    getRegisteredStudentsStats,
    getRatingsAverage,
    getDateString,
+   markStudentStatsInUse,
 };

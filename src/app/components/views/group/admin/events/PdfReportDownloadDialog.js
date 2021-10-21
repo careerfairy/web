@@ -5,10 +5,7 @@ import { PDFViewer } from "@react-pdf/renderer";
 import EventPdfReport from "./EventPdfReport";
 import { useTheme } from "@material-ui/core/styles";
 
-const PdfReportDownloadDialogContent = ({
-   handleClose,
-   reportPdfData: { summary, groupReports },
-}) => {
+const PdfReportDownloadDialogContent = ({ handleClose, reportPdfData }) => {
    const theme = useTheme();
    return (
       <React.Fragment>
@@ -20,7 +17,7 @@ const PdfReportDownloadDialogContent = ({
                borderRadius: theme.spacing(0.4),
             }}
          >
-            <EventPdfReport groupReports={groupReports} summary={summary} />
+            <EventPdfReport {...reportPdfData} />
          </PDFViewer>
       </React.Fragment>
    );
@@ -34,7 +31,6 @@ const PdfReportDownloadDialog = ({ openDialog, onClose, reportPdfData }) => {
    const handleClose = () => {
       onClose?.();
    };
-
    return (
       <Dialog
          open={openDialog}

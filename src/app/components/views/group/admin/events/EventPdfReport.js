@@ -72,7 +72,8 @@ const GroupLogoView = styled.View`
 `;
 
 const SpeakerAvatar = styled.Image`
-   height: 15vw;
+   height: 14vw;
+   width: 14vw;
    border-radius: 50% !important;
    object-fit: cover;
 `;
@@ -310,10 +311,13 @@ const SpecializedSubCategoryElement = ({ subOption }) => {
    );
 };
 
-const SpecializedCategoryElement = ({ option, index }) => {
+const SpecializedCategoryElement = ({ option }) => {
    let subCategoryElements = Object.keys(option.subOptions).map((entry) => {
       return (
-         <SpecializedSubCategoryElement subOption={option.subOptions[entry]} />
+         <SpecializedSubCategoryElement
+            key={entry}
+            subOption={option.subOptions[entry]}
+         />
       );
    });
    return (
@@ -323,6 +327,14 @@ const SpecializedCategoryElement = ({ option, index }) => {
          <SubCategoryParent>{subCategoryElements}</SubCategoryParent>
       </Border>
    );
+};
+const NonSpecializedCategoryElement = ({ options }) => {
+   return options.map((option) => (
+      <Border key={option.id} wrap={false}>
+         <LargeText>{option.name}</LargeText>
+         <LargeNumber>{option.entries}</LargeNumber>
+      </Border>
+   ));
 };
 
 const QuestionView = ({ question }) => {
@@ -371,6 +383,7 @@ const SpeakerView = ({ speaker }) => {
          <View
             style={{
                width: "15vw",
+               height: "15vw",
                borderRadius: "50%",
                marginRight: "10vw",
                marginBottom: "5px",
@@ -400,9 +413,99 @@ const getPercentage = (num1, num2) => {
    return `${((num1 / num2) * 100).toFixed(0)}%`;
 };
 
-const EventPdfReport = ({ summary, groupReports }) => {
+const ReportPage = ({
+   categoryElements,
+   followersWithMissingData,
+   nameElements,
+   report,
+}) => {
+   return (
+      <Fragment>
+         {report.isUniversity && (
+            <GroupLogoView break>
+               <GroupLogoImage source={report.group.logoUrl} />
+            </GroupLogoView>
+         )}
+         <Title break={!report.isUniversity}>
+            {report.isUniversity
+               ? `Your Audience from ${report.group.universityName}`
+               : "Participants form other universities"}
+         </Title>
+         <Fragment>
+            <InlineView>
+               {report.isUniversity ? (
+                  <GroupSubTitle>
+                     Number Of Participating Students from{" "}
+                     {report.group.universityName}:{" "}
+                     {report.isUniversity
+                        ? report.numberOfStudentsFromUniversity
+                        : report.numberOfStudentsFollowingCompany}
+                  </GroupSubTitle>
+               ) : (
+                  <GroupSubTitle>
+                     Number Of Participating Students:{" "}
+                     {report.numberOfStudentsFollowingCompany}
+                  </GroupSubTitle>
+               )}
+            </InlineView>
+         </Fragment>
+         {/*)}*/}
+
+         <CategoriesParent>
+            {report.studentStats.type === "specialized" ? (
+               <>
+                  <Border>
+                     <LargeText style={{ color: "grey" }}>Faculty</LargeText>
+                     <LargeNumber style={{ color: "grey" }}>#</LargeNumber>
+                     <SubCategoryParent>{nameElements}</SubCategoryParent>
+                  </Border>
+                  {categoryElements}
+               </>
+            ) : (
+               categoryElements
+            )}
+            {followersWithMissingData > 0 && (
+               <Border wrap={false}>
+                  <LargeText style={{ color: "grey" }}>No Data</LargeText>
+                  <LargeNumber style={{ color: "grey" }}>
+                     {followersWithMissingData}
+                  </LargeNumber>
+               </Border>
+               // <View>
+               //    <GroupDisclaimerText>
+               //       * {followersWithMissingData} participants did not have any
+               //       data
+               //    </GroupDisclaimerText>
+               // </View>
+            )}
+         </CategoriesParent>
+      </Fragment>
+   );
+};
+
+ReportPage.propTypes = {
+   report: PropTypes.any,
+   nameElements: PropTypes.arrayOf(PropTypes.any),
+   categoryElements: PropTypes.arrayOf(PropTypes.any),
+   followersWithMissingData: PropTypes.any,
+};
+
+const PartnerBreakdown = ({ name, numberOfStudents }) => {
+   return (
+      <PartnerBreakdownItem>
+         <SubHeader>{name}</SubHeader>
+         <View>
+            <ColorText>
+               <Text>{numberOfStudents}</Text>
+            </ColorText>
+         </View>
+      </PartnerBreakdownItem>
+   );
+};
+const EventPdfReport = ({ universityReports, companyReport, summary }) => {
    console.log("-> summary in EventPdfReport", summary);
-   console.log("-> groupReports in EventPdfReport", groupReports);
+   console.log("-> universityReports", universityReports);
+   console.log("-> companyReport", companyReport);
    let questionElements = [];
 
    function compareOptions(optionA, optionB, studentStats) {
@@ -411,11 +514,11 @@ const EventPdfReport = ({ summary, groupReports }) => {
          studentStats.options[optionA].entries
       );
    }
-   const compareParticipants = (group1, group2) => {
-      return (
-         group1.totalParticipantsFromGroup - group2.totalParticipantsFromGroup
-      );
-   };
+   // const compareParticipants = (group1, group2) => {
+   //    return (
+   //       group1.totalParticipantsFromGroup - group2.totalParticipantsFromGroup
+   //    );
+   // };
 
    const getNameElements = (studentStats) => {
       let nameElements = [];
@@ -430,9 +533,9 @@ const EventPdfReport = ({ summary, groupReports }) => {
       }
       return nameElements;
    };
-   const getCategoryElements = (studentStats) => {
+   const getCategoryElements = (studentStats, report) => {
       let categoryElements = [];
-
+      console.log("-> studentStats", studentStats);
       if (studentStats && studentStats.type === "specialized") {
          categoryElements = Object.keys(studentStats.options)
             .sort((optionA, optionB) =>
@@ -444,22 +547,62 @@ const EventPdfReport = ({ summary, groupReports }) => {
                   <SpecializedCategoryElement
                      option={studentStats.options[option]}
                      index={index}
+                     key={index}
                   />
                );
             });
+      } else if (studentStats && studentStats.type === "non-specialized") {
+         const totalFollowers = report.isUniversity
+            ? report.numberOfUniversityStudentsThatFollowingUniversity
+            : report.numberOfStudentsFollowingCompany;
+         categoryElements = studentStats.noneSpecializedStats.map((stats) => {
+            const totalEntries = stats.options.reduce((acc, curr) => {
+               acc += curr.entries || 0;
+               return acc;
+            }, 0);
+            const followersWithMissingData = totalFollowers - totalEntries;
+            return (
+               <>
+                  <Border>
+                     <LargeText style={{ color: "grey" }}>
+                        {stats.categoryName}
+                     </LargeText>
+                  </Border>
+                  <NonSpecializedCategoryElement
+                     key={stats.id}
+                     options={stats.options}
+                  />
+                  {followersWithMissingData > 0 && (
+                     <Border wrap={false}>
+                        <LargeText style={{ color: "grey" }}>No Data</LargeText>
+                        <LargeNumber style={{ color: "grey" }}>
+                           {followersWithMissingData}
+                        </LargeNumber>
+                     </Border>
+                  )}
+               </>
+            );
+         });
       }
       return categoryElements;
    };
 
    const getNumberOfFollowersWithNoCategories = (report) => {
-      const totalEntries = Object.keys(report.studentStats.options).reduce(
-         (acc, curr) => {
-            acc += report.studentStats.options[curr].entries || 0;
-            return acc;
-         },
-         0
-      );
-      return report.totalParticipantsFromGroup - totalEntries;
+      const totalFollowers = report.isUniversity
+         ? report.numberOfUniversityStudentsThatFollowingUniversity
+         : report.numberOfStudentsFollowingCompany;
+      let totalEntries;
+      if (report.studentStats && report.studentStats.type === "specialized") {
+         totalEntries = Object.keys(report.studentStats.options).reduce(
+            (acc, curr) => {
+               acc += report.studentStats.options[curr].entries || 0;
+               return acc;
+            },
+            0
+         );
+      } else {
+      }
+      return totalFollowers - totalEntries;
    };
 
    questionElements = summary.questions.slice(0, 3).map((question) => {
@@ -501,15 +644,22 @@ const EventPdfReport = ({ summary, groupReports }) => {
                </DateText>
                <SubTitle>Speakers</SubTitle>
                <SpeakersViewElement speakers={summary.speakers} />
-               {!!groupReports.length && (
+               {!!universityReports.length && (
                   <View wrap={false}>
                      <SubTitle>Hosts</SubTitle>
                      <PartnersWrapper>
-                        {groupReports.map((report) => (
+                        {universityReports.map((report) => (
                            <PartnerItem key={report.group.id}>
                               <PartnerLogo source={report.group.logoUrl} />
                            </PartnerItem>
                         ))}
+                        {companyReport && (
+                           <PartnerItem>
+                              <PartnerLogo
+                                 source={companyReport.group.logoUrl}
+                              />
+                           </PartnerItem>
+                        )}
                      </PartnersWrapper>
                   </View>
                )}
@@ -537,21 +687,15 @@ const EventPdfReport = ({ summary, groupReports }) => {
                <View wrap={false}>
                   <SubTitle>Where They Came From</SubTitle>
                   <PartnersWrapper>
-                     {[...groupReports]
+                     {[...universityReports]
                         .sort(dynamicSort("totalParticipantsFromGroup"))
                         .map((report) => (
-                           <PartnerBreakdownItem key={report.group.id}>
-                              <SubHeader>
-                                 {report.group.universityName}
-                              </SubHeader>
-                              <View>
-                                 <ColorText>
-                                    <Text>
-                                       {report.totalParticipantsFromGroup}
-                                    </Text>
-                                 </ColorText>
-                              </View>
-                           </PartnerBreakdownItem>
+                           <PartnerBreakdown
+                              name={report.group.universityName}
+                              numberOfStudents={
+                                 report.numberOfStudentsFromUniversity
+                              }
+                           />
                         ))}
                   </PartnersWrapper>
                </View>
@@ -614,61 +758,44 @@ const EventPdfReport = ({ summary, groupReports }) => {
                   <SubTitle>Most upvoted questions</SubTitle>
                   {questionElements}
                </View>
-               {groupReports.map((report) => {
-                  const followersWithMissingData = getNumberOfFollowersWithNoCategories(
-                     report
-                  );
-                  return (
-                     <Fragment key={report.group.groupId}>
-                        <GroupLogoView break>
-                           <GroupLogoImage source={report.group.logoUrl} />
-                        </GroupLogoView>
-                        <Title>
-                           Your Audience from {report.group.universityName}
-                        </Title>
-                        <Fragment>
-                           <InlineView>
-                              <GroupSubTitle>
-                                 Number Of Participating Students from{" "}
-                                 {report.group.universityName}:{" "}
-                                 {report.totalParticipantsFromGroup}
-                              </GroupSubTitle>
-                           </InlineView>
-                        </Fragment>
-                        {/*)}*/}
-
-                        <CategoriesParent>
-                           <Border>
-                              <LargeText style={{ color: "grey" }}>
-                                 Faculty
-                              </LargeText>
-                              <LargeNumber style={{ color: "grey" }}>
-                                 #
-                              </LargeNumber>
-                              <SubCategoryParent>
-                                 {getNameElements(report.studentStats)}
-                              </SubCategoryParent>
-                           </Border>
-                           {getCategoryElements(report.studentStats)}
-                           {followersWithMissingData > 0 && (
-                              <View>
-                                 <GroupDisclaimerText>
-                                    * {followersWithMissingData} participants
-                                    did not have any data
-                                 </GroupDisclaimerText>
-                              </View>
-                           )}
-                        </CategoriesParent>
-                     </Fragment>
-                  );
-               })}
-               {summary.participatingStudentsWithNoStats > 0 && (
+               {universityReports.map((report) => (
+                  <ReportPage
+                     key={report.group.groupId}
+                     report={report}
+                     nameElements={getNameElements(report.studentStats)}
+                     categoryElements={getCategoryElements(
+                        report.studentStats,
+                        report
+                     )}
+                     followersWithMissingData={getNumberOfFollowersWithNoCategories(
+                        report
+                     )}
+                  />
+               ))}
+               {companyReport && (
+                  <ReportPage
+                     followersWithMissingData={getNumberOfFollowersWithNoCategories(
+                        companyReport
+                     )}
+                     categoryElements={getCategoryElements(
+                        companyReport.studentStats,
+                        companyReport
+                     )}
+                     nameElements={getNameElements(companyReport.studentStats)}
+                     report={companyReport}
+                  />
+               )}
+               {summary.numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent >
+                  0 && (
                   <View break>
                      <DisclaimerTitle>Disclaimer</DisclaimerTitle>
                      <GroupDisclaimerText>
-                        * {summary.participatingStudentsWithNoStats} of the
-                        total {summary.totalParticipating} participants came
-                        from other sources
+                        *{" "}
+                        {
+                           summary.numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent
+                        }{" "}
+                        of the total {summary.totalParticipating} participants
+                        for the event came from other sources
                      </GroupDisclaimerText>
                   </View>
                )}
@@ -684,7 +811,7 @@ EventPdfReport.propTypes = {
    summary: PropTypes.shape({
       requestingGroup: PropTypes.object,
       totalParticipating: PropTypes.number,
-      participatingStudentsWithNoStats: PropTypes.number,
+      totalSumOfUniversityStudents: PropTypes.number,
       totalSumOfParticipatingStudentsWithStats: PropTypes.number,
       requestingGroupId: PropTypes.string,
       speakers: PropTypes.array,
@@ -695,17 +822,28 @@ EventPdfReport.propTypes = {
       questions: PropTypes.array,
       polls: PropTypes.array,
       numberOfIcons: PropTypes.number,
+      numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent: PropTypes.number,
    }),
-   groupReports: PropTypes.arrayOf(
+   universityReports: PropTypes.arrayOf(
       PropTypes.shape({
+         numberOfStudentsFromUniversity: PropTypes.number,
+         numberOfUniversityStudentsThatFollowingUniversity: PropTypes.number,
+         numberOfUniversityStudentsWithNoStats: PropTypes.number,
          group: PropTypes.object,
          groupName: PropTypes.string,
          groupId: PropTypes.string,
          studentStats: PropTypes.object,
-         totalParticipantsFromOutsideGroupOrWithNoStats: PropTypes.number,
-         totalParticipantsFromGroup: PropTypes.number,
+         isUniversity: PropTypes.bool,
       })
    ),
+   companyReport: PropTypes.shape({
+      numberOfStudentsFollowingCompany: PropTypes.number,
+      group: PropTypes.object,
+      groupName: PropTypes.string,
+      groupId: PropTypes.string,
+      studentStats: PropTypes.object,
+      isUniversity: PropTypes.bool,
+   }),
 };
 
 export default EventPdfReport;
