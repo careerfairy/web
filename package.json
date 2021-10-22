@@ -20,12 +20,11 @@
     "rm-prior-build": "rm -rf dist && rm -rf node_modules && rm -rf src/app/node_modules && rm -rf src/app/.next",
     "predeploy": "rimraf dist/ && npm run build",
     "deploy": "npm run firebase deploy --only functions,hosting",
-    "start:functions:withProdDb": "firebase emulators:exec --only functions \"cd ./src/app && npm run dev\"",
-    "start:functions:withLocalDb": "firebase emulators:exec --only functions,firestore \"cd ./src/app && npm run dev\""
+    "start:functions:withProdDb": "firebase emulators:exec --only functions \"cd ./src/app && npm run dev:windows\"",
+    "start:functions:withLocalDb": "firebase emulators:exec --only functions,firestore \"cd ./src/app && npm run dev:windows\""
   },
   "dependencies": {
     "@date-io/date-fns": "^1.3.11",
-    "react-cookie-consent": "^6.3.0",
     "@fullpage/react-fullpage": "^0.1.17",
     "@google-cloud/firestore": "^4.2.0",
     "@itsfaqih/usepagination": "^0.3.3",
@@ -39,7 +38,7 @@
     "@mui-treasury/layout": "^4.5.0",
     "@mui-treasury/styles": "^1.13.1",
     "@next/bundle-analyzer": "^10.0.6",
-    "@react-pdf/renderer": "^1.6.13",
+    "@react-pdf/renderer": "^2.0.20",
     "@react-pdf/styled-components": "^1.4.0",
     "@reactivers/use-measure": "^1.0.0",
     "@sentry/browser": "^5.13.2",
@@ -83,6 +82,7 @@
     "react": "^16.14.0",
     "react-calendly": "^2.0.2",
     "react-chartjs-2": "^2.10.0",
+    "react-cookie-consent": "^6.3.0",
     "react-countdown-circle-timer": "^2.5.3",
     "react-csv": "^2.0.3",
     "react-dom": "^16.12.0",

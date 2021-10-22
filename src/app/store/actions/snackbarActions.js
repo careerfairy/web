@@ -49,9 +49,20 @@ export const removeSnackbar = (key) => ({
 
 export const sendGeneralError = (error = "") => async (dispatch) => {
    console.error("error", error);
+   let message = GENERAL_ERROR;
+   if (process.env.NODE_ENV === "development") {
+      const devInfo =
+         "This type of error only appears in development, it will just show a general error in production.";
+      if (typeof error === "string") {
+         message = `${error} - ${devInfo}`;
+      }
+      if (typeof error?.message === "string") {
+         message = `${error.message} - ${devInfo}`;
+      }
+   }
    dispatch(
       enqueueSnackbar({
-         message: GENERAL_ERROR,
+         message: message,
          options: {
             variant: "error",
             preventDuplicate: true,

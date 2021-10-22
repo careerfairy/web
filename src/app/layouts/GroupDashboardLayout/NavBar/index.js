@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
       width: 256,
       top: 64,
       height: "calc(100% - 64px)",
-      boxShadow: theme.shadows[15],
+      boxShadow: theme.shadows[5],
    },
    avatar: {
       padding: theme.spacing(1),

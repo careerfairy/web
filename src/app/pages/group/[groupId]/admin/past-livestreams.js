@@ -1,19 +1,26 @@
 import React from "react";
-import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
-import StreamsOverview from "../../../../components/views/group/admin/streams";
-import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead";
-import { withFirebase } from "../../../../context/firebase";
 
-const PastLivestreamsPage = ({ firebase }) => {
-   return (
-      <GroupDashboardLayout>
-         <DashboardHead title="CareerFairy | Admin Past Streams of" />
-         <StreamsOverview
-            query={firebase.listenToPastLiveStreamsByGroupId}
-            typeOfStream="past"
-         />
-      </GroupDashboardLayout>
-   );
+const PastStreamsPage = () => {
+   return <div />;
 };
 
-export default withFirebase(PastLivestreamsPage);
+export async function getServerSideProps({ query: { groupId, livestreamId } }) {
+   let destination;
+   if (!groupId) {
+      destination = "/";
+   } else {
+      destination = livestreamId
+         ? `/group/${groupId}/admin/events?eventId=${livestreamId}`
+         : `/group/${groupId}/admin/events`;
+   }
+
+   return {
+      props: {},
+      redirect: {
+         destination: destination,
+         permanent: false,
+      },
+   };
+}
+
+export default PastStreamsPage;

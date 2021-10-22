@@ -345,8 +345,11 @@ export const getResizedUrl = (url, size = "sm") => {
       lg: "1200x900",
    };
 
+   if (typeof url === "undefined") {
+      return "";
+   }
    if (typeof url !== "string") {
-      console.warn("Invalid url provided");
+      console.warn("Invalid url provided to getResizedUrl helper fn");
       return "";
    }
 

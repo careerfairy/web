@@ -73,6 +73,7 @@ const NewStreamModal = ({
    typeOfStream,
    currentStream,
    handleResetCurrentStream,
+   handlePublishStream,
 }) => {
    const formRef = useRef();
    const dialogRef = useRef();
@@ -121,14 +122,7 @@ const NewStreamModal = ({
             formRef.current?.setSubmitting(true);
             const newStream = { ...streamToPublish };
             newStream.companyId = uuidv4();
-            const author = getAuthor(newStream);
-            await firebase.addLivestream(newStream, "livestreams", author);
-            await firebase.deleteLivestream(
-               currentStream.id,
-               "draftLivestreams"
-            );
-
-            push(`/group/${group.id}/admin/upcoming-livestreams`);
+            await handlePublishStream(newStream);
             handleCloseDialog();
          } catch (e) {
             console.log("-> e", e);
