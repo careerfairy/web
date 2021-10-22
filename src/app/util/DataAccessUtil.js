@@ -39,13 +39,13 @@ export default class DataAccessUtil {
       });
    }
 
-   static sendNewlyPublishedEventEmail(
+   static sendNewlyPublishedEventEmail({
       adminsInfo,
       senderName,
       stream,
       submitTime,
-      senderEmail
-   ) {
+      senderEmail,
+   }) {
       return axios({
          method: "post",
          url:

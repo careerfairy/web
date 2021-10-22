@@ -1,6 +1,6 @@
 import React from "react";
 
-const PastStreamsPage = () => {
+const UpcomingStreamsPage = () => {
    return <div />;
 };
 
@@ -23,4 +23,4 @@ export async function getServerSideProps({ query: { groupId, livestreamId } }) {
    };
 }
 
-export default PastStreamsPage;
+export default UpcomingStreamsPage;

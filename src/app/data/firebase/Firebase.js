@@ -498,6 +498,36 @@ class Firebase {
       }
    };
 
+   getGroupsInfo = async (arrayOfGroupIds) => {
+      const groupsDictionary = {};
+      let i,
+         j,
+         tempArray,
+         chunk = 800;
+      for (i = 0, j = arrayOfGroupIds.length; i < j; i += chunk) {
+         tempArray = arrayOfGroupIds.slice(i, i + chunk);
+         const groupSnaps = await Promise.all(
+            tempArray
+               .filter((groupId) => groupId)
+               .map((groupId) =>
+                  this.firestore
+                     .collection("careerCenterData")
+                     .doc(groupId)
+                     .get()
+               )
+         );
+         groupSnaps.forEach((doc) => {
+            if (doc.exists) {
+               groupsDictionary[doc.id] = {
+                  id: doc.id,
+                  ...doc.data(),
+               };
+            }
+         });
+      }
+      return groupsDictionary;
+   };
+
    deleteLivestream = async (livestreamId, collection) => {
       let batch = this.firestore.batch();
       let livestreamsRef = this.firestore
@@ -2666,9 +2696,8 @@ class Firebase {
                const newAdminsInfo = groupData.adminEmails.map((email) => ({
                   groupId,
                   email,
-                  draftStreamDashboardLink: `${baseUrl}/group/${groupId}/admin/events?eventId=${streamId}`,
-                  // livestreamDashboardLink: `${}`,
-                  nextLivestreamsLink: ``,
+                  eventDashboardLink: `${baseUrl}/group/${groupId}/admin/events?eventId=${streamId}`,
+                  nextLivestreamsLink: `${baseUrl}/next-livestreams/${groupId}?livestreamId=${streamId}`,
                }));
                adminsInfo = [...adminsInfo, ...newAdminsInfo];
             }

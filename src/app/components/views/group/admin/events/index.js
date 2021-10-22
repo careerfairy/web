@@ -5,7 +5,10 @@ import { AppBar, Box, CircularProgress, Tabs } from "@material-ui/core";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import NewStreamModal from "./NewStreamModal";
 import { useRouter } from "next/router";
-import { repositionElement } from "../../../../helperFunctions/HelperFunctions";
+import {
+   prettyLocalizedDate,
+   repositionElement,
+} from "../../../../helperFunctions/HelperFunctions";
 import Tab from "@material-ui/core/Tab";
 import Header from "./Header";
 import EventsTable from "./events-table/EventsTable";
@@ -13,6 +16,7 @@ import { useFirebase } from "context/firebase";
 import { v4 as uuidv4 } from "uuid";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
+import DataAccessUtil from "../../../../../util/DataAccessUtil";
 
 const useStyles = makeStyles((theme) => ({
    containerRoot: {
@@ -56,10 +60,10 @@ const EventsOverview = ({ group, scrollRef }) => {
    const [currentStream, setCurrentStream] = useState(null);
    const [fetchingQueryEvent, setFetchingQueryEvent] = useState(false);
    const [publishingDraft, setPublishingDraft] = useState(false);
+   const [groupsDictionary, setGroupsDictionary] = useState({});
 
    const {
       query: { eventId },
-      push,
       replace,
       asPath,
    } = useRouter();
@@ -135,6 +139,24 @@ const EventsOverview = ({ group, scrollRef }) => {
                "livestreams",
                author
             );
+            newStream.id = publishedStreamId;
+
+            const submitTime = prettyLocalizedDate(new Date());
+            const adminsInfo = await firebase.getAllGroupAdminInfo(
+               newStream.groupIds || [],
+               id
+            );
+
+            const senderName = `${userData.firstName} ${userData.lastName}`;
+            const senderEmail = userData.userEmail;
+
+            await DataAccessUtil.sendNewlyPublishedEventEmail({
+               adminsInfo,
+               senderName,
+               stream: newStream,
+               submitTime,
+               senderEmail,
+            });
             await deleteLivestream(streamObj.id, "draftLivestreams");
             await replace(
                asPath,
@@ -152,8 +174,6 @@ const EventsOverview = ({ group, scrollRef }) => {
    const handleChange = (event, newValue) => {
       setTabValue(newValue);
    };
-
-   const getDrafts = () => {};
 
    const handleOpenNewStreamModal = () => {
       setOpenNewStreamModal(true);
@@ -216,7 +236,11 @@ const EventsOverview = ({ group, scrollRef }) => {
                   isDraft={tabValue === "draft"}
                   isPast={tabValue === "past"}
                   streams={streams}
+                  handleOpenNewStreamModal={handleOpenNewStreamModal}
+                  groupsDictionary={groupsDictionary}
                   group={group}
+                  eventId={eventId}
+                  setGroupsDictionary={setGroupsDictionary}
                   hasAccessToRegisteredStudents={
                      userData?.isAdmin &&
                      Boolean(

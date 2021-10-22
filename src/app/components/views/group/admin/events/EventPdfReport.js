@@ -128,31 +128,20 @@ const PartnersWrapper = styled.View`
    display: flex;
    flex-wrap: wrap;
    flex-direction: row;
-   justify-content: flex-start;
+   justify-content: space-between;
 `;
 
 const PartnerItem = styled.View`
-   width: 30vw;
+   width: 28vw;
    display: flex;
    flex-direction: column;
    align-items: flex-start;
 `;
 const PartnerBreakdownItem = styled(PartnerItem)`
-   align-items: center;
+   align-items: flex-start;
 `;
 const PartnerLogo = styled.Image`
    width: 40%;
-`;
-
-const PartnerName = styled.Text`
-   font-family: "Poppins";
-   font-size: 12px;
-   text-align: center;
-   margin-bottom: 8px;
-`;
-const BreakdownsParent = styled.View`
-   display: flex;
-   flex-direction: column;
 `;
 
 const EngagementChild = styled.View`
@@ -160,16 +149,8 @@ const EngagementChild = styled.View`
    margin-right: 5vw;
 `;
 
-const BreakdownPercentageView = styled.View`
-   width: 100vw !important;
-`;
 const RatingChild = styled.View`
    width: 40vw;
-   margin-right: 5vw;
-`;
-
-const AudienceChild = styled.View`
-   width: 50vw;
    margin-right: 5vw;
 `;
 
@@ -215,18 +196,6 @@ const LargeText = styled.Text`
    margin-right: 5vw;
    text-transform: uppercase;
    color: #314150;
-`;
-
-const TotalViewer = styled.Text`
-   font-size: 11px;
-   color: #555555;
-`;
-const PercentageText = styled.Text`
-   font-size: 11px;
-   font-weight: bold;
-   color: #00d2aa;
-   display: flex;
-   flex-direction: row;
 `;
 
 const SmallNumber = styled.Text`
@@ -404,7 +373,7 @@ const SpeakerView = ({ speaker }) => {
 
 const SpeakersViewElement = ({ speakers }) => {
    let speakerElements = speakers.map((speaker) => {
-      return <SpeakerView speaker={speaker} />;
+      return <SpeakerView key={speaker.id} speaker={speaker} />;
    });
    return <SpeakersView>{speakerElements}</SpeakersView>;
 };
@@ -416,8 +385,8 @@ const getPercentage = (num1, num2) => {
 const ReportPage = ({
    categoryElements,
    followersWithMissingData,
-   nameElements,
    report,
+   onlyCompany,
 }) => {
    return (
       <Fragment>
@@ -429,6 +398,8 @@ const ReportPage = ({
          <Title break={!report.isUniversity}>
             {report.isUniversity
                ? `Your Audience from ${report.group.universityName}`
+               : onlyCompany
+               ? "Your participants breakdown"
                : "Participants form other universities"}
          </Title>
          <Fragment>
@@ -449,21 +420,9 @@ const ReportPage = ({
                )}
             </InlineView>
          </Fragment>
-         {/*)}*/}
 
          <CategoriesParent>
-            {report.studentStats.type === "specialized" ? (
-               <>
-                  <Border>
-                     <LargeText style={{ color: "grey" }}>Faculty</LargeText>
-                     <LargeNumber style={{ color: "grey" }}>#</LargeNumber>
-                     <SubCategoryParent>{nameElements}</SubCategoryParent>
-                  </Border>
-                  {categoryElements}
-               </>
-            ) : (
-               categoryElements
-            )}
+            {categoryElements}
             {followersWithMissingData > 0 && (
                <Border wrap={false}>
                   <LargeText style={{ color: "grey" }}>
@@ -473,12 +432,6 @@ const ReportPage = ({
                      {followersWithMissingData}
                   </LargeNumber>
                </Border>
-               // <View>
-               //    <GroupDisclaimerText>
-               //       * {followersWithMissingData} participants did not have any
-               //       data
-               //    </GroupDisclaimerText>
-               // </View>
             )}
          </CategoriesParent>
       </Fragment>
@@ -488,7 +441,7 @@ const ReportPage = ({
 ReportPage.propTypes = {
    report: PropTypes.any,
    nameElements: PropTypes.arrayOf(PropTypes.any),
-   categoryElements: PropTypes.arrayOf(PropTypes.any),
+   categoryElements: PropTypes.object,
    followersWithMissingData: PropTypes.any,
 };
 
@@ -513,11 +466,6 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
          studentStats.options[optionA].entries
       );
    }
-   // const compareParticipants = (group1, group2) => {
-   //    return (
-   //       group1.totalParticipantsFromGroup - group2.totalParticipantsFromGroup
-   //    );
-   // };
 
    const getNameElements = (studentStats) => {
       let nameElements = [];
@@ -534,22 +482,32 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
    };
    const getCategoryElements = (studentStats, report) => {
       let categoryElements = [];
-      console.log("-> studentStats", studentStats);
       if (studentStats && studentStats.type === "specialized") {
-         categoryElements = Object.keys(studentStats.options)
-            .sort((optionA, optionB) =>
-               compareOptions(optionA, optionB, studentStats)
-            )
-            .filter((option) => studentStats.options[option].entries > 0)
-            .map((option, index) => {
-               return (
-                  <SpecializedCategoryElement
-                     option={studentStats.options[option]}
-                     index={index}
-                     key={index}
-                  />
-               );
-            });
+         categoryElements = (
+            <>
+               <Border>
+                  <LargeText style={{ color: "grey" }}>Faculty</LargeText>
+                  <LargeNumber style={{ color: "grey" }}>#</LargeNumber>
+                  <SubCategoryParent>
+                     {getNameElements(studentStats)}
+                  </SubCategoryParent>
+               </Border>
+               {Object.keys(studentStats.options)
+                  .sort((optionA, optionB) =>
+                     compareOptions(optionA, optionB, studentStats)
+                  )
+                  .filter((option) => studentStats.options[option].entries > 0)
+                  .map((option, index) => {
+                     return (
+                        <SpecializedCategoryElement
+                           option={studentStats.options[option]}
+                           index={index}
+                           key={index}
+                        />
+                     );
+                  })}
+            </>
+         );
       } else if (studentStats && studentStats.type === "non-specialized") {
          const totalFollowers = report.isUniversity
             ? report.numberOfUniversityStudentsThatFollowingUniversity
@@ -692,12 +650,21 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                         .sort(dynamicSort("totalParticipantsFromGroup"))
                         .map((report) => (
                            <PartnerBreakdown
+                              key={report.group.id}
                               name={report.group.universityName}
                               numberOfStudents={
                                  report.numberOfStudentsFromUniversity
                               }
                            />
                         ))}
+                     {companyReport && (
+                        <PartnerBreakdown
+                           name={companyReport.group.universityName}
+                           numberOfStudents={
+                              companyReport.numberOfStudentsFollowingCompany
+                           }
+                        />
+                     )}
                   </PartnersWrapper>
                </View>
                <View wrap={false}>
@@ -763,7 +730,6 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                   <ReportPage
                      key={report.group.groupId}
                      report={report}
-                     nameElements={getNameElements(report.studentStats)}
                      categoryElements={getCategoryElements(
                         report.studentStats,
                         report
@@ -782,7 +748,7 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                         companyReport.studentStats,
                         companyReport
                      )}
-                     nameElements={getNameElements(companyReport.studentStats)}
+                     onlyCompany={Boolean(!universityReports?.length)}
                      report={companyReport}
                   />
                )}
@@ -800,8 +766,6 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                      </GroupDisclaimerText>
                   </View>
                )}
-               {/* <SubTitle>Your polls</SubTitle>
-                    { pollElements } */}
             </View>
          </CFPage>
       </Document>

@@ -41,6 +41,7 @@ const Speakers = ({ speakers }) => {
       () => setSpeakersExpanded((prevState) => !prevState),
       []
    );
+
    return (
       <Box maxWidth={200} position="relative">
          {!!speakers.length && (
@@ -70,11 +71,7 @@ const Speakers = ({ speakers }) => {
                <Collapse in={speakersExpanded}>
                   <Box dense component={List}>
                      {speakers.map((speaker) => (
-                        <ListItem
-                           className={classes.root}
-                           key={speaker.id}
-                           alignItems="flex-start"
-                        >
+                        <ListItem key={speaker.id} alignItems="flex-start">
                            <ListItemAvatar>
                               <Avatar
                                  alt={`${speaker.firstName} ${speaker.lastName}`}
@@ -91,10 +88,7 @@ const Speakers = ({ speakers }) => {
                            <ListItemText
                               disableTypography
                               primary={
-                                 <Typography
-                                    variant="body1"
-                                    className={classes.secondary}
-                                 >
+                                 <Typography variant="body1">
                                     {speaker.firstName} {speaker.lastName}
                                  </Typography>
                               }

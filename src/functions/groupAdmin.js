@@ -21,7 +21,7 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(
 
       functions.logger.log("admins Info in approval request", adminsInfo);
 
-      const emails = adminsInfo.map(({ email, draftStreamDashboardLink }) => ({
+      const emails = adminsInfo.map(({ email, eventDashboardLink }) => ({
          TemplateId: 22299429,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: email,
@@ -29,7 +29,7 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(
             sender_name: req.body.sender_name,
             livestream_title: req.body.livestream_title,
             livestream_company_name: req.body.livestream_company_name,
-            draft_stream_link: draftStreamDashboardLink,
+            draft_stream_link: eventDashboardLink,
             submit_time: req.body.submit_time,
          },
       }));
@@ -62,14 +62,14 @@ exports.sendNewlyPublishedEventEmail = functions.https.onRequest(
       functions.logger.log("admins Info in newly published event", adminsInfo);
 
       const emails = adminsInfo.map(
-         ({ email, livestreamDashboardLink, nextLivestreamsLink }) => ({
+         ({ email, eventDashboardLink, nextLivestreamsLink }) => ({
             TemplateId: 25484780,
             From: "CareerFairy <noreply@careerfairy.io>",
             To: email,
             TemplateModel: {
                sender_name: req.body.sender_name,
-               dashboard_link: nextLivestreamsLink,
-               next_livestreams_link: livestreamDashboardLink,
+               dashboard_link: eventDashboardLink,
+               next_livestreams_link: nextLivestreamsLink,
                livestream_title: req.body.livestream_title,
                livestream_company_name: req.body.livestream_company_name,
                submit_time: req.body.submit_time,
@@ -279,6 +279,7 @@ exports.getLivestreamReportData = functions.https.onCall(
 
          let totalSumOfParticipatingStudentsWithStats = 0;
          let totalSumOfUniversityStudents = 0;
+         let numberOfStudentsFollowingCompany = 0;
          for (const groupId of livestreamGroupIds) {
             let groupData;
             if (groupId === requestingGroupData.id) {
@@ -340,7 +341,7 @@ exports.getLivestreamReportData = functions.https.onCall(
                   groupData
                );
 
-               const numberOfStudentsFollowingCompany =
+               numberOfStudentsFollowingCompany =
                   studentsThatFollowCompany.length;
 
                const studentStats = getRegisteredStudentsStats(
@@ -375,9 +376,10 @@ exports.getLivestreamReportData = functions.https.onCall(
                polls,
                numberOfIcons: icons.length,
                totalSumOfUniversityStudents,
-               numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent: participatingStudents.filter(
-                  (student) => !student.statsInUse
-               ).length,
+               numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent:
+                  participatingStudents.length -
+                  (totalSumOfUniversityStudents +
+                     numberOfStudentsFollowingCompany),
             },
          };
       } catch (e) {
