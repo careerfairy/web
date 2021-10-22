@@ -10,6 +10,10 @@ const useStyles = makeStyles((theme) => {
          boxShadow: theme.shadows[1],
          fontSize: 11,
          padding: theme.spacing(2),
+         [theme.breakpoints.down("xs")]: {
+            padding: theme.spacing(1.5),
+            maxWidth: 150,
+         },
       },
       arrow: {
          color: theme.palette.background.paper,
@@ -21,6 +25,9 @@ const useStyles = makeStyles((theme) => {
       text: {},
       buttonWrapper: {
          marginTop: theme.spacing(1),
+         [theme.breakpoints.down("xs")]: {
+            marginTop: theme.spacing(0.5),
+         },
          width: "100%",
          display: "flex",
          justifyContent: "flex-end",
@@ -50,7 +57,9 @@ export const WhiteTooltip = ({ title, children, open, style, ...props }) => {
          classes={{ arrow: classes.arrow, tooltip: classes.tooltip }}
          title={title}
       >
-         <div style={style} className={open ? classes.highlight : {}}>{children}</div>
+         <div style={style} className={open ? classes.highlight : {}}>
+            {children}
+         </div>
       </Tooltip>
    );
 };

@@ -53,37 +53,6 @@ exports.generateAgoraToken = functions.https.onRequest(async (req, res) => {
    return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
 });
 
-exports.startRecordingLivestream = functions.https.onRequest(
-   async (req, res) => {
-      setHeaders(req, res);
-
-      const customerKey = "fd45e86c6ffe445ebb87571344e945b1";
-      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0";
-
-      let plainCredentials = `${customerKey}:${customerSecret}`;
-      let base64Credentials = Buffer.from(plainCredentials).toString("base64");
-
-      let authorizationHeader = `Basic ${base64Credentials}`;
-
-      let acquire = await axios({
-         method: "post",
-         data: {
-            cname: "bnruMEB6DGte14VNaZ9M",
-            uid: 1234232,
-            clientRequest: {},
-         },
-         url: `https://api.agora.io/dev/v1/apps/${appID}/cloud_recording/acquire`,
-         headers: {
-            Authorization: authorizationHeader,
-            "Content-Type": "application/json",
-         },
-      });
-
-      console.log(acquire);
-      functions.logger.info("acquire", acquire);
-   }
-);
-
 exports.generateAgoraTokenSecure = functions.https.onRequest(
    async (req, res) => {
       setHeaders(req, res);

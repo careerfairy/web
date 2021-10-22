@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import { StyledTooltipWithButton } from "../../materialUI/GlobalTooltips";
@@ -9,17 +10,18 @@ const NewFeatureHint = ({
    buttonText,
    tooltipTitle,
    placement,
-   onClick,
-  hide
+   onClickConfirm,
+   hide,
 }) => {
    const [hasSeenTip, setHasSeenTip] = useState(false);
+   const {
+      query: { isRecordingWindow },
+   } = useRouter();
 
    useEffect(() => {
       const hasSeenDataSetButton = localStorage.getItem(localStorageKey);
-      if (JSON.parse(hasSeenDataSetButton)) {
-         setHasSeenTip(true);
-      }
-   }, []);
+      setHasSeenTip(Boolean(JSON.parse(hasSeenDataSetButton)));
+   }, [localStorageKey]);
 
    const markAsSeen = () => {
       localStorage.setItem(localStorageKey, JSON.stringify(true));
@@ -28,21 +30,21 @@ const NewFeatureHint = ({
 
    const handleSeen = () => {
       markAsSeen();
-      onClick?.();
+      onClickConfirm?.();
    };
 
    return (
       <StyledTooltipWithButton
          placement={placement}
-         open={!hasSeenTip && !hide}
+         open={!hasSeenTip && !hide && !isRecordingWindow}
          tooltipTitle={tooltipTitle}
          onConfirm={handleSeen}
          tooltipText={tooltipText}
          buttonText={buttonText}
       >
-         <div onClick={handleSeen} style={{ cursor: "pointer" }}>
+         <span onClick={handleSeen} style={{ cursor: "pointer" }}>
             {children}
-         </div>
+         </span>
       </StyledTooltipWithButton>
    );
 };
@@ -51,7 +53,7 @@ NewFeatureHint.propTypes = {
    buttonText: PropTypes.string,
    children: PropTypes.node.isRequired,
    localStorageKey: PropTypes.string.isRequired,
-   onClick: PropTypes.func,
+   onClickConfirm: PropTypes.func,
    placement: PropTypes.oneOf([
       "bottom-end",
       "bottom-start",

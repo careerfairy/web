@@ -73,7 +73,7 @@ const ViewerLayout = (props) => {
    const { children, isBreakout } = props;
    const firebase = useFirebase();
    const {
-      query: { livestreamId, breakoutRoomId },
+      query: { livestreamId, breakoutRoomId, token, isRecordingWindow },
       replace,
       asPath,
    } = useRouter();
@@ -91,18 +91,45 @@ const ViewerLayout = (props) => {
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
    );
+   const spyModeEnabled = useSelector(
+      (state) => state.stream.streaming.spyModeEnabled
+   );
    const classes = useStyles({ showMenu, mobile, focusModeEnabled });
    const [selectedState, setSelectedState] = useState("questions");
+   const [notAuthorized, setNotAuthorized] = useState(false);
 
    const currentLivestream = useStreamConnect();
 
    useViewerHandRaiseConnect(currentLivestream);
 
-   const notAuthorized =
-      currentLivestream &&
-      !currentLivestream.test &&
-      authenticatedUser?.isLoaded &&
-      authenticatedUser?.isEmpty;
+   useEffect(() => {
+      if (currentLivestream && !currentLivestream.test) {
+         if (token) {
+            firebase.getLivestreamSecureTokenWithRef(streamRef).then((doc) => {
+               if (!doc.exists) {
+                  router.push("/streaming/error");
+               }
+               let storedToken = doc.data().value;
+               if (storedToken !== token) {
+                  setNotAuthorized(false);
+               }
+            });
+         } else {
+            setNotAuthorized(
+               currentLivestream &&
+                  !currentLivestream.test &&
+                  authenticatedUser?.isLoaded &&
+                  authenticatedUser?.isEmpty
+            );
+         }
+      }
+   }, [token, currentLivestream?.test, currentLivestream?.id]);
+
+   useEffect(() => {
+      if (Boolean(isRecordingWindow)) {
+         dispatch(actions.setFocusMode(true, mobile));
+      }
+   }, [isRecordingWindow]);
 
    useEffect(() => {
       if (mobile) {
@@ -115,6 +142,7 @@ const ViewerLayout = (props) => {
    }, [mobile]);
 
    useEffect(() => {
+      if (userData?.isAdmin) return;
       if (userData?.userEmail) {
          if (livestreamId) {
             firebase.setUserIsParticipating(livestreamId, userData);
@@ -126,6 +154,7 @@ const ViewerLayout = (props) => {
    }, [
       livestreamId,
       userData?.email,
+      userData?.isAdmin,
       userData?.linkedinUrl,
       userData?.firstName,
       userData?.lastName,
@@ -143,6 +172,8 @@ const ViewerLayout = (props) => {
             setStreamerId(currentLivestream.id + joiningId);
          } else if (authenticatedUser?.email) {
             setStreamerId(currentLivestream.id + authenticatedUser.email);
+         } else if (isRecordingWindow) {
+            setStreamerId(uuidv4());
          }
       }
    }, [
@@ -152,12 +183,12 @@ const ViewerLayout = (props) => {
    ]);
 
    useEffect(() => {
-      if (currentLivestream?.hasStarted) {
+      if (currentLivestream?.hasStarted || spyModeEnabled) {
          dispatch(actions.unmuteAllRemoteVideos());
       } else {
          dispatch(actions.muteAllRemoteVideos());
       }
-   }, [currentLivestream?.hasStarted]);
+   }, [currentLivestream?.hasStarted, spyModeEnabled]);
 
    if (notAuthorized) {
       replace({

@@ -114,3 +114,12 @@ export const setFocusMode = (mode, mobile) => async (dispatch, getState) => {
       }
    }
 };
+
+// Action to show the left menu on stream UI
+export const setSpyMode = (mode) => async (dispatch, getState) => {
+   // if mode is undefined or null, it will perform a toggle
+   const newSpyMode = Boolean(
+      mode ?? !getState().stream.streaming.spyModeEnabled
+   );
+   dispatch({ type: actions.SET_SPY_MODE, payload: Boolean(newSpyMode) });
+};

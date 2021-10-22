@@ -1,22 +1,25 @@
-import PropTypes from "prop-types";
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { languageCodes } from "../../../../../helperFunctions/streamFormFunctions";
 import {
+   Avatar,
+   Box,
+   Button,
+   Card,
+   CardActions,
+   CardContent,
    CardHeader,
+   CardMedia,
+   CircularProgress,
+   Dialog,
+   DialogContent,
+   IconButton,
    List,
    ListItem,
    ListItemAvatar,
    ListItemText,
-   CardActions,
-   CardContent,
-   CardMedia,
-   Button,
-   Card,
-   Avatar,
-   IconButton,
    Menu,
    MenuItem,
+   Typography,
 } from "@material-ui/core";
 import {
    getBaseUrl,
@@ -26,11 +29,13 @@ import RegistrationsIcon from "@material-ui/icons/People";
 import ParticipationIcon from "@material-ui/icons/Visibility";
 import JoinIcon from "@material-ui/icons/RecordVoiceOver";
 import { useFirestore } from "react-redux-firebase";
-import { useDispatch } from "react-redux";
-import * as actions from "../../../../../../store/actions/index";
+import { useFirebase } from "context/firebase";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "store/actions/index";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog";
 import { streamType } from "../../../../../../types";
+import ConfirmRecordingDialog from "./ConfirmRecordingDialog";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -52,16 +57,29 @@ const useStyles = makeStyles((theme) => ({
          width: "calc(100% - 30px)",
       },
    },
+   recording: {
+      fontSize: "0.8rem",
+      color: "red",
+      textTransform: "uppercase",
+      fontWeight: 800,
+   },
 }));
 
 const StreamCard = ({ stream }) => {
    const classes = useStyles();
    const firestore = useFirestore();
+   const firebase = useFirebase();
    const dispatch = useDispatch();
 
+   const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] = useState(
+      false
+   );
    const [anchorEl, setAnchorEl] = React.useState(null);
    const [openStreamerLinksDialog, setOpenStreamerLinksDialog] = React.useState(
       false
+   );
+   const recordingRequestOngoing = useSelector(
+      (state) => state.streamAdmin.recording.recordingRequestOngoing
    );
 
    const handleClick = (event) => {
@@ -70,6 +88,12 @@ const StreamCard = ({ stream }) => {
 
    const handleClose = () => {
       setAnchorEl(null);
+   };
+   const handleOpenConfirmRecordingDialog = () => {
+      setConfirmRecordingDialogOpen(true);
+   };
+   const handleCloseConfirmRecordingDialog = () => {
+      setConfirmRecordingDialogOpen(false);
    };
 
    const handleJoinAsStreamer = async () => {
@@ -96,6 +120,14 @@ const StreamCard = ({ stream }) => {
       } catch (e) {
          dispatch(actions.sendGeneralError(e));
       }
+   };
+
+   const handleStartRecording = async () => {
+      dispatch(actions.handleStartRecording({ firebase, streamId: stream.id }));
+   };
+
+   const handleStopRecording = async () => {
+      dispatch(actions.handleStopRecording({ firebase, streamId: stream.id }));
    };
 
    return (
@@ -137,12 +169,42 @@ const StreamCard = ({ stream }) => {
                         >
                            Get streamer links
                         </MenuItem>
+                        <MenuItem
+                           disabled={recordingRequestOngoing}
+                           onClick={handleOpenConfirmRecordingDialog}
+                        >
+                           {stream.isRecording
+                              ? "Stop recording stream"
+                              : "Start recording stream"}
+                        </MenuItem>
+                        {stream.isRecording ? (
+                           <ConfirmRecordingDialog
+                              confirmText="Are you sure that you want to stop recording this live stream?"
+                              onConfirm={handleStopRecording}
+                              open={confirmRecordingDialogOpen}
+                              disabled={recordingRequestOngoing}
+                              onclose={handleCloseConfirmRecordingDialog}
+                           />
+                        ) : (
+                           <ConfirmRecordingDialog
+                              confirmText="Are you sure that you want to start recording this live stream?"
+                              onConfirm={handleStartRecording}
+                              open={confirmRecordingDialogOpen}
+                              disabled={recordingRequestOngoing}
+                              onclose={handleCloseConfirmRecordingDialog}
+                           />
+                        )}
                      </Menu>
                   }
                </React.Fragment>
             }
          />
          <CardContent>
+            {stream.isRecording && (
+               <Typography className={classes.recording}>
+                  Recording in progress
+               </Typography>
+            )}
             <List dense className={classes.list}>
                <ListItem>
                   <ListItemAvatar>
@@ -174,7 +236,7 @@ const StreamCard = ({ stream }) => {
                className={classes.spyButton}
                target="_blank"
                startIcon={<ParticipationIcon />}
-               href={`https://testing2-careerfairy.web.app/streaming/${stream.id}/viewer`}
+               href={`${getBaseUrl()}/streaming/${stream.id}/viewer?spy=true`}
                color="primary"
             >
                Spy
@@ -194,6 +256,18 @@ const StreamCard = ({ stream }) => {
             openDialog={openStreamerLinksDialog}
             setOpenDialog={setOpenStreamerLinksDialog}
          />
+         <Dialog open={recordingRequestOngoing}>
+            <DialogContent>
+               <Box p={3} textAlign="center">
+                  <div>
+                     <CircularProgress />
+                  </div>
+                  {stream.isRecording
+                     ? "Stopping livestream recording"
+                     : "Starting livestream recording"}
+               </Box>
+            </DialogContent>
+         </Dialog>
       </Card>
    );
 };
