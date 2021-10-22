@@ -134,11 +134,11 @@ function StreamPublishingModal({
 
    const hasAudioTrack = useMemo(() => {
       return Boolean(localStream) && Boolean(localStream.audioTrack);
-   }, [localStream, localStream.audioTrack]);
+   }, [localStream, localStream?.audioTrack]);
 
    const hasVideoTrack = useMemo(() => {
       return Boolean(localStream) && Boolean(localStream.videoTrack);
-   }, [localStream, localStream.videoTrack]);
+   }, [localStream, localStream?.videoTrack]);
 
    const joinButtonLabel = useMemo(() => {
       if (hasAudioTrack && hasVideoTrack) return "Join as streamer";

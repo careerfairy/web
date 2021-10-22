@@ -36,7 +36,9 @@ const HandRaiseCategory = ({
          livestream.hasStarted &&
          livestream.handRaiseActive &&
          handRaiseState &&
-         ["connecting", "connected"].includes(handRaiseState?.state)
+         ["connecting", "connected", "requested", "invited", "Tecg"].includes(
+            handRaiseState?.state
+         )
       ) {
          setHandRaiseActive(true);
       } else {

@@ -365,7 +365,6 @@ function VideoContainer({
             handleClose={handleCloseScreenShareModal}
             handleScreenShare={handleScreenShare}
          />
-
          <DemoIntroModal
             open={showDemoIntroModal}
             handleClose={handleCloseDemoIntroModal}

@@ -21,7 +21,7 @@ export default function useDevices(localStream) {
                .catch(handleError);
          };
       }
-   }, [Boolean(localStream), localStream.audioTrack, localStream.videoTrack]);
+   }, [Boolean(localStream), localStream?.audioTrack, localStream?.videoTrack]);
 
    function gotDevices(deviceInfos) {
       let audioInputList = [];

@@ -22,6 +22,7 @@ import DraggableComponent from "../../banners/DraggableComponent";
 import WifiIndicator from "../../streaming/video-container/WifiIndicator";
 import useAgoraRtc from "components/custom-hook/useAgoraRtc";
 import useAgoraRtm from "components/custom-hook/useAgoraRtm";
+import StreamPublishingModal from "components/views/streaming/modal/StreamPublishingModal";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -68,6 +69,10 @@ function ViewerComponent({
    const [showSettings, setShowSettings] = useState(false);
    const [showScreenShareModal, setShowScreenShareModal] = useState(false);
    const [optimizationMode, setOptimizationMode] = useState("detail");
+   const [
+      showLocalStreamPublishingModal,
+      setShowLocalStreamPublishingModal,
+   ] = useState(true);
    const streamRef = useStreamRef();
    const {
       query: { livestreamId },
@@ -92,6 +97,7 @@ function ViewerComponent({
       localStream,
       localMediaControls,
       remoteStreams,
+      localMediaEnabling,
       publishLocalCameraStream,
       publishScreenShareStream,
       unpublishScreenShareStream,
@@ -102,7 +108,7 @@ function ViewerComponent({
       streamerId
    );
 
-   const devices = useDevices(false);
+   const devices = useDevices(localStream);
    // console.log("-> agoraRtcStatus.msg", agoraRtcStatus.msg);
    // console.log("-> devices from use devices", devices);
 
@@ -112,33 +118,10 @@ function ViewerComponent({
    } = useMediaSources(
       devices,
       localStream,
-      !streamerReady || showSettings,
-      handRaiseActive
+      (showLocalStreamPublishingModal || showSettings) &&
+         localStream?.audioTrack,
+      true
    );
-
-   // useEffect(() => {
-   //    if (
-   //       handRaiseActive &&
-   //       agoraRtcStatus &&
-   //       agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
-   //    ) {
-   //       if (currentLivestream) {
-   //          if (currentLivestream.test) {
-   //             firebase.updateHandRaiseRequest(
-   //                streamRef,
-   //                "streamerEmail",
-   //                "connected"
-   //             );
-   //          } else {
-   //             firebase.updateHandRaiseRequest(
-   //                streamRef,
-   //                authenticatedUser.email,
-   //                "connected"
-   //             );
-   //          }
-   //       }
-   //    }
-   // }, [agoraRtcStatus]);
 
    const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams);
 
@@ -185,6 +168,24 @@ function ViewerComponent({
       [currentLivestream?.mode, optimizationMode, streamerId]
    );
 
+   const handlePublishLocalStream = async () => {
+      if (localStream.audioTrack && !localStream.isAudioPublished) {
+         await publishLocalStreamTracks.publishLocalMicrophoneTrack();
+      }
+      if (localStream.videoTrack && !localStream.isVideoPublished) {
+         await publishLocalStreamTracks.publishLocalCameraTrack();
+      }
+      await dispatch(actions.setStreamerIsPublished(true));
+      setShowLocalStreamPublishingModal(false);
+   };
+
+   const handleJoinAsViewer = async () => {
+      await localMediaEnabling.closeLocalCameraTrack();
+      await localMediaEnabling.closeLocalMicrophoneTrack();
+      await dispatch(actions.setStreamerIsPublished(false));
+      setShowLocalStreamPublishingModal(false);
+   };
+
    if (!currentLivestream) {
       return null;
    }
@@ -211,6 +212,17 @@ function ViewerComponent({
          />
          {handRaiseActive && (
             <Fragment>
+               <StreamPublishingModal
+                  open={showLocalStreamPublishingModal}
+                  setOpen={setShowLocalStreamPublishingModal}
+                  localStream={localStream}
+                  displayableMediaStream={displayableMediaStream}
+                  devices={devices}
+                  mediaControls={mediaControls}
+                  onConfirmStream={handlePublishLocalStream}
+                  onRefuseStream={handleJoinAsViewer}
+                  localMediaEnabling={localMediaEnabling}
+               />
                <DraggableComponent
                   zIndex={3}
                   bounds="parent"
@@ -221,8 +233,8 @@ function ViewerComponent({
                   <WifiIndicator
                      uplink={networkQuality.uplinkNetworkQuality}
                      downlink={networkQuality.downlinkNetworkQuality}
-                     agoraRtcConnectionStatus={agoraRtcConnectionStatus}
-                     agoraRtmStatus={agoraRtmStatus}
+                     agoraRtcConnectionStatus={{}}
+                     agoraRtmStatus={{}}
                   />
                </DraggableComponent>
                <VideoControlsContainer
@@ -230,6 +242,13 @@ function ViewerComponent({
                   handleClickScreenShareButton={handleClickScreenShareButton}
                   streamerId={streamerId}
                   isMainStreamer={false}
+                  localStreamIsPublished={{
+                     audio: localStream?.isAudioPublished,
+                     video: localStream?.isVideoPublished,
+                  }}
+                  openPublishingModal={() =>
+                     setShowLocalStreamPublishingModal(true)
+                  }
                   viewer={true}
                   localMediaControls={localMediaControls}
                   showSettings={showSettings}

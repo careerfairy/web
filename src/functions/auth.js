@@ -207,7 +207,10 @@ exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(
 
       admin
          .auth()
-         .generatePasswordResetLink(recipient_email, actionCodeSettings)
+         .generatePasswordResetLink(
+            recipient_email.toLowerCase(),
+            actionCodeSettings
+         )
          .then((link) => {
             const email = {
                TemplateId: 16531013,
