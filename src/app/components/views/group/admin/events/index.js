@@ -145,7 +145,7 @@ const EventsOverview = ({ group, scrollRef }) => {
             const submitTime = prettyLocalizedDate(new Date());
             const adminsInfo = await getAllGroupAdminInfo(
                newStream.groupIds || [],
-               id
+               streamObj.id
             );
 
             const senderName = `${userData.firstName} ${userData.lastName}`;

@@ -47,18 +47,18 @@ module.exports = (phase, { defaultConfig }) => {
          REACT_APP_FIREBASE_STORAGE_BUCKET: "careerfairy-e1fd9.appspot.com",
          REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "993933306494",
       },
-      // headers: async () => {
-      //    return [
-      //       {
-      //          source: "/(.*)",
-      //          headers: securityHeaders,
-      //       },
-      //       {
-      //          source: "/next-livestreams/:groupId/embed",
-      //          headers: iFrameSecurityHeaders,
-      //       },
-      //    ];
-      // },
+      headers: async () => {
+         return [
+            {
+               source: "/(.*)",
+               headers: securityHeaders,
+            },
+            {
+               source: "/next-livestreams/:groupId/embed",
+               headers: iFrameSecurityHeaders,
+            },
+         ];
+      },
       webpackDevMiddleware: (config) => {
          config.watchOptions = {
             poll: 1000,
