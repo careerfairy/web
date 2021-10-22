@@ -52,6 +52,7 @@ const EventsOverview = ({ group, scrollRef }) => {
       findTargetEvent,
       addLivestream,
       deleteLivestream,
+      getAllGroupAdminInfo,
    } = useFirebase();
    const [streams, setStreams] = useState([]);
    const [openNewStreamModal, setOpenNewStreamModal] = useState(false);
@@ -142,7 +143,7 @@ const EventsOverview = ({ group, scrollRef }) => {
             newStream.id = publishedStreamId;
 
             const submitTime = prettyLocalizedDate(new Date());
-            const adminsInfo = await firebase.getAllGroupAdminInfo(
+            const adminsInfo = await getAllGroupAdminInfo(
                newStream.groupIds || [],
                id
             );
