@@ -135,7 +135,7 @@ function TestStreamingPage(props) {
                   disabled={loading}
                   onClick={createTestLivestream}
                >
-                  Test the streaming connection
+                  Open a new test room
                </Button>
             </div>
          </Container>
