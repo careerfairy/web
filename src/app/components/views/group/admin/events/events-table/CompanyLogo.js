@@ -1,8 +1,9 @@
 import React from "react";
-import { Avatar } from "@material-ui/core";
+import { Avatar, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions";
 import clsx from "clsx";
+import ImageIcon from "@material-ui/icons/Image";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -21,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const CompanyLogo = ({ src, withBackground }) => {
+const CompanyLogo = ({ src, withBackground, onClick }) => {
    const classes = useStyles();
    return (
       <Avatar
@@ -30,7 +31,11 @@ const CompanyLogo = ({ src, withBackground }) => {
          })}
          variant="rounded"
          src={getResizedUrl(src, "xs")}
-      />
+      >
+         <Button size="large" startIcon={<ImageIcon />} onClick={onClick}>
+            Upload image
+         </Button>
+      </Avatar>
    );
 };
 

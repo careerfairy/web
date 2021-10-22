@@ -2614,7 +2614,6 @@ class Firebase {
    findTargetEvent = async (eventId) => {
       let targetStream = null;
       let typeOfStream = "";
-      console.log("-> eventId in fn", eventId);
       try {
          const streamSnap = await this.firestore
             .collection("livestreams")

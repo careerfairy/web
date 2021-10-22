@@ -400,7 +400,7 @@ const ReportPage = ({
                ? `Your Audience from ${report.group.universityName}`
                : onlyCompany
                ? "Your participants breakdown"
-               : "Participants form other universities"}
+               : "Participants from other universities"}
          </Title>
          <Fragment>
             <InlineView>
@@ -578,7 +578,7 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
          <CFPage>
             <PageNumber
                render={({ pageNumber, totalPages }) =>
-                  `Page ${pageNumber} / ${totalPages}`
+                  `${pageNumber} / ${totalPages}`
                }
                fixed
             />

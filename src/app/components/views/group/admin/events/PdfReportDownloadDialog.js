@@ -111,8 +111,8 @@ const PdfReportDownloadDialog = ({ openDialog, onClose, reportPdfData }) => {
          fullWidth
          PaperProps={{
             style: {
-               background: "none",
-               boxShadow: "none",
+               background: !isMobile && "none",
+               boxShadow: !isMobile && "none",
             },
          }}
          aria-labelledby="pdf-report-download-dialog"

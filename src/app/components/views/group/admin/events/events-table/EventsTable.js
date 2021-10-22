@@ -25,6 +25,7 @@ import GroupLogos from "./GroupLogos";
 import AddBoxIcon from "@material-ui/icons/AddBox";
 import ToolbarActionsDialog from "../ToolbarActionsDialog";
 import { useTheme } from "@material-ui/core/styles";
+import * as storeActions from "store/actions";
 
 const EventsTable = ({
    streams,
@@ -39,7 +40,6 @@ const EventsTable = ({
    groupsDictionary,
    eventId,
 }) => {
-   console.count("-> EventsTable");
    const firebase = useFirebase();
    const theme = useTheme();
    const [deletingEvent, setDeletingEvent] = useState(false);
@@ -114,14 +114,17 @@ const EventsTable = ({
             speaker.lastName.toLowerCase().indexOf(term.toLowerCase()) >= 0
       );
    }, []);
-   const handleHostsSearch = useCallback((term, rowData) => {
-      return rowData.groupIds?.some(
-         (groupId) =>
-            groupsDictionary[groupId]?.universityName
-               ?.toLowerCase()
-               .indexOf(term.toLowerCase()) >= 0
-      );
-   }, []);
+   const handleHostsSearch = useCallback(
+      (term, rowData) => {
+         return rowData.groupIds?.some(
+            (groupId) =>
+               groupsDictionary[groupId]?.universityName
+                  ?.toLowerCase()
+                  .indexOf(term.toLowerCase()) >= 0
+         );
+      },
+      [groupsDictionary]
+   );
 
    const handleOpenToolbarActionsDialog = useCallback(() => {
       setToolbarActionsDialogOpen(true);
@@ -158,7 +161,7 @@ const EventsTable = ({
          const targetPath = `${baseUrl}/draft-stream?draftStreamId=${draftId}`;
          copyStringToClipboard(targetPath);
          dispatch(
-            actions.enqueueSnackbar({
+            storeActions.enqueueSnackbar({
                message: "Link has been copied to your clipboard!",
                options: {
                   variant: "success",
@@ -225,11 +228,6 @@ const EventsTable = ({
             onClick: handleCreateExternalLink,
             hidden: !isDraft,
          },
-         {
-            icon: () => <DraftLinkIcon color="action" />,
-            tooltip: "Generate external Link to Edit Draft",
-            onClick: handleCreateExternalLink,
-         },
       ],
       [
          registeredStudentsAction,
@@ -252,7 +250,11 @@ const EventsTable = ({
             filtering: false,
             export: false,
             render: (rowData) => (
-               <CompanyLogo withBackground src={rowData.companyLogoUrl} />
+               <CompanyLogo
+                  withBackground
+                  onClick={() => handleEditStream(rowData)}
+                  src={rowData.companyLogoUrl}
+               />
             ),
          },
          {
@@ -263,7 +265,10 @@ const EventsTable = ({
             filtering: false,
             export: false,
             render: (rowData) => (
-               <CompanyLogo src={rowData.backgroundImageUrl} />
+               <CompanyLogo
+                  onClick={() => handleEditStream(rowData)}
+                  src={rowData.backgroundImageUrl}
+               />
             ),
          },
          {
@@ -309,6 +314,7 @@ const EventsTable = ({
          groupsDictionary,
          handleHostsSearch,
          eventId,
+         handleEditStream,
       ]
    );
 

@@ -169,7 +169,7 @@ const EventsOverview = ({ group, scrollRef }) => {
             dispatch(actions.sendGeneralError(e));
          }
       },
-      [dispatch]
+      [dispatch, userData]
    );
 
    const handleChange = (event, newValue) => {
