@@ -61,6 +61,8 @@ exports.fetchAgoraRtmToken = agora.fetchAgoraRtmToken;
 exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail;
 exports.sendDraftApprovalRequestEmail =
    groupAdmin.sendDraftApprovalRequestEmail;
+exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail;
+exports.getLivestreamReportData = groupAdmin.getLivestreamReportData;
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus;
 exports.joinGroupDashboard = groupAdmin.joinGroupDashboard;
 
@@ -69,6 +71,10 @@ exports.sendReminderEmailToRegistrants =
    reminders.sendReminderEmailToRegistrants;
 exports.scheduleReminderEmailSendTestOnRun =
    reminders.scheduleReminderEmailSendTestOnRun;
+exports.scheduleReminderEmailSFor2HoursBefore =
+   reminders.scheduleReminderEmailSFor2HoursBefore;
+exports.scheduleReminderEmailSFor20MinutesBefore =
+   reminders.scheduleReminderEmailSFor20MinutesBefore;
 exports.sendReminderEmailToUserFromUniversity =
    reminders.sendReminderEmailToUserFromUniversity;
 exports.sendReminderEmailsWhenLivestreamStarts =

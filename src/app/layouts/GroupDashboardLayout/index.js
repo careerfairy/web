@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import NavBar from "./NavBar";
 import { useRouter } from "next/router";
@@ -18,6 +18,8 @@ const useStyles = makeStyles(styles);
 
 const GroupDashboardLayout = (props) => {
    const { children, firebase } = props;
+   const scrollRef = useRef(null);
+
    const classes = useStyles();
    const {
       query: { groupId },
@@ -65,12 +67,13 @@ const GroupDashboardLayout = (props) => {
          )}
          <div className={classes.wrapper}>
             <div className={classes.contentContainer}>
-               <div className={classes.content}>
+               <div ref={scrollRef} className={classes.content}>
                   {isLoaded(group) && !isEmpty(group) && isCorrectGroup ? (
                      React.Children.map(children, (child) =>
                         React.cloneElement(child, {
                            notifications,
                            isAdmin,
+                           scrollRef,
                            group,
                            ...props,
                         })

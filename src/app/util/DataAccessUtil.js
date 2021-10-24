@@ -38,4 +38,26 @@ export default class DataAccessUtil {
          },
       });
    }
+
+   static sendNewlyPublishedEventEmail({
+      adminsInfo,
+      senderName,
+      stream,
+      submitTime,
+      senderEmail,
+   }) {
+      return axios({
+         method: "post",
+         url:
+            "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendNewlyPublishedEventEmail",
+         data: {
+            adminsInfo: adminsInfo,
+            sender_name: senderName,
+            livestream_title: stream.title,
+            livestream_company_name: stream.company,
+            submit_time: submitTime,
+            sender_email: senderEmail,
+         },
+      });
+   }
 }

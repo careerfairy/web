@@ -151,7 +151,7 @@ const EmoteButtons = ({ createEmote }) => {
    const {
       currentLivestream: { id: livestreamId },
    } = useCurrentStream();
-   const { authenticatedUser } = useAuth();
+   const { authenticatedUser, userData } = useAuth();
    const classes = useStyles({ handRaiseActive: false });
    const SPEED = isNaN(smoothness) ? 2 : smoothness;
    const DELAY = isNaN(delay) ? 3000 : delay;
@@ -218,7 +218,9 @@ const EmoteButtons = ({ createEmote }) => {
    const postIcon = (iconName) => {
       if (!iconsDisabled) {
          createEmote(iconName);
-         setIconsDisabled(true);
+         if (!userData.isClapAdmin) {
+            setIconsDisabled(true);
+         }
          firebase.postIcon(
             livestreamId,
             iconName,

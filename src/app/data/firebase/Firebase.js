@@ -126,6 +126,22 @@ class Firebase {
       return joinGroupDashboard(data);
    };
 
+   /**
+    * Call an on call cloud function to generate a secure agora token.
+    * @param {({
+    * targetStreamId: string,
+    * targetGroupId: string,
+    * userEmail: string,
+    * })} data
+    * @return {Promise<firebase.functions.HttpsCallableResult>}
+    */
+   getLivestreamReportData = async (data) => {
+      const handleGetLivestreamReportData = this.functions.httpsCallable(
+         "getLivestreamReportData"
+      );
+      return handleGetLivestreamReportData(data);
+   };
+
    sendRegistrationConfirmationEmail = (user, userData, livestream) => {
       if (livestream.isFaceToFace) {
          return this.sendPhysicalEventEmailRegistrationConfirmation(
@@ -509,6 +525,36 @@ class Firebase {
       } catch (error) {
          return error;
       }
+   };
+
+   getGroupsInfo = async (arrayOfGroupIds) => {
+      const groupsDictionary = {};
+      let i,
+         j,
+         tempArray,
+         chunk = 800;
+      for (i = 0, j = arrayOfGroupIds.length; i < j; i += chunk) {
+         tempArray = arrayOfGroupIds.slice(i, i + chunk);
+         const groupSnaps = await Promise.all(
+            tempArray
+               .filter((groupId) => groupId)
+               .map((groupId) =>
+                  this.firestore
+                     .collection("careerCenterData")
+                     .doc(groupId)
+                     .get()
+               )
+         );
+         groupSnaps.forEach((doc) => {
+            if (doc.exists) {
+               groupsDictionary[doc.id] = {
+                  id: doc.id,
+                  ...doc.data(),
+               };
+            }
+         });
+      }
+      return groupsDictionary;
    };
 
    deleteLivestream = async (livestreamId, collection) => {
@@ -2593,6 +2639,40 @@ class Firebase {
       });
    };
 
+   findTargetEvent = async (eventId) => {
+      let targetStream = null;
+      let typeOfStream = "";
+      try {
+         const streamSnap = await this.firestore
+            .collection("livestreams")
+            .doc(eventId)
+            .get();
+         if (streamSnap.exists) {
+            targetStream = { id: streamSnap.id, ...streamSnap.data() };
+            const startDate = targetStream.start?.toDate?.();
+            typeOfStream = this.isPastEvent(startDate) ? "past" : "upcoming";
+         } else {
+            const draftSnap = await this.firestore
+               .collection("draftLivestreams")
+               .doc(eventId)
+               .get();
+            if (draftSnap.exists) {
+               targetStream = { id: draftSnap.id, ...draftSnap.data() };
+               typeOfStream = "draft";
+            }
+         }
+      } catch (e) {}
+      return { targetStream, typeOfStream };
+   };
+
+   isPastEvent = (eventStartDate) => {
+      return (
+         eventStartDate <
+            new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS) &&
+         eventStartDate > new Date(START_DATE_FOR_REPORTED_EVENTS)
+      );
+   };
+
    promoteToMainAdmin = async (groupId, userEmail) => {
       let batch = this.firestore.batch();
 
@@ -2643,7 +2723,8 @@ class Firebase {
                const newAdminsInfo = groupData.adminEmails.map((email) => ({
                   groupId,
                   email,
-                  link: `${baseUrl}/group/${groupId}/admin/drafts?livestreamId=${streamId}`,
+                  eventDashboardLink: `${baseUrl}/group/${groupId}/admin/events?eventId=${streamId}`,
+                  nextLivestreamsLink: `${baseUrl}/next-livestreams/${groupId}?livestreamId=${streamId}`,
                }));
                adminsInfo = [...adminsInfo, ...newAdminsInfo];
             }

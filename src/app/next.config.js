@@ -16,7 +16,7 @@ const securityHeaders = [
    {
       key: "Content-Security-Policy",
       value:
-         "default-src 'self' blob: *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; script-src 'self' *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-eval' 'unsafe-inline' ; style-src 'self' *.googleapis.com 'unsafe-inline'; connect-src 'self' wss: *.googleapis.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:*",
+         "default-src 'self' blob: *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; script-src 'self' *.googleapis.com *.googletagmanager.com localhost:5001* *.google-analytics.com *.facebook.net 'unsafe-eval' 'unsafe-inline' ; style-src 'self' *.googleapis.com 'unsafe-inline'; connect-src 'self' wss: *.googleapis.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:*",
    },
    {
       key: "Referrer-Policy",

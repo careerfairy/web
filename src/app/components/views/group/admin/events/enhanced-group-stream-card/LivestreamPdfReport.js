@@ -313,6 +313,7 @@ const LivestreamPdfReport = ({
    polls,
    icons,
    speakers,
+   numberOfIcons,
 }) => {
    let categoryElements = [];
    let nameElements = [];
@@ -457,7 +458,7 @@ const LivestreamPdfReport = ({
                            <Text># Reactions</Text>
                         </View>
                         <ColorText>
-                           <Text>{icons.length}</Text>
+                           <Text>{numberOfIcons}</Text>
                         </ColorText>
                      </EngagementChild>
                      <EngagementChild>
