@@ -33,7 +33,12 @@ const getLivestreamTimeInterval = (
    return `(${startDateTime})`;
 };
 
-const generateEmailData = (livestreamId, livestream, startingNow) => {
+const generateEmailData = (
+   livestreamId,
+   livestream,
+   startingNow,
+   timeToDelivery
+) => {
    let recipientEmails = livestream.registeredUsers.join();
    var luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), {
       zone: livestream.timezone || "Europe/Zurich",
@@ -41,6 +46,9 @@ const generateEmailData = (livestreamId, livestream, startingNow) => {
    const mailgunVariables = {
       company: livestream.company,
       startTime: luxonStartDateTime.toFormat("HH:mm ZZZZ", { locale: "en-GB" }),
+      companyLogo: livestream.companyLogoUrl,
+      streamTitle: livestream.title,
+      backgroundImage: livestream.backgroundImageUrl,
       streamLink: livestream.externalEventLink
          ? livestream.externalEventLink
          : getStreamLink(livestreamId),
@@ -77,10 +85,10 @@ const generateEmailData = (livestreamId, livestream, startingNow) => {
                livestream.start,
                livestream.timezone || "Europe/Zurich"
             ),
-         template: "registration-reminder",
+         template: "registrationreminder-2021-10-24.070709",
          "recipient-variables": JSON.stringify(recipientVariablesObj),
          "o:deliverytime": luxonStartDateTime
-            .minus({ minutes: 45 })
+            .minus({ minutes: timeToDelivery })
             .toRFC2822(),
       };
    }
