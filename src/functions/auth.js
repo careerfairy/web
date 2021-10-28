@@ -196,7 +196,16 @@ exports.validateUserEmailWithPin = functions
 
 exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(
    async (req, res) => {
-      setHeaders(req, res);
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Credentials", "true");
+
+      if (req.method === "OPTIONS") {
+         // Send response to OPTIONS requests
+         res.set("Access-Control-Allow-Methods", "GET");
+         res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+         res.set("Access-Control-Max-Age", "3600");
+         return res.sendStatus(204);
+      }
 
       const recipient_email = req.body.recipientEmail;
       const redirect_link = req.body.redirect_link;
@@ -204,6 +213,8 @@ exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(
       const actionCodeSettings = {
          url: redirect_link,
       };
+
+      console.log("recipient_email", recipient_email);
 
       admin
          .auth()
@@ -220,7 +231,7 @@ exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(
             };
             return client.sendEmailWithTemplate(email).then(
                (response) => {
-                  res.send(200);
+                  res.sendStatus(200);
                },
                (error) => {
                   res.send("Error: " + error);

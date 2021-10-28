@@ -178,7 +178,7 @@ exports.scheduleReminderEmailSFor2HoursBefore = functions.pubsub
                   console.log(
                      "number of emails: " + livestream.registeredUsers.length
                   );
-                  const dataEarly = generateEmailDataEarly(
+                  const dataEarly = generateEmailData(
                      livestream.id,
                      livestream,
                      false,
@@ -207,7 +207,7 @@ exports.scheduleReminderEmailSFor20MinutesBefore = functions.pubsub
    .onRun(async (context) => {
       let messageSender = mailgun.messages();
       const dateStart = new Date(Date.now() + 1000 * 60 * 25);
-      const dateEnd = new Date(Date.now() + 1000 * 60 * 60 * 40);
+      const dateEnd = new Date(Date.now() + 1000 * 60 * 40);
       await admin
          .firestore()
          .collection("livestreams")
@@ -227,7 +227,7 @@ exports.scheduleReminderEmailSFor20MinutesBefore = functions.pubsub
                   console.log(
                      "number of emails: " + livestream.registeredUsers.length
                   );
-                  const dataEarly = generateEmailDataEarly(
+                  const dataEarly = generateEmailData(
                      livestream.id,
                      livestream,
                      false,

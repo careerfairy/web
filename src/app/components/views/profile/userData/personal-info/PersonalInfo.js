@@ -14,6 +14,8 @@ import {
    Collapse,
    FormHelperText,
    FormControl,
+   Checkbox,
+   FormControlLabel,
 } from "@material-ui/core";
 import UniversityCountrySelector from "components/views/universitySelect/UniversityCountrySelector";
 import UniversitySelector from "components/views/universitySelect/UniversitySelector";
@@ -89,6 +91,7 @@ const PersonalInfo = ({ firebase, userData }) => {
                userData?.linkedinUrl || "" ? userData.linkedinUrl : "",
             university: userData?.university,
             universityCountryCode: userData?.universityCountryCode || "",
+            unsubscribed: userData?.unsubscribed || false,
          }}
          enableReinitialize
          validate={(values) => {
@@ -296,6 +299,34 @@ const PersonalInfo = ({ firebase, userData }) => {
                                     {errors.linkedinUrl}
                                  </FormHelperText>
                               </Collapse>
+                           </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
+                           <Typography
+                              className={classes.subtitle}
+                              variant="h5"
+                           >
+                              Newsletter
+                           </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                           <FormControl fullWidth>
+                              <FormControlLabel
+                                 control={
+                                    <Checkbox
+                                       checked={!values.unsubscribed}
+                                       onBlur={handleBlur}
+                                       onChange={(event) => {
+                                          setFieldValue(
+                                             "unsubscribed",
+                                             !event.target.checked
+                                          );
+                                       }}
+                                       name="unsubscribed"
+                                    />
+                                 }
+                                 label="I want to be informed about companies interested in my profile by subscribing to the CareerFairy newsletter."
+                              />
                            </FormControl>
                         </Grid>
                      </Grid>
