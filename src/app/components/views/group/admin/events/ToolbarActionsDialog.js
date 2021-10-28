@@ -5,6 +5,7 @@ import {
    List,
    ListItem,
    ListItemIcon,
+   ListItemSecondaryAction,
    ListItemText,
    Paper,
    Slide,
@@ -17,6 +18,7 @@ import {
 import ShareIcon from "@material-ui/icons/Share";
 import { Film as StreamIcon } from "react-feather";
 import OpenInBrowserIcon from "@material-ui/icons/OpenInBrowser";
+import HintIcon from "../../../common/HintIcon";
 
 const ToolbarActionsDialogContent = ({
    handleClose,
@@ -33,6 +35,8 @@ const ToolbarActionsDialogContent = ({
             handleClose();
          },
          icon: <ShareIcon />,
+         description:
+            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
       },
       {
          name: "Draft a new stream",
@@ -41,6 +45,8 @@ const ToolbarActionsDialogContent = ({
             handleClose();
          },
          icon: <StreamIcon />,
+         description:
+            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
       },
       {
          name: "View your upcoming streams on the student page",
@@ -49,6 +55,8 @@ const ToolbarActionsDialogContent = ({
             handleClose();
          },
          icon: <OpenInBrowserIcon />,
+         description:
+            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
       },
    ]);
 
@@ -79,6 +87,12 @@ const ToolbarActionsDialogContent = ({
                <ListItem key={action.name} onClick={action.onClick} button>
                   <ListItemIcon>{action.icon}</ListItemIcon>
                   <ListItemText>{action.name}</ListItemText>
+                  <ListItemSecondaryAction>
+                     <HintIcon
+                        title={action.name}
+                        description={action.description}
+                     />
+                  </ListItemSecondaryAction>
                </ListItem>
             ))}
          </List>

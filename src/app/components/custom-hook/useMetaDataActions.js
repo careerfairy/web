@@ -1,5 +1,5 @@
 import StatsUtil from "data/util/StatsUtil";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import TalentPoolIcon from "@material-ui/icons/HowToRegRounded";
 import { useFirebase } from "../../context/firebase";
 import { CircularProgress } from "@material-ui/core";
@@ -10,10 +10,13 @@ import { useAuth } from "../../HOCs/AuthProvider";
 import RegisteredUsersIcon from "@material-ui/icons/People";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
+import ButtonWithHint from "../views/group/admin/events/events-table/ButtonWithHint";
+import { useTheme } from "@material-ui/core/styles";
 
 export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    const firebase = useFirebase();
    const { userData } = useAuth();
+   const theme = useTheme();
    const dispatch = useDispatch();
    const [talentPoolDictionary, setTalentPoolDictionary] = useState({});
    const [targetStream, setTargetStream] = useState(null);
@@ -79,10 +82,7 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                      }
                   );
                }
-               setLoadingRegisteredUsersFromGroupData((prevState) => ({
-                  ...prevState,
-                  [targetStream.id]: false,
-               }));
+
                setRegisteredStudentsFromGroupDictionary({
                   ...registeredStudentsFromGroupDictionary,
                   [targetStream.id]: newRegisteredStudentsFromGroup,
@@ -91,6 +91,10 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
          } catch (e) {
             dispatch(actions.sendGeneralError(e));
          }
+         setLoadingRegisteredUsersFromGroupData((prevState) => ({
+            ...prevState,
+            [targetStream.id]: false,
+         }));
       })();
    }, [registeredStudentsDictionary, targetStream, group]);
 
@@ -121,48 +125,51 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                [targetStream.id]: true,
             }));
             try {
-               const querySnapshot = await firebase.getLivestreamTalentPoolMembers(
-                  targetStream.companyId
-               );
-               const registeredStudents = querySnapshot.docs.map((doc) => {
-                  let element = doc.data();
-                  if (
-                     registeredStudentsFromGroupDictionary[
-                        targetStream.id
-                     ]?.some((student) => student.Email === doc.id)
-                  ) {
-                     let publishedStudent;
-                     if (group.universityCode) {
-                        publishedStudent = StatsUtil.getStudentInGroupDataObject(
-                           element,
-                           group
-                        );
+               if (!talentPoolDictionary[targetStream.id]) {
+                  const querySnapshot = await firebase.getLivestreamTalentPoolMembers(
+                     targetStream.companyId
+                  );
+                  const registeredStudents = querySnapshot.docs.map((doc) => {
+                     let element = doc.data();
+                     if (
+                        registeredStudentsFromGroupDictionary[
+                           targetStream.id
+                        ]?.some((student) => student.Email === doc.id)
+                     ) {
+                        let publishedStudent;
+                        if (group.universityCode) {
+                           publishedStudent = StatsUtil.getStudentInGroupDataObject(
+                              element,
+                              group
+                           );
+                        } else {
+                           const livestreamGroups = allGroups.filter((group) =>
+                              targetStream.groupIds.includes(group.id)
+                           );
+                           const livestreamGroupUserBelongsTo = StatsUtil.getFirstGroupThatUserBelongsTo(
+                              element,
+                              livestreamGroups,
+                              group
+                           );
+                           publishedStudent = StatsUtil.getStudentInGroupDataObject(
+                              element,
+                              livestreamGroupUserBelongsTo || {}
+                           );
+                        }
+                        return publishedStudent;
                      } else {
-                        const livestreamGroups = allGroups.filter((group) =>
-                           targetStream.groupIds.includes(group.id)
-                        );
-                        const livestreamGroupUserBelongsTo = StatsUtil.getFirstGroupThatUserBelongsTo(
+                        return StatsUtil.getStudentOutsideGroupDataObject(
                            element,
-                           livestreamGroups,
-                           group
-                        );
-                        publishedStudent = StatsUtil.getStudentInGroupDataObject(
-                           element,
-                           livestreamGroupUserBelongsTo || {}
+                           allGroups
                         );
                      }
-                     return publishedStudent;
-                  } else {
-                     return StatsUtil.getStudentOutsideGroupDataObject(
-                        element,
-                        allGroups
-                     );
-                  }
-               });
-               setTalentPoolDictionary({
-                  ...talentPoolDictionary,
-                  [targetStream.id]: registeredStudents,
-               });
+                  });
+
+                  setTalentPoolDictionary({
+                     ...talentPoolDictionary,
+                     [targetStream.id]: registeredStudents,
+                  });
+               }
             } catch (e) {}
             setLoadingTalentPool((prevState) => ({
                ...prevState,
@@ -170,10 +177,10 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
             }));
          })();
       }
-   }, [targetStream, targetStream, registeredStudentsFromGroupDictionary]);
+   }, [targetStream, registeredStudentsFromGroupDictionary]);
 
    const handleGetLivestreamReportData = useCallback(
-      async (event, rowData) => {
+      async (rowData) => {
          try {
             if (!userData.userEmail)
                return dispatch(
@@ -226,38 +233,50 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
          const targetStreamTalentPoolData = talentPoolDictionary[rowData?.id];
          const actionLoading = loadingTalentPool[rowData?.id];
          return {
-            icon: () => {
-               return targetStreamTalentPoolData ? (
-                  <CSVLink
-                     data={targetStreamTalentPoolData}
-                     separator={";"}
-                     filename={
-                        "TalentPool " +
-                        rowData.company +
-                        " " +
-                        rowData.id +
-                        ".csv"
+            icon: targetStreamTalentPoolData ? (
+               <GetAppIcon color="primary" />
+            ) : actionLoading ? (
+               <CircularProgress color="inherit" size={15} />
+            ) : (
+               <TalentPoolIcon color="action" />
+            ),
+            hintTitle: "Download Talent Pool",
+            hintDescription:
+               "Download a CSV with the details of the students who opted to put themselves in the talent pool",
+            loadedButton: targetStreamTalentPoolData && (
+               <CSVLink
+                  data={targetStreamTalentPoolData}
+                  separator={";"}
+                  filename={
+                     "TalentPool " + rowData.company + " " + rowData.id + ".csv"
+                  }
+                  style={{ color: "red" }}
+               >
+                  <ButtonWithHint
+                     hintTitle={"Download Talent Pool"}
+                     style={{
+                        marginTop: theme.spacing(0.5),
+                     }}
+                     hintDescription={
+                        "Download a CSV with the details of the students who opted to put themselves in the talent pool"
                      }
-                     style={{ color: "red" }}
+                     startIcon={<TalentPoolIcon color="action" />}
                   >
-                     <GetAppIcon color="primary" />
-                  </CSVLink>
-               ) : actionLoading ? (
-                  <CircularProgress size={15} />
-               ) : (
-                  <TalentPoolIcon color="action" />
-               );
-            },
+                     Download Talent Pool
+                  </ButtonWithHint>
+               </CSVLink>
+            ),
             tooltip: targetStreamTalentPoolData
                ? "Download Talent Pool"
                : actionLoading
-               ? "Generating Talent Pool..."
-               : "Generate Talent Pool",
-            onClick: () => setTargetStream(rowData),
+               ? "Getting Talent Pool..."
+               : "Get Talent Pool",
+            onClick: () => {},
             disabled: actionLoading,
+            hidden: isDraft,
          };
       },
-      [loadingTalentPool, targetStream, talentPoolDictionary]
+      [loadingTalentPool, targetStream, talentPoolDictionary, isDraft]
    );
 
    const pdfReportAction = useCallback(
@@ -266,20 +285,22 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
          const reportData = reportDataDictionary[rowData?.id];
 
          return {
-            icon: () =>
-               reportData ? (
-                  <PDFIcon color="primary" />
-               ) : actionLoading ? (
-                  <CircularProgress size={15} />
-               ) : (
-                  <PDFIcon />
-               ),
+            icon: reportData ? (
+               <PDFIcon />
+            ) : actionLoading ? (
+               <CircularProgress color="inherit" size={15} />
+            ) : (
+               <PDFIcon color="action" />
+            ),
+            hintTitle: "Download Report",
+            hintDescription:
+               "Generate a PDF report giving a concise breakdown of engagement metrics during the event.",
             tooltip: actionLoading
                ? "Downloading Report..."
                : "Download Report",
             onClick: reportData
                ? () => setReportPdfData(reportData)
-               : handleGetLivestreamReportData,
+               : () => handleGetLivestreamReportData(rowData),
             hidden: !isPast || isDraft,
             disabled: actionLoading,
          };
@@ -293,40 +314,55 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
          const registeredStudentsData =
             registeredStudentsFromGroupDictionary[rowData?.id];
          const canDownloadRegisteredStudents = Boolean(
-            group.universityCode ||
-               group.privacyPolicyActive ||
-               userData?.isAdmin
+            !isDraft &&
+               (group.universityCode ||
+                  group.privacyPolicyActive ||
+                  userData?.isAdmin)
          );
          return {
-            icon: () =>
-               registeredStudentsData ? (
-                  <CSVLink
-                     data={registeredStudentsData}
-                     separator={";"}
-                     filename={
-                        "Registered Students " +
-                        rowData.company +
-                        " " +
-                        rowData.id +
-                        ".csv"
-                     }
-                     style={{ color: "red" }}
-                  >
-                     <RegisteredUsersIcon color="primary" />
-                  </CSVLink>
-               ) : actionLoading ? (
-                  <CircularProgress size={15} />
-               ) : (
-                  <RegisteredUsersIcon />
-               ),
+            icon: actionLoading ? (
+               <CircularProgress size={15} color="inherit" />
+            ) : (
+               <RegisteredUsersIcon color="action" />
+            ),
+            hintTitle: "Download Registered Users",
+            hintDescription:
+               "Download a CSV with the details of the students who registered to your event",
             tooltip: registeredStudentsData
                ? "Download Registered Users"
                : actionLoading
-               ? "Generating Registered Users..."
-               : "Generate Registered Users",
-            onClick: () => setTargetStream(rowData),
+               ? "Getting Registered Users..."
+               : "Get Registered Users",
+            onClick: () => {},
             hidden: !canDownloadRegisteredStudents,
             disabled: actionLoading || !canDownloadRegisteredStudents,
+            loadedButton: registeredStudentsData && (
+               <CSVLink
+                  data={registeredStudentsData}
+                  separator={";"}
+                  filename={
+                     "Registered Students " +
+                     rowData.company +
+                     " " +
+                     rowData.id +
+                     ".csv"
+                  }
+                  style={{ color: "red" }}
+               >
+                  <ButtonWithHint
+                     startIcon={<RegisteredUsersIcon color="action" />}
+                     hintTitle={"Download Registered Users"}
+                     style={{
+                        marginTop: theme.spacing(0.5),
+                     }}
+                     hintDescription={
+                        "Download a CSV with the details of the students who registered to your event"
+                     }
+                  >
+                     Download Registered Students
+                  </ButtonWithHint>
+               </CSVLink>
+            ),
          };
       },
       [
@@ -345,5 +381,6 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
       reportPdfData,
       removeReportPdfData,
       registeredStudentsAction,
+      setTargetStream,
    };
 }

@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { defaultTableOptions, tableIcons } from "components/util/tableUtils";
-import MaterialTable from "@material-table/core";
+import MaterialTable, { MTableAction } from "@material-table/core";
 import {
    copyStringToClipboard,
    getBaseUrl,
+   getResizedUrl,
    prettyDate,
 } from "../../../../../helperFunctions/HelperFunctions";
 import PropTypes from "prop-types";
@@ -26,6 +27,9 @@ import AddBoxIcon from "@material-ui/icons/AddBox";
 import ToolbarActionsDialog from "../ToolbarActionsDialog";
 import { useTheme } from "@material-ui/core/styles";
 import * as storeActions from "store/actions";
+import ManageStreamActions from "./ManageStreamActions";
+import Button from "@material-ui/core/Button";
+import ToolbarDialogAction from "./ToolbarDialogAction";
 
 const EventsTable = ({
    streams,
@@ -55,6 +59,7 @@ const EventsTable = ({
       registeredStudentsAction,
       removeReportPdfData,
       reportPdfData,
+      setTargetStream,
    } = useMetaDataActions({
       allGroups,
       group,
@@ -107,23 +112,31 @@ const EventsTable = ({
       }
    }, [streams]);
 
-   const handleSpeakerSearch = useCallback((term, rowData) => {
-      return rowData.speakers.some(
-         (speaker) =>
-            speaker.firstName.toLowerCase().indexOf(term.toLowerCase()) >= 0 ||
-            speaker.lastName.toLowerCase().indexOf(term.toLowerCase()) >= 0
-      );
-   }, []);
+   const handleSpeakerSearch = useCallback(
+      (term, rowData) =>
+         rowData.speakers.some(
+            (speaker) =>
+               speaker.firstName.toLowerCase().indexOf(term.toLowerCase()) >=
+                  0 ||
+               speaker.lastName.toLowerCase().indexOf(term.toLowerCase()) >= 0
+         ),
+      []
+   );
+
    const handleHostsSearch = useCallback(
-      (term, rowData) => {
-         return rowData.groupIds?.some(
+      (term, rowData) =>
+         rowData.groupIds?.some(
             (groupId) =>
                groupsDictionary[groupId]?.universityName
                   ?.toLowerCase()
                   .indexOf(term.toLowerCase()) >= 0
-         );
-      },
+         ),
       [groupsDictionary]
+   );
+   const handleCompanySearch = useCallback(
+      (term, rowData) =>
+         rowData.company?.toLowerCase?.().indexOf(term.toLowerCase()) >= 0,
+      []
    );
 
    const handleOpenToolbarActionsDialog = useCallback(() => {
@@ -145,7 +158,7 @@ const EventsTable = ({
       setStreamIdToBeDeleted(null);
    };
 
-   const handleOpenStreamerLinksModal = useCallback((event, rowData) => {
+   const handleOpenStreamerLinksModal = useCallback((rowData) => {
       if (rowData.id) {
          setTargetLivestreamStreamerLinksId(rowData.id);
       }
@@ -155,7 +168,7 @@ const EventsTable = ({
    }, []);
 
    const handleCreateExternalLink = useCallback(
-      (event, rowData) => {
+      (rowData) => {
          let baseUrl = getBaseUrl();
          const draftId = rowData.id;
          const targetPath = `${baseUrl}/draft-stream?draftStreamId=${draftId}`;
@@ -178,55 +191,64 @@ const EventsTable = ({
       setStreamIdToBeDeleted(streamId);
    }, []);
 
-   const actions = useMemo(
-      () => [
+   const manageStreamActions = useCallback(
+      (rowData) => [
          {
-            position: "toolbar",
-            icon: () => <AddBoxIcon fontSize="large" color="primary" />,
-            onClick: handleOpenToolbarActionsDialog,
+            icon: <EditIcon color="action" />,
+            tooltip: isDraft ? "Edit Draft Event" : "Edit Event",
+            onClick: () => handleEditStream(rowData),
+            hintTitle: isDraft ? "Edit Draft Event" : "Edit Event",
+            hintDescription:
+               "Edit the details of the event like the start date and speakers.",
          },
-         pdfReportAction,
-         registeredStudentsAction,
-         talentPoolAction,
+         pdfReportAction(rowData),
+         registeredStudentsAction(rowData),
+         talentPoolAction(rowData),
          {
-            icon: () => <EditIcon color="action" />,
-            tooltip: isDraft ? "Edit Draft" : "Edit Stream",
-            onClick: (event, rowData) => handleEditStream(rowData),
-         },
-         {
-            icon: () => <DeleteIcon color="action" />,
-            tooltip: "Delete",
-            onClick: (event, rowData) => handleClickDeleteStream(rowData.id),
-         },
-         {
-            icon: () => <GetStreamerLinksIcon color="action" />,
+            icon: <GetStreamerLinksIcon color="action" />,
             tooltip: "Get Streamer Links",
-            onClick: handleOpenStreamerLinksModal,
+            onClick: () => handleOpenStreamerLinksModal(rowData),
             hidden: isDraft,
+            hintTitle: "Get Streamer Links",
+            hintDescription:
+               "Copy your streamer links in your browser URL to access your streaming room. The first link should be use by one person only and all other speakers can use the second link.",
          },
-         (rowData) => ({
-            icon: () =>
-               publishingDraft ? (
-                  <CircularProgress size={20} color="inherit" />
-               ) : (
-                  <PublishIcon color="action" />
-               ),
+         {
+            icon: <DraftLinkIcon color="action" />,
+            tooltip: "Generate external Link to Edit Draft",
+            onClick: () => handleCreateExternalLink(rowData),
+            hidden: !isDraft,
+            hintTitle: "Generate external Link to Edit Draft",
+            hintDescription:
+               "Click here to create an external link that can be shared with a company or non-admin allowing them to edit or fill in the details of the event.",
+         },
+         {
+            icon: <DeleteIcon color="action" />,
+            tooltip: isDraft ? "Delete Draft" : "Delete Event",
+            onClick: () => handleClickDeleteStream(rowData.id),
+            hintTitle: isDraft ? "Delete Draft" : "Delete Event",
+            hintDescription:
+               "Deleting an event is a permanent action and cannot be undone.",
+         },
+         {
+            icon: publishingDraft ? (
+               <CircularProgress size={20} color="inherit" />
+            ) : (
+               <PublishIcon color="action" />
+            ),
             tooltip: publishingDraft
                ? "Publishing"
                : !rowData.status?.pendingApproval
-               ? "Cannot publish yet, click to open and approve event"
+               ? "Needs Approval"
                : "Publish Stream",
             onClick: !rowData.status?.pendingApproval
                ? () => handleEditStream(rowData)
                : () => handlePublishStream(rowData),
             hidden: !isDraft,
             disabled: publishingDraft,
-         }),
-         {
-            icon: () => <DraftLinkIcon color="action" />,
-            tooltip: "Generate external Link to Edit Draft",
-            onClick: handleCreateExternalLink,
-            hidden: !isDraft,
+            hintTitle: "Publish Stream",
+            hintDescription:
+               "Once you are happy with the contents of the drafted event, you can then make it live so that users can now register.",
          },
       ],
       [
@@ -236,38 +258,59 @@ const EventsTable = ({
          handleCreateExternalLink,
          handleOpenStreamerLinksModal,
          handleClickDeleteStream,
+         handleCreateExternalLink,
+         handleOpenStreamerLinksModal,
+         handleClickDeleteStream,
          streams,
+         isDraft,
       ]
+   );
+
+   const actions = useMemo(
+      () => [
+         {
+            position: "toolbar",
+            icon: () => <AddBoxIcon fontSize="large" color="primary" />,
+            onClick: handleOpenToolbarActionsDialog,
+            tooltip: "Other options",
+         },
+      ],
+      [streams]
    );
 
    const columns = useMemo(
       () => [
          {
-            field: "companyLogoUrl",
+            field: "backgroundImageUrl",
             title: "Logo",
-            sorting: false,
-            searchable: false,
-            filtering: false,
+            cellStyle: (backgroundImageUrl) => ({
+               padding: 0,
+               height: 70,
+               boxShadow: theme.shadows[2],
+               backgroundImage:
+                  backgroundImageUrl &&
+                  `url(${getResizedUrl(backgroundImageUrl, "xs")})`,
+               backgroundSize: "cover",
+               backgroundRepeat: "no-repeat",
+            }),
             export: false,
+            customFilterAndSearch: handleCompanySearch,
             render: (rowData) => (
                <CompanyLogo
-                  withBackground
                   onClick={() => handleEditStream(rowData)}
-                  src={rowData.companyLogoUrl}
+                  livestream={rowData}
                />
             ),
          },
          {
-            field: "backgroundImageUrl",
-            title: "Thumbnail / Illustration",
-            sorting: false,
-            searchable: false,
-            filtering: false,
-            export: false,
+            title: "Options",
+            description: "Title of the event",
             render: (rowData) => (
-               <CompanyLogo
-                  onClick={() => handleEditStream(rowData)}
-                  src={rowData.backgroundImageUrl}
+               <ManageStreamActions
+                  rowData={rowData}
+                  isHighlighted={rowData?.id === eventId}
+                  setTargetStream={setTargetStream}
+                  actions={manageStreamActions(rowData)}
                />
             ),
          },
@@ -284,6 +327,7 @@ const EventsTable = ({
             title: "Title",
             description: "Title of the event",
          },
+
          {
             field: "company",
             title: "Company",
@@ -315,6 +359,7 @@ const EventsTable = ({
          handleHostsSearch,
          eventId,
          handleEditStream,
+         manageStreamActions,
       ]
    );
 
@@ -341,6 +386,15 @@ const EventsTable = ({
             actions={actions}
             columns={columns}
             data={streams}
+            components={{
+               Action: (props) => {
+                  return props?.action?.tooltip === "Other options" ? (
+                     <ToolbarDialogAction {...props.action} />
+                  ) : (
+                     <MTableAction {...props} />
+                  );
+               },
+            }}
             options={customOptions}
             title={null}
             icons={tableIcons}
