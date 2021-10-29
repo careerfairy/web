@@ -17,7 +17,7 @@ import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDial
 import GetStreamerLinksIcon from "@material-ui/icons/Share";
 import PublishIcon from "@material-ui/icons/Publish";
 import { useFirebase } from "context/firebase";
-import { CircularProgress } from "@material-ui/core";
+import { Box, CircularProgress } from "@material-ui/core";
 import { useDispatch } from "react-redux";
 import DraftLinkIcon from "@material-ui/icons/Link";
 import { useMetaDataActions } from "components/custom-hook/useMetaDataActions";
@@ -30,6 +30,7 @@ import * as storeActions from "store/actions";
 import ManageStreamActions from "./ManageStreamActions";
 import Button from "@material-ui/core/Button";
 import ToolbarDialogAction from "./ToolbarDialogAction";
+import { useRouter } from "next/router";
 
 const EventsTable = ({
    streams,
@@ -46,6 +47,7 @@ const EventsTable = ({
 }) => {
    const firebase = useFirebase();
    const theme = useTheme();
+   const { replace, asPath, push } = useRouter();
    const [deletingEvent, setDeletingEvent] = useState(false);
    const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null);
    const [allGroups, setAllGroups] = useState([]);
@@ -327,7 +329,12 @@ const EventsTable = ({
             title: "Title",
             description: "Title of the event",
          },
-
+         {
+            field: "registeredUsers.length",
+            title: "Total Registrations",
+            description: "Total registrations for the event",
+            type: "numeric",
+         },
          {
             field: "company",
             title: "Company",
@@ -379,26 +386,39 @@ const EventsTable = ({
       }),
       [eventId]
    );
+   const handleRemoveEventId = () => {
+      if (eventId) {
+         push(
+            asPath,
+            {
+               query: { eventId: null },
+            },
+            { shallow: true }
+         );
+      }
+   };
 
    return (
       <>
-         <MaterialTable
-            actions={actions}
-            columns={columns}
-            data={streams}
-            components={{
-               Action: (props) => {
-                  return props?.action?.tooltip === "Other options" ? (
-                     <ToolbarDialogAction {...props.action} />
-                  ) : (
-                     <MTableAction {...props} />
-                  );
-               },
-            }}
-            options={customOptions}
-            title={null}
-            icons={tableIcons}
-         />
+         <Box onClick={handleRemoveEventId}>
+            <MaterialTable
+               actions={actions}
+               columns={columns}
+               data={streams}
+               components={{
+                  Action: (props) => {
+                     return props?.action?.tooltip === "Other options" ? (
+                        <ToolbarDialogAction {...props.action} />
+                     ) : (
+                        <MTableAction {...props} />
+                     );
+                  },
+               }}
+               options={customOptions}
+               title={null}
+               icons={tableIcons}
+            />
+         </Box>
          <AreYouSureModal
             open={Boolean(streamIdToBeDeleted)}
             handleClose={() => setStreamIdToBeDeleted(null)}
