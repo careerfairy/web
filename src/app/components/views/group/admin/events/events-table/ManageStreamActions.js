@@ -27,12 +27,21 @@ const useStyles = makeStyles((theme) => ({
    streamActionButton: {
       marginTop: theme.spacing(0.5),
    },
+   numberOfRegisteredBtn: {
+      background: "transparent",
+      marginBottom: theme.spacing(0.5),
+      cursor: "default",
+      "&:hover": {
+         background: "transparent",
+      },
+   },
 }));
 const ManageStreamActions = ({
    actions,
    isHighlighted,
    setTargetStream,
    rowData,
+   numberOfRegisteredUsers,
 }) => {
    const classes = useStyles();
    const [open, setOpen] = useState(false);
@@ -58,6 +67,19 @@ const ManageStreamActions = ({
    };
    return (
       <Box display="flex" flexDirection="column" height="100%" minWidth={300}>
+         {numberOfRegisteredUsers !== undefined && (
+            <Button
+               className={clsx(classes.btn, classes.numberOfRegisteredBtn)}
+               disableElevation
+               disableRipple
+               variant="outlined"
+               color="secondary"
+               disableFocusRipple
+               size="large"
+            >
+               {numberOfRegisteredUsers} - Registrations
+            </Button>
+         )}
          <Button
             className={clsx(classes.root, classes.btn)}
             fullWidth

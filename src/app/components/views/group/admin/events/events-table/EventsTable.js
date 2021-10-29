@@ -28,7 +28,6 @@ import ToolbarActionsDialog from "../ToolbarActionsDialog";
 import { useTheme } from "@material-ui/core/styles";
 import * as storeActions from "store/actions";
 import ManageStreamActions from "./ManageStreamActions";
-import Button from "@material-ui/core/Button";
 import ToolbarDialogAction from "./ToolbarDialogAction";
 import { useRouter } from "next/router";
 
@@ -47,7 +46,7 @@ const EventsTable = ({
 }) => {
    const firebase = useFirebase();
    const theme = useTheme();
-   const { replace, asPath, push } = useRouter();
+   const { pathname, push, query } = useRouter();
    const [deletingEvent, setDeletingEvent] = useState(false);
    const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null);
    const [allGroups, setAllGroups] = useState([]);
@@ -62,6 +61,7 @@ const EventsTable = ({
       removeReportPdfData,
       reportPdfData,
       setTargetStream,
+      registeredStudentsFromGroupDictionary,
    } = useMetaDataActions({
       allGroups,
       group,
@@ -310,6 +310,10 @@ const EventsTable = ({
             render: (rowData) => (
                <ManageStreamActions
                   rowData={rowData}
+                  numberOfRegisteredUsers={
+                     registeredStudentsFromGroupDictionary?.[rowData?.id]
+                        ?.length
+                  }
                   isHighlighted={rowData?.id === eventId}
                   setTargetStream={setTargetStream}
                   actions={manageStreamActions(rowData)}
@@ -328,12 +332,6 @@ const EventsTable = ({
             field: "title",
             title: "Title",
             description: "Title of the event",
-         },
-         {
-            field: "registeredUsers.length",
-            title: "Total Registrations",
-            description: "Total registrations for the event",
-            type: "numeric",
          },
          {
             field: "company",
@@ -367,6 +365,7 @@ const EventsTable = ({
          eventId,
          handleEditStream,
          manageStreamActions,
+         registeredStudentsFromGroupDictionary,
       ]
    );
 
@@ -386,15 +385,19 @@ const EventsTable = ({
       }),
       [eventId]
    );
+
    const handleRemoveEventId = () => {
       if (eventId) {
-         push(
-            asPath,
-            {
-               query: { eventId: null },
+         const newQuery = { ...query };
+         if (newQuery.eventId) {
+            delete newQuery.eventId;
+         }
+         return push({
+            pathname,
+            query: {
+               ...newQuery,
             },
-            { shallow: true }
-         );
+         });
       }
    };
 

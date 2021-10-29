@@ -1,5 +1,5 @@
 import StatsUtil from "data/util/StatsUtil";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import TalentPoolIcon from "@material-ui/icons/HowToRegRounded";
 import { useFirebase } from "../../context/firebase";
 import { CircularProgress } from "@material-ui/core";
@@ -53,7 +53,11 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                ...prevState,
                [targetStream.id]: true,
             }));
-            if (targetRegisteredStudents && targetRegisteredStudents.length) {
+            if (
+               targetRegisteredStudents &&
+               targetRegisteredStudents.length &&
+               !registeredStudentsFromGroupDictionary?.[targetStream.id]
+            ) {
                let newRegisteredStudentsFromGroup;
                if (group.universityCode) {
                   newRegisteredStudentsFromGroup = targetRegisteredStudents
@@ -99,7 +103,11 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    }, [registeredStudentsDictionary, targetStream, group]);
 
    useEffect(() => {
-      if (targetStream && group) {
+      if (
+         targetStream &&
+         group &&
+         !registeredStudentsDictionary?.[targetStream?.id]
+      ) {
          (async function () {
             const querySnapshot = await firebase.getLivestreamRegisteredStudents(
                targetStream.id
@@ -382,5 +390,6 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
       removeReportPdfData,
       registeredStudentsAction,
       setTargetStream,
+      registeredStudentsFromGroupDictionary,
    };
 }
