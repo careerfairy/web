@@ -239,7 +239,7 @@ export default class StatsUtil {
 
    static getRegisteredGroupById(student, groupId) {
       return student.registeredGroups?.find(
-         (category) => category.groupId === groupId
+         (category) => category?.groupId === groupId
       );
    }
 
@@ -257,6 +257,24 @@ export default class StatsUtil {
 
    static studentFollowsGroup(student = {}, group = {}) {
       return student.groupIds && student.groupIds.includes(group.groupId);
+   }
+
+   static getGroupThatStudentFollows(student, groups){
+      return groups.find(group => StatsUtil.studentFollowsGroup(student, group))
+   }
+
+   static studentHasAllCategoriesOfGroup(student, group){
+      const studentCategoriesForGroup  = StatsUtil.getRegisteredGroupById(student, group.id)
+      // If the group exists but has no categories,
+      // it means that the student has all categories so return true
+      if(group && !group.categories?.length){
+         return  true
+      }
+      return group.categories.every(groupCategory => {
+         return  studentCategoriesForGroup?.categories.find(
+             (studCat) => studCat?.id === groupCategory?.id
+         );
+      })
    }
 
    static getFirstGroupThatUserBelongsTo(
