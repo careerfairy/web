@@ -314,6 +314,7 @@ const EventsTable = ({
                      registeredStudentsFromGroupDictionary?.[rowData?.id]
                         ?.length
                   }
+                  isDraft={isDraft}
                   isHighlighted={rowData?.id === eventId}
                   setTargetStream={setTargetStream}
                   actions={manageStreamActions(rowData)}

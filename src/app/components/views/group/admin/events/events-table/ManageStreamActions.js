@@ -52,6 +52,7 @@ const useStyles = makeStyles((theme) => ({
 const ManageStreamActions = ({
    actions,
    isHighlighted,
+   isDraft,
    setTargetStream,
    rowData,
    numberOfRegisteredUsers,
@@ -78,6 +79,10 @@ const ManageStreamActions = ({
       if (open) handleClose();
       if (!open) handleOpen();
    };
+
+   const showRegisteredUsersInfo =
+      !open && !numberOfRegisteredUsers && !isDraft;
+
    return (
       <Box display="flex" flexDirection="column" height="100%" minWidth={300}>
          {numberOfRegisteredUsers !== undefined && (
@@ -110,17 +115,11 @@ const ManageStreamActions = ({
                />
             }
          >
-            <div
-               className={!open && !numberOfRegisteredUsers && classes.btnLabel}
-            >
-               <div
-                  className={
-                     !open && !numberOfRegisteredUsers && classes.btnTitle
-                  }
-               >
+            <div className={showRegisteredUsersInfo && classes.btnLabel}>
+               <div className={showRegisteredUsersInfo && classes.btnTitle}>
                   {open ? "Show Less" : "Manage stream"}
                </div>
-               {!open && !numberOfRegisteredUsers && (
+               {showRegisteredUsersInfo && (
                   <div className={classes.btnSubtitle}>
                      Click to see registrations
                   </div>
