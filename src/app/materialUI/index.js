@@ -54,6 +54,11 @@ export const baseThemeObj = {
          },
       },
       MuiSnackbar: {},
+      MuiTooltip: {
+         tooltip: {
+            fontSize: "1rem",
+         },
+      },
    },
    breakpoints: {
       values: {
