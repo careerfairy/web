@@ -255,26 +255,42 @@ export default class StatsUtil {
       }
    }
 
+   static studentHasSelectedCategory(student, group, targetCategoryId) {
+      if (!targetCategoryId) return false;
+      const studentCategoriesForGroup = StatsUtil.getRegisteredGroupById(
+         student,
+         group?.id
+      );
+      return studentCategoriesForGroup?.categories?.some(
+         (category) => category?.id === targetCategoryId
+      );
+   }
+
    static studentFollowsGroup(student = {}, group = {}) {
       return student.groupIds && student.groupIds.includes(group.groupId);
    }
 
-   static getGroupThatStudentFollows(student, groups){
-      return groups.find(group => StatsUtil.studentFollowsGroup(student, group))
+   static getGroupThatStudentFollows(student, groups) {
+      return groups.find((group) =>
+         StatsUtil.studentFollowsGroup(student, group)
+      );
    }
 
-   static studentHasAllCategoriesOfGroup(student, group){
-      const studentCategoriesForGroup  = StatsUtil.getRegisteredGroupById(student, group.id)
+   static studentHasAllCategoriesOfGroup(student, group) {
+      const studentCategoriesForGroup = StatsUtil.getRegisteredGroupById(
+         student,
+         group.id
+      );
       // If the group exists but has no categories,
       // it means that the student has all categories so return true
-      if(group && !group.categories?.length){
-         return  true
+      if (group && !group.categories?.length) {
+         return true;
       }
-      return group.categories.every(groupCategory => {
-         return  studentCategoriesForGroup?.categories.find(
-             (studCat) => studCat?.id === groupCategory?.id
+      return group.categories.every((groupCategory) => {
+         return studentCategoriesForGroup?.categories.find(
+            (studCat) => studCat?.id === groupCategory?.id
          );
-      })
+      });
    }
 
    static getFirstGroupThatUserBelongsTo(

@@ -17,7 +17,8 @@ import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHandRaiseConnect";
 import StatsUtil from "../../data/util/StatsUtil";
-import ViewerGroupCategorySelectDialog from "../../components/views/viewer/ViewerGroupCategorySelectDialog";
+import GroupsUtil from "../../data/util/GroupsUtil";
+import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -100,10 +101,15 @@ const ViewerLayout = (props) => {
    const classes = useStyles({ showMenu, mobile, focusModeEnabled });
    const [selectedState, setSelectedState] = useState("questions");
    const [notAuthorized, setNotAuthorized] = useState(false);
-   const [checkingForCategoryData, setCheckingForCategoryData] = useState(false);
-   const [hasCheckedForCategoryData, setHasCheckedForCategoryData] = useState(false);
+   const [checkingForCategoryData, setCheckingForCategoryData] = useState(
+      false
+   );
+   const [hasCheckedForCategoryData, setHasCheckedForCategoryData] = useState(
+      false
+   );
    const [groupsToFollow, setGroupsToFollow] = useState([]);
    const [groupToUpdateCategories, setGroupToUpdateCategories] = useState(null);
+   const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
 
    const currentLivestream = useStreamConnect();
 
@@ -168,7 +174,7 @@ const ViewerLayout = (props) => {
       userData?.registeredGroups,
       breakoutRoomId,
       streamRef,
-       hasCheckedForCategoryData
+      hasCheckedForCategoryData,
    ]);
 
    useEffect(() => {
@@ -202,40 +208,56 @@ const ViewerLayout = (props) => {
    useEffect(() => {
       const checkForCategoryData = async () => {
          try {
-      if(!currentLivestream?.test && currentLivestream?.groupIds?.length && !breakoutRoomId){
-            setCheckingForCategoryData(true)
-            const livestreamGroups = await firebase.getGroupsWithIds(currentLivestream.groupIds)
-            const groupThatUserFollows = StatsUtil.getGroupThatStudentFollows(userData, livestreamGroups)
-            if(!groupThatUserFollows){
-               // If user is not following any of the groups bring up group following Dialog
-               // Open the follow group dialog...
-               if(livestreamGroups?.length){
-                  // Only open dialog when there are groups
-                  setGroupsToFollow(livestreamGroups)
+            if (
+               !currentLivestream?.test &&
+               currentLivestream?.groupIds?.length &&
+               !breakoutRoomId
+            ) {
+               setCheckingForCategoryData(true);
+               const livestreamGroups = await firebase.getGroupsWithIds(
+                  currentLivestream.groupIds
+               );
+               const {
+                  hasAgreedToAll,
+                  groupsWithPolicies,
+               } = await GroupsUtil.getPolicyStatus(
+                  livestreamGroups,
+                  userData.userEmail,
+                  firebase
+               );
+               const groupThatUserFollows = StatsUtil.getGroupThatStudentFollows(
+                  userData,
+                  livestreamGroups
+               );
+               if (!groupThatUserFollows) {
+                  // If user is not following any of the groups bring up group following Dialog
+                  // Open the follow group dialog...
+                  if (livestreamGroups?.length) {
+                     // Only open dialog when there are groups
+                     setGroupsToFollow(livestreamGroups);
+                  }
+               } else {
+                  // If user is following one of the groups, please check if the user has all the categories of the group
+                  const userHasAllCategoriesOfGroup = StatsUtil.studentHasAllCategoriesOfGroup(
+                     userData,
+                     groupThatUserFollows
+                  );
+                  if (!userHasAllCategoriesOfGroup) {
+                     // Open the category select dialog...
+                     setGroupToUpdateCategories(groupThatUserFollows);
+                     if (!hasAgreedToAll) {
+                        setGroupsWithPolicies(groupsWithPolicies);
+                     }
+                  }
                }
-
-            } else {
-               // If user is following one of the groups, please check if the user has all the categories of the group
-               console.log("-> groupThatUserFollows", groupThatUserFollows);
-               const userHasAllCategoriesOfGroup = StatsUtil.studentHasAllCategoriesOfGroup(userData, groupThatUserFollows)
-               if(!userHasAllCategoriesOfGroup){
-                  // Open the category select dialog...
-                  setGroupToUpdateCategories(groupThatUserFollows)
-
-               }
-               console.log("-> userHasAllCategoriesOfGroup", userHasAllCategoriesOfGroup);
             }
+         } catch (e) {}
+         setCheckingForCategoryData(false);
+         setHasCheckedForCategoryData(true);
+      };
 
-      }
-         } catch (e) {
-
-         }
-         setCheckingForCategoryData(false)
-         setHasCheckedForCategoryData(true)
-      }
-
-         checkForCategoryData()
-   },[Boolean(userData), Boolean(currentLivestream)])
+      checkForCategoryData();
+   }, [Boolean(userData), Boolean(currentLivestream)]);
 
    if (notAuthorized) {
       replace({
@@ -247,10 +269,10 @@ const ViewerLayout = (props) => {
    const closeLeftMenu = () => dispatch(actions.closeLeftMenu());
    const openLeftMenu = () => dispatch(actions.openLeftMenu());
 
-   const handleCloseViewerGroupCategorySelectDialog = useCallback( () => {
-      setGroupsToFollow([])
-      setGroupToUpdateCategories(null)
-   },[])
+   const handleCloseViewerGroupCategorySelectDialog = useCallback(() => {
+      setGroupsToFollow([]);
+      setGroupToUpdateCategories(null);
+   }, []);
 
    const handleStateChange = useCallback(
       (state) => {
@@ -270,8 +292,24 @@ const ViewerLayout = (props) => {
       setAudienceDrawerOpen(false);
    }, []);
 
-   if (!isLoaded(currentLivestream) || notAuthorized || checkingForCategoryData) {
+   if (
+      !isLoaded(currentLivestream) ||
+      notAuthorized ||
+      checkingForCategoryData ||
+      !hasCheckedForCategoryData
+   ) {
       return <Loader />;
+   }
+
+   if (groupToUpdateCategories || groupsToFollow.length) {
+      return (
+         <ViewerGroupCategorySelectMenu
+            onClose={handleCloseViewerGroupCategorySelectDialog}
+            groupToUpdateCategories={groupToUpdateCategories}
+            groupsToFollow={groupsToFollow}
+            groupsWithPolicies={groupsWithPolicies}
+         />
+      );
    }
 
    return (
@@ -282,11 +320,6 @@ const ViewerLayout = (props) => {
                showMenu={showMenu}
                audienceDrawerOpen={audienceDrawerOpen}
                mobile={mobile}
-            />
-            <ViewerGroupCategorySelectDialog
-                onClose={handleCloseViewerGroupCategorySelectDialog}
-            groupToUpdateCategories={groupToUpdateCategories}
-                                             groupsToFollow={groupsToFollow}
             />
             <LeftMenu
                handRaiseActive={handRaiseActive}
