@@ -35,6 +35,19 @@ const useStyles = makeStyles((theme) => ({
          background: "transparent",
       },
    },
+   btnLabel: {
+      marginLeft: 10,
+      textAlign: "left",
+   },
+   btnTitle: {
+      lineHeight: "1rem",
+      marginBottom: 5,
+   },
+   btnSubtitle: {
+      fontWeight: 400,
+      textTransform: "none",
+      lineHeight: "1rem",
+   },
 }));
 const ManageStreamActions = ({
    actions,
@@ -97,7 +110,22 @@ const ManageStreamActions = ({
                />
             }
          >
-            {open ? "Show Less" : "Manage stream"}
+            <div
+               className={!open && !numberOfRegisteredUsers && classes.btnLabel}
+            >
+               <div
+                  className={
+                     !open && !numberOfRegisteredUsers && classes.btnTitle
+                  }
+               >
+                  {open ? "Show Less" : "Manage stream"}
+               </div>
+               {!open && !numberOfRegisteredUsers && (
+                  <div className={classes.btnSubtitle}>
+                     Click to see registrations
+                  </div>
+               )}
+            </div>
          </Button>
          <Collapse mountOnEnter in={open}>
             {actions

@@ -29,34 +29,34 @@ const ToolbarActionsDialogContent = ({
 
    const [actions] = useState([
       {
-         name: "Generate a draft link for companies",
-         onClick: () => {
-            handleShareDraftLink();
-            handleClose();
-         },
-         icon: <ShareIcon />,
-         description:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-      },
-      {
-         name: "Draft a new stream",
+         name: "Create a draft live stream",
          onClick: () => {
             handleOpenNewStreamModal();
             handleClose();
          },
          icon: <StreamIcon />,
          description:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+            "Create a draft live stream event. This event will be created as a draft and will not be visible to the public until you explicitly publish it.",
       },
       {
-         name: "View your upcoming streams on the student page",
+         name: "Share a link to create a draft live stream",
+         onClick: () => {
+            handleShareDraftLink();
+            handleClose();
+         },
+         icon: <ShareIcon />,
+         description:
+            "This button copies a shareable link to your clipboard to create a new live stream draft. You can send this link to anyone in charge of setting up a live stream for your CareerFairy group. The stream that they create will not be published and only visible by you as a draft within this dashboard.",
+      },
+      {
+         name: "See your upcoming streams as a student",
          onClick: () => {
             handleOpenStudentView();
             handleClose();
          },
          icon: <OpenInBrowserIcon />,
          description:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+            "Go to your public group page and see your events as a student.",
       },
    ]);
 
