@@ -150,7 +150,7 @@ const StreamerLayout = (props) => {
 
    useEffect(() => {
       const regex = /-/g;
-      if (livestreamId && !isMainStreamer) {
+      if (livestreamId) {
          if (localStorage.getItem("streamingUuid")) {
             let storedUuid = localStorage.getItem("streamingUuid");
             let joiningId = storedUuid.replace(regex, "");
@@ -161,8 +161,6 @@ const StreamerLayout = (props) => {
             localStorage.setItem("streamingUuid", joiningId);
             setStreamerId(livestreamId + joiningId);
          }
-      } else if (currentLivestream?.id) {
-         setStreamerId(currentLivestream.id);
       }
    }, [livestreamId, isMainStreamer, currentLivestream?.id]);
 

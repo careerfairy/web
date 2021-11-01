@@ -565,7 +565,7 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
    };
 
    questionElements = summary.questions.slice(0, 3).map((question) => {
-      return <QuestionView question={question} />;
+      return <QuestionView key={question.id} question={question} />;
    });
 
    let numberOfVotes = 0;

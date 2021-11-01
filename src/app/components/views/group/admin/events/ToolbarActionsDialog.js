@@ -5,6 +5,7 @@ import {
    List,
    ListItem,
    ListItemIcon,
+   ListItemSecondaryAction,
    ListItemText,
    Paper,
    Slide,
@@ -17,6 +18,7 @@ import {
 import ShareIcon from "@material-ui/icons/Share";
 import { Film as StreamIcon } from "react-feather";
 import OpenInBrowserIcon from "@material-ui/icons/OpenInBrowser";
+import HintIcon from "../../../common/HintIcon";
 
 const ToolbarActionsDialogContent = ({
    handleClose,
@@ -27,28 +29,34 @@ const ToolbarActionsDialogContent = ({
 
    const [actions] = useState([
       {
-         name: "Generate a draft link for companies",
-         onClick: () => {
-            handleShareDraftLink();
-            handleClose();
-         },
-         icon: <ShareIcon />,
-      },
-      {
-         name: "Draft a new stream",
+         name: "Create a draft live stream",
          onClick: () => {
             handleOpenNewStreamModal();
             handleClose();
          },
          icon: <StreamIcon />,
+         description:
+            "Create a draft live stream event. This event will be created as a draft and will not be visible to the public until you explicitly publish it.",
       },
       {
-         name: "View your upcoming streams on the student page",
+         name: "Share a link to create a draft live stream",
+         onClick: () => {
+            handleShareDraftLink();
+            handleClose();
+         },
+         icon: <ShareIcon />,
+         description:
+            "This button copies a shareable link to your clipboard to create a new live stream draft. You can send this link to anyone in charge of setting up a live stream for your CareerFairy group. The stream that they create will not be published and only visible by you as a draft within this dashboard.",
+      },
+      {
+         name: "See your upcoming streams as a student",
          onClick: () => {
             handleOpenStudentView();
             handleClose();
          },
          icon: <OpenInBrowserIcon />,
+         description:
+            "Go to your public group page and see your events as a student.",
       },
    ]);
 
@@ -79,6 +87,12 @@ const ToolbarActionsDialogContent = ({
                <ListItem key={action.name} onClick={action.onClick} button>
                   <ListItemIcon>{action.icon}</ListItemIcon>
                   <ListItemText>{action.name}</ListItemText>
+                  <ListItemSecondaryAction>
+                     <HintIcon
+                        title={action.name}
+                        description={action.description}
+                     />
+                  </ListItemSecondaryAction>
                </ListItem>
             ))}
          </List>
