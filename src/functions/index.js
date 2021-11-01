@@ -74,6 +74,10 @@ exports.sendReminderEmailToRegistrants =
    reminders.sendReminderEmailToRegistrants;
 exports.scheduleReminderEmailSendTestOnRun =
    reminders.scheduleReminderEmailSendTestOnRun;
+exports.scheduleReminderEmailSFor2HoursBefore =
+   reminders.scheduleReminderEmailSFor2HoursBefore;
+exports.scheduleReminderEmailSFor20MinutesBefore =
+   reminders.scheduleReminderEmailSFor20MinutesBefore;
 exports.sendReminderEmailToUserFromUniversity =
    reminders.sendReminderEmailToUserFromUniversity;
 exports.sendReminderEmailsWhenLivestreamStarts =
