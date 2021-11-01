@@ -265,7 +265,7 @@ class Firebase {
    setgroups = (userId, arrayOfIds, arrayOfGroupObjects) => {
       let userRef = this.firestore.collection("userData").doc(userId);
       return userRef.update({
-         groupIds: arrayOfIds,
+         groupIds: [...new Set(arrayOfIds)],
          registeredGroups: arrayOfGroupObjects,
       });
    };

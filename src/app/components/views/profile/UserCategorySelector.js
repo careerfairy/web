@@ -8,6 +8,7 @@ import {
    MenuItem,
    FormControl,
    Select,
+   Chip,
 } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
@@ -17,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const UserCategorySelector = ({ category, handleSetSelected }) => {
+const UserCategorySelector = ({ category, handleSetSelected, isNew }) => {
    const theme = useTheme();
    const native = useMediaQuery(theme.breakpoints.down("xs"));
    const classes = useStyles();
@@ -81,6 +82,7 @@ const UserCategorySelector = ({ category, handleSetSelected }) => {
             <Select
                open={open}
                fullWidth
+               startAdornment={isNew && <Chip color="primary" label={"New!"} />}
                native={native}
                onClose={handleClose}
                onOpen={handleOpen}

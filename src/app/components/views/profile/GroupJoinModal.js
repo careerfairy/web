@@ -25,6 +25,9 @@ const useStyles = makeStyles((theme) => ({
    image: {
       objectFit: "contain",
       maxWidth: "80%",
+      padding:theme.spacing(1),
+      borderRadius: theme.spacing(1),
+      background: theme.palette.common.white
    },
    actions: {
       display: "flex",

@@ -14,11 +14,15 @@ const useStyles = makeStyles((theme) => ({
    },
    image: {
       position: "relative",
+      background: theme.palette.common.white,
+      padding: theme.spacing(4),
+      borderRadius: 6,
       height: 200,
       flex: 1,
       minWidth: 200,
       margin: "0.5rem",
       [theme.breakpoints.down("xs")]: {
+         padding: 0,
          width: "100% !important", // Overrides inline-style
          height: 100,
       },
@@ -39,17 +43,6 @@ const useStyles = makeStyles((theme) => ({
    focusVisible: {
       opacity: 0.3,
    },
-   imageButton: {
-      position: "absolute",
-      left: 0,
-      right: 0,
-      top: 0,
-      bottom: 0,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      color: theme.palette.common.white,
-   },
    imageSrc: {
       width: "100%",
       height: "100%",
@@ -58,17 +51,6 @@ const useStyles = makeStyles((theme) => ({
       backgroundPosition: "center",
       maxWidth: "80%",
       maxHeight: "80%",
-   },
-   imageBackdrop: {
-      position: "absolute",
-      left: 0,
-      right: 0,
-      top: 0,
-      bottom: 0,
-      borderRadius: 5,
-      backgroundColor: theme.palette.common.black,
-      opacity: 0.6,
-      transition: theme.transitions.create("opacity"),
    },
    imageTitle: {
       position: "relative",
@@ -106,18 +88,6 @@ const LogoButtons = ({ groups, setGroup }) => {
                      backgroundImage: `url(${group.logoUrl})`,
                   }}
                />
-               <span className={classes.imageBackdrop} />
-               <span className={classes.imageButton}>
-                  <Typography
-                     component="span"
-                     variant="subtitle1"
-                     color="inherit"
-                     className={classes.imageTitle}
-                  >
-                     {group.universityName}
-                     <span className={classes.imageMarked} />
-                  </Typography>
-               </span>
             </ButtonBase>
          ))}
       </div>
