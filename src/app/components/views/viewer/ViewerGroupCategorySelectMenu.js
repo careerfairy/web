@@ -47,7 +47,10 @@ const ViewerGroupCategorySelectMenu = ({
                   : [groupToUpdateCategories]
             }
             followAGroupTitle={"Where are you joining from?"}
-            updateCategoriesTitle={`${groupToUpdateCategories?.universityName} Would Like To Know More About you`}
+            updateCategoriesTitle={`${
+               groupToUpdateCategories?.universityName ||
+               groupsToFollow[0]?.universityName
+            } Would Like To Know More About You`}
             groupsWithPolicies={groupsWithPolicies}
             alreadyJoined={Boolean(groupToUpdateCategories)}
             userData={userData}
