@@ -156,14 +156,10 @@ function BookingModal({
    }
 
    const handleFirstStep = () => {
-      if (livestream.isFaceToFace) {
-         setModalStep(3);
+      if (questionElements.length > 0) {
+         setModalStep(1);
       } else {
-         if (questionElements.length > 0) {
-            setModalStep(1);
-         } else {
-            setModalStep(2);
-         }
+         setModalStep(2);
       }
    };
 
