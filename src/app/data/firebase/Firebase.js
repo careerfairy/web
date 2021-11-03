@@ -15,9 +15,9 @@ class Firebase {
       this.firestore = firebase.firestore();
       this.storage = firebase.storage();
       this.functions = firebase.functions();
-      // if (process.env.NODE_ENV === "development") {
-      //    this.functions.useFunctionsEmulator("http://localhost:5001");
-      // }
+      if (process.env.NODE_ENV === "development") {
+         this.functions.useFunctionsEmulator("http://localhost:5001");
+      }
    }
 
    getFirebaseTimestamp = (dateString) => {
@@ -128,7 +128,13 @@ class Firebase {
    };
 
    sendRegistrationConfirmationEmail = (user, userData, livestream) => {
-      if (livestream.isFaceToFace) {
+      if (livestream.isHybrid) {
+         return this.sendHybridEventEmailRegistrationConfirmation(
+            user,
+            userData,
+            livestream
+         );
+      } else if (livestream.isFaceToFace) {
          return this.sendPhysicalEventEmailRegistrationConfirmation(
             user,
             userData,
@@ -175,6 +181,22 @@ class Firebase {
          company_logo_url: event.companyLogoUrl,
          event_title: event.title,
          event_address: event.address,
+      });
+   };
+
+   sendHybridEventEmailRegistrationConfirmation = (user, userData, event) => {
+      const sendHybridEventEmailRegistrationConfirmation = this.functions.httpsCallable(
+         "sendHybridEventRegistrationConfirmationEmail"
+      );
+      return sendHybridEventEmailRegistrationConfirmation({
+         recipientEmail: user.email,
+         user_first_name: userData.firstName,
+         event_date: DateUtil.getPrettyDate(event.start.toDate()),
+         company_name: event.company,
+         company_logo_url: event.companyLogoUrl,
+         event_title: event.title,
+         event_address: event.address,
+         livestream_link: `https://careerfairy.io/upcoming-livestream/${event.id}`,
       });
    };
 

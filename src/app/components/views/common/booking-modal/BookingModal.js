@@ -157,7 +157,7 @@ function BookingModal({
 
    const handleFirstStep = () => {
       if (livestream.isFaceToFace) {
-         setModalStep(4);
+         setModalStep(3);
       } else {
          if (questionElements.length > 0) {
             setModalStep(1);
