@@ -9,10 +9,10 @@ const {
 } = require("next/constants");
 
 const securityHeaders = [
-   {
-      key: "X-Frame-Options",
-      value: "SAMEORIGIN",
-   },
+   // {
+   //    key: "X-Frame-Options",
+   //    value: "SAMEORIGIN",
+   // },
    {
       key: "Content-Security-Policy",
       value:

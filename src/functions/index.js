@@ -98,6 +98,8 @@ exports.sendLivestreamRegistrationConfirmationEmail =
    livestreams.sendLivestreamRegistrationConfirmationEmail;
 exports.sendPhysicalEventRegistrationConfirmationEmail =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail;
+exports.sendHybridEventRegistrationConfirmationEmail =
+   livestreams.sendHybridEventRegistrationConfirmationEmail;
 
 // University Emails
 exports.sendEmailToStudentOfUniversityAndField =
