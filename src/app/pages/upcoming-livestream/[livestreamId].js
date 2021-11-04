@@ -278,10 +278,17 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                   group.id = doc.id;
                   groupList.push(group);
                });
-               setCareerCenters(groupList);
+               setCareerCenters(
+                  groupList.filter((careerCenter) =>
+                     GroupsUtil.filterCurrentGroup(
+                        careerCenter,
+                        currentGroup?.groupId
+                     )
+                  )
+               );
             });
       }
-   }, [currentLivestream]);
+   }, [currentLivestream, currentGroup?.groupId]);
 
    useEffect(() => {
       if (
@@ -606,7 +613,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          </Grid>
       );
    });
-
    let logoElements = careerCenters.map((careerCenter, index) => {
       return (
          <Item key={careerCenter.id} className={classes.imageGrid}>
@@ -1356,7 +1362,8 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 }
 
 export async function getServerSideProps({
-   params: { livestreamId, groupId },
+   params: { livestreamId },
+   query: { groupId },
 }) {
    let serverSideLivestream = {};
    const snap = await store.firestore.get({
