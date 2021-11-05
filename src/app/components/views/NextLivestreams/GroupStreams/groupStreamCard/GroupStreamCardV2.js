@@ -3,7 +3,6 @@ import React, { Fragment, memo, useEffect, useMemo, useState } from "react";
 import { withFirebase } from "context/firebase";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import UserUtil from "../../../../../data/util/UserUtil";
-import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import { useRouter } from "next/router";
 import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
@@ -38,9 +37,6 @@ import { DateTimeDisplay } from "./TimeDisplay";
 import { AttendButton, DetailsButton } from "./actionButtons";
 import LogoElement from "../LogoElement";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
-import WhatshotIcon from "@material-ui/icons/Whatshot";
-import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
-import { Chip } from "@material-ui/core";
 import { InPersonEventBadge, LimitedRegistrationsBadge } from "./badges";
 
 const useStyles = makeStyles((theme) => ({
@@ -555,12 +551,6 @@ const GroupStreamCardV2 = memo(
          }
       };
 
-      const filterCurrentGroup = (group) => {
-         return groupData && groupData.groupId
-            ? group.groupId === groupData.groupId
-            : true;
-      };
-
       const registrationDisabled = useMemo(() => {
          if (isPastLivestreams) return true;
          //User should always be able to cancel registration
@@ -763,7 +753,12 @@ const GroupStreamCardV2 = memo(
                               <Item>
                                  <AvatarGroup>
                                     {careerCenters
-                                       .filter(filterCurrentGroup)
+                                       .filter((currentGroup) =>
+                                          GroupsUtil.filterCurrentGroup(
+                                             currentGroup,
+                                             groupData?.groupId
+                                          )
+                                       )
                                        .map((careerCenter) => (
                                           <Avatar
                                              variant="rounded"
@@ -822,7 +817,12 @@ const GroupStreamCardV2 = memo(
                               className={classes.groupLogos}
                            >
                               {careerCenters
-                                 .filter(filterCurrentGroup)
+                                 .filter((currentGroup) =>
+                                    GroupsUtil.filterCurrentGroup(
+                                       currentGroup,
+                                       groupData?.groupId
+                                    )
+                                 )
                                  .map((careerCenter) => (
                                     <LogoElement
                                        className={classes.groupLogo}
