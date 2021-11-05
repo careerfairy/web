@@ -139,6 +139,7 @@ const TopBar = ({ links, className, onMobileNavOpen, currentGroup }) => {
                   </Button>
                ) : (
                   <IconButton
+                     id="profile_icon"
                      component={Link}
                      color="primary"
                      className={classes.navIconButton}

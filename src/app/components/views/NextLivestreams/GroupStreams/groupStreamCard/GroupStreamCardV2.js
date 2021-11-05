@@ -701,17 +701,18 @@ const GroupStreamCardV2 = memo(
                               livestream={livestream}
                            />
 
-                           {!isPastLivestreams && (
-                              <AttendButton
-                                 size="small"
-                                 mobile={mobile}
-                                 disabled={registrationDisabled}
-                                 attendButtonLabel={mainButtonLabel}
-                                 handleRegisterClick={handleRegisterClick}
-                                 checkIfRegistered={checkIfRegistered}
-                                 user={user}
-                              />
-                           )}
+                           {!isPastLivestreams &&
+                              !(livestream.openStream === true) && (
+                                 <AttendButton
+                                    size="small"
+                                    mobile={mobile}
+                                    disabled={registrationDisabled}
+                                    attendButtonLabel={mainButtonLabel}
+                                    handleRegisterClick={handleRegisterClick}
+                                    checkIfRegistered={checkIfRegistered}
+                                    user={user}
+                                 />
+                              )}
                            <Grow in={Boolean(userIsRegistered())}>
                               <div className={classes.bookedIcon}>
                                  <CheckCircleRoundedIcon />

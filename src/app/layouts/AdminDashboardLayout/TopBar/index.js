@@ -93,6 +93,7 @@ const TopBar = ({ className, links, onMobileNavOpen, ...rest }) => {
             <Box>
                <Hidden mdDown>
                   <IconButton
+                     id="profile_icon"
                      component={Link}
                      className={classes.navIconButton}
                      href="/profile"

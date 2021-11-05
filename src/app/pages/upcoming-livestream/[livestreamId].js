@@ -791,31 +791,32 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                      )}
                      <div style={{ margin: "40px 0", width: "100%" }}>
                         <div>
-                           {!isPastEvent && (
-                              <Button
-                                 size="large"
-                                 id="register-button"
-                                 disabled={isRegistrationDisabled}
-                                 children={getMainButtonLabel}
-                                 color={registered ? "default" : "primary"}
-                                 variant="contained"
-                                 startIcon={
-                                    registered ? <ClearIcon /> : <AddIcon />
-                                 }
-                                 style={{ margin: "5px" }}
-                                 onClick={
-                                    registered
-                                       ? () =>
-                                            deregisterFromLivestream(
-                                               currentLivestream.id
-                                            )
-                                       : () =>
-                                            startRegistrationProcess(
-                                               currentLivestream.id
-                                            )
-                                 }
-                              />
-                           )}
+                           {!isPastEvent &&
+                              !(currentLivestream.openStream === true) && (
+                                 <Button
+                                    size="large"
+                                    id="register-button"
+                                    disabled={isRegistrationDisabled}
+                                    children={getMainButtonLabel}
+                                    color={registered ? "default" : "primary"}
+                                    variant="contained"
+                                    startIcon={
+                                       registered ? <ClearIcon /> : <AddIcon />
+                                    }
+                                    style={{ margin: "5px" }}
+                                    onClick={
+                                       registered
+                                          ? () =>
+                                               deregisterFromLivestream(
+                                                  currentLivestream.id
+                                               )
+                                          : () =>
+                                               startRegistrationProcess(
+                                                  currentLivestream.id
+                                               )
+                                    }
+                                 />
+                              )}
                            <Button
                               size="large"
                               children={"How Live Streams Work"}
