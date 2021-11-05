@@ -211,10 +211,10 @@ const CategoryBreakdown = ({
       const flattenedGroupOptions = [...currentCategory.options].map(
          (option) => {
             const count = aggregateCategories.filter((category) =>
-               category.categories.some(
+               category?.categories?.some(
                   (userOption) => userOption.selectedValueId === option.id
                )
-            ).length;
+            )?.length;
             return { ...option, count };
          }
       );
