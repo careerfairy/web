@@ -1,5 +1,6 @@
 import axios from "axios";
 import DateUtil from "./DateUtil";
+import dayjs from "dayjs";
 
 export default class DataAccessUtil {
    static sendDashboardInvite(recipientEmail, userData, group, invite_link) {
@@ -13,6 +14,32 @@ export default class DataAccessUtil {
             group_name: group.universityName,
             invite_link: invite_link,
          },
+      });
+   }
+   static sendBasicTemplateEmail({ values, emails }) {
+      const start = DateUtil.getRelativeDate(values.startDate);
+      const testingEmails = [
+         "habib@careerfairy.io",
+         "kadirit@hotmail.com",
+         "maximilian@careerfairy.io",
+      ];
+
+      const dataObj = {
+         title: values.title,
+         summary: values.summary,
+         companyLogoUrl: values.companyLogoUrl,
+         illustrationImageUrl: values.illustrationImageUrl,
+         eventUrl: values.eventUrl,
+         subject: values.subject,
+         start,
+         emails: testingEmails,
+      };
+      console.log("-> dataObj", dataObj);
+      return axios({
+         method: "post",
+         url:
+            "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendBasicTemplateEmail",
+         data: dataObj,
       });
    }
 
