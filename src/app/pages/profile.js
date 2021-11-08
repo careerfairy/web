@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
 const UserProfile = () => {
    const classes = useStyles();
    const { userData, authenticatedUser: user } = useAuth();
-
+   //
    return (
       <React.Fragment>
          <Head>
