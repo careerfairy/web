@@ -58,6 +58,7 @@ const useStyles = makeStyles((theme) => ({
 
 const states = ["questions", "polls", "hand", "chat"];
 const LeftMenu = ({
+   streamerId,
    handRaiseActive,
    setHandRaiseActive,
    streamer,
@@ -133,6 +134,7 @@ const LeftMenu = ({
       <TabPanel key={2} value={value} index={2} dir={theme.direction}>
          <HandRaiseCategory
             streamer={streamer}
+            streamerId={streamerId}
             livestream={livestream}
             selectedState={selectedState}
             user={user}

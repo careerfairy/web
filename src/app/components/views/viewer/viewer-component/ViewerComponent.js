@@ -132,10 +132,10 @@ function ViewerComponent({
          agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
       ) {
          if (currentLivestream) {
-            if (currentLivestream.test) {
+            if (currentLivestream.test || currentLivestream.openStream) {
                firebase.updateHandRaiseRequest(
                   streamRef,
-                  "streamerEmail",
+                  "anonymous" + streamerId,
                   "connected"
                );
             } else {
