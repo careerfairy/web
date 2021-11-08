@@ -158,22 +158,21 @@ const CurrentGroup = ({ firebase, userData, group, isAdmin, groupId }) => {
          });
       }
    }
-
-   // if (isAdmin) {
-   //    menuItems.push(
-   //       {
-   //          onClick: () => push(`/group/${localGroup.id}/admin`),
-   //          label: "Admin group",
-   //       },
-   //       {
-   //          onClick: () => {
-   //             setOpen(true);
-   //             handleClose();
-   //          },
-   //          label: "Delete group",
-   //       }
-   //    );
-   // }
+   if (isAdmin) {
+      menuItems.push(
+         {
+            onClick: () => push(`/group/${localGroup.id}/admin`),
+            label: "Admin group",
+         },
+         {
+            onClick: () => {
+               setOpen(true);
+               handleClose();
+            },
+            label: "Delete group",
+         }
+      );
+   }
 
    return (
       <Fragment key={localGroup.id}>
@@ -248,7 +247,7 @@ const CurrentGroup = ({ firebase, userData, group, isAdmin, groupId }) => {
                            </Button>
                         </Link>
                      )}
-                     {/* <Menu
+                     <Menu
                         id="simple-menu"
                         anchorEl={anchorEl}
                         keepMounted
@@ -266,7 +265,7 @@ const CurrentGroup = ({ firebase, userData, group, isAdmin, groupId }) => {
                               </MenuItem>
                            );
                         })}
-                     </Menu> */}
+                     </Menu>
                   </CardActions>
                </Card>
             </Grid>
