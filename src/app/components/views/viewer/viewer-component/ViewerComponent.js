@@ -226,6 +226,7 @@ function ViewerComponent({
             videoMutedBackgroundImg={currentLivestream.companyLogoUrl}
             liveSpeakers={currentLivestream.liveSpeakers}
             isBroadCasting={handRaiseActive}
+            openStream={currentLivestream.openStream}
             sharingScreen={currentLivestream.mode === "desktop"}
             sharingPdf={currentLivestream.mode === "presentation"}
             showMenu={showMenu}

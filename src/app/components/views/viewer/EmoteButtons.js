@@ -218,7 +218,7 @@ const EmoteButtons = ({ createEmote }) => {
    const postIcon = (iconName) => {
       if (!iconsDisabled) {
          createEmote(iconName);
-         if (!userData.isClapAdmin) {
+         if (!userData || !userData.isClapAdmin) {
             setIconsDisabled(true);
          }
          firebase.postIcon(
