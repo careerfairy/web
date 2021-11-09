@@ -20,8 +20,11 @@ exports.sendBasicTemplateEmail = functions.https.onRequest(async (req, res) => {
    } = req.body;
 
    let emailsArray = emails || [];
-   emailsArray.push(senderEmail);
+   if (senderEmail) {
+      emailsArray.push(senderEmail);
+   }
 
+   console.log("-> summary string", summary.toString());
    // Remove the sender email if the sender is already in the emails list
    emailsArray = [...new Set(emailsArray)];
 

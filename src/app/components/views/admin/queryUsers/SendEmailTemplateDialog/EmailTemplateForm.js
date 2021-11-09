@@ -60,6 +60,7 @@ const EmailTemplateForm = ({
          setSendingEmails(true);
          await targetTemplate.sendTemplate({
             ...data,
+            senderEmail: userData.userEmail,
          });
       } catch (e) {
          dispatch(actions.sendGeneralError(e));
@@ -70,7 +71,7 @@ const EmailTemplateForm = ({
 
    const handleConfirmSendTestEmail = useCallback(
       async (data) => {
-         let dataWithTestEmails = { ...data };
+         let dataWithTestEmails = { ...data, senderEmail: userData.userEmail };
          // ensure that the emails
          delete dataWithTestEmails?.emails;
          dataWithTestEmails.emails = testEmails || [];
@@ -84,7 +85,7 @@ const EmailTemplateForm = ({
          setSendingEmails(false);
          handleCloseSendConfirmEmailModal();
       },
-      [testEmails]
+      [testEmails, userData.userEmail]
    );
 
    const handleCloseSendConfirmEmailModal = () =>
@@ -103,10 +104,15 @@ const EmailTemplateForm = ({
          onSubmit={async (values, { setSubmitting }) => {
             try {
                const data = {
-                  values: { ...values },
-                  senderEmail: userData.userEmail,
+                  values: {
+                     ...values,
+                     start: DateUtil.getRelativeDate(
+                        values.startDate
+                     ).toString(),
+                  },
                   templateId: targetTemplate.templateId,
                };
+               console.log("-> data", data);
                if (values.isTestEmail) {
                   // open test email modal
                   setConfirmSendTestEmailModalData(data);
