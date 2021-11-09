@@ -22,8 +22,8 @@ const AdminUsersTable = ({ users, isFiltered }) => {
       tableActions,
    } = useUserTable();
 
-   const [emails, setEmails] = useState([]);
-
+   const [subscribedEmails, setSubscribedEmails] = useState([]);
+   console.log("-> subscribedEmails", subscribedEmails);
    const [emailTemplateDialogOpen, setEmailTemplateDialogOpen] = useState(
       false
    );
@@ -45,14 +45,16 @@ const AdminUsersTable = ({ users, isFiltered }) => {
    const adminUsersTableActions = useMemo(
       () => ({
          copyEmails: (rowData) => ({
-            tooltip: !(rowData.length === 0) && "Send an Email",
+            tooltip:
+               !(rowData.length === 0) &&
+               `Send an email to ${subscribedEmails.length} subscribed user(s)`,
             position: "toolbarOnSelect",
-            icon: tableIcons.AllInboxIcon,
+            icon: tableIcons.EmailIcon,
             disabled: rowData.length === 0,
             onClick: handleOpenEmailTemplateDialog,
          }),
       }),
-      [handleOpenEmailTemplateDialog]
+      [handleOpenEmailTemplateDialog, subscribedEmails.length]
    );
 
    return (
@@ -71,14 +73,20 @@ const AdminUsersTable = ({ users, isFiltered }) => {
             ]}
             onSelectionChange={(rows) => {
                setSelection(rows);
-               setEmails(rows?.map((user) => user.id) || []);
+               setSubscribedEmails(
+                  rows.reduce(
+                     (acc, curr) =>
+                        !curr.unsubscribed ? acc.concat(curr.id) : acc,
+                     []
+                  )
+               );
             }}
             title={title}
          />
          <SendEmailTemplateDialog
             onClose={handleCloseEmailTemplateDialog}
             open={emailTemplateDialogOpen}
-            emails={emails}
+            emails={subscribedEmails}
          />
       </Card>
    );

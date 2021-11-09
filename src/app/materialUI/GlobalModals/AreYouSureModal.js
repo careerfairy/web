@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
 import {
@@ -10,12 +10,28 @@ import {
    DialogContent,
    DialogContentText,
    DialogTitle,
+   TextField,
+   Paper,
+   Typography,
+   FormHelperText,
 } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
    errorButton: {
       background: theme.palette.error.main,
       color: theme.palette.error.contrastText,
+   },
+   securityTextPaper: {
+      // padding: theme.spacing(2),
+   },
+   noSelect: {
+      WebkitTouchCallout: "none",
+      WebkitUserSelect: "none",
+      KhtmlUserSelect: "none",
+      MozUserSelect: "none",
+      msUserSelect: "none",
+      userSelect: "none",
+      marginBottom: theme.spacing(1),
    },
 }));
 const AreYouSureModal = ({
@@ -25,8 +41,19 @@ const AreYouSureModal = ({
    open,
    handleClose,
    loading,
+   confirmButtonText,
+   confirmSecurityText,
 }) => {
    const classes = useStyles();
+   const [repeatSecurityText, setRepeatSecurityText] = useState("");
+   const [fieldError, setFieldError] = useState("");
+
+   const handleSecureConfirm = () => {
+      if (confirmSecurityText && confirmSecurityText !== repeatSecurityText) {
+         return setFieldError("The text does not match");
+      }
+      handleConfirm();
+   };
 
    return (
       <div>
@@ -41,6 +68,31 @@ const AreYouSureModal = ({
                <DialogContentText id="alert-dialog-description">
                   {message}
                </DialogContentText>
+               {confirmSecurityText && (
+                  <div className={classes.securityTextPaper}>
+                     <Typography
+                        className={classes.noSelect}
+                        variant="subtitle1"
+                        gutterBottom
+                     >
+                        {confirmSecurityText}
+                     </Typography>
+                     <TextField
+                        onChange={(e) => {
+                           if (fieldError) setFieldError("");
+                           setRepeatSecurityText(e.currentTarget.value);
+                        }}
+                        fullWidth
+                        label="Please type the message above to confirm"
+                        variant="outlined"
+                        error={Boolean(fieldError)}
+                        value={repeatSecurityText}
+                        type="text"
+                        disabled={loading}
+                     />
+                     <FormHelperText error>{fieldError}</FormHelperText>
+                  </div>
+               )}
             </DialogContent>
             <DialogActions>
                <Button onClick={handleClose}>Cancel</Button>
@@ -49,11 +101,11 @@ const AreYouSureModal = ({
                   endIcon={
                      loading && <CircularProgress color="inherit" size={20} />
                   }
-                  onClick={handleConfirm}
+                  onClick={handleSecureConfirm}
                   variant="contained"
                   color="primary"
                >
-                  Confirm
+                  {confirmButtonText || "Confirm"}
                </Button>
             </DialogActions>
          </Dialog>
@@ -68,6 +120,7 @@ AreYouSureModal.propTypes = {
    message: PropTypes.string,
    open: PropTypes.bool.isRequired,
    title: PropTypes.string,
+   confirmSecurityText: PropTypes.string,
 };
 
 AreYouSureModal.defaultProps = {
