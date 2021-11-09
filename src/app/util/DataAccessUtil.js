@@ -16,7 +16,7 @@ export default class DataAccessUtil {
          },
       });
    }
-   static sendBasicTemplateEmail({ values, emails }, senderEmail) {
+   static sendBasicTemplateEmail({ values, emails, senderEmail, templateId }) {
       const start = DateUtil.getRelativeDate(values.startDate);
       const testingEmails = [
          "habib@careerfairy.io",
@@ -34,6 +34,7 @@ export default class DataAccessUtil {
          start,
          emails: testingEmails,
          senderEmail,
+         templateId,
       };
 
       return axios({

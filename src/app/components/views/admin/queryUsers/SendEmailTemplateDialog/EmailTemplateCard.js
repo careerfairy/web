@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
 const EmailTemplateCard = ({
    templateImageUrl,
    templateName,
+   templateEditUrl,
    onClick,
    selected,
 }) => {
@@ -46,7 +47,7 @@ const EmailTemplateCard = ({
             <CardHeader
                action={
                   <IconButton
-                     href="https://account.postmarkapp.com/servers/5274171/templates/25653565/edit"
+                     href={templateEditUrl}
                      target="_blank"
                      aria-label="edit-template"
                   >

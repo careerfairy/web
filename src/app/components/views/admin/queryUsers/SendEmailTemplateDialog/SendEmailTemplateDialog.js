@@ -190,7 +190,8 @@ const TemplateSelectView = ({
          <Box display="flex" justifyContent="center" p={1}>
             {templates.map((template) => (
                <EmailTemplateCard
-                  key={template.templateName}
+                  key={template.templateId}
+                  templateEditUrl={template.templateEditUrl}
                   selected={
                      template.templateImageUrl ===
                      targetTemplate?.templateImageUrl

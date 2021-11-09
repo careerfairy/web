@@ -58,7 +58,9 @@ const EmailTemplateForm = ({
       console.log("-> handleConfirmSendEmail data", data);
       try {
          setSendingEmails(true);
-         await targetTemplate.sendTemplate(data, userData.userEmail);
+         await targetTemplate.sendTemplate({
+            ...data,
+         });
       } catch (e) {
          dispatch(actions.sendGeneralError(e));
       }
@@ -68,14 +70,14 @@ const EmailTemplateForm = ({
 
    const handleConfirmSendTestEmail = useCallback(
       async (data) => {
-         const dataWithTestEmails = { ...data, emails: testEmails || [] };
+         let dataWithTestEmails = { ...data };
+         // ensure that the emails
+         delete dataWithTestEmails?.emails;
+         dataWithTestEmails.emails = testEmails || [];
          console.log("-> handleConfirmSendTestEmail data", dataWithTestEmails);
          try {
             setSendingEmails(true);
-            await targetTemplate.sendTemplate(
-               dataWithTestEmails,
-               userData.userEmail
-            );
+            await targetTemplate.sendTemplate(dataWithTestEmails);
          } catch (e) {
             dispatch(actions.sendGeneralError(e));
          }
@@ -102,12 +104,14 @@ const EmailTemplateForm = ({
             try {
                const data = {
                   values: { ...values },
-                  emails,
+                  senderEmail: userData.userEmail,
+                  templateId: targetTemplate.templateId,
                };
                if (values.isTestEmail) {
                   // open test email modal
                   setConfirmSendTestEmailModalData(data);
                } else {
+                  data.emails = emails;
                   setConfirmSendEmailModalData(data);
                }
             } catch (e) {
@@ -288,6 +292,7 @@ const EmailTemplateForm = ({
                      open={Boolean(confirmSendTestEmailModalData)}
                      testEmails={testEmails}
                      setTestEmails={setTestEmails}
+                     loading={sendingEmails}
                      handleConfirmSendTestEmail={() =>
                         handleConfirmSendTestEmail(
                            confirmSendTestEmailModalData

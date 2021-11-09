@@ -4,16 +4,15 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import {
    Button,
-   Dialog,
    CircularProgress,
+   Dialog,
    DialogActions,
    DialogContent,
    DialogContentText,
    DialogTitle,
-   TextField,
-   Paper,
-   Typography,
    FormHelperText,
+   TextField,
+   Typography,
 } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
@@ -52,14 +51,20 @@ const AreYouSureModal = ({
       if (confirmSecurityText && confirmSecurityText !== repeatSecurityText) {
          return setFieldError("The text does not match");
       }
+      setRepeatSecurityText("");
       handleConfirm();
+   };
+
+   const onClose = () => {
+      setRepeatSecurityText("");
+      handleClose();
    };
 
    return (
       <div>
          <Dialog
             open={open}
-            onClose={handleClose}
+            onClose={onClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
          >
@@ -95,7 +100,7 @@ const AreYouSureModal = ({
                )}
             </DialogContent>
             <DialogActions>
-               <Button onClick={handleClose}>Cancel</Button>
+               <Button onClick={onClose}>Cancel</Button>
                <Button
                   disabled={loading}
                   endIcon={

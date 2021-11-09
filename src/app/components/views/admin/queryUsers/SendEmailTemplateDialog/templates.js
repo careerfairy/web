@@ -110,6 +110,9 @@ const templates = [
       getInitialValues: getInitialValues,
       fields: basicFields,
       sendTemplate: DataAccessUtil.sendBasicTemplateEmail,
+      templateId: "25653565",
+      templateEditUrl:
+         "https://account.postmarkapp.com/servers/5274171/templates/25653565/edit",
    },
 ];
 

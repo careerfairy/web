@@ -60,6 +60,7 @@ const SendTestEmailDialog = ({
    onClose,
    handleConfirmSendTestEmail,
    setTestEmails,
+   loading,
    testEmails,
 }) => {
    const handleClose = () => {
@@ -69,6 +70,7 @@ const SendTestEmailDialog = ({
       <Dialog maxWidth="sm" fullWidth onClose={handleClose} open={open}>
          <Content
             testEmails={testEmails}
+            loading={loading}
             handleConfirmSendTestEmail={handleConfirmSendTestEmail}
             setTestEmails={setTestEmails}
             handleClose={handleClose}

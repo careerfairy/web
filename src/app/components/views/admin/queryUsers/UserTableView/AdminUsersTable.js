@@ -23,7 +23,6 @@ const AdminUsersTable = ({ users, isFiltered }) => {
    } = useUserTable();
 
    const [subscribedEmails, setSubscribedEmails] = useState([]);
-   console.log("-> subscribedEmails", subscribedEmails);
    const [emailTemplateDialogOpen, setEmailTemplateDialogOpen] = useState(
       false
    );
