@@ -3,6 +3,8 @@ import { URL_REGEX } from "../../../../util/constants";
 import { basicEmailTemplate } from "constants/images";
 import { getBaseUrl } from "../../../../helperFunctions/HelperFunctions";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
+import { useFirebase } from "context/firebase";
+import { useMemo } from "react";
 
 const MAX_SUBJECT_LENGTH = 500;
 const MAX_DISPLAY_TITLE_LENGTH = 1000;
@@ -102,18 +104,26 @@ const basicFields = [
       placeHolder: "Summarise the event here",
    },
 ];
-const templates = [
-   {
-      templateImageUrl: basicEmailTemplate,
-      templateName: "Basic",
-      validationSchema: basicTemplateSchema,
-      getInitialValues: getInitialValues,
-      fields: basicFields,
-      sendTemplate: DataAccessUtil.sendBasicTemplateEmail,
-      templateId: "25653565",
-      templateEditUrl:
-         "https://account.postmarkapp.com/servers/5274171/templates/25653565/edit",
-   },
-];
 
-export default templates;
+const useTemplates = () => {
+   const { sendBasicTemplateEmail } = useFirebase();
+
+   return useMemo(
+      () => [
+         {
+            templateImageUrl: basicEmailTemplate,
+            templateName: "Basic",
+            validationSchema: basicTemplateSchema,
+            getInitialValues: getInitialValues,
+            fields: basicFields,
+            sendTemplate: sendBasicTemplateEmail,
+            templateId: "25653565",
+            templateEditUrl:
+               "https://account.postmarkapp.com/servers/5274171/templates/25653565/edit",
+         },
+      ],
+      [sendBasicTemplateEmail]
+   );
+};
+
+export default useTemplates;

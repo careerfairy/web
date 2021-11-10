@@ -15,9 +15,9 @@ class Firebase {
       this.firestore = firebase.firestore();
       this.storage = firebase.storage();
       this.functions = firebase.functions();
-      // if (process.env.NODE_ENV === "development") {
-      //    this.functions.useFunctionsEmulator("http://localhost:5001");
-      // }
+      if (process.env.NODE_ENV === "development") {
+         this.functions.useFunctionsEmulator("http://localhost:5001");
+      }
    }
 
    getFirebaseTimestamp = (dateString) => {
@@ -102,6 +102,39 @@ class Firebase {
          "sendReminderEmailAboutApplicationLink"
       );
       return sendReminderEmailAboutApplicationLink(data);
+   };
+
+   sendBasicTemplateEmail = async ({
+      values,
+      emails,
+      senderEmail,
+      templateId,
+   }) => {
+      console.log("-> emails in fn", emails);
+      const testingEmails = [
+         "kadirit@hotmail.com",
+         "maximilian@careerfairy.io",
+      ];
+      console.log("-> testingEmails", testingEmails);
+
+      const dataObj = {
+         title: values.title,
+         summary: values.summary,
+         companyLogoUrl: values.companyLogoUrl,
+         illustrationImageUrl: values.illustrationImageUrl,
+         eventUrl: values.eventUrl,
+         subject: values.subject,
+         start: values.start,
+         emails: testingEmails,
+         senderEmail,
+         templateId,
+      };
+
+      const sendBasicTemplateEmail = this.functions.httpsCallable(
+         "sendBasicTemplateEmail"
+      );
+
+      return sendBasicTemplateEmail(dataObj);
    };
 
    joinGroupDashboard = async (data) => {

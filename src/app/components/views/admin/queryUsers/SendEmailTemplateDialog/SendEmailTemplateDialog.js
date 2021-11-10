@@ -26,8 +26,8 @@ import clsx from "clsx";
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
 import dayjs from "dayjs";
 import EmailTemplateCard from "./EmailTemplateCard";
-import templates from "./templates";
 import EmailTemplateForm from "./EmailTemplateForm";
+import useTemplates from "./templates";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -184,6 +184,7 @@ const TemplateSelectView = ({
    targetTemplate,
    handleNext,
 }) => {
+   const templates = useTemplates();
    return (
       <>
          <DialogTitle>Choose a template</DialogTitle>
