@@ -146,7 +146,7 @@ const Streams = memo(
                <Banners
                   isBottom
                   presenter={presenter}
-                  handRaiseActive={handRaiseActive}
+                  handRaiseActive={handRaiseActive && !openStream}
                   mobile={mobile}
                />
             )}
