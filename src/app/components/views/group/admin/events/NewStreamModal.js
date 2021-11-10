@@ -2,20 +2,20 @@ import React, { useRef, useState } from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import {
    AppBar,
+   Button,
+   ButtonGroup,
    CardActions,
    Dialog,
    DialogContent,
-   Slide,
-   Zoom,
-   Toolbar,
    IconButton,
+   Slide,
+   Toolbar,
    Typography,
-   Button,
-   ButtonGroup,
+   Zoom,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import DraftStreamForm from "../../../draftStreamForm/DraftStreamForm";
-import { withFirebase } from "../../../../../context/firebase";
+import { useFirebase } from "context/firebase";
 import { buildLivestreamObject } from "../../../../helperFunctions/streamFormFunctions";
 import {
    GENERAL_ERROR,
@@ -69,12 +69,12 @@ const NewStreamModal = ({
    group,
    open,
    onClose,
-   firebase,
    typeOfStream,
    currentStream,
    handleResetCurrentStream,
    handlePublishStream,
 }) => {
+   const firebase = useFirebase();
    const formRef = useRef();
    const dialogRef = useRef();
    const saveChangesButtonRef = useRef();
@@ -190,19 +190,19 @@ const NewStreamModal = ({
             : "draftLivestreams";
          if (updateMode) {
             id = livestream.id;
-            if (!livestream.author) {
-               livestream.author = {
+            if (!livestream.lastUpdatedAuthorInfo) {
+               livestream.lastUpdatedAuthorInfo = {
                   groupId: group.id,
                   email: authenticatedUser.email,
                };
             }
             await firebase.updateLivestream(livestream, targetCollection);
-            console.log(
-               `-> ${
-                  !isActualLivestream() && "Draft "
-               }livestream was updated with id`,
-               id
-            );
+            // console.log(
+            //    `-> ${
+            //       !isActualLivestream() && "Draft "
+            //    }livestream was updated with id`,
+            //    id
+            // );
          } else {
             const author = {
                groupId: group.id,
@@ -213,12 +213,12 @@ const NewStreamModal = ({
                targetCollection,
                author
             );
-            console.log(
-               `-> ${
-                  !isActualLivestream() && "Draft "
-               }livestream was created with id`,
-               id
-            );
+            // console.log(
+            //    `-> ${
+            //       !isActualLivestream() && "Draft "
+            //    }livestream was created with id`,
+            //    id
+            // );
          }
          handleCloseDialog();
 
@@ -369,4 +369,4 @@ const NewStreamModal = ({
    );
 };
 
-export default withFirebase(NewStreamModal);
+export default NewStreamModal;

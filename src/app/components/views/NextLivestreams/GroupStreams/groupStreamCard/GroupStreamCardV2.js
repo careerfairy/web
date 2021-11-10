@@ -342,19 +342,33 @@ const GroupStreamCardV2 = memo(
             firebase
                .getDetailLivestreamCareerCenters(livestream.groupIds)
                .then((querySnapshot) => {
-                  let groupList = [];
-                  querySnapshot.forEach((doc) => {
-                     let group = doc.data();
-                     group.id = doc.id;
-                     groupList.push(group);
-                  });
+                  let groupList = querySnapshot.docs.map((doc) => ({
+                     id: doc.id,
+                     ...doc.data(),
+                  }));
+
+                  let targetGroupId = groupData?.groupId;
+                  if (listenToUpcoming) {
+                     const companyThatPublishedStream = groupList.find(
+                        (group) =>
+                           !group.universityCode &&
+                           group.id === livestream?.author?.groupId
+                     );
+                     if (companyThatPublishedStream?.id) {
+                        targetGroupId = companyThatPublishedStream.id;
+                     }
+                  }
+                  groupList = groupList.filter((currentGroup) =>
+                     GroupsUtil.filterCurrentGroup(currentGroup, targetGroupId)
+                  );
+
                   setCareerCenters(groupList);
                })
                .catch((e) => {
                   console.log("error", e);
                });
          }
-      }, []);
+      }, [groupData?.groupId, listenToUpcoming, livestream?.author?.groupId]);
 
       const handleMouseEntered = () => {
          if (!cardHovered && !globalCardHighlighted) {
@@ -752,28 +766,21 @@ const GroupStreamCardV2 = memo(
                               </Item>
                               <Item>
                                  <AvatarGroup>
-                                    {careerCenters
-                                       .filter((currentGroup) =>
-                                          GroupsUtil.filterCurrentGroup(
-                                             currentGroup,
-                                             groupData?.groupId
-                                          )
-                                       )
-                                       .map((careerCenter) => (
-                                          <Avatar
-                                             variant="rounded"
-                                             key={careerCenter.id}
-                                             className={clsx(
-                                                classes.groupLogo,
-                                                classes.groupLogoStacked
-                                             )}
-                                             src={getResizedUrl(
-                                                careerCenter.logoUrl,
-                                                "xs"
-                                             )}
-                                             alt={careerCenter.universityName}
-                                          />
-                                       ))}
+                                    {careerCenters.map((careerCenter) => (
+                                       <Avatar
+                                          variant="rounded"
+                                          key={careerCenter.id}
+                                          className={clsx(
+                                             classes.groupLogo,
+                                             classes.groupLogoStacked
+                                          )}
+                                          src={getResizedUrl(
+                                             careerCenter.logoUrl,
+                                             "xs"
+                                          )}
+                                          alt={careerCenter.universityName}
+                                       />
+                                    ))}
                                  </AvatarGroup>
                               </Item>
                            </Row>
@@ -816,29 +823,22 @@ const GroupStreamCardV2 = memo(
                               style={{ width: "100%" }}
                               className={classes.groupLogos}
                            >
-                              {careerCenters
-                                 .filter((currentGroup) =>
-                                    GroupsUtil.filterCurrentGroup(
-                                       currentGroup,
-                                       groupData?.groupId
-                                    )
-                                 )
-                                 .map((careerCenter) => (
-                                    <LogoElement
-                                       className={classes.groupLogo}
-                                       hideFollow={
-                                          (!cardHovered && !mobile) || isAdmin
-                                       }
-                                       key={careerCenter.groupId}
-                                       livestreamId={livestream.id}
-                                       userFollows={checkIfUserFollows(
-                                          careerCenter
-                                       )}
-                                       careerCenter={careerCenter}
-                                       userData={userData}
-                                       user={user}
-                                    />
-                                 ))}
+                              {careerCenters.map((careerCenter) => (
+                                 <LogoElement
+                                    className={classes.groupLogo}
+                                    hideFollow={
+                                       (!cardHovered && !mobile) || isAdmin
+                                    }
+                                    key={careerCenter.groupId}
+                                    livestreamId={livestream.id}
+                                    userFollows={checkIfUserFollows(
+                                       careerCenter
+                                    )}
+                                    careerCenter={careerCenter}
+                                    userData={userData}
+                                    user={user}
+                                 />
+                              ))}
                            </Row>
                         </div>
                      </Collapse>
