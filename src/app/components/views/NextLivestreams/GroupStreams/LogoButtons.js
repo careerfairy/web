@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { ButtonBase, Typography } from "@material-ui/core";
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -67,10 +68,25 @@ const useStyles = makeStyles((theme) => ({
       left: "calc(50% - 9px)",
       transition: theme.transitions.create("opacity"),
    },
+   otherText: {
+      color: theme.palette.common.black,
+      fontWeight: "bold",
+   },
 }));
 
 const LogoButtons = ({ groups, setGroup }) => {
    const classes = useStyles();
+
+   const [hasMoreThanOneCompanyGroup, setHasMoreThanOneCompanyGroup] = useState(
+      false
+   );
+
+   useEffect(() => {
+      const numberOfCompanyGroups = groups.reduce((count, currentGroup) => {
+         return !currentGroup?.universityCode ? count + 1 : count;
+      }, 0);
+      setHasMoreThanOneCompanyGroup(numberOfCompanyGroups > 1);
+   }, [groups]);
 
    return (
       <div className={classes.root}>
@@ -82,12 +98,21 @@ const LogoButtons = ({ groups, setGroup }) => {
                className={classes.image}
                focusVisibleClassName={classes.focusVisible}
             >
-               <div
-                  className={classes.imageSrc}
-                  style={{
-                     backgroundImage: `url(${group.logoUrl})`,
-                  }}
-               />
+               {group.universityCode || hasMoreThanOneCompanyGroup ? (
+                  <div
+                     className={classes.imageSrc}
+                     style={{
+                        backgroundImage: `url(${getResizedUrl(
+                           group.logoUrl,
+                           "sm"
+                        )})`,
+                     }}
+                  />
+               ) : (
+                  <Typography className={classes.otherText} variant="h2">
+                     OTHER
+                  </Typography>
+               )}
             </ButtonBase>
          ))}
       </div>

@@ -49,7 +49,7 @@ const GroupJoinToAttendModal = ({
    isOnStreamPage,
    followAGroupTitle,
    updateCategoriesTitle,
-   onJoinAttempt, // callback will be called regardless if the joining the group succeded or failed
+   onJoinAttempt, // callback will be called regardless if the joining the group succeeded or failed
 }) => {
    const classes = useStyles();
    const firebase = useFirebase();
