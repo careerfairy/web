@@ -20,6 +20,7 @@ import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 import Streams from "../../streaming/video-container/Streams";
 import DraggableComponent from "../../banners/DraggableComponent";
 import WifiIndicator from "../../streaming/video-container/WifiIndicator";
+import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -285,15 +286,18 @@ function ViewerComponent({
             </Fragment>
          )}
 
-         {!currentLivestream.hasStarted && !spyModeEnabled && (
-            <div className={classes.waitingOverlay}>
-               <Typography className={classes.waitingText}>
-                  {currentLivestream.test
-                     ? "The streamer has to press Start Streaming to be visible to students"
-                     : "Thank you for joining!"}
-               </Typography>
-            </div>
-         )}
+         {!currentLivestream.hasStarted &&
+            !spyModeEnabled &&
+            (currentLivestream.test ? (
+               <div className={classes.waitingOverlay}>
+                  <Typography className={classes.waitingText}>
+                     "The streamer has to press Start Streaming to be visible to
+                     students"
+                  </Typography>
+               </div>
+            ) : (
+               <StreamStoppedOverlay />
+            ))}
       </React.Fragment>
    );
 }
