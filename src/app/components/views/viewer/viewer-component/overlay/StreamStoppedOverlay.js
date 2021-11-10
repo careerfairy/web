@@ -1,6 +1,7 @@
 import { Button, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import CardGiftcardIcon from "@material-ui/icons/CardGiftcard";
+import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -59,7 +60,7 @@ const StreamStoppedOverlay = () => {
                   Thanks for joining the stream!
                </Typography>
                <Typography className={classes.mainTitle}>
-                  Get Your 50€ Amazon Gift Card
+                  We need your input!
                </Typography>
                <Typography>
                   We are currently improving CareerFairy to help you land your
@@ -67,11 +68,11 @@ const StreamStoppedOverlay = () => {
                </Typography>
                <Typography className={classes.marginBottom}>
                   Click on the button below to help us by{" "}
-                  <em>booking a 15 minute call with our product expert</em> and
-                  answering a few questions about your experience.
+                  <em>filling out our short Typeform survey</em> and answering a
+                  few questions about your experience.
                </Typography>
                <a
-                  href="https://calendly.com/federico-spiezia/ux-intro-meeting"
+                  href="https://mf82k3pxiqx.typeform.com/to/wI7YFVbC"
                   target="_blank"
                >
                   <Button
@@ -79,15 +80,11 @@ const StreamStoppedOverlay = () => {
                      size="large"
                      color="secondary"
                      className={classes.buttonMarginBottom}
-                     startIcon={<CardGiftcardIcon />}
+                     startIcon={<EmojiPeopleIcon />}
                   >
-                     I want my gift card
+                     I want to help!
                   </Button>
                </a>
-               <Typography>
-                  We'll send you your 50€ Amazon gift card as your reward right
-                  after the interview.
-               </Typography>
                <Typography>Thank you for your contribution!</Typography>
             </div>
          </div>
