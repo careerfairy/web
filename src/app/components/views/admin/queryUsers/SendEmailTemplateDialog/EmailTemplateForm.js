@@ -127,6 +127,7 @@ const EmailTemplateForm = ({
          }}
       >
          {(formik) => {
+            console.log("-> formik.errors", formik.errors);
             return (
                <>
                   <Box p={1} position="relative">

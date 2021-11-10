@@ -38,9 +38,6 @@ export default class DataAccessUtil {
          method: "post",
          url: localUrl,
          data: dataObj,
-         headers: {
-            "Content-Type": "application/json",
-         },
       });
    }
 

@@ -24,17 +24,18 @@ exports.sendBasicTemplateEmail = functions.https.onRequest(async (req, res) => {
       emailsArray.push(senderEmail);
    }
 
-   console.log("-> summary string", summary.toString());
+   const newSummary = summary.replace(/\n/g, "\\\n");
+   console.log("-> newSummary v4", newSummary);
    // Remove the sender email if the sender is already in the emails list
    emailsArray = [...new Set(emailsArray)];
 
-   functions.logger.log(
-      "number of emails in sendBasicTemplateEmail",
-      emailsArray.length
-   );
+   // functions.logger.log(
+   //    "number of emails in sendBasicTemplateEmail",
+   //    emailsArray.length
+   // );
 
    //TODO remove before deploying to prod
-   functions.logger.log("Total emails in sendBasicTemplateEmail", emailsArray);
+   // functions.logger.log("Total emails in sendBasicTemplateEmail", emailsArray);
 
    // Will use the server side of the templateId for more
    // security instead of getting it from the client
@@ -46,7 +47,7 @@ exports.sendBasicTemplateEmail = functions.https.onRequest(async (req, res) => {
       To: email,
       TemplateModel: {
          title,
-         summary,
+         summary: newSummary,
          start,
          eventUrl,
          companyLogoUrl,
@@ -58,12 +59,12 @@ exports.sendBasicTemplateEmail = functions.https.onRequest(async (req, res) => {
 
    client.sendEmailBatchWithTemplates(emailObjects).then(
       (responses) => {
-         responses.forEach((response) =>
-            functions.logger.log(
-               "sent sendBasicTemplateEmail email with response:",
-               response
-            )
-         );
+         // responses.forEach((response) =>
+         // functions.logger.log(
+         //    "sent sendBasicTemplateEmail email with response:",
+         //    response
+         // )
+         // );
          return res.send(200);
       },
       (error) => {
