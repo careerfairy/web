@@ -98,7 +98,6 @@ const EmailTemplateForm = ({
          setSendingEmails(false);
          handleCloseSendTestEmailModalData();
          successSnackbar(testEmails.length);
-         handleClose();
       },
       [testEmails, userData.userEmail]
    );
@@ -332,8 +331,8 @@ const EmailTemplateForm = ({
                            undone.
                         </>
                      }
-                     confirmSecurityText={`Yes, I would like to send this email to ${emails.length} users`}
-                     confirmButtonText={`Yes, I wish to send this email to ${emails.length} users`}
+                     confirmSecurityText={`I wish to send this email to ${emails.length} users`}
+                     confirmButtonText={`Send this email to ${emails.length} users`}
                      handleConfirm={() =>
                         handleConfirmSendEmail(confirmSendEmailModalData)
                      }
