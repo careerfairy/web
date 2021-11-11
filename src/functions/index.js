@@ -26,6 +26,7 @@ const auth = require("./auth");
 const agora = require("./agora");
 const backup = require("./backup");
 const groupAdmin = require("./groupAdmin");
+const admin = require("./admin");
 const reminders = require("./reminders");
 const livestreams = require("./livestreams");
 const universityEmails = require("./universityEmails");
@@ -59,6 +60,9 @@ exports.generateAgoraTokenSecureOnCall = agora.generateAgoraTokenSecureOnCall;
 
 // Backup
 exports.exportFirestoreBackup = backup.exportFirestoreBackup;
+
+// Admin Functions
+exports.sendBasicTemplateEmail = admin.sendBasicTemplateEmail;
 
 // Group Admin
 exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail;

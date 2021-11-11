@@ -92,7 +92,7 @@ const useUserTable = () => {
          copyEmails: (rowData) => ({
             tooltip: !(rowData.length === 0) && "Copy Emails",
             position: "toolbarOnSelect",
-            icon: tableIcons.EmailIcon,
+            icon: tableIcons.AlternateEmailIcon,
             disabled: rowData.length === 0,
             onClick: handlers.handleCopyEmails,
          }),

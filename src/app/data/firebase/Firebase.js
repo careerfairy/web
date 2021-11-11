@@ -104,6 +104,34 @@ class Firebase {
       return sendReminderEmailAboutApplicationLink(data);
    };
 
+   sendBasicTemplateEmail = async ({
+      values,
+      emails,
+      senderEmail,
+      templateId,
+   }) => {
+      // const testingEmails = ["kadirit@hotmail.com"];
+
+      const dataObj = {
+         title: values.title,
+         summary: values.summary,
+         companyLogoUrl: values.companyLogoUrl,
+         illustrationImageUrl: values.illustrationImageUrl,
+         eventUrl: values.eventUrl,
+         subject: values.subject,
+         start: values.start,
+         emails,
+         senderEmail,
+         templateId,
+      };
+
+      const sendBasicTemplateEmail = this.functions.httpsCallable(
+         "sendBasicTemplateEmail"
+      );
+
+      return sendBasicTemplateEmail(dataObj);
+   };
+
    joinGroupDashboard = async (data) => {
       const joinGroupDashboard = this.functions.httpsCallable(
          "joinGroupDashboard"

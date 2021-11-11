@@ -1,3 +1,8 @@
+import dayjs from "dayjs";
+
+var calendar = require("dayjs/plugin/calendar");
+dayjs.extend(calendar);
+
 export default class DateUtil {
    static getTodaysISODate() {
       let today = new Date();
@@ -9,6 +14,18 @@ export default class DateUtil {
       let todaysDate =
          today.getDate() > 9 ? today.getDate() : "0" + today.getDate();
       return todaysYear + "-" + todaysMonth + "-" + todaysDate;
+   }
+
+   static getRelativeDate(JSDate) {
+      const now = new Date();
+      return dayjs(JSDate).calendar(now, {
+         sameDay: "[Today,] h:mm", // The same day ( Today, 2:30  )
+         nextDay: "[Tomorrow,] h:mm", // The next day ( Tomorrow, 2:30 )
+         nextWeek: "dddd[,] h:mm", // The next week ( Sunday, 2:30 )
+         lastDay: "[Yesterday,] h:mm", // The day before ( Yesterday, 2:30 )
+         lastWeek: "[Last] dddd[,] h:mm", // Last week ( Last Monday, 2:30 )
+         sameElse: "DD.MM[,] h:mm A", // Everything else ( 17.10, 2:30 )
+      });
    }
 
    static getISODateTime(JSDate) {
