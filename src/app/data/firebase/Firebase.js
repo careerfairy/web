@@ -15,9 +15,9 @@ class Firebase {
       this.firestore = firebase.firestore();
       this.storage = firebase.storage();
       this.functions = firebase.functions();
-      if (process.env.NODE_ENV === "development") {
-         this.functions.useFunctionsEmulator("http://localhost:5001");
-      }
+      // if (process.env.NODE_ENV === "development") {
+      //    this.functions.useFunctionsEmulator("http://localhost:5001");
+      // }
    }
 
    getFirebaseTimestamp = (dateString) => {
@@ -110,12 +110,7 @@ class Firebase {
       senderEmail,
       templateId,
    }) => {
-      console.log("-> emails in fn", emails);
-      const testingEmails = [
-         "kadirit@hotmail.com",
-         "maximilian@careerfairy.io",
-      ];
-      console.log("-> testingEmails", testingEmails);
+      // const testingEmails = ["kadirit@hotmail.com"];
 
       const dataObj = {
          title: values.title,
@@ -125,7 +120,7 @@ class Firebase {
          eventUrl: values.eventUrl,
          subject: values.subject,
          start: values.start,
-         emails: testingEmails,
+         emails,
          senderEmail,
          templateId,
       };

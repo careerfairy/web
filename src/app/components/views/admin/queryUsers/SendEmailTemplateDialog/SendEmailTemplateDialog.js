@@ -12,9 +12,10 @@ import {
    Stepper,
    TextField,
    Typography,
+   useMediaQuery,
 } from "@material-ui/core";
 import { GlassDialog } from "materialUI/GlobalModals";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
 import { useFirestore } from "react-redux-firebase";
 import {
    FORTY_FIVE_MINUTES_IN_MILLISECONDS,
@@ -240,7 +241,6 @@ function getStepContent(stepIndex, props) {
 const targetTime = new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS);
 
 const Content = ({ handleClose, emails }) => {
-   const classes = useStyles();
    const firestore = useFirestore();
    const [activeStep, setActiveStep] = useState(0);
    const [targetStream, setTargetStream] = useState(null);
@@ -303,9 +303,17 @@ const SendEmailTemplateDialog = ({ open, onClose, emails }) => {
    const handleClose = () => {
       onClose();
    };
-
+   const { breakpoints } = useTheme();
+   const mobile = useMediaQuery(breakpoints.down("sm"));
    return (
-      <GlassDialog scroll="body" TransitionComponent={Grow} open={open}>
+      <GlassDialog
+         maxWidth="md"
+         fullWidth
+         fullScreen={mobile}
+         scroll="body"
+         TransitionComponent={Grow}
+         open={open}
+      >
          <Content emails={emails} handleClose={handleClose} />
       </GlassDialog>
    );

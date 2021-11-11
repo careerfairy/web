@@ -25,17 +25,17 @@ exports.sendBasicTemplateEmail = functions.https.onCall(
       // Remove the sender email if the sender is already in the emails list
       emailsArray = [...new Set(emailsArray)];
 
-      // functions.logger.log(
-      //    "number of emails in sendBasicTemplateEmail",
-      //    emailsArray.length
-      // );
+      functions.logger.log(
+         "number of emails in sendBasicTemplateEmail",
+         emailsArray.length
+      );
 
       //TODO remove before deploying to prod
       // functions.logger.log("Total emails in sendBasicTemplateEmail", emailsArray);
 
       // Will use the server side of the templateId for more
       // security instead of getting it from the client
-      const templateIdentifier = 25653565;
+      const templateIdentifier = templateId;
 
       const emailObjects = emailsArray.map((email) => ({
          TemplateId: templateIdentifier,

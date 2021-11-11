@@ -84,11 +84,15 @@ const basicFields = [
       label: "Company Logo Url",
       type: "image",
       name: "companyLogoUrl",
+      path: "company-logos",
+      small: true,
    },
    {
       label: "Illustration Url",
       type: "image",
       name: "illustrationImageUrl",
+      path: "illustration-images",
+      small: true,
    },
    {
       label: "Link to Event",

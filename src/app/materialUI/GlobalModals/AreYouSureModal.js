@@ -122,7 +122,7 @@ AreYouSureModal.propTypes = {
    handleClose: PropTypes.func.isRequired,
    handleConfirm: PropTypes.func.isRequired,
    loading: PropTypes.bool,
-   message: PropTypes.string,
+   message: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
    open: PropTypes.bool.isRequired,
    title: PropTypes.string,
    confirmSecurityText: PropTypes.string,

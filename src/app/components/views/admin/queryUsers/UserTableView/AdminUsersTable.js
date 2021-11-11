@@ -42,12 +42,12 @@ const AdminUsersTable = ({ users, isFiltered }) => {
       setEmailTemplateDialogOpen(false);
 
    const adminUsersTableActions = useMemo(
-      () => ({
+      (position) => ({
          copyEmails: (rowData) => ({
             tooltip:
                !(rowData.length === 0) &&
                `Send an email to ${subscribedEmails.length} subscribed user(s)`,
-            position: "toolbarOnSelect",
+            position: position || "toolbarOnSelect",
             icon: tableIcons.EmailIcon,
             disabled: rowData.length === 0,
             onClick: handleOpenEmailTemplateDialog,

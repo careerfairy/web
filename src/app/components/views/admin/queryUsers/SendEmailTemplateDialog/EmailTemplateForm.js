@@ -18,6 +18,8 @@ import DateUtil from "../../../../../util/DateUtil";
 import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import SendTestEmailDialog from "./SendTestEmailDialog";
+import ImageSelect from "../../../draftStreamForm/ImageSelect/ImageSelect";
+import { getDownloadUrl } from "../../../../helperFunctions/streamFormFunctions";
 
 const now = new Date();
 
@@ -54,8 +56,18 @@ const EmailTemplateForm = ({
    const [testEmails, setTestEmails] = useState([userData.userEmail]);
    const [sendingEmails, setSendingEmails] = useState(false);
 
+   const successSnackbar = (numberOfEmails) =>
+      dispatch(
+         actions.enqueueSnackbar({
+            message: `Emails have successfully been sent to ${numberOfEmails} user(s).`,
+            options: {
+               variant: "success",
+               preventDuplicate: true,
+            },
+         })
+      );
+
    const handleConfirmSendEmail = async (data) => {
-      console.log("-> handleConfirmSendEmail data", data);
       try {
          setSendingEmails(true);
          await targetTemplate.sendTemplate({
@@ -67,6 +79,8 @@ const EmailTemplateForm = ({
       }
       setSendingEmails(false);
       handleCloseSendConfirmEmailModal();
+      successSnackbar(data.emails?.length);
+      handleClose();
    };
 
    const handleConfirmSendTestEmail = useCallback(
@@ -75,7 +89,6 @@ const EmailTemplateForm = ({
          // ensure that the emails
          delete dataWithTestEmails?.emails;
          dataWithTestEmails.emails = testEmails || [];
-         console.log("-> handleConfirmSendTestEmail data", dataWithTestEmails);
          try {
             setSendingEmails(true);
             await targetTemplate.sendTemplate(dataWithTestEmails);
@@ -83,7 +96,9 @@ const EmailTemplateForm = ({
             dispatch(actions.sendGeneralError(e));
          }
          setSendingEmails(false);
-         handleCloseSendConfirmEmailModal();
+         handleCloseSendTestEmailModalData();
+         successSnackbar(testEmails.length);
+         handleClose();
       },
       [testEmails, userData.userEmail]
    );
@@ -107,12 +122,12 @@ const EmailTemplateForm = ({
                   values: {
                      ...values,
                      start: DateUtil.getRelativeDate(
-                        values.startDate
+                        values.eventStartDate
                      ).toString(),
                   },
                   templateId: targetTemplate.templateId,
                };
-               console.log("-> data", data);
+
                if (values.isTestEmail) {
                   // open test email modal
                   setConfirmSendTestEmailModalData(data);
@@ -127,7 +142,6 @@ const EmailTemplateForm = ({
          }}
       >
          {(formik) => {
-            console.log("-> formik.errors", formik.errors);
             return (
                <>
                   <Box p={1} position="relative">
@@ -142,10 +156,39 @@ const EmailTemplateForm = ({
                         </Typography>
                         <Grid container spacing={2}>
                            {targetTemplate.fields.map((field) => {
-                              if (
-                                 field.type === "string" ||
-                                 field.type === "image"
-                              ) {
+                              if (field.type === "image") {
+                                 return (
+                                    <Grid
+                                       key={field.name}
+                                       item
+                                       xs={12}
+                                       md={field.small && 6}
+                                    >
+                                       <ImageSelect
+                                          error={
+                                             formik.touched[field.name] &&
+                                             formik.errors[field.name]
+                                          }
+                                          value={formik.values[field.name]}
+                                          loading={
+                                             formik.isSubmitting ||
+                                             sendingEmails
+                                          }
+                                          handleBlur={formik.handleBlur}
+                                          formName={field.name}
+                                          setFieldValue={formik.setFieldValue}
+                                          path={field.path}
+                                          getDownloadUrl={getDownloadUrl}
+                                          label={field.label}
+                                          isSubmitting={
+                                             formik.isSubmitting ||
+                                             sendingEmails
+                                          }
+                                       />
+                                    </Grid>
+                                 );
+                              }
+                              if (field.type === "string") {
                                  return (
                                     <Grid
                                        key={field.name}
@@ -164,7 +207,7 @@ const EmailTemplateForm = ({
                                           }
                                           multiline={field.multiLine}
                                           minRows={field.multiLine && 3}
-                                          maxRows={field.multiLine && 12}
+                                          maxRows={field.multiLine && 20}
                                           inputProps={{
                                              maxLength: field.maxLength,
                                           }}
