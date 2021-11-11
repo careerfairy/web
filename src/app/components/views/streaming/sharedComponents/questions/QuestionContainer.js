@@ -140,6 +140,7 @@ const ReactionsToggle = ({
 
 const QuestionContainer = memo(
    ({
+      sessionUuid,
       sliding,
       user,
       streamer,
@@ -162,14 +163,17 @@ const QuestionContainer = memo(
       const { tutorialSteps, handleConfirmStep } = useContext(TutorialContext);
       const [loading, setLoading] = useState(false);
       const isEmpty =
-         !newCommentTitle.trim() || (!userData && !livestream?.test);
+         !newCommentTitle.trim() ||
+         (!userData && !(livestream?.test || livestream.openStream));
       const active = question?.type === "current";
       const old = question?.type !== "new";
       const upvoted =
          (!user && !livestream?.test) ||
          (question?.emailOfVoters
             ? question?.emailOfVoters.indexOf(
-                 livestream?.test ? "streamerEmail" : authenticatedUser.email
+                 livestream?.test || livestream?.openStream
+                    ? "streamerEmail" + sessionUuid
+                    : authenticatedUser.email
               ) > -1
             : false);
       const classes = useStyles({ active });
@@ -212,7 +216,9 @@ const QuestionContainer = memo(
          try {
             if (
                !newCommentTitle.trim() ||
-               (!userData && !livestream?.test && !streamer)
+               (!userData &&
+                  !(livestream?.test || livestream.openStream) &&
+                  !streamer)
             ) {
                return;
             }
@@ -258,9 +264,10 @@ const QuestionContainer = memo(
       }
 
       function upvoteLivestreamQuestion() {
-         let authEmail = livestream.test
-            ? "streamerEmail"
-            : authenticatedUser.email;
+         let authEmail =
+            livestream.test || livestream.openStream
+               ? "streamerEmail" + sessionUuid
+               : authenticatedUser.email;
          firebase.upvoteLivestreamQuestionWithRef(
             streamRef,
             question,

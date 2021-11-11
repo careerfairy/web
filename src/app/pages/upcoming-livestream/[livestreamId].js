@@ -135,7 +135,7 @@ const parseDates = (stream) => {
 function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    const classes = useStyles();
    const router = useRouter();
-   const { livestreamId } = router.query;
+   const { livestreamId, groupId: queryGroupId } = router.query;
    const absolutePath = router.asPath;
    const summaryRef = useRef();
    const { referrerId } = router.query;
@@ -272,23 +272,30 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          firebase
             .getDetailLivestreamCareerCenters(currentLivestream.groupIds)
             .then((querySnapshot) => {
-               let groupList = [];
-               querySnapshot.forEach((doc) => {
-                  let group = doc.data();
-                  group.id = doc.id;
-                  groupList.push(group);
-               });
-               setCareerCenters(
-                  groupList.filter((careerCenter) =>
-                     GroupsUtil.filterCurrentGroup(
-                        careerCenter,
-                        currentGroup?.groupId
-                     )
-                  )
+               let groupList = querySnapshot.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+               }));
+
+               let targetGroupId = currentGroup?.groupId;
+
+               if (!queryGroupId) {
+                  const companyThatPublishedStream = groupList.find(
+                     (group) =>
+                        !group.universityCode &&
+                        group.id === currentLivestream?.author?.groupId
+                  );
+                  if (companyThatPublishedStream?.id) {
+                     targetGroupId = companyThatPublishedStream.id;
+                  }
+               }
+               groupList = groupList.filter((careerCenter) =>
+                  GroupsUtil.filterCurrentGroup(careerCenter, targetGroupId)
                );
+               setCareerCenters(groupList);
             });
       }
-   }, [currentLivestream, currentGroup?.groupId]);
+   }, [currentLivestream?.groupIds, currentGroup?.groupId]);
 
    useEffect(() => {
       if (
@@ -1390,6 +1397,7 @@ export async function getServerSideProps({
       delete serverSideLivestream.adminEmails;
       delete serverSideLivestream.adminEmail;
       delete serverSideLivestream.author;
+      delete serverSideLivestream.lastUpdatedAuthorInfo;
       delete serverSideLivestream.status;
 
       serverSideLivestream.id = snap.id;

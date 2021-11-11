@@ -12,13 +12,16 @@ import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
 
 const HandRaiseCategory = ({
+   streamerId,
    livestream,
    selectedState,
    setHandRaiseActive,
    isMobile,
 }) => {
    const dispatch = useDispatch();
-   const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState();
+   const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState(
+      streamerId
+   );
    const [handRaisePromptDialogOpen, setHandRaisePromptDialogOpen] = useState(
       false
    );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { withFirebase } from "../../../context/firebase";
+import { useFirebase, withFirebase } from "context/firebase";
 import { useMediaQuery } from "@material-ui/core";
 import { useTheme } from "@material-ui/core/styles";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
@@ -18,6 +18,7 @@ const NextLivestreams = ({
    listenToUpcoming,
 }) => {
    const { userData } = useAuth();
+   const firebase = useFirebase();
    const theme = useTheme();
    const mobile = useMediaQuery(theme.breakpoints.down("sm"));
    const router = useRouter();
@@ -113,4 +114,4 @@ const NextLivestreams = ({
    );
 };
 
-export default withFirebase(NextLivestreams);
+export default NextLivestreams;

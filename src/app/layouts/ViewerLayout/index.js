@@ -113,27 +113,33 @@ const ViewerLayout = (props) => {
 
    const currentLivestream = useStreamConnect();
 
-   useViewerHandRaiseConnect(currentLivestream);
+   useViewerHandRaiseConnect(currentLivestream, streamerId);
    // console.log("-> currentLivestream", currentLivestream);
    useEffect(() => {
       if (currentLivestream && !currentLivestream.test) {
-         if (token) {
-            firebase.getLivestreamSecureTokenWithRef(streamRef).then((doc) => {
-               if (!doc.exists) {
-                  router.push("/streaming/error");
-               }
-               let storedToken = doc.data().value;
-               if (storedToken !== token) {
-                  setNotAuthorized(false);
-               }
-            });
+         if (currentLivestream.openStream) {
+            setNotAuthorized(false);
          } else {
-            setNotAuthorized(
-               currentLivestream &&
-                  !currentLivestream.test &&
-                  authenticatedUser?.isLoaded &&
-                  authenticatedUser?.isEmpty
-            );
+            if (token) {
+               firebase
+                  .getLivestreamSecureTokenWithRef(streamRef)
+                  .then((doc) => {
+                     if (!doc.exists) {
+                        router.push("/streaming/error");
+                     }
+                     let storedToken = doc.data().value;
+                     if (storedToken !== token) {
+                        setNotAuthorized(false);
+                     }
+                  });
+            } else {
+               setNotAuthorized(
+                  currentLivestream &&
+                     !currentLivestream.test &&
+                     authenticatedUser?.isLoaded &&
+                     authenticatedUser?.isEmpty
+               );
+            }
          }
       }
    }, [token, currentLivestream?.test, currentLivestream?.id]);
@@ -181,7 +187,7 @@ const ViewerLayout = (props) => {
       if (currentLivestream && !streamerId) {
          if (currentLivestream.test && authenticatedUser?.email) {
             setStreamerId(currentLivestream.id + authenticatedUser.email);
-         } else if (currentLivestream.test) {
+         } else if (currentLivestream.test || currentLivestream.openStream) {
             let uuid = uuidv4();
             let joiningId = uuid.replace(/-/g, "");
             setStreamerId(currentLivestream.id + joiningId);
@@ -322,6 +328,7 @@ const ViewerLayout = (props) => {
                mobile={mobile}
             />
             <LeftMenu
+               streamerId={streamerId}
                handRaiseActive={handRaiseActive}
                setHandRaiseActive={setHandRaiseActive}
                streamer={false}

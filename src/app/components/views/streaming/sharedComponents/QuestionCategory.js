@@ -46,6 +46,7 @@ import { compose } from "redux";
 import { useCurrentStream } from "../../../../context/stream/StreamContext";
 import { truncate } from "../../../helperFunctions/HelperFunctions";
 import useStreamRef from "../../../custom-hook/useStreamRef";
+import { v4 as uuidv4 } from "uuid";
 
 const useStyles = makeStyles((theme) => ({
    view: {
@@ -123,6 +124,7 @@ const QuestionCategory = (props) => {
    const [showQuestionModal, setShowQuestionModal] = useState(false);
    const [touched, setTouched] = useState(false);
    const [value, setValue] = useState(0);
+   const [sessionUuid, setSessionUuid] = useState(uuidv4());
    const [parentHeight, setParentHeight] = useState(400);
    const [submittingQuestion, setSubmittingQuestion] = useState(false);
    const [goingToQuestion, setGoingToQuestion] = useState(false);
@@ -233,7 +235,7 @@ const QuestionCategory = (props) => {
    const addNewQuestion = async () => {
       setTouched(true);
       if (
-         (!userData && !livestream.test) ||
+         (!userData && !(livestream.test || livestream.openStream)) ||
          !newQuestionTitle.trim() ||
          newQuestionTitle.trim().length < 5
       ) {
@@ -245,10 +247,10 @@ const QuestionCategory = (props) => {
             title: newQuestionTitle,
             votes: 0,
             type: "new",
-            author: !livestream.test
+            author: !(livestream.test || livestream.openStream)
                ? authenticatedUser.email
-               : "test@careerfairy.io",
-            displayName: !livestream.test
+               : "open@careerfairy.io",
+            displayName: !(livestream.test || livestream.openStream)
                ? `${userData.firstName} ${userData.lastName}`
                : "A viewer",
          };
@@ -265,6 +267,7 @@ const QuestionCategory = (props) => {
       return (
          <QuestionContainer
             key={question.id}
+            sessionUuid={sessionUuid}
             streamer={streamer}
             goToThisQuestion={goToThisQuestion}
             isNextQuestions={value === 0}
