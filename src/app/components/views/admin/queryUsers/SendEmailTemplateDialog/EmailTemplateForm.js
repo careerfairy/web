@@ -98,7 +98,6 @@ const EmailTemplateForm = ({
          setSendingEmails(false);
          handleCloseSendTestEmailModalData();
          successSnackbar(testEmails.length);
-         handleClose();
       },
       [testEmails, userData.userEmail]
    );
