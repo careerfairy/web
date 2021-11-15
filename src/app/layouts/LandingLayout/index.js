@@ -17,7 +17,7 @@ const LandingLayout = ({ backgroundImage, children }) => {
          style={{ backgroundImage: `url(${backgroundImage})` }}
       >
          <TopBar />
-         <NavBar drawerWidth={drawerWidth} />
+         <NavBar anchor="left" drawerWidth={drawerWidth} />
          <div className={classes.wrapper}>
             <div className={classes.contentContainer}>
                <div className={classes.content}>

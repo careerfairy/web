@@ -5,7 +5,7 @@ import Section from "components/views/common/Section";
 import { Grid } from "@material-ui/core";
 import LaptopVideo from "./LaptopVideo";
 import Fade from "react-reveal/Fade";
-import HeroMessage from "./HeroMessage";
+import GeneralHeroMessage from "./HeroMessage";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 const useStyles = makeStyles((theme) => ({
@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
       alignItems: (props) => (props.mobile ? "flex-start" : "center"),
    },
    heroContainer: {
-      maxWidth: "90%",
+      // maxWidth: "90%",
    },
    subTitle: {
       color: theme.palette.text.secondary,
@@ -49,7 +49,9 @@ const HeroSection = ({
    big,
    color,
    handleOpenCalendly,
+   buttons,
    title,
+   subTitle,
 }) => {
    const theme = useTheme();
    const mobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -78,19 +80,22 @@ const HeroSection = ({
                      {mobile ? (
                         <LaptopVideo />
                      ) : (
-                        <HeroMessage
+                        <GeneralHeroMessage
                            mobile={mobile}
                            title={title}
+                           subTitle={subTitle}
+                           buttons={buttons}
                            handleOpenCalendly={handleOpenCalendly}
                         />
                      )}
                   </Fade>
                </Grid>
                <Grid className={classes.laptopVideoWrapper} {...itemProps}>
-                  <Fade up>
+                  <Fade style={{}} up>
                      {mobile ? (
-                        <HeroMessage
+                        <GeneralHeroMessage
                            mobile={mobile}
+                           buttons={buttons}
                            title={title}
                            handleOpenCalendly={handleOpenCalendly}
                         />

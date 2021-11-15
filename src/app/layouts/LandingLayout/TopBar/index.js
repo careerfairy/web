@@ -130,7 +130,16 @@ const TopBar = ({ className, ...rest }) => {
 
    return (
       <GeneralHeader permanent transparent>
-         <MainLogo />
+         <Box display="flex" alignItems="center">
+            <IconButton
+               style={{ marginRight: "1rem" }}
+               color="primary"
+               onClick={handleDrawerOpen}
+            >
+               <MenuIcon />
+            </IconButton>
+            <MainLogo />
+         </Box>
          <Hidden smDown>
             <Tabs
                className={classes.tabs}
@@ -167,13 +176,6 @@ const TopBar = ({ className, ...rest }) => {
                   </IconButton>
                )}
             </Hidden>
-            <IconButton
-               style={{ marginLeft: "1rem" }}
-               color="primary"
-               onClick={handleDrawerOpen}
-            >
-               <MenuIcon />
-            </IconButton>
          </Box>
       </GeneralHeader>
    );

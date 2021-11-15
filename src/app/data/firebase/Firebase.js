@@ -2224,7 +2224,7 @@ class Firebase {
          .get();
    };
 
-   listenToUpcomingLivestreams = (callback) => {
+   listenToUpcomingLivestreams = (callback, limit) => {
       var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
       let ref = this.firestore
          .collection("livestreams")
@@ -2235,7 +2235,27 @@ class Firebase {
          )
          .where("test", "==", false)
          .orderBy("start", "asc");
+      if (limit) {
+         ref = ref.limit(limit);
+      }
       return ref.onSnapshot(callback);
+   };
+
+   getUpcomingLivestreams = (limit) => {
+      var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
+      let ref = this.firestore
+         .collection("livestreams")
+         .where(
+            "start",
+            ">",
+            new Date(Date.now() - fortyFiveMinutesInMilliseconds)
+         )
+         .where("test", "==", false)
+         .orderBy("start", "asc");
+      if (limit) {
+         ref = ref.limit(limit);
+      }
+      return ref.get();
    };
 
    /**

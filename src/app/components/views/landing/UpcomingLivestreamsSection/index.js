@@ -1,13 +1,11 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
-import HighlightText from "../common/HighlightText";
-import landingCompanies from "../../../../constants/landingCompanies";
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
-import Logo from "../common/Logo";
-import LogosComponent from "../common/LogosComponent";
+import UpcomingLivestreamCard from "../../common/stream-cards/UpcomingLivestreamCard";
+import { Box, Grid } from "@material-ui/core";
+import { useFirebase } from "../../../../context/firebase";
 
 const useStyles = makeStyles((theme) => ({
    section: {
@@ -30,8 +28,22 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const CompaniesSection = (props) => {
+const UpcomingLivestreamsSection = (props) => {
    const classes = useStyles();
+   const { getUpcomingLivestreams } = useFirebase();
+
+   const [upcomingLivestreams, setUpcomingLivestreams] = useState([]);
+
+   useEffect(() => {
+      (async function () {
+         const newStreamSnaps = await getUpcomingLivestreams(3);
+         const newStreams = newStreamSnaps.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }));
+         setUpcomingLivestreams(newStreams);
+      })();
+   }, []);
 
    return (
       <Section
@@ -44,24 +56,24 @@ const CompaniesSection = (props) => {
          backgroundColor={props.backgroundColor}
       >
          <SectionContainer>
-            {props.overheadText && <HighlightText text={props.overheadText} />}
-            <LogosComponent>
-               {landingCompanies.map(({ name, imageUrlMain }) => (
-                  <Logo
-                     key={name}
-                     alt={name}
-                     logoUrl={getResizedUrl(imageUrlMain, "xs")}
-                  />
+            <Grid container spacing={2} display="flex" justifyContent="center">
+               {upcomingLivestreams.map((livestream) => (
+                  <Grid item xs>
+                     <UpcomingLivestreamCard
+                        livestream={livestream}
+                        key={livestream.id}
+                     />
+                  </Grid>
                ))}
-            </LogosComponent>
+            </Grid>
          </SectionContainer>
       </Section>
    );
 };
 
-export default CompaniesSection;
+export default UpcomingLivestreamsSection;
 
-CompaniesSection.propTypes = {
+UpcomingLivestreamsSection.propTypes = {
    backgroundColor: PropTypes.any,
    backgroundImage: PropTypes.any,
    backgroundImageClassName: PropTypes.any,
