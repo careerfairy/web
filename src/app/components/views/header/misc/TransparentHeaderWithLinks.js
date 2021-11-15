@@ -108,6 +108,7 @@ const TransparentHeaderWithLinks = ({ className, ...rest }) => {
                   <LoginButton />
                ) : (
                   <IconButton
+                     id="profile_icon"
                      component={Link}
                      className={classes.navIconButton}
                      color="primary"

@@ -1,24 +1,9 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { withFirebase } from "context/firebase";
+import { useFirebase } from "context/firebase";
 import ShareIcon from "@material-ui/icons/Share";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import { v4 as uuidv4 } from "uuid";
-import {
-   Box,
-   Button,
-   Chip,
-   CircularProgress,
-   Dialog,
-   DialogActions,
-   DialogContent,
-   DialogTitle,
-   Divider,
-   FormControl,
-   InputLabel,
-   MenuItem,
-   Select,
-   Typography,
-} from "@material-ui/core";
+import { Box, Button, CircularProgress, Typography } from "@material-ui/core";
 import { CSVLink } from "react-csv";
 import StatsUtil from "data/util/StatsUtil";
 import { PDFDownloadLink } from "@react-pdf/renderer";
@@ -49,20 +34,14 @@ const useStyles = makeStyles((theme) => {
    };
 });
 const EnhancedGroupStreamCard = ({
-   firebase,
    livestream,
    group,
    isPastLivestream,
-   levelOfStudyModalOpen = false,
-   handleCloseLevelOfStudyModal,
-   handleOpenLevelOfStudyModal,
    switchToNextLivestreamsTab,
    handleEditStream,
-
    isDraft,
-   router,
-   hasOptions,
 }) => {
+   const firebase = useFirebase();
    const classes = useStyles();
    const { authenticatedUser, userData } = useAuth();
    const { enqueueSnackbar } = useSnackbar();
@@ -89,7 +68,6 @@ const EnhancedGroupStreamCard = ({
       questions,
       polls,
       icons,
-      livestreamSpeakers,
       overallRating,
       contentRating,
       talentPoolForReport,
@@ -106,25 +84,24 @@ const EnhancedGroupStreamCard = ({
    const [startDownloadingTalentPool, setStartDownloadingTalentPool] = useState(
       false
    );
-   const { hasDownloadedTalentPool, talentPool } = useTalentPoolMetadata(
+   const { hasDownloadedTalentPool, talentPool } = useTalentPoolMetadata({
       livestream,
       allGroups,
       group,
       firebase,
       registeredStudentsFromGroup,
-      startDownloadingTalentPool
-   );
+      startDownloadingTalentPool,
+   });
 
    useEffect(() => {
       if (
          livestream &&
          livestream.targetCategories &&
-         livestream.targetCategories[group.id] &&
-         levelOfStudyModalOpen
+         livestream.targetCategories[group.id]
       ) {
          setLocalCategories(livestream.targetCategories[group.id]);
       }
-   }, [livestream, levelOfStudyModalOpen]);
+   }, [livestream]);
 
    useEffect(() => {
       if (group && group.categories) {
@@ -216,29 +193,11 @@ const EnhancedGroupStreamCard = ({
       return correspondingOption?.name || "CATEGORY_UNDEFINED";
    }
 
-   function addElement(optionId) {
-      if (localCategories.indexOf(optionId) < 0) {
-         setLocalCategories([...localCategories, optionId]);
-      }
-   }
-
    function removeElement(optionId) {
       const filteredOptions = localCategories.filter(
          (option) => option !== optionId
       );
       setLocalCategories(filteredOptions);
-   }
-
-   function updateLivestreamCategories() {
-      let categoryCopy = livestream.targetCategories
-         ? livestream.targetCategories
-         : {};
-      categoryCopy[group.id] = localCategories;
-      firebase
-         .updateLivestreamCategories(livestream.id, categoryCopy)
-         .then(() => {
-            handleCloseLevelOfStudyModal();
-         });
    }
 
    const sendErrorMessage = () => {
@@ -308,26 +267,6 @@ const EnhancedGroupStreamCard = ({
    };
 
    const isWorkInProgress = () => !livestream.status?.pendingApproval;
-
-   let categoryElements = localCategories.map((category, index) => {
-      return (
-         <Chip
-            size={"medium"}
-            variant={"outlined"}
-            key={category.id || index}
-            onDelete={() => removeElement(category)}
-            label={getOptionName(category)}
-         />
-      );
-   });
-
-   let menuItems = groupCategories.map((group) => {
-      return (
-         <MenuItem value={group.id} key={group.id}>
-            {group?.name}
-         </MenuItem>
-      );
-   });
 
    const canDownloadRegisteredStudents = () =>
       Boolean(group.universityCode || group.privacyPolicyActive);
@@ -463,6 +402,7 @@ const EnhancedGroupStreamCard = ({
                   </CSVLink>
                )}
             </Fragment>
+
             {isPastLivestream && (
                <Fragment>
                   {!startDownloadingReport || !hasDownloadedReport ? (
@@ -546,52 +486,9 @@ const EnhancedGroupStreamCard = ({
                   isDraft ? "draft" : "stream"
                }? you will be no longer able to recover it`}
             />
-            <Dialog
-               open={levelOfStudyModalOpen}
-               onClose={handleCloseLevelOfStudyModal}
-               fullWidth
-               maxWidth="sm"
-            >
-               <DialogTitle align="center">Update Target Groups</DialogTitle>
-               <DialogContent>
-                  <FormControl
-                     variant="outlined"
-                     fullWidth
-                     style={{ marginBottom: "10px" }}
-                  >
-                     <InputLabel>Add a Target Group</InputLabel>
-                     <Select
-                        value={""}
-                        placeholder="Select a target group"
-                        onChange={(e) => addElement(e.target.value)}
-                        label="New target group"
-                     >
-                        {menuItems}
-                     </Select>
-                  </FormControl>
-                  {categoryElements}
-               </DialogContent>
-               <DialogActions>
-                  <Button
-                     variant="contained"
-                     size="large"
-                     color="primary"
-                     onClick={updateLivestreamCategories}
-                     autoFocus
-                  >
-                     Confirm
-                  </Button>
-                  <Button size="large" onClick={handleCloseLevelOfStudyModal}>
-                     Cancel
-                  </Button>
-               </DialogActions>
-            </Dialog>
          </Box>
-         {hasOptions && (
-            <Divider className={classes.divider} variant="middle" />
-         )}
       </>
    );
 };
 
-export default withFirebase(EnhancedGroupStreamCard);
+export default EnhancedGroupStreamCard;

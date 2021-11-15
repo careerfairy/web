@@ -120,7 +120,7 @@ const draftStream = ({ firebase }) => {
             }
             await firebase.updateLivestream(livestream, "draftLivestreams");
 
-            console.log("-> Draft livestream was updated with id", id);
+            // console.log("-> Draft livestream was updated with id", id);
          } else {
             const author = {
                email: authenticatedUser?.email || userInfo.email || "anonymous",
@@ -130,7 +130,7 @@ const draftStream = ({ firebase }) => {
                "draftLivestreams",
                author
             );
-            console.log("-> Draft livestream was created with id", id);
+            // console.log("-> Draft livestream was created with id", id);
             push(`/draft-stream?draftStreamId=${id}`);
          }
 

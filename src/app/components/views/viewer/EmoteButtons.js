@@ -4,6 +4,7 @@ import {
    CircularProgress,
    ClickAwayListener,
    Fab,
+   Grow,
 } from "@material-ui/core";
 import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
@@ -14,7 +15,6 @@ import { useCurrentStream } from "../../../context/stream/StreamContext";
 import { useAuth } from "../../../HOCs/AuthProvider";
 import { useFirebase } from "context/firebase";
 import { TEST_EMAIL } from "../streaming/LeftMenu/categories/chat/EmotesModal/utils";
-import { useRouter } from "next/router";
 
 const useStyles = makeStyles((theme) => ({
    image: {
@@ -147,10 +147,11 @@ const delay = 3000; //3 seconds
 const smoothness = 2;
 const EmoteButtons = ({ createEmote }) => {
    const firebase = useFirebase();
+
    const {
       currentLivestream: { id: livestreamId },
    } = useCurrentStream();
-   const { authenticatedUser } = useAuth();
+   const { authenticatedUser, userData } = useAuth();
    const classes = useStyles({ handRaiseActive: false });
    const SPEED = isNaN(smoothness) ? 2 : smoothness;
    const DELAY = isNaN(delay) ? 3000 : delay;
@@ -217,7 +218,9 @@ const EmoteButtons = ({ createEmote }) => {
    const postIcon = (iconName) => {
       if (!iconsDisabled) {
          createEmote(iconName);
-         setIconsDisabled(true);
+         if (!userData || !userData.isClapAdmin) {
+            setIconsDisabled(true);
+         }
          firebase.postIcon(
             livestreamId,
             iconName,
@@ -231,6 +234,7 @@ const EmoteButtons = ({ createEmote }) => {
 
    return (
       <ClickAwayListener onClickAway={handleClose}>
+         {/*<Grow in={true} unmountOnExit>*/}
          <div
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -296,6 +300,7 @@ const EmoteButtons = ({ createEmote }) => {
                </div>
             </Box>
          </div>
+         {/*</Grow>*/}
       </ClickAwayListener>
    );
 };

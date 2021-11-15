@@ -6,14 +6,19 @@ import QuestionVotingBox from "components/views/question-voting-box/QuestionVoti
 
 import Link from "next/link";
 
-import { withFirebase } from "context/firebase";
+import { useFirebase, withFirebase } from "context/firebase";
 import {
+   Box,
    Button,
    Dialog,
    DialogContent,
    Grid,
    TextField,
 } from "@material-ui/core";
+import CopyLinkField from "../CopyLinkField";
+import { getBaseUrl } from "../../../helperFunctions/HelperFunctions";
+import { useRouter } from "next/router";
+import { useAuth } from "../../../../HOCs/AuthProvider";
 
 function BookingModal({
    modalOpen,
@@ -21,13 +26,16 @@ function BookingModal({
    careerCenters,
    livestream,
    registration,
-   groupId,
    setModalOpen,
    setRegistration,
    buttonAction,
-   firebase,
 }) {
+   const firebase = useFirebase();
    const [modalStep, setModalStep] = useState(0);
+   const {
+      query: { groupId, referrerId },
+   } = useRouter();
+   const { userData } = useAuth();
 
    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
    const [questionsAvailable, setQuestionsAvailable] = useState(false);
@@ -87,19 +95,34 @@ function BookingModal({
    }, [upcomingQuestions]);
 
    function handleUrl() {
-      let url = "/next-livestreams";
-      if (groupId) {
-         url = `/next-livestreams/${groupId}?livestreamId=${livestream.id}`;
-      } else if (
-         careerCenters &&
-         careerCenters.length &&
-         careerCenters.length === 1
-      ) {
-         // If there's only one group, please send me to that groups page
-         url = `/next-livestreams/${careerCenters[0].id}?livestreamId=${livestream.id}`;
-      }
-      return url;
+      return {
+         pathname: groupId
+            ? `/next-livestreams/${groupId}`
+            : careerCenters.length === 1
+            ? `/next-livestreams/${careerCenters[0].id}`
+            : "/next-livestreams",
+         query: {
+            ...(referrerId && { referrerId }),
+            ...(livestream?.id && {
+               livestreamId: livestream.id,
+            }),
+         },
+      };
    }
+
+   const getRefererUrl = () => {
+      let url = `/next-livestreams?livestreamId=${livestream.id}`;
+      if (userData?.authId) {
+         url = `/next-livestreams?livestreamId=${livestream.id}&referrerId=${userData.authId}`;
+         if (groupId) {
+            url = `/next-livestreams/${groupId}?livestreamId=${livestream.id}&referrerId=${userData.authId}`;
+         } else if (careerCenters?.[0]?.id) {
+            // If there's only one group, please send me to that groups page
+            url = `/next-livestreams/${careerCenters[0].id}?livestreamId=${livestream.id}&referrerId=${userData.authId}`;
+         }
+      }
+      return `${getBaseUrl()}${url}`;
+   };
 
    function addNewQuestion() {
       if (!user) {
@@ -133,20 +156,16 @@ function BookingModal({
    }
 
    const handleFirstStep = () => {
-      if (livestream.isFaceToFace) {
-         setModalStep(4);
+      if (questionElements.length > 0) {
+         setModalStep(1);
       } else {
-         if (questionElements.length > 0) {
-            setModalStep(1);
-         } else {
-            setModalStep(2);
-         }
+         setModalStep(2);
       }
    };
 
    function joinTalentPool() {
       firebase
-         .joinCompanyTalentPool(livestream.companyId, user.email, livestream.id)
+         .joinCompanyTalentPool(livestream.companyId, userData, livestream.id)
          .then(() => {
             setModalStep(4);
          });
@@ -176,6 +195,9 @@ function BookingModal({
             maxWidth={"md"}
          >
             <DialogContent>
+               {/*<Box>*/}
+               {/*   <CopyLinkField linkUrl={getRefererUrl()} />*/}
+               {/*</Box>*/}
                <div
                   style={{ padding: "200px" }}
                   className={registration ? "" : "hidden"}
@@ -466,4 +488,4 @@ function BookingModal({
    );
 }
 
-export default withFirebase(BookingModal);
+export default BookingModal;

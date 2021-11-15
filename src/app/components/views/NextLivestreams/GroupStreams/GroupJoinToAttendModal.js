@@ -1,22 +1,21 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { withFirebase } from "context/firebase";
+import { useFirebase, withFirebase } from "context/firebase";
 import UserCategorySelector from "components/views/profile/UserCategorySelector";
 import {
    Box,
    Button,
    CardMedia,
-   Checkbox,
    CircularProgress,
    Dialog,
    DialogActions,
    DialogContent,
    DialogContentText,
    DialogTitle,
-   FormControlLabel,
    Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import LogoButtons from "./LogoButtons";
+import StatsUtil from "../../../../data/util/StatsUtil";
 
 const useStyles = makeStyles((theme) => ({
    media: {
@@ -28,6 +27,9 @@ const useStyles = makeStyles((theme) => ({
    image: {
       objectFit: "contain",
       maxWidth: "80%",
+      padding: theme.spacing(1),
+      borderRadius: theme.spacing(1),
+      background: theme.palette.common.white,
    },
    actions: {
       display: "flex",
@@ -38,15 +40,19 @@ const useStyles = makeStyles((theme) => ({
 
 const GroupJoinToAttendModal = ({
    groups,
-   firebase,
    open,
    closeModal,
    groupsWithPolicies,
    userData,
    onConfirm,
    alreadyJoined,
+   isOnStreamPage,
+   followAGroupTitle,
+   updateCategoriesTitle,
+   onJoinAttempt, // callback will be called regardless if the joining the group succeeded or failed
 }) => {
    const classes = useStyles();
+   const firebase = useFirebase();
    const [categories, setCategories] = useState([]);
    const [group, setGroup] = useState({});
    const [allSelected, setAllSelected] = useState(false);
@@ -71,11 +77,11 @@ const GroupJoinToAttendModal = ({
             selectedValueId: "",
          }));
          if (userData && alreadyJoined) {
-            const userCategories = userData.registeredGroups.find(
+            const userCategories = userData.registeredGroups?.find(
                (el) => el.groupId === group.id
-            ).categories;
-            userCategories.forEach((category, index) => {
-               groupCategories.forEach((groupCategory) => {
+            )?.categories;
+            userCategories?.forEach((category, index) => {
+               groupCategories?.forEach((groupCategory) => {
                   const exists = groupCategory.options.some(
                      (option) => option.id === category.selectedValueId
                   );
@@ -118,26 +124,26 @@ const GroupJoinToAttendModal = ({
             groupId: group.id,
             categories: newCategories,
          };
-         let arrayOfGroupObjects = [];
-         let arrayOfGroupIds = [];
-         if (userData.groupIds && userData.registeredGroups) {
-            if (alreadyJoined) {
-               arrayOfGroupIds = [...userData.groupIds];
-               const index = userData.registeredGroups.findIndex(
-                  (group) => group.groupId === groupObj.groupId
-               );
-               arrayOfGroupObjects = [...userData.registeredGroups];
-               arrayOfGroupObjects[index] = groupObj;
-            } else {
-               arrayOfGroupObjects = [...userData.registeredGroups, groupObj];
-               arrayOfGroupIds = arrayOfGroupObjects.map((obj) => obj.groupId);
-            }
-         } else {
-            arrayOfGroupObjects.push(groupObj);
-            arrayOfGroupIds.push(groupObj.groupId);
+         let arrayOfGroupObjects = userData.registeredGroups?.length
+            ? userData.registeredGroups?.filter(
+                 (group) => group.groupId !== groupObj.groupId
+              )
+            : [];
+
+         arrayOfGroupObjects.push(groupObj);
+
+         let arrayOfGroupIds = arrayOfGroupObjects.map((obj) => obj.groupId);
+
+         if (userData.groupIds?.length) {
+            arrayOfGroupIds = [...arrayOfGroupIds, ...userData.groupIds];
          }
+
          const userId = userData.id || userData.userEmail;
-         await firebase.setgroups(userId, arrayOfGroupIds, arrayOfGroupObjects);
+         await firebase.setgroups(
+            userId,
+            [...new Set(arrayOfGroupIds)],
+            arrayOfGroupObjects
+         );
          setSubmitting(false);
          if (onConfirm) {
             onConfirm();
@@ -147,6 +153,7 @@ const GroupJoinToAttendModal = ({
          console.log("error in handle join", e);
          setSubmitting(false);
       }
+      onJoinAttempt?.();
    };
 
    const renderCategories = categories.map((category, index) => {
@@ -155,6 +162,15 @@ const GroupJoinToAttendModal = ({
             <UserCategorySelector
                handleSetSelected={handleSetSelected}
                index={index}
+               isNew={
+                  alreadyJoined &&
+                  !StatsUtil.studentHasSelectedCategory(
+                     userData,
+                     group,
+                     category.id
+                  )
+               }
+               alreadyJoined={alreadyJoined}
                category={category}
             />
          </Fragment>
@@ -162,7 +178,7 @@ const GroupJoinToAttendModal = ({
    });
 
    const handleClose = () => {
-      closeModal();
+      closeModal?.();
    };
 
    return (
@@ -170,14 +186,16 @@ const GroupJoinToAttendModal = ({
          {!group.universityName ? (
             <>
                <DialogTitle align="center">
-                  Please follow one of the following groups in order to
-                  register:
+                  {followAGroupTitle ||
+                     "Please follow one of the following groups in order to register:"}
                </DialogTitle>
                <LogoButtons setGroup={setGroup} groups={groups} />
             </>
          ) : (
             <>
-               <DialogTitle align="center">Join live streams from</DialogTitle>
+               <DialogTitle align="center">
+                  {updateCategoriesTitle || "Join live streams from"}
+               </DialogTitle>
                <CardMedia className={classes.media}>
                   <img src={group.logoUrl} className={classes.image} alt="" />
                </CardMedia>
@@ -209,9 +227,11 @@ const GroupJoinToAttendModal = ({
                   </Box>
                </DialogContent>
                <DialogActions>
-                  <Button size="large" onClick={handleClose}>
-                     Cancel
-                  </Button>
+                  {!isOnStreamPage && (
+                     <Button size="large" onClick={handleClose}>
+                        Cancel
+                     </Button>
+                  )}
                   {((alreadyJoined && group.categories) || !alreadyJoined) && (
                      <Button
                         disabled={!allSelected || submitting}
@@ -226,7 +246,7 @@ const GroupJoinToAttendModal = ({
                         color="primary"
                         autoFocus
                      >
-                        I'll attend
+                        {isOnStreamPage ? "Enter event" : "I'll attend"}
                      </Button>
                   )}
                </DialogActions>

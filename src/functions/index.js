@@ -26,12 +26,14 @@ const auth = require("./auth");
 const agora = require("./agora");
 const backup = require("./backup");
 const groupAdmin = require("./groupAdmin");
+const admin = require("./admin");
 const reminders = require("./reminders");
 const livestreams = require("./livestreams");
 const universityEmails = require("./universityEmails");
 const algolia = require("./algolia");
 const analytics = require("./analytics");
 const breakoutRooms = require("./breakoutRooms");
+const recording = require("./recording");
 
 // Hosting
 exports.production = hosting.production;
@@ -55,15 +57,19 @@ exports.resendPostmarkEmailVerificationEmailWithPin =
 exports.generateAgoraToken = agora.generateAgoraToken;
 exports.generateAgoraTokenSecure = agora.generateAgoraTokenSecure;
 exports.generateAgoraTokenSecureOnCall = agora.generateAgoraTokenSecureOnCall;
-exports.startRecordingLivestream = agora.startRecordingLivestream;
 
 // Backup
 exports.exportFirestoreBackup = backup.exportFirestoreBackup;
+
+// Admin Functions
+exports.sendBasicTemplateEmail = admin.sendBasicTemplateEmail;
 
 // Group Admin
 exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail;
 exports.sendDraftApprovalRequestEmail =
    groupAdmin.sendDraftApprovalRequestEmail;
+exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail;
+exports.getLivestreamReportData = groupAdmin.getLivestreamReportData;
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus;
 exports.joinGroupDashboard = groupAdmin.joinGroupDashboard;
 
@@ -72,6 +78,10 @@ exports.sendReminderEmailToRegistrants =
    reminders.sendReminderEmailToRegistrants;
 exports.scheduleReminderEmailSendTestOnRun =
    reminders.scheduleReminderEmailSendTestOnRun;
+exports.scheduleReminderEmailSFor2HoursBefore =
+   reminders.scheduleReminderEmailSFor2HoursBefore;
+exports.scheduleReminderEmailSFor20MinutesBefore =
+   reminders.scheduleReminderEmailSFor20MinutesBefore;
 exports.sendReminderEmailToUserFromUniversity =
    reminders.sendReminderEmailToUserFromUniversity;
 exports.sendReminderEmailsWhenLivestreamStarts =
@@ -92,6 +102,8 @@ exports.sendLivestreamRegistrationConfirmationEmail =
    livestreams.sendLivestreamRegistrationConfirmationEmail;
 exports.sendPhysicalEventRegistrationConfirmationEmail =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail;
+exports.sendHybridEventRegistrationConfirmationEmail =
+   livestreams.sendHybridEventRegistrationConfirmationEmail;
 
 // University Emails
 exports.sendEmailToStudentOfUniversityAndField =
@@ -106,8 +118,14 @@ exports.updateStreamIndex = algolia.updateStreamIndex;
 exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex;
 
 // Analytics
-exports.updateUserDataAnalyticsOnWrite =
+exports.updateUserDataAnalytcicsOnWrite =
    analytics.updateUserDataAnalyticsOnWrite;
+
+//Recording
+exports.startRecordingLivestream = recording.startRecordingLivestream;
+exports.stopRecordingLivestream = recording.stopRecordingLivestream;
+exports.startRecordingLivestreamApi = recording.startRecordingLivestreamApi;
+exports.stopRecordingLivestreamApi = recording.stopRecordingLivestreamApi;
 
 // Breakout Rooms
 exports.updateBreakoutRoomStatusOnWrite =

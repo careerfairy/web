@@ -3,7 +3,6 @@ import React, { Fragment, memo, useEffect, useMemo, useState } from "react";
 import { withFirebase } from "context/firebase";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import UserUtil from "../../../../../data/util/UserUtil";
-import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import { useRouter } from "next/router";
 import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
@@ -38,9 +37,6 @@ import { DateTimeDisplay } from "./TimeDisplay";
 import { AttendButton, DetailsButton } from "./actionButtons";
 import LogoElement from "../LogoElement";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
-import WhatshotIcon from "@material-ui/icons/Whatshot";
-import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
-import { Chip } from "@material-ui/core";
 import { InPersonEventBadge, LimitedRegistrationsBadge } from "./badges";
 
 const useStyles = makeStyles((theme) => ({
@@ -99,6 +95,9 @@ const useStyles = makeStyles((theme) => ({
          background: theme.palette.primary.dark,
          opacity: 0.8,
       },
+   },
+   highlighted: {
+      border: `12px solid ${theme.palette.primary.main}`,
    },
    content: {
       bottom: 0,
@@ -266,14 +265,18 @@ const GroupStreamCardV2 = memo(
    }) => {
       const mediaStyles = useCoverCardMediaStyles();
       const classes = useStyles();
-      const { pathname, absolutePath, push } = useRouter();
-      const linkToStream = useMemo(
-         () =>
-            pathname === "/next-livestreams/[groupId]"
-               ? `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}`
-               : `/next-livestreams?livestreamId=${livestream.id}`,
-         [pathname, livestream?.id, groupData?.groupId]
-      );
+      const {
+         pathname,
+         absolutePath,
+         push,
+         query: { referrerId },
+      } = useRouter();
+      const linkToStream = useMemo(() => {
+         const referrerQuery = referrerId ? `&referrerId=${referrerId}` : "";
+         return pathname === "/next-livestreams/[groupId]"
+            ? `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}${referrerQuery}`
+            : `/next-livestreams?livestreamId=${livestream.id}${referrerQuery}`;
+      }, [pathname, livestream?.id, groupData?.groupId, referrerId]);
 
       function userIsRegistered() {
          if (
@@ -339,19 +342,33 @@ const GroupStreamCardV2 = memo(
             firebase
                .getDetailLivestreamCareerCenters(livestream.groupIds)
                .then((querySnapshot) => {
-                  let groupList = [];
-                  querySnapshot.forEach((doc) => {
-                     let group = doc.data();
-                     group.id = doc.id;
-                     groupList.push(group);
-                  });
+                  let groupList = querySnapshot.docs.map((doc) => ({
+                     id: doc.id,
+                     ...doc.data(),
+                  }));
+
+                  let targetGroupId = groupData?.groupId;
+                  if (listenToUpcoming) {
+                     const companyThatPublishedStream = groupList.find(
+                        (group) =>
+                           !group.universityCode &&
+                           group.id === livestream?.author?.groupId
+                     );
+                     if (companyThatPublishedStream?.id) {
+                        targetGroupId = companyThatPublishedStream.id;
+                     }
+                  }
+                  groupList = groupList.filter((currentGroup) =>
+                     GroupsUtil.filterCurrentGroup(currentGroup, targetGroupId)
+                  );
+
                   setCareerCenters(groupList);
                })
                .catch((e) => {
                   console.log("error", e);
                });
          }
-      }, []);
+      }, [groupData?.groupId, listenToUpcoming, livestream?.author?.groupId]);
 
       const handleMouseEntered = () => {
          if (!cardHovered && !globalCardHighlighted) {
@@ -392,7 +409,9 @@ const GroupStreamCardV2 = memo(
          if (user.isLoaded && user.isEmpty) {
             return push({
                pathname: "/login",
-               query: { absolutePath },
+               query: {
+                  absolutePath,
+               },
             });
          }
 
@@ -403,14 +422,15 @@ const GroupStreamCardV2 = memo(
          if ((user.isLoaded && user.isEmpty) || !user.emailVerified) {
             return push({
                pathname: `/login`,
-               query: { absolutePath: linkToStream },
+               query: {
+                  absolutePath: linkToStream,
+               },
             });
          }
 
          if (!userData || !UserUtil.userProfileIsComplete(userData)) {
             return push({
                pathname: "/profile",
-               query: "profile",
             });
          }
          const {
@@ -432,8 +452,9 @@ const GroupStreamCardV2 = memo(
                firebase
                   .registerToLivestream(
                      livestream.id,
-                     user.email,
-                     groupsWithPolicies
+                     userData,
+                     groupsWithPolicies,
+                     referrerId
                   )
                   .then(() => {
                      setCardHovered(false);
@@ -449,8 +470,9 @@ const GroupStreamCardV2 = memo(
                firebase
                   .registerToLivestream(
                      livestream.id,
-                     user.email,
-                     groupsWithPolicies
+                     userData,
+                     groupsWithPolicies,
+                     referrerId
                   )
                   .then(() => {
                      setCardHovered(false);
@@ -463,7 +485,12 @@ const GroupStreamCardV2 = memo(
 
       function completeRegistrationProcess() {
          firebase
-            .registerToLivestream(livestream.id, user.email, groupsWithPolicies)
+            .registerToLivestream(
+               livestream.id,
+               userData,
+               groupsWithPolicies,
+               referrerId
+            )
             .then(() => {
                setCardHovered(false);
                setBookingModalOpen(true);
@@ -605,6 +632,7 @@ const GroupStreamCardV2 = memo(
                   <Box
                      className={clsx(classes.main, {
                         [classes.mainBooked]: registered,
+                        [classes.highlighted]: livestream.highlighted,
                      })}
                      position={"relative"}
                   >
@@ -622,9 +650,7 @@ const GroupStreamCardV2 = memo(
                            avatar={
                               <DateTimeDisplay
                                  mobile={mobile}
-                                 date={
-                                    livestream.start?.toDate()
-                                 }
+                                 date={livestream.start?.toDate()}
                               />
                            }
                            title={
@@ -642,7 +668,7 @@ const GroupStreamCardV2 = memo(
                               />
                            }
                         />
-                        <Collapse collapsedHeight={80} in={cardHovered}>
+                        <Collapse collapsedSize={80} in={cardHovered}>
                            <Typography
                               variant={"h4"}
                               className={clsx(classes.title, {
@@ -673,22 +699,24 @@ const GroupStreamCardV2 = memo(
                            <DetailsButton
                               size="small"
                               mobile={mobile}
+                              referrerId={referrerId}
                               groupData={groupData}
                               listenToUpcoming={listenToUpcoming}
                               livestream={livestream}
                            />
 
-                           {!isPastLivestreams && (
-                              <AttendButton
-                                 size="small"
-                                 mobile={mobile}
-                                 disabled={registrationDisabled}
-                                 attendButtonLabel={mainButtonLabel}
-                                 handleRegisterClick={handleRegisterClick}
-                                 checkIfRegistered={checkIfRegistered}
-                                 user={user}
-                              />
-                           )}
+                           {!isPastLivestreams &&
+                              !(livestream.openStream === true) && (
+                                 <AttendButton
+                                    size="small"
+                                    mobile={mobile}
+                                    disabled={registrationDisabled}
+                                    attendButtonLabel={mainButtonLabel}
+                                    handleRegisterClick={handleRegisterClick}
+                                    checkIfRegistered={checkIfRegistered}
+                                    user={user}
+                                 />
+                              )}
                            <Grow in={Boolean(userIsRegistered())}>
                               <div className={classes.bookedIcon}>
                                  <CheckCircleRoundedIcon />

@@ -19,9 +19,7 @@ import Logo from "./Logo";
 import { useThemeToggle } from "../../../context/theme/ThemeContext";
 import { useCurrentStream } from "../../../context/stream/StreamContext";
 import PeopleIcon from "@material-ui/icons/People";
-import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
 import NewFeatureHint from "../../../components/util/NewFeatureHint";
-import useJoinTalentPool from "../../../components/custom-hook/useJoinTalentPool";
 import ViewerBreakoutRoomModal from "./ViewerBreakoutRoomModal";
 import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
 import { useRouter } from "next/router";
@@ -32,15 +30,19 @@ import breakoutRoomsSelector from "../../../components/selectors/breakoutRoomsSe
 import * as actions from "store/actions";
 import useStreamGroups from "../../../components/custom-hook/useStreamGroups";
 import ViewerCtaModal from "./ViewerCtaModal";
+import FocusModeButton from "./buttons/FocusModeButton";
+import JoinTalentPoolButton from "./buttons/JoinTalentPoolButton";
+import { localStorageAudienceDrawerKey } from "constants/localStorageKeys";
 
 const useStyles = makeStyles((theme) => ({
-   joinButton: {
-      marginLeft: theme.spacing(1),
-   },
    toolbar: {
       minHeight: 55,
       display: "flex",
       justifyContent: "space-between",
+      "& .MuiIconButton-root": {
+         width: 40,
+         height: 40,
+      },
    },
    viewCount: {
       color: theme.palette.primary.main,
@@ -49,27 +51,30 @@ const useStyles = makeStyles((theme) => ({
       justifyContent: "center",
       margin: theme.spacing(0, 1),
    },
-   viewCountText: {
-      fontWeight: 600,
-      marginLeft: theme.spacing(0.5),
-   },
-   floatingButton: {
-      color: theme.palette.primary.main,
-      width: 48,
-      height: 48,
-   },
    floatingWrapper: {
       position: "absolute",
       top: theme.spacing(2.5),
       right: theme.spacing(2.5),
       zIndex: 120,
       display: "flex",
-      alignItems: "baseline",
+      alignItems: "center",
+      "& svg": {
+         filter: `drop-shadow(0px 0px 3px rgba(0,0,0,0.4))`,
+      },
+      "& .MuiIconButton-root": {
+         color: theme.palette.primary.main,
+         width: 35,
+         height: 35,
+      },
    },
 }));
 
-const localStorageAudienceDrawerKey = "hasSeenAudienceDrawer";
-const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
+const ViewerTopBar = ({
+   mobile,
+   showAudience,
+   showMenu,
+   audienceDrawerOpen,
+}) => {
    const classes = useStyles();
    const [ctaStatus, setCtaStatus] = useState({
       active: false,
@@ -86,10 +91,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
    const numberOfViewers = useSelector((state) =>
       currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0
    );
-   const {
-      userIsInTalentPool,
-      handlers: { joinTalentPool, leaveTalentPool },
-   } = useJoinTalentPool();
+
    const breakoutRoomOpen = useSelector((state) =>
       Boolean(
          breakoutRoomsSelector(
@@ -97,6 +99,10 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
          )?.length
       )
    );
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
+
    const careerCenters = useStreamGroups(currentLivestream?.groupIds);
 
    useEffect(() => {
@@ -120,10 +126,15 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
       dispatch(actions.openViewerCtaModal());
    };
 
-   if (mobile && !showMenu) {
+   if (focusModeEnabled || (mobile && !showMenu)) {
       return (
          <React.Fragment>
             <div className={classes.floatingWrapper}>
+               <FocusModeButton
+                  audienceDrawerOpen={audienceDrawerOpen}
+                  mobile={mobile}
+                  primary
+               />
                {breakoutRoomId && (
                   <Tooltip title="Back to main room">
                      <Button
@@ -137,12 +148,10 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                      </Button>
                   </Tooltip>
                )}
+
                {breakoutRoomOpen && (
                   <Tooltip title="Checkout breakout rooms">
-                     <IconButton
-                        className={classes.floatingButton}
-                        onClick={handleOpenBreakoutRoomModal}
-                     >
+                     <IconButton onClick={handleOpenBreakoutRoomModal}>
                         <Badge color="secondary" badgeContent={"!"}>
                            <BreakoutRoomIcon />
                         </Badge>
@@ -157,9 +166,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                            : ""
                      }`}
                   >
-                     <IconButton
-                       className={classes.floatingButton}
-                       onClick={handleOpenCtaModal}>
+                     <IconButton onClick={handleOpenCtaModal}>
                         <Badge
                            color="secondary"
                            badgeContent={ctaStatus.numberActive && "!"}
@@ -169,27 +176,28 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                      </IconButton>
                   </Tooltip>
                )}
-               <Tooltip title="See who joined">
-                  <IconButton
-                     onClick={showAudience}
-                     className={classes.floatingButton}
-                  >
-                     <Badge
-                        max={999999}
-                        color="secondary"
-                        badgeContent={numberOfViewers}
+               <NewFeatureHint
+                  onClickConfirm={showAudience}
+                  tooltipText="Click here to see who's joined the stream since the start"
+                  localStorageKey={localStorageAudienceDrawerKey}
+                  tooltipTitle="Hint"
+               >
+                  <Tooltip title="See who joined">
+                     <IconButton
+                        onClick={showAudience}
+                        className={classes.floatingButton}
                      >
-                        <NewFeatureHint
-                           onClick={showAudience}
-                           tooltipText="Click here to see who's joined the stream since the start"
-                           localStorageKey={localStorageAudienceDrawerKey}
-                           tooltipTitle="Hint"
+                        <Badge
+                           max={999999}
+                           color="secondary"
+                           badgeContent={numberOfViewers}
                         >
                            <PeopleIcon />
-                        </NewFeatureHint>
-                     </Badge>
-                  </IconButton>
-               </Tooltip>
+                        </Badge>
+                     </IconButton>
+                  </Tooltip>
+               </NewFeatureHint>
+               <JoinTalentPoolButton mobile />
             </div>
             <ViewerBreakoutRoomModal
                mobile={mobile}
@@ -261,7 +269,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                         </IconButton>
                      </Tooltip>
                   )}
-
+                  <FocusModeButton audienceDrawerOpen={audienceDrawerOpen} />
                   <Tooltip
                      title={
                         themeMode === "dark"
@@ -278,7 +286,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                      />
                   </Tooltip>
                   <NewFeatureHint
-                     onClick={showAudience}
+                     onClickConfirm={showAudience}
                      tooltipText="Click here to see who's joined the stream since the start"
                      localStorageKey={localStorageAudienceDrawerKey}
                      tooltipTitle="Hint"
@@ -305,25 +313,7 @@ const ViewerTopBar = ({ mobile, showAudience, showMenu }) => {
                      </Box>
                   </NewFeatureHint>
                </Box>
-               {!currentLivestream.hasNoTalentPool && (
-                  <Button
-                     children={
-                        userIsInTalentPool
-                           ? "Leave Talent Pool"
-                           : "Join Talent Pool"
-                     }
-                     variant="contained"
-                     className={classes.joinButton}
-                     startIcon={<HowToRegRoundedIcon />}
-                     icon={userIsInTalentPool ? "delete" : "handshake outline"}
-                     onClick={
-                        userIsInTalentPool
-                           ? () => leaveTalentPool()
-                           : () => joinTalentPool()
-                     }
-                     color={userIsInTalentPool ? "default" : "primary"}
-                  />
-               )}
+               <JoinTalentPoolButton mobile={mobile} />
             </Toolbar>
          </AppBar>
          <ViewerBreakoutRoomModal

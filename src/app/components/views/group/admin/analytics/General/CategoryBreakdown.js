@@ -176,7 +176,7 @@ const CategoryBreakdown = ({
    useEffect(() => {
       const newTypeOfOptions = getTypeOfStudents();
       setTypesOfOptions(newTypeOfOptions);
-   }, [audience, currentCategory]);
+   }, [audience, currentCategory, currentGroup?.categories]);
 
    useEffect(() => {
       if (typesOfOptions.length) {
@@ -192,6 +192,8 @@ const CategoryBreakdown = ({
          datasets: [
             {
                data: typesOfOptions.map((option) => option.count),
+               ids: typesOfOptions.map((option) => option.id),
+               id: typesOfOptions.map((option) => option.id),
                backgroundColor: localColors,
                borderWidth: 8,
                borderColor: theme.palette.common.white,
@@ -200,18 +202,19 @@ const CategoryBreakdown = ({
          ],
          labels: typesOfOptions.map((option) => option.name),
          ids: typesOfOptions.map((option) => option.id),
+         dataId: currentCategory.id,
       });
-   }, [typesOfOptions, localColors]);
+   }, [typesOfOptions, localColors, currentGroup]);
 
    const getTypeOfStudents = () => {
       const aggregateCategories = getAggregateCategories(audience);
       const flattenedGroupOptions = [...currentCategory.options].map(
          (option) => {
             const count = aggregateCategories.filter((category) =>
-               category.categories.some(
+               category?.categories?.some(
                   (userOption) => userOption.selectedValueId === option.id
                )
-            ).length;
+            )?.length;
             return { ...option, count };
          }
       );
@@ -417,9 +420,9 @@ const CategoryBreakdown = ({
                      expanded: classes.expanded,
                      root: classes.accordionRoot,
                   }}
-                  onClick={() => setShowLabels(!showLabels)}
                >
                   <AccordionSummary
+                     onClick={() => setShowLabels(!showLabels)}
                      expandIcon={<ExpandMoreIcon />}
                      style={{ minHeight: 45 }}
                   >
@@ -436,7 +439,7 @@ const CategoryBreakdown = ({
                            fullWidth
                            hideEmpty
                            chartData={data}
-                           optionDataType="Student"
+                           optionDataType="User"
                            optionValueProp="count"
                         />
                      </Box>

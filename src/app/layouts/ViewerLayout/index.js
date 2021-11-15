@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { withFirebase } from "../../context/firebase";
+import { useFirebase } from "context/firebase";
 import { useRouter } from "next/router";
 import ViewerTopBar from "./ViewerTopBar";
 import { isLoaded } from "react-redux-firebase";
@@ -13,21 +13,31 @@ import { CurrentStreamContext } from "../../context/stream/StreamContext";
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 import PropTypes from "prop-types";
 import useStreamRef from "../../components/custom-hook/useStreamRef";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHandRaiseConnect";
+import StatsUtil from "../../data/util/StatsUtil";
+import GroupsUtil from "../../data/util/GroupsUtil";
+import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu";
 
 const useStyles = makeStyles((theme) => ({
    root: {
       position: "relative",
-      // minHeight: "100vh",
+      "& ::-webkit-scrollbar": {
+         width: "3px",
+         backgroundColor: "transparent",
+         borderRadius: theme.spacing(1),
+      },
+      "& ::-webkit-scrollbar-thumb": {
+         borderRadius: theme.spacing(1),
+         WebkitBoxShadow: "inset 0 0 6px rgba(0,0,0,.3)",
+         backgroundColor: theme.palette.text.secondary,
+      },
       height: "100vh",
       width: "100%",
       touchAction: "manipulation",
-      // border: "6px solid pink",
       backgroundColor: theme.palette.background.dark,
       display: "flex",
-      // height: '100vh',
       overflow: "hidden",
    },
    wrapper: {
@@ -45,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
          paddingLeft: 0,
       },
       [theme.breakpoints.up("mobile")]: {
-         paddingTop: 55,
+         paddingTop: ({ focusModeEnabled }) => !focusModeEnabled && 55,
       },
    },
    contentContainer: {
@@ -63,9 +73,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ViewerLayout = (props) => {
-   const { children, firebase, isBreakout } = props;
+   const { children, isBreakout } = props;
+   const firebase = useFirebase();
    const {
-      query: { livestreamId, breakoutRoomId },
+      query: { livestreamId, breakoutRoomId, token, isRecordingWindow },
       replace,
       asPath,
    } = useRouter();
@@ -77,34 +88,82 @@ const ViewerLayout = (props) => {
    const mobile = useMediaQuery(`(max-width:${values.mobile}px)`);
    const streamRef = useStreamRef();
    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
-   const [showMenu, setShowMenu] = useState(false);
    const [handRaiseActive, setHandRaiseActive] = useState(false);
    const [streamerId, setStreamerId] = useState(null);
-   const classes = useStyles({ showMenu, mobile });
+   const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen);
 
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
+   const spyModeEnabled = useSelector(
+      (state) => state.stream.streaming.spyModeEnabled
+   );
+   const classes = useStyles({ showMenu, mobile, focusModeEnabled });
    const [selectedState, setSelectedState] = useState("questions");
+   const [notAuthorized, setNotAuthorized] = useState(false);
+   const [checkingForCategoryData, setCheckingForCategoryData] = useState(
+      false
+   );
+   const [hasCheckedForCategoryData, setHasCheckedForCategoryData] = useState(
+      false
+   );
+   const [groupsToFollow, setGroupsToFollow] = useState([]);
+   const [groupToUpdateCategories, setGroupToUpdateCategories] = useState(null);
+   const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
 
    const currentLivestream = useStreamConnect();
 
-   useViewerHandRaiseConnect(currentLivestream);
+   useViewerHandRaiseConnect(currentLivestream, streamerId);
+   // console.log("-> currentLivestream", currentLivestream);
+   useEffect(() => {
+      if (currentLivestream && !currentLivestream.test) {
+         if (currentLivestream.openStream) {
+            setNotAuthorized(false);
+         } else {
+            if (token) {
+               firebase
+                  .getLivestreamSecureTokenWithRef(streamRef)
+                  .then((doc) => {
+                     if (!doc.exists) {
+                        router.push("/streaming/error");
+                     }
+                     let storedToken = doc.data().value;
+                     if (storedToken !== token) {
+                        setNotAuthorized(false);
+                     }
+                  });
+            } else {
+               setNotAuthorized(
+                  currentLivestream &&
+                     !currentLivestream.test &&
+                     authenticatedUser?.isLoaded &&
+                     authenticatedUser?.isEmpty
+               );
+            }
+         }
+      }
+   }, [token, currentLivestream?.test, currentLivestream?.id]);
 
-   const notAuthorized =
-      currentLivestream &&
-      !currentLivestream.test &&
-      authenticatedUser?.isLoaded &&
-      authenticatedUser?.isEmpty;
+   useEffect(() => {
+      if (Boolean(isRecordingWindow)) {
+         dispatch(actions.setFocusMode(true, mobile));
+      }
+   }, [isRecordingWindow]);
 
    useEffect(() => {
       if (mobile) {
-         setShowMenu(false);
+         closeLeftMenu();
       } else {
-         setShowMenu(true);
+         if (!focusModeEnabled) {
+            openLeftMenu();
+         }
       }
    }, [mobile]);
 
    useEffect(() => {
+      if (userData?.isAdmin) return;
       if (userData?.userEmail) {
-         if (livestreamId) {
+         if (livestreamId && hasCheckedForCategoryData) {
             firebase.setUserIsParticipating(livestreamId, userData);
          }
          if (breakoutRoomId) {
@@ -114,22 +173,28 @@ const ViewerLayout = (props) => {
    }, [
       livestreamId,
       userData?.email,
+      userData?.isAdmin,
       userData?.linkedinUrl,
       userData?.firstName,
       userData?.lastName,
+      userData?.registeredGroups,
       breakoutRoomId,
+      streamRef,
+      hasCheckedForCategoryData,
    ]);
 
    useEffect(() => {
       if (currentLivestream && !streamerId) {
          if (currentLivestream.test && authenticatedUser?.email) {
             setStreamerId(currentLivestream.id + authenticatedUser.email);
-         } else if (currentLivestream.test) {
+         } else if (currentLivestream.test || currentLivestream.openStream) {
             let uuid = uuidv4();
             let joiningId = uuid.replace(/-/g, "");
             setStreamerId(currentLivestream.id + joiningId);
          } else if (authenticatedUser?.email) {
             setStreamerId(currentLivestream.id + authenticatedUser.email);
+         } else if (isRecordingWindow) {
+            setStreamerId(uuidv4());
          }
       }
    }, [
@@ -139,12 +204,66 @@ const ViewerLayout = (props) => {
    ]);
 
    useEffect(() => {
-      if (currentLivestream?.hasStarted) {
+      if (currentLivestream?.hasStarted || spyModeEnabled) {
          dispatch(actions.unmuteAllRemoteVideos());
       } else {
          dispatch(actions.muteAllRemoteVideos());
       }
-   }, [currentLivestream?.hasStarted]);
+   }, [currentLivestream?.hasStarted, spyModeEnabled]);
+
+   useEffect(() => {
+      const checkForCategoryData = async () => {
+         try {
+            if (
+               !currentLivestream?.test &&
+               currentLivestream?.groupIds?.length &&
+               !breakoutRoomId
+            ) {
+               setCheckingForCategoryData(true);
+               const livestreamGroups = await firebase.getGroupsWithIds(
+                  currentLivestream.groupIds
+               );
+               const {
+                  hasAgreedToAll,
+                  groupsWithPolicies,
+               } = await GroupsUtil.getPolicyStatus(
+                  livestreamGroups,
+                  userData.userEmail,
+                  firebase
+               );
+               const groupThatUserFollows = StatsUtil.getGroupThatStudentFollows(
+                  userData,
+                  livestreamGroups
+               );
+               if (!groupThatUserFollows) {
+                  // If user is not following any of the groups bring up group following Dialog
+                  // Open the follow group dialog...
+                  if (livestreamGroups?.length) {
+                     // Only open dialog when there are groups
+                     setGroupsToFollow(livestreamGroups);
+                  }
+               } else {
+                  // If user is following one of the groups, please check if the user has all the categories of the group
+                  const userHasAllCategoriesOfGroup = StatsUtil.studentHasAllCategoriesOfGroup(
+                     userData,
+                     groupThatUserFollows
+                  );
+                  if (!userHasAllCategoriesOfGroup) {
+                     // Open the category select dialog...
+                     setGroupToUpdateCategories(groupThatUserFollows);
+                     if (!hasAgreedToAll) {
+                        setGroupsWithPolicies(groupsWithPolicies);
+                     }
+                  }
+               }
+            }
+         } catch (e) {}
+         setCheckingForCategoryData(false);
+         setHasCheckedForCategoryData(true);
+      };
+
+      checkForCategoryData();
+   }, [Boolean(userData), Boolean(currentLivestream)]);
 
    if (notAuthorized) {
       replace({
@@ -153,10 +272,18 @@ const ViewerLayout = (props) => {
       });
    }
 
+   const closeLeftMenu = () => dispatch(actions.closeLeftMenu());
+   const openLeftMenu = () => dispatch(actions.openLeftMenu());
+
+   const handleCloseViewerGroupCategorySelectDialog = useCallback(() => {
+      setGroupsToFollow([]);
+      setGroupToUpdateCategories(null);
+   }, []);
+
    const handleStateChange = useCallback(
       (state) => {
          if (!showMenu) {
-            setShowMenu(true);
+            openLeftMenu();
          }
          setSelectedState(state);
       },
@@ -171,12 +298,24 @@ const ViewerLayout = (props) => {
       setAudienceDrawerOpen(false);
    }, []);
 
-   const toggleShowMenu = useCallback(() => {
-      setShowMenu(!showMenu);
-   }, [showMenu]);
-
-   if (!isLoaded(currentLivestream) || notAuthorized) {
+   if (
+      !isLoaded(currentLivestream) ||
+      notAuthorized ||
+      checkingForCategoryData ||
+      !hasCheckedForCategoryData
+   ) {
       return <Loader />;
+   }
+
+   if (groupToUpdateCategories || groupsToFollow.length) {
+      return (
+         <ViewerGroupCategorySelectMenu
+            onClose={handleCloseViewerGroupCategorySelectDialog}
+            groupToUpdateCategories={groupToUpdateCategories}
+            groupsToFollow={groupsToFollow}
+            groupsWithPolicies={groupsWithPolicies}
+         />
+      );
    }
 
    return (
@@ -189,6 +328,7 @@ const ViewerLayout = (props) => {
                mobile={mobile}
             />
             <LeftMenu
+               streamerId={streamerId}
                handRaiseActive={handRaiseActive}
                setHandRaiseActive={setHandRaiseActive}
                streamer={false}
@@ -196,10 +336,7 @@ const ViewerLayout = (props) => {
                selectedState={selectedState}
                setSelectedState={setSelectedState}
                livestream={currentLivestream}
-               showMenu={showMenu}
-               setShowMenu={setShowMenu}
                isMobile={mobile}
-               toggleShowMenu={toggleShowMenu}
             />
 
             <div className={classes.wrapper}>
@@ -211,7 +348,6 @@ const ViewerLayout = (props) => {
                         selectedState,
                         setSelectedState,
                         showMenu,
-                        setShowMenu,
                         streamerId,
                         mobile,
                         showAudience,
@@ -228,7 +364,6 @@ const ViewerLayout = (props) => {
 
 ViewerLayout.propTypes = {
    children: PropTypes.node.isRequired,
-   firebase: PropTypes.object,
 };
 
-export default withFirebase(ViewerLayout);
+export default ViewerLayout;

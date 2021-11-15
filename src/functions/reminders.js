@@ -152,13 +152,13 @@ exports.sendReminderEmailAboutApplicationLink = functions
       );
    });
 
-exports.scheduleReminderEmailSendTestOnRun = functions.pubsub
+exports.scheduleReminderEmailSFor2HoursBefore = functions.pubsub
    .schedule("every 45 minutes")
    .timeZone("Europe/Zurich")
    .onRun(async (context) => {
       let messageSender = mailgun.messages();
-      const dateStart = new Date(Date.now() + 1000 * 60 * 60);
-      const dateEnd = new Date(Date.now() + 1000 * 60 * 60 * 1.75);
+      const dateStart = new Date(Date.now() + 1000 * 60 * 60 * 2);
+      const dateEnd = new Date(Date.now() + 1000 * 60 * 60 * 2.75);
       await admin
          .firestore()
          .collection("livestreams")
@@ -178,14 +178,64 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub
                   console.log(
                      "number of emails: " + livestream.registeredUsers.length
                   );
-                  const data = generateEmailData(
+                  const dataEarly = generateEmailData(
                      livestream.id,
                      livestream,
-                     false
+                     false,
+                     105
                   );
-                  messageSender.send(data, (error, body) => {
+                  messageSender.send(dataEarly, (error, body) => {
                      console.log("error:" + error);
-                     console.log("body:" + JSON.stringify(body));
+                     console.log("body for data early:" + JSON.stringify(body));
+                  });
+               } else {
+                  functions.logger.log(
+                     `Livestream with ${livestream.company} is F2F, no reminder email sent out`
+                  );
+               }
+            });
+         })
+         .catch((error) => {
+            console.log("error: " + error);
+         });
+      return null;
+   });
+
+exports.scheduleReminderEmailSFor20MinutesBefore = functions.pubsub
+   .schedule("every 15 minutes")
+   .timeZone("Europe/Zurich")
+   .onRun(async (context) => {
+      let messageSender = mailgun.messages();
+      const dateStart = new Date(Date.now() + 1000 * 60 * 25);
+      const dateEnd = new Date(Date.now() + 1000 * 60 * 40);
+      await admin
+         .firestore()
+         .collection("livestreams")
+         .where("start", ">=", dateStart)
+         .where("start", "<", dateEnd)
+         .get()
+         .then((querySnapshot) => {
+            console.log("querysnapshot size: " + querySnapshot.size);
+            querySnapshot.forEach((doc) => {
+               const livestream = doc.data();
+               if (!livestream.isFaceToFace) {
+                  livestream.id = doc.id;
+                  functions.logger.log(
+                     `Livestream with ${livestream.company}: prepare emails`
+                  );
+
+                  console.log(
+                     "number of emails: " + livestream.registeredUsers.length
+                  );
+                  const dataEarly = generateEmailData(
+                     livestream.id,
+                     livestream,
+                     false,
+                     20
+                  );
+                  messageSender.send(dataEarly, (error, body) => {
+                     console.log("error:" + error);
+                     console.log("body for data early:" + JSON.stringify(body));
                   });
                } else {
                   functions.logger.log(
@@ -223,7 +273,8 @@ exports.sendReminderEmailsWhenLivestreamStarts = functions.firestore
                   const data = generateEmailData(
                      context.params.livestreamId,
                      newValue,
-                     true
+                     true,
+                     0
                   );
                   console.log(data);
                   mailgunSender.send(data, (error, body) => {

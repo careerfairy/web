@@ -56,3 +56,6 @@ export const wallet =
 export const company_building =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/placeholders%2Fcompany-banner.webp?alt=media&token=d50893e1-11cb-43b3-845f-f66a22c55f73";
 export const careerfairyLogo = "/logo_teal.svg";
+
+export const basicEmailTemplate =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/email-template-images%2Fbasic-email-template.png?alt=media&token=4ede176e-c84a-4a91-bceb-b80648bb9773";

@@ -120,6 +120,7 @@ const TopBar = ({ className, ...rest }) => {
                   </div>
                ) : (
                   <IconButton
+                     id="profile_icon"
                      component={Link}
                      className={classes.navIconButton}
                      color="primary"

@@ -86,7 +86,7 @@ const RatingSideTable = ({
    const innerTableStyle = {
       background: alpha(theme.palette.navyBlue.main, 0.05),
    };
-   customOptions.selection = false;
+   // customOptions.selection = false;
    customOptions.headerStyle = innerTableStyle;
    customOptions.exportButton.pdf = true;
    customOptions.pageSize = getPageSize(customOptions.pageSizeOptions, data);

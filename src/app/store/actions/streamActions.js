@@ -79,4 +79,47 @@ export const unpauseRemoteVideosAfterFail = () => async (dispatch) => {
    dispatch({ type: actions.UNPAUSE_PAUSED_REMOTE_VIDEOS_ON_FAIL });
 };
 
+// Action to hide the left menu on stream UI
+export const openLeftMenu = () => async (dispatch) => {
+   dispatch({ type: actions.OPEN_LEFT_MENU });
+};
 
+// Action to show the left menu on stream UI
+export const closeLeftMenu = () => async (dispatch) => {
+   dispatch({ type: actions.CLOSE_LEFT_MENU });
+};
+
+// Action to toggle the open state of the left menu on stream UI
+export const toggleLeftMenu = () => async (dispatch) => {
+   dispatch({ type: actions.TOGGLE_LEFT_MENU });
+};
+
+export const setFocusMode = (mode, mobile) => async (dispatch, getState) => {
+   // If mode is null or undefined, the new mode will be the opposite of the current mode
+   const newFocusMode = Boolean(
+      mode ?? !getState().stream.layout.focusModeEnabled
+   );
+
+   dispatch({
+      type: actions.SET_FOCUS_MODE,
+      payload: Boolean(newFocusMode),
+   });
+
+   dispatch({ type: actions.CLEAR_ALL_EMOTES });
+   if (newFocusMode) {
+      return dispatch(closeLeftMenu());
+   } else {
+      if (!mobile) {
+         return dispatch(openLeftMenu());
+      }
+   }
+};
+
+// Action to show the left menu on stream UI
+export const setSpyMode = (mode) => async (dispatch, getState) => {
+   // if mode is undefined or null, it will perform a toggle
+   const newSpyMode = Boolean(
+      mode ?? !getState().stream.streaming.spyModeEnabled
+   );
+   dispatch({ type: actions.SET_SPY_MODE, payload: Boolean(newSpyMode) });
+};

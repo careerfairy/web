@@ -1,10 +1,4 @@
-import React, {
-   Fragment,
-   useCallback,
-   useEffect,
-   useMemo,
-   useState,
-} from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { withFirebasePage } from "context/firebase";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
 import useDevices from "components/custom-hook/useDevices";
@@ -26,6 +20,7 @@ import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 import Streams from "../../streaming/video-container/Streams";
 import DraggableComponent from "../../banners/DraggableComponent";
 import WifiIndicator from "../../streaming/video-container/WifiIndicator";
+import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -61,6 +56,12 @@ function ViewerComponent({
    streamerId,
    mobile,
 }) {
+   const focusModeEnabled = useSelector(
+      (state) => state.stream.layout.focusModeEnabled
+   );
+   const spyModeEnabled = useSelector(
+      (state) => state.stream.streaming.spyModeEnabled
+   );
    const classes = useStyles();
    const dispatch = useDispatch();
    const [showSettings, setShowSettings] = useState(false);
@@ -132,10 +133,10 @@ function ViewerComponent({
          agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
       ) {
          if (currentLivestream) {
-            if (currentLivestream.test) {
+            if (currentLivestream.test || currentLivestream.openStream) {
                firebase.updateHandRaiseRequest(
                   streamRef,
-                  "streamerEmail",
+                  "anonymous" + streamerId,
                   "connected"
                );
             } else {
@@ -213,7 +214,7 @@ function ViewerComponent({
 
    return (
       <React.Fragment>
-         {!Boolean(mobile && handRaiseActive) && (
+         {!Boolean(mobile && handRaiseActive) && !focusModeEnabled && (
             <EmoteButtons createEmote={createEmote} />
          )}
          <Streams
@@ -226,6 +227,7 @@ function ViewerComponent({
             videoMutedBackgroundImg={currentLivestream.companyLogoUrl}
             liveSpeakers={currentLivestream.liveSpeakers}
             isBroadCasting={handRaiseActive}
+            openStream={currentLivestream.openStream}
             sharingScreen={currentLivestream.mode === "desktop"}
             sharingPdf={currentLivestream.mode === "presentation"}
             showMenu={showMenu}
@@ -284,15 +286,18 @@ function ViewerComponent({
             </Fragment>
          )}
 
-         {!currentLivestream.hasStarted && (
-            <div className={classes.waitingOverlay}>
-               <Typography className={classes.waitingText}>
-                  {currentLivestream.test
-                     ? "The streamer has to press Start Streaming to be visible to students"
-                     : "Thank you for joining!"}
-               </Typography>
-            </div>
-         )}
+         {!currentLivestream.hasStarted &&
+            !spyModeEnabled &&
+            (currentLivestream.test ? (
+               <div className={classes.waitingOverlay}>
+                  <Typography className={classes.waitingText}>
+                     "The streamer has to press Start Streaming to be visible to
+                     students"
+                  </Typography>
+               </div>
+            ) : (
+               <StreamStoppedOverlay />
+            ))}
       </React.Fragment>
    );
 }

@@ -29,7 +29,7 @@ export {
    enqueueBroadcastMessage,
    enqueueCallToAction,
    enqueueJobPostingCta,
-   enqueueSuccessfulHandRaiseRequest
+   enqueueSuccessfulHandRaiseRequest,
 } from "./snackbarActions.js";
 export {
    deleteFilterGroup,
@@ -73,8 +73,18 @@ export {
    toggleLocalVideo,
    toggleLocalAudio,
    unmuteMutedRemoteVideosAfterFail,
-   unpauseRemoteVideosAfterFail
+   unpauseRemoteVideosAfterFail,
+   closeLeftMenu,
+   openLeftMenu,
+   toggleLeftMenu,
+   setFocusMode,
+   setSpyMode,
 } from "./streamActions";
+
+export {
+   handleStartRecording,
+   handleStopRecording,
+} from "./streamAdminActions";
 
 export {
    openNavDrawer,

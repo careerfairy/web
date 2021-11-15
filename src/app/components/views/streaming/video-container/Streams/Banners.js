@@ -6,6 +6,7 @@ import HandRaiseStreamerBanner from "../../../banners/HandRaiseStreamerBanner";
 import { STREAM_ELEMENT_SPACING } from "../../../../../constants/streams";
 import HandRaiseViewerBanner from "../../../banners/HandRaiseViewerBanner";
 import { useRouter } from "next/router";
+import { useCurrentStream } from "../../../../../context/stream/StreamContext";
 
 const useStyles = makeStyles((theme) => ({
    bannerTop: {
@@ -30,7 +31,8 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const Banners = ({ presenter, handRaiseActive, isBottom , mobile}) => {
+const Banners = ({ presenter, handRaiseActive, isBottom, mobile }) => {
+   const { currentLivestream } = useCurrentStream();
    const {
       query: { breakoutRoomId },
    } = useRouter();
@@ -51,8 +53,15 @@ const Banners = ({ presenter, handRaiseActive, isBottom , mobile}) => {
 
    useEffect(() => {
       setShowStreamerHandRaiseBanner(Boolean(presenter && handRaiseActive));
-      setShowViewerHandRaiseBanner(Boolean(!presenter && handRaiseActive && !mobile));
-   }, [presenter, handRaiseActive, mobile]);
+      setShowViewerHandRaiseBanner(
+         Boolean(
+            !presenter &&
+               handRaiseActive &&
+               !mobile &&
+               currentLivestream?.hasStarted
+         )
+      );
+   }, [presenter, handRaiseActive, mobile, currentLivestream?.hasStarted]);
 
    return (
       <div className={isBottom ? classes.bannerBottom : classes.bannerTop}>

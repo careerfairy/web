@@ -69,6 +69,20 @@ class Firebase {
       return await getSecureAgoraToken(data);
    };
 
+   startLivestreamRecording = async (data) => {
+      const startLivestreamRecording = this.functions.httpsCallable(
+         "startRecordingLivestream"
+      );
+      return await startLivestreamRecording(data);
+   };
+
+   stopLivestreamRecording = async (data) => {
+      const stopLivestreamRecording = this.functions.httpsCallable(
+         "stopRecordingLivestream"
+      );
+      return await stopLivestreamRecording(data);
+   };
+
    createUserInAuthAndFirebase = async (userData) => {
       const createUserInAuthAndFirebase = this.functions.httpsCallable(
          "createNewUserAccount"
@@ -90,6 +104,34 @@ class Firebase {
       return sendReminderEmailAboutApplicationLink(data);
    };
 
+   sendBasicTemplateEmail = async ({
+      values,
+      emails,
+      senderEmail,
+      templateId,
+   }) => {
+      // const testingEmails = ["kadirit@hotmail.com"];
+
+      const dataObj = {
+         title: values.title,
+         summary: values.summary,
+         companyLogoUrl: values.companyLogoUrl,
+         illustrationImageUrl: values.illustrationImageUrl,
+         eventUrl: values.eventUrl,
+         subject: values.subject,
+         start: values.start,
+         emails,
+         senderEmail,
+         templateId,
+      };
+
+      const sendBasicTemplateEmail = this.functions.httpsCallable(
+         "sendBasicTemplateEmail"
+      );
+
+      return sendBasicTemplateEmail(dataObj);
+   };
+
    joinGroupDashboard = async (data) => {
       const joinGroupDashboard = this.functions.httpsCallable(
          "joinGroupDashboard"
@@ -97,8 +139,30 @@ class Firebase {
       return joinGroupDashboard(data);
    };
 
+   /**
+    * Call an on call cloud function to generate a secure agora token.
+    * @param {({
+    * targetStreamId: string,
+    * targetGroupId: string,
+    * userEmail: string,
+    * })} data
+    * @return {Promise<firebase.functions.HttpsCallableResult>}
+    */
+   getLivestreamReportData = async (data) => {
+      const handleGetLivestreamReportData = this.functions.httpsCallable(
+         "getLivestreamReportData"
+      );
+      return handleGetLivestreamReportData(data);
+   };
+
    sendRegistrationConfirmationEmail = (user, userData, livestream) => {
-      if (livestream.isFaceToFace) {
+      if (livestream.isHybrid) {
+         return this.sendHybridEventEmailRegistrationConfirmation(
+            user,
+            userData,
+            livestream
+         );
+      } else if (livestream.isFaceToFace) {
          return this.sendPhysicalEventEmailRegistrationConfirmation(
             user,
             userData,
@@ -145,6 +209,22 @@ class Firebase {
          company_logo_url: event.companyLogoUrl,
          event_title: event.title,
          event_address: event.address,
+      });
+   };
+
+   sendHybridEventEmailRegistrationConfirmation = (user, userData, event) => {
+      const sendHybridEventEmailRegistrationConfirmation = this.functions.httpsCallable(
+         "sendHybridEventRegistrationConfirmationEmail"
+      );
+      return sendHybridEventEmailRegistrationConfirmation({
+         recipientEmail: user.email,
+         user_first_name: userData.firstName,
+         event_date: DateUtil.getPrettyDate(event.start.toDate()),
+         company_name: event.company,
+         company_logo_url: event.companyLogoUrl,
+         event_title: event.title,
+         event_address: event.address,
+         livestream_link: `https://careerfairy.io/upcoming-livestream/${event.id}`,
       });
    };
 
@@ -235,7 +315,7 @@ class Firebase {
    setgroups = (userId, arrayOfIds, arrayOfGroupObjects) => {
       let userRef = this.firestore.collection("userData").doc(userId);
       return userRef.update({
-         groupIds: arrayOfIds,
+         groupIds: [...new Set(arrayOfIds)],
          registeredGroups: arrayOfGroupObjects,
       });
    };
@@ -480,6 +560,36 @@ class Firebase {
       } catch (error) {
          return error;
       }
+   };
+
+   getGroupsInfo = async (arrayOfGroupIds) => {
+      const groupsDictionary = {};
+      let i,
+         j,
+         tempArray,
+         chunk = 800;
+      for (i = 0, j = arrayOfGroupIds.length; i < j; i += chunk) {
+         tempArray = arrayOfGroupIds.slice(i, i + chunk);
+         const groupSnaps = await Promise.all(
+            tempArray
+               .filter((groupId) => groupId)
+               .map((groupId) =>
+                  this.firestore
+                     .collection("careerCenterData")
+                     .doc(groupId)
+                     .get()
+               )
+         );
+         groupSnaps.forEach((doc) => {
+            if (doc.exists) {
+               groupsDictionary[doc.id] = {
+                  id: doc.id,
+                  ...doc.data(),
+               };
+            }
+         });
+      }
+      return groupsDictionary;
    };
 
    deleteLivestream = async (livestreamId, collection) => {
@@ -2071,7 +2181,7 @@ class Firebase {
          });
          batch.update(streamRef, {
             handRaiseActive: mode,
-         })
+         });
          return await batch.commit();
       }
    };
@@ -2128,7 +2238,19 @@ class Firebase {
       return ref.onSnapshot(callback);
    };
 
-   registerToLivestream = (livestreamId, userId, groupsWithPolicies = []) => {
+   /**
+    * @param {string} livestreamId
+    * @param userData
+    * @param {*[]} groupsWithPolicies
+    * @param {string} [referrerAuthId]
+    */
+   registerToLivestream = async (
+      livestreamId,
+      userData,
+      groupsWithPolicies = [],
+      referrerAuthId
+   ) => {
+      const { id: userId, authId } = userData;
       const idsOfGroupsWithPolicies = groupsWithPolicies.map(
          (group) => group.id
       );
@@ -2141,36 +2263,44 @@ class Firebase {
          .doc(livestreamId)
          .collection("registeredStudents")
          .doc(userId);
-      return this.firestore.runTransaction((transaction) => {
-         return transaction.get(userRef).then((userDoc) => {
-            const user = userDoc.data();
-            transaction.update(livestreamRef, {
-               registrants: firebase.firestore.FieldValue.arrayUnion(
-                  user.authId
-               ),
-               registeredUsers: firebase.firestore.FieldValue.arrayUnion(
-                  userId
-               ),
-            });
-
-            for (const groupId of idsOfGroupsWithPolicies) {
-               let userInPolicyRef = this.firestore
-                  .collection("careerCenterData")
-                  .doc(groupId)
-                  .collection("usersInPolicy")
-                  .doc(userId);
-               transaction.set(userInPolicyRef, {
-                  ...user,
-                  dateAgreed: this.getServerTimestamp(),
+      const referralPromise = this.#createLivestreamReferral(
+         referrerAuthId,
+         authId,
+         livestreamId
+      );
+      const transactionPromise = this.firestore.runTransaction(
+         (transaction) => {
+            return transaction.get(userRef).then((userDoc) => {
+               const user = userDoc.data();
+               transaction.update(livestreamRef, {
+                  registrants: firebase.firestore.FieldValue.arrayUnion(
+                     user.authId
+                  ),
+                  registeredUsers: firebase.firestore.FieldValue.arrayUnion(
+                     userId
+                  ),
                });
-            }
 
-            transaction.set(registeredUsersRef, {
-               ...user,
-               dateRegistered: this.getServerTimestamp(),
+               for (const groupId of idsOfGroupsWithPolicies) {
+                  let userInPolicyRef = this.firestore
+                     .collection("careerCenterData")
+                     .doc(groupId)
+                     .collection("usersInPolicy")
+                     .doc(userId);
+                  transaction.set(userInPolicyRef, {
+                     ...user,
+                     dateAgreed: this.getServerTimestamp(),
+                  });
+               }
+
+               transaction.set(registeredUsersRef, {
+                  ...user,
+                  dateRegistered: this.getServerTimestamp(),
+               });
             });
-         });
-      });
+         }
+      );
+      return await Promise.all([referralPromise, transactionPromise]);
    };
 
    deregisterFromLivestream = (livestreamId, userId) => {
@@ -2190,8 +2320,10 @@ class Firebase {
       return batch.commit();
    };
 
-   joinCompanyTalentPool = (companyId, userId, mainStreamId) => {
-      let userRef = this.firestore.collection("userData").doc(userId);
+   joinCompanyTalentPool = (companyId, userData, mainStreamId) => {
+      let userRef = this.firestore
+         .collection("userData")
+         .doc(userData.userEmail);
       let streamRef = this.firestore
          .collection("livestreams")
          .doc(mainStreamId);
@@ -2199,7 +2331,7 @@ class Firebase {
          .collection("livestreams")
          .doc(mainStreamId)
          .collection("talentPool")
-         .doc(userId);
+         .doc(userData.userEmail);
 
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(userRef).then((userSnap) => {
@@ -2211,7 +2343,9 @@ class Firebase {
                   ),
                });
                transaction.update(streamRef, {
-                  talentPool: firebase.firestore.FieldValue.arrayUnion(userId),
+                  talentPool: firebase.firestore.FieldValue.arrayUnion(
+                     userData.userEmail
+                  ),
                   registrants: firebase.firestore.FieldValue.arrayUnion(
                      userData.authId
                   ),
@@ -2237,9 +2371,11 @@ class Firebase {
       return streamData.companyId;
    };
 
-   leaveCompanyTalentPool = (companyId, userId, livestreamId) => {
+   leaveCompanyTalentPool = (companyId, userData, livestreamId) => {
       let batch = this.firestore.batch();
-      let userRef = this.firestore.collection("userData").doc(userId);
+      let userRef = this.firestore
+         .collection("userData")
+         .doc(userData.userEmail);
       let streamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId);
@@ -2247,13 +2383,15 @@ class Firebase {
          .collection("livestreams")
          .doc(livestreamId)
          .collection("talentPool")
-         .doc(userId);
+         .doc(userData.userEmail);
       batch.update(userRef, {
          talentPools: firebase.firestore.FieldValue.arrayRemove(companyId),
          registrants: firebase.firestore.FieldValue.arrayUnion(userData.authId),
       });
       batch.update(streamRef, {
-         talentPool: firebase.firestore.FieldValue.arrayRemove(userId),
+         talentPool: firebase.firestore.FieldValue.arrayRemove(
+            userData.userEmail
+         ),
       });
 
       batch.delete(userInTalentPoolCollectionRef);
@@ -2270,7 +2408,7 @@ class Firebase {
       return userTalentPoolRef.onSnapshot(callback);
    };
 
-   setUserIsParticipating = (livestreamId, userData) => {
+   setUserIsParticipating = async (livestreamId, userData) => {
       let batch = this.firestore.batch();
       let livestreamRef = this.firestore
          .collection("livestreams")
@@ -2290,9 +2428,18 @@ class Firebase {
             userData.userEmail
          ),
       });
-
-      return batch.commit();
+      const participationPromise = batch.commit();
+      let promises = [participationPromise];
+      if (userData.authId && livestreamId) {
+         const referralCompletionPromise = this.#markLivestreamReferralAsCompleted(
+            livestreamId,
+            userData.authId
+         );
+         promises.push(referralCompletionPromise);
+      }
+      return await Promise.all(promises);
    };
+
    setUserIsParticipatingWithRef = (streamRef, userData) => {
       let batch = this.firestore.batch();
       let participantsRef = streamRef
@@ -2528,6 +2675,40 @@ class Firebase {
       });
    };
 
+   findTargetEvent = async (eventId) => {
+      let targetStream = null;
+      let typeOfStream = "";
+      try {
+         const streamSnap = await this.firestore
+            .collection("livestreams")
+            .doc(eventId)
+            .get();
+         if (streamSnap.exists) {
+            targetStream = { id: streamSnap.id, ...streamSnap.data() };
+            const startDate = targetStream.start?.toDate?.();
+            typeOfStream = this.isPastEvent(startDate) ? "past" : "upcoming";
+         } else {
+            const draftSnap = await this.firestore
+               .collection("draftLivestreams")
+               .doc(eventId)
+               .get();
+            if (draftSnap.exists) {
+               targetStream = { id: draftSnap.id, ...draftSnap.data() };
+               typeOfStream = "draft";
+            }
+         }
+      } catch (e) {}
+      return { targetStream, typeOfStream };
+   };
+
+   isPastEvent = (eventStartDate) => {
+      return (
+         eventStartDate <
+            new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS) &&
+         eventStartDate > new Date(START_DATE_FOR_REPORTED_EVENTS)
+      );
+   };
+
    promoteToMainAdmin = async (groupId, userEmail) => {
       let batch = this.firestore.batch();
 
@@ -2578,7 +2759,8 @@ class Firebase {
                const newAdminsInfo = groupData.adminEmails.map((email) => ({
                   groupId,
                   email,
-                  link: `${baseUrl}/group/${groupId}/admin/drafts?livestreamId=${streamId}`,
+                  eventDashboardLink: `${baseUrl}/group/${groupId}/admin/events?eventId=${streamId}`,
+                  nextLivestreamsLink: `${baseUrl}/next-livestreams/${groupId}?livestreamId=${streamId}`,
                }));
                adminsInfo = [...adminsInfo, ...newAdminsInfo];
             }
@@ -2942,6 +3124,101 @@ class Firebase {
          .collection("breakoutRooms")
          .doc(breakoutRoomId);
       return ref.get();
+   };
+
+   // Livestream Referral methods
+   #markLivestreamReferralAsCompleted = async (
+      livestreamId,
+      recipientAuthId
+   ) => {
+      try {
+         return await this.firestore
+            .collection("livestreamReferrals")
+            .doc(this.#getReferralDocId(livestreamId, recipientAuthId))
+            .update({
+               attendedStreamAt: this.getServerTimestamp(),
+               recipientAttendedLivestream: true,
+            });
+      } catch (e) {}
+   };
+
+   /**
+    * Check to see weather a referral doc already exists
+    * @param {String} referrerAuthId
+    * @param {string} recipientAuthId
+    * @param {string} livestreamId
+    */
+   #createLivestreamReferral = async (
+      referrerAuthId,
+      recipientAuthId,
+      livestreamId
+   ) => {
+      // You should not be able to refer your self so we return early here
+      if (referrerAuthId === recipientAuthId) {
+         return false;
+      }
+
+      if (!referrerAuthId || !recipientAuthId || !livestreamId) {
+         return false;
+      }
+
+      const [refAlreadyExists, data] = await this.checkIfReferralAlreadyExists(
+         referrerAuthId,
+         recipientAuthId,
+         livestreamId
+      );
+      // if the livestream has already been attended by the invited that means that the referral if complete, no need to update anything
+      if (data?.recipientAttendedLivestream) {
+         return false;
+      }
+
+      const referralRef = this.firestore
+         .collection("livestreamReferrals")
+         .doc(this.#getReferralDocId(livestreamId, recipientAuthId));
+
+      if (refAlreadyExists) {
+         // If its the same referer, then just return out of this function, no need to update anything
+         if (data.referrerAuthId === referrerAuthId) {
+            return false;
+         }
+         // Else if its a new referrer then update the referrerAuthId on the document
+         return referralRef.update({
+            referrerAuthId,
+            updated: this.getServerTimestamp(),
+         });
+      }
+
+      const referralData = {
+         created: this.getServerTimestamp(),
+         referrerAuthId,
+         recipientAuthId,
+         livestreamId,
+      };
+      // console.log("-> creating new referral!");
+      return await referralRef.set(referralData);
+   };
+
+   /**
+    * Check to see weather a referral doc already exists
+    * @param {String} referrerAuthId
+    * @param {string} recipientAuthId
+    * @param {string} livestreamId
+    */
+   checkIfReferralAlreadyExists = async (
+      referrerAuthId,
+      recipientAuthId,
+      livestreamId
+   ) => {
+      if (!referrerAuthId || !recipientAuthId || !livestreamId) return false;
+      const referralSnap = await this.firestore
+         .collection("livestreamReferrals")
+         .doc(this.#getReferralDocId(livestreamId, recipientAuthId))
+         .get();
+      return [referralSnap.exists, referralSnap.data?.()];
+   };
+
+   #getReferralDocId = (livestreamId, recipientAuthId) => {
+      return `${livestreamId}-${recipientAuthId}`;
    };
 
    // Streamer Helpers

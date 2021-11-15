@@ -1,5 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Container, TextField, Grid, Hidden } from "@material-ui/core";
+import {
+   Avatar,
+   Box,
+   Button,
+   Container,
+   Fab,
+   Grid,
+   TextField,
+   Tooltip,
+} from "@material-ui/core";
 import Header from "../../components/views/header/Header";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { withFirebasePage } from "context/firebase";
@@ -16,7 +25,6 @@ import ClearIcon from "@material-ui/icons/Clear";
 import UserUtil from "../../data/util/UserUtil";
 import TargetOptions from "../../components/views/common/TargetOptions";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
-import DataAccessUtil from "util/DataAccessUtil";
 import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
 import EmailIcon from "@material-ui/icons/Email";
 import RssFeedIcon from "@material-ui/icons/RssFeed";
@@ -27,7 +35,6 @@ import { speakerPlaceholder } from "../../components/util/constants";
 import { useAuth } from "../../HOCs/AuthProvider";
 import GroupsUtil from "../../data/util/GroupsUtil";
 import { store } from "../_app";
-import { Paper, Avatar, Box } from "@material-ui/core";
 import { companyLogoPlaceholder } from "../../constants/images";
 import { getResizedUrl } from "../../components/helperFunctions/HelperFunctions";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
@@ -39,6 +46,7 @@ import {
    InPersonEventBadge,
    LimitedRegistrationsBadge,
 } from "components/views/NextLivestreams/GroupStreams/groupStreamCard/badges";
+import Link from "materialUI/NextNavLink";
 
 const useStyles = makeStyles((theme) => ({
    speakerAvatar: {
@@ -100,6 +108,13 @@ const useStyles = makeStyles((theme) => ({
       width: "fit-content",
    },
    logosGridContainer: {},
+   adminJoinStreamButton: {
+      position: "fixed",
+      bottom: theme.spacing(4),
+      right: theme.spacing(2),
+      textDecoration: "none !important",
+      zIndex: 201,
+   },
 }));
 
 const parseDates = (stream) => {
@@ -120,9 +135,10 @@ const parseDates = (stream) => {
 function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    const classes = useStyles();
    const router = useRouter();
-   const { livestreamId } = router.query;
+   const { livestreamId, groupId: queryGroupId } = router.query;
    const absolutePath = router.asPath;
    const summaryRef = useRef();
+   const { referrerId } = router.query;
    const { userData, authenticatedUser: user } = useAuth();
    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
    const [newQuestionTitle, setNewQuestionTitle] = useState("");
@@ -256,16 +272,30 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          firebase
             .getDetailLivestreamCareerCenters(currentLivestream.groupIds)
             .then((querySnapshot) => {
-               let groupList = [];
-               querySnapshot.forEach((doc) => {
-                  let group = doc.data();
-                  group.id = doc.id;
-                  groupList.push(group);
-               });
+               let groupList = querySnapshot.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+               }));
+
+               let targetGroupId = currentGroup?.groupId;
+
+               if (!queryGroupId) {
+                  const companyThatPublishedStream = groupList.find(
+                     (group) =>
+                        !group.universityCode &&
+                        group.id === currentLivestream?.author?.groupId
+                  );
+                  if (companyThatPublishedStream?.id) {
+                     targetGroupId = companyThatPublishedStream.id;
+                  }
+               }
+               groupList = groupList.filter((careerCenter) =>
+                  GroupsUtil.filterCurrentGroup(careerCenter, targetGroupId)
+               );
                setCareerCenters(groupList);
             });
       }
-   }, [currentLivestream]);
+   }, [currentLivestream?.groupIds, currentGroup?.groupId]);
 
    useEffect(() => {
       if (
@@ -290,18 +320,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
       window.open("http://careerfairy.io" + route, "_blank");
    }
 
-   function deregisterFromLivestream() {
-      if (!user || !user.emailVerified) {
-         return router.replace("/signup");
-      }
-
-      if (!userData) {
-         return router.push("/profile");
-      }
-
-      firebase.deregisterFromLivestream(currentLivestream.id, user.email);
-   }
-
    function joinTalentPool() {
       if (!user || !user.emailVerified) {
          return router.replace("/signup");
@@ -313,7 +331,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
       firebase.joinCompanyTalentPool(
          currentLivestream.companyId,
-         user.email,
+         userData,
          currentLivestream.id
       );
    }
@@ -329,7 +347,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
       firebase.leaveCompanyTalentPool(
          currentLivestream.companyId,
-         user.email,
+         userData,
          currentLivestream.id
       );
    }
@@ -388,8 +406,9 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          firebase
             .registerToLivestream(
                currentLivestream.id,
-               user.email,
-               groupsWithPolicies
+               userData,
+               groupsWithPolicies,
+               referrerId
             )
             .then(() => {
                sendEmailRegistrationConfirmation();
@@ -402,8 +421,9 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
       firebase
          .registerToLivestream(
             currentLivestream.id,
-            user.email,
-            groupsWithPolicies
+            userData,
+            groupsWithPolicies,
+            referrerId
          )
          .then(() => {
             setBookingModalOpen(true);
@@ -600,10 +620,9 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          </Grid>
       );
    });
-
    let logoElements = careerCenters.map((careerCenter, index) => {
       return (
-         <Item className={classes.imageGrid}>
+         <Item key={careerCenter.id} className={classes.imageGrid}>
             <img
                src={getResizedUrl(careerCenter.logoUrl, "lg")}
                className={classes.logoElementImage}
@@ -785,31 +804,32 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                      )}
                      <div style={{ margin: "40px 0", width: "100%" }}>
                         <div>
-                           {!isPastEvent && (
-                              <Button
-                                 size="large"
-                                 id="register-button"
-                                 disabled={isRegistrationDisabled}
-                                 children={getMainButtonLabel}
-                                 color={registered ? "default" : "primary"}
-                                 variant="contained"
-                                 startIcon={
-                                    registered ? <ClearIcon /> : <AddIcon />
-                                 }
-                                 style={{ margin: "5px" }}
-                                 onClick={
-                                    registered
-                                       ? () =>
-                                            deregisterFromLivestream(
-                                               currentLivestream.id
-                                            )
-                                       : () =>
-                                            startRegistrationProcess(
-                                               currentLivestream.id
-                                            )
-                                 }
-                              />
-                           )}
+                           {!isPastEvent &&
+                              !(currentLivestream.openStream === true) && (
+                                 <Button
+                                    size="large"
+                                    id="register-button"
+                                    disabled={isRegistrationDisabled}
+                                    children={getMainButtonLabel}
+                                    color={registered ? "default" : "primary"}
+                                    variant="contained"
+                                    startIcon={
+                                       registered ? <ClearIcon /> : <AddIcon />
+                                    }
+                                    style={{ margin: "5px" }}
+                                    onClick={
+                                       registered
+                                          ? () =>
+                                               deregisterFromLivestream(
+                                                  currentLivestream.id
+                                               )
+                                          : () =>
+                                               startRegistrationProcess(
+                                                  currentLivestream.id
+                                               )
+                                    }
+                                 />
+                              )}
                            <Button
                               size="large"
                               children={"How Live Streams Work"}
@@ -976,6 +996,27 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                      />
                   </Box>
                </div>
+               {userData?.isAdmin && (
+                  <Tooltip
+                     title={
+                        "This button is only present for CareerFairy admins"
+                     }
+                  >
+                     <Fab
+                        className={classes.adminJoinStreamButton}
+                        variant="extended"
+                        color="secondary"
+                        component={Link}
+                        href={
+                           "/streaming/" +
+                           currentLivestream?.id +
+                           "/viewer?spy=true"
+                        }
+                     >
+                        Check Stream now
+                     </Fab>
+                  </Tooltip>
+               )}
                <Grid
                   container
                   justifyContent="center"
@@ -1329,7 +1370,8 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 }
 
 export async function getServerSideProps({
-   params: { livestreamId, groupId },
+   params: { livestreamId },
+   query: { groupId },
 }) {
    let serverSideLivestream = {};
    const snap = await store.firestore.get({
@@ -1355,6 +1397,7 @@ export async function getServerSideProps({
       delete serverSideLivestream.adminEmails;
       delete serverSideLivestream.adminEmail;
       delete serverSideLivestream.author;
+      delete serverSideLivestream.lastUpdatedAuthorInfo;
       delete serverSideLivestream.status;
 
       serverSideLivestream.id = snap.id;

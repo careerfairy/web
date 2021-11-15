@@ -3,6 +3,9 @@ import React, { memo, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import StreamsLayout from "./StreamsLayout";
 import Banners from "./Banners";
+import { useSelector } from "react-redux";
+import { useAuth } from "../../../../../HOCs/AuthProvider";
+import SuperAdminControls from "../SuperAdminControls";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -30,18 +33,23 @@ const Streams = memo(
       livestreamId,
       setRemovedStream,
       presenter,
+      openStream,
       videoMutedBackgroundImg,
       handRaiseActive,
       mobile,
    }) => {
+      const focusModeEnabled = useSelector(
+         (state) => state.stream.layout.focusModeEnabled
+      );
       const [streamData, setStreamData] = useState([]);
       const [bannersBottom, setBannersBottom] = useState(false);
       const [hasManySpeakers, setHasManySpeakers] = useState(false);
       const classes = useStyles();
+      const { userData } = useAuth();
 
       useEffect(() => {
-         setBannersBottom(Boolean(mobile && !presenter));
-      }, [mobile, presenter]);
+         setBannersBottom(Boolean((mobile || focusModeEnabled) && !presenter));
+      }, [mobile, presenter, focusModeEnabled]);
 
       useEffect(() => {
          const allStreams = [...externalMediaStreams];
@@ -114,7 +122,7 @@ const Streams = memo(
             {!bannersBottom && (
                <Banners
                   presenter={presenter}
-                  handRaiseActive={handRaiseActive}
+                  handRaiseActive={handRaiseActive && !openStream}
                   mobile={mobile}
                />
             )}
@@ -132,12 +140,13 @@ const Streams = memo(
                   livestreamId={livestreamId}
                   presenter={presenter}
                />
+               {userData?.isAdmin && <SuperAdminControls />}
             </div>
             {bannersBottom && (
                <Banners
                   isBottom
                   presenter={presenter}
-                  handRaiseActive={handRaiseActive}
+                  handRaiseActive={handRaiseActive && !openStream}
                   mobile={mobile}
                />
             )}

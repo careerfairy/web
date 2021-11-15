@@ -66,7 +66,7 @@ function JoinTalentPoolModal({
          firebase
             .joinCompanyTalentPool(
                livestream.companyId,
-               userData.id,
+               userData,
                livestream.id
             )
             .then(() => {

@@ -12,6 +12,7 @@ import nextLivestreamsReducer from "./nextLivestreamsReducer";
 import streamReducer from "./streamReducer";
 import generalLayoutReducer from "./generalLayoutReducer";
 import groupAnalyticsReducer from "./groupAnalyticsReducer";
+import streamAdminReducer from "./streamAdminReducer";
 
 export default combineReducers({
    auth: authReducer,
@@ -26,4 +27,5 @@ export default combineReducers({
    generalLayout: generalLayoutReducer,
    analyticsReducer: groupAnalyticsReducer,
    stream: streamReducer,
+   streamAdmin: streamAdminReducer,
 });

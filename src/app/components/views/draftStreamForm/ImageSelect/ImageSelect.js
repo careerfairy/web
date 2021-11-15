@@ -1,24 +1,17 @@
 import React, { useEffect, useState } from "react";
 import {
+   Avatar,
    Box,
    Button,
-   Card,
    CardMedia,
    Collapse,
-   FormControl,
    FormHelperText,
-   Avatar,
-   Typography,
-   TextField,
-   CircularProgress,
 } from "@material-ui/core";
-import match from "autosuggest-highlight/match";
 import PublishIcon from "@material-ui/icons/Publish";
-import parse from "autosuggest-highlight/parse";
-import Autocomplete from "@material-ui/lab/Autocomplete";
 import { uploadLogo } from "../../../helperFunctions/HelperFunctions";
 import FilePickerContainer from "../../../ssr/FilePickerContainer";
 import { makeStyles } from "@material-ui/core/styles";
+import { useFirebase } from "context/firebase";
 
 const logoPlaceholder =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Flogo-placeholder.png?alt=media&token=ef6c8d5a-af92-4b69-a946-ce78a9997382";
@@ -63,19 +56,17 @@ const useStyles = makeStyles((theme) => ({
 
 const ImageSelect = ({
    options,
-   firebase,
    error,
    value,
    formName,
    label,
-   loading,
    isSubmitting,
-   handleBlur,
    getDownloadUrl,
    setFieldValue,
    path,
    isAvatar,
 }) => {
+   const firebase = useFirebase();
    const classes = useStyles();
    const [open, setOpen] = useState(false);
    const [filePickerError, setFilePickerError] = useState(null);

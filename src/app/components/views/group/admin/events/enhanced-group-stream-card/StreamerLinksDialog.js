@@ -96,11 +96,9 @@ const StreamerLinksDialog = ({
    firebase,
    livestreamId,
    openDialog,
-   setOpenDialog,
    onClose,
 }) => {
    const handleClose = () => {
-      setOpenDialog(false);
       onClose?.();
    };
 

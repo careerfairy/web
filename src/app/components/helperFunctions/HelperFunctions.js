@@ -187,20 +187,7 @@ export const MultilineText = ({ text }) => {
 };
 
 export const copyStringToClipboard = (string) => {
-   // Create new element
-   let el = document.createElement("textarea");
-   // Set value (string to be copied)
-   el.value = string;
-   // Set non-editable to avoid focus and move outside of view
-   el.setAttribute("readonly", "");
-   el.style = { position: "absolute", left: "-9999px" };
-   document.body.appendChild(el);
-   // Select text inside element
-   el.select();
-   // Copy text to clipboard
-   document.execCommand("copy");
-   // Remove temporary element
-   document.body.removeChild(el);
+   navigator.clipboard.writeText(string);
 };
 
 export const mustBeNumber = (value, decimals = 2) => {
@@ -345,8 +332,11 @@ export const getResizedUrl = (url, size = "sm") => {
       lg: "1200x900",
    };
 
+   if (typeof url === "undefined") {
+      return "";
+   }
    if (typeof url !== "string") {
-      console.warn("Invalid url provided");
+      console.warn("Invalid url provided to getResizedUrl helper fn");
       return "";
    }
 
