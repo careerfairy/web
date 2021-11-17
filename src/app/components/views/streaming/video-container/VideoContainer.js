@@ -96,7 +96,7 @@ function VideoContainer({
       true
    );
 
-   const currentSpeakerId = useCurrentSpeaker(localStream, []);
+   const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams);
 
    useEffect(() => {
       if (streamerId && currentLivestream.id) {

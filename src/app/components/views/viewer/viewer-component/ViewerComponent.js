@@ -85,13 +85,6 @@ function ViewerComponent({
             ?.length
       )
    );
-   const streamerReady = true;
-
-   const screenSharingMode =
-      currentLivestream.screenSharerId === authenticatedUser?.email &&
-      currentLivestream.mode === "desktop"
-         ? optimizationMode
-         : "";
 
    const {
       networkQuality,
@@ -124,34 +117,37 @@ function ViewerComponent({
       true
    );
 
-   useEffect(() => {
-      if (
-         handRaiseActive &&
-         agoraRtcStatus &&
-         agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
-      ) {
-         if (currentLivestream) {
-            if (currentLivestream.test || currentLivestream.openStream) {
-               firebase.updateHandRaiseRequest(
-                  streamRef,
-                  "anonymous" + streamerId,
-                  "connected"
-               );
-            } else {
-               firebase.updateHandRaiseRequest(
-                  streamRef,
-                  authenticatedUser.email,
-                  "connected"
-               );
-            }
-         }
-      }
-   }, [agoraRtcStatus]);
+   // useEffect(() => {
+   //    if (
+   //       handRaiseActive &&
+   //       agoraRtcStatus &&
+   //       agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
+   //    ) {
+   //       if (currentLivestream) {
+   //          if (currentLivestream.test || currentLivestream.openStream) {
+   //             firebase.updateHandRaiseRequest(
+   //                streamRef,
+   //                "anonymous" + streamerId,
+   //                "connected"
+   //             );
+   //          } else {
+   //             firebase.updateHandRaiseRequest(
+   //                streamRef,
+   //                authenticatedUser.email,
+   //                "connected"
+   //             );
+   //          }
+   //       }
+   //    }
+   // }, [localStream]);
 
-   const currentSpeakerId = useCurrentSpeaker(
-      localMediaStream,
-      externalMediaStreams
-   );
+   const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams);
+
+   useEffect(() => {
+      if (handRaiseActive) {
+         setShowLocalStreamPublishingModal(true);
+      }
+   }, [handRaiseActive]);
 
    useEffect(() => {
       if (!isBreakout && !remoteStreams?.length && hasActiveRooms) {
@@ -239,19 +235,19 @@ function ViewerComponent({
             showMenu={showMenu}
             livestreamId={currentLivestream.id}
          />
+         <StreamPublishingModal
+            open={showLocalStreamPublishingModal}
+            setOpen={setShowLocalStreamPublishingModal}
+            localStream={localStream}
+            displayableMediaStream={displayableMediaStream}
+            devices={devices}
+            mediaControls={mediaControls}
+            onConfirmStream={handlePublishLocalStream}
+            onRefuseStream={handleJoinAsViewer}
+            localMediaEnabling={localMediaEnabling}
+         />
          {handRaiseActive && (
             <Fragment>
-               <StreamPublishingModal
-                  open={showLocalStreamPublishingModal}
-                  setOpen={setShowLocalStreamPublishingModal}
-                  localStream={localStream}
-                  displayableMediaStream={displayableMediaStream}
-                  devices={devices}
-                  mediaControls={mediaControls}
-                  onConfirmStream={handlePublishLocalStream}
-                  onRefuseStream={handleJoinAsViewer}
-                  localMediaEnabling={localMediaEnabling}
-               />
                <DraggableComponent
                   zIndex={3}
                   bounds="parent"

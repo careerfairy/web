@@ -63,11 +63,13 @@ export default function useMediaSources(
    }, [devices, localStream?.uid, active]);
 
    useEffect(() => {
-      if (!localStream.audioTrack) {
-         setAudioSource(null);
-      }
-      if (!localStream.videoTrack) {
-         setVideoSource(null);
+      if (localStream) {
+         if (!localStream.audioTrack) {
+            setAudioSource(null);
+         }
+         if (!localStream.videoTrack) {
+            setVideoSource(null);
+         }
       }
    }, [localStream?.audioTrack, localStream?.videoTrack]);
 
