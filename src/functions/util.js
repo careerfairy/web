@@ -345,6 +345,16 @@ const markStudentStatsInUse = (totalParticipants, groupData) => {
    });
 };
 
+const createNestedArrayOfTemplates = (arrayOfTemplates, chunkSize = 500) => {
+   let nestedArrayOfTemplates = [];
+   let i, j, tempArray;
+   for (i = 0, j = arrayOfTemplates.length; i < j; i += chunkSize) {
+      tempArray = arrayOfTemplates.slice(i, i + chunkSize);
+      nestedArrayOfTemplates.push(tempArray);
+   }
+   return nestedArrayOfTemplates;
+};
+
 module.exports = {
    setHeaders,
    generateEmailData,
@@ -360,4 +370,5 @@ module.exports = {
    getRatingsAverage,
    getDateString,
    markStudentStatsInUse,
+   createNestedArrayOfTemplates,
 };
