@@ -2,11 +2,9 @@ import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import SectionContainer from "../../common/Section/Container";
-import UpcomingLivestreamCard from "../../common/stream-cards/UpcomingLivestreamCard";
-import { Box, Grid } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import { useFirebase } from "../../../../context/firebase";
-import { useFirestore } from "react-redux-firebase";
+import UpcomingLivestreamsCarousel from "./UpcomingLivestreamsCarousel";
 
 const useStyles = makeStyles((theme) => ({
    section: {
@@ -36,7 +34,7 @@ const UpcomingLivestreamsSection = (props) => {
 
    useEffect(() => {
       (async function () {
-         const newStreamSnaps = await getUpcomingLivestreams(3);
+         const newStreamSnaps = await getUpcomingLivestreams(15);
          const newStreams = newStreamSnaps.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
@@ -55,18 +53,11 @@ const UpcomingLivestreamsSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         <SectionContainer>
-            <Grid container spacing={2} display="flex" justifyContent="center">
-               {upcomingLivestreams.map((livestream) => (
-                  <Grid item xs>
-                     <UpcomingLivestreamCard
-                        livestream={livestream}
-                        key={livestream.id}
-                     />
-                  </Grid>
-               ))}
-            </Grid>
-         </SectionContainer>
+         <Box>
+            <UpcomingLivestreamsCarousel
+               upcomingStreams={upcomingLivestreams}
+            />
+         </Box>
       </Section>
    );
 };
