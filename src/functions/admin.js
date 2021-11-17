@@ -73,7 +73,7 @@ exports.sendBasicTemplateEmail = functions.https.onCall(
                .sendEmailBatchWithTemplates(arrayOfTemplateEmails)
                .then(
                   (response) => {
-                     console.log(
+                     functions.logger.log(
                         `Successfully sent email to ${arrayOfTemplateEmails.length}`
                      );
                   },
