@@ -6,6 +6,7 @@ import SectionContainer from "../../common/Section/Container";
 import UpcomingLivestreamCard from "../../common/stream-cards/UpcomingLivestreamCard";
 import { Box, Grid } from "@material-ui/core";
 import { useFirebase } from "../../../../context/firebase";
+import { useFirestore } from "react-redux-firebase";
 
 const useStyles = makeStyles((theme) => ({
    section: {
@@ -31,7 +32,6 @@ const useStyles = makeStyles((theme) => ({
 const UpcomingLivestreamsSection = (props) => {
    const classes = useStyles();
    const { getUpcomingLivestreams } = useFirebase();
-
    const [upcomingLivestreams, setUpcomingLivestreams] = useState([]);
 
    useEffect(() => {

@@ -1516,6 +1516,36 @@ class Firebase {
          .map((doc) => ({ id: doc.id, ...doc.data() }));
    };
 
+   getFollowingGroupsWithCache = async (groupIds = []) => {
+      const uniqueGroupIds = [...new Set(groupIds)];
+      const getFromCache = async (groupId) => {
+         let snap = { notInCache: true, groupId };
+         try {
+            snap = await this.firestore
+               .collection("careerCenterData")
+               .doc(groupId)
+               .get({ source: "cache" });
+         } catch (e) {}
+         return snap;
+      };
+      const groupSnapsFromCache = await Promise.all(
+         uniqueGroupIds.map((groupId) => getFromCache(groupId))
+      );
+      const groupSnapsFromServer = await Promise.all(
+         groupSnapsFromCache
+            .filter((doc) => doc.notInCache)
+            .map(({ groupId }) => {
+               return this.firestore
+                  .collection("careerCenterData")
+                  .doc(groupId)
+                  .get();
+            })
+      );
+      return [...groupSnapsFromCache, ...groupSnapsFromServer]
+         .filter((doc) => doc.exists && !doc.notInCache)
+         .map((doc) => ({ id: doc.id, ...doc.data() }));
+   };
+
    getGroupsWithIds = async (arrayOfGroupIds) => {
       return await this.getFollowingGroups(arrayOfGroupIds);
    };
