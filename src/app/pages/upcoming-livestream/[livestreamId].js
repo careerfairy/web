@@ -135,7 +135,7 @@ const parseDates = (stream) => {
 function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    const classes = useStyles();
    const router = useRouter();
-   const { livestreamId } = router.query;
+   const { livestreamId, groupId: queryGroupId } = router.query;
    const absolutePath = router.asPath;
    const summaryRef = useRef();
    const { referrerId } = router.query;
@@ -272,16 +272,30 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          firebase
             .getDetailLivestreamCareerCenters(currentLivestream.groupIds)
             .then((querySnapshot) => {
-               let groupList = [];
-               querySnapshot.forEach((doc) => {
-                  let group = doc.data();
-                  group.id = doc.id;
-                  groupList.push(group);
-               });
+               let groupList = querySnapshot.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+               }));
+
+               let targetGroupId = currentGroup?.groupId;
+
+               if (!queryGroupId) {
+                  const companyThatPublishedStream = groupList.find(
+                     (group) =>
+                        !group.universityCode &&
+                        group.id === currentLivestream?.author?.groupId
+                  );
+                  if (companyThatPublishedStream?.id) {
+                     targetGroupId = companyThatPublishedStream.id;
+                  }
+               }
+               groupList = groupList.filter((careerCenter) =>
+                  GroupsUtil.filterCurrentGroup(careerCenter, targetGroupId)
+               );
                setCareerCenters(groupList);
             });
       }
-   }, [currentLivestream]);
+   }, [currentLivestream?.groupIds, currentGroup?.groupId]);
 
    useEffect(() => {
       if (
@@ -606,7 +620,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          </Grid>
       );
    });
-
    let logoElements = careerCenters.map((careerCenter, index) => {
       return (
          <Item key={careerCenter.id} className={classes.imageGrid}>
@@ -791,31 +804,32 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                      )}
                      <div style={{ margin: "40px 0", width: "100%" }}>
                         <div>
-                           {!isPastEvent && (
-                              <Button
-                                 size="large"
-                                 id="register-button"
-                                 disabled={isRegistrationDisabled}
-                                 children={getMainButtonLabel}
-                                 color={registered ? "default" : "primary"}
-                                 variant="contained"
-                                 startIcon={
-                                    registered ? <ClearIcon /> : <AddIcon />
-                                 }
-                                 style={{ margin: "5px" }}
-                                 onClick={
-                                    registered
-                                       ? () =>
-                                            deregisterFromLivestream(
-                                               currentLivestream.id
-                                            )
-                                       : () =>
-                                            startRegistrationProcess(
-                                               currentLivestream.id
-                                            )
-                                 }
-                              />
-                           )}
+                           {!isPastEvent &&
+                              !(currentLivestream.openStream === true) && (
+                                 <Button
+                                    size="large"
+                                    id="register-button"
+                                    disabled={isRegistrationDisabled}
+                                    children={getMainButtonLabel}
+                                    color={registered ? "default" : "primary"}
+                                    variant="contained"
+                                    startIcon={
+                                       registered ? <ClearIcon /> : <AddIcon />
+                                    }
+                                    style={{ margin: "5px" }}
+                                    onClick={
+                                       registered
+                                          ? () =>
+                                               deregisterFromLivestream(
+                                                  currentLivestream.id
+                                               )
+                                          : () =>
+                                               startRegistrationProcess(
+                                                  currentLivestream.id
+                                               )
+                                    }
+                                 />
+                              )}
                            <Button
                               size="large"
                               children={"How Live Streams Work"}
@@ -1356,7 +1370,8 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 }
 
 export async function getServerSideProps({
-   params: { livestreamId, groupId },
+   params: { livestreamId },
+   query: { groupId },
 }) {
    let serverSideLivestream = {};
    const snap = await store.firestore.get({
@@ -1382,6 +1397,7 @@ export async function getServerSideProps({
       delete serverSideLivestream.adminEmails;
       delete serverSideLivestream.adminEmail;
       delete serverSideLivestream.author;
+      delete serverSideLivestream.lastUpdatedAuthorInfo;
       delete serverSideLivestream.status;
 
       serverSideLivestream.id = snap.id;

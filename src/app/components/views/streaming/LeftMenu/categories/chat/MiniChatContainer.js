@@ -117,7 +117,8 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
    const [open, setOpen] = useState(false);
 
    const isEmpty =
-      !newChatEntry.trim() || (!userData && !livestream.test && !isStreamer);
+      !newChatEntry.trim() ||
+      (!userData && !livestream.test && !livestream.openStream && !isStreamer);
    const classes = useStyles({ isEmpty });
 
    useEffect(() => {
@@ -205,7 +206,24 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
       setCurrentEntry(null);
    };
 
+   const getAuthorName = () => {
+      if (isStreamer || livestream.test) return "Streamer";
+      else if (livestream.openStream) return "anonymous";
+      else if (userData) {
+         return userData.firstName + " " + userData.lastName.charAt(0);
+      }
+   };
+
+   const getAuthorEmail = () => {
+      if (isStreamer || livestream.test) return "Streamer";
+      else if (livestream.openStream) return "anonymous";
+      else if (authenticatedUser) {
+         return authenticatedUser.email;
+      }
+   };
+
    function addNewChatEntry() {
+      debugger;
       if (isEmpty || submitting) {
          return;
       }
@@ -213,14 +231,8 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
 
       const newChatEntryObject = {
          message: newChatEntry,
-         authorName:
-            isStreamer || livestream.test
-               ? "Streamer"
-               : userData.firstName + " " + userData.lastName.charAt(0),
-         authorEmail:
-            isStreamer || livestream.test
-               ? "Streamer"
-               : authenticatedUser.email,
+         authorName: getAuthorName(),
+         authorEmail: getAuthorEmail(),
          votes: 0,
       };
 

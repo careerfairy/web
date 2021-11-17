@@ -16,6 +16,9 @@ import useStreamRef from "../../components/custom-hook/useStreamRef";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHandRaiseConnect";
+import StatsUtil from "../../data/util/StatsUtil";
+import GroupsUtil from "../../data/util/GroupsUtil";
+import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -88,6 +91,7 @@ const ViewerLayout = (props) => {
    const [handRaiseActive, setHandRaiseActive] = useState(false);
    const [streamerId, setStreamerId] = useState(null);
    const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen);
+
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
    );
@@ -97,30 +101,45 @@ const ViewerLayout = (props) => {
    const classes = useStyles({ showMenu, mobile, focusModeEnabled });
    const [selectedState, setSelectedState] = useState("questions");
    const [notAuthorized, setNotAuthorized] = useState(false);
+   const [checkingForCategoryData, setCheckingForCategoryData] = useState(
+      false
+   );
+   const [hasCheckedForCategoryData, setHasCheckedForCategoryData] = useState(
+      false
+   );
+   const [groupsToFollow, setGroupsToFollow] = useState([]);
+   const [groupToUpdateCategories, setGroupToUpdateCategories] = useState(null);
+   const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
 
    const currentLivestream = useStreamConnect();
 
-   useViewerHandRaiseConnect(currentLivestream);
-
+   useViewerHandRaiseConnect(currentLivestream, streamerId);
+   // console.log("-> currentLivestream", currentLivestream);
    useEffect(() => {
       if (currentLivestream && !currentLivestream.test) {
-         if (token) {
-            firebase.getLivestreamSecureTokenWithRef(streamRef).then((doc) => {
-               if (!doc.exists) {
-                  router.push("/streaming/error");
-               }
-               let storedToken = doc.data().value;
-               if (storedToken !== token) {
-                  setNotAuthorized(false);
-               }
-            });
+         if (currentLivestream.openStream) {
+            setNotAuthorized(false);
          } else {
-            setNotAuthorized(
-               currentLivestream &&
-                  !currentLivestream.test &&
-                  authenticatedUser?.isLoaded &&
-                  authenticatedUser?.isEmpty
-            );
+            if (token) {
+               firebase
+                  .getLivestreamSecureTokenWithRef(streamRef)
+                  .then((doc) => {
+                     if (!doc.exists) {
+                        router.push("/streaming/error");
+                     }
+                     let storedToken = doc.data().value;
+                     if (storedToken !== token) {
+                        setNotAuthorized(false);
+                     }
+                  });
+            } else {
+               setNotAuthorized(
+                  currentLivestream &&
+                     !currentLivestream.test &&
+                     authenticatedUser?.isLoaded &&
+                     authenticatedUser?.isEmpty
+               );
+            }
          }
       }
    }, [token, currentLivestream?.test, currentLivestream?.id]);
@@ -144,7 +163,7 @@ const ViewerLayout = (props) => {
    useEffect(() => {
       if (userData?.isAdmin) return;
       if (userData?.userEmail) {
-         if (livestreamId) {
+         if (livestreamId && hasCheckedForCategoryData) {
             firebase.setUserIsParticipating(livestreamId, userData);
          }
          if (breakoutRoomId) {
@@ -158,15 +177,17 @@ const ViewerLayout = (props) => {
       userData?.linkedinUrl,
       userData?.firstName,
       userData?.lastName,
+      userData?.registeredGroups,
       breakoutRoomId,
       streamRef,
+      hasCheckedForCategoryData,
    ]);
 
    useEffect(() => {
       if (currentLivestream && !streamerId) {
          if (currentLivestream.test && authenticatedUser?.email) {
             setStreamerId(currentLivestream.id + authenticatedUser.email);
-         } else if (currentLivestream.test) {
+         } else if (currentLivestream.test || currentLivestream.openStream) {
             let uuid = uuidv4();
             let joiningId = uuid.replace(/-/g, "");
             setStreamerId(currentLivestream.id + joiningId);
@@ -190,6 +211,60 @@ const ViewerLayout = (props) => {
       }
    }, [currentLivestream?.hasStarted, spyModeEnabled]);
 
+   useEffect(() => {
+      const checkForCategoryData = async () => {
+         try {
+            if (
+               !currentLivestream?.test &&
+               currentLivestream?.groupIds?.length &&
+               !breakoutRoomId
+            ) {
+               setCheckingForCategoryData(true);
+               const livestreamGroups = await firebase.getGroupsWithIds(
+                  currentLivestream.groupIds
+               );
+               const {
+                  hasAgreedToAll,
+                  groupsWithPolicies,
+               } = await GroupsUtil.getPolicyStatus(
+                  livestreamGroups,
+                  userData.userEmail,
+                  firebase
+               );
+               const groupThatUserFollows = StatsUtil.getGroupThatStudentFollows(
+                  userData,
+                  livestreamGroups
+               );
+               if (!groupThatUserFollows) {
+                  // If user is not following any of the groups bring up group following Dialog
+                  // Open the follow group dialog...
+                  if (livestreamGroups?.length) {
+                     // Only open dialog when there are groups
+                     setGroupsToFollow(livestreamGroups);
+                  }
+               } else {
+                  // If user is following one of the groups, please check if the user has all the categories of the group
+                  const userHasAllCategoriesOfGroup = StatsUtil.studentHasAllCategoriesOfGroup(
+                     userData,
+                     groupThatUserFollows
+                  );
+                  if (!userHasAllCategoriesOfGroup) {
+                     // Open the category select dialog...
+                     setGroupToUpdateCategories(groupThatUserFollows);
+                     if (!hasAgreedToAll) {
+                        setGroupsWithPolicies(groupsWithPolicies);
+                     }
+                  }
+               }
+            }
+         } catch (e) {}
+         setCheckingForCategoryData(false);
+         setHasCheckedForCategoryData(true);
+      };
+
+      checkForCategoryData();
+   }, [Boolean(userData), Boolean(currentLivestream)]);
+
    if (notAuthorized) {
       replace({
          pathname: `/login`,
@@ -199,6 +274,11 @@ const ViewerLayout = (props) => {
 
    const closeLeftMenu = () => dispatch(actions.closeLeftMenu());
    const openLeftMenu = () => dispatch(actions.openLeftMenu());
+
+   const handleCloseViewerGroupCategorySelectDialog = useCallback(() => {
+      setGroupsToFollow([]);
+      setGroupToUpdateCategories(null);
+   }, []);
 
    const handleStateChange = useCallback(
       (state) => {
@@ -218,8 +298,24 @@ const ViewerLayout = (props) => {
       setAudienceDrawerOpen(false);
    }, []);
 
-   if (!isLoaded(currentLivestream) || notAuthorized) {
+   if (
+      !isLoaded(currentLivestream) ||
+      notAuthorized ||
+      checkingForCategoryData ||
+      !hasCheckedForCategoryData
+   ) {
       return <Loader />;
+   }
+
+   if (groupToUpdateCategories || groupsToFollow.length) {
+      return (
+         <ViewerGroupCategorySelectMenu
+            onClose={handleCloseViewerGroupCategorySelectDialog}
+            groupToUpdateCategories={groupToUpdateCategories}
+            groupsToFollow={groupsToFollow}
+            groupsWithPolicies={groupsWithPolicies}
+         />
+      );
    }
 
    return (
@@ -232,6 +328,7 @@ const ViewerLayout = (props) => {
                mobile={mobile}
             />
             <LeftMenu
+               streamerId={streamerId}
                handRaiseActive={handRaiseActive}
                setHandRaiseActive={setHandRaiseActive}
                streamer={false}

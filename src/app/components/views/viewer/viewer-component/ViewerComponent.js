@@ -23,6 +23,7 @@ import WifiIndicator from "../../streaming/video-container/WifiIndicator";
 import useAgoraRtc from "components/custom-hook/useAgoraRtc";
 import useAgoraRtm from "components/custom-hook/useAgoraRtm";
 import StreamPublishingModal from "components/views/streaming/modal/StreamPublishingModal";
+import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -123,7 +124,34 @@ function ViewerComponent({
       true
    );
 
-   const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams);
+   useEffect(() => {
+      if (
+         handRaiseActive &&
+         agoraRtcStatus &&
+         agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
+      ) {
+         if (currentLivestream) {
+            if (currentLivestream.test || currentLivestream.openStream) {
+               firebase.updateHandRaiseRequest(
+                  streamRef,
+                  "anonymous" + streamerId,
+                  "connected"
+               );
+            } else {
+               firebase.updateHandRaiseRequest(
+                  streamRef,
+                  authenticatedUser.email,
+                  "connected"
+               );
+            }
+         }
+      }
+   }, [agoraRtcStatus]);
+
+   const currentSpeakerId = useCurrentSpeaker(
+      localMediaStream,
+      externalMediaStreams
+   );
 
    useEffect(() => {
       if (!isBreakout && !remoteStreams?.length && hasActiveRooms) {
@@ -205,6 +233,7 @@ function ViewerComponent({
             videoMutedBackgroundImg={currentLivestream.companyLogoUrl}
             liveSpeakers={currentLivestream.liveSpeakers}
             isBroadCasting={handRaiseActive}
+            openStream={currentLivestream.openStream}
             sharingScreen={currentLivestream.mode === "desktop"}
             sharingPdf={currentLivestream.mode === "presentation"}
             showMenu={showMenu}
@@ -276,15 +305,18 @@ function ViewerComponent({
             </Fragment>
          )}
 
-         {!currentLivestream.hasStarted && !spyModeEnabled && (
-            <div className={classes.waitingOverlay}>
-               <Typography className={classes.waitingText}>
-                  {currentLivestream.test
-                     ? "The streamer has to press Start Streaming to be visible to students"
-                     : "Thank you for joining!"}
-               </Typography>
-            </div>
-         )}
+         {!currentLivestream.hasStarted &&
+            !spyModeEnabled &&
+            (currentLivestream.test ? (
+               <div className={classes.waitingOverlay}>
+                  <Typography className={classes.waitingText}>
+                     "The streamer has to press Start Streaming to be visible to
+                     students"
+                  </Typography>
+               </div>
+            ) : (
+               <StreamStoppedOverlay />
+            ))}
       </React.Fragment>
    );
 }

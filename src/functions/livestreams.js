@@ -163,6 +163,36 @@ exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onCall(
    }
 );
 
+exports.sendHybridEventRegistrationConfirmationEmail = functions.https.onCall(
+   async (data, context) => {
+      console.log("Starting");
+      const email = {
+         TemplateId: 25768238,
+         From: "CareerFairy <noreply@careerfairy.io>",
+         To: data.recipientEmail,
+         TemplateModel: {
+            user_first_name: data.user_first_name,
+            event_date: data.event_date,
+            company_name: data.company_name,
+            company_logo_url: data.company_logo_url,
+            event_title: data.event_title,
+            event_address: data.event_address,
+            livestream_link: data.livestream_link,
+         },
+      };
+
+      client.sendEmailWithTemplate(email).then(
+         (response) => {
+            return { status: 200 };
+         },
+         (error) => {
+            console.log("error:" + error);
+            return { status: 500, error: error };
+         }
+      );
+   }
+);
+
 exports.setFirstCommentOfQuestionOnCreate = functions.firestore
    .document("livestreams/{livestream}/questions/{question}/comments/{comment}")
    .onCreate(async (commentSnap) => {

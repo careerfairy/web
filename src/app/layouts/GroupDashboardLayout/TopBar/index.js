@@ -140,6 +140,7 @@ const TopBar = ({
                />
                <Hidden mdDown>
                   <IconButton
+                     id="profile_icon"
                      component={Link}
                      className={classes.navIconButton}
                      href="/profile"

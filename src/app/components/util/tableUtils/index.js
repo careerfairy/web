@@ -38,6 +38,8 @@ import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import RotateLeftIcon from "@material-ui/icons/RotateLeft";
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
 import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
+import AllInboxIcon from "@material-ui/icons/AllInbox";
+import AlternateEmailIcon from "@material-ui/icons/AlternateEmail";
 import Linkify from "react-linkify";
 
 export const tableIcons = {
@@ -120,6 +122,12 @@ export const tableIcons = {
    )),
    DeleteForeverOutlinedIcon: forwardRef((props, ref) => (
       <DeleteForeverOutlinedIcon {...props} ref={ref} />
+   )),
+   AllInboxIcon: forwardRef((props, ref) => (
+      <AllInboxIcon {...props} ref={ref} />
+   )),
+   AlternateEmailIcon: forwardRef((props, ref) => (
+      <AlternateEmailIcon {...props} ref={ref} />
    )),
 };
 

@@ -33,6 +33,7 @@ const Streams = memo(
       livestreamId,
       setRemovedStream,
       presenter,
+      openStream,
       videoMutedBackgroundImg,
       handRaiseActive,
       mobile,
@@ -123,7 +124,7 @@ const Streams = memo(
             {!bannersBottom && (
                <Banners
                   presenter={presenter}
-                  handRaiseActive={handRaiseActive}
+                  handRaiseActive={handRaiseActive && !openStream}
                   mobile={mobile}
                />
             )}
@@ -147,7 +148,7 @@ const Streams = memo(
                <Banners
                   isBottom
                   presenter={presenter}
-                  handRaiseActive={handRaiseActive}
+                  handRaiseActive={handRaiseActive && !openStream}
                   mobile={mobile}
                />
             )}
