@@ -1,6 +1,7 @@
 const functions = require("firebase-functions");
 const { client } = require("./api/postmark");
 const { createNestedArrayOfTemplates } = require("./util");
+const { emailsToRemove } = require("./emailsToRemove");
 
 exports.sendBasicTemplateEmail = functions.https.onCall(
    async (data, context) => {
@@ -18,7 +19,8 @@ exports.sendBasicTemplateEmail = functions.https.onCall(
          templateId,
       } = data;
 
-      let emailsArray = emails || [];
+      let emailsArray =
+         emails.filter((email) => !emailsToRemove.includes(email)) || [];
       if (senderEmail) {
          emailsArray.push(senderEmail);
       }
