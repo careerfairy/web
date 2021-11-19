@@ -2,21 +2,14 @@ import React, { useState } from "react";
 import { useTheme } from "@material-ui/core/styles";
 import LandingLayout from "../layouts/LandingLayout";
 import BookADemoSection from "../components/views/landing/BookADemoSection";
-import TestimonialsSection from "../components/views/landing/TestimonialsSection";
-import AnalyticsSection from "../components/views/landing/AnalyticsSection";
-import StreamSection from "../components/views/landing/StreamSection";
-import UniversitySection from "../components/views/landing/UniversitySection";
-import BenefitsSection from "../components/views/landing/BenefitsSection";
 import CompaniesSection from "../components/views/landing/CompaniesSection";
-import HeroSection from "../components/views/landing/HeroSection";
 import CalendlyModal from "../components/views/landing/CalendlyModal";
 import ScrollToTop from "../components/views/common/ScrollToTop";
 import {
-   rectangle1,
-   mainBackground,
+   alternateStudentBackground,
    engageShape,
-   reachShape,
    measureShape,
+   reachShape,
 } from "../constants/images";
 import HeadWithMeta from "../components/page/HeadWithMeta";
 import StudentHeroSection from "../components/views/landing/HeroSection/StudentHeroSection";
@@ -70,7 +63,7 @@ const StudentLandingPage = ({}) => {
             image={"https://careerfairy.io/logo_padding_teal.png"}
             description={""}
          />
-         <LandingLayout backgroundImage={mainBackground}>
+         <LandingLayout backgroundImage={alternateStudentBackground}>
             <StudentHeroSection big />
             <CompaniesSection />
             <UpcomingLivestreamsSection />

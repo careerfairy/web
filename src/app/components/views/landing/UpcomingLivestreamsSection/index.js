@@ -53,11 +53,7 @@ const UpcomingLivestreamsSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         <Box>
-            <UpcomingLivestreamsCarousel
-               upcomingStreams={upcomingLivestreams}
-            />
-         </Box>
+         <UpcomingLivestreamsCarousel upcomingStreams={upcomingLivestreams} />
       </Section>
    );
 };

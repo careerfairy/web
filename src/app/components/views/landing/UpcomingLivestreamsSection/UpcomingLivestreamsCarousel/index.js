@@ -6,7 +6,8 @@ import Slider from "react-slick";
 import NextIcon from "@material-ui/icons/NavigateNextRounded";
 import PrevIcon from "@material-ui/icons/NavigateBeforeRounded";
 import { Box, Fab } from "@material-ui/core";
-import UpcomingLivestreamCard from "../../../common/stream-cards/UpcomingLivestreamCard";
+// import UpcomingLivestreamCard from "../../../common/stream-cards/UpcomingLivestreamCard";
+import PreviewEventCard from "../../../common/stream-cards/PreviewEventCard";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -63,7 +64,7 @@ const UpcomingLivestreamsCarousel = ({ upcomingStreams }) => {
       lazyLoad: true,
       nextArrow: <SampleNextArrow />,
       prevArrow: <SamplePrevArrow />,
-      autoplay: true,
+      // autoplay: true,
       autoplaySpeed: 10000,
       pauseOnHover: true,
       appendDots: (dots) => (
@@ -110,11 +111,12 @@ const UpcomingLivestreamsCarousel = ({ upcomingStreams }) => {
       <div className={classes.root}>
          <Slider {...settings}>
             {upcomingStreams.map((livestream) => (
-               <Box p={2}>
-                  <UpcomingLivestreamCard
-                     key={livestream.id}
-                     livestream={livestream}
-                  />
+               <Box height={500} key={livestream.id} p={2}>
+                  <PreviewEventCard livestream={livestream} />
+                  {/*<UpcomingLivestreamCard*/}
+                  {/*   key={livestream.id}*/}
+                  {/*   livestream={livestream}*/}
+                  {/*/>*/}
                </Box>
             ))}
          </Slider>

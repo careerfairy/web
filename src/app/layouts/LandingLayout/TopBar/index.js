@@ -44,6 +44,7 @@ const useStyles = makeStyles((theme) => ({
    },
    navLinks: {
       // fontWeight: 600,
+      textDecoration: "none !important",
       color: theme.palette.common.black,
       textTransform: "none",
       padding: 0,
@@ -52,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(0, 4),
       transition: theme.transitions.create(["color"], {
          easing: theme.transitions.easing.sharp,
-         duration: theme.transitions.duration.short,
+         duration: theme.transitions.duration.shortest,
       }),
       "&:before": {
          borderRadius: theme.spacing(1),
@@ -68,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
          transform: "scaleX(1)",
          transition: theme.transitions.create(["all"], {
             easing: theme.transitions.easing.easeInOut,
-            duration: theme.transitions.duration.short,
+            duration: theme.transitions.duration.shortest,
          }),
       },
       "&:hover": {
@@ -152,6 +153,8 @@ const TopBar = ({ className, ...rest }) => {
                      className={clsx(classes.navLinks, {
                         [classes.active]: pathname === item.href,
                      })}
+                     component={Link}
+                     disableRipple
                      label={<Typography variant="h6">{item.title}</Typography>}
                      href={item.href}
                   />

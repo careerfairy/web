@@ -7,16 +7,17 @@ import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
 const useStyles = makeStyles((theme) => ({
    root: {
       display: "flex",
-      padding: theme.spacing(1, 1, 1, 0),
+      padding: theme.spacing(0.5, 0.5, 0.5, 0),
       flexWrap: "nowrap",
+      alignItems: "center",
    },
    speakerAvatar: {
-      width: theme.spacing(8),
-      height: theme.spacing(8),
-      [theme.breakpoints.up("md")]: {
-         width: theme.spacing(10),
-         height: theme.spacing(10),
-      },
+      width: theme.spacing(6),
+      height: theme.spacing(6),
+      // [theme.breakpoints.up("md")]: {
+      //    width: theme.spacing(10),
+      //    height: theme.spacing(10),
+      // },
       "& img": {},
    },
    speakerInfoWrapper: {
@@ -28,7 +29,6 @@ const useStyles = makeStyles((theme) => ({
    },
    speakerName: {
       fontWeight: 600,
-      height: 30,
       textOverflow: "ellipsis",
       display: "-webkit-box",
       boxOrient: "vertical",
@@ -38,12 +38,11 @@ const useStyles = makeStyles((theme) => ({
       overflow: "hidden",
    },
    speakerPosition: {
-      height: 50,
       textOverflow: "ellipsis",
       display: "-webkit-box",
       boxOrient: "vertical",
-      lineClamp: 2,
-      WebkitLineClamp: 2,
+      lineClamp: 1,
+      WebkitLineClamp: 1,
       wordBreak: "break-word",
       overflow: "hidden",
    },

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Collapse, Paper, Typography } from "@material-ui/core";
+import {
+   Box,
+   Button,
+   Collapse,
+   Grid,
+   Paper,
+   Typography,
+} from "@material-ui/core";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
 import EventIcon from "@material-ui/icons/Event";
@@ -11,6 +18,7 @@ import debounce from "lodash.debounce";
 import { useFirebase } from "../../../../../context/firebase";
 import clsx from "clsx";
 import SpeakerInfo from "./SpeakerInfo";
+import GroupLogoButton from "./GroupLogoButton";
 
 const useStyles = makeStyles((theme) => {
    const backgroundImageHeight = 200;
@@ -27,10 +35,24 @@ const useStyles = makeStyles((theme) => {
          border: `1px solid ${alpha(theme.palette.common.black, 0.1)}`,
          display: "flex",
          flexDirection: "column",
-         transition: theme.transitions.create(["transform", "box-shadow"], {
-            easing: theme.transitions.easing.easeInOut,
-            duration: theme.transitions.duration.standard,
-         }),
+         height: 542,
+         transition: theme.transitions.create(
+            ["transform", "box-shadow", "all"],
+            {
+               easing: theme.transitions.easing.easeInOut,
+               duration: theme.transitions.duration.standard,
+            }
+         ),
+         "&::-webkit-scrollbar": {
+            height: 5,
+         },
+         "&::-webkit-scrollbar-track": {
+            background: theme.palette.common.black,
+         },
+         "&::-webkit-scrollbar-thumb": {
+            borderRadius: cardBorderRadius,
+            background: theme.palette.primary.main,
+         },
       },
       rootHovered: {},
       backgroundImage: {
@@ -63,6 +85,23 @@ const useStyles = makeStyles((theme) => {
       companyLogoHovered: {
          boxShadow: theme.shadows[10],
       },
+      contentWrapper: {
+         position: "absolute",
+
+         left: 0,
+         width: "100%",
+         // top: "calc(100% - 500px)",
+         top: backgroundImageHeight - 50,
+         // bottom: 0,
+         transition: theme.transitions.create(["top", "bottom"], {
+            easing: theme.transitions.easing.easeInOut,
+            duration: theme.transitions.duration.standard,
+         }),
+      },
+      contentWrapperHovered: {
+         top: 0,
+         // bottom: `-200px`,
+      },
       upperContent: {
          padding: theme.spacing(2),
          position: "relative",
@@ -71,7 +110,7 @@ const useStyles = makeStyles((theme) => {
          justifyContent: "center",
          background: `linear-gradient(transparent 9%, 18%, ${theme.palette.background.paper} 43%)`,
 
-         paddingTop: `calc(${backgroundImageHeight}px - 50px) !important`,
+         // paddingTop: `calc(${backgroundImageHeight}px - 50px) !important`,
          alignItems: "center",
          transition: theme.transitions.create(["padding-top", "background"], {
             easing: theme.transitions.easing.easeInOut,
@@ -82,24 +121,24 @@ const useStyles = makeStyles((theme) => {
          },
          borderRadius: cardBorderRadius,
       },
-      upperContentHovered: {
-         paddingTop: `70px !important`,
-      },
+      upperContentHovered: {},
       lowerContent: {
          background: theme.palette.background.default,
          display: "flex",
          width: "100%",
-         flexDirection: "column",
+         flexDirection: "column-reverse",
          borderBottomLeftRadius: cardBorderRadius,
          borderBottomRightRadius: cardBorderRadius,
          position: "relative",
+         maxHeight: backgroundImageHeight + 25,
+         overflow: "auto",
       },
       lowerMiniWrapper: {
          display: "flex",
          width: "100%",
          padding: theme.spacing(2),
          [theme.breakpoints.up("sm")]: {
-            padding: theme.spacing(4),
+            padding: theme.spacing(3),
          },
       },
       lowerBigWrapper: {
@@ -114,9 +153,14 @@ const useStyles = makeStyles((theme) => {
       lowerBigWrapperHovered: {
          padding: theme.spacing(2),
          [theme.breakpoints.up("sm")]: {
-            padding: theme.spacing(4),
+            padding: theme.spacing(3),
          },
          opacity: 1,
+      },
+
+      groupLogosWrapper: {
+         paddingTop: theme.spacing(0.5),
+         overflowX: "auto",
       },
       eventInfoWrapper: {
          width: "100%",
@@ -147,6 +191,7 @@ const useStyles = makeStyles((theme) => {
          borderRadius: cardBorderRadius,
          padding: theme.spacing(1.5, 6),
       },
+
       miniSpeakersWrapper: {
          display: "flex",
          flexWrap: "nowrap",
@@ -160,11 +205,10 @@ const useStyles = makeStyles((theme) => {
    };
 });
 
-const throttle_speed = 100;
+const throttle_speed = 0;
 const UpcomingLivestreamCard = ({ livestream }) => {
    const [hovered, setHovered] = useState(false);
    const classes = useStyles();
-   const [fullyCollapsed, setFullyCollapsed] = useState(false);
    const [speakers, setSpeakers] = useState([]);
    const [groups, setGroups] = useState([]);
 
@@ -182,8 +226,9 @@ const UpcomingLivestreamCard = ({ livestream }) => {
                );
                setGroups(
                   newGroups.map((group) => ({
-                     imageUrl: getResizedUrl(group.logoUrl, "xs"),
-                     alt: `${group.universityName} - logo`,
+                     imgPath: getResizedUrl(group.logoUrl, "xs"),
+                     label: `${group.universityName} - logo`,
+                     id: group.id,
                   }))
                );
             } catch (e) {
@@ -197,8 +242,10 @@ const UpcomingLivestreamCard = ({ livestream }) => {
       if (livestream.speakers) {
          setSpeakers(
             livestream.speakers.map((speaker) => ({
-               imageUrl: getResizedUrl(speaker.avatar, "xs"),
-               alt: `${speaker.firstName || ""} - ${speaker.lastName || ""}`,
+               label: `${speaker.firstName} ${speaker.lastName}`,
+               imgPath: getResizedUrl(speaker.avatar, "sm"),
+               subLabel: `${speaker.position}`,
+               id: speaker.id,
             }))
          );
       }
@@ -217,88 +264,109 @@ const UpcomingLivestreamCard = ({ livestream }) => {
             src={getResizedUrl(livestream.backgroundImageUrl, "md")}
             alt="thumbnail"
          />
-         <Box
-            className={clsx(classes.upperContent, {
-               [classes.upperContentHovered]: hovered && fullyCollapsed,
+         <div
+            className={clsx(classes.contentWrapper, {
+               [classes.contentWrapperHovered]: hovered,
             })}
          >
-            <img
-               alt="company-logo"
-               className={clsx(classes.companyLogo, {
-                  [classes.companyLogoHovered]: hovered,
-               })}
-               src={getResizedUrl(livestream.companyLogoUrl, "md")}
-            />
-            <Box className={classes.eventInfoWrapper}>
-               <Typography
-                  variant="h5"
-                  gutterBottom
-                  className={classes.eventTitle}
-               >
-                  {livestream.title}
-               </Typography>
-               <Typography
-                  gutterBottom
-                  className={classes.dateInfo}
-                  variant="h6"
-               >
-                  <EventIcon />
-                  &nbsp;
-                  {DateUtil.getStreamDate(livestream.start.toDate())}
-               </Typography>
-               <Typography
-                  gutterBottom
-                  className={classes.dateInfo}
-                  variant="h6"
-               >
-                  <ClockIcon />
-                  &nbsp;
-                  {DateUtil.getStreamTime(livestream.start.toDate())}
-               </Typography>
-               <Box mt={2}>
-                  <Button
-                     color="primary"
-                     fullWidth
-                     size="large"
-                     variant="outlined"
-                     className={classes.button}
-                  >
-                     Learn More
-                  </Button>
-               </Box>
-            </Box>
-         </Box>
-         <Box className={classes.lowerContent}>
-            <Collapse in={!hovered}>
-               {!hovered && (
-                  <Box className={classes.lowerMiniWrapper}>
-                     <Box className={classes.miniSpeakersWrapper}>
-                        <StreamAvatarGroup avatars={speakers} max={3} />
-                     </Box>
-                     {!!groups.length && (
-                        <Box className={classes.miniGroupsWrapper}>
-                           <StreamAvatarGroup isLogo avatars={groups} max={5} />
-                        </Box>
-                     )}
-                  </Box>
-               )}
-            </Collapse>
             <Box
-               className={clsx(classes.lowerBigWrapper, {
-                  [classes.lowerBigWrapperHovered]: hovered,
+               className={clsx(classes.upperContent, {
+                  [classes.upperContentHovered]: hovered,
                })}
             >
-               <Collapse
-                  onEntered={() => setFullyCollapsed(true)}
-                  onExited={() => setFullyCollapsed(false)}
-                  in={hovered}
-               >
-                  {livestream.speakers.map((speaker) => (
-                     <SpeakerInfo key={speaker.id} speaker={speaker} />
-                  ))}
-               </Collapse>
+               <img
+                  alt="company-logo"
+                  className={clsx(classes.companyLogo, {
+                     [classes.companyLogoHovered]: hovered,
+                  })}
+                  src={getResizedUrl(livestream.companyLogoUrl, "md")}
+               />
+               <Box className={classes.eventInfoWrapper}>
+                  <Typography
+                     variant="h5"
+                     gutterBottom
+                     className={classes.eventTitle}
+                  >
+                     {livestream.title}
+                  </Typography>
+                  <Typography
+                     gutterBottom
+                     className={classes.dateInfo}
+                     variant="h6"
+                  >
+                     <EventIcon />
+                     &nbsp;
+                     {DateUtil.getStreamDate(livestream.start.toDate())}
+                  </Typography>
+                  <Typography
+                     gutterBottom
+                     className={classes.dateInfo}
+                     variant="h6"
+                  >
+                     <ClockIcon />
+                     &nbsp;
+                     {DateUtil.getStreamTime(livestream.start.toDate())}
+                  </Typography>
+                  <Box mt={2}>
+                     <Button
+                        color="primary"
+                        fullWidth
+                        size="large"
+                        variant="outlined"
+                        className={classes.button}
+                     >
+                        Learn More
+                     </Button>
+                  </Box>
+               </Box>
             </Box>
-         </Box>
+            <Box className={classes.lowerContent}>
+               <Collapse in={!hovered}>
+                  {!hovered && (
+                     <Box className={classes.lowerMiniWrapper}>
+                        <Box className={classes.miniSpeakersWrapper}>
+                           <StreamAvatarGroup avatars={speakers} max={3} />
+                        </Box>
+                        {!!groups.length && (
+                           <Box className={classes.miniGroupsWrapper}>
+                              <StreamAvatarGroup
+                                 isLogo
+                                 avatars={groups}
+                                 max={5}
+                              />
+                           </Box>
+                        )}
+                     </Box>
+                  )}
+               </Collapse>
+               <Box
+                  className={clsx(classes.lowerBigWrapper, {
+                     [classes.lowerBigWrapperHovered]: hovered,
+                  })}
+               >
+                  <Collapse in={hovered}>
+                     {livestream.speakers.map((speaker) => (
+                        <SpeakerInfo key={speaker.id} speaker={speaker} />
+                     ))}
+                     <Grid
+                        className={classes.groupLogosWrapper}
+                        wrap="nowrap"
+                        spacing={2}
+                        justify={
+                           groups.length === 1 ? "center" : "space-evenly"
+                        }
+                        container
+                     >
+                        {groups.map((group) => (
+                           <Grid xs={"auto"} item key={group.id}>
+                              <GroupLogoButton group={group} />
+                           </Grid>
+                        ))}
+                     </Grid>
+                  </Collapse>
+               </Box>
+            </Box>
+         </div>
       </Paper>
    );
 };

@@ -11,10 +11,6 @@ const useStyles = makeStyles((theme) => ({
       border: `2px solid ${alpha(theme.palette.text.secondary, 0.2)}`,
       width: theme.spacing(6),
       height: theme.spacing(6),
-      [theme.breakpoints.up("md")]: {
-         width: theme.spacing(8),
-         height: theme.spacing(8),
-      },
    },
    logoAvatar: {
       "& img": {
@@ -31,8 +27,9 @@ const StreamAvatarGroup = ({ avatars, max = 2, isLogo }) => {
                className={clsx(classes.avatar, {
                   [classes.logoAvatar]: isLogo,
                })}
-               src={avatar.imageUrl}
-               alt={avatar.alt}
+               src={avatar.imgPath}
+               alt={avatar.label}
+               key={avatar.id}
             />
          ))}
       </AvatarGroup>
