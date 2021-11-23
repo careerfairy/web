@@ -53,11 +53,11 @@ const useStyles = makeStyles((theme) => {
          position: "relative",
          // display: "flex",
          paddingTop: logoTopHeight / 2,
+         transform: "translateY(-100%)",
          alignItems: "center",
          padding: "2em",
          borderRadius: theme.spacing(radiusValue, 0, 0, 0),
          backgroundColor: theme.palette.background.paper,
-         transform: "translateY(-100%)",
          transition: theme.transitions.create(["transform"], {
             easing: theme.transitions.easing.easeInOut,
             duration: theme.transitions.duration.standard,

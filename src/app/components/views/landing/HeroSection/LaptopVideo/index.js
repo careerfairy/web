@@ -9,8 +9,9 @@ import { smilingStreamerVideoUrl } from "../../../../../constants/videos";
 
 const useStyles = makeStyles((theme) => ({
    laptopImage: {
-      minWidth: "80%",
-      height: "90%",
+      // minWidth: "80%",
+      // height: "90%",
+      width: "100%",
    },
    laptopUi: {
       width: "100%",
@@ -52,10 +53,10 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 1,
    },
    laptop: {
-      // width: "100%",
+      width: "100%",
       // maxWidth: "1200px",
       position: "relative",
-      height: "100%",
+      // height: "100%",
       "& img": {},
       "& video": {},
    },

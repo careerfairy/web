@@ -1550,6 +1550,13 @@ class Firebase {
       return await this.getFollowingGroups(arrayOfGroupIds);
    };
 
+   getFeaturedCompanies = async () => {
+      const ref = this.firestore
+         .collection("careerCenterData")
+         .where("featured", "==", true);
+      return ref.get();
+   };
+
    listenCareerCentersByAdminEmail = (email, callback) => {
       let ref = this.firestore
          .collection("careerCenterData")

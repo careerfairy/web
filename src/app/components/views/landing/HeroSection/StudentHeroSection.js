@@ -36,7 +36,6 @@ const StudentHeroSection = (props) => {
          buttons={[
             <HeroButton
                href="/next-livestreams"
-               className={classes.linkButton}
                component={Link}
                color="secondary"
                withGradient

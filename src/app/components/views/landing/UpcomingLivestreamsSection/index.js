@@ -5,15 +5,11 @@ import Section from "components/views/common/Section";
 import { Box } from "@material-ui/core";
 import { useFirebase } from "../../../../context/firebase";
 import UpcomingLivestreamsCarousel from "./UpcomingLivestreamsCarousel";
+import Link from "../../../../materialUI/NextNavLink";
+import HeroButton from "../HeroSection/HeroButton";
 
 const useStyles = makeStyles((theme) => ({
-   section: {
-      paddingBottom: 20,
-      [theme.breakpoints.down("sm")]: {
-         paddingTop: 40,
-      },
-      // paddingTop: 0
-   },
+   section: {},
    subTitle: {
       color: theme.palette.text.secondary,
       fontWeight: 500,
@@ -54,6 +50,17 @@ const UpcomingLivestreamsSection = (props) => {
          backgroundColor={props.backgroundColor}
       >
          <UpcomingLivestreamsCarousel upcomingStreams={upcomingLivestreams} />
+         <Box display="flex" justifyContent="center" p={2}>
+            <HeroButton
+               href="/next-livestreams"
+               component={Link}
+               color="secondary"
+               withGradient
+               variant="contained"
+            >
+               View Upcoming Livestreams
+            </HeroButton>
+         </Box>
       </Section>
    );
 };

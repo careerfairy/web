@@ -2,23 +2,18 @@ import PropTypes from "prop-types";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import SectionHeader from "components/views/common/SectionHeader";
 import SectionContainer from "../../common/Section/Container";
-import BenefitsGrid from "../common/BenefitsGrid";
+import NumbersCard from "./NumbersCard";
+import { Box, Grid } from "@material-ui/core";
+import MuiGridFade from "materialUI/animations/MuiGridFade";
 
-const useStyles = makeStyles((theme) => ({
-   subTitle: {
-      color: theme.palette.text.secondary,
-      fontWeight: 500,
-   },
-   benefitsWrapper: {},
-}));
+const useStyles = makeStyles((theme) => ({}));
 
-const BenefitsSection = (props) => {
+const NumbersSection = (props) => {
    const classes = useStyles();
-
    return (
       <Section
+         className={classes.section}
          big={props.big}
          color={props.color}
          backgroundImageClassName={props.backgroundImageClassName}
@@ -27,21 +22,25 @@ const BenefitsSection = (props) => {
          backgroundColor={props.backgroundColor}
       >
          <SectionContainer>
-            <SectionHeader
-               color={props.color}
-               subTitleClassName={classes.subTitle}
-               title={props.title}
-               subtitle={props.subtitle}
-            />
-            <BenefitsGrid benefits={props.benefits} />
+            <Box display="flex" width="100%">
+               <Grid container justifyContent="space-around" spacing={5}>
+                  {props.numbersData.map((data, index) => (
+                     <Grid item xs={12} sm={6} md={3} key={data.id}>
+                        <MuiGridFade index={index} up>
+                           <NumbersCard {...data} />
+                        </MuiGridFade>
+                     </Grid>
+                  ))}
+               </Grid>
+            </Box>
          </SectionContainer>
       </Section>
    );
 };
 
-export default BenefitsSection;
+export default NumbersSection;
 
-BenefitsSection.propTypes = {
+NumbersSection.propTypes = {
    backgroundColor: PropTypes.any,
    backgroundImage: PropTypes.any,
    backgroundImageClassName: PropTypes.any,

@@ -2,23 +2,32 @@ import PropTypes from "prop-types";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import SectionHeader from "components/views/common/SectionHeader";
+import SectionHeader from "../../common/SectionHeader";
 import SectionContainer from "../../common/Section/Container";
-import BenefitsGrid from "../common/BenefitsGrid";
+import FollowCompaniesPrompt from "./FollowCompaniesPrompt";
+import FeaturedCompanies from "./FeaturedCompanies";
 
 const useStyles = makeStyles((theme) => ({
+   section: {},
    subTitle: {
       color: theme.palette.text.secondary,
       fontWeight: 500,
    },
-   benefitsWrapper: {},
+   title: {
+      fontSize: "4.5rem",
+      fontWeight: 500,
+      [theme.breakpoints.down("xs")]: {
+         fontSize: "3.5rem",
+      },
+   },
 }));
 
-const BenefitsSection = (props) => {
+const FollowCompaniesSection = (props) => {
    const classes = useStyles();
 
    return (
       <Section
+         className={classes.section}
          big={props.big}
          color={props.color}
          backgroundImageClassName={props.backgroundImageClassName}
@@ -29,19 +38,19 @@ const BenefitsSection = (props) => {
          <SectionContainer>
             <SectionHeader
                color={props.color}
-               subTitleClassName={classes.subTitle}
                title={props.title}
                subtitle={props.subtitle}
             />
-            <BenefitsGrid benefits={props.benefits} />
+            <FeaturedCompanies />
+            <FollowCompaniesPrompt />
          </SectionContainer>
       </Section>
    );
 };
 
-export default BenefitsSection;
+export default FollowCompaniesSection;
 
-BenefitsSection.propTypes = {
+FollowCompaniesSection.propTypes = {
    backgroundColor: PropTypes.any,
    backgroundImage: PropTypes.any,
    backgroundImageClassName: PropTypes.any,

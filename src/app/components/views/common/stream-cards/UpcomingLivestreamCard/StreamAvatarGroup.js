@@ -37,10 +37,12 @@ const StreamAvatarGroup = ({ avatars, max = 2, isLogo }) => {
 };
 
 StreamAvatarGroup.propTypes = {
-   avatars: PropTypes.shape({
-      imageUrl: PropTypes.string,
-      alt: PropTypes.string,
-   }),
+   avatars: PropTypes.arrayOf(
+      PropTypes.shape({
+         imageUrl: PropTypes.string,
+         alt: PropTypes.string,
+      })
+   ),
 };
 
 export default StreamAvatarGroup;

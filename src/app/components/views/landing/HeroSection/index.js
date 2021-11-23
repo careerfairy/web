@@ -1,12 +1,13 @@
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import { Grid } from "@material-ui/core";
+import { Grid, Hidden } from "@material-ui/core";
 import LaptopVideo from "./LaptopVideo";
 import Fade from "react-reveal/Fade";
 import GeneralHeroMessage from "./HeroMessage";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import SectionContainer from "../../common/Section/Container";
 
 const useStyles = makeStyles((theme) => ({
    section: {
@@ -32,12 +33,12 @@ const useStyles = makeStyles((theme) => ({
    },
    heroContentWrapper: {
       display: "flex",
-      justifyContent: "center",
+      justifyContent: "flex-end",
       alignItems: "flex-end",
    },
    laptopVideoWrapper: {
       display: "flex",
-      alignItems: "flex-end",
+      alignItems: "center",
    },
 }));
 
@@ -56,12 +57,6 @@ const HeroSection = ({
    const theme = useTheme();
    const mobile = useMediaQuery(theme.breakpoints.down("sm"));
    const classes = useStyles({ mobile });
-   const [itemProps] = useState({
-      item: true,
-      xs: 12,
-      md: 6,
-      lg: 6,
-   });
 
    return (
       <Section
@@ -73,13 +68,16 @@ const HeroSection = ({
          backgroundImageOpacity={backgroundImageOpacity}
          backgroundColor={backgroundColor}
       >
-         <div className={classes.heroContainerWrapper}>
-            <Grid className={classes.heroContainer} spacing={2} container>
-               <Grid className={classes.heroContentWrapper} {...itemProps}>
-                  <Fade down>
-                     {mobile ? (
-                        <LaptopVideo />
-                     ) : (
+         <SectionContainer maxWidth="xl">
+            <div className={classes.heroContainerWrapper}>
+               <Grid className={classes.heroContainer} spacing={2} container>
+                  <Grid
+                     className={classes.heroContentWrapper}
+                     item
+                     xs={12}
+                     lg={6}
+                  >
+                     <Fade down>
                         <GeneralHeroMessage
                            mobile={mobile}
                            title={title}
@@ -87,25 +85,18 @@ const HeroSection = ({
                            buttons={buttons}
                            handleOpenCalendly={handleOpenCalendly}
                         />
-                     )}
-                  </Fade>
+                     </Fade>
+                  </Grid>
+                  <Hidden mdDown>
+                     <Grid className={classes.laptopVideoWrapper} item md={6}>
+                        <Fade up>
+                           <LaptopVideo />
+                        </Fade>
+                     </Grid>
+                  </Hidden>
                </Grid>
-               <Grid className={classes.laptopVideoWrapper} {...itemProps}>
-                  <Fade style={{}} up>
-                     {mobile ? (
-                        <GeneralHeroMessage
-                           mobile={mobile}
-                           buttons={buttons}
-                           title={title}
-                           handleOpenCalendly={handleOpenCalendly}
-                        />
-                     ) : (
-                        <LaptopVideo />
-                     )}
-                  </Fade>
-               </Grid>
-            </Grid>
-         </div>
+            </div>
+         </SectionContainer>
       </Section>
    );
 };

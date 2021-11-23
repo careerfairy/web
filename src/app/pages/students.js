@@ -7,13 +7,18 @@ import CalendlyModal from "../components/views/landing/CalendlyModal";
 import ScrollToTop from "../components/views/common/ScrollToTop";
 import {
    alternateStudentBackground,
-   engageShape,
-   measureShape,
-   reachShape,
+   landingBottomBackground,
+   locationShape,
+   personShape,
+   suitCaseShape,
 } from "../constants/images";
 import HeadWithMeta from "../components/page/HeadWithMeta";
 import StudentHeroSection from "../components/views/landing/HeroSection/StudentHeroSection";
 import UpcomingLivestreamsSection from "../components/views/landing/UpcomingLivestreamsSection";
+import FollowCompaniesSection from "../components/views/landing/FollowCompaniesSection";
+import StudentBenefitsSection from "../components/views/landing/StudentBenefitsSection";
+import Link from "materialUI/NextNavLink";
+import NumbersSection from "../components/views/landing/NumbersSection";
 
 const StudentLandingPage = ({}) => {
    const {
@@ -28,30 +33,53 @@ const StudentLandingPage = ({}) => {
 
    const handleCloseCalendly = () => setCalendlyModalOpen(false);
 
-   const companyBenefitsData = [
+   const studentBenefitsData = [
       {
-         name: "Create fun career events",
-         description:
-            "A highly interactive format " +
-            "developed for a young " +
-            "audience worldwide",
-         imageUrl: engageShape,
+         name: "Students",
+         description: "Register & meet companies at livestreams now",
+         imageUrl: personShape,
+         buttonProps: {
+            children: "Register",
+            href: "/signup",
+            component: Link,
+         },
       },
       {
-         name: "Reach more talents",
-         description:
-            "We promote your events to " +
-            "the CareerFairy community " +
-            "and universities",
-         imageUrl: reachShape,
+         name: "Companies",
+         description: "Engage and recruit talents from leading schools",
+         imageUrl: suitCaseShape,
+         buttonProps: {
+            children: "Book a demo",
+            onClick: handleOpenCalendly,
+         },
       },
       {
-         name: "Easily measure success",
+         name: "Career Centers",
          description:
-            "Demonstrate the success of " +
-            "your events through " +
-            "detailed analytics",
-         imageUrl: measureShape,
+            "Boost student & employer interactions with our career live streams",
+         imageUrl: locationShape,
+         buttonProps: {
+            children: "Book a demo",
+            onClick: handleOpenCalendly,
+         },
+      },
+   ];
+
+   const numbersData = [
+      {
+         id: 1,
+         amount: "250+",
+         label: "Companies",
+      },
+      {
+         id: 2,
+         amount: "200+",
+         label: "Live Streaming Events",
+      },
+      {
+         id: 3,
+         amount: "60+",
+         label: "Universities",
       },
    ];
 
@@ -63,48 +91,32 @@ const StudentLandingPage = ({}) => {
             image={"https://careerfairy.io/logo_padding_teal.png"}
             description={""}
          />
-         <LandingLayout backgroundImage={alternateStudentBackground}>
+         <LandingLayout
+            bottomImage={landingBottomBackground}
+            topImage={alternateStudentBackground}
+         >
             <StudentHeroSection big />
             <CompaniesSection />
-            <UpcomingLivestreamsSection />
-            {/*<BenefitsSection*/}
-            {/*   title={"Why CareerFairy?"}*/}
-            {/*   benefits={companyBenefitsData}*/}
-            {/*/>*/}
-            {/*<UniversitySection*/}
-            {/*   title={"Some of the universities we work with"}*/}
-            {/*   subtitle="Reach students at multiple universities with a single event. No travel, no logistics, no days off work."*/}
-            {/*/>*/}
-            {/*/!*<iframe frameBorder="0" height="600" src="https://personal-habib.web.app/next-livestreams/GXW3MtpTehSmAe0aP1J4/embed" title="Events"/>*!/*/}
-            {/*<StreamSection*/}
-            {/*   title={*/}
-            {/*      <>*/}
-            {/*         Showcase your best ambassadors <b>- your employees.</b>*/}
-            {/*      </>*/}
-            {/*   }*/}
-            {/*   subtitle="We believe that your employees are your biggest asset, and their insights provide*/}
-            {/*    an authentic look into the opportunities that your company has to offer."*/}
-            {/*/>*/}
-            {/*<AnalyticsSection*/}
-            {/*   title={*/}
-            {/*      <>*/}
-            {/*         Boost your <b>employer brand</b>, measure the results with{" "}*/}
-            {/*         <b>data</b>*/}
-            {/*      </>*/}
-            {/*   }*/}
-            {/*   backgroundImage={rectangle1}*/}
-            {/*   subtitle="Evaluate the success of your events, gather live feedback from your audience and follow up easily with interesting candidates"*/}
-            {/*/>*/}
-            {/*<TestimonialsSection*/}
-            {/*   title="What They Are Saying"*/}
-            {/*   backgroundColor={grey["200"]}*/}
-            {/*/>*/}
+            <UpcomingLivestreamsSection big />
+            <FollowCompaniesSection title={"Follow Your Favorite Companies"} />
+            <StudentBenefitsSection
+               title={
+                  <>
+                     Connecting <b>students</b> and <b>companies</b> in a
+                     meaningful way.
+                  </>
+               }
+               benefits={studentBenefitsData}
+            />
+            <NumbersSection numbersData={numbersData} />
             <BookADemoSection
-               backgroundColor={`linear-gradient(-8deg, ${secondary.main} 1%, ${secondary.light} 100%)`}
-               color={common.white}
+               backgroundColor={`transparent`}
+               color={common.black}
                big
+               signUp
                handleOpenCalendly={handleOpenCalendly}
                title={"Join the ranks of leading organisations today"}
+               dividerColor={secondary.light}
             />
             <CalendlyModal
                open={calendlyModalOpen}

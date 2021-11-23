@@ -11,6 +11,7 @@ import CalendlyModal from "../components/views/landing/CalendlyModal";
 import ScrollToTop from "../components/views/common/ScrollToTop";
 import {
    alternateBackground,
+   landingBottomBackground,
    livestream,
    mouse,
    promote,
@@ -98,7 +99,10 @@ const CareerCenterLandingPage = ({}) => {
    ];
 
    return (
-      <LandingLayout backgroundImage={alternateBackground}>
+      <LandingLayout
+         topImage={alternateBackground}
+         bottomImage={landingBottomBackground}
+      >
          <HeroSection
             title={
                <div>
@@ -132,6 +136,7 @@ const CareerCenterLandingPage = ({}) => {
             color={common.white}
             big
             handleOpenCalendly={handleOpenCalendly}
+            bookingWhite
             title={"Have a chat with us"}
          />
          <CalendlyModal

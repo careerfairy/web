@@ -29,9 +29,11 @@ export const laptopDemo =
 export const mainBackground =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fmain-background.png?alt=media&token=10c9a856-98d2-4668-834d-16b0c6cc1f72";
 export const alternateBackground =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Falternate_background.png?alt=media&token=2a8f1c36-c73e-477d-9ffa-5a3096d5e83f";
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fmain-landing-background.png?alt=media&token=3a710b6b-8cb3-4806-b89f-6bace8483377";
 export const alternateStudentBackground =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstudent-landing-background.png?alt=media&token=338f4c9f-4a3f-460c-aff3-4bdb2ef11251";
+export const landingBottomBackground =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstudent-landing-bottom-background.png?alt=media&token=f31e48fc-5aa5-4488-8b4e-91e01fd2b0e6";
 export const blankLaptop =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flaptop.webp?alt=media&token=41342a75-c0a3-4462-93b8-6fc1a7ff2558";
 export const blankUIQAndA =
@@ -61,3 +63,12 @@ export const careerfairyLogo = "/logo_teal.svg";
 
 export const basicEmailTemplate =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/email-template-images%2Fbasic-email-template.png?alt=media&token=4ede176e-c84a-4a91-bceb-b80648bb9773";
+
+export const personShape =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fperson-shape.png?alt=media&token=5a64716f-4b58-4bf1-9232-724316650ecd";
+
+export const locationShape =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flocation-shape.png?alt=media&token=e2ec3c7c-e697-4c62-8589-b1d78fb63190";
+
+export const suitCaseShape =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fsuitcase-shape.png?alt=media&token=fa4b98a6-3270-4bc6-b8fb-3c460b5a5242";

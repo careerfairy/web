@@ -1,7 +1,8 @@
-import React from "react";
-import { Avatar, Box, Button } from "@material-ui/core";
+import React, { useState } from "react";
+import { Avatar, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
+
 const useStyles = makeStyles((theme) => {
    const cardBorderRadius = theme.spacing(3);
    return {
@@ -11,14 +12,8 @@ const useStyles = makeStyles((theme) => {
          width: "100%",
          justifyContent: "center",
          alignItems: "center",
-         cursor: ({ isButton }) => isButton && "pointer",
-         "&:hover": {
-            "& .MuiAvatar-root": {
-               boxShadow: theme.shadows[8],
-            },
-         },
          "& .MuiAvatar-root": {
-            boxShadow: "none",
+            boxShadow: ({ hovered }) => (hovered ? theme.shadows[8] : "none"),
             width: theme.spacing(6),
             height: theme.spacing(6),
             transition: theme.transitions.create(["box-shadow"], {
@@ -39,23 +34,32 @@ const useStyles = makeStyles((theme) => {
          borderRadius: cardBorderRadius,
          padding: theme.spacing(0.5, 0),
       },
+      btn: {
+         cursor: "pointer",
+      },
    };
 });
 
 const GroupLogoButton = ({ group, handleFollow }) => {
-   const classes = useStyles();
+   const [hovered, setHovered] = useState(false);
+   const classes = useStyles({ hovered });
    return (
-      <div onClick={handleFollow} className={classes.root}>
+      <div
+         onClick={handleFollow}
+         onMouseEnter={() => setHovered(true)}
+         onMouseLeave={() => setHovered(false)}
+         className={clsx(classes.root, {
+            [classes.btn]: Boolean(handleFollow),
+         })}
+      >
          <Avatar
-            className={clsx(classes.groupLogo, {
-               isButton: Boolean(handleFollow),
-            })}
+            className={classes.groupLogo}
             src={group.imgPath}
             alt={group.label}
          />
          {handleFollow && (
             <Button
-               variant="outlined"
+               variant={hovered ? "contained" : "outlined"}
                size="small"
                fullWidth
                className={classes.smallButton}

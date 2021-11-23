@@ -17,6 +17,7 @@ import {
    engageShape,
    reachShape,
    measureShape,
+   landingBottomBackground,
 } from "../constants/images";
 import HeadWithMeta from "../components/page/HeadWithMeta";
 
@@ -68,7 +69,10 @@ const LandingPage = ({}) => {
             image={"https://careerfairy.io/logo_padding_teal.png"}
             description={""}
          />
-         <LandingLayout backgroundImage={mainBackground}>
+         <LandingLayout
+            bottomImage={landingBottomBackground}
+            topImage={mainBackground}
+         >
             <HeroSection big handleOpenCalendly={handleOpenCalendly} />
             <CompaniesSection overheadText="Over 200+ happy customers" />
             <BenefitsSection
@@ -107,6 +111,7 @@ const LandingPage = ({}) => {
                backgroundColor={`linear-gradient(-8deg, ${secondary.main} 1%, ${secondary.light} 100%)`}
                color={common.white}
                big
+               bookingWhite
                handleOpenCalendly={handleOpenCalendly}
                title={"Join the ranks of leading organisations today"}
             />

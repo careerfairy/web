@@ -87,8 +87,14 @@ const GeneralHeroMessage = ({
          </Typography>
          {subTitle}
          <Grid spacing={2} container className={classes.buttonsWrapper}>
-            {buttons?.map((button) => (
-               <Grid xs={12} sm={12} md={buttons?.length === 1 ? 12 : 6} item>
+            {buttons?.map((button, index) => (
+               <Grid
+                  xs={12}
+                  sm={12}
+                  key={index}
+                  md={buttons?.length === 1 ? 12 : 6}
+                  item
+               >
                   {button}
                </Grid>
             )) || (
