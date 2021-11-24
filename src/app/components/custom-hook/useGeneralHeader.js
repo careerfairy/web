@@ -9,12 +9,12 @@ const useGeneralHeader = (options = { dark: false }) => {
       if (options.dark) {
          return {
             backgroundColor: theme.palette.common.black,
-            navLinksColor: theme.palette.common.white,
+            navLinksActiveColor: theme.palette.common.white,
          };
       }
       return {
          backgroundColor: theme.palette.common.white,
-         navLinksColor: theme.palette.grey["800"],
+         navLinksActiveColor: theme.palette.grey["800"],
       };
    }, [options.dark, theme]);
 

@@ -1,10 +1,12 @@
-import React from "react";
-import { Button, Grid, Typography } from "@material-ui/core";
+import React, { useEffect, useState } from "react";
+import { Box, Button, Grid, Typography } from "@material-ui/core";
 import { useRouter } from "next/router";
-import { withFirebase } from "context/firebase";
+import { useFirebase, withFirebase } from "context/firebase";
 import AddIcon from "@material-ui/icons/Add";
 import CurrentGroup from "components/views/profile/CurrentGroup";
 import { makeStyles } from "@material-ui/core/styles";
+import { Highlights } from "../../groups/Groups";
+import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers";
 
 const useStyles = makeStyles((theme) => ({
    header: {
@@ -23,17 +25,44 @@ const useStyles = makeStyles((theme) => ({
 const JoinedGroups = ({ userData }) => {
    const router = useRouter();
    const classes = useStyles();
+   const [joinedGroups, setJoinedGroups] = useState([]);
+   const [selectedGroup, setSelectedGroup] = useState(null);
+   const [filteredGroups, setFilteredGroups] = useState([]);
+   const [slicedFilteredGroups] = useInfiniteScrollClientWithHandlers(
+      filteredGroups,
+      9,
+      6
+   );
+   const { getFollowingGroups } = useFirebase();
 
-   let existingGroupElements = [];
+   useEffect(() => {
+      (async function () {
+         if (userData?.groupIds?.length) {
+            const newJoinedGroups = await getFollowingGroups(userData.groupIds);
+            setJoinedGroups(newJoinedGroups);
+         } else {
+            setJoinedGroups([]);
+         }
+      })();
+   }, [userData.groupIds]);
 
-   if (userData && userData.groupIds) {
-      existingGroupElements = [...new Set(userData.groupIds)].map((groupId) => {
-         // new set to get rid of duplicate groupIds, dont know how they got there....
-         return (
-            <CurrentGroup key={groupId} groupId={groupId} userData={userData} />
+   useEffect(() => {
+      if (selectedGroup) {
+         setFilteredGroups(
+            joinedGroups.filter((group) => group.id === selectedGroup.id)
          );
-      });
-   }
+      } else {
+         setFilteredGroups([...joinedGroups]);
+      }
+   }, [joinedGroups, selectedGroup]);
+
+   const existingGroupElements = slicedFilteredGroups.map((group) => (
+      <CurrentGroup key={group.id} group={group} userData={userData} />
+   ));
+
+   const handleSelectGroup = (event, value) => {
+      setSelectedGroup(value);
+   };
 
    return (
       <div>
@@ -51,6 +80,13 @@ const JoinedGroups = ({ userData }) => {
                Follow More Groups
             </Button>
          </div>
+         <Box>
+            <Highlights
+               handleSelectGroup={handleSelectGroup}
+               hideButton
+               groups={joinedGroups}
+            />
+         </Box>
          {existingGroupElements.length ? (
             <Grid style={{ marginBottom: 50 }} container spacing={3}>
                {existingGroupElements}

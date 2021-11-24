@@ -75,11 +75,6 @@ const AnalyticsSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         {/*<img*/}
-         {/*   className={classes.backgroundRectangle}*/}
-         {/*   alt="background-rectangle"*/}
-         {/*   src={rectangle1}*/}
-         {/*/>*/}
          <SectionContainer>
             <Fade right>
                <SectionHeader

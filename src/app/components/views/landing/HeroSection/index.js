@@ -1,26 +1,16 @@
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import { Grid } from "@material-ui/core";
+import { Grid, Hidden } from "@material-ui/core";
 import LaptopVideo from "./LaptopVideo";
-import Fade from "react-reveal/Fade";
-import HeroMessage from "./HeroMessage";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import GeneralHeroMessage from "./HeroMessage";
+import SectionContainer from "../../common/Section/Container";
+import Slide from "@material-ui/core/Slide";
 
 const useStyles = makeStyles((theme) => ({
-   section: {
-      // padding: 0,
-   },
-   heroContainerWrapper: {
-      // height: "calc(100vh - 60px)",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: (props) => (props.mobile ? "flex-start" : "center"),
-   },
-   heroContainer: {
-      maxWidth: "90%",
-   },
+   section: {},
+   heroContainer: {},
    subTitle: {
       color: theme.palette.text.secondary,
       fontWeight: 500,
@@ -32,12 +22,15 @@ const useStyles = makeStyles((theme) => ({
    },
    heroContentWrapper: {
       display: "flex",
-      justifyContent: "center",
+      justifyContent: "flex-end",
       alignItems: "flex-end",
+      [theme.breakpoints.down("md")]: {
+         justifyContent: "center",
+      },
    },
    laptopVideoWrapper: {
       display: "flex",
-      alignItems: "flex-end",
+      alignItems: "center",
    },
 }));
 
@@ -49,18 +42,11 @@ const HeroSection = ({
    big,
    color,
    handleOpenCalendly,
+   buttons,
    title,
+   subTitle,
 }) => {
-   const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
-   const classes = useStyles({ mobile });
-   const [itemProps] = useState({
-      item: true,
-      xs: 12,
-      md: 6,
-      lg: 6,
-   });
-
+   const classes = useStyles();
    return (
       <Section
          big={big}
@@ -71,36 +57,32 @@ const HeroSection = ({
          backgroundImageOpacity={backgroundImageOpacity}
          backgroundColor={backgroundColor}
       >
-         <div className={classes.heroContainerWrapper}>
+         <SectionContainer maxWidth="xl">
             <Grid className={classes.heroContainer} spacing={2} container>
-               <Grid className={classes.heroContentWrapper} {...itemProps}>
-                  <Fade down>
-                     {mobile ? (
+               <Slide timeout={1000} in direction="right">
+                  <Grid
+                     className={classes.heroContentWrapper}
+                     item
+                     xs={12}
+                     lg={6}
+                  >
+                     <GeneralHeroMessage
+                        title={title}
+                        subTitle={subTitle}
+                        buttons={buttons}
+                        handleOpenCalendly={handleOpenCalendly}
+                     />
+                  </Grid>
+               </Slide>
+               <Hidden mdDown>
+                  <Slide timeout={1000} in direction="left">
+                     <Grid className={classes.laptopVideoWrapper} item md={6}>
                         <LaptopVideo />
-                     ) : (
-                        <HeroMessage
-                           mobile={mobile}
-                           title={title}
-                           handleOpenCalendly={handleOpenCalendly}
-                        />
-                     )}
-                  </Fade>
-               </Grid>
-               <Grid className={classes.laptopVideoWrapper} {...itemProps}>
-                  <Fade up>
-                     {mobile ? (
-                        <HeroMessage
-                           mobile={mobile}
-                           title={title}
-                           handleOpenCalendly={handleOpenCalendly}
-                        />
-                     ) : (
-                        <LaptopVideo />
-                     )}
-                  </Fade>
-               </Grid>
+                     </Grid>
+                  </Slide>
+               </Hidden>
             </Grid>
-         </div>
+         </SectionContainer>
       </Section>
    );
 };

@@ -1516,8 +1516,45 @@ class Firebase {
          .map((doc) => ({ id: doc.id, ...doc.data() }));
    };
 
+   getFollowingGroupsWithCache = async (groupIds = []) => {
+      const uniqueGroupIds = [...new Set(groupIds)];
+      const getFromCache = async (groupId) => {
+         let snap = { notInCache: true, groupId };
+         try {
+            snap = await this.firestore
+               .collection("careerCenterData")
+               .doc(groupId)
+               .get({ source: "cache" });
+         } catch (e) {}
+         return snap;
+      };
+      const groupSnapsFromCache = await Promise.all(
+         uniqueGroupIds.map((groupId) => getFromCache(groupId))
+      );
+      const groupSnapsFromServer = await Promise.all(
+         groupSnapsFromCache
+            .filter((doc) => doc.notInCache)
+            .map(({ groupId }) => {
+               return this.firestore
+                  .collection("careerCenterData")
+                  .doc(groupId)
+                  .get();
+            })
+      );
+      return [...groupSnapsFromCache, ...groupSnapsFromServer]
+         .filter((doc) => doc.exists && !doc.notInCache)
+         .map((doc) => ({ id: doc.id, ...doc.data() }));
+   };
+
    getGroupsWithIds = async (arrayOfGroupIds) => {
       return await this.getFollowingGroups(arrayOfGroupIds);
+   };
+
+   getFeaturedCompanies = async () => {
+      const ref = this.firestore
+         .collection("careerCenterData")
+         .where("featured", "==", true);
+      return ref.get();
    };
 
    listenCareerCentersByAdminEmail = (email, callback) => {
@@ -2224,7 +2261,7 @@ class Firebase {
          .get();
    };
 
-   listenToUpcomingLivestreams = (callback) => {
+   listenToUpcomingLivestreams = (callback, limit) => {
       var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
       let ref = this.firestore
          .collection("livestreams")
@@ -2235,7 +2272,27 @@ class Firebase {
          )
          .where("test", "==", false)
          .orderBy("start", "asc");
+      if (limit) {
+         ref = ref.limit(limit);
+      }
       return ref.onSnapshot(callback);
+   };
+
+   getUpcomingLivestreams = (limit) => {
+      var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
+      let ref = this.firestore
+         .collection("livestreams")
+         .where(
+            "start",
+            ">",
+            new Date(Date.now() - fortyFiveMinutesInMilliseconds)
+         )
+         .where("test", "==", false)
+         .orderBy("start", "asc");
+      if (limit) {
+         ref = ref.limit(limit);
+      }
+      return ref.get();
    };
 
    /**

@@ -27,18 +27,18 @@ const initialMainLinks = [
 ];
 const initialSecondaryLinks = [
    {
-      href: `/next-livestreams`,
-      title: "FOR STUDENTS",
-      basePath: "/next-livestreams",
+      href: `/students`,
+      title: "For Students",
+      basePath: "/students",
    },
    {
       href: `/`,
-      title: "FOR COMPANIES",
+      title: "For Companies",
       basePath: "/",
    },
    {
       href: `/career-center`,
-      title: "FOR CAREER CENTERS",
+      title: "For Career Centers",
       basePath: "/career-center",
    },
 ];

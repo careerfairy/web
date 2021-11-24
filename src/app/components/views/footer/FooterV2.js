@@ -9,7 +9,8 @@ const useStyles = makeStyles((theme) => {
    const greyColor = alpha(theme.palette.text.secondary, 0.5);
    return {
       root: {
-         background: theme.palette.common.white,
+         background: ({ background }) =>
+            background || theme.palette.common.white,
       },
       footerTitle: {
          marginTop: theme.spacing(2),
@@ -59,8 +60,8 @@ const useStyles = makeStyles((theme) => {
    };
 });
 
-const FooterV2 = ({}) => {
-   const classes = useStyles();
+const FooterV2 = ({ background }) => {
+   const classes = useStyles({ background });
 
    return (
       <div className={classes.root}>

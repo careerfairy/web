@@ -60,7 +60,7 @@ const LandingPage = ({}) => {
    ];
 
    return (
-      <LandingLayout backgroundImage={mainBackground}>
+      <LandingLayout topImage={mainBackground}>
          <HeroSection big handleOpenCalendly={handleOpenCalendly} />
          <CompaniesSection overheadText="Over 200+ happy customers" />
          <BenefitsSection

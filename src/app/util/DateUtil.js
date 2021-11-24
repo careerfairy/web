@@ -1,6 +1,12 @@
 import dayjs from "dayjs";
 
 var calendar = require("dayjs/plugin/calendar");
+var advancedFormat = require("dayjs/plugin/advancedFormat");
+var utc = require("dayjs/plugin/utc");
+var timezone = require("dayjs/plugin/timezone"); // dependent on utc plugin
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(advancedFormat);
 dayjs.extend(calendar);
 
 export default class DateUtil {
@@ -14,6 +20,13 @@ export default class DateUtil {
       let todaysDate =
          today.getDate() > 9 ? today.getDate() : "0" + today.getDate();
       return todaysYear + "-" + todaysMonth + "-" + todaysDate;
+   }
+
+   static getStreamTime(JSDate) {
+      return dayjs(JSDate).format("hh:ss z");
+   }
+   static getStreamDate(JSDate) {
+      return dayjs(JSDate).format("dddd, MMMM D");
    }
 
    static getRelativeDate(JSDate) {

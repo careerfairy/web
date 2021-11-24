@@ -36,6 +36,20 @@ export default class GroupsUtil {
       return optionsArray;
    };
 
+   static checkIfUserFollows = ({ authenticatedUser, userData }, group) => {
+      if (
+         authenticatedUser.isLoaded &&
+         !authenticatedUser.isEmpty &&
+         userData &&
+         userData.groupIds
+      ) {
+         const { id } = group;
+         return userData.groupIds.includes(id);
+      } else {
+         return false;
+      }
+   };
+
    static getUniqueGroupsFromArrayOfGroups = (groups = []) => {
       return groups.filter(function (el) {
          if (!this[el.groupId]) {

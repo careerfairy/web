@@ -44,7 +44,7 @@ const CompaniesSection = (props) => {
          backgroundColor={props.backgroundColor}
       >
          <SectionContainer>
-            <HighlightText text={props.overheadText} />
+            {props.overheadText && <HighlightText text={props.overheadText} />}
             <LogosComponent>
                {landingCompanies.map(({ name, imageUrlMain }) => (
                   <Logo

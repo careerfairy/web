@@ -1,54 +1,58 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
-const initialTotal = []
-const useInfiniteScrollClientWithHandlers = (data , limit = 3, loadAdditional = 0) => {
-  const [hasMore, setHasMore] = useState(true)
-  const [totalItems, setTotalItems] = useState(initialTotal)
-  const [end, setEnd] = useState(limit)
-  const [items, setItems] = useState([])
+const initialTotal = [];
+const useInfiniteScrollClientWithHandlers = (
+   data,
+   limit = 3,
+   loadAdditional = 0
+) => {
+   const [hasMore, setHasMore] = useState(true);
+   const [totalItems, setTotalItems] = useState(initialTotal);
+   const [end, setEnd] = useState(limit);
+   const [items, setItems] = useState([]);
 
-  useEffect(() => {
-    const paginatedItems = totalItems.slice(0, end)
-    setItems(paginatedItems)
-  }, [end, totalItems])
+   useEffect(() => {
+      const paginatedItems = totalItems.slice(0, end);
+      setItems(paginatedItems);
+   }, [end, totalItems]);
 
-  useEffect(() => {
-    setHasMore(totalItems.length > items.length)
-  }, [items, totalItems.length])
+   useEffect(() => {
+      setHasMore(totalItems.length > items.length);
+   }, [items, totalItems.length]);
 
+   useEffect(() => {
+      setTotalItems(data || initialTotal);
+   }, [data]);
 
-  useEffect(() => {
-    setTotalItems(data || initialTotal)
-  }, [data])
+   useEffect(() => {
+      handleScroll();
+   }, [totalItems?.length, items?.length]);
 
-  useEffect(() => {
-    handleScroll()
-  },[])
+   const handleScroll = () => {
+      const bottom =
+         Math.ceil(window.innerHeight + window.scrollY) >=
+         document.documentElement.scrollHeight * 0.5;
+      if (bottom && hasMore) {
+         getMore();
+      }
+   };
 
-  const handleScroll = () => {
-    const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight * 0.6
-    if (bottom && hasMore) {
-      getMore()
-    }
-  };
+   useEffect(() => {
+      window.addEventListener("scroll", handleScroll, {});
 
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll, {
-    });
+      return () => {
+         window.removeEventListener("scroll", handleScroll);
+      };
+   }, [totalItems, items]);
 
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [totalItems, items]);
+   const getMore = () => {
+      const stillMore = Boolean(totalItems.length > items.length);
+      if (stillMore) {
+         setEnd((prevState) => prevState + (limit + loadAdditional));
+      }
+   };
 
-  const getMore = () => {
-    const stillMore = Boolean(totalItems.length > items.length)
-    if (stillMore) {
-      setEnd(prevState => prevState + (limit + loadAdditional))
-    }
-  }
+   return [items, getMore, hasMore, totalItems];
+};
 
-  return [items, getMore, hasMore, totalItems]
-}
-
-export default useInfiniteScrollClientWithHandlers
+export default useInfiniteScrollClientWithHandlers;

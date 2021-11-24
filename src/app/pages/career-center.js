@@ -3,7 +3,6 @@ import { useTheme } from "@material-ui/core/styles";
 import LandingLayout from "../layouts/LandingLayout";
 import BookADemoSection from "../components/views/landing/BookADemoSection";
 import TestimonialsSection from "../components/views/landing/TestimonialsSection";
-import StreamSection from "../components/views/landing/StreamSection";
 import UniversitySection from "../components/views/landing/UniversitySection";
 import BenefitsSection from "../components/views/landing/BenefitsSection";
 import CompaniesSection from "../components/views/landing/CompaniesSection";
@@ -11,15 +10,14 @@ import HeroSection from "../components/views/landing/HeroSection";
 import CalendlyModal from "../components/views/landing/CalendlyModal";
 import ScrollToTop from "../components/views/common/ScrollToTop";
 import {
-   star,
-   mouse,
-   wallet,
-   phone,
-   livestream,
-   promote,
-   trackAnalytics,
    alternateBackground,
-   engageShape,
+   landingBottomBackground,
+   livestream,
+   mouse,
+   promote,
+   star,
+   trackAnalytics,
+   wallet,
 } from "../constants/images";
 import ExperienceSection from "components/views/landing/ExperienceSection";
 
@@ -101,7 +99,10 @@ const CareerCenterLandingPage = ({}) => {
    ];
 
    return (
-      <LandingLayout backgroundImage={alternateBackground}>
+      <LandingLayout
+         topImage={alternateBackground}
+         bottomImage={landingBottomBackground}
+      >
          <HeroSection
             title={
                <div>
@@ -135,6 +136,7 @@ const CareerCenterLandingPage = ({}) => {
             color={common.white}
             big
             handleOpenCalendly={handleOpenCalendly}
+            bookingWhite
             title={"Have a chat with us"}
          />
          <CalendlyModal

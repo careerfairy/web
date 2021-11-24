@@ -37,7 +37,7 @@ function SectionHeader(props) {
    }
 
    return (
-      <header className={clsx(classes.sectionHeader, props.className)}>
+      <header className={clsx(props.className, classes.sectionHeader)}>
          {props.title && (
             <Typography
                gutterBottom

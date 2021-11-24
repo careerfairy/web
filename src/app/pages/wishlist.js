@@ -172,7 +172,7 @@ function WishFactoryPlay(props) {
                }}
             >
                <Typography
-                  textAlign="center"
+                  align="center"
                   variant="h1"
                   style={{ margin: "30px 0", fontSize: "2.8em" }}
                >
