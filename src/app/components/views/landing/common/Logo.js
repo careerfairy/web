@@ -55,6 +55,7 @@ const Logo = ({
             })}
             alt={alt}
             src={logoUrl}
+            loading="lazy"
             width={width}
             height={height}
          />

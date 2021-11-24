@@ -56,6 +56,7 @@ const GroupLogoButton = ({ group, handleFollow }) => {
             className={classes.groupLogo}
             src={group.imgPath}
             alt={group.label}
+            imgProps={{ loading: "lazy" }}
          />
          {handleFollow && (
             <Button

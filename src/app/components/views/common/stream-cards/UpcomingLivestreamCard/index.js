@@ -228,6 +228,7 @@ const UpcomingLivestreamCard = ({ livestream }) => {
             })}
             src={getResizedUrl(livestream.backgroundImageUrl, "sm")}
             alt="thumbnail"
+            loading="lazy"
          />
          <div
             className={clsx(classes.contentWrapper, {
@@ -244,6 +245,7 @@ const UpcomingLivestreamCard = ({ livestream }) => {
                   className={clsx(classes.companyLogo, {
                      [classes.companyLogoHovered]: hovered,
                   })}
+                  loading="lazy"
                   src={getResizedUrl(livestream.companyLogoUrl, "md")}
                />
                <Box className={classes.eventInfoWrapper}>

@@ -29,6 +29,7 @@ const FeaturedCompanyCard = ({ company }) => {
             alt={`${company.universityName}-logo`}
             width={100}
             height={100}
+            loading="lazy"
             className={classes.logo}
             src={getResizedUrl(company.logoUrl, "sm")}
          />

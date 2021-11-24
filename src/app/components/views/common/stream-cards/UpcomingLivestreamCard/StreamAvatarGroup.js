@@ -27,6 +27,7 @@ const StreamAvatarGroup = ({ avatars, max = 2, isLogo }) => {
                className={clsx(classes.avatar, {
                   [classes.logoAvatar]: isLogo,
                })}
+               imgProps={{ loading: "lazy" }}
                src={avatar.imgPath}
                alt={avatar.label}
                key={avatar.id}

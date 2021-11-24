@@ -6,6 +6,7 @@ import { calendarIcon, ipad } from "../../../../constants/images";
 import SectionContainer from "../../common/Section/Container";
 import Fade from "react-reveal/Fade";
 import HeroButton from "../HeroSection/HeroButton";
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
    section: {},
@@ -80,8 +81,9 @@ const ExperienceSection = (props) => {
                <div className={classes.imagesWrapper}>
                   <img
                      className={classes.streamerImage}
-                     src={ipad}
+                     src={getResizedUrl(ipad, "md")}
                      alt="analytics"
+                     loading="lazy"
                   />
                </div>
             </Fade>

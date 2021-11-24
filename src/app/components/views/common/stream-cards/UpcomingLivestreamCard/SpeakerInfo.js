@@ -57,6 +57,7 @@ const SpeakerInfo = ({ speaker }) => {
             alt={`${speaker.firstName || ""} - ${
                speaker.lastName || ""
             } - avatar`}
+            imgProps={{ loading: "lazy" }}
             className={classes.speakerAvatar}
          />
          <div className={classes.speakerInfoWrapper}>
