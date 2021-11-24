@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Collapse, Paper, Typography } from "@material-ui/core";
+import {
+   Avatar,
+   Box,
+   Button,
+   Collapse,
+   Paper,
+   Typography,
+} from "@material-ui/core";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
 import EventIcon from "@material-ui/icons/Event";
@@ -13,6 +20,7 @@ import clsx from "clsx";
 import LowerPreviewContent from "./LowerPreviewContent";
 import LowerMainContent from "./LowerMainContent";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
+import { speakerPlaceholder } from "../../../../util/constants";
 
 const useStyles = makeStyles((theme) => {
    const backgroundImageHeight = 200;
@@ -65,16 +73,18 @@ const useStyles = makeStyles((theme) => {
          transform: "scale(1.25)",
       },
       companyLogo: {
-         maxWidth: "80%",
          marginTop: `-20px`,
-
-         maxHeight: "100px",
-         objectFit: "cover",
          borderRadius: cardBorderRadius,
+         height: 100,
+         width: "80%",
          boxShadow: theme.shadows[5],
          background: theme.palette.common.white,
          marginBottom: theme.spacing(2),
-         padding: theme.spacing(2),
+         "& img": {
+            maxHeight: "80%",
+            maxWidth: "80%",
+            objectFit: "contain",
+         },
          transition: theme.transitions.create(["box-shadow"], {
             easing: theme.transitions.easing.easeInOut,
             duration: theme.transitions.duration.standard,
@@ -218,7 +228,8 @@ const UpcomingLivestreamCard = ({ livestream, handleOpenJoinModal }) => {
          setSpeakers(
             livestream.speakers.map((speaker) => ({
                label: `${speaker.firstName} ${speaker.lastName}`,
-               imgPath: getResizedUrl(speaker.avatar, "xs"),
+               imgPath:
+                  getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder,
                subLabel: `${speaker.position}`,
                id: speaker.id,
             }))
@@ -252,12 +263,13 @@ const UpcomingLivestreamCard = ({ livestream, handleOpenJoinModal }) => {
                   [classes.upperContentHovered]: hovered,
                })}
             >
-               <img
+               <Avatar
                   alt="company-logo"
                   className={clsx(classes.companyLogo, {
                      [classes.companyLogoHovered]: hovered,
                   })}
-                  loading="lazy"
+                  variant="rounded"
+                  imgProps={{ loading: "lazy" }}
                   src={getResizedUrl(livestream.companyLogoUrl, "md")}
                />
                <Box className={classes.eventInfoWrapper}>

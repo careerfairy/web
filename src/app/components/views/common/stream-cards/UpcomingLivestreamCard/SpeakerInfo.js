@@ -3,6 +3,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Avatar, Typography } from "@material-ui/core";
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
+import { speakerPlaceholder } from "../../../../util/constants";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -14,11 +15,6 @@ const useStyles = makeStyles((theme) => ({
    speakerAvatar: {
       width: theme.spacing(6),
       height: theme.spacing(6),
-      // [theme.breakpoints.up("md")]: {
-      //    width: theme.spacing(10),
-      //    height: theme.spacing(10),
-      // },
-      "& img": {},
    },
    speakerInfoWrapper: {
       paddingLeft: theme.spacing(2),
@@ -53,7 +49,7 @@ const SpeakerInfo = ({ speaker }) => {
    return (
       <div className={classes.root}>
          <Avatar
-            src={getResizedUrl(speaker.avatar, "xs")}
+            src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
             alt={`${speaker.firstName || ""} - ${
                speaker.lastName || ""
             } - avatar`}

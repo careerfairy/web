@@ -4,6 +4,7 @@ import HeroButton from "./HeroButton";
 import { Box, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Link from "../../../../materialUI/NextNavLink";
+import { playIcon } from "../../../../constants/images";
 const useStyles = makeStyles((theme) => ({
    subTitleHeader: {
       fontWeight: 600,
@@ -40,6 +41,7 @@ const StudentHeroSection = (props) => {
                color="secondary"
                withGradient
                variant="contained"
+               iconUrl={playIcon}
             >
                View Upcoming Livestreams
             </HeroButton>,
