@@ -4,12 +4,16 @@ import TopBar from "./TopBar";
 import NavBar from "./NavBar";
 import styles from "../../materialUI/styles/layoutStyles/landingLayoutStyles";
 import FooterV2 from "../../components/views/footer/FooterV2";
+import { getResizedUrl } from "../../components/helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(styles);
 
 const drawerWidth = 300;
 const LandingLayout = ({ topImage, bottomImage, children }) => {
-   const classes = useStyles({ topImage, bottomImage });
+   const classes = useStyles({
+      topImage: getResizedUrl(topImage, "md"),
+      bottomImage: getResizedUrl(bottomImage, "md"),
+   });
 
    return (
       <div className={classes.root}>

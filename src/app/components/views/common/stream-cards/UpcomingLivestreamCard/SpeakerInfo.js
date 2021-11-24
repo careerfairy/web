@@ -53,7 +53,7 @@ const SpeakerInfo = ({ speaker }) => {
    return (
       <div className={classes.root}>
          <Avatar
-            src={getResizedUrl(speaker.avatar, "md")}
+            src={getResizedUrl(speaker.avatar, "xs")}
             alt={`${speaker.firstName || ""} - ${
                speaker.lastName || ""
             } - avatar`}

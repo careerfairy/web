@@ -206,7 +206,7 @@ const UpcomingLivestreamCard = ({ livestream }) => {
          setSpeakers(
             livestream.speakers.map((speaker) => ({
                label: `${speaker.firstName} ${speaker.lastName}`,
-               imgPath: getResizedUrl(speaker.avatar, "sm"),
+               imgPath: getResizedUrl(speaker.avatar, "xs"),
                subLabel: `${speaker.position}`,
                id: speaker.id,
             }))
@@ -226,7 +226,7 @@ const UpcomingLivestreamCard = ({ livestream }) => {
             className={clsx(classes.backgroundImage, {
                [classes.backgroundImageHovered]: hovered,
             })}
-            src={getResizedUrl(livestream.backgroundImageUrl, "md")}
+            src={getResizedUrl(livestream.backgroundImageUrl, "sm")}
             alt="thumbnail"
          />
          <div
