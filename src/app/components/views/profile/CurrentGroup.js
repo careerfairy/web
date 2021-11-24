@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { useRouter } from "next/router";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import { withFirebase } from "context/firebase";
+import { useFirebase, withFirebase } from "context/firebase";
 import {
    Card,
    CardContent,
@@ -20,6 +20,8 @@ import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal";
 import Skeleton from "@material-ui/lab/Skeleton";
 import GroupJoinModal from "./GroupJoinModal";
 import Link from "next/link";
+import Fade from "react-reveal/Fade";
+import { getResizedUrl } from "../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -37,9 +39,9 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const CurrentGroup = ({ firebase, userData, group, isAdmin, groupId }) => {
+const CurrentGroup = ({ userData, group, isAdmin, groupId }) => {
    const { push } = useRouter();
-
+   const firebase = useFirebase();
    const [open, setOpen] = useState(false);
    const [localGroup, setLocalGroup] = useState({});
    const [noGroup, setNoGroup] = useState(false);
@@ -176,8 +178,8 @@ const CurrentGroup = ({ firebase, userData, group, isAdmin, groupId }) => {
 
    return (
       <Fragment key={localGroup.id}>
-         <Grow in={Boolean(localGroup.id)} timeout={600}>
-            <Grid item xs={12} sm={6} md={4} lg={4}>
+         <Grid item xs={12} sm={6} md={4} lg={4}>
+            <Fade>
                <Card style={{ position: "relative" }}>
                   {!localGroup.logoUrl ? (
                      <Skeleton
@@ -188,7 +190,7 @@ const CurrentGroup = ({ firebase, userData, group, isAdmin, groupId }) => {
                   ) : (
                      <CardMedia className={classes.media}>
                         <img
-                           src={localGroup.logoUrl}
+                           src={getResizedUrl(localGroup.logoUrl, "sm")}
                            style={{
                               objectFit: "contain",
                               maxWidth: "80%",
@@ -268,8 +270,8 @@ const CurrentGroup = ({ firebase, userData, group, isAdmin, groupId }) => {
                      </Menu>
                   </CardActions>
                </Card>
-            </Grid>
-         </Grow>
+            </Fade>
+         </Grid>
          <GroupJoinModal
             fromProfile={true}
             open={openJoinModal}
@@ -296,4 +298,4 @@ const CurrentGroup = ({ firebase, userData, group, isAdmin, groupId }) => {
    );
 };
 
-export default withFirebase(CurrentGroup);
+export default CurrentGroup;

@@ -27,13 +27,13 @@ export const playIcon =
 export const laptopDemo =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flaptop-demo.webp?alt=media&token=c1793c9e-00e4-4033-87a7-262f6c72f1fd";
 export const mainBackground =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fmain-landing-background.png?alt=media&token=3a710b6b-8cb3-4806-b89f-6bace8483377";
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fmain-background.webp?alt=media&token=1da0330b-8d48-4cc2-8cd4-ced561a0a931";
 export const alternateBackground =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Falternate_background.png?alt=media&token=2a8f1c36-c73e-477d-9ffa-5a3096d5e83f";
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Falternate_background.webp?alt=media&token=8b374f95-ce1f-42d6-8b79-8d502ed218ac";
 export const alternateStudentBackground =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstudent-landing-background.png?alt=media&token=338f4c9f-4a3f-460c-aff3-4bdb2ef11251";
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstudent-main-background.webp?alt=media&token=f6597bc5-71df-4445-95c8-38134ad7be79";
 export const landingBottomBackground =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstudent-landing-bottom-background.png?alt=media&token=f31e48fc-5aa5-4488-8b4e-91e01fd2b0e6";
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fbottom-background.webp?alt=media&token=05cc7acd-b876-4944-b828-6a67ba501d1c";
 export const blankLaptop =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flaptop.webp?alt=media&token=41342a75-c0a3-4462-93b8-6fc1a7ff2558";
 export const blankUIQAndA =

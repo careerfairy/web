@@ -19,12 +19,18 @@ import FollowCompaniesSection from "../components/views/landing/FollowCompaniesS
 import StudentBenefitsSection from "../components/views/landing/StudentBenefitsSection";
 import Link from "materialUI/NextNavLink";
 import NumbersSection from "../components/views/landing/NumbersSection";
+import { useAuth } from "../HOCs/AuthProvider";
+import GroupJoinModal from "../components/views/profile/GroupJoinModal";
 
 const StudentLandingPage = ({}) => {
    const {
-      palette: { secondary, common, grey },
+      palette: { secondary, common },
    } = useTheme();
 
+   const { userData } = useAuth();
+   const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
+   const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
+   const handleOpenJoinModal = (groupData) => setJoinGroupModalData(groupData);
    const [calendlyModalOpen, setCalendlyModalOpen] = useState(false);
 
    const handleOpenCalendly = () => {
@@ -38,7 +44,7 @@ const StudentLandingPage = ({}) => {
          name: "Students",
          description: "Register & meet companies at livestreams now",
          imageUrl: personShape,
-         buttonProps: {
+         buttonProps: !userData && {
             children: "Register",
             href: "/signup",
             component: Link,
@@ -97,8 +103,13 @@ const StudentLandingPage = ({}) => {
          >
             <StudentHeroSection big />
             <CompaniesSection />
-            <UpcomingLivestreamsSection big />
-            <FollowCompaniesSection title={"Follow Your Favorite Companies"} />
+            <UpcomingLivestreamsSection
+               handleOpenJoinModal={handleOpenJoinModal}
+            />
+            <FollowCompaniesSection
+               handleOpenJoinModal={handleOpenJoinModal}
+               title={"Follow Your Favorite Companies"}
+            />
             <StudentBenefitsSection
                title={
                   <>
@@ -113,9 +124,9 @@ const StudentLandingPage = ({}) => {
                backgroundColor={`transparent`}
                color={common.black}
                big
-               signUp
+               goToNextLivestreams
                handleOpenCalendly={handleOpenCalendly}
-               title={"Join the ranks of leading organisations today"}
+               title={"Register for your first event today"}
                dividerColor={secondary.light}
             />
             <CalendlyModal
@@ -123,6 +134,12 @@ const StudentLandingPage = ({}) => {
                onClose={handleCloseCalendly}
             />
             <ScrollToTop />
+            <GroupJoinModal
+               open={Boolean(joinGroupModalData)}
+               group={joinGroupModalData}
+               userData={userData}
+               closeModal={handleCloseJoinModal}
+            />
          </LandingLayout>
       </React.Fragment>
    );

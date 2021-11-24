@@ -7,6 +7,8 @@ import { useFirebase } from "../../../../context/firebase";
 import UpcomingLivestreamsCarousel from "./UpcomingLivestreamsCarousel";
 import Link from "../../../../materialUI/NextNavLink";
 import HeroButton from "../HeroSection/HeroButton";
+import GroupJoinModal from "../../profile/GroupJoinModal";
+import { useAuth } from "../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
    section: {},
@@ -31,10 +33,12 @@ const UpcomingLivestreamsSection = (props) => {
    useEffect(() => {
       (async function () {
          const newStreamSnaps = await getUpcomingLivestreams(15);
-         const newStreams = newStreamSnaps.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-         }));
+         const newStreams = newStreamSnaps.docs
+            .map((doc) => ({
+               id: doc.id,
+               ...doc.data(),
+            }))
+            .filter((livestream) => !livestream.hidden);
          setUpcomingLivestreams(newStreams);
       })();
    }, []);
@@ -49,7 +53,10 @@ const UpcomingLivestreamsSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         <UpcomingLivestreamsCarousel upcomingStreams={upcomingLivestreams} />
+         <UpcomingLivestreamsCarousel
+            handleOpenJoinModal={props.handleOpenJoinModal}
+            upcomingStreams={upcomingLivestreams}
+         />
          <Box display="flex" justifyContent="center" p={2}>
             <HeroButton
                href="/next-livestreams"

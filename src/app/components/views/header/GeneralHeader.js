@@ -9,12 +9,8 @@ const useStyles = makeStyles((theme) => ({
    root: {
       // Ensures top bar's Zindex is always above the drawer
       zIndex: theme.zIndex.drawer + 1,
-      color: (props) => props.navLinksColor,
+      color: (props) => props.navLinksActiveColor,
       background: "transparent",
-   },
-   whiteToolbar: {
-      boxShadow: theme.shadows[2],
-      background: (props) => [props.backgroundColor, "!important"],
    },
    transparentToolbar: {
       // boxShadow: theme.shadows[1],
@@ -26,13 +22,16 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       justifyContent: "space-between",
       background: "transparent",
-      borderBottomColor: alpha(theme.palette.common.black, 0.2)
+      borderBottomColor: alpha(theme.palette.common.black, 0.2),
    },
    animated: {
-      transition: theme.transitions.create(["background", "box-shadow", "border-bottom-color"], {
-         duration: theme.transitions.duration.complex,
-         easing: theme.transitions.easing.easeInOut,
-      }),
+      transition: theme.transitions.create(
+         ["background", "box-shadow", "border-bottom-color"],
+         {
+            duration: theme.transitions.duration.complex,
+            easing: theme.transitions.easing.easeInOut,
+         }
+      ),
    },
 }));
 
@@ -41,12 +40,13 @@ const GeneralHeader = ({
    children,
    permanent,
    headerColors,
-  className,
+   className,
    ...rest
 }) => {
    const theme = useTheme();
    const classes = useStyles({
-      navLinksColor: headerColors?.navLinksColor || theme.palette.grey["800"],
+      navLinksActiveColor:
+         headerColors?.navLinksActiveColor || theme.palette.grey["800"],
       backgroundColor:
          headerColors?.backgroundColor || theme.palette.common.white,
    });
@@ -64,7 +64,11 @@ const GeneralHeader = ({
 
    return (
       <HideOnScroll forceShow={permanent}>
-         <AppBar className={clsx(classes.root, className)} elevation={0} {...rest}>
+         <AppBar
+            className={clsx(classes.root, className)}
+            elevation={0}
+            {...rest}
+         >
             <Toolbar
                className={clsx(classes.toolbar, classes.animated, {
                   [classes.transparentToolbar]: scrolled || !transparent,

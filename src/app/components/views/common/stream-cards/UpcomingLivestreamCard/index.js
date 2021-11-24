@@ -5,12 +5,14 @@ import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
 import EventIcon from "@material-ui/icons/Event";
 import ClockIcon from "@material-ui/icons/AccessTime";
 import DateUtil from "../../../../../util/DateUtil";
+import Link from "materialUI/NextNavLink";
 import debounce from "lodash.debounce";
 
 import { useFirebase } from "../../../../../context/firebase";
 import clsx from "clsx";
 import LowerPreviewContent from "./LowerPreviewContent";
 import LowerMainContent from "./LowerMainContent";
+import { useAuth } from "../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => {
    const backgroundImageHeight = 200;
@@ -157,23 +159,32 @@ const useStyles = makeStyles((theme) => {
       },
       dateInfo: {
          textOverflow: "ellipsis",
-         display: "flex",
          color: theme.palette.text.secondary,
          alignItems: "center",
+         lineClamp: 1,
+         overflow: "hidden",
+         display: "flex",
+         WebkitBoxOrient: "vertical",
+         WebkitLineClamp: 1,
+         [theme.breakpoints.down("md")]: {
+            fontSize: "1rem",
+         },
       },
       button: {
          borderRadius: cardBorderRadius,
          padding: theme.spacing(1.5, 6),
+         textDecoration: "none !important",
       },
    };
 });
 
 const throttle_speed = 50;
-const UpcomingLivestreamCard = ({ livestream }) => {
+const UpcomingLivestreamCard = ({ livestream, handleOpenJoinModal }) => {
    const [hovered, setHovered] = useState(false);
    const classes = useStyles();
    const [speakers, setSpeakers] = useState([]);
    const [groups, setGroups] = useState([]);
+   const { userData, authenticatedUser } = useAuth();
 
    const handleMouseEnter = debounce(() => setHovered(true), throttle_speed);
    const handleMouseLeave = debounce(() => setHovered(false), throttle_speed);
@@ -189,6 +200,7 @@ const UpcomingLivestreamCard = ({ livestream }) => {
                );
                setGroups(
                   newGroups.map((group) => ({
+                     ...group,
                      imgPath: getResizedUrl(group.logoUrl, "xs"),
                      label: `${group.universityName} - logo`,
                      id: group.id,
@@ -281,6 +293,8 @@ const UpcomingLivestreamCard = ({ livestream }) => {
                         color="primary"
                         fullWidth
                         size="large"
+                        component={Link}
+                        href={`/upcoming-livestream/${livestream.id}`}
                         variant="outlined"
                         className={classes.button}
                      >
@@ -297,6 +311,9 @@ const UpcomingLivestreamCard = ({ livestream }) => {
                   {hovered && (
                      <LowerMainContent
                         groups={groups}
+                        handleOpenJoinModal={handleOpenJoinModal}
+                        authenticatedUser={authenticatedUser}
+                        userData={userData}
                         livestream={livestream}
                      />
                   )}

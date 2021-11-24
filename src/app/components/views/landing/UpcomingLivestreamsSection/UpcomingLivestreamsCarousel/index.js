@@ -9,7 +9,14 @@ import { Box, Fab } from "@material-ui/core";
 import UpcomingLivestreamCard from "../../../common/stream-cards/UpcomingLivestreamCard";
 
 const useStyles = makeStyles((theme) => ({
-   root: {},
+   root: {
+      marginLeft: "auto",
+      marginRight: "auto",
+      width: "95%",
+      [theme.breakpoints.down("md")]: {
+         width: "100%",
+      },
+   },
    arrow: {
       [theme.breakpoints.down("md")]: {
          display: ["none", "!important"],
@@ -55,7 +62,10 @@ function SamplePrevArrow(props) {
    );
 }
 
-const UpcomingLivestreamsCarousel = ({ upcomingStreams }) => {
+const UpcomingLivestreamsCarousel = ({
+   upcomingStreams,
+   handleOpenJoinModal,
+}) => {
    const classes = useStyles();
    const [settings] = useState({
       infinite: true,
@@ -65,12 +75,14 @@ const UpcomingLivestreamsCarousel = ({ upcomingStreams }) => {
       prevArrow: <SamplePrevArrow />,
       autoplay: true,
       autoplaySpeed: 10000,
+      dots: true,
       pauseOnHover: true,
       appendDots: (dots) => (
          <div
             style={{
                borderRadius: "10px",
                padding: "10px",
+               position: "static",
             }}
          >
             <ul style={{ margin: "0px" }}> {dots} </ul>
@@ -93,6 +105,7 @@ const UpcomingLivestreamsCarousel = ({ upcomingStreams }) => {
             settings: {
                slidesToShow: 2,
                slidesToScroll: 2,
+               dots: false,
                infinite: true,
             },
          },
@@ -100,6 +113,7 @@ const UpcomingLivestreamsCarousel = ({ upcomingStreams }) => {
             breakpoint: 600,
             settings: {
                slidesToShow: 1,
+               dots: false,
                slidesToScroll: 1,
             },
          },
@@ -113,6 +127,7 @@ const UpcomingLivestreamsCarousel = ({ upcomingStreams }) => {
                <Box key={livestream.id} p={2}>
                   <UpcomingLivestreamCard
                      key={livestream.id}
+                     handleOpenJoinModal={handleOpenJoinModal}
                      livestream={livestream}
                   />
                </Box>

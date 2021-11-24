@@ -11,8 +11,8 @@ const useStyles = makeStyles(styles);
 const drawerWidth = 300;
 const LandingLayout = ({ topImage, bottomImage, children }) => {
    const classes = useStyles({
-      topImage: getResizedUrl(topImage, "sm"),
-      bottomImage: getResizedUrl(bottomImage, "sm"),
+      topImage,
+      bottomImage: getResizedUrl(bottomImage, "md"),
    });
 
    return (

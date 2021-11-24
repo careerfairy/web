@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
       borderRadius: theme.spacing(2),
    },
 }));
-const FeaturedCompanyCard = ({ company }) => {
+const FeaturedCompanyCard = ({ company, handleFollow }) => {
    const classes = useStyles();
    return (
       <div className={classes.root}>
@@ -37,9 +37,11 @@ const FeaturedCompanyCard = ({ company }) => {
             <Button
                variant={"outlined"}
                color="primary"
+               onClick={handleFollow}
+               disabled={!Boolean(handleFollow)}
                className={classes.btn}
             >
-               Follow
+               {handleFollow ? "Follow" : "Following"}
             </Button>
          </Box>
       </div>

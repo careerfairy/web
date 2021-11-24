@@ -1,62 +1,21 @@
 import React from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import {
-   AppBar,
-   Box,
-   Hidden,
-   IconButton,
-   Tab,
-   Tabs,
-   Toolbar,
-} from "@material-ui/core";
+import { AppBar, Box, Hidden, IconButton, Toolbar } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
 import Link from "../../../materialUI/NextNavLink";
 import { MainLogo, MiniLogo } from "../../../components/logos";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import NavLinks from "../../../components/views/header/NavLinks";
 
 const useStyles = makeStyles((theme) => ({
-   avatar: {
-      width: 60,
-      height: 60,
-   },
    navIconButton: {
       color: "white !important",
    },
    toolbar: {
       display: "flex",
       justifyContent: "space-between",
-   },
-   navLinks: {
-      fontWeight: 600,
-      opacity: 1,
-      color: `${theme.palette.primary.contrastText} !important`,
-      "&:before": {
-         content: '""',
-         position: "absolute",
-         width: "100%",
-         height: 2,
-         bottom: 4,
-         left: "0",
-         backgroundColor: theme.palette.common.white,
-         visibility: "hidden",
-         WebkitTransform: "scaleX(0)",
-         transform: "scaleX(0)",
-         transition: theme.transitions.create(["all"], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.short,
-         }),
-      },
-      "&:hover:before": {
-         visibility: "visible",
-         WebkitTransform: "scaleX(1)",
-         transform: "scaleX(1)",
-      },
-   },
-   indicator: {
-      background: theme.palette.common.white,
-      color: theme.palette.common.white,
    },
    root: {
       // Ensures top bar's Zindex is always above the drawer
@@ -66,29 +25,30 @@ const useStyles = makeStyles((theme) => ({
 
 const TopBar = ({ className, links, onMobileNavOpen, ...rest }) => {
    const classes = useStyles();
+   const theme = useTheme();
 
    return (
       <AppBar elevation={1} className={clsx(classes.root, className)} {...rest}>
          <Toolbar className={classes.toolbar}>
+            <Box display="flex" alignItems="center">
+               <Hidden lgUp>
+                  <IconButton color="inherit" onClick={onMobileNavOpen}>
+                     <MenuIcon />
+                  </IconButton>
+               </Hidden>
+               <Hidden smDown>
+                  <MainLogo white />
+               </Hidden>
+               <Hidden mdUp>
+                  <MiniLogo />
+               </Hidden>
+            </Box>
             <Hidden smDown>
-               <MainLogo white />
-            </Hidden>
-            <Hidden mdUp>
-               <MiniLogo />
-            </Hidden>
-            <Hidden smDown>
-               <Tabs value={false} classes={{ indicator: classes.indicator }}>
-                  {links.map((item) => {
-                     return (
-                        <Tab
-                           key={item.title}
-                           className={classes.navLinks}
-                           label={item.title}
-                           href={item.href}
-                        />
-                     );
-                  })}
-               </Tabs>
+               <NavLinks
+                  links={links}
+                  navLinksActiveColor={theme.palette.common.white}
+                  navLinksBaseColor={theme.palette.common.white}
+               />
             </Hidden>
             <Box>
                <Hidden mdDown>
@@ -99,11 +59,6 @@ const TopBar = ({ className, links, onMobileNavOpen, ...rest }) => {
                      href="/profile"
                   >
                      <AccountCircleOutlinedIcon />
-                  </IconButton>
-               </Hidden>
-               <Hidden lgUp>
-                  <IconButton color="inherit" onClick={onMobileNavOpen}>
-                     <MenuIcon />
                   </IconButton>
                </Hidden>
             </Box>

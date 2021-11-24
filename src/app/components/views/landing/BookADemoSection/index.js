@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React from "react";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
@@ -7,7 +7,6 @@ import RoundButton from "materialUI/GlobalButtons/RoundButton";
 import Link from "materialUI/NextNavLink";
 import SectionContainer from "../../common/Section/Container";
 import Pulse from "react-reveal/Pulse";
-import { useAuth } from "../../../../HOCs/AuthProvider";
 import { Box } from "@material-ui/core";
 import clsx from "clsx";
 
@@ -32,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
          color: theme.palette.common.white,
       },
    },
-   signUpButton: {
+   goToNextLivestreamsBtn: {
       margin: theme.spacing(2),
       textDecoration: "none !important",
    },
@@ -46,7 +45,6 @@ const useStyles = makeStyles((theme) => ({
 
 const BookADemoSection = (props) => {
    const classes = useStyles({ dividerColor: props.dividerColor });
-   const { userData } = useAuth();
    return (
       <Section
          className={classes.section}
@@ -72,29 +70,29 @@ const BookADemoSection = (props) => {
                   justifyContent="center"
                   display="flex"
                >
-                  <RoundButton
-                     className={clsx(
-                        classes.bookingButton,
-                        props.bookingWhite && classes.bookingWhite
-                     )}
-                     color="secondary"
-                     size="large"
-                     variant="contained"
-                     onClick={props.handleOpenCalendly}
-                  >
-                     Book a Demo
-                  </RoundButton>
-                  {!userData && props.signUp && (
+                  {props.goToNextLivestreams ? (
                      <RoundButton
-                        className={classes.signUpButton}
-                        color="primary"
+                        className={classes.goToNextLivestreamsBtn}
+                        color="secondary"
                         size="large"
-                        variant="outlined"
+                        variant="contained"
                         component={Link}
-                        href="/signup"
+                        href="/next-livestreams"
+                     >
+                        Register now
+                     </RoundButton>
+                  ) : (
+                     <RoundButton
+                        className={clsx(
+                           classes.bookingButton,
+                           props.bookingWhite && classes.bookingWhite
+                        )}
+                        color="secondary"
+                        size="large"
+                        variant="contained"
                         onClick={props.handleOpenCalendly}
                      >
-                        Join Today
+                        Book a Demo
                      </RoundButton>
                   )}
                </Box>

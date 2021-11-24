@@ -2,8 +2,15 @@ import React from "react";
 import { Box, Grid } from "@material-ui/core";
 import GroupLogoButton from "./GroupLogoButton";
 import SpeakerInfo from "./SpeakerInfo";
+import GroupsUtil from "../../../../../data/util/GroupsUtil";
 
-const LowerMainContent = ({ groups, livestream }) => {
+const LowerMainContent = ({
+   groups,
+   livestream,
+   handleOpenJoinModal,
+   authenticatedUser,
+   userData,
+}) => {
    return (
       <>
          <Grid
@@ -12,11 +19,22 @@ const LowerMainContent = ({ groups, livestream }) => {
             justifyContent={groups.length === 1 ? "center" : "space-evenly"}
             container
          >
-            {groups.map((group) => (
-               <Grid xs={"auto"} item key={group.id}>
-                  <GroupLogoButton handleFollow={() => {}} group={group} />
-               </Grid>
-            ))}
+            {groups.map((group) => {
+               const following = GroupsUtil.checkIfUserFollows(
+                  { authenticatedUser, userData },
+                  group
+               );
+               return (
+                  <Grid xs={"auto"} item key={group.id}>
+                     <GroupLogoButton
+                        handleFollow={
+                           following ? null : () => handleOpenJoinModal(group)
+                        }
+                        group={group}
+                     />
+                  </Grid>
+               );
+            })}
          </Grid>
          <Box mt={1}>
             {livestream.speakers.map((speaker) => (
