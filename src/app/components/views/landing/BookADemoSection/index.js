@@ -47,7 +47,6 @@ const useStyles = makeStyles((theme) => ({
 const BookADemoSection = (props) => {
    const classes = useStyles({ dividerColor: props.dividerColor });
    const { userData } = useAuth();
-   console.log("-> userData", userData);
    return (
       <Section
          className={classes.section}
