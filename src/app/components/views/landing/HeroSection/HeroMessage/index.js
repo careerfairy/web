@@ -69,11 +69,10 @@ const RockstarTextTalent = () => {
 const GeneralHeroMessage = ({
    handleOpenCalendly,
    title,
-   mobile,
    buttons,
    subTitle,
 }) => {
-   const classes = useStyles({ mobile });
+   const classes = useStyles();
 
    return (
       <div className={classes.heroContent}>
@@ -133,7 +132,6 @@ const GeneralHeroMessage = ({
 
 GeneralHeroMessage.propTypes = {
    handleOpenCalendly: PropTypes.func,
-   mobile: PropTypes.bool,
    title: PropTypes.any,
 };
 

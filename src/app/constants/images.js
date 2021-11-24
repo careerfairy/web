@@ -27,9 +27,9 @@ export const playIcon =
 export const laptopDemo =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flaptop-demo.webp?alt=media&token=c1793c9e-00e4-4033-87a7-262f6c72f1fd";
 export const mainBackground =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fmain-background.png?alt=media&token=10c9a856-98d2-4668-834d-16b0c6cc1f72";
-export const alternateBackground =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fmain-landing-background.png?alt=media&token=3a710b6b-8cb3-4806-b89f-6bace8483377";
+export const alternateBackground =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Falternate_background.png?alt=media&token=2a8f1c36-c73e-477d-9ffa-5a3096d5e83f";
 export const alternateStudentBackground =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstudent-landing-background.png?alt=media&token=338f4c9f-4a3f-460c-aff3-4bdb2ef11251";
 export const landingBottomBackground =
