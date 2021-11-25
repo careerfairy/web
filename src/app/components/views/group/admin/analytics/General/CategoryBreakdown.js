@@ -176,7 +176,6 @@ const CategoryBreakdown = ({
 
    useEffect(() => {
       const newTypeOfOptions = getTypeOfStudents();
-      console.log("-> newTypeOfOptions", newTypeOfOptions);
       setTypesOfOptions(newTypeOfOptions);
    }, [audience, currentCategory, currentGroup?.categories]);
 
@@ -210,7 +209,6 @@ const CategoryBreakdown = ({
 
    const getTypeOfStudents = () => {
       const aggregateCategories = getAggregateCategories(audience);
-      console.log("-> aggregateCategories", aggregateCategories);
       const flattenedGroupOptions = [...currentCategory.options].map(
          (option) => {
             const count = aggregateCategories.filter((category) =>
