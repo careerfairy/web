@@ -49,6 +49,7 @@ const EmailTemplateForm = ({
    const [confirmSendEmailModalData, setConfirmSendEmailModalData] = useState(
       null
    );
+   const [showTimezone, setShowTimezone] = useState(true);
    const [
       confirmSendTestEmailModalData,
       setConfirmSendTestEmailModalData,
@@ -120,9 +121,10 @@ const EmailTemplateForm = ({
                const data = {
                   values: {
                      ...values,
-                     start: DateUtil.getRelativeDate(
-                        values.eventStartDate
-                     ).toString(),
+                     start:
+                        DateUtil.getRelativeDate(
+                           values.eventStartDate
+                        ).toString() + " CET",
                   },
                   templateId: targetTemplate.templateId,
                };
@@ -241,7 +243,8 @@ const EmailTemplateForm = ({
                                           disablePast
                                           label={field.label}
                                           labelFunc={(date) =>
-                                             DateUtil.getRelativeDate(date)
+                                             DateUtil.getRelativeDate(date) +
+                                             " CET"
                                           }
                                           value={formik.values[field.name]}
                                           name={field.name}
