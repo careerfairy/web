@@ -2,6 +2,7 @@ import React from "react";
 import { Grid } from "@material-ui/core";
 import MuiGridFade from "materialUI/animations/MuiGridFade";
 import BenefitCard from "./BenefitCard";
+import Fade from "react-reveal/Fade";
 
 const BenefitsGrid = ({
    benefits,
@@ -11,10 +12,11 @@ const BenefitsGrid = ({
    secondaryGradientEnd,
 }) => {
    return (
-      <Grid justifyContent="space-around" container spacing={5}>
-         {benefits.map((props, index) => (
-            <Grid item xs={12} sm={6} md={3} key={props.name}>
-               <MuiGridFade index={index} up>
+      <Fade top cascade>
+         <Grid justifyContent="space-around" container spacing={5}>
+            {benefits.map((props, index) => (
+               <Grid item xs={12} sm={6} md={3} key={props.name}>
+                  {/*<MuiGridFade index={index} up>*/}
                   <BenefitCard
                      {...props}
                      primaryGradientEnd={primaryGradientEnd}
@@ -22,10 +24,11 @@ const BenefitsGrid = ({
                      secondaryGradientStart={secondaryGradientStart}
                      secondaryGradientEnd={secondaryGradientEnd}
                   />
-               </MuiGridFade>
-            </Grid>
-         ))}
-      </Grid>
+                  {/*</MuiGridFade>*/}
+               </Grid>
+            ))}
+         </Grid>
+      </Fade>
    );
 };
 

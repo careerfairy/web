@@ -79,7 +79,7 @@ const StudentLandingPage = ({}) => {
       },
       {
          id: 2,
-         amount: "200+",
+         amount: "700+",
          label: "Live Streaming Events",
       },
       {
@@ -106,10 +106,10 @@ const StudentLandingPage = ({}) => {
             <UpcomingLivestreamsSection
                handleOpenJoinModal={handleOpenJoinModal}
             />
-            <FollowCompaniesSection
-               handleOpenJoinModal={handleOpenJoinModal}
-               title={"Follow Your Favorite Companies"}
-            />
+            {/*<FollowCompaniesSection*/}
+            {/*   handleOpenJoinModal={handleOpenJoinModal}*/}
+            {/*   title={"Follow Your Favorite Companies"}*/}
+            {/*/>*/}
             <StudentBenefitsSection
                title={
                   <>
