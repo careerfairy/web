@@ -72,3 +72,5 @@ export const locationShape =
 
 export const suitCaseShape =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fsuitcase-shape.png?alt=media&token=fa4b98a6-3270-4bc6-b8fb-3c460b5a5242";
+export const lightBulbShape =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flight-bulb-shape.png?alt=media&token=1270e061-aac5-4db2-832a-b7413ae13e2b";

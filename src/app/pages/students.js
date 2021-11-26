@@ -8,8 +8,8 @@ import ScrollToTop from "../components/views/common/ScrollToTop";
 import {
    alternateStudentBackground,
    landingBottomBackground,
+   lightBulbShape,
    locationShape,
-   personShape,
    suitCaseShape,
 } from "../constants/images";
 import HeadWithMeta from "../components/page/HeadWithMeta";
@@ -21,6 +21,7 @@ import Link from "materialUI/NextNavLink";
 import NumbersSection from "../components/views/landing/NumbersSection";
 import { useAuth } from "../HOCs/AuthProvider";
 import GroupJoinModal from "../components/views/profile/GroupJoinModal";
+import SpeakersSection from "../components/views/landing/SpeakersSection";
 
 const StudentLandingPage = ({}) => {
    const {
@@ -41,33 +42,27 @@ const StudentLandingPage = ({}) => {
 
    const studentBenefitsData = [
       {
-         name: "Students",
-         description: "Register & meet companies at livestreams now",
-         imageUrl: personShape,
+         name: "Get inspired",
+         description:
+            "Discover who's hiring and meet people in different workplaces",
+         imageUrl: lightBulbShape, // personShape might give better context
          buttonProps: !userData && {
-            children: "Register",
-            href: "/signup",
+            children: "Discover",
+            href: "/next-livestreams",
             component: Link,
          },
       },
       {
-         name: "Companies",
-         description: "Engage and recruit talents from leading schools",
+         name: "Land your dream job",
+         description:
+            "Connect with recruiters that will give you valuable tips & tricks to stand out",
          imageUrl: suitCaseShape,
-         buttonProps: {
-            children: "Book a demo",
-            onClick: handleOpenCalendly,
-         },
       },
       {
-         name: "Career Centers",
+         name: "Connect from anywhere",
          description:
-            "Boost student & employer interactions with our career live streams",
+            "Connect via your laptop or phone - anytime, from anywhere",
          imageUrl: locationShape,
-         buttonProps: {
-            children: "Book a demo",
-            onClick: handleOpenCalendly,
-         },
       },
    ];
 
@@ -84,8 +79,56 @@ const StudentLandingPage = ({}) => {
       },
       {
          id: 3,
-         amount: "60+",
+         amount: "80+",
          label: "Universities",
+      },
+   ];
+
+   const speakers = [
+      {
+         avatarUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2F23581989-66fc-4de8-8a73-75d9614df8f7_Theresa_Wang.jpg?alt=media",
+         position: "Project Leader",
+         name: "Theresa",
+         companyName: "Consultant",
+         companyUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2F997c48b1-8b5d-4670-b2c7-b59d52563a24_BCG_LOCKUP_CMYK_BLACK.png?alt=media",
+      },
+      {
+         avatarUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fe03205ff-516b-4ddb-bb33-a39517ac1def__Mauer.png?alt=media",
+         position: "CEO of Aisight und KI-Experte",
+         name: "Matthias",
+         companyUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2F01ce5c5c-8e72-44de-a3ac-bf5c31542f26_logo.jpg?alt=media",
+      },
+      {
+         avatarUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fe67a2e65-8ac9-4ab6-92f0-bfd8b706af12_IA.jpg?alt=media",
+         position:
+            "Analyst, Structured & Solutions Global Market Sales Switzerland",
+         name: "Ines",
+         companyName: "UBS",
+         companyUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Ff0967998-3ef3-4942-be6e-b9ddd11c06aa_b_2018.jpg?alt=media",
+      },
+      {
+         avatarUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fdeb6bccd-3463-4107-86c9-babb90be0c29_anager.jpg?alt=media",
+         position: "Senior Innovation Manager",
+         name: "Dirk",
+         companyName: "NIVEA",
+         companyUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2F74a17db0-dea1-472a-9c31-abe26555f3fb_sset_1.png?alt=media",
+      },
+      {
+         avatarUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2F8f75bb7f-c6ae-4cea-b531-d9c8986b2de9_la_009.jpg?alt=media",
+         position: "Campus Recruiter",
+         name: "Manuela",
+         companyName: "KPMG",
+         companyUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2F68d9a71d-cacd-46da-ac03-deabc74c7e77_ne__1_.jpg?alt=media",
       },
    ];
 
@@ -102,14 +145,24 @@ const StudentLandingPage = ({}) => {
             topImage={alternateStudentBackground}
          >
             <StudentHeroSection big />
-            <CompaniesSection />
+            <CompaniesSection
+               title={"299+ companies and startups are waiting for you."}
+            />
+            <SpeakersSection
+               speakers={speakers}
+               title={"Meet your future colleagues."}
+               subtitle={"Recent speakers that you might have missed"}
+            />
             <UpcomingLivestreamsSection
+               title={"Next events"}
                handleOpenJoinModal={handleOpenJoinModal}
             />
-            {/*<FollowCompaniesSection*/}
-            {/*   handleOpenJoinModal={handleOpenJoinModal}*/}
-            {/*   title={"Follow Your Favorite Companies"}*/}
-            {/*/>*/}
+            <FollowCompaniesSection
+               handleOpenJoinModal={handleOpenJoinModal}
+               title={
+                  "See your favourite companies missing? Let's change that."
+               }
+            />
             <StudentBenefitsSection
                title={
                   <>
@@ -125,8 +178,13 @@ const StudentLandingPage = ({}) => {
                color={common.black}
                big
                goToNextLivestreams
+               goTo={userData ? "/next-livestreams" : "/signup"}
                handleOpenCalendly={handleOpenCalendly}
-               title={"Register for your first event today"}
+               title={
+                  userData
+                     ? "Register for your first event today"
+                     : "Start finding your dream job today!"
+               }
                dividerColor={secondary.light}
             />
             <CalendlyModal
