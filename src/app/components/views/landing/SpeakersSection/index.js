@@ -3,12 +3,10 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
-import HighlightText from "../common/HighlightText";
-import landingCompanies from "../../../../constants/landingCompanies";
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
-import Logo from "../common/Logo";
-import LogosComponent from "../common/LogosComponent";
 import SectionHeader from "../../common/SectionHeader";
+import { Box, Grid } from "@material-ui/core";
+import TestimonialCarousel from "../TestimonialsSection/TestimonialCarousel";
+import SpeakersCarousel from "./SpeakersCarousel";
 
 const useStyles = makeStyles((theme) => ({
    section: {
@@ -31,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const CompaniesSection = (props) => {
+const SpeakersSection = (props) => {
    const classes = useStyles();
 
    return (
@@ -52,24 +50,19 @@ const CompaniesSection = (props) => {
                   subtitle={props.subtitle}
                />
             )}
-            {props.overheadText && <HighlightText text={props.overheadText} />}
-            <LogosComponent>
-               {landingCompanies.map(({ name, imageUrlMain }) => (
-                  <Logo
-                     key={name}
-                     alt={name}
-                     logoUrl={getResizedUrl(imageUrlMain, "xs")}
-                  />
-               ))}
-            </LogosComponent>
+            <Grid container justifyContent="center">
+               <Grid item xs={12} md={12}>
+                  <SpeakersCarousel speakers={props.speakers} />
+               </Grid>
+            </Grid>
          </SectionContainer>
       </Section>
    );
 };
 
-export default CompaniesSection;
+export default SpeakersSection;
 
-CompaniesSection.propTypes = {
+SpeakersSection.propTypes = {
    backgroundColor: PropTypes.any,
    backgroundImage: PropTypes.any,
    backgroundImageClassName: PropTypes.any,

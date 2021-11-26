@@ -41,9 +41,6 @@ const FollowCompaniesSection = (props) => {
                title={props.title}
                subtitle={props.subtitle}
             />
-            <FeaturedCompanies
-               handleOpenJoinModal={props.handleOpenJoinModal}
-            />
             <FollowCompaniesPrompt />
          </SectionContainer>
       </Section>

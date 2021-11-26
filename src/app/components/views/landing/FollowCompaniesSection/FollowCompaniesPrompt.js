@@ -12,15 +12,10 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(2),
    },
 }));
-const FollowCompaniesPrompt = ({
-   promptText = "See your favourite companies missing? Let's change that.",
-}) => {
+const FollowCompaniesPrompt = () => {
    const classes = useStyles();
    return (
       <div className={classes.root}>
-         <Typography gutterBottom variant="h5" align="center">
-            {promptText}
-         </Typography>
          <Box>
             <HeroButton
                href="/wishlist"

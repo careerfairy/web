@@ -7,8 +7,7 @@ import { useFirebase } from "../../../../context/firebase";
 import UpcomingLivestreamsCarousel from "./UpcomingLivestreamsCarousel";
 import Link from "../../../../materialUI/NextNavLink";
 import HeroButton from "../HeroSection/HeroButton";
-import GroupJoinModal from "../../profile/GroupJoinModal";
-import { useAuth } from "../../../../HOCs/AuthProvider";
+import SectionHeader from "../../common/SectionHeader";
 
 const useStyles = makeStyles((theme) => ({
    section: {},
@@ -53,6 +52,11 @@ const UpcomingLivestreamsSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
+         <SectionHeader
+            color={props.color}
+            title={props.title}
+            subtitle={props.subtitle}
+         />
          <UpcomingLivestreamsCarousel
             handleOpenJoinModal={props.handleOpenJoinModal}
             upcomingStreams={upcomingLivestreams}

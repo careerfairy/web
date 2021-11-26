@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
          color: theme.palette.common.white,
       },
    },
-   goToNextLivestreamsBtn: {
+   goToBtn: {
       margin: theme.spacing(2),
       textDecoration: "none !important",
    },
@@ -70,16 +70,16 @@ const BookADemoSection = (props) => {
                   justifyContent="center"
                   display="flex"
                >
-                  {props.goToNextLivestreams ? (
+                  {props.goTo ? (
                      <RoundButton
-                        className={classes.goToNextLivestreamsBtn}
+                        className={classes.goToBtn}
                         color="secondary"
                         size="large"
                         variant="contained"
                         component={Link}
-                        href="/next-livestreams"
+                        href={props.goTo}
                      >
-                        Register now
+                        Register for free
                      </RoundButton>
                   ) : (
                      <RoundButton

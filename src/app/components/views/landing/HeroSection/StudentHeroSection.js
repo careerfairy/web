@@ -19,8 +19,8 @@ const StudentHeroSection = (props) => {
       <HeroSection
          title={
             <>
-               Looking at <b>post grad career</b> prospects but don't know where
-               to <b>start?</b>
+               Looking for your <b>dream job</b> but don't know where to{" "}
+               <b>start?</b>
             </>
          }
          subTitle={
@@ -29,8 +29,8 @@ const StudentHeroSection = (props) => {
                   We've been there.
                </Typography>
                <Typography variant="h5">
-                  We host sessions with top companies for you to learn more
-                  about the opportunities for you.
+                  We host sessions with employees and recruiters from hundreds
+                  of companies to help you land that job.
                </Typography>
             </Box>
          }
