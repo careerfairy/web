@@ -18,6 +18,7 @@ import { useAuth } from "../../../../../HOCs/AuthProvider";
 import * as actions from "../../../../../store/actions";
 import { AppBar, Box, Tab, Tabs } from "@material-ui/core";
 import {
+   checkIfInTalentPool,
    arraysOfIdsEqual,
    getTotalUniqueStreamGroupIdsFromStreams,
 } from "../../../../../data/util/AnalyticsUtil";
@@ -119,6 +120,7 @@ const streamsSelector = createSelector(
                   userType.propertyName
                ]?.map((userEmail) => ({
                   ...userDataSetDictionary?.[userEmail],
+                  isInTalentPool: checkIfInTalentPool(livestream, userEmail),
                }));
             }
             return livestream;
