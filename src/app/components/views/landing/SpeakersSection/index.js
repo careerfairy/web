@@ -4,8 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import SectionHeader from "../../common/SectionHeader";
-import { Box, Grid } from "@material-ui/core";
-import TestimonialCarousel from "../TestimonialsSection/TestimonialCarousel";
+import { Grid } from "@material-ui/core";
 import SpeakersCarousel from "./SpeakersCarousel";
 
 const useStyles = makeStyles((theme) => ({
