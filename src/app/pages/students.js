@@ -119,7 +119,7 @@ const StudentLandingPage = ({}) => {
          name: "Dirk",
          companyName: "NIVEA",
          companyUrl:
-            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2F74a17db0-dea1-472a-9c31-abe26555f3fb_sset_1.png?alt=media",
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fnivea-logo.png?alt=media&token=c8b982c6-4a9d-4bad-bbd9-607e0d2f213d",
       },
       {
          avatarUrl:

@@ -31,12 +31,12 @@ const useStyles = makeStyles((theme) => {
       companyImage: {
          height: 130,
          borderRadius: cardSpacing,
-         width: "100%",
+         width: "50%",
+         margin: "auto 0",
          background: theme.palette.common.white,
          "& img": {
             objectFit: "contain",
          },
-         padding: theme.spacing(1.5),
       },
       speakerDetails: {
          display: "flex",

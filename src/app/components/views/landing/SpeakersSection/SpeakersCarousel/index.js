@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { alpha, makeStyles } from "@material-ui/core/styles";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
@@ -17,6 +17,15 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 1,
       "&:before": {
          display: ["none", "!important"],
+      },
+      "& button": {
+         boxShadow: "none",
+         color: theme.palette.primary.main,
+         background: "transparent",
+         border: `2px solid ${theme.palette.primary.main}`,
+         "&:hover": {
+            background: alpha(theme.palette.primary.main, 0.3),
+         },
       },
    },
 }));
