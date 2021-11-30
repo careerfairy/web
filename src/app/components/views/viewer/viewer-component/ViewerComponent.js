@@ -212,10 +212,6 @@ function ViewerComponent({
    if (!currentLivestream) {
       return null;
    }
-   console.log(
-      "-> currentLivestream.recommendedEventIds",
-      currentLivestream.recommendedEventIds
-   );
 
    return (
       <React.Fragment>
@@ -303,6 +299,7 @@ function ViewerComponent({
             ) : currentLivestream.recommendedEventIds?.length ? (
                <RecommendedEventsOverlay
                   recommendedEventIds={currentLivestream.recommendedEventIds}
+                  mobile={mobile}
                />
             ) : (
                <StreamStoppedOverlay />

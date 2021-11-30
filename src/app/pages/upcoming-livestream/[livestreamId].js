@@ -395,7 +395,11 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
       const {
          hasAgreedToAll,
          groupsWithPolicies,
-      } = await GroupsUtil.getPolicyStatus(careerCenters, user.email, firebase);
+      } = await GroupsUtil.getPolicyStatus(
+         careerCenters,
+         user.email,
+         firebase.checkIfUserAgreedToGroupPolicy
+      );
       if (!hasAgreedToAll) {
          setOpenJoinModal(true);
          setGroupsWithPolicies(groupsWithPolicies);

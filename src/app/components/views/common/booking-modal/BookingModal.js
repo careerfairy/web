@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect } from "react";
 
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
-import CommonUtil from "util/CommonUtil";
+import CommonUtil, { getRandom } from "util/CommonUtil";
 import QuestionVotingBox from "components/views/question-voting-box/QuestionVotingBox";
 
 import Link from "next/link";
@@ -171,7 +171,7 @@ function BookingModal({
          });
    }
 
-   let questionElements = CommonUtil.getRandom(upcomingQuestions, 9).map(
+   let questionElements = getRandom(upcomingQuestions, 9).map(
       (question, index) => {
          return (
             <Grid item key={index} xs={12} sm={4}>

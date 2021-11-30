@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-import NextIcon from "@material-ui/icons/NavigateNextRounded";
-import PrevIcon from "@material-ui/icons/NavigateBeforeRounded";
-import { Box, Fab, Grow } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import UpcomingLivestreamCard from "../../../common/stream-cards/UpcomingLivestreamCard";
+import { getMaxSlides } from "util/CommonUtil";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -17,62 +16,32 @@ const useStyles = makeStyles((theme) => ({
          width: "100%",
       },
    },
-   arrow: {
-      [theme.breakpoints.down("md")]: {
-         display: ["none", "!important"],
+   dotElements: {
+      "& li": {
+         width: "0.5rem",
+         height: "0.5rem",
+         border: `1px solid ${theme.palette.primary.main}`,
+         borderRadius: "100%",
       },
-      zIndex: 1,
-      "&:before": {
-         display: ["none", "!important"],
+      "& .slick-active": {
+         background: theme.palette.primary.main,
       },
    },
 }));
 
-function SampleNextArrow(props) {
-   const { className, onClick } = props;
-   const classes = useStyles();
-   return (
-      <div className={`${classes.arrow} ${className}`}>
-         <Fab
-            size="small"
-            onClick={onClick}
-            color="primary"
-            aria-label="next-testimonial"
-         >
-            <NextIcon />
-         </Fab>
-      </div>
-   );
-}
-
-function SamplePrevArrow(props) {
-   const { className, onClick } = props;
-   const classes = useStyles();
-   return (
-      <div className={`${classes.arrow} ${className}`}>
-         <Fab
-            size="small"
-            onClick={onClick}
-            color="primary"
-            aria-label="previous-testimonial"
-         >
-            <PrevIcon />
-         </Fab>
-      </div>
-   );
-}
-
 const UpcomingLivestreamsCarousel = ({
    upcomingStreams,
    handleOpenJoinModal,
+   additionalSettings,
+   allowRegister,
 }) => {
    const classes = useStyles();
-   const [settings] = useState({
+
+   const settings = {
       infinite: true,
       speed: 500,
       lazyLoad: true,
-      nextArrow: <SampleNextArrow />,
-      prevArrow: <SamplePrevArrow />,
+      arrows: false,
       autoplay: true,
       autoplaySpeed: 10000,
       dots: true,
@@ -85,27 +54,32 @@ const UpcomingLivestreamsCarousel = ({
                position: "static",
             }}
          >
-            <ul style={{ margin: "0px" }}> {dots} </ul>
+            <ul
+               className={classes.dotElements}
+               style={{ margin: "0px", padding: 0 }}
+            >
+               {dots}
+            </ul>
          </div>
       ),
-      slidesToShow: 4,
-      slidesToScroll: 4,
+      slidesToShow: getMaxSlides(4, upcomingStreams.length),
+      slidesToScroll: getMaxSlides(4, upcomingStreams.length),
       initialSlide: 0,
       responsive: [
          {
             breakpoint: 1400,
             settings: {
-               slidesToShow: 3,
-               slidesToScroll: 3,
+               slidesToShow: getMaxSlides(3, upcomingStreams.length),
+               slidesToScroll: getMaxSlides(3, upcomingStreams.length),
                infinite: true,
             },
          },
          {
             breakpoint: 1024,
             settings: {
-               slidesToShow: 2,
-               slidesToScroll: 2,
-               dots: false,
+               slidesToShow: getMaxSlides(2, upcomingStreams.length),
+               slidesToScroll: getMaxSlides(2, upcomingStreams.length),
+               dots: true,
                infinite: true,
             },
          },
@@ -113,30 +87,25 @@ const UpcomingLivestreamsCarousel = ({
             breakpoint: 600,
             settings: {
                slidesToShow: 1,
-               dots: false,
+               dots: true,
                slidesToScroll: 1,
             },
          },
       ],
-   });
+      ...additionalSettings,
+   };
 
    return (
       <div className={classes.root}>
          <Slider {...settings}>
-            {upcomingStreams.map((livestream, index) => (
-               <Grow
-                  in
-                  key={livestream.id}
-                  style={{ transformOrigin: "0 0 0" }}
-                  timeout={index + 1 * 600}
-               >
-                  <Box key={livestream.id} p={2}>
-                     <UpcomingLivestreamCard
-                        handleOpenJoinModal={handleOpenJoinModal}
-                        livestream={livestream}
-                     />
-                  </Box>
-               </Grow>
+            {upcomingStreams.map((livestream) => (
+               <Box key={livestream.id} p={2}>
+                  <UpcomingLivestreamCard
+                     handleOpenJoinModal={handleOpenJoinModal}
+                     livestream={livestream}
+                     allowRegister={allowRegister}
+                  />
+               </Box>
             ))}
          </Slider>
       </div>

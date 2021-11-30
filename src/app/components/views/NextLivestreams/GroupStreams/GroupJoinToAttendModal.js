@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { useFirebase, withFirebase } from "context/firebase";
+import { useFirebase } from "context/firebase";
 import UserCategorySelector from "components/views/profile/UserCategorySelector";
 import {
    Box,
@@ -58,8 +58,9 @@ const GroupJoinToAttendModal = ({
    const [allSelected, setAllSelected] = useState(false);
    const [submitting, setSubmitting] = useState(false);
    const [localGroupsWithPolicies, setLocalGroupsWithPolicies] = useState([]);
+
    useEffect(() => {
-      setLocalGroupsWithPolicies(groupsWithPolicies);
+      setLocalGroupsWithPolicies(groupsWithPolicies || []);
    }, [groupsWithPolicies]);
 
    useEffect(() => {
@@ -80,7 +81,7 @@ const GroupJoinToAttendModal = ({
             const userCategories = userData.registeredGroups?.find(
                (el) => el.groupId === group.id
             )?.categories;
-            userCategories?.forEach((category, index) => {
+            userCategories?.forEach((category) => {
                groupCategories?.forEach((groupCategory) => {
                   const exists = groupCategory.options.some(
                      (option) => option.id === category.selectedValueId
@@ -189,7 +190,9 @@ const GroupJoinToAttendModal = ({
                   {followAGroupTitle ||
                      "Please follow one of the following groups in order to register:"}
                </DialogTitle>
-               <LogoButtons setGroup={setGroup} groups={groups} />
+               {groups?.length && (
+                  <LogoButtons setGroup={setGroup} groups={groups} />
+               )}
             </>
          ) : (
             <>
@@ -256,4 +259,4 @@ const GroupJoinToAttendModal = ({
    );
 };
 
-export default withFirebase(GroupJoinToAttendModal);
+export default GroupJoinToAttendModal;

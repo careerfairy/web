@@ -60,13 +60,17 @@ export default class GroupsUtil {
       }, Object.create(null));
    };
 
-   static getPolicyStatus = async (groups, userEmail, firebase) => {
+   static getPolicyStatus = async (
+      groups,
+      userEmail,
+      checkIfUserAgreedToGroupPolicy
+   ) => {
       let hasAgreedToAll = true;
       const updatedGroups = await Promise.all(
          groups.map(async (group) => {
             let needsToAgree = false;
             if (group.privacyPolicyActive) {
-               needsToAgree = await firebase.checkIfUserAgreedToGroupPolicy(
+               needsToAgree = await checkIfUserAgreedToGroupPolicy(
                   group.id,
                   userEmail
                );
@@ -86,5 +90,16 @@ export default class GroupsUtil {
       );
 
       return { hasAgreedToAll, groupsWithPolicies };
+   };
+
+   static userDoesNotFollowAnyGroup = (userData, livestream) => {
+      if (userData.groupIds && livestream.groupIds) {
+         // are you following any group thats part of this livstream?
+         return userData.groupIds.some(
+            (id) => livestream.groupIds.indexOf(id) >= 0
+         );
+      } else {
+         return false;
+      }
    };
 }

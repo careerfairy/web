@@ -606,7 +606,7 @@ const GroupStreamCardV2Old = memo(
          } = await GroupsUtil.getPolicyStatus(
             careerCenters,
             user.email,
-            firebase
+            firebase.checkIfUserAgreedToGroupPolicy
          );
          if (!hasAgreedToAll) {
             setOpenJoinModal(true);

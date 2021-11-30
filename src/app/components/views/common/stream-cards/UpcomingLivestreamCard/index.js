@@ -21,6 +21,9 @@ import LowerPreviewContent from "./LowerPreviewContent";
 import LowerMainContent from "./LowerMainContent";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import { speakerPlaceholder } from "../../../../util/constants";
+import UserUtil from "../../../../../data/util/UserUtil";
+import GroupsUtil from "../../../../../data/util/GroupsUtil";
+import { useRouter } from "next/router";
 
 const useStyles = makeStyles((theme) => {
    const backgroundImageHeight = 200;
@@ -189,9 +192,14 @@ const useStyles = makeStyles((theme) => {
 });
 
 const throttle_speed = 50;
-const UpcomingLivestreamCard = ({ livestream, handleOpenJoinModal }) => {
+const UpcomingLivestreamCard = ({
+   livestream,
+   handleOpenJoinModal,
+   allowRegister,
+}) => {
    const [hovered, setHovered] = useState(false);
    const classes = useStyles();
+   const { push, asPath } = useRouter();
    const [speakers, setSpeakers] = useState([]);
    const [groups, setGroups] = useState([]);
    const { userData, authenticatedUser } = useAuth();
@@ -199,7 +207,12 @@ const UpcomingLivestreamCard = ({ livestream, handleOpenJoinModal }) => {
    const handleMouseEnter = debounce(() => setHovered(true), throttle_speed);
    const handleMouseLeave = debounce(() => setHovered(false), throttle_speed);
 
-   const { getFollowingGroupsWithCache } = useFirebase();
+   const {
+      getFollowingGroupsWithCache,
+      registerToLivestream,
+      checkIfUserAgreedToGroupPolicy,
+      sendRegistrationConfirmationEmail,
+   } = useFirebase();
 
    useEffect(() => {
       (async function () {
@@ -236,6 +249,57 @@ const UpcomingLivestreamCard = ({ livestream, handleOpenJoinModal }) => {
          );
       }
    }, [livestream.speakers]);
+
+   const startRegistrationProcess = async () => {
+      if (
+         (authenticatedUser.isLoaded && authenticatedUser.isEmpty) ||
+         !authenticatedUser.emailVerified
+      ) {
+         return push({
+            pathname: `/login`,
+            query: {
+               absolutePath: asPath,
+            },
+         });
+      }
+
+      if (!userData || !UserUtil.userProfileIsComplete(userData)) {
+         return push({
+            pathname: "/profile",
+         });
+      }
+
+      const {
+         hasAgreedToAll,
+         groupsWithPolicies,
+      } = await GroupsUtil.getPolicyStatus(
+         groups,
+         authenticatedUser.email,
+         checkIfUserAgreedToGroupPolicy
+      );
+      if (!hasAgreedToAll) {
+         handleOpenJoinModal({ groups, groupsWithPolicies });
+      } else {
+         // If on next livestreams tab...
+         if (
+            GroupsUtil.userDoesNotFollowAnyGroup(userData, livestream) &&
+            livestream.groupIds?.length
+         ) {
+            handleOpenJoinModal({ groups });
+         } else {
+            await registerToLivestream(
+               livestream.id,
+               userData,
+               groupsWithPolicies
+            );
+            return await sendRegistrationConfirmationEmail(
+               authenticatedUser,
+               userData,
+               livestream
+            );
+         }
+      }
+   };
 
    return (
       <Paper
@@ -301,17 +365,30 @@ const UpcomingLivestreamCard = ({ livestream, handleOpenJoinModal }) => {
                      {DateUtil.getStreamTime(livestream.start.toDate())}
                   </Typography>
                   <Box mt={2}>
-                     <Button
-                        color="primary"
-                        fullWidth
-                        size="large"
-                        component={Link}
-                        href={`/upcoming-livestream/${livestream.id}`}
-                        variant="outlined"
-                        className={classes.button}
-                     >
-                        Learn More
-                     </Button>
+                     {allowRegister ? (
+                        <Button
+                           color="primary"
+                           fullWidth
+                           onClick={startRegistrationProcess}
+                           size="large"
+                           variant="contained"
+                           className={classes.button}
+                        >
+                           Register Now
+                        </Button>
+                     ) : (
+                        <Button
+                           color="primary"
+                           fullWidth
+                           size="large"
+                           component={Link}
+                           href={`/upcoming-livestream/${livestream.id}`}
+                           variant="outlined"
+                           className={classes.button}
+                        >
+                           Learn More
+                        </Button>
+                     )}
                   </Box>
                </Box>
             </Box>

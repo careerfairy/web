@@ -229,7 +229,7 @@ const ViewerLayout = (props) => {
                } = await GroupsUtil.getPolicyStatus(
                   livestreamGroups,
                   userData.userEmail,
-                  firebase
+                  firebase.checkIfUserAgreedToGroupPolicy
                );
                const groupThatUserFollows = StatsUtil.getGroupThatStudentFollows(
                   userData,

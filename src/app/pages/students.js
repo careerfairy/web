@@ -22,6 +22,7 @@ import NumbersSection from "../components/views/landing/NumbersSection";
 import { useAuth } from "../HOCs/AuthProvider";
 import GroupJoinModal from "../components/views/profile/GroupJoinModal";
 import SpeakersSection from "../components/views/landing/SpeakersSection";
+import GroupJoinToAttendModal from "../components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 
 const StudentLandingPage = ({}) => {
    const {
@@ -31,7 +32,8 @@ const StudentLandingPage = ({}) => {
    const { userData } = useAuth();
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
-   const handleOpenJoinModal = (groupData) => setJoinGroupModalData(groupData);
+   const handleOpenJoinModal = ({ groups, groupsWithPolicies }) =>
+      setJoinGroupModalData({ groups, groupsWithPolicies });
    const [calendlyModalOpen, setCalendlyModalOpen] = useState(false);
 
    const handleOpenCalendly = () => {
@@ -131,7 +133,7 @@ const StudentLandingPage = ({}) => {
             "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2F68d9a71d-cacd-46da-ac03-deabc74c7e77_ne__1_.jpg?alt=media",
       },
    ];
-
+   console.log("-> joinGroupModalData", joinGroupModalData);
    return (
       <React.Fragment>
          <HeadWithMeta
@@ -158,7 +160,6 @@ const StudentLandingPage = ({}) => {
                handleOpenJoinModal={handleOpenJoinModal}
             />
             <FollowCompaniesSection
-               handleOpenJoinModal={handleOpenJoinModal}
                title={
                   "See your favourite companies missing? Let's change that."
                }
@@ -192,9 +193,11 @@ const StudentLandingPage = ({}) => {
                onClose={handleCloseCalendly}
             />
             <ScrollToTop />
-            <GroupJoinModal
+            <GroupJoinToAttendModal
                open={Boolean(joinGroupModalData)}
-               group={joinGroupModalData}
+               groups={joinGroupModalData?.groups}
+               groupsWithPolicies={joinGroupModalData?.groupsWithPolicies}
+               alreadyJoined={false}
                userData={userData}
                closeModal={handleCloseJoinModal}
             />
