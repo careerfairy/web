@@ -29,7 +29,13 @@ export default function useMediaSources(
          }
          setLocalMediaStream(mediaStream);
       }
-   }, [localStream, localStream?.audioTrack, localStream?.videoTrack, active]);
+   }, [
+      localStream,
+      localStream?.audioTrack,
+      localStream?.videoTrack,
+      localStream?.videoTrack?.getMediaStreamTrack().getSettings().deviceId,
+      active,
+   ]);
 
    const cleanupDisplayableMediaStream = (mediaStream) => {
       const audioTracks = mediaStream.getAudioTracks();

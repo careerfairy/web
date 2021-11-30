@@ -56,6 +56,7 @@ function StreamPublishingModal({
    onConfirmStream,
    onRefuseStream,
    localMediaEnabling,
+   labels,
 }) {
    const testVideoRef = useRef(null);
    const inputLabel = useRef(null);
@@ -141,9 +142,9 @@ function StreamPublishingModal({
    }, [localStream, localStream?.videoTrack]);
 
    const joinButtonLabel = useMemo(() => {
-      if (hasAudioTrack && hasVideoTrack) return "Join as streamer";
-      if (!hasAudioTrack) return "Activate microphone to join";
-      if (!hasVideoTrack) return "Join without camera";
+      if (hasAudioTrack && hasVideoTrack) return labels.joinButtonLabel;
+      if (!hasAudioTrack) return labels.disabledJoinButtonLabel;
+      if (!hasVideoTrack) return labels.joinWithoutCameraLabel;
    }, [hasAudioTrack, hasVideoTrack]);
 
    return (
@@ -165,7 +166,7 @@ function StreamPublishingModal({
                style={{ fontSize: "1.2em", fontWeight: 500 }}
                variant="h5"
             >
-               Join the Stream
+               {labels.mainTitle}
             </Typography>
          </DialogTitle>
          <MuiDialogContent dividers>
@@ -335,8 +336,8 @@ function StreamPublishingModal({
             </Grid>
          </MuiDialogContent>
          <MuiDialogActions>
-            <Tooltip title="Join without camera nor microphone. You will still be able to watch the streamers, give written answers to questions, share your screen and control slides.">
-               <Button children="I am only watching" onClick={onRefuseStream} />
+            <Tooltip title={labels.refuseTooltip}>
+               <Button children={labels.refuseLabel} onClick={onRefuseStream} />
             </Tooltip>
             {!hasVideoTrack && hasAudioTrack ? (
                <ButtonWithConfirm
@@ -344,9 +345,11 @@ function StreamPublishingModal({
                   variant="contained"
                   color="primary"
                   startIcon={<CheckIcon />}
-                  tooltipTitle="We recommend to activate your camera for a better experience."
+                  tooltipTitle={labels.joinWithoutCameraTooltip}
                   buttonAction={onConfirmStream}
-                  confirmDescription="Are you sure that you want to join the stream without camera?"
+                  confirmDescription={
+                     labels.joinWithoutCameraConfirmDescription
+                  }
                />
             ) : (
                <Button

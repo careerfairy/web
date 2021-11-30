@@ -10,6 +10,7 @@ import HandRaiseJoinDialog from "./hand-raise/HandRaiseJoinDialog";
 import HandRaisePromptDialog from "./hand-raise/HandRaisePromptDialog";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
+import HandRaiseAcquiringMedia from "./hand-raise/active/HandRaiseAcquiringMedia";
 
 const HandRaiseCategory = ({
    streamerId,
@@ -39,9 +40,13 @@ const HandRaiseCategory = ({
          livestream.hasStarted &&
          livestream.handRaiseActive &&
          handRaiseState &&
-         ["connecting", "connected", "requested", "invited", "Tecg"].includes(
-            handRaiseState?.state
-         )
+         [
+            "connecting",
+            "connected",
+            "requested",
+            "invited",
+            "acquire_media",
+         ].includes(handRaiseState?.state)
       ) {
          setHandRaiseActive(true);
       } else {
@@ -81,6 +86,12 @@ const HandRaiseCategory = ({
          <HandRaisePriorRequest
             handRaiseState={handRaiseState}
             updateHandRaiseRequest={updateHandRaiseRequest}
+            handRaiseActive={livestream.handRaiseActive}
+         />
+         <HandRaiseAcquiringMedia
+            handRaiseState={handRaiseState}
+            requestHandRaise={requestHandRaise}
+            unRequestHandRaise={unRequestHandRaise}
             handRaiseActive={livestream.handRaiseActive}
          />
          <HandRaiseRequested

@@ -223,7 +223,6 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
    };
 
    function addNewChatEntry() {
-      debugger;
       if (isEmpty || submitting) {
          return;
       }

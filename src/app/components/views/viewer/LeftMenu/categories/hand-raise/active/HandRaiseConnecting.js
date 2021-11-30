@@ -7,35 +7,34 @@ import {
 } from "../../../../../../../materialUI/GlobalContainers";
 import { ThemedPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
 
-const HandRaiseRequested = memo(({ handRaiseState, updateHandRaiseRequest }) => {
-   const shouldRender = () =>
-      Boolean(
-         !(
-            !handRaiseState ||
-            (handRaiseState.state !== "connecting" &&
-               handRaiseState.state !== "invited")
+const HandRaiseRequested = memo(
+   ({ handRaiseState, updateHandRaiseRequest }) => {
+      const shouldRender = () =>
+         Boolean(
+            handRaiseState?.state === "connecting" ||
+               handRaiseState?.state === "invited"
+         );
+      return (
+         shouldRender() && (
+            <Grow unmountOnExit in>
+               <CategoryContainerCentered>
+                  <CategoryContainerContent>
+                     <ThemedPermanentMarker>
+                        Connecting to the stream...
+                     </ThemedPermanentMarker>
+                     <Button
+                        size="large"
+                        startIcon={<ClearRoundedIcon />}
+                        variant="contained"
+                        children="Cancel"
+                        onClick={() => updateHandRaiseRequest("unrequested")}
+                     />
+                  </CategoryContainerContent>
+               </CategoryContainerCentered>
+            </Grow>
          )
       );
-   return (
-      shouldRender() && (
-         <Grow unmountOnExit in>
-            <CategoryContainerCentered>
-               <CategoryContainerContent>
-                  <ThemedPermanentMarker>
-                     Connecting to the stream...
-                  </ThemedPermanentMarker>
-                  <Button
-                     size="large"
-                     startIcon={<ClearRoundedIcon />}
-                     variant="contained"
-                     children="Cancel"
-                     onClick={() => updateHandRaiseRequest("unrequested")}
-                  />
-               </CategoryContainerContent>
-            </CategoryContainerCentered>
-         </Grow>
-      )
-   );
-});
+   }
+);
 
 export default HandRaiseRequested;

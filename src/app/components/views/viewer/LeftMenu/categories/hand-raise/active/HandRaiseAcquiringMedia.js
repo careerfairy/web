@@ -14,7 +14,7 @@ import useTimeOut from "../../../../../../custom-hook/useTimeOut";
 
 const DELAY_IN_SECONDS = 5;
 
-const HandRaiseRequested = memo(
+const HandRaiseAcquiringMedia = memo(
    ({
       handRaiseState,
       handRaiseActive,
@@ -24,10 +24,11 @@ const HandRaiseRequested = memo(
       const { startCountDown, isCountingDown } = useTimeOut({
          delay: DELAY_IN_SECONDS * 1000,
       });
-      const shouldRender = () => Boolean(handRaiseState?.state === "requested");
+      const shouldRender = () =>
+         Boolean(handRaiseState?.state === "acquire_media");
 
       const onClick = () => {
-         return unRequestHandRaise();
+         unRequestHandRaise();
       };
 
       return (
@@ -36,27 +37,11 @@ const HandRaiseRequested = memo(
                <CategoryContainerCentered>
                   <CategoryContainerContent>
                      <ThemedPermanentMarker>
-                        You raised your&nbsp;hand!
+                        Activate your camera/mic!
                      </ThemedPermanentMarker>
                      <CategorySubtitle>
-                        Please wait to be invited to join by the&nbsp;speaker.
+                        Make sure to activate your camera and/or microphone
                      </CategorySubtitle>
-                     {
-                        <Button
-                           size="large"
-                           disabled={isCountingDown}
-                           startIcon={
-                              handRaiseActive ? (
-                                 <HandRaiseIcon />
-                              ) : (
-                                 <ClearRoundedIcon />
-                              )
-                           }
-                           variant="contained"
-                           children={"Cancel"}
-                           onClick={onClick}
-                        />
-                     }
                   </CategoryContainerContent>
                </CategoryContainerCentered>
             </Grow>
@@ -65,4 +50,4 @@ const HandRaiseRequested = memo(
    }
 );
 
-export default HandRaiseRequested;
+export default HandRaiseAcquiringMedia;

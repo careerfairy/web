@@ -2,6 +2,7 @@ import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { withFirebasePage } from "context/firebase";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
 import useDevices from "components/custom-hook/useDevices";
+import { useFirebase } from "context/firebase";
 import useMediaSources from "components/custom-hook/useMediaSources";
 import VideoControlsContainer from "components/views/streaming/video-container/VideoControlsContainer";
 import { useAuth } from "HOCs/AuthProvider";
@@ -74,6 +75,7 @@ function ViewerComponent({
       showLocalStreamPublishingModal,
       setShowLocalStreamPublishingModal,
    ] = useState(true);
+   const { updateHandRaiseRequest } = useFirebase();
    const streamRef = useStreamRef();
    const {
       query: { livestreamId },
@@ -117,30 +119,6 @@ function ViewerComponent({
       true
    );
 
-   // useEffect(() => {
-   //    if (
-   //       handRaiseActive &&
-   //       agoraRtcStatus &&
-   //       agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED"
-   //    ) {
-   //       if (currentLivestream) {
-   //          if (currentLivestream.test || currentLivestream.openStream) {
-   //             firebase.updateHandRaiseRequest(
-   //                streamRef,
-   //                "anonymous" + streamerId,
-   //                "connected"
-   //             );
-   //          } else {
-   //             firebase.updateHandRaiseRequest(
-   //                streamRef,
-   //                authenticatedUser.email,
-   //                "connected"
-   //             );
-   //          }
-   //       }
-   //    }
-   // }, [localStream]);
-
    const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams);
 
    useEffect(() => {
@@ -159,6 +137,24 @@ function ViewerComponent({
          return () => clearTimeout(timout); // Cancel opening modal if streams appear before 3 seconds
       }
    }, [Boolean(remoteStreams?.length), isBreakout, hasActiveRooms]);
+
+   const updateHandRaiseState = (newState) => {
+      if (currentLivestream) {
+         if (currentLivestream.test || currentLivestream.openStream) {
+            return updateHandRaiseRequest(
+               streamRef,
+               "anonymous" + streamerId,
+               newState
+            );
+         } else {
+            return updateHandRaiseRequest(
+               streamRef,
+               authenticatedUser.email,
+               newState
+            );
+         }
+      }
+   };
 
    const setDesktopMode = async (mode, initiatorId) => {
       let screenSharerId =
@@ -191,6 +187,15 @@ function ViewerComponent({
       },
       [currentLivestream?.mode, optimizationMode, streamerId]
    );
+
+   const requestHandRaise = async () => {
+      await updateHandRaiseRequest(
+         streamRef,
+         authenticatedUser.email,
+         "requested"
+      );
+      setShowLocalStreamPublishingModal(false);
+   };
 
    const handlePublishLocalStream = async () => {
       if (localStream.audioTrack && !localStream.isAudioPublished) {
@@ -242,9 +247,19 @@ function ViewerComponent({
             displayableMediaStream={displayableMediaStream}
             devices={devices}
             mediaControls={mediaControls}
-            onConfirmStream={handlePublishLocalStream}
+            onConfirmStream={requestHandRaise}
             onRefuseStream={handleJoinAsViewer}
             localMediaEnabling={localMediaEnabling}
+            labels={{
+               mainTitle: "Activate Your Devices To Join The Stream",
+               refuseTooltip: "Cancel Hand Raise",
+               refuseLabel: "Cancel",
+               joinWithoutCameraLabel: "Join without camera",
+               joinWithoutCameraTooltip:
+                  "We recommend to activate your camera for a better experience.",
+               joinButtonLabel: "Confirm Hand Raise",
+               disabledJoinButtonLabel: "Activate Microphone to Join",
+            }}
          />
          {handRaiseActive && (
             <Fragment>

@@ -9,8 +9,7 @@ import { ThemedPermanentMarker } from "../../../../../../../materialUI/GlobalTit
 
 const HandRaiseRequested = memo(
    ({ handRaiseState, updateHandRaiseRequest }) => {
-      const shouldRender = () =>
-         Boolean(!(!handRaiseState || handRaiseState.state !== "connected"));
+      const shouldRender = () => Boolean(handRaiseState?.state === "connected");
       return (
          shouldRender() && (
             <Grow unmountOnExit in>
