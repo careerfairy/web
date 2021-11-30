@@ -1,87 +1,152 @@
-import React, {useContext} from 'react';
-import {withFirebase} from 'context/firebase';
-import { Button, Typography, Grow } from "@material-ui/core";
-import {CategoryContainerCentered} from "../../../../../../../materialUI/GlobalContainers";
-import {GreyPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
+import React, { useContext, useEffect, useState } from "react";
+import { useFirebase } from "context/firebase";
+import { Button, Grow, Typography } from "@material-ui/core";
+import { CategoryContainerCentered } from "../../../../../../../materialUI/GlobalContainers";
+import { GreyPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
 import {
-    TooltipButtonComponent,
-    TooltipText,
-    TooltipTitle,
-    WhiteTooltip
+   TooltipButtonComponent,
+   TooltipText,
+   TooltipTitle,
+   WhiteTooltip,
 } from "../../../../../../../materialUI/GlobalTooltips";
+import useStreamRef from "../../../../../../custom-hook/useStreamRef";
+import { useLocalStorage } from "react-use";
+import NewFeatureHint from "../../../../../../util/NewFeatureHint";
 
-function HandRaiseInactive({firebase, livestream, showMenu, selectedState, sliding}) {
+const HAND_RAISE_HINT_LOCAL_KEY = "hasSeenHandRaiseTip";
 
-    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+function HandRaiseInactive({
+   livestream,
+   showMenu,
+   selectedState,
+   sliding,
+   handleStateChange,
+}) {
+   const { tutorialSteps, setTutorialSteps } = useContext(TutorialContext);
+   const firebase = useFirebase();
+   const streamRef = useStreamRef();
+   const [animating, setAnimating] = useState(false);
+   const [hasSeenHandRaiseTip, setHasSeenHandRaiseTip] = useLocalStorage(
+      HAND_RAISE_HINT_LOCAL_KEY,
+      false
+   );
 
-    const isOpen = (property) => {
-        return Boolean(livestream.test
-            && showMenu
-            && tutorialSteps.streamerReady
-            && tutorialSteps[property]
-            && selectedState === "hand"
-            && !sliding
-        )
-    }
+   useEffect(() => {
+      if (hasSeenHandRaiseTip === false && !livestream.test) {
+         handleStateChange("hand");
+      }
+   }, [hasSeenHandRaiseTip, livestream.test]);
 
-    const handleConfirm = (property) => {
-        setTutorialSteps({
-            ...tutorialSteps,
-            [property]: false,
-            [property + 1]: true,
-        })
-        if (property === 9) {
-            createDemoHandRaiseRequest()
-        }
-    }
+   const isOpen = (property) => {
+      return Boolean(
+         livestream.test &&
+            showMenu &&
+            tutorialSteps.streamerReady &&
+            tutorialSteps[property] &&
+            selectedState === "hand" &&
+            !sliding
+      );
+   };
 
-    if (livestream.handRaiseActive) {
-        return null;
-    }
+   const handleConfirm = (property) => {
+      setTutorialSteps({
+         ...tutorialSteps,
+         [property]: false,
+         [property + 1]: true,
+      });
+      if (property === 9) {
+         createDemoHandRaiseRequest();
+      }
+   };
 
-    function setHandRaiseModeActive() {
-        firebase.setHandRaiseMode(livestream.id, true);
-    }
+   if (livestream.handRaiseActive) {
+      return null;
+   }
 
-    function createDemoHandRaiseRequest() {
-        firebase.createHandRaiseRequest(livestream.id, "demo@careerfairy.io", { firstName: 'Demoman', lastName: 'Test'});
-    }
+   function setHandRaiseModeActive() {
+      return firebase.setHandRaiseMode(streamRef, true);
+   }
 
-    return (
-        <Grow mountOnEnter unmountOnExit in={Boolean(!livestream.handRaiseActive)}>
-            <CategoryContainerCentered>
-                <div style={{width: "90%", display: "grid", placeItems: "center"}}>
-                    <GreyPermanentMarker>Hand Raise is not active</GreyPermanentMarker>
-                    <Typography style={{marginBottom: "1rem"}} align="center" gutterBottom>Allow viewers to join in your
-                        stream by activating hand
-                        raise.</Typography>
-                    <WhiteTooltip
-                        placement="right-start"
-                        title={
-                            <React.Fragment>
-                                <TooltipTitle>Hand Raise (1/5)</TooltipTitle>
-                                <TooltipText>
-                                    Invite your viewers to also ask
-                                    you questions via video and audio
-                                </TooltipText>
-                                <TooltipButtonComponent onConfirm={() => {
-                                    setHandRaiseModeActive()
-                                    handleConfirm(9)
-                                }} buttonText="Ok"/>
-                            </React.Fragment>
-                        } open={isOpen(9)}>
-                        <Button variant="contained" color="primary" size='large'
-                                children='Activate Hand Raise'
-                                onClick={() => {
-                                    setHandRaiseModeActive()
-                                    isOpen(9) && handleConfirm(9)
-                                }}/>
-                    </WhiteTooltip>
-                </div>
-            </CategoryContainerCentered>
-        </Grow>
-    );
+   function createDemoHandRaiseRequest() {
+      firebase.createHandRaiseRequest(streamRef, "demo@careerfairy.io", {
+         firstName: "Demoman",
+         lastName: "Test",
+      });
+   }
+
+   return (
+      <Grow
+         mountOnEnter
+         onEntering={() => setAnimating(true)}
+         onEntered={() => setAnimating(false)}
+         unmountOnExit
+         in={Boolean(!livestream.handRaiseActive)}
+      >
+         <CategoryContainerCentered>
+            <div
+               style={{ width: "90%", display: "grid", placeItems: "center" }}
+            >
+               <GreyPermanentMarker>
+                  Hand Raise is not active
+               </GreyPermanentMarker>
+               <Typography
+                  style={{ marginBottom: "1rem" }}
+                  align="center"
+                  gutterBottom
+               >
+                  Allow viewers to join in your stream via audio and video by
+                  activating hand raise feature.
+               </Typography>
+               <WhiteTooltip
+                  placement="right-start"
+                  title={
+                     <React.Fragment>
+                        <TooltipTitle>Hand Raise (1/5)</TooltipTitle>
+                        <TooltipText>
+                           Invite your viewers to also ask you questions via
+                           video and audio
+                        </TooltipText>
+                        <TooltipButtonComponent
+                           onConfirm={() => {
+                              setHandRaiseModeActive();
+                              handleConfirm(9);
+                           }}
+                           buttonText="Ok"
+                        />
+                     </React.Fragment>
+                  }
+                  open={isOpen(9)}
+               >
+                  <NewFeatureHint
+                     onClickConfirm={() => setHasSeenHandRaiseTip(true)}
+                     localStorageKey={HAND_RAISE_HINT_LOCAL_KEY}
+                     tooltipTitle="Allow audience to join with video/audio"
+                     hide={
+                        tutorialSteps.streamerReady ||
+                        selectedState !== "hand" ||
+                        animating
+                     }
+                     placement="bottom"
+                     tooltipText="Please activate this feature if you would like your audience to join with video and video."
+                     buttonText={"I understand"}
+                  >
+                     <Button
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        children="Activate Hand Raise"
+                        onClick={() => {
+                           setHandRaiseModeActive();
+                           isOpen(9) && handleConfirm(9);
+                        }}
+                     />
+                  </NewFeatureHint>
+               </WhiteTooltip>
+            </div>
+         </CategoryContainerCentered>
+      </Grow>
+   );
 }
 
-export default withFirebase(HandRaiseInactive);
+export default HandRaiseInactive;

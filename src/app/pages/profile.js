@@ -1,40 +1,37 @@
-import {makeStyles} from '@material-ui/core/styles';
-import {withFirebase} from 'context/firebase';
-import Header from '../components/views/header/Header';
-import Head from 'next/head';
-import Footer from "../components/views/footer/Footer";
+import React from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import { withFirebase } from "context/firebase";
+import Head from "next/head";
 import ProfileNav from "../components/views/profile/ProfileNav";
-import {useAuth} from "../HOCs/AuthProvider";
-
+import { useAuth } from "../HOCs/AuthProvider";
+import GeneralLayout from "../layouts/GeneralLayout";
+import ScrollToTop from "../components/views/common/ScrollToTop";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        backgroundColor: theme.palette.background.default,
-        height: "100vh",
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column"
-    },
-    content: {
-        minHeight: "20vh",
-        flexGrow: 1
-    }
+   content: {
+      minHeight: "60vh",
+   },
 }));
 
 const UserProfile = () => {
-    const classes = useStyles();
-    const {userData, authenticatedUser: user} = useAuth();
+   const classes = useStyles();
+   const { userData, authenticatedUser: user } = useAuth();
 
-    return (
-        <div className={classes.root}>
-            <Head>
-                <title key="title">CareerFairy | My Profile</title>
-            </Head>
-            <Header classElement='relative white-background'/>
-            {userData ? <ProfileNav user={user} userData={userData}/> : <div className={classes.content}/>}
-            <Footer/>
-        </div>
-    );
-}
+   return (
+      <React.Fragment>
+         <Head>
+            <title key="title">CareerFairy | My Profile</title>
+         </Head>
+         <GeneralLayout fullScreen>
+            {userData ? (
+               <ProfileNav user={user} userData={userData} />
+            ) : (
+               <div className={classes.content} />
+            )}
+         </GeneralLayout>
+         <ScrollToTop />
+      </React.Fragment>
+   );
+};
 
-export default withFirebase(UserProfile)
+export default withFirebase(UserProfile);

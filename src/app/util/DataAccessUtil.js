@@ -1,75 +1,88 @@
-import axios from 'axios';
-import DateUtil from './DateUtil';
+import axios from "axios";
+import DateUtil from "./DateUtil";
 
 export default class DataAccessUtil {
+   static sendDashboardInvite(recipientEmail, userData, group, invite_link) {
+      return axios({
+         method: "post",
+         url:
+            "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDashboardInviteEmail",
+         data: {
+            recipientEmail: recipientEmail,
+            sender_first_name: userData.firstName,
+            group_name: group.universityName,
+            invite_link: invite_link,
+         },
+      });
+   }
+   static sendBasicTemplateEmail({ values, emails, senderEmail, templateId }) {
+      const testingEmails = ["kadirit@hotmail.com"];
 
-    static sendRegistrationConfirmationEmail(user, userData, livestream) {
-        if (livestream.isFaceToFace) {
-            return this.sendPhysicalEventEmailRegistrationConfirmation(user, userData, livestream);
-        } else {
-            return this.sendLivestreamEmailRegistrationConfirmation(user, userData, livestream);
-        }
-    }
+      const dataObj = {
+         title: values.title,
+         summary: values.summary,
+         companyLogoUrl: values.companyLogoUrl,
+         illustrationImageUrl: values.illustrationImageUrl,
+         eventUrl: values.eventUrl,
+         subject: values.subject,
+         start: values.start,
+         emails: testingEmails,
+         senderEmail,
+         templateId,
+      };
+      const localUrl =
+         "http://localhost:5001/careerfairy-e1fd9/us-central1/sendBasicTemplateEmail";
+      const prodUrl =
+         "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendBasicTemplateEmail";
+      return axios({
+         method: "post",
+         url: localUrl,
+         data: dataObj,
+      });
+   }
 
-    static sendLivestreamEmailRegistrationConfirmation(user, userData, livestream) {
-        return axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendLivestreamRegistrationConfirmationEmail',
-            data: {
-                recipientEmail: user.email,
-                user_first_name: userData.firstName,
-                livestream_date: DateUtil.getPrettyDate(livestream.start.toDate()),
-                company_name: livestream.company,
-                company_logo_url: livestream.companyLogoUrl,
-                livestream_title: livestream.title,
-                livestream_link: ('https://careerfairy.io/upcoming-livestream/' + livestream.id)
-            }
-        });
-    }
-    static sendDashboardInvite(recipientEmail, userData, group, invite_link) {
-        return axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDashboardInviteEmail',
-            data: {
-                recipientEmail: recipientEmail,
-                sender_first_name: userData.firstName,
-                group_name: group.universityName,
-                invite_link: invite_link
-            }
-        });
-    }
+   static sendDraftApprovalRequestEmail(
+      adminsInfo,
+      senderName,
+      stream,
+      submitTime,
+      senderEmail
+   ) {
+      // TODO Update the cloud function to send the sender an email of the draft they submitted
+      return axios({
+         method: "post",
+         url:
+            "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDraftApprovalRequestEmail",
+         data: {
+            adminsInfo: adminsInfo,
+            sender_name: senderName,
+            livestream_title: stream.title,
+            livestream_company_name: stream.company,
+            submit_time: submitTime,
+            sender_email: senderEmail,
+         },
+      });
+   }
 
-    static sendDraftApprovalRequestEmail(adminsInfo, senderName, stream, submitTime, senderEmail) {
-        // TODO Update the cloud function to send the sender an email of the draft they submitted
-        return axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDraftApprovalRequestEmail',
-            data: {
-                adminsInfo: adminsInfo,
-                sender_name: senderName,
-                livestream_title: stream.title,
-                livestream_company_name: stream.company,
-                submit_time: submitTime,
-                sender_email: senderEmail
-            }
-        });
-    }
-
-    static sendPhysicalEventEmailRegistrationConfirmation(user, userData, event) {
-        return axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPhysicalEventRegistrationConfirmationEmail',
-            data: {
-                recipientEmail: user.email,
-                user_first_name: userData.firstName,
-                event_date: DateUtil.getPrettyDate(event.start.toDate()),
-                company_name: event.company,
-                company_logo_url: event.companyLogoUrl,
-                event_title: event.title,
-                event_address: event.address
-            }
-        });
-    }
+   static sendNewlyPublishedEventEmail({
+      adminsInfo,
+      senderName,
+      stream,
+      submitTime,
+      senderEmail,
+   }) {
+      return axios({
+         method: "post",
+         url:
+            "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendNewlyPublishedEventEmail",
+         data: {
+            adminsInfo: adminsInfo,
+            sender_name: senderName,
+            livestream_title: stream.title,
+            livestream_company_name: stream.company,
+            submit_time: submitTime,
+            sender_email: senderEmail,
+         },
+      });
+   }
 }
-
-

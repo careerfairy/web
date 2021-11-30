@@ -1,61 +1,63 @@
-import {useContext, useEffect, useState} from "react";
-import {useRouter} from "next/router";
-import {withFirebase} from "../context/firebase";
-import Header from "../components/views/header/Header";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { withFirebase } from "../context/firebase";
 import Loader from "../components/views/loader/Loader";
 
 import Head from "next/head";
-import NewGroup from "../components/views/profile/NewGroup";
-import Footer from "../components/views/footer/Footer";
-import { Container, Grow, Typography, Grid } from "@material-ui/core";
-import {GlobalBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
+import { Container } from "@material-ui/core";
 import Groups from "../components/views/groups/Groups";
-import {useAuth} from "../HOCs/AuthProvider";
+import { useAuth } from "../HOCs/AuthProvider";
+import GeneralLayout from "../layouts/GeneralLayout";
 
 const JoinGroup = (props) => {
-    const router = useRouter();
-    const [groups, setGroups] = useState([]);
-    const {userData, authenticatedUser: user, loading} = useAuth();
+   const router = useRouter();
+   const [groups, setGroups] = useState([]);
+   const { userData, authenticatedUser: user, loading } = useAuth();
 
-    useEffect(() => {
-        if (user === null) {
-            router.replace("/login");
-        }
-    }, [user]);
+   useEffect(() => {
+      if (user === null) {
+         router.replace("/login");
+      }
+   }, [user]);
 
-    useEffect(() => {
-        if (userData) {
-            const unsubscribe = props.firebase.listenToGroups((querySnapshot) => {
-                let careerCenters = [];
-                querySnapshot.forEach((doc) => {
-                    let careerCenter = doc.data();
-                    careerCenter.id = doc.id;
-                    if (!userData.groupIds?.includes(careerCenter.id)) {
-                        careerCenters.push(careerCenter);
-                    }
-                });
-                setGroups(careerCenters);
+   useEffect(() => {
+      if (userData) {
+         const unsubscribe = props.firebase.listenToGroups((querySnapshot) => {
+            let careerCenters = [];
+            querySnapshot.forEach((doc) => {
+               let careerCenter = doc.data();
+               careerCenter.id = doc.id;
+               if (!userData.groupIds?.includes(careerCenter.id)) {
+                  careerCenters.push(careerCenter);
+               }
             });
-            return () => unsubscribe();
-        }
-    }, [userData]);
+            setGroups(careerCenters);
+         });
+         return () => unsubscribe();
+      }
+   }, [userData]);
 
-    if (user === null || userData === null || loading === true) {
-        return <Loader/>;
-    }
+   if (user === null || userData === null || loading === true) {
+      return <Loader />;
+   }
 
-    return (
-        <GlobalBackground>
-            <Head>
-                <title key="title">CareerFairy | Join Groups</title>
-            </Head>
-            <Header classElement="relative white-background"/>
-            <Container>
-                <Groups userData={userData} groups={groups}/>
+   return (
+      <>
+         <Head>
+            <title key="title">CareerFairy | Join Groups</title>
+         </Head>
+         <GeneralLayout>
+            <Container
+               style={{
+                  marginTop: "2rem",
+                  minHeight: "60vh",
+               }}
+            >
+               <Groups userData={userData} groups={groups} />
             </Container>
-            <Footer/>
-        </GlobalBackground>
-    );
+         </GeneralLayout>
+      </>
+   );
 };
 
 export default withFirebase(JoinGroup);

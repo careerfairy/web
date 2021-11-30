@@ -1,70 +1,33 @@
-import PropTypes from 'prop-types'
-import React, {useState} from 'react';
-import {makeStyles} from '@material-ui/core/styles';
-import {withFirebase} from "../../context/firebase";
-import {useSelector} from "react-redux";
-import styles from "../../materialUI/styles/groupDashboardStyles";
-import useGeneralLinks from "../../components/custom-hook/useGeneralLinks";
-import TopBar from "../../components/views/header/TopBar";
-import SideBar from "../../components/views/header/SideBar";
-import Footer from "../../components/views/footer/Footer";
+import React from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import TopBar from "./TopBar";
+import NavBar from "./NavBar";
+import styles from "../../materialUI/styles/layoutStyles/generalLayoutStyles";
+import FooterV2 from "../../components/views/footer/FooterV2";
 
 const useStyles = makeStyles(styles);
-const useWrapperStyles = makeStyles(theme => ({
-    root: {
-        display: 'flex',
-        flex: '1 1 auto',
-        overflow: 'hidden',
-        paddingTop: 64,
-        [theme.breakpoints.down('xs')]: {
-            paddingTop: 56
-        },
-    },
-}))
 
-const GeneralLayout = (props) => {
-    const {children} = props
-    const classes = useStyles();
-    const wrapperClasses = useWrapperStyles();
-    const [isMobileNavOpen, setMobileNavOpen] = useState(false);
-    const notifications = useSelector(({firestore}) => firestore.ordered.notifications || [])
-    const {mainLinks, secondaryLinks} = useGeneralLinks()
+const drawerWidth = 300;
+const GeneralLayout = ({ children, fullScreen }) => {
+   const classes = useStyles();
 
-
-    return (
-        <div className={classes.root}>
-            <TopBar
-                links={mainLinks}
-                notifications={notifications}
-                onMobileNavOpen={() => setMobileNavOpen(true)}
-            />
-            <SideBar
-                drawerTopLinks={mainLinks}
-                drawerBottomLinks={secondaryLinks}
-                headerLinks={mainLinks}
-                onMobileClose={() => setMobileNavOpen(false)}
-                openMobile={isMobileNavOpen}
-            />
-            <div className={wrapperClasses.root}>
-                <div className={classes.contentContainer}>
-                    <div className={classes.content}>
-                        {React.Children.map(children, child => React.cloneElement(child, {
-                            notifications,
-                            ...props
-                        }))}
-                        <Footer/>
-                    </div>
-                </div>
+   return (
+      <div
+         style={{ minHeight: fullScreen && "100vh" }}
+         className={classes.root}
+      >
+         <TopBar />
+         <NavBar drawerWidth={drawerWidth} />
+         <div className={classes.wrapper}>
+            <div className={classes.contentContainer}>
+               <div className={classes.content}>
+                  {children}
+                  <FooterV2 />
+               </div>
             </div>
-        </div>
-    );
+         </div>
+      </div>
+   );
 };
 
-
-GeneralLayout.propTypes = {
-    children: PropTypes.node.isRequired,
-    firebase: PropTypes.object,
-}
-
-GeneralLayout.defaultProps = {}
-export default withFirebase(GeneralLayout);
+export default GeneralLayout;

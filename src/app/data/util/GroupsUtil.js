@@ -1,46 +1,90 @@
 export default class GroupsUtil {
+   static getGroupCategoryName(categoryId, group) {
+      let searchForCategory = group.categories.find(
+         (category) => category.id === categoryId
+      );
+      return searchForCategory.name;
+   }
 
-    static getGroupCategoryName(categoryId, group) {
-        let searchForCategory = group.categories.find( category => category.id === categoryId);
-        return searchForCategory.name;
-    }
+   static getGroupCategoryOptionName(categoryId, optionId, group) {
+      let searchForCategory = group.categories.find(
+         (category) => category.id === categoryId
+      );
+      let searchForOption = searchForCategory.options.find(
+         (option) => option.id === optionId
+      );
+      return searchForOption.name;
+   }
 
-    static getGroupCategoryOptionName(categoryId, optionId, group) {
-        let searchForCategory = group.categories.find( category => category.id === categoryId);
-        let searchForOption = searchForCategory.options.find( option => option.id === optionId);
-        return searchForOption.name;
-    }
+   static filterCurrentGroup = (currentGroup, targetGroupId) => {
+      // If there is no target groupId it means we dont need to hide other groups so return everything/true
+      if (!targetGroupId) return true;
 
-    static handleFlattenOptions = (group) => {
-        let optionsArray = []
-        if (group.categories && group.categories.length) {
-            group.categories.forEach(category => {
-                if (category.options && category.options.length) {
-                    category.options.forEach(option => optionsArray.push(option))
-                }
-            })
-        }
-        return optionsArray
-    }
+      // If there is a target group, we only want to return the target group
+      return currentGroup?.groupId === targetGroupId;
+   };
 
-    static getPolicyStatus = async (groups, userEmail, firebase) => {
-        let hasAgreedToAll = true
-        const updatedGroups = await Promise.all(groups.map(async group => {
-            let needsToAgree = false
-            if (group.privacyPolicyActive) {
-                needsToAgree = await firebase.checkIfUserAgreedToGroupPolicy(group.id, userEmail)
-                if (hasAgreedToAll && needsToAgree) {
-                    hasAgreedToAll = false
-                }
+   static handleFlattenOptions = (group) => {
+      let optionsArray = [];
+      if (group.categories && group.categories.length) {
+         group.categories.forEach((category) => {
+            if (category.options && category.options.length) {
+               category.options.forEach((option) => optionsArray.push(option));
             }
-            return ({
-                ...group,
-                needsToAgree
-            })
-        }))
+         });
+      }
+      return optionsArray;
+   };
 
-        const groupsWithPolicies = updatedGroups.filter(group => group.needsToAgree)
+   static checkIfUserFollows = ({ authenticatedUser, userData }, group) => {
+      if (
+         authenticatedUser.isLoaded &&
+         !authenticatedUser.isEmpty &&
+         userData &&
+         userData.groupIds
+      ) {
+         const { id } = group;
+         return userData.groupIds.includes(id);
+      } else {
+         return false;
+      }
+   };
 
-        return {hasAgreedToAll, groupsWithPolicies}
-    }
+   static getUniqueGroupsFromArrayOfGroups = (groups = []) => {
+      return groups.filter(function (el) {
+         if (!this[el.groupId]) {
+            this[el.groupId] = true;
+            return true;
+         }
+         return false;
+      }, Object.create(null));
+   };
+
+   static getPolicyStatus = async (groups, userEmail, firebase) => {
+      let hasAgreedToAll = true;
+      const updatedGroups = await Promise.all(
+         groups.map(async (group) => {
+            let needsToAgree = false;
+            if (group.privacyPolicyActive) {
+               needsToAgree = await firebase.checkIfUserAgreedToGroupPolicy(
+                  group.id,
+                  userEmail
+               );
+               if (hasAgreedToAll && needsToAgree) {
+                  hasAgreedToAll = false;
+               }
+            }
+            return {
+               ...group,
+               needsToAgree,
+            };
+         })
+      );
+
+      const groupsWithPolicies = updatedGroups.filter(
+         (group) => group.needsToAgree
+      );
+
+      return { hasAgreedToAll, groupsWithPolicies };
+   };
 }
