@@ -40,6 +40,7 @@ import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
 import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
 import AllInboxIcon from "@material-ui/icons/AllInbox";
 import AlternateEmailIcon from "@material-ui/icons/AlternateEmail";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Linkify from "react-linkify";
 
 export const tableIcons = {
@@ -128,6 +129,9 @@ export const tableIcons = {
    )),
    AlternateEmailIcon: forwardRef((props, ref) => (
       <AlternateEmailIcon {...props} ref={ref} />
+   )),
+   MoreVertIcon: forwardRef((props, ref) => (
+      <MoreVertIcon {...props} ref={ref} />
    )),
 };
 

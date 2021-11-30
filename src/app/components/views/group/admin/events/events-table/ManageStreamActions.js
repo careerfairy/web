@@ -51,20 +51,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 const ManageStreamActions = ({
    actions,
-   isHighlighted,
    isDraft,
    setTargetStream,
    rowData,
    numberOfRegisteredUsers,
+   clicked,
 }) => {
    const classes = useStyles();
    const [open, setOpen] = useState(false);
 
    useEffect(() => {
-      if (isHighlighted) {
+      if (clicked) {
          handleOpen();
+      } else if (!clicked) {
+         handleClose();
       }
-   }, [isHighlighted]);
+   }, [clicked]);
 
    const handleOpen = () => {
       setTargetStream(rowData);
@@ -115,8 +117,8 @@ const ManageStreamActions = ({
                />
             }
          >
-            <div className={showRegisteredUsersInfo && classes.btnLabel}>
-               <div className={showRegisteredUsersInfo && classes.btnTitle}>
+            <div className={showRegisteredUsersInfo ? classes.btnLabel : ""}>
+               <div className={showRegisteredUsersInfo ? classes.btnTitle : ""}>
                   {open ? "Show Less" : "Manage stream"}
                </div>
                {showRegisteredUsersInfo && (

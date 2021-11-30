@@ -5,7 +5,7 @@ import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import NextIcon from "@material-ui/icons/NavigateNextRounded";
 import PrevIcon from "@material-ui/icons/NavigateBeforeRounded";
-import { Box, Fab } from "@material-ui/core";
+import { Box, Fab, Grow } from "@material-ui/core";
 import UpcomingLivestreamCard from "../../../common/stream-cards/UpcomingLivestreamCard";
 
 const useStyles = makeStyles((theme) => ({
@@ -123,14 +123,20 @@ const UpcomingLivestreamsCarousel = ({
    return (
       <div className={classes.root}>
          <Slider {...settings}>
-            {upcomingStreams.map((livestream) => (
-               <Box key={livestream.id} p={2}>
-                  <UpcomingLivestreamCard
-                     key={livestream.id}
-                     handleOpenJoinModal={handleOpenJoinModal}
-                     livestream={livestream}
-                  />
-               </Box>
+            {upcomingStreams.map((livestream, index) => (
+               <Grow
+                  in
+                  key={livestream.id}
+                  style={{ transformOrigin: "0 0 0" }}
+                  timeout={index + 1 * 600}
+               >
+                  <Box key={livestream.id} p={2}>
+                     <UpcomingLivestreamCard
+                        handleOpenJoinModal={handleOpenJoinModal}
+                        livestream={livestream}
+                     />
+                  </Box>
+               </Grow>
             ))}
          </Slider>
       </div>

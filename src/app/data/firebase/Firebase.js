@@ -3053,6 +3053,18 @@ class Firebase {
       };
    };
 
+   getEventsWithArrayOfIds = async (arrayOfIds = []) => {
+      const eventSnaps = await Promise.all(
+         arrayOfIds.map((eventId) =>
+            this.firestore.collection("livestreams").doc(eventId).get()
+         )
+      );
+
+      return eventSnaps
+         .filter((doc) => doc.exists)
+         .map((doc) => ({ id: doc.id, ...doc.data() }));
+   };
+
    getUsersByIdsWithCache = async (arrayOfUserIds = []) => {
       const getOptions = {
          source: "cache",

@@ -56,21 +56,15 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const GroupLogos = ({ groupsDictionary, groupIds }) => {
-   const [groupLogosExpanded, setGroupLogosExpanded] = useState(false);
+const GroupLogos = ({ groupsDictionary, groupIds, clicked }) => {
    const classes = useStyles();
-
-   const handleToggleExpand = useCallback(
-      () => setGroupLogosExpanded((prevState) => !prevState),
-      []
-   );
 
    return (
       <Box maxWidth={200} position="relative">
          {!!groupIds.length && (
             <>
                <Box display="flex" justifyContent="space-between">
-                  <AvatarGroup onClick={handleToggleExpand} max={3}>
+                  <AvatarGroup max={3}>
                      {groupIds.map((groupId) => {
                         const groupData = groupsDictionary[groupId];
                         return groupData ? (
@@ -90,18 +84,17 @@ const GroupLogos = ({ groupsDictionary, groupIds }) => {
                   <Box>
                      <IconButton
                         className={clsx(classes.expand, {
-                           [classes.expandOpen]: groupLogosExpanded,
+                           [classes.expandOpen]: clicked,
                         })}
-                        onClick={handleToggleExpand}
-                        aria-expanded={groupLogosExpanded}
+                        aria-expanded={clicked}
                         aria-label="show more"
                      >
                         <ExpandMoreIcon />
                      </IconButton>
                   </Box>
                </Box>
-               {groupLogosExpanded && <Divider />}
-               <Collapse in={groupLogosExpanded}>
+               {clicked && <Divider />}
+               <Collapse in={clicked}>
                   <Box dense component={List}>
                      {groupIds.map((groupId) => {
                         const groupData = groupsDictionary[groupId];

@@ -30,6 +30,8 @@ import * as storeActions from "store/actions";
 import ManageStreamActions from "./ManageStreamActions";
 import ToolbarDialogAction from "./ToolbarDialogAction";
 import { useRouter } from "next/router";
+import MoreOptionsMenu from "./MoreOptionsMenu";
+import ManageEndOfEventDialog from "./ManageEndOfEventDialog";
 
 const EventsTable = ({
    streams,
@@ -44,6 +46,7 @@ const EventsTable = ({
    groupsDictionary,
    eventId,
 }) => {
+   const [clickedRows, setClickedRows] = useState({});
    const firebase = useFirebase();
    const theme = useTheme();
    const { pathname, push, query } = useRouter();
@@ -53,6 +56,7 @@ const EventsTable = ({
    const [toolbarActionsDialogOpen, setToolbarActionsDialogOpen] = useState(
       false
    );
+   const [endOfEventDialogData, setEndOfEventDialogData] = useState(null);
 
    const {
       talentPoolAction,
@@ -75,6 +79,12 @@ const EventsTable = ({
       targetLivestreamStreamerLinksId,
       setTargetLivestreamStreamerLinksId,
    ] = useState("");
+
+   useEffect(() => {
+      if (eventId) {
+         handleRowClick(_, { id: eventId });
+      }
+   }, [eventId]);
 
    useEffect(() => {
       firebase.getAllCareerCenters().then((querySnapshot) => {
@@ -113,6 +123,13 @@ const EventsTable = ({
          handleGetGroups();
       }
    }, [streams]);
+
+   const handleCloseEndOfEventDialog = () => {
+      setEndOfEventDialogData(null);
+   };
+   const handleOpenEndOfEventDialog = ({ rowData }) => {
+      setEndOfEventDialogData(rowData);
+   };
 
    const handleSpeakerSearch = useCallback(
       (term, rowData) =>
@@ -276,6 +293,16 @@ const EventsTable = ({
             onClick: handleOpenToolbarActionsDialog,
             tooltip: "Other options",
          },
+         (rowData) => ({
+            icon: () => (
+               <MoreOptionsMenu
+                  handleOpenEndOfEventDialog={handleOpenEndOfEventDialog}
+                  rowData={rowData}
+               />
+            ),
+            tooltip: "More options",
+            onClick: (event) => event.stopPropagation(),
+         }),
       ],
       [streams]
    );
@@ -299,13 +326,16 @@ const EventsTable = ({
             customFilterAndSearch: handleCompanySearch,
             render: (rowData) => (
                <CompanyLogo
-                  onClick={() => handleEditStream(rowData)}
+                  onClick={(event) => {
+                     event.stopPropagation();
+                     handleEditStream(rowData);
+                  }}
                   livestream={rowData}
                />
             ),
          },
          {
-            title: "Options",
+            title: "Manage",
             description: "Title of the event",
             render: (rowData) => (
                <ManageStreamActions
@@ -314,8 +344,8 @@ const EventsTable = ({
                      registeredStudentsFromGroupDictionary?.[rowData?.id]
                         ?.length
                   }
+                  clicked={Boolean(clickedRows[rowData?.id])}
                   isDraft={isDraft}
-                  isHighlighted={rowData?.id === eventId}
                   setTargetStream={setTargetStream}
                   actions={manageStreamActions(rowData)}
                />
@@ -341,7 +371,12 @@ const EventsTable = ({
          {
             title: "Speakers",
             render: (rowData) => {
-               return <Speakers speakers={rowData.speakers} />;
+               return (
+                  <Speakers
+                     clicked={Boolean(clickedRows[rowData?.id])}
+                     speakers={rowData.speakers}
+                  />
+               );
             },
             customFilterAndSearch: handleSpeakerSearch,
          },
@@ -351,6 +386,7 @@ const EventsTable = ({
                return (
                   <GroupLogos
                      groupIds={rowData.groupIds}
+                     clicked={Boolean(clickedRows[rowData?.id])}
                      groupsDictionary={groupsDictionary}
                   />
                );
@@ -363,17 +399,17 @@ const EventsTable = ({
          streams,
          groupsDictionary,
          handleHostsSearch,
-         eventId,
          handleEditStream,
          manageStreamActions,
          registeredStudentsFromGroupDictionary,
+         clickedRows,
       ]
    );
 
    const customOptions = useMemo(
       () => ({
          ...defaultTableOptions,
-         actionsColumnIndex: 1,
+         actionsColumnIndex: -1,
          selection: false,
          pageSize: 5,
          actionsCellStyle: {},
@@ -402,6 +438,14 @@ const EventsTable = ({
       }
    };
 
+   const handleRowClick = (event, rowData) => {
+      setClickedRows((prevState) => {
+         const newClickedRows = { ...prevState };
+         newClickedRows[rowData.id] = !Boolean(newClickedRows[rowData.id]);
+         return newClickedRows;
+      });
+   };
+
    return (
       <>
          <Box onClick={handleRemoveEventId}>
@@ -418,6 +462,7 @@ const EventsTable = ({
                      );
                   },
                }}
+               onRowClick={handleRowClick}
                options={customOptions}
                title={null}
                icons={tableIcons}
@@ -447,6 +492,12 @@ const EventsTable = ({
             onClose={handleCloseToolbarActionsDialog}
             openDialog={toolbarActionsDialogOpen}
             handleOpenNewStreamModal={handleOpenNewStreamModal}
+         />
+         <ManageEndOfEventDialog
+            open={Boolean(endOfEventDialogData)}
+            eventData={endOfEventDialogData}
+            group={group}
+            handleClose={handleCloseEndOfEventDialog}
          />
       </>
    );
