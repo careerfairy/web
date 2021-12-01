@@ -23,7 +23,13 @@ const RegistrationModal = ({
 
    return (
       <div className={classes.root}>
-         <Dialog open={open} onClose={onClose}>
+         <Dialog
+            maxWidth="sm"
+            fullWidth
+            scroll="body"
+            open={open}
+            onClose={onClose}
+         >
             <RegistrationContextProvider
                closeModal={onClose}
                livestream={livestream}

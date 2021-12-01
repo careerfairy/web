@@ -65,9 +65,12 @@ export function RegistrationContextProvider({
       checkIfUserAgreedToGroupPolicy,
       registerToLivestream,
       sendRegistrationConfirmationEmail,
+      deregisterFromLivestream,
    } = useFirebase();
    const {
       query: { referrerId },
+      asPath,
+      push,
    } = useRouter();
    const { authenticatedUser, userData } = useAuth();
    const [
@@ -125,7 +128,6 @@ export function RegistrationContextProvider({
 
    useEffect(() => {
       const newAlreadyJoined = Boolean(userData.groupIds?.includes(group?.id));
-      console.log("-> newAlreadyJoined", newAlreadyJoined);
       setAlreadyJoined(newAlreadyJoined);
    }, [group, userData]);
 
@@ -173,7 +175,7 @@ export function RegistrationContextProvider({
             alreadyJoined,
          }}
       >
-         <div className="registration-step-form">{children}</div>
+         {children}
       </RegistrationContext.Provider>
    );
 }

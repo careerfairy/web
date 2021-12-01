@@ -19,8 +19,8 @@ const useStyles = makeStyles((theme) => ({
          background: theme.palette.primary.main,
       },
       "& .slick-dots button:before": {
-         // width: "0.5rem",
-         // height: "0.5rem",
+         width: "0.5rem",
+         height: "0.5rem",
          border: `1px solid ${theme.palette.primary.main}`,
          borderRadius: "100%",
          content: '""',
@@ -32,7 +32,6 @@ const UpcomingLivestreamsCarousel = ({
    upcomingStreams,
    handleOpenJoinModal,
    additionalSettings,
-   allowRegister,
 }) => {
    const classes = useStyles();
 
@@ -86,7 +85,6 @@ const UpcomingLivestreamsCarousel = ({
                   <UpcomingLivestreamCard
                      handleOpenJoinModal={handleOpenJoinModal}
                      livestream={livestream}
-                     allowRegister={allowRegister}
                   />
                </Box>
             ))}

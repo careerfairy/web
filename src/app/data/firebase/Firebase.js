@@ -3065,6 +3065,13 @@ class Firebase {
          .map((doc) => ({ id: doc.id, ...doc.data() }));
    };
 
+   listenToRecommendedEvents = (recommendedEventIds, callback) => {
+      const ref = this.firestore
+         .collection("livestreams")
+         .where("id", "in", recommendedEventIds || []);
+      return ref.onSnapshot(callback);
+   };
+
    getUsersByIdsWithCache = async (arrayOfUserIds = []) => {
       const getOptions = {
          source: "cache",

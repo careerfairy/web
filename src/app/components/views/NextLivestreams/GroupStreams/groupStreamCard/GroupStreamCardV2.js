@@ -538,9 +538,6 @@ const GroupStreamCardV2 = memo(
       };
 
       const checkIfRegistered = () => {
-         if (isAdmin) {
-            return false;
-         }
          return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1);
       };
 
@@ -601,7 +598,7 @@ const GroupStreamCardV2 = memo(
                livestream.maxRegistrants - livestream.registeredUsers.length
             );
          }
-      });
+      }, [livestream?.maxRegistrants, livestream.registeredUsers?.length]);
 
       return (
          <Fragment>
@@ -704,18 +701,17 @@ const GroupStreamCardV2 = memo(
                               livestream={livestream}
                            />
 
-                           {!isPastLivestreams &&
-                              !(livestream.openStream === true) && (
-                                 <AttendButton
-                                    size="small"
-                                    mobile={mobile}
-                                    disabled={registrationDisabled}
-                                    attendButtonLabel={mainButtonLabel}
-                                    handleRegisterClick={handleRegisterClick}
-                                    checkIfRegistered={checkIfRegistered}
-                                    user={user}
-                                 />
-                              )}
+                           {!isPastLivestreams && !livestream.openStream && (
+                              <AttendButton
+                                 size="small"
+                                 mobile={mobile}
+                                 disabled={registrationDisabled}
+                                 attendButtonLabel={mainButtonLabel}
+                                 handleRegisterClick={handleRegisterClick}
+                                 checkIfRegistered={checkIfRegistered}
+                                 user={user}
+                              />
+                           )}
                            <Grow in={Boolean(userIsRegistered())}>
                               <div className={classes.bookedIcon}>
                                  <CheckCircleRoundedIcon />

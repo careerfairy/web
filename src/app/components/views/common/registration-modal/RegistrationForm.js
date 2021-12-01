@@ -31,22 +31,18 @@ const RegistrationForm = () => {
             <div>congrats step</div>
          ) : (
             <>
-               <Box sx={{ my: 5 }}>
-                  <Typography variant="h4" align="center">
-                     {labels[activeStep]}
-                  </Typography>
-                  <Typography variant="subtitle2" align="center" sx={{ mt: 2 }}>
-                     React Material UI multi step form with basic form
-                     validation logic.
-                  </Typography>
-               </Box>
-               <Stepper activeStep={activeStep} sx={{ py: 3 }} alternativeLabel>
-                  {labels.map((label) => (
-                     <Step key={label}>
-                        <StepLabel>{label}</StepLabel>
-                     </Step>
-                  ))}
-               </Stepper>
+               {/*<Box sx={{ my: 5 }}>*/}
+               {/*   <Typography variant="h4" align="center">*/}
+               {/*      {labels[activeStep]}*/}
+               {/*   </Typography>*/}
+               {/*</Box>*/}
+               {/*<Stepper activeStep={activeStep} sx={{ py: 3 }} alternativeLabel>*/}
+               {/*   {labels.map((label) => (*/}
+               {/*      <Step key={label}>*/}
+               {/*         <StepLabel>{label}</StepLabel>*/}
+               {/*      </Step>*/}
+               {/*   ))}*/}
+               {/*</Stepper>*/}
 
                {handleSteps(activeStep)}
             </>

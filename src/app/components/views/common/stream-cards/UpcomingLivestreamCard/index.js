@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
    Avatar,
    Box,
    Button,
+   ButtonGroup,
    Collapse,
    Paper,
    Typography,
@@ -22,8 +23,8 @@ import LowerMainContent from "./LowerMainContent";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import { speakerPlaceholder } from "../../../../util/constants";
 import UserUtil from "../../../../../data/util/UserUtil";
-import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import { useRouter } from "next/router";
+import { FORTY_FIVE_MINUTES_IN_MILLISECONDS } from "../../../../../data/constants/streamContants";
 
 const useStyles = makeStyles((theme) => {
    const backgroundImageHeight = 200;
@@ -183,20 +184,22 @@ const useStyles = makeStyles((theme) => {
             fontSize: "1rem",
          },
       },
+      buttonGroup: {
+         // padding: theme.spacing(1.5, 6),
+      },
       button: {
          borderRadius: cardBorderRadius,
-         padding: theme.spacing(1.5, 6),
          textDecoration: "none !important",
       },
    };
 });
 
+const fortyFiveMinutesAgo = new Date(
+   Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS
+);
+
 const throttle_speed = 50;
-const UpcomingLivestreamCard = ({
-   livestream,
-   handleOpenJoinModal,
-   allowRegister,
-}) => {
+const UpcomingLivestreamCard = ({ livestream, handleOpenJoinModal }) => {
    const [hovered, setHovered] = useState(false);
    const classes = useStyles();
    const { push, asPath } = useRouter();
@@ -207,7 +210,10 @@ const UpcomingLivestreamCard = ({
    const handleMouseEnter = debounce(() => setHovered(true), throttle_speed);
    const handleMouseLeave = debounce(() => setHovered(false), throttle_speed);
 
-   const { getFollowingGroupsWithCache } = useFirebase();
+   const {
+      getFollowingGroupsWithCache,
+      deregisterFromLivestream,
+   } = useFirebase();
 
    useEffect(() => {
       (async function () {
@@ -245,6 +251,68 @@ const UpcomingLivestreamCard = ({
       }
    }, [livestream.speakers]);
 
+   const status = useMemo(() => {
+      const hasRegistered = Boolean(
+         livestream.registeredUsers.includes(authenticatedUser.email)
+      );
+      let mainButtonLabel = "Join";
+      let registrationDisabled = false;
+      let numberOfSpotsRemaining =
+         livestream.maxRegistrants - livestream.registeredUsers.length;
+      const isPastLivestream =
+         livestream.start?.toDate?.() <= fortyFiveMinutesAgo;
+
+      if (hasRegistered) {
+         mainButtonLabel = "Cancel";
+      } else if (
+         livestream.maxRegistrants &&
+         livestream.maxRegistrants > 0 &&
+         livestream.registeredUsers &&
+         livestream.maxRegistrants <= livestream.registeredUsers.length
+      ) {
+         mainButtonLabel = "full";
+      } else if (authenticatedUser) {
+         mainButtonLabel = "attend";
+      }
+
+      if (isPastLivestream) {
+         registrationDisabled = true;
+      } else if (hasRegistered) {
+         registrationDisabled = false;
+      } else if (livestream?.maxRegistrants && livestream?.maxRegistrants > 0) {
+         registrationDisabled = livestream.registeredUsers
+            ? livestream.maxRegistrants <= livestream.registeredUsers.length
+            : false;
+      }
+
+      if (!livestream.maxRegistrants) {
+         numberOfSpotsRemaining = 0;
+      } else if (!livestream.registeredUsers) {
+         numberOfSpotsRemaining = livestream.maxRegistrants;
+      }
+
+      return {
+         hasRegistered,
+         mainButtonLabel,
+         registrationDisabled,
+         numberOfSpotsRemaining,
+         isPastLivestream,
+      };
+   }, [
+      livestream.maxRegistrants,
+      livestream.start,
+      livestream.registeredUsers,
+      authenticatedUser.email,
+   ]);
+
+   const handleRegisterClick = () => {
+      if (status.hasRegistered) {
+         return deregister();
+      } else {
+         return startRegistrationProcess();
+      }
+   };
+
    const startRegistrationProcess = async () => {
       if (
          (authenticatedUser.isLoaded && authenticatedUser.isEmpty) ||
@@ -264,6 +332,24 @@ const UpcomingLivestreamCard = ({
          });
       }
       handleOpenJoinModal({ groups, livestream });
+   };
+
+   const deregister = async () => {
+      try {
+         if (authenticatedUser.isLoaded && authenticatedUser.isEmpty) {
+            return push({
+               pathname: "/login",
+               query: {
+                  absolutePath: asPath,
+               },
+            });
+         }
+
+         return await deregisterFromLivestream(
+            livestream?.id,
+            authenticatedUser.email
+         );
+      } catch (e) {}
    };
 
    return (
@@ -330,30 +416,40 @@ const UpcomingLivestreamCard = ({
                      {DateUtil.getStreamTime(livestream.start.toDate())}
                   </Typography>
                   <Box mt={2}>
-                     {allowRegister ? (
+                     <ButtonGroup
+                        variant="text"
+                        color="primary"
+                        fullWidth
+                        className={classes.buttonGroup}
+                        aria-label="text primary button group"
+                     >
+                        {(!status.isPastLivestream ||
+                           !livestream.openStream) && (
+                           <Button
+                              color={
+                                 status.hasRegistered ? "default" : "primary"
+                              }
+                              onClick={handleRegisterClick}
+                              size="large"
+                              variant={"contained"}
+                              className={classes.button}
+                           >
+                              {status.hasRegistered
+                                 ? "Cancel"
+                                 : status.mainButtonLabel}
+                           </Button>
+                        )}
                         <Button
                            color="primary"
-                           fullWidth
-                           onClick={startRegistrationProcess}
-                           size="large"
-                           variant="contained"
-                           className={classes.button}
-                        >
-                           Register Now
-                        </Button>
-                     ) : (
-                        <Button
-                           color="primary"
-                           fullWidth
                            size="large"
                            component={Link}
                            href={`/upcoming-livestream/${livestream.id}`}
                            variant="outlined"
                            className={classes.button}
                         >
-                           Learn More
+                           More
                         </Button>
-                     )}
+                     </ButtonGroup>
                   </Box>
                </Box>
             </Box>

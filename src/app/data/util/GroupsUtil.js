@@ -92,7 +92,8 @@ export default class GroupsUtil {
       return { hasAgreedToAll, groupsWithPolicies };
    };
 
-   static userDoesNotFollowAnyGroup = (userData, livestream) => {
+   static userNeedsToFollowAGroup = (userData, livestream) => {
+      if (!livestream.groupIds?.length) return false;
       if (userData.groupIds && livestream.groupIds) {
          // are you following any group thats part of this livstream?
          return userData.groupIds.some(

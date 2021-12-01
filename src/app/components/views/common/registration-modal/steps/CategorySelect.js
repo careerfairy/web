@@ -134,16 +134,15 @@ const CategorySelect = () => {
             [...new Set(arrayOfGroupIds)],
             arrayOfGroupObjects
          );
-         setSubmitting(false);
          if (livestream) {
-            completeRegistrationProcess();
+            await completeRegistrationProcess();
          } else {
             closeModal();
          }
       } catch (e) {
          console.log("error in handle join", e);
-         setSubmitting(false);
       }
+      setSubmitting(false);
    };
 
    const renderCategories = categories.map((category, index) => {

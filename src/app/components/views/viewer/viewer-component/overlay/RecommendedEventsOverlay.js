@@ -33,25 +33,25 @@ const useStyles = makeStyles((theme) => ({
 }));
 const RecommendedEventsOverlay = ({ recommendedEventIds, mobile }) => {
    const classes = useStyles();
-   const { userData } = useAuth();
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
    const handleOpenJoinModal = (groupData) => setJoinGroupModalData(groupData);
-   const { getEventsWithArrayOfIds } = useFirebase();
+   const { listenToRecommendedEvents } = useFirebase();
    const [recommendedEvents, setRecommendedEvents] = useState([]);
 
    useEffect(() => {
       if (recommendedEventIds?.length) {
-         (async function () {
-            try {
-               const newRecommendedEvents = await getEventsWithArrayOfIds(
-                  recommendedEventIds
-               );
+         const unsubscribe = listenToRecommendedEvents(
+            recommendedEventIds,
+            (querySnapshot) => {
+               const newRecommendedEvents = querySnapshot.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+               }));
                setRecommendedEvents(newRecommendedEvents);
-            } catch (e) {
-               console.error(e);
             }
-         })();
+         );
+         return () => unsubscribe();
       }
    }, [recommendedEventIds]);
 
@@ -99,7 +99,6 @@ const RecommendedEventsOverlay = ({ recommendedEventIds, mobile }) => {
                handleOpenJoinModal={handleOpenJoinModal}
                upcomingStreams={recommendedEvents}
                additionalSettings={additionalSettings}
-               allowRegister
             />
          </Container>
          <RegistrationModal
