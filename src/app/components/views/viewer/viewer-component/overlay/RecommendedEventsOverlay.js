@@ -6,6 +6,7 @@ import UpcomingLivestreamsCarousel from "../../../landing/UpcomingLivestreamsSec
 import { useAuth } from "HOCs/AuthProvider";
 import { getMaxSlides } from "util/CommonUtil";
 import GroupJoinToAttendModal from "../../../NextLivestreams/GroupStreams/GroupJoinToAttendModal";
+import RegistrationModal from "../../../common/registration-modal";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -38,7 +39,7 @@ const RecommendedEventsOverlay = ({ recommendedEventIds, mobile }) => {
    const handleOpenJoinModal = (groupData) => setJoinGroupModalData(groupData);
    const { getEventsWithArrayOfIds } = useFirebase();
    const [recommendedEvents, setRecommendedEvents] = useState([]);
-   console.log("-> recommendedEvents", recommendedEvents);
+
    useEffect(() => {
       if (recommendedEventIds?.length) {
          (async function () {
@@ -101,14 +102,21 @@ const RecommendedEventsOverlay = ({ recommendedEventIds, mobile }) => {
                allowRegister
             />
          </Container>
-         <GroupJoinToAttendModal
+         <RegistrationModal
             open={Boolean(joinGroupModalData)}
+            handleClose={handleCloseJoinModal}
+            withBooking
+            livestream={joinGroupModalData?.livestream}
             groups={joinGroupModalData?.groups}
-            groupsWithPolicies={joinGroupModalData?.groupsWithPolicies}
-            alreadyJoined={false}
-            userData={userData}
-            closeModal={handleCloseJoinModal}
          />
+         {/*<GroupJoinToAttendModal*/}
+         {/*   open={Boolean(joinGroupModalData)}*/}
+         {/*   groups={joinGroupModalData?.groups}*/}
+         {/*   groupsWithPolicies={joinGroupModalData?.groupsWithPolicies}*/}
+         {/*   alreadyJoined={false}*/}
+         {/*   userData={userData}*/}
+         {/*   closeModal={handleCloseJoinModal}*/}
+         {/*/>*/}
       </div>
    );
 };

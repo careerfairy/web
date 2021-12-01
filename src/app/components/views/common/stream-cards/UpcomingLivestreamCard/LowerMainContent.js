@@ -30,7 +30,11 @@ const LowerMainContent = ({
                         handleFollow={
                            following
                               ? null
-                              : () => handleOpenJoinModal({ groups: [group] })
+                              : () =>
+                                   handleOpenJoinModal({
+                                      groups: [group],
+                                      livestream,
+                                   })
                         }
                         group={group}
                      />

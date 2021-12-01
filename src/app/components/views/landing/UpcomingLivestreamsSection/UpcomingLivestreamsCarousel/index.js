@@ -15,16 +15,15 @@ const useStyles = makeStyles((theme) => ({
       [theme.breakpoints.down("md")]: {
          width: "100%",
       },
-   },
-   dotElements: {
-      "& li": {
-         width: "0.5rem",
-         height: "0.5rem",
+      "& .slick-dots li.slick-active button:before": {
+         background: theme.palette.primary.main,
+      },
+      "& .slick-dots button:before": {
+         // width: "0.5rem",
+         // height: "0.5rem",
          border: `1px solid ${theme.palette.primary.main}`,
          borderRadius: "100%",
-      },
-      "& .slick-active": {
-         background: theme.palette.primary.main,
+         content: '""',
       },
    },
 }));
@@ -46,22 +45,6 @@ const UpcomingLivestreamsCarousel = ({
       autoplaySpeed: 10000,
       dots: true,
       pauseOnHover: true,
-      appendDots: (dots) => (
-         <div
-            style={{
-               borderRadius: "10px",
-               padding: "10px",
-               position: "static",
-            }}
-         >
-            <ul
-               className={classes.dotElements}
-               style={{ margin: "0px", padding: 0 }}
-            >
-               {dots}
-            </ul>
-         </div>
-      ),
       slidesToShow: getMaxSlides(4, upcomingStreams.length),
       slidesToScroll: getMaxSlides(4, upcomingStreams.length),
       initialSlide: 0,

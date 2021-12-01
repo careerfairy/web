@@ -1,35 +1,31 @@
-import { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
-import CommonUtil, { getRandom } from "util/CommonUtil";
+import { getRandom } from "util/CommonUtil";
 import QuestionVotingBox from "components/views/question-voting-box/QuestionVotingBox";
 
 import Link from "next/link";
 
-import { useFirebase, withFirebase } from "context/firebase";
+import { useFirebase } from "context/firebase";
 import {
-   Box,
    Button,
    Dialog,
    DialogContent,
    Grid,
    TextField,
 } from "@material-ui/core";
-import CopyLinkField from "../CopyLinkField";
 import { getBaseUrl } from "../../../helperFunctions/HelperFunctions";
 import { useRouter } from "next/router";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 
-function BookingModal({
+const BookingModal = ({
    modalOpen,
    user,
    careerCenters,
    livestream,
    registration,
    setModalOpen,
-   setRegistration,
-   buttonAction,
-}) {
+}) => {
    const firebase = useFirebase();
    const [modalStep, setModalStep] = useState(0);
    const {
@@ -38,9 +34,6 @@ function BookingModal({
    const { userData } = useAuth();
 
    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
-   const [questionsAvailable, setQuestionsAvailable] = useState(false);
-   const [questionsVoted, setQuestionsVoted] = useState(false);
-   const [questionAsked, setQuestionAsked] = useState(false);
 
    const [newQuestionTitle, setNewQuestionTitle] = useState("");
 
@@ -69,30 +62,6 @@ function BookingModal({
          return () => unsubscribe();
       }
    }, [livestream]);
-
-   useEffect(() => {
-      if (upcomingQuestions.length > 3) {
-         setQuestionsAvailable(true);
-      }
-      let upvotedQuestions = upcomingQuestions.filter((question) => {
-         if (!question.emailOfVoters || !user) {
-            return false;
-         }
-         return question.emailOfVoters.indexOf(user.email) > -1;
-      });
-      if (upvotedQuestions.length > 1) {
-         setQuestionsVoted(true);
-      }
-      let authoredQuestions = upcomingQuestions.filter((question) => {
-         if (!user) {
-            return false;
-         }
-         return question.author === user.email;
-      });
-      if (authoredQuestions.length > 0) {
-         setQuestionAsked(true);
-      }
-   }, [upcomingQuestions]);
 
    function handleUrl() {
       return {
@@ -486,6 +455,6 @@ function BookingModal({
          `}</style>
       </Fragment>
    );
-}
+};
 
 export default BookingModal;

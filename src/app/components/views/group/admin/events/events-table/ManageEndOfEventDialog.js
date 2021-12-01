@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Content = ({ onClose, eventData, group }) => {
    const dispatch = useDispatch();
-   const [showOnlyLinkedEvents, setShowOnlyLinkedEvents] = useState(false);
+   const [showOnlyLinkedEvents, setShowOnlyLinkedEvents] = useState(true);
    const [updating, setUpdating] = useState(false);
    const [fetchingEvents, setFetchingEvents] = useState(false);
    const { getUpcomingLivestreams, updateLivestream } = useFirebase();

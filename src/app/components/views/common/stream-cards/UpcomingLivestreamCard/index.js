@@ -207,12 +207,7 @@ const UpcomingLivestreamCard = ({
    const handleMouseEnter = debounce(() => setHovered(true), throttle_speed);
    const handleMouseLeave = debounce(() => setHovered(false), throttle_speed);
 
-   const {
-      getFollowingGroupsWithCache,
-      registerToLivestream,
-      checkIfUserAgreedToGroupPolicy,
-      sendRegistrationConfirmationEmail,
-   } = useFirebase();
+   const { getFollowingGroupsWithCache } = useFirebase();
 
    useEffect(() => {
       (async function () {
@@ -268,37 +263,7 @@ const UpcomingLivestreamCard = ({
             pathname: "/profile",
          });
       }
-
-      const {
-         hasAgreedToAll,
-         groupsWithPolicies,
-      } = await GroupsUtil.getPolicyStatus(
-         groups,
-         authenticatedUser.email,
-         checkIfUserAgreedToGroupPolicy
-      );
-      if (!hasAgreedToAll) {
-         handleOpenJoinModal({ groups, groupsWithPolicies });
-      } else {
-         // If on next livestreams tab...
-         if (
-            GroupsUtil.userDoesNotFollowAnyGroup(userData, livestream) &&
-            livestream.groupIds?.length
-         ) {
-            handleOpenJoinModal({ groups });
-         } else {
-            await registerToLivestream(
-               livestream.id,
-               userData,
-               groupsWithPolicies
-            );
-            return await sendRegistrationConfirmationEmail(
-               authenticatedUser,
-               userData,
-               livestream
-            );
-         }
-      }
+      handleOpenJoinModal({ groups, livestream });
    };
 
    return (

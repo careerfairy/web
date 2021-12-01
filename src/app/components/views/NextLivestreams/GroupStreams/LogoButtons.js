@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { ButtonBase, Typography } from "@material-ui/core";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
+import { RegistrationContext } from "../../../../context/registration/RegistrationContext";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -74,8 +75,9 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const LogoButtons = ({ groups, setGroup }) => {
+const LogoButtons = () => {
    const classes = useStyles();
+   const { setGroup, groups } = useContext(RegistrationContext);
 
    const [hasMoreThanOneCompanyGroup, setHasMoreThanOneCompanyGroup] = useState(
       false

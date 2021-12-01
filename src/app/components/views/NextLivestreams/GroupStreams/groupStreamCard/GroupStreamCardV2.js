@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { Fragment, memo, useEffect, useMemo, useState } from "react";
-import { withFirebase } from "context/firebase";
+import { useFirebase } from "context/firebase";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import UserUtil from "../../../../../data/util/UserUtil";
 import { useRouter } from "next/router";
@@ -251,18 +251,17 @@ const GroupStreamCardV2 = memo(
       user,
       mobile,
       userData,
-      firebase,
       livestreamId,
       id,
       careerCenterId,
       groupData,
       listenToUpcoming,
       isTargetDraft,
-      setGlobalCardHighlighted,
       isPastLivestreams,
       globalCardHighlighted,
       isAdmin,
    }) => {
+      const firebase = useFirebase();
       const mediaStyles = useCoverCardMediaStyles();
       const classes = useStyles();
       const {
@@ -885,4 +884,4 @@ GroupStreamCardV2.propTypes = {
    isPastLivestreams: PropTypes.bool,
 };
 
-export default withFirebase(GroupStreamCardV2);
+export default GroupStreamCardV2;

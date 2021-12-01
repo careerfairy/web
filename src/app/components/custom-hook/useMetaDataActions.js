@@ -265,6 +265,7 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                      style={{
                         marginTop: theme.spacing(0.5),
                      }}
+                     onClick={(e) => e.stopPropagation()}
                      hintDescription={
                         "Download a CSV with the details of the students who opted to put themselves in the talent pool"
                      }
@@ -360,6 +361,7 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                   <ButtonWithHint
                      startIcon={<RegisteredUsersIcon color="action" />}
                      hintTitle={"Download Registered Users"}
+                     onClick={(e) => e.stopPropagation()}
                      style={{
                         marginTop: theme.spacing(0.5),
                      }}

@@ -1149,7 +1149,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                modalOpen={bookingModalOpen}
                setModalOpen={setBookingModalOpen}
                registration={registration}
-               setRegistration={(value) => setRegistration(value)}
                user={user}
             />
             ;

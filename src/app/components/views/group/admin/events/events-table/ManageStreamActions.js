@@ -145,7 +145,10 @@ const ManageStreamActions = ({
                         hintDescription={action.hintDescription}
                         startIcon={action.icon}
                         key={action.tooltip}
-                        onClick={action.onClick}
+                        onClick={(e) => {
+                           e.stopPropagation();
+                           action.onClick();
+                        }}
                         disabled={action.disabled}
                         fullWidth
                      >
