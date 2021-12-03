@@ -2204,7 +2204,7 @@ class Firebase {
    createHandRaiseRequest = (streamRef, userEmail, userData) => {
       let ref = streamRef.collection("handRaises").doc(userEmail);
       return ref.set({
-         state: "requested",
+         state: "acquire_media",
          timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
          name: userData.firstName + " " + userData.lastName,
       });

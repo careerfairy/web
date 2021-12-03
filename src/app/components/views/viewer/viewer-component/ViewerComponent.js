@@ -25,6 +25,7 @@ import useAgoraRtc from "components/custom-hook/useAgoraRtc";
 import useAgoraRtm from "components/custom-hook/useAgoraRtm";
 import StreamPublishingModal from "components/views/streaming/modal/StreamPublishingModal";
 import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay";
+import useHandRaiseState from "components/custom-hook/useHandRaiseState";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -74,8 +75,9 @@ function ViewerComponent({
    const [
       showLocalStreamPublishingModal,
       setShowLocalStreamPublishingModal,
-   ] = useState(true);
+   ] = useState(false);
    const { updateHandRaiseRequest } = useFirebase();
+   const [handRaiseState, updateRequest] = useHandRaiseState(streamerId);
    const streamRef = useStreamRef();
    const {
       query: { livestreamId },
@@ -94,9 +96,7 @@ function ViewerComponent({
       localMediaControls,
       remoteStreams,
       localMediaEnabling,
-      publishLocalCameraStream,
-      publishScreenShareStream,
-      unpublishScreenShareStream,
+      publishLocalStreamTracks,
    } = useAgoraRtc(streamerId, currentLivestream.id, handRaiseActive);
 
    const { agoraHandlers, createEmote } = useAgoraRtm(
@@ -137,6 +137,27 @@ function ViewerComponent({
          return () => clearTimeout(timout); // Cancel opening modal if streams appear before 3 seconds
       }
    }, [Boolean(remoteStreams?.length), isBreakout, hasActiveRooms]);
+
+   useEffect(() => {
+      if (
+         handRaiseActive &&
+         handRaiseState &&
+         handRaiseState.state === "connecting"
+      ) {
+         handleJoinAsHandRaiser();
+      }
+   }, [handRaiseState]);
+
+   useEffect(() => {
+      if (
+         !handRaiseActive ||
+         (handRaiseState &&
+            (handRaiseState.state === "unrequested" ||
+               handRaiseState.state === "denied"))
+      ) {
+         handleLeaveAsHandRaiser();
+      }
+   }, [handRaiseActive, handRaiseState]);
 
    const updateHandRaiseState = (newState) => {
       if (currentLivestream) {
@@ -197,21 +218,33 @@ function ViewerComponent({
       setShowLocalStreamPublishingModal(false);
    };
 
-   const handlePublishLocalStream = async () => {
+   const handleJoinAsHandRaiser = async () => {
       if (localStream.audioTrack && !localStream.isAudioPublished) {
          await publishLocalStreamTracks.publishLocalMicrophoneTrack();
       }
       if (localStream.videoTrack && !localStream.isVideoPublished) {
          await publishLocalStreamTracks.publishLocalCameraTrack();
       }
+      await updateHandRaiseState("connected");
       await dispatch(actions.setStreamerIsPublished(true));
-      setShowLocalStreamPublishingModal(false);
+   };
+
+   const handleLeaveAsHandRaiser = async () => {
+      if (localStream.audioTrack && localStream.isAudioPublished) {
+         await localMediaEnabling.closeLocalMicrophoneTrack();
+      }
+      if (localStream.videoTrack && localStream.isVideoPublished) {
+         await localMediaEnabling.closeLocalCameraTrack();
+      }
+      await publishLocalStreamTracks.returnToAudience();
+      await dispatch(actions.setStreamerIsPublished(false));
    };
 
    const handleJoinAsViewer = async () => {
       await localMediaEnabling.closeLocalCameraTrack();
       await localMediaEnabling.closeLocalMicrophoneTrack();
       await dispatch(actions.setStreamerIsPublished(false));
+      await updateHandRaiseState("unrequested");
       setShowLocalStreamPublishingModal(false);
    };
 

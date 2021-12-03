@@ -163,7 +163,13 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
             localStream.audioTrack.close();
          }
       }
-      setLocalStream(null);
+      setLocalStream((localStream) => ({
+         ...localStream,
+         isAudioPublished: false,
+         isVideoPublished: false,
+         videoTrack: null,
+         audioTrack: null,
+      }));
    };
 
    const setLocalAudioEnabled = (value) => {
@@ -267,9 +273,6 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
                if (localStream.isAudioPublished) {
                   let localStreamTracks = [localStream.audioTrack];
                   await primaryRtcClient.unpublish(localStreamTracks);
-                  if (primaryRtcClientHost) {
-                     await primaryRtcClient.setClientRole("audience");
-                  }
                }
                setLocalStream((localStream) => ({
                   ...localStream,
@@ -284,6 +287,12 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
             reject(error);
          }
       });
+   };
+
+   const returnToAudience = async () => {
+      if (primaryRtcClient) {
+         await primaryRtcClient.setClientRole("audience");
+      }
    };
 
    const publishScreenShareStream = async (
@@ -391,6 +400,7 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
       publishLocalStreamTracks: {
          publishLocalCameraTrack,
          publishLocalMicrophoneTrack,
+         returnToAudience,
       },
       publishScreenShareStream,
       unpublishScreenShareStream,

@@ -51,7 +51,7 @@ const HandRaiseViewerBanner = () => {
             subTitle: "Join the stream with your camera and microphone.",
             buttons: [
                {
-                  onClick: () => requestHandRaise(),
+                  onClick: () => updateRequest("acquire_media"),
                   buttonText: "Join now",
                },
             ],

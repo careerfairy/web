@@ -68,7 +68,7 @@ const HandRaiseCategory = ({
       }
    };
    const unRequestHandRaise = () => {
-      return updateHandRaiseRequest("requested");
+      return updateHandRaiseRequest("unrequested");
    };
    const startConnectingHandRaise = () => {
       return updateHandRaiseRequest("connecting");
