@@ -43,6 +43,14 @@ const useInfiniteScrollServer = ({ limit = 5, query }) => {
       setLoading(false);
    };
 
+   const handleClientUpdate = (docId, updateData) => {
+      setDocs((prevState) =>
+         prevState.map((doc) =>
+            doc.id === docId ? { ...doc, ...updateData } : doc
+         )
+      );
+   };
+
    // const handleScroll = () => {
    //    const bottom =
    //       Math.ceil(window.innerHeight + window.scrollY) >=
@@ -54,7 +62,13 @@ const useInfiniteScrollServer = ({ limit = 5, query }) => {
    //    }
    // };
 
-   return { getMore, hasMore: lastDoc !== undefined, docs, loading };
+   return {
+      getMore,
+      hasMore: lastDoc !== undefined,
+      docs,
+      loading,
+      handleClientUpdate,
+   };
 };
 
 export default useInfiniteScrollServer;
