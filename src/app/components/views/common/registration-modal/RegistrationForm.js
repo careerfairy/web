@@ -6,6 +6,7 @@ import React, { useContext } from "react";
 import { Box, Step, StepLabel, Stepper, Typography } from "@material-ui/core";
 import { RegistrationContext } from "context/registration/RegistrationContext";
 import CategorySelect from "./steps/CategorySelect";
+import QuestionUpvote from "./steps/QuestionUpvote";
 
 // Step titles
 const labels = ["Select your categories", "Add a Question", "Upvote questions"];
@@ -14,7 +15,7 @@ const handleSteps = (step) => {
       case 0:
          return <CategorySelect />;
       case 1:
-         return <div>questions step</div>;
+         return <QuestionUpvote />;
       case 2:
          return <div>upvote questions step</div>;
       default:

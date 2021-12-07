@@ -317,4 +317,31 @@ export default class StatsUtil {
       }
       return groupThatUserBelongsTo;
    }
+   static mapUserCategorySelection({ userData, group, alreadyJoined }) {
+      let mappedCategories = [];
+      if (group.categories) {
+         mappedCategories = group.categories.map((obj) => ({
+            ...obj,
+            selectedValueId: "",
+         }));
+         if (userData && alreadyJoined) {
+            const userCategories = userData.registeredGroups?.find(
+               (el) => el.groupId === group.id
+            )?.categories;
+            userCategories?.forEach((category) => {
+               mappedCategories?.forEach((groupCategory) => {
+                  const exists = groupCategory.options.some(
+                     (option) => option.id === category.selectedValueId
+                  );
+                  if (exists) {
+                     groupCategory.selectedValueId = category.selectedValueId;
+                     groupCategory.isNew = !exists;
+                  }
+               });
+            });
+         }
+
+         return mappedCategories;
+      }
+   }
 }

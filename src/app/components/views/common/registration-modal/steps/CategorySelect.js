@@ -4,7 +4,6 @@ import UserCategorySelector from "components/views/profile/UserCategorySelector"
 import {
    Box,
    Button,
-   CardMedia,
    CircularProgress,
    DialogActions,
    DialogContent,
@@ -17,21 +16,9 @@ import StatsUtil from "../../../../../data/util/StatsUtil";
 import LogoButtons from "../../../NextLivestreams/GroupStreams/LogoButtons";
 import { RegistrationContext } from "context/registration/RegistrationContext";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
+import GroupLogo from "../common/GroupLogo";
 
 const useStyles = makeStyles((theme) => ({
-   media: {
-      display: "flex",
-      justifyContent: "center",
-      padding: "1.5em 1em 1em 1em",
-      height: "120px",
-   },
-   image: {
-      objectFit: "contain",
-      maxWidth: "80%",
-      padding: theme.spacing(1),
-      borderRadius: theme.spacing(1),
-      background: theme.palette.common.white,
-   },
    actions: {
       display: "flex",
       flexFlow: "column",
@@ -56,34 +43,31 @@ const CategorySelect = () => {
    const [allSelected, setAllSelected] = useState(false);
    const [submitting, setSubmitting] = useState(false);
    const [localGroupsWithPolicies, setLocalGroupsWithPolicies] = useState([]);
-
    useEffect(() => {
       setLocalGroupsWithPolicies(groupsWithPolicies || []);
    }, [groupsWithPolicies]);
    useEffect(() => {
       if (group.categories) {
-         const groupCategories = group.categories.map((obj) => ({
-            ...obj,
-            selectedValueId: "",
-         }));
-         if (userData && alreadyJoined) {
-            const userCategories = userData.registeredGroups?.find(
-               (el) => el.groupId === group.id
-            )?.categories;
-            userCategories?.forEach((category) => {
-               groupCategories?.forEach((groupCategory) => {
-                  const exists = groupCategory.options.some(
-                     (option) => option.id === category.selectedValueId
-                  );
-                  if (exists) {
-                     groupCategory.selectedValueId = category.selectedValueId;
-                  }
-               });
-            });
-         }
-         setCategories(groupCategories);
+         const newCategories = StatsUtil.mapUserCategorySelection({
+            userData,
+            group,
+            alreadyJoined,
+         });
+         setCategories(newCategories);
       }
-   }, [group, alreadyJoined]);
+   }, [group, alreadyJoined, userData]);
+
+   useEffect(() => {
+      if (submitting) return;
+      if (group && categories.length) {
+         const hasAlreadySelectedAllCategories = categories.every(
+            (cat) => cat.isNew === false
+         );
+         if (hasAlreadySelectedAllCategories) {
+            completeRegistrationProcess();
+         }
+      }
+   }, [group, categories, submitting]);
 
    useEffect(() => {
       if (categories) {
@@ -95,10 +79,13 @@ const CategorySelect = () => {
    }, [categories]);
 
    const handleSetSelected = (categoryId, event) => {
-      const newCategories = [...categories];
-      const index = newCategories.findIndex((el) => el.id === categoryId);
-      newCategories[index].selectedValueId = event.target.value;
-      setCategories(newCategories);
+      setCategories((prevState) =>
+         prevState.map((category) =>
+            category.id === categoryId
+               ? { ...category, selectedValueId: event.target.value }
+               : category
+         )
+      );
    };
 
    const handleJoinGroup = async () => {
@@ -151,14 +138,7 @@ const CategorySelect = () => {
             <UserCategorySelector
                handleSetSelected={handleSetSelected}
                index={index}
-               isNew={
-                  alreadyJoined &&
-                  !StatsUtil.studentHasSelectedCategory(
-                     userData,
-                     group,
-                     category.id
-                  )
-               }
+               isNew={!category.selectedValueId}
                alreadyJoined={alreadyJoined}
                category={category}
             />
@@ -188,9 +168,7 @@ const CategorySelect = () => {
                      ? `${group.universityName} Would Like To Know More About You`
                      : "Join live streams from"}
                </DialogTitle>
-               <CardMedia className={classes.media}>
-                  <img src={group.logoUrl} className={classes.image} alt="" />
-               </CardMedia>
+               <GroupLogo logoUrl={group.logoUrl} />
                <DialogContent>
                   <DialogContentText align="center" noWrap>
                      {group.description}

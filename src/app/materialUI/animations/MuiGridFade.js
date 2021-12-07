@@ -2,8 +2,9 @@ import PropTypes from "prop-types";
 import React from "react";
 import Fade from "react-reveal/Fade";
 
-const MuiGridFade = ({ index, ...props }) => {
-   return <Fade up timeout={(index + 1) * 600} {...props} />;
+const MuiGridFade = ({ index, maxDelay = 3000, ...props }) => {
+   const delay = (index + 1) * 600;
+   return <Fade up timeout={delay <= maxDelay ? delay : maxDelay} {...props} />;
 };
 
 MuiGridFade.propTypes = {

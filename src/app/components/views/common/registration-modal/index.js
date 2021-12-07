@@ -26,7 +26,7 @@ const RegistrationModal = ({
          <Dialog
             maxWidth="sm"
             fullWidth
-            scroll="body"
+            scroll="paper"
             open={open}
             onClose={onClose}
          >

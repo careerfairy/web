@@ -15,6 +15,7 @@ export const RegistrationContext = createContext({
    handleBack() {},
    variant,
    margin,
+   livestream: null,
 });
 
 function reducer(state, action) {
