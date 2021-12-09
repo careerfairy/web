@@ -3,9 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useFirebase } from "context/firebase";
 import { Box, Container, Typography } from "@material-ui/core";
 import UpcomingLivestreamsCarousel from "../../../landing/UpcomingLivestreamsSection/UpcomingLivestreamsCarousel";
-import { useAuth } from "HOCs/AuthProvider";
 import { getMaxSlides } from "util/CommonUtil";
-import GroupJoinToAttendModal from "../../../NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import RegistrationModal from "../../../common/registration-modal";
 
 const useStyles = makeStyles((theme) => ({
@@ -35,7 +33,11 @@ const RecommendedEventsOverlay = ({ recommendedEventIds, mobile }) => {
    const classes = useStyles();
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
-   const handleOpenJoinModal = (groupData) => setJoinGroupModalData(groupData);
+   const handleOpenJoinModal = (dataObj) =>
+      setJoinGroupModalData({
+         groups: dataObj.groups,
+         livestream: dataObj.livestream,
+      });
    const { listenToRecommendedEvents } = useFirebase();
    const [recommendedEvents, setRecommendedEvents] = useState([]);
 
@@ -104,18 +106,9 @@ const RecommendedEventsOverlay = ({ recommendedEventIds, mobile }) => {
          <RegistrationModal
             open={Boolean(joinGroupModalData)}
             handleClose={handleCloseJoinModal}
-            withBooking
             livestream={joinGroupModalData?.livestream}
             groups={joinGroupModalData?.groups}
          />
-         {/*<GroupJoinToAttendModal*/}
-         {/*   open={Boolean(joinGroupModalData)}*/}
-         {/*   groups={joinGroupModalData?.groups}*/}
-         {/*   groupsWithPolicies={joinGroupModalData?.groupsWithPolicies}*/}
-         {/*   alreadyJoined={false}*/}
-         {/*   userData={userData}*/}
-         {/*   closeModal={handleCloseJoinModal}*/}
-         {/*/>*/}
       </div>
    );
 };

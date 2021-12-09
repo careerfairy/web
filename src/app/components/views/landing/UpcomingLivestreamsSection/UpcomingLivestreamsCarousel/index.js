@@ -85,6 +85,7 @@ const UpcomingLivestreamsCarousel = ({
                   <UpcomingLivestreamCard
                      handleOpenJoinModal={handleOpenJoinModal}
                      livestream={livestream}
+                     disableExpand
                   />
                </Box>
             ))}

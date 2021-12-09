@@ -30,9 +30,9 @@ const useStyles = makeStyles((theme) => ({
       },
       "&:hover, &$focusVisible": {
          zIndex: 1,
-         "& $imageBackdrop": {
-            opacity: 0.15,
-         },
+         // "& $imageBackdrop": {
+         //    opacity: 0.15,
+         // },
          "& $imageMarked": {
             opacity: 0,
          },

@@ -270,9 +270,26 @@ export default class StatsUtil {
       return student.groupIds && student.groupIds.includes(group.groupId);
    }
 
-   static getGroupThatStudentFollows(student, groups) {
-      return groups.find((group) =>
-         StatsUtil.studentFollowsGroup(student, group)
+   static getGroupThatStudentBelongsTo(student, groups) {
+      const studentUniversityGroup = StatsUtil.getStudentUniversityGroup(
+         student,
+         groups
+      );
+      return (
+         studentUniversityGroup ||
+         StatsUtil.getFirstGroupUserBelongsTo(student, groups)
+      );
+   }
+
+   static getStudentUniversityGroup(student, groups) {
+      return groups.find(
+         (uniGroup) => student.university?.code === uniGroup.universityCode
+      );
+   }
+
+   static getFirstGroupUserBelongsTo(student, groups) {
+      return groups.find(
+         (grp) => student.groupIds && student.groupIds.includes(grp.groupId)
       );
    }
 
@@ -318,30 +335,36 @@ export default class StatsUtil {
       return groupThatUserBelongsTo;
    }
    static mapUserCategorySelection({ userData, group, alreadyJoined }) {
-      let mappedCategories = [];
-      if (group.categories) {
-         mappedCategories = group.categories.map((obj) => ({
-            ...obj,
-            selectedValueId: "",
-         }));
-         if (userData && alreadyJoined) {
-            const userCategories = userData.registeredGroups?.find(
-               (el) => el.groupId === group.id
-            )?.categories;
-            userCategories?.forEach((category) => {
-               mappedCategories?.forEach((groupCategory) => {
-                  const exists = groupCategory.options.some(
-                     (option) => option.id === category.selectedValueId
-                  );
-                  if (exists) {
-                     groupCategory.selectedValueId = category.selectedValueId;
-                     groupCategory.isNew = !exists;
-                  }
-               });
-            });
-         }
+      let mappedGroupCategories = [];
+      const userCategories = userData?.registeredGroups?.find(
+         (el) => el.groupId === group.id
+      )?.categories;
+      if (group?.categories?.length) {
+         mappedGroupCategories = group.categories.map((groupCategory) => {
+            if (userCategories && alreadyJoined) {
+               let userSelectedValueId = "";
+               const newGroupCategory = { ...groupCategory };
+               const userCategory = userCategories.find(
+                  (userCat) => userCat.id === newGroupCategory.id
+               );
 
-         return mappedCategories;
+               if (userCategory) {
+                  userSelectedValueId = userCategory.selectedValueId;
+               }
+               return {
+                  ...newGroupCategory,
+                  selectedValueId: userSelectedValueId,
+                  isNew: !Boolean(userSelectedValueId),
+               };
+            } else {
+               return {
+                  ...groupCategory,
+                  selectedValueId: "",
+               };
+            }
+         });
+
+         return mappedGroupCategories;
       }
    }
 }

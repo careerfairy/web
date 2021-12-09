@@ -17,7 +17,6 @@ import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHandRaiseConnect";
 import StatsUtil from "../../data/util/StatsUtil";
-import GroupsUtil from "../../data/util/GroupsUtil";
 import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu";
 
 const useStyles = makeStyles((theme) => ({
@@ -107,14 +106,15 @@ const ViewerLayout = (props) => {
    const [hasCheckedForCategoryData, setHasCheckedForCategoryData] = useState(
       false
    );
-   const [groupsToFollow, setGroupsToFollow] = useState([]);
-   const [groupToUpdateCategories, setGroupToUpdateCategories] = useState(null);
-   const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
+   const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
+   const handleOpenJoinModal = ({ groups }) =>
+      setJoinGroupModalData({ groups });
+   const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
 
    const currentLivestream = useStreamConnect();
 
    useViewerHandRaiseConnect(currentLivestream, streamerId);
-   // console.log("-> currentLivestream", currentLivestream);
+
    useEffect(() => {
       if (currentLivestream && !currentLivestream.test) {
          if (currentLivestream.openStream) {
@@ -223,24 +223,17 @@ const ViewerLayout = (props) => {
                const livestreamGroups = await firebase.getGroupsWithIds(
                   currentLivestream.groupIds
                );
-               const {
-                  hasAgreedToAll,
-                  groupsWithPolicies,
-               } = await GroupsUtil.getPolicyStatus(
-                  livestreamGroups,
-                  userData.userEmail,
-                  firebase.checkIfUserAgreedToGroupPolicy
-               );
-               const groupThatUserFollows = StatsUtil.getGroupThatStudentFollows(
+               const groupThatUserFollows = StatsUtil.getGroupThatStudentBelongsTo(
                   userData,
                   livestreamGroups
                );
+
                if (!groupThatUserFollows) {
                   // If user is not following any of the groups bring up group following Dialog
                   // Open the follow group dialog...
                   if (livestreamGroups?.length) {
                      // Only open dialog when there are groups
-                     setGroupsToFollow(livestreamGroups);
+                     handleOpenJoinModal({ groups: livestreamGroups });
                   }
                } else {
                   // If user is following one of the groups, please check if the user has all the categories of the group
@@ -250,10 +243,7 @@ const ViewerLayout = (props) => {
                   );
                   if (!userHasAllCategoriesOfGroup) {
                      // Open the category select dialog...
-                     setGroupToUpdateCategories(groupThatUserFollows);
-                     if (!hasAgreedToAll) {
-                        setGroupsWithPolicies(groupsWithPolicies);
-                     }
+                     handleOpenJoinModal({ groups: [groupThatUserFollows] });
                   }
                }
             }
@@ -274,11 +264,6 @@ const ViewerLayout = (props) => {
 
    const closeLeftMenu = () => dispatch(actions.closeLeftMenu());
    const openLeftMenu = () => dispatch(actions.openLeftMenu());
-
-   const handleCloseViewerGroupCategorySelectDialog = useCallback(() => {
-      setGroupsToFollow([]);
-      setGroupToUpdateCategories(null);
-   }, []);
 
    const handleStateChange = useCallback(
       (state) => {
@@ -307,13 +292,11 @@ const ViewerLayout = (props) => {
       return <Loader />;
    }
 
-   if (groupToUpdateCategories || groupsToFollow.length) {
+   if (joinGroupModalData) {
       return (
          <ViewerGroupCategorySelectMenu
-            onClose={handleCloseViewerGroupCategorySelectDialog}
-            groupToUpdateCategories={groupToUpdateCategories}
-            groupsToFollow={groupsToFollow}
-            groupsWithPolicies={groupsWithPolicies}
+            joinGroupModalData={joinGroupModalData}
+            handleCloseJoinModal={handleCloseJoinModal}
          />
       );
    }

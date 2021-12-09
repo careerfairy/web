@@ -20,9 +20,8 @@ import StudentBenefitsSection from "../components/views/landing/StudentBenefitsS
 import Link from "materialUI/NextNavLink";
 import NumbersSection from "../components/views/landing/NumbersSection";
 import { useAuth } from "../HOCs/AuthProvider";
-import GroupJoinModal from "../components/views/profile/GroupJoinModal";
 import SpeakersSection from "../components/views/landing/SpeakersSection";
-import GroupJoinToAttendModal from "../components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
+import RegistrationModal from "../components/views/common/registration-modal";
 
 const StudentLandingPage = ({}) => {
    const {
@@ -32,8 +31,8 @@ const StudentLandingPage = ({}) => {
    const { userData } = useAuth();
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
-   const handleOpenJoinModal = ({ groups, groupsWithPolicies }) =>
-      setJoinGroupModalData({ groups, groupsWithPolicies });
+   const handleOpenJoinModal = ({ groups }) =>
+      setJoinGroupModalData({ groups });
    const [calendlyModalOpen, setCalendlyModalOpen] = useState(false);
 
    const handleOpenCalendly = () => {
@@ -133,7 +132,7 @@ const StudentLandingPage = ({}) => {
             "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2F68d9a71d-cacd-46da-ac03-deabc74c7e77_ne__1_.jpg?alt=media",
       },
    ];
-   console.log("-> joinGroupModalData", joinGroupModalData);
+
    return (
       <React.Fragment>
          <HeadWithMeta
@@ -193,13 +192,11 @@ const StudentLandingPage = ({}) => {
                onClose={handleCloseCalendly}
             />
             <ScrollToTop />
-            <GroupJoinToAttendModal
+            <RegistrationModal
                open={Boolean(joinGroupModalData)}
+               handleClose={handleCloseJoinModal}
+               livestream={joinGroupModalData?.livestream}
                groups={joinGroupModalData?.groups}
-               groupsWithPolicies={joinGroupModalData?.groupsWithPolicies}
-               alreadyJoined={false}
-               userData={userData}
-               closeModal={handleCloseJoinModal}
             />
          </LandingLayout>
       </React.Fragment>

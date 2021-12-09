@@ -8,6 +8,8 @@ const useStyles = makeStyles((theme) => ({
       justifyContent: "center",
       padding: "1.5em 1em 1em 1em",
       height: "120px",
+      maxWidth: 350,
+      alignSelf: "center",
    },
    image: {
       objectFit: "contain",

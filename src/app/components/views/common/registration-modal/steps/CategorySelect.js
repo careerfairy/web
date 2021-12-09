@@ -24,6 +24,12 @@ const useStyles = makeStyles((theme) => ({
       flexFlow: "column",
       alignItems: "center",
    },
+   loaderWrapper: {
+      height: 200,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+   },
 }));
 
 const CategorySelect = () => {
@@ -32,42 +38,45 @@ const CategorySelect = () => {
       groups,
       groupsWithPolicies,
       livestream,
-      closeModal,
       alreadyJoined,
       completeRegistrationProcess,
+      handleClose,
+      hasAgreedToAll,
    } = useContext(RegistrationContext);
    const { userData } = useAuth();
    const classes = useStyles();
    const firebase = useFirebase();
+   const [checkingCategories, setCheckingCategories] = useState(false);
    const [categories, setCategories] = useState([]);
    const [allSelected, setAllSelected] = useState(false);
    const [submitting, setSubmitting] = useState(false);
    const [localGroupsWithPolicies, setLocalGroupsWithPolicies] = useState([]);
+
    useEffect(() => {
       setLocalGroupsWithPolicies(groupsWithPolicies || []);
    }, [groupsWithPolicies]);
    useEffect(() => {
-      if (group.categories) {
-         const newCategories = StatsUtil.mapUserCategorySelection({
-            userData,
-            group,
-            alreadyJoined,
-         });
-         setCategories(newCategories);
+      if (group.categories?.length) {
+         (async function () {
+            try {
+               setCheckingCategories(true);
+               const newCategories = StatsUtil.mapUserCategorySelection({
+                  userData,
+                  group,
+                  alreadyJoined,
+               });
+               const hasAlreadySelectedAllCategories = categories.every(
+                  (cat) => cat.isNew === false
+               );
+               if (hasAlreadySelectedAllCategories && hasAgreedToAll) {
+                  await completeRegistrationProcess();
+               }
+               setCategories(newCategories);
+            } catch (e) {}
+            setCheckingCategories(false);
+         })();
       }
-   }, [group, alreadyJoined, userData]);
-
-   useEffect(() => {
-      if (submitting) return;
-      if (group && categories.length) {
-         const hasAlreadySelectedAllCategories = categories.every(
-            (cat) => cat.isNew === false
-         );
-         if (hasAlreadySelectedAllCategories) {
-            completeRegistrationProcess();
-         }
-      }
-   }, [group, categories, submitting]);
+   }, [group, alreadyJoined, userData, hasAgreedToAll]);
 
    useEffect(() => {
       if (categories) {
@@ -124,7 +133,7 @@ const CategorySelect = () => {
          if (livestream) {
             await completeRegistrationProcess();
          } else {
-            closeModal();
+            handleClose();
          }
       } catch (e) {
          console.log("error in handle join", e);
@@ -146,9 +155,13 @@ const CategorySelect = () => {
       );
    });
 
-   const handleClose = () => {
-      closeModal?.();
-   };
+   if (checkingCategories) {
+      return (
+         <div className={classes.loaderWrapper}>
+            <CircularProgress />
+         </div>
+      );
+   }
 
    return (
       <>
@@ -216,7 +229,11 @@ const CategorySelect = () => {
                         color="primary"
                         autoFocus
                      >
-                        {livestream?.hasStarted ? "Enter event" : "I'll attend"}
+                        {!livestream
+                           ? "Join group"
+                           : livestream?.hasStarted
+                           ? "Enter event"
+                           : "I'll attend"}
                      </Button>
                   )}
                </DialogActions>

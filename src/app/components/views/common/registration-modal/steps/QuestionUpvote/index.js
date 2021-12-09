@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useFirebase } from "context/firebase";
 import {
    Box,
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(1),
    },
 }));
-
+const questionsContainerHeight = 400;
 const QuestionUpvote = () => {
    const { handleNext, group, livestream } = useContext(RegistrationContext);
    const classes = useStyles();
@@ -41,10 +41,15 @@ const QuestionUpvote = () => {
       getMore,
       handleClientUpdate,
    } = useInfiniteScrollServer({
-      limit: 3,
+      limit: 8,
       query: livestreamQuestionsQuery(livestream?.id),
    });
-   console.log("-> hasMore", hasMore);
+
+   useEffect(() => {
+      if (!docs.length && !hasMore) {
+         handleNext();
+      }
+   }, [docs, hasMore]);
 
    const handleUpvote = async (question) => {
       if (!authenticatedUser) {
@@ -81,23 +86,13 @@ const QuestionUpvote = () => {
             WHICH QUESTIONS SHOULD THE SPEAKER ANSWER?
          </DialogTitle>
          <DialogContent className={classes.content}>
-            <Box height={300}>
+            <Box height={questionsContainerHeight}>
                <CustomInfiniteScroll
-                  height={300}
+                  height={questionsContainerHeight}
                   hasMore={hasMore}
                   next={getMore}
-                  // style={{ overflow: "inherit" }}
                   dataLength={docs.length}
                >
-                  {/*{docs.map((question) => (*/}
-                  {/*   <Fade key={question.id} up>*/}
-                  {/*      <QuestionCard*/}
-                  {/*         question={question}*/}
-                  {/*         hasVoted={hasVoted}*/}
-                  {/*         handleUpvote={handleUpvote}*/}
-                  {/*      />*/}
-                  {/*   </Fade>*/}
-                  {/*))}*/}
                   <Box p={2}>
                      <Grid container spacing={2}>
                         {docs.map((question, index) => (

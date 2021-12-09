@@ -199,7 +199,11 @@ const fortyFiveMinutesAgo = new Date(
 );
 
 const throttle_speed = 50;
-const UpcomingLivestreamCard = ({ livestream, handleOpenJoinModal }) => {
+const UpcomingLivestreamCard = ({
+   livestream,
+   handleOpenJoinModal,
+   disableExpand,
+}) => {
    const [hovered, setHovered] = useState(false);
    const classes = useStyles();
    const { push, asPath } = useRouter();
@@ -207,7 +211,10 @@ const UpcomingLivestreamCard = ({ livestream, handleOpenJoinModal }) => {
    const [groups, setGroups] = useState([]);
    const { userData, authenticatedUser } = useAuth();
 
-   const handleMouseEnter = debounce(() => setHovered(true), throttle_speed);
+   const handleMouseEnter = debounce(
+      () => !disableExpand && setHovered(true),
+      throttle_speed
+   );
    const handleMouseLeave = debounce(() => setHovered(false), throttle_speed);
 
    const {
@@ -431,6 +438,7 @@ const UpcomingLivestreamCard = ({ livestream, handleOpenJoinModal }) => {
                               }
                               onClick={handleRegisterClick}
                               size="large"
+                              disableElevation={status.hasRegistered}
                               variant={"contained"}
                               className={classes.button}
                            >

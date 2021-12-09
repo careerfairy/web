@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import {
@@ -7,6 +7,7 @@ import {
    CardActions,
    CardContent,
    CardHeader,
+   CircularProgress,
    Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
@@ -19,8 +20,8 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(1),
    },
    questionTitle: {
-      fontSize: "1.2em",
-      fontWeight: 500,
+      // fontSize: "1.2em",
+      // fontWeight: 500,
       wordBreak: "break-word",
    },
    actions: {
@@ -41,14 +42,22 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: 700,
       marginTop: `${theme.spacing(0.5)}px !important`,
    },
+   content: {
+      padding: theme.spacing(1),
+   },
+   header: {
+      padding: theme.spacing(1),
+   },
 }));
 
 const QuestionCard = ({ isPastEvent, question, handleUpvote, hasVoted }) => {
+   const [loading, setLoading] = useState(false);
    const classes = useStyles();
 
    return (
       <Card elevation={2} className={classes.root}>
          <CardHeader
+            className={classes.header}
             action={
                <div className={classes.voteCount}>
                   <Typography
@@ -62,7 +71,7 @@ const QuestionCard = ({ isPastEvent, question, handleUpvote, hasVoted }) => {
                </div>
             }
          />
-         <CardContent>
+         <CardContent className={classes.content}>
             <Typography
                align="center"
                className={classes.questionTitle}
@@ -74,12 +83,24 @@ const QuestionCard = ({ isPastEvent, question, handleUpvote, hasVoted }) => {
          </CardContent>
          <CardActions className={classes.actions} disableSpacing>
             <Button
-               disabled={hasVoted(question) || isPastEvent}
+               disabled={hasVoted(question) || isPastEvent || loading}
                variant="contained"
                fullWidth
-               onClick={() => handleUpvote(question)}
+               onClick={async () => {
+                  try {
+                     setLoading(true);
+                     await handleUpvote(question);
+                  } catch (e) {}
+                  setLoading(false);
+               }}
                color="primary"
-               startIcon={<ThumbUpIcon />}
+               startIcon={
+                  loading ? (
+                     <CircularProgress size={10} color="inherit" />
+                  ) : (
+                     <ThumbUpIcon />
+                  )
+               }
             >
                upvote
             </Button>

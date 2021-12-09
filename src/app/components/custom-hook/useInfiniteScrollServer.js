@@ -6,30 +6,34 @@ const useInfiniteScrollServer = ({ limit = 5, query }) => {
    const [loading, setLoading] = useState(false);
 
    useEffect(() => {
-      (async function () {
-         const { lastDoc, docs } = await getInitialQuery();
-         setDocs(docs);
-         setLastDoc(lastDoc);
-      })();
+      getInitialQuery();
    }, []);
 
    const getInitialQuery = async () => {
-      console.log("-> getInitialQuery");
       try {
+         if (loading) return;
          setLoading(true);
          const data = await query.limit(limit).get();
-         let docs = data.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-         const newLastDoc = data.docs[data.docs.length - 1];
-         return { docs, lastDoc: newLastDoc };
+         const initialDocs = data.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }));
+         const newLastDoc =
+            data.docs.length < limit
+               ? undefined
+               : data.docs[data.docs.length - 1];
+         setDocs(initialDocs);
+         setLastDoc(newLastDoc);
       } catch (e) {
-         console.log(e);
+         console.log("-> e", e);
+      } finally {
+         setLoading(false);
       }
-      setLoading(false);
    };
 
    const getMore = async () => {
-      console.log("-> getMore");
-      if (!lastDoc) return;
+      console.log(`-> in the get more loading: ${loading} lastDoc: ${lastDoc}`);
+      if (!lastDoc || loading) return;
       try {
          setLoading(true);
          const data = await query.startAfter(lastDoc).limit(limit).get();
@@ -39,8 +43,9 @@ const useInfiniteScrollServer = ({ limit = 5, query }) => {
          setLastDoc(newLastDoc);
       } catch (e) {
          console.log(e);
+      } finally {
+         setLoading(false);
       }
-      setLoading(false);
    };
 
    const handleClientUpdate = (docId, updateData) => {
@@ -50,17 +55,6 @@ const useInfiniteScrollServer = ({ limit = 5, query }) => {
          )
       );
    };
-
-   // const handleScroll = () => {
-   //    const bottom =
-   //       Math.ceil(window.innerHeight + window.scrollY) >=
-   //       document.documentElement.scrollHeight * 0.5;
-   //    console.log("-> bottom", bottom);
-   //    console.log("-> lastDoc", lastDoc);
-   //    if (bottom && lastDoc !== undefined) {
-   //       return getMore();
-   //    }
-   // };
 
    return {
       getMore,

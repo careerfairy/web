@@ -9,22 +9,18 @@ import {
    TextField,
    Tooltip,
 } from "@material-ui/core";
-import Header from "../../components/views/header/Header";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { withFirebasePage } from "context/firebase";
 import AddIcon from "@material-ui/icons/Add";
 import Loader from "../../components/views/loader/Loader";
 import DateUtil from "../../util/DateUtil";
 import { useRouter } from "next/router";
-import Footer from "../../components/views/footer/Footer";
 import Countdown from "../../components/views/common/Countdown";
-import BookingModal from "../../components/views/common/booking-modal/BookingModal";
 import QuestionVotingBox from "../../components/views/question-voting-box/QuestionVotingBox";
 import StringUtils from "../../util/StringUtils";
 import ClearIcon from "@material-ui/icons/Clear";
 import UserUtil from "../../data/util/UserUtil";
 import TargetOptions from "../../components/views/common/TargetOptions";
-import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
 import EmailIcon from "@material-ui/icons/Email";
 import RssFeedIcon from "@material-ui/icons/RssFeed";
@@ -48,6 +44,7 @@ import {
 } from "components/views/NextLivestreams/GroupStreams/groupStreamCard/badges";
 import Link from "materialUI/NextNavLink";
 import GeneralLayout from "../../layouts/GeneralLayout";
+import RegistrationModal from "../../components/views/common/registration-modal";
 
 const useStyles = makeStyles((theme) => ({
    speakerAvatar: {
@@ -139,28 +136,31 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    const { livestreamId, groupId: queryGroupId } = router.query;
    const absolutePath = router.asPath;
    const summaryRef = useRef();
-   const { referrerId } = router.query;
    const { userData, authenticatedUser: user } = useAuth();
    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
    const [newQuestionTitle, setNewQuestionTitle] = useState("");
    const [currentLivestream, setCurrentLivestream] = useState(
       parseDates(serverSideLivestream)
    );
-   const [registration, setRegistration] = useState(false);
 
    const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
    const [registered, setRegistered] = useState(false);
-   const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
-   const [bookingModalOpen, setBookingModalOpen] = useState(false);
    const [careerCenters, setCareerCenters] = useState([]);
    const [currentGroup, setCurrentGroup] = useState(null);
    const [targetOptions, setTargetOptions] = useState([]);
 
-   const [openJoinModal, setOpenJoinModal] = useState(false);
    const [openTalentPoolModal, setOpenTalentPoolModal] = useState(false);
    const [isPastEvent, setIsPastEvent] = useState(
       streamIsOld(currentLivestream?.startDate)
    );
+
+   const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
+   const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
+   const handleOpenJoinModal = (dataObj) =>
+      setJoinGroupModalData({
+         groups: dataObj.groups,
+         livestream: dataObj.livestream,
+      });
 
    useEffect(() => {
       // Checks if the event is old and has a summary,
@@ -182,7 +182,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          const unsubscribe = firebase.listenToLivestreamQuestions(
             livestreamId,
             (querySnapshot) => {
-               var questionsList = [];
+               const questionsList = [];
                querySnapshot.forEach((doc) => {
                   let question = doc.data();
                   question.id = doc.id;
@@ -392,53 +392,11 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          return router.push("/profile");
       }
 
-      const {
-         hasAgreedToAll,
-         groupsWithPolicies,
-      } = await GroupsUtil.getPolicyStatus(
-         careerCenters,
-         user.email,
-         firebase.checkIfUserAgreedToGroupPolicy
-      );
-      if (!hasAgreedToAll) {
-         setOpenJoinModal(true);
-         setGroupsWithPolicies(groupsWithPolicies);
-      } else if (careerCenters.length > 0 && !userFollowsSomeCareerCenter()) {
-         setOpenJoinModal(true);
-      } else {
-         setBookingModalOpen(true);
-         setRegistration(true);
-         firebase
-            .registerToLivestream(
-               currentLivestream.id,
-               userData,
-               groupsWithPolicies,
-               referrerId
-            )
-            .then(() => {
-               sendEmailRegistrationConfirmation();
-               setRegistration(false);
-            });
-      }
+      handleOpenJoinModal({
+         groups: careerCenters,
+         livestream: currentLivestream,
+      });
    };
-
-   function completeRegistrationProcess() {
-      firebase
-         .registerToLivestream(
-            currentLivestream.id,
-            userData,
-            groupsWithPolicies,
-            referrerId
-         )
-         .then(() => {
-            setBookingModalOpen(true);
-            sendEmailRegistrationConfirmation();
-         });
-   }
-
-   function handleCloseJoinModal() {
-      setOpenJoinModal(false);
-   }
 
    function deregisterFromLivestream(livestreamId) {
       if (!user || !user.emailVerified) {
@@ -1132,24 +1090,12 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                   </div>
                </Container>
             </div>
-            <GroupJoinToAttendModal
-               open={openJoinModal}
-               groupsWithPolicies={groupsWithPolicies}
-               groups={careerCenters}
-               alreadyJoined={false}
-               userData={userData}
-               onConfirm={completeRegistrationProcess}
-               closeModal={handleCloseJoinModal}
-            />
-            ;
-            <BookingModal
-               careerCenters={careerCenters}
-               livestream={currentLivestream}
-               groupId={groupId}
-               modalOpen={bookingModalOpen}
-               setModalOpen={setBookingModalOpen}
-               registration={registration}
-               user={user}
+            <RegistrationModal
+               open={Boolean(joinGroupModalData)}
+               handleClose={handleCloseJoinModal}
+               promptOtherEventsOnFinal
+               livestream={joinGroupModalData?.livestream}
+               groups={joinGroupModalData?.groups}
             />
             ;
             <JoinTalentPoolModal

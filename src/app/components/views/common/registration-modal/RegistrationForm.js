@@ -1,15 +1,12 @@
 import React, { useContext } from "react";
-// import FirstStep from "./FirstStep";
-// import SecondStep from "./SecondStep";
-// import Confirm from "./Confirm";
-// import Success from "./Success";
 import { Box, Step, StepLabel, Stepper, Typography } from "@material-ui/core";
 import { RegistrationContext } from "context/registration/RegistrationContext";
 import CategorySelect from "./steps/CategorySelect";
 import QuestionUpvote from "./steps/QuestionUpvote";
+import QuestionCreateForm from "./steps/QuestionCreateForm";
+import TalentPoolJoin from "./steps/TalentPoolJoin";
+import RegistrationComplete from "./steps/RegistrationComplete";
 
-// Step titles
-const labels = ["Select your categories", "Add a Question", "Upvote questions"];
 const handleSteps = (step) => {
    switch (step) {
       case 0:
@@ -17,19 +14,23 @@ const handleSteps = (step) => {
       case 1:
          return <QuestionUpvote />;
       case 2:
-         return <div>upvote questions step</div>;
+         return <QuestionCreateForm />;
+      case 3:
+         return <TalentPoolJoin />;
+      case 4:
+         return <RegistrationComplete />;
       default:
          throw new Error("Unknown step");
    }
 };
 
 const RegistrationForm = () => {
-   const { activeStep } = useContext(RegistrationContext);
+   const { activeStep, labels } = useContext(RegistrationContext);
 
    return (
       <>
          {activeStep === labels.length ? (
-            <div>congrats step</div>
+            <RegistrationComplete />
          ) : (
             <>
                {/*<Box sx={{ my: 5 }}>*/}
