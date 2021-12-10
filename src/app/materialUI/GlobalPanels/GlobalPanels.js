@@ -23,21 +23,6 @@ export const TabPanel = ({
    );
 };
 
-// function a11yProps(index) {
-//    return {
-//       id: `simple-tab-${index}`,
-//       "aria-controls": `simple-tabpanel-${index}`,
-//    };
-// }
-//
-// export const Tab = ({ index, ...props }) => {
-//    return <Tab {...a11yProps(index)} {...props} />;
-// };
-//
-// Tab.propTypes = {
-//    index: PropTypes.number.isRequired,
-// };
-
 export const SimplePanel = ({ panelId, children, height, ...other }) => {
    return (
       <div {...other} id={panelId} style={{ height: "100%", ...other.style }}>

@@ -18,8 +18,8 @@ const useStyles = makeStyles((theme) => ({
    root: {
       display: "flex",
       top: 0,
-      width: "220px",
-      padding: "30px",
+      // width: "220px",
+      paddingLeft: "30px",
       position: "absolute",
       alignItems: "center",
       transform: "translateY(50%)",

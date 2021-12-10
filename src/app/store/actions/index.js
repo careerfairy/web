@@ -27,6 +27,7 @@ export {
    sendGeneralError,
    sendCustomError,
    enqueueBroadcastMessage,
+   sendSuccessMessage,
    enqueueCallToAction,
    enqueueJobPostingCta,
    enqueueSuccessfulHandRaiseRequest,

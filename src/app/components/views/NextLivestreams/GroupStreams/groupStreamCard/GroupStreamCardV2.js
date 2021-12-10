@@ -1,11 +1,9 @@
 import PropTypes from "prop-types";
 import React, { Fragment, memo, useEffect, useMemo, useState } from "react";
-import { withFirebase } from "context/firebase";
+import { useFirebase } from "context/firebase";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import UserUtil from "../../../../../data/util/UserUtil";
 import { useRouter } from "next/router";
-import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
-import BookingModal from "../../../common/booking-modal/BookingModal";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import {
    dynamicSort,
@@ -38,6 +36,7 @@ import { AttendButton, DetailsButton } from "./actionButtons";
 import LogoElement from "../LogoElement";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 import { InPersonEventBadge, LimitedRegistrationsBadge } from "./badges";
+import RegistrationModal from "../../../common/registration-modal";
 
 const useStyles = makeStyles((theme) => ({
    cardHovered: {
@@ -125,14 +124,6 @@ const useStyles = makeStyles((theme) => ({
    groupLogoStacked: {
       width: 60,
       height: 60,
-   },
-   tag: {
-      display: "inline-block",
-      backgroundColor: "#ff5dac",
-      borderRadius: "0.5rem",
-      padding: "2px 0.5rem",
-      color: "#fff",
-      marginBottom: "0.5rem",
    },
    title: {
       fontWeight: 800,
@@ -251,32 +242,38 @@ const GroupStreamCardV2 = memo(
       user,
       mobile,
       userData,
-      firebase,
       livestreamId,
       id,
       careerCenterId,
       groupData,
       listenToUpcoming,
       isTargetDraft,
-      setGlobalCardHighlighted,
       isPastLivestreams,
       globalCardHighlighted,
       isAdmin,
    }) => {
+      const firebase = useFirebase();
       const mediaStyles = useCoverCardMediaStyles();
       const classes = useStyles();
-      const {
-         pathname,
-         absolutePath,
-         push,
-         query: { referrerId },
-      } = useRouter();
+      const { absolutePath, pathname, push, query } = useRouter();
       const linkToStream = useMemo(() => {
-         const referrerQuery = referrerId ? `&referrerId=${referrerId}` : "";
+         const notLoggedIn =
+            (user.isLoaded && user.isEmpty) || !user.emailVerified;
+         const registerQuery = notLoggedIn ? `&register=${livestream.id}` : "";
+         const referrerQuery = query.referrerId
+            ? `&referrerId=${query.referrerId}`
+            : "";
+         const queries = `${registerQuery}${referrerQuery}`;
          return pathname === "/next-livestreams/[groupId]"
-            ? `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}${referrerQuery}`
-            : `/next-livestreams?livestreamId=${livestream.id}${referrerQuery}`;
-      }, [pathname, livestream?.id, groupData?.groupId, referrerId]);
+            ? `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}${queries}`
+            : `/next-livestreams?livestreamId=${livestream.id}${queries}`;
+      }, [
+         pathname,
+         livestream?.id,
+         groupData?.groupId,
+         query.referrerId,
+         user,
+      ]);
 
       function userIsRegistered() {
          if (
@@ -296,20 +293,49 @@ const GroupStreamCardV2 = memo(
       const [cardHovered, setCardHovered] = useState(false);
       const [targetOptions, setTargetOptions] = useState([]);
       const [careerCenters, setCareerCenters] = useState([]);
-      const [bookingModalOpen, setBookingModalOpen] = useState(false);
       const [isHighlighted, setIsHighlighted] = useState(false);
-      const [openJoinModal, setOpenJoinModal] = useState(false);
-      const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
-
+      const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
+      const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
+      const handleOpenJoinModal = (dataObj) =>
+         setJoinGroupModalData({
+            groups: dataObj.groups,
+            livestream: dataObj?.livestream,
+         });
       useEffect(() => {
          if (checkIfHighlighted() && !isHighlighted) {
             setIsHighlighted(true);
-            // setGlobalCardHighlighted?.(true)
-            // setCardHovered(true)
          } else if (checkIfHighlighted() && isHighlighted) {
             setIsHighlighted(false);
          }
       }, [livestreamId, id, careerCenterId, groupData.groupId]);
+
+      useEffect(() => {
+         if (
+            query.register === livestream.id &&
+            careerCenters.length &&
+            !livestream.registeredUsers.includes(user.email)
+         ) {
+            (async function handleAutoRegister() {
+               const newQuery = { ...query };
+               if (newQuery.register) {
+                  delete newQuery.register;
+               }
+               await push({
+                  pathname: pathname,
+                  query: {
+                     ...newQuery,
+                  },
+               });
+               handleOpenJoinModal({ groups: careerCenters, livestream });
+            })();
+         }
+      }, [
+         query.register,
+         livestream.id,
+         careerCenters,
+         livestream.registeredUsers,
+         user.email,
+      ]);
 
       useEffect(() => {
          if (groupData.categories && livestream.targetCategories) {
@@ -410,7 +436,7 @@ const GroupStreamCardV2 = memo(
             return push({
                pathname: "/login",
                query: {
-                  absolutePath,
+                  absolutePath: absolutePath,
                },
             });
          }
@@ -433,73 +459,10 @@ const GroupStreamCardV2 = memo(
                pathname: "/profile",
             });
          }
-         const {
-            hasAgreedToAll,
-            groupsWithPolicies,
-         } = await GroupsUtil.getPolicyStatus(
-            careerCenters,
-            user.email,
-            firebase
-         );
-         if (!hasAgreedToAll) {
-            setOpenJoinModal(true);
-            setGroupsWithPolicies(groupsWithPolicies);
-         } else if (listenToUpcoming) {
-            // If on next livestreams tab...
-            if (!userFollowingAnyGroup() && livestream.groupIds?.length) {
-               setOpenJoinModal(true);
-            } else {
-               firebase
-                  .registerToLivestream(
-                     livestream.id,
-                     userData,
-                     groupsWithPolicies,
-                     referrerId
-                  )
-                  .then(() => {
-                     setCardHovered(false);
-                     setBookingModalOpen(true);
-                     sendEmailRegistrationConfirmation();
-                  });
-            }
-         } else {
-            // if on any other tab that isn't next livestreams...
-            if (!userFollowingCurrentGroup()) {
-               setOpenJoinModal(true);
-            } else {
-               firebase
-                  .registerToLivestream(
-                     livestream.id,
-                     userData,
-                     groupsWithPolicies,
-                     referrerId
-                  )
-                  .then(() => {
-                     setCardHovered(false);
-                     setBookingModalOpen(true);
-                     sendEmailRegistrationConfirmation();
-                  });
-            }
-         }
-      }
 
-      function completeRegistrationProcess() {
-         firebase
-            .registerToLivestream(
-               livestream.id,
-               userData,
-               groupsWithPolicies,
-               referrerId
-            )
-            .then(() => {
-               setCardHovered(false);
-               setBookingModalOpen(true);
-               sendEmailRegistrationConfirmation();
-            });
-      }
+         setCardHovered(false);
 
-      function handleCloseJoinModal() {
-         setOpenJoinModal(false);
+         handleOpenJoinModal({ groups: careerCenters, livestream });
       }
 
       function sendEmailRegistrationConfirmation() {
@@ -510,26 +473,6 @@ const GroupStreamCardV2 = memo(
          );
       }
 
-      const userFollowingAnyGroup = () => {
-         if (userData.groupIds && livestream.groupIds) {
-            // are you following any group thats part of this livstream?
-            return userData.groupIds.some(
-               (id) => livestream.groupIds.indexOf(id) >= 0
-            );
-         } else {
-            return false;
-         }
-      };
-
-      const userFollowingCurrentGroup = () => {
-         if (userData.groupIds && groupData.groupId) {
-            // Are you following the group in group tab?
-            return userData.groupIds.includes(groupData.groupId);
-         } else {
-            return false;
-         }
-      };
-
       const handleRegisterClick = () => {
          if (user && livestream.registeredUsers?.indexOf(user.email) > -1) {
             deregisterFromLivestream();
@@ -539,9 +482,6 @@ const GroupStreamCardV2 = memo(
       };
 
       const checkIfRegistered = () => {
-         if (isAdmin) {
-            return false;
-         }
          return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1);
       };
 
@@ -602,7 +542,7 @@ const GroupStreamCardV2 = memo(
                livestream.maxRegistrants - livestream.registeredUsers.length
             );
          }
-      });
+      }, [livestream?.maxRegistrants, livestream.registeredUsers?.length]);
 
       return (
          <Fragment>
@@ -699,24 +639,23 @@ const GroupStreamCardV2 = memo(
                            <DetailsButton
                               size="small"
                               mobile={mobile}
-                              referrerId={referrerId}
+                              referrerId={query.referrerId}
                               groupData={groupData}
                               listenToUpcoming={listenToUpcoming}
                               livestream={livestream}
                            />
 
-                           {!isPastLivestreams &&
-                              !(livestream.openStream === true) && (
-                                 <AttendButton
-                                    size="small"
-                                    mobile={mobile}
-                                    disabled={registrationDisabled}
-                                    attendButtonLabel={mainButtonLabel}
-                                    handleRegisterClick={handleRegisterClick}
-                                    checkIfRegistered={checkIfRegistered}
-                                    user={user}
-                                 />
-                              )}
+                           {!isPastLivestreams && !livestream.openStream && (
+                              <AttendButton
+                                 size="small"
+                                 mobile={mobile}
+                                 disabled={registrationDisabled}
+                                 attendButtonLabel={mainButtonLabel}
+                                 handleRegisterClick={handleRegisterClick}
+                                 checkIfRegistered={checkIfRegistered}
+                                 user={user}
+                              />
+                           )}
                            <Grow in={Boolean(userIsRegistered())}>
                               <div className={classes.bookedIcon}>
                                  <CheckCircleRoundedIcon />
@@ -829,6 +768,8 @@ const GroupStreamCardV2 = memo(
                                     hideFollow={
                                        (!cardHovered && !mobile) || isAdmin
                                     }
+                                    handleOpenJoinModal={handleOpenJoinModal}
+                                    handleCloseJoinModal={handleCloseJoinModal}
                                     key={careerCenter.groupId}
                                     livestreamId={livestream.id}
                                     userFollows={checkIfUserFollows(
@@ -847,20 +788,12 @@ const GroupStreamCardV2 = memo(
                   <div className={`${classes.shadow} ${classes.shadow2}`} />
                </Card>
             </ClickAwayListener>
-            <GroupJoinToAttendModal
-               open={openJoinModal}
-               groups={getGroups()}
-               groupsWithPolicies={groupsWithPolicies}
-               alreadyJoined={false}
-               userData={userData}
-               onConfirm={completeRegistrationProcess}
-               closeModal={handleCloseJoinModal}
-            />
-            <BookingModal
-               livestream={livestream}
-               modalOpen={bookingModalOpen}
-               setModalOpen={setBookingModalOpen}
-               user={user}
+            <RegistrationModal
+               open={Boolean(joinGroupModalData)}
+               onFinish={handleCloseJoinModal}
+               promptOtherEventsOnFinal
+               livestream={joinGroupModalData?.livestream}
+               groups={joinGroupModalData?.groups}
             />
          </Fragment>
       );
@@ -885,4 +818,4 @@ GroupStreamCardV2.propTypes = {
    isPastLivestreams: PropTypes.bool,
 };
 
-export default withFirebase(GroupStreamCardV2);
+export default GroupStreamCardV2;

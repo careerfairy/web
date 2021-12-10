@@ -1,0 +1,85 @@
+import React, { useContext, useEffect, useState } from "react";
+import { RegistrationContext } from "context/registration/RegistrationContext";
+import CategorySelect from "./steps/CategorySelect";
+import QuestionUpvote from "./steps/QuestionUpvote";
+import QuestionCreateForm from "./steps/QuestionCreateForm";
+import TalentPoolJoin from "./steps/TalentPoolJoin";
+import RegistrationComplete from "./steps/RegistrationComplete";
+import SwipeableViews from "react-swipeable-views";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels";
+
+const useStyles = makeStyles((theme) => ({
+   panel: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+   },
+}));
+
+const steps = [
+   {
+      index: 0,
+      step: <CategorySelect />,
+      label: "Select your categories",
+      id: "categorySelect",
+   },
+   {
+      index: 1,
+      step: <QuestionUpvote />,
+      label: "Add a Question",
+      id: "questionsUpvote",
+   },
+   {
+      index: 2,
+      step: <QuestionCreateForm />,
+      label: "Upvote questions",
+      id: "questionCreate",
+   },
+   {
+      index: 3,
+      step: <TalentPoolJoin />,
+      label: "Join Talent Pool",
+      id: "talentPoolJoin",
+   },
+   {
+      index: 4,
+      step: <RegistrationComplete />,
+      label: "Finish",
+      id: "registrationComplete",
+   },
+];
+
+const RegistrationForm = () => {
+   const { activeStep, setTotalSteps, setSliding } = useContext(
+      RegistrationContext
+   );
+   const theme = useTheme();
+   const classes = useStyles();
+
+   useEffect(() => {
+      setTotalSteps(steps.length);
+   }, [steps]);
+   return (
+      <SwipeableViews
+         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+         index={activeStep}
+         onChangeIndex={() => setSliding(true)}
+         onTransitionEnd={() => setSliding(false)}
+         disabled
+      >
+         {steps.map((stepData) => (
+            <SwipeablePanel
+               value={activeStep}
+               index={stepData.index}
+               key={stepData.index}
+               className={classes.panel}
+            >
+               {stepData.step}
+            </SwipeablePanel>
+         ))}
+      </SwipeableViews>
+   );
+};
+
+export default RegistrationForm;

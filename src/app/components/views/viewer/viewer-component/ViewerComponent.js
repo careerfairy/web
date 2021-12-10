@@ -21,6 +21,7 @@ import Streams from "../../streaming/video-container/Streams";
 import DraggableComponent from "../../banners/DraggableComponent";
 import WifiIndicator from "../../streaming/video-container/WifiIndicator";
 import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay";
+import RecommendedEventsOverlay from "./overlay/RecommendedEventsOverlay";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -295,6 +296,11 @@ function ViewerComponent({
                      students"
                   </Typography>
                </div>
+            ) : currentLivestream.recommendedEventIds?.length ? (
+               <RecommendedEventsOverlay
+                  recommendedEventIds={currentLivestream.recommendedEventIds}
+                  mobile={mobile}
+               />
             ) : (
                <StreamStoppedOverlay />
             ))}

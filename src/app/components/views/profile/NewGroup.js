@@ -1,18 +1,17 @@
 import React, { useState } from "react";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 import EditIcon from "@material-ui/icons/Edit";
-import { withFirebase } from "context/firebase";
 import {
    Button,
    Card,
+   CardActions,
    CardContent,
    CardMedia,
-   Typography,
-   CardActions,
    Grid,
+   Typography,
 } from "@material-ui/core";
 import GroupJoinModal from "./GroupJoinModal";
-import { Fade } from "react-reveal";
+import Fade from "react-reveal/Fade";
 
 const NewGroup = ({ group, userData, makeSix, selected }) => {
    const [openJoinModal, setOpenJoinModal] = useState(false);
@@ -108,4 +107,4 @@ const NewGroup = ({ group, userData, makeSix, selected }) => {
    );
 };
 
-export default withFirebase(NewGroup);
+export default NewGroup;

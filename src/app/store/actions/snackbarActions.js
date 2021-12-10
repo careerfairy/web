@@ -70,6 +70,19 @@ export const sendGeneralError = (error = "") => async (dispatch) => {
       })
    );
 };
+
+export const sendSuccessMessage = (message = "Success") => async (dispatch) => {
+   dispatch(
+      enqueueSnackbar({
+         message: message,
+         options: {
+            variant: "success",
+            preventDuplicate: true,
+            key: message,
+         },
+      })
+   );
+};
 export const enqueueBroadcastMessage = (message = "", action) => async (
    dispatch
 ) => {

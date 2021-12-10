@@ -1,12 +1,10 @@
-import React, { Fragment, useEffect, useState } from "react";
-import { useFirebase, withFirebase } from "context/firebase";
+import React, { Fragment, useContext, useEffect, useState } from "react";
+import { useFirebase } from "context/firebase";
 import UserCategorySelector from "components/views/profile/UserCategorySelector";
 import {
    Box,
    Button,
-   CardMedia,
    CircularProgress,
-   Dialog,
    DialogActions,
    DialogContent,
    DialogContentText,
@@ -14,101 +12,92 @@ import {
    Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import LogoButtons from "./LogoButtons";
-import StatsUtil from "../../../../data/util/StatsUtil";
+import StatsUtil from "../../../../../data/util/StatsUtil";
+import LogoButtons from "../../../NextLivestreams/GroupStreams/LogoButtons";
+import { RegistrationContext } from "context/registration/RegistrationContext";
+import { useAuth } from "../../../../../HOCs/AuthProvider";
+import GroupLogo from "../common/GroupLogo";
 
 const useStyles = makeStyles((theme) => ({
-   media: {
-      display: "flex",
-      justifyContent: "center",
-      padding: "1.5em 1em 1em 1em",
-      height: "120px",
-   },
-   image: {
-      objectFit: "contain",
-      maxWidth: "80%",
-      padding: theme.spacing(1),
-      borderRadius: theme.spacing(1),
-      background: theme.palette.common.white,
-   },
    actions: {
       display: "flex",
       flexFlow: "column",
       alignItems: "center",
    },
+   loaderWrapper: {
+      height: 200,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+   },
 }));
 
-const GroupJoinToAttendModal = ({
-   groups,
-   open,
-   closeModal,
-   groupsWithPolicies,
-   userData,
-   onConfirm,
-   alreadyJoined,
-   isOnStreamPage,
-   followAGroupTitle,
-   updateCategoriesTitle,
-   onJoinAttempt, // callback will be called regardless if the joining the group succeeded or failed
-}) => {
+const CategorySelect = () => {
+   const {
+      group,
+      groups,
+      groupsWithPolicies,
+      livestream,
+      alreadyJoined,
+      completeRegistrationProcess,
+      handleClose,
+      gettingPolicyStatus,
+      hasAgreedToAll,
+      onGroupJoin,
+   } = useContext(RegistrationContext);
+   const { userData } = useAuth();
    const classes = useStyles();
    const firebase = useFirebase();
+   const [checkingCategories, setCheckingCategories] = useState(false);
    const [categories, setCategories] = useState([]);
-   const [group, setGroup] = useState({});
    const [allSelected, setAllSelected] = useState(false);
    const [submitting, setSubmitting] = useState(false);
    const [localGroupsWithPolicies, setLocalGroupsWithPolicies] = useState([]);
+
    useEffect(() => {
-      setLocalGroupsWithPolicies(groupsWithPolicies);
+      setLocalGroupsWithPolicies(groupsWithPolicies || []);
    }, [groupsWithPolicies]);
-
    useEffect(() => {
-      if (groups && groups.length && groups.length === 1) {
-         setGroup(groups[0]);
-      } else {
-         setGroup({});
-      }
-   }, [groups]);
-
-   useEffect(() => {
-      if (group.categories) {
-         const groupCategories = group.categories.map((obj) => ({
-            ...obj,
-            selectedValueId: "",
-         }));
-         if (userData && alreadyJoined) {
-            const userCategories = userData.registeredGroups?.find(
-               (el) => el.groupId === group.id
-            )?.categories;
-            userCategories?.forEach((category, index) => {
-               groupCategories?.forEach((groupCategory) => {
-                  const exists = groupCategory.options.some(
-                     (option) => option.id === category.selectedValueId
-                  );
-                  if (exists) {
-                     groupCategory.selectedValueId = category.selectedValueId;
-                  }
+      if (group.categories?.length) {
+         (async function () {
+            setCheckingCategories(true);
+            try {
+               const newCategories = StatsUtil.mapUserCategorySelection({
+                  userData,
+                  group,
+                  alreadyJoined,
                });
-            });
-         }
-         setCategories(groupCategories);
+               const hasAlreadySelectedAllCategories = categories.every(
+                  (cat) => cat.isNew === false
+               );
+               if (hasAlreadySelectedAllCategories && hasAgreedToAll) {
+                  await completeRegistrationProcess();
+               } else {
+                  setCategories(newCategories);
+               }
+            } catch (e) {}
+            setCheckingCategories(false);
+         })();
       }
-   }, [group]);
+   }, [group, alreadyJoined, userData, hasAgreedToAll]);
 
    useEffect(() => {
-      if (categories && open) {
+      if (categories) {
          const notAllSelected = !categories.some(
             (category) => category.selectedValueId === ""
          );
          setAllSelected(notAllSelected);
       }
-   }, [categories, open]);
+   }, [categories]);
 
    const handleSetSelected = (categoryId, event) => {
-      const newCategories = [...categories];
-      const index = newCategories.findIndex((el) => el.id === categoryId);
-      newCategories[index].selectedValueId = event.target.value;
-      setCategories(newCategories);
+      setCategories((prevState) =>
+         prevState.map((category) =>
+            category.id === categoryId
+               ? { ...category, selectedValueId: event.target.value }
+               : category
+         )
+      );
    };
 
    const handleJoinGroup = async () => {
@@ -144,16 +133,16 @@ const GroupJoinToAttendModal = ({
             [...new Set(arrayOfGroupIds)],
             arrayOfGroupObjects
          );
-         setSubmitting(false);
-         if (onConfirm) {
-            onConfirm();
+         if (livestream) {
+            await completeRegistrationProcess();
+         } else {
+            handleClose();
          }
-         handleClose();
       } catch (e) {
          console.log("error in handle join", e);
-         setSubmitting(false);
       }
-      onJoinAttempt?.();
+      onGroupJoin?.();
+      setSubmitting(false);
    };
 
    const renderCategories = categories.map((category, index) => {
@@ -162,14 +151,7 @@ const GroupJoinToAttendModal = ({
             <UserCategorySelector
                handleSetSelected={handleSetSelected}
                index={index}
-               isNew={
-                  alreadyJoined &&
-                  !StatsUtil.studentHasSelectedCategory(
-                     userData,
-                     group,
-                     category.id
-                  )
-               }
+               isNew={!category.selectedValueId}
                alreadyJoined={alreadyJoined}
                category={category}
             />
@@ -177,28 +159,33 @@ const GroupJoinToAttendModal = ({
       );
    });
 
-   const handleClose = () => {
-      closeModal?.();
-   };
+   if (checkingCategories || gettingPolicyStatus) {
+      return (
+         <div className={classes.loaderWrapper}>
+            <CircularProgress />
+         </div>
+      );
+   }
 
    return (
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+      <>
          {!group.universityName ? (
             <>
                <DialogTitle align="center">
-                  {followAGroupTitle ||
-                     "Please follow one of the following groups in order to register:"}
+                  {livestream?.hasStarted
+                     ? "Where are you joining from?"
+                     : "Please follow one of the following groups in order to register:"}
                </DialogTitle>
-               <LogoButtons setGroup={setGroup} groups={groups} />
+               {groups?.length && <LogoButtons />}
             </>
          ) : (
             <>
                <DialogTitle align="center">
-                  {updateCategoriesTitle || "Join live streams from"}
+                  {livestream?.hasStarted && group?.universityName
+                     ? `${group.universityName} Would Like To Know More About You`
+                     : "Join live streams from"}
                </DialogTitle>
-               <CardMedia className={classes.media}>
-                  <img src={group.logoUrl} className={classes.image} alt="" />
-               </CardMedia>
+               <GroupLogo logoUrl={group.logoUrl} />
                <DialogContent>
                   <DialogContentText align="center" noWrap>
                      {group.description}
@@ -207,8 +194,11 @@ const GroupJoinToAttendModal = ({
                      {!!categories.length && renderCategories}
                   </Box>
                   <Box p={2} className={classes.actions}>
-                     {localGroupsWithPolicies.map((group, index) => (
-                        <Typography style={{ fontSize: "0.8rem" }}>
+                     {localGroupsWithPolicies.map((group) => (
+                        <Typography
+                           key={group.id}
+                           style={{ fontSize: "0.8rem" }}
+                        >
                            Your participant information (surname, first name,
                            university affiliation) and the data above will be
                            transferred to the organizer when you register for
@@ -227,7 +217,7 @@ const GroupJoinToAttendModal = ({
                   </Box>
                </DialogContent>
                <DialogActions>
-                  {!isOnStreamPage && (
+                  {!livestream?.hasStarted && (
                      <Button size="large" onClick={handleClose}>
                         Cancel
                      </Button>
@@ -246,14 +236,18 @@ const GroupJoinToAttendModal = ({
                         color="primary"
                         autoFocus
                      >
-                        {isOnStreamPage ? "Enter event" : "I'll attend"}
+                        {!livestream
+                           ? "Join group"
+                           : livestream?.hasStarted
+                           ? "Enter event"
+                           : "I'll attend"}
                      </Button>
                   )}
                </DialogActions>
             </>
          )}
-      </Dialog>
+      </>
    );
 };
 
-export default withFirebase(GroupJoinToAttendModal);
+export default CategorySelect;

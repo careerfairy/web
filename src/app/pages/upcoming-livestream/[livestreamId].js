@@ -9,22 +9,18 @@ import {
    TextField,
    Tooltip,
 } from "@material-ui/core";
-import Header from "../../components/views/header/Header";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { withFirebasePage } from "context/firebase";
 import AddIcon from "@material-ui/icons/Add";
 import Loader from "../../components/views/loader/Loader";
 import DateUtil from "../../util/DateUtil";
 import { useRouter } from "next/router";
-import Footer from "../../components/views/footer/Footer";
 import Countdown from "../../components/views/common/Countdown";
-import BookingModal from "../../components/views/common/booking-modal/BookingModal";
 import QuestionVotingBox from "../../components/views/question-voting-box/QuestionVotingBox";
 import StringUtils from "../../util/StringUtils";
 import ClearIcon from "@material-ui/icons/Clear";
 import UserUtil from "../../data/util/UserUtil";
 import TargetOptions from "../../components/views/common/TargetOptions";
-import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
 import EmailIcon from "@material-ui/icons/Email";
 import RssFeedIcon from "@material-ui/icons/RssFeed";
@@ -48,6 +44,7 @@ import {
 } from "components/views/NextLivestreams/GroupStreams/groupStreamCard/badges";
 import Link from "materialUI/NextNavLink";
 import GeneralLayout from "../../layouts/GeneralLayout";
+import RegistrationModal from "../../components/views/common/registration-modal";
 
 const useStyles = makeStyles((theme) => ({
    speakerAvatar: {
@@ -135,32 +132,33 @@ const parseDates = (stream) => {
 
 function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    const classes = useStyles();
-   const router = useRouter();
-   const { livestreamId, groupId: queryGroupId } = router.query;
-   const absolutePath = router.asPath;
+   const { asPath, push, query, replace, pathname } = useRouter();
    const summaryRef = useRef();
-   const { referrerId } = router.query;
    const { userData, authenticatedUser: user } = useAuth();
    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
    const [newQuestionTitle, setNewQuestionTitle] = useState("");
    const [currentLivestream, setCurrentLivestream] = useState(
       parseDates(serverSideLivestream)
    );
-   const [registration, setRegistration] = useState(false);
 
    const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
    const [registered, setRegistered] = useState(false);
-   const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
-   const [bookingModalOpen, setBookingModalOpen] = useState(false);
    const [careerCenters, setCareerCenters] = useState([]);
    const [currentGroup, setCurrentGroup] = useState(null);
    const [targetOptions, setTargetOptions] = useState([]);
 
-   const [openJoinModal, setOpenJoinModal] = useState(false);
    const [openTalentPoolModal, setOpenTalentPoolModal] = useState(false);
    const [isPastEvent, setIsPastEvent] = useState(
       streamIsOld(currentLivestream?.startDate)
    );
+
+   const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
+   const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
+   const handleOpenJoinModal = (dataObj) =>
+      setJoinGroupModalData({
+         groups: dataObj.groups,
+         livestream: dataObj.livestream,
+      });
 
    useEffect(() => {
       // Checks if the event is old and has a summary,
@@ -178,11 +176,11 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    }, [currentLivestream?.startDate]);
 
    useEffect(() => {
-      if (livestreamId) {
+      if (query.livestreamId) {
          const unsubscribe = firebase.listenToLivestreamQuestions(
-            livestreamId,
+            query.livestreamId,
             (querySnapshot) => {
-               var questionsList = [];
+               const questionsList = [];
                querySnapshot.forEach((doc) => {
                   let question = doc.data();
                   question.id = doc.id;
@@ -193,7 +191,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          );
          return () => unsubscribe();
       }
-   }, [livestreamId, user]);
+   }, [query.livestreamId, user]);
 
    useEffect(() => {
       if (groupId) {
@@ -210,9 +208,9 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    }, [groupId]);
 
    useEffect(() => {
-      if (livestreamId) {
+      if (query.livestreamId) {
          const unsubscribe = firebase.listenToScheduledLivestreamById(
-            livestreamId,
+            query.livestreamId,
             (querySnapshot) => {
                if (querySnapshot.data()) {
                   let livestream = querySnapshot.data();
@@ -226,7 +224,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          );
          return () => unsubscribe();
       }
-   }, [livestreamId]);
+   }, [query.livestreamId]);
 
    useEffect(() => {
       if (
@@ -280,7 +278,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
                let targetGroupId = currentGroup?.groupId;
 
-               if (!queryGroupId) {
+               if (!query.groupId) {
                   const companyThatPublishedStream = groupList.find(
                      (group) =>
                         !group.universityCode &&
@@ -313,9 +311,40 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    useEffect(() => {
       if (currentLivestream.hasStarted) {
-         router.replace?.("/streaming/" + currentLivestream.id + "/viewer");
+         replace?.("/streaming/" + currentLivestream.id + "/viewer");
       }
    }, [currentLivestream.hasStarted]);
+
+   useEffect(() => {
+      if (
+         query.register === currentLivestream?.id &&
+         careerCenters.length &&
+         !currentLivestream?.registeredUsers.includes(user.email)
+      ) {
+         (async function handleAutoRegister() {
+            const newQuery = { ...query };
+            if (newQuery.register) {
+               delete newQuery.register;
+            }
+            await push({
+               pathname,
+               query: {
+                  ...newQuery,
+               },
+            });
+            handleOpenJoinModal({
+               groups: careerCenters,
+               livestream: currentLivestream,
+            });
+         })();
+      }
+   }, [
+      query.register,
+      currentLivestream?.id,
+      careerCenters,
+      currentLivestream?.registeredUsers,
+      user.email,
+   ]);
 
    function goToSeparateRoute(route) {
       window.open("http://careerfairy.io" + route, "_blank");
@@ -323,11 +352,11 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    function joinTalentPool() {
       if (!user || !user.emailVerified) {
-         return router.replace("/signup");
+         return replace("/signup");
       }
 
       if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-         return router.push("/profile");
+         return push("/profile");
       }
 
       firebase.joinCompanyTalentPool(
@@ -339,11 +368,11 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    function leaveTalentPool() {
       if (!user || !user.emailVerified) {
-         return router.replace("/signup");
+         return replace("/signup");
       }
 
       if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-         return router.push("/profile");
+         return push("/profile");
       }
 
       firebase.leaveCompanyTalentPool(
@@ -360,89 +389,50 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
       return currentLivestream.registeredUsers.indexOf(user.email) > -1;
    }
 
-   function sendEmailRegistrationConfirmation() {
-      return firebase.sendRegistrationConfirmationEmail(
-         user,
-         userData,
-         currentLivestream
-      );
-   }
+   const linkToStream = useMemo(() => {
+      const notLoggedIn =
+         (user.isLoaded && user.isEmpty) || !user.emailVerified;
+      const registerQuery = notLoggedIn
+         ? `&register=${currentLivestream.id}`
+         : "";
+      const referrerQuery = query.referrerId
+         ? `&referrerId=${query.referrerId}`
+         : "";
+      const groupIdQuery = query.groupId ? `&groupId=${query.groupId}` : "";
+      const queries = `${registerQuery}${referrerQuery}${groupIdQuery}`;
+      const basePath = `/upcoming-livestream/${currentLivestream.id}`;
+      return queries ? `${basePath}?${queries}` : basePath;
+   }, [asPath, currentLivestream?.id, query.groupId, user, query.referrerId]);
 
-   function userFollowsSomeCareerCenter() {
-      return userData.groupIds?.some((groupId) => {
-         return careerCenters.some((careerCenter) => {
-            return careerCenter.groupId === groupId;
-         });
-      });
-   }
-
-   const startRegistrationProcess = async (livestreamId) => {
+   const startRegistrationProcess = async () => {
       if (!user || !user.emailVerified) {
-         return router.push(
-            absolutePath
+         return push(
+            asPath
                ? {
                     pathname: `/login`,
-                    query: { absolutePath },
+                    query: { absolutePath: linkToStream },
                  }
                : "/signup"
          );
       }
 
       if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-         return router.push("/profile");
+         return push("/profile");
       }
 
-      const {
-         hasAgreedToAll,
-         groupsWithPolicies,
-      } = await GroupsUtil.getPolicyStatus(careerCenters, user.email, firebase);
-      if (!hasAgreedToAll) {
-         setOpenJoinModal(true);
-         setGroupsWithPolicies(groupsWithPolicies);
-      } else if (careerCenters.length > 0 && !userFollowsSomeCareerCenter()) {
-         setOpenJoinModal(true);
-      } else {
-         setBookingModalOpen(true);
-         setRegistration(true);
-         firebase
-            .registerToLivestream(
-               currentLivestream.id,
-               userData,
-               groupsWithPolicies,
-               referrerId
-            )
-            .then(() => {
-               sendEmailRegistrationConfirmation();
-               setRegistration(false);
-            });
-      }
+      handleOpenJoinModal({
+         groups: careerCenters,
+         livestream: currentLivestream,
+      });
    };
-
-   function completeRegistrationProcess() {
-      firebase
-         .registerToLivestream(
-            currentLivestream.id,
-            userData,
-            groupsWithPolicies,
-            referrerId
-         )
-         .then(() => {
-            setBookingModalOpen(true);
-            sendEmailRegistrationConfirmation();
-         });
-   }
-
-   function handleCloseJoinModal() {
-      setOpenJoinModal(false);
-   }
 
    function deregisterFromLivestream(livestreamId) {
       if (!user || !user.emailVerified) {
-         return router.push("/signup");
+         return push("/signup");
       }
 
       if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-         return router.push("/profile");
+         return push("/profile");
       }
 
       firebase.deregisterFromLivestream(livestreamId, user.email);
@@ -502,7 +492,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    function addNewQuestion() {
       if (!user || !user.emailVerified) {
-         return router.replace("/signup");
+         return replace("/signup");
       }
 
       if (StringUtils.isEmpty(newQuestionTitle)) {
@@ -657,8 +647,8 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                   title={`CareerFairy | Live Stream with ${currentLivestream.company}`}
                   fullPath={
                      groupId
-                        ? `https://careerfairy.io/upcoming-livestream/${livestreamId}?groupId=${groupId}`
-                        : `https://careerfairy.io/upcoming-livestream/${livestreamId}`
+                        ? `https://careerfairy.io/upcoming-livestream/${query.livestreamId}?groupId=${groupId}`
+                        : `https://careerfairy.io/upcoming-livestream/${query.livestreamId}`
                   }
                   image={getResizedUrl(
                      currentLivestream.backgroundImageUrl,
@@ -1128,25 +1118,12 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                   </div>
                </Container>
             </div>
-            <GroupJoinToAttendModal
-               open={openJoinModal}
-               groupsWithPolicies={groupsWithPolicies}
-               groups={careerCenters}
-               alreadyJoined={false}
-               userData={userData}
-               onConfirm={completeRegistrationProcess}
-               closeModal={handleCloseJoinModal}
-            />
-            ;
-            <BookingModal
-               careerCenters={careerCenters}
-               livestream={currentLivestream}
-               groupId={groupId}
-               modalOpen={bookingModalOpen}
-               setModalOpen={setBookingModalOpen}
-               registration={registration}
-               setRegistration={(value) => setRegistration(value)}
-               user={user}
+            <RegistrationModal
+               open={Boolean(joinGroupModalData)}
+               onFinish={handleCloseJoinModal}
+               promptOtherEventsOnFinal
+               livestream={joinGroupModalData?.livestream}
+               groups={joinGroupModalData?.groups}
             />
             ;
             <JoinTalentPoolModal

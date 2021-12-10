@@ -20,8 +20,8 @@ import StudentBenefitsSection from "../components/views/landing/StudentBenefitsS
 import Link from "materialUI/NextNavLink";
 import NumbersSection from "../components/views/landing/NumbersSection";
 import { useAuth } from "../HOCs/AuthProvider";
-import GroupJoinModal from "../components/views/profile/GroupJoinModal";
 import SpeakersSection from "../components/views/landing/SpeakersSection";
+import RegistrationModal from "../components/views/common/registration-modal";
 
 const StudentLandingPage = ({}) => {
    const {
@@ -31,7 +31,8 @@ const StudentLandingPage = ({}) => {
    const { userData } = useAuth();
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
-   const handleOpenJoinModal = (groupData) => setJoinGroupModalData(groupData);
+   const handleOpenJoinModal = ({ groups }) =>
+      setJoinGroupModalData({ groups });
    const [calendlyModalOpen, setCalendlyModalOpen] = useState(false);
 
    const handleOpenCalendly = () => {
@@ -158,7 +159,6 @@ const StudentLandingPage = ({}) => {
                handleOpenJoinModal={handleOpenJoinModal}
             />
             <FollowCompaniesSection
-               handleOpenJoinModal={handleOpenJoinModal}
                title={
                   "See your favourite companies missing? Let's change that."
                }
@@ -192,11 +192,11 @@ const StudentLandingPage = ({}) => {
                onClose={handleCloseCalendly}
             />
             <ScrollToTop />
-            <GroupJoinModal
+            <RegistrationModal
                open={Boolean(joinGroupModalData)}
-               group={joinGroupModalData}
-               userData={userData}
-               closeModal={handleCloseJoinModal}
+               handleClose={handleCloseJoinModal}
+               livestream={joinGroupModalData?.livestream}
+               groups={joinGroupModalData?.groups}
             />
          </LandingLayout>
       </React.Fragment>

@@ -61,7 +61,7 @@ const UpcomingLivestreamsSection = (props) => {
             handleOpenJoinModal={props.handleOpenJoinModal}
             upcomingStreams={upcomingLivestreams}
          />
-         <Box display="flex" justifyContent="center" p={2}>
+         <Box display="flex" justifyContent="center" p={2} pt={4}>
             <HeroButton
                href="/next-livestreams"
                component={Link}
