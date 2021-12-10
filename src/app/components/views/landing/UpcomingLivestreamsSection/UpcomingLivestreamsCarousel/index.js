@@ -32,6 +32,7 @@ const UpcomingLivestreamsCarousel = ({
    upcomingStreams,
    handleOpenJoinModal,
    additionalSettings,
+   disableAutoPlay,
 }) => {
    const classes = useStyles();
 
@@ -40,7 +41,7 @@ const UpcomingLivestreamsCarousel = ({
       speed: 500,
       lazyLoad: true,
       arrows: false,
-      autoplay: true,
+      autoplay: !disableAutoPlay,
       autoplaySpeed: 10000,
       dots: true,
       pauseOnHover: true,

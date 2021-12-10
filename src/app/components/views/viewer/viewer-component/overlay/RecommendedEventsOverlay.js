@@ -101,6 +101,7 @@ const RecommendedEventsOverlay = ({ recommendedEventIds, mobile }) => {
                handleOpenJoinModal={handleOpenJoinModal}
                upcomingStreams={recommendedEvents}
                additionalSettings={additionalSettings}
+               disableAutoPlay={Boolean(joinGroupModalData)}
             />
          </Container>
          <RegistrationModal

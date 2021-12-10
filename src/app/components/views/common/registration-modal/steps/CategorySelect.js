@@ -58,8 +58,8 @@ const CategorySelect = () => {
    useEffect(() => {
       if (group.categories?.length) {
          (async function () {
+            setCheckingCategories(true);
             try {
-               setCheckingCategories(true);
                const newCategories = StatsUtil.mapUserCategorySelection({
                   userData,
                   group,
@@ -190,8 +190,11 @@ const CategorySelect = () => {
                      {!!categories.length && renderCategories}
                   </Box>
                   <Box p={2} className={classes.actions}>
-                     {localGroupsWithPolicies.map((group, index) => (
-                        <Typography style={{ fontSize: "0.8rem" }}>
+                     {localGroupsWithPolicies.map((group) => (
+                        <Typography
+                           key={group.id}
+                           style={{ fontSize: "0.8rem" }}
+                        >
                            Your participant information (surname, first name,
                            university affiliation) and the data above will be
                            transferred to the organizer when you register for

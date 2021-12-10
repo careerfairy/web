@@ -4,17 +4,11 @@ import { useFirebase } from "../firebase";
 import { useAuth } from "../../HOCs/AuthProvider";
 import { useRouter } from "next/router";
 import StatsUtil from "../../data/util/StatsUtil";
+import useInfiniteScrollServer from "../../components/custom-hook/useInfiniteScrollServer";
 
 // Applied to all fields
 const variant = "standard";
 const margin = "normal";
-const labels = [
-   "Select your categories",
-   "Add a Question",
-   "Upvote questions",
-   "Join Talent Pool",
-   "Finish",
-];
 
 export const RegistrationContext = createContext({
    activeStep: 0,
@@ -30,11 +24,13 @@ export const RegistrationContext = createContext({
    group: {},
    groups: [],
    setGroup() {},
+   handleClientSideQuestionUpdate() {},
    groupsWithPolicies: [],
    hasAgreedToAll: false,
    completeRegistrationProcess() {},
    labels: [],
    promptOtherEventsOnFinal: false,
+   totalSteps: 0,
 });
 
 function reducer(state, action) {
@@ -64,6 +60,11 @@ function reducer(state, action) {
             ...state,
             group: action.payload,
          };
+      case "set-total-steps":
+         return {
+            ...state,
+            totalSteps: action.payload,
+         };
       case "set-policy-groups":
          return {
             ...state,
@@ -90,19 +91,31 @@ export function RegistrationContextProvider({
       checkIfUserAgreedToGroupPolicy,
       registerToLivestream,
       sendRegistrationConfirmationEmail,
+      livestreamQuestionsQuery,
    } = useFirebase();
    const {
       query: { referrerId },
    } = useRouter();
    const { authenticatedUser, userData } = useAuth();
    const [
-      { activeStep, group, groupsWithPolicies, hasAgreedToAll },
+      { activeStep, group, groupsWithPolicies, hasAgreedToAll, totalSteps },
       dispatch,
    ] = useReducer(reducer, {
       activeStep: 0,
       group: {},
       groupsWithPolicies: [],
       hasAgreedToAll: false,
+      totalSteps: 0,
+   });
+
+   const {
+      docs,
+      hasMore,
+      getMore,
+      handleClientUpdate: handleClientSideQuestionUpdate,
+   } = useInfiniteScrollServer({
+      limit: 8,
+      query: livestream && livestreamQuestionsQuery(livestream?.id),
    });
 
    // Proceed to next step
@@ -110,7 +123,7 @@ export function RegistrationContextProvider({
    // Go back to prev step
    const handleBack = () => dispatch({ type: "decrease" });
    const handleGoToLast = () =>
-      dispatch({ type: "set-step", payload: labels.length - 1 });
+      dispatch({ type: "set-step", payload: totalSteps ? totalSteps - 1 : 0 });
 
    const handleSkipNext = () => dispatch({ type: "skip-next" });
 
@@ -121,6 +134,8 @@ export function RegistrationContextProvider({
 
    const setGroup = (group) =>
       dispatch({ type: "set-group", payload: group || {} });
+   const setTotalSteps = (totalAmountOfSteps) =>
+      dispatch({ type: "set-total-steps", payload: totalAmountOfSteps || 0 });
    const setPolicyGroups = (policyGroups) =>
       dispatch({ type: "set-policy-groups", payload: policyGroups || [] });
    const setHasAgreedToAll = (hasAgreedToAll) =>
@@ -198,11 +213,15 @@ export function RegistrationContextProvider({
             setGroup,
             groupsWithPolicies,
             hasAgreedToAll,
+            questions: docs,
+            hasMore,
+            getMore,
+            handleClientSideQuestionUpdate,
             livestream,
             handleClose,
             completeRegistrationProcess,
-            labels,
             handleSkipNext,
+            setTotalSteps,
             handleGoToLast,
             promptOtherEventsOnFinal,
             alreadyJoined: Boolean(userData?.groupIds?.includes(group?.id)),

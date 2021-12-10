@@ -14,7 +14,6 @@ import { useAuth } from "../../../../../../HOCs/AuthProvider";
 import { useRouter } from "next/router";
 import QuestionCard from "./QuestionCard";
 import GroupLogo from "../../common/GroupLogo";
-import useInfiniteScrollServer from "../../../../../custom-hook/useInfiniteScrollServer";
 import CustomInfiniteScroll from "../../../../../util/CustomInfiteScroll";
 
 const useStyles = makeStyles((theme) => ({
@@ -29,27 +28,26 @@ const useStyles = makeStyles((theme) => ({
 }));
 const questionsContainerHeight = 400;
 const QuestionUpvote = () => {
-   const { handleNext, group, livestream } = useContext(RegistrationContext);
+   const {
+      handleNext,
+      group,
+      livestream,
+      hasMore,
+      getMore,
+      questions,
+      handleClientSideQuestionUpdate,
+   } = useContext(RegistrationContext);
    const classes = useStyles();
-   const { upvoteLivestreamQuestion, livestreamQuestionsQuery } = useFirebase();
+   const { upvoteLivestreamQuestion } = useFirebase();
 
    const { push } = useRouter();
    const { authenticatedUser } = useAuth();
-   const {
-      docs,
-      hasMore,
-      getMore,
-      handleClientUpdate,
-   } = useInfiniteScrollServer({
-      limit: 8,
-      query: livestreamQuestionsQuery(livestream?.id),
-   });
 
    useEffect(() => {
-      if (!docs.length && !hasMore) {
+      if (!questions.length && !hasMore) {
          handleNext();
       }
-   }, [docs, hasMore]);
+   }, [questions, hasMore]);
 
    const handleUpvote = async (question) => {
       if (!authenticatedUser) {
@@ -62,7 +60,7 @@ const QuestionUpvote = () => {
             authenticatedUser.email
          );
 
-         handleClientUpdate(question.id, {
+         handleClientSideQuestionUpdate(question.id, {
             votes: question.votes + 1 || 1,
             emailOfVoters: question.emailOfVoters?.concat(
                authenticatedUser.email
@@ -91,11 +89,11 @@ const QuestionUpvote = () => {
                   height={questionsContainerHeight}
                   hasMore={hasMore}
                   next={getMore}
-                  dataLength={docs.length}
+                  dataLength={questions.length}
                >
                   <Box p={2}>
                      <Grid container spacing={2}>
-                        {docs.map((question, index) => (
+                        {questions.map((question, index) => (
                            <Grid item key={question.id} xs={12} sm={6}>
                               <QuestionCard
                                  question={question}

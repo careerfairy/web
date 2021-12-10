@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import GroupLogo from "../../common/GroupLogo";
 import {
    Box,
    Button,
@@ -29,13 +28,18 @@ const useStyles = makeStyles((theme) => ({
       justifyContent: "center",
       width: "100%",
    },
+   content: {
+      background: theme.palette.primary.main,
+   },
+   titleWrapper: {
+      paddingTop: theme.spacing(2),
+   },
 }));
 
 const RegistrationComplete = () => {
    const {
       group,
       livestream,
-      // handleBack,
       promptOtherEventsOnFinal,
       handleClose,
    } = useContext(RegistrationContext);
@@ -76,20 +80,22 @@ const RegistrationComplete = () => {
    const classes = useStyles();
    return (
       <>
-         <GroupLogo logoUrl={group.logoUrl} />
-         <Grow timeout={1000} in>
-            <DialogTitle align="center">
-               <Typography variant="h6" className={classes.title}>
-                  Thank you!
-               </Typography>
-            </DialogTitle>
-         </Grow>
          <DialogContent className={classes.content}>
             <SuccessCheckmark />
          </DialogContent>
+         <Grow timeout={1000} in>
+            <div className={classes.titleWrapper}>
+               <Typography
+                  variant="h5"
+                  align="center"
+                  className={classes.title}
+               >
+                  Thank you!
+               </Typography>
+            </div>
+         </Grow>
          <DialogActions>
-            <Box className={classes.actions}>
-               {/*<Button onClick={handleBack}>back</Button>*/}
+            <Box p={2} className={classes.actions}>
                {promptOtherEventsOnFinal ? (
                   <Button
                      className={classes.linkBtn}

@@ -6,8 +6,10 @@ const useInfiniteScrollServer = ({ limit = 5, query }) => {
    const [loading, setLoading] = useState(false);
 
    useEffect(() => {
-      getInitialQuery();
-   }, []);
+      if (query) {
+         getInitialQuery();
+      }
+   }, [Boolean(query)]);
 
    const getInitialQuery = async () => {
       try {
