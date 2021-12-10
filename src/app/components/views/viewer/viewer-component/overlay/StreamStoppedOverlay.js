@@ -53,42 +53,44 @@ const StreamStoppedOverlay = () => {
    const classes = useStyles();
 
    return (
-      <>
-         <div className={classes.waitingOverlay}>
-            <div className={classes.waitingContent}>
-               <Typography className={classes.waitingText}>
-                  Thanks for joining the stream!
-               </Typography>
-               <Typography className={classes.mainTitle}>
-                  We need your input!
-               </Typography>
-               <Typography>
-                  We are currently improving CareerFairy to help you land your
-                  dream job.
-               </Typography>
-               <Typography className={classes.marginBottom}>
-                  Click on the button below to help us by{" "}
-                  <em>filling out our short Typeform survey</em> and answering a
-                  few questions about your experience.
-               </Typography>
-               <a
-                  href="https://mf82k3pxiqx.typeform.com/to/wI7YFVbC"
-                  target="_blank"
+      <div className={classes.waitingOverlay}>
+         <div className={classes.waitingContent}>
+            <Typography className={classes.waitingText}>
+               Thanks for joining the stream!
+            </Typography>
+            <Typography className={classes.mainTitle}>
+               Get Your 30€ Amazon Gift Card
+            </Typography>
+            <Typography>
+               We are currently improving CareerFairy to help you land your
+               dream job.
+            </Typography>
+            <Typography className={classes.marginBottom}>
+               Click on the button below to help us by{" "}
+               <em>booking a 15 minute call with our product expert</em> and
+               answering a few questions about your experience.
+            </Typography>
+            <a
+               href="https://calendly.com/federico-spiezia-1/ux-interviews"
+               target="_blank"
+            >
+               <Button
+                  variant="contained"
+                  size="large"
+                  color="secondary"
+                  className={classes.buttonMarginBottom}
+                  startIcon={<CardGiftcardIcon />}
                >
-                  <Button
-                     variant="contained"
-                     size="large"
-                     color="secondary"
-                     className={classes.buttonMarginBottom}
-                     startIcon={<EmojiPeopleIcon />}
-                  >
-                     I want to help!
-                  </Button>
-               </a>
-               <Typography>Thank you for your contribution!</Typography>
-            </div>
+                  I want my gift card
+               </Button>
+            </a>
+            <Typography>
+               We'll send you your 30€ Amazon gift card as your reward right
+               after the interview.
+            </Typography>
+            <Typography>Thank you for your contribution!</Typography>
          </div>
-      </>
+      </div>
    );
 };
 
