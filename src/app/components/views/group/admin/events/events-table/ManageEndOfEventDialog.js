@@ -129,25 +129,25 @@ const Content = ({ onClose, eventData, group }) => {
                      options={filteredEvents}
                      fullWidth
                   />
-                  <Box py={1}>
-                     <FormControlLabel
-                        disabled={updating}
-                        control={
-                           <Checkbox
-                              name="show-only-linked-events"
-                              onChange={(e) =>
-                                 setShowOnlyLinkedEvents(
-                                    e.currentTarget.checked
-                                 )
-                              }
-                              value={showOnlyLinkedEvents}
-                              checked={showOnlyLinkedEvents}
-                              color="primary"
-                           />
-                        }
-                        label={<Typography>Only linked events</Typography>}
-                     />
-                  </Box>
+                  {/*<Box py={1}>*/}
+                  {/*   <FormControlLabel*/}
+                  {/*      disabled={updating}*/}
+                  {/*      control={*/}
+                  {/*         <Checkbox*/}
+                  {/*            name="show-only-linked-events"*/}
+                  {/*            onChange={(e) =>*/}
+                  {/*               setShowOnlyLinkedEvents(*/}
+                  {/*                  e.currentTarget.checked*/}
+                  {/*               )*/}
+                  {/*            }*/}
+                  {/*            value={showOnlyLinkedEvents}*/}
+                  {/*            checked={showOnlyLinkedEvents}*/}
+                  {/*            color="primary"*/}
+                  {/*         />*/}
+                  {/*      }*/}
+                  {/*      label={<Typography>Only linked events</Typography>}*/}
+                  {/*   />*/}
+                  {/*</Box>*/}
                </Box>
             )}
          </DialogContent>

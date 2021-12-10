@@ -32,6 +32,7 @@ import ToolbarDialogAction from "./ToolbarDialogAction";
 import { useRouter } from "next/router";
 import MoreOptionsMenu from "./MoreOptionsMenu";
 import ManageEndOfEventDialog from "./ManageEndOfEventDialog";
+import { useAuth } from "../../../../../../HOCs/AuthProvider";
 
 const EventsTable = ({
    streams,
@@ -50,6 +51,7 @@ const EventsTable = ({
    const firebase = useFirebase();
    const theme = useTheme();
    const { pathname, push, query } = useRouter();
+   const { userData } = useAuth();
    const [deletingEvent, setDeletingEvent] = useState(false);
    const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null);
    const [allGroups, setAllGroups] = useState([]);
@@ -269,6 +271,17 @@ const EventsTable = ({
             hintDescription:
                "Once you are happy with the contents of the drafted event, you can then make it live so that users can now register.",
          },
+         {
+            loadedButton: (
+               <MoreOptionsMenu
+                  handleOpenEndOfEventDialog={handleOpenEndOfEventDialog}
+                  rowData={rowData}
+                  hintTitle="More options"
+               />
+            ),
+            tooltip: "More options",
+            hidden: isDraft || !userData.isAdmin,
+         },
       ],
       [
          registeredStudentsAction,
@@ -282,6 +295,7 @@ const EventsTable = ({
          handleClickDeleteStream,
          streams,
          isDraft,
+         userData?.isAdmin,
       ]
    );
 
@@ -293,16 +307,6 @@ const EventsTable = ({
             onClick: handleOpenToolbarActionsDialog,
             tooltip: "Other options",
          },
-         (rowData) => ({
-            icon: () => (
-               <MoreOptionsMenu
-                  handleOpenEndOfEventDialog={handleOpenEndOfEventDialog}
-                  rowData={rowData}
-               />
-            ),
-            tooltip: "More options",
-            onClick: (event) => event.stopPropagation(),
-         }),
       ],
       [streams]
    );
