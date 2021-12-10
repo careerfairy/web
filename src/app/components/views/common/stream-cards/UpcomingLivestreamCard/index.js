@@ -210,6 +210,7 @@ const UpcomingLivestreamCard = ({
    livestream,
    handleOpenJoinModal,
    disableExpand,
+   noRegister,
 }) => {
    const theme = useTheme();
    const isLandscapeOnMobile = useMediaQuery(
@@ -446,23 +447,23 @@ const UpcomingLivestreamCard = ({
                         className={classes.buttonGroup}
                         aria-label="text primary button group"
                      >
-                        {(!status.isPastLivestream ||
-                           !livestream.openStream) && (
-                           <Button
-                              color={
-                                 status.hasRegistered ? "default" : "primary"
-                              }
-                              onClick={handleRegisterClick}
-                              size="large"
-                              disableElevation={status.hasRegistered}
-                              variant={"contained"}
-                              className={classes.button}
-                           >
-                              {status.hasRegistered
-                                 ? "Cancel"
-                                 : status.mainButtonLabel}
-                           </Button>
-                        )}
+                        {(!status.isPastLivestream || !livestream.openStream) &&
+                           !noRegister && (
+                              <Button
+                                 color={
+                                    status.hasRegistered ? "default" : "primary"
+                                 }
+                                 onClick={handleRegisterClick}
+                                 size="large"
+                                 disableElevation={status.hasRegistered}
+                                 variant={"contained"}
+                                 className={classes.button}
+                              >
+                                 {status.hasRegistered
+                                    ? "Cancel"
+                                    : status.mainButtonLabel}
+                              </Button>
+                           )}
                         <Button
                            color="primary"
                            size="large"
@@ -471,7 +472,7 @@ const UpcomingLivestreamCard = ({
                            variant="outlined"
                            className={classes.button}
                         >
-                           More
+                           {noRegister ? "Learn More" : "More"}
                         </Button>
                      </ButtonGroup>
                   </Box>

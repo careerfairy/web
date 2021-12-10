@@ -33,6 +33,7 @@ const UpcomingLivestreamsCarousel = ({
    handleOpenJoinModal,
    additionalSettings,
    disableAutoPlay,
+   noRegister,
 }) => {
    const classes = useStyles();
 
@@ -87,6 +88,7 @@ const UpcomingLivestreamsCarousel = ({
                      handleOpenJoinModal={handleOpenJoinModal}
                      livestream={livestream}
                      disableExpand
+                     noRegister={noRegister}
                   />
                </Box>
             ))}

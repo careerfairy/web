@@ -60,6 +60,7 @@ const UpcomingLivestreamsSection = (props) => {
          <UpcomingLivestreamsCarousel
             handleOpenJoinModal={props.handleOpenJoinModal}
             upcomingStreams={upcomingLivestreams}
+            noRegister
          />
          <Box display="flex" justifyContent="center" p={2} pt={4}>
             <HeroButton
