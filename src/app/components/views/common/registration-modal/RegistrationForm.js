@@ -66,7 +66,7 @@ const RegistrationForm = () => {
          index={activeStep}
          onChangeIndex={() => setSliding(true)}
          onTransitionEnd={() => setSliding(false)}
-         enableMouseEvents
+         disabled
       >
          {steps.map((stepData) => (
             <SwipeablePanel

@@ -1,4 +1,10 @@
-import React, { createContext, useEffect, useReducer, useState } from "react";
+import React, {
+   createContext,
+   useEffect,
+   useMemo,
+   useReducer,
+   useState,
+} from "react";
 import GroupsUtil from "../../data/util/GroupsUtil";
 import { useFirebase } from "../firebase";
 import { useAuth } from "../../HOCs/AuthProvider";
@@ -33,6 +39,9 @@ export const RegistrationContext = createContext({
    labels: [],
    promptOtherEventsOnFinal: false,
    totalSteps: 0,
+   questionSortType: "timestamp",
+   handleChangeQuestionSortType() {},
+   loadingInitialQuestions: false,
 });
 
 function reducer(state, action) {
@@ -100,7 +109,8 @@ export function RegistrationContextProvider({
    } = useRouter();
    const { authenticatedUser, userData } = useAuth();
    const [sliding, setSliding] = useState(false);
-
+   const [gettingPolicyStatus, setGettingPolicyStatus] = useState(false);
+   const [questionSortType, setQuestionSortType] = useState("timestamp");
    const [
       { activeStep, group, groupsWithPolicies, hasAgreedToAll, totalSteps },
       dispatch,
@@ -111,15 +121,22 @@ export function RegistrationContextProvider({
       hasAgreedToAll: false,
       totalSteps: 0,
    });
+   const questionsQuery = useMemo(
+      () =>
+         livestream &&
+         livestreamQuestionsQuery(livestream.id, questionSortType),
+      [livestream?.id, questionSortType]
+   );
 
    const {
       docs,
       hasMore,
       getMore,
+      loadingInitial: loadingInitialQuestions,
       handleClientUpdate: handleClientSideQuestionUpdate,
    } = useInfiniteScrollServer({
       limit: 8,
-      query: livestream && livestreamQuestionsQuery(livestream?.id),
+      query: questionsQuery,
    });
 
    // Proceed to next step
@@ -136,6 +153,11 @@ export function RegistrationContextProvider({
       dispatch({ type: "set-step", payload: 0 });
    };
 
+   const handleChangeQuestionSortType = (event, newSortType) => {
+      if (newSortType !== null) {
+         setQuestionSortType(newSortType);
+      }
+   };
    const setGroup = (group) =>
       dispatch({ type: "set-group", payload: group || {} });
    const setTotalSteps = (totalAmountOfSteps) =>
@@ -160,6 +182,7 @@ export function RegistrationContextProvider({
    useEffect(() => {
       (async function () {
          if (groups?.length) {
+            setGettingPolicyStatus(true);
             const {
                hasAgreedToAll,
                groupsWithPolicies,
@@ -174,6 +197,7 @@ export function RegistrationContextProvider({
             setPolicyGroups([]);
             setHasAgreedToAll(false);
          }
+         setGettingPolicyStatus(false);
       })();
    }, [groups]);
 
@@ -231,6 +255,10 @@ export function RegistrationContextProvider({
             handleGoToLast,
             promptOtherEventsOnFinal,
             alreadyJoined: Boolean(userData?.groupIds?.includes(group?.id)),
+            gettingPolicyStatus,
+            handleChangeQuestionSortType,
+            questionSortType,
+            loadingInitialQuestions,
          }}
       >
          {children}

@@ -2,90 +2,53 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import {
+   Box,
    Button,
-   Card,
-   CardActions,
-   CardContent,
-   CardHeader,
+   Chip,
    CircularProgress,
+   Paper,
    Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { getTimeFromNow } from "../../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
-   root: {
-      height: "100%",
+   paperRoot: {
+      padding: theme.spacing(1),
+      borderRadius: theme.spacing(2),
       display: "flex",
       flexDirection: "column",
-      padding: theme.spacing(1),
    },
-   questionTitle: {
-      // fontSize: "1.2em",
-      // fontWeight: 500,
-      wordBreak: "break-word",
+   chipTime: {
+      color: theme.palette.text.secondary,
    },
-   actions: {
-      marginTop: "auto",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-   },
-   icon: {
-      marginLeft: theme.spacing(0.5),
-   },
-   voteCount: {
-      display: "flex",
-      alignItems: "center",
-      color: theme.palette.action.disabled,
-   },
-   voteText: {
-      fontWeight: 700,
-      marginTop: `${theme.spacing(0.5)}px !important`,
-   },
-   content: {
-      padding: theme.spacing(1),
-   },
-   header: {
-      padding: theme.spacing(1),
+   chipLabel: {
+      fontSize: "0.8rem",
    },
 }));
 
 const QuestionCard = ({ isPastEvent, question, handleUpvote, hasVoted }) => {
    const [loading, setLoading] = useState(false);
    const classes = useStyles();
-
    return (
-      <Card elevation={2} className={classes.root}>
-         <CardHeader
-            className={classes.header}
-            action={
-               <div className={classes.voteCount}>
-                  <Typography
-                     color="inherit"
-                     className={classes.voteText}
-                     variant="body1"
-                  >
-                     {question.votes}
-                  </Typography>
-                  <ThumbUpIcon className={classes.icon} color="inherit" />
-               </div>
-            }
-         />
-         <CardContent className={classes.content}>
-            <Typography
-               align="center"
-               className={classes.questionTitle}
-               variant="body2"
-               component="p"
-            >
-               {question.title}
-            </Typography>
-         </CardContent>
-         <CardActions className={classes.actions} disableSpacing>
+      <Paper className={classes.paperRoot} variant="outlined">
+         <Box>
+            <Chip
+               variant="outlined"
+               className={classes.chipTime}
+               size="small"
+               classes={{ label: classes.chipLabel }}
+               label={getTimeFromNow(question.timestamp)}
+            />
+         </Box>
+         <Box py={1}>
+            <Typography variant="body2">{question.title}</Typography>
+         </Box>
+         <Box>
             <Button
                disabled={hasVoted(question) || isPastEvent || loading}
-               variant="contained"
-               fullWidth
+               variant="text"
+               size="small"
                onClick={async () => {
                   try {
                      setLoading(true);
@@ -93,7 +56,7 @@ const QuestionCard = ({ isPastEvent, question, handleUpvote, hasVoted }) => {
                   } catch (e) {}
                   setLoading(false);
                }}
-               color="primary"
+               color={hasVoted(question) || isPastEvent ? "default" : "primary"}
                startIcon={
                   loading ? (
                      <CircularProgress size={10} color="inherit" />
@@ -102,10 +65,10 @@ const QuestionCard = ({ isPastEvent, question, handleUpvote, hasVoted }) => {
                   )
                }
             >
-               upvote
+               {`${question.votes} Likes`}
             </Button>
-         </CardActions>
-      </Card>
+         </Box>
+      </Paper>
    );
 };
 

@@ -41,6 +41,7 @@ const CategorySelect = () => {
       alreadyJoined,
       completeRegistrationProcess,
       handleClose,
+      gettingPolicyStatus,
       hasAgreedToAll,
    } = useContext(RegistrationContext);
    const { userData } = useAuth();
@@ -70,8 +71,9 @@ const CategorySelect = () => {
                );
                if (hasAlreadySelectedAllCategories && hasAgreedToAll) {
                   await completeRegistrationProcess();
+               } else {
+                  setCategories(newCategories);
                }
-               setCategories(newCategories);
             } catch (e) {}
             setCheckingCategories(false);
          })();
@@ -155,7 +157,7 @@ const CategorySelect = () => {
       );
    });
 
-   if (checkingCategories) {
+   if (checkingCategories || gettingPolicyStatus) {
       return (
          <div className={classes.loaderWrapper}>
             <CircularProgress />

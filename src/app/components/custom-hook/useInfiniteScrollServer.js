@@ -4,17 +4,18 @@ const useInfiniteScrollServer = ({ limit = 5, query }) => {
    const [docs, setDocs] = useState([]);
    const [lastDoc, setLastDoc] = useState(null);
    const [loading, setLoading] = useState(false);
+   const [loadingInitial, setLoadingInitial] = useState(false);
 
    useEffect(() => {
       if (query) {
          getInitialQuery();
       }
-   }, [Boolean(query)]);
+   }, [query]);
 
    const getInitialQuery = async () => {
       try {
          if (loading) return;
-         setLoading(true);
+         setLoadingInitial(true);
          const data = await query.limit(limit).get();
          const initialDocs = data.docs.map((doc) => ({
             id: doc.id,
@@ -29,13 +30,12 @@ const useInfiniteScrollServer = ({ limit = 5, query }) => {
       } catch (e) {
          console.log("-> e", e);
       } finally {
-         setLoading(false);
+         setLoadingInitial(false);
       }
    };
 
    const getMore = async () => {
-      console.log(`-> in the get more loading: ${loading} lastDoc: ${lastDoc}`);
-      if (!lastDoc || loading) return;
+      if (!lastDoc || loading || loadingInitial) return;
       try {
          setLoading(true);
          const data = await query.startAfter(lastDoc).limit(limit).get();
@@ -64,6 +64,7 @@ const useInfiniteScrollServer = ({ limit = 5, query }) => {
       docs,
       loading,
       handleClientUpdate,
+      loadingInitial,
    };
 };
 

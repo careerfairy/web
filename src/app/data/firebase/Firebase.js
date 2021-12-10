@@ -1066,13 +1066,13 @@ class Firebase {
          .orderBy("votes", "desc");
       return ref.onSnapshot(callback);
    };
-   livestreamQuestionsQuery = (livestreamId) => {
+   livestreamQuestionsQuery = (livestreamId, sortType = "votes") => {
       if (!livestreamId) return;
       return this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("questions")
-         .orderBy("votes", "desc");
+         .orderBy(sortType, "desc");
    };
 
    listenToQuestionComments = (streamRef, questionId, callback) => {

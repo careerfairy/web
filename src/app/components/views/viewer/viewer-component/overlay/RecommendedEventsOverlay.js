@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { useFirebase } from "context/firebase";
 import { Box, Container, Typography } from "@material-ui/core";
@@ -32,7 +32,10 @@ const useStyles = makeStyles((theme) => ({
 const RecommendedEventsOverlay = ({ recommendedEventIds, mobile }) => {
    const classes = useStyles();
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
-   const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
+   const handleCloseJoinModal = useCallback(
+      () => setJoinGroupModalData(undefined),
+      []
+   );
    const handleOpenJoinModal = (dataObj) =>
       setJoinGroupModalData({
          groups: dataObj.groups,
