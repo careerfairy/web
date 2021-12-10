@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { RegistrationContext } from "context/registration/RegistrationContext";
 import CategorySelect from "./steps/CategorySelect";
 import QuestionUpvote from "./steps/QuestionUpvote";
@@ -51,7 +51,9 @@ const steps = [
 ];
 
 const RegistrationForm = () => {
-   const { activeStep, setTotalSteps } = useContext(RegistrationContext);
+   const { activeStep, setTotalSteps, setSliding } = useContext(
+      RegistrationContext
+   );
    const theme = useTheme();
    const classes = useStyles();
 
@@ -62,6 +64,8 @@ const RegistrationForm = () => {
       <SwipeableViews
          axis={theme.direction === "rtl" ? "x-reverse" : "x"}
          index={activeStep}
+         onChangeIndex={() => setSliding(true)}
+         onTransitionEnd={() => setSliding(false)}
          enableMouseEvents
       >
          {steps.map((stepData) => (

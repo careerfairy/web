@@ -1,8 +1,9 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useFirebase } from "context/firebase";
 import {
    Box,
    Button,
+   Collapse,
    DialogActions,
    DialogContent,
    DialogTitle,
@@ -36,8 +37,18 @@ const QuestionUpvote = () => {
       getMore,
       questions,
       handleClientSideQuestionUpdate,
+      sliding,
    } = useContext(RegistrationContext);
    const classes = useStyles();
+   const [show, setShow] = useState(false);
+
+   useEffect(() => {
+      const timeout = setTimeout(() => {
+         setShow(true);
+      }, 300);
+
+      return () => clearTimeout(timeout);
+   }, [show]);
    const { upvoteLivestreamQuestion } = useFirebase();
 
    const { push } = useRouter();
@@ -84,28 +95,30 @@ const QuestionUpvote = () => {
             WHICH QUESTIONS SHOULD THE SPEAKER ANSWER?
          </DialogTitle>
          <DialogContent className={classes.content}>
-            <Box height={questionsContainerHeight}>
-               <CustomInfiniteScroll
-                  height={questionsContainerHeight}
-                  hasMore={hasMore}
-                  next={getMore}
-                  dataLength={questions.length}
-               >
-                  <Box p={2}>
-                     <Grid container spacing={2}>
-                        {questions.map((question, index) => (
-                           <Grid item key={question.id} xs={12} sm={6}>
-                              <QuestionCard
-                                 question={question}
-                                 hasVoted={hasVoted}
-                                 handleUpvote={handleUpvote}
-                              />
-                           </Grid>
-                        ))}
-                     </Grid>
-                  </Box>
-               </CustomInfiniteScroll>
-            </Box>
+            <Collapse in={Boolean(questions.length && !sliding && show)}>
+               <Box height={questionsContainerHeight}>
+                  <CustomInfiniteScroll
+                     height={questionsContainerHeight}
+                     hasMore={hasMore}
+                     next={getMore}
+                     dataLength={questions.length}
+                  >
+                     <Box p={2}>
+                        <Grid container spacing={2}>
+                           {questions.map((question, index) => (
+                              <Grid item key={question.id} xs={12} sm={6}>
+                                 <QuestionCard
+                                    question={question}
+                                    hasVoted={hasVoted}
+                                    handleUpvote={handleUpvote}
+                                 />
+                              </Grid>
+                           ))}
+                        </Grid>
+                     </Box>
+                  </CustomInfiniteScroll>
+               </Box>
+            </Collapse>
          </DialogContent>
          <DialogActions>
             <Button

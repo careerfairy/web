@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer } from "react";
+import React, { createContext, useEffect, useReducer, useState } from "react";
 import GroupsUtil from "../../data/util/GroupsUtil";
 import { useFirebase } from "../firebase";
 import { useAuth } from "../../HOCs/AuthProvider";
@@ -24,6 +24,8 @@ export const RegistrationContext = createContext({
    group: {},
    groups: [],
    setGroup() {},
+   setSliding() {},
+   sliding: false,
    handleClientSideQuestionUpdate() {},
    groupsWithPolicies: [],
    hasAgreedToAll: false,
@@ -97,6 +99,8 @@ export function RegistrationContextProvider({
       query: { referrerId },
    } = useRouter();
    const { authenticatedUser, userData } = useAuth();
+   const [sliding, setSliding] = useState(false);
+
    const [
       { activeStep, group, groupsWithPolicies, hasAgreedToAll, totalSteps },
       dispatch,
@@ -222,6 +226,8 @@ export function RegistrationContextProvider({
             completeRegistrationProcess,
             handleSkipNext,
             setTotalSteps,
+            sliding,
+            setSliding,
             handleGoToLast,
             promptOtherEventsOnFinal,
             alreadyJoined: Boolean(userData?.groupIds?.includes(group?.id)),
