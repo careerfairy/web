@@ -8,7 +8,7 @@ import {
    Paper,
    Typography,
 } from "@material-ui/core";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
 import EventIcon from "@material-ui/icons/Event";
 import ClockIcon from "@material-ui/icons/AccessTime";
@@ -25,6 +25,7 @@ import { speakerPlaceholder } from "../../../../util/constants";
 import UserUtil from "../../../../../data/util/UserUtil";
 import { useRouter } from "next/router";
 import { FORTY_FIVE_MINUTES_IN_MILLISECONDS } from "../../../../../data/constants/streamContants";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 const useStyles = makeStyles((theme) => {
    const backgroundImageHeight = 200;
@@ -60,6 +61,9 @@ const useStyles = makeStyles((theme) => {
             borderRadius: cardBorderRadius,
             background: theme.palette.primary.main,
          },
+      },
+      rootLandscape: {
+         height: theme.spacing(36),
       },
       rootHovered: {},
       backgroundImage: {
@@ -108,6 +112,9 @@ const useStyles = makeStyles((theme) => {
          }),
       },
       contentWrapperHovered: {
+         top: 0,
+      },
+      contentWrapperLandscape: {
          top: 0,
       },
       upperContent: {
@@ -204,6 +211,10 @@ const UpcomingLivestreamCard = ({
    handleOpenJoinModal,
    disableExpand,
 }) => {
+   const theme = useTheme();
+   const isLandscapeOnMobile = useMediaQuery(
+      `${theme.breakpoints.down("sm")} and (orientation: landscape)`
+   );
    const [hovered, setHovered] = useState(false);
    const classes = useStyles();
    const { push, asPath } = useRouter();
@@ -212,9 +223,12 @@ const UpcomingLivestreamCard = ({
    const { userData, authenticatedUser } = useAuth();
 
    const handleMouseEnter = debounce(
-      () => !disableExpand && setHovered(true),
+      () => !disableExpand && !isLandscapeOnMobile && setHovered(true),
       throttle_speed
    );
+   useEffect(() => {
+      setHovered(false);
+   }, [isLandscapeOnMobile]);
    const handleMouseLeave = debounce(() => setHovered(false), throttle_speed);
 
    const {
@@ -365,6 +379,7 @@ const UpcomingLivestreamCard = ({
          onMouseLeave={handleMouseLeave}
          className={clsx(classes.root, {
             [classes.rootHovered]: hovered,
+            [classes.rootLandscape]: isLandscapeOnMobile,
          })}
       >
          <img
@@ -378,6 +393,7 @@ const UpcomingLivestreamCard = ({
          <div
             className={clsx(classes.contentWrapper, {
                [classes.contentWrapperHovered]: hovered,
+               [classes.contentWrapperLandscape]: isLandscapeOnMobile,
             })}
          >
             <Box

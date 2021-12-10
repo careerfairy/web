@@ -35,6 +35,8 @@ const useStyles = makeStyles((theme) => ({
    },
    filterWrapper: {
       padding: theme.spacing(1, 2),
+      display: "flex",
+      justifyContent: "space-between",
    },
    toggleGroup: {
       "& btn": {
@@ -129,16 +131,18 @@ const QuestionUpvote = () => {
 
    return (
       <div className={classes.root}>
-         <Hidden xsDown>
-            <GroupLogo logoUrl={group.logoUrl} />
-         </Hidden>
+         <Box width="100%" display="flex" justifyContent="center">
+            <Hidden xsDown>
+               <GroupLogo logoUrl={group.logoUrl} />
+            </Hidden>
+         </Box>
          <DialogTitle align="center">
             WHICH QUESTIONS SHOULD THE SPEAKER ANSWER?
          </DialogTitle>
          <DialogContent className={classes.content}>
             <Collapse in={Boolean(questions.length && !sliding && show)}>
-               {questions.length > 1 && (
-                  <div className={classes.filterWrapper}>
+               <div className={classes.filterWrapper}>
+                  {questions.length > 1 && (
                      <ToggleButtonGroup
                         value={questionSortType}
                         exclusive
@@ -160,8 +164,17 @@ const QuestionUpvote = () => {
                            Popular
                         </ToggleButton>
                      </ToggleButtonGroup>
-                  </div>
-               )}
+                  )}
+                  <Hidden mdUp>
+                     <Button
+                        variant="contained"
+                        onClick={handleNext}
+                        color="primary"
+                     >
+                        Next
+                     </Button>
+                  </Hidden>
+               </div>
                <div className={classes.dividerWrapper}>
                   <Divider />
                </div>
@@ -193,17 +206,19 @@ const QuestionUpvote = () => {
                   )}
                </div>
             </Collapse>
-            <DialogActions>
-               <Button
-                  variant="contained"
-                  size="large"
-                  onClick={handleNext}
-                  color="primary"
-                  autoFocus
-               >
-                  Next
-               </Button>
-            </DialogActions>
+            <Hidden smDown>
+               <DialogActions>
+                  <Button
+                     variant="contained"
+                     size="large"
+                     onClick={handleNext}
+                     color="primary"
+                     autoFocus
+                  >
+                     Next
+                  </Button>
+               </DialogActions>
+            </Hidden>
          </DialogContent>
       </div>
    );

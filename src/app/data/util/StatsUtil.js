@@ -283,13 +283,13 @@ export default class StatsUtil {
 
    static getStudentUniversityGroup(student, groups) {
       return groups.find(
-         (uniGroup) => student.university?.code === uniGroup.universityCode
+         (uniGroup) => student.university?.code === uniGroup?.universityCode
       );
    }
 
    static getFirstGroupUserBelongsTo(student, groups) {
       return groups.find(
-         (grp) => student.groupIds && student.groupIds.includes(grp.groupId)
+         (grp) => student.groupIds && student?.groupIds?.includes(grp?.groupId)
       );
    }
 
