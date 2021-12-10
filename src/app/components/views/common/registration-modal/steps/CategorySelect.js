@@ -43,6 +43,7 @@ const CategorySelect = () => {
       handleClose,
       gettingPolicyStatus,
       hasAgreedToAll,
+      onGroupJoin,
    } = useContext(RegistrationContext);
    const { userData } = useAuth();
    const classes = useStyles();
@@ -140,6 +141,7 @@ const CategorySelect = () => {
       } catch (e) {
          console.log("error in handle join", e);
       }
+      onGroupJoin?.();
       setSubmitting(false);
    };
 

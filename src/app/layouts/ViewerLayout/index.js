@@ -296,7 +296,7 @@ const ViewerLayout = (props) => {
       return (
          <ViewerGroupCategorySelectMenu
             joinGroupModalData={joinGroupModalData}
-            handleCloseJoinModal={handleCloseJoinModal}
+            onGroupJoin={handleCloseJoinModal}
          />
       );
    }

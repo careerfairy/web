@@ -213,20 +213,15 @@ const SignUpForm = withFirebase(SignUpFormBase);
 
 const SignUpFormSent = firebaseConnect()(SignUpFormValidate);
 
-function SignUpFormBase({
-   firebase,
-   user,
-   userData,
-   emailVerificationSent,
-   setEmailVerificationSent,
-   setActiveStep,
-}) {
+function SignUpFormBase({ firebase, setEmailVerificationSent, setActiveStep }) {
    const classes = useStyles();
+   const {
+      query: { absolutePath },
+   } = useRouter();
 
    const [emailSent, setEmailSent] = useState(false);
    const [errorMessage, setErrorMessage] = useState(null);
    const [generalLoading, setGeneralLoading] = useState(false);
-   const [formData, setFormData] = useState({});
    const [open, setOpen] = React.useState(false);
 
    const submitting = (isSubmitting) => {
@@ -608,7 +603,7 @@ function SignUpFormBase({
                      size="large"
                      variant="contained"
                      color="primary"
-                     disabled={emailSent}
+                     disabled={isSubmitting || emailSent}
                      endIcon={
                         (isSubmitting || generalLoading) && (
                            <CircularProgress size={20} color="inherit" />
@@ -622,7 +617,16 @@ function SignUpFormBase({
                      <div style={{ marginBottom: "5px" }}>
                         Already part of the family?
                      </div>
-                     <Link href="/login">
+                     <Link
+                        href={
+                           absolutePath
+                              ? {
+                                   pathname: "/login",
+                                   query: { absolutePath },
+                                }
+                              : "/login"
+                        }
+                     >
                         <a href="#">Log in</a>
                      </Link>
                   </div>
@@ -652,13 +656,13 @@ function SignUpFormValidate({
    firebase: { reloadAuth },
    setEmailVerificationSent,
    setActiveStep,
-   absolutePath,
 }) {
-   const classes = useStyles();
-   const router = useRouter();
+   const {
+      push,
+      query: { absolutePath },
+   } = useRouter();
    const firebase = useFirebase();
-
-   const [errorMessageShown, setErrorMessageShown] = useState(false);
+   const [errorMessageShown] = useState(false);
    const [incorrectPin, setIncorrectPin] = useState(false);
    const [generalLoading, setGeneralLoading] = useState(false);
 
@@ -715,7 +719,7 @@ function SignUpFormValidate({
                      setTimeout(() => {
                         reloadAuth().then(() => {
                            if (absolutePath) {
-                              router.push(absolutePath);
+                              push(absolutePath);
                            } else {
                               updateActiveStep(2);
                            }

@@ -41,6 +41,8 @@ export const RegistrationContext = createContext({
    totalSteps: 0,
    questionSortType: "timestamp",
    handleChangeQuestionSortType() {},
+   onGroupJoin() {},
+   onFinish() {},
    loadingInitialQuestions: false,
 });
 
@@ -97,6 +99,8 @@ export function RegistrationContextProvider({
    livestream,
    closeModal,
    promptOtherEventsOnFinal,
+   onGroupJoin,
+   onFinish,
 }) {
    const {
       checkIfUserAgreedToGroupPolicy,
@@ -259,6 +263,8 @@ export function RegistrationContextProvider({
             handleChangeQuestionSortType,
             questionSortType,
             loadingInitialQuestions,
+            onFinish,
+            onGroupJoin,
          }}
       >
          {children}

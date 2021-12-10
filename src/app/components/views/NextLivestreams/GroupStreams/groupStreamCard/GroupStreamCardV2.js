@@ -255,18 +255,25 @@ const GroupStreamCardV2 = memo(
       const firebase = useFirebase();
       const mediaStyles = useCoverCardMediaStyles();
       const classes = useStyles();
-      const {
-         pathname,
-         absolutePath,
-         push,
-         query: { referrerId },
-      } = useRouter();
+      const { absolutePath, pathname, push, query } = useRouter();
       const linkToStream = useMemo(() => {
-         const referrerQuery = referrerId ? `&referrerId=${referrerId}` : "";
+         const notLoggedIn =
+            (user.isLoaded && user.isEmpty) || !user.emailVerified;
+         const registerQuery = notLoggedIn ? `&register=${livestream.id}` : "";
+         const referrerQuery = query.referrerId
+            ? `&referrerId=${query.referrerId}`
+            : "";
+         const queries = `${registerQuery}${referrerQuery}`;
          return pathname === "/next-livestreams/[groupId]"
-            ? `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}${referrerQuery}`
-            : `/next-livestreams?livestreamId=${livestream.id}${referrerQuery}`;
-      }, [pathname, livestream?.id, groupData?.groupId, referrerId]);
+            ? `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}${queries}`
+            : `/next-livestreams?livestreamId=${livestream.id}${queries}`;
+      }, [
+         pathname,
+         livestream?.id,
+         groupData?.groupId,
+         query.referrerId,
+         user,
+      ]);
 
       function userIsRegistered() {
          if (
@@ -301,6 +308,34 @@ const GroupStreamCardV2 = memo(
             setIsHighlighted(false);
          }
       }, [livestreamId, id, careerCenterId, groupData.groupId]);
+
+      useEffect(() => {
+         if (
+            query.register === livestream.id &&
+            careerCenters.length &&
+            !livestream.registeredUsers.includes(user.email)
+         ) {
+            (async function handleAutoRegister() {
+               const newQuery = { ...query };
+               if (newQuery.register) {
+                  delete newQuery.register;
+               }
+               await push({
+                  pathname: pathname,
+                  query: {
+                     ...newQuery,
+                  },
+               });
+               handleOpenJoinModal({ groups: careerCenters, livestream });
+            })();
+         }
+      }, [
+         query.register,
+         livestream.id,
+         careerCenters,
+         livestream.registeredUsers,
+         user.email,
+      ]);
 
       useEffect(() => {
          if (groupData.categories && livestream.targetCategories) {
@@ -401,7 +436,7 @@ const GroupStreamCardV2 = memo(
             return push({
                pathname: "/login",
                query: {
-                  absolutePath,
+                  absolutePath: absolutePath,
                },
             });
          }
@@ -604,7 +639,7 @@ const GroupStreamCardV2 = memo(
                            <DetailsButton
                               size="small"
                               mobile={mobile}
-                              referrerId={referrerId}
+                              referrerId={query.referrerId}
                               groupData={groupData}
                               listenToUpcoming={listenToUpcoming}
                               livestream={livestream}
@@ -755,7 +790,7 @@ const GroupStreamCardV2 = memo(
             </ClickAwayListener>
             <RegistrationModal
                open={Boolean(joinGroupModalData)}
-               handleClose={handleCloseJoinModal}
+               onFinish={handleCloseJoinModal}
                promptOtherEventsOnFinal
                livestream={joinGroupModalData?.livestream}
                groups={joinGroupModalData?.groups}

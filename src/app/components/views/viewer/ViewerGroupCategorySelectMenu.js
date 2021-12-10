@@ -22,17 +22,14 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const ViewerGroupCategorySelectMenu = ({
-   joinGroupModalData,
-   handleCloseJoinModal,
-}) => {
+const ViewerGroupCategorySelectMenu = ({ joinGroupModalData, onGroupJoin }) => {
    const classes = useStyles();
 
    return (
       <Box className={classes.root}>
          <RegistrationModal
             open={Boolean(joinGroupModalData)}
-            handleClose={handleCloseJoinModal}
+            onGroupJoin={onGroupJoin}
             livestream={joinGroupModalData?.livestream}
             groups={joinGroupModalData?.groups}
          />
@@ -41,7 +38,7 @@ const ViewerGroupCategorySelectMenu = ({
 };
 
 ViewerGroupCategorySelectMenu.propTypes = {
-   handleCloseJoinModal: PropTypes.func.isRequired,
+   onGroupJoin: PropTypes.func.isRequired,
    joinGroupModalData: PropTypes.shape({
       groups: PropTypes.array,
    }),

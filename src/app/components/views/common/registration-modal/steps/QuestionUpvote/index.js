@@ -21,7 +21,8 @@ import QuestionCard from "./QuestionCard";
 import GroupLogo from "../../common/GroupLogo";
 import CustomInfiniteScroll from "../../../../../util/CustomInfiteScroll";
 import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
-
+const questionsContainerHeight = 400;
+const mobileQuestionsContainerHeight = 300;
 const useStyles = makeStyles((theme) => ({
    root: {},
    actions: {
@@ -43,9 +44,20 @@ const useStyles = makeStyles((theme) => ({
    dividerWrapper: {
       padding: theme.spacing(0, 2),
    },
+   questionsWrapper: {
+      height: questionsContainerHeight,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      "& > *": {
+         width: "100%",
+      },
+      [theme.breakpoints.down("xs")]: {
+         height: mobileQuestionsContainerHeight,
+      },
+   },
 }));
-const questionsContainerHeight = 400;
-const mobileQuestionsContainerHeight = 300;
+
 const QuestionUpvote = () => {
    const {
       handleNext,
@@ -153,17 +165,13 @@ const QuestionUpvote = () => {
                <div className={classes.dividerWrapper}>
                   <Divider />
                </div>
-               <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  height={containerHeight}
-               >
+               <div className={classes.questionsWrapper}>
                   {loadingInitialQuestions ? (
                      <CircularProgress />
                   ) : (
                      <CustomInfiniteScroll
                         height={containerHeight}
+                        style={{ width: "100%" }}
                         hasMore={hasMore}
                         next={getMore}
                         dataLength={questions.length}
@@ -183,7 +191,7 @@ const QuestionUpvote = () => {
                         </Box>
                      </CustomInfiniteScroll>
                   )}
-               </Box>
+               </div>
             </Collapse>
             <DialogActions>
                <Button

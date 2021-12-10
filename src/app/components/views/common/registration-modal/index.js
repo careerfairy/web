@@ -5,9 +5,17 @@ import { RegistrationContextProvider } from "context/registration/RegistrationCo
 import RegistrationForm from "./RegistrationForm";
 
 const RegistrationModal = memo(
-   ({ open, handleClose, livestream, groups, promptOtherEventsOnFinal }) => {
+   ({
+      open,
+      handleClose,
+      livestream,
+      groups,
+      promptOtherEventsOnFinal,
+      onGroupJoin,
+      onFinish,
+   }) => {
       const onClose = () => {
-         handleClose();
+         handleClose?.();
       };
 
       return (
@@ -22,6 +30,8 @@ const RegistrationModal = memo(
             <RegistrationContextProvider
                closeModal={onClose}
                livestream={livestream}
+               onFinish={onFinish}
+               onGroupJoin={onGroupJoin}
                groups={groups}
                promptOtherEventsOnFinal={promptOtherEventsOnFinal}
             >
@@ -33,8 +43,10 @@ const RegistrationModal = memo(
 );
 
 RegistrationModal.propTypes = {
-   handleClose: PropTypes.func.isRequired,
    open: PropTypes.bool.isRequired,
+   onGroupJoin: PropTypes.func,
+   handleClose: PropTypes.func,
+   onFinish: PropTypes.func,
 };
 
 export default RegistrationModal;

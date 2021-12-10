@@ -5,7 +5,6 @@ import {
    Button,
    DialogActions,
    DialogContent,
-   DialogTitle,
    Grow,
    Typography,
 } from "@material-ui/core";
@@ -42,6 +41,7 @@ const RegistrationComplete = () => {
       livestream,
       promptOtherEventsOnFinal,
       handleClose,
+      onFinish,
    } = useContext(RegistrationContext);
    const {
       query: { groupId, referrerId },
@@ -78,6 +78,11 @@ const RegistrationComplete = () => {
    }
 
    const classes = useStyles();
+
+   const handleFinish = () => {
+      onFinish?.();
+      handleClose?.();
+   };
    return (
       <>
          <DialogContent className={classes.content}>
@@ -100,8 +105,9 @@ const RegistrationComplete = () => {
                   <Button
                      className={classes.linkBtn}
                      color="primary"
-                     component={Link}
+                     onClick={handleFinish}
                      href={handleUrl()}
+                     component={Link}
                      variant="contained"
                      size="large"
                   >
@@ -111,7 +117,7 @@ const RegistrationComplete = () => {
                   <Button
                      variant="contained"
                      size="large"
-                     onClick={handleClose}
+                     onClick={handleFinish}
                      color="primary"
                      autoFocus
                   >
