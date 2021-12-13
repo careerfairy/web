@@ -10,7 +10,11 @@ const useStreamerActiveHandRaisesConnect = () => {
 
    const query = useMemo(() => {
       let query = [];
-      const whereQuery = ["state", "not-in", ["denied", "unrequested"]]
+      const whereQuery = [
+         "state",
+         "not-in",
+         ["denied", "unrequested", "acquire_media"],
+      ];
       if (livestreamId) {
          if (breakoutRoomId) {
             query = [
@@ -24,7 +28,7 @@ const useStreamerActiveHandRaisesConnect = () => {
                         subcollections: [
                            {
                               collection: "handRaises",
-                              where:[whereQuery]
+                              where: [whereQuery],
                            },
                         ],
                      },
@@ -41,7 +45,7 @@ const useStreamerActiveHandRaisesConnect = () => {
                   subcollections: [
                      {
                         collection: "handRaises",
-                        where:[whereQuery]
+                        where: [whereQuery],
                      },
                   ],
                },
@@ -49,10 +53,7 @@ const useStreamerActiveHandRaisesConnect = () => {
          }
       }
       return query;
-   }, [
-      livestreamId,
-      breakoutRoomId,
-   ]);
+   }, [livestreamId, breakoutRoomId]);
 
    useFirestoreConnect(query);
 };
