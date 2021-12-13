@@ -18,3 +18,14 @@ export function getMaxSlides(intendedSlidesToShow, numberOfElements) {
       return intendedSlidesToShow;
    }
 }
+
+/**
+ * @param {number|string|VarDate|Date} streamStartDate -  Date
+ * @param {number} minimumTimeElapsed - Minimum time (minutes) that must have passed since the start of the stream
+ */
+export function streamIsOld(streamStartDate, minimumTimeElapsed = 120) {
+   const streamDate = new Date(streamStartDate);
+   const now = new Date();
+   const timeElapsed = now - streamDate;
+   return timeElapsed > minimumTimeElapsed * 60 * 1000;
+}

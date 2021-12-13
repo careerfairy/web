@@ -16,6 +16,11 @@ export const getServerSideStream = async (livestreamId) => {
             companyLogoUrl: streamData.companyLogoUrl,
             backgroundImageUrl: streamData.backgroundImageUrl,
             summary: streamData.summary,
+            createdDateString:
+               streamData.created?.toDate?.().toString() || null,
+            lastUpdatedDateString:
+               streamData.lastUpdated?.toDate?.().toString() || null,
+            startDateString: streamData.start?.toDate?.().toString() || null,
          };
       }
    }

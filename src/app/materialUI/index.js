@@ -63,7 +63,7 @@ export const baseThemeObj = {
    breakpoints: {
       values: {
          lg: 1280,
-         md: 960,
+         md: 900,
          sm: 600,
          mobile: 768,
          xl: 1920,
