@@ -15,6 +15,7 @@ export const getServerSideStream = async (livestreamId) => {
             title: streamData.title,
             companyLogoUrl: streamData.companyLogoUrl,
             backgroundImageUrl: streamData.backgroundImageUrl,
+            speakers: streamData.speakers,
             summary: streamData.summary,
             createdDateString:
                streamData.created?.toDate?.().toString() || null,

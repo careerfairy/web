@@ -23,7 +23,7 @@ export default class DateUtil {
    }
 
    static getUpcomingDate(JSDate) {
-      return dayjs(JSDate).format("dddd, MMMM D, YYYY h:mm A");
+      return dayjs(JSDate).format("dddd, MMM D, YYYY h:mm A");
    }
    static getStreamTime(JSDate) {
       return dayjs(JSDate).format("hh:ss z");

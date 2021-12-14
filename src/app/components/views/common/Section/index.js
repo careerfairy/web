@@ -11,8 +11,8 @@ const useStyles = makeStyles((theme) => ({
       display: "block",
       position: "relative",
       [theme.breakpoints.up("sm")]: {
-         paddingTop: (props) => (props.big ? 160 : 80),
-         paddingBottom: (props) => (props.big ? 160 : 80),
+         paddingTop: (props) => (props.big ? 160 : 60),
+         paddingBottom: (props) => (props.big ? 160 : 60),
       },
       [theme.breakpoints.down("sm")]: {
          paddingTop: 48,

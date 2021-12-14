@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
 import { streamerImage } from "../../../../constants/images";
-import HighlightText from "../common/HighlightText";
+import HighlightText from "../../common/HighlightText";
 import SectionContainer from "../../common/Section/Container";
 import Fade from "react-reveal/Fade";
 

@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, Grid, Paper, Typography } from "@material-ui/core";
+import {
+   Button,
+   Divider,
+   Grid,
+   Hidden,
+   IconButton,
+   Paper,
+   Typography,
+} from "@material-ui/core";
 import DateUtil from "../../../../util/DateUtil";
 import CheckIcon from "@material-ui/icons/Check";
+import CalendarIcon from "@material-ui/icons/CalendarToday";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -31,14 +40,27 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: 700,
    },
    attendBtn: ({ registered }) => ({
-      marginTop: theme.spacing(2),
       "&:disabled": {
          color: registered && theme.palette.common.white,
          backgroundColor: registered && theme.palette.primary.main,
       },
    }),
+   dateTimeWrapper: {
+      display: "flex",
+      justifyContent: "space-between",
+      flexWrap: "nowrap",
+      alignItems: "center",
+   },
    dateTime: {
       fontWeight: 500,
+   },
+   addToCalendarIconBtn: {
+      border: `1px solid ${theme.palette.text.secondary}`,
+      borderRadius: theme.spacing(0.5),
+   },
+   addToCalendarBtn: {},
+   divider: {
+      margin: theme.spacing(1, 0),
    },
 }));
 const CountDown = ({
@@ -47,6 +69,7 @@ const CountDown = ({
    disabled,
    onRegisterClick,
    registered,
+   handleAddToCalendar,
 }) => {
    const classes = useStyles({ registered });
 
@@ -76,18 +99,28 @@ const CountDown = ({
    });
 
    return (
-      <Grid container spacing={3}>
-         <Grid item xs={12}>
-            <Typography
-               align="center"
-               className={classes.dateTime}
-               variant="h3"
-            >
-               {DateUtil.getUpcomingDate(time)}
-            </Typography>
-         </Grid>
-         <Grid item xs={12}>
-            <Paper className={classes.root}>
+      <Paper className={classes.root}>
+         <Grid container spacing={2}>
+            <Grid item xs={12}>
+               <div className={classes.dateTimeWrapper}>
+                  <Typography
+                     align="center"
+                     className={classes.dateTime}
+                     variant="h6"
+                  >
+                     {DateUtil.getUpcomingDate(time)}
+                  </Typography>
+                  <Hidden xsDown>
+                     <IconButton
+                        onClick={handleAddToCalendar}
+                        className={classes.addToCalendarIconBtn}
+                        variant="outlined"
+                     >
+                        <CalendarIcon />
+                     </IconButton>
+                  </Hidden>
+               </div>
+               <Divider className={classes.divider} />
                <div className={classes.countDownWrapper}>
                   {Object.keys(timeLeft).map((interval, index) => (
                      <div key={index} className={classes.timeElement}>
@@ -103,6 +136,22 @@ const CountDown = ({
                      </div>
                   ))}
                </div>
+            </Grid>
+            <Hidden smUp>
+               <Grid item xs={12}>
+                  <Button
+                     onClick={handleAddToCalendar}
+                     variant="outlined"
+                     fullWidth
+                     size="large"
+                     className={classes.addToCalendarBtn}
+                     startIcon={<CalendarIcon />}
+                  >
+                     ADD TO CALENDAR
+                  </Button>
+               </Grid>
+            </Hidden>
+            <Grid item xs={12}>
                <Button
                   className={classes.attendBtn}
                   color="primary"
@@ -116,9 +165,9 @@ const CountDown = ({
                >
                   {registerButtonLabel}
                </Button>
-            </Paper>
+            </Grid>
          </Grid>
-      </Grid>
+      </Paper>
    );
 };
 

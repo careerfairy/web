@@ -13,6 +13,8 @@ import UserUtil from "../../data/util/UserUtil";
 import { useRouter } from "next/router";
 import GroupsUtil from "../../data/util/GroupsUtil";
 import RegistrationModal from "../../components/views/common/registration-modal";
+import AboutSection from "../../components/views/upcoming-livestream/AboutSection";
+import QuestionsSection from "../../components/views/upcoming-livestream/QuestionsSection";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -202,13 +204,19 @@ const UpcomingLivestreamPage = ({ serverStream, groupId }) => {
          <HeroSection
             backgroundImage={getResizedUrl(stream.backgroundImageUrl, "md")}
             title={stream.title}
-            subtitle={stream.summary}
+            speakers={stream.speakers}
             eventStartTime={stream.startDate}
             registerButtonLabel={registerButtonLabel}
             disabled={isRegistrationDisabled}
             registered={registered}
             onRegisterClick={handleRegisterClick}
          />
+         <AboutSection
+            summary={stream.summary}
+            title={`${stream.company}`}
+            overheadText={"ABOUT"}
+         />
+         <QuestionsSection title={`Have any questions for the speakers?`} />
          <RegistrationModal
             open={Boolean(joinGroupModalData)}
             onFinish={handleCloseJoinModal}

@@ -1,7 +1,9 @@
 import React from "react";
-import { darken, makeStyles, useTheme } from "@material-ui/core/styles";
-import { Box, Container, Grid, Typography } from "@material-ui/core";
+import { darken, makeStyles } from "@material-ui/core/styles";
+import { Box, Container, Grid, Hidden, Typography } from "@material-ui/core";
 import CountDown from "./CountDown";
+import SingleHeroSpeaker from "./SingleHeroSpeaker";
+import HeroSpeakers from "./HeroSpeakers";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -79,31 +81,39 @@ const useStyles = makeStyles((theme) => ({
 const HeroSection = ({
    backgroundImage,
    title,
-   subtitle,
    eventStartTime,
    registerButtonLabel,
    onRegisterClick,
    disabled,
+   speakers,
    registered,
 }) => {
    const classes = useStyles({ backgroundImage });
-
    return (
       <div className={classes.root}>
          <div className={classes.containerWrapper}>
             <Container className={classes.container}>
                <Grid className={classes.gridContainer} spacing={4} container>
                   <Grid item xs={12} md={6}>
-                     <Typography
-                        variant="h2"
-                        gutterBottom
-                        className={classes.title}
-                     >
+                     <Typography variant="h2" className={classes.title}>
                         {title}
                      </Typography>
-                     <Typography variant="h6" className={classes.subTitle}>
-                        {subtitle}
-                     </Typography>
+                     {!!speakers.length && (
+                        <Hidden xsDown>
+                           <Box
+                              onClick={() => {
+                                 // TODO got to speakers section
+                              }}
+                              marginTop={2}
+                           >
+                              {speakers.length > 1 ? (
+                                 <HeroSpeakers speakers={speakers} />
+                              ) : (
+                                 <SingleHeroSpeaker speaker={speakers[0]} />
+                              )}
+                           </Box>
+                        </Hidden>
+                     )}
                   </Grid>
                   <Grid item xs={12} md={6}>
                      <Box className={classes.timerWrapper}>
