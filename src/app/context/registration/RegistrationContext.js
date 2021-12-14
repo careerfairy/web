@@ -101,6 +101,7 @@ export function RegistrationContextProvider({
    promptOtherEventsOnFinal,
    onGroupJoin,
    onFinish,
+   cancelable,
 }) {
    const {
       checkIfUserAgreedToGroupPolicy,
@@ -173,11 +174,13 @@ export function RegistrationContextProvider({
 
    useEffect(() => {
       if (groups && groups.length) {
-         let targetGroup;
-         targetGroup =
-            StatsUtil.getGroupThatStudentBelongsTo(userData, groups) ||
-            groups[0];
-         setGroup(targetGroup);
+         const groupUserBelongsTo = StatsUtil.getGroupThatStudentBelongsTo(
+            userData,
+            groups
+         );
+         if (groupUserBelongsTo) {
+            setGroup(groupUserBelongsTo);
+         }
       } else {
          setGroup({});
       }
@@ -265,6 +268,7 @@ export function RegistrationContextProvider({
             loadingInitialQuestions,
             onFinish,
             onGroupJoin,
+            cancelable,
          }}
       >
          {children}

@@ -32,6 +32,7 @@ const RegistrationModal = memo(
                livestream={livestream}
                onFinish={onFinish}
                onGroupJoin={onGroupJoin}
+               cancelable={Boolean(handleClose)}
                groups={groups}
                promptOtherEventsOnFinal={promptOtherEventsOnFinal}
             >
