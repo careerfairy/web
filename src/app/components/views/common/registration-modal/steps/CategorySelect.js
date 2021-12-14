@@ -68,7 +68,7 @@ const CategorySelect = () => {
                   group,
                   alreadyJoined,
                });
-               const hasAlreadySelectedAllCategories = categories.every(
+               const hasAlreadySelectedAllCategories = newCategories.every(
                   (cat) => cat.isNew === false
                );
                if (hasAlreadySelectedAllCategories && hasAgreedToAll) {

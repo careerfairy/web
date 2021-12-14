@@ -102,6 +102,7 @@ export function RegistrationContextProvider({
    onGroupJoin,
    onFinish,
    cancelable,
+   targetGroupId,
 }) {
    const {
       checkIfUserAgreedToGroupPolicy,
@@ -171,15 +172,26 @@ export function RegistrationContextProvider({
       dispatch({ type: "set-policy-groups", payload: policyGroups || [] });
    const setHasAgreedToAll = (hasAgreedToAll) =>
       dispatch({ type: "set-has-agreed-to-all", payload: hasAgreedToAll });
-
    useEffect(() => {
       if (groups && groups.length) {
-         const groupUserBelongsTo = StatsUtil.getGroupThatStudentBelongsTo(
-            userData,
-            groups
-         );
-         if (groupUserBelongsTo) {
-            setGroup(groupUserBelongsTo);
+         if (groups.length === 1) {
+            setGroup(groups[0]);
+            return;
+         }
+         let targetGroup;
+         if (targetGroupId) {
+            targetGroup = groups.find((group) => group.id === targetGroupId);
+         }
+         if (targetGroup) {
+            setGroup(targetGroup);
+         } else {
+            const groupUserBelongsTo = StatsUtil.getGroupThatStudentBelongsTo(
+               userData,
+               groups
+            );
+            if (groupUserBelongsTo) {
+               setGroup(groupUserBelongsTo);
+            }
          }
       } else {
          setGroup({});
