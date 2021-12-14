@@ -292,13 +292,16 @@ const GroupStreamCardV2 = memo(
 
       const [cardHovered, setCardHovered] = useState(false);
       const [targetOptions, setTargetOptions] = useState([]);
-      const [careerCenters, setCareerCenters] = useState([]);
+      const [filteredGroups, setFilteredGroups] = useState([]);
+      const [unfilteredGroups, setUnfilteredGroups] = useState([]);
       const [isHighlighted, setIsHighlighted] = useState(false);
+      const [targetGroupId, setTargetGroupId] = useState("");
       const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
       const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
       const handleOpenJoinModal = (dataObj) =>
          setJoinGroupModalData({
             groups: dataObj.groups,
+            targetGroupId: targetGroupId,
             livestream: dataObj?.livestream,
          });
       useEffect(() => {
@@ -312,7 +315,7 @@ const GroupStreamCardV2 = memo(
       useEffect(() => {
          if (
             query.register === livestream.id &&
-            careerCenters.length &&
+            unfilteredGroups.length &&
             !livestream.registeredUsers.includes(user.email)
          ) {
             (async function handleAutoRegister() {
@@ -326,13 +329,13 @@ const GroupStreamCardV2 = memo(
                      ...newQuery,
                   },
                });
-               handleOpenJoinModal({ groups: careerCenters, livestream });
+               handleOpenJoinModal({ groups: unfilteredGroups, livestream });
             })();
          }
       }, [
          query.register,
          livestream.id,
-         careerCenters,
+         unfilteredGroups,
          livestream.registeredUsers,
          user.email,
       ]);
@@ -360,7 +363,7 @@ const GroupStreamCardV2 = memo(
 
       useEffect(() => {
          if (
-            !careerCenters.length &&
+            !filteredGroups.length &&
             livestream &&
             livestream.groupIds &&
             livestream.groupIds.length
@@ -368,7 +371,7 @@ const GroupStreamCardV2 = memo(
             firebase
                .getDetailLivestreamCareerCenters(livestream.groupIds)
                .then((querySnapshot) => {
-                  let groupList = querySnapshot.docs.map((doc) => ({
+                  const groupList = querySnapshot.docs.map((doc) => ({
                      id: doc.id,
                      ...doc.data(),
                   }));
@@ -384,11 +387,14 @@ const GroupStreamCardV2 = memo(
                         targetGroupId = companyThatPublishedStream.id;
                      }
                   }
-                  groupList = groupList.filter((currentGroup) =>
-                     GroupsUtil.filterCurrentGroup(currentGroup, targetGroupId)
+                  const targetGroup = groupList.find(
+                     (group) => group.id === targetGroupId
                   );
-
-                  setCareerCenters(groupList);
+                  if (targetGroup) {
+                     setTargetGroupId(targetGroup.id);
+                  }
+                  setFilteredGroups(targetGroup ? [targetGroup] : groupList);
+                  setUnfilteredGroups(groupList);
                })
                .catch((e) => {
                   console.log("error", e);
@@ -462,15 +468,10 @@ const GroupStreamCardV2 = memo(
 
          setCardHovered(false);
 
-         handleOpenJoinModal({ groups: careerCenters, livestream });
-      }
-
-      function sendEmailRegistrationConfirmation() {
-         return firebase.sendRegistrationConfirmationEmail(
-            user,
-            userData,
-            livestream
-         );
+         handleOpenJoinModal({
+            groups: unfilteredGroups,
+            livestream,
+         });
       }
 
       const handleRegisterClick = () => {
@@ -483,14 +484,6 @@ const GroupStreamCardV2 = memo(
 
       const checkIfRegistered = () => {
          return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1);
-      };
-
-      const getGroups = () => {
-         if (groupData.groupId) {
-            return [groupData];
-         } else {
-            return careerCenters;
-         }
       };
 
       const handleCardClick = () => {
@@ -705,7 +698,7 @@ const GroupStreamCardV2 = memo(
                               </Item>
                               <Item>
                                  <AvatarGroup>
-                                    {careerCenters.map((careerCenter) => (
+                                    {filteredGroups.map((careerCenter) => (
                                        <Avatar
                                           variant="rounded"
                                           key={careerCenter.id}
@@ -762,7 +755,7 @@ const GroupStreamCardV2 = memo(
                               style={{ width: "100%" }}
                               className={classes.groupLogos}
                            >
-                              {careerCenters.map((careerCenter) => (
+                              {filteredGroups.map((careerCenter) => (
                                  <LogoElement
                                     className={classes.groupLogo}
                                     hideFollow={
@@ -791,9 +784,15 @@ const GroupStreamCardV2 = memo(
             <RegistrationModal
                open={Boolean(joinGroupModalData)}
                onFinish={handleCloseJoinModal}
-               promptOtherEventsOnFinal
+               promptOtherEventsOnFinal={!query.groupId}
                livestream={joinGroupModalData?.livestream}
                groups={joinGroupModalData?.groups}
+               targetGroupId={joinGroupModalData?.targetGroupId}
+               handleClose={
+                  joinGroupModalData?.livestream
+                     ? undefined
+                     : handleCloseJoinModal
+               }
             />
          </Fragment>
       );
