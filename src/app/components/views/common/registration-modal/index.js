@@ -13,7 +13,9 @@ const RegistrationModal = memo(
       promptOtherEventsOnFinal,
       onGroupJoin,
       onFinish,
+      targetGroupId,
    }) => {
+      const cancelable = Boolean(handleClose);
       const onClose = () => {
          handleClose?.();
       };
@@ -25,13 +27,15 @@ const RegistrationModal = memo(
             fullWidth
             TransitionComponent={Grow}
             open={open}
-            onClose={onClose}
+            onClose={cancelable ? onClose : undefined}
          >
             <RegistrationContextProvider
                closeModal={onClose}
                livestream={livestream}
                onFinish={onFinish}
                onGroupJoin={onGroupJoin}
+               targetGroupId={targetGroupId}
+               cancelable={cancelable}
                groups={groups}
                promptOtherEventsOnFinal={promptOtherEventsOnFinal}
             >

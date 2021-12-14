@@ -45,6 +45,7 @@ const RegistrationComplete = () => {
    } = useContext(RegistrationContext);
    const {
       query: { groupId, referrerId },
+      push,
    } = useRouter();
 
    // const getRefererUrl = () => {
@@ -63,10 +64,10 @@ const RegistrationComplete = () => {
 
    function handleUrl() {
       return {
-         pathname: groupId
+         pathname: group?.id
+            ? `/next-livestreams/${group?.id}`
+            : groupId
             ? `/next-livestreams/${groupId}`
-            : group?.id
-            ? `/next-livestreams/${group.id}`
             : "/next-livestreams",
          query: {
             ...(referrerId && { referrerId }),
@@ -105,9 +106,10 @@ const RegistrationComplete = () => {
                   <Button
                      className={classes.linkBtn}
                      color="primary"
-                     onClick={handleFinish}
-                     href={handleUrl()}
-                     component={Link}
+                     onClick={async () => {
+                        handleFinish();
+                        push(handleUrl());
+                     }}
                      variant="contained"
                      size="large"
                   >

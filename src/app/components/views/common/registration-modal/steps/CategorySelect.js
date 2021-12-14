@@ -44,6 +44,7 @@ const CategorySelect = () => {
       gettingPolicyStatus,
       hasAgreedToAll,
       onGroupJoin,
+      cancelable,
    } = useContext(RegistrationContext);
    const { userData } = useAuth();
    const classes = useStyles();
@@ -67,7 +68,7 @@ const CategorySelect = () => {
                   group,
                   alreadyJoined,
                });
-               const hasAlreadySelectedAllCategories = categories.every(
+               const hasAlreadySelectedAllCategories = newCategories.every(
                   (cat) => cat.isNew === false
                );
                if (hasAlreadySelectedAllCategories && hasAgreedToAll) {
@@ -217,7 +218,7 @@ const CategorySelect = () => {
                   </Box>
                </DialogContent>
                <DialogActions>
-                  {!livestream?.hasStarted && (
+                  {!livestream?.hasStarted && cancelable && (
                      <Button size="large" onClick={handleClose}>
                         Cancel
                      </Button>

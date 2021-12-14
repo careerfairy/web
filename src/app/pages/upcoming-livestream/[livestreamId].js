@@ -143,10 +143,11 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
    const [registered, setRegistered] = useState(false);
-   const [careerCenters, setCareerCenters] = useState([]);
+   const [filteredGroups, setFilteredGroups] = useState([]);
+   const [unfilteredGroups, setUnfilteredGroups] = useState([]);
    const [currentGroup, setCurrentGroup] = useState(null);
    const [targetOptions, setTargetOptions] = useState([]);
-
+   const [targetGroupId, setTargetGroupId] = useState("");
    const [openTalentPoolModal, setOpenTalentPoolModal] = useState(false);
    const [isPastEvent, setIsPastEvent] = useState(
       streamIsOld(currentLivestream?.startDate)
@@ -157,6 +158,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    const handleOpenJoinModal = (dataObj) =>
       setJoinGroupModalData({
          groups: dataObj.groups,
+         targetGroupId: targetGroupId,
          livestream: dataObj.livestream,
       });
 
@@ -198,9 +200,12 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          const unsubscribe = firebase.listenToCareerCenterById(
             groupId,
             (querySnapshot) => {
-               let group = querySnapshot.data();
-               group.id = querySnapshot.id;
-               setCurrentGroup(group);
+               if (querySnapshot.exists) {
+                  setCurrentGroup({
+                     ...querySnapshot.data(),
+                     id: querySnapshot.id,
+                  });
+               }
             }
          );
          return () => unsubscribe();
@@ -261,7 +266,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          }
       }
    }, [currentGroup, currentLivestream]);
-
    useEffect(() => {
       if (
          currentLivestream &&
@@ -271,27 +275,31 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          firebase
             .getDetailLivestreamCareerCenters(currentLivestream.groupIds)
             .then((querySnapshot) => {
-               let groupList = querySnapshot.docs.map((doc) => ({
+               const groupList = querySnapshot.docs.map((doc) => ({
                   id: doc.id,
                   ...doc.data(),
                }));
 
                let targetGroupId = currentGroup?.groupId;
 
-               if (!query.groupId) {
+               if (!targetGroupId) {
                   const companyThatPublishedStream = groupList.find(
                      (group) =>
                         !group.universityCode &&
                         group.id === currentLivestream?.author?.groupId
                   );
+                  // TODO Dont think including the publishing company as the default group
+                  //  if none is provided to be the best choice
                   if (companyThatPublishedStream?.id) {
                      targetGroupId = companyThatPublishedStream.id;
                   }
                }
-               groupList = groupList.filter((careerCenter) =>
-                  GroupsUtil.filterCurrentGroup(careerCenter, targetGroupId)
+               const targetGroup = groupList.find(
+                  (group) => group.id === targetGroupId
                );
-               setCareerCenters(groupList);
+               setTargetGroupId(targetGroup?.id);
+               setFilteredGroups(targetGroup ? [targetGroup] : groupList);
+               setUnfilteredGroups(groupList);
             });
       }
    }, [currentLivestream?.groupIds, currentGroup?.groupId]);
@@ -318,7 +326,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    useEffect(() => {
       if (
          query.register === currentLivestream?.id &&
-         careerCenters.length &&
+         filteredGroups.length &&
          !currentLivestream?.registeredUsers.includes(user.email)
       ) {
          (async function handleAutoRegister() {
@@ -333,7 +341,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                },
             });
             handleOpenJoinModal({
-               groups: careerCenters,
+               groups: unfilteredGroups,
                livestream: currentLivestream,
             });
          })();
@@ -341,7 +349,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    }, [
       query.register,
       currentLivestream?.id,
-      careerCenters,
+      filteredGroups,
       currentLivestream?.registeredUsers,
       user.email,
    ]);
@@ -421,7 +429,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
       }
 
       handleOpenJoinModal({
-         groups: careerCenters,
+         groups: unfilteredGroups,
          livestream: currentLivestream,
       });
    };
@@ -611,7 +619,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          </Grid>
       );
    });
-   let logoElements = careerCenters.map((careerCenter, index) => {
+   let logoElements = filteredGroups.map((careerCenter, index) => {
       return (
          <Item key={careerCenter.id} className={classes.imageGrid}>
             <img
@@ -1124,6 +1132,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                promptOtherEventsOnFinal
                livestream={joinGroupModalData?.livestream}
                groups={joinGroupModalData?.groups}
+               targetGroupId={joinGroupModalData?.targetGroupId}
             />
             ;
             <JoinTalentPoolModal
