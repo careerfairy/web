@@ -65,7 +65,7 @@ const CareerCenterLandingPage = ({}) => {
       {
          name: "Get feedback from your students",
          description:
-            "CareerFairy provides detailed analytics" +
+            "CareerFairy provides detailed analytics " +
             "to help you understand what your students " +
             "are looking for",
          imageUrl: trackAnalytics,
