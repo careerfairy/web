@@ -59,7 +59,7 @@ const AboutSection = (props) => {
                   <Typography
                      style={{ whiteSpace: "pre-line" }}
                      color="textSecondary"
-                     align="center"
+                     align=""
                      variant="h6"
                   >
                      {props.summary}

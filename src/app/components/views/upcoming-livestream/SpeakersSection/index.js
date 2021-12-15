@@ -58,7 +58,7 @@ const SpeakersSection = (props) => {
             <Box width="100%">
                <Fade bottom>
                   <Box>
-                     <Grid justifyContent="flex-start" container spacing={2}>
+                     <Grid justifyContent="center" container spacing={2}>
                         {props.speakers.map((speaker) => (
                            <Grid key={speaker.id} xs={12} sm={6} md={4} item>
                               <SpeakerCard speaker={speaker} />

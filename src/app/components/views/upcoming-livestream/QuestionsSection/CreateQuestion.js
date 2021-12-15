@@ -99,7 +99,6 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
          <Box display="flex" justifyContent="flex-end" marginTop={2}>
             <Button
                variant="contained"
-               size="large"
                onClick={handleSubmit}
                color="primary"
                startIcon={

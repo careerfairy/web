@@ -34,7 +34,9 @@ const useStyles = makeStyles((theme) => ({
          width: "100%",
          content: '" "',
          zIndex: 1,
-         backgroundColor: darken(theme.palette.primary.main, 0.5),
+         // backgroundColor: "#151e6b",
+         // backgroundColor: theme.palette.navyBlue.main,
+         backgroundColor: darken(theme.palette.navyBlue.main, 0.5),
          backgroundAttachment: "fixed",
          opacity: 0.7,
       },
@@ -92,16 +94,11 @@ const useStyles = makeStyles((theme) => ({
    companyLogo: {
       padding: theme.spacing(0.5),
       borderRadius: theme.spacing(1),
-      width: 300,
-      height: 90,
-      [theme.breakpoints.down("sm")]: {
-         width: "100%",
-      },
       boxShadow: theme.shadows[4],
       background: theme.palette.common.white,
-      "& img": {
-         objectFit: "contain",
-      },
+      maxWidth: 280,
+      maxHeight: 90,
+      objectFit: "contain",
    },
    hostsCard: {
       display: "flex",
@@ -167,14 +164,14 @@ const HeroSection = ({
                   <Grid item xs={12} md={6}>
                      <Grid container spacing={2}>
                         <Grid item xs={12}>
-                           <Box display="flex" justifyContent="center">
-                              <Avatar
+                           <Box display="flex">
+                              <img
                                  className={classes.companyLogo}
                                  src={getResizedUrl(
                                     stream.companyLogoUrl,
                                     "md"
                                  )}
-                                 title={stream.company}
+                                 alt={stream.company}
                               />
                            </Box>
                         </Grid>
@@ -191,7 +188,7 @@ const HeroSection = ({
                         </Grid>
                         {/*<Grid item xs={12}>*/}
                         {/*   <Paper className={classes.hostsCard}>*/}
-                        {/*      <Typography variant="body1" color="textSecondary">*/}
+                        {/*      <Typography variant="body2" color="textSecondary">*/}
                         {/*         Hosted by*/}
                         {/*      </Typography>*/}
                         {/*      <div className={classes.hostsLogoWrapper}>*/}

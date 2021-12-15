@@ -7,6 +7,10 @@ import BackgroundImage from "../BackgroundImage";
 
 const useStyles = makeStyles((theme) => ({
    sectionComponent: {
+      transition: theme.transitions.create(["background", "color"], {
+         easing: theme.transitions.easing.easeInOut,
+         duration: theme.transitions.duration.standard,
+      }),
       background: (props) => props.backgroundColor,
       display: "block",
       position: "relative",

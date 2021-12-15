@@ -15,10 +15,16 @@ import AboutSection from "../../components/views/upcoming-livestream/AboutSectio
 import QuestionsSection from "../../components/views/upcoming-livestream/QuestionsSection";
 import useInfiniteScrollServer from "../../components/custom-hook/useInfiniteScrollServer";
 import SpeakersSection from "../../components/views/upcoming-livestream/SpeakersSection";
+import TalentPoolSection from "../../components/views/upcoming-livestream/TalentPoolSection";
+import { useTheme } from "@material-ui/core/styles";
+import ContactSection from "../../components/views/upcoming-livestream/ContactSection";
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
+   console.count("-> UpcomingLivestreamPage");
+   const theme = useTheme();
    const [stream, setStream] = useState(parseStreamDates(serverStream));
    const [registered, setRegistered] = useState(false);
+   const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
    const { push, asPath, query, pathname } = useRouter();
    const [currentGroup, setCurrentGroup] = useState(null);
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
@@ -42,7 +48,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const [isPastEvent, setIsPastEvent] = useState(
       streamIsOld(stream?.startDate)
    );
-   const { authenticatedUser, userData } = useAuth();
+   const { authenticatedUser, userData, isLoggedOut } = useAuth();
 
    const {
       listenToScheduledLivestreamById,
@@ -51,6 +57,8 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       getDetailLivestreamCareerCenters,
       livestreamQuestionsQuery,
       upvoteLivestreamQuestion,
+      leaveCompanyTalentPool,
+      joinCompanyTalentPool,
    } = useFirebase();
 
    const questionsQuery = useMemo(
@@ -62,6 +70,12 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       limit: 8,
       query: questionsQuery,
    });
+
+   useEffect(() => {
+      setUserIsInTalentPool(
+         Boolean(stream && userData?.talentPools?.includes(stream?.companyId))
+      );
+   }, [stream, userData]);
 
    useEffect(() => {
       setIsPastEvent(streamIsOld(stream?.startDate));
@@ -223,7 +237,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [asPath, stream?.id, query.groupId, authenticatedUser, query.referrerId]);
 
    const startRegistrationProcess = async () => {
-      if (!authenticatedUser || !authenticatedUser.emailVerified) {
+      if (isLoggedOut || !authenticatedUser.emailVerified) {
          return push(
             asPath
                ? {
@@ -235,7 +249,10 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       }
 
       if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-         return push("/profile");
+         return push({
+            pathname: `/profile`,
+            query: { absolutePath: asPath },
+         });
       }
 
       handleOpenJoinModal({
@@ -257,8 +274,11 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    };
 
    const handleUpvote = async (question) => {
-      if (!authenticatedUser) {
-         return push("/signup");
+      if (isLoggedOut) {
+         return push({
+            pathname: `/signup`,
+            query: { absolutePath: asPath },
+         });
       }
       try {
          await upvoteLivestreamQuestion(
@@ -289,7 +309,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             {...getStreamMetaInfo({ stream, groupId: query.groupId })}
          />
          <HeroSection
-            backgroundImage={getResizedUrl(stream.backgroundImageUrl, "md")}
+            backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}
             stream={stream}
             registerButtonLabel={registerButtonLabel}
             disabled={isRegistrationDisabled}
@@ -297,16 +317,21 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             hosts={filteredGroups}
             onRegisterClick={handleRegisterClick}
          />
-         <SpeakersSection
-            title="The speakers of this event"
-            overheadText={"OUR SPEAKERS"}
-            speakers={stream.speakers}
-         />
-         <AboutSection
-            summary={stream.summary}
-            title={`${stream.company}`}
-            overheadText={"ABOUT"}
-         />
+         {stream.summary && (
+            <AboutSection
+               summary={stream.summary}
+               title={`${stream.company}`}
+               overheadText={"ABOUT"}
+            />
+         )}
+         {!!stream.speakers.length && (
+            <SpeakersSection
+               title="The speakers of this event"
+               overheadText={"OUR SPEAKERS"}
+               speakers={stream.speakers}
+            />
+         )}
+
          <QuestionsSection
             livestreamId={stream.id}
             title={`Have any questions for the speakers?`}
@@ -320,7 +345,24 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             questions={handlers.docs}
             questionSortType={questionSortType}
          />
-
+         {!stream.hasNoTalentPool && (
+            <TalentPoolSection
+               title={
+                  userIsInTalentPool
+                     ? "You are part of the talent pool"
+                     : "Join the Talent Pool and Get Hired"
+               }
+               stream={stream}
+               userIsInTalentPool={userIsInTalentPool}
+               backgroundColor={
+                  userIsInTalentPool && theme.palette.primary.main
+               }
+               color={userIsInTalentPool && theme.palette.common.white}
+            />
+         )}
+         <ContactSection
+            title={"Any problem or question ? We want to hear from you"}
+         />
          <RegistrationModal
             open={Boolean(joinGroupModalData)}
             onFinish={handleCloseJoinModal}

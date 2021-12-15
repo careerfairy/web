@@ -3,11 +3,12 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
+import HighlightText from "components/views/common/HighlightText";
 import SectionHeader from "../../common/SectionHeader";
 import Box from "@material-ui/core/Box";
 import Fade from "react-reveal/Fade";
-import CreateQuestion from "./CreateQuestion";
-import QuestionVotingContainer from "../../common/QuestionVotingContainer";
+import { Button } from "@material-ui/core";
+import EmailIcon from "@material-ui/icons/Email";
 
 const useStyles = makeStyles((theme) => ({
    section: {},
@@ -20,10 +21,17 @@ const useStyles = makeStyles((theme) => ({
    title: {
       fontWeight: 600,
    },
+   talentPoolText: {
+      color: ({ color }) => color,
+   },
+   whiteBtn: {
+      borderColor: theme.palette.common.white,
+      color: theme.palette.common.white,
+   },
 }));
 
-const QuestionsSection = (props) => {
-   const classes = useStyles();
+const ContactSection = (props) => {
+   const classes = useStyles({ color: props.color });
 
    return (
       <Section
@@ -36,6 +44,13 @@ const QuestionsSection = (props) => {
          backgroundColor={props.backgroundColor}
       >
          <SectionContainer>
+            {props.overheadText && (
+               <Fade bottom>
+                  <Box marginBottom={2}>
+                     <HighlightText text={props.overheadText} />
+                  </Box>
+               </Fade>
+            )}
             {props.title && (
                <Fade bottom>
                   <SectionHeader
@@ -49,34 +64,18 @@ const QuestionsSection = (props) => {
             )}
             <Box width="100%">
                <Fade bottom>
-                  <Box>
-                     <CreateQuestion
-                        reFetchQuestions={props.reFetchQuestions}
-                        livestreamId={props.livestreamId}
-                     />
-                     {!!props.questions.length && (
-                        <QuestionVotingContainer
-                           loadingInitialQuestions={
-                              props.loadingInitialQuestions
-                           }
-                           hasVoted={props.hasVoted}
-                           hasMore={props.hasMore}
-                           questionSortType={props.questionSortType}
-                           handleUpvote={props.handleUpvote}
-                           getMore={props.getMore}
-                           containerHeight={
-                              props.questions.length > 4
-                                 ? 400
-                                 : props.questions.length > 2
-                                 ? 300
-                                 : 170
-                           }
-                           questions={props.questions}
-                           handleChangeQuestionSortType={
-                              props.handleChangeQuestionSortType
-                           }
+                  <Box marginTop={2} display="flex" justifyContent="center">
+                     <a
+                        className="aboutContentContactButton"
+                        href="mailto:thomas@careerfairy.io"
+                     >
+                        <Button
+                           size="large"
+                           children="Contact CareerFairy"
+                           startIcon={<EmailIcon />}
+                           variant="outlined"
                         />
-                     )}
+                     </a>
                   </Box>
                </Fade>
             </Box>
@@ -85,9 +84,9 @@ const QuestionsSection = (props) => {
    );
 };
 
-export default QuestionsSection;
+export default ContactSection;
 
-QuestionsSection.propTypes = {
+ContactSection.propTypes = {
    backgroundColor: PropTypes.any,
    backgroundImage: PropTypes.any,
    backgroundImageClassName: PropTypes.any,
