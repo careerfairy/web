@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { getServerSideStream, parseStreamDates } from "../../util/serverUtil";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
 import { getStreamMetaInfo } from "../../util/SeoUtil";
@@ -11,27 +10,34 @@ import { useAuth } from "../../HOCs/AuthProvider";
 import { streamIsOld } from "../../util/CommonUtil";
 import UserUtil from "../../data/util/UserUtil";
 import { useRouter } from "next/router";
-import GroupsUtil from "../../data/util/GroupsUtil";
 import RegistrationModal from "../../components/views/common/registration-modal";
 import AboutSection from "../../components/views/upcoming-livestream/AboutSection";
 import QuestionsSection from "../../components/views/upcoming-livestream/QuestionsSection";
+import useInfiniteScrollServer from "../../components/custom-hook/useInfiniteScrollServer";
+import SpeakersSection from "../../components/views/upcoming-livestream/SpeakersSection";
 
-const useStyles = makeStyles((theme) => ({
-   root: {},
-}));
-const UpcomingLivestreamPage = ({ serverStream, groupId }) => {
+const UpcomingLivestreamPage = ({ serverStream }) => {
    const [stream, setStream] = useState(parseStreamDates(serverStream));
    const [registered, setRegistered] = useState(false);
-   const { push, asPath, query } = useRouter();
-   const [careerCenters, setCareerCenters] = useState([]);
+   const { push, asPath, query, pathname } = useRouter();
    const [currentGroup, setCurrentGroup] = useState(null);
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
+   const [filteredGroups, setFilteredGroups] = useState([]);
+   const [targetGroupId, setTargetGroupId] = useState("");
+   const [questionSortType, setQuestionSortType] = useState("timestamp");
+
+   const [unfilteredGroups, setUnfilteredGroups] = useState([]);
+
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
-   const handleOpenJoinModal = (dataObj) =>
-      setJoinGroupModalData({
-         groups: dataObj.groups,
-         livestream: dataObj.livestream,
-      });
+   const handleOpenJoinModal = useCallback(
+      (dataObj) =>
+         setJoinGroupModalData({
+            groups: dataObj.groups,
+            targetGroupId: targetGroupId,
+            livestream: dataObj.livestream,
+         }),
+      [targetGroupId]
+   );
 
    const [isPastEvent, setIsPastEvent] = useState(
       streamIsOld(stream?.startDate)
@@ -43,7 +49,19 @@ const UpcomingLivestreamPage = ({ serverStream, groupId }) => {
       deregisterFromLivestream,
       listenToCareerCenterById,
       getDetailLivestreamCareerCenters,
+      livestreamQuestionsQuery,
+      upvoteLivestreamQuestion,
    } = useFirebase();
+
+   const questionsQuery = useMemo(
+      () => stream && livestreamQuestionsQuery(stream.id, questionSortType),
+      [stream?.id, questionSortType]
+   );
+
+   const handlers = useInfiniteScrollServer({
+      limit: 8,
+      query: questionsQuery,
+   });
 
    useEffect(() => {
       setIsPastEvent(streamIsOld(stream?.startDate));
@@ -71,9 +89,9 @@ const UpcomingLivestreamPage = ({ serverStream, groupId }) => {
    }, [stream?.id]);
 
    useEffect(() => {
-      if (groupId) {
+      if (query.groupId) {
          const unsubscribe = listenToCareerCenterById(
-            groupId,
+            query.groupId,
             (querySnapshot) => {
                setCurrentGroup({
                   ...querySnapshot.data(),
@@ -83,7 +101,7 @@ const UpcomingLivestreamPage = ({ serverStream, groupId }) => {
          );
          return () => unsubscribe();
       }
-   }, [groupId]);
+   }, [query.groupId]);
 
    useEffect(() => {
       if (
@@ -100,31 +118,66 @@ const UpcomingLivestreamPage = ({ serverStream, groupId }) => {
       if (stream?.groupIds?.length) {
          getDetailLivestreamCareerCenters(stream.groupIds).then(
             (querySnapshot) => {
-               let groupList = querySnapshot.docs.map((doc) => ({
+               const groupList = querySnapshot.docs.map((doc) => ({
                   id: doc.id,
                   ...doc.data(),
                }));
 
                let targetGroupId = currentGroup?.groupId;
 
-               if (!groupId) {
+               if (!targetGroupId) {
                   const companyThatPublishedStream = groupList.find(
                      (group) =>
                         !group.universityCode &&
                         group.id === stream?.author?.groupId
                   );
+                  // TODO Dont think including the publishing company as the default group
+                  //  if none is provided to be the best choice
                   if (companyThatPublishedStream?.id) {
                      targetGroupId = companyThatPublishedStream.id;
                   }
                }
-               groupList = groupList.filter((careerCenter) =>
-                  GroupsUtil.filterCurrentGroup(careerCenter, targetGroupId)
+               const targetGroup = groupList.find(
+                  (group) => group.id === targetGroupId
                );
-               setCareerCenters(groupList);
+               setTargetGroupId(targetGroup?.id);
+               setFilteredGroups(targetGroup ? [targetGroup] : groupList);
+               setUnfilteredGroups(groupList);
             }
          );
       }
    }, [stream?.groupIds, currentGroup?.groupId]);
+
+   useEffect(() => {
+      if (
+         query.register === stream?.id &&
+         filteredGroups.length &&
+         !stream?.registeredUsers.includes(authenticatedUser.email)
+      ) {
+         (async function handleAutoRegister() {
+            const newQuery = { ...query };
+            if (newQuery.register) {
+               delete newQuery.register;
+            }
+            await push({
+               pathname,
+               query: {
+                  ...newQuery,
+               },
+            });
+            handleOpenJoinModal({
+               groups: unfilteredGroups,
+               livestream: stream,
+            });
+         })();
+      }
+   }, [
+      query.register,
+      stream?.id,
+      filteredGroups,
+      stream?.registeredUsers,
+      authenticatedUser.email,
+   ]);
 
    const registerButtonLabel = useMemo(() => {
       if (authenticatedUser && registered) return "You're booked";
@@ -186,7 +239,7 @@ const UpcomingLivestreamPage = ({ serverStream, groupId }) => {
       }
 
       handleOpenJoinModal({
-         groups: careerCenters,
+         groups: unfilteredGroups,
          livestream: stream,
       });
    };
@@ -197,26 +250,77 @@ const UpcomingLivestreamPage = ({ serverStream, groupId }) => {
       }
    };
 
-   const classes = useStyles();
+   const handleChangeQuestionSortType = (event, newSortType) => {
+      if (newSortType !== null) {
+         setQuestionSortType(newSortType);
+      }
+   };
+
+   const handleUpvote = async (question) => {
+      if (!authenticatedUser) {
+         return push("/signup");
+      }
+      try {
+         await upvoteLivestreamQuestion(
+            stream.id,
+            question,
+            authenticatedUser.email
+         );
+
+         handlers.handleClientUpdate(question.id, {
+            votes: question.votes + 1 || 1,
+            emailOfVoters: question.emailOfVoters?.concat(
+               authenticatedUser.email
+            ) || [authenticatedUser.email],
+         });
+      } catch (e) {}
+   };
+
+   function hasVoted(question) {
+      if (!authenticatedUser || !question.emailOfVoters) {
+         return false;
+      }
+      return question.emailOfVoters.indexOf(authenticatedUser.email) > -1;
+   }
+
    return (
       <UpcomingLayout>
-         <HeadWithMeta {...getStreamMetaInfo({ stream, groupId })} />
+         <HeadWithMeta
+            {...getStreamMetaInfo({ stream, groupId: query.groupId })}
+         />
          <HeroSection
             backgroundImage={getResizedUrl(stream.backgroundImageUrl, "md")}
-            title={stream.title}
-            speakers={stream.speakers}
-            eventStartTime={stream.startDate}
+            stream={stream}
             registerButtonLabel={registerButtonLabel}
             disabled={isRegistrationDisabled}
             registered={registered}
+            hosts={filteredGroups}
             onRegisterClick={handleRegisterClick}
+         />
+         <SpeakersSection
+            title="The speakers of this event"
+            overheadText={"OUR SPEAKERS"}
+            speakers={stream.speakers}
          />
          <AboutSection
             summary={stream.summary}
             title={`${stream.company}`}
             overheadText={"ABOUT"}
          />
-         <QuestionsSection title={`Have any questions for the speakers?`} />
+         <QuestionsSection
+            livestreamId={stream.id}
+            title={`Have any questions for the speakers?`}
+            handleChangeQuestionSortType={handleChangeQuestionSortType}
+            getMore={handlers.getMore}
+            loadingInitialQuestions={handlers.loadingInitial}
+            hasVoted={hasVoted}
+            hasMore={handlers.hasMore}
+            reFetchQuestions={handlers.getInitialQuery}
+            handleUpvote={handleUpvote}
+            questions={handlers.docs}
+            questionSortType={questionSortType}
+         />
+
          <RegistrationModal
             open={Boolean(joinGroupModalData)}
             onFinish={handleCloseJoinModal}
@@ -234,6 +338,7 @@ export async function getServerSideProps({
 }) {
    const serverStream = await getServerSideStream(livestreamId);
 
+   // TODO check if groupId is part of stream.groupIds
    return {
       props: { serverStream, groupId: groupId || null }, // will be passed to the page component as props
    };

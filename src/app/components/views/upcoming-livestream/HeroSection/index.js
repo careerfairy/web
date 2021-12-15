@@ -1,9 +1,18 @@
 import React from "react";
 import { darken, makeStyles } from "@material-ui/core/styles";
-import { Box, Container, Grid, Hidden, Typography } from "@material-ui/core";
+import {
+   Avatar,
+   Box,
+   Container,
+   Grid,
+   Hidden,
+   Paper,
+   Typography,
+} from "@material-ui/core";
 import CountDown from "./CountDown";
 import SingleHeroSpeaker from "./SingleHeroSpeaker";
 import HeroSpeakers from "./HeroSpeakers";
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -59,6 +68,9 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.common.white,
    },
    title: {
+      [theme.breakpoints.down("sm")]: {
+         fontSize: "calc(1.5em + 1.5vw)",
+      },
       fontWeight: 600,
    },
    subTitle: {
@@ -77,18 +89,53 @@ const useStyles = makeStyles((theme) => ({
       alignItems: "center",
       flexDirection: "column",
    },
+   companyLogo: {
+      padding: theme.spacing(0.5),
+      borderRadius: theme.spacing(1),
+      width: 300,
+      height: 90,
+      [theme.breakpoints.down("sm")]: {
+         width: "100%",
+      },
+      boxShadow: theme.shadows[4],
+      background: theme.palette.common.white,
+      "& img": {
+         objectFit: "contain",
+      },
+   },
+   hostsCard: {
+      display: "flex",
+      flexDirection: "column",
+      borderRadius: theme.spacing(1),
+      padding: theme.spacing(2),
+      width: "fit-content",
+   },
+   hostsLogoWrapper: {},
+   hostLogo: {
+      padding: theme.spacing(0.5),
+      borderRadius: theme.spacing(1),
+      width: 300,
+      height: 90,
+      [theme.breakpoints.down("sm")]: {
+         width: "100%",
+      },
+      background: theme.palette.common.white,
+      "& img": {
+         objectFit: "contain",
+      },
+   },
 }));
 const HeroSection = ({
    backgroundImage,
-   title,
-   eventStartTime,
    registerButtonLabel,
    onRegisterClick,
    disabled,
-   speakers,
    registered,
+   stream,
+   hosts,
 }) => {
    const classes = useStyles({ backgroundImage });
+
    return (
       <div className={classes.root}>
          <div className={classes.containerWrapper}>
@@ -96,9 +143,9 @@ const HeroSection = ({
                <Grid className={classes.gridContainer} spacing={4} container>
                   <Grid item xs={12} md={6}>
                      <Typography variant="h2" className={classes.title}>
-                        {title}
+                        {stream.title}
                      </Typography>
-                     {!!speakers.length && (
+                     {!!stream.speakers.length && (
                         <Hidden xsDown>
                            <Box
                               onClick={() => {
@@ -106,25 +153,60 @@ const HeroSection = ({
                               }}
                               marginTop={2}
                            >
-                              {speakers.length > 1 ? (
-                                 <HeroSpeakers speakers={speakers} />
+                              {stream.speakers.length > 1 ? (
+                                 <HeroSpeakers speakers={stream.speakers} />
                               ) : (
-                                 <SingleHeroSpeaker speaker={speakers[0]} />
+                                 <SingleHeroSpeaker
+                                    speaker={stream.speakers[0]}
+                                 />
                               )}
                            </Box>
                         </Hidden>
                      )}
                   </Grid>
                   <Grid item xs={12} md={6}>
-                     <Box className={classes.timerWrapper}>
-                        <CountDown
-                           registerButtonLabel={registerButtonLabel}
-                           time={eventStartTime}
-                           onRegisterClick={onRegisterClick}
-                           disabled={disabled}
-                           registered={registered}
-                        />
-                     </Box>
+                     <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                           <Box display="flex" justifyContent="center">
+                              <Avatar
+                                 className={classes.companyLogo}
+                                 src={getResizedUrl(
+                                    stream.companyLogoUrl,
+                                    "md"
+                                 )}
+                                 title={stream.company}
+                              />
+                           </Box>
+                        </Grid>
+                        <Grid item xs={12}>
+                           <Box className={classes.timerWrapper}>
+                              <CountDown
+                                 registerButtonLabel={registerButtonLabel}
+                                 time={stream.startDate}
+                                 onRegisterClick={onRegisterClick}
+                                 disabled={disabled}
+                                 registered={registered}
+                              />
+                           </Box>
+                        </Grid>
+                        {/*<Grid item xs={12}>*/}
+                        {/*   <Paper className={classes.hostsCard}>*/}
+                        {/*      <Typography variant="body1" color="textSecondary">*/}
+                        {/*         Hosted by*/}
+                        {/*      </Typography>*/}
+                        {/*      <div className={classes.hostsLogoWrapper}>*/}
+                        {/*         {hosts.map((host) => (*/}
+                        {/*            <Avatar*/}
+                        {/*               key={host.id}*/}
+                        {/*               className={classes.hostLogo}*/}
+                        {/*               src={getResizedUrl(host.logoUrl, "md")}*/}
+                        {/*               title={host.universityName}*/}
+                        {/*            />*/}
+                        {/*         ))}*/}
+                        {/*      </div>*/}
+                        {/*   </Paper>*/}
+                        {/*</Grid>*/}
+                     </Grid>
                   </Grid>
                </Grid>
             </Container>

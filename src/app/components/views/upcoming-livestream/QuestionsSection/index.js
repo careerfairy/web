@@ -1,14 +1,15 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useMemo } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
-import HighlightText from "components/views/common/HighlightText";
 import SectionHeader from "../../common/SectionHeader";
 import Box from "@material-ui/core/Box";
-import { Typography } from "@material-ui/core";
 import Fade from "react-reveal/Fade";
 import CreateQuestion from "./CreateQuestion";
+import QuestionVotingContainer from "../../common/QuestionVotingContainer";
+import useInfiniteScrollServer from "../../../custom-hook/useInfiniteScrollServer";
+import { useFirebase } from "../../../../context/firebase";
 
 const useStyles = makeStyles((theme) => ({
    section: {},
@@ -48,11 +49,39 @@ const QuestionsSection = (props) => {
                   />
                </Fade>
             )}
-            <Fade bottom>
-               <Box>
-                  <CreateQuestion />
-               </Box>
-            </Fade>
+            <Box width="100%">
+               <Fade bottom>
+                  <Box>
+                     <CreateQuestion
+                        reFetchQuestions={props.reFetchQuestions}
+                        livestreamId={props.livestreamId}
+                     />
+                     {!!props.questions.length && (
+                        <QuestionVotingContainer
+                           loadingInitialQuestions={
+                              props.loadingInitialQuestions
+                           }
+                           hasVoted={props.hasVoted}
+                           hasMore={props.hasMore}
+                           questionSortType={props.questionSortType}
+                           handleUpvote={props.handleUpvote}
+                           getMore={props.getMore}
+                           containerHeight={
+                              props.questions.length > 4
+                                 ? 400
+                                 : props.questions.length > 2
+                                 ? 300
+                                 : 170
+                           }
+                           questions={props.questions}
+                           handleChangeQuestionSortType={
+                              props.handleChangeQuestionSortType
+                           }
+                        />
+                     )}
+                  </Box>
+               </Fade>
+            </Box>
          </SectionContainer>
       </Section>
    );

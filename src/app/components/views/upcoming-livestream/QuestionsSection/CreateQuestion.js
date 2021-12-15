@@ -7,14 +7,22 @@ import {
    minQuestionLength,
 } from "../../../../constants/forms";
 import { useFirebase } from "../../../../context/firebase";
+import { useRouter } from "next/router";
+import { Box, Button, CircularProgress, TextField } from "@material-ui/core";
+import { useDispatch } from "react-redux";
+import * as actions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({
-   root: {},
+   root: {
+      width: "100%",
+   },
 }));
-const CreateQuestion = ({ livestreamId }) => {
+const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
    const classes = useStyles();
    const { putLivestreamQuestion } = useFirebase();
-   const { authenticatedUser, userData } = useAuth();
+   const { authenticatedUser } = useAuth();
+   const dispatch = useDispatch();
+   const { replace, asPath } = useRouter();
    const {
       handleChange,
       values,
@@ -27,9 +35,12 @@ const CreateQuestion = ({ livestreamId }) => {
       initialValues: {
          questionTitle: "",
       },
-      onSubmit: async (values) => {
+      onSubmit: async (values, { resetForm, setFieldError }) => {
          if (!authenticatedUser) {
-            return replace("/signup");
+            return replace({
+               pathname: "/signup",
+               query: { absolutePath: asPath },
+            });
          }
          try {
             const newQuestion = {
@@ -39,7 +50,19 @@ const CreateQuestion = ({ livestreamId }) => {
                author: authenticatedUser.email,
             };
             await putLivestreamQuestion(livestreamId, newQuestion);
-         } catch (e) {}
+            dispatch(
+               actions.sendSuccessMessage(
+                  "Thanks, your question has successfully been submitted!"
+               )
+            );
+            reFetchQuestions();
+            resetForm();
+         } catch (e) {
+            setFieldError(
+               "questionTitle",
+               "There was an issue submitting the question"
+            );
+         }
       },
       validate: (values) => {
          let errors = {};
@@ -55,7 +78,41 @@ const CreateQuestion = ({ livestreamId }) => {
          return errors;
       },
    });
-   return <div className={classes.root}></div>;
+   return (
+      <div className={classes.root}>
+         <TextField
+            variant="outlined"
+            id="questionTitle"
+            name="questionTitle"
+            label="Your Question"
+            value={values.questionTitle}
+            placeholder={"What would like to ask our speaker?"}
+            maxLength="170"
+            error={touched.questionTitle && Boolean(errors.questionTitle)}
+            helperText={touched.questionTitle && errors.questionTitle}
+            inputProps={{ maxLength: maxQuestionLength }}
+            fullWidth
+            onBlur={handleBlur}
+            onChange={handleChange}
+            disabled={isSubmitting}
+         />
+         <Box display="flex" justifyContent="flex-end" marginTop={2}>
+            <Button
+               variant="contained"
+               size="large"
+               onClick={handleSubmit}
+               color="primary"
+               startIcon={
+                  isSubmitting && <CircularProgress size={10} color="inherit" />
+               }
+               autoFocus
+               disabled={isSubmitting}
+            >
+               {isSubmitting ? "submitting" : "Submit"}
+            </Button>
+         </Box>
+      </div>
+   );
 };
 
 export default CreateQuestion;

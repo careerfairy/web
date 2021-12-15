@@ -7,6 +7,7 @@ import {
    Hidden,
    IconButton,
    Paper,
+   Tooltip,
    Typography,
 } from "@material-ui/core";
 import DateUtil from "../../../../util/DateUtil";
@@ -111,13 +112,15 @@ const CountDown = ({
                      {DateUtil.getUpcomingDate(time)}
                   </Typography>
                   <Hidden xsDown>
-                     <IconButton
-                        onClick={handleAddToCalendar}
-                        className={classes.addToCalendarIconBtn}
-                        variant="outlined"
-                     >
-                        <CalendarIcon />
-                     </IconButton>
+                     <Tooltip arrow placement="top" title={"Add to calendar"}>
+                        <IconButton
+                           onClick={handleAddToCalendar}
+                           className={classes.addToCalendarIconBtn}
+                           variant="outlined"
+                        >
+                           <CalendarIcon />
+                        </IconButton>
+                     </Tooltip>
                   </Hidden>
                </div>
                <Divider className={classes.divider} />

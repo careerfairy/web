@@ -6,8 +6,9 @@ import SectionContainer from "../../common/Section/Container";
 import HighlightText from "components/views/common/HighlightText";
 import SectionHeader from "../../common/SectionHeader";
 import Box from "@material-ui/core/Box";
-import { Typography } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import Fade from "react-reveal/Fade";
+import SpeakerCard from "./SpeakerCard";
 
 const useStyles = makeStyles((theme) => ({
    section: {},
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const AboutSection = (props) => {
+const SpeakersSection = (props) => {
    const classes = useStyles();
 
    return (
@@ -54,26 +55,27 @@ const AboutSection = (props) => {
                   />
                </Fade>
             )}
-            <Fade bottom>
-               <Box>
-                  <Typography
-                     style={{ whiteSpace: "pre-line" }}
-                     color="textSecondary"
-                     align="center"
-                     variant="h6"
-                  >
-                     {props.summary}
-                  </Typography>
-               </Box>
-            </Fade>
+            <Box width="100%">
+               <Fade bottom>
+                  <Box>
+                     <Grid justifyContent="flex-start" container spacing={2}>
+                        {props.speakers.map((speaker) => (
+                           <Grid key={speaker.id} xs={12} sm={6} md={4} item>
+                              <SpeakerCard speaker={speaker} />
+                           </Grid>
+                        ))}
+                     </Grid>
+                  </Box>
+               </Fade>
+            </Box>
          </SectionContainer>
       </Section>
    );
 };
 
-export default AboutSection;
+export default SpeakersSection;
 
-AboutSection.propTypes = {
+SpeakersSection.propTypes = {
    backgroundColor: PropTypes.any,
    backgroundImage: PropTypes.any,
    backgroundImageClassName: PropTypes.any,

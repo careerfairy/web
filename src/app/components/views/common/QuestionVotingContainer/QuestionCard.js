@@ -10,7 +10,7 @@ import {
    Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { getTimeFromNow } from "../../../../../helperFunctions/HelperFunctions";
+import { getTimeFromNow } from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
    paperRoot: {
