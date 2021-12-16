@@ -5,13 +5,29 @@ import NavBar from "./NavBar";
 import styles from "../../materialUI/styles/layoutStyles/landingLayoutStyles";
 import FooterV2 from "../../components/views/footer/FooterV2";
 
-const useStyles = makeStyles((theme) => ({
-   ...styles(theme),
-   root: {
-      minHeight: "100vh",
-      display: "flex",
-   },
-}));
+const useStyles = makeStyles((theme) => {
+   const inheritedStyles = { ...styles(theme) };
+   return {
+      ...inheritedStyles,
+      root: {
+         minHeight: "100vh",
+         display: "flex",
+      },
+      wrapper: {
+         ...inheritedStyles.wrapper,
+         overflow: "visible",
+      },
+      contentContainer: {
+         ...inheritedStyles.contentContainer,
+         overflow: "visible",
+      },
+      content: {
+         ...inheritedStyles.content,
+         overflow: "visible",
+         overflowX: "visible",
+      },
+   };
+});
 
 const drawerWidth = 300;
 const UpcomingLayout = ({ children }) => {
@@ -19,7 +35,7 @@ const UpcomingLayout = ({ children }) => {
 
    return (
       <div className={classes.root}>
-         <TopBar />
+         {/*<TopBar />*/}
          <NavBar anchor="left" drawerWidth={drawerWidth} />
          <div className={classes.wrapper}>
             <div className={classes.contentContainer}>

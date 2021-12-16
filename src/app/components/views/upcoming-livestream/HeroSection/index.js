@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
       backgroundAttachment: "fixed",
       backgroundImage: ({ backgroundImage }) => `url(${backgroundImage});`,
       [theme.breakpoints.up("md")]: {
-         minHeight: "calc(100vh - 64px);",
+         // minHeight: "calc(100vh - 64px);",
       },
       "&:after": {
          position: "absolute",
@@ -43,9 +43,9 @@ const useStyles = makeStyles((theme) => ({
    },
    containerWrapper: {
       [theme.breakpoints.up("md")]: {
-         position: "absolute",
-         top: "50%",
-         transform: "translateY(-50%)",
+         // position: "absolute",
+         // top: "50%",
+         // transform: "translateY(-50%)",
       },
       width: "100%",
       zIndex: 2,
@@ -53,18 +53,18 @@ const useStyles = makeStyles((theme) => ({
       top: 0,
    },
    container: {
-      [theme.breakpoints.up("md")]: {
-         paddingTop: theme.spacing(8),
-         paddingBottom: theme.spacing(8),
-      },
       [theme.breakpoints.up("sm")]: {
          paddingTop: theme.spacing(6),
          paddingBottom: theme.spacing(6),
       },
-      [theme.breakpoints.up("xs")]: {
-         paddingTop: theme.spacing(4),
-         paddingBottom: theme.spacing(4),
+      [theme.breakpoints.up("md")]: {
+         paddingTop: theme.spacing(8),
+         paddingBottom: theme.spacing(8),
       },
+      // [theme.breakpoints.up("xs")]: {
+      // },
+      paddingTop: theme.spacing(4),
+      paddingBottom: theme.spacing(4),
    },
    gridContainer: {
       color: theme.palette.common.white,

@@ -141,7 +141,9 @@ const TalentPoolSection = (props) => {
                   <Box marginTop={2} display="flex" justifyContent="center">
                      <Button
                         size="large"
-                        className={props.userIsInTalentPool && classes.whiteBtn}
+                        className={
+                           props.userIsInTalentPool ? classes.whiteBtn : ""
+                        }
                         disabled={joiningTalentPool || leavingTalentPool}
                         variant={
                            props.userIsInTalentPool ? "outlined" : "contained"

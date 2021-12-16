@@ -39,6 +39,8 @@ const Section = (props) => {
       backgroundImageClassName,
       big,
       className,
+      sectionRef,
+      sectionId,
       // Passed to section element
       ...otherProps
    } = props;
@@ -49,9 +51,10 @@ const Section = (props) => {
    });
 
    return (
-      <Box
-         component="section"
+      <section
          className={clsx(classes.sectionComponent, className)}
+         ref={sectionRef}
+         id={sectionId}
          {...otherProps}
       >
          {props.children}
@@ -63,7 +66,7 @@ const Section = (props) => {
                repeat={backgroundImageRepeat}
             />
          )}
-      </Box>
+      </section>
    );
 };
 Section.propTypes = {

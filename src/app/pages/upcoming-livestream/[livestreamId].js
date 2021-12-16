@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+   useCallback,
+   useEffect,
+   useMemo,
+   useState,
+   useRef,
+} from "react";
 import { getServerSideStream, parseStreamDates } from "../../util/serverUtil";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
 import { getStreamMetaInfo } from "../../util/SeoUtil";
@@ -18,10 +24,17 @@ import SpeakersSection from "../../components/views/upcoming-livestream/Speakers
 import TalentPoolSection from "../../components/views/upcoming-livestream/TalentPoolSection";
 import { useTheme } from "@material-ui/core/styles";
 import ContactSection from "../../components/views/upcoming-livestream/ContactSection";
+import Navigation from "../../components/views/upcoming-livestream/Navigation";
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
-   console.count("-> UpcomingLivestreamPage");
+   // console.count("-> UpcomingLivestreamPage");
+
+   const aboutRef = useRef(null);
+   const speakersRef = useRef(null);
+   const questionsRef = useRef(null);
+
    const theme = useTheme();
+
    const [stream, setStream] = useState(parseStreamDates(serverStream));
    const [registered, setRegistered] = useState(false);
    const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
@@ -317,9 +330,16 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             hosts={filteredGroups}
             onRegisterClick={handleRegisterClick}
          />
+         <Navigation
+            aboutRef={aboutRef}
+            speakersRef={speakersRef}
+            questionsRef={questionsRef}
+         />
          {stream.summary && (
             <AboutSection
                summary={stream.summary}
+               sectionRef={aboutRef}
+               sectionId="about"
                title={`${stream.company}`}
                overheadText={"ABOUT"}
             />
@@ -328,6 +348,8 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             <SpeakersSection
                title="The speakers of this event"
                overheadText={"OUR SPEAKERS"}
+               sectionRef={speakersRef}
+               sectionId="speakers"
                speakers={stream.speakers}
             />
          )}
@@ -339,6 +361,8 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             getMore={handlers.getMore}
             loadingInitialQuestions={handlers.loadingInitial}
             hasVoted={hasVoted}
+            sectionRef={questionsRef}
+            sectionId="questions"
             hasMore={handlers.hasMore}
             reFetchQuestions={handlers.getInitialQuery}
             handleUpvote={handleUpvote}
@@ -355,9 +379,11 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                stream={stream}
                userIsInTalentPool={userIsInTalentPool}
                backgroundColor={
-                  userIsInTalentPool && theme.palette.primary.main
+                  userIsInTalentPool ? theme.palette.primary.main : undefined
                }
-               color={userIsInTalentPool && theme.palette.common.white}
+               color={
+                  userIsInTalentPool ? theme.palette.common.white : undefined
+               }
             />
          )}
          <ContactSection

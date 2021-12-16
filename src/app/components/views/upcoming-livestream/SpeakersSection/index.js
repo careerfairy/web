@@ -30,6 +30,8 @@ const SpeakersSection = (props) => {
       <Section
          className={classes.section}
          big={props.big}
+         sectionRef={props.sectionRef}
+         sectionId={props.sectionId}
          color={props.color}
          backgroundImageClassName={props.backgroundImageClassName}
          backgroundImage={props.backgroundImage}

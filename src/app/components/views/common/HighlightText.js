@@ -6,21 +6,21 @@ import { Typography } from "@material-ui/core";
 const useStyles = makeStyles((theme) => ({
    root: {
       background: theme.palette.secondary.light,
-      padding: theme.spacing(1),
       color: theme.palette.common.white,
       borderRadius: theme.spacing(1),
       marginBottom: theme.spacing(1),
    },
    text: {
+      padding: "0.578em",
       fontWeight: 500,
    },
 }));
 
-const HighlightText = ({ text }) => {
+const HighlightText = ({ text, variant = "body1" }) => {
    const classes = useStyles();
    return (
       <div className={classes.root}>
-         <Typography className={classes.text} variant="body1">
+         <Typography className={classes.text} variant={variant}>
             {text}
          </Typography>
       </div>
