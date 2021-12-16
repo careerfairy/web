@@ -1,48 +1,49 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { alpha, makeStyles } from "@material-ui/core/styles";
 import { Tab, Tabs } from "@material-ui/core";
-import useScrollTrigger from "@material-ui/core/useScrollTrigger";
-import clsx from "clsx";
-import { useRouter } from "next/router";
+import debounce from "lodash.debounce";
+import Link from "materialUI/NextNavLink";
+import SectionContainer from "../common/Section/Container";
 
 const useStyles = makeStyles((theme) => ({
-   root: {},
-   tabs: {
-      position: "sticky",
+   root: {
+      position: "sticky !important",
       top: 0,
-      backgroundColor: theme.palette.background.default,
       zIndex: theme.zIndex.appBar,
-      transition: theme.transitions.create(["top"], {
-         duration: theme.transitions.duration.standard,
-         easing: theme.transitions.easing.easeInOut,
-      }),
+      backgroundColor: theme.palette.background.default,
    },
-   tabsScrolling: {
-      // top: 64,
+   tabs: {
+      width: "100%",
+      borderBottom: `1px solid ${alpha(theme.palette.text.secondary, 0.1)}`,
+   },
+   navLink: {
+      textDecoration: "none !important",
    },
 }));
 
 const Navigation = ({ aboutRef, questionsRef, speakersRef }) => {
-   const isScrolling = useScrollTrigger();
-   const router = useRouter();
-   console.log("-> router", router);
    const classes = useStyles();
    const [value, setValue] = useState("about");
    const [tabs, setTabs] = useState([]);
+
    useEffect(() => {
       const newTabs = [
-         { ref: aboutRef, label: "About", value: aboutRef.current.id },
-         { ref: speakersRef, label: "Speakers", value: speakersRef.current.id },
+         { ref: aboutRef, label: "About", value: aboutRef.current?.id },
+         {
+            ref: speakersRef,
+            label: "Speakers",
+            value: speakersRef.current?.id,
+         },
          {
             ref: questionsRef,
             label: "Questions",
-            value: questionsRef.current.id,
+            value: questionsRef.current?.id,
          },
       ].filter(({ ref }) => ref.current);
       setTabs(newTabs);
-   }, [aboutRef, questionsRef, speakersRef]);
+   }, [aboutRef.current, questionsRef.current, speakersRef.current]);
 
-   React.useEffect(() => {
+   useEffect(() => {
       let observer;
       if (tabs.length) {
          const options = {
@@ -50,18 +51,9 @@ const Navigation = ({ aboutRef, questionsRef, speakersRef }) => {
          };
          observer = new IntersectionObserver((entries, observer) => {
             entries.forEach((entry) => {
-               const navElement = document.querySelector(
-                  `a[href="#${entry.target.id}"]`
-               );
+               const entryId = entry.target.id;
                if (entry.isIntersecting) {
-                  console.log("-> entry", entry);
-                  console.log("-> entry.target.id", entry.target.id);
-                  // setValue(entry.target.id);
-                  // if (!navElement.classList.contains("active")) {
-                  //    navElement.classList.add("active");
-                  // }
-               } else if (navElement.classList.contains("active")) {
-                  // navElement.classList.remove("active");
+                  handleChange(_, entryId);
                }
             });
          }, options);
@@ -70,32 +62,37 @@ const Navigation = ({ aboutRef, questionsRef, speakersRef }) => {
       return () => observer?.disconnect();
    }, [tabs]);
 
-   const handleChange = (event, newValue) => {
+   const handleChange = debounce((event, newValue) => {
       setValue(newValue);
-   };
+   }, 250);
 
    if (!tabs.length) {
       return null;
    }
 
    return (
-      <Tabs
-         value={value}
-         className={clsx(classes.tabs, {
-            [classes.tabsScrolling]: !isScrolling,
-         })}
-         onChange={handleChange}
-         aria-label="simple tabs example"
-      >
-         {tabs.map((tab) => (
-            <Tab
-               href={`#${tab.value}`}
-               label={tab.label}
-               value={tab.value}
-               key={tab.value}
-            />
-         ))}
-      </Tabs>
+      <SectionContainer className={classes.root}>
+         <Tabs
+            value={value}
+            onChange={handleChange}
+            className={classes.tabs}
+            aria-label="upcoming event nav"
+            centered
+            variant="fullWidth"
+         >
+            {tabs.map((tab) => (
+               <Tab
+                  label={tab.label}
+                  id={`upcoming-event-nav-link-${tab.value}`}
+                  className={classes.navLink}
+                  value={tab.value}
+                  component={Link}
+                  href={{ hash: `#${tab.value}` }}
+                  key={tab.value}
+               />
+            ))}
+         </Tabs>
+      </SectionContainer>
    );
 };
 

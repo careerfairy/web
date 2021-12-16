@@ -25,6 +25,7 @@ import TalentPoolSection from "../../components/views/upcoming-livestream/Talent
 import { useTheme } from "@material-ui/core/styles";
 import ContactSection from "../../components/views/upcoming-livestream/ContactSection";
 import Navigation from "../../components/views/upcoming-livestream/Navigation";
+import smoothscroll from "smoothscroll-polyfill";
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    // console.count("-> UpcomingLivestreamPage");
@@ -83,6 +84,10 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       limit: 8,
       query: questionsQuery,
    });
+
+   useEffect(() => {
+      smoothscroll.polyfill();
+   }, []);
 
    useEffect(() => {
       setUserIsInTalentPool(

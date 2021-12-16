@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import { Container } from "@material-ui/core";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -16,14 +17,14 @@ const useStyles = makeStyles((theme) => ({
    customMaxWidth: {},
 }));
 
-const SectionContainer = ({ children, ...props }) => {
+const SectionContainer = ({ className, children, ...props }) => {
    const classes = useStyles();
    return (
       <Container
          classes={{
             maxWidthLg: classes.customMaxWidth,
          }}
-         className={classes.root}
+         className={clsx(classes.root, className)}
          maxWidth="md"
          {...props}
          children={children}

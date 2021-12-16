@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
    Button,
@@ -13,6 +13,8 @@ import {
 import DateUtil from "../../../../util/DateUtil";
 import CheckIcon from "@material-ui/icons/Check";
 import CalendarIcon from "@material-ui/icons/CalendarToday";
+import { makeUrls } from "../../../../util/makeUrls";
+import { useRouter } from "next/router";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -71,8 +73,34 @@ const CountDown = ({
    onRegisterClick,
    registered,
    handleAddToCalendar,
+   stream,
 }) => {
    const classes = useStyles({ registered });
+   console.log("-> stream", stream);
+   const {
+      pathname,
+      asPath,
+      basePath,
+      query: { livestreamId, groupId },
+   } = useRouter();
+   console.log("-> pathname", pathname);
+   console.log("-> asPath", asPath);
+   console.log("-> basePath", basePath);
+   const urls = useMemo(() => {
+      const event = {
+         name: "CareerFairy Event",
+         details: "Join NOW!",
+         location: `https://careerfairy.io/upcoming-livestream/${livestreamId}${
+            groupId ? `?groupId=${groupId}` : ""
+         }`,
+         startsAt: new Date(stream.startDate).toISOString(),
+         endsAt: new Date(
+            new Date(stream.startDate).getTime() +
+               1 * (stream.duration || 45) * 60 * 1000
+         ).toISOString(),
+      };
+      return makeUrls(event);
+   }, [stream, pathname, livestreamId, groupId]);
 
    const calculateTimeLeft = () => {
       const difference = time - new Date();
@@ -114,7 +142,11 @@ const CountDown = ({
                   <Hidden xsDown>
                      <Tooltip arrow placement="top" title={"Add to calendar"}>
                         <IconButton
-                           onClick={handleAddToCalendar}
+                           component="a"
+                           href={urls.google}
+                           download={"events"}
+                           target="_blank"
+                           rel="noopener noreferrer"
                            className={classes.addToCalendarIconBtn}
                            variant="outlined"
                         >

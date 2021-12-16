@@ -67,6 +67,7 @@ const GeneralHeader = ({
          <AppBar
             className={clsx(classes.root, className)}
             elevation={0}
+            position="static"
             {...rest}
          >
             <Toolbar

@@ -12,10 +12,12 @@ const useStyles = makeStyles((theme) => {
       root: {
          minHeight: "100vh",
          display: "flex",
+         flexDirection: "column",
       },
       wrapper: {
          ...inheritedStyles.wrapper,
          overflow: "visible",
+         paddingTop: "0 !important",
       },
       contentContainer: {
          ...inheritedStyles.contentContainer,
@@ -35,7 +37,7 @@ const UpcomingLayout = ({ children }) => {
 
    return (
       <div className={classes.root}>
-         {/*<TopBar />*/}
+         <TopBar />
          <NavBar anchor="left" drawerWidth={drawerWidth} />
          <div className={classes.wrapper}>
             <div className={classes.contentContainer}>

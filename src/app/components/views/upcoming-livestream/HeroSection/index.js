@@ -13,6 +13,7 @@ import CountDown from "./CountDown";
 import SingleHeroSpeaker from "./SingleHeroSpeaker";
 import HeroSpeakers from "./HeroSpeakers";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
+import { makeUrls } from "../../../../util/makeUrls";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
       backgroundAttachment: "fixed",
       backgroundImage: ({ backgroundImage }) => `url(${backgroundImage});`,
       [theme.breakpoints.up("md")]: {
-         // minHeight: "calc(100vh - 64px);",
+         minHeight: "calc(100vh - 64px);",
       },
       "&:after": {
          position: "absolute",
@@ -43,9 +44,9 @@ const useStyles = makeStyles((theme) => ({
    },
    containerWrapper: {
       [theme.breakpoints.up("md")]: {
-         // position: "absolute",
-         // top: "50%",
-         // transform: "translateY(-50%)",
+         position: "absolute",
+         top: "50%",
+         transform: "translateY(-50%)",
       },
       width: "100%",
       zIndex: 2,
@@ -180,6 +181,7 @@ const HeroSection = ({
                               <CountDown
                                  registerButtonLabel={registerButtonLabel}
                                  time={stream.startDate}
+                                 stream={stream}
                                  onRegisterClick={onRegisterClick}
                                  disabled={disabled}
                                  registered={registered}
