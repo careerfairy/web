@@ -9,22 +9,18 @@ import {
    TextField,
    Tooltip,
 } from "@material-ui/core";
-import Header from "../../components/views/header/Header";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { withFirebasePage } from "context/firebase";
 import AddIcon from "@material-ui/icons/Add";
 import Loader from "../../components/views/loader/Loader";
 import DateUtil from "../../util/DateUtil";
 import { useRouter } from "next/router";
-import Footer from "../../components/views/footer/Footer";
 import Countdown from "../../components/views/common/Countdown";
-import BookingModal from "../../components/views/common/booking-modal/BookingModal";
 import QuestionVotingBox from "../../components/views/question-voting-box/QuestionVotingBox";
 import StringUtils from "../../util/StringUtils";
 import ClearIcon from "@material-ui/icons/Clear";
 import UserUtil from "../../data/util/UserUtil";
 import TargetOptions from "../../components/views/common/TargetOptions";
-import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
 import EmailIcon from "@material-ui/icons/Email";
 import RssFeedIcon from "@material-ui/icons/RssFeed";
@@ -47,6 +43,8 @@ import {
    LimitedRegistrationsBadge,
 } from "components/views/NextLivestreams/GroupStreams/groupStreamCard/badges";
 import Link from "materialUI/NextNavLink";
+import GeneralLayout from "../../layouts/GeneralLayout";
+import RegistrationModal from "../../components/views/common/registration-modal";
 
 const useStyles = makeStyles((theme) => ({
    speakerAvatar: {
@@ -134,32 +132,35 @@ const parseDates = (stream) => {
 
 function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    const classes = useStyles();
-   const router = useRouter();
-   const { livestreamId, groupId: queryGroupId } = router.query;
-   const absolutePath = router.asPath;
+   const { asPath, push, query, replace, pathname } = useRouter();
    const summaryRef = useRef();
-   const { referrerId } = router.query;
    const { userData, authenticatedUser: user } = useAuth();
    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
    const [newQuestionTitle, setNewQuestionTitle] = useState("");
    const [currentLivestream, setCurrentLivestream] = useState(
       parseDates(serverSideLivestream)
    );
-   const [registration, setRegistration] = useState(false);
 
    const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
    const [registered, setRegistered] = useState(false);
-   const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
-   const [bookingModalOpen, setBookingModalOpen] = useState(false);
-   const [careerCenters, setCareerCenters] = useState([]);
+   const [filteredGroups, setFilteredGroups] = useState([]);
+   const [unfilteredGroups, setUnfilteredGroups] = useState([]);
    const [currentGroup, setCurrentGroup] = useState(null);
    const [targetOptions, setTargetOptions] = useState([]);
-
-   const [openJoinModal, setOpenJoinModal] = useState(false);
+   const [targetGroupId, setTargetGroupId] = useState("");
    const [openTalentPoolModal, setOpenTalentPoolModal] = useState(false);
    const [isPastEvent, setIsPastEvent] = useState(
       streamIsOld(currentLivestream?.startDate)
    );
+
+   const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
+   const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
+   const handleOpenJoinModal = (dataObj) =>
+      setJoinGroupModalData({
+         groups: dataObj.groups,
+         targetGroupId: targetGroupId,
+         livestream: dataObj.livestream,
+      });
 
    useEffect(() => {
       // Checks if the event is old and has a summary,
@@ -177,11 +178,11 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    }, [currentLivestream?.startDate]);
 
    useEffect(() => {
-      if (livestreamId) {
+      if (query.livestreamId) {
          const unsubscribe = firebase.listenToLivestreamQuestions(
-            livestreamId,
+            query.livestreamId,
             (querySnapshot) => {
-               var questionsList = [];
+               const questionsList = [];
                querySnapshot.forEach((doc) => {
                   let question = doc.data();
                   question.id = doc.id;
@@ -192,16 +193,19 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          );
          return () => unsubscribe();
       }
-   }, [livestreamId, user]);
+   }, [query.livestreamId, user]);
 
    useEffect(() => {
       if (groupId) {
          const unsubscribe = firebase.listenToCareerCenterById(
             groupId,
             (querySnapshot) => {
-               let group = querySnapshot.data();
-               group.id = querySnapshot.id;
-               setCurrentGroup(group);
+               if (querySnapshot.exists) {
+                  setCurrentGroup({
+                     ...querySnapshot.data(),
+                     id: querySnapshot.id,
+                  });
+               }
             }
          );
          return () => unsubscribe();
@@ -209,9 +213,9 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
    }, [groupId]);
 
    useEffect(() => {
-      if (livestreamId) {
+      if (query.livestreamId) {
          const unsubscribe = firebase.listenToScheduledLivestreamById(
-            livestreamId,
+            query.livestreamId,
             (querySnapshot) => {
                if (querySnapshot.data()) {
                   let livestream = querySnapshot.data();
@@ -225,7 +229,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          );
          return () => unsubscribe();
       }
-   }, [livestreamId]);
+   }, [query.livestreamId]);
 
    useEffect(() => {
       if (
@@ -262,7 +266,6 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          }
       }
    }, [currentGroup, currentLivestream]);
-
    useEffect(() => {
       if (
          currentLivestream &&
@@ -272,27 +275,31 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          firebase
             .getDetailLivestreamCareerCenters(currentLivestream.groupIds)
             .then((querySnapshot) => {
-               let groupList = querySnapshot.docs.map((doc) => ({
+               const groupList = querySnapshot.docs.map((doc) => ({
                   id: doc.id,
                   ...doc.data(),
                }));
 
                let targetGroupId = currentGroup?.groupId;
 
-               if (!queryGroupId) {
+               if (!targetGroupId) {
                   const companyThatPublishedStream = groupList.find(
                      (group) =>
                         !group.universityCode &&
                         group.id === currentLivestream?.author?.groupId
                   );
+                  // TODO Dont think including the publishing company as the default group
+                  //  if none is provided to be the best choice
                   if (companyThatPublishedStream?.id) {
                      targetGroupId = companyThatPublishedStream.id;
                   }
                }
-               groupList = groupList.filter((careerCenter) =>
-                  GroupsUtil.filterCurrentGroup(careerCenter, targetGroupId)
+               const targetGroup = groupList.find(
+                  (group) => group.id === targetGroupId
                );
-               setCareerCenters(groupList);
+               setTargetGroupId(targetGroup?.id);
+               setFilteredGroups(targetGroup ? [targetGroup] : groupList);
+               setUnfilteredGroups(groupList);
             });
       }
    }, [currentLivestream?.groupIds, currentGroup?.groupId]);
@@ -312,9 +319,40 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    useEffect(() => {
       if (currentLivestream.hasStarted) {
-         router.replace?.("/streaming/" + currentLivestream.id + "/viewer");
+         replace?.("/streaming/" + currentLivestream.id + "/viewer");
       }
    }, [currentLivestream.hasStarted]);
+
+   useEffect(() => {
+      if (
+         query.register === currentLivestream?.id &&
+         filteredGroups.length &&
+         !currentLivestream?.registeredUsers.includes(user.email)
+      ) {
+         (async function handleAutoRegister() {
+            const newQuery = { ...query };
+            if (newQuery.register) {
+               delete newQuery.register;
+            }
+            await push({
+               pathname,
+               query: {
+                  ...newQuery,
+               },
+            });
+            handleOpenJoinModal({
+               groups: unfilteredGroups,
+               livestream: currentLivestream,
+            });
+         })();
+      }
+   }, [
+      query.register,
+      currentLivestream?.id,
+      filteredGroups,
+      currentLivestream?.registeredUsers,
+      user.email,
+   ]);
 
    function goToSeparateRoute(route) {
       window.open("http://careerfairy.io" + route, "_blank");
@@ -322,11 +360,11 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    function joinTalentPool() {
       if (!user || !user.emailVerified) {
-         return router.replace("/signup");
+         return replace("/signup");
       }
 
       if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-         return router.push("/profile");
+         return push("/profile");
       }
 
       firebase.joinCompanyTalentPool(
@@ -338,11 +376,11 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    function leaveTalentPool() {
       if (!user || !user.emailVerified) {
-         return router.replace("/signup");
+         return replace("/signup");
       }
 
       if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-         return router.push("/profile");
+         return push("/profile");
       }
 
       firebase.leaveCompanyTalentPool(
@@ -359,89 +397,50 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
       return currentLivestream.registeredUsers.indexOf(user.email) > -1;
    }
 
-   function sendEmailRegistrationConfirmation() {
-      return firebase.sendRegistrationConfirmationEmail(
-         user,
-         userData,
-         currentLivestream
-      );
-   }
+   const linkToStream = useMemo(() => {
+      const notLoggedIn =
+         (user.isLoaded && user.isEmpty) || !user.emailVerified;
+      const registerQuery = notLoggedIn
+         ? `&register=${currentLivestream.id}`
+         : "";
+      const referrerQuery = query.referrerId
+         ? `&referrerId=${query.referrerId}`
+         : "";
+      const groupIdQuery = query.groupId ? `&groupId=${query.groupId}` : "";
+      const queries = `${registerQuery}${referrerQuery}${groupIdQuery}`;
+      const basePath = `/upcoming-livestream/${currentLivestream.id}`;
+      return queries ? `${basePath}?${queries}` : basePath;
+   }, [asPath, currentLivestream?.id, query.groupId, user, query.referrerId]);
 
-   function userFollowsSomeCareerCenter() {
-      return userData.groupIds?.some((groupId) => {
-         return careerCenters.some((careerCenter) => {
-            return careerCenter.groupId === groupId;
-         });
-      });
-   }
-
-   const startRegistrationProcess = async (livestreamId) => {
+   const startRegistrationProcess = async () => {
       if (!user || !user.emailVerified) {
-         return router.push(
-            absolutePath
+         return push(
+            asPath
                ? {
                     pathname: `/login`,
-                    query: { absolutePath },
+                    query: { absolutePath: linkToStream },
                  }
                : "/signup"
          );
       }
 
       if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-         return router.push("/profile");
+         return push("/profile");
       }
 
-      const {
-         hasAgreedToAll,
-         groupsWithPolicies,
-      } = await GroupsUtil.getPolicyStatus(careerCenters, user.email, firebase);
-      if (!hasAgreedToAll) {
-         setOpenJoinModal(true);
-         setGroupsWithPolicies(groupsWithPolicies);
-      } else if (careerCenters.length > 0 && !userFollowsSomeCareerCenter()) {
-         setOpenJoinModal(true);
-      } else {
-         setBookingModalOpen(true);
-         setRegistration(true);
-         firebase
-            .registerToLivestream(
-               currentLivestream.id,
-               userData,
-               groupsWithPolicies,
-               referrerId
-            )
-            .then(() => {
-               sendEmailRegistrationConfirmation();
-               setRegistration(false);
-            });
-      }
+      handleOpenJoinModal({
+         groups: unfilteredGroups,
+         livestream: currentLivestream,
+      });
    };
-
-   function completeRegistrationProcess() {
-      firebase
-         .registerToLivestream(
-            currentLivestream.id,
-            userData,
-            groupsWithPolicies,
-            referrerId
-         )
-         .then(() => {
-            setBookingModalOpen(true);
-            sendEmailRegistrationConfirmation();
-         });
-   }
-
-   function handleCloseJoinModal() {
-      setOpenJoinModal(false);
-   }
 
    function deregisterFromLivestream(livestreamId) {
       if (!user || !user.emailVerified) {
-         return router.push("/signup");
+         return push("/signup");
       }
 
       if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-         return router.push("/profile");
+         return push("/profile");
       }
 
       firebase.deregisterFromLivestream(livestreamId, user.email);
@@ -501,7 +500,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    function addNewQuestion() {
       if (!user || !user.emailVerified) {
-         return router.replace("/signup");
+         return replace("/signup");
       }
 
       if (StringUtils.isEmpty(newQuestionTitle)) {
@@ -620,7 +619,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
          </Grid>
       );
    });
-   let logoElements = careerCenters.map((careerCenter, index) => {
+   let logoElements = filteredGroups.map((careerCenter, index) => {
       return (
          <Item key={careerCenter.id} className={classes.imageGrid}>
             <img
@@ -650,721 +649,743 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
 
    return (
       <div>
-         <div className="topLevelContainer">
-            <HeadWithMeta
-               title={`CareerFairy | Live Stream with ${currentLivestream.company}`}
-               fullPath={
-                  groupId
-                     ? `https://careerfairy.io/upcoming-livestream/${livestreamId}?groupId=${groupId}`
-                     : `https://careerfairy.io/upcoming-livestream/${livestreamId}`
-               }
-               image={getResizedUrl(currentLivestream.backgroundImageUrl, "sm")}
-               description={currentLivestream.title}
-            />
-            <Header color="white" />
-            <div
-               className="video-mask"
-               style={{
-                  backgroundImage:
-                     "url(" +
-                     getResizedUrl(currentLivestream.backgroundImageUrl, "lg") +
-                     ")",
-               }}
-            >
+         <GeneralLayout>
+            <div className="topLevelContainer">
+               <HeadWithMeta
+                  title={`CareerFairy | Live Stream with ${currentLivestream.company}`}
+                  fullPath={
+                     groupId
+                        ? `https://careerfairy.io/upcoming-livestream/${query.livestreamId}?groupId=${groupId}`
+                        : `https://careerfairy.io/upcoming-livestream/${query.livestreamId}`
+                  }
+                  image={getResizedUrl(
+                     currentLivestream.backgroundImageUrl,
+                     "sm"
+                  )}
+                  description={currentLivestream.title}
+               />
                <div
-                  className="mask"
+                  className="video-mask"
                   style={{
-                     backgroundColor: userIsRegistered()
-                        ? "rgba(0, 210, 170, 0.9)"
-                        : "",
+                     backgroundImage:
+                        "url(" +
+                        getResizedUrl(
+                           currentLivestream.backgroundImageUrl,
+                           "lg"
+                        ) +
+                        ")",
                   }}
                >
-                  <Container>
-                     <div
-                        className="livestream-label"
-                        style={{
-                           color: userIsRegistered() ? "white" : "",
-                           border: userIsRegistered() ? "2px solid white" : "",
-                        }}
-                     >
-                        <RssFeedIcon
-                           style={{ verticalAlign: "middle", marginRight: 5 }}
-                        />
-                        <span style={{ verticalAlign: "middle" }}>
-                           Live stream
-                        </span>
-                     </div>
-                     <div
-                        className="livestream-title"
-                        style={{ color: userIsRegistered() ? "white" : "" }}
-                     >
-                        {currentLivestream.title}
-                     </div>
-                     <div
-                        className="livestream-date"
-                        style={{ color: userIsRegistered() ? "white" : "" }}
-                     >
-                        <span>
-                           <DateRangeIcon style={{ marginRight: 5 }} />
-                           {DateUtil.getPrettyDate(currentLivestream.startDate)}
-                        </span>
-                     </div>
-                     <Box zIndex={200}>
-                        {currentLivestream.isFaceToFace && (
-                           <InPersonEventBadge />
-                        )}
-                        {currentLivestream.maxRegistrants && (
-                           <LimitedRegistrationsBadge
-                              numberOfSpotsRemaining={numberOfSpotsRemaining}
-                           />
-                        )}
-                     </Box>
-                     {!isPastEvent && !currentLivestream.isFaceToFace && (
+                  <div
+                     className="mask"
+                     style={{
+                        backgroundColor: userIsRegistered()
+                           ? "rgba(0, 210, 170, 0.9)"
+                           : "",
+                     }}
+                  >
+                     <Container>
                         <div
-                           className={
-                              "topDescriptionContainer " +
-                              (dateIsInUnder24Hours(currentLivestream.startDate)
-                                 ? ""
-                                 : "hidden")
-                           }
-                        >
-                           <div
-                              className="countdown-title"
-                              style={{
-                                 textAlign: "center",
-                                 color: "rgb(255, 20, 147)",
-                                 fontSize: "1.4em",
-                              }}
-                           >
-                              Please wait here! You will be redirected when the
-                              stream starts.
-                           </div>
-                           <div
-                              style={{
-                                 textAlign: "center",
-                                 color: "rgb(255, 20, 147)",
-                              }}
-                           >
-                              <Countdown date={currentLivestream.startDate}>
-                                 <span style={{ margin: "30px" }}>
-                                    This livestream will start shortly
-                                 </span>
-                              </Countdown>
-                           </div>
-                        </div>
-                     )}
-                     <div style={{ margin: "50px 0", display: "flex" }}>
-                        <img
-                           src={getResizedUrl(
-                              currentLivestream.companyLogoUrl,
-                              "md"
-                           )}
-                           className={classes.companyLogo}
-                        />
-                     </div>
-                     <Grid container justifyContent="center" align="center">
-                        {speakerElements}
-                     </Grid>
-
-                     {currentLivestream.isFaceToFace && (
-                        <div
+                           className="livestream-label"
                            style={{
-                              display: "flex",
-                              justifyContent: "center",
+                              color: userIsRegistered() ? "white" : "",
+                              border: userIsRegistered()
+                                 ? "2px solid white"
+                                 : "",
                            }}
                         >
-                           <Box>
+                           <RssFeedIcon
+                              style={{
+                                 verticalAlign: "middle",
+                                 marginRight: 5,
+                              }}
+                           />
+                           <span style={{ verticalAlign: "middle" }}>
+                              Live stream
+                           </span>
+                        </div>
+                        <div
+                           className="livestream-title"
+                           style={{ color: userIsRegistered() ? "white" : "" }}
+                        >
+                           {currentLivestream.title}
+                        </div>
+                        <div
+                           className="livestream-date"
+                           style={{ color: userIsRegistered() ? "white" : "" }}
+                        >
+                           <span>
+                              <DateRangeIcon style={{ marginRight: 5 }} />
+                              {DateUtil.getPrettyDate(
+                                 currentLivestream.startDate
+                              )}
+                           </span>
+                        </div>
+                        <Box zIndex={200}>
+                           {currentLivestream.isFaceToFace && (
+                              <InPersonEventBadge />
+                           )}
+                           {currentLivestream.maxRegistrants && (
+                              <LimitedRegistrationsBadge
+                                 numberOfSpotsRemaining={numberOfSpotsRemaining}
+                              />
+                           )}
+                        </Box>
+                        {!isPastEvent && !currentLivestream.isFaceToFace && (
+                           <div
+                              className={
+                                 "topDescriptionContainer " +
+                                 (dateIsInUnder24Hours(
+                                    currentLivestream.startDate
+                                 )
+                                    ? ""
+                                    : "hidden")
+                              }
+                           >
                               <div
+                                 className="countdown-title"
                                  style={{
-                                    backgroundColor: "white",
-                                    padding: 20,
-                                    borderRadius: 5,
+                                    textAlign: "center",
+                                    color: "rgb(255, 20, 147)",
+                                    fontSize: "1.4em",
                                  }}
                               >
-                                 <Typography>
-                                    This event will take place at the following
-                                    location:
-                                 </Typography>
-                                 <Typography
-                                    style={{ fontWeight: "600", marginTop: 10 }}
-                                 >
-                                    {currentLivestream.address}
-                                 </Typography>
-                                 <Typography
-                                    style={{
-                                       fontSize: "0.8rem",
-                                       marginTop: 10,
-                                    }}
-                                 >
-                                    Please make sure you are able to attend
-                                 </Typography>
+                                 Please wait here! You will be redirected when
+                                 the stream starts.
                               </div>
-                           </Box>
-                        </div>
-                     )}
-                     <div style={{ margin: "40px 0", width: "100%" }}>
-                        <div>
-                           {!isPastEvent &&
-                              !(currentLivestream.openStream === true) && (
-                                 <Button
-                                    size="large"
-                                    id="register-button"
-                                    disabled={isRegistrationDisabled}
-                                    children={getMainButtonLabel}
-                                    color={registered ? "default" : "primary"}
-                                    variant="contained"
-                                    startIcon={
-                                       registered ? <ClearIcon /> : <AddIcon />
-                                    }
-                                    style={{ margin: "5px" }}
-                                    onClick={
-                                       registered
-                                          ? () =>
-                                               deregisterFromLivestream(
-                                                  currentLivestream.id
-                                               )
-                                          : () =>
-                                               startRegistrationProcess(
-                                                  currentLivestream.id
-                                               )
-                                    }
-                                 />
+                              <div
+                                 style={{
+                                    textAlign: "center",
+                                    color: "rgb(255, 20, 147)",
+                                 }}
+                              >
+                                 <Countdown date={currentLivestream.startDate}>
+                                    <span style={{ margin: "30px" }}>
+                                       This livestream will start shortly
+                                    </span>
+                                 </Countdown>
+                              </div>
+                           </div>
+                        )}
+                        <div style={{ margin: "50px 0", display: "flex" }}>
+                           <img
+                              src={getResizedUrl(
+                                 currentLivestream.companyLogoUrl,
+                                 "md"
                               )}
-                           <Button
-                              size="large"
-                              children={"How Live Streams Work"}
-                              startIcon={<SettingsIcon />}
-                              style={{ margin: "5px" }}
-                              onClick={() => goToSeparateRoute("/howitworks")}
-                              color="secondary"
-                              variant="contained"
+                              className={classes.companyLogo}
                            />
                         </div>
-                     </div>
+                        <Grid container justifyContent="center" align="center">
+                           {speakerElements}
+                        </Grid>
 
-                     <div style={{ textAlign: "center", marginBottom: "20px" }}>
-                        <TargetOptions options={targetOptions} />
-                     </div>
-                     <div style={{ textAlign: "center", marginBottom: "20px" }}>
-                        <div className={classes.logosGridContainerWrapper}>
-                           <Row
-                              style={{ justifyContent: "space-evenly" }}
-                              gap={1.5}
-                              className={classes.logoElementsRow}
-                           >
-                              {logoElements}
-                           </Row>
-                        </div>
-                     </div>
-                     {!isPastEvent && !currentLivestream.isFaceToFace && (
-                        <div className="topDescriptionContainer">
-                           <div
-                              className="countdown-title"
-                              style={{
-                                 textAlign: "center",
-                                 color: registered
-                                    ? "white"
-                                    : "rgb(255, 20, 147)",
-                              }}
-                           >
-                              This live stream starts here in
-                           </div>
+                        {currentLivestream.isFaceToFace && (
                            <div
                               style={{
-                                 textAlign: "center",
-                                 color: "rgb(255, 20, 147)",
+                                 display: "flex",
+                                 justifyContent: "center",
                               }}
                            >
-                              <Countdown date={currentLivestream.startDate}>
-                                 <span style={{ margin: "30px" }}>
-                                    This livestream will start shortly
-                                 </span>
-                              </Countdown>
+                              <Box>
+                                 <div
+                                    style={{
+                                       backgroundColor: "white",
+                                       padding: 20,
+                                       borderRadius: 5,
+                                    }}
+                                 >
+                                    <Typography>
+                                       This event will take place at the
+                                       following location:
+                                    </Typography>
+                                    <Typography
+                                       style={{
+                                          fontWeight: "600",
+                                          marginTop: 10,
+                                       }}
+                                    >
+                                       {currentLivestream.address}
+                                    </Typography>
+                                    <Typography
+                                       style={{
+                                          fontSize: "0.8rem",
+                                          marginTop: 10,
+                                       }}
+                                    >
+                                       Please make sure you are able to attend
+                                    </Typography>
+                                 </div>
+                              </Box>
+                           </div>
+                        )}
+                        <div style={{ margin: "40px 0", width: "100%" }}>
+                           <div>
+                              {!isPastEvent &&
+                                 !(currentLivestream.openStream === true) && (
+                                    <Button
+                                       size="large"
+                                       id="register-button"
+                                       disabled={isRegistrationDisabled}
+                                       children={getMainButtonLabel}
+                                       color={
+                                          registered ? "default" : "primary"
+                                       }
+                                       variant="contained"
+                                       startIcon={
+                                          registered ? (
+                                             <ClearIcon />
+                                          ) : (
+                                             <AddIcon />
+                                          )
+                                       }
+                                       style={{ margin: "5px" }}
+                                       onClick={
+                                          registered
+                                             ? () =>
+                                                  deregisterFromLivestream(
+                                                     currentLivestream.id
+                                                  )
+                                             : () =>
+                                                  startRegistrationProcess(
+                                                     currentLivestream.id
+                                                  )
+                                       }
+                                    />
+                                 )}
+                              <Button
+                                 size="large"
+                                 children={"How Live Streams Work"}
+                                 startIcon={<SettingsIcon />}
+                                 style={{ margin: "5px" }}
+                                 onClick={() =>
+                                    goToSeparateRoute("/howitworks")
+                                 }
+                                 color="secondary"
+                                 variant="contained"
+                              />
                            </div>
                         </div>
-                     )}
-                  </Container>
-                  <div className="bottom-icon">
-                     <KeyboardArrowDownIcon
-                        style={{ color: "rgb(44, 66, 81)" }}
-                        fontSize="large"
-                     />
+
+                        <div
+                           style={{ textAlign: "center", marginBottom: "20px" }}
+                        >
+                           <TargetOptions options={targetOptions} />
+                        </div>
+                        <div
+                           style={{ textAlign: "center", marginBottom: "20px" }}
+                        >
+                           <div className={classes.logosGridContainerWrapper}>
+                              <Row
+                                 style={{ justifyContent: "space-evenly" }}
+                                 gap={1.5}
+                                 className={classes.logoElementsRow}
+                              >
+                                 {logoElements}
+                              </Row>
+                           </div>
+                        </div>
+                        {!isPastEvent && !currentLivestream.isFaceToFace && (
+                           <div className="topDescriptionContainer">
+                              <div
+                                 className="countdown-title"
+                                 style={{
+                                    textAlign: "center",
+                                    color: registered
+                                       ? "white"
+                                       : "rgb(255, 20, 147)",
+                                 }}
+                              >
+                                 This live stream starts here in
+                              </div>
+                              <div
+                                 style={{
+                                    textAlign: "center",
+                                    color: "rgb(255, 20, 147)",
+                                 }}
+                              >
+                                 <Countdown date={currentLivestream.startDate}>
+                                    <span style={{ margin: "30px" }}>
+                                       This livestream will start shortly
+                                    </span>
+                                 </Countdown>
+                              </div>
+                           </div>
+                        )}
+                     </Container>
+                     <div className="bottom-icon">
+                        <KeyboardArrowDownIcon
+                           style={{ color: "rgb(44, 66, 81)" }}
+                           fontSize="large"
+                        />
+                     </div>
                   </div>
                </div>
             </div>
-         </div>
-         <div className="white-container">
-            <Container>
-               <div ref={summaryRef} className="container-title">
-                  Short summary
-               </div>
-               <div
-                  style={{
-                     fontSize: "1.3em",
-                     lineHeight: "1.4em",
-                     width: "80%",
-                     margin: "0 auto",
-                  }}
-               >
-                  <LinkifyText>
-                     <Typography style={{ whiteSpace: "pre-line" }}>
-                        {currentLivestream.summary}
-                     </Typography>
-                  </LinkifyText>
-                  {/*<MulitLineText text={currentLivestream.summary}/>*/}
-               </div>
-            </Container>
-         </div>
-         ;
-         <div className="grey-container">
-            <Container>
-               <div className="container-title">
-                  Which questions should the speaker answer during the
-                  livestream?
-               </div>
-               <div style={{ textAlign: "center" }}>
-                  <TextField
-                     variant="outlined"
-                     fullWidth
-                     value={newQuestionTitle}
-                     className={classes.input}
-                     onChange={(event) =>
-                        setNewQuestionTitle(event.target.value)
-                     }
-                     maxLength="170"
-                  />
-                  <Button
-                     size="large"
-                     variant="contained"
-                     children="Submit Your Question"
-                     style={{ margin: "20px 0 0 0" }}
-                     onClick={() => addNewQuestion()}
-                     color="primary"
-                  />
-               </div>
-               <div
-                  className={
-                     "container-title " +
-                     (questionElements.length === 0 ? "hidden" : "")
-                  }
-                  style={{ margin: "30px 0 0 0" }}
-               >
-                  Upvote questions from your peers
-               </div>
-               <Grid container spacing={3} style={{ margin: "5px 0 30px 0" }}>
-                  {questionElements}
-               </Grid>
-               <div
-                  className={user ? "" : "hidden"}
-                  style={{ textAlign: "center" }}
-                  className={questionElements.length === 0 ? "" : "hidden"}
-               >
-                  The speaker is eagerly waiting for your input!
-               </div>
-            </Container>
-         </div>
-         <div
-            className={
-               "white-container " +
-               (currentLivestream.hasNoTalentPool ? "hidden" : "")
-            }
-            style={{
-               backgroundColor: userIsInTalentPool ? "rgb(0, 210, 170)" : "",
-            }}
-         >
-            <Container>
-               <div
-                  className="container-title"
-                  style={{ color: userIsInTalentPool ? "white" : "" }}
-               >
-                  {userIsInTalentPool
-                     ? "You are part of the talent pool"
-                     : "Join the Talent Pool and Get Hired"}
-               </div>
-               <div>
-                  <Box display="flex" justifyContent="center">
-                     <img
-                        src={
-                           currentLivestream.companyLogoUrl
-                              ? getResizedUrl(
-                                   currentLivestream.companyLogoUrl,
-                                   "md"
-                                )
-                              : companyLogoPlaceholder
-                        }
-                        className={classes.companyLogo}
-                     />
-                  </Box>
-               </div>
-               {userData?.isAdmin && (
-                  <Tooltip
-                     title={
-                        "This button is only present for CareerFairy admins"
-                     }
+            <div className="white-container">
+               <Container>
+                  <div ref={summaryRef} className="container-title">
+                     Short summary
+                  </div>
+                  <div
+                     style={{
+                        fontSize: "1.3em",
+                        lineHeight: "1.4em",
+                        width: "80%",
+                        margin: "0 auto",
+                     }}
                   >
-                     <Fab
-                        className={classes.adminJoinStreamButton}
-                        variant="extended"
-                        color="secondary"
-                        component={Link}
-                        href={
-                           "/streaming/" +
-                           currentLivestream?.id +
-                           "/viewer?spy=true"
-                        }
-                     >
-                        Check Stream now
-                     </Fab>
-                  </Tooltip>
-               )}
-               <Grid
-                  container
-                  justifyContent="center"
-                  alignItems="center"
-                  style={{ margin: "50px 0 0 0" }}
-               >
-                  <Grid item xs={12} md={6} style={{ textAlign: "center" }}>
-                     <Button
-                        size="large"
-                        children={
-                           userIsInTalentPool
-                              ? "Leave Talent Pool"
-                              : "Join Talent Pool"
-                        }
-                        variant="contained"
-                        startIcon={
-                           userIsInTalentPool ? (
-                              <ClearIcon />
-                           ) : (
-                              <HowToRegRoundedIcon />
-                           )
-                        }
-                        onClick={
-                           userIsInTalentPool
-                              ? () => leaveTalentPool()
-                              : () => joinTalentPool()
-                        }
-                        color={userIsInTalentPool ? "default" : "primary"}
-                     />
-                  </Grid>
-                  <Grid item xs={12}>
-                     <div
-                        style={{
-                           margin: "20px 0",
-                           color: userIsInTalentPool ? "white" : "",
-                        }}
-                     >
-                        We want to make it easy for students and young pros to
-                        find the right company for them. To help you let
-                        companies know that you're interested in potentially
-                        joining - now or in the future -, we've invented the
-                        Talent Pool. By joining its talent pool, the company can
-                        contact you at any time with a relevant opportunity.
-                     </div>
-                  </Grid>
-               </Grid>
-            </Container>
-         </div>
-         ;
-         <div
-            className={
-               "grey-container " +
-               (currentLivestream.hasNoTalentPool ? "hidden" : "")
-            }
-         >
-            <div className="container-title">
-               Any problem or question ? We want to hear from you
+                     <LinkifyText>
+                        <Typography style={{ whiteSpace: "pre-line" }}>
+                           {currentLivestream.summary}
+                        </Typography>
+                     </LinkifyText>
+                     {/*<MulitLineText text={currentLivestream.summary}/>*/}
+                  </div>
+               </Container>
             </div>
-            <Container>
-               <div style={{ textAlign: "center" }}>
-                  <a
-                     className="aboutContentContactButton"
-                     href="mailto:thomas@careerfairy.io"
-                  >
+            ;
+            <div className="grey-container">
+               <Container>
+                  <div className="container-title">
+                     Which questions should the speaker answer during the
+                     livestream?
+                  </div>
+                  <div style={{ textAlign: "center" }}>
+                     <TextField
+                        variant="outlined"
+                        fullWidth
+                        value={newQuestionTitle}
+                        className={classes.input}
+                        onChange={(event) =>
+                           setNewQuestionTitle(event.target.value)
+                        }
+                        maxLength="170"
+                     />
                      <Button
                         size="large"
-                        children="Contact CareerFairy"
-                        startIcon={<EmailIcon />}
                         variant="contained"
-                        style={{ margin: "30px 0 0 0" }}
+                        children="Submit Your Question"
+                        style={{ margin: "20px 0 0 0" }}
+                        onClick={() => addNewQuestion()}
+                        color="primary"
                      />
-                  </a>
+                  </div>
+                  <div
+                     className={
+                        "container-title " +
+                        (questionElements.length === 0 ? "hidden" : "")
+                     }
+                     style={{ margin: "30px 0 0 0" }}
+                  >
+                     Upvote questions from your peers
+                  </div>
+                  <Grid
+                     container
+                     spacing={3}
+                     style={{ margin: "5px 0 30px 0" }}
+                  >
+                     {questionElements}
+                  </Grid>
+                  <div
+                     className={user ? "" : "hidden"}
+                     style={{ textAlign: "center" }}
+                     className={questionElements.length === 0 ? "" : "hidden"}
+                  >
+                     The speaker is eagerly waiting for your input!
+                  </div>
+               </Container>
+            </div>
+            <div
+               className={
+                  "white-container " +
+                  (currentLivestream.hasNoTalentPool ? "hidden" : "")
+               }
+               style={{
+                  backgroundColor: userIsInTalentPool ? "rgb(0, 210, 170)" : "",
+               }}
+            >
+               <Container>
+                  <div
+                     className="container-title"
+                     style={{ color: userIsInTalentPool ? "white" : "" }}
+                  >
+                     {userIsInTalentPool
+                        ? "You are part of the talent pool"
+                        : "Join the Talent Pool and Get Hired"}
+                  </div>
+                  <div>
+                     <Box display="flex" justifyContent="center">
+                        <img
+                           src={
+                              currentLivestream.companyLogoUrl
+                                 ? getResizedUrl(
+                                      currentLivestream.companyLogoUrl,
+                                      "md"
+                                   )
+                                 : companyLogoPlaceholder
+                           }
+                           className={classes.companyLogo}
+                        />
+                     </Box>
+                  </div>
+                  {userData?.isAdmin && (
+                     <Tooltip
+                        title={
+                           "This button is only present for CareerFairy admins"
+                        }
+                     >
+                        <Fab
+                           className={classes.adminJoinStreamButton}
+                           variant="extended"
+                           color="secondary"
+                           component={Link}
+                           href={
+                              "/streaming/" +
+                              currentLivestream?.id +
+                              "/viewer?spy=true"
+                           }
+                        >
+                           Check Stream now
+                        </Fab>
+                     </Tooltip>
+                  )}
+                  <Grid
+                     container
+                     justifyContent="center"
+                     alignItems="center"
+                     style={{ margin: "50px 0 0 0" }}
+                  >
+                     <Grid item xs={12} md={6} style={{ textAlign: "center" }}>
+                        <Button
+                           size="large"
+                           children={
+                              userIsInTalentPool
+                                 ? "Leave Talent Pool"
+                                 : "Join Talent Pool"
+                           }
+                           variant="contained"
+                           startIcon={
+                              userIsInTalentPool ? (
+                                 <ClearIcon />
+                              ) : (
+                                 <HowToRegRoundedIcon />
+                              )
+                           }
+                           onClick={
+                              userIsInTalentPool
+                                 ? () => leaveTalentPool()
+                                 : () => joinTalentPool()
+                           }
+                           color={userIsInTalentPool ? "default" : "primary"}
+                        />
+                     </Grid>
+                     <Grid item xs={12}>
+                        <div
+                           style={{
+                              margin: "20px 0",
+                              color: userIsInTalentPool ? "white" : "",
+                           }}
+                        >
+                           We want to make it easy for students and young pros
+                           to find the right company for them. To help you let
+                           companies know that you're interested in potentially
+                           joining - now or in the future -, we've invented the
+                           Talent Pool. By joining its talent pool, the company
+                           can contact you at any time with a relevant
+                           opportunity.
+                        </div>
+                     </Grid>
+                  </Grid>
+               </Container>
+            </div>
+            ;
+            <div
+               className={
+                  "grey-container " +
+                  (currentLivestream.hasNoTalentPool ? "hidden" : "")
+               }
+            >
+               <div className="container-title">
+                  Any problem or question ? We want to hear from you
                </div>
-            </Container>
-         </div>
-         ;
-         <Footer />;
-         <GroupJoinToAttendModal
-            open={openJoinModal}
-            groupsWithPolicies={groupsWithPolicies}
-            groups={careerCenters}
-            alreadyJoined={false}
-            userData={userData}
-            onConfirm={completeRegistrationProcess}
-            closeModal={handleCloseJoinModal}
-         />
-         ;
-         <BookingModal
-            careerCenters={careerCenters}
-            livestream={currentLivestream}
-            groupId={groupId}
-            modalOpen={bookingModalOpen}
-            setModalOpen={setBookingModalOpen}
-            registration={registration}
-            setRegistration={(value) => setRegistration(value)}
-            user={user}
-         />
-         ;
-         <JoinTalentPoolModal
-            livestream={currentLivestream}
-            modalOpen={openTalentPoolModal}
-            setModalOpen={setOpenTalentPoolModal}
-            userData={userData}
-         />
-         ;
-         <style jsx>{`
-            .hidden {
-               display: none;
-            }
+               <Container>
+                  <div style={{ textAlign: "center" }}>
+                     <a
+                        className="aboutContentContactButton"
+                        href="mailto:thomas@careerfairy.io"
+                     >
+                        <Button
+                           size="large"
+                           children="Contact CareerFairy"
+                           startIcon={<EmailIcon />}
+                           variant="contained"
+                           style={{ margin: "30px 0 0 0" }}
+                        />
+                     </a>
+                  </div>
+               </Container>
+            </div>
+            <RegistrationModal
+               open={Boolean(joinGroupModalData)}
+               onFinish={handleCloseJoinModal}
+               promptOtherEventsOnFinal
+               livestream={joinGroupModalData?.livestream}
+               groups={joinGroupModalData?.groups}
+               targetGroupId={joinGroupModalData?.targetGroupId}
+            />
+            ;
+            <JoinTalentPoolModal
+               livestream={currentLivestream}
+               modalOpen={openTalentPoolModal}
+               setModalOpen={setOpenTalentPoolModal}
+               userData={userData}
+            />
+            ;
+            <style jsx>{`
+               .hidden {
+                  display: none;
+               }
 
-            .topLevelContainer {
-               background-color: rgb(44, 66, 81);
-               position: relative;
-               width: 100%;
-            }
+               .topLevelContainer {
+                  background-color: rgb(44, 66, 81);
+                  position: relative;
+                  width: 100%;
+               }
 
-            .topDescriptionContainer {
-               width: 100%;
-               position: relative;
-               margin: 0 0 40px 0;
-               padding: 0 30px;
-            }
+               .topDescriptionContainer {
+                  width: 100%;
+                  position: relative;
+                  margin: 0 0 40px 0;
+                  padding: 0 30px;
+               }
 
-            .top-menu {
-               background-color: rgba(250, 250, 250, 1);
-               padding: 15px 0;
-               height: 80px;
-               text-align: center;
-               position: relative;
-               box-shadow: 0 0 5px grey;
-            }
+               .top-menu {
+                  background-color: rgba(250, 250, 250, 1);
+                  padding: 15px 0;
+                  height: 80px;
+                  text-align: center;
+                  position: relative;
+                  box-shadow: 0 0 5px grey;
+               }
 
-            .top-menu div,
-            .top-menu button {
-               display: inline-block;
-               vertical-align: middle;
-            }
+               .top-menu div,
+               .top-menu button {
+                  display: inline-block;
+                  vertical-align: middle;
+               }
 
-            .top-menu #stream-button {
-               margin: 0 50px;
-            }
+               .top-menu #stream-button {
+                  margin: 0 50px;
+               }
 
-            .top-menu.active {
-               background-color: rgba(0, 210, 170, 1);
-               color: white;
-            }
+               .top-menu.active {
+                  background-color: rgba(0, 210, 170, 1);
+                  color: white;
+               }
 
-            .top-menu h3 {
-               font-weight: 600;
-            }
+               .top-menu h3 {
+                  font-weight: 600;
+               }
 
-            .video-mask {
-               width: 100%;
-               background-color: rgb(230, 230, 230);
-               background-size: cover;
-               text-align: center;
-            }
+               .video-mask {
+                  width: 100%;
+                  background-color: rgb(230, 230, 230);
+                  background-size: cover;
+                  text-align: center;
+               }
 
-            .mask {
-               width: 100%;
-               padding: 20px 0 60px 0;
-               background-color: rgba(255, 255, 255, 0.9);
-            }
+               .mask {
+                  width: 100%;
+                  padding: 20px 0 60px 0;
+                  background-color: rgba(255, 255, 255, 0.9);
+               }
 
-            .livestream-label {
-               color: rgb(44, 66, 81);
-               font-size: 1.3em;
-               border: 3px solid rgb(44, 66, 81);
-               display: inline-block;
-               font-weight: 700;
-               text-transform: uppercase;
-               padding: 5px 10px;
-               vertical-align: middle;
-               margin: 20px 0 20px 0;
-            }
+               .livestream-label {
+                  color: rgb(44, 66, 81);
+                  font-size: 1.3em;
+                  border: 3px solid rgb(44, 66, 81);
+                  display: inline-block;
+                  font-weight: 700;
+                  text-transform: uppercase;
+                  padding: 5px 10px;
+                  vertical-align: middle;
+                  margin: 20px 0 20px 0;
+               }
 
-            .livestream-title {
-               font-size: calc(1.5em + 1.5vw);
-               color: rgb(44, 66, 81);
-               line-height: 1.4em;
-               font-weight: 700;
-               max-width: 800px;
-               margin: 0 auto;
-               text-align: center;
-            }
+               .livestream-title {
+                  font-size: calc(1.5em + 1.5vw);
+                  color: rgb(44, 66, 81);
+                  line-height: 1.4em;
+                  font-weight: 700;
+                  max-width: 800px;
+                  margin: 0 auto;
+                  text-align: center;
+               }
 
-            .livestream-speaker-avatar-capsule {
-               border: 2px solid rgb(0, 210, 170);
-               display: inline-block;
-               margin: 20px auto;
-               padding: 8px;
-               border-radius: 50%;
-            }
+               .livestream-speaker-avatar-capsule {
+                  border: 2px solid rgb(0, 210, 170);
+                  display: inline-block;
+                  margin: 20px auto;
+                  padding: 8px;
+                  border-radius: 50%;
+               }
 
-            .livestream-speaker-avatar {
-               width: 110px;
-               padding-top: 110px;
-               border-radius: 50%;
-               vertical-align: middle;
-               display: inline-block;
-               box-shadow: 0 0 2px grey;
-               display: inline-block;
-               background-size: cover;
-            }
+               .livestream-speaker-avatar {
+                  width: 110px;
+                  padding-top: 110px;
+                  border-radius: 50%;
+                  vertical-align: middle;
+                  display: inline-block;
+                  box-shadow: 0 0 2px grey;
+                  display: inline-block;
+                  background-size: cover;
+               }
 
-            .livestream-date {
-               text-align: center;
-               font-size: 1.3em;
-               font-weight: 700;
-               color: rgb(255, 20, 147);
-               vertical-align: middle;
-               margin: 20px 0;
-               width: 100%;
-               text-transform: uppercase;
-            }
+               .livestream-date {
+                  text-align: center;
+                  font-size: 1.3em;
+                  font-weight: 700;
+                  color: rgb(255, 20, 147);
+                  vertical-align: middle;
+                  margin: 20px 0;
+                  width: 100%;
+                  text-transform: uppercase;
+               }
 
-            .livestream-speaker-image-container {
-               display: inline-block;
-               border: 2px solid rgb(0, 210, 170);
-               border-radius: 50%;
-            }
+               .livestream-speaker-image-container {
+                  display: inline-block;
+                  border: 2px solid rgb(0, 210, 170);
+                  border-radius: 50%;
+               }
 
-            .livestream-speaker-image {
-               min-height: 100px;
-               min-width: 100px;
-               border-radius: 9999px;
-               background-size: cover;
-               background-position: center center;
-               vertical-align: middle;
-               margin: 20px auto;
-            }
+               .livestream-speaker-image {
+                  min-height: 100px;
+                  min-width: 100px;
+                  border-radius: 9999px;
+                  background-size: cover;
+                  background-position: center center;
+                  vertical-align: middle;
+                  margin: 20px auto;
+               }
 
-            .livestream-speaker-description {
-               display: inline-block;
-               vertical-align: middle;
-               width: 100%;
-               text-align: center;
-               margin: 0 0 0 10px;
-            }
+               .livestream-speaker-description {
+                  display: inline-block;
+                  vertical-align: middle;
+                  width: 100%;
+                  text-align: center;
+                  margin: 0 0 0 10px;
+               }
 
-            .livestream-speaker-name {
-               display: inline-block;
-               color: rgb(44, 66, 81);
-               vertical-align: middle;
-            }
+               .livestream-speaker-name {
+                  display: inline-block;
+                  color: rgb(44, 66, 81);
+                  vertical-align: middle;
+               }
 
-            .livestream-speaker-name div:first-child {
-               font-size: 1.4em;
-               margin: 0 0 5px 0;
-               font-weight: 600;
-            }
+               .livestream-speaker-name div:first-child {
+                  font-size: 1.4em;
+                  margin: 0 0 5px 0;
+                  font-weight: 600;
+               }
 
-            .video-mask-title {
-               width: 100%;
-               text-align: center;
-               font-weight: 600;
-               color: white;
-               z-index: 4000;
-               padding: 15px 0;
-            }
+               .video-mask-title {
+                  width: 100%;
+                  text-align: center;
+                  font-weight: 600;
+                  color: white;
+                  z-index: 4000;
+                  padding: 15px 0;
+               }
 
-            .countdown-title {
-               text-transform: uppercase;
-               font-weight: 700;
-               color: rgb(120, 120, 120);
-               margin: 40px 0 0 0;
-            }
+               .countdown-title {
+                  text-transform: uppercase;
+                  font-weight: 700;
+                  color: rgb(120, 120, 120);
+                  margin: 40px 0 0 0;
+               }
 
-            .live-now {
-               margin-bottom: 30px;
-               text-transform: uppercase;
-               font-size: 1.8em;
-               vertical-align: middle;
-               color: red;
-            }
+               .live-now {
+                  margin-bottom: 30px;
+                  text-transform: uppercase;
+                  font-size: 1.8em;
+                  vertical-align: middle;
+                  color: red;
+               }
 
-            .live-now span {
-               margin-left: 10px;
-            }
+               .live-now span {
+                  margin-left: 10px;
+               }
 
-            .live-now i,
-            .live-now span {
-               vertical-align: middle;
-            }
+               .live-now i,
+               .live-now span {
+                  vertical-align: middle;
+               }
 
-            .bottom-icon {
-               color: rgb(44, 66, 81);
-               position: absolute;
-               bottom: 10px;
-               width: 100%;
-               text-align: center;
-               font-size: 1.4em;
-            }
+               .bottom-icon {
+                  color: rgb(44, 66, 81);
+                  position: absolute;
+                  bottom: 10px;
+                  width: 100%;
+                  text-align: center;
+                  font-size: 1.4em;
+               }
 
-            .container-title {
-               text-transform: uppercase;
-               text-align: center;
-               font-size: 1.1em;
-               font-weight: 700;
-               margin-bottom: 20px;
-               color: rgb(150, 150, 150);
-            }
+               .container-title {
+                  text-transform: uppercase;
+                  text-align: center;
+                  font-size: 1.1em;
+                  font-weight: 700;
+                  margin-bottom: 20px;
+                  color: rgb(150, 150, 150);
+               }
 
-            .white-container {
-               padding: 40px 0 50px 0;
-               text-align: center;
-            }
+               .white-container {
+                  padding: 40px 0 50px 0;
+                  text-align: center;
+               }
 
-            .grey-container {
-               position: relative;
-               width: 100%;
-               padding: 40px 0 50px 0;
-               background-color: rgb(245, 245, 245);
-            }
+               .grey-container {
+                  position: relative;
+                  width: 100%;
+                  padding: 40px 0 50px 0;
+                  background-color: rgb(245, 245, 245);
+               }
 
-            .description {
-               width: 70%;
-               margin: 30px auto;
-               line-height: 1.4em;
-               text-align: center;
-            }
+               .description {
+                  width: 70%;
+                  margin: 30px auto;
+                  line-height: 1.4em;
+                  text-align: center;
+               }
 
-            .spots-left {
-               position: absolute;
-               right: 40px;
-               bottom: 40px;
-               height: 100px;
-               width: 100px;
-               border-radius: 50%;
-               background-color: white;
-               text-align: center;
-               padding: 28px 0;
-            }
+               .spots-left {
+                  position: absolute;
+                  right: 40px;
+                  bottom: 40px;
+                  height: 100px;
+                  width: 100px;
+                  border-radius: 50%;
+                  background-color: white;
+                  text-align: center;
+                  padding: 28px 0;
+               }
 
-            .spots-left-number {
-               font-size: 1.8em;
-               font-weight: 700;
-               color: rgb(0, 210, 170);
-            }
+               .spots-left-number {
+                  font-size: 1.8em;
+                  font-weight: 700;
+                  color: rgb(0, 210, 170);
+               }
 
-            .spots-left-label {
-               font-size: 1em;
-               font-weight: 700;
-               margin: 5px 0;
-               color: rgb(44, 66, 81);
-            }
-         `}</style>
-         ;
+               .spots-left-label {
+                  font-size: 1em;
+                  font-weight: 700;
+                  margin: 5px 0;
+                  color: rgb(44, 66, 81);
+               }
+            `}</style>
+            ;
+         </GeneralLayout>
       </div>
    );
 }

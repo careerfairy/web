@@ -1,13 +1,17 @@
-import React, { Fragment, useEffect, useState } from "react";
-import { Button, Typography, Grid, TextField } from "@material-ui/core";
+import React, { Fragment, useState } from "react";
+import { Button, Grid, TextField, Typography } from "@material-ui/core";
 import NewGroup from "../profile/NewGroup";
-import { Fade } from "react-reveal";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import parse from "autosuggest-highlight/parse";
 import match from "autosuggest-highlight/match";
 import Link from "next/link";
 
-const Highlights = ({ groups, handleSelectGroup, absolutePath }) => {
+export const Highlights = ({
+   groups,
+   handleSelectGroup,
+   absolutePath,
+   hideButton,
+}) => {
    return (
       <div
          style={{
@@ -55,8 +59,8 @@ const Highlights = ({ groups, handleSelectGroup, absolutePath }) => {
                   </div>
                );
             }}
-         ></Autocomplete>
-         {absolutePath ? null : (
+         />
+         {absolutePath || hideButton ? null : (
             <Link href="/next-livestreams">
                <a>
                   <Button

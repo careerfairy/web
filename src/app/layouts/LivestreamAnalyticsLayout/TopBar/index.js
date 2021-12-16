@@ -1,6 +1,5 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import clsx from "clsx";
 import { AppBar, Box, Hidden, Toolbar } from "@material-ui/core";
 import { MainLogo, MiniLogo } from "../../../components/logos";
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React from "react";
 import {
    Avatar,
    Box,
@@ -31,23 +31,23 @@ const useStyles = makeStyles((theme) => ({
    expandOpen: {
       transform: "rotate(180deg)",
    },
+   root: {
+      overflowY: "auto",
+      overflowX: "hidden",
+      maxHeight: 300,
+      maxWidth: 200,
+      position: "relative",
+   },
 }));
 
-const Speakers = ({ speakers }) => {
-   const [speakersExpanded, setSpeakersExpanded] = useState(false);
+const Speakers = ({ speakers, clicked }) => {
    const classes = useStyles();
-
-   const handleToggleExpand = useCallback(
-      () => setSpeakersExpanded((prevState) => !prevState),
-      []
-   );
-
    return (
-      <Box maxWidth={200} position="relative">
+      <Box className={classes.root}>
          {!!speakers.length && (
             <>
                <Box display="flex" justifyContent="space-between">
-                  <AvatarGroup onClick={handleToggleExpand} max={3}>
+                  <AvatarGroup max={3}>
                      {speakers.map((speaker) => (
                         <Avatar
                            key={speaker.id}
@@ -58,17 +58,16 @@ const Speakers = ({ speakers }) => {
                   </AvatarGroup>
                   <IconButton
                      className={clsx(classes.expand, {
-                        [classes.expandOpen]: speakersExpanded,
+                        [classes.expandOpen]: clicked,
                      })}
-                     onClick={handleToggleExpand}
-                     aria-expanded={speakersExpanded}
+                     aria-expanded={clicked}
                      aria-label="show more"
                   >
                      <ExpandMoreIcon />
                   </IconButton>
                </Box>
-               {speakersExpanded && <Divider />}
-               <Collapse in={speakersExpanded}>
+               {clicked && <Divider />}
+               <Collapse in={clicked}>
                   <Box dense component={List}>
                      {speakers.map((speaker) => (
                         <ListItem key={speaker.id} alignItems="flex-start">

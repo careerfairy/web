@@ -71,14 +71,10 @@ function LogInPage({ firebase }) {
    const { authenticatedUser, userData } = useAuth();
    const [userEmailNotValidated, setUserEmailNotValidated] = useState(false);
    const [generalLoading, setGeneralLoading] = useState(false);
-   const router = useRouter();
-   const { absolutePath } = router.query;
-
-   // useEffect(() => {
-   //     if (authenticatedUser && authenticatedUser.emailVerified && absolutePath) {
-   //         router.replace(`${absolutePath}`)
-   //     }
-   // }, [authenticatedUser, absolutePath])
+   const {
+      query: { absolutePath },
+      replace,
+   } = useRouter();
 
    useEffect(() => {
       if (
@@ -87,7 +83,7 @@ function LogInPage({ firebase }) {
          userData !== undefined
       ) {
          if (!authenticatedUser.emailVerified) {
-            router.replace(
+            replace(
                absolutePath
                   ? {
                        pathname: "/signup",
@@ -96,7 +92,8 @@ function LogInPage({ firebase }) {
                   : "/signup"
             );
          } else {
-            router.replace(absolutePath || "/next-livestreams");
+            replace(absolutePath || "/next-livestreams");
+
             setGeneralLoading(false);
          }
       }
@@ -104,7 +101,7 @@ function LogInPage({ firebase }) {
 
    useEffect(() => {
       if (userEmailNotValidated) {
-         router.replace("/signup");
+         replace("/signup");
       }
    }, [userEmailNotValidated]);
 

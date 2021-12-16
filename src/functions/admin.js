@@ -1,5 +1,7 @@
 const functions = require("firebase-functions");
 const { client } = require("./api/postmark");
+const { createNestedArrayOfTemplates } = require("./util");
+const { emailsToRemove } = require("./emailsToRemove");
 
 exports.sendBasicTemplateEmail = functions.https.onCall(
    async (data, context) => {
@@ -17,7 +19,8 @@ exports.sendBasicTemplateEmail = functions.https.onCall(
          templateId,
       } = data;
 
-      let emailsArray = emails || [];
+      let emailsArray =
+         emails.filter((email) => !emailsToRemove.includes(email)) || [];
       if (senderEmail) {
          emailsArray.push(senderEmail);
       }
@@ -56,23 +59,40 @@ exports.sendBasicTemplateEmail = functions.https.onCall(
          },
       }));
 
-      client.sendEmailBatchWithTemplates(emailObjects).then(
-         (responses) => {
-            // responses.forEach((response) =>
-            // functions.logger.log(
-            //    "sent sendBasicTemplateEmail email with response:",
-            //    response
-            // )
-            // );
-         },
-         (error) => {
-            functions.logger.error("error:" + error);
-            console.log("error:" + error);
-            throw new functions.https.HttpsError(
-               "unknown",
-               `Unhandled error: ${error.message}`
+      const nestedArrayOfEmailTemplates = createNestedArrayOfTemplates(
+         emailObjects,
+         500
+      );
+      functions.logger.log(
+         "-> Total number of Batches:",
+         nestedArrayOfEmailTemplates.length
+      );
+      let count = 0;
+      for (const arrayOfTemplateEmails of nestedArrayOfEmailTemplates) {
+         count += 1;
+         try {
+            await client
+               .sendEmailBatchWithTemplates(arrayOfTemplateEmails)
+               .then(
+                  (response) => {
+                     functions.logger.log(
+                        `Successfully sent email to ${arrayOfTemplateEmails.length}`
+                     );
+                  },
+                  (error) => {
+                     functions.logger.error("error:" + error);
+                     console.log("error:" + error);
+                     throw new functions.https.HttpsError(
+                        "unknown",
+                        `Unhandled error: ${error.message}`
+                     );
+                  }
+               );
+         } catch (batchError) {
+            functions.logger.error(
+               `error in sending batch ${count}: ${batchError}`
             );
          }
-      );
+      }
    }
 );

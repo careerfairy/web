@@ -36,6 +36,20 @@ export default class GroupsUtil {
       return optionsArray;
    };
 
+   static checkIfUserFollows = ({ authenticatedUser, userData }, group) => {
+      if (
+         authenticatedUser.isLoaded &&
+         !authenticatedUser.isEmpty &&
+         userData &&
+         userData.groupIds
+      ) {
+         const { id } = group;
+         return userData.groupIds.includes(id);
+      } else {
+         return false;
+      }
+   };
+
    static getUniqueGroupsFromArrayOfGroups = (groups = []) => {
       return groups.filter(function (el) {
          if (!this[el.groupId]) {
@@ -46,13 +60,17 @@ export default class GroupsUtil {
       }, Object.create(null));
    };
 
-   static getPolicyStatus = async (groups, userEmail, firebase) => {
+   static getPolicyStatus = async (
+      groups,
+      userEmail,
+      checkIfUserAgreedToGroupPolicy
+   ) => {
       let hasAgreedToAll = true;
       const updatedGroups = await Promise.all(
          groups.map(async (group) => {
             let needsToAgree = false;
             if (group.privacyPolicyActive) {
-               needsToAgree = await firebase.checkIfUserAgreedToGroupPolicy(
+               needsToAgree = await checkIfUserAgreedToGroupPolicy(
                   group.id,
                   userEmail
                );
@@ -72,5 +90,17 @@ export default class GroupsUtil {
       );
 
       return { hasAgreedToAll, groupsWithPolicies };
+   };
+
+   static userNeedsToFollowAGroup = (userData, livestream) => {
+      if (!livestream.groupIds?.length) return false;
+      if (userData.groupIds && livestream.groupIds) {
+         // are you following any group thats part of this livstream?
+         return userData.groupIds.some(
+            (id) => livestream.groupIds.indexOf(id) >= 0
+         );
+      } else {
+         return false;
+      }
    };
 }

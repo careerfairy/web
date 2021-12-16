@@ -26,6 +26,7 @@ import useAgoraRtm from "components/custom-hook/useAgoraRtm";
 import StreamPublishingModal from "components/views/streaming/modal/StreamPublishingModal";
 import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay";
 import useHandRaiseState from "components/custom-hook/useHandRaiseState";
+import RecommendedEventsOverlay from "./overlay/RecommendedEventsOverlay";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -358,6 +359,11 @@ function ViewerComponent({
                      students"
                   </Typography>
                </div>
+            ) : currentLivestream.recommendedEventIds?.length ? (
+               <RecommendedEventsOverlay
+                  recommendedEventIds={currentLivestream.recommendedEventIds}
+                  mobile={mobile}
+               />
             ) : (
                <StreamStoppedOverlay />
             ))}

@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
-import { withFirebase } from "context/firebase";
+import { useFirebase, withFirebase } from "context/firebase";
 import UserResume from "components/views/profile/userData/user-resume/UserResume";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import {
@@ -52,8 +52,8 @@ function JoinTalentPoolModal({
    userData,
    modalOpen,
    setModalOpen,
-   firebase,
 }) {
+   const firebase = useFirebase();
    const classes = useStyles();
    const [withCV, setWithCV] = useState(undefined);
    const [loading, setLoading] = useState(false);
@@ -153,4 +153,4 @@ function JoinTalentPoolModal({
    );
 }
 
-export default withFirebase(JoinTalentPoolModal);
+export default JoinTalentPoolModal;

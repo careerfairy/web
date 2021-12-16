@@ -1,8 +1,10 @@
-import React, { Fragment } from "react";
-import { Grid, Typography } from "@material-ui/core";
+import React, { Fragment, useEffect, useState } from "react";
+import { Box, Grid, Typography } from "@material-ui/core";
 import { withFirebase } from "context/firebase";
 import CurrentGroup from "components/views/profile/CurrentGroup";
 import { makeStyles } from "@material-ui/core/styles";
+import { Highlights } from "../../groups/Groups";
+import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers";
 
 const useStyles = makeStyles((theme) => ({
    header: {
@@ -20,11 +22,31 @@ const useStyles = makeStyles((theme) => ({
 
 const AdminGroups = ({ userData, adminGroups }) => {
    const classes = useStyles();
+   const [selectedGroup, setSelectedGroup] = useState(null);
+   const [filteredAdminGroups, setFilteredAdminGroups] = useState([]);
+   const [slicedFilteredAdminGroups] = useInfiniteScrollClientWithHandlers(
+      filteredAdminGroups,
+      9,
+      6
+   );
 
    let adminGroupElements = [];
 
+   useEffect(() => {
+      if (selectedGroup) {
+         setFilteredAdminGroups(
+            adminGroups.filter((group) => group.id === selectedGroup.id)
+         );
+      } else {
+         setFilteredAdminGroups([...adminGroups]);
+      }
+   }, [selectedGroup, adminGroups]);
+   const handleSelectGroup = (event, value) => {
+      setSelectedGroup(value);
+   };
+
    if (userData) {
-      adminGroupElements = adminGroups.map((group) => {
+      adminGroupElements = slicedFilteredAdminGroups.map((group) => {
          return (
             <Fragment key={group.id}>
                <CurrentGroup isAdmin={true} group={group} userData={userData} />
@@ -42,9 +64,18 @@ const AdminGroups = ({ userData, adminGroups }) => {
                </Typography>
             </div>
             {adminGroupElements.length ? (
-               <Grid style={{ marginBottom: 50 }} container spacing={3}>
-                  {adminGroupElements}
-               </Grid>
+               <>
+                  <Box>
+                     <Highlights
+                        handleSelectGroup={handleSelectGroup}
+                        hideButton
+                        groups={adminGroups}
+                     />
+                  </Box>
+                  <Grid style={{ marginBottom: 50 }} container spacing={3}>
+                     {adminGroupElements}
+                  </Grid>
+               </>
             ) : (
                <Typography gutterBottom>
                   You are currently not an admin of any career group.

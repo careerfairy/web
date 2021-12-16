@@ -4,6 +4,7 @@ const { admin } = require("./api/firestoreAdmin");
 const { client } = require("./api/postmark");
 
 const { setHeaders } = require("./util");
+const { emailsToRemove } = require("./emailsToRemove");
 
 exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(
    async (req, res) => {
@@ -16,53 +17,6 @@ exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(
 
       console.log(groups);
       let recipients = new Set();
-
-      const emailsToRemove = [
-         "christina.habetler@tucareer.com",
-         "michaela.unger@tucareer.com",
-         "susanne.leeb@tucareer.com",
-         "julia.hainitz@tucareer.com",
-         "christine.kaiser@hr.ethz.ch",
-         "evelyne.kappel@hr.ethz.ch",
-         "ekappel@gmx.ch,",
-         "franziska.liese@hr.ethz.ch",
-         "anja.pauling@hr.ethz.ch",
-         "lorena.coletti@hr.ethz.ch",
-         "stephan.burkart@fhnw.ch",
-         "sibylle.graf@fhnw.ch",
-         "csc.business@fhnw.ch",
-         "wels@zhaw.ch",
-         "spib@zhaw.ch",
-         "birgit-helga.mueller@unibas.ch",
-         "n.astitouh@unibas.ch",
-         " anja.robert@zhv.rwth-aachen.de",
-         "neslihan.congar@zhv.rwth-aachen.de",
-         "s.potstada@tu-braunschweig.de",
-         "reiner.laue@verwaltung.uni-stuttgart.de",
-         "thao.luu@tu-dresden.de",
-         "cecilia.czambor@tu-dresden.de",
-         "jazzny@gmx.de",
-         "john.imonopi@lernende.ethz.ch",
-         "michael.grunder@hr.ethz.ch",
-         "daniela.gunz@uzh.ch",
-         "roger.gfroerer@careerservices.uzh.ch",
-         "sabine.demerle@epfl.ch",
-         "cc@epfl.ch",
-         "regina.cardoso@epfl.ch",
-         "philippe.ory@epfl.ch",
-         "nadine.leemann@unisg.ch",
-         "gerd.winandi-martin@unisg.ch",
-         "maxim.polikarpov@telejob.ch",
-         "sandro.luh@telejob.ch",
-         "konrad.jakubowski@telejob.ch",
-         "reiner.laue@verwaltung.uni-stuttgart.de",
-         "s.potstada@tu-braunschweig.de",
-         "Anja.Robert@zhv.rwth-aachen.de",
-         "Neslihan.Congar@zhv.rwth-aachen.de",
-         "kathrin.neumann@uni-graz.at",
-         "melanie.koeppel@uni-graz.at",
-         "angela.messner-lipp@uni-graz.at",
-      ];
 
       let snapshot = await admin
          .firestore()

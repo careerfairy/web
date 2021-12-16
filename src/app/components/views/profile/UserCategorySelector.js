@@ -87,7 +87,7 @@ const UserCategorySelector = ({ category, handleSetSelected, isNew }) => {
                onClose={handleClose}
                onOpen={handleOpen}
                value={category.selectedValueId}
-               onChange={(e) => handleSetSelected(category.id, e)}
+               onChange={(e) => handleSetSelected(category?.id, e)}
             >
                {native && <option disabled hidden value="" />}
                {renderOptions}

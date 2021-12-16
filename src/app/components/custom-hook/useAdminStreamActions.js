@@ -46,7 +46,6 @@ const useAdminStreamActions = ({
    const { authenticatedUser, userData } = useAuth();
    const { enqueueSnackbar } = useSnackbar();
 
-   const [localCategories, setLocalCategories] = useState([]);
    const [groupCategories, setGroupCategories] = useState([]);
    const [allGroups, setAllGroups] = useState([]);
 
@@ -92,16 +91,6 @@ const useAdminStreamActions = ({
       registeredStudentsFromGroup,
       startDownloadingTalentPool
    );
-
-   useEffect(() => {
-      if (
-         livestream &&
-         livestream.targetCategories &&
-         livestream.targetCategories[group.id]
-      ) {
-         setLocalCategories(livestream.targetCategories[group.id]);
-      }
-   }, [livestream]);
 
    useEffect(() => {
       if (group && group.categories) {
@@ -191,13 +180,6 @@ const useAdminStreamActions = ({
          (option) => option.id === optionId
       );
       return correspondingOption?.name || "CATEGORY_UNDEFINED";
-   }
-
-   function removeElement(optionId) {
-      const filteredOptions = localCategories.filter(
-         (option) => option !== optionId
-      );
-      setLocalCategories(filteredOptions);
    }
 
    const sendErrorMessage = () => {

@@ -5,6 +5,7 @@ import Head from "next/head";
 import ProfileNav from "../components/views/profile/ProfileNav";
 import { useAuth } from "../HOCs/AuthProvider";
 import GeneralLayout from "../layouts/GeneralLayout";
+import ScrollToTop from "../components/views/common/ScrollToTop";
 
 const useStyles = makeStyles((theme) => ({
    content: {
@@ -21,13 +22,14 @@ const UserProfile = () => {
          <Head>
             <title key="title">CareerFairy | My Profile</title>
          </Head>
-         <GeneralLayout>
+         <GeneralLayout fullScreen>
             {userData ? (
                <ProfileNav user={user} userData={userData} />
             ) : (
                <div className={classes.content} />
             )}
          </GeneralLayout>
+         <ScrollToTop />
       </React.Fragment>
    );
 };

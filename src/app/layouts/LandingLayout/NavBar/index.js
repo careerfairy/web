@@ -5,15 +5,15 @@ import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import Divider from "@material-ui/core/Divider";
 import ListItem from "@material-ui/core/ListItem";
-import { Box, Button, Grow, Hidden } from "@material-ui/core";
+import { Box, Button, Grow } from "@material-ui/core";
 import { useAuth } from "../../../HOCs/AuthProvider";
 import NavItem from "../../../components/views/navbar/NavItem";
 import { LogOut as LogoutIcon } from "react-feather";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../store/actions";
 import Link from "../../../materialUI/NextNavLink";
-import { withFirebase } from "context/firebase";
 import useGeneralLinks from "../../../components/custom-hook/useGeneralLinks";
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme) => ({
    mobileDrawer: {
@@ -79,7 +79,7 @@ function LoginButton() {
    );
 }
 
-const NavBar = memo(({ drawerWidth }) => {
+const NavBar = memo(({ drawerWidth, anchor = "left" }) => {
    const classes = useStyles({ drawerWidth });
    const { userData, authenticatedUser } = useAuth();
    const dispatch = useDispatch();
@@ -143,7 +143,7 @@ const NavBar = memo(({ drawerWidth }) => {
 
    return (
       <Drawer
-         anchor="left"
+         anchor={anchor}
          classes={{ paper: clsx(classes.mobileDrawer, classes.background) }}
          className={classes.drawer}
          onClose={handleDrawerClose}
@@ -155,4 +155,8 @@ const NavBar = memo(({ drawerWidth }) => {
    );
 });
 
-export default withFirebase(NavBar);
+NavBar.propTypes = {
+   anchor: PropTypes.oneOf(["left", "right"]),
+};
+
+export default NavBar;

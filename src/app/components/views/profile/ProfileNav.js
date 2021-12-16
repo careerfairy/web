@@ -134,7 +134,7 @@ const ProfileNav = ({ userData }) => {
    }
 
    return (
-      <Container style={{ marginTop: "50px" }}>
+      <Container style={{ marginTop: "50px", marginBottom: "auto" }}>
          <AppBar className={classes.bar} position="static" color="default">
             <Tabs
                value={value}
@@ -158,4 +158,4 @@ const ProfileNav = ({ userData }) => {
    );
 };
 
-export default withFirebase(ProfileNav);
+export default ProfileNav;

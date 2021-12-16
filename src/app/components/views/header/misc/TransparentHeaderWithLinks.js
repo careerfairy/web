@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
          height: 2,
          bottom: 4,
          left: "0",
-         backgroundColor: (props) => props.navLinksColor,
+         backgroundColor: (props) => props.navLinksActiveColor,
          visibility: "hidden",
          WebkitTransform: "scaleX(0)",
          transform: "scaleX(0)",
@@ -59,13 +59,13 @@ const useStyles = makeStyles((theme) => ({
       },
    },
    indicator: {
-      background: (props) => props.navLinksColor,
-      color: (props) => props.navLinksColor,
+      background: (props) => props.navLinksActiveColor,
+      color: (props) => props.navLinksActiveColor,
    },
    root: {
       // Ensures top bar's Zindex is always above the drawer
       zIndex: theme.zIndex.drawer + 1,
-      color: (props) => props.navLinksColor,
+      color: (props) => props.navLinksActiveColor,
       background: "transparent",
    },
    whiteToolbar: {
@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
 const TransparentHeaderWithLinks = ({ className, ...rest }) => {
    const theme = useTheme();
    const classes = useStyles({
-      navLinksColor: theme.palette.common.white,
+      navLinksActiveColor: theme.palette.common.white,
    });
 
    const { mainLinks } = useGeneralLinks();

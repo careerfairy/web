@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
 import clsx from "clsx";
 import HideOnScroll from "../../../components/views/common/HideOnScroll";
 import { AppBar, Toolbar } from "@material-ui/core";
@@ -9,23 +9,29 @@ const useStyles = makeStyles((theme) => ({
    root: {
       // Ensures top bar's Zindex is always above the drawer
       zIndex: theme.zIndex.drawer + 1,
-      color: (props) => props.navLinksColor,
+      color: (props) => props.navLinksActiveColor,
       background: "transparent",
    },
-   whiteToolbar: {
-      boxShadow: theme.shadows[2],
-      background: (props) => [props.backgroundColor, "!important"],
+   transparentToolbar: {
+      // boxShadow: theme.shadows[1],
+      backgroundColor: [alpha(theme.palette.common.white, 0.7), "!important"],
+      borderBottom: `1px solid transparent`,
+      backdropFilter: "blur(20px)",
    },
    toolbar: {
       display: "flex",
       justifyContent: "space-between",
       background: "transparent",
+      borderBottomColor: alpha(theme.palette.common.black, 0.2),
    },
    animated: {
-      transition: theme.transitions.create(["background", "box-shadow"], {
-         duration: theme.transitions.duration.complex,
-         easing: theme.transitions.easing.easeInOut,
-      }),
+      transition: theme.transitions.create(
+         ["background", "box-shadow", "border-bottom-color"],
+         {
+            duration: theme.transitions.duration.complex,
+            easing: theme.transitions.easing.easeInOut,
+         }
+      ),
    },
 }));
 
@@ -34,11 +40,13 @@ const GeneralHeader = ({
    children,
    permanent,
    headerColors,
+   className,
    ...rest
 }) => {
    const theme = useTheme();
    const classes = useStyles({
-      navLinksColor: headerColors?.navLinksColor || theme.palette.grey["800"],
+      navLinksActiveColor:
+         headerColors?.navLinksActiveColor || theme.palette.grey["800"],
       backgroundColor:
          headerColors?.backgroundColor || theme.palette.common.white,
    });
@@ -56,10 +64,14 @@ const GeneralHeader = ({
 
    return (
       <HideOnScroll forceShow={permanent}>
-         <AppBar className={classes.root} elevation={0} {...rest}>
+         <AppBar
+            className={clsx(classes.root, className)}
+            elevation={0}
+            {...rest}
+         >
             <Toolbar
                className={clsx(classes.toolbar, classes.animated, {
-                  [classes.whiteToolbar]: scrolled || !transparent,
+                  [classes.transparentToolbar]: scrolled || !transparent,
                })}
             >
                {children}

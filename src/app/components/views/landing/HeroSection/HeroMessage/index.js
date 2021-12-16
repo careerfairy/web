@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
       //width: "100%",
    },
    heroContent: {
-      padding: theme.spacing(0, 5),
+      padding: theme.spacing(0, 0, 0, 5),
       maxWidth: 720,
       marginRight: "auto",
       marginLeft: "auto",
@@ -66,8 +66,13 @@ const RockstarTextTalent = () => {
       </div>
    );
 };
-const HeroMessage = ({ handleOpenCalendly, title, mobile }) => {
-   const classes = useStyles({ mobile });
+const GeneralHeroMessage = ({
+   handleOpenCalendly,
+   title,
+   buttons,
+   subTitle,
+}) => {
+   const classes = useStyles();
 
    return (
       <div className={classes.heroContent}>
@@ -79,41 +84,49 @@ const HeroMessage = ({ handleOpenCalendly, title, mobile }) => {
                </>
             )}
          </Typography>
+         {subTitle}
          <Grid spacing={2} container className={classes.buttonsWrapper}>
-            <Grid xs={12} sm={12} md={6} item>
-               <HeroButton
-                  color="primary"
-                  variant="outlined"
-                  fullWidth
-                  href="/next-livestreams"
-                  className={classes.linkButton}
-                  component={Link}
-                  iconUrl={playIcon}
-               >
-                  Our Next Events
-               </HeroButton>
-            </Grid>
-            <Grid xs={12} sm={12} md={6} item>
-               <HeroButton
-                  color="secondary"
-                  fullWidth
-                  withGradient
-                  onClick={handleOpenCalendly}
-                  iconUrl={calendarIcon}
-                  variant="contained"
-               >
-                  Book a Demo
-               </HeroButton>
-            </Grid>
+            {buttons?.map((button, index) => (
+               <Grid xs={12} sm={12} key={index} md={6} item>
+                  {button}
+               </Grid>
+            )) || (
+               <>
+                  <Grid xs={12} sm={12} md={6} item>
+                     <HeroButton
+                        color="primary"
+                        variant="outlined"
+                        fullWidth
+                        href="/next-livestreams"
+                        className={classes.linkButton}
+                        component={Link}
+                        iconUrl={playIcon}
+                     >
+                        Our Next Events
+                     </HeroButton>
+                  </Grid>
+                  <Grid xs={12} sm={12} md={6} item>
+                     <HeroButton
+                        color="secondary"
+                        fullWidth
+                        withGradient
+                        onClick={handleOpenCalendly}
+                        iconUrl={calendarIcon}
+                        variant="contained"
+                     >
+                        Book a Demo
+                     </HeroButton>
+                  </Grid>
+               </>
+            )}
          </Grid>
       </div>
    );
 };
 
-HeroMessage.propTypes = {
+GeneralHeroMessage.propTypes = {
    handleOpenCalendly: PropTypes.func,
-   mobile: PropTypes.bool,
    title: PropTypes.any,
 };
 
-export default HeroMessage;
+export default GeneralHeroMessage;

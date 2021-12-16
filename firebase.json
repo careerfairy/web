@@ -1,6 +1,16 @@
 {
   "functions": {
-    "source": "."  
+    "source": ".",
+    "ignore": [
+      "**/src/**",
+      "**/.vscode/**",
+      ".firebase/**",
+      ".firebaserc",
+      "firebase.json",
+      "**/node_modules/**",
+      "**/public/**",
+      "**/.next/cache/**"
+    ]
   },
   "hosting": [
     {

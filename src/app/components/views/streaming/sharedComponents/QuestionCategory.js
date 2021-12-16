@@ -125,12 +125,12 @@ const QuestionCategory = (props) => {
    const [touched, setTouched] = useState(false);
    const [value, setValue] = useState(0);
    const [sessionUuid, setSessionUuid] = useState(uuidv4());
-   const [parentHeight, setParentHeight] = useState(400);
    const [submittingQuestion, setSubmittingQuestion] = useState(false);
    const [goingToQuestion, setGoingToQuestion] = useState(false);
    const [newQuestionTitle, setNewQuestionTitle] = useState("");
    const [openQuestionId, setOpenQuestionId] = useState("");
    const { authenticatedUser, userData } = useAuth();
+   const [parentHeight, setParentHeight] = useState(400);
 
    const parentRef = useRef();
 

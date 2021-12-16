@@ -16,8 +16,6 @@ import {
    LinkifyText,
    tableIcons,
 } from "../../common/TableUtils";
-// import UserInnerTable from "./UserInnerTable";
-import { useAuth } from "../../../../../../../HOCs/AuthProvider";
 import { makeStyles } from "@material-ui/core/styles";
 import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil";
 import { useDispatch, useSelector } from "react-redux";
@@ -69,7 +67,6 @@ const UsersTable = ({
    ...rest
 }) => {
    const dataTableRef = useRef(null);
-   const { userData } = useAuth();
    const classes = useStyles();
    const [selection, setSelection] = useState([]);
    const { enqueueSnackbar } = useSnackbar();
@@ -119,7 +116,6 @@ const UsersTable = ({
          })
          .map((e) => e);
    }, [targetGroups, group]);
-   // console.table(categoryFields);
 
    const allGroupsMap = useSelector(
       (state) => state.firestore.data?.allGroups || {}
@@ -159,18 +155,17 @@ const UsersTable = ({
             }) || [];
       } else {
          newUsers =
-            totalUniqueUsers?.map((user) => {
-               return AnalyticsUtil.mapUserEngagement(
+            totalUniqueUsers?.map((user) =>
+               AnalyticsUtil.mapUserEngagement(
                   user,
                   streamsFromTimeFrameAndFuture,
                   group
-               );
-            }) || [];
+               )
+            ) || [];
       }
       setUsers(newUsers);
       setSelection([]);
    }, [totalUniqueUsers, targetGroups]);
-
    useEffect(() => {
       if (dataTableRef.current) {
          dataTableRef.current.onAllSelected(false);
@@ -287,7 +282,6 @@ const UsersTable = ({
       `${userData.firstName} ${userData.lastName} CV - ${prettyLocalizedDate(
          new Date()
       )}`;
-
    const dataPrivacyTab = !userTypes.find(
       ({ propertyName }) => propertyName === "registeredUsers"
    ) && (
@@ -355,6 +349,14 @@ const UsersTable = ({
                      type: "numeric",
                   },
                   {
+                     field: "isInTalentPool",
+                     title: "Is In TalentPool",
+                     type: "boolean",
+                     hidden: Boolean(
+                        userType.propertyName === "talentPool" || !currentStream
+                     ),
+                  },
+                  {
                      field: "numberOfStreamsRegistered",
                      title: "Events Registered To",
                      type: "numeric",
@@ -411,88 +413,28 @@ const UsersTable = ({
                      hidden: Boolean(!currentStream),
                   },
                ]}
-               // detailPanel={[
-               //    ({
-               //       numberOfStreamsRegistered,
-               //       streamsRegistered,
-               //       firstName,
-               //       lastName,
-               //    }) => ({
-               //       icon: tableIcons.LibraryAddOutlinedIcon,
-               //       openIcon: tableIcons.AddToPhotosIcon,
-               //       tooltip:
-               //          !(numberOfStreamsRegistered === 0) &&
-               //          `See streams ${firstName} registered to`,
-               //       disabled: numberOfStreamsRegistered === 0,
-               //       render: () => (
-               //          <UserInnerTable
-               //             firstName={firstName}
-               //             lastName={lastName}
-               //             group={group}
-               //             streams={streamsRegistered}
-               //             firebase={firebase}
-               //             registered
-               //          />
-               //       ),
-               //    }),
-               //    ({
-               //       numberOfStreamsWatched,
-               //       streamsWatched,
-               //       firstName,
-               //       lastName,
-               //    }) => ({
-               //       icon: tableIcons.VideoLibraryOutlinedIcon,
-               //       openIcon: tableIcons.VideoLibraryIcon,
-               //       tooltip:
-               //          !(numberOfStreamsWatched === 0) &&
-               //          `See streams ${firstName} watched`,
-               //       disabled: numberOfStreamsWatched === 0,
-               //       render: () => (
-               //          <UserInnerTable
-               //             firstName={firstName}
-               //             lastName={lastName}
-               //             firebase={firebase}
-               //             group={group}
-               //             streams={streamsWatched}
-               //          />
-               //       ),
-               //    }),
-               // ]}
                actions={[
                   exportSelectionAction(
                      dataTableRef?.current?.props?.columns || [],
                      getTitle()
                   ),
                   (rowData) => ({
-                     tooltip:
-                        !(
-                           (rowData.length === 0)
-                           // || !isTalentPool()
-                        ) && "Copy Emails",
+                     tooltip: !(rowData.length === 0) && "Copy Emails",
                      position: "toolbarOnSelect",
                      icon: tableIcons.EmailIcon,
                      disabled: rowData.length === 0,
-                     // || !isTalentPool()
                      onClick: handleCopyEmails,
                   }),
                   (rowData) => ({
                      tooltip:
-                        !(
-                           (rowData.length === 0)
-                           // || !isTalentPool()
-                        ) && "Copy LinkedIn Addresses",
+                        !(rowData.length === 0) && "Copy LinkedIn Addresses",
                      position: "toolbarOnSelect",
                      icon: tableIcons.LinkedInIcon,
                      disabled: rowData.length === 0,
-                     // || !isTalentPool()
                      onClick: handleCopyLinkedin,
                   }),
                   (rowData) => ({
-                     tooltip:
-                        !(
-                           (rowData.length === 0)
-                           // || !isTalentPool()
-                        ) && "Download CVs",
+                     tooltip: !(rowData.length === 0) && "Download CVs",
                      position: "toolbarOnSelect",
                      icon: tableIcons.PictureAsPdfIcon,
                      disabled: rowData.length === 0 || processingCVs,

@@ -18,6 +18,7 @@ import { useAuth } from "../HOCs/AuthProvider";
 import DataAccessUtil from "../util/DataAccessUtil";
 import EnterDetailsModal from "../components/views/draftStreamForm/EnterDetailsModal";
 import { prettyLocalizedDate } from "../components/helperFunctions/HelperFunctions";
+import GeneralLayout from "../layouts/GeneralLayout";
 
 const draftStream = ({ firebase }) => {
    const [showEnterDetailsModal, setShowEnterDetailsModal] = useState(false);
@@ -177,36 +178,39 @@ const draftStream = ({ firebase }) => {
    };
 
    return (
-      <TealBackground style={{ paddingBottom: 0 }}>
+      <>
          <Head>
             <title key="title">CareerFairy | Draft a Live Stream</title>
          </Head>
-         <div style={{ background: "rgb(44, 66, 81)" }}>
-            <Header color="white" />
-         </div>
-         <Typography
-            variant="h3"
-            align="center"
-            style={{ marginTop: submitted ? "15vh" : "1.5rem", color: "white" }}
-            gutterBottom
-         >
-            {submitted ? "Success!" : "Draft a Live Stream"}
-         </Typography>
-         <DraftStreamForm
-            onSubmit={onSubmit}
-            formRef={formRef}
-            submitted={submitted}
-            setSubmitted={setSubmitted}
-         />
-         <EnterDetailsModal
-            open={showEnterDetailsModal}
-            handleSubmit={handleSubmit}
-            onClose={handleCloseShowEnterDetailsModal}
-            setUserInfo={setUserInfo}
-            userInfo={userInfo}
-         />
-         <Footer />
-      </TealBackground>
+         <GeneralLayout>
+            <TealBackground style={{ paddingBottom: 0 }}>
+               <Typography
+                  variant="h3"
+                  align="center"
+                  style={{
+                     marginTop: submitted ? "15vh" : "1.5rem",
+                     color: "white",
+                  }}
+                  gutterBottom
+               >
+                  {submitted ? "Success!" : "Draft a Live Stream"}
+               </Typography>
+               <DraftStreamForm
+                  onSubmit={onSubmit}
+                  formRef={formRef}
+                  submitted={submitted}
+                  setSubmitted={setSubmitted}
+               />
+               <EnterDetailsModal
+                  open={showEnterDetailsModal}
+                  handleSubmit={handleSubmit}
+                  onClose={handleCloseShowEnterDetailsModal}
+                  setUserInfo={setUserInfo}
+                  userInfo={userInfo}
+               />
+            </TealBackground>
+         </GeneralLayout>
+      </>
    );
 };
 

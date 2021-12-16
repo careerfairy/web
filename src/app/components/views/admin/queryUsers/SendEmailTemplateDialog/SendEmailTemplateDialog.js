@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-   Avatar,
    Box,
    Button,
    Collapse,
@@ -11,11 +10,10 @@ import {
    StepLabel,
    Stepper,
    TextField,
-   Typography,
    useMediaQuery,
 } from "@material-ui/core";
 import { GlassDialog } from "materialUI/GlobalModals";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@material-ui/core/styles";
 import { useFirestore } from "react-redux-firebase";
 import {
    FORTY_FIVE_MINUTES_IN_MILLISECONDS,
@@ -23,62 +21,11 @@ import {
 } from "../../../../../data/constants/streamContants";
 import { useSelector } from "react-redux";
 import { Autocomplete } from "@material-ui/lab";
-import clsx from "clsx";
-import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
-import dayjs from "dayjs";
 import EmailTemplateCard from "./EmailTemplateCard";
 import EmailTemplateForm from "./EmailTemplateForm";
 import useTemplates from "./templates";
-
-const useStyles = makeStyles((theme) => ({
-   root: {
-      width: "100%",
-   },
-   backButton: {
-      marginRight: theme.spacing(1),
-   },
-   instructions: {
-      marginTop: theme.spacing(1),
-      marginBottom: theme.spacing(1),
-   },
-   streamCompanyLogo: {
-      width: 60,
-      height: 60,
-      background: theme.palette.common.white,
-      boxShadow: theme.shadows[2],
-      "& img": {
-         objectFit: "contain",
-         maxWidth: "90%",
-         maxHeight: "90%",
-      },
-   },
-   groupLogoStacked: {
-      width: 60,
-      height: 60,
-   },
-   optionViewRoot: {
-      display: "flex",
-      flexDirection: "column",
-      padding: theme.spacing(1),
-      borderBottom: `2px solid ${alpha(theme.palette.common.black, 0.5)}`,
-      width: "100%",
-   },
-   preview: {
-      border: `2px solid ${alpha(theme.palette.common.black, 0.5)}`,
-      borderRadius: theme.spacing(1),
-   },
-   optionDetailsWrapper: {
-      display: "flex",
-      flexWrap: "nowrap",
-      width: "100%",
-   },
-   streamInfoWrapper: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      padding: theme.spacing(0.5),
-   },
-}));
+import EventOptionPreview from "../../../common/EventAutoSelect/EventOptionPreview";
+import EventAutoSelect from "../../../common/EventAutoSelect";
 
 function getSteps() {
    return [
@@ -87,34 +34,6 @@ function getSteps() {
       "Finalize your template",
    ];
 }
-const GroupOptionView = ({ streamData = {}, preview }) => {
-   const classes = useStyles();
-   return (
-      <div
-         className={clsx(classes.optionViewRoot, {
-            [classes.preview]: preview,
-         })}
-      >
-         <Typography variant="subtitle1" gutterBottom>
-            {streamData?.title}
-         </Typography>
-         <div className={classes.optionDetailsWrapper}>
-            <Avatar
-               variant="square"
-               className={clsx(classes.streamCompanyLogo)}
-               alt={streamData?.companyLogoUrl}
-               src={getResizedUrl(streamData?.companyLogoUrl, "xs")}
-            />
-            <div className={classes.streamInfoWrapper}>
-               <Typography variant="body2" gutterBottom color="textSecondary">
-                  {dayjs(streamData?.start?.toDate?.()).format("YYYY MMM, DD")}
-               </Typography>
-               <Typography variant="body1">{streamData?.company}</Typography>
-            </div>
-         </div>
-      </div>
-   );
-};
 
 const EventSelectView = ({
    handleClose,
@@ -132,10 +51,10 @@ const EventSelectView = ({
          <Box p={2}>
             <Collapse in={Boolean(targetStream)} unmountOnExit>
                <Box mb={2}>
-                  <GroupOptionView preview streamData={targetStream} />
+                  <EventOptionPreview preview streamData={targetStream} />
                </Box>
             </Collapse>
-            <Autocomplete
+            <EventAutoSelect
                value={targetStream}
                onChange={(event, newValue) => {
                   setTargetStream(newValue);
@@ -144,24 +63,9 @@ const EventSelectView = ({
                onInputChange={(event, newInputValue) => {
                   setInputValue(newInputValue);
                }}
-               getOptionSelected={(option, value) =>
-                  option.title === value.title ||
-                  option.company === value.company
-               }
-               getOptionLabel={(option) => option.title || ""}
                id="event-select-menu"
-               renderOption={(option) => (
-                  <GroupOptionView streamData={option} />
-               )}
                options={upcomingStreams}
                fullWidth
-               renderInput={(params) => (
-                  <TextField
-                     {...params}
-                     label="Chose an Event"
-                     variant="outlined"
-                  />
-               )}
             />
          </Box>
          <DialogActions>

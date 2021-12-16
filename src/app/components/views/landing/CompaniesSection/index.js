@@ -8,6 +8,7 @@ import landingCompanies from "../../../../constants/landingCompanies";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 import Logo from "../common/Logo";
 import LogosComponent from "../common/LogosComponent";
+import SectionHeader from "../../common/SectionHeader";
 
 const useStyles = makeStyles((theme) => ({
    section: {
@@ -44,7 +45,14 @@ const CompaniesSection = (props) => {
          backgroundColor={props.backgroundColor}
       >
          <SectionContainer>
-            <HighlightText text={props.overheadText} />
+            {props.title && (
+               <SectionHeader
+                  color={props.color}
+                  title={props.title}
+                  subtitle={props.subtitle}
+               />
+            )}
+            {props.overheadText && <HighlightText text={props.overheadText} />}
             <LogosComponent>
                {landingCompanies.map(({ name, imageUrlMain }) => (
                   <Logo
