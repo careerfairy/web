@@ -41,9 +41,11 @@ const GeneralHeader = ({
    permanent,
    headerColors,
    className,
+   position,
    ...rest
 }) => {
    const theme = useTheme();
+   const absolute = position === "absolute";
    const classes = useStyles({
       navLinksActiveColor:
          headerColors?.navLinksActiveColor || theme.palette.grey["800"],
@@ -67,11 +69,13 @@ const GeneralHeader = ({
          <AppBar
             className={clsx(classes.root, className)}
             elevation={0}
+            position={position}
             {...rest}
          >
             <Toolbar
                className={clsx(classes.toolbar, classes.animated, {
-                  [classes.transparentToolbar]: scrolled || !transparent,
+                  [classes.transparentToolbar]:
+                     (scrolled || !transparent) && !absolute,
                })}
             >
                {children}

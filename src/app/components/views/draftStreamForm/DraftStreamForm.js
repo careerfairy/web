@@ -495,7 +495,7 @@ const DraftStreamForm = ({
                                        fullWidth
                                        id="title"
                                        label="Livestream Title"
-                                       inputProps={{ maxLength: 1000 }}
+                                       inputProps={{ maxLength: 104 }}
                                        onBlur={handleBlur}
                                        value={values.title}
                                        disabled={isSubmitting}

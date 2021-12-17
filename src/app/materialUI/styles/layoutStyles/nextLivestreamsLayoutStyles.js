@@ -22,6 +22,7 @@ const nextLivestreamsLayoutStyles = (theme) => ({
       display: "flex",
       overflow: "hidden",
       width: "100%",
+      flexDirection: "column",
    },
    content: {
       ...basicLayoutStyles(theme).content,

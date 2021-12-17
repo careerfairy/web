@@ -16,6 +16,10 @@ import { useRouter } from "next/router";
 import { useFirebase } from "../../../../../context/firebase";
 import { useFormik } from "formik";
 import { questionIcon } from "../../../../../constants/svgs";
+import {
+   maxQuestionLength,
+   minQuestionLength,
+} from "../../../../../constants/forms";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -57,8 +61,6 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const maxQuestionLength = 170;
-const minQuestionLength = 10;
 const QuestionCreateForm = () => {
    const { handleNext, group, livestream, handleGoToLast } = useContext(
       RegistrationContext
