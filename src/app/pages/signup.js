@@ -246,7 +246,7 @@ function SignUpFormBase({ firebase, setEmailVerificationSent, setActiveStep }) {
                password: "",
                confirmPassword: "",
                agreeTerm: false,
-               subscribed: true,
+               subscribed: false,
                university: { code: "other", name: "Other" },
                universityCountryCode: "",
             }}
