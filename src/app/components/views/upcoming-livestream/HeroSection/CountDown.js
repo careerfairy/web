@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
    attendBtn: ({ registered }) => ({
       "&:disabled": {
          color: registered && theme.palette.common.white,
-         backgroundColor: registered && theme.palette.primary.main,
+         backgroundColor: registered && theme.palette.secondary.main,
       },
    }),
    dateTimeWrapper: {
@@ -205,8 +205,8 @@ const CountDown = ({
             <Grid item xs={12}>
                <Button
                   className={classes.attendBtn}
-                  color="primary"
-                  variant="contained"
+                  color={registered ? "secondary" : "primary"}
+                  variant={"contained"}
                   fullWidth
                   startIcon={registered && <CheckIcon />}
                   disabled={disabled || registered}

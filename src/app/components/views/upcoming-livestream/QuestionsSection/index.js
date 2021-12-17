@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
    },
    title: {
       fontWeight: 600,
+      textAlign: "left",
    },
    imgGrid: {
       // background: theme.palette.primary.main,

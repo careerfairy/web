@@ -25,7 +25,6 @@ import TalentPoolSection from "../../components/views/upcoming-livestream/Talent
 import { useTheme } from "@material-ui/core/styles";
 import ContactSection from "../../components/views/upcoming-livestream/ContactSection";
 import Navigation from "../../components/views/upcoming-livestream/Navigation";
-import smoothscroll from "smoothscroll-polyfill";
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null);
@@ -81,7 +80,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    });
 
    useEffect(() => {
-      smoothscroll.polyfill();
+      window.scrollTo(0, 0);
    }, []);
 
    useEffect(() => {
@@ -374,6 +373,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                sectionRef={aboutRef}
                sectionId="about"
                title={`${stream.company}`}
+               big
                overheadText={"ABOUT"}
             />
          )}
@@ -383,6 +383,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                sectionRef={speakersRef}
                backgroundColor={theme.palette.common.white}
                sectionId="speakers"
+               big
                speakers={stream.speakers}
             />
          )}
@@ -394,6 +395,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                   ? "Questions that were asked"
                   : `Have any questions for the speakers?`
             }
+            big
             handleChangeQuestionSortType={handleChangeQuestionSortType}
             getMore={handlers.getMore}
             loadingInitialQuestions={handlers.loadingInitial}

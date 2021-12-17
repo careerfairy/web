@@ -24,6 +24,7 @@ import Notifier from "../components/views/notifier";
 import { getCookieConsentValue } from "react-cookie-consent";
 import CFCookieConsent from "components/views/common/cookie-consent/CFCookieConsent";
 import { useRouter } from "next/router";
+import smoothscroll from "smoothscroll-polyfill";
 
 config({ ssrFadeout: true });
 
@@ -87,6 +88,9 @@ function MyApp({ Component, pageProps }) {
    const [showBubbles, setShowBubbles] = useState(false);
    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState);
 
+   useEffect(() => {
+      smoothscroll.polyfill();
+   }, []);
    useEffect(() => {
       // Remove the server-side injected CSS.
       const jssStyles = document.querySelector("#jss-server-side");

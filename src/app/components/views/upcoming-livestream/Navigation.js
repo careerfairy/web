@@ -72,7 +72,7 @@ const Navigation = ({ aboutRef, questionsRef, speakersRef }) => {
    }
 
    return (
-      <SectionContainer className={classes.root}>
+      <SectionContainer maxWidth="lg" className={classes.root}>
          <Tabs
             value={value}
             onChange={handleChange}
