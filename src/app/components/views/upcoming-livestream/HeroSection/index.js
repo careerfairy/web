@@ -128,7 +128,7 @@ const HeroSection = ({
       <div className={classes.root}>
          <div className={classes.containerWrapper}>
             <Container className={classes.container}>
-               <Grid className={classes.gridContainer} spacing={4} container>
+               <Grid className={classes.gridContainer} spacing={2} container>
                   <Grid className={classes.leftGridItem} item xs={12} md={6}>
                      <Typography variant="h2" className={classes.title}>
                         {stream.title}

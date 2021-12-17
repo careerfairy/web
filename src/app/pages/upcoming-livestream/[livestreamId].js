@@ -36,12 +36,13 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
 
    const [stream, setStream] = useState(parseStreamDates(serverStream));
    const [registered, setRegistered] = useState(false);
-   const { push, asPath, query, pathname } = useRouter();
+   const { push, asPath, query, pathname, replace } = useRouter();
    const [currentGroup, setCurrentGroup] = useState(null);
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
    const [filteredGroups, setFilteredGroups] = useState([]);
    const [targetGroupId, setTargetGroupId] = useState("");
    const [questionSortType, setQuestionSortType] = useState("timestamp");
+   const [targetOptions, setTargetOptions] = useState([]);
 
    const [unfilteredGroups, setUnfilteredGroups] = useState([]);
 
@@ -107,6 +108,29 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          return () => unsubscribe();
       }
    }, [stream?.id]);
+
+   useEffect(() => {
+      if (
+         currentGroup &&
+         currentGroup.categories &&
+         stream &&
+         stream.targetCategories
+      ) {
+         const { groupId, categories } = currentGroup;
+         let totalOptions = [];
+         categories.forEach((category) => totalOptions.push(category.options));
+         const flattenedOptions = totalOptions.reduce(function (a, b) {
+            return a.concat(b);
+         }, []);
+         const matchedOptions = stream.targetCategories[groupId];
+         if (matchedOptions) {
+            const filteredOptions = flattenedOptions.filter((option) =>
+               matchedOptions.includes(option.id)
+            );
+            setTargetOptions(filteredOptions);
+         }
+      }
+   }, [currentGroup, stream]);
 
    useEffect(() => {
       if (query.groupId) {
@@ -198,6 +222,12 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       stream?.registeredUsers,
       authenticatedUser.email,
    ]);
+
+   useEffect(() => {
+      if (stream.hasStarted) {
+         replace?.(`/streaming/${stream.id}/viewer`);
+      }
+   }, [stream.hasStarted]);
 
    const registerButtonLabel = useMemo(() => {
       if (authenticatedUser && registered) return "You're booked";
