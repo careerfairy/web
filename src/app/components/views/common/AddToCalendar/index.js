@@ -48,7 +48,6 @@ const Dropdown = ({ filename, handleClose, anchorEl, urls }) => {
       <Menu
          id="add to calendar menu"
          anchorEl={anchorEl}
-         keepMounted
          open={Boolean(anchorEl)}
          onClose={handleClose}
       >

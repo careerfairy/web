@@ -6,14 +6,12 @@ import {
    Container,
    Grid,
    Hidden,
-   Paper,
    Typography,
 } from "@material-ui/core";
 import CountDown from "./CountDown";
-import SingleHeroSpeaker from "./SingleHeroSpeaker";
 import HeroSpeakers from "./HeroSpeakers";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
-import { makeUrls } from "../../../../util/makeUrls";
+import HeroHosts from "./HeroHosts";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -35,8 +33,6 @@ const useStyles = makeStyles((theme) => ({
          width: "100%",
          content: '" "',
          zIndex: 1,
-         // backgroundColor: "#151e6b",
-         // backgroundColor: theme.palette.navyBlue.main,
          backgroundColor: darken(theme.palette.navyBlue.main, 0.5),
          backgroundAttachment: "fixed",
          opacity: 0.7,
@@ -55,34 +51,29 @@ const useStyles = makeStyles((theme) => ({
    },
    container: {
       [theme.breakpoints.up("sm")]: {
-         paddingTop: theme.spacing(6),
+         paddingTop: theme.spacing(8),
          paddingBottom: theme.spacing(6),
       },
       [theme.breakpoints.up("md")]: {
          paddingTop: theme.spacing(8),
          paddingBottom: theme.spacing(8),
       },
-      // [theme.breakpoints.up("xs")]: {
-      // },
-      paddingTop: theme.spacing(4),
+      paddingTop: theme.spacing(8),
       paddingBottom: theme.spacing(4),
    },
    gridContainer: {
       color: theme.palette.common.white,
+   },
+   leftGridItem: {
+      display: "flex",
+      justifyContent: "space-evenly",
+      flexDirection: "column",
    },
    title: {
       [theme.breakpoints.down("sm")]: {
          fontSize: "calc(1.5em + 1.5vw)",
       },
       fontWeight: 600,
-   },
-   subTitle: {
-      display: "-webkit-box",
-      boxOrient: "vertical",
-      lineClamp: 5,
-      WebkitLineClamp: 5,
-      wordBreak: "break-word",
-      overflow: "hidden",
    },
    timerWrapper: {
       display: "flex",
@@ -93,36 +84,26 @@ const useStyles = makeStyles((theme) => ({
       flexDirection: "column",
    },
    companyLogo: {
-      padding: theme.spacing(0.5),
+      padding: theme.spacing(2),
       borderRadius: theme.spacing(1),
       boxShadow: theme.shadows[4],
       background: theme.palette.common.white,
-      maxWidth: 280,
-      maxHeight: 90,
-      objectFit: "contain",
-   },
-   hostsCard: {
-      display: "flex",
-      flexDirection: "column",
-      borderRadius: theme.spacing(1),
-      padding: theme.spacing(2),
       width: "fit-content",
-   },
-   hostsLogoWrapper: {},
-   hostLogo: {
-      padding: theme.spacing(0.5),
-      borderRadius: theme.spacing(1),
-      width: 300,
-      height: 90,
-      [theme.breakpoints.down("sm")]: {
-         width: "100%",
-      },
-      background: theme.palette.common.white,
+      height: "fit-content",
       "& img": {
+         borderRadius: theme.spacing(1),
+         maxHeight: 90,
+         maxWidth: 280,
          objectFit: "contain",
       },
    },
+   heroSpeakersWrapper: {
+      marginTop: theme.spacing(2),
+      color: "inherit",
+      textDecoration: "none !important",
+   },
 }));
+
 const HeroSection = ({
    backgroundImage,
    registerButtonLabel,
@@ -139,26 +120,18 @@ const HeroSection = ({
          <div className={classes.containerWrapper}>
             <Container className={classes.container}>
                <Grid className={classes.gridContainer} spacing={4} container>
-                  <Grid item xs={12} md={6}>
+                  <Grid className={classes.leftGridItem} item xs={12} md={6}>
                      <Typography variant="h2" className={classes.title}>
                         {stream.title}
                      </Typography>
                      {!!stream.speakers.length && (
                         <Hidden xsDown>
-                           <Box
-                              onClick={() => {
-                                 // TODO got to speakers section
-                              }}
-                              marginTop={2}
+                           <a
+                              className={classes.heroSpeakersWrapper}
+                              href="#speakers"
                            >
-                              {stream.speakers.length > 1 ? (
-                                 <HeroSpeakers speakers={stream.speakers} />
-                              ) : (
-                                 <SingleHeroSpeaker
-                                    speaker={stream.speakers[0]}
-                                 />
-                              )}
-                           </Box>
+                              <HeroSpeakers speakers={stream.speakers} />
+                           </a>
                         </Hidden>
                      )}
                   </Grid>
@@ -166,13 +139,13 @@ const HeroSection = ({
                      <Grid container spacing={2}>
                         <Grid item xs={12}>
                            <Box display="flex">
-                              <img
-                                 className={classes.companyLogo}
+                              <Avatar
+                                 title={stream.company}
                                  src={getResizedUrl(
                                     stream.companyLogoUrl,
                                     "md"
                                  )}
-                                 alt={stream.company}
+                                 className={classes.companyLogo}
                               />
                            </Box>
                         </Grid>
@@ -188,23 +161,11 @@ const HeroSection = ({
                               />
                            </Box>
                         </Grid>
-                        {/*<Grid item xs={12}>*/}
-                        {/*   <Paper className={classes.hostsCard}>*/}
-                        {/*      <Typography variant="body2" color="textSecondary">*/}
-                        {/*         Hosted by*/}
-                        {/*      </Typography>*/}
-                        {/*      <div className={classes.hostsLogoWrapper}>*/}
-                        {/*         {hosts.map((host) => (*/}
-                        {/*            <Avatar*/}
-                        {/*               key={host.id}*/}
-                        {/*               className={classes.hostLogo}*/}
-                        {/*               src={getResizedUrl(host.logoUrl, "md")}*/}
-                        {/*               title={host.universityName}*/}
-                        {/*            />*/}
-                        {/*         ))}*/}
-                        {/*      </div>*/}
-                        {/*   </Paper>*/}
-                        {/*</Grid>*/}
+                        {!!hosts.length && (
+                           <Grid item xs={12}>
+                              <HeroHosts hosts={hosts} />
+                           </Grid>
+                        )}
                      </Grid>
                   </Grid>
                </Grid>
