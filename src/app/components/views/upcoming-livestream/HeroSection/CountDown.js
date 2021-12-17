@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
    Button,
@@ -66,6 +66,49 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1, 0),
    },
 }));
+
+const TimerText = memo(({ time }) => {
+   const classes = useStyles();
+   const calculateTimeLeft = () => {
+      const difference = time - new Date();
+      let timeLeft = {};
+
+      if (difference > 0) {
+         timeLeft = {
+            Days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+            Hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+            Minutes: Math.floor((difference / 1000 / 60) % 60),
+            Seconds: Math.floor((difference / 1000) % 60),
+         };
+      }
+
+      return timeLeft;
+   };
+
+   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
+   useEffect(() => {
+      const timeout = setTimeout(() => {
+         setTimeLeft(calculateTimeLeft());
+      }, 1000);
+      return () => clearTimeout(timeout);
+   });
+   return (
+      <div className={classes.countDownWrapper}>
+         {Object.keys(timeLeft).map((interval, index) => (
+            <div key={index} className={classes.timeElement}>
+               <Typography variant="h3" className={classes.timeLeft}>
+                  {timeLeft[interval]}
+               </Typography>
+               <Typography variant="body1" className={classes.timeType}>
+                  {interval}
+               </Typography>
+            </div>
+         ))}
+      </div>
+   );
+});
+
 const CountDown = ({
    time,
    registerButtonLabel,
@@ -93,31 +136,6 @@ const CountDown = ({
          ).toISOString(),
       };
    }, [stream, livestreamId, groupId]);
-
-   const calculateTimeLeft = () => {
-      const difference = time - new Date();
-      let timeLeft = {};
-
-      if (difference > 0) {
-         timeLeft = {
-            Days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-            Hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-            Minutes: Math.floor((difference / 1000 / 60) % 60),
-            Seconds: Math.floor((difference / 1000) % 60),
-         };
-      }
-
-      return timeLeft;
-   };
-
-   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
-
-   useEffect(() => {
-      const timeout = setTimeout(() => {
-         setTimeLeft(calculateTimeLeft());
-      }, 1000);
-      return () => clearTimeout(timeout);
-   });
 
    return (
       <Paper className={classes.root}>
@@ -155,21 +173,7 @@ const CountDown = ({
                   </Hidden>
                </div>
                <Divider className={classes.divider} />
-               <div className={classes.countDownWrapper}>
-                  {Object.keys(timeLeft).map((interval, index) => (
-                     <div key={index} className={classes.timeElement}>
-                        <Typography variant="h3" className={classes.timeLeft}>
-                           {timeLeft[interval]}
-                        </Typography>
-                        <Typography
-                           variant="body1"
-                           className={classes.timeType}
-                        >
-                           {interval}
-                        </Typography>
-                     </div>
-                  ))}
-               </div>
+               <TimerText time={time} />
             </Grid>
             <Hidden smUp>
                <Grid item xs={12}>

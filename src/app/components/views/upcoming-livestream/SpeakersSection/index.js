@@ -41,7 +41,7 @@ const SpeakersSection = (props) => {
          <SectionContainer>
             {props.overheadText && (
                <Fade bottom>
-                  <Box marginBottom={2}>
+                  <Box marginBottom={4}>
                      <HighlightText text={props.overheadText} />
                   </Box>
                </Fade>

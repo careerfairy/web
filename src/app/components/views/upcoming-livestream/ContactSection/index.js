@@ -51,7 +51,7 @@ const ContactSection = (props) => {
                   </Box>
                </Fade>
             )}
-            {props.title && (
+            {(props.title || props.subtitle) && (
                <Fade bottom>
                   <SectionHeader
                      color={props.color}

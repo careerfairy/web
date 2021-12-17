@@ -17,7 +17,12 @@ const useStyles = makeStyles((theme) => ({
    customMaxWidth: {},
 }));
 
-const SectionContainer = ({ className, children, ...props }) => {
+const SectionContainer = ({
+   className,
+   maxWidth = "md",
+   children,
+   ...props
+}) => {
    const classes = useStyles();
    return (
       <Container
@@ -25,7 +30,7 @@ const SectionContainer = ({ className, children, ...props }) => {
             maxWidthLg: classes.customMaxWidth,
          }}
          className={clsx(classes.root, className)}
-         maxWidth="md"
+         maxWidth={maxWidth}
          {...props}
          children={children}
       />

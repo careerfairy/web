@@ -28,8 +28,6 @@ import Navigation from "../../components/views/upcoming-livestream/Navigation";
 import smoothscroll from "smoothscroll-polyfill";
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
-   // console.count("-> UpcomingLivestreamPage");
-
    const aboutRef = useRef(null);
    const speakersRef = useRef(null);
    const questionsRef = useRef(null);
@@ -38,7 +36,6 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
 
    const [stream, setStream] = useState(parseStreamDates(serverStream));
    const [registered, setRegistered] = useState(false);
-   const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
    const { push, asPath, query, pathname } = useRouter();
    const [currentGroup, setCurrentGroup] = useState(null);
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
@@ -48,6 +45,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
 
    const [unfilteredGroups, setUnfilteredGroups] = useState([]);
 
+   const { authenticatedUser, userData, isLoggedOut } = useAuth();
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
    const handleOpenJoinModal = useCallback(
       (dataObj) =>
@@ -56,23 +54,19 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             targetGroupId: targetGroupId,
             livestream: dataObj.livestream,
          }),
-      [targetGroupId]
+      [targetGroupId, userData]
    );
 
    const [isPastEvent, setIsPastEvent] = useState(
       streamIsOld(stream?.startDate)
    );
-   const { authenticatedUser, userData, isLoggedOut } = useAuth();
 
    const {
       listenToScheduledLivestreamById,
-      deregisterFromLivestream,
       listenToCareerCenterById,
       getDetailLivestreamCareerCenters,
       livestreamQuestionsQuery,
       upvoteLivestreamQuestion,
-      leaveCompanyTalentPool,
-      joinCompanyTalentPool,
    } = useFirebase();
 
    const questionsQuery = useMemo(
@@ -88,12 +82,6 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    useEffect(() => {
       smoothscroll.polyfill();
    }, []);
-
-   useEffect(() => {
-      setUserIsInTalentPool(
-         Boolean(stream && userData?.talentPools?.includes(stream?.companyId))
-      );
-   }, [stream, userData]);
 
    useEffect(() => {
       setIsPastEvent(streamIsOld(stream?.startDate));
@@ -213,6 +201,8 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
 
    const registerButtonLabel = useMemo(() => {
       if (authenticatedUser && registered) return "You're booked";
+      if (isPastEvent) return "The event is over";
+
       if (
          stream.maxRegistrants &&
          stream.maxRegistrants > 0 &&
@@ -220,12 +210,12 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          stream.maxRegistrants <= stream.registeredUsers.length
       ) {
          return "No spots left";
-      } else if (authenticatedUser) {
-         return "I'll attend";
-      } else {
-         return "Join to attend";
       }
-   }, [authenticatedUser, registered, stream]);
+      if (authenticatedUser) {
+         return "I'll attend";
+      }
+      return "Join to attend";
+   }, [authenticatedUser, registered, stream, isPastEvent]);
 
    const isRegistrationDisabled = useMemo(() => {
       if (isPastEvent) return true;
@@ -253,6 +243,14 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       const basePath = `/upcoming-livestream/${stream.id}`;
       return queries ? `${basePath}?${queries}` : basePath;
    }, [asPath, stream?.id, query.groupId, authenticatedUser, query.referrerId]);
+
+   const numberOfSpotsRemaining = useMemo(() => {
+      if (!stream.maxRegistrants) return 0;
+      else if (!stream.registeredUsers) return stream.maxRegistrants;
+      else {
+         return stream.maxRegistrants - stream.registeredUsers.length;
+      }
+   });
 
    const startRegistrationProcess = async () => {
       if (isLoggedOut || !authenticatedUser.emailVerified) {
@@ -320,7 +318,6 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       }
       return question.emailOfVoters.indexOf(authenticatedUser.email) > -1;
    }
-
    return (
       <UpcomingLayout>
          <HeadWithMeta
@@ -332,6 +329,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             registerButtonLabel={registerButtonLabel}
             disabled={isRegistrationDisabled}
             registered={registered}
+            numberOfSpotsRemaining={numberOfSpotsRemaining}
             hosts={filteredGroups}
             onRegisterClick={handleRegisterClick}
          />
@@ -351,9 +349,9 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          )}
          {!!stream.speakers.length && (
             <SpeakersSection
-               title="The speakers of this event"
                overheadText={"OUR SPEAKERS"}
                sectionRef={speakersRef}
+               backgroundColor={theme.palette.common.white}
                sectionId="speakers"
                speakers={stream.speakers}
             />
@@ -361,12 +359,17 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
 
          <QuestionsSection
             livestreamId={stream.id}
-            title={`Have any questions for the speakers?`}
+            title={
+               isPastEvent
+                  ? "Questions that were asked"
+                  : `Have any questions for the speakers?`
+            }
             handleChangeQuestionSortType={handleChangeQuestionSortType}
             getMore={handlers.getMore}
             loadingInitialQuestions={handlers.loadingInitial}
             hasVoted={hasVoted}
             sectionRef={questionsRef}
+            isPastEvent={isPastEvent}
             sectionId="questions"
             hasMore={handlers.hasMore}
             reFetchQuestions={handlers.getInitialQuery}
@@ -374,25 +377,9 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             questions={handlers.docs}
             questionSortType={questionSortType}
          />
-         {!stream.hasNoTalentPool && (
-            <TalentPoolSection
-               title={
-                  userIsInTalentPool
-                     ? "You are part of the talent pool"
-                     : "Join the Talent Pool and Get Hired"
-               }
-               stream={stream}
-               userIsInTalentPool={userIsInTalentPool}
-               backgroundColor={
-                  userIsInTalentPool ? theme.palette.primary.main : undefined
-               }
-               color={
-                  userIsInTalentPool ? theme.palette.common.white : undefined
-               }
-            />
-         )}
+         {!stream.hasNoTalentPool && <TalentPoolSection stream={stream} />}
          <ContactSection
-            title={"Any problem or question ? We want to hear from you"}
+            subtitle={"Any problem or question ? We want to hear from you"}
          />
          <RegistrationModal
             open={Boolean(joinGroupModalData)}

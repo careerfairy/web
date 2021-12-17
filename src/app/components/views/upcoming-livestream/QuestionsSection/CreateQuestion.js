@@ -15,6 +15,7 @@ import * as actions from "store/actions";
 const useStyles = makeStyles((theme) => ({
    root: {
       width: "100%",
+      padding: theme.spacing(1, 2),
    },
 }));
 const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
@@ -96,18 +97,25 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
             onChange={handleChange}
             disabled={isSubmitting}
          />
-         <Box display="flex" justifyContent="flex-end" marginTop={2}>
+         <Box
+            display="flex"
+            justifyContent="flex-start"
+            marginTop={2}
+            marginBottom={2}
+         >
             <Button
                variant="contained"
                onClick={handleSubmit}
+               style={{ width: 250 }}
                color="primary"
+               size="large"
                startIcon={
                   isSubmitting && <CircularProgress size={10} color="inherit" />
                }
                autoFocus
                disabled={isSubmitting}
             >
-               {isSubmitting ? "submitting" : "Submit"}
+               {isSubmitting ? "submitting" : "Submit Your question"}
             </Button>
          </Box>
       </div>

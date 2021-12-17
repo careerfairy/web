@@ -8,6 +8,7 @@ import {
    Paper,
 } from "@material-ui/core";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
+import { speakerPlaceholder } from "../../../util/constants";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -45,7 +46,11 @@ const SpeakerCard = ({ speaker }) => {
       <Card elevation={0} className={classes.root}>
          <CardMedia
             className={classes.cardMedia}
-            image={getResizedUrl(speaker.avatar, "md")}
+            image={
+               speaker.avatar
+                  ? getResizedUrl(speaker.avatar, "md")
+                  : speakerPlaceholder
+            }
          />
          <CardContent className={classes.cardContent}>
             <Card className={classes.innerCard} elevation={3}>

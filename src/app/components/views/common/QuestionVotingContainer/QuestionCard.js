@@ -27,7 +27,13 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const QuestionCard = ({ isPastEvent, question, handleUpvote, hasVoted }) => {
+const QuestionCard = ({
+   isPastEvent,
+   question,
+   handleUpvote,
+   hasVoted,
+   votingDisabled,
+}) => {
    const [loading, setLoading] = useState(false);
    const classes = useStyles();
    return (
@@ -46,7 +52,9 @@ const QuestionCard = ({ isPastEvent, question, handleUpvote, hasVoted }) => {
          </Box>
          <Box>
             <Button
-               disabled={hasVoted(question) || isPastEvent || loading}
+               disabled={
+                  hasVoted(question) || isPastEvent || loading || votingDisabled
+               }
                variant="text"
                size="small"
                onClick={async () => {

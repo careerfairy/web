@@ -45,6 +45,7 @@ const QuestionVotingContainer = ({
    getMore,
    hasVoted,
    handleUpvote,
+   votingDisabled,
 }) => {
    const classes = useStyles({ containerHeight });
    return (
@@ -90,6 +91,7 @@ const QuestionVotingContainer = ({
                               <QuestionCard
                                  question={question}
                                  hasVoted={hasVoted}
+                                 votingDisabled={votingDisabled}
                                  handleUpvote={handleUpvote}
                               />
                            </Grid>

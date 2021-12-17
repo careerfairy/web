@@ -12,6 +12,10 @@ import CountDown from "./CountDown";
 import HeroSpeakers from "./HeroSpeakers";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 import HeroHosts from "./HeroHosts";
+import {
+   InPersonEventBadge,
+   LimitedRegistrationsBadge,
+} from "../../NextLivestreams/GroupStreams/groupStreamCard/badges";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -24,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
       backgroundAttachment: "fixed",
       backgroundImage: ({ backgroundImage }) => `url(${backgroundImage});`,
       [theme.breakpoints.up("md")]: {
-         minHeight: "calc(100vh - 64px);",
+         minHeight: "100vh",
       },
       "&:after": {
          position: "absolute",
@@ -102,6 +106,10 @@ const useStyles = makeStyles((theme) => ({
       color: "inherit",
       textDecoration: "none !important",
    },
+   streamStatuses: {
+      paddingTop: theme.spacing(2),
+      display: "flex",
+   },
 }));
 
 const HeroSection = ({
@@ -112,6 +120,7 @@ const HeroSection = ({
    registered,
    stream,
    hosts,
+   numberOfSpotsRemaining,
 }) => {
    const classes = useStyles({ backgroundImage });
 
@@ -124,6 +133,17 @@ const HeroSection = ({
                      <Typography variant="h2" className={classes.title}>
                         {stream.title}
                      </Typography>
+                     {(stream.isFaceToFace || stream.maxRegistrants) && (
+                        <Box className={classes.streamStatuses}>
+                           {stream.isFaceToFace && <InPersonEventBadge white />}
+                           {stream.maxRegistrants && (
+                              <LimitedRegistrationsBadge
+                                 white
+                                 numberOfSpotsRemaining={numberOfSpotsRemaining}
+                              />
+                           )}
+                        </Box>
+                     )}
                      {!!stream.speakers.length && (
                         <Hidden xsDown>
                            <a

@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Avatar, Typography } from "@material-ui/core";
 import { AvatarGroup } from "@material-ui/lab";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
+import { speakerPlaceholder } from "../../../util/constants";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -38,7 +39,11 @@ const HeroSpeakers = ({ speakers }) => {
                speakers[0].lastName || ""
             }`}
             className={classes.speakerAva}
-            src={getResizedUrl(speakers[0].avatar, "sm")}
+            src={
+               speakers[0].avatar
+                  ? getResizedUrl(speakers[0].avatar, "sm")
+                  : speakerPlaceholder
+            }
          />
          <div className={classes.speakerInfo}>
             <Typography variant="body1">
@@ -55,7 +60,11 @@ const HeroSpeakers = ({ speakers }) => {
             <Avatar
                className={classes.avatar}
                key={speaker.id}
-               src={getResizedUrl(speaker.avatar, "xs")}
+               src={
+                  speaker.avatar
+                     ? getResizedUrl(speaker.avatar, "xs")
+                     : speakerPlaceholder
+               }
                title={`${speaker.firstName || ""} ${speaker.lastName || ""}`}
             />
          ))}

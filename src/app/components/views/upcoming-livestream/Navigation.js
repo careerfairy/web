@@ -48,7 +48,7 @@ const Navigation = ({ aboutRef, questionsRef, speakersRef }) => {
       let observer;
       if (tabs.length) {
          const options = {
-            threshold: 0.2,
+            threshold: 0.9,
          };
          observer = new IntersectionObserver((entries, observer) => {
             entries.forEach((entry) => {

@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useMemo, useState } from "react";
+import React, { memo, useCallback, useMemo, useState } from "react";
 import {
    Avatar,
    ListItemIcon,
@@ -93,31 +93,33 @@ const Dropdown = ({ filename, handleClose, anchorEl, urls }) => {
    );
 };
 
-export const AddToCalendar = ({ children, event, filename = "download" }) => {
-   const [anchorEl, setAnchorEl] = useState(null);
-   const urls = useMemo(() => makeUrls(event), [event]);
+export const AddToCalendar = memo(
+   ({ children, event, filename = "download" }) => {
+      const [anchorEl, setAnchorEl] = useState(null);
+      const urls = useMemo(() => makeUrls(event), [event]);
 
-   const handleClick = (event) => {
-      setAnchorEl(event.currentTarget);
-   };
-   const handleClose = () => {
-      setAnchorEl(null);
-   };
+      const handleClick = useCallback((event) => {
+         setAnchorEl(event.currentTarget);
+      }, []);
+      const handleClose = useCallback(() => {
+         setAnchorEl(null);
+      }, []);
 
-   return (
-      <div>
-         <>
-            {children(handleClick)}
-            <Dropdown
-               filename={filename}
-               anchorEl={anchorEl}
-               handleClose={handleClose}
-               urls={urls}
-            />
-         </>
-      </div>
-   );
-};
+      return (
+         <div>
+            <>
+               {children(handleClick)}
+               <Dropdown
+                  filename={filename}
+                  anchorEl={anchorEl}
+                  handleClose={handleClose}
+                  urls={urls}
+               />
+            </>
+         </div>
+      );
+   }
+);
 
 AddToCalendar.propTypes = {
    children: PropTypes.any.isRequired,

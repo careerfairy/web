@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import TopBar from "./TopBar";
 import NavBar from "./NavBar";
 import styles from "../../materialUI/styles/layoutStyles/landingLayoutStyles";
@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => {
 const drawerWidth = 300;
 const UpcomingLayout = ({ children }) => {
    const classes = useStyles();
-
+   const theme = useTheme();
    return (
       <div className={classes.root}>
          <TopBar />
@@ -43,7 +43,7 @@ const UpcomingLayout = ({ children }) => {
             <div className={classes.contentContainer}>
                <div className={classes.content}>
                   {children}
-                  <FooterV2 background={"transparent"} />
+                  <FooterV2 background={theme.palette.common.white} />
                </div>
             </div>
          </div>
