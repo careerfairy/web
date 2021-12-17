@@ -13,8 +13,8 @@ import {
 import DateUtil from "../../../../util/DateUtil";
 import CheckIcon from "@material-ui/icons/Check";
 import CalendarIcon from "@material-ui/icons/CalendarToday";
-import { makeUrls } from "../../../../util/makeUrls";
 import { useRouter } from "next/router";
+import { AddToCalendar } from "../../common/AddToCalendar";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -72,35 +72,27 @@ const CountDown = ({
    disabled,
    onRegisterClick,
    registered,
-   handleAddToCalendar,
    stream,
 }) => {
    const classes = useStyles({ registered });
-   console.log("-> stream", stream);
    const {
-      pathname,
-      asPath,
-      basePath,
       query: { livestreamId, groupId },
    } = useRouter();
-   console.log("-> pathname", pathname);
-   console.log("-> asPath", asPath);
-   console.log("-> basePath", basePath);
-   const urls = useMemo(() => {
-      const event = {
-         name: "CareerFairy Event",
-         details: "Join NOW!",
-         location: `https://careerfairy.io/upcoming-livestream/${livestreamId}${
-            groupId ? `?groupId=${groupId}` : ""
-         }`,
+   const event = useMemo(() => {
+      const linkToStream = `https://careerfairy.io/upcoming-livestream/${livestreamId}${
+         groupId ? `?groupId=${groupId}` : ""
+      }`;
+      return {
+         name: stream.title,
+         details: `Here is your Link: ${linkToStream}`,
+         location: "Hosted virtually on CareerFairy (link in the description)",
          startsAt: new Date(stream.startDate).toISOString(),
          endsAt: new Date(
             new Date(stream.startDate).getTime() +
                1 * (stream.duration || 45) * 60 * 1000
          ).toISOString(),
       };
-      return makeUrls(event);
-   }, [stream, pathname, livestreamId, groupId]);
+   }, [stream, livestreamId, groupId]);
 
    const calculateTimeLeft = () => {
       const difference = time - new Date();
@@ -140,19 +132,26 @@ const CountDown = ({
                      {DateUtil.getUpcomingDate(time)}
                   </Typography>
                   <Hidden xsDown>
-                     <Tooltip arrow placement="top" title={"Add to calendar"}>
-                        <IconButton
-                           component="a"
-                           href={urls.google}
-                           download={"events"}
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           className={classes.addToCalendarIconBtn}
-                           variant="outlined"
-                        >
-                           <CalendarIcon />
-                        </IconButton>
-                     </Tooltip>
+                     <AddToCalendar
+                        event={event}
+                        filename={`${stream.company}-event`}
+                     >
+                        {(handleClick) => (
+                           <Tooltip
+                              arrow
+                              placement="top"
+                              title={"Add to calendar"}
+                           >
+                              <IconButton
+                                 onClick={handleClick}
+                                 className={classes.addToCalendarIconBtn}
+                                 variant="outlined"
+                              >
+                                 <CalendarIcon />
+                              </IconButton>
+                           </Tooltip>
+                        )}
+                     </AddToCalendar>
                   </Hidden>
                </div>
                <Divider className={classes.divider} />
@@ -174,16 +173,29 @@ const CountDown = ({
             </Grid>
             <Hidden smUp>
                <Grid item xs={12}>
-                  <Button
-                     onClick={handleAddToCalendar}
-                     variant="outlined"
-                     fullWidth
-                     size="large"
-                     className={classes.addToCalendarBtn}
-                     startIcon={<CalendarIcon />}
+                  <AddToCalendar
+                     event={event}
+                     filename={`${stream.company}-event`}
                   >
-                     ADD TO CALENDAR
-                  </Button>
+                     {(handleClick) => (
+                        <Tooltip
+                           arrow
+                           placement="top"
+                           title={"Add to calendar"}
+                        >
+                           <Button
+                              onClick={handleClick}
+                              variant="outlined"
+                              fullWidth
+                              size="large"
+                              className={classes.addToCalendarBtn}
+                              startIcon={<CalendarIcon />}
+                           >
+                              ADD TO CALENDAR
+                           </Button>
+                        </Tooltip>
+                     )}
+                  </AddToCalendar>
                </Grid>
             </Hidden>
             <Grid item xs={12}>

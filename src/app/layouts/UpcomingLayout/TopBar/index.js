@@ -23,7 +23,10 @@ const TopBar = () => {
    const { authenticatedUser } = useAuth();
 
    return (
-      <GeneralHeader headerColors={theme.palette.primary.main}>
+      <GeneralHeader
+         position="static"
+         headerColors={theme.palette.primary.main}
+      >
          <Box display="flex" alignItems="center">
             <IconButton
                style={{ marginRight: "1rem" }}

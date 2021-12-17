@@ -70,11 +70,11 @@ const makeICSCalendarUrl = function (event) {
       components.push(urlComponent);
    }
    components.push(
-      "DTSTART:" + makeTime(event.startsAt),
-      "DTEND:" + makeTime(event.endsAt),
-      "SUMMARY:" + event.name,
-      "DESCRIPTION:" + event.details,
-      "URL:" + event.location,
+      `DTSTART:${makeTime(event.startsAt)}`,
+      `DTEND:${makeTime(event.endsAt)}`,
+      `SUMMARY:${event.name}`,
+      `DESCRIPTION:${event.details}`,
+      `LOCATION:${event.location}`,
       "END:VEVENT",
       "END:VCALENDAR"
    );

@@ -10,9 +10,10 @@ const useStyles = makeStyles((theme) => ({
       position: "sticky !important",
       top: 0,
       zIndex: theme.zIndex.appBar,
-      backgroundColor: theme.palette.background.default,
    },
    tabs: {
+      backgroundColor: theme.palette.background.default,
+      borderRadius: theme.spacing(0, 0, 0.5, 0.5),
       width: "100%",
       borderBottom: `1px solid ${alpha(theme.palette.text.secondary, 0.1)}`,
    },
