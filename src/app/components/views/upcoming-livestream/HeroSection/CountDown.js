@@ -204,6 +204,7 @@ const CountDown = ({
             </Hidden>
             <Grid item xs={12}>
                <Button
+                  id="register-button"
                   className={classes.attendBtn}
                   color={registered ? "secondary" : "primary"}
                   variant={"contained"}
