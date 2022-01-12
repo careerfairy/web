@@ -48,7 +48,11 @@ function MyApp({ Component, pageProps }) {
       dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031",
    });
 
-   const { pathname } = useRouter();
+   const {
+      pathname,
+      query: { isRecordingWindow },
+   } = useRouter();
+
    const firebase = new Firebase();
 
    const [generalError, setGeneralError] = useState("");
@@ -173,7 +177,9 @@ function MyApp({ Component, pageProps }) {
                               >
                                  {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                                  <CssBaseline />
-                                 {disableCookies ? null : <CFCookieConsent />}
+                                 {disableCookies || isRecordingWindow ? null : (
+                                    <CFCookieConsent />
+                                 )}
                                  <Component {...pageProps} />
                                  <Notifier />
                                  <ErrorSnackBar
