@@ -634,6 +634,7 @@ const GroupStreamCardV2 = memo(
                               mobile={mobile}
                               referrerId={query.referrerId}
                               groupData={groupData}
+                              isPastLivestreams={isPastLivestreams}
                               listenToUpcoming={listenToUpcoming}
                               livestream={livestream}
                            />

@@ -275,12 +275,13 @@ const UpcomingLivestreamCard = ({
 
    const status = useMemo(() => {
       const hasRegistered = Boolean(
-         livestream.registeredUsers.includes(authenticatedUser.email)
+         livestream.registeredUsers?.includes(authenticatedUser.email)
       );
       let mainButtonLabel = "Join";
       let registrationDisabled = false;
       let numberOfSpotsRemaining =
-         livestream.maxRegistrants - livestream.registeredUsers.length;
+         livestream.maxRegistrants -
+         (livestream.registeredUsers ? livestream.registeredUsers.length : 0);
       const isPastLivestream =
          livestream.start?.toDate?.() <= fortyFiveMinutesAgo;
 
@@ -290,7 +291,8 @@ const UpcomingLivestreamCard = ({
          livestream.maxRegistrants &&
          livestream.maxRegistrants > 0 &&
          livestream.registeredUsers &&
-         livestream.maxRegistrants <= livestream.registeredUsers.length
+         livestream.maxRegistrants <=
+            (livestream.registeredUsers ? livestream.registeredUsers.length : 0)
       ) {
          mainButtonLabel = "full";
       } else if (authenticatedUser) {

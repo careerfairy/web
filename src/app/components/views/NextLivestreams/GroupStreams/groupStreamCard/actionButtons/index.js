@@ -55,14 +55,15 @@ export const DetailsButton = ({
    livestream,
    groupData,
    referrerId,
+   isPastLivestreams,
    ...props
 }) => {
    const classes = useStyles();
    return (
       <Link
-         prefetch={false}
          href={{
             pathname: `/upcoming-livestream/${livestream.id}`,
+            hash: isPastLivestreams && "#about",
             query: {
                ...(!listenToUpcoming && { groupId: groupData.groupId }),
                ...(referrerId && { referrerId }),

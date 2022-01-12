@@ -35,7 +35,6 @@ function SectionHeader(props) {
    if (!props.title && !props.subtitle) {
       return null;
    }
-
    return (
       <header className={clsx(props.className, classes.sectionHeader)}>
          {props.title && (

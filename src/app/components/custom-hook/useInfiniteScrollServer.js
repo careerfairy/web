@@ -65,6 +65,7 @@ const useInfiniteScrollServer = ({ limit = 5, query }) => {
       loading,
       handleClientUpdate,
       loadingInitial,
+      getInitialQuery,
    };
 };
 
