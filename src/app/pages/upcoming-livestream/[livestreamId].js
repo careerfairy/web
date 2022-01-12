@@ -13,7 +13,7 @@ import { useFirebase } from "context/firebase";
 import { getResizedUrl } from "../../components/helperFunctions/HelperFunctions";
 import HeroSection from "../../components/views/upcoming-livestream/HeroSection";
 import { useAuth } from "../../HOCs/AuthProvider";
-import { streamIsOld } from "../../util/CommonUtil";
+import { dateIsInUnder24Hours, streamIsOld } from "../../util/CommonUtil";
 import UserUtil from "../../data/util/UserUtil";
 import { useRouter } from "next/router";
 import RegistrationModal from "../../components/views/common/registration-modal";
@@ -25,6 +25,7 @@ import TalentPoolSection from "../../components/views/upcoming-livestream/Talent
 import { useTheme } from "@material-ui/core/styles";
 import ContactSection from "../../components/views/upcoming-livestream/ContactSection";
 import Navigation from "../../components/views/upcoming-livestream/Navigation";
+import { useMediaQuery } from "@material-ui/core";
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null);
@@ -32,6 +33,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const questionsRef = useRef(null);
 
    const theme = useTheme();
+   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
 
    const [stream, setStream] = useState(parseStreamDates(serverStream));
    const [registered, setRegistered] = useState(false);
@@ -281,6 +283,14 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       }
    });
 
+   const streamAboutToStart = useMemo(() => {
+      return Boolean(
+         !isPastEvent &&
+            !stream?.isFaceToFace &&
+            dateIsInUnder24Hours(stream?.startDate)
+      );
+   }, [isPastEvent, stream?.isFaceToFace, stream?.startDate]);
+
    const startRegistrationProcess = async () => {
       if (isLoggedOut || !authenticatedUser.emailVerified) {
          return push(
@@ -355,6 +365,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          <HeroSection
             backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}
             stream={stream}
+            streamAboutToStart={streamAboutToStart}
             registerButtonLabel={registerButtonLabel}
             disabled={isRegistrationDisabled}
             registered={registered}
@@ -373,6 +384,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                sectionRef={aboutRef}
                sectionId="about"
                title={`${stream.company}`}
+               forceReveal={mobile}
                big
                overheadText={"ABOUT"}
             />

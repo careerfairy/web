@@ -29,3 +29,13 @@ export function streamIsOld(streamStartDate, minimumTimeElapsed = 120) {
    const timeElapsed = now - streamDate;
    return timeElapsed > minimumTimeElapsed * 60 * 1000;
 }
+
+/**
+ * @param {Date} date - input date
+ */
+export function dateIsInUnder24Hours(date) {
+   return (
+      new Date(date).getTime() - Date.now() < 1000 * 60 * 60 * 24 ||
+      Date.now() > new Date(date).getTime()
+   );
+}

@@ -121,6 +121,7 @@ const HeroSection = ({
    stream,
    hosts,
    numberOfSpotsRemaining,
+   streamAboutToStart,
 }) => {
    const classes = useStyles({ backgroundImage });
 
@@ -175,6 +176,7 @@ const HeroSection = ({
                                  registerButtonLabel={registerButtonLabel}
                                  time={stream.startDate}
                                  stream={stream}
+                                 streamAboutToStart={streamAboutToStart}
                                  onRegisterClick={onRegisterClick}
                                  disabled={disabled}
                                  registered={registered}
