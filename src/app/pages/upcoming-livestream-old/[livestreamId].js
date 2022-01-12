@@ -45,6 +45,7 @@ import {
 import Link from "materialUI/NextNavLink";
 import GeneralLayout from "../../layouts/GeneralLayout";
 import RegistrationModal from "../../components/views/common/registration-modal";
+import { getServerStreamData } from "../../util/serverUtil";
 
 const useStyles = makeStyles((theme) => ({
    speakerAvatar: {
@@ -1400,39 +1401,7 @@ export async function getServerSideProps({
       doc: livestreamId,
    });
    if (snap.exists) {
-      serverSideLivestream = snap.data();
-      // Clear out sensitive data for initial props
-      delete serverSideLivestream.registeredUsers;
-      delete serverSideLivestream.registeredStudentsCount;
-      delete serverSideLivestream.currentSpeakerId;
-      delete serverSideLivestream.participatingStudents;
-      delete serverSideLivestream.participatingStudentsCount;
-      delete serverSideLivestream.talentPool;
-      delete serverSideLivestream.targetGroups;
-      delete serverSideLivestream.hasStarted;
-      delete serverSideLivestream.hasSentEmails;
-      delete serverSideLivestream.liveSpeakers;
-      delete serverSideLivestream.hasEnded;
-      delete serverSideLivestream.hidden;
-      delete serverSideLivestream.test;
-      delete serverSideLivestream.adminEmails;
-      delete serverSideLivestream.adminEmail;
-      delete serverSideLivestream.author;
-      delete serverSideLivestream.lastUpdatedAuthorInfo;
-      delete serverSideLivestream.status;
-
-      serverSideLivestream.id = snap.id;
-      serverSideLivestream.createdDateString =
-         serverSideLivestream.created?.toDate?.().toString() || null;
-      serverSideLivestream.lastUpdatedDateString =
-         serverSideLivestream.lastUpdated?.toDate?.().toString() || null;
-      serverSideLivestream.startDateString =
-         serverSideLivestream.start?.toDate?.().toString() || null;
-
-      // Clear out props that have methods of which the server can't parse
-      delete serverSideLivestream.created;
-      delete serverSideLivestream.lastUpdated;
-      delete serverSideLivestream.start;
+      serverSideLivestream = getServerStreamData(snap);
    }
    return {
       props: { serverSideLivestream, groupId: groupId || null }, // will be passed to the page component as props
