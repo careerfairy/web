@@ -1,7 +1,9 @@
 import React, { memo, useEffect, useMemo, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
+   Box,
    Button,
+   Collapse,
    Divider,
    Grid,
    Hidden,
@@ -15,6 +17,7 @@ import CheckIcon from "@material-ui/icons/Check";
 import CalendarIcon from "@material-ui/icons/CalendarToday";
 import { useRouter } from "next/router";
 import { AddToCalendar } from "../../common/AddToCalendar";
+import { Alert } from "@material-ui/lab";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -56,6 +59,15 @@ const useStyles = makeStyles((theme) => ({
    },
    dateTime: {
       fontWeight: 500,
+   },
+   streamStartingNoticeWrapper: {
+      paddingBottom: theme.spacing(1),
+      [theme.breakpoints.up("sm")]: {
+         paddingBottom: theme.spacing(2),
+      },
+   },
+   alert: {
+      borderRadius: theme.spacing(1),
    },
    addToCalendarIconBtn: {
       border: `1px solid ${theme.palette.text.secondary}`,
@@ -116,8 +128,10 @@ const CountDown = ({
    onRegisterClick,
    registered,
    stream,
+   streamAboutToStart,
 }) => {
    const classes = useStyles({ registered });
+
    const {
       query: { livestreamId, groupId },
    } = useRouter();
@@ -141,6 +155,18 @@ const CountDown = ({
       <Paper className={classes.root}>
          <Grid container spacing={2}>
             <Grid item xs={12}>
+               <Collapse in={streamAboutToStart}>
+                  <Box className={classes.streamStartingNoticeWrapper}>
+                     <Alert
+                        className={classes.alert}
+                        variant="standard"
+                        severity="info"
+                     >
+                        PLEASE WAIT HERE! YOU WILL BE REDIRECTED WHEN THE STREAM
+                        STARTS.
+                     </Alert>
+                  </Box>
+               </Collapse>
                <div className={classes.dateTimeWrapper}>
                   <Typography
                      align="center"
@@ -173,6 +199,7 @@ const CountDown = ({
                   </Hidden>
                </div>
                <Divider className={classes.divider} />
+
                <TimerText time={time} />
             </Grid>
             <Hidden smUp>

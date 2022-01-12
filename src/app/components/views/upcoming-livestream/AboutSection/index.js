@@ -39,14 +39,14 @@ const AboutSection = (props) => {
       >
          <SectionContainer>
             {props.overheadText && (
-               <Fade bottom>
+               <Fade fraction={props.forceReveal ? 0 : 0.2} bottom>
                   <Box marginBottom={2}>
                      <HighlightText text={props.overheadText} />
                   </Box>
                </Fade>
             )}
             {props.title && (
-               <Fade bottom>
+               <Fade fraction={props.forceReveal ? 0 : 0.2} bottom>
                   <SectionHeader
                      color={props.color}
                      className={classes.header}
@@ -56,7 +56,7 @@ const AboutSection = (props) => {
                   />
                </Fade>
             )}
-            <Fade bottom>
+            <Fade fraction={props.forceReveal ? 0 : 0.2} bottom>
                <Box>
                   <Typography
                      style={{ whiteSpace: "pre-line" }}
