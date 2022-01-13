@@ -27,8 +27,8 @@ export const getServerSideStream = async (livestreamId) => {
       if (livestreamSnap.exists) {
          serverSideStream = getServerStreamData(livestreamSnap);
       }
-      return serverSideStream;
    }
+   return serverSideStream;
 };
 
 export const serializeServerSideStream = (serverSideStream) => {
