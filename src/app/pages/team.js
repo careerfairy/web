@@ -32,7 +32,7 @@ const TeamPage = () => {
          name: "Quality",
          description:
             "We aim to provide the best \n" +
-            "Live Stream qualify for both \n" +
+            "Live Stream quality for both \n" +
             "talents and companies.",
          imageUrl: qualityShape,
       },
