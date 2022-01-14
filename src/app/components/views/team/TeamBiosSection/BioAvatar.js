@@ -30,7 +30,7 @@ const BioAvatar = (props) => (
             href={props.person.linkedinUrl}
             alt="linkedin"
          >
-            <LinkedInIcon fontSize="default" />
+            <LinkedInIcon fontSize="medium" />
          </SmallAvatar>
       }
    >

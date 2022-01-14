@@ -4,9 +4,11 @@ import Typography from "@material-ui/core/Typography";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
-import { MultilineText } from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
+   root: {
+      width: "100%",
+   },
    avatar: {
       width: theme.spacing(20),
       height: theme.spacing(20),
@@ -49,7 +51,7 @@ export const TeamMemberCard = (props) => {
          onMouseEnter={handleMouseEnter}
          onMouseLeave={handleMouseLeave}
          raised={hovered}
-         className={clsx({
+         className={clsx(classes.root, {
             [classes.greenBorder]: hovered,
          })}
       >

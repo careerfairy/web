@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Grid } from "@material-ui/core";
 import { TeamMemberCard } from "./TeamMemberCard";
@@ -18,9 +18,14 @@ TeamMemberCard.propTypes = {
 };
 const TeamBios = ({ people }) => {
    const classes = useStyles();
+   const [mounted, setMounted] = useState(false);
    const theme = useTheme();
+   useEffect(() => {
+      // Masonry library malfunctions on the server side, so mui grid is used initially
+      setMounted(true);
+   }, []);
 
-   return (
+   return mounted ? (
       <ResponsiveMasonry
          columnsCountBreakPoints={{ 350: 1, 800: 2, 1280: 2, 1450: 3 }}
       >
@@ -41,26 +46,23 @@ const TeamBios = ({ people }) => {
             ))}
          </Masonry>
       </ResponsiveMasonry>
+   ) : (
+      <Grid container justify="center" spacing={4}>
+         {people.map((person, index) => (
+            <Grid
+               item
+               className={classes.gridItem}
+               xs={12}
+               sm={12}
+               md={6}
+               lg={4}
+               key={person.id}
+            >
+               <TeamMemberCard person={person} classes={classes} />
+            </Grid>
+         ))}
+      </Grid>
    );
-   // return (
-   //     <Grid
-   //         container
-   //           justify="center"
-   //           spacing={4}>
-   //         {people.map((person, index) => (
-   //             <Grid
-   //                 item
-   //                 className={classes.gridItem}
-   //                 xs={12}
-   //                 sm={12}
-   //                 md={6}
-   //                 key={index}
-   //             >
-   //                 <TeamMemberCard person={person} classes={classes}/>
-   //             </Grid>
-   //         ))}
-   //     </Grid>
-   // );
 };
 
 TeamBios.propTypes = {

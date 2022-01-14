@@ -100,18 +100,10 @@ const people = [
       bio: "",
       linkedinUrl: "https://www.linkedin.com/in/gary-terol/",
    },
-   // {
-   //    id: 10,
-   //    avatar: "",
-   //    name: "",
-   //    role: "",
-   //    bio: "",
-   //    linkedinUrl: "",
-   // },
 ];
 
 const shuffledPeople = shuffleArray(people);
-console.table(shuffledPeople);
+
 const TeamBiosSection = (props) => {
    return (
       <Section
