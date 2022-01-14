@@ -34,6 +34,7 @@ const Section = (props) => {
       backgroundImage,
       backgroundImageOpacity,
       backgroundImageRepeat,
+      backgroundImagePosition,
       children,
       backgroundColor,
       backgroundImageClassName,
@@ -61,6 +62,7 @@ const Section = (props) => {
          {backgroundImage && (
             <BackgroundImage
                className={backgroundImageClassName}
+               imagePosition={backgroundImagePosition}
                image={backgroundImage}
                opacity={backgroundImageOpacity}
                repeat={backgroundImageRepeat}

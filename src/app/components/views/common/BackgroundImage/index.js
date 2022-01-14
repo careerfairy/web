@@ -7,7 +7,7 @@ const useStyles = makeStyles((theme) => ({
    backgroundImage: {
       backgroundImage: (props) => `url(${props.image})`,
       opacity: (props) => props.opacity,
-      backgroundPosition: "center center",
+      backgroundPosition: (props) => props.imagePosition,
       backgroundSize: "cover",
       top: "0",
       left: "0",
@@ -22,10 +22,17 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const BackgroundImage = ({ image, opacity, repeat, className }) => {
+const BackgroundImage = ({
+   image,
+   opacity,
+   repeat,
+   className,
+   imagePosition = "center center",
+}) => {
    const classes = useStyles({
       opacity: opacity,
       image: image,
+      imagePosition,
    });
    return (
       <div

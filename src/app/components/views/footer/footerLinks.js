@@ -36,10 +36,10 @@ const footerLinks = [
    {
       category: "3",
       links: [
-         // {
-         //    label: "Discover",
-         //    href: "/discover",
-         // },
+         {
+            label: "Team",
+            href: "/team",
+         },
          {
             label: "Companies",
             href: "/companies",
