@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const TopBar = () => {
+const TopBar = ({ headerProps, navLinksProps }) => {
    const theme = useTheme();
    const { GeneralHeader, headerColors } = useGeneralHeader();
    const classes = useStyles({
@@ -34,7 +34,7 @@ const TopBar = () => {
    const { authenticatedUser } = useAuth();
 
    return (
-      <GeneralHeader headerColors={headerColors} permanent>
+      <GeneralHeader headerColors={headerColors} permanent {...headerProps}>
          <Box display="flex" alignItems="center">
             <IconButton
                style={{ marginRight: "1rem" }}
@@ -49,6 +49,7 @@ const TopBar = () => {
             <NavLinks
                links={mainLinks}
                navLinksActiveColor={theme.palette.primary.main}
+               {...navLinksProps}
             />
          </Hidden>
          <Box display="flex" alignItems="center">

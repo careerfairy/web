@@ -27,39 +27,47 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 //
-function SectionHeader(props) {
+function SectionHeader({
+   className,
+   color,
+   hasSearch,
+   subTitleClassName,
+   subtitle,
+   title,
+   titleClassName,
+   subTitleVariant = "subtitle1",
+   titleVariant = "h3",
+}) {
    const classes = useStyles({
-      color: props.color,
+      color: color,
    });
    // Render nothing if no title or subtitle
-   if (!props.title && !props.subtitle) {
+   if (!title && !subtitle) {
       return null;
    }
    return (
-      <header className={clsx(props.className, classes.sectionHeader)}>
-         {props.title && (
+      <header className={clsx(className, classes.sectionHeader)}>
+         {title && (
             <Typography
                gutterBottom
-               className={props.titleClassName}
+               className={titleClassName}
                align="center"
-               variant="h3"
+               variant={titleVariant}
                component="h3"
                margin={20}
             >
-               {props.title}
+               {title}
             </Typography>
          )}
 
-         {props.subtitle && (
-            <Typography align="center" component="h5" variant="subtitle1">
-               <span
-                  className={clsx(classes.subtitle, props.subTitleClassName)}
-               >
-                  {props.subtitle}
+         {subtitle && (
+            <Typography align="center" component="h5" variant={subTitleVariant}>
+               <span className={clsx(classes.subtitle, subTitleClassName)}>
+                  {subtitle}
                </span>
             </Typography>
          )}
-         {props.hasSearch && (
+         {hasSearch && (
             <div className={classes.searchWrapper}>
                <GeneralSearch />
             </div>

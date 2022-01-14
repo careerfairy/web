@@ -379,3 +379,9 @@ export const addMinutesToDate = (date, minutes) => {
    const newDate = new Date(date);
    return new Date(newDate.getTime() + minutes * 60000);
 };
+
+export const shuffleArray = (array) =>
+   array
+      .map((value) => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);

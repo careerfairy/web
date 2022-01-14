@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Box, Container, Typography } from "@material-ui/core";
 import Section from "../../common/Section";
 import SectionHeader from "../../common/SectionHeader";
+import BenefitsGrid from "../../common/BenefitsGrid";
 
 const useStyles = makeStyles((theme) => ({
    container: {
@@ -21,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const HeroSection = (props) => {
+const ValuesSection = (props) => {
    const classes = useStyles();
 
    return (
@@ -43,20 +44,14 @@ const HeroSection = (props) => {
                subtitle={props.subtitle}
             />
             <Box marginTop={3}>
-               <Typography
-                  align="center"
-                  variant="subtitle1"
-                  className={classes.bodyText}
-               >
-                  {props.bodyText}
-               </Typography>
+               <BenefitsGrid benefits={props.valuesData} />
             </Box>
          </Container>
       </Section>
    );
 };
 
-HeroSection.propTypes = {
+ValuesSection.propTypes = {
    backgroundColor: PropTypes.string,
    backgroundImage: PropTypes.string,
    backgroundImageOpacity: PropTypes.number,
@@ -64,4 +59,4 @@ HeroSection.propTypes = {
    subtitle: PropTypes.string,
    title: PropTypes.string,
 };
-export default HeroSection;
+export default ValuesSection;

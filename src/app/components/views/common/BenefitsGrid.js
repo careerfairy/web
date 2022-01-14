@@ -1,7 +1,7 @@
 import React from "react";
 import { Grid } from "@material-ui/core";
 import MuiGridFade from "materialUI/animations/MuiGridFade";
-import BenefitCard from "./BenefitCard";
+import BenefitCard from "../landing/common/BenefitCard";
 
 const BenefitsGrid = ({
    benefits,

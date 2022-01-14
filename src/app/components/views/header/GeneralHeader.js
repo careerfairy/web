@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
 import HideOnScroll from "../../../components/views/common/HideOnScroll";
 import { AppBar, Toolbar } from "@material-ui/core";
@@ -39,19 +39,12 @@ const GeneralHeader = ({
    transparent,
    children,
    permanent,
-   headerColors,
    className,
    position,
    ...rest
 }) => {
-   const theme = useTheme();
    const absolute = position === "absolute";
-   const classes = useStyles({
-      navLinksActiveColor:
-         headerColors?.navLinksActiveColor || theme.palette.grey["800"],
-      backgroundColor:
-         headerColors?.backgroundColor || theme.palette.common.white,
-   });
+   const classes = useStyles();
 
    const [scrolled, setScrolled] = useState(false);
 

@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
 import SectionContainer from "../../common/Section/Container";
-import BenefitsGrid from "../common/BenefitsGrid";
+import BenefitsGrid from "../../common/BenefitsGrid";
 
 const useStyles = makeStyles((theme) => ({
    subTitle: {
