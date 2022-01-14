@@ -53,7 +53,7 @@ const TeamPage = () => {
             // backgroundImage={placeholderBackground}
             backgroundImagePosition="top"
             backgroundImage={teamPhoto}
-            backgroundImageOpacity={0.3}
+            backgroundImageOpacity={0.2}
             title="About Us"
             subtitle="CareerFairy was launched in the summer of 2019 and is an ETH Zurich spinoff."
             bodyText="We are a fast-growing HR-Tech startup with the mission to empower talents from all over

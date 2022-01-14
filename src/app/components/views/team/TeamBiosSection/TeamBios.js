@@ -29,11 +29,11 @@ const TeamBios = ({ people }) => {
       <ResponsiveMasonry
          columnsCountBreakPoints={{ 350: 1, 800: 2, 1280: 2, 1450: 3 }}
       >
-         <Masonry gutter={`${theme.spacing(4)}px`}>
+         <Masonry gutter={`${theme.spacing(2)}px`}>
             {people.map((person, index) => (
                <Bounce
                   key={person.id}
-                  delay={index % 2 !== 0 ? 300 : 0}
+                  delay={index % 2 !== 0 ? 200 : 0}
                   left={index % 2 === 0}
                   right={index % 2 !== 0}
                >

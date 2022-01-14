@@ -7,6 +7,7 @@ import SectionHeader from "../../common/SectionHeader";
 
 const useStyles = makeStyles((theme) => ({
    container: {
+      paddingTop: theme.spacing(2),
       zIndex: 1,
       "&.MuiContainer-root": {
          position: "relative",
