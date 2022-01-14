@@ -27,7 +27,6 @@ const ValuesSection = (props) => {
 
    return (
       <Section
-         big
          color={props.color}
          backgroundImage={props.backgroundImage}
          backgroundImageOpacity={props.backgroundImageOpacity}

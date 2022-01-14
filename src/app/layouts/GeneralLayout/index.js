@@ -8,13 +8,7 @@ import FooterV2 from "../../components/views/footer/FooterV2";
 const useStyles = makeStyles(styles);
 
 const drawerWidth = 300;
-const GeneralLayout = ({
-   children,
-   fullScreen,
-   navLinksProps,
-   headerProps,
-   noPaddingTop,
-}) => {
+const GeneralLayout = ({ children, fullScreen }) => {
    const classes = useStyles();
 
    return (
@@ -22,12 +16,9 @@ const GeneralLayout = ({
          style={{ minHeight: fullScreen && "100vh" }}
          className={classes.root}
       >
-         <TopBar headerProps={headerProps} navLinksProps={navLinksProps} />
+         <TopBar />
          <NavBar drawerWidth={drawerWidth} />
-         <div
-            style={{ paddingTop: noPaddingTop && "0 !important" }}
-            className={classes.wrapper}
-         >
+         <div className={classes.wrapper}>
             <div className={classes.contentContainer}>
                <div className={classes.content}>
                   {children}

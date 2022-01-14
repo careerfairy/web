@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
    subTitle: {},
    bodyText: {
       color: theme.palette.common.white,
+      opacity: 0.9,
    },
 }));
 
@@ -29,6 +30,7 @@ const HeroSection = (props) => {
          big
          color={props.color}
          backgroundImage={props.backgroundImage}
+         backgroundImagePosition={props.backgroundImagePosition}
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
@@ -45,7 +47,7 @@ const HeroSection = (props) => {
             <Box marginTop={3}>
                <Typography
                   align="center"
-                  variant="subtitle1"
+                  variant="h6"
                   className={classes.bodyText}
                >
                   {props.bodyText}

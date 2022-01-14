@@ -8,6 +8,8 @@ import { honestyShape, ideaShape, qualityShape } from "../constants/images";
 
 const placeholderBackground =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2F6098fdd8-f209-4736-8db7-d86025eb1806_CF.PNG?alt=media";
+const teamPhoto =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fteam-photo.jpeg?alt=media&token=42a24b6a-8b26-4493-a460-75fb20e11bf9";
 const TeamPage = () => {
    const {
       palette: {
@@ -48,8 +50,10 @@ const TeamPage = () => {
          <HeroSection
             color={white}
             backgroundColor={navyBlue.main}
-            backgroundImage={placeholderBackground}
-            backgroundImageOpacity={0.5}
+            // backgroundImage={placeholderBackground}
+            backgroundImagePosition="top"
+            backgroundImage={teamPhoto}
+            backgroundImageOpacity={0.3}
             title="About Us"
             subtitle="CareerFairy was launched in the summer of 2019 and is an ETH Zurich spinoff."
             bodyText="We are a fast-growing HR-Tech startup with the mission to empower talents from all over
@@ -60,10 +64,13 @@ work at the company."
          />
          <ValuesSection
             title="Our core values"
-            backgroundColor={background.default}
+            backgroundColor={white}
             valuesData={valuesData}
          />
-         <TeamBiosSection backgroundColor={white} title="Meet our team" />
+         <TeamBiosSection
+            backgroundColor={background.default}
+            title="Meet our team"
+         />
       </UpcomingLayout>
    );
 };

@@ -47,7 +47,7 @@ const TeamBios = ({ people }) => {
          </Masonry>
       </ResponsiveMasonry>
    ) : (
-      <Grid container justify="center" spacing={4}>
+      <Grid container justifyContent="center" spacing={4}>
          {people.map((person, index) => (
             <Grid
                item

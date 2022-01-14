@@ -6,7 +6,17 @@ import Section from "../../common/Section";
 import SectionHeader from "../../common/SectionHeader";
 import { shuffleArray } from "../../../helperFunctions/HelperFunctions";
 
-const useStyles = makeStyles((theme) => ({}));
+const useStyles = makeStyles((theme) => ({
+   container: {
+      zIndex: 1,
+      "&.MuiContainer-root": {
+         position: "relative",
+      },
+   },
+   title: {
+      fontWeight: 500,
+   },
+}));
 const people = [
    {
       id: 1,
@@ -105,6 +115,7 @@ const people = [
 const shuffledPeople = shuffleArray(people);
 
 const TeamBiosSection = (props) => {
+   const classes = useStyles();
    return (
       <Section
          color={props.color}
@@ -112,10 +123,11 @@ const TeamBiosSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         <Container>
+         <Container className={classes.container}>
             <SectionHeader
                title={props.title}
                subtitle={props.subtitle}
+               titleClassName={classes.title}
                color={props.color}
                size={3}
                spaced={true}
