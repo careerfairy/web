@@ -1066,6 +1066,14 @@ class Firebase {
          .orderBy("votes", "desc");
       return ref.onSnapshot(callback);
    };
+   livestreamQuestionsQuery = (livestreamId, sortType = "votes") => {
+      if (!livestreamId) return;
+      return this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("questions")
+         .orderBy(sortType, "desc");
+   };
 
    listenToQuestionComments = (streamRef, questionId, callback) => {
       let ref = streamRef
@@ -1184,15 +1192,10 @@ class Firebase {
          .doc(livestreamId)
          .collection("questions")
          .doc(question.id);
-      return this.firestore.runTransaction((transaction) => {
-         return transaction.get(ref).then((question) => {
-            transaction.update(ref, {
-               votes: question.data().votes + 1,
-               emailOfVoters: firebase.firestore.FieldValue.arrayUnion(
-                  userEmail
-               ),
-            });
-         });
+
+      return ref.update({
+         votes: firebase.firestore.FieldValue.increment(1),
+         emailOfVoters: firebase.firestore.FieldValue.arrayUnion(userEmail),
       });
    };
 
@@ -3051,6 +3054,25 @@ class Firebase {
          title,
          ...(index && { index: index }),
       };
+   };
+
+   getEventsWithArrayOfIds = async (arrayOfIds = []) => {
+      const eventSnaps = await Promise.all(
+         arrayOfIds.map((eventId) =>
+            this.firestore.collection("livestreams").doc(eventId).get()
+         )
+      );
+
+      return eventSnaps
+         .filter((doc) => doc.exists)
+         .map((doc) => ({ id: doc.id, ...doc.data() }));
+   };
+
+   listenToRecommendedEvents = (recommendedEventIds, callback) => {
+      const ref = this.firestore
+         .collection("livestreams")
+         .where("id", "in", recommendedEventIds || []);
+      return ref.onSnapshot(callback);
    };
 
    getUsersByIdsWithCache = async (arrayOfUserIds = []) => {

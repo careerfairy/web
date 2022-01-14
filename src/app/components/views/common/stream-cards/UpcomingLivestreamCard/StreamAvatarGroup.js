@@ -7,7 +7,7 @@ import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
    avatar: {
-      background: theme.palette.background.paper,
+      background: theme.palette.common.white,
       border: `2px solid ${alpha(theme.palette.text.secondary, 0.2)}`,
       width: theme.spacing(6),
       height: theme.spacing(6),

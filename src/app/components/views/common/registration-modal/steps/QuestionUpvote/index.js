@@ -1,0 +1,156 @@
+import React, { useContext, useEffect, useState } from "react";
+import { useFirebase } from "context/firebase";
+import {
+   Box,
+   Button,
+   Collapse,
+   DialogActions,
+   DialogContent,
+   DialogTitle,
+   Hidden,
+   useMediaQuery,
+} from "@material-ui/core";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { RegistrationContext } from "context/registration/RegistrationContext";
+import { useAuth } from "../../../../../../HOCs/AuthProvider";
+import { useRouter } from "next/router";
+import GroupLogo from "../../common/GroupLogo";
+import QuestionVotingContainer from "../../../QuestionVotingContainer";
+
+const questionsContainerHeight = 400;
+const mobileQuestionsContainerHeight = 300;
+const useStyles = makeStyles((theme) => ({
+   root: {},
+   actions: {
+      display: "flex",
+      flexFlow: "column",
+      alignItems: "center",
+   },
+   content: {
+      padding: theme.spacing(1),
+   },
+}));
+
+const QuestionUpvote = () => {
+   const {
+      handleNext,
+      group,
+      livestream,
+      hasMore,
+      getMore,
+      questions,
+      handleClientSideQuestionUpdate,
+      sliding,
+      handleChangeQuestionSortType,
+      questionSortType,
+      loadingInitialQuestions,
+   } = useContext(RegistrationContext);
+   const classes = useStyles();
+   const [show, setShow] = useState(false);
+   const theme = useTheme();
+   const mobile = useMediaQuery(theme.breakpoints.down("xs"));
+   const containerHeight = mobile
+      ? mobileQuestionsContainerHeight
+      : questionsContainerHeight;
+
+   useEffect(() => {
+      const timeout = setTimeout(() => {
+         setShow(true);
+      }, 300);
+
+      return () => clearTimeout(timeout);
+   }, [show]);
+   const { upvoteLivestreamQuestion } = useFirebase();
+
+   const { push } = useRouter();
+   const { authenticatedUser } = useAuth();
+
+   useEffect(() => {
+      if (!questions.length && !hasMore) {
+         handleNext();
+      }
+   }, [questions, hasMore]);
+
+   const handleUpvote = async (question) => {
+      if (!authenticatedUser) {
+         return push("/signup");
+      }
+      try {
+         await upvoteLivestreamQuestion(
+            livestream.id,
+            question,
+            authenticatedUser.email
+         );
+
+         handleClientSideQuestionUpdate(question.id, {
+            votes: question.votes + 1 || 1,
+            emailOfVoters: question.emailOfVoters?.concat(
+               authenticatedUser.email
+            ) || [authenticatedUser.email],
+         });
+      } catch (e) {}
+   };
+
+   function hasVoted(question) {
+      if (!authenticatedUser || !question.emailOfVoters) {
+         return false;
+      }
+      return question.emailOfVoters.indexOf(authenticatedUser.email) > -1;
+   }
+
+   if (!livestream) return null;
+
+   return (
+      <div className={classes.root}>
+         <Box width="100%" display="flex" justifyContent="center">
+            <Hidden xsDown>
+               <GroupLogo logoUrl={group.logoUrl} />
+            </Hidden>
+         </Box>
+         <DialogTitle align="center">
+            WHICH QUESTIONS SHOULD THE SPEAKER ANSWER?
+         </DialogTitle>
+         <DialogContent className={classes.content}>
+            <Collapse in={Boolean(questions.length && !sliding && show)}>
+               <QuestionVotingContainer
+                  questions={questions}
+                  handleChangeQuestionSortType={handleChangeQuestionSortType}
+                  questionSortType={questionSortType}
+                  headerButton={
+                     <Hidden mdUp>
+                        <Button
+                           variant="contained"
+                           onClick={handleNext}
+                           color="primary"
+                        >
+                           Next
+                        </Button>
+                     </Hidden>
+                  }
+                  containerHeight={containerHeight}
+                  getMore={getMore}
+                  handleUpvote={handleUpvote}
+                  hasMore={hasMore}
+                  hasVoted={hasVoted}
+                  loadingInitialQuestions={loadingInitialQuestions}
+               />
+            </Collapse>
+            <Hidden smDown>
+               <DialogActions>
+                  <Button
+                     variant="contained"
+                     size="large"
+                     onClick={handleNext}
+                     color="primary"
+                     autoFocus
+                  >
+                     Next
+                  </Button>
+               </DialogActions>
+            </Hidden>
+         </DialogContent>
+      </div>
+   );
+};
+
+export default QuestionUpvote;

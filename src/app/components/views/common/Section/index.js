@@ -7,12 +7,16 @@ import BackgroundImage from "../BackgroundImage";
 
 const useStyles = makeStyles((theme) => ({
    sectionComponent: {
+      transition: theme.transitions.create(["background", "color"], {
+         easing: theme.transitions.easing.easeInOut,
+         duration: theme.transitions.duration.standard,
+      }),
       background: (props) => props.backgroundColor,
       display: "block",
       position: "relative",
       [theme.breakpoints.up("sm")]: {
-         paddingTop: (props) => (props.big ? 160 : 80),
-         paddingBottom: (props) => (props.big ? 160 : 80),
+         paddingTop: (props) => (props.big ? 160 : 60),
+         paddingBottom: (props) => (props.big ? 160 : 60),
       },
       [theme.breakpoints.down("sm")]: {
          paddingTop: 48,
@@ -35,6 +39,8 @@ const Section = (props) => {
       backgroundImageClassName,
       big,
       className,
+      sectionRef,
+      sectionId,
       // Passed to section element
       ...otherProps
    } = props;
@@ -45,9 +51,10 @@ const Section = (props) => {
    });
 
    return (
-      <Box
-         component="section"
+      <section
          className={clsx(classes.sectionComponent, className)}
+         ref={sectionRef}
+         id={sectionId}
          {...otherProps}
       >
          {props.children}
@@ -59,7 +66,7 @@ const Section = (props) => {
                repeat={backgroundImageRepeat}
             />
          )}
-      </Box>
+      </section>
    );
 };
 Section.propTypes = {

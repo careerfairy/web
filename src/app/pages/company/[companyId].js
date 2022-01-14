@@ -11,6 +11,7 @@ import Loader from "../../components/views/loader/Loader";
 
 function CompanyProfile(props) {
    const router = useRouter();
+   console.log("-> props", props);
    const [company, setCompanyData] = useState(null);
    const [loading, setLoading] = useState(true);
 

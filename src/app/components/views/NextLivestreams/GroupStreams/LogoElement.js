@@ -1,8 +1,7 @@
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import GroupJoinModal from "../../profile/GroupJoinModal";
 import { useRouter } from "next/router";
 import Avatar from "@material-ui/core/Avatar";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
@@ -22,24 +21,16 @@ const LogoElement = ({
    livestreamId,
    hideFollow,
    className,
+   handleOpenJoinModal,
 }) => {
    const classes = useStyles();
    const router = useRouter();
 
    const linkToStream = `/next-livestreams?careerCenterId=${careerCenter.groupId}&livestreamId=${livestreamId}`;
 
-   const [openJoinModal, setOpenJoinModal] = useState(false);
-
-   const handleCloseJoinModal = () => {
-      setOpenJoinModal(false);
-   };
-   const handleOpenJoinModal = () => {
-      setOpenJoinModal(true);
-   };
-
    const handleJoin = () => {
       if (userData) {
-         handleOpenJoinModal();
+         handleOpenJoinModal({ groups: [careerCenter] });
       } else {
          return router.push({
             pathname: "/login",
@@ -69,13 +60,6 @@ const LogoElement = ({
                Follow{" "}
             </Button>
          )}
-         <GroupJoinModal
-            open={openJoinModal}
-            group={careerCenter}
-            alreadyJoined={false}
-            userData={userData}
-            closeModal={handleCloseJoinModal}
-         />
       </div>
    );
 };

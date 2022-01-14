@@ -28,7 +28,13 @@ const LowerMainContent = ({
                   <Grid xs={"auto"} item key={group.id}>
                      <GroupLogoButton
                         handleFollow={
-                           following ? null : () => handleOpenJoinModal(group)
+                           following
+                              ? null
+                              : () =>
+                                   handleOpenJoinModal({
+                                      groups: [group],
+                                      livestream,
+                                   })
                         }
                         group={group}
                      />

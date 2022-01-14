@@ -1,5 +1,22 @@
 import { store } from "../pages/_app";
 
+export const getServerStreamData = (livestreamSnap) => {
+   const streamData = livestreamSnap.data();
+   return {
+      id: livestreamSnap.id,
+      company: streamData.company,
+      title: streamData.title,
+      companyLogoUrl: streamData.companyLogoUrl,
+      backgroundImageUrl: streamData.backgroundImageUrl,
+      speakers: streamData.speakers,
+      summary: streamData.summary,
+      createdDateString: streamData.created?.toDate?.().toString() || null,
+      lastUpdatedDateString:
+         streamData.lastUpdated?.toDate?.().toString() || null,
+      startDateString: streamData.start?.toDate?.().toString() || null,
+   };
+};
+
 export const getServerSideStream = async (livestreamId) => {
    let serverSideStream = null;
    if (livestreamId) {
@@ -8,15 +25,7 @@ export const getServerSideStream = async (livestreamId) => {
          doc: livestreamId,
       });
       if (livestreamSnap.exists) {
-         const streamData = livestreamSnap.data();
-         serverSideStream = {
-            id: livestreamSnap.id,
-            company: streamData.company,
-            title: streamData.title,
-            companyLogoUrl: streamData.companyLogoUrl,
-            backgroundImageUrl: streamData.backgroundImageUrl,
-            summary: streamData.summary,
-         };
+         serverSideStream = getServerStreamData(livestreamSnap);
       }
    }
    return serverSideStream;

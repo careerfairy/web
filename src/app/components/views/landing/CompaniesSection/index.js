@@ -3,7 +3,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
-import HighlightText from "../common/HighlightText";
+import HighlightText from "../../common/HighlightText";
 import landingCompanies from "../../../../constants/landingCompanies";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 import Logo from "../common/Logo";
@@ -16,7 +16,6 @@ const useStyles = makeStyles((theme) => ({
       [theme.breakpoints.down("sm")]: {
          paddingTop: 40,
       },
-      // paddingTop: 0
    },
    subTitle: {
       color: theme.palette.text.secondary,

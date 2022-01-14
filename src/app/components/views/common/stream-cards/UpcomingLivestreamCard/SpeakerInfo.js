@@ -57,11 +57,16 @@ const SpeakerInfo = ({ speaker }) => {
             className={classes.speakerAvatar}
          />
          <div className={classes.speakerInfoWrapper}>
-            <Typography variant="h6" className={classes.speakerName}>
+            <Typography
+               variant="h6"
+               align="left"
+               className={classes.speakerName}
+            >
                {speaker.firstName}
             </Typography>
             <Typography
                variant="subtitle1"
+               align="left"
                color="textSecondary"
                className={classes.speakerPosition}
             >
