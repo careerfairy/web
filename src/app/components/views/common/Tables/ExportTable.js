@@ -1,8 +1,9 @@
 import MaterialTable from "@material-table/core";
-import {
-   ExportCsv,
-   // ,ExportPdf
-} from "@material-table/exporters";
+// import {
+//    ExportCsv,
+//    // ,ExportPdf
+// } from "@material-table/exporters";
+import ExportCsv from "@material-table/exporters/csv";
 import { defaultTableOptions } from "components/util/tableUtils";
 import { useEffect, useState } from "react";
 

@@ -1,4 +1,4 @@
-import { Document, Font, Text, View } from "@react-pdf/renderer";
+import { Document, Font, Text, View, StyleSheet } from "@react-pdf/renderer";
 import styled from "@react-pdf/styled-components";
 import { Fragment } from "react";
 import DateUtil from "util/DateUtil";
@@ -19,6 +19,207 @@ Font.register({
          fontWeight: "bold",
       },
    ],
+});
+
+const styles = StyleSheet.create({
+   cfPage: {
+      fontFamily: '"Poppins"',
+      padding: "5vw",
+      position: "relative",
+   },
+   topView: {
+      width: "90vw",
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: "10vw",
+   },
+   cfLogoContainer: {
+      width: "25vw",
+      display: "flex",
+      alignItems: "center !important",
+      justifyContent: "flex-start !important",
+      height: "100px",
+   },
+   CFLogoContainerSmall: {
+      width: "20vw",
+   },
+   cfLogo: {
+      minWidth: "15vw",
+      width: "auto",
+      marginRight: "auto",
+      marginBottom: "auto",
+      marginTop: "auto",
+   },
+   companyLogo: { maxHeight: "25vw", width: "auto", height: "auto" },
+   groupLogoImage: {
+      maxHeight: "20vw",
+      width: "auto",
+      height: "auto",
+   },
+   groupLogoView: {
+      maxWidth: "20vw",
+      marginBottom: "5vw",
+   },
+   speakerAvatar: {
+      height: "14vw",
+      width: "14vw",
+      borderRadius: "50% !important",
+      objectFit: "cover",
+   },
+   label: {
+      fontFamily: '"Poppins"',
+      textTransform: "uppercase",
+      fontWeight: "bold",
+      fontSize: "18px",
+      color: "#00d2aa",
+   },
+   title: {
+      fontFamily: '"Poppins"',
+      fontWeight: "normal",
+      fontSize: "22px",
+   },
+   InlineView: {
+      display: "flex",
+      flexDirection: "row",
+   },
+   SubTitle: {
+      fontFamily: '"Poppins"',
+      fontWeight: "bold",
+      color: "grey",
+      fontSize: "10px",
+      margin: "30px 0 5px 0",
+      textTransform: "uppercase",
+   },
+   categoriesParent: {
+      maxWidth: "100vw !important",
+      margin: "5vw 0",
+   },
+   disclaimerTitle: {
+      fontFamily: '"Poppins"',
+      fontSize: "12px",
+   },
+   groupDisclaimerText: {
+      fontFamily: '"Poppins"',
+      fontSize: "6px",
+   },
+   flexParent: {
+      display: "flex",
+      flexDirection: "row",
+   },
+   partnersWrapper: {
+      display: "flex",
+      flexWrap: "wrap",
+      flexDirection: "row",
+      justifyContent: "space-between",
+   },
+   partnerItem: {
+      width: "28vw",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+   },
+   partnerItemBreakdown: {
+      alignItems: "flex-start",
+   },
+   partnerLogo: {
+      width: "40%",
+   },
+   engagementChild: {
+      width: "25vw",
+      marginRight: "5vw",
+   },
+   ratingChild: {
+      width: "40vw",
+      marginRight: "5vw",
+   },
+   pageNumber: {
+      fontSize: "10px",
+      fontFamily: '"Poppins"',
+      position: "absolute",
+      bottom: "10px",
+      right: "10px",
+   },
+   // SubHeader as well
+   ratingText: { fontWeight: "bold", fontSize: "12px", color: "black" },
+   subCategoryParent: {
+      display: "flex",
+      flexDirection: "row",
+      flexWrap: "wrap",
+   },
+   speakersView: { display: "flex", flexDirection: "row", flexWrap: "wrap" },
+   largeNumber: {
+      fontWeight: "bold",
+      fontSize: "14px",
+      width: "10vw",
+      color: "#314150",
+   },
+   largeText: {
+      fontSize: "8px",
+      width: "15vw",
+      padding: "1px",
+      fontWeight: "bold",
+      marginRight: "5vw",
+      textTransform: "uppercase",
+      color: "#314150",
+   },
+   smallNumber: {
+      fontWeight: "bold",
+      fontSize: "14px",
+      color: "#bbbbbb",
+   },
+   smallText: {
+      fontWeight: "bold",
+      fontSize: "8px",
+      color: "grey",
+   },
+   smallLabel: {
+      fontWeight: "bold",
+      fontSize: "10px",
+      color: "grey",
+   },
+   dateText: {
+      fontSize: "14px",
+      textTransform: "uppercase",
+      fontWeight: "bold",
+      color: "#bbbbbb",
+   },
+   questionText: {
+      fontSize: "14px",
+   },
+   groupSubTitle: {
+      fontSize: "14px",
+      fontFamily: '"Poppins"',
+      display: "flex",
+      flexDirection: "row",
+      color: "#555555",
+   },
+   answerText: {
+      fontSize: "11px",
+   },
+   colorText: { fontWeight: "bold", color: "#00d2aa" },
+   poll: { marginBottom: "20px" },
+   questionVotes: {
+      fontSize: "11px",
+      textTransform: "uppercase",
+      color: "#00d2aa",
+   },
+   border: {
+      fontFamily: '"Poppins"',
+      fontSize: "9px",
+      display: "flex",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      verticalAlign: "middle",
+      marginBottom: "5px",
+   },
+   smallView: {
+      fontFamily: '"Poppins"',
+      fontSize: "10px",
+      width: "10vw",
+      height: "30px",
+      padding: "0 0 0 2px",
+   },
 });
 
 const CFPage = styled.Page`
