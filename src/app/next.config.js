@@ -11,7 +11,11 @@ const securityHeaders = [
    {
       key: "Content-Security-Policy",
       value:
-         "default-src 'self' blob: *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; script-src 'self' *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-eval' 'unsafe-inline' ; style-src 'self' *.googleapis.com 'unsafe-inline'; connect-src 'self' wss: *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:*",
+         "default-src blob: 'self' *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; " +
+         "script-src blob: 'self' snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com; " +
+         "style-src 'self' *.googleapis.com 'unsafe-inline'; " +
+         "connect-src wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:*;" +
+         "img-src https: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com;",
    },
    {
       key: "Referrer-Policy",
