@@ -99,8 +99,10 @@ const styles = StyleSheet.create({
       textTransform: "uppercase",
    },
    categoriesParent: {
-      maxWidth: "100vw !important",
+      width: "90vw",
       margin: "5vw 0",
+      display: "flex",
+      flexDirection: "column",
    },
    disclaimerTitle: {
       fontFamily: "Poppins",
