@@ -1,12 +1,7 @@
 "use strict";
-const withBundleAnalyzer = require("@next/bundle-analyzer")({
-   enabled: process.env.ANALYZE === "true",
-});
-
-const {
-   PHASE_DEVELOPMENT_SERVER,
-   PHASE_PRODUCTION_BUILD,
-} = require("next/constants");
+// const withBundleAnalyzer = require("@next/bundle-analyzer")({
+//    enabled: process.env.ANALYZE === "true",
+// });
 
 const securityHeaders = [
    // {
@@ -36,8 +31,13 @@ const iFrameSecurityHeaders = [
 ];
 
 module.exports = (phase, { defaultConfig }) => {
-   //console.log("-> phase", phase);
-   const config = {
+   // Only uncomment if you want to host build on firebase, keep commented out if hosting on Vercel
+   // if (phase === PHASE_PRODUCTION_BUILD) {
+   //     config.distDir = '../../dist/client'
+   // }
+   /* config options for all phases except development here */
+   // return withBundleAnalyzer(config);
+   return {
       env: {
          REACT_APP_FIREBASE_API_KEY: "AIzaSyAMx1wVVxqo4fooh0OMVSeSTOqNKzMbch0",
          REACT_APP_FIREBASE_AUTH_DOMAIN: "careerfairy-e1fd9.firebaseapp.com",
@@ -73,18 +73,9 @@ module.exports = (phase, { defaultConfig }) => {
          });
          config.module.rules.push({
             test: /\.svg$/,
-            issuer: {
-               test: /\.(js|ts)x?$/,
-            },
             use: ["@svgr/webpack"],
          });
          return config;
       },
    };
-   // Only uncomment if you want to host build on firebase, keep commented out if hosting on Vercel
-   // if (phase === PHASE_PRODUCTION_BUILD) {
-   //     config.distDir = '../../dist/client'
-   // }
-   /* config options for all phases except development here */
-   return withBundleAnalyzer(config);
 };

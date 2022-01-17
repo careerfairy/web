@@ -11,7 +11,7 @@ import {
    Typography,
 } from "@material-ui/core";
 import GroupJoinModal from "./GroupJoinModal";
-import Fade from "react-reveal/Fade";
+import Fade from "@stahl.luke/react-reveal/Fade";
 
 const NewGroup = ({ group, userData, makeSix, selected }) => {
    const [openJoinModal, setOpenJoinModal] = useState(false);

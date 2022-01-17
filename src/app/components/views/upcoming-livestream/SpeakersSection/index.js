@@ -7,7 +7,7 @@ import HighlightText from "components/views/common/HighlightText";
 import SectionHeader from "../../common/SectionHeader";
 import Box from "@material-ui/core/Box";
 import { Grid, Typography } from "@material-ui/core";
-import Fade from "react-reveal/Fade";
+import Fade from "@stahl.luke/react-reveal/Fade";
 import SpeakerCard from "./SpeakerCard";
 
 const useStyles = makeStyles((theme) => ({

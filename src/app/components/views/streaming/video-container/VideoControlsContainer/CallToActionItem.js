@@ -22,7 +22,7 @@ import {
    callToActionsDictionary,
    callToActionsSocialsDictionary,
 } from "../../../../util/constants/callToActions";
-import RubberBand from "react-reveal/RubberBand";
+import RubberBand from "@stahl.luke/react-reveal/RubberBand";
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips";
 import TutorialContext from "../../../../../context/tutorials/TutorialContext";
 import { getRandomInt } from "../../../../helperFunctions/HelperFunctions";

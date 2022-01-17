@@ -4,7 +4,7 @@ import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Grid } from "@material-ui/core";
 import { TeamMemberCard } from "./TeamMemberCard";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import Bounce from "react-reveal/Bounce";
+import Bounce from "@stahl.luke/react-reveal/Bounce";
 
 const useStyles = makeStyles((theme) => ({
    gridItem: {

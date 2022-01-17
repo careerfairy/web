@@ -6,7 +6,7 @@ import SectionHeader from "components/views/common/SectionHeader";
 import RoundButton from "materialUI/GlobalButtons/RoundButton";
 import Link from "materialUI/NextNavLink";
 import SectionContainer from "../../common/Section/Container";
-import Pulse from "react-reveal/Pulse";
+import Pulse from "@stahl.luke/react-reveal/Pulse";
 import { Box } from "@material-ui/core";
 import clsx from "clsx";
 

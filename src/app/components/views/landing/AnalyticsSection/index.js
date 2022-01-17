@@ -7,8 +7,8 @@ import { analyticsSVG } from "../../../../constants/images";
 import clsx from "clsx";
 import SectionContainer from "../../common/Section/Container";
 import { analyticsShowCaseVideoUrl } from "../../../../constants/videos";
-import Fade from "react-reveal/Fade";
-import LightSpeed from "react-reveal/LightSpeed";
+import Fade from "@stahl.luke/react-reveal/Fade";
+import LightSpeed from "@stahl.luke/react-reveal/LightSpeed";
 
 const useStyles = makeStyles((theme) => ({
    section: {
