@@ -7,7 +7,7 @@ import React, {
    useState,
 } from "react";
 import * as actions from "../../../../store/actions";
-import RubberBand from "react-reveal/RubberBand";
+import RubberBand from "@stahl.luke/react-reveal/RubberBand";
 import { makeStyles } from "@material-ui/core/styles";
 import { v4 as uuidv4 } from "uuid";
 import TutorialContext from "../../../../context/tutorials/TutorialContext";

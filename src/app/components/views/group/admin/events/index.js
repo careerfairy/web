@@ -60,6 +60,7 @@ const EventsOverview = ({ group, scrollRef }) => {
    const [fetching, setFetching] = useState(false);
    const [currentStream, setCurrentStream] = useState(null);
    const [fetchingQueryEvent, setFetchingQueryEvent] = useState(false);
+   const [triggered, setTriggered] = useState(false);
    const [publishingDraft, setPublishingDraft] = useState(false);
    const [groupsDictionary, setGroupsDictionary] = useState({});
 
@@ -81,6 +82,14 @@ const EventsOverview = ({ group, scrollRef }) => {
          }
          setFetching(true);
          const unsubscribe = query(group.id, (querySnapshot) => {
+            if (
+               tabValue === "upcoming" &&
+               !querySnapshot.docs.length &&
+               !triggered
+            ) {
+               setTabValue("past");
+               setTriggered(true);
+            }
             const streamsData = querySnapshot.docs.map((doc) => ({
                id: doc.id,
                rowId: doc.id,
@@ -88,6 +97,7 @@ const EventsOverview = ({ group, scrollRef }) => {
                date: doc.data().start?.toDate?.(),
                ...doc.data(),
             }));
+
             if (eventId) {
                const queryEventIndex = streamsData.findIndex(
                   (el) => el.id === eventId

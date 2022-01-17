@@ -1,6 +1,7 @@
 import { memo, useEffect, useState } from "react";
-import { Document, Page } from "react-pdf";
-import * as PDFJS from "pdfjs-dist/build/pdf";
+import { pdfjs } from "react-pdf";
+var { Document, Page } = require("react-pdf/dist/esm/entry.webpack");
+
 import { useWindowSize } from "components/custom-hook/useWindowSize";
 import {
    Button,
@@ -38,8 +39,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
    const firebase = useFirebase();
-   PDFJS.GlobalWorkerOptions.workerSrc =
-      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js";
+   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
    const windowSize = useWindowSize();
    const [pdfObject, setPdfObject] = useState(null);

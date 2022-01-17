@@ -28,7 +28,7 @@ import { useCoverCardMediaStyles } from "@mui-treasury/styles/cardMedia/cover";
 import { AvatarGroup } from "@material-ui/lab";
 import { speakerPlaceholder } from "../../../../util/constants";
 import Tag from "./Tag";
-import Fade from "react-reveal/Fade";
+import Fade from "@stahl.luke/react-reveal/Fade";
 import clsx from "clsx";
 import CopyToClipboard from "../../../common/CopyToClipboard";
 import { DateTimeDisplay } from "./TimeDisplay";

@@ -1,12 +1,7 @@
 "use strict";
-const withBundleAnalyzer = require("@next/bundle-analyzer")({
-   enabled: process.env.ANALYZE === "true",
-});
-
-const {
-   PHASE_DEVELOPMENT_SERVER,
-   PHASE_PRODUCTION_BUILD,
-} = require("next/constants");
+// const withBundleAnalyzer = require("@next/bundle-analyzer")({
+//    enabled: process.env.ANALYZE === "true",
+// });
 
 const securityHeaders = [
    // {
@@ -16,7 +11,11 @@ const securityHeaders = [
    {
       key: "Content-Security-Policy",
       value:
-         "default-src 'self' blob: *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; script-src 'self' *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-eval' 'unsafe-inline' ; style-src 'self' *.googleapis.com 'unsafe-inline'; connect-src 'self' wss: *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:*",
+         "default-src blob: 'self' *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; " +
+         "script-src blob: 'self' snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com; " +
+         "style-src 'self' *.googleapis.com 'unsafe-inline'; " +
+         "connect-src *.careerfairy.io wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:*;" +
+         "img-src https: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com;",
    },
    {
       key: "Referrer-Policy",
@@ -36,8 +35,13 @@ const iFrameSecurityHeaders = [
 ];
 
 module.exports = (phase, { defaultConfig }) => {
-   //console.log("-> phase", phase);
-   const config = {
+   // Only uncomment if you want to host build on firebase, keep commented out if hosting on Vercel
+   // if (phase === PHASE_PRODUCTION_BUILD) {
+   //     config.distDir = '../../dist/client'
+   // }
+   /* config options for all phases except development here */
+   // return withBundleAnalyzer(config);
+   return {
       env: {
          REACT_APP_FIREBASE_API_KEY: "AIzaSyAMx1wVVxqo4fooh0OMVSeSTOqNKzMbch0",
          REACT_APP_FIREBASE_AUTH_DOMAIN: "careerfairy-e1fd9.firebaseapp.com",
@@ -73,18 +77,13 @@ module.exports = (phase, { defaultConfig }) => {
          });
          config.module.rules.push({
             test: /\.svg$/,
-            issuer: {
-               test: /\.(js|ts)x?$/,
-            },
             use: ["@svgr/webpack"],
+         });
+         config.module.rules.push({
+            test: /\.(woff(2)?|ttf)(\?v=\d+\.\d+\.\d+)?$/,
+            loader: "file-loader",
          });
          return config;
       },
    };
-   // Only uncomment if you want to host build on firebase, keep commented out if hosting on Vercel
-   // if (phase === PHASE_PRODUCTION_BUILD) {
-   //     config.distDir = '../../dist/client'
-   // }
-   /* config options for all phases except development here */
-   return withBundleAnalyzer(config);
 };

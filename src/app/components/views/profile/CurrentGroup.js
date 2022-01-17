@@ -20,7 +20,7 @@ import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal";
 import Skeleton from "@material-ui/lab/Skeleton";
 import GroupJoinModal from "./GroupJoinModal";
 import Link from "next/link";
-import Fade from "react-reveal/Fade";
+import Fade from "@stahl.luke/react-reveal/Fade";
 import { getResizedUrl } from "../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({

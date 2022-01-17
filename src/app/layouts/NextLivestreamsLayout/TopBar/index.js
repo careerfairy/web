@@ -37,7 +37,7 @@ const TopBar = ({ links, onMobileNavOpen, currentGroup }) => {
       dispatch(actions.toggleNextLivestreamsFilter());
 
    return (
-      <GeneralHeader headerColors={headerColors} permanent={showHeaderLinks}>
+      <GeneralHeader permanent={showHeaderLinks}>
          <Box display="flex" alignItems="center">
             <Hidden lgUp>
                <IconButton color="primary" onClick={onMobileNavOpen}>

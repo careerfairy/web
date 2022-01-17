@@ -3,7 +3,7 @@ import "styles.css";
 import FirebaseContext from "context/firebase/FirebaseContext";
 import Firebase from "context/firebase";
 import * as Sentry from "@sentry/browser";
-import config from "react-reveal/globals";
+import config from "@stahl.luke/react-reveal/globals";
 import DateFnsUtils from "@date-io/date-fns";
 import { newStore, wrapper } from "../store";
 

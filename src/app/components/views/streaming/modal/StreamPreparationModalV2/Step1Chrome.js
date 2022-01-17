@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Checkbox, FormControlLabel, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import Fade from "react-reveal/Fade";
+import Fade from "@stahl.luke/react-reveal/Fade";
 
 import MicIcon from "@material-ui/icons/Mic";
 import WifiIcon from "@material-ui/icons/Wifi";

@@ -23,11 +23,7 @@ const TopBar = () => {
    const { authenticatedUser } = useAuth();
 
    return (
-      <GeneralHeader
-         headerColors={theme.palette.primary.main}
-         permanent
-         transparent
-      >
+      <GeneralHeader permanent transparent>
          <Box display="flex" alignItems="center">
             <IconButton
                style={{ marginRight: "1rem" }}

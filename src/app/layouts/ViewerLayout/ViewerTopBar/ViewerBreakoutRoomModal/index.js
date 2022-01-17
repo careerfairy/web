@@ -18,7 +18,7 @@ import {
 } from "@material-ui/core";
 import PropTypes from "prop-types";
 import * as actions from "store/actions";
-import Zoom from "react-reveal/Zoom";
+import Zoom from "@stahl.luke/react-reveal/Zoom";
 import { getBaseUrl } from "../../../../components/helperFunctions/HelperFunctions";
 import { ThemedPermanentMarker } from "../../../../materialUI/GlobalTitles";
 import clsx from "clsx";

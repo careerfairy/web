@@ -6,7 +6,7 @@ import SectionContainer from "../../common/Section/Container";
 import HighlightText from "components/views/common/HighlightText";
 import SectionHeader from "../../common/SectionHeader";
 import Box from "@material-ui/core/Box";
-import Fade from "react-reveal/Fade";
+import Fade from "@stahl.luke/react-reveal/Fade";
 import {
    Button,
    CircularProgress,

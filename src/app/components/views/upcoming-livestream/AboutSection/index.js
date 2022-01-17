@@ -7,7 +7,7 @@ import HighlightText from "components/views/common/HighlightText";
 import SectionHeader from "../../common/SectionHeader";
 import Box from "@material-ui/core/Box";
 import { Typography } from "@material-ui/core";
-import Fade from "react-reveal/Fade";
+import Fade from "@stahl.luke/react-reveal/Fade";
 
 const useStyles = makeStyles((theme) => ({
    section: {},

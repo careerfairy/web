@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import { calendarIcon, ipad } from "../../../../constants/images";
 import SectionContainer from "../../common/Section/Container";
-import Fade from "react-reveal/Fade";
+import Fade from "@stahl.luke/react-reveal/Fade";
 import HeroButton from "../HeroSection/HeroButton";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 
