@@ -80,7 +80,7 @@ const PdfReportDownloadDialogContent = ({ handleClose, reportPdfData }) => {
          <PDFViewer
             style={{
                width: "100%",
-               height: "clamp(150px, 80vh, 80vh)",
+               height: "80vh",
                border: "none",
                borderRadius: theme.spacing(0.4),
                boxShadow: theme.shadows[5],

@@ -1,5 +1,12 @@
-import { Document, Font, Text, View, StyleSheet } from "@react-pdf/renderer";
-import styled from "@react-pdf/styled-components";
+import {
+   Document,
+   StyleSheet,
+   Font,
+   Text,
+   View,
+   Page,
+   Image,
+} from "@react-pdf/renderer";
 import { Fragment } from "react";
 import DateUtil from "util/DateUtil";
 import * as PropTypes from "prop-types";
@@ -23,7 +30,7 @@ Font.register({
 
 const styles = StyleSheet.create({
    cfPage: {
-      fontFamily: '"Poppins"',
+      fontFamily: "Poppins",
       padding: "5vw",
       position: "relative",
    },
@@ -41,15 +48,15 @@ const styles = StyleSheet.create({
       justifyContent: "flex-start !important",
       height: "100px",
    },
-   CFLogoContainerSmall: {
+   cfLogoContainerSmall: {
       width: "20vw",
    },
    cfLogo: {
-      minWidth: "15vw",
+      // minWidth: "15vw",
       width: "auto",
-      marginRight: "auto",
-      marginBottom: "auto",
-      marginTop: "auto",
+      // marginRight: "auto",
+      // marginBottom: "auto",
+      // marginTop: "auto",
    },
    companyLogo: { maxHeight: "25vw", width: "auto", height: "auto" },
    groupLogoImage: {
@@ -68,23 +75,23 @@ const styles = StyleSheet.create({
       objectFit: "cover",
    },
    label: {
-      fontFamily: '"Poppins"',
+      fontFamily: "Poppins",
       textTransform: "uppercase",
       fontWeight: "bold",
       fontSize: "18px",
       color: "#00d2aa",
    },
    title: {
-      fontFamily: '"Poppins"',
+      fontFamily: "Poppins",
       fontWeight: "normal",
       fontSize: "22px",
    },
-   InlineView: {
+   inlineView: {
       display: "flex",
       flexDirection: "row",
    },
-   SubTitle: {
-      fontFamily: '"Poppins"',
+   subTitle: {
+      fontFamily: "Poppins",
       fontWeight: "bold",
       color: "grey",
       fontSize: "10px",
@@ -96,11 +103,11 @@ const styles = StyleSheet.create({
       margin: "5vw 0",
    },
    disclaimerTitle: {
-      fontFamily: '"Poppins"',
+      fontFamily: "Poppins",
       fontSize: "12px",
    },
    groupDisclaimerText: {
-      fontFamily: '"Poppins"',
+      fontFamily: "Poppins",
       fontSize: "6px",
    },
    flexParent: {
@@ -135,7 +142,7 @@ const styles = StyleSheet.create({
    },
    pageNumber: {
       fontSize: "10px",
-      fontFamily: '"Poppins"',
+      fontFamily: "Poppins",
       position: "absolute",
       bottom: "10px",
       right: "10px",
@@ -189,7 +196,7 @@ const styles = StyleSheet.create({
    },
    groupSubTitle: {
       fontSize: "14px",
-      fontFamily: '"Poppins"',
+      fontFamily: "Poppins",
       display: "flex",
       flexDirection: "row",
       color: "#555555",
@@ -205,7 +212,7 @@ const styles = StyleSheet.create({
       color: "#00d2aa",
    },
    border: {
-      fontFamily: '"Poppins"',
+      fontFamily: "Poppins",
       fontSize: "9px",
       display: "flex",
       flexDirection: "row",
@@ -214,7 +221,7 @@ const styles = StyleSheet.create({
       marginBottom: "5px",
    },
    smallView: {
-      fontFamily: '"Poppins"',
+      fontFamily: "Poppins",
       fontSize: "10px",
       width: "10vw",
       height: "30px",
@@ -222,257 +229,121 @@ const styles = StyleSheet.create({
    },
 });
 
-const CFPage = styled.Page`
-   font-family: "Poppins";
-   padding: 5vw;
-   position: relative;
-`;
+const CFPage = (props) => <Page {...props} style={styles.cfPage} />;
 
-const TopView = styled.View`
-   width: 90vw;
-   display: flex;
-   flex-direction: row;
-   justify-content: space-between;
-   margin-bottom: 10vw;
-`;
+const TopView = (props) => <View {...props} style={styles.topView} />;
 
-const CFLogoContainer = styled.View`
-   width: 25vw;
-   display: flex;
-   align-items: center !important;
-   justify-content: flex-start !important;
-   height: 100px;
-`;
+const CFLogoContainer = (props) => (
+   <View {...props} style={styles.cfLogoContainer} />
+);
 
-const CFLogoContainerSmall = styled(CFLogoContainer)`
-   width: 20vw;
-`;
+const CFLogoContainerSmall = (props) => (
+   <View
+      {...props}
+      style={{ ...styles.cfLogoContainer, ...styles.cfLogoContainerSmall }}
+   />
+);
 
-const CFLogo = styled.Image`
-   min-width: 15vw;
-   width: auto;
-   margin-right: auto;
-   margin-bottom: auto;
-   margin-top: auto;
-`;
+const CFLogo = (props) => <Image {...props} style={styles.cfLogo} />;
 
-const CompanyLogo = styled.Image`
-   max-height: 25vw;
-   width: auto;
-   height: auto;
-`;
-const GroupLogoImage = styled.Image`
-   max-height: 20vw;
-   width: auto;
-   height: auto;
-`;
+const CompanyLogo = (props) => <Image {...props} style={styles.companyLogo} />;
 
-const GroupLogoView = styled.View`
-   max-width: 20vw;
-   margin-bottom: 5vw;
-`;
+const GroupLogoImage = (props) => (
+   <Image {...props} style={styles.groupLogoImage} />
+);
 
-const SpeakerAvatar = styled.Image`
-   height: 14vw;
-   width: 14vw;
-   border-radius: 50% !important;
-   object-fit: cover;
-`;
+const GroupLogoView = (props) => (
+   <View {...props} style={styles.groupLogoView} />
+);
 
-const Label = styled.Text`
-   font-family: "Poppins";
-   text-transform: uppercase;
-   font-weight: bold;
-   font-size: 18px;
-   color: #00d2aa;
-`;
+const SpeakerAvatar = (props) => (
+   <Image {...props} style={styles.speakerAvatar} />
+);
 
-const Title = styled.Text`
-   font-family: "Poppins";
-   font-weight: normal;
-   font-size: 22px;
-`;
+const Label = (props) => <Text {...props} style={styles.label} />;
 
-const InlineView = styled.View`
-   display: flex;
-   flex-direction: row;
-`;
+const Title = (props) => <Text {...props} style={styles.title} />;
 
-const SubTitle = styled.Text`
-   font-family: "Poppins";
-   font-weight: bold;
-   color: grey;
-   font-size: 10px;
-   margin: 30px 0 5px 0;
-   text-transform: uppercase;
-`;
+const InlineView = (props) => <View {...props} style={styles.inlineView} />;
 
-const CategoriesParent = styled.View`
-   max-width: 100vw !important;
-   margin: 5vw 0;
-`;
+const SubTitle = (props) => <Text {...props} style={styles.subTitle} />;
 
-const DisclaimerTitle = styled.Text`
-   font-family: "Poppins";
-   font-size: 12px;
-`;
-const GroupDisclaimerText = styled.Text`
-   font-family: "Poppins";
-   font-size: 6px;
-`;
+const CategoriesParent = (props) => (
+   <View {...props} style={styles.categoriesParent} />
+);
 
-const FlexParent = styled.View`
-   display: flex;
-   flex-direction: row;
-`;
-const PartnersWrapper = styled.View`
-   display: flex;
-   flex-wrap: wrap;
-   flex-direction: row;
-   justify-content: space-between;
-`;
+const DisclaimerTitle = (props) => (
+   <Text {...props} style={styles.disclaimerTitle} />
+);
 
-const PartnerItem = styled.View`
-   width: 28vw;
-   display: flex;
-   flex-direction: column;
-   align-items: flex-start;
-`;
-const PartnerBreakdownItem = styled(PartnerItem)`
-   align-items: flex-start;
-`;
-const PartnerLogo = styled.Image`
-   width: 40%;
-`;
+const GroupDisclaimerText = (props) => (
+   <Text {...props} style={styles.groupDisclaimerText} />
+);
 
-const EngagementChild = styled.View`
-   width: 25vw;
-   margin-right: 5vw;
-`;
+const FlexParent = (props) => <View {...props} style={styles.flexParent} />;
 
-const RatingChild = styled.View`
-   width: 40vw;
-   margin-right: 5vw;
-`;
+const PartnersWrapper = (props) => (
+   <View {...props} style={styles.partnersWrapper} />
+);
 
-const PageNumber = styled.Text`
-   font-size: 10px;
-   font-family: "Poppins";
-   position: absolute;
-   bottom: 10px;
-   right: 10px;
-`;
-const RatingText = styled.Text`
-   font-weight: bold;
-   font-size: 12px;
-   color: black;
-`;
+const PartnerItem = (props) => <View {...props} style={styles.partnerItem} />;
+const PartnerBreakdownItem = (props) => (
+   <View
+      {...props}
+      style={{ ...styles.partnerItem, ...styles.partnerItemBreakdown }}
+   />
+);
+const PartnerLogo = (props) => <Image {...props} style={styles.partnerLogo} />;
 
-const SubHeader = styled(RatingText)``;
+const EngagementChild = (props) => (
+   <View {...props} style={styles.engagementChild} />
+);
 
-const SubCategoryParent = styled.View`
-   display: flex;
-   flex-direction: row;
-   flex-wrap: wrap;
-`;
+const RatingChild = (props) => <View {...props} style={styles.ratingChild} />;
 
-const SpeakersView = styled.View`
-   display: flex;
-   flex-direction: row;
-   flex-wrap: wrap;
-`;
+const PageNumber = (props) => <Text {...props} style={styles.pageNumber} />;
+const RatingText = (props) => <Text {...props} style={styles.ratingText} />;
 
-const LargeNumber = styled.Text`
-   font-weight: bold;
-   font-size: 14px;
-   width: 10vw;
-   color: #314150;
-`;
+const SubHeader = (props) => <Text {...props} style={styles.ratingText} />;
 
-const LargeText = styled.Text`
-   font-size: 8px;
-   width: 15vw;
-   padding: 1px;
-   font-weight: bold;
-   margin-right: 5vw;
-   text-transform: uppercase;
-   color: #314150;
-`;
+const SubCategoryParent = (props) => (
+   <View {...props} style={styles.subCategoryParent} />
+);
+const SpeakersView = (props) => <View {...props} style={styles.speakersView} />;
 
-const SmallNumber = styled.Text`
-   font-weight: bold;
-   font-size: 14px;
-   color: #bbbbbb;
-`;
+const LargeNumber = (props) => <Text {...props} style={styles.largeNumber} />;
 
-const SmallText = styled.Text`
-   font-weight: bold;
-   font-size: 8px;
-   color: grey;
-`;
+const LargeText = (props) => <Text {...props} style={styles.largeText} />;
 
-const SmallLabel = styled.Text`
-   font-weight: bold;
-   font-size: 10px;
-   color: grey;
-`;
+const SmallNumber = (props) => <Text {...props} style={styles.smallNumber} />;
 
-const DateText = styled.Text`
-   font-size: 14px;
-   text-transform: uppercase;
-   font-weight: bold;
-   color: #bbbbbb;
-`;
+const SmallText = (props) => <Text {...props} style={styles.smallText} />;
 
-const QuestionText = styled.Text`
-   font-size: 14px;
-`;
+const SmallLabel = (props) => <Text {...props} style={styles.smallLabel} />;
 
-const GroupSubTitle = styled(QuestionText)`
-   font-family: "Poppins";
-   display: flex;
-   flex-direction: row;
-   color: #555555;
-`;
+const DateText = (props) => <Text {...props} style={styles.dateText} />;
 
-const AnswerText = styled.Text`
-   font-size: 11px;
-`;
+const QuestionText = (props) => <Text {...props} style={styles.questionText} />;
 
-const ColorText = styled.View`
-   font-weight: bold;
-   color: #00d2aa;
-`;
+const GroupSubTitle = (props) => (
+   <Text
+      {...props}
+      style={{ ...styles.questionText, ...styles.groupSubTitle }}
+   />
+);
 
-const Poll = styled.View`
-   margin-bottom: 20px;
-`;
+const AnswerText = (props) => <Text {...props} style={styles.answerText} />;
+const ColorText = (props) => <View {...props} style={styles.colorText} />;
 
-const QuestionVotes = styled.Text`
-   font-size: 11px;
-   text-transform: uppercase;
-   color: #00d2aa;
-`;
+const Poll = (props) => <View {...props} style={styles.poll} />;
 
-const Border = styled.View`
-   font-family: "Poppins";
-   font-size: 9px;
-   display: flex;
-   flex-direction: row;
-   flex-wrap: wrap;
-   vertical-align: middle;
-   margin-bottom: 5px;
-   //height: 40px;
-`;
+const QuestionVotes = (props) => (
+   <Text {...props} style={styles.questionVotes} />
+);
 
-const SmallView = styled.View`
-   font-family: "Poppins";
-   font-size: 10px;
-   width: 10vw;
-   height: 30px;
-   padding: 0 0 0 2px;
-`;
+const Border = (props) => <View {...props} style={styles.border} />;
 
+const SmallView = (props) => <View {...props} style={styles.smallView} />;
 const SpecializedSubCategoryElement = ({ subOption }) => {
    return (
       <SmallView>
@@ -563,7 +434,7 @@ const SpeakerView = ({ speaker }) => {
                alignItems: "center",
             }}
          >
-            <SpeakerAvatar source={avatarUrl} />
+            <SpeakerAvatar src={avatarUrl} />
          </View>
          <SmallLabel>
             {speaker.firstName} {speaker.lastName}
@@ -593,7 +464,7 @@ const ReportPage = ({
       <Fragment>
          {report.isUniversity && (
             <GroupLogoView break>
-               <GroupLogoImage source={report.group.logoUrl} />
+               <GroupLogoImage src={report.group.logoUrl} />
             </GroupLogoView>
          )}
          <Title break={!report.isUniversity}>
@@ -785,15 +656,15 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
             />
             <TopView>
                <CFLogoContainer>
-                  <CFLogo source={summary.requestingGroup.logoUrl} />
+                  <CFLogo src={summary.requestingGroup.logoUrl} />
                </CFLogoContainer>
                <CFLogoContainerSmall>
-                  <CFLogo source="https://www.careerfairy.io/logo_teal.png" />
+                  <CFLogo src="https://www.careerfairy.io/logo_teal.png" />
                </CFLogoContainerSmall>
             </TopView>
             <View>
                <View style={{ maxWidth: "25vw", marginBottom: "20px" }}>
-                  <CompanyLogo source={summary.livestream.companyLogoUrl} />
+                  <CompanyLogo src={summary.livestream.companyLogoUrl} />
                </View>
                <Label>Live Stream Report </Label>
                <Title>{summary.livestream.title}</Title>
@@ -810,14 +681,12 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                      <PartnersWrapper>
                         {universityReports.map((report) => (
                            <PartnerItem key={report.group.id}>
-                              <PartnerLogo source={report.group.logoUrl} />
+                              <PartnerLogo src={report.group.logoUrl} />
                            </PartnerItem>
                         ))}
                         {companyReport && (
                            <PartnerItem>
-                              <PartnerLogo
-                                 source={companyReport.group.logoUrl}
-                              />
+                              <PartnerLogo src={companyReport.group.logoUrl} />
                            </PartnerItem>
                         )}
                      </PartnersWrapper>

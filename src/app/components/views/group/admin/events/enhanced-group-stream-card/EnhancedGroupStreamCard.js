@@ -6,8 +6,6 @@ import { v4 as uuidv4 } from "uuid";
 import { Box, Button, CircularProgress, Typography } from "@material-ui/core";
 import { CSVLink } from "react-csv";
 import StatsUtil from "data/util/StatsUtil";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import LivestreamPdfReport from "./LivestreamPdfReport";
 import { useLivestreamMetadata } from "components/custom-hook/useLivestreamMetadata";
 import { useTalentPoolMetadata } from "components/custom-hook/useTalentPoolMetadata";
 import { makeStyles } from "@material-ui/core/styles";
@@ -403,71 +401,71 @@ const EnhancedGroupStreamCard = ({
                )}
             </Fragment>
 
-            {isPastLivestream && (
-               <Fragment>
-                  {!startDownloadingReport || !hasDownloadedReport ? (
-                     <div>
-                        <Button
-                           className={classes.button}
-                           fullWidth
-                           style={{ color: "white" }}
-                           startIcon={
-                              startDownloadingReport && (
-                                 <CircularProgress size={20} color="inherit" />
-                              )
-                           }
-                           variant="outlined"
-                           onClick={() => setStartDownloadingReport(true)}
-                           disabled={startDownloadingReport}
-                        >
-                           {startDownloadingReport
-                              ? "Generating Report..."
-                              : "Generate Report"}
-                        </Button>
-                     </div>
-                  ) : (
-                     <PDFDownloadLink
-                        fileName={`General Report ${livestream.company} ${livestream.id}.pdf`}
-                        document={
-                           <LivestreamPdfReport
-                              group={group}
-                              livestream={livestream}
-                              studentStats={studentStats}
-                              speakers={livestream.speakers}
-                              overallRating={overallRating}
-                              contentRating={contentRating}
-                              totalStudentsInTalentPool={
-                                 talentPoolForReport.length
-                              }
-                              totalViewerFromOutsideETH={
-                                 participatingStudents.length -
-                                 participatingStudentsFromGroup.length
-                              }
-                              totalViewerFromETH={
-                                 participatingStudentsFromGroup.length
-                              }
-                              questions={questions}
-                              polls={polls}
-                              icons={icons}
-                           />
-                        }
-                     >
-                        {({ blob, url, loading, error }) => (
-                           <div>
-                              <Button
-                                 className={classes.button}
-                                 fullWidth
-                                 variant="outlined"
-                                 color="primary"
-                              >
-                                 Download Report
-                              </Button>
-                           </div>
-                        )}
-                     </PDFDownloadLink>
-                  )}
-               </Fragment>
-            )}
+            {/*{isPastLivestream && (*/}
+            {/*   <Fragment>*/}
+            {/*      {!startDownloadingReport || !hasDownloadedReport ? (*/}
+            {/*         <div>*/}
+            {/*            <Button*/}
+            {/*               className={classes.button}*/}
+            {/*               fullWidth*/}
+            {/*               style={{ color: "white" }}*/}
+            {/*               startIcon={*/}
+            {/*                  startDownloadingReport && (*/}
+            {/*                     <CircularProgress size={20} color="inherit" />*/}
+            {/*                  )*/}
+            {/*               }*/}
+            {/*               variant="outlined"*/}
+            {/*               onClick={() => setStartDownloadingReport(true)}*/}
+            {/*               disabled={startDownloadingReport}*/}
+            {/*            >*/}
+            {/*               {startDownloadingReport*/}
+            {/*                  ? "Generating Report..."*/}
+            {/*                  : "Generate Report"}*/}
+            {/*            </Button>*/}
+            {/*         </div>*/}
+            {/*      ) : (*/}
+            {/*         <PDFDownloadLink*/}
+            {/*            fileName={`General Report ${livestream.company} ${livestream.id}.pdf`}*/}
+            {/*            document={*/}
+            {/*               <LivestreamPdfReport*/}
+            {/*                  group={group}*/}
+            {/*                  livestream={livestream}*/}
+            {/*                  studentStats={studentStats}*/}
+            {/*                  speakers={livestream.speakers}*/}
+            {/*                  overallRating={overallRating}*/}
+            {/*                  contentRating={contentRating}*/}
+            {/*                  totalStudentsInTalentPool={*/}
+            {/*                     talentPoolForReport.length*/}
+            {/*                  }*/}
+            {/*                  totalViewerFromOutsideETH={*/}
+            {/*                     participatingStudents.length -*/}
+            {/*                     participatingStudentsFromGroup.length*/}
+            {/*                  }*/}
+            {/*                  totalViewerFromETH={*/}
+            {/*                     participatingStudentsFromGroup.length*/}
+            {/*                  }*/}
+            {/*                  questions={questions}*/}
+            {/*                  polls={polls}*/}
+            {/*                  icons={icons}*/}
+            {/*               />*/}
+            {/*            }*/}
+            {/*         >*/}
+            {/*            {({ blob, url, loading, error }) => (*/}
+            {/*               <div>*/}
+            {/*                  <Button*/}
+            {/*                     className={classes.button}*/}
+            {/*                     fullWidth*/}
+            {/*                     variant="outlined"*/}
+            {/*                     color="primary"*/}
+            {/*                  >*/}
+            {/*                     Download Report*/}
+            {/*                  </Button>*/}
+            {/*               </div>*/}
+            {/*            )}*/}
+            {/*         </PDFDownloadLink>*/}
+            {/*      )}*/}
+            {/*   </Fragment>*/}
+            {/*)}*/}
             <Button
                className={classes.button}
                fullWidth

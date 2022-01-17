@@ -14,7 +14,7 @@ const securityHeaders = [
          "default-src blob: 'self' *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; " +
          "script-src blob: 'self' snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com; " +
          "style-src 'self' *.googleapis.com 'unsafe-inline'; " +
-         "connect-src wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:*;" +
+         "connect-src *.careerfairy.io wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:*;" +
          "img-src https: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com;",
    },
    {
@@ -78,6 +78,10 @@ module.exports = (phase, { defaultConfig }) => {
          config.module.rules.push({
             test: /\.svg$/,
             use: ["@svgr/webpack"],
+         });
+         config.module.rules.push({
+            test: /\.(woff(2)?|ttf)(\?v=\d+\.\d+\.\d+)?$/,
+            loader: "file-loader",
          });
          return config;
       },
