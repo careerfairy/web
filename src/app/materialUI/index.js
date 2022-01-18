@@ -1,6 +1,10 @@
-export const baseThemeObj = {
+import { createTheme } from "@mui/material/styles";
+import { deepmerge } from "@mui/utils";
+
+export const rootThemeObj = {
    palette: {
       primary: {
+         light: "#89c2ba",
          main: "#00d2aa",
          dark: "#00b08f",
          contrastText: "#FFFFFF",
@@ -29,34 +33,40 @@ export const baseThemeObj = {
          contrastText: "#FFFFFF",
          dark: "#00b08f",
       },
-      type: "light",
-      background: {
-         level1: "#212121",
-         level2: "#333",
-         offWhite: "#F5F5F5",
-         default: "#F5F5F5",
-      },
    },
-   overrides: {
+   components: {
+      // Name of the component
       MuiButton: {
-         root: {
-            fontWeight: 600,
+         styleOverrides: {
+            // Name of the slot
+            root: {
+               // Some CSS
+               fontWeight: 600,
+            },
          },
       },
       MuiChip: {
-         label: {
-            fontWeight: 500,
-            fontSize: "1rem",
-         },
-         root: {
-            margin: "0.5em",
-            marginLeft: 0,
+         styleOverrides: {
+            label: {
+               fontWeight: 500,
+               fontSize: "1rem",
+            },
+            root: {
+               margin: "0.5em",
+               marginLeft: 0,
+            },
          },
       },
-      MuiSnackbar: {},
       MuiTooltip: {
-         tooltip: {
-            fontSize: "1rem",
+         styleOverrides: {
+            tooltip: {
+               fontSize: "1rem",
+            },
+         },
+      },
+      MuiTypography: {
+         defaultProps: {
+            fontFamily: "Poppins,sans-serif",
          },
       },
    },
@@ -71,7 +81,6 @@ export const baseThemeObj = {
       },
       keys: ["xs", "sm", "mobile", "md", "lg", "xl"],
    },
-
    typography: {
       fontFamily: "Poppins,sans-serif",
       htmlFontSize: 16,
@@ -79,17 +88,38 @@ export const baseThemeObj = {
    whiteShadow:
       "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)",
 };
-export const darkThemeObj = {
-   ...baseThemeObj,
+
+export const getTheme = (mode, rootThemeObj) => ({
+   ...rootThemeObj,
    palette: {
-      ...baseThemeObj.palette,
-      background: {
-         level1: "#212121",
-         level2: "#424242",
-         offWhite: "#FAFAFA",
-         default: "#1E1E1E",
-         paper: "#424242",
-      },
-      type: "dark",
+      ...rootThemeObj.palette,
+      mode,
+      ...(mode === "light"
+         ? {
+              // palette values for light mode
+              background: {
+                 ...rootThemeObj.palette.background,
+                 level1: "#212121",
+                 level2: "#333",
+                 offWhite: "#F5F5F5",
+                 default: "#F5F5F5",
+                 paper: "#fff",
+              },
+           }
+         : {
+              // palette values for dark mode
+              background: {
+                 ...rootThemeObj.palette.background,
+                 level1: "#212121",
+                 level2: "#424242",
+                 offWhite: "#FAFAFA",
+                 default: "#1E1E1E",
+                 paper: "#424242",
+              },
+           }),
    },
-};
+});
+
+export const brandedLightTheme = createTheme(getTheme("light", rootThemeObj));
+
+export const brandedDarkTheme = createTheme(getTheme("dark", rootThemeObj));

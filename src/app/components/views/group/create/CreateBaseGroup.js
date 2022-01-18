@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { withFirebase } from "../../../../context/firebase";
-import PublishIcon from "@material-ui/icons/Publish";
+import PublishIcon from "@mui/icons-material/Publish";
 import { Form as UiForm, Formik } from "formik";
 import FilePickerContainer from "../../../../components/ssr/FilePickerContainer";
 import {
@@ -11,8 +11,8 @@ import {
    FormHelperText,
    TextField,
    Typography,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { useAuth } from "../../../../HOCs/AuthProvider";
 
 const placeholder =

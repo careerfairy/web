@@ -12,7 +12,7 @@ import {
    FormControlLabel,
    Switch,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { withFirebase } from "../../../../../../context/firebase";
 import { colorsArray } from "../../../../../util/colors";
 import {
@@ -20,7 +20,9 @@ import {
    prettyDate,
    truncate,
 } from "../../../../../helperFunctions/HelperFunctions";
-import { makeStyles, useTheme, alpha } from "@material-ui/core/styles";
+import { useTheme, alpha } from "@mui/material/styles";
+
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    root: {},

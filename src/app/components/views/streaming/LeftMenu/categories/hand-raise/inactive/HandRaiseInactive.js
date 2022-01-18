@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useFirebase } from "context/firebase";
-import { Button, Grow, Typography } from "@material-ui/core";
+import { Button, Grow, Typography } from "@mui/material";
 import { CategoryContainerCentered } from "../../../../../../../materialUI/GlobalContainers";
 import { GreyPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";

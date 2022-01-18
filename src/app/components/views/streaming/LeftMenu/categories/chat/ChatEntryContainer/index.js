@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { memo, useEffect, useState } from "react";
 import Linkify from "react-linkify";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Box,
    Card,
@@ -9,11 +9,11 @@ import {
    Popover,
    Slide,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { getTimeFromNow } from "../../../../../../helperFunctions/HelperFunctions";
 import { useAuth } from "../../../../../../../HOCs/AuthProvider";
 import { withFirebase } from "context/firebase";
-import EmojiEmotionsOutlinedIcon from "@material-ui/icons/EmojiEmotionsOutlined";
+import EmojiEmotionsOutlinedIcon from "@mui/icons-material/EmojiEmotionsOutlined";
 import EmotesPreview from "./EmotesPreview";
 import EmotesPopUp from "./EmotesPopUp";
 import clsx from "clsx";

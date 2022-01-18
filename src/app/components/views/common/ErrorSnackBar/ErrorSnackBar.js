@@ -4,9 +4,9 @@ import {
    Snackbar,
    SnackbarContent,
    IconButton,
-} from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    close: {
@@ -38,7 +38,7 @@ const ErrorSnackBar = ({ errorMessage, handleClose }) => {
                   color="inherit"
                   className={classes.close}
                   onClick={handleClose}
-               >
+                  size="large">
                   <CloseIcon />
                </IconButton>
             }

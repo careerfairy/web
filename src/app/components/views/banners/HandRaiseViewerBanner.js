@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import StreamBanner from "./StreamBanner";
-import { Box, Button, Tooltip } from "@material-ui/core";
-import HandRaiseIcon from "@material-ui/icons/PanToolOutlined";
+import { Box, Button, Tooltip } from "@mui/material";
+import HandRaiseIcon from "@mui/icons-material/PanToolOutlined";
 import useHandRaiseState from "../../custom-hook/useHandRaiseState";
-import { makeStyles, darken } from "@material-ui/core/styles";
-import StopStreamingIcon from "@material-ui/icons/Stop";
+import { darken } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import StopStreamingIcon from "@mui/icons-material/Stop";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
 

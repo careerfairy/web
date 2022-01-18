@@ -1,14 +1,14 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import HighlightText from "components/views/common/HighlightText";
 import SectionHeader from "../../common/SectionHeader";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import Fade from "@stahl.luke/react-reveal/Fade";
-import { Button } from "@material-ui/core";
-import EmailIcon from "@material-ui/icons/Email";
+import { Button } from "@mui/material";
+import EmailIcon from "@mui/icons-material/Email";
 
 const useStyles = makeStyles((theme) => ({
    section: {},

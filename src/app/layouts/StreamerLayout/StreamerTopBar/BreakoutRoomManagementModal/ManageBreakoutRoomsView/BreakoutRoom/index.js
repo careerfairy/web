@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Accordion,
    AccordionSummary,
@@ -11,12 +12,12 @@ import {
    Menu,
    MenuItem,
    Tooltip,
-} from "@material-ui/core";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
-import RenameRoomIcon from "@material-ui/icons/Edit";
-import DeleteRoomIcon from "@material-ui/icons/Close";
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import RenameRoomIcon from "@mui/icons-material/Edit";
+import DeleteRoomIcon from "@mui/icons-material/Close";
 import BreakoutRoomAccordionContent from "./BreakoutRoomAccordionContent";
 import React, { useEffect, useState } from "react";
 import EditRoomNameModal from "./EditRoomNameModal";

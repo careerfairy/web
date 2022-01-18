@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useMemo, useRef, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import NavBar from "./NavBar";
 import { useRouter } from "next/router";
 import { withFirebase } from "../../context/firebase";
@@ -12,7 +12,7 @@ import styles from "../../materialUI/styles/layoutStyles/groupDashboardStyles";
 import useDashboardRedirect from "../../components/custom-hook/useDashboardRedirect";
 import useAdminGroup from "../../components/custom-hook/useAdminGroup";
 import useDashboardLinks from "../../components/custom-hook/useDashboardLinks";
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress } from "@mui/material";
 
 const useStyles = makeStyles(styles);
 

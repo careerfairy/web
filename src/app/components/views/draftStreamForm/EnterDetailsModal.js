@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Button,
    Dialog,
@@ -9,7 +9,7 @@ import {
    DialogTitle,
    Slide,
    TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useFormik } from "formik";
 import { EMAIL_REGEX } from "../../util/constants";
 import PropTypes from "prop-types";

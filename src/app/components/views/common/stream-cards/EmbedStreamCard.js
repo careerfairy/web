@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import cx from "clsx";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
-import Avatar from "@material-ui/core/Avatar";
-import Box from "@material-ui/core/Box";
-import CardMedia from "@material-ui/core/CardMedia";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import CardMedia from "@mui/material/CardMedia";
 import { useCoverCardMediaStyles } from "@mui-treasury/styles/cardMedia/cover";
 import { Item, Row } from "@mui-treasury/components/flex";
 import {
@@ -16,11 +17,11 @@ import {
   Tooltip,
   Typography,
   useMediaQuery,
-} from "@material-ui/core";
-import { AvatarGroup } from "@material-ui/lab";
+} from "@mui/material";
+import { AvatarGroup } from '@mui/material';
 import { MainLogo } from "../../../logos";
-import RegisterIcon from "@material-ui/icons/AddToPhotosRounded";
-import LibraryBooksIcon from "@material-ui/icons/LibraryBooks";
+import RegisterIcon from "@mui/icons-material/AddToPhotosRounded";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import EmbedTimeDisplay from "../time-display/EmbedTimeDisplay";
 import MobileCarousel from "../carousels/MobileCarousel";
 

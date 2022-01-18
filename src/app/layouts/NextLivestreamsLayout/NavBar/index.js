@@ -1,11 +1,11 @@
 import React, { memo, useEffect, useState } from "react";
 import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
-import ListItem from "@material-ui/core/ListItem";
-import { Box, CircularProgress, Grow, Hidden } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import ListItem from "@mui/material/ListItem";
+import { Box, CircularProgress, Grow, Hidden } from "@mui/material";
 import { useAuth } from "../../../HOCs/AuthProvider";
 import { useRouter } from "next/router";
 import {
@@ -192,37 +192,35 @@ const FeedDrawer = memo(
          </Box>
       );
 
-      return (
-         <>
-            <Hidden lgUp>
-               <Drawer
-                  anchor="left"
-                  classes={{
-                     paper: clsx(classes.mobileDrawer, classes.background),
-                  }}
-                  className={classes.drawer}
-                  onClose={onMobileClose}
-                  open={openMobile}
-                  variant="temporary"
-               >
-                  {content}
-               </Drawer>
-            </Hidden>
-            <Hidden mdDown>
-               <Drawer
-                  anchor="left"
-                  classes={{
-                     paper: clsx(classes.desktopDrawer, classes.background),
-                  }}
-                  className={classes.drawer}
-                  open
-                  variant="persistent"
-               >
-                  {content}
-               </Drawer>
-            </Hidden>
-         </>
-      );
+      return <>
+         <Hidden lgUp>
+            <Drawer
+               anchor="left"
+               classes={{
+                  paper: clsx(classes.mobileDrawer, classes.background),
+               }}
+               className={classes.drawer}
+               onClose={onMobileClose}
+               open={openMobile}
+               variant="temporary"
+            >
+               {content}
+            </Drawer>
+         </Hidden>
+         <Hidden lgDown>
+            <Drawer
+               anchor="left"
+               classes={{
+                  paper: clsx(classes.desktopDrawer, classes.background),
+               }}
+               className={classes.drawer}
+               open
+               variant="persistent"
+            >
+               {content}
+            </Drawer>
+         </Hidden>
+      </>;
    }
 );
 

@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Box,
    Button,
@@ -14,7 +14,7 @@ import {
    FormControlLabel,
    Grid,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import * as actions from "store/actions";
 import EventOptionPreview from "../../../../common/EventAutoSelect/EventOptionPreview";
 import EventAutoSelect from "../../../../common/EventAutoSelect";

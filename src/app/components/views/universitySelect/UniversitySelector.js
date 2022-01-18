@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from '@mui/material/Autocomplete';
 import { withFirebase } from "../../../context/firebase";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
@@ -9,7 +9,7 @@ import {
    FormHelperText,
    TextField,
    CircularProgress,
-} from "@material-ui/core";
+} from "@mui/material";
 
 const otherObj = { name: "Other", id: "other" };
 const UniversitySelector = ({
@@ -90,7 +90,7 @@ const UniversitySelector = ({
          }}
          getOptionLabel={(option) => option.name || ""}
          value={getSelectedItem()}
-         getOptionSelected={(option, value) => option.id === value.id}
+         isOptionEqualToValue={(option, value) => option.id === value.id}
          options={universities}
          loading={loading}
          renderInput={(params) => (

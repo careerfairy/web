@@ -1,14 +1,14 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import SectionHeader from "../../common/SectionHeader";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import Fade from "@stahl.luke/react-reveal/Fade";
 import CreateQuestion from "./CreateQuestion";
 import QuestionVotingContainer from "../../common/QuestionVotingContainer";
-import { Grid, Hidden } from "@material-ui/core";
+import { Grid, Hidden } from "@mui/material";
 import { questionIcon } from "../../../../constants/svgs";
 
 const useStyles = makeStyles((theme) => ({
@@ -61,7 +61,7 @@ const QuestionsSection = (props) => {
       >
          <SectionContainer maxWidth="lg">
             <Grid spacing={2} container>
-               <Hidden smDown>
+               <Hidden mdDown>
                   <Grid className={classes.imgGrid} item xs={12} md={4}>
                      <Fade left>
                         <div className={classes.imgWrapper}>

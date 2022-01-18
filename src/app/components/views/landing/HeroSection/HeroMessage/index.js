@@ -1,12 +1,13 @@
 import PropTypes from "prop-types";
-import Typography from "@material-ui/core/Typography";
-import { Grid } from "@material-ui/core";
+import Typography from "@mui/material/Typography";
+import { Grid } from "@mui/material";
 import HeroButton from "../HeroButton";
 import Link from "materialUI/NextNavLink";
 import { calendarIcon, playIcon } from "constants/images";
 import React from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import SvgIcon from "@material-ui/core/SvgIcon";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import SvgIcon from "@mui/material/SvgIcon";
 
 const useStyles = makeStyles((theme) => ({
    linkButton: {
@@ -18,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
    },
    buttonsWrapper: {
       marginTop: theme.spacing(10),
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          marginTop: theme.spacing(1),
       },
       //width: "100%",
@@ -28,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
       maxWidth: 720,
       marginRight: "auto",
       marginLeft: "auto",
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          padding: theme.spacing(0, 2),
       },
    },

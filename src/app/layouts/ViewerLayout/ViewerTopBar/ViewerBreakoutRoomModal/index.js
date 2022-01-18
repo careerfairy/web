@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { useFirestoreConnect } from "react-redux-firebase";
 import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector";
@@ -15,17 +16,17 @@ import {
    ListItemText,
    Tooltip,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import PropTypes from "prop-types";
 import * as actions from "store/actions";
 import Zoom from "@stahl.luke/react-reveal/Zoom";
 import { getBaseUrl } from "../../../../components/helperFunctions/HelperFunctions";
 import { ThemedPermanentMarker } from "../../../../materialUI/GlobalTitles";
 import clsx from "clsx";
-import CloseIcon from "@material-ui/icons/Close";
-import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
+import CloseIcon from "@mui/icons-material/Close";
+import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos";
 import { useFirebase } from "../../../../context/firebase";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const useStyles = makeStyles((theme) => ({
    contentRoot: {
@@ -111,7 +112,7 @@ const Content = ({
                </div>
             )}
             {mobile ? (
-               <IconButton {...closeProps()}>
+               <IconButton {...closeProps()} size="large">
                   <CloseIcon />
                </IconButton>
             ) : (

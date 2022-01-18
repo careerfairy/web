@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Button } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { useRouter } from "next/router";
-import Avatar from "@material-ui/core/Avatar";
+import Avatar from "@mui/material/Avatar";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({

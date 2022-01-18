@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Chip, TextField } from "@material-ui/core";
-import { Autocomplete } from "@material-ui/lab";
+import { Chip, TextField } from "@mui/material";
+import { Autocomplete } from '@mui/material';
 import { convertArrayOfObjectsToDictionaryByProp } from "../../../../data/util/AnalyticsUtil";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    inputWrapper: {
@@ -62,11 +62,7 @@ const CategoryCard = ({ category, handleToggleActive }) => {
          )}
          renderTags={(value, getTagProps) =>
             value.map((option, index) => (
-               <Chip
-                  variant="default"
-                  label={optionsMap[option]?.name}
-                  {...getTagProps({ index })}
-               />
+               <Chip label={optionsMap[option]?.name} {...getTagProps({ index })} />
             ))
          }
       />

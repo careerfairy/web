@@ -11,7 +11,7 @@ import {
    Container,
    Typography,
    CircularProgress,
-} from "@material-ui/core";
+} from "@mui/material";
 
 function TestStreamingPage(props) {
    const router = useRouter();

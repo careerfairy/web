@@ -1,6 +1,6 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { CircularProgress, Grid, Typography } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { CircularProgress, Grid, Typography } from "@mui/material";
 import { isEmpty, isLoaded } from "react-redux-firebase";
 import EmbedStreamCard from "../../../common/stream-cards/EmbedStreamCard";
 import useInfiniteScrollClientWithHandlers from "../../../../custom-hook/useInfiniteScrollClientWithHandlers";

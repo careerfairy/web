@@ -1,10 +1,11 @@
 import React, { useMemo } from "react";
 import { useCurrentStream } from "../../../../../context/stream/StreamContext";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
-import { Backdrop, Typography } from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { Backdrop, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { colorsArray } from "../../../../util/colors";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import useStreamToken from "../../../../custom-hook/useStreamToken";
 import { useRouter } from "next/router";
 

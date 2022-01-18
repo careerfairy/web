@@ -1,10 +1,10 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { withFirebase } from "../context/firebase";
 
-import MicIcon from "@material-ui/icons/Mic";
-import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
-import BusinessCenterIcon from "@material-ui/icons/BusinessCenter";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import MicIcon from "@mui/icons-material/Mic";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -19,7 +19,7 @@ import {
    Container,
    TextField,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 
 function ResetPasswordPage(props) {
    const { authenticatedUser: user } = useAuth();

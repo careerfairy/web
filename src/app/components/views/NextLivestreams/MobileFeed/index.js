@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 
-import { Box, Button, Grid, Typography } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { withFirebase } from "../../../../context/firebase";
 import GroupStreams from "../GroupStreams/GroupStreams";
 import { useRouter } from "next/router";
 import GroupJoinModal from "../../profile/GroupJoinModal";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import FiltersDrawer from "./FiltersDrawer";
 
 const useStyles = makeStyles((theme) => ({

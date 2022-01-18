@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import {makeStyles} from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
-import {Card, CardActionArea, CardContent, Typography} from "@material-ui/core";
+import {Card, CardActionArea, CardContent, Typography} from "@mui/material";
 import {getBaseUrl, timeAgo} from '../../../../helperFunctions/HelperFunctions';
 import {populate} from "react-redux-firebase";
 import {useSelector} from "react-redux";

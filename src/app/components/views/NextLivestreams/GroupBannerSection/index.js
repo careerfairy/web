@@ -1,10 +1,10 @@
 import React from "react";
-import { Avatar, Container, Paper } from "@material-ui/core";
+import { Avatar, Container, Paper } from "@mui/material";
 import SectionHeader from "../../common/SectionHeader";
 import Section from "../../common/Section";
 import StreamsTab from "../StreamsTab";
 import GroupBio from "./groupBio";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({

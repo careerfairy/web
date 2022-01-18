@@ -1,8 +1,9 @@
 import PropTypes from "prop-types";
 import React, { useState } from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import SearchIcon from "@material-ui/icons/Search";
-import { InputAdornment, InputBase, TextField } from "@material-ui/core";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import SearchIcon from "@mui/icons-material/Search";
+import { InputAdornment, InputBase, TextField } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
    search: {
@@ -15,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
 
       marginRight: theme.spacing(1),
 
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          marginLeft: "auto",
       },
    },

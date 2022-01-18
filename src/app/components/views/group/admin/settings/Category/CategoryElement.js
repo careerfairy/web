@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useState } from "react";
-import EditIcon from "@material-ui/icons/Edit";
+import EditIcon from "@mui/icons-material/Edit";
 import { withFirebase } from "context/firebase";
 import CategoryEdit from "./CategoryEdit";
 import {
@@ -11,8 +11,8 @@ import {
    Divider,
    Fade,
    IconButton,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    whiteBox: {
@@ -97,10 +97,7 @@ function CategoryElement({
                   }}
                   title={category.name}
                   action={
-                     <IconButton
-                        onClick={() => setEditMode(true)}
-                        aria-label="settings"
-                     >
+                     <IconButton onClick={() => setEditMode(true)} aria-label="settings" size="large">
                         <EditIcon color="primary" />
                      </IconButton>
                   }

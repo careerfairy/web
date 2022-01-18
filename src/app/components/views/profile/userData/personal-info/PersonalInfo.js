@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Formik } from "formik";
 
 import { withFirebase } from "context/firebase";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Typography,
    TextField,
@@ -16,7 +16,7 @@ import {
    FormControl,
    Checkbox,
    FormControlLabel,
-} from "@material-ui/core";
+} from "@mui/material";
 import UniversityCountrySelector from "components/views/universitySelect/UniversityCountrySelector";
 import UniversitySelector from "components/views/universitySelect/UniversitySelector";
 import { GENERAL_ERROR, URL_REGEX } from "components/util/constants";

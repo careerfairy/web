@@ -1,7 +1,8 @@
 import PropTypes from "prop-types";
 import React, { useMemo } from "react";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
-import { Button } from "@material-ui/core";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { Button } from "@mui/material";
 import clsx from "clsx";
 
 const paddingSize = 4;
@@ -11,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
    root: {
       padding: `${paddingSize * paddingXFactor}em ${paddingSize}em`,
       borderRadius: `${paddingSize}em`,
-      [theme.breakpoints.down("xs")]: {
+      [theme.breakpoints.down('sm')]: {
          padding: `${paddingSize * paddingXFactor * mobileFactor}em ${
             paddingSize * mobileFactor
          }em`,

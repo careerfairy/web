@@ -1,6 +1,7 @@
 import React from "react";
 import { Fragment } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Typography,
    useMediaQuery,
@@ -9,7 +10,7 @@ import {
    FormControl,
    Select,
    Chip,
-} from "@material-ui/core";
+} from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
    formControl: {
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 
 const UserCategorySelector = ({ category, handleSetSelected, isNew }) => {
    const theme = useTheme();
-   const native = useMediaQuery(theme.breakpoints.down("xs"));
+   const native = useMediaQuery(theme.breakpoints.down('sm'));
    const classes = useStyles();
    const [open, setOpen] = React.useState(false);
 

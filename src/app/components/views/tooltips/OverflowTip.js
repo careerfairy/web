@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { useRef, useEffect, useState } from 'react';
-import Tooltip from '@material-ui/core/Tooltip';
+import Tooltip from '@mui/material/Tooltip';
 
 const OverflowTip = ({ children, title }) => {
   // Create Ref

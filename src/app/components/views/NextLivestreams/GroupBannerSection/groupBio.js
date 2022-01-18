@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Button, Collapse, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import { Button, Collapse, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
       color: "inherit",
       whiteSpace: "pre-line",
       padding: theme.spacing(0, 20),
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          padding: theme.spacing(0),
       },
    },

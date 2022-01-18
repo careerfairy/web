@@ -7,11 +7,12 @@ import {
    Collapse,
    Paper,
    Typography,
-} from "@material-ui/core";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+} from "@mui/material";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
-import EventIcon from "@material-ui/icons/Event";
-import ClockIcon from "@material-ui/icons/AccessTime";
+import EventIcon from "@mui/icons-material/Event";
+import ClockIcon from "@mui/icons-material/AccessTime";
 import DateUtil from "../../../../../util/DateUtil";
 import Link from "materialUI/NextNavLink";
 import debounce from "lodash.debounce";
@@ -25,7 +26,7 @@ import { speakerPlaceholder } from "../../../../util/constants";
 import UserUtil from "../../../../../data/util/UserUtil";
 import { useRouter } from "next/router";
 import { FORTY_FIVE_MINUTES_IN_MILLISECONDS } from "../../../../../data/constants/streamContants";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const useStyles = makeStyles((theme) => {
    const backgroundImageHeight = 200;
@@ -187,7 +188,7 @@ const useStyles = makeStyles((theme) => {
          display: "flex",
          WebkitBoxOrient: "vertical",
          WebkitLineClamp: 1,
-         [theme.breakpoints.down("md")]: {
+         [theme.breakpoints.down('lg')]: {
             fontSize: "1rem",
          },
       },
@@ -214,7 +215,7 @@ const UpcomingLivestreamCard = ({
 }) => {
    const theme = useTheme();
    const isLandscapeOnMobile = useMediaQuery(
-      `${theme.breakpoints.down("sm")} and (orientation: landscape)`
+      `${theme.breakpoints.down('md')} and (orientation: landscape)`
    );
    const [hovered, setHovered] = useState(false);
    const classes = useStyles();

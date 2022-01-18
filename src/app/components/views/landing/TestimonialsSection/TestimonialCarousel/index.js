@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import testimonialData from "../testimonialData";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import TestimonialCard from "./TestimonialCard";
-import NextIcon from "@material-ui/icons/NavigateNextRounded";
-import PrevIcon from "@material-ui/icons/NavigateBeforeRounded";
-import { Fab } from "@material-ui/core";
+import NextIcon from "@mui/icons-material/NavigateNextRounded";
+import PrevIcon from "@mui/icons-material/NavigateBeforeRounded";
+import { Fab } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
    arrow: {
-      [theme.breakpoints.down("md")]: {
+      [theme.breakpoints.down('lg')]: {
          display: ["none", "!important"],
       },
       zIndex: 1,

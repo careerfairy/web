@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useMemo } from "react";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import RoundButton from "materialUI/GlobalButtons/RoundButton";
 import clsx from "clsx";
 
@@ -16,14 +17,14 @@ const useStyles = makeStyles((theme) => ({
       transform: "translate(-50%, -50%)",
       width: "50%",
       height: "auto",
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          display: "none",
       },
    },
    heroBtn: {
       whiteSpace: "nowrap",
       textDecoration: "none !important",
-      [theme.breakpoints.down("md")]: {
+      [theme.breakpoints.down('lg')]: {
          filter: (props) =>
             `drop-shadow(4.092px 4.39px 9.5px ${alpha(
                props.buttonColor,

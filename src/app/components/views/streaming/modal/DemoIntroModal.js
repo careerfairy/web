@@ -7,7 +7,7 @@ import {
    DialogContent,
    DialogContentText,
    DialogTitle,
-} from "@material-ui/core";
+} from "@mui/material";
 import { GlassDialog } from "materialUI/GlobalModals";
 import { v4 as uuid } from "uuid";
 import useStreamRef from "../../../custom-hook/useStreamRef";

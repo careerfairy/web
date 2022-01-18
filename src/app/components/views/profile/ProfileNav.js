@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from "react";
 import SwipeableViews from "react-swipeable-views";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+
+import makeStyles from '@mui/styles/makeStyles';
 
 import {
    Container,
@@ -10,7 +12,7 @@ import {
    Tabs,
    Tab,
    Box,
-} from "@material-ui/core";
+} from "@mui/material";
 import { withFirebase } from "context/firebase";
 import JoinedGroups from "./my-groups/JoinedGroups";
 import AdminGroups from "./my-groups/AdminGroups";
@@ -50,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
 const ProfileNav = ({ userData }) => {
    const classes = useStyles();
    const theme = useTheme();
-   const native = useMediaQuery(theme.breakpoints.down("xs"));
+   const native = useMediaQuery(theme.breakpoints.down('sm'));
    const [value, setValue] = useState(0);
    const { authenticatedUser } = useAuth();
 

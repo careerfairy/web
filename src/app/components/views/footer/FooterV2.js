@@ -1,6 +1,7 @@
 import React from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import { Container, Grid, Typography } from "@material-ui/core";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { Container, Grid, Typography } from "@mui/material";
 import Link from "next/link";
 import footerLinks from "./footerLinks";
 import icons from "./icons";

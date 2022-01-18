@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "../../common/Section";
-import { Container } from "@material-ui/core";
+import { Container } from "@mui/material";
 import SectionHeader from "../../common/SectionHeader";
 import StreamsTab from "../StreamsTab";
 

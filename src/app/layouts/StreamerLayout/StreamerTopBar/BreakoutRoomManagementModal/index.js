@@ -8,7 +8,7 @@ import {
    DialogContentText,
    DialogTitle,
    Slide,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useCurrentStream } from "../../../../context/stream/StreamContext";
 import { useRouter } from "next/router";
 import { isEmpty, isLoaded, useFirestoreConnect } from "react-redux-firebase";
@@ -16,8 +16,8 @@ import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import CreateBreakoutRoomsView from "./CreateBreakoutRoomsView";
 import ManageBreakoutRoomsView from "./ManageBreakoutRoomsView";
 import { GlassDialog } from "materialUI/GlobalModals";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { useTheme } from "@material-ui/core/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector";
 import * as actions from "store/actions";
 
@@ -105,7 +105,7 @@ const BreakoutRoomManagementModal = ({ agoraHandlers }) => {
    );
    const theme = useTheme();
    const dispatch = useDispatch();
-   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+   const mobile = useMediaQuery(theme.breakpoints.down('md'));
 
    const onClose = () => {
       dispatch(actions.closeStreamerBreakoutModal());

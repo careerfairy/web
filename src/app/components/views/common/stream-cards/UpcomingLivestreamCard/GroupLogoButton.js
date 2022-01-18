@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Avatar, Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Avatar, Button } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => {

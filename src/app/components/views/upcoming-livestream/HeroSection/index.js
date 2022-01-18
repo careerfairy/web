@@ -1,5 +1,6 @@
 import React from "react";
-import { darken, makeStyles } from "@material-ui/core/styles";
+import { darken } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Avatar,
    Box,
@@ -7,7 +8,7 @@ import {
    Grid,
    Hidden,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import CountDown from "./CountDown";
 import HeroSpeakers from "./HeroSpeakers";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
@@ -74,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
       flexDirection: "column",
    },
    title: {
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          fontSize: "calc(1.5em + 1.5vw)",
       },
       fontWeight: 600,
@@ -146,7 +147,7 @@ const HeroSection = ({
                         </Box>
                      )}
                      {!!stream.speakers.length && (
-                        <Hidden xsDown>
+                        <Hidden smDown>
                            <a
                               className={classes.heroSpeakersWrapper}
                               href="#speakers"

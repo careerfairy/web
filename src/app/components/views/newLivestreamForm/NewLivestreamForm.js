@@ -1,5 +1,5 @@
 import React, { Fragment, useContext, useEffect, useState } from "react";
-import DeleteIcon from "@material-ui/icons/Delete";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
    Button,
    CircularProgress,
@@ -12,12 +12,12 @@ import {
    TextField,
    Typography,
    Fab,
-} from "@material-ui/core";
+} from "@mui/material";
 import { Formik } from "formik";
 import { v4 as uuidv4 } from "uuid";
 import { withFirebase } from "../../../context/firebase";
 import ImageSelect from "./ImageSelect/ImageSelect";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DateTimePicker from "@mui/lab/DateTimePicker";
@@ -546,7 +546,7 @@ const NewLivestreamForm = ({ firebase }) => {
                            </FormControl>
                         </Grid>
                         <Grid xs={12} sm={7} md={8} item>
-                           <LocalizationProvider utils={AdapterDateFns}>
+                           <LocalizationProvider dateAdapter={AdapterDateFns}>
                               <DateTimePicker
                                  inputVariant="outlined"
                                  fullWidth
@@ -584,7 +584,7 @@ const NewLivestreamForm = ({ firebase }) => {
                                  id="summary"
                                  label="Summary"
                                  rows={2}
-                                 rowsMax={7}
+                                 maxRows={7}
                                  inputProps={{ maxLength: 5000 }}
                                  onBlur={handleBlur}
                                  value={values.summary}

@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
 import React, { memo, useContext, useEffect, useState } from "react";
-import ThumbUpRoundedIcon from "@material-ui/icons/ThumbUpRounded";
+import ThumbUpRoundedIcon from "@mui/icons-material/ThumbUpRounded";
 import Linkify from "react-linkify";
-import ExpandLessRoundedIcon from "@material-ui/icons/ExpandLessRounded";
-import ExpandMoreRoundedIcon from "@material-ui/icons/ExpandMoreRounded";
+import ExpandLessRoundedIcon from "@mui/icons-material/ExpandLessRounded";
+import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import { withFirebase } from "context/firebase";
 import {
    Box,
@@ -17,8 +17,8 @@ import {
    Slide,
    TextField,
    Typography,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { PlayIconButton } from "materialUI/GlobalButtons/GlobalButtons";
 import {
    TooltipButtonComponent,
@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: ({ active }) =>
          active
             ? theme.palette.primary.main
-            : theme.palette.type === "light"
+            : theme.palette.mode === "light"
             ? theme.palette.background.offWhite
             : theme.palette.background.paper,
       color: ({ active }) => (active ? theme.palette.common.white : "inherit"),
@@ -97,7 +97,7 @@ const useStyles = makeStyles((theme) => ({
       background: ({ active }) =>
          active
             ? theme.palette.common.white
-            : theme.palette.type === "dark"
+            : theme.palette.mode === "dark"
             ? theme.palette.background.default
             : theme.palette.background.paper,
       color: ({ active }) =>
@@ -317,7 +317,7 @@ const QuestionContainer = memo(
                <Box
                   key={comment.id}
                   className={classes.questionComment}
-                  borderRadius={8}
+                  borderRadius="8px"
                   mb={1}
                   p={1}
                   component={Card}

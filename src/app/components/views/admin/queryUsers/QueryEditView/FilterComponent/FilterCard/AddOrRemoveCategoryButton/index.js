@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
-import AddIcon from "@material-ui/icons/AddSharp";
-import { Button } from "@material-ui/core";
+import AddIcon from "@mui/icons-material/AddSharp";
+import { Button } from "@mui/material";
 import CategoryAddModal from "./CategoryAddModal";
 
 const AddOrRemoveCategoryButton = ({ disabled, ...props }) => {

@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from "clsx";
-import { Box, Button, Typography } from "@material-ui/core";
+import { Box, Button, Typography } from "@mui/material";
 
 const angle = 20;
 const rectLength = 130;
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
       left: "50%",
       width: rectLength,
       height: rectLength,
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          width: rectLength * 0.7,
          height: rectLength * 0.7,
       },
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
       height: "auto",
       left: "50%",
       transform: `translate(-50%,-50%)`,
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          width: rectLength * 0.5,
       },
    },

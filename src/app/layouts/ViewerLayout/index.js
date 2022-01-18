@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useFirebase } from "context/firebase";
 import { useRouter } from "next/router";
 import ViewerTopBar from "./ViewerTopBar";
 import { isLoaded } from "react-redux-firebase";
 import { useAuth } from "../../HOCs/AuthProvider";
 import Loader from "../../components/views/loader/Loader";
-import { useMediaQuery } from "@material-ui/core";
+import { useMediaQuery } from "@mui/material";
 import LeftMenu from "../../components/views/viewer/LeftMenu/LeftMenu";
 import { v4 as uuidv4 } from "uuid";
 import { CurrentStreamContext } from "../../context/stream/StreamContext";
@@ -48,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
          duration: theme.transitions.duration.shortest,
          easing: theme.transitions.easing.easeInOut,
       }),
-      [theme.breakpoints.down("mobile")]: {
+      [theme.breakpoints.down(undefined)]: {
          width: "100%",
          paddingTop: 0,
          paddingLeft: 0,

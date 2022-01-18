@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
-import { Container } from "@material-ui/core";
+import { Container } from "@mui/material";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({

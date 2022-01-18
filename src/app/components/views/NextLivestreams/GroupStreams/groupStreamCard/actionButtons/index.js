@@ -1,10 +1,10 @@
-import { Button } from "@material-ui/core";
-import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
-import AddToPhotosRoundedIcon from "@material-ui/icons/AddToPhotosRounded";
+import { Button } from "@mui/material";
+import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
+import AddToPhotosRoundedIcon from "@mui/icons-material/AddToPhotosRounded";
 import Link from "next/link";
-import LibraryBooksIcon from "@material-ui/icons/LibraryBooks";
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import React, {useMemo} from "react";
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
    actionButton: {
@@ -59,6 +59,7 @@ export const DetailsButton = ({
    ...props
 }) => {
    const classes = useStyles();
+   const link = useMemo(() => ,[])
    return (
       <Link
          href={{
@@ -70,7 +71,7 @@ export const DetailsButton = ({
             },
          }}
       >
-         <a>
+         <a href={`/upcoming-livestream/${livestream.id}`}>
             <Button
                className={classes.actionButton}
                style={{ marginRight: 5 }}

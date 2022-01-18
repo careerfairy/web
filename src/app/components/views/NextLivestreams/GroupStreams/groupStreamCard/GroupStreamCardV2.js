@@ -1,7 +1,8 @@
 import PropTypes from "prop-types";
 import React, { Fragment, memo, useEffect, useMemo, useState } from "react";
 import { useFirebase } from "context/firebase";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import UserUtil from "../../../../../data/util/UserUtil";
 import { useRouter } from "next/router";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
@@ -16,16 +17,16 @@ import {
    ClickAwayListener,
    Collapse,
    Grow,
-} from "@material-ui/core";
-import Avatar from "@material-ui/core/Avatar";
-import Box from "@material-ui/core/Box";
-import CardMedia from "@material-ui/core/CardMedia";
-import Typography from "@material-ui/core/Typography";
+} from "@mui/material";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
 import { Item, Row } from "@mui-treasury/components/flex";
 import { Info, InfoSubtitle, InfoTitle } from "@mui-treasury/components/info";
 import { useNewsInfoStyles } from "@mui-treasury/styles/info/news";
 import { useCoverCardMediaStyles } from "@mui-treasury/styles/cardMedia/cover";
-import { AvatarGroup } from "@material-ui/lab";
+import { AvatarGroup } from '@mui/material';
 import { speakerPlaceholder } from "../../../../util/constants";
 import Tag from "./Tag";
 import Fade from "@stahl.luke/react-reveal/Fade";
@@ -34,7 +35,7 @@ import CopyToClipboard from "../../../common/CopyToClipboard";
 import { DateTimeDisplay } from "./TimeDisplay";
 import { AttendButton, DetailsButton } from "./actionButtons";
 import LogoElement from "../LogoElement";
-import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import { InPersonEventBadge, LimitedRegistrationsBadge } from "./badges";
 import RegistrationModal from "../../../common/registration-modal";
 
@@ -191,8 +192,8 @@ const useStyles = makeStyles((theme) => ({
       flexWrap: "wrap",
    },
    livestreamCompanyAva: {
-      borderBottomRightRadius: `${theme.spacing(2.5)}px !important`,
-      borderTopLeftRadius: `${theme.spacing(2.5)}px !important`,
+      borderBottomRightRadius: `${theme.spacing(2.5)} !important`,
+      borderTopLeftRadius: `${theme.spacing(2.5)} !important`,
       width: "100%",
       height: 100,
       boxShadow: theme.shadows[5],

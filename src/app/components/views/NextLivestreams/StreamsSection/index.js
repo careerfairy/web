@@ -1,10 +1,10 @@
 import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import { isLoaded } from "react-redux-firebase";
 import NextLivestreams from "../NextLivestreams";
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress } from "@mui/material";
 import * as PropTypes from "prop-types";
 import React, { useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { forceCheck } from "react-lazyload";
 
 const useStyles = makeStyles((theme) => ({

@@ -9,10 +9,11 @@ import {
    ListItemIcon,
    ListItemText,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { PollQuestion } from "../../../../materialUI/GlobalTitles";
 import { colorsArray } from "../../../util/colors";
-import { useTheme, withStyles } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import withStyles from '@mui/styles/withStyles';
 import { withFirebase } from "../../../../context/firebase";
 import { useCurrentStream } from "../../../../context/stream/StreamContext";
 import useMapPollVoters from "../../../custom-hook/useMapPollVoters";
@@ -136,7 +137,7 @@ const CurrentPollGraph = ({
             },
          ],
       });
-   }, [pollId, theme.palette.type]);
+   }, [pollId, theme.palette.mode]);
 
    useEffect(() => {
       if (chartRef.current) {

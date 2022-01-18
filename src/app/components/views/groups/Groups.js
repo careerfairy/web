@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
-import { Button, Grid, TextField, Typography } from "@material-ui/core";
+import { Button, Grid, TextField, Typography } from "@mui/material";
 import NewGroup from "../profile/NewGroup";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from '@mui/material/Autocomplete';
 import parse from "autosuggest-highlight/parse";
 import match from "autosuggest-highlight/match";
 import Link from "next/link";

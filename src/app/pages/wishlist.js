@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { withFirebase } from "../context/firebase";
 
 import Head from "next/head";
-import { Button, Container, TextField, Typography } from "@material-ui/core";
+import { Button, Container, TextField, Typography } from "@mui/material";
 import GeneralLayout from "../layouts/GeneralLayout";
 
 function WishFactoryPlay(props) {

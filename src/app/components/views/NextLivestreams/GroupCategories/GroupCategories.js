@@ -1,8 +1,8 @@
 import React from "react";
-import { Box, Button, Collapse, Divider, Grid } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Box, Button, Collapse, Divider, Grid } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import CategoryCard from "./CategoryCard";
-import FilterIcon from "@material-ui/icons/Tune";
+import FilterIcon from "@mui/icons-material/Tune";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../../store/actions";
 

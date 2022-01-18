@@ -10,8 +10,8 @@ import {
    DialogContentText,
    DialogTitle,
    Typography,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import StatsUtil from "../../../../../data/util/StatsUtil";
 import LogoButtons from "../../../NextLivestreams/GroupStreams/LogoButtons";
 import { RegistrationContext } from "context/registration/RegistrationContext";

@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
-import { Box, Drawer, Hidden, List } from "@material-ui/core";
+import { Box, Drawer, Hidden, List } from "@mui/material";
 import { LogOut as LogoutIcon } from "react-feather";
 import { useRouter } from "next/router";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from "clsx";
 import * as actions from "../../../store/actions";
 import { compose } from "redux";
@@ -114,35 +115,33 @@ const NavBar = ({
       </Box>
    );
 
-   return (
-      <>
-         <Hidden lgUp>
-            <Drawer
-               anchor="left"
-               classes={{
-                  paper: clsx(classes.mobileDrawer, classes.background),
-               }}
-               onClose={onMobileClose}
-               open={openMobile}
-               variant="temporary"
-            >
-               {content}
-            </Drawer>
-         </Hidden>
-         <Hidden mdDown>
-            <Drawer
-               anchor="left"
-               classes={{
-                  paper: clsx(classes.desktopDrawer, classes.background),
-               }}
-               open
-               variant="persistent"
-            >
-               {content}
-            </Drawer>
-         </Hidden>
-      </>
-   );
+   return <>
+      <Hidden lgUp>
+         <Drawer
+            anchor="left"
+            classes={{
+               paper: clsx(classes.mobileDrawer, classes.background),
+            }}
+            onClose={onMobileClose}
+            open={openMobile}
+            variant="temporary"
+         >
+            {content}
+         </Drawer>
+      </Hidden>
+      <Hidden lgDown>
+         <Drawer
+            anchor="left"
+            classes={{
+               paper: clsx(classes.desktopDrawer, classes.background),
+            }}
+            open
+            variant="persistent"
+         >
+            {content}
+         </Drawer>
+      </Hidden>
+   </>;
 };
 
 NavBar.propTypes = {

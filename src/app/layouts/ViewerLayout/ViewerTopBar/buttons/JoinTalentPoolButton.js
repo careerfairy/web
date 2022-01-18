@@ -1,7 +1,7 @@
 import React from "react";
-import { Button, IconButton, Tooltip } from "@material-ui/core";
-import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
-import HowToRegOutlinedIcon from "@material-ui/icons/HowToRegOutlined";
+import { Button, IconButton, Tooltip } from "@mui/material";
+import HowToRegRoundedIcon from "@mui/icons-material/HowToRegRounded";
+import HowToRegOutlinedIcon from "@mui/icons-material/HowToRegOutlined";
 import { useCurrentStream } from "../../../../context/stream/StreamContext";
 import useJoinTalentPool from "../../../../components/custom-hook/useJoinTalentPool";
 
@@ -29,7 +29,7 @@ const JoinTalentPoolButton = ({ mobile }) => {
                      ? () => leaveTalentPool()
                      : () => joinTalentPool()
                }
-            >
+               size="large">
                {userIsInTalentPool ? (
                   <HowToRegRoundedIcon />
                ) : (

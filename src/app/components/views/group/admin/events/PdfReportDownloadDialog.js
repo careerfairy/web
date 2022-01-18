@@ -10,13 +10,13 @@ import {
    DialogContentText,
    IconButton,
    Slide,
-} from "@material-ui/core";
+} from "@mui/material";
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import EventPdfReport from "./EventPdfReport";
-import { useTheme } from "@material-ui/core/styles";
-import CloseIcon from "@material-ui/icons/Close";
+import { useTheme } from "@mui/material/styles";
+import CloseIcon from "@mui/icons-material/Close";
 import { isMobile } from "react-device-detect";
-import { Alert, AlertTitle } from "@material-ui/lab";
+import { Alert, AlertTitle } from '@mui/material';
 
 const PdfReportDownloadDialogContent = ({ handleClose, reportPdfData }) => {
    const theme = useTheme();
@@ -73,7 +73,7 @@ const PdfReportDownloadDialogContent = ({ handleClose, reportPdfData }) => {
    return (
       <React.Fragment>
          <Box display="flex" justifyContent="flex-end" color="white">
-            <IconButton color="inherit" onClick={handleClose}>
+            <IconButton color="inherit" onClick={handleClose} size="large">
                <CloseIcon fontSize="large" />
             </IconButton>
          </Box>

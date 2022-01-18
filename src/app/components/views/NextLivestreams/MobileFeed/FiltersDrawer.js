@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Box, Drawer, Typography } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Box, Drawer, Typography } from "@mui/material";
 import CategoryCard from "../GroupCategories/CategoryCard";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../../store/actions";
-import IconButton from "@material-ui/core/IconButton";
-import CloseDrawerIcon from "@material-ui/icons/ExpandMore";
+import IconButton from "@mui/material/IconButton";
+import CloseDrawerIcon from "@mui/icons-material/ExpandMore";
 
 const useStyles = makeStyles((theme) => ({
    actions: {
@@ -53,7 +53,7 @@ const FiltersDrawer = ({ groupData, handleToggleActive, hasCategories }) => {
                <Typography color="textSecondary" variant="h5">
                   Filters
                </Typography>
-               <IconButton onClick={handleCloseFilter}>
+               <IconButton onClick={handleCloseFilter} size="large">
                   <CloseDrawerIcon />
                </IconButton>
             </Box>

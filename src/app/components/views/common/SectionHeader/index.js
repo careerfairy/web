@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import clsx from "clsx";
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import GeneralSearch from "../GeneralSearch";
 
 const useStyles = makeStyles((theme) => ({
@@ -54,7 +54,6 @@ function SectionHeader({
                align="center"
                variant={titleVariant}
                component="h3"
-               margin={20}
             >
                {title}
             </Typography>

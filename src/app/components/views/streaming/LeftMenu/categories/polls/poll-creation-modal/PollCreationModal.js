@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import AddIcon from "@material-ui/icons/Add";
+import AddIcon from "@mui/icons-material/Add";
 import { withFirebase } from "context/firebase";
-import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import {
    DialogTitle,
    DialogContent,
@@ -15,8 +15,8 @@ import {
    DialogActions,
    TextField,
    Grow,
-} from "@material-ui/core";
-import { BarChart } from "@material-ui/icons";
+} from "@mui/material";
+import { BarChart } from "@mui/icons-material";
 import { GlassDialog } from "../../../../../../../materialUI/GlobalModals";
 import { v4 as uuidv4 } from "uuid";
 import useStreamRef from "../../../../../../custom-hook/useStreamRef";
@@ -165,14 +165,12 @@ function PollCreationModal({
          onClose={handleClose}
       >
          <DialogTitle
-            disableTypography
             style={{
                display: "flex",
                justifyContent: "center",
                alignItems: "flex-end",
             }}
-            align="center"
-         >
+            align="center">
             <BarChart color="primary" fontSize="large" />{" "}
             <Typography
                color="primary"

@@ -1,10 +1,10 @@
 import React from "react";
-import { Box, Checkbox, FormControlLabel, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Box, Checkbox, FormControlLabel, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import Fade from "@stahl.luke/react-reveal/Fade";
 
-import MicIcon from "@material-ui/icons/Mic";
-import WifiIcon from "@material-ui/icons/Wifi";
+import MicIcon from "@mui/icons-material/Mic";
+import WifiIcon from "@mui/icons-material/Wifi";
 
 const chromeLogo =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fchrome.svg?alt=media&token=516e705a-bafa-4a43-99f7-e184cc85b557";

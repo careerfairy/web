@@ -1,7 +1,7 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Avatar, Typography } from "@material-ui/core";
-import { AvatarGroup } from "@material-ui/lab";
+import makeStyles from '@mui/styles/makeStyles';
+import { Avatar, Typography } from "@mui/material";
+import { AvatarGroup } from '@mui/material';
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 import { speakerPlaceholder } from "../../../util/constants";
 

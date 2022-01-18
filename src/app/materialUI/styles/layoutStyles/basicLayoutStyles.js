@@ -14,7 +14,7 @@ const basicLayoutStyles = (theme) => ({
       [theme.breakpoints.up("lg")]: {
          paddingLeft: 256,
       },
-      [theme.breakpoints.down("xs")]: {
+      [theme.breakpoints.down('sm')]: {
          paddingTop: 56,
       },
    },

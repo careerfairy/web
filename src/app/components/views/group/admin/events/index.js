@@ -1,7 +1,8 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import { AppBar, Box, CircularProgress, Tabs } from "@material-ui/core";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { AppBar, Box, CircularProgress, Tabs } from "@mui/material";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import NewStreamModal from "./NewStreamModal";
 import { useRouter } from "next/router";
@@ -9,7 +10,7 @@ import {
    prettyLocalizedDate,
    repositionElement,
 } from "../../../../helperFunctions/HelperFunctions";
-import Tab from "@material-ui/core/Tab";
+import Tab from "@mui/material/Tab";
 import Header from "./Header";
 import EventsTable from "./events-table/EventsTable";
 import { useFirebase } from "context/firebase";

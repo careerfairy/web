@@ -1,7 +1,7 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Card, CardContent, CardHeader } from "@material-ui/core";
-import Skeleton from "@material-ui/lab/Skeleton";
+import makeStyles from '@mui/styles/makeStyles';
+import { Card, CardContent, CardHeader } from "@mui/material";
+import Skeleton from '@mui/material/Skeleton';
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -32,7 +32,7 @@ const Spinner = ({}) => {
                <Skeleton
                   className={classes.timestamp}
                   animation="wave"
-                  variant="rect"
+                  variant="rectangular"
                   width={55}
                   height={70}
                />
@@ -41,7 +41,7 @@ const Spinner = ({}) => {
          <Skeleton
             animation="wave"
             height={150}
-            variant="rect"
+            variant="rectangular"
             className={classes.media}
          />
          <CardContent>
@@ -59,7 +59,7 @@ const Spinner = ({}) => {
             <Skeleton animation="wave" height={10} width="60%" />
          </CardContent>
 
-         <Skeleton animation="wave" height={150} variant="rect" />
+         <Skeleton animation="wave" height={150} variant="rectangular" />
       </Card>
    );
 };

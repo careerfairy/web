@@ -1,7 +1,7 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
-import { Box, CircularProgress, Divider, Grid } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, CircularProgress, Divider, Grid } from "@mui/material";
 import QuestionCard from "./QuestionCard";
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 

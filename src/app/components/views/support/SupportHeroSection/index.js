@@ -1,8 +1,8 @@
 import React from 'react';
-import {makeStyles} from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "../../common/Section";
 import SectionHeader from "../../common/SectionHeader";
-import {Container} from "@material-ui/core";
+import {Container} from "@mui/material";
 
 const useStyles = makeStyles(theme => ({
     container: {

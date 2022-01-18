@@ -1,9 +1,10 @@
 import React from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { IconButton, Modal, useMediaQuery } from "@material-ui/core";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { IconButton, Modal, useMediaQuery } from "@mui/material";
 import { InlineWidget } from "react-calendly";
 import { useAuth } from "../../../../HOCs/AuthProvider";
-import CloseIcon from "@material-ui/icons/Close";
+import CloseIcon from "@mui/icons-material/Close";
 
 const closeWrapperHeight = 70;
 const useStyles = makeStyles((theme) => ({
@@ -51,7 +52,7 @@ const Content = ({ handleClose, background, primary, text, mobile }) => {
       <React.Fragment>
          <div className={classes.closeWrapper}>
             <div>
-               <IconButton onClick={handleClose}>
+               <IconButton onClick={handleClose} size="large">
                   <CloseIcon className={classes.closeIcon} />
                </IconButton>
             </div>
@@ -62,7 +63,7 @@ const Content = ({ handleClose, background, primary, text, mobile }) => {
 };
 const CalendlyModal = ({ open, onClose }) => {
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down("xs"));
+   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
    const handleClose = () => {
       onClose();

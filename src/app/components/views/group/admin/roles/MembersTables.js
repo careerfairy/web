@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import { Avatar, Badge, Box, Card, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Avatar, Badge, Box, Card, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { defaultTableOptions, tableIcons } from "../../../../util/tableUtils";
 import { useSelector } from "react-redux";
 import { exportSelectionAction } from "../analytics/common/TableUtils";

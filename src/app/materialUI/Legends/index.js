@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useRef, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Checkbox,
    Collapse,
@@ -9,7 +9,7 @@ import {
    Slide,
    ListItemIcon,
    ListItemText,
-} from "@material-ui/core";
+} from "@mui/material";
 import { colorsArray } from "../../components/util/colors";
 import { TransitionGroup } from "react-transition-group";
 

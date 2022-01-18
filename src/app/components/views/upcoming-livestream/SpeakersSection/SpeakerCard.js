@@ -1,12 +1,12 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Card,
    CardContent,
    CardMedia,
    ListItemText,
    Paper,
-} from "@material-ui/core";
+} from "@mui/material";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 import { speakerPlaceholder } from "../../../util/constants";
 

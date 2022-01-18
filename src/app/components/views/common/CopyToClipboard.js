@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { IconButton, Tooltip } from "@material-ui/core";
-import ShareIcon from "@material-ui/icons/Share";
+import { IconButton, Tooltip } from "@mui/material";
+import ShareIcon from "@mui/icons-material/Share";
 import { getBaseUrl } from "../../helperFunctions/HelperFunctions";
 
 const CopyToClipboard = ({ value, color, children, ...props }) => {
@@ -61,7 +61,7 @@ const CopyToClipboard = ({ value, color, children, ...props }) => {
             disableHoverListener
             disableTouchListener
          >
-            <IconButton onClick={() => copyStringToClipboard()}>
+            <IconButton onClick={() => copyStringToClipboard()} size="large">
                <ShareIcon
                   fontSize="large"
                   style={{ color: color || "inherit" }}

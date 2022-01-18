@@ -8,11 +8,11 @@ import {
    Grid,
    Typography,
    CircularProgress,
-} from "@material-ui/core";
-import PeopleIcon from "@material-ui/icons/PeopleOutlined";
+} from "@mui/material";
+import PeopleIcon from "@mui/icons-material/PeopleOutlined";
 import { withFirebase } from "../../../../../../context/firebase";
-import indigo from "@material-ui/core/colors/indigo";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { indigo } from '@mui/material/colors';
 
 const useStyles = makeStyles(() => ({
    root: {

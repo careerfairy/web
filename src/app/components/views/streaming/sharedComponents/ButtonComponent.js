@@ -1,14 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
-import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
-import HelpIcon from "@material-ui/icons/Help";
-import BarChartIcon from "@material-ui/icons/BarChart";
-import PanToolOutlinedIcon from "@material-ui/icons/PanToolOutlined";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
-import SpeedDial from "@material-ui/lab/SpeedDial";
-import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
-import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
-import { ClickAwayListener } from "@material-ui/core";
-import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
+import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
+import HelpIcon from "@mui/icons-material/Help";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import PanToolOutlinedIcon from "@mui/icons-material/PanToolOutlined";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import SpeedDial from '@mui/material/SpeedDial';
+import SpeedDialIcon from '@mui/material/SpeedDialIcon';
+import SpeedDialAction from '@mui/material/SpeedDialAction';
+import { ClickAwayListener } from "@mui/material";
+import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
@@ -279,10 +280,10 @@ const ButtonComponent = ({
                                  [classes.actionButtonPink]: !action.name
                                     .length,
                                  [classes.darkActionButton]:
-                                    theme.palette.type === "dark",
+                                    theme.palette.mode === "dark",
                                  [classes.darkActionButtonPink]:
                                     !action.name.length &&
-                                    theme.palette.type === "dark",
+                                    theme.palette.mode === "dark",
                               }),
                            },
                            disabled: action.disabled,

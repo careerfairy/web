@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    FormControl,
    Grid,
@@ -8,7 +8,7 @@ import {
    MenuItem,
    Select,
    TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import UserList from "./UserList";
 import { isEmpty, isLoaded } from "react-redux-firebase";
 import { useCurrentStream } from "../../../../../context/stream/StreamContext";

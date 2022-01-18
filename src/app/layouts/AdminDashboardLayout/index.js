@@ -1,12 +1,12 @@
 import PropTypes from "prop-types";
 import React, { useMemo, useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import NavBar from "./NavBar";
 import { withFirebase } from "../../context/firebase";
 import { useAuth } from "../../HOCs/AuthProvider";
 import TopBar from "./TopBar";
 import styles from "../../materialUI/styles/layoutStyles/groupDashboardStyles";
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress } from "@mui/material";
 import useAdminLinks from "../../components/custom-hook/useAdminLinks";
 import { useRouter } from "next/router";
 import * as actions from "../../store/actions";

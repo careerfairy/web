@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import SectionHeader from "../../common/SectionHeader";
 import SectionContainer from "../../common/Section/Container";
@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
    title: {
       fontSize: "4.5rem",
       fontWeight: 500,
-      [theme.breakpoints.down("xs")]: {
+      [theme.breakpoints.down('sm')]: {
          fontSize: "3.5rem",
       },
    },

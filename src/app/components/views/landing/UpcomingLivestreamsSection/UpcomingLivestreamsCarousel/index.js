@@ -1,9 +1,9 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import UpcomingLivestreamCard from "../../../common/stream-cards/UpcomingLivestreamCard";
 import { getMaxSlides } from "util/CommonUtil";
 
@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
       marginLeft: "auto",
       marginRight: "auto",
       width: "95%",
-      [theme.breakpoints.down("md")]: {
+      [theme.breakpoints.down('lg')]: {
          width: "100%",
       },
       "& .slick-dots li.slick-active button:before": {

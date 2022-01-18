@@ -1,15 +1,16 @@
 import React, { useMemo, useState } from "react";
-import { Container, Grid, Tooltip } from "@material-ui/core";
+import { Container, Grid, Tooltip } from "@mui/material";
 import TotalRegistrations from "./TotalRegistrations";
 import TotalUniqueRegistrations from "./TotalUniqueRegistrations";
 import CategoryBreakdown from "./CategoryBreakdown";
 import AverageRegistrations from "./AverageRegistrations";
 import { mustBeNumber } from "../../../../../helperFunctions/HelperFunctions";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import LatestEvents from "../common/LatestEvents";
 import UserCount from "./UserCount";
 import TotalUniqueParticipatingStudents from "./TotalUniqueParticipatingStudents";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import {
    getTotalEmailsFromStreamsByProperty,
    getUniqueIds,
@@ -53,7 +54,7 @@ const General = ({
    const classes = useStyles();
    const [localUserType, setLocalUserType] = useState(userTypes[0]);
    const theme = useTheme();
-   const mediumScreen = useMediaQuery(theme.breakpoints.down("md"));
+   const mediumScreen = useMediaQuery(theme.breakpoints.down('lg'));
    const userDataSet = useUserDataSet(currentUserDataSet, { isFiltered: true });
 
    const getTotalRegisteredUsers = (streamsArray) => {

@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Avatar, Typography } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Avatar, Typography } from "@mui/material";
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
 import { speakerPlaceholder } from "../../../../util/constants";
 

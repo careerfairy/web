@@ -6,7 +6,7 @@ import {
    ListItemText,
    Menu,
    MenuItem,
-} from "@material-ui/core";
+} from "@mui/material";
 import { makeUrls } from "../../../../util/makeUrls";
 import {
    appleIcon,
@@ -15,7 +15,7 @@ import {
    outlookYellowIcon,
    yahooIcon,
 } from "../../../../constants/svgs";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    avatar: {

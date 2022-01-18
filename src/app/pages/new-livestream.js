@@ -4,7 +4,7 @@ import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 import NewLivestreamForm from "../components/views/newLivestreamForm/NewLivestreamForm";
 import React from "react";
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import { useAuth } from "../HOCs/AuthProvider";
 
 const newLivestream = () => {

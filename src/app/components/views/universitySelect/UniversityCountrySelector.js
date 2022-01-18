@@ -4,9 +4,9 @@ import {
    FormControl,
    FormHelperText,
    TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import { universityCountries } from "../../util/constants/universityCountries";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from '@mui/material/Autocomplete';
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 
@@ -51,7 +51,7 @@ const UniversityCountrySelector = ({
          onClose={handleClose}
          getOptionLabel={(option) => option.name || ""}
          value={getSelectedItem()}
-         getOptionSelected={(option, value) => option.code === value.code}
+         isOptionEqualToValue={(option, value) => option.code === value.code}
          options={universityCountries}
          renderInput={(params) => {
             const inputProps = params.inputProps;

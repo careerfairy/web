@@ -18,12 +18,17 @@ import { AuthProvider } from "../HOCs/AuthProvider";
 import { ReactReduxFirebaseProvider } from "react-redux-firebase";
 import { createFirestoreInstance } from "redux-firestore";
 import { Provider } from "react-redux";
-import { ThemeProviderWrapper } from "../context/theme/ThemeContext";
-import { CssBaseline } from "@material-ui/core";
+import { CacheProvider } from "@emotion/react";
+import createEmotionCache from "materialUI/createEmotionCache";
+
 import Notifier from "../components/views/notifier";
 import { getCookieConsentValue } from "react-cookie-consent";
 import CFCookieConsent from "components/views/common/cookie-consent/CFCookieConsent";
 import { useRouter } from "next/router";
+import { ThemeProviderWrapper } from "../context/theme/ThemeContext";
+
+// Client-side cache, shared for the whole session of the user in the browser.
+const clientSideEmotionCache = createEmotionCache();
 
 config({ ssrFadeout: true });
 
@@ -42,7 +47,13 @@ const rrfProps = {
    createFirestoreInstance,
 };
 
-function MyApp({ Component, pageProps }) {
+function MyApp(props) {
+   const {
+      Component,
+      emotionCache = clientSideEmotionCache,
+      pageProps,
+   } = props;
+
    // const classes = useStyles()
    Sentry.init({
       dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031",
@@ -90,14 +101,6 @@ function MyApp({ Component, pageProps }) {
 
    const [showBubbles, setShowBubbles] = useState(false);
    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState);
-
-   useEffect(() => {
-      // Remove the server-side injected CSS.
-      const jssStyles = document.querySelector("#jss-server-side");
-      if (jssStyles) {
-         jssStyles.parentElement.removeChild(jssStyles);
-      }
-   }, []);
 
    const tagManagerArgs = {
       gtmId: "GTM-P29VCWC",
@@ -150,7 +153,7 @@ function MyApp({ Component, pageProps }) {
    };
 
    return (
-      <Fragment>
+      <CacheProvider value={emotionCache}>
          <Head>
             <title>CareerFairy | Watch live streams. Get hired.</title>
          </Head>
@@ -171,12 +174,10 @@ function MyApp({ Component, pageProps }) {
                   <AuthProvider>
                      <ThemeProviderWrapper>
                         <FirebaseContext.Provider value={firebase}>
-                           <LocalizationProvider utils={AdapterDateFns}>
+                           <LocalizationProvider dateAdapter={AdapterDateFns}>
                               <ErrorContext.Provider
                                  value={{ generalError, setGeneralError }}
                               >
-                                 {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                                 <CssBaseline />
                                  {disableCookies || isRecordingWindow ? null : (
                                     <CFCookieConsent />
                                  )}
@@ -194,7 +195,7 @@ function MyApp({ Component, pageProps }) {
                </TutorialContext.Provider>
             </ReactReduxFirebaseProvider>
          </Provider>
-      </Fragment>
+      </CacheProvider>
    );
 }
 

@@ -1,17 +1,17 @@
 import StatsUtil from "data/util/StatsUtil";
 import React, { useCallback, useEffect, useState } from "react";
-import TalentPoolIcon from "@material-ui/icons/HowToRegRounded";
+import TalentPoolIcon from "@mui/icons-material/HowToRegRounded";
 import { useFirebase } from "../../context/firebase";
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress } from "@mui/material";
 import { CSVLink } from "react-csv";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import PDFIcon from "@material-ui/icons/PictureAsPdf";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import PDFIcon from "@mui/icons-material/PictureAsPdf";
 import { useAuth } from "../../HOCs/AuthProvider";
-import RegisteredUsersIcon from "@material-ui/icons/People";
+import RegisteredUsersIcon from "@mui/icons-material/People";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
 import ButtonWithHint from "../views/group/admin/events/events-table/ButtonWithHint";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 
 export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    const firebase = useFirebase();

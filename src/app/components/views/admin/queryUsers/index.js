@@ -1,5 +1,6 @@
 import React from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import SwipeableViews from "react-swipeable-views";
 import QueryEditView from "./QueryEditView";
 import { TabPanel } from "../../../../materialUI/GlobalPanels/GlobalPanels";
@@ -12,7 +13,7 @@ import {
    Grid,
    Tab,
    Tabs,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useSelector } from "react-redux";
 import { isLoaded } from "react-redux-firebase";
 

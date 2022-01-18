@@ -19,20 +19,21 @@ import {
    Tab,
    Tabs,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { colorsArray } from "../../../../../util/colors";
 import { withFirebase } from "../../../../../../context/firebase";
-import RotateLeftIcon from "@material-ui/icons/RotateLeft";
+import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import { prettyDate } from "../../../../../helperFunctions/HelperFunctions";
 import CustomLegend from "../../../../../../materialUI/Legends";
 import Chart from "chart.js";
 import "chartjs-plugin-labels";
 import { customDonutConfig } from "../common/TableUtils";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import StatsUtil from "../../../../../../data/util/StatsUtil";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const audienceSelector = createSelector(
    (state) => state,

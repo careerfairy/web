@@ -1,8 +1,8 @@
 import React, { Fragment, useState, useEffect, useContext } from "react";
 import { useFirebase, withFirebase } from "context/firebase";
-import TheatersRoundedIcon from "@material-ui/icons/TheatersRounded";
-import ArrowForwardIosRoundedIcon from "@material-ui/icons/ArrowForwardIosRounded";
-import BusinessCenterRoundedIcon from "@material-ui/icons/BusinessCenterRounded";
+import TheatersRoundedIcon from "@mui/icons-material/TheatersRounded";
+import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
+import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded";
 import { useRouter } from "next/router";
 
 import Link from "next/link";
@@ -13,7 +13,7 @@ import {
    Link as MuiLink,
    MenuItem,
    Select,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import Head from "next/head";
 import {
@@ -32,8 +32,8 @@ import {
    Stepper,
    Step,
    StepLabel,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { TealBackground } from "../materialUI/GlobalBackground/GlobalBackGround";
 import GroupProvider from "../components/views/signup/GroupProvider";
 import UniversitySelector from "../components/views/universitySelect/UniversitySelector";
@@ -822,10 +822,7 @@ function SignUpFormValidate({
                   >
                      <strong>Incorrect PIN</strong> <br />
                      The PIN code you entered appears to be incorrect.{" "}
-                     <MuiLink
-                        href="#"
-                        onClick={() => resendVerificationEmail()}
-                     >
+                     <MuiLink href="#" onClick={() => resendVerificationEmail()} underline="hover">
                         <br />
                         Resend the verification email.
                      </MuiLink>
@@ -838,7 +835,7 @@ function SignUpFormValidate({
                         <MuiLink
                            style={{ cursor: "pointer" }}
                            href="mailto:maximilian@careerfairy.io"
-                        >
+                           underline="hover">
                            {" "}
                            Let us know
                         </MuiLink>

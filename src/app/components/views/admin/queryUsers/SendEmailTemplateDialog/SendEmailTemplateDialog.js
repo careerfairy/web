@@ -11,16 +11,16 @@ import {
    Stepper,
    TextField,
    useMediaQuery,
-} from "@material-ui/core";
+} from "@mui/material";
 import { GlassDialog } from "materialUI/GlobalModals";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import { useFirestore } from "react-redux-firebase";
 import {
    FORTY_FIVE_MINUTES_IN_MILLISECONDS,
    UPCOMING_LIVESTREAMS_NAME,
 } from "../../../../../data/constants/streamContants";
 import { useSelector } from "react-redux";
-import { Autocomplete } from "@material-ui/lab";
+import { Autocomplete } from '@mui/material';
 import EmailTemplateCard from "./EmailTemplateCard";
 import EmailTemplateForm from "./EmailTemplateForm";
 import useTemplates from "./templates";

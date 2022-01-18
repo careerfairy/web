@@ -1,6 +1,6 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Tab, Tabs, Typography } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Tab, Tabs, Typography } from "@mui/material";
 import clsx from "clsx";
 import Link from "../../../materialUI/NextNavLink";
 import { useRouter } from "next/router";

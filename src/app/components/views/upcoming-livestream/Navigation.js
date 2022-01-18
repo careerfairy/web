@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import { Tab, Tabs } from "@material-ui/core";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { Tab, Tabs } from "@mui/material";
 import debounce from "lodash.debounce";
 import Link from "materialUI/NextNavLink";
 import SectionContainer from "../common/Section/Container";

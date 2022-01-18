@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import {
@@ -10,9 +11,9 @@ import {
    Grid,
    IconButton,
    List,
-} from "@material-ui/core";
+} from "@mui/material";
 import { ThemedPermanentMarker } from "../../../../materialUI/GlobalTitles";
-import CloseIcon from "@material-ui/icons/Close";
+import CloseIcon from "@mui/icons-material/Close";
 import { useCurrentStream } from "context/stream/StreamContext";
 import { useFirebase } from "context/firebase";
 import useStreamRef from "components/custom-hook/useStreamRef";
@@ -120,7 +121,7 @@ const Content = ({ fullyOpened, handleClose, mobile }) => {
             </ThemedPermanentMarker>
             <Box flex={1} />
             {mobile ? (
-               <IconButton {...closeProps()}>
+               <IconButton {...closeProps()} size="large">
                   <CloseIcon />
                </IconButton>
             ) : (

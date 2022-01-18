@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import { calendarIcon, ipad } from "../../../../constants/images";
 import SectionContainer from "../../common/Section/Container";
@@ -51,10 +51,10 @@ const useStyles = makeStyles((theme) => ({
       height: "100%",
       opacity: 0.35,
       right: "4%",
-      [theme.breakpoints.down("md")]: {
+      [theme.breakpoints.down('lg')]: {
          right: theme.spacing(1),
       },
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          borderRadius: theme.spacing(0, 5, 5, 0),
       },
       borderRadius: theme.spacing(0, 10, 10, 0),

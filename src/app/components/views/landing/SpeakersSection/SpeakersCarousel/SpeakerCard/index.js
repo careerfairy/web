@@ -1,6 +1,6 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Avatar, Box, Card, Grid, Typography } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Avatar, Box, Card, Grid, Typography } from "@mui/material";
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => {

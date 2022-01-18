@@ -1,7 +1,7 @@
 import { useState, useEffect, Fragment } from "react";
 import JobDescription from "./job-description/JobDescription";
 import { withFirebase } from "context/firebase";
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 
 function JobDescriptions(props) {
    let [positions, setPositions] = useState([]);

@@ -1,12 +1,13 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import { Dialog } from "@material-ui/core";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { Dialog } from "@mui/material";
 
 const useGlassStyles = makeStyles((theme) => ({
    glass: {
       backgroundColor: (props) => {
-         return theme.palette.type === "dark" || props.forceGlass
+         return theme.palette.mode === "dark" || props.forceGlass
             ? alpha(theme.palette.common.black, 0.4)
             : theme.palette.background.default;
       },
@@ -42,11 +43,9 @@ const GlassDialog = ({
          onClose={onClose}
          scroll={scroll}
          TransitionComponent={TransitionComponent}
-         disableBackdropClick={disableBackdropClick}
          classes={classes}
          TransitionProps={TransitionProps}
-         {...rest}
-      />
+         {...rest} />
    );
 };
 

@@ -9,10 +9,10 @@ import {
    Paper,
    TextField,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import DateTimePicker from "@mui/lab/DateTimePicker";
 
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 import DateUtil from "../../../../../util/DateUtil";

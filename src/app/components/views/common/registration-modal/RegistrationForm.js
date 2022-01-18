@@ -6,7 +6,8 @@ import QuestionCreateForm from "./steps/QuestionCreateForm";
 import TalentPoolJoin from "./steps/TalentPoolJoin";
 import RegistrationComplete from "./steps/RegistrationComplete";
 import SwipeableViews from "react-swipeable-views";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels";
 
 const useStyles = makeStyles((theme) => ({

@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import clsx from "clsx";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
-import { Link as MuiLink } from "@material-ui/core";
+import { Link as MuiLink } from "@mui/material";
 
 const NextComposed = React.forwardRef(function NextComposed(props, ref) {
    const { as, href, ...other } = props;
@@ -58,7 +58,7 @@ function Link(props) {
          ref={innerRef}
          href={href}
          {...other}
-      />
+         underline="hover" />
    );
 }
 

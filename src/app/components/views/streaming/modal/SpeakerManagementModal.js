@@ -1,6 +1,6 @@
 import React from "react";
-import PersonAddIcon from "@material-ui/icons/PersonAdd";
-import CheckIcon from "@material-ui/icons/Check";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import CheckIcon from "@mui/icons-material/Check";
 import { withFirebase } from "context/firebase";
 import {
    DialogContentText,
@@ -12,7 +12,7 @@ import {
    Dialog,
    TextField,
    Button,
-} from "@material-ui/core";
+} from "@mui/material";
 import { GlassDialog } from "../../../../materialUI/GlobalModals";
 
 function SpeakerManagementModal({ open, setOpen, joiningStreamerLink }) {
@@ -24,14 +24,12 @@ function SpeakerManagementModal({ open, setOpen, joiningStreamerLink }) {
          open={open}
       >
          <DialogTitle
-            disableTypography
             style={{
                display: "flex",
                justifyContent: "center",
                alignItems: "flex-end",
             }}
-            align="center"
-         >
+            align="center">
             <PersonAddIcon style={{ marginRight: "1rem" }} fontSize="large" />{" "}
             <Typography
                style={{ fontSize: "1.8em", fontWeight: 500 }}

@@ -1,6 +1,6 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Button, Tooltip, Typography } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Button, Tooltip, Typography } from "@mui/material";
 
 const useStyles = makeStyles((theme) => {
    return {
@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => {
          boxShadow: theme.shadows[1],
          fontSize: 11,
          padding: theme.spacing(2),
-         [theme.breakpoints.down("xs")]: {
+         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(1.5),
             maxWidth: 150,
          },
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => {
       text: {},
       buttonWrapper: {
          marginTop: theme.spacing(1),
-         [theme.breakpoints.down("xs")]: {
+         [theme.breakpoints.down('sm')]: {
             marginTop: theme.spacing(0.5),
          },
          width: "100%",

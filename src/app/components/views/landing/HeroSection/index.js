@@ -1,12 +1,13 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
-import { Grid, Hidden } from "@material-ui/core";
+import { Grid, Hidden } from "@mui/material";
 import LaptopVideo from "./LaptopVideo";
 import GeneralHeroMessage from "./HeroMessage";
 import SectionContainer from "../../common/Section/Container";
-import Slide from "@material-ui/core/Slide";
+import Slide from "@mui/material/Slide";
 
 const useStyles = makeStyles((theme) => ({
    section: {},
@@ -24,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       justifyContent: "flex-end",
       alignItems: "flex-end",
-      [theme.breakpoints.down("md")]: {
+      [theme.breakpoints.down('lg')]: {
          justifyContent: "center",
       },
    },
@@ -74,7 +75,7 @@ const HeroSection = ({
                      />
                   </Grid>
                </Slide>
-               <Hidden mdDown>
+               <Hidden lgDown>
                   <Slide timeout={1000} in direction="left">
                      <Grid className={classes.laptopVideoWrapper} item md={6}>
                         <LaptopVideo />

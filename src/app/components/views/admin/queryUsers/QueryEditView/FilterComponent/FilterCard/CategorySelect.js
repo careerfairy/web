@@ -1,12 +1,12 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Box, Chip, IconButton, TextField } from "@material-ui/core";
-import { Autocomplete } from "@material-ui/lab";
+import makeStyles from '@mui/styles/makeStyles';
+import { Box, Chip, IconButton, TextField } from "@mui/material";
+import { Autocomplete } from '@mui/material';
 import { convertArrayOfObjectsToDictionaryByProp } from "../../../../../../../data/util/AnalyticsUtil";
 import { useDispatch } from "react-redux";
 import * as actions from "../../../../../../../store/actions";
-import CancelSharpIcon from "@material-ui/icons/CancelSharp";
+import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 
 const useStyles = makeStyles((theme) => ({
    inputWrapper: {
@@ -94,7 +94,7 @@ const CategorySelect = ({ option, groupId, handleRemoveFilterOption }) => {
                         handleRemoveFilterOption(categoryId, groupId)
                      }
                      color="secondary"
-                  >
+                     size="large">
                      <CancelSharpIcon />
                   </IconButton>
                </Box>
@@ -103,7 +103,6 @@ const CategorySelect = ({ option, groupId, handleRemoveFilterOption }) => {
          renderTags={(value, getTagProps) =>
             value.map((option, index) => (
                <Chip
-                  variant="default"
                   label={optionsMap[option]?.name}
                   {...getTagProps({ index })}
                   onDelete={() =>
@@ -113,8 +112,7 @@ const CategorySelect = ({ option, groupId, handleRemoveFilterOption }) => {
                         categoryId,
                         groupId
                      )
-                  }
-               />
+                  } />
             ))
          }
       />

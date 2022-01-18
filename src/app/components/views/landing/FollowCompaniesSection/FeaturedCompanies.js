@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useFirebase } from "context/firebase";
 import FeaturedCompanyCard from "./FeaturedCompanyCard";
-import { Box, Grid } from "@material-ui/core";
+import { Box, Grid } from "@mui/material";
 import GroupsUtil from "../../../../data/util/GroupsUtil";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 

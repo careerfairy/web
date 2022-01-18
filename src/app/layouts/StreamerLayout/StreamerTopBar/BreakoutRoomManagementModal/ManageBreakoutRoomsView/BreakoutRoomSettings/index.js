@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import {
    Button,
    DialogActions,
@@ -9,9 +9,9 @@ import {
    ListItemIcon,
    ListItemText,
    Switch,
-} from "@material-ui/core";
+} from "@mui/material";
 import PropTypes from "prop-types";
-import List from "@material-ui/core/List";
+import List from "@mui/material/List";
 import { useFirebase } from "context/firebase";
 import { useRouter } from "next/router";
 

@@ -1,13 +1,14 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
 import RoundButton from "materialUI/GlobalButtons/RoundButton";
 import Link from "materialUI/NextNavLink";
 import SectionContainer from "../../common/Section/Container";
 import Pulse from "@stahl.luke/react-reveal/Pulse";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({

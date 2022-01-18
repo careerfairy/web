@@ -1,6 +1,6 @@
 import React, { memo } from "react";
-import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
-import { Button, Grow } from "@material-ui/core";
+import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
+import { Button, Grow } from "@mui/material";
 import {
    CategoryContainerCentered,
    CategoryContainerContent,

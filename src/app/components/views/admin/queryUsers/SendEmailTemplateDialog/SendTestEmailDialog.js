@@ -5,9 +5,9 @@ import {
    DialogActions,
    DialogContent,
    TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import * as PropTypes from "prop-types";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from '@mui/material/Autocomplete';
 
 const Content = ({
    handleClose,

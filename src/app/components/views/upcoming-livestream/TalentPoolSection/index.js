@@ -1,11 +1,12 @@
 import PropTypes from "prop-types";
 import React, { memo, useEffect, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import HighlightText from "components/views/common/HighlightText";
 import SectionHeader from "../../common/SectionHeader";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import Fade from "@stahl.luke/react-reveal/Fade";
 import {
    Button,
@@ -13,9 +14,9 @@ import {
    Grid,
    Hidden,
    Typography,
-} from "@material-ui/core";
-import ClearIcon from "@material-ui/icons/Clear";
-import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
+} from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
+import HowToRegRoundedIcon from "@mui/icons-material/HowToRegRounded";
 import UserUtil from "../../../../data/util/UserUtil";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 import { useFirebase } from "../../../../context/firebase";
@@ -245,7 +246,7 @@ const TalentPoolSection = memo((props) => {
                      </Fade>
                   </Box>
                </Grid>
-               <Hidden smDown>
+               <Hidden mdDown>
                   <Grid className={classes.imgGrid} item xs={12} md={6}>
                      <Fade right>
                         <div className={classes.imgWrapper}>

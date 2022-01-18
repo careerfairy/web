@@ -1,17 +1,17 @@
 import PropTypes from "prop-types";
 import React, { useMemo } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Item, Row } from "@mui-treasury/components/flex";
 import StreamContainer from "./StreamContainer";
 import clsx from "clsx";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import LivestreamPdfViewer from "../../../../util/LivestreamPdfViewer";
 import {
    STREAM_ELEMENT_BORDER_RADIUS,
    STREAM_ELEMENT_SPACING,
 } from "constants/streams";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 
 const STREAMS_ROW_HEIGHT = 125;
 const WIDE_SCREEN_ROW_HEIGHT = 180

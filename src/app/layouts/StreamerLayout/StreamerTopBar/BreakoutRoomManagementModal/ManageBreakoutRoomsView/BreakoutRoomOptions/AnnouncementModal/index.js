@@ -7,7 +7,7 @@ import {
    DialogTitle,
    Slide,
    TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useRouter } from "next/router";
 import { useFirebase } from "context/firebase";
 import { useDispatch } from "react-redux";

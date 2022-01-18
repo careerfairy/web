@@ -6,9 +6,9 @@ import {
    DialogContent,
    DialogContentText,
    DialogTitle,
-} from "@material-ui/core";
-import ClearIcon from "@material-ui/icons/Clear";
-import CheckIcon from "@material-ui/icons/Check";
+} from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
+import CheckIcon from "@mui/icons-material/Check";
 
 const ConfirmStartStreamingDialog = ({
    open,

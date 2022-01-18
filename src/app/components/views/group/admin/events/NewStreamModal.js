@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    AppBar,
    Button,
@@ -12,8 +13,8 @@ import {
    Toolbar,
    Typography,
    Zoom,
-} from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import DraftStreamForm from "../../../draftStreamForm/DraftStreamForm";
 import { useFirebase } from "context/firebase";
 import { buildLivestreamObject } from "../../../../helperFunctions/streamFormFunctions";
@@ -22,9 +23,9 @@ import {
    SAVE_WITH_NO_VALIDATION,
    SUBMIT_FOR_APPROVAL,
 } from "../../../../util/constants";
-import SaveIcon from "@material-ui/icons/Save";
+import SaveIcon from "@mui/icons-material/Save";
 import { useSnackbar } from "notistack";
-import PublishIcon from "@material-ui/icons/Publish";
+import PublishIcon from "@mui/icons-material/Publish";
 import { useRouter } from "next/router";
 import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
@@ -46,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
       alignItems: "center",
    },
    contentRoot: {
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          padding: 0,
       },
    },
@@ -320,7 +321,7 @@ const NewStreamModal = ({
                   color="inherit"
                   onClick={handleCloseDialog}
                   aria-label="close"
-               >
+                  size="large">
                   <CloseIcon />
                </IconButton>
                <Typography variant="h4" className={classes.title}>

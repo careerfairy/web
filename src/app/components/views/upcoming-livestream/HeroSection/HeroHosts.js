@@ -1,9 +1,10 @@
 import React from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import { Avatar, Box, Paper, Typography } from "@material-ui/core";
-import { AvatarGroup } from "@material-ui/lab";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { Avatar, Box, Paper, Typography } from "@mui/material";
+import { AvatarGroup } from '@mui/material';
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
-import { grey } from "@material-ui/core/colors";
+import { grey } from "@mui/material/colors";
 
 const useStyles = makeStyles((theme) => ({
    root: {},

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Grid } from "@material-ui/core";
+import { Box, Grid } from "@mui/material";
 import GroupLogoButton from "./GroupLogoButton";
 import SpeakerInfo from "./SpeakerInfo";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";

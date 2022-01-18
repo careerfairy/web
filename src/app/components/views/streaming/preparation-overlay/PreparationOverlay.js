@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { isEmpty } from "lodash/fp";
 import {
    Button,
@@ -13,8 +13,8 @@ import {
    Switch,
    TextField,
    Typography,
-} from "@material-ui/core";
-import WarningIcon from "@material-ui/icons/Warning";
+} from "@mui/material";
+import WarningIcon from "@mui/icons-material/Warning";
 import { URL_REGEX } from "components/util/constants";
 import usePreparationOverlay from "../../../custom-hook/usePreparationOverlay";
 import { useRouter } from "next/router";

@@ -1,10 +1,9 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Box, LinearProgress, Typography } from "@material-ui/core";
-import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
-import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
-import red from "@material-ui/core/colors/red";
-import green from "@material-ui/core/colors/green";
+import makeStyles from '@mui/styles/makeStyles';
+import { Box, LinearProgress, Typography } from "@mui/material";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import { red, green } from '@mui/material/colors';
 
 const useStyles = makeStyles((theme) => ({
    differenceIcon: {

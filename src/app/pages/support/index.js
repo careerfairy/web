@@ -1,5 +1,6 @@
 import React from 'react';
-import {makeStyles, useTheme} from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import GeneralLayout from "../../layouts/GeneralLayout";
 import SupportHeroSection from "../../components/views/support/SupportHeroSection";
 import SupportCategoriesSection from "../../components/views/support/SupportCategoriesSection";

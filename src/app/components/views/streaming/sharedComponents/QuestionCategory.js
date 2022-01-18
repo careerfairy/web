@@ -22,11 +22,11 @@ import {
    Tabs,
    TextField,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import QuestionContainer from "./questions/QuestionContainer";
-import HelpIcon from "@material-ui/icons/Help";
+import HelpIcon from "@mui/icons-material/Help";
 import { withFirebase } from "context/firebase";
-import AddIcon from "@material-ui/icons/Add";
+import AddIcon from "@mui/icons-material/Add";
 import {
    CategoryContainerTopAligned,
    QuestionContainerHeader,
@@ -35,12 +35,13 @@ import {
 import * as actions from "../../../../store/actions";
 import SwipeableViews from "react-swipeable-views";
 import { TabPanel } from "../../../../materialUI/GlobalPanels/GlobalPanels";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 import { GreyPermanentMarker } from "../../../../materialUI/GlobalTitles";
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useDispatch } from "react-redux";
 import { compose } from "redux";
 import { useCurrentStream } from "../../../../context/stream/StreamContext";

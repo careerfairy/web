@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React, { memo } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
 import {
    Avatar,
    Badge,
@@ -13,15 +14,15 @@ import {
    MenuItem,
    Tooltip,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import clsx from "clsx";
-import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import EmailIcon from "@material-ui/icons/Email";
-import GetAppIcon from "@material-ui/icons/GetApp";
+import HowToRegRoundedIcon from "@mui/icons-material/HowToRegRounded";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import EmailIcon from "@mui/icons-material/Email";
+import GetAppIcon from "@mui/icons-material/GetApp";
 import { makeExternalLink } from "../../../../../helperFunctions/HelperFunctions";
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -168,7 +169,7 @@ const User = ({ user, style, inTalentPool }) => {
          />
          {inTalentPool && (
             <ListItemIcon className={classes.talentPoolIcon}>
-               <IconButton edge="end" onClick={handleClick}>
+               <IconButton edge="end" onClick={handleClick} size="large">
                   <MoreVertIcon />
                </IconButton>
             </ListItemIcon>

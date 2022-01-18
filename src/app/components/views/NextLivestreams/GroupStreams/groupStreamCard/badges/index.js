@@ -1,8 +1,8 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import WhatshotIcon from "@material-ui/icons/Whatshot";
-import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
-import { Chip } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import WhatshotIcon from "@mui/icons-material/Whatshot";
+import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
+import { Chip } from "@mui/material";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({

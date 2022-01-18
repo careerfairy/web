@@ -1,7 +1,7 @@
 import React from "react";
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
-import { makeStyles } from "@material-ui/core/styles";
-import { CircularProgress, Container } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { CircularProgress, Container } from "@mui/material";
 import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead";
 
 // the /admin page is just a redirect for now it also eareses it self from the browser history

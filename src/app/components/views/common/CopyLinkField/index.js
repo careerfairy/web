@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Box,
    Button,
@@ -10,8 +10,8 @@ import {
    InputLabel,
    OutlinedInput,
    Tooltip
-} from "@material-ui/core";
-import LinkIcon from "@material-ui/icons/Link";
+} from "@mui/material";
+import LinkIcon from "@mui/icons-material/Link";
 import { useCopyToClipboard } from "react-use";
 
 const useStyles = makeStyles((theme) => ({

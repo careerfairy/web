@@ -1,8 +1,11 @@
 import React from "react";
-import { Container, Grid, Grow, withWidth } from "@material-ui/core";
+import { Container, Grid, Grow } from "@mui/material";
 import GroupCategories from "../GroupCategories/GroupCategories";
 import GroupStreams from "../GroupStreams/GroupStreams";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 const DesktopFeed = ({
    groupData,

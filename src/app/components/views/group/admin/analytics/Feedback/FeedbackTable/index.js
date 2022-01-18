@@ -9,7 +9,7 @@ import {
    Tabs,
    Tab,
    IconButton,
-} from "@material-ui/core";
+} from "@mui/material";
 import { withFirebase } from "../../../../../../../context/firebase";
 import {
    addMinutes,
@@ -27,8 +27,8 @@ import EditFeedbackModal from "./EditFeedbackModal";
 import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import { useSnackbar } from "notistack";
 import FeedbackGraph from "../FeedbackGraph";
-import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
-import { makeStyles } from "@material-ui/core/styles";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import makeStyles from '@mui/styles/makeStyles';
 import ExportTable from "../../../../../common/Tables/ExportTable";
 
 const useStyles = makeStyles((theme) => ({
@@ -119,7 +119,7 @@ const FeedbackTable = ({
                color={currentRating?.id === rowData.id ? "primary" : "default"}
                disabled={hasNoData()}
                onClick={handleClick}
-            >
+               size="large">
                <ArrowDownwardIcon />
             </IconButton>
          </Box>

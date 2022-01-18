@@ -2,13 +2,13 @@ import { useCurrentStream } from "context/stream/StreamContext";
 import { useFirebase } from "context/firebase";
 import React, { useEffect, useState } from "react";
 import useInfiniteScrollClient from "../../../../../../../components/custom-hook/useInfiniteScrollClient";
-import { AccordionDetails } from "@material-ui/core";
-import Box from "@material-ui/core/Box";
-import EmptyRoomIcon from "@material-ui/icons/SentimentDissatisfied";
-import Typography from "@material-ui/core/Typography";
+import { AccordionDetails } from "@mui/material";
+import Box from "@mui/material/Box";
+import EmptyRoomIcon from "@mui/icons-material/SentimentDissatisfied";
+import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
 import UserList from "./UserList";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    listWrapper: {

@@ -1,6 +1,6 @@
 import { withFirebase } from "../context/firebase";
 import Head from "next/head";
-import { Container } from "@material-ui/core";
+import { Container } from "@mui/material";
 import GeneralLayout from "../layouts/GeneralLayout";
 
 function TermsAndConditions(props) {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Container, Grid } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Container, Grid } from "@mui/material";
 import MembersTable from "./MembersTables";
 import { useSelector } from "react-redux";
 import AddMemberModal from "./AddMemberModal";

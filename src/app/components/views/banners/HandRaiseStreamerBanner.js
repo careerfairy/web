@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import StreamBanner from "./StreamBanner";
-import { Button, Tooltip } from "@material-ui/core";
+import { Button, Tooltip } from "@mui/material";
 import { useFirebase } from "../../../context/firebase";
 import useStreamRef from "../../custom-hook/useStreamRef";
-import HandRaiseIcon from "@material-ui/icons/PanToolOutlined";
+import HandRaiseIcon from "@mui/icons-material/PanToolOutlined";
 
 const HandRaiseStreamerBanner = () => {
    const [buttonMessage] = useState("Deactivate Hand Raise");

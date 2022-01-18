@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import {
    Box,
    Button,
@@ -8,8 +8,8 @@ import {
    CircularProgress,
    Paper,
    Typography,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { getTimeFromNow } from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({

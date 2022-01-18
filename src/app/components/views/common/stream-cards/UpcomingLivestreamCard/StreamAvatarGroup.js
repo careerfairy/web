@@ -1,8 +1,9 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import { AvatarGroup } from "@material-ui/lab";
-import { Avatar } from "@material-ui/core";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { AvatarGroup } from '@mui/material';
+import { Avatar } from "@mui/material";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({

@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import EditIcon from "@material-ui/icons/Edit";
+import EditIcon from "@mui/icons-material/Edit";
 import { withFirebase } from "context/firebase";
 import PollCreationModal from "../../poll-creation-modal/PollCreationModal";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
    Box,
    Button,
@@ -15,8 +15,8 @@ import {
    ListItemIcon,
    ListItemText,
    Paper,
-} from "@material-ui/core";
-import { CloseRounded } from "@material-ui/icons";
+} from "@mui/material";
+import { CloseRounded } from "@mui/icons-material";
 import { colorsArray } from "../../../../../../../util/colors";
 import TutorialContext from "../../../../../../../../context/tutorials/TutorialContext";
 import {
@@ -25,7 +25,8 @@ import {
    TooltipTitle,
    WhiteTooltip,
 } from "../../../../../../../../materialUI/GlobalTooltips";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
 import useStreamRef from "../../../../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles((theme) => ({

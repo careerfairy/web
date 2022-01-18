@@ -7,13 +7,13 @@ const nextLivestreamsLayoutStyles = (theme) => ({
       flex: "1 1 auto",
       overflow: "hidden",
       paddingTop: 64,
-      [theme.breakpoints.down("md")]: {
+      [theme.breakpoints.down('lg')]: {
          paddingLeft: 0,
       },
       [theme.breakpoints.up("lg")]: {
          paddingLeft: (props) => props.drawerWidth,
       },
-      [theme.breakpoints.down("xs")]: {
+      [theme.breakpoints.down('sm')]: {
          paddingTop: 48,
       },
    },

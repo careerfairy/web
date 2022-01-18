@@ -17,10 +17,10 @@ import {
    Switch,
    TextField,
    CircularProgress,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useSnackbar } from "notistack";
 import { GENERAL_ERROR, URL_REGEX } from "../../../../util/constants";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useRouter } from "next/router";
 import usePulseStyles from "../../../../../materialUI/Misc/pulse";
 

@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useMemo, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Box,
    Button,
@@ -11,13 +11,13 @@ import {
    Paper,
    Tooltip,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import DateUtil from "../../../../util/DateUtil";
-import CheckIcon from "@material-ui/icons/Check";
-import CalendarIcon from "@material-ui/icons/CalendarToday";
+import CheckIcon from "@mui/icons-material/Check";
+import CalendarIcon from "@mui/icons-material/CalendarToday";
 import { useRouter } from "next/router";
 import { AddToCalendar } from "../../common/AddToCalendar";
-import { Alert } from "@material-ui/lab";
+import { Alert } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -175,7 +175,7 @@ const CountDown = ({
                   >
                      {DateUtil.getUpcomingDate(time)}
                   </Typography>
-                  <Hidden xsDown>
+                  <Hidden smDown>
                      <AddToCalendar
                         event={event}
                         filename={`${stream.company}-event`}
@@ -190,7 +190,7 @@ const CountDown = ({
                                  onClick={handleClick}
                                  className={classes.addToCalendarIconBtn}
                                  variant="outlined"
-                              >
+                                 size="large">
                                  <CalendarIcon />
                               </IconButton>
                            </Tooltip>

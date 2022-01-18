@@ -1,12 +1,12 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import HighlightText from "components/views/common/HighlightText";
 import SectionHeader from "../../common/SectionHeader";
-import Box from "@material-ui/core/Box";
-import { Grid, Typography } from "@material-ui/core";
+import Box from "@mui/material/Box";
+import { Grid, Typography } from "@mui/material";
 import Fade from "@stahl.luke/react-reveal/Fade";
 import SpeakerCard from "./SpeakerCard";
 

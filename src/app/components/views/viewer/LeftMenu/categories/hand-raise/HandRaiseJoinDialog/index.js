@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { GlassDialog } from "../../../../../../../materialUI/GlobalModals";
 import {
    Button,
@@ -7,7 +7,7 @@ import {
    DialogTitle,
    Grow,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
    title: {

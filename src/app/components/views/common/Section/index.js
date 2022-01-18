@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from "clsx";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import BackgroundImage from "../BackgroundImage";
 
 const useStyles = makeStyles((theme) => ({
@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
          paddingTop: (props) => (props.big ? 160 : 60),
          paddingBottom: (props) => (props.big ? 160 : 60),
       },
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          paddingTop: 48,
          paddingBottom: 48,
       },

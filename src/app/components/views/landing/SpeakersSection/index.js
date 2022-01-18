@@ -1,16 +1,16 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import SectionHeader from "../../common/SectionHeader";
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 import SpeakersCarousel from "./SpeakersCarousel";
 
 const useStyles = makeStyles((theme) => ({
    section: {
       paddingBottom: 20,
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          paddingTop: 40,
       },
       // paddingTop: 0
@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
    title: {
       fontSize: "4.5rem",
       fontWeight: 500,
-      [theme.breakpoints.down("xs")]: {
+      [theme.breakpoints.down('sm')]: {
          fontSize: "3.5rem",
       },
    },

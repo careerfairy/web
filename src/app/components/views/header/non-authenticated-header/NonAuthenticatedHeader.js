@@ -2,10 +2,10 @@ import { Fragment } from "react";
 
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Button, IconButton } from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
+import { Button, IconButton } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    nextLink: {
@@ -36,7 +36,7 @@ const NonAuthenticatedHeader = (props) => {
          <header id="main-header">
             <ul id="left-menu">
                <li>
-                  <IconButton onClick={props.toggleSideBar}>
+                  <IconButton onClick={props.toggleSideBar} size="large">
                      <MenuIcon
                         id="sidebar-toggle"
                         fontSize="large"

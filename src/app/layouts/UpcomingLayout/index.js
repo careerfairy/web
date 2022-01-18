@@ -1,5 +1,6 @@
 import React from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import TopBar from "./TopBar";
 import NavBar from "./NavBar";
 import styles from "../../materialUI/styles/layoutStyles/landingLayoutStyles";

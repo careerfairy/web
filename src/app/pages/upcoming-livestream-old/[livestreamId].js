@@ -8,25 +8,25 @@ import {
    Grid,
    TextField,
    Tooltip,
-} from "@material-ui/core";
-import SettingsIcon from "@material-ui/icons/Settings";
+} from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { withFirebasePage } from "context/firebase";
-import AddIcon from "@material-ui/icons/Add";
+import AddIcon from "@mui/icons-material/Add";
 import Loader from "../../components/views/loader/Loader";
 import DateUtil from "../../util/DateUtil";
 import { useRouter } from "next/router";
 import Countdown from "../../components/views/common/Countdown";
 import QuestionVotingBox from "../../components/views/question-voting-box/QuestionVotingBox";
 import StringUtils from "../../util/StringUtils";
-import ClearIcon from "@material-ui/icons/Clear";
+import ClearIcon from "@mui/icons-material/Clear";
 import UserUtil from "../../data/util/UserUtil";
 import TargetOptions from "../../components/views/common/TargetOptions";
-import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
-import EmailIcon from "@material-ui/icons/Email";
-import RssFeedIcon from "@material-ui/icons/RssFeed";
-import DateRangeIcon from "@material-ui/icons/DateRange";
-import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
-import { makeStyles } from "@material-ui/core/styles";
+import HowToRegRoundedIcon from "@mui/icons-material/HowToRegRounded";
+import EmailIcon from "@mui/icons-material/Email";
+import RssFeedIcon from "@mui/icons-material/RssFeed";
+import DateRangeIcon from "@mui/icons-material/DateRange";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import makeStyles from '@mui/styles/makeStyles';
 import { speakerPlaceholder } from "../../components/util/constants";
 import { useAuth } from "../../HOCs/AuthProvider";
 import GroupsUtil from "../../data/util/GroupsUtil";
@@ -34,7 +34,7 @@ import { store } from "../_app";
 import { companyLogoPlaceholder } from "../../constants/images";
 import { getResizedUrl } from "../../components/helperFunctions/HelperFunctions";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import JoinTalentPoolModal from "../../components/views/common/join-talent-pool-modal/JoinTalentPoolModal";
 import LinkifyText from "../../components/util/LinkifyText";
 import { Item, Row } from "@mui-treasury/components/flex";

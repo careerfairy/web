@@ -7,7 +7,7 @@ import {
    ArrowDropDown,
    CheckCircleOutline,
    Publish,
-} from "@material-ui/icons";
+} from "@mui/icons-material";
 import {
    Box,
    Button,
@@ -22,8 +22,8 @@ import {
    Slider,
    Switch,
    Typography,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
 import { withFirebase } from "context/firebase";

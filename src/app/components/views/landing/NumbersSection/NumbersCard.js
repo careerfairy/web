@@ -1,6 +1,7 @@
 import React from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { Typography } from "@mui/material";
 import clsx from "clsx";
 import Slide from "@stahl.luke/react-reveal/Slide";
 

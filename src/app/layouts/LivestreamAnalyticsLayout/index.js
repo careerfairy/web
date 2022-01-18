@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import TopBar from "./TopBar";
 import { useFirestoreConnect } from "react-redux-firebase";
 import { useRouter } from "next/router";

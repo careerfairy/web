@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Collapse } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Collapse } from "@mui/material";
 import BreakoutRoomBanner from "../../../banners/BreakoutRoomBanner";
 import HandRaiseStreamerBanner from "../../../banners/HandRaiseStreamerBanner";
 import { STREAM_ELEMENT_SPACING } from "../../../../../constants/streams";

@@ -12,10 +12,10 @@ import {
    Grid,
    TextField,
    CircularProgress,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useSnackbar } from "notistack";
 import { GENERAL_ERROR } from "../../../../util/constants";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles(() => ({
    root: {},

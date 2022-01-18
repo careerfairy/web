@@ -1,9 +1,10 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from "clsx";
 import HideOnScroll from "../../../components/views/common/HideOnScroll";
-import { AppBar, Toolbar } from "@material-ui/core";
+import { AppBar, Toolbar } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
    root: {

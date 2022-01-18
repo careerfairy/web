@@ -1,7 +1,7 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Autocomplete } from "@material-ui/lab";
-import { TextField } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Autocomplete } from '@mui/material';
+import { TextField } from "@mui/material";
 import EventOptionPreview from "./EventOptionPreview";
 
 const useStyles = makeStyles((theme) => ({
@@ -22,7 +22,7 @@ const EventAutoSelect = ({
          onChange={onChange}
          inputValue={inputValue}
          onInputChange={onInputChange}
-         getOptionSelected={(option, value) =>
+         isOptionEqualToValue={(option, value) =>
             option.title === value.title || option.company === value.company
          }
          filterSelectedOptions

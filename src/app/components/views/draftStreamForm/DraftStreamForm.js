@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useRef, useState } from "react";
-import DeleteIcon from "@material-ui/icons/Delete";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
    Box,
    Button,
@@ -15,12 +15,12 @@ import {
    TextField,
    Tooltip,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { Formik } from "formik";
 import { v4 as uuidv4 } from "uuid";
 import { withFirebase } from "../../../context/firebase";
 import ImageSelect from "./ImageSelect/ImageSelect";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import DateTimePicker from "@mui/lab/DateTimePicker";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -29,7 +29,7 @@ import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 import { useRouter } from "next/router";
 import FormGroup from "./FormGroup";
-import WarningIcon from "@material-ui/icons/Warning";
+import WarningIcon from "@mui/icons-material/Warning";
 import {
    getStreamSubCollectionSpeakers,
    handleAddSpeaker,
@@ -608,7 +608,9 @@ const DraftStreamForm = ({
                                  />
                               </Grid>
                               <Grid xs={12} sm={6} md={4} item>
-                                 <LocalizationProvider utils={AdapterDateFns}>
+                                 <LocalizationProvider
+                                    dateAdapter={AdapterDateFns}
+                                 >
                                     <DateTimePicker
                                        inputVariant="outlined"
                                        fullWidth

@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Avatar,
    Card,
@@ -7,7 +7,7 @@ import {
    CardHeader,
    Grid,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
       position: "relative",
       justifyContent: "center",
       padding: theme.spacing(5),
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          padding: theme.spacing(1),
       },
    },
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
       transform: "translate(-50%, -50%)",
       background: "#E1F0EE",
       borderRadius: "2rem",
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          left: "50%",
          width: "99%",
       },

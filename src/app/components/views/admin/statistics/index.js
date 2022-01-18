@@ -1,6 +1,6 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Backdrop, CircularProgress, Container, Grid } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Backdrop, CircularProgress, Container, Grid } from "@mui/material";
 import UniversityCountriesChart from "./UniversityCountriesChart";
 import { useFirestoreConnect } from "react-redux-firebase";
 

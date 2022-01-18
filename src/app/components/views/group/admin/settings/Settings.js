@@ -2,15 +2,15 @@ import React, { Fragment, useState, useEffect } from "react";
 import { withFirebase } from "context/firebase";
 import CategoryElement from "components/views/group/admin/settings/Category/CategoryElement";
 import CategoryEdit from "./Category/CategoryEdit";
-import EditIcon from "@material-ui/icons/Edit";
+import EditIcon from "@mui/icons-material/Edit";
 import {
    Button,
    Typography,
    CircularProgress,
    TextField,
-} from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    buttonTitle: {
@@ -120,7 +120,7 @@ const Settings = ({ group, firebase }) => {
                   style={{ marginBottom: 30 }}
                   helperText={descriptionError}
                   disabled={submitting}
-                  rowsMax={10}
+                  maxRows={10}
                   name="description"
                   multiline
                   fullWidth

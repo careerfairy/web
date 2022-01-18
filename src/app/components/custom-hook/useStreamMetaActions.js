@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Fragment } from "react";
 import { CSVLink } from "react-csv";
-import { Button } from "@material-ui/core";
+import { Button } from "@mui/material";
 import axios from "axios";
 import PropTypes from "prop-types";
 import StatsUtil from "../../../data/util/StatsUtil";

@@ -9,9 +9,9 @@ import {
    Dialog,
    DialogContent,
    TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
-import { Warning } from "@material-ui/icons";
+import { Warning } from "@mui/icons-material";
 
 const requiredTxt = "Please fill this field";
 const duplicateTxt = "Cannot be a duplicate";

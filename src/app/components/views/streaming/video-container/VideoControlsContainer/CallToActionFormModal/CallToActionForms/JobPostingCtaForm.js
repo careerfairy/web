@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Collapse, Grid, TextField } from "@material-ui/core";
+import { Collapse, Grid, TextField } from "@mui/material";
 import DateTimePicker from "@mui/lab/DateTimePicker";
 
 const JobPostingCtaForm = memo(

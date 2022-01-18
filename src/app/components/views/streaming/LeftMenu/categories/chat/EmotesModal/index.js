@@ -11,7 +11,7 @@ import {
    List,
    Tab,
    Tabs,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import * as actions from "../../../../../../../store/actions";
 import { GlassDialog } from "../../../../../../../materialUI/GlobalModals";
@@ -23,7 +23,7 @@ import PanelDisplay from "./PanelDisplay";
 import EmotesModalUser from "./EmotesModalUser";
 import { TEST_EMAIL } from "./utils";
 import { isLoaded } from "react-redux-firebase";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 import usePopulatedChatEntry from "../../../../../../custom-hook/usePopulatedChatEntry";
 

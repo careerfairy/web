@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Container, Grid } from "@material-ui/core";
+import { Container, Grid } from "@mui/material";
 
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import LatestEvents from "../common/LatestEvents";
 import FeedbackTable from "./FeedbackTable";
 import RatingSideTable from "./RatingSideTable";

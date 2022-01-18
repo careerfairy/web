@@ -8,10 +8,10 @@ import {
    DialogContent,
    DialogTitle,
    TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../../../../../store/actions";
-import { Autocomplete } from "@material-ui/lab";
+import { Autocomplete } from '@mui/material';
 import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import useDeleteFilter from "../../../../../../custom-hook/useDeleteFilter";
 
@@ -61,11 +61,9 @@ const Content = ({ handleClose }) => {
                renderTags={(value, getTagProps) =>
                   value.map((option, index) => (
                      <Chip
-                        variant="default"
                         label={mapGroups[option].universityName}
                         {...getTagProps({ index })}
-                        onDelete={() => handlers.handleClickDelete(option)}
-                     />
+                        onDelete={() => handlers.handleClickDelete(option)} />
                   ))
                }
             />

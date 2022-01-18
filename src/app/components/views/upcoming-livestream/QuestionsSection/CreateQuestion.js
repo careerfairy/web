@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useAuth } from "../../../../HOCs/AuthProvider";
 import { useFormik } from "formik";
 import {
@@ -8,7 +8,7 @@ import {
 } from "../../../../constants/forms";
 import { useFirebase } from "../../../../context/firebase";
 import { useRouter } from "next/router";
-import { Box, Button, CircularProgress, TextField } from "@material-ui/core";
+import { Box, Button, CircularProgress, TextField } from "@mui/material";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 

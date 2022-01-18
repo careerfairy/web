@@ -7,11 +7,11 @@ import {
    MenuItem,
    Select,
    Typography,
-} from "@material-ui/core";
-import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import makeStyles from '@mui/styles/makeStyles';
 import { useAudio } from "../../../../custom-hook/useAudio";
-import { Alert } from "@material-ui/lab";
+import { Alert } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
    actions: {

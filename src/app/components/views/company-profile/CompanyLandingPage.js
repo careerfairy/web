@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 
 import Header from "components/views/header/Header";
-import { Container, Typography, Button } from "@material-ui/core";
+import { Container, Typography, Button } from "@mui/material";
 import TransparentHeaderWithLinks from "../header/misc/TransparentHeaderWithLinks";
 
 function CompanyLandingPage(props) {

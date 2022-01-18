@@ -1,8 +1,9 @@
-import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import React from "react";
-import { makeStyles, alpha, useTheme } from "@material-ui/core/styles";
-import { grey } from "@material-ui/core/colors";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { grey } from "@mui/material/colors";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import PropTypes from "prop-types";
 import { validateHTMLColor } from "validate-color";
 
@@ -18,7 +19,7 @@ import {
    MenuItem,
    MenuList,
    CircularProgress,
-} from "@material-ui/core";
+} from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
    sendIcon: {
@@ -79,7 +80,7 @@ export const PlayIconButton = ({
             }}
             disabled={isEmpty}
             onClick={() => addNewComment()}
-         >
+            size="large">
             <ChevronRightRoundedIcon
                {...IconProps}
                className={classes.sendIcon}

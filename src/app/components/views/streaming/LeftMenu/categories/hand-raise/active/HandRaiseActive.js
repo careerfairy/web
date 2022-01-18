@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import HandRaiseElement from "./hand-raise-element/HandRaiseElement";
 import NotificationsContext from "context/notifications/NotificationsContext";
-import CloseRoundedIcon from "@material-ui/icons/CloseRounded";
-import PanToolOutlinedIcon from "@material-ui/icons/PanToolOutlined";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import PanToolOutlinedIcon from "@mui/icons-material/PanToolOutlined";
 
 import {
    Box,
@@ -17,7 +17,7 @@ import {
    Paper,
    Select,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { CategoryContainerCentered } from "../../../../../../../materialUI/GlobalContainers";
 import { ThemedPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
@@ -27,10 +27,10 @@ import {
    TooltipTitle,
    WhiteTooltip,
 } from "../../../../../../../materialUI/GlobalTooltips";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { TransitionGroup } from "react-transition-group";
 import { dynamicSort } from "../../../../../../helperFunctions/HelperFunctions";
-import OrderIcon from "@material-ui/icons/KeyboardArrowUpRounded";
+import OrderIcon from "@mui/icons-material/KeyboardArrowUpRounded";
 import useStreamActiveHandRaises from "../../../../../../custom-hook/useStreamActiveHandRaises";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";

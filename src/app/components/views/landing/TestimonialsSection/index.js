@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 import SectionHeader from "components/views/common/SectionHeader";
 import SectionContainer from "../../common/Section/Container";
 import TestimonialCarousel from "./TestimonialCarousel";

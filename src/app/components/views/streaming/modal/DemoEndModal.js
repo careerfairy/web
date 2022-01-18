@@ -10,9 +10,9 @@ import {
    DialogActions,
    Grow,
    Collapse,
-} from "@material-ui/core";
-import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
-import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
+} from "@mui/material";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { TooltipHighlight } from "../../../../materialUI/GlobalTooltips";
 import { GlassDialog } from "../../../../materialUI/GlobalModals";
 

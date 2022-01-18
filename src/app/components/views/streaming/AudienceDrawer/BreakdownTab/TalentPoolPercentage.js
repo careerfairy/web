@@ -1,14 +1,15 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
 import {
    Card,
    CardContent,
    CardHeader,
    Grid,
    Typography,
-} from "@material-ui/core";
-import LinearProgress from "@material-ui/core/LinearProgress";
+} from "@mui/material";
+import LinearProgress from "@mui/material/LinearProgress";
 
 import clsx from "clsx";
 
@@ -19,7 +20,7 @@ const BorderLinearProgress = withStyles((theme) => ({
    },
    colorPrimary: {
       backgroundColor:
-         theme.palette.grey[theme.palette.type === "light" ? 200 : 700],
+         theme.palette.grey[theme.palette.mode === "light" ? 200 : 700],
    },
    bar: {
       borderRadius: 5,
