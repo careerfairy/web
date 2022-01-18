@@ -21,8 +21,9 @@ import { v4 as uuidv4 } from "uuid";
 import { withFirebase } from "../../../context/firebase";
 import ImageSelect from "./ImageSelect/ImageSelect";
 import { makeStyles } from "@material-ui/core/styles";
-import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
+import DateTimePicker from "@mui/lab/DateTimePicker";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import SpeakerForm from "./SpeakerForm/SpeakerForm";
 import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
@@ -607,10 +608,13 @@ const DraftStreamForm = ({
                                  />
                               </Grid>
                               <Grid xs={12} sm={6} md={4} item>
-                                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                 <LocalizationProvider utils={AdapterDateFns}>
                                     <DateTimePicker
                                        inputVariant="outlined"
                                        fullWidth
+                                       renderInput={(params) => (
+                                          <TextField {...params} />
+                                       )}
                                        variant="outlined"
                                        disabled={isSubmitting}
                                        label="Livestream Start Date"
@@ -623,7 +627,7 @@ const DraftStreamForm = ({
                                           );
                                        }}
                                     />
-                                 </MuiPickersUtilsProvider>
+                                 </LocalizationProvider>
                               </Grid>
                               <Grid xs={12} sm={6} md={4} item>
                                  <StreamDurationSelect

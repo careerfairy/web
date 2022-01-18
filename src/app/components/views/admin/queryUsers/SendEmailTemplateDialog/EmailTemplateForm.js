@@ -10,7 +10,8 @@ import {
    TextField,
    Typography,
 } from "@material-ui/core";
-import { DateTimePicker } from "@material-ui/pickers";
+import DateTimePicker from "@mui/lab/DateTimePicker";
+
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
@@ -241,6 +242,9 @@ const EmailTemplateForm = ({
                                           id={field.name}
                                           clearable
                                           disablePast
+                                          renderInput={(params) => (
+                                             <TextField {...params} />
+                                          )}
                                           label={field.label}
                                           labelFunc={(date) =>
                                              DateUtil.getRelativeDate(date) +

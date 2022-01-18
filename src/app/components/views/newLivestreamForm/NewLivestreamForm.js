@@ -18,8 +18,9 @@ import { v4 as uuidv4 } from "uuid";
 import { withFirebase } from "../../../context/firebase";
 import ImageSelect from "./ImageSelect/ImageSelect";
 import { makeStyles } from "@material-ui/core/styles";
-import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import DateTimePicker from "@mui/lab/DateTimePicker";
 import SpeakerForm from "./SpeakerForm/SpeakerForm";
 import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
@@ -545,10 +546,13 @@ const NewLivestreamForm = ({ firebase }) => {
                            </FormControl>
                         </Grid>
                         <Grid xs={12} sm={7} md={8} item>
-                           <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                           <LocalizationProvider utils={AdapterDateFns}>
                               <DateTimePicker
                                  inputVariant="outlined"
                                  fullWidth
+                                 renderInput={(params) => (
+                                    <TextField {...params} />
+                                 )}
                                  variant="outlined"
                                  disabled={isSubmitting}
                                  label="Live Stream Start Date"
@@ -561,7 +565,7 @@ const NewLivestreamForm = ({ firebase }) => {
                                     );
                                  }}
                               />
-                           </MuiPickersUtilsProvider>
+                           </LocalizationProvider>
                         </Grid>
                         <Grid xs={12} sm={5} md={4} item>
                            <LanguageSelect
