@@ -4,7 +4,7 @@ import {
    createTheme,
    responsiveFontSizes,
    ThemeProvider,
-   makeStyles,
+   // makeStyles,
 } from "@material-ui/core/styles";
 import { SnackbarProvider } from "notistack";
 import { useRouter } from "next/router";
@@ -57,16 +57,16 @@ const ThemeProviderWrapper = ({ children }) => {
       setTheme(responsiveFontSizes(createdTheme));
    };
 
-   const useStyles = makeStyles({
-      // success: {backgroundColor: 'purple'},
-      // error: {backgroundColor: 'blue'},
-      // warning: {backgroundColor: 'green'},
-      info: {
-         backgroundColor: `${theme.palette.background.paper} !important`,
-         color: `${theme.palette.text.primary} !important`,
-      },
-   });
-   const classes = useStyles();
+   // const useStyles = makeStyles({
+   //    // success: {backgroundColor: 'purple'},
+   //    // error: {backgroundColor: 'blue'},
+   //    // warning: {backgroundColor: 'green'},
+   //    info: {
+   //       backgroundColor: `${theme.palette.background.paper} !important`,
+   //       color: `${theme.palette.text.primary} !important`,
+   //    },
+   // });
+   // const classes = useStyles();
 
    return (
       <ThemeContext.Provider
@@ -74,9 +74,9 @@ const ThemeProviderWrapper = ({ children }) => {
       >
          <ThemeProvider theme={theme}>
             <SnackbarProvider
-               classes={{
-                  variantInfo: classes.info,
-               }}
+               // classes={{
+               //    variantInfo: classes.info,
+               // }}
                maxSnack={5}
             >
                {children}
