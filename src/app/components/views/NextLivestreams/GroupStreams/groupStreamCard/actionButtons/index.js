@@ -3,7 +3,7 @@ import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import AddToPhotosRoundedIcon from "@mui/icons-material/AddToPhotosRounded";
 import Link from "next/link";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
-import React, {useMemo} from "react";
+import React, { useMemo } from "react";
 import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
@@ -59,7 +59,7 @@ export const DetailsButton = ({
    ...props
 }) => {
    const classes = useStyles();
-   const link = useMemo(() => ,[])
+   const link = useMemo(() => "", []);
    return (
       <Link
          href={{
