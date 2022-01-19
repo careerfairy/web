@@ -3,7 +3,7 @@ import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import AddToPhotosRoundedIcon from "@mui/icons-material/AddToPhotosRounded";
 import Link from "next/link";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
-import React, { useMemo } from "react";
+import React from "react";
 import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
@@ -42,7 +42,7 @@ export const AttendButton = ({
                <AddToPhotosRoundedIcon />
             )
          }
-         color={user && checkIfRegistered() ? "default" : "primary"}
+         color={user && checkIfRegistered() ? "grey" : "primary"}
          children={attendButtonLabel}
          onClick={handleRegisterClick}
       />
@@ -59,7 +59,22 @@ export const DetailsButton = ({
    ...props
 }) => {
    const classes = useStyles();
-   const link = useMemo(() => "", []);
+   // const link = useMemo(() => {
+   //    let newLink = `/upcoming-livestream/${livestream.id}`;
+   //    const searchParams = {
+   //       ...(!listenToUpcoming && { groupId: groupData.groupId }),
+   //       ...(referrerId && { referrerId }),
+   //    };
+   //
+   //    const params = new URLSearchParams(searchParams).toString();
+   //    if (params) {
+   //       newLink += `?${params}`;
+   //    }
+   //    if (isPastLivestreams) {
+   //       newLink += "#about";
+   //    }
+   //    return newLink;
+   // }, [isPastLivestreams, listenToUpcoming, groupData.groupId, referrerId]);
    return (
       <Link
          href={{
@@ -71,7 +86,7 @@ export const DetailsButton = ({
             },
          }}
       >
-         <a href={`/upcoming-livestream/${livestream.id}`}>
+         <a>
             <Button
                className={classes.actionButton}
                style={{ marginRight: 5 }}

@@ -9,7 +9,7 @@ import {
    Paper,
    Typography,
 } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { getTimeFromNow } from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
@@ -64,7 +64,7 @@ const QuestionCard = ({
                   } catch (e) {}
                   setLoading(false);
                }}
-               color={hasVoted(question) || isPastEvent ? "default" : "primary"}
+               color={hasVoted(question) || isPastEvent ? "grey" : "primary"}
                startIcon={
                   loading ? (
                      <CircularProgress size={10} color="inherit" />

@@ -20,6 +20,7 @@ const JobPostingCtaForm = memo(
                   <InputLabel>Select ATS Position</InputLabel>
                   <Select
                      autoWidth={true}
+                     label="Select ATS Position"
                      value={selectedAtsPosition}
                      onChange={handleChange}
                   >

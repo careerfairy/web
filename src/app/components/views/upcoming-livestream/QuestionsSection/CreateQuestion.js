@@ -1,5 +1,5 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 import { useFormik } from "formik";
 import {
@@ -112,7 +112,6 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
                startIcon={
                   isSubmitting && <CircularProgress size={10} color="inherit" />
                }
-               autoFocus
                disabled={isSubmitting}
             >
                {isSubmitting ? "submitting" : "Submit Your question"}

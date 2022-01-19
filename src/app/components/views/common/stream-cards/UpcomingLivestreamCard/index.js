@@ -9,7 +9,7 @@ import {
    Typography,
 } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
 import EventIcon from "@mui/icons-material/Event";
 import ClockIcon from "@mui/icons-material/AccessTime";
@@ -188,7 +188,7 @@ const useStyles = makeStyles((theme) => {
          display: "flex",
          WebkitBoxOrient: "vertical",
          WebkitLineClamp: 1,
-         [theme.breakpoints.down('lg')]: {
+         [theme.breakpoints.down("lg")]: {
             fontSize: "1rem",
          },
       },
@@ -215,7 +215,7 @@ const UpcomingLivestreamCard = ({
 }) => {
    const theme = useTheme();
    const isLandscapeOnMobile = useMediaQuery(
-      `${theme.breakpoints.down('md')} and (orientation: landscape)`
+      `${theme.breakpoints.down("md")} and (orientation: landscape)`
    );
    const [hovered, setHovered] = useState(false);
    const classes = useStyles();
@@ -454,7 +454,7 @@ const UpcomingLivestreamCard = ({
                            !noRegister && (
                               <Button
                                  color={
-                                    status.hasRegistered ? "default" : "primary"
+                                    status.hasRegistered ? "grey" : "primary"
                                  }
                                  onClick={handleRegisterClick}
                                  size="large"

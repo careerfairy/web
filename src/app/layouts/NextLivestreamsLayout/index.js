@@ -1,8 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import NavBar from "./NavBar";
-import { withFirebase } from "../../context/firebase";
 import styles from "../../materialUI/styles/layoutStyles/nextLivestreamsLayoutStyles";
 import TopBar from "./TopBar";
 import useGeneralLinks from "../../components/custom-hook/useGeneralLinks";
@@ -58,4 +57,4 @@ NextLivestreamsLayout.propTypes = {
 };
 
 NextLivestreamsLayout.defaultProps = {};
-export default withFirebase(NextLivestreamsLayout);
+export default NextLivestreamsLayout;

@@ -8,6 +8,7 @@ import {
 import { SnackbarProvider } from "notistack";
 import { useRouter } from "next/router";
 import { CssBaseline } from "@mui/material";
+import { createGenerateClassName } from "@mui/styles";
 
 // import { Button } from "@mui/material";
 
@@ -24,6 +25,9 @@ const pathsReadyForDarkMode = [
 
 const initialTheme = responsiveFontSizes(brandedLightTheme);
 
+const generateClassName = createGenerateClassName({
+   productionPrefix: "c",
+});
 const ThemeProviderWrapper = ({ children }) => {
    const { pathname } = useRouter();
 
@@ -61,23 +65,26 @@ const ThemeProviderWrapper = ({ children }) => {
       <ThemeContext.Provider
          value={{ toggleTheme, themeMode: theme.palette.mode }}
       >
-         <StyledEngineProvider injectFirst>
-            <ThemeProvider theme={theme}>
-               {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-               <CssBaseline />
-               <SnackbarProvider maxSnack={5}>
-                  {children}
-                  {/*<Button*/}
-                  {/*   color="secondary"*/}
-                  {/*   onClick={toggleTheme}*/}
-                  {/*   variant="contained"*/}
-                  {/*   style={{ position: "fixed", bottom: "5%", right: "5%" }}*/}
-                  {/*>*/}
-                  {/*   toggle*/}
-                  {/*</Button>*/}
-               </SnackbarProvider>
-            </ThemeProvider>
-         </StyledEngineProvider>
+         {/*<StyledEngineProvider*/}
+         {/*   injectFirst*/}
+         {/*   generateClassName={generateClassName}*/}
+         {/*>*/}
+         <ThemeProvider theme={theme}>
+            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+            <CssBaseline />
+            <SnackbarProvider maxSnack={5}>
+               {children}
+               {/*<Button*/}
+               {/*   color="secondary"*/}
+               {/*   onClick={toggleTheme}*/}
+               {/*   variant="contained"*/}
+               {/*   style={{ position: "fixed", bottom: "5%", right: "5%" }}*/}
+               {/*>*/}
+               {/*   toggle*/}
+               {/*</Button>*/}
+            </SnackbarProvider>
+         </ThemeProvider>
+         {/*</StyledEngineProvider>*/}
       </ThemeContext.Provider>
    );
 };

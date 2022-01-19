@@ -29,7 +29,8 @@ const JoinTalentPoolButton = ({ mobile }) => {
                      ? () => leaveTalentPool()
                      : () => joinTalentPool()
                }
-               size="large">
+               size="large"
+            >
                {userIsInTalentPool ? (
                   <HowToRegRoundedIcon />
                ) : (
@@ -53,7 +54,7 @@ const JoinTalentPoolButton = ({ mobile }) => {
                ? () => leaveTalentPool()
                : () => joinTalentPool()
          }
-         color={userIsInTalentPool ? "default" : "primary"}
+         color={userIsInTalentPool ? "grey" : "primary"}
       />
    );
 };

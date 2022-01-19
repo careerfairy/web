@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React, { Fragment, memo, useEffect, useMemo, useState } from "react";
 import { useFirebase } from "context/firebase";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import UserUtil from "../../../../../data/util/UserUtil";
 import { useRouter } from "next/router";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
@@ -17,16 +17,13 @@ import {
    ClickAwayListener,
    Collapse,
    Grow,
+   Stack,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import { Item, Row } from "@mui-treasury/components/flex";
-import { Info, InfoSubtitle, InfoTitle } from "@mui-treasury/components/info";
-import { useNewsInfoStyles } from "@mui-treasury/styles/info/news";
-import { useCoverCardMediaStyles } from "@mui-treasury/styles/cardMedia/cover";
-import { AvatarGroup } from '@mui/material';
+import { AvatarGroup } from "@mui/material";
 import { speakerPlaceholder } from "../../../../util/constants";
 import Tag from "./Tag";
 import Fade from "@stahl.luke/react-reveal/Fade";
@@ -169,12 +166,8 @@ const useStyles = makeStyles((theme) => ({
    },
    previewRow: {
       width: "100%",
-      justifyContent: "space-evenly",
    },
    avaLogoWrapper: {
-      display: "flex",
-      // flexDirection: "column",
-      justifyContent: "center",
       flexWrap: "inherit",
       alignItems: "center",
    },
@@ -254,7 +247,6 @@ const GroupStreamCardV2 = memo(
       isAdmin,
    }) => {
       const firebase = useFirebase();
-      const mediaStyles = useCoverCardMediaStyles();
       const classes = useStyles();
       const { absolutePath, pathname, push, query } = useRouter();
       const linkToStream = useMemo(() => {
@@ -571,7 +563,16 @@ const GroupStreamCardV2 = memo(
                      position={"relative"}
                   >
                      <CardMedia
-                        classes={mediaStyles}
+                        sx={{
+                           top: 0,
+                           left: 0,
+                           width: "100%",
+                           height: "100%",
+                           zIndex: 0,
+                           position: "absolute",
+                           backgroundPosition: "center center",
+                           backgroundColor: "rgba(0, 0, 0, 0.08)",
+                        }}
                         image={getResponsiveResizedUrl(
                            livestream.backgroundImageUrl,
                            mobile,
@@ -665,23 +666,28 @@ const GroupStreamCardV2 = memo(
                         </Box>
                      </div>
                   </Box>
-                  <Row
+                  <Box
                      className={clsx(classes.author, {
                         [classes.authorHovered]: cardHovered,
                      })}
-                     m={0}
-                     p={1}
-                     py={1}
-                     gap={mobile ? 1 : 2}
-                     bgcolor={"common.white"}
+                     sx={{
+                        bgcolor: "white",
+                        py: 1,
+                        p: 1,
+                        m: 0,
+                        display: "flex",
+                        flexDirection: "row",
+                     }}
                   >
-                     <Collapse unmountOnExit in={!cardHovered}>
+                     <Collapse in={!cardHovered}>
                         <Fade timeout={300} unmountOnExit in={!cardHovered}>
-                           <Row
-                              style={{ justifyContent: "space-evenly" }}
+                           <Stack
+                              direction="row"
+                              justifyContent="space-evenly"
+                              alignItems="center"
                               className={classes.avaLogoWrapper}
                            >
-                              <Item>
+                              <Box>
                                  <AvatarGroup>
                                     {livestream.speakers?.map((speaker) => (
                                        <Avatar
@@ -697,8 +703,8 @@ const GroupStreamCardV2 = memo(
                                        />
                                     ))}
                                  </AvatarGroup>
-                              </Item>
-                              <Item>
+                              </Box>
+                              <Box>
                                  <AvatarGroup>
                                     {filteredGroups.map((careerCenter) => (
                                        <Avatar
@@ -716,22 +722,28 @@ const GroupStreamCardV2 = memo(
                                        />
                                     ))}
                                  </AvatarGroup>
-                              </Item>
-                           </Row>
+                              </Box>
+                           </Stack>
                         </Fade>
                      </Collapse>
                      <Collapse unmountOnExit in={cardHovered}>
                         <div
-                           className={clsx(classes.avaLogoWrapper, {
-                              [classes.avaLogoWrapperHovered]: cardHovered,
-                           })}
+                           className={clsx(
+                              classes.avaLogoWrapper,
+                              classes.avaLogoWrapperHovered
+                           )}
                         >
                            {livestream.speakers?.map((speaker) => (
-                              <Row
+                              <Stack
+                                 direction="row"
+                                 justifyContent="flex-start"
                                  className={classes.previewRow}
                                  key={speaker.id}
+                                 sx={{
+                                    mb: 1,
+                                 }}
                               >
-                                 <Item>
+                                 <Box>
                                     <Avatar
                                        className={classes.avatar}
                                        src={
@@ -740,20 +752,30 @@ const GroupStreamCardV2 = memo(
                                        }
                                        alt={speaker.firstName}
                                     />
-                                 </Item>
-                                 <Info
-                                    style={{ marginRight: "auto" }}
-                                    useStyles={useNewsInfoStyles}
+                                 </Box>
+                                 <Box
+                                    sx={{
+                                       display: "flex",
+                                       flexDirection: "column",
+                                       ml: 1,
+                                       justifyContent: "center",
+                                    }}
                                  >
-                                    <InfoTitle>{`${speaker.firstName} ${speaker.lastName}`}</InfoTitle>
-                                    <InfoSubtitle>
+                                    <Typography>
+                                       {`${speaker.firstName} ${speaker.lastName}`}
+                                    </Typography>
+                                    <Typography
+                                       variant="body2"
+                                       color="textSecondary"
+                                    >
                                        {speaker.position}
-                                    </InfoSubtitle>
-                                 </Info>
-                              </Row>
+                                    </Typography>
+                                 </Box>
+                              </Stack>
                            ))}
-                           <Row
-                              p={1}
+                           <Stack
+                              direction="row"
+                              sx={{ p: 1 }}
                               style={{ width: "100%" }}
                               className={classes.groupLogos}
                            >
@@ -775,10 +797,10 @@ const GroupStreamCardV2 = memo(
                                     user={user}
                                  />
                               ))}
-                           </Row>
+                           </Stack>
                         </div>
                      </Collapse>
-                  </Row>
+                  </Box>
                   <div className={classes.shadow} />
                   <div className={`${classes.shadow} ${classes.shadow2}`} />
                </Card>

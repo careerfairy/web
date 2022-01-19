@@ -2,7 +2,7 @@ import { Button } from "@mui/material";
 import Tab from "@mui/material/Tab";
 import React, { useContext } from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
 import { StyledTooltipWithButton } from "../../../../../../../materialUI/GlobalTooltips";
 import { useCurrentStream } from "../../../../../../../context/stream/StreamContext";
@@ -12,7 +12,7 @@ const useCtaCardStyles = makeStyles(({ palette: { mode, common } }) => ({
    cardRoot: {},
    ctaButton: {
       backgroundColor: (props) => alpha(props.color, 0.1),
-      color: (props) => (type === "dark" ? common.white : props.color),
+      color: (props) => (mode === "dark" ? common.white : props.color),
       "& svg": {
          color: (props) => props.color,
       },

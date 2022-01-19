@@ -66,7 +66,7 @@ const DemoEndModal = ({ open, handleClose }) => {
                         }
                         variant="contained"
                         startIcon={<PeopleAltIcon />}
-                        color={hasJoinedTalentPool ? "default" : "primary"}
+                        color={hasJoinedTalentPool ? "" : "primary"}
                      />
                   </TooltipHighlight>
                   <Collapse in={hasJoinedTalentPool}>

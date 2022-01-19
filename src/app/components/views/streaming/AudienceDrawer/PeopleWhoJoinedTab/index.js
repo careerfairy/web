@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useEffect, useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import {
    FormControl,
    Grid,
@@ -79,6 +79,7 @@ const PeopleWhoJoinedTab = ({ isStreamer, participatingStudents }) => {
                      <Select
                         labelId="audience-select"
                         id="audience-select"
+                        label="filter:"
                         value={currentOption}
                         onChange={handleFilterOptions}
                      >

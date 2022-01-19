@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import {
-   Box,
-   Card,
-   Divider,
-   Grow,
-   Tabs,
-   Tab,
-   IconButton,
-} from "@mui/material";
+import { Box, Card, Divider, Grow, Tabs, Tab, IconButton } from "@mui/material";
 import { withFirebase } from "../../../../../../../context/firebase";
 import {
    addMinutes,
@@ -28,7 +20,7 @@ import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYou
 import { useSnackbar } from "notistack";
 import FeedbackGraph from "../FeedbackGraph";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import ExportTable from "../../../../../common/Tables/ExportTable";
 
 const useStyles = makeStyles((theme) => ({
@@ -116,10 +108,11 @@ const FeedbackTable = ({
       return (
          <Box display="flex" justifyContent="center">
             <IconButton
-               color={currentRating?.id === rowData.id ? "primary" : "default"}
+               color={currentRating?.id === rowData.id ? undefined : "default"}
                disabled={hasNoData()}
                onClick={handleClick}
-               size="large">
+               size="large"
+            >
                <ArrowDownwardIcon />
             </IconButton>
          </Box>

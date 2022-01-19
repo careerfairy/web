@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Button, Collapse, Divider, Grid } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import CategoryCard from "./CategoryCard";
 import FilterIcon from "@mui/icons-material/Tune";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,7 +28,7 @@ const GroupCategories = ({ groupData, handleToggleActive, hasCategories }) => {
       <Grid item xs={12}>
          <Button
             size="large"
-            color={filterOpen ? "primary" : "default"}
+            color={filterOpen ? "primary" : "grey"}
             onClick={handleToggleFilter}
             startIcon={<FilterIcon />}
          >

@@ -26,7 +26,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import RssFeedIcon from "@mui/icons-material/RssFeed";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { speakerPlaceholder } from "../../components/util/constants";
 import { useAuth } from "../../HOCs/AuthProvider";
 import GroupsUtil from "../../data/util/GroupsUtil";
@@ -829,9 +829,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                                        id="register-button"
                                        disabled={isRegistrationDisabled}
                                        children={getMainButtonLabel}
-                                       color={
-                                          registered ? "default" : "primary"
-                                       }
+                                       color={registered ? "" : "primary"}
                                        variant="contained"
                                        startIcon={
                                           registered ? (
@@ -1078,7 +1076,7 @@ function UpcomingLivestream({ firebase, serverSideLivestream, groupId }) {
                                  ? () => leaveTalentPool()
                                  : () => joinTalentPool()
                            }
-                           color={userIsInTalentPool ? "default" : "primary"}
+                           color={userIsInTalentPool ? "" : "primary"}
                         />
                      </Grid>
                      <Grid item xs={12}>

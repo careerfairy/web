@@ -1,7 +1,7 @@
 import React from "react";
 import { Fragment } from "react";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import {
    Typography,
    useMediaQuery,
@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 
 const UserCategorySelector = ({ category, handleSetSelected, isNew }) => {
    const theme = useTheme();
-   const native = useMediaQuery(theme.breakpoints.down('sm'));
+   const native = useMediaQuery(theme.breakpoints.down("sm"));
    const classes = useStyles();
    const [open, setOpen] = React.useState(false);
 
@@ -77,12 +77,11 @@ const UserCategorySelector = ({ category, handleSetSelected, isNew }) => {
             style={{ width: native ? "100%" : "100%" }}
             className={classes.formControl}
          >
-            <InputLabel id="demo-controlled-open-select-label">
-               {category.name}
-            </InputLabel>
+            <InputLabel id="group-category-select">{category.name}</InputLabel>
             <Select
                open={open}
                fullWidth
+               label={category.name}
                startAdornment={isNew && <Chip color="primary" label={"New!"} />}
                native={native}
                onClose={handleClose}

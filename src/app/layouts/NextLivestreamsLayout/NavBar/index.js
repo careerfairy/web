@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 import clsx from "clsx";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
@@ -19,7 +19,6 @@ import * as actions from "../../../store/actions";
 import GroupNavLink from "./groupNavLink";
 import NavPrompt from "./navPrompt";
 import { signInImage } from "../../../constants/images";
-import { withFirebase } from "context/firebase";
 import useFollowingGroups from "../../../components/custom-hook/useFollowingGroups";
 import LoginButtonComponent from "components/views/common/LoginButton";
 
@@ -61,9 +60,6 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const ListItemWrapper = ({ active, children }) =>
-   active ? <Grow in>{children}</Grow> : <>{children}</>;
-
 function LoginButton() {
    return (
       <ListItem>
@@ -81,7 +77,6 @@ const FeedDrawer = memo(
       drawerBottomLinks,
       drawerTopLinks,
       drawerWidth,
-      firebase,
    }) => {
       const classes = useStyles({ drawerWidth });
       const {
@@ -92,7 +87,7 @@ const FeedDrawer = memo(
       const [groups, setGroups] = useState(null);
       const dispatch = useDispatch();
       const signOut = () => dispatch(actions.signOut());
-      const [followingGroups, loading] = useFollowingGroups(firebase);
+      const [followingGroups, loading] = useFollowingGroups();
 
       useEffect(() => {
          if (userData) {
@@ -146,19 +141,14 @@ const FeedDrawer = memo(
                ) : groups?.length ? (
                   <List>
                      {groups?.map(({ universityName, groupId, logoUrl }) => (
-                        <ListItemWrapper
+                        <GroupNavLink
                            key={groupId}
-                           active={groupIdInQuery === groupId}
-                        >
-                           <GroupNavLink
-                              key={groupId}
-                              groupId={groupId}
-                              onClick={onMobileClose}
-                              groupIdInQuery={groupIdInQuery}
-                              alt={universityName}
-                              src={getResizedUrl(logoUrl, "xs")}
-                           />
-                        </ListItemWrapper>
+                           groupId={groupId}
+                           onClick={onMobileClose}
+                           groupIdInQuery={groupIdInQuery}
+                           alt={universityName}
+                           src={getResizedUrl(logoUrl, "xs")}
+                        />
                      ))}
                   </List>
                ) : (
@@ -192,36 +182,38 @@ const FeedDrawer = memo(
          </Box>
       );
 
-      return <>
-         <Hidden lgUp>
-            <Drawer
-               anchor="left"
-               classes={{
-                  paper: clsx(classes.mobileDrawer, classes.background),
-               }}
-               className={classes.drawer}
-               onClose={onMobileClose}
-               open={openMobile}
-               variant="temporary"
-            >
-               {content}
-            </Drawer>
-         </Hidden>
-         <Hidden lgDown>
-            <Drawer
-               anchor="left"
-               classes={{
-                  paper: clsx(classes.desktopDrawer, classes.background),
-               }}
-               className={classes.drawer}
-               open
-               variant="persistent"
-            >
-               {content}
-            </Drawer>
-         </Hidden>
-      </>;
+      return (
+         <>
+            <Hidden lgUp>
+               <Drawer
+                  anchor="left"
+                  classes={{
+                     paper: clsx(classes.mobileDrawer, classes.background),
+                  }}
+                  className={classes.drawer}
+                  onClose={onMobileClose}
+                  open={openMobile}
+                  variant="temporary"
+               >
+                  {content}
+               </Drawer>
+            </Hidden>
+            <Hidden lgDown>
+               <Drawer
+                  anchor="left"
+                  classes={{
+                     paper: clsx(classes.desktopDrawer, classes.background),
+                  }}
+                  className={classes.drawer}
+                  open
+                  variant="persistent"
+               >
+                  {content}
+               </Drawer>
+            </Hidden>
+         </>
+      );
    }
 );
 
-export default withFirebase(FeedDrawer);
+export default FeedDrawer;

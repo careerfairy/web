@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { memo, useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import HighlightText from "components/views/common/HighlightText";
@@ -232,7 +232,7 @@ const TalentPoolSection = memo((props) => {
                                     ? () => leaveTalentPool()
                                     : () => joinTalentPool()
                               }
-                              color={userIsInTalentPool ? "default" : "primary"}
+                              color={userIsInTalentPool ? "" : "primary"}
                            >
                               {joiningTalentPool
                                  ? "Joining Talent Pool"

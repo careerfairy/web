@@ -51,12 +51,13 @@ const FocusModeButton = ({ primary, mobile, audienceDrawerOpen }) => {
             }
          >
             <IconButton
-               color={focusModeEnabled || primary ? "primary" : "default"}
+               color={focusModeEnabled || primary ? "primary" : undefined}
                onClick={(e) => {
                   e.stopPropagation();
                   toggleFocusMode();
                }}
-               size="large">
+               size="large"
+            >
                {focusModeEnabled ? (
                   <FocusModeActiveIcon />
                ) : (

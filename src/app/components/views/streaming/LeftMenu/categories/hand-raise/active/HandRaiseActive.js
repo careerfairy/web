@@ -27,7 +27,7 @@ import {
    TooltipTitle,
    WhiteTooltip,
 } from "../../../../../../../materialUI/GlobalTooltips";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { TransitionGroup } from "react-transition-group";
 import { dynamicSort } from "../../../../../../helperFunctions/HelperFunctions";
 import OrderIcon from "@mui/icons-material/KeyboardArrowUpRounded";
@@ -68,15 +68,10 @@ const FILTER_MAP = {
    Connected: (handRaise) => handRaise.state === "connected",
 };
 
-function HandRaiseActive({
-   livestream,
-   showMenu,
-   selectedState,
-   sliding,
-}) {
+function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
    const dispatch = useDispatch();
 
-   const closeSnackbar = (...args) => dispatch(actions.closeSnackbar(...args))
+   const closeSnackbar = (...args) => dispatch(actions.closeSnackbar(...args));
 
    const { setNewNotification, setNotificationToRemove } = useContext(
       NotificationsContext
@@ -87,7 +82,11 @@ function HandRaiseActive({
       getActiveTutorialStepKey,
       isOpen: isStepOpen,
    } = useContext(TutorialContext);
-   const { handRaises, handlers, numberOfActiveHandRaisers } = useStreamActiveHandRaises();
+   const {
+      handRaises,
+      handlers,
+      numberOfActiveHandRaisers,
+   } = useStreamActiveHandRaises();
    const [hasEntered, setHasEntered] = useState(false);
    const [hasExited, setHasExited] = useState(false);
    const [sortByNew, setSortByNew] = useState(true);
@@ -172,6 +171,7 @@ function HandRaiseActive({
                         <Select
                            labelId="hand-raise-filter-select-label"
                            id="hand-raise-filter-select"
+                           label="Sort by:"
                            value={filterMapProperty}
                            onChange={handleChangeFilterMapProperty}
                         >
