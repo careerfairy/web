@@ -102,7 +102,9 @@ const JobPostingCtaForm = memo(
                      id="applicationDeadline"
                      clearable
                      disablePast
-                     renderInput={(params) => <TextField {...params} />}
+                     renderInput={(params) => (
+                        <TextField fullWidth {...params} />
+                     )}
                      label="Application deadline"
                      value={formik.values.jobData.applicationDeadline}
                      name="jobData.applicationDeadline"
@@ -117,7 +119,6 @@ const JobPostingCtaForm = memo(
                      disabled={formik.isSubmitting}
                      minDate={now}
                      inputVariant="outlined"
-                     fullWidth
                      error={
                         formik.touched.jobData?.applicationDeadline &&
                         Boolean(formik.errors.jobData?.applicationDeadline)

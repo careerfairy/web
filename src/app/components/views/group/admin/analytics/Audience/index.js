@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Container, Grid } from "@mui/material";
 
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import LatestEvents from "../common/LatestEvents";
 import UsersTable from "./UsersTable";
 import { getUniqueUsersByEmailWithArrayOfUsers } from "../../../../../../data/util/AnalyticsUtil";
@@ -63,8 +63,6 @@ const Audience = ({
       currentStream,
       userType,
    ]);
-   // console.log("-> streamsFromTimeFrameAndFuture", streamsFromTimeFrameAndFuture);
-   // console.log("-> totalUniqueUsers", totalUniqueUsers);
 
    return (
       <Container className={classes.root} maxWidth={false}>

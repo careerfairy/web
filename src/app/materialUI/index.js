@@ -2,60 +2,62 @@ import { alpha, createTheme } from "@mui/material/styles";
 // import { deepmerge } from "@mui/utils";
 import { grey } from "@mui/material/colors";
 
-export const rootThemeObj = createTheme({
-   palette: {
-      primary: {
-         light: "#89c2ba",
-         main: "#00d2aa",
-         dark: "#00b08f",
-         contrastText: "#FFFFFF",
-         gradient: "#07c1a7",
+export const rootThemeObj = (mode) =>
+   createTheme({
+      palette: {
+         mode,
+         primary: {
+            light: "#89c2ba",
+            main: "#00d2aa",
+            dark: "#00b08f",
+            contrastText: "#FFFFFF",
+            gradient: "#07c1a7",
+         },
+         secondary: {
+            light: "#b4a8ff",
+            main: "#7431e2",
+            dark: "#590db6",
+            gradient: "#644eec",
+            contrastText: "#FFFFFF",
+         },
+         grey: {
+            main: grey[300],
+            dark: grey[400],
+         },
+         error: {
+            main: "#e70026",
+            dark: "#b00024",
+            contrastText: "#FFFFFF",
+         },
+         navyBlue: {
+            main: "#2C4251",
+            contrastText: "#FFFFFF",
+         },
+         info: {
+            light: "#FFFFFF",
+            main: "#00d2aa",
+            contrastText: "#FFFFFF",
+            dark: "#00b08f",
+         },
       },
-      secondary: {
-         light: "#b4a8ff",
-         main: "#7431e2",
-         dark: "#590db6",
-         gradient: "#644eec",
-         contrastText: "#FFFFFF",
+      breakpoints: {
+         values: {
+            xl: 1920,
+            lg: 1280,
+            md: 900,
+            mobile: 768,
+            sm: 600,
+            xs: 0,
+         },
+         keys: ["xs", "sm", "mobile", "md", "lg", "xl"],
       },
-      grey: {
-         main: grey[300],
-         dark: grey[400],
+      typography: {
+         fontFamily: "Poppins,sans-serif",
+         htmlFontSize: 16,
       },
-      error: {
-         main: "#e70026",
-         dark: "#b00024",
-         contrastText: "#FFFFFF",
-      },
-      navyBlue: {
-         main: "#2C4251",
-         contrastText: "#FFFFFF",
-      },
-      info: {
-         light: "#FFFFFF",
-         main: "#00d2aa",
-         contrastText: "#FFFFFF",
-         dark: "#00b08f",
-      },
-   },
-   breakpoints: {
-      values: {
-         xl: 1920,
-         lg: 1280,
-         md: 900,
-         mobile: 768,
-         sm: 600,
-         xs: 0,
-      },
-      keys: ["xs", "sm", "mobile", "md", "lg", "xl"],
-   },
-   typography: {
-      fontFamily: "Poppins,sans-serif",
-      htmlFontSize: 16,
-   },
-   whiteShadow:
-      "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)",
-});
+      whiteShadow:
+         "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)",
+   });
 
 const getComponents = (theme) => ({
    // Name of the component
@@ -131,20 +133,15 @@ const getComponents = (theme) => ({
          },
       },
    },
-   MuiTypography: {
-      defaultProps: {
-         fontFamily: "Poppins,sans-serif",
-      },
-   },
 });
 
-export const getTheme = (mode, rootThemeObj) => {
+export const getTheme = (rootThemeObj) => {
    const themeWithMode = createTheme({
       ...rootThemeObj,
       palette: {
          ...rootThemeObj.palette,
-         mode,
-         ...(mode === "light"
+         mode: rootThemeObj.palette.mode,
+         ...(rootThemeObj.palette.mode === "light"
             ? {
                  // palette values for light mode
                  background: {
@@ -176,6 +173,6 @@ export const getTheme = (mode, rootThemeObj) => {
    };
 };
 
-export const brandedLightTheme = createTheme(getTheme("light", rootThemeObj));
+export const brandedLightTheme = createTheme(getTheme(rootThemeObj("light")));
 
-export const brandedDarkTheme = createTheme(getTheme("dark", rootThemeObj));
+export const brandedDarkTheme = createTheme(getTheme(rootThemeObj("dark")));

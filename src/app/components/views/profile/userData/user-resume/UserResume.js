@@ -23,7 +23,7 @@ import {
    Switch,
    Typography,
 } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
 import { withFirebase } from "context/firebase";
@@ -50,12 +50,10 @@ const useStyles = makeStyles((theme) => ({
    },
    buttons: {
       marginTop: 25,
+      backgroundColor: theme.palette.grey.main,
    },
    button: {
-      backgroundColor: theme.palette.background.default,
-   },
-   buttonIcon: {
-      marginRight: 5,
+      // backgroundColor: theme.palette.background.default,
    },
    largeIcon: {
       fontSize: "3.5rem",
@@ -186,14 +184,11 @@ const UserResume = ({ firebase, userData }) => {
                      variant="contained"
                      className={classes.buttons}
                      ref={anchorRef}
+                     color="grey"
                      aria-label="split button"
                   >
                      {selectedIndex === 0 && (
-                        <Button
-                           className={classes.button}
-                           href={userData.userResume}
-                           target="_blank"
-                        >
+                        <Button href={userData.userResume} target="_blank">
                            <GetApp
                               className={classes.buttonIcon}
                               fontSize="small"
@@ -208,11 +203,15 @@ const UserResume = ({ firebase, userData }) => {
                            maxSize={20}
                            onError={(errMsg) => console.log(errMsg)}
                         >
-                           <Button className={classes.button}>
-                              <Add
-                                 className={classes.buttonIcon}
-                                 fontSize="small"
-                              />
+                           <Button
+                              startIcon={
+                                 <Add
+                                    className={classes.buttonIcon}
+                                    fontSize="small"
+                                 />
+                              }
+                              className={classes.button}
+                           >
                               Upload New CV [.pdf]
                            </Button>
                         </FilePickerContainer>
@@ -221,11 +220,8 @@ const UserResume = ({ firebase, userData }) => {
                         <Button
                            className={classes.button}
                            onClick={deleteResume}
+                           startIcon={<DeleteForever fontSize="small" />}
                         >
-                           <DeleteForever
-                              className={classes.buttonIcon}
-                              fontSize="small"
-                           />
                            Delete CV
                         </Button>
                      )}
@@ -302,9 +298,11 @@ const UserResume = ({ firebase, userData }) => {
                   <Button
                      color="primary"
                      variant="contained"
-                     className={classes.buttons}
+                     sx={{
+                        mt: 3,
+                     }}
+                     startIcon={<Add fontSize="small" />}
                   >
-                     <Add className={classes.buttonIcon} fontSize="small" />
                      Upload New CV [.pdf]
                   </Button>
                </FilePickerContainer>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { isEmpty } from "lodash/fp";
 import {
    Button,
@@ -18,6 +18,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import { URL_REGEX } from "components/util/constants";
 import usePreparationOverlay from "../../../custom-hook/usePreparationOverlay";
 import { useRouter } from "next/router";
+import { useTheme } from "@mui/material/styles";
 
 const useStyles = makeStyles((theme) => ({
    background: {
@@ -39,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
       fontSize: "1rem",
       textTransform: "uppercase",
       fontWeight: "bold",
-      color: theme.palette.text.secondary,
       marginBottom: 10,
    },
    speakerName: {
@@ -119,7 +119,11 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
       lastName: "",
       position: "",
    });
-   const [showLinkedIn, setShowLinkedIn] = useState(false);
+   const {
+      palette: { mode },
+   } = useTheme();
+
+   const [showLinkedIn, setShowLinkedIn] = useState(true);
    const [linkedInUrl, setLinkedInUrl] = useState("");
    const [formErrors, setFormErrors] = useState({});
    const [loading, setLoading] = useState(false);
@@ -206,7 +210,14 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
                {livestream.company}
             </Typography>
             <Paper className={classes.padding}>
-               <Typography variant="h4" className={classes.speakerTitle}>
+               <Typography
+                  color="textSecondary"
+                  variant="h4"
+                  sx={{
+                     color: "text.primary",
+                  }}
+                  className={classes.speakerTitle}
+               >
                   Your Speaker Profile
                </Typography>
                <FormGroup>
@@ -285,8 +296,8 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
                      }
                      label={
                         showLinkedIn
-                           ? "Show LinkedIn Profile"
-                           : "Hide LinkedIn Profile"
+                           ? "Click To Hide LinkedIn Profile"
+                           : "Click to Show LinkedIn Profile"
                      }
                   />
                   <Collapse in={showLinkedIn}>
@@ -317,6 +328,13 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
                variant="contained"
                type="submit"
                size="large"
+               sx={(theme) => ({
+                  bgcolor: theme.palette.background.paper,
+                  "&:hover": {
+                     backgroundColor: theme.palette.background.default,
+                  },
+                  color: theme.palette.mode === "dark" ? "white" : "black",
+               })}
                onClick={joinStream}
                disabled={loading}
                startIcon={loading && <CircularProgress size="small" />}

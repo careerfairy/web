@@ -1,7 +1,7 @@
 import React, { forwardRef, useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { getMinutes, prettyDate } from "../../helperFunctions/HelperFunctions";
-import { Rating } from '@mui/material';
+import { Rating } from "@mui/material";
 import { Box, Tooltip, Typography } from "@mui/material";
 import { CsvBuilder } from "filefy";
 
@@ -195,6 +195,7 @@ export const defaultTableOptions = {
    exportAllData: true,
    exportDelimiter: ";",
    exportButton: { csv: true, pdf: true }, // PDF is false because its buggy and throws errors
+   searchFieldVariant: "standard",
 };
 
 export const getPageSize = (pageSizeOptions = [], totalData = []) => {

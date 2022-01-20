@@ -1,5 +1,5 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import clsx from "clsx";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
@@ -21,12 +21,14 @@ const ButtonWithHint = ({
    endIcon,
    hintTitle,
    hintDescription,
+   color = "grey",
    ...props
 }) => {
    const classes = useButtonStyles();
    return (
       <Button
          fullWidth={fullWidth}
+         color={color}
          classes={{
             label: classes.btnLabel,
          }}

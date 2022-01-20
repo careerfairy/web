@@ -232,7 +232,7 @@ const TalentPoolSection = memo((props) => {
                                     ? () => leaveTalentPool()
                                     : () => joinTalentPool()
                               }
-                              color={userIsInTalentPool ? "" : "primary"}
+                              color={userIsInTalentPool ? "grey" : "primary"}
                            >
                               {joiningTalentPool
                                  ? "Joining Talent Pool"

@@ -549,9 +549,8 @@ const NewLivestreamForm = ({ firebase }) => {
                            <LocalizationProvider dateAdapter={AdapterDateFns}>
                               <DateTimePicker
                                  inputVariant="outlined"
-                                 fullWidth
                                  renderInput={(params) => (
-                                    <TextField {...params} />
+                                    <TextField fullWidth {...params} />
                                  )}
                                  variant="outlined"
                                  disabled={isSubmitting}

@@ -29,7 +29,7 @@ import Chart from "chart.js";
 import "chartjs-plugin-labels";
 import { customDonutConfig } from "../common/TableUtils";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import StatsUtil from "../../../../../../data/util/StatsUtil";

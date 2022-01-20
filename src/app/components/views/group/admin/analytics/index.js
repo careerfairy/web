@@ -3,7 +3,7 @@ import { v4 as uuid } from "uuid";
 import SwipeableViews from "react-swipeable-views";
 import General from "./General";
 import { alpha, useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels";
 import Audience from "./Audience";
 import Title from "./Title";
