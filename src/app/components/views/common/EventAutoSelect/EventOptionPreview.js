@@ -1,6 +1,6 @@
 import React from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import clsx from "clsx";
 import { Avatar, Typography } from "@mui/material";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
       overflow: "hidden",
    },
 }));
-const EventOptionPreview = ({ streamData, preview }) => {
+const EventOptionPreview = ({ streamData, preview, selected }) => {
    const classes = useStyles();
    return (
       <div

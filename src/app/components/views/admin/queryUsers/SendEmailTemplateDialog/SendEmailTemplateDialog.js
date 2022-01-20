@@ -4,6 +4,7 @@ import {
    Button,
    Collapse,
    DialogActions,
+   DialogContent,
    DialogTitle,
    Grow,
    Step,
@@ -20,7 +21,7 @@ import {
    UPCOMING_LIVESTREAMS_NAME,
 } from "../../../../../data/constants/streamContants";
 import { useSelector } from "react-redux";
-import { Autocomplete } from '@mui/material';
+import { Autocomplete } from "@mui/material";
 import EmailTemplateCard from "./EmailTemplateCard";
 import EmailTemplateForm from "./EmailTemplateForm";
 import useTemplates from "./templates";
@@ -182,7 +183,7 @@ const Content = ({ handleClose, emails }) => {
       setActiveStep(0);
    };
    return (
-      <>
+      <DialogContent>
          <Stepper activeStep={activeStep} alternativeLabel>
             {steps.map((label) => (
                <Step key={label}>
@@ -200,7 +201,7 @@ const Content = ({ handleClose, emails }) => {
             targetTemplate,
             emails,
          })}
-      </>
+      </DialogContent>
    );
 };
 const SendEmailTemplateDialog = ({ open, onClose, emails }) => {

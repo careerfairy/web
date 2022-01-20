@@ -4,8 +4,7 @@
   "description": "ssr app",
   "main": "server.js",
   "scripts": {
-    "dev": "NODE_OPTIONS=--max_old_space_size=8192 next",
-    "dev:windows": "cross-env NODE_OPTIONS=--max_old_space_size=8192 next",
+    "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 next",
     "build": "next build --debug",
     "start": "next start"
   },

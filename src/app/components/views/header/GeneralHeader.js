@@ -1,15 +1,15 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import clsx from "clsx";
 import HideOnScroll from "../../../components/views/common/HideOnScroll";
 import { AppBar, Toolbar } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
    root: {
-      // Ensures top bar's Zindex is always above the drawer
-      zIndex: theme.zIndex.drawer + 1,
+      // Ensures top bar's Zindex is always behind the drawer
+      zIndex: theme.zIndex.drawer - 1,
       color: (props) => props.navLinksActiveColor,
       background: "transparent",
    },
