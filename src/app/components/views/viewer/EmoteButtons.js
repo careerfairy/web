@@ -9,7 +9,7 @@ import {
 import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { amber, deepOrange, grey, red } from "@mui/material/colors";
 import ClappingSVG from "../../util/CustomSVGs";
 import { useCurrentStream } from "../../../context/stream/StreamContext";
@@ -235,7 +235,6 @@ const EmoteButtons = ({ createEmote }) => {
 
    return (
       <ClickAwayListener onClickAway={handleClose}>
-         {/*<Grow in={true} unmountOnExit>*/}
          <div
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -301,7 +300,6 @@ const EmoteButtons = ({ createEmote }) => {
                </div>
             </Box>
          </div>
-         {/*</Grow>*/}
       </ClickAwayListener>
    );
 };

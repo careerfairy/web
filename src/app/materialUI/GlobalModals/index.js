@@ -1,14 +1,14 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { Dialog } from "@mui/material";
 
 const useGlassStyles = makeStyles((theme) => ({
    glass: {
       backgroundColor: (props) => {
          return theme.palette.mode === "dark" || props.forceGlass
-            ? alpha(theme.palette.common.black, 0.4)
+            ? alpha(theme.palette.common.black, 0.8)
             : theme.palette.background.default;
       },
       backdropFilter: "blur(5px)",
@@ -45,7 +45,8 @@ const GlassDialog = ({
          TransitionComponent={TransitionComponent}
          classes={classes}
          TransitionProps={TransitionProps}
-         {...rest} />
+         {...rest}
+      />
    );
 };
 

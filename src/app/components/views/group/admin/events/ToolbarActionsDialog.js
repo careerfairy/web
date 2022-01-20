@@ -17,7 +17,7 @@ import {
 } from "../../../../helperFunctions/HelperFunctions";
 import ShareIcon from "@mui/icons-material/Share";
 import { Film as StreamIcon } from "react-feather";
-import OpenInBrowserIcon from "@mui/icons-material/OpenInBrowser";
+import StudentViewIcon from "@mui/icons-material/FaceRounded";
 import HintIcon from "../../../common/HintIcon";
 
 const ToolbarActionsDialogContent = ({
@@ -54,7 +54,7 @@ const ToolbarActionsDialogContent = ({
             handleOpenStudentView();
             handleClose();
          },
-         icon: <OpenInBrowserIcon />,
+         icon: <StudentViewIcon />,
          description:
             "Go to your public group page and see your events as a student.",
       },

@@ -11,7 +11,7 @@ import {
    Typography,
 } from "@mui/material";
 import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
    button: {
@@ -173,7 +173,7 @@ const Step4Mic = ({
             md={12}
             sm={12}
             xs={12}
-            style={{ padding: "0 0 3rem 0" }}
+            style={{ padding: "1rem 0 3rem 0" }}
             item
          >
             <Typography

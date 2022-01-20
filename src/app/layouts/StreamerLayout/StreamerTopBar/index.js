@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import {
    AppBar,
    Badge,
@@ -25,7 +25,7 @@ import ButtonWithConfirm from "../../../components/views/common/ButtonWithConfir
 import StopIcon from "@mui/icons-material/Stop";
 import PlayCircleFilledWhiteIcon from "@mui/icons-material/PlayCircleFilledWhite";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import OpenInBrowserIcon from "@mui/icons-material/OpenInBrowser";
+import StudentViewIcon from "@mui/icons-material/FaceRounded";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import BreakoutRoomIcon from "@mui/icons-material/Widgets";
@@ -79,7 +79,7 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
    const streamRef = useStreamRef();
    const classes = useStyles({ hasStarted: currentLivestream?.hasStarted });
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down('lg'));
+   const mobile = useMediaQuery(theme.breakpoints.down("lg"));
    const { toggleTheme, themeMode } = useThemeToggle();
    const numberOfViewers = useSelector((state) =>
       currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0
@@ -230,7 +230,8 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                            onClick={() => {
                               setSpeakerManagementOpen(true);
                            }}
-                           size="large">
+                           size="large"
+                        >
                            <PersonAddIcon color="inherit" />
                         </IconButton>
                      </Tooltip>
@@ -240,14 +241,19 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                      <IconButton
                         disabled={openStreamerBreakoutRoomModal}
                         onClick={handleOpenBreakoutRoomModal}
-                        size="large">
+                        size="large"
+                     >
                         <BreakoutRoomIcon />
                      </IconButton>
                   </Tooltip>
                   {
                      <Tooltip title="Open Student View">
-                        <IconButton target="_blank" href={viewerLink} size="large">
-                           <OpenInBrowserIcon color="inherit" />
+                        <IconButton
+                           target="_blank"
+                           href={viewerLink}
+                           size="large"
+                        >
+                           <StudentViewIcon color="inherit" />
                         </IconButton>
                      </Tooltip>
                   }
@@ -275,7 +281,11 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                      <Box className={classes.viewCount}>
                         {mobile ? (
                            <Tooltip title="See who joined">
-                              <IconButton color="inherit" onClick={showAudience} size="large">
+                              <IconButton
+                                 color="inherit"
+                                 onClick={showAudience}
+                                 size="large"
+                              >
                                  <Badge
                                     max={999999}
                                     color="secondary"

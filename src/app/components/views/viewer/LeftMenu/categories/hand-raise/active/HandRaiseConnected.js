@@ -14,20 +14,22 @@ const HandRaiseRequested = memo(
       return (
          shouldRender() && (
             <Grow unmountOnExit in>
-               <CategoryContainerCentered>
-                  <CategoryContainerContent>
-                     <ThemedPermanentMarker align="center">
-                        You are live!
-                     </ThemedPermanentMarker>
-                     <Button
-                        size="large"
-                        startIcon={<ClearRoundedIcon />}
-                        variant="contained"
-                        children="Stop Streaming"
-                        onClick={() => updateHandRaiseRequest("unrequested")}
-                     />
-                  </CategoryContainerContent>
-               </CategoryContainerCentered>
+               <span>
+                  <CategoryContainerCentered>
+                     <CategoryContainerContent>
+                        <ThemedPermanentMarker align="center">
+                           You are live!
+                        </ThemedPermanentMarker>
+                        <Button
+                           size="large"
+                           startIcon={<ClearRoundedIcon />}
+                           variant="contained"
+                           children="Stop Streaming"
+                           onClick={() => updateHandRaiseRequest("unrequested")}
+                        />
+                     </CategoryContainerContent>
+                  </CategoryContainerCentered>
+               </span>
             </Grow>
          )
       );

@@ -12,7 +12,7 @@ import {
    TextField,
    Typography,
 } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 
 const placeholder =
@@ -148,7 +148,7 @@ const CreateBaseGroup = ({ handleNext, setBaseGroupInfo, baseGroupInfo }) => {
                      </FormHelperText>
                      <FormHelperText>{filePickerError}</FormHelperText>
                   </FormControl>
-                  <FormControl className={classes.form}>
+                  <FormControl sx={{ mt: 2 }} className={classes.form}>
                      <TextField
                         id="groupName"
                         value={values.universityName}

@@ -242,70 +242,78 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
          </Grow>
 
          <Grow mountOnEnter unmountOnExit in={Boolean(!handRaises.length)}>
-            <CategoryContainerCentered>
-               <Box
-                  p={2}
-                  component={Paper}
-                  style={{
-                     width: "90%",
-                     display: "grid",
-                     placeItems: "center",
-                  }}
-               >
-                  <PanToolOutlinedIcon
-                     color="primary"
-                     style={{ fontSize: 40 }}
-                  />
-                  <ThemedPermanentMarker gutterBottom>
-                     Waiting for viewers to raise their hands...
-                  </ThemedPermanentMarker>
-                  <Typography style={{ marginBottom: "1rem" }} align="center">
-                     Your viewers can now request to join the stream. Don't
-                     forget to remind them to join in!
-                  </Typography>
-                  <Typography
+            <span>
+               <CategoryContainerCentered>
+                  <Box
+                     p={2}
+                     component={Paper}
                      style={{
-                        marginBottom: "0.8rem",
-                        textTransform: "uppercase",
+                        width: "90%",
+                        display: "grid",
+                        placeItems: "center",
                      }}
-                     align="center"
                   >
-                     You can invite up to 8 hand raisers
-                  </Typography>
-                  <WhiteTooltip
-                     placement="right-end"
-                     title={
-                        <React.Fragment>
-                           <TooltipTitle>Hand Raise (5/5)</TooltipTitle>
-                           <TooltipText>
-                              You can de-activate the Hand Raise mode to prevent
-                              viewers from making subsequent requests.
-                           </TooltipText>
-                           {activeStep === 13 && (
-                              <TooltipButtonComponent
-                                 onConfirm={() => {
-                                    handlers.setHandRaiseModeInactive();
-                                    handleConfirm(13);
-                                 }}
-                                 buttonText="Ok"
-                              />
-                           )}
-                        </React.Fragment>
-                     }
-                     open={hasExited && isOpen(13)}
-                  >
-                     <Button
-                        variant="contained"
-                        startIcon={<CloseRoundedIcon />}
-                        children="Deactivate Hand Raise"
-                        onClick={() => {
-                           handlers.setHandRaiseModeInactive();
-                           isOpen(13) && activeStep === 13 && handleConfirm(13);
-                        }}
+                     <PanToolOutlinedIcon
+                        color="primary"
+                        style={{ fontSize: 40 }}
                      />
-                  </WhiteTooltip>
-               </Box>
-            </CategoryContainerCentered>
+                     <ThemedPermanentMarker gutterBottom>
+                        Waiting for viewers to raise their hands...
+                     </ThemedPermanentMarker>
+                     <Typography
+                        style={{ marginBottom: "1rem" }}
+                        align="center"
+                     >
+                        Your viewers can now request to join the stream. Don't
+                        forget to remind them to join in!
+                     </Typography>
+                     <Typography
+                        style={{
+                           marginBottom: "0.8rem",
+                           textTransform: "uppercase",
+                        }}
+                        align="center"
+                     >
+                        You can invite up to 8 hand raisers
+                     </Typography>
+                     <WhiteTooltip
+                        placement="right-end"
+                        title={
+                           <React.Fragment>
+                              <TooltipTitle>Hand Raise (5/5)</TooltipTitle>
+                              <TooltipText>
+                                 You can de-activate the Hand Raise mode to
+                                 prevent viewers from making subsequent
+                                 requests.
+                              </TooltipText>
+                              {activeStep === 13 && (
+                                 <TooltipButtonComponent
+                                    onConfirm={() => {
+                                       handlers.setHandRaiseModeInactive();
+                                       handleConfirm(13);
+                                    }}
+                                    buttonText="Ok"
+                                 />
+                              )}
+                           </React.Fragment>
+                        }
+                        open={hasExited && isOpen(13)}
+                     >
+                        <Button
+                           variant="contained"
+                           startIcon={<CloseRoundedIcon />}
+                           children="Deactivate Hand Raise"
+                           onClick={() => {
+                              handlers.setHandRaiseModeInactive();
+                              isOpen(13) &&
+                                 activeStep === 13 &&
+                                 handleConfirm(13);
+                           }}
+                        />
+                     </WhiteTooltip>
+                  </Box>
+               </CategoryContainerCentered>
+            </span>
          </Grow>
       </>
    );

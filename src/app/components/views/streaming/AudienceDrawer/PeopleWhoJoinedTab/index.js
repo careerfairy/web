@@ -68,13 +68,14 @@ const PeopleWhoJoinedTab = ({ isStreamer, participatingStudents }) => {
                <TextField
                   fullWidth
                   value={searchParams}
+                  variant="standard"
                   onChange={handleSearch}
                   label="Search for people..."
                />
             </Grid>
             {isStreamer && (
                <Grid item xs={3}>
-                  <FormControl fullWidth>
+                  <FormControl variant="standard" fullWidth>
                      <InputLabel id="audience-select">filter:</InputLabel>
                      <Select
                         labelId="audience-select"

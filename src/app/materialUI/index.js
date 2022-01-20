@@ -34,10 +34,30 @@ export const rootThemeObj = (mode) =>
             contrastText: "#FFFFFF",
          },
          info: {
-            light: "#FFFFFF",
-            main: "#00d2aa",
-            contrastText: "#FFFFFF",
-            dark: "#00b08f",
+            ...(mode === "light"
+               ? {
+                    // palette values for light mode
+                    light: "#F5F5F5",
+                    contrastText: "#333",
+                    dark: "#F5F5F5",
+                    main: "#fff",
+                 }
+               : {
+                    // palette values for dark mode
+                    contrastText: "#FAFAFA",
+                    dark: "#1E1E1E",
+                    main: "#424242",
+                    light: "#424242",
+                 }),
+            // light: "#FFFFFF",
+            // main: "#00d2aa",
+            // contrastText: "#FFFFFF",
+            // dark: "#00b08f",
+            // gradient: "#07c1a7",
+            // info: {
+            //    backgroundColor: `${theme.palette.background.paper} !important`,
+            //    color: `${theme.palette.text.primary} !important`,
+            // },
          },
       },
       breakpoints: {

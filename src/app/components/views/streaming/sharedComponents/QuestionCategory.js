@@ -36,7 +36,7 @@ import * as actions from "../../../../store/actions";
 import SwipeableViews from "react-swipeable-views";
 import { TabPanel } from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import { alpha, useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import { useAuth } from "../../../../HOCs/AuthProvider";
@@ -45,7 +45,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useDispatch } from "react-redux";
 import { compose } from "redux";
 import { useCurrentStream } from "../../../../context/stream/StreamContext";
-import { truncate } from "../../../helperFunctions/HelperFunctions";
+// import { truncate } from "../../../helperFunctions/HelperFunctions";
 import useStreamRef from "../../../custom-hook/useStreamRef";
 import { v4 as uuidv4 } from "uuid";
 
@@ -424,6 +424,9 @@ const QuestionCategory = (props) => {
                </Collapse>
             </DialogContent>
             <DialogActions>
+               <Button size="large" onClick={handleClose}>
+                  Cancel
+               </Button>
                <Button
                   variant="contained"
                   color="primary"
@@ -436,9 +439,6 @@ const QuestionCategory = (props) => {
                   ) : (
                      "Submit"
                   )}
-               </Button>
-               <Button variant="contained" size="large" onClick={handleClose}>
-                  Cancel
                </Button>
             </DialogActions>
          </Dialog>

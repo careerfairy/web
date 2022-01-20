@@ -17,7 +17,7 @@ const HandRaiseStreamerBanner = () => {
    return (
       <StreamBanner
          severity="info"
-         icon={<HandRaiseIcon />}
+         icon={<HandRaiseIcon color="primary" />}
          title={`Hand Raise is Active`}
          subTitle={"Your audience can now request to join via audio and video."}
          action={

@@ -3,12 +3,13 @@ import { brandedDarkTheme, brandedLightTheme } from "../../materialUI";
 import {
    responsiveFontSizes,
    ThemeProvider,
-   StyledEngineProvider,
+   // StyledEngineProvider,
 } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
 import { useRouter } from "next/router";
 import { CssBaseline } from "@mui/material";
 import { createGenerateClassName } from "@mui/styles";
+import makeStyles from "@mui/styles/makeStyles";
 
 // import { Button } from "@mui/material";
 
@@ -25,9 +26,10 @@ const pathsReadyForDarkMode = [
 
 const initialTheme = responsiveFontSizes(brandedLightTheme);
 
-const generateClassName = createGenerateClassName({
-   productionPrefix: "c",
-});
+// const generateClassName = createGenerateClassName({
+//    productionPrefix: "c",
+// });
+
 const ThemeProviderWrapper = ({ children }) => {
    const { pathname } = useRouter();
 
@@ -61,6 +63,14 @@ const ThemeProviderWrapper = ({ children }) => {
       setTheme(responsiveFontSizes(newThemeObj));
    };
 
+   const useStyles = makeStyles({
+      info: {
+         backgroundColor: `${theme.palette.background.paper} !important`,
+         color: `${theme.palette.text.primary} !important`,
+      },
+   });
+   const classes = useStyles();
+
    return (
       <ThemeContext.Provider
          value={{ toggleTheme, themeMode: theme.palette.mode }}
@@ -72,7 +82,10 @@ const ThemeProviderWrapper = ({ children }) => {
          <ThemeProvider theme={theme}>
             {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
             <CssBaseline />
-            <SnackbarProvider maxSnack={5}>
+            <SnackbarProvider
+               classes={{ variantInfo: classes.info }}
+               maxSnack={5}
+            >
                {children}
                {/*<Button*/}
                {/*   color="secondary"*/}

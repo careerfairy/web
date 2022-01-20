@@ -14,7 +14,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { GlassDialog } from "materialUI/GlobalModals";
 import { useTheme } from "@mui/material/styles";
 
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
    iconInButton: {
@@ -35,7 +35,7 @@ function ButtonWithConfirm({
    ...rest
 }) {
    const theme = useTheme();
-   const extraSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+   const extraSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
    const classes = useStyles({ hasStarted });
    const [modalOpen, setModalOpen] = useState(false);
 
@@ -62,7 +62,8 @@ function ButtonWithConfirm({
                      className={classes.iconInButton}
                      disabled={disabled}
                      onClick={() => setModalOpen(true)}
-                     size="large">
+                     size="large"
+                  >
                      {rest.startIcon}
                   </IconButton>
                ) : (
@@ -87,13 +88,7 @@ function ButtonWithConfirm({
                </DialogContentText>
             </DialogContent>
             <DialogActions>
-               <Button
-                  startIcon={<ClearIcon />}
-                  variant="contained"
-                  onClick={() => setModalOpen(false)}
-               >
-                  Cancel
-               </Button>
+               <Button onClick={() => setModalOpen(false)}>Cancel</Button>
                <Button
                   startIcon={<CheckIcon />}
                   variant="contained"

@@ -380,17 +380,19 @@ const FeedbackTable = ({
                              render: ({ rowData }) => {
                                 return (
                                    <Grow in>
-                                      <FeedbackGraph
-                                         group={group}
-                                         setCurrentStream={setCurrentStream}
-                                         currentStream={currentStream}
-                                         typesOfOptions={typesOfOptions}
-                                         userTypes={userTypes}
-                                         setUserType={setUserType}
-                                         currentPoll={rowData}
-                                         userType={userType}
-                                         streamDataType={streamDataType}
-                                      />
+                                      <span>
+                                         <FeedbackGraph
+                                            group={group}
+                                            setCurrentStream={setCurrentStream}
+                                            currentStream={currentStream}
+                                            typesOfOptions={typesOfOptions}
+                                            userTypes={userTypes}
+                                            setUserType={setUserType}
+                                            currentPoll={rowData}
+                                            userType={userType}
+                                            streamDataType={streamDataType}
+                                         />
+                                      </span>
                                    </Grow>
                                 );
                              },

@@ -1,6 +1,6 @@
 import React, { memo, useEffect } from "react";
 import clsx from "clsx";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
@@ -56,9 +56,6 @@ const useStyles = makeStyles((theme) => ({
       color: "white !important",
    },
 }));
-
-const ListItemWrapper = ({ active, children }) =>
-   active ? <Grow in>{children}</Grow> : <>{children}</>;
 
 function LoginButton() {
    const classes = useStyles();
