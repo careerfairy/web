@@ -3,7 +3,7 @@ import { brandedDarkTheme, brandedLightTheme } from "../../materialUI";
 import {
    responsiveFontSizes,
    ThemeProvider,
-   // StyledEngineProvider,
+   StyledEngineProvider,
 } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
 import { useRouter } from "next/router";
@@ -26,9 +26,9 @@ const pathsReadyForDarkMode = [
 
 const initialTheme = responsiveFontSizes(brandedLightTheme);
 
-// const generateClassName = createGenerateClassName({
-//    productionPrefix: "c",
-// });
+const generateClassName = createGenerateClassName({
+   productionPrefix: "c",
+});
 
 const ThemeProviderWrapper = ({ children }) => {
    const { pathname } = useRouter();
@@ -75,29 +75,29 @@ const ThemeProviderWrapper = ({ children }) => {
       <ThemeContext.Provider
          value={{ toggleTheme, themeMode: theme.palette.mode }}
       >
-         {/*<StyledEngineProvider*/}
-         {/*   injectFirst*/}
-         {/*   generateClassName={generateClassName}*/}
-         {/*>*/}
-         <ThemeProvider theme={theme}>
-            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-            <CssBaseline />
-            <SnackbarProvider
-               classes={{ variantInfo: classes.info }}
-               maxSnack={5}
-            >
-               {children}
-               {/*<Button*/}
-               {/*   color="secondary"*/}
-               {/*   onClick={toggleTheme}*/}
-               {/*   variant="contained"*/}
-               {/*   style={{ position: "fixed", bottom: "5%", right: "5%" }}*/}
-               {/*>*/}
-               {/*   toggle*/}
-               {/*</Button>*/}
-            </SnackbarProvider>
-         </ThemeProvider>
-         {/*</StyledEngineProvider>*/}
+         <StyledEngineProvider
+            injectFirst
+            generateClassName={generateClassName}
+         >
+            <ThemeProvider theme={theme}>
+               {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+               <CssBaseline />
+               <SnackbarProvider
+                  classes={{ variantInfo: classes.info }}
+                  maxSnack={5}
+               >
+                  {children}
+                  {/*<Button*/}
+                  {/*   color="secondary"*/}
+                  {/*   onClick={toggleTheme}*/}
+                  {/*   variant="contained"*/}
+                  {/*   style={{ position: "fixed", bottom: "5%", right: "5%" }}*/}
+                  {/*>*/}
+                  {/*   toggle*/}
+                  {/*</Button>*/}
+               </SnackbarProvider>
+            </ThemeProvider>
+         </StyledEngineProvider>
       </ThemeContext.Provider>
    );
 };
