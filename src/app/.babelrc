@@ -2,31 +2,31 @@
   "presets": ["next/babel"],
   "plugins": [
     [
-      "import",
+      "babel-plugin-import",
       {
-        "libraryName": "@material-ui/core",
+        "libraryName": "@mui/material",
         "libraryDirectory": "",
         "camel2DashComponentName": false
       },
-      "mui-core"
+      "core"
     ],
     [
-      "import",
+      "babel-plugin-import",
       {
-        "libraryName": "@material-ui/core/colors",
+        "libraryName": "@mui/icons-material",
         "libraryDirectory": "",
         "camel2DashComponentName": false
       },
-      "mui-core-colors"
+      "icons"
     ],
     [
-      "import",
+      "babel-plugin-import",
       {
-        "libraryName": "@material-ui/icons",
+        "libraryName": "@mui/material/colors",
         "libraryDirectory": "",
         "camel2DashComponentName": false
       },
-      "mui-icons"
+      "colors"
     ],
     ["@babel/plugin-proposal-throw-expressions"]
   ]
