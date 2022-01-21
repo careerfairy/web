@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { GlassDialog } from "../../../../../materialUI/GlobalModals";
 import {
    Box,
@@ -133,7 +133,9 @@ const AddMemberModal = ({ open = false, onClose, group, firebase }) => {
                   />
                </DialogContent>
                <DialogActions>
-                  <Button onClick={() => handleClose(resetForm)}>Cancel</Button>
+                  <Button color="grey" onClick={() => handleClose(resetForm)}>
+                     Cancel
+                  </Button>
                   <Button
                      variant="contained"
                      endIcon={

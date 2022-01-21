@@ -25,7 +25,9 @@ const ConfirmRecordingDialog = ({
             <DialogTitle>Confirm {action}</DialogTitle>
             <DialogContent>{confirmText}</DialogContent>
             <DialogActions>
-               <Button onClick={() => onclose()}>Cancel</Button>
+               <Button color="grey" onClick={() => onclose()}>
+                  Cancel
+               </Button>
                <Button color="primary" onClick={handleConfirm}>
                   Confirm
                </Button>

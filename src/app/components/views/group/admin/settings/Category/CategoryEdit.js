@@ -25,7 +25,7 @@ import {
    Zoom,
 } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import EditIcon from "@mui/icons-material/Edit";
 
 const useStyles = makeStyles((theme) => ({
@@ -340,6 +340,7 @@ function CategoryEditModal({
                   <Button
                      onClick={() => setEditMode(false)}
                      size="small"
+                     color="grey"
                      style={{ marginRight: 10 }}
                   >
                      Cancel

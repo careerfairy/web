@@ -63,7 +63,7 @@ const FeedbackModal = ({
    currentStream,
 }) => {
    const theme = useTheme();
-   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
    const isForEnd = (appearAfter) => {
       return Boolean(appearAfter === marks[marks.length - 1]);
@@ -253,7 +253,9 @@ const FeedbackModal = ({
                      {/*</Box>*/}
                   </DialogContent>
                   <DialogActions>
-                     <Button onClick={handleClose}>Cancel</Button>
+                     <Button color="grey" onClick={handleClose}>
+                        Cancel
+                     </Button>
                      <Button
                         variant="contained"
                         endIcon={

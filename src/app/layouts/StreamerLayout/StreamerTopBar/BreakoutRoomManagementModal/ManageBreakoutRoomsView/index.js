@@ -8,7 +8,7 @@ import {
 import PropTypes from "prop-types";
 import { streamShape } from "types";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useDispatch } from "react-redux";
 import BreakoutRoom from "./BreakoutRoom";
 import { useFirebase } from "context/firebase";
@@ -41,7 +41,7 @@ const ManageBreakoutRoomsView = ({
    const classes = useStyles();
    const { isMainStreamer } = useCurrentStream();
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down('md'));
+   const mobile = useMediaQuery(theme.breakpoints.down("md"));
    const links = useStreamToken({ forStreamType: "mainLivestream" });
    const { openAllBreakoutRooms, closeAllBreakoutRooms } = useFirebase();
    const {
@@ -200,7 +200,9 @@ const ManageBreakoutRoomsView = ({
             ))}
          </DialogContent>
          <DialogActions>
-            <Button onClick={handleClose}>Close</Button>
+            <Button color="grey" onClick={handleClose}>
+               Close
+            </Button>
             {isMainStreamer && (
                <React.Fragment>
                   <Box flex={1} />

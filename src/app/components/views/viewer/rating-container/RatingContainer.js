@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import { withFirebasePage } from "context/firebase";
-import { Rating } from '@mui/material';
+import { Rating } from "@mui/material";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 import {
    Button,
@@ -10,7 +10,7 @@ import {
    Grid,
    TextField,
 } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { Formik } from "formik";
 import clsx from "clsx";
 import * as actions from "../../../../store/actions";
@@ -175,6 +175,7 @@ const ActionComponent = ({
                            disabled={isSubmitting}
                            onClick={() => handleDismiss(setSubmitting)}
                            className={classes.button}
+                           color="grey"
                         >
                            Cancel
                         </Button>

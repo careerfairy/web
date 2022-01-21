@@ -88,7 +88,9 @@ function ButtonWithConfirm({
                </DialogContentText>
             </DialogContent>
             <DialogActions>
-               <Button onClick={() => setModalOpen(false)}>Cancel</Button>
+               <Button color="grey" onClick={() => setModalOpen(false)}>
+                  Cancel
+               </Button>
                <Button
                   startIcon={<CheckIcon />}
                   variant="contained"

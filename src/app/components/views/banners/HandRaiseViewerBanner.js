@@ -4,7 +4,7 @@ import { Box, Button, Tooltip } from "@mui/material";
 import HandRaiseIcon from "@mui/icons-material/PanToolOutlined";
 import useHandRaiseState from "../../custom-hook/useHandRaiseState";
 import { darken } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import StopStreamingIcon from "@mui/icons-material/Stop";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -67,6 +67,7 @@ const HandRaiseViewerBanner = () => {
                   onClick: () => updateRequest("unrequested"),
                   buttonText: "Cancel request",
                   variant: "text",
+                  color: "grey",
                },
             ],
          };
@@ -78,6 +79,7 @@ const HandRaiseViewerBanner = () => {
                {
                   onClick: () => updateRequest("unrequested"),
                   buttonText: "Cancel",
+                  color: "grey",
                },
             ],
          };
@@ -94,6 +96,7 @@ const HandRaiseViewerBanner = () => {
                {
                   onClick: () => updateRequest("unrequested"),
                   buttonText: "Cancel",
+                  color: "grey",
                },
             ],
          };

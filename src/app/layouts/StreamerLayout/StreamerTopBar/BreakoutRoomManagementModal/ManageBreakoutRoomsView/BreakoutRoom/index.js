@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import {
    Accordion,
    AccordionSummary,
@@ -65,6 +65,7 @@ const RoomClosedActions = ({
                   className={clsx({
                      [classes.activeColor]: active,
                   })}
+                  color="grey"
                   disabled={loading}
                >
                   Open
@@ -90,6 +91,7 @@ const RoomClosedActions = ({
                      <Button
                         onClick={handleClickRename}
                         disabled={loading}
+                        color="grey"
                         className={clsx({
                            [classes.activeColor]: active,
                         })}
@@ -119,6 +121,7 @@ const RoomClosedActions = ({
                         className={clsx({
                            [classes.activeColor]: active,
                         })}
+                        color="grey"
                         startIcon={
                            <DeleteRoomIcon
                               htmlColor={theme.palette.error.main}

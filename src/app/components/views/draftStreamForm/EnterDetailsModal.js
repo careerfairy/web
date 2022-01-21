@@ -1,5 +1,5 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import {
    Button,
    Dialog,
@@ -89,7 +89,9 @@ const EnterDetailsModal = ({
                />
             </DialogContent>
             <DialogActions>
-               <Button onClick={handleClose}>Cancel</Button>
+               <Button color="grey" onClick={handleClose}>
+                  Cancel
+               </Button>
                <Button
                   variant="contained"
                   color="primary"

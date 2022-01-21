@@ -42,7 +42,11 @@ const ConfirmStartStreamingDialog = ({
             </DialogContentText>
          </DialogContent>
          <DialogActions>
-            <Button startIcon={<ClearIcon />} onClick={handleClose}>
+            <Button
+               color="grey"
+               startIcon={<ClearIcon />}
+               onClick={handleClose}
+            >
                Cancel
             </Button>
             <Button

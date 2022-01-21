@@ -89,7 +89,9 @@ const BreakoutRoomSettings = ({ classes, handleClose, onClick }) => {
             </List>
          </DialogContent>
          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button color="grey" onClick={handleClose}>
+               Cancel
+            </Button>
          </DialogActions>
       </React.Fragment>
    );

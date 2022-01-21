@@ -170,7 +170,8 @@ function PollCreationModal({
                justifyContent: "center",
                alignItems: "flex-end",
             }}
-            align="center">
+            align="center"
+         >
             <BarChart color="primary" fontSize="large" />{" "}
             <Typography
                color="primary"
@@ -181,42 +182,42 @@ function PollCreationModal({
             </Typography>
          </DialogTitle>
          <DialogContent>
-            <TextField
-               label="Your Question"
-               value={question}
-               fullWidth
-               variant="outlined"
-               onChange={({ currentTarget: { value } }) => setQuestion(value)}
-               placeholder="Write down your question or poll to your audience"
-            />
-            {optionElements}
-            <Button
-               startIcon={<AddIcon />}
-               variant="contained"
-               color="secondary"
-               style={{ marginTop: "1rem" }}
-               children="Add an Option"
-               onClick={increaseNumberOfOptions}
-               disabled={options.length > 3}
-            />
-            <DialogActions>
-               <Button
-                  children="Cancel"
-                  variant="contained"
-                  onClick={handleClose}
-               />
-               <Button
-                  startIcon={
-                     loading && <CircularProgress size={20} color="inherit" />
+            <Box sx={{ py: 1 }}>
+               <TextField
+                  label="Your Question"
+                  value={question}
+                  fullWidth
+                  variant="outlined"
+                  onChange={({ currentTarget: { value } }) =>
+                     setQuestion(value)
                   }
-                  disabled={loading}
-                  children={initialPoll ? "Update Poll" : "Create Poll"}
-                  color="primary"
-                  variant="contained"
-                  onClick={savePoll}
+                  placeholder="Write down your question or poll to your audience"
                />
-            </DialogActions>
+               {optionElements}
+               <Button
+                  startIcon={<AddIcon />}
+                  variant="contained"
+                  color="secondary"
+                  style={{ marginTop: "1rem" }}
+                  children="Add an Option"
+                  onClick={increaseNumberOfOptions}
+                  disabled={options.length > 3}
+               />
+            </Box>
          </DialogContent>
+         <DialogActions>
+            <Button children="Cancel" color="grey" onClick={handleClose} />
+            <Button
+               startIcon={
+                  loading && <CircularProgress size={20} color="inherit" />
+               }
+               disabled={loading}
+               children={initialPoll ? "Update Poll" : "Create Poll"}
+               color="primary"
+               variant="contained"
+               onClick={savePoll}
+            />
+         </DialogActions>
       </GlassDialog>
    );
 }

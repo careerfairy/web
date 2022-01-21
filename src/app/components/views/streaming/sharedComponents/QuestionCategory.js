@@ -424,7 +424,7 @@ const QuestionCategory = (props) => {
                </Collapse>
             </DialogContent>
             <DialogActions>
-               <Button size="large" onClick={handleClose}>
+               <Button size="large" color="grey" onClick={handleClose}>
                   Cancel
                </Button>
                <Button

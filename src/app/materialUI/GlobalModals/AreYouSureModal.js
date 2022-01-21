@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 
 import {
    Button,
@@ -100,7 +100,9 @@ const AreYouSureModal = ({
                )}
             </DialogContent>
             <DialogActions>
-               <Button onClick={onClose}>Cancel</Button>
+               <Button color="grey" onClick={onClose}>
+                  Cancel
+               </Button>
                <Button
                   disabled={loading}
                   endIcon={

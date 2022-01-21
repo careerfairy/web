@@ -75,7 +75,7 @@ export const AddCategory = ({ handleAdd, updateMode, setUpdateMode, open }) => {
                />
             </DialogContent>
             <DialogActions>
-               <Button variant="contained" onClick={() => setUpdateMode({})}>
+               <Button color="grey" onClick={() => setUpdateMode({})}>
                   Cancel
                </Button>
                <Button variant="contained" type="submit" color="primary">
@@ -119,7 +119,7 @@ export const DeleteCategory = ({
             </Box>
          </DialogContent>
          <DialogActions>
-            <Button variant="contained" onClick={() => setUpdateMode({})}>
+            <Button color="grey" onClick={() => setUpdateMode({})}>
                Cancel
             </Button>
             <Button
@@ -209,7 +209,7 @@ export const RenameOption = ({
                </Typography>
             </DialogContent>
             <DialogActions>
-               <Button variant="contained" onClick={() => setUpdateMode({})}>
+               <Button color="grey" onClick={() => setUpdateMode({})}>
                   Cancel
                </Button>
                <Button type="submit" color="primary" variant="contained">
@@ -253,15 +253,15 @@ export const DeleteOption = ({
             </Box>
          </DialogContent>
          <DialogActions>
+            <Button color="grey" onClick={() => setUpdateMode({})}>
+               Cancel
+            </Button>
             <Button
                color="primary"
                onClick={() => handleDelete(updateMode.option)}
                variant="contained"
             >
                Permanently Delete the Category {updateMode.option.name}
-            </Button>
-            <Button variant="contained" onClick={() => setUpdateMode({})}>
-               Cancel
             </Button>
          </DialogActions>
       </Dialog>

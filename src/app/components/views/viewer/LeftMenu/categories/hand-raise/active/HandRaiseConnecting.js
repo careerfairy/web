@@ -30,6 +30,7 @@ const HandRaiseRequested = memo(
                            size="large"
                            startIcon={<ClearRoundedIcon />}
                            variant="contained"
+                           color="grey"
                            children="Cancel"
                            onClick={() => updateHandRaiseRequest("unrequested")}
                         />

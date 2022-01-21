@@ -1,5 +1,5 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { GlassDialog } from "../../../../../../../materialUI/GlobalModals";
 import {
    Button,
@@ -17,10 +17,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const Content = ({
-   handleClose,
-   startConnectingHandRaise,
-}) => {
+const Content = ({ handleClose, startConnectingHandRaise }) => {
    const classes = useStyles();
    return (
       <React.Fragment>
@@ -30,7 +27,7 @@ const Content = ({
             </Typography>
          </DialogTitle>
          <DialogActions>
-            <Button children="Cancel" onClick={handleClose} />
+            <Button color="grey" children="Cancel" onClick={handleClose} />
             <Button
                variant="contained"
                children="Join now"
@@ -41,11 +38,7 @@ const Content = ({
       </React.Fragment>
    );
 };
-const HandRaiseJoinDialog = ({
-   open,
-   onClose,
-   startConnectingHandRaise,
-}) => {
+const HandRaiseJoinDialog = ({ open, onClose, startConnectingHandRaise }) => {
    const handleClose = () => {
       onClose();
    };

@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import {
    Box,
    Button,
@@ -152,7 +152,7 @@ const Content = ({ onClose, eventData, group }) => {
             )}
          </DialogContent>
          <DialogActions>
-            <Button disabled={updating} onClick={onClose}>
+            <Button disabled={updating} color="grey" onClick={onClose}>
                Cancel
             </Button>
             <Button

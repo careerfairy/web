@@ -29,7 +29,8 @@ function SpeakerManagementModal({ open, setOpen, joiningStreamerLink }) {
                justifyContent: "center",
                alignItems: "flex-end",
             }}
-            align="center">
+            align="center"
+         >
             <PersonAddIcon style={{ marginRight: "1rem" }} fontSize="large" />{" "}
             <Typography
                style={{ fontSize: "1.8em", fontWeight: 500 }}
@@ -49,6 +50,7 @@ function SpeakerManagementModal({ open, setOpen, joiningStreamerLink }) {
             <TextField
                variant="outlined"
                fullWidth
+               sx={{ mt: 2 }}
                autoFocus
                InputProps={{ readOnly: true }}
                value={joiningStreamerLink}

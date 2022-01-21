@@ -104,13 +104,6 @@ const DemoIntroModal = ({ open, handleClose }) => {
 
          <DialogActions>
             <Button
-               onClick={() => handleClose(false)}
-               color="grey"
-               disabled={loading}
-            >
-               No Thanks
-            </Button>
-            <Button
                onClick={handleStartDemo}
                startIcon={
                   loading && <CircularProgress size={20} color="inherit" />
@@ -120,6 +113,13 @@ const DemoIntroModal = ({ open, handleClose }) => {
                color="primary"
             >
                Yes Please
+            </Button>
+            <Button
+               onClick={() => handleClose(false)}
+               color="grey"
+               disabled={loading}
+            >
+               No Thanks
             </Button>
          </DialogActions>
       </GlassDialog>

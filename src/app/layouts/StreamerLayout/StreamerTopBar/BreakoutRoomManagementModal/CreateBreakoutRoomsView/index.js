@@ -122,7 +122,9 @@ const CreateBreakoutRoomsView = ({ handleClose }) => {
             {/*</Box>*/}
          </DialogContent>
          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button color="grey" onClick={handleClose}>
+               Cancel
+            </Button>
             <DynamicColorButton
                color="primary"
                loading={loading}
