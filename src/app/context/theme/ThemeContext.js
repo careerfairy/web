@@ -9,17 +9,9 @@ import { SnackbarProvider } from "notistack";
 import { useRouter } from "next/router";
 import { CssBaseline } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
-import { createGenerateClassName } from "@material-ui/core/styles";
 
 // import { Button } from "@mui/material";
-const generateClassName = createGenerateClassName({
-   // By enabling this option, if you have non-MUI elements (e.g. `<div />`)
-   // using MUI classes (e.g. `.MuiButton`) they will lose styles.
-   // Make sure to convert them to use `styled()` or `<Box />` first.
-   disableGlobal: true,
-   // Class names will receive this seed to avoid name collisions.
-   seed: "mui-jss",
-});
+
 const ThemeContext = createContext();
 const pathsReadyForDarkMode = [
    "/streaming/[livestreamId]/joining-streamer",
@@ -78,10 +70,7 @@ const ThemeProviderWrapper = ({ children }) => {
       <ThemeContext.Provider
          value={{ toggleTheme, themeMode: theme.palette.mode }}
       >
-         <StyledEngineProvider
-            generateClassName={generateClassName}
-            injectFirst
-         >
+         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={theme}>
                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                <CssBaseline />
