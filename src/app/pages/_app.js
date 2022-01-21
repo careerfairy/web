@@ -24,7 +24,6 @@ import Notifier from "../components/views/notifier";
 import { getCookieConsentValue } from "react-cookie-consent";
 import CFCookieConsent from "components/views/common/cookie-consent/CFCookieConsent";
 import { useRouter } from "next/router";
-import { StyledEngineProvider } from "@mui/material/styles";
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext";
 
 // Client-side cache, shared for the whole session of the user in the browser.
@@ -153,54 +152,49 @@ function MyApp(props) {
    };
 
    return (
-      <StyledEngineProvider injectFirst>
-         <CacheProvider value={emotionCache}>
-            <Head>
-               <title>CareerFairy | Watch live streams. Get hired.</title>
-            </Head>
-            <Provider store={store}>
-               <ReactReduxFirebaseProvider {...rrfProps}>
-                  <TutorialContext.Provider
-                     value={{
-                        tutorialSteps,
-                        setTutorialSteps,
-                        showBubbles,
-                        setShowBubbles,
-                        getActiveTutorialStepKey,
-                        handleConfirmStep,
-                        isOpen,
-                        endTutorial,
-                     }}
-                  >
-                     <AuthProvider>
-                        <ThemeProviderWrapper>
-                           <FirebaseContext.Provider value={firebase}>
-                              <LocalizationProvider
-                                 dateAdapter={AdapterDateFns}
+      <CacheProvider value={emotionCache}>
+         <Head>
+            <title>CareerFairy | Watch live streams. Get hired.</title>
+         </Head>
+         <Provider store={store}>
+            <ReactReduxFirebaseProvider {...rrfProps}>
+               <TutorialContext.Provider
+                  value={{
+                     tutorialSteps,
+                     setTutorialSteps,
+                     showBubbles,
+                     setShowBubbles,
+                     getActiveTutorialStepKey,
+                     handleConfirmStep,
+                     isOpen,
+                     endTutorial,
+                  }}
+               >
+                  <AuthProvider>
+                     <ThemeProviderWrapper>
+                        <FirebaseContext.Provider value={firebase}>
+                           <LocalizationProvider dateAdapter={AdapterDateFns}>
+                              <ErrorContext.Provider
+                                 value={{ generalError, setGeneralError }}
                               >
-                                 <ErrorContext.Provider
-                                    value={{ generalError, setGeneralError }}
-                                 >
-                                    {disableCookies ||
-                                    isRecordingWindow ? null : (
-                                       <CFCookieConsent />
-                                    )}
-                                    <Component {...pageProps} />
-                                    <Notifier />
-                                    <ErrorSnackBar
-                                       handleClose={() => setGeneralError("")}
-                                       errorMessage={generalError}
-                                    />
-                                 </ErrorContext.Provider>
-                              </LocalizationProvider>
-                           </FirebaseContext.Provider>
-                        </ThemeProviderWrapper>
-                     </AuthProvider>
-                  </TutorialContext.Provider>
-               </ReactReduxFirebaseProvider>
-            </Provider>
-         </CacheProvider>
-      </StyledEngineProvider>
+                                 {disableCookies || isRecordingWindow ? null : (
+                                    <CFCookieConsent />
+                                 )}
+                                 <Component {...pageProps} />
+                                 <Notifier />
+                                 <ErrorSnackBar
+                                    handleClose={() => setGeneralError("")}
+                                    errorMessage={generalError}
+                                 />
+                              </ErrorContext.Provider>
+                           </LocalizationProvider>
+                        </FirebaseContext.Provider>
+                     </ThemeProviderWrapper>
+                  </AuthProvider>
+               </TutorialContext.Provider>
+            </ReactReduxFirebaseProvider>
+         </Provider>
+      </CacheProvider>
    );
 }
 

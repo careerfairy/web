@@ -70,24 +70,26 @@ const ThemeProviderWrapper = ({ children }) => {
       <ThemeContext.Provider
          value={{ toggleTheme, themeMode: theme.palette.mode }}
       >
-         <ThemeProvider theme={theme}>
-            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-            <CssBaseline />
-            <SnackbarProvider
-               classes={{ variantInfo: classes.info }}
-               maxSnack={5}
-            >
-               {children}
-               {/*<Button*/}
-               {/*   color="secondary"*/}
-               {/*   onClick={toggleTheme}*/}
-               {/*   variant="contained"*/}
-               {/*   style={{ position: "fixed", bottom: "5%", right: "5%" }}*/}
-               {/*>*/}
-               {/*   toggle*/}
-               {/*</Button>*/}
-            </SnackbarProvider>
-         </ThemeProvider>
+         <StyledEngineProvider>
+            <ThemeProvider theme={theme}>
+               {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+               <CssBaseline />
+               <SnackbarProvider
+                  classes={{ variantInfo: classes.info }}
+                  maxSnack={5}
+               >
+                  {children}
+                  {/*<Button*/}
+                  {/*   color="secondary"*/}
+                  {/*   onClick={toggleTheme}*/}
+                  {/*   variant="contained"*/}
+                  {/*   style={{ position: "fixed", bottom: "5%", right: "5%" }}*/}
+                  {/*>*/}
+                  {/*   toggle*/}
+                  {/*</Button>*/}
+               </SnackbarProvider>
+            </ThemeProvider>
+         </StyledEngineProvider>
       </ThemeContext.Provider>
    );
 };
