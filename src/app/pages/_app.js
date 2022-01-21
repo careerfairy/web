@@ -20,7 +20,7 @@ import { createFirestoreInstance } from "redux-firestore";
 import { Provider } from "react-redux";
 import { CacheProvider } from "@emotion/react";
 import createEmotionCache from "materialUI/createEmotionCache";
-
+import { StyledEngineProvider } from "@mui/material/styles";
 import Notifier from "../components/views/notifier";
 import { getCookieConsentValue } from "react-cookie-consent";
 import CFCookieConsent from "components/views/common/cookie-consent/CFCookieConsent";
@@ -172,25 +172,30 @@ function MyApp(props) {
                   }}
                >
                   <AuthProvider>
-                     <ThemeProviderWrapper>
-                        <FirebaseContext.Provider value={firebase}>
-                           <LocalizationProvider dateAdapter={AdapterDateFns}>
-                              <ErrorContext.Provider
-                                 value={{ generalError, setGeneralError }}
+                     <StyledEngineProvider injectFirst>
+                        <ThemeProviderWrapper>
+                           <FirebaseContext.Provider value={firebase}>
+                              <LocalizationProvider
+                                 dateAdapter={AdapterDateFns}
                               >
-                                 {disableCookies || isRecordingWindow ? null : (
-                                    <CFCookieConsent />
-                                 )}
-                                 <Component {...pageProps} />
-                                 <Notifier />
-                                 <ErrorSnackBar
-                                    handleClose={() => setGeneralError("")}
-                                    errorMessage={generalError}
-                                 />
-                              </ErrorContext.Provider>
-                           </LocalizationProvider>
-                        </FirebaseContext.Provider>
-                     </ThemeProviderWrapper>
+                                 <ErrorContext.Provider
+                                    value={{ generalError, setGeneralError }}
+                                 >
+                                    {disableCookies ||
+                                    isRecordingWindow ? null : (
+                                       <CFCookieConsent />
+                                    )}
+                                    <Component {...pageProps} />
+                                    <Notifier />
+                                    <ErrorSnackBar
+                                       handleClose={() => setGeneralError("")}
+                                       errorMessage={generalError}
+                                    />
+                                 </ErrorContext.Provider>
+                              </LocalizationProvider>
+                           </FirebaseContext.Provider>
+                        </ThemeProviderWrapper>
+                     </StyledEngineProvider>
                   </AuthProvider>
                </TutorialContext.Provider>
             </ReactReduxFirebaseProvider>

@@ -107,9 +107,9 @@ export default class MyDocument extends Document {
                   content="/mstile-310x310.png"
                />
                <link
-                  rel="stylesheet"
-                  type="text/css"
                   href="https://fonts.googleapis.com/css?family=Poppins:400,400i,500,500i,700, 700i|Roboto+Slab|Permanent+Marker"
+                  type="text/css"
+                  rel="stylesheet"
                />
                {/* Inject MUI styles first to match with the prepend: true configuration. */}
                {this.props.emotionStyleTags}

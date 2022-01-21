@@ -79,10 +79,10 @@ module.exports = (phase, { defaultConfig }) => {
             test: /\.svg$/,
             use: ["@svgr/webpack"],
          });
-         config.module.rules.push({
-            test: /\.(woff(2)?|ttf)(\?v=\d+\.\d+\.\d+)?$/,
-            loader: "file-loader",
-         });
+         // config.module.rules.push({
+         //    test: /\.(woff(2)?|ttf)(\?v=\d+\.\d+\.\d+)?$/,
+         //    loader: "file-loader",
+         // });
          return config;
       },
    };
