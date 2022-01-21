@@ -1,21 +1,18 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
 
-import styles from "../../materialUI/styles/layoutStyles/embedLayoutStyles";
+import { styles } from "../../materialUI/styles/layoutStyles/basicLayoutStyles";
 
-const useStyles = makeStyles(styles);
+import { Box } from "@mui/material";
 
 const EmbedLayout = ({ children }) => {
-   const classes = useStyles();
-
    return (
-      <div className={classes.root}>
-         <div className={classes.wrapper}>
-            <div className={classes.contentContainer}>
-               <div className={classes.content}>{children}</div>
-            </div>
-         </div>
-      </div>
+      <Box sx={styles.root}>
+         <Box sx={styles.wrapper}>
+            <Box sx={styles.contentContainer}>
+               <Box sx={styles.content}>{children}</Box>
+            </Box>
+         </Box>
+      </Box>
    );
 };
 

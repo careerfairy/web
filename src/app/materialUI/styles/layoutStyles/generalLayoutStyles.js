@@ -1,10 +1,8 @@
-import nextLivestreamsLayoutStyles from "./nextLivestreamsLayoutStyles";
+import { styles as nextLivestreamStyles } from "./nextLivestreamsLayoutStyles";
 
-const generalLayoutStyles = (theme) => ({
-   ...nextLivestreamsLayoutStyles(theme),
-   root: {
-      ...nextLivestreamsLayoutStyles(theme).root,
-   },
-});
-
-export default generalLayoutStyles;
+export const styles = {
+   ...nextLivestreamStyles,
+   root: (theme) => ({
+      ...nextLivestreamStyles.root(theme),
+   }),
+};

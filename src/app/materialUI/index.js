@@ -77,6 +77,7 @@ export const rootThemeObj = (mode) =>
       },
       whiteShadow:
          "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)",
+      drawerWidth: { small: "256px", medium: "300px" },
    });
 
 const getComponents = (theme) => ({

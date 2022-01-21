@@ -2,7 +2,6 @@ import PropTypes from "prop-types";
 import React, { useMemo } from "react";
 import makeStyles from "@mui/styles/makeStyles";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { Item, Row } from "@mui-treasury/components/flex";
 import StreamContainer from "./StreamContainer";
 import clsx from "clsx";
 import Box from "@mui/material/Box";

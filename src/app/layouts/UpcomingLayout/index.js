@@ -1,54 +1,51 @@
 import React from "react";
+import { styles as landingLayoutStyles } from "../../materialUI/styles/layoutStyles/landingLayoutStyles";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
 import TopBar from "./TopBar";
 import NavBar from "./NavBar";
-import styles from "../../materialUI/styles/layoutStyles/landingLayoutStyles";
 import FooterV2 from "../../components/views/footer/FooterV2";
+import { Box } from "@mui/material";
 
-const useStyles = makeStyles((theme) => {
-   const inheritedStyles = { ...styles(theme) };
-   return {
-      ...inheritedStyles,
-      root: {
-         minHeight: "100vh",
-         display: "flex",
-         flexDirection: "column",
-      },
-      wrapper: {
-         ...inheritedStyles.wrapper,
-         overflow: "visible",
-         paddingTop: "0 !important",
-      },
-      contentContainer: {
-         ...inheritedStyles.contentContainer,
-         overflow: "visible",
-      },
-      content: {
-         ...inheritedStyles.content,
-         overflow: "visible",
-         overflowX: "visible",
-      },
-   };
-});
+const layoutStyles = landingLayoutStyles({});
+const styles = {
+   ...layoutStyles,
+   root: {
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+   },
+   wrapper: (theme) => ({
+      ...layoutStyles.wrapper(theme),
+      overflow: "visible",
+      paddingTop: "0 !important",
+   }),
+   contentContainer: {
+      ...layoutStyles.contentContainer,
+      overflow: "visible",
+   },
+   content: {
+      ...layoutStyles.content,
+      overflow: "visible",
+      overflowX: "visible",
+   },
+};
 
 const drawerWidth = 300;
 const UpcomingLayout = ({ children }) => {
-   const classes = useStyles();
    const theme = useTheme();
    return (
-      <div className={classes.root}>
+      <Box sx={styles.root}>
          <TopBar />
          <NavBar anchor="left" drawerWidth={drawerWidth} />
-         <div className={classes.wrapper}>
-            <div className={classes.contentContainer}>
-               <div className={classes.content}>
+         <Box sx={styles.wrapper}>
+            <Box sx={styles.contentContainer}>
+               <Box sx={styles.content}>
                   {children}
                   <FooterV2 background={theme.palette.common.white} />
-               </div>
-            </div>
-         </div>
-      </div>
+               </Box>
+            </Box>
+         </Box>
+      </Box>
    );
 };
 

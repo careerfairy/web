@@ -13,13 +13,16 @@ import { LogOut as LogoutIcon } from "react-feather";
 import NavItem from "./NavItem";
 import { useRouter } from "next/router";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import clsx from "clsx";
 import * as actions from "../../../store/actions";
 import { compose } from "redux";
 import { connect } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
+   drawer: {
+      zIndex: theme.zIndex.drawer + 1,
+   },
    mobileDrawer: {
       width: 256,
    },
@@ -146,35 +149,37 @@ const NavBar = ({
       </Box>
    );
 
-   return <>
-      <Hidden lgUp>
-         <Drawer
-            anchor="left"
-            classes={{
-               paper: clsx(classes.mobileDrawer, classes.background),
-            }}
-            className={classes.drawer}
-            onClose={onMobileClose}
-            open={openMobile}
-            variant="temporary"
-         >
-            {content}
-         </Drawer>
-      </Hidden>
-      <Hidden lgDown>
-         <Drawer
-            anchor="left"
-            classes={{
-               paper: clsx(classes.desktopDrawer, classes.background),
-            }}
-            className={classes.drawer}
-            open
-            variant="persistent"
-         >
-            {content}
-         </Drawer>
-      </Hidden>
-   </>;
+   return (
+      <>
+         <Hidden lgUp>
+            <Drawer
+               anchor="left"
+               classes={{
+                  paper: clsx(classes.mobileDrawer, classes.background),
+               }}
+               className={classes.drawer}
+               onClose={onMobileClose}
+               open={openMobile}
+               variant="temporary"
+            >
+               {content}
+            </Drawer>
+         </Hidden>
+         <Hidden lgDown>
+            <Drawer
+               anchor="left"
+               classes={{
+                  paper: clsx(classes.desktopDrawer, classes.background),
+               }}
+               className={classes.drawer}
+               open
+               variant="persistent"
+            >
+               {content}
+            </Drawer>
+         </Hidden>
+      </>
+   );
 };
 
 NavBar.propTypes = {

@@ -1,20 +1,18 @@
 import PropTypes from "prop-types";
 import React, { useState } from "react";
-import makeStyles from "@mui/styles/makeStyles";
 import NavBar from "./NavBar";
-import styles from "../../materialUI/styles/layoutStyles/nextLivestreamsLayoutStyles";
+import { styles } from "../../materialUI/styles/layoutStyles/nextLivestreamsLayoutStyles";
 import TopBar from "./TopBar";
 import useGeneralLinks from "../../components/custom-hook/useGeneralLinks";
 import FooterV2 from "../../components/views/footer/FooterV2";
-
-const useStyles = makeStyles(styles);
+import { useTheme } from "@mui/material/styles";
+import { Box } from "@mui/material";
 
 const NextLivestreamsLayout = (props) => {
    const { children, currentGroup } = props;
-   const drawerWidth = 300;
-   const classes = useStyles({ drawerWidth });
 
    const { mainLinks, secondaryLinks } = useGeneralLinks();
+   const theme = useTheme();
 
    const [isMobileNavOpen, setMobileNavOpen] = useState(false);
    const handleDrawerOpen = () => setMobileNavOpen(true);
@@ -23,7 +21,7 @@ const NextLivestreamsLayout = (props) => {
 
    return (
       <React.Fragment>
-         <div className={classes.root}>
+         <Box sx={styles.root}>
             <TopBar
                links={mainLinks}
                currentGroup={currentGroup}
@@ -32,21 +30,21 @@ const NextLivestreamsLayout = (props) => {
             <NavBar
                drawerTopLinks={mainLinks}
                handleDrawerToggle={handleDrawerToggle}
-               drawerWidth={drawerWidth}
+               drawerWidth={theme.drawerWidth.medium}
                drawerBottomLinks={secondaryLinks}
                onMobileNavOpen={handleDrawerOpen}
                onMobileClose={handleDrawerClose}
                openMobile={isMobileNavOpen}
             />
-            <div className={classes.wrapper}>
-               <div className={classes.contentContainer}>
-                  <div className={classes.content}>
+            <Box sx={styles.wrapper}>
+               <Box sx={styles.contentContainer}>
+                  <Box sx={styles.content}>
                      {children}
                      <FooterV2 />
-                  </div>
-               </div>
-            </div>
-         </div>
+                  </Box>
+               </Box>
+            </Box>
+         </Box>
       </React.Fragment>
    );
 };
