@@ -2,6 +2,12 @@ import { styles as nextLivestreamsLayoutStyles } from "./nextLivestreamsLayoutSt
 
 export const styles = ({ bottomImage = "", topImage = "" }) => ({
    ...nextLivestreamsLayoutStyles,
+   wrapper: (theme) => ({
+      ...nextLivestreamsLayoutStyles.wrapper(theme),
+      [theme.breakpoints.up("lg")]: {
+         paddingLeft: 0,
+      },
+   }),
    root: (theme) => ({
       ...nextLivestreamsLayoutStyles.root(theme),
       background: `url(${topImage}) top left no-repeat, url(${bottomImage}) bottom left no-repeat, ${theme.palette.common.white}`,
