@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import * as React from "react";
 import "styles.css";
 import FirebaseContext from "context/firebase/FirebaseContext";
 import Firebase from "context/firebase";
@@ -25,6 +25,7 @@ import { getCookieConsentValue } from "react-cookie-consent";
 import CFCookieConsent from "components/views/common/cookie-consent/CFCookieConsent";
 import { useRouter } from "next/router";
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext";
+import { useEffect, useState } from "react";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
