@@ -24,12 +24,20 @@ const TopBar = () => {
 
    return (
       <GeneralHeader permanent transparent>
-         <Box display="flex" alignItems="center">
+         <Box
+            sx={{
+               display: "flex",
+               alignItems: "center",
+            }}
+         >
             <IconButton
-               style={{ marginRight: "1rem" }}
+               sx={{
+                  marginRight: "1rem",
+               }}
                color="primary"
                onClick={handleDrawerOpen}
-               size="large">
+               size="large"
+            >
                <MenuIcon />
             </IconButton>
             <MainLogo />
@@ -40,7 +48,12 @@ const TopBar = () => {
                navLinksActiveColor={theme.palette.primary.main}
             />
          </Hidden>
-         <Box display="flex" alignItems="center">
+         <Box
+            sx={{
+               display: "flex",
+               alignItems: "center",
+            }}
+         >
             <Hidden lgDown>
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <div>
@@ -52,7 +65,8 @@ const TopBar = () => {
                      component={Link}
                      color="primary"
                      href="/profile"
-                     size="large">
+                     size="large"
+                  >
                      <AccountCircleOutlinedIcon />
                   </IconButton>
                )}

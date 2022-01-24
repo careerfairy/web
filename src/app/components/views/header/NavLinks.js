@@ -1,5 +1,5 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { Tab, Tabs, Typography } from "@mui/material";
 import clsx from "clsx";
 import Link from "../../../materialUI/NextNavLink";
@@ -75,7 +75,10 @@ const NavLinks = ({ links, navLinksActiveColor, navLinksBaseColor }) => {
    const { pathname } = useRouter();
    return (
       <Tabs
-         className={classes.tabs}
+         sx={{
+            display: "flex",
+            justifyContent: "space-around",
+         }}
          value={false}
          classes={{ indicator: classes.indicator }}
       >
