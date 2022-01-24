@@ -8,6 +8,7 @@ import SectionHeader from "../../common/SectionHeader";
 import Box from "@material-ui/core/Box";
 import { Typography } from "@material-ui/core";
 import Fade from "@stahl.luke/react-reveal/Fade";
+import LinkifyText from "../../../util/LinkifyText";
 
 const useStyles = makeStyles((theme) => ({
    section: {},
@@ -58,13 +59,15 @@ const AboutSection = (props) => {
             )}
             <Fade fraction={props.forceReveal ? 0 : 0.2} bottom>
                <Box>
-                  <Typography
-                     style={{ whiteSpace: "pre-line" }}
-                     color="textSecondary"
-                     variant="h6"
-                  >
-                     {props.summary}
-                  </Typography>
+                  <LinkifyText>
+                     <Typography
+                        style={{ whiteSpace: "pre-line" }}
+                        color="textSecondary"
+                        variant="h6"
+                     >
+                        {props.summary}
+                     </Typography>
+                  </LinkifyText>
                </Box>
             </Fade>
          </SectionContainer>
