@@ -155,6 +155,10 @@ function MyApp(props) {
    return (
       <CacheProvider value={emotionCache}>
          <Head>
+            <meta
+               name="viewport"
+               content="initial-scale=1, width=device-width"
+            />
             <title>CareerFairy | Watch live streams. Get hired.</title>
          </Head>
          <Provider store={store}>
