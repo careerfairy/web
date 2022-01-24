@@ -1,10 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { brandedDarkTheme, brandedLightTheme } from "../../materialUI";
-import {
-   responsiveFontSizes,
-   ThemeProvider,
-   StyledEngineProvider,
-} from "@mui/material/styles";
+import { responsiveFontSizes, ThemeProvider } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
 import { useRouter } from "next/router";
 import { CssBaseline } from "@mui/material";
@@ -70,26 +66,24 @@ const ThemeProviderWrapper = ({ children }) => {
       <ThemeContext.Provider
          value={{ toggleTheme, themeMode: theme.palette.mode }}
       >
-         <StyledEngineProvider>
-            <ThemeProvider theme={theme}>
-               {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-               <CssBaseline />
-               <SnackbarProvider
-                  classes={{ variantInfo: classes.info }}
-                  maxSnack={5}
-               >
-                  {children}
-                  {/*<Button*/}
-                  {/*   color="secondary"*/}
-                  {/*   onClick={toggleTheme}*/}
-                  {/*   variant="contained"*/}
-                  {/*   style={{ position: "fixed", bottom: "5%", right: "5%" }}*/}
-                  {/*>*/}
-                  {/*   toggle*/}
-                  {/*</Button>*/}
-               </SnackbarProvider>
-            </ThemeProvider>
-         </StyledEngineProvider>
+         <ThemeProvider theme={theme}>
+            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+            <CssBaseline />
+            <SnackbarProvider
+               classes={{ variantInfo: classes.info }}
+               maxSnack={5}
+            >
+               {children}
+               {/*<Button*/}
+               {/*   color="secondary"*/}
+               {/*   onClick={toggleTheme}*/}
+               {/*   variant="contained"*/}
+               {/*   style={{ position: "fixed", bottom: "5%", right: "5%" }}*/}
+               {/*>*/}
+               {/*   toggle*/}
+               {/*</Button>*/}
+            </SnackbarProvider>
+         </ThemeProvider>
       </ThemeContext.Provider>
    );
 };
