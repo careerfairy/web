@@ -110,6 +110,18 @@ const people = [
       bio: "",
       linkedinUrl: "https://www.linkedin.com/in/gary-terol/",
    },
+   {
+      id: 10,
+      avatar:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fcarlos.jfif?alt=media&token=970b3bda-001a-4612-abc3-19b6c97b93ef",
+      name: "Carlos Florêncio",
+      role: "Software Engineer",
+      bio:
+         "Carlos has a background in Computer Science and a very diversified skill set. The experience of working as an SRE, Manager and Backend Developer has given him a different perspective when approaching problems.\n" +
+         "\n" +
+         "In his free time, he's developing side projects and spending time with friends.\n",
+      linkedinUrl: "https://www.linkedin.com/in/carlosflorencio/",
+   },
 ];
 
 const shuffledPeople = shuffleArray(people);
