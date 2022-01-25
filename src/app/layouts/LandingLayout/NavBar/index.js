@@ -1,11 +1,9 @@
 import React, { memo, useEffect } from "react";
-import clsx from "clsx";
-import makeStyles from "@mui/styles/makeStyles";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
-import { Box, Button, Grow } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useAuth } from "../../../HOCs/AuthProvider";
 import NavItem from "../../../components/views/navbar/NavItem";
 import { LogOut as LogoutIcon } from "react-feather";
@@ -15,55 +13,14 @@ import Link from "../../../materialUI/NextNavLink";
 import useGeneralLinks from "../../../components/custom-hook/useGeneralLinks";
 import PropTypes from "prop-types";
 
-const useStyles = makeStyles((theme) => ({
-   mobileDrawer: {
-      width: (props) => props.drawerWidth || 256,
-   },
-   desktopDrawer: {
-      width: (props) => props.drawerWidth || 256,
-      top: 64,
-      height: "calc(100% - 64px)",
-      boxShadow: theme.shadows[1],
-   },
-   background: {
-      borderRight: "none",
-      backgroundSize: "cover",
-      backgroundPosition: "center center",
-      // background: `linear-gradient(0deg, ${alpha(theme.palette.common.black, 0.3)}, ${alpha(theme.palette.common.black, 0.3)}), url(/next-livestreams-side.jpg)`,
-   },
-   name: {
-      marginTop: theme.spacing(1),
-   },
-   drawerText: {
-      color: theme.palette.common.white,
-   },
-
-   drawer: {
-      flexShrink: 0,
-      whiteSpace: "nowrap",
-      "& ::-webkit-scrollbar": {
-         width: "3px",
-         backgroundColor: "transparent",
-      },
-      "& ::-webkit-scrollbar-thumb": {
-         borderRadius: "10px",
-         WebkitBoxShadow: "inset 0 0 6px rgba(0,0,0,.3)",
-         backgroundColor: "#555",
-      },
-   },
-
-   loginButton: {
-      color: "white !important",
-   },
-}));
-
 function LoginButton() {
-   const classes = useStyles();
    return (
       <ListItem>
          <Button
             fullWidth
-            className={classes.loginButton}
+            sx={{
+               color: "white !important",
+            }}
             component={Link}
             href="/login"
             style={{ textDecoration: "none" }}
@@ -77,7 +34,6 @@ function LoginButton() {
 }
 
 const NavBar = memo(({ drawerWidth, anchor = "left" }) => {
-   const classes = useStyles({ drawerWidth });
    const { userData, authenticatedUser } = useAuth();
    const dispatch = useDispatch();
    const signOut = () => dispatch(actions.signOut());
@@ -86,7 +42,6 @@ const NavBar = memo(({ drawerWidth, anchor = "left" }) => {
       (state) => state.generalLayout.layout.drawerOpen
    );
    const handleDrawerClose = () => dispatch(actions.closeNavDrawer());
-   const handleDrawerToggle = () => dispatch(actions.toggleNavDrawer());
 
    useEffect(() => {
       return () => handleDrawerClose();
@@ -141,8 +96,28 @@ const NavBar = memo(({ drawerWidth, anchor = "left" }) => {
    return (
       <Drawer
          anchor={anchor}
-         classes={{ paper: clsx(classes.mobileDrawer, classes.background) }}
-         className={classes.drawer}
+         PaperProps={{
+            sx: {
+               width: drawerWidth || "256px",
+               borderRight: "none",
+               backgroundSize: "cover",
+               backgroundPosition: "center center",
+               // background: `linear-gradient(0deg, ${alpha(theme.palette.common.black, 0.3)}, ${alpha(theme.palette.common.black, 0.3)}), url(/next-livestreams-side.jpg)`,
+            },
+         }}
+         sx={{
+            flexShrink: 0,
+            whiteSpace: "nowrap",
+            "& ::-webkit-scrollbar": {
+               width: "3px",
+               backgroundColor: "transparent",
+            },
+            "& ::-webkit-scrollbar-thumb": {
+               borderRadius: "10px",
+               WebkitBoxShadow: "inset 0 0 6px rgba(0,0,0,.3)",
+               backgroundColor: "#555",
+            },
+         }}
          onClose={handleDrawerClose}
          open={openMobile}
          variant="temporary"

@@ -49,8 +49,8 @@ const NavLinks = ({ links, navLinksActiveColor, navLinksBaseColor }) => {
                      color: navLinksActiveColor,
                   },
                   "&:hover:before": {
-                     bottom: 6,
-                     height: 4,
+                     bottom: "6px",
+                     height: "4px",
                      width: "100%",
                   },
                   ...(pathname === item.href && {

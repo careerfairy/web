@@ -1,40 +1,8 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from "@mui/styles/makeStyles";
-import clsx from "clsx";
 import HideOnScroll from "../../../components/views/common/HideOnScroll";
 import { AppBar, Toolbar } from "@mui/material";
-
-const useStyles = makeStyles((theme) => ({
-   root: {
-      // Ensures top bar's Zindex is always behind the drawer
-      zIndex: theme.zIndex.drawer - 1,
-      color: (props) => props.navLinksActiveColor,
-      background: "transparent",
-   },
-   transparentToolbar: {
-      // boxShadow: theme.shadows[1],
-      backgroundColor: [alpha(theme.palette.common.white, 0.7), "!important"],
-      borderBottom: `1px solid transparent`,
-      backdropFilter: "blur(20px)",
-   },
-   toolbar: {
-      display: "flex",
-      justifyContent: "space-between",
-      background: "transparent",
-      borderBottomColor: alpha(theme.palette.common.black, 0.2),
-   },
-   animated: {
-      transition: theme.transitions.create(
-         ["background", "box-shadow", "border-bottom-color"],
-         {
-            duration: theme.transitions.duration.complex,
-            easing: theme.transitions.easing.easeInOut,
-         }
-      ),
-   },
-}));
 
 const GeneralHeader = ({
    transparent,
@@ -45,7 +13,6 @@ const GeneralHeader = ({
    ...rest
 }) => {
    const absolute = position === "absolute";
-   const classes = useStyles();
 
    const [scrolled, setScrolled] = useState(false);
 
@@ -61,15 +28,41 @@ const GeneralHeader = ({
    return (
       <HideOnScroll forceShow={permanent}>
          <AppBar
-            className={clsx(classes.root, className)}
+            className={className}
+            sx={{
+               // Ensures top bar's Zindex is always behind the drawer
+               zIndex: (theme) => theme.zIndex.drawer - 1,
+               background: "transparent",
+            }}
             elevation={0}
             position={position}
             {...rest}
          >
             <Toolbar
-               className={clsx(classes.toolbar, classes.animated, {
-                  [classes.transparentToolbar]:
-                     (scrolled || !transparent) && !absolute,
+               sx={(theme) => ({
+                  display: "flex",
+                  justifyContent: "space-between",
+                  background: "transparent",
+                  borderBottomColor: alpha(theme.palette.common.black, 0.2),
+                  transition: theme.transitions.create(
+                     ["background", "box-shadow", "border-bottom-color"],
+                     {
+                        duration: theme.transitions.duration.complex,
+                        easing: theme.transitions.easing.easeInOut,
+                     }
+                  ),
+                  ...((scrolled || !transparent) &&
+                     !absolute && {
+                        backgroundColor: [
+                           alpha(theme.palette.common.white, 0.7),
+                           "!important",
+                        ],
+                        borderBottom: `1px solid ${alpha(
+                           theme.palette.common.black,
+                           0.2
+                        )}`,
+                        backdropFilter: "blur(20px)",
+                     }),
                })}
             >
                {children}
