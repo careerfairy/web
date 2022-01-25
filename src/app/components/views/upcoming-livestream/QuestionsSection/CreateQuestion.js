@@ -112,7 +112,6 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
                startIcon={
                   isSubmitting && <CircularProgress size={10} color="inherit" />
                }
-               autoFocus
                disabled={isSubmitting}
             >
                {isSubmitting ? "submitting" : "Submit Your question"}
