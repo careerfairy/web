@@ -1,32 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from "clsx";
 import { Box } from "@mui/material";
 import BackgroundImage from "../BackgroundImage";
-
-const useStyles = makeStyles((theme) => ({
-   sectionComponent: {
-      transition: theme.transitions.create(["background", "color"], {
-         easing: theme.transitions.easing.easeInOut,
-         duration: theme.transitions.duration.standard,
-      }),
-      background: (props) => props.backgroundColor,
-      display: "block",
-      position: "relative",
-      [theme.breakpoints.up("sm")]: {
-         paddingTop: (props) => (props.big ? 160 : 60),
-         paddingBottom: (props) => (props.big ? 160 : 60),
-      },
-      [theme.breakpoints.down('md')]: {
-         paddingTop: 48,
-         paddingBottom: 48,
-      },
-   },
-   isWhite: {
-      borderTop: `1px solid ${theme.palette.text.secondary}`,
-   },
-}));
 
 const Section = (props) => {
    const {
@@ -46,14 +21,27 @@ const Section = (props) => {
       ...otherProps
    } = props;
 
-   const classes = useStyles({
-      backgroundColor: backgroundColor,
-      big: big,
-   });
-
    return (
-      <section
-         className={clsx(classes.sectionComponent, className)}
+      <Box
+         component="section"
+         className={className}
+         sx={(theme) => ({
+            transition: theme.transitions.create(["background", "color"], {
+               easing: theme.transitions.easing.easeInOut,
+               duration: theme.transitions.duration.standard,
+            }),
+            background: backgroundColor,
+            display: "block",
+            position: "relative",
+            [theme.breakpoints.up("sm")]: {
+               paddingTop: big ? "160px" : "60px",
+               paddingBottom: big ? "160px" : "60px",
+            },
+            [theme.breakpoints.down("md")]: {
+               paddingTop: "48px",
+               paddingBottom: "48px",
+            },
+         })}
          ref={sectionRef}
          id={sectionId}
          {...otherProps}
@@ -68,7 +56,7 @@ const Section = (props) => {
                repeat={backgroundImageRepeat}
             />
          )}
-      </section>
+      </Box>
    );
 };
 Section.propTypes = {

@@ -1,26 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from "clsx";
-
-const useStyles = makeStyles((theme) => ({
-   backgroundImage: {
-      backgroundImage: (props) => `url(${props.image})`,
-      opacity: (props) => props.opacity,
-      backgroundPosition: (props) => props.imagePosition,
-      backgroundSize: "cover",
-      top: "0",
-      left: "0",
-      bottom: "0",
-      right: "0",
-      position: "absolute",
-   },
-   repeat: {
-      backgroundSize: "auto",
-      backgroundPosition: "0% 0%",
-      backgroundRepeat: "true",
-   },
-}));
+import { Box } from "@mui/material";
 
 const BackgroundImage = ({
    image,
@@ -29,16 +9,25 @@ const BackgroundImage = ({
    className,
    imagePosition = "center center",
 }) => {
-   const classes = useStyles({
-      opacity: opacity,
-      image: image,
-      imagePosition,
-   });
    return (
-      <div
-         className={clsx(classes.backgroundImage, className, {
-            [classes.repeat]: repeat,
-         })}
+      <Box
+         className={className}
+         sx={{
+            backgroundImage: `url(${image})`,
+            opacity: opacity,
+            backgroundPosition: imagePosition,
+            backgroundSize: "cover",
+            top: "0",
+            left: "0",
+            bottom: "0",
+            right: "0",
+            position: "absolute",
+            ...(repeat && {
+               backgroundSize: "auto",
+               backgroundPosition: "0% 0%",
+               backgroundRepeat: "true",
+            }),
+         }}
       />
    );
 };

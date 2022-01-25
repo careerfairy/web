@@ -1,94 +1,84 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
-import {
-   blankLaptop,
-   blankUIQAndA,
-   laptopUi,
-} from "../../../../../constants/images";
+import { styled } from "@mui/material/styles";
+import { blankLaptop, laptopUi } from "../../../../../constants/images";
 import { smilingStreamerVideoUrl } from "../../../../../constants/videos";
 
-const useStyles = makeStyles((theme) => ({
-   laptopImage: {
-      // minWidth: "80%",
-      // height: "90%",
-      width: "100%",
-   },
-   laptopUi: {
-      width: "100%",
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      zIndex: 2,
-   },
-   laptopScreenDiv: {
-      top: "7.07%",
-      left: "14.7%",
-      width: "70.5%",
-      height: "81.5%",
-      justifyContent: "center",
-      alignItems: "center",
-      display: "flex",
-      zIndex: 1,
-      position: "absolute",
-   },
-   laptopScreenInnerDiv: {
-      position: "relative",
-      width: "100%",
-      height: "100%",
-      background: theme.palette.common.black,
-   },
-   laptopVideoWrapper: {
-      top: "8%",
-      left: "3.8%",
-      right: "0.1%",
-      bottom: "4.8%",
-      position: "absolute",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-   },
-   laptopVideo: {
-      width: "100%",
-      zIndex: 1,
-   },
-   laptop: {
-      width: "100%",
-      // maxWidth: "1200px",
-      position: "relative",
-      // height: "100%",
-      "& img": {},
-      "& video": {},
-   },
+const ImgLaptopImage = styled("img")(({ theme }) => ({
+   width: "100%",
+}));
+
+const ImgLaptopUi = styled("img")(({ theme }) => ({
+   width: "100%",
+   position: "absolute",
+   top: "50%",
+   left: "50%",
+   transform: "translate(-50%, -50%)",
+   zIndex: 2,
+}));
+
+const DivLaptopScreenDiv = styled("div")(({ theme }) => ({
+   top: "7.07%",
+   left: "14.7%",
+   width: "70.5%",
+   height: "81.5%",
+   justifyContent: "center",
+   alignItems: "center",
+   display: "flex",
+   zIndex: 1,
+   position: "absolute",
+}));
+
+const DivLaptopScreenInnerDiv = styled("div")(({ theme }) => ({
+   position: "relative",
+   width: "100%",
+   height: "100%",
+   background: theme.palette.common.black,
+}));
+
+const DivLaptopVideoWrapper = styled("div")(({ theme }) => ({
+   top: "8%",
+   left: "3.8%",
+   right: "0.1%",
+   bottom: "4.8%",
+   position: "absolute",
+   display: "flex",
+   justifyContent: "center",
+   alignItems: "center",
+}));
+
+const VideoLaptopVideo = styled("video")(({ theme }) => ({
+   width: "100%",
+   zIndex: 1,
+}));
+
+const DivLaptop = styled("div")(({ theme }) => ({
+   width: "100%",
+   position: "relative",
+   "& img": {},
+
+   "& video": {},
 }));
 
 const LaptopVideo = ({}) => {
-   const classes = useStyles();
-
    return (
-      <div className={classes.laptop}>
-         <div className={classes.laptopScreenDiv}>
-            <div className={classes.laptopScreenInnerDiv}>
-               <div className={classes.laptopVideoWrapper}>
-                  <video
-                     className={classes.laptopVideo}
+      <DivLaptop>
+         <DivLaptopScreenDiv>
+            <DivLaptopScreenInnerDiv>
+               <DivLaptopVideoWrapper>
+                  <VideoLaptopVideo
                      autoPlay
                      loop
                      muted
                      src={smilingStreamerVideoUrl}
                   />
-               </div>
+               </DivLaptopVideoWrapper>
                <div>
-                  <img className={classes.laptopUi} src={laptopUi} alt="ui" />
+                  <ImgLaptopUi src={laptopUi} alt="ui" />
                </div>
-            </div>
-         </div>
-         <img
-            className={classes.laptopImage}
-            src={blankLaptop}
-            alt="stream showcase laptop"
-         />
-      </div>
+            </DivLaptopScreenInnerDiv>
+         </DivLaptopScreenDiv>
+         <ImgLaptopImage src={blankLaptop} alt="stream showcase laptop" />
+      </DivLaptop>
    );
 };
 
