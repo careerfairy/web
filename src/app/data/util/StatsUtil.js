@@ -305,7 +305,9 @@ export default class StatsUtil {
       }
       return group.categories.every((groupCategory) => {
          return studentCategoriesForGroup?.categories.find(
-            (studCat) => studCat?.id === groupCategory?.id
+            // check to see if the student has all the non hidden group categories
+            (studCat) =>
+               studCat?.id === groupCategory?.id || groupCategory.hidden
          );
       });
    }

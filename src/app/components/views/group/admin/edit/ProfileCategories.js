@@ -82,7 +82,11 @@ const ProfileCategories = ({ group, firebase, className, ...rest }) => {
                {group.categories?.map((category) => {
                   return (
                      <Grid key={category.id} item md={12} xs={12}>
-                        <CategoryElement group={group} category={category} />
+                        <CategoryElement
+                           group={group}
+                           hidden={category.hidden}
+                           category={category}
+                        />
                      </Grid>
                   );
                })}
