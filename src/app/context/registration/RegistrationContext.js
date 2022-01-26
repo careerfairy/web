@@ -164,8 +164,17 @@ export function RegistrationContextProvider({
          setQuestionSortType(newSortType);
       }
    };
-   const setGroup = (group) =>
-      dispatch({ type: "set-group", payload: group || {} });
+   const setGroup = (group) => {
+      let newGroup = { ...group };
+      if (group?.categories?.length) {
+         // filter out hidden categories if any
+         newGroup = {
+            ...group,
+            categories: group.categories.filter((cat) => !cat.hidden),
+         };
+      }
+      return dispatch({ type: "set-group", payload: newGroup || {} });
+   };
    const setTotalSteps = (totalAmountOfSteps) =>
       dispatch({ type: "set-total-steps", payload: totalAmountOfSteps || 0 });
    const setPolicyGroups = (policyGroups) =>
