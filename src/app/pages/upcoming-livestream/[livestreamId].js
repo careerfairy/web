@@ -196,7 +196,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    useEffect(() => {
       if (
          query.register === stream?.id &&
-         filteredGroups.length &&
+         unfilteredGroups.length &&
          !stream?.registeredUsers.includes(authenticatedUser.email)
       ) {
          (async function handleAutoRegister() {
@@ -219,7 +219,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [
       query.register,
       stream?.id,
-      filteredGroups,
+      unfilteredGroups,
       stream?.registeredUsers,
       authenticatedUser.email,
    ]);
