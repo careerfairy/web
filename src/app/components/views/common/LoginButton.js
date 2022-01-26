@@ -2,13 +2,16 @@ import React from "react";
 import { Button } from "@mui/material";
 import Link from "materialUI/NextNavLink";
 
+const styles = {
+   root: {
+      color: (theme) => [theme.palette.common.white, "important"],
+   },
+};
 const LoginButton = ({}) => {
    return (
       <Button
          fullWidth
-         sx={{
-            color: (theme) => [theme.palette.common.white, "important"],
-         }}
+         sx={styles.root}
          component={Link}
          href="/login"
          style={{ textDecoration: "none" }}

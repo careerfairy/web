@@ -7,6 +7,20 @@ import GeneralHeroMessage from "./HeroMessage";
 import SectionContainer from "../../common/Section/Container";
 import Slide from "@mui/material/Slide";
 
+const styles = {
+   messageGridItem: (theme) => ({
+      display: "flex",
+      justifyContent: "flex-end",
+      alignItems: "flex-end",
+      [theme.breakpoints.down("lg")]: {
+         justifyContent: "center",
+      },
+   }),
+   laptopGridItem: {
+      display: "flex",
+      alignItems: "center",
+   },
+};
 const HeroSection = ({
    backgroundColor,
    backgroundImage,
@@ -31,19 +45,7 @@ const HeroSection = ({
          <SectionContainer maxWidth="xl">
             <Grid spacing={2} container>
                <Slide timeout={1000} in direction="right">
-                  <Grid
-                     sx={(theme) => ({
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        alignItems: "flex-end",
-                        [theme.breakpoints.down("lg")]: {
-                           justifyContent: "center",
-                        },
-                     })}
-                     item
-                     xs={12}
-                     lg={6}
-                  >
+                  <Grid sx={styles.messageGridItem} item xs={12} lg={6}>
                      <GeneralHeroMessage
                         title={title}
                         subTitle={subTitle}
@@ -54,14 +56,7 @@ const HeroSection = ({
                </Slide>
                <Hidden lgDown>
                   <Slide timeout={1000} in direction="left">
-                     <Grid
-                        sx={{
-                           display: "flex",
-                           alignItems: "center",
-                        }}
-                        item
-                        md={6}
-                     >
+                     <Grid sx={styles.laptopGridItem} item md={6}>
                         <LaptopVideo />
                      </Grid>
                   </Slide>

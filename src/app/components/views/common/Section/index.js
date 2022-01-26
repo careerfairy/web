@@ -3,6 +3,25 @@ import React from "react";
 import { Box } from "@mui/material";
 import BackgroundImage from "../BackgroundImage";
 
+const styles = {
+   section: (theme, { big, backgroundColor }) => ({
+      transition: theme.transitions.create(["background", "color"], {
+         easing: theme.transitions.easing.easeInOut,
+         duration: theme.transitions.duration.standard,
+      }),
+      background: backgroundColor,
+      display: "block",
+      position: "relative",
+      [theme.breakpoints.up("sm")]: {
+         paddingTop: big ? "160px" : "60px",
+         paddingBottom: big ? "160px" : "60px",
+      },
+      [theme.breakpoints.down("md")]: {
+         paddingTop: "48px",
+         paddingBottom: "48px",
+      },
+   }),
+};
 const Section = (props) => {
    const {
       color,
@@ -25,23 +44,7 @@ const Section = (props) => {
       <Box
          component="section"
          className={className}
-         sx={(theme) => ({
-            transition: theme.transitions.create(["background", "color"], {
-               easing: theme.transitions.easing.easeInOut,
-               duration: theme.transitions.duration.standard,
-            }),
-            background: backgroundColor,
-            display: "block",
-            position: "relative",
-            [theme.breakpoints.up("sm")]: {
-               paddingTop: big ? "160px" : "60px",
-               paddingBottom: big ? "160px" : "60px",
-            },
-            [theme.breakpoints.down("md")]: {
-               paddingTop: "48px",
-               paddingBottom: "48px",
-            },
-         })}
+         sx={(theme) => styles.section(theme, { big, backgroundColor })}
          ref={sectionRef}
          id={sectionId}
          {...otherProps}

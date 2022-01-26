@@ -1,84 +1,95 @@
 import React from "react";
-import { styled } from "@mui/material/styles";
 import { blankLaptop, laptopUi } from "../../../../../constants/images";
 import { smilingStreamerVideoUrl } from "../../../../../constants/videos";
+import { Box } from "@mui/material";
 
-const ImgLaptopImage = styled("img")(({ theme }) => ({
-   width: "100%",
-}));
-
-const ImgLaptopUi = styled("img")(({ theme }) => ({
-   width: "100%",
-   position: "absolute",
-   top: "50%",
-   left: "50%",
-   transform: "translate(-50%, -50%)",
-   zIndex: 2,
-}));
-
-const DivLaptopScreenDiv = styled("div")(({ theme }) => ({
-   top: "7.07%",
-   left: "14.7%",
-   width: "70.5%",
-   height: "81.5%",
-   justifyContent: "center",
-   alignItems: "center",
-   display: "flex",
-   zIndex: 1,
-   position: "absolute",
-}));
-
-const DivLaptopScreenInnerDiv = styled("div")(({ theme }) => ({
-   position: "relative",
-   width: "100%",
-   height: "100%",
-   background: theme.palette.common.black,
-}));
-
-const DivLaptopVideoWrapper = styled("div")(({ theme }) => ({
-   top: "8%",
-   left: "3.8%",
-   right: "0.1%",
-   bottom: "4.8%",
-   position: "absolute",
-   display: "flex",
-   justifyContent: "center",
-   alignItems: "center",
-}));
-
-const VideoLaptopVideo = styled("video")(({ theme }) => ({
-   width: "100%",
-   zIndex: 1,
-}));
-
-const DivLaptop = styled("div")(({ theme }) => ({
-   width: "100%",
-   position: "relative",
-   "& img": {},
-
-   "& video": {},
-}));
+const styles = {
+   laptopImage: {
+      // minWidth: "80%",
+      // height: "90%",
+      width: "100%",
+   },
+   laptopUi: {
+      width: "100%",
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      zIndex: 2,
+   },
+   laptopScreenDiv: {
+      top: "7.07%",
+      left: "14.7%",
+      width: "70.5%",
+      height: "81.5%",
+      justifyContent: "center",
+      alignItems: "center",
+      display: "flex",
+      zIndex: 1,
+      position: "absolute",
+   },
+   laptopScreenInnerDiv: (theme) => ({
+      position: "relative",
+      width: "100%",
+      height: "100%",
+      background: theme.palette.common.black,
+   }),
+   laptopVideoWrapper: {
+      top: "8%",
+      left: "3.8%",
+      right: "0.1%",
+      bottom: "4.8%",
+      position: "absolute",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+   },
+   laptopVideo: {
+      width: "100%",
+      zIndex: 1,
+   },
+   laptop: {
+      width: "100%",
+      // maxWidth: "1200px",
+      position: "relative",
+      // height: "100%",
+      "& img": {},
+      "& video": {},
+   },
+};
 
 const LaptopVideo = ({}) => {
    return (
-      <DivLaptop>
-         <DivLaptopScreenDiv>
-            <DivLaptopScreenInnerDiv>
-               <DivLaptopVideoWrapper>
-                  <VideoLaptopVideo
+      <Box sx={styles.laptop}>
+         <Box sx={styles.laptopScreenDiv}>
+            <Box sx={styles.laptopScreenInnerDiv}>
+               <Box sx={styles.laptopVideoWrapper}>
+                  <Box
+                     component="video"
+                     sx={styles.laptopVideo}
                      autoPlay
                      loop
                      muted
                      src={smilingStreamerVideoUrl}
                   />
-               </DivLaptopVideoWrapper>
+               </Box>
                <div>
-                  <ImgLaptopUi src={laptopUi} alt="ui" />
+                  <Box
+                     component="img"
+                     sx={styles.laptopUi}
+                     src={laptopUi}
+                     alt="ui"
+                  />
                </div>
-            </DivLaptopScreenInnerDiv>
-         </DivLaptopScreenDiv>
-         <ImgLaptopImage src={blankLaptop} alt="stream showcase laptop" />
-      </DivLaptop>
+            </Box>
+         </Box>
+         <Box
+            component="img"
+            sx={styles.laptopImage}
+            src={blankLaptop}
+            alt="stream showcase laptop"
+         />
+      </Box>
    );
 };
 
