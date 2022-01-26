@@ -2840,7 +2840,7 @@ class Firebase {
          if (options.force === true) {
             return await this.updateNotification(notificationId, details);
          }
-         return throw `Notification Already Exists as document ${notificationId}`;
+         throw `Notification Already Exists as document ${notificationId}`;
       }
       let ref = this.firestore.collection("notifications");
       const newNotification = {
