@@ -18,7 +18,6 @@ const TeamPage = () => {
          background,
       },
    } = useTheme();
-   console.log("-> background IN TEAM", background);
 
    const valuesData = [
       {
