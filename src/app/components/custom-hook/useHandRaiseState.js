@@ -17,7 +17,6 @@ const useHandRaiseState = (streamerId) => {
 
    const updateRequest = useCallback(
       (state) => {
-         debugger;
          if (
             currentLivestream.test ||
             currentLivestream.openStream ||

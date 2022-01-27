@@ -2,20 +2,16 @@ import PropTypes from "prop-types";
 import React, { memo, useEffect, useState } from "react";
 import Linkify from "react-linkify";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-   Box,
-   Card,
-   IconButton,
-   Popover,
-   Slide,
-   Typography,
-} from "@material-ui/core";
+import { Box, Card, IconButton, Popover, Typography } from "@material-ui/core";
 import { getTimeFromNow } from "../../../../../../helperFunctions/HelperFunctions";
 import { useAuth } from "../../../../../../../HOCs/AuthProvider";
-import { withFirebase } from "context/firebase";
+import { useFirebase } from "context/firebase";
 import EmojiEmotionsOutlinedIcon from "@material-ui/icons/EmojiEmotionsOutlined";
 import EmotesPreview from "./EmotesPreview";
 import EmotesPopUp from "./EmotesPopUp";
+import Fade from "@stahl.luke/react-reveal/Fade";
+import isEqual from "react-fast-compare";
+
 import clsx from "clsx";
 
 const dayjs = require("dayjs");
@@ -33,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
    },
    chatWrapper: {
       marginLeft: ({ isMe }) => (isMe ? "auto" : 0),
-      marginBottom: theme.spacing(1),
+      marginBottom: ({ last }) => !last && theme.spacing(1.4),
       maxWidth: "80%",
       width: "min-content",
       display: "flex",
@@ -56,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
          isMe ? "23px 23px 5px 23px" : "23px 23px 23px 5px",
       width: "max-content",
       minWidth: 140,
-      padding: "10px 15px",
+      padding: "8px 13px",
       paddingBottom: 5,
       backgroundColor: ({ isMe, isStreamer }) =>
          isMe
@@ -87,14 +83,19 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-function ChatEntryContainer({
+const ChatEntryContainer = ({
    chatEntry,
-   firebase,
    handleSetCurrentEntry,
    currentEntry,
-}) {
+   last,
+}) => {
+   const firebase = useFirebase();
+   const isNew = chatEntry.timestamp === null;
    const [anchorEl, setAnchorEl] = useState(null);
    const { authenticatedUser } = useAuth();
+
+   const [time, setTime] = useState(getTimeFromNow(chatEntry.timestamp));
+
    const [isMe, setIsMe] = useState(
       chatEntry?.authorEmail === authenticatedUser?.email
    );
@@ -105,7 +106,16 @@ function ChatEntryContainer({
    const classes = useStyles({
       isMe,
       isStreamer,
+      last,
    });
+
+   useEffect(() => {
+      setTime(getTimeFromNow(chatEntry.timestamp));
+      const interval = setInterval(() => {
+         setTime(getTimeFromNow(chatEntry.timestamp));
+      }, 60000);
+      return () => clearInterval(interval);
+   }, [Boolean(chatEntry.timestamp)]);
 
    useEffect(() => {
       setIsMe(chatEntry?.authorEmail === authenticatedUser?.email);
@@ -132,7 +142,7 @@ function ChatEntryContainer({
 
    const open = Boolean(anchorEl);
    return (
-      <Slide in direction={isMe ? "left" : "right"}>
+      <Fade left={!isMe && isNew} right={isMe && isNew} duration={250}>
          <span className={classes.chatWrapper}>
             <Popover
                id="mouse-over-popover"
@@ -172,7 +182,7 @@ function ChatEntryContainer({
                   {chatEntry.authorName}
                </Typography>
                <Typography align="right" className={classes.stamp}>
-                  {getTimeFromNow(chatEntry.timestamp)}
+                  {time || "..."}
                </Typography>
             </Box>
             <IconButton
@@ -184,9 +194,9 @@ function ChatEntryContainer({
             </IconButton>
             <EmotesPreview onClick={handleClickPreview} chatEntry={chatEntry} />
          </span>
-      </Slide>
+      </Fade>
    );
-}
+};
 
 ChatEntryContainer.propTypes = {
    chatEntry: PropTypes.object.isRequired,
@@ -195,4 +205,26 @@ ChatEntryContainer.propTypes = {
    handleSetCurrentEntry: PropTypes.func.isRequired,
 };
 
-export default withFirebase(memo(ChatEntryContainer));
+// function areEqual(prevProps, nextProps) {
+//    /*
+//    return true if passing nextProps to render would return
+//    the same result as passing prevProps to render,
+//    otherwise return false
+//    */
+//    return Boolean(
+//       prevProps.chatEntry?.message === nextProps.chatEntry?.message &&
+//          prevProps.chatEntry?.heart?.length ===
+//             nextProps.chatEntry?.heart?.length &&
+//          prevProps.chatEntry?.laughing?.length ===
+//             nextProps.chatEntry?.laughing?.length &&
+//          prevProps.chatEntry?.thumbsUp?.length ===
+//             nextProps.chatEntry?.thumbsUp?.length &&
+//          prevProps.chatEntry?.wow?.length ===
+//             nextProps.chatEntry?.wow?.length &&
+//          Boolean(prevProps.chatEntry?.timestamp) ===
+//             Boolean(nextProps.chatEntry?.timestamp) &&
+//          prevProps.last === nextProps.last
+//    );
+// }
+
+export default memo(ChatEntryContainer, isEqual);
