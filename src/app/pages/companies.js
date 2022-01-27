@@ -113,4 +113,12 @@ const LandingPage = ({}) => {
    );
 };
 
+export const getServerSideProps = () => {
+   return {
+      redirect: {
+         destination: "/",
+      },
+   };
+};
+
 export default LandingPage;

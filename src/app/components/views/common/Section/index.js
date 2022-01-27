@@ -29,6 +29,7 @@ const Section = (props) => {
       backgroundImageOpacity,
       backgroundImageRepeat,
       backgroundImagePosition,
+      backgroundImageSx,
       children,
       backgroundColor,
       backgroundImageClassName,
@@ -36,6 +37,7 @@ const Section = (props) => {
       className,
       sectionRef,
       sectionId,
+      sx,
       // Passed to section element
       ...otherProps
    } = props;
@@ -44,7 +46,7 @@ const Section = (props) => {
       <Box
          component="section"
          className={className}
-         sx={(theme) => styles.section(theme, { big, backgroundColor })}
+         sx={[(theme) => styles.section(theme, { big, backgroundColor }), sx]}
          ref={sectionRef}
          id={sectionId}
          {...otherProps}
@@ -54,6 +56,7 @@ const Section = (props) => {
             <BackgroundImage
                className={backgroundImageClassName}
                imagePosition={backgroundImagePosition}
+               backgroundImageSx={backgroundImageSx}
                image={backgroundImage}
                opacity={backgroundImageOpacity}
                repeat={backgroundImageRepeat}
@@ -70,6 +73,7 @@ Section.propTypes = {
    color: PropTypes.string,
    big: PropTypes.bool,
    className: PropTypes.string,
+   sx: PropTypes.object,
 };
 
 export default Section;

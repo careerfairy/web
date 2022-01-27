@@ -1,50 +1,34 @@
 import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from "clsx";
 import { Box, Button, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 const angle = 20;
 const rectLength = 130;
-const useStyles = makeStyles((theme) => ({
-   root: {
-      // border: "1px solid red"
-   },
+const styles = {
    graphicContainer: {
       height: rectLength * 1.5,
       position: "relative",
    },
-   primary: ({ primaryGradientStart, primaryGradientEnd }) => ({
-      backgroundImage: `linear-gradient(-8deg, ${
-         primaryGradientStart || theme.palette.primary.dark
-      } 1%, ${primaryGradientEnd || theme.palette.primary.light} 100%)`,
-      filter: "drop-shadow(21.632px 36.001px 24.5px rgba(189,243,236,0.29))",
-   }),
-   secondary: ({ secondaryGradientStart, secondaryGradientEnd }) => ({
-      filter: "drop-shadow(2.302px 32.92px 17.5px rgba(112,57,229,0.19))",
-      backgroundImage: `linear-gradient(-8deg, ${
-         secondaryGradientStart || theme.palette.secondary.main
-      } 1%, ${secondaryGradientEnd || theme.palette.secondary.light} 100%)`,
-   }),
    angled: {
       transform: `translate(-50%,-50%) rotate(${angle}deg)`,
    },
    angledReverse: {
       transform: `translate(-50%,-50%) rotate(-${angle}deg)`,
    },
-   rectangle: {
+   rectangle: (theme) => ({
       borderRadius: "25%",
       position: "absolute",
       top: "50%",
       left: "50%",
       width: rectLength,
       height: rectLength,
-      [theme.breakpoints.down('md')]: {
+      [theme.breakpoints.down("md")]: {
          width: rectLength * 0.7,
          height: rectLength * 0.7,
       },
-   },
-   graphic: {
+   }),
+   graphic: (theme) => ({
       position: "absolute",
       top: "50%",
       maxWidth: rectLength * 0.6,
@@ -52,15 +36,15 @@ const useStyles = makeStyles((theme) => ({
       height: "auto",
       left: "50%",
       transform: `translate(-50%,-50%)`,
-      [theme.breakpoints.down('md')]: {
+      [theme.breakpoints.down("md")]: {
          width: rectLength * 0.5,
       },
-   },
+   }),
    btn: {
-      borderRadius: theme.spacing(2),
+      borderRadius: (theme) => theme.spacing(2),
       textDecoration: "none !important",
    },
-}));
+};
 
 const BenefitCard = ({
    description,
@@ -72,30 +56,43 @@ const BenefitCard = ({
    secondaryGradientEnd,
    buttonProps,
 }) => {
-   const classes = useStyles({
-      primaryGradientStart,
-      primaryGradientEnd,
-      secondaryGradientStart,
-      secondaryGradientEnd,
-   });
-
+   const theme = useTheme();
    return (
-      <div className={classes.root}>
-         <div className={classes.graphicContainer}>
-            <div
-               className={clsx(classes.rectangle, {
-                  [classes.angledReverse]: true,
-                  [classes.secondary]: true,
-               })}
+      <Box>
+         <Box sx={styles.graphicContainer}>
+            <Box
+               sx={{
+                  ...styles.rectangle(theme),
+                  ...styles.angledReverse,
+                  filter:
+                     "drop-shadow(2.302px 32.92px 17.5px rgba(112,57,229,0.19))",
+                  backgroundImage: `linear-gradient(-8deg, ${
+                     secondaryGradientStart || theme.palette.secondary.main
+                  } 1%, ${
+                     secondaryGradientEnd || theme.palette.secondary.light
+                  } 100%)`,
+               }}
             />
-            <div
-               className={clsx(classes.rectangle, {
-                  [classes.angled]: true,
-                  [classes.primary]: true,
-               })}
+            <Box
+               sx={{
+                  ...styles.rectangle(theme),
+                  ...styles.angled,
+                  backgroundImage: `linear-gradient(-8deg, ${
+                     primaryGradientStart || theme.palette.primary.dark
+                  } 1%, ${
+                     primaryGradientEnd || theme.palette.primary.light
+                  } 100%)`,
+                  filter:
+                     "drop-shadow(21.632px 36.001px 24.5px rgba(189,243,236,0.29))",
+               }}
             />
-            <img className={classes.graphic} src={imageUrl} alt={name} />
-         </div>
+            <Box
+               component="img"
+               sx={styles.graphic}
+               src={imageUrl}
+               alt={name}
+            />
+         </Box>
          <div
             style={{
                display: "flex",
@@ -114,14 +111,14 @@ const BenefitCard = ({
          {buttonProps && (
             <Box display="flex" justifyContent="center" p={2}>
                <Button
-                  className={classes.btn}
+                  sx={styles.btn}
                   variant="outlined"
                   color="primary"
                   {...buttonProps}
                />
             </Box>
          )}
-      </div>
+      </Box>
    );
 };
 

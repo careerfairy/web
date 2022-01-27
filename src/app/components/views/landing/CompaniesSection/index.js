@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import HighlightText from "../../common/HighlightText";
@@ -10,32 +9,19 @@ import Logo from "../common/Logo";
 import LogosComponent from "../common/LogosComponent";
 import SectionHeader from "../../common/SectionHeader";
 
-const useStyles = makeStyles((theme) => ({
-   section: {
+const styles = {
+   section: (theme) => ({
       paddingBottom: 20,
-      [theme.breakpoints.down('md')]: {
+      [theme.breakpoints.down("md")]: {
          paddingTop: 40,
       },
-   },
-   subTitle: {
-      color: theme.palette.text.secondary,
-      fontWeight: 500,
-   },
-   title: {
-      fontSize: "4.5rem",
-      fontWeight: 500,
-      [theme.breakpoints.down('sm')]: {
-         fontSize: "3.5rem",
-      },
-   },
-}));
+   }),
+};
 
 const CompaniesSection = (props) => {
-   const classes = useStyles();
-
    return (
       <Section
-         className={classes.section}
+         sx={styles.section}
          big={props.big}
          color={props.color}
          backgroundImageClassName={props.backgroundImageClassName}

@@ -21,7 +21,7 @@ import {
 } from "../constants/images";
 import HeadWithMeta from "../components/page/HeadWithMeta";
 
-const LandingPage = ({}) => {
+const LandingPage = () => {
    const {
       palette: { secondary, common, grey },
    } = useTheme();

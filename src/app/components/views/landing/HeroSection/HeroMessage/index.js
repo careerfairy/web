@@ -9,13 +9,13 @@ import { alpha } from "@mui/material/styles";
 import SvgIcon from "@mui/material/SvgIcon";
 
 const styles = {
-   linkButton: (theme) => ({
+   linkButton: {
       textDecoration: "none !important",
-      background: alpha(theme.palette.common.white, 0.8),
+      background: (theme) => alpha(theme.palette.common.white, 0.8),
       "&:hover": {
-         background: alpha(theme.palette.background.paper, 0.8),
+         background: (theme) => alpha(theme.palette.background.paper, 0.8),
       },
-   }),
+   },
    buttonsWrapper: (theme) => ({
       marginTop: theme.spacing(10),
       [theme.breakpoints.down("md")]: {

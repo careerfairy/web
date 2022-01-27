@@ -1,21 +1,19 @@
 import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from "clsx";
+import { Box } from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
-   root: {
-      width: "auto",
-      height: 50,
-      margin: theme.spacing(2),
+const styles = {
+   root: (theme, { withZoom }) => ({
+      maxWidth: "100%",
+      maxHeight: 50,
       transition: theme.transitions.create(["transform", "filter"], {
          duration: theme.transitions.duration.complex,
          easing: theme.transitions.easing.easeInOut,
       }),
       "&:hover": {
-         transform: ({ withZoom }) => withZoom && `scale(1.05) rotate(0.5deg)`,
+         transform: withZoom && `scale(1.05) rotate(0.5deg)`,
       },
-   },
+   }),
    withFilter: {
       filter:
          "invert(55%) sepia(0%) saturate(1465%) hue-rotate(134deg) brightness(94%) contrast(84%) grayscale(100%)",
@@ -24,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
             "invert(55%) sepia(0%) saturate(1465%) hue-rotate(134deg) brightness(20%) contrast(84%) grayscale(100%)",
       },
    },
-}));
+};
 
 const LinkWrapper = ({ websiteUrl, children }) => {
    return websiteUrl ? (
@@ -45,14 +43,14 @@ const Logo = ({
    websiteUrl,
    withZoom,
 }) => {
-   const classes = useStyles({ withZoom });
-
    return (
       <LinkWrapper websiteUrl={websiteUrl}>
-         <img
-            className={clsx(classes.root, {
-               [classes.withFilter]: withFilter,
-            })}
+         <Box
+            sx={[
+               (theme) => styles.root(theme, { withZoom }),
+               withFilter && styles.withFilter,
+            ]}
+            component="img"
             alt={alt}
             src={logoUrl}
             loading="lazy"

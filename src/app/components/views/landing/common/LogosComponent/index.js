@@ -1,33 +1,26 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { Grid } from "@mui/material";
 import Fade from "@stahl.luke/react-reveal/Fade";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    root: {
       width: "100%",
-      marginTop: theme.spacing(2),
+      marginTop: (theme) => theme.spacing(2),
    },
    gridItem: {
       display: "grid",
       placeItems: "center",
    },
-}));
+};
 
 const LogosComponent = ({ children }) => {
-   const classes = useStyles();
-
    return (
       <Fade up>
-         <Grid
-            container
-            justifyContent="center"
-            spacing={3}
-            className={classes.root}
-         >
+         <Grid container justifyContent="center" spacing={3} sx={styles.root}>
             {children.map((child) => (
                <Grid
-                  className={classes.gridItem}
+                  sx={styles.gridItem}
                   key={child.key}
                   item
                   xs={12}

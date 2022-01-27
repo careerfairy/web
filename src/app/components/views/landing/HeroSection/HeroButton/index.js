@@ -34,14 +34,17 @@ const styles = {
 };
 
 const HeroButton = ({ color, className, iconUrl, sx, ...props }) => {
-   const {
-      palette: { primary, secondary, grey },
-   } = useTheme();
+   const theme = useTheme();
    const buttonColor = useMemo(() => {
-      if (color === "primary") return primary.main;
-      if (color === "secondary") return secondary.main;
-      return grey["300"];
-   }, [color, primary, secondary, grey]);
+      if (color === "primary") return theme.palette.primary.main;
+      if (color === "secondary") return theme.palette.secondary.main;
+      return theme.palette.grey["300"];
+   }, [
+      color,
+      theme.palette.primary,
+      theme.palette.secondary,
+      theme.palette.grey,
+   ]);
 
    return (
       <Box sx={styles.heroBtnRoot}>
@@ -55,7 +58,10 @@ const HeroButton = ({ color, className, iconUrl, sx, ...props }) => {
          )}
          <RoundButton
             className={className}
-            sx={{ ...(theme) => styles.heroBtn(theme, { buttonColor }), ...sx }}
+            sx={{
+               ...sx,
+               ...styles.heroBtn(theme, { buttonColor }),
+            }}
             size="large"
             color={color}
             {...props}

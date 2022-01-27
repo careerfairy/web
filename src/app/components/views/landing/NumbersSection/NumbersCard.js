@@ -1,107 +1,94 @@
 import React from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
-import { Typography } from "@mui/material";
-import clsx from "clsx";
-import Slide from "@stahl.luke/react-reveal/Slide";
+import { Box, Typography } from "@mui/material";
 
-const useStyles = makeStyles((theme) => {
-   const circleWidth = theme.spacing(22);
-   return {
-      root: {},
-      graphicsContainer: {
-         position: "relative",
-         width: "100%",
-         aspectRatio: "1 / 1",
-         marginBottom: theme.spacing(2),
-      },
-      graphicCircle: {
-         width: circleWidth,
-         height: circleWidth,
-         borderRadius: "50%",
-         background: `linear-gradient(${alpha(
-            theme.palette.secondary.main,
-            0.1
-         )}, 75%, ${theme.palette.secondary.light})`,
-         position: "absolute",
-      },
-      secondaryShadow: {
-         filter: `drop-shadow(4.092px 4.39px 9.5px ${theme.palette.secondary.light})`,
-      },
-      primaryShadow: {
-         filter: `drop-shadow(4.092px 4.39px 9.5px ${alpha(
+const circleWidth = 22;
+const styles = {
+   graphicsContainer: {
+      position: "relative",
+      width: "100%",
+      aspectRatio: "1 / 1",
+      marginBottom: (theme) => theme.spacing(2),
+   },
+   graphicCircle: {
+      width: (theme) => theme.spacing(circleWidth),
+      height: (theme) => theme.spacing(circleWidth),
+      borderRadius: "50%",
+      background: (theme) =>
+         `linear-gradient(${alpha(theme.palette.secondary.main, 0.1)}, 75%, ${
+            theme.palette.secondary.light
+         })`,
+      position: "absolute",
+   },
+   secondaryShadow: {
+      filter: (theme) =>
+         `drop-shadow(4.092px 4.39px 9.5px ${theme.palette.secondary.light})`,
+   },
+   primaryShadow: {
+      filter: (theme) =>
+         `drop-shadow(4.092px 4.39px 9.5px ${alpha(
             theme.palette.primary.light,
             0.2
          )})`,
-      },
-      bottomLeft: {
-         top: "55%",
-         left: "45%",
-         transform: "translate(-50%, -50%)",
-      },
-      topRight: {
-         top: "45%",
-         left: "55%",
-         transform: "translate(-50%, -50%)",
-      },
-      middle: {
-         top: "50%",
-         left: "50%",
-         transform: "translate(-50%, -50%)",
-         background: theme.palette.primary.main,
-         color: theme.palette.common.white,
-         display: "flex",
-         justifyContent: "center",
-         alignItems: "center",
-      },
-      amount: {
-         fontSize: "3.5rem",
-      },
-      label: {
-         fontWeight: 600,
-         fontSize: "2rem",
-      },
-   };
-});
+   },
+   bottomLeft: {
+      top: "55%",
+      left: "45%",
+      transform: "translate(-50%, -50%)",
+   },
+   topRight: {
+      top: "45%",
+      left: "55%",
+      transform: "translate(-50%, -50%)",
+   },
+   middle: {
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      background: (theme) => theme.palette.primary.main,
+      color: (theme) => theme.palette.common.white,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+   },
+   amount: {
+      fontSize: "3.5rem",
+   },
+   label: {
+      fontWeight: 600,
+      fontSize: "2rem",
+   },
+};
 const NumbersCard = ({ label, amount }) => {
-   const classes = useStyles();
    return (
-      <div className={classes.root}>
-         <div className={classes.graphicsContainer}>
-            <div
-               className={clsx(
-                  classes.graphicCircle,
-                  classes.bottomLeft,
-                  classes.secondaryShadow
-               )}
+      <Box>
+         <Box sx={styles.graphicsContainer}>
+            <Box
+               sx={[
+                  styles.graphicCircle,
+                  styles.bottomLeft,
+                  styles.secondaryShadow,
+               ]}
             />
-            <div
-               className={clsx(
-                  classes.graphicCircle,
-                  classes.topRight,
-                  classes.secondaryShadow
-               )}
+            <Box
+               sx={[
+                  styles.graphicCircle,
+                  styles.topRight,
+                  styles.secondaryShadow,
+               ]}
             />
-            <div
-               className={clsx(
-                  classes.graphicCircle,
-                  classes.middle,
-                  classes.primaryShadow
-               )}
+            <Box
+               sx={[styles.graphicCircle, styles.middle, styles.primaryShadow]}
             >
-               <Typography
-                  className={classes.amount}
-                  variant="h4"
-                  align="center"
-               >
+               <Typography sx={styles.amount} variant="h4" align="center">
                   {amount}
                </Typography>
-            </div>
-         </div>
-         <Typography align="center" variant="h3" className={classes.label}>
+            </Box>
+         </Box>
+         <Typography align="center" variant="h3" sx={styles.label}>
             {label}
          </Typography>
-      </div>
+      </Box>
    );
 };
 

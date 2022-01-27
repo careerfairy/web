@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
 import RoundButton from "materialUI/GlobalButtons/RoundButton";
@@ -11,44 +11,43 @@ import Pulse from "@stahl.luke/react-reveal/Pulse";
 import { Box } from "@mui/material";
 import clsx from "clsx";
 
-const useStyles = makeStyles((theme) => ({
-   section: {
+const styles = {
+   section: (theme, { dividerColor }) => ({
       height: "60vh",
       display: "flex",
 
       alignItems: "center",
-      borderTop: ({ dividerColor }) =>
-         dividerColor && `2px solid ${alpha(dividerColor, 0.5)}`,
-      borderBottom: ({ dividerColor }) =>
-         dividerColor && `2px solid ${alpha(dividerColor, 0.5)}`,
-   },
+      borderTop: dividerColor && `2px solid ${alpha(dividerColor, 0.5)}`,
+      borderBottom: dividerColor && `2px solid ${alpha(dividerColor, 0.5)}`,
+   }),
    bookingButton: {
-      margin: theme.spacing(1),
+      margin: (theme) => theme.spacing(1),
    },
    bookingWhite: {
-      background: theme.palette.common.white,
-      color: theme.palette.secondary.main,
+      background: (theme) => theme.palette.common.white,
+      color: (theme) => theme.palette.secondary.main,
       "&:hover": {
-         color: theme.palette.common.white,
+         color: (theme) => theme.palette.common.white,
       },
    },
    goToBtn: {
-      margin: theme.spacing(2),
+      margin: (theme) => theme.spacing(2),
       textDecoration: "none !important",
    },
    bookADemoHeader: {
-      marginBottom: [theme.spacing(2), "!important"],
+      marginBottom: (theme) => [theme.spacing(2), "!important"],
    },
    title: {
       fontWeight: 600,
    },
-}));
+};
 
 const BookADemoSection = (props) => {
-   const classes = useStyles({ dividerColor: props.dividerColor });
    return (
       <Section
-         className={classes.section}
+         sx={(theme) =>
+            styles.section(theme, { dividerColor: props.dividerColor })
+         }
          big={props.big}
          color={props.color}
          backgroundImageClassName={props.backgroundImageClassName}
@@ -59,9 +58,9 @@ const BookADemoSection = (props) => {
          <SectionContainer>
             <SectionHeader
                color={props.color}
-               className={classes.bookADemoHeader}
+               sx={styles.bookADemoHeader}
                title={props.title}
-               titleClassName={classes.title}
+               titleSx={styles.title}
                subtitle={props.subtitle}
             />
             <Pulse forever>
@@ -73,7 +72,7 @@ const BookADemoSection = (props) => {
                >
                   {props.goTo ? (
                      <RoundButton
-                        className={classes.goToBtn}
+                        sx={styles.goToBtn}
                         color="secondary"
                         size="large"
                         variant="contained"
@@ -84,10 +83,10 @@ const BookADemoSection = (props) => {
                      </RoundButton>
                   ) : (
                      <RoundButton
-                        className={clsx(
-                           classes.bookingButton,
-                           props.bookingWhite && classes.bookingWhite
-                        )}
+                        sx={{
+                           ...styles.bookingButton,
+                           ...(props.bookingWhite && styles.bookingWhite),
+                        }}
                         color="secondary"
                         size="large"
                         variant="contained"

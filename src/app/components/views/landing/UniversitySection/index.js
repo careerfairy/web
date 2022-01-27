@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
 import landingUniversities from "../../../../constants/landingUniversities";
@@ -8,16 +7,14 @@ import SectionContainer from "../../common/Section/Container";
 import Logo from "../common/Logo";
 import LogosComponent from "../common/LogosComponent";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    subTitle: {
-      color: theme.palette.text.secondary,
+      color: (theme) => theme.palette.text.secondary,
       fontWeight: 500,
    },
-}));
+};
 
 const UniversitySection = (props) => {
-   const classes = useStyles();
-
    return (
       <Section
          big={props.big}
@@ -30,8 +27,8 @@ const UniversitySection = (props) => {
          <SectionContainer>
             <SectionHeader
                color={props.color}
-               subTitleClassName={classes.subTitle}
                title={props.title}
+               subTitleSx={styles.subTitle}
                subtitle={props.subtitle}
             />
             <LogosComponent>

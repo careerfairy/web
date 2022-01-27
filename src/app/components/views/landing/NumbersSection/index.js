@@ -1,19 +1,15 @@
 import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import NumbersCard from "./NumbersCard";
 import { Box, Grid } from "@mui/material";
 import MuiGridFade from "materialUI/animations/MuiGridFade";
 
-const useStyles = makeStyles((theme) => ({}));
 
 const NumbersSection = (props) => {
-   const classes = useStyles();
    return (
       <Section
-         className={classes.section}
          big={props.big}
          color={props.color}
          backgroundImageClassName={props.backgroundImageClassName}

@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { Box } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 const styles = {
    root: (theme, { image, opacity, imagePosition, repeat }) => ({
@@ -26,14 +27,17 @@ const BackgroundImage = ({
    opacity,
    repeat,
    className,
+   backgroundImageSx,
    imagePosition = "center center",
 }) => {
+   const theme = useTheme();
    return (
       <Box
          className={className}
-         sx={(theme) =>
-            styles.root(theme, { image, opacity, imagePosition, repeat })
-         }
+         sx={{
+            ...styles.root(theme, { image, opacity, imagePosition, repeat }),
+            ...backgroundImageSx,
+         }}
       />
    );
 };
