@@ -31,8 +31,7 @@ import EmotesModal from "./EmotesModal";
 import useStreamRef from "../../../../../custom-hook/useStreamRef";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
-import { enqueueBroadcastMessage } from "store/actions";
-import { useCurrentStream } from "../../../../../../context/stream/StreamContext";
+import { MAX_STREAM_CHAT_ENTRIES } from "../../../../../../constants/streams";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -91,7 +90,7 @@ const useStyles = makeStyles((theme) => ({
       },
    },
    entriesWrapper: {
-      padding: theme.spacing(1),
+      padding: theme.spacing(1.4),
    },
 }));
 
@@ -125,7 +124,7 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
       if (livestream.id) {
          const unsubscribe = firebase.listenToChatEntries(
             streamRef,
-            150,
+            MAX_STREAM_CHAT_ENTRIES,
             (querySnapshot) => {
                const newEntries = querySnapshot.docs
                   .map((doc) => ({ id: doc.id, ...doc.data() }))
@@ -223,7 +222,6 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
    };
 
    function addNewChatEntry() {
-      debugger;
       if (isEmpty || submitting) {
          return;
       }
@@ -263,15 +261,6 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
    if (mobile) {
       return null;
    }
-
-   const chatElements = chatEntries.map((chatEntry) => (
-      <ChatEntryContainer
-         handleSetCurrentEntry={handleSetCurrentEntry}
-         currentEntry={currentEntry}
-         key={chatEntry.id}
-         chatEntry={chatEntry}
-      />
-   ));
 
    const playIcon = (
       <div>
@@ -335,7 +324,17 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
                   <CustomScrollToBottom
                      scrollViewClassName={classes.entriesWrapper}
                      className={classes.scrollToBottom}
-                     scrollItems={chatElements}
+                     scrollItems={chatEntries.map(
+                        (chatEntry, index, entries) => (
+                           <ChatEntryContainer
+                              handleSetCurrentEntry={handleSetCurrentEntry}
+                              last={index === entries.length - 1}
+                              currentEntry={currentEntry}
+                              key={chatEntry.id}
+                              chatEntry={chatEntry}
+                           />
+                        )
+                     )}
                   />
                   <WhiteTooltip
                      placement="top"
