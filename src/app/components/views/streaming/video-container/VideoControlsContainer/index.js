@@ -12,7 +12,7 @@ import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import ScreenShareIcon from "@mui/icons-material/ScreenShare";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { withFirebasePage } from "context/firebase";
+import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
 import { alpha, useTheme } from "@mui/material/styles";
 import makeStyles from '@mui/styles/makeStyles';
 import { ClickAwayListener } from "@mui/material";

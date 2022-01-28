@@ -26,7 +26,7 @@ import {
 import makeStyles from "@mui/styles/makeStyles";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 
 const useStyles = makeStyles((theme) => ({
    title: {

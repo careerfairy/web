@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
 import { Button, Card, Slide, Tab, Tabs } from "@mui/material";
-import { withFirebase } from "../../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext";
 import {
    copyStringToClipboard,
    prettyDate,

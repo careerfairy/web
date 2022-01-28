@@ -10,7 +10,7 @@ import {
    Typography,
 } from "@mui/material";
 import InsertChartIcon from "@mui/icons-material/InsertChartOutlined";
-import { withFirebase } from "../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext";
 import makeStyles from '@mui/styles/makeStyles';
 import { orange } from '@mui/material/colors';
 

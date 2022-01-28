@@ -14,7 +14,7 @@ import { amber, deepOrange, grey, red } from "@mui/material/colors";
 import ClappingSVG from "../../util/CustomSVGs";
 import { useCurrentStream } from "../../../context/stream/StreamContext";
 import { useAuth } from "../../../HOCs/AuthProvider";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { TEST_EMAIL } from "../streaming/LeftMenu/categories/chat/EmotesModal/utils";
 
 const useStyles = makeStyles((theme) => ({
@@ -147,7 +147,7 @@ const useStyles = makeStyles((theme) => ({
 const delay = 3000; //3 seconds
 const smoothness = 2;
 const EmoteButtons = ({ createEmote }) => {
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
 
    const {
       currentLivestream: { id: livestreamId },

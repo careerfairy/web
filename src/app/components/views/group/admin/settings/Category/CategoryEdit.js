@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import {
    AddCategory,
    DeleteCategory,
@@ -17,16 +17,21 @@ import {
    CardHeader,
    Chip,
    Divider,
+   FormControlLabel,
    FormHelperText,
    IconButton,
    Menu,
    MenuItem,
+   Switch,
    TextField,
+   Tooltip,
    Zoom,
 } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import makeStyles from "@mui/styles/makeStyles";
 import EditIcon from "@mui/icons-material/Edit";
+import { useDispatch } from "react-redux";
+import * as actions from "store/actions";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -85,7 +90,8 @@ function CategoryEditModal({
    isLocal,
 }) {
    const classes = useStyles();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
+   const dispatch = useDispatch();
    const [categoryName, setCategoryName] = useState("");
 
    const [editableOptions, setEditableOptions] = useState([]);
@@ -260,6 +266,28 @@ function CategoryEditModal({
       };
    };
 
+   const toggleCategoryHidden = async (event) => {
+      try {
+         const isHidden = event.currentTarget.checked;
+         const updatedGroupCategories = group.categories.map((prevCategory) =>
+            prevCategory.id === category.id
+               ? {
+                    ...prevCategory,
+                    hidden: isHidden,
+                 }
+               : prevCategory
+         );
+         if (updatedGroupCategories.length) {
+            await firebase.updateGroupCategoryElements(
+               group.id,
+               updatedGroupCategories
+            );
+         }
+      } catch (e) {
+         dispatch(actions.sendGeneralError(e));
+      }
+   };
+
    const optionElements = editableOptions.map((el) => {
       return (
          <Zoom key={el.id} in={Boolean(el.id)}>
@@ -294,7 +322,30 @@ function CategoryEditModal({
                {touched && !categoryName.length && "Required"}
             </FormHelperText>
             <Card>
-               <CardHeader subheader="Category Options" />
+               <CardHeader
+                  action={
+                     <Tooltip
+                        title={
+                           category.hidden
+                              ? "Re-enable this category so that users will be prompted to fill it in when registering for your events."
+                              : "Don’t ask this category when users register to your events."
+                        }
+                     >
+                        <FormControlLabel
+                           control={
+                              <Switch
+                                 checked={Boolean(category.hidden)}
+                                 onChange={toggleCategoryHidden}
+                                 name="category-visibility-toggle"
+                                 color="primary"
+                              />
+                           }
+                           label={category.hidden ? "Hidden" : "Hide Category"}
+                        />
+                     </Tooltip>
+                  }
+                  subheader="Category Options"
+               />
                <Divider />
                <CardActions>
                   <div style={{ display: "flex", flexWrap: "wrap" }}>

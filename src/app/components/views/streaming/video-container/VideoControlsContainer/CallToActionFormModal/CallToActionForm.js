@@ -7,7 +7,7 @@ import { useFormik } from "formik";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useStreamRef from "components/custom-hook/useStreamRef";
 import TutorialContext from "../../../../../../context/tutorials/TutorialContext";
 import { StyledTooltipWithButton } from "../../../../../../materialUI/GlobalTooltips";
@@ -90,7 +90,7 @@ const CallToActionForm = memo(
          activateCallToAction,
          clickOnCallToAction,
          dismissCallToAction,
-      } = useFirebase();
+      } = useFirebaseService();
 
       const canChangeMessage = useMemo(
          () => Boolean(isCustom || isJobPosting),

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState, Fragment } from "react";
 import Groups from "../groups/Groups";
-import { withFirebase } from "../../../context/firebase";
+import { withFirebase } from "../../../context/firebase/FirebaseServiceContext";
 import { Button } from "@mui/material";
 import Link from "next/link";
 import { useAuth } from "../../../HOCs/AuthProvider";

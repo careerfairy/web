@@ -11,7 +11,7 @@ import PublishIcon from "@mui/icons-material/Publish";
 import { uploadLogo } from "../../../helperFunctions/HelperFunctions";
 import FilePickerContainer from "../../../ssr/FilePickerContainer";
 import makeStyles from '@mui/styles/makeStyles';
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 
 const logoPlaceholder =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Flogo-placeholder.png?alt=media&token=ef6c8d5a-af92-4b69-a946-ce78a9997382";
@@ -66,7 +66,7 @@ const ImageSelect = ({
    path,
    isAvatar,
 }) => {
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const classes = useStyles();
    const [open, setOpen] = useState(false);
    const [filePickerError, setFilePickerError] = useState(null);

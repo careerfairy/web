@@ -10,7 +10,7 @@ import {
    Typography,
 } from "@mui/material";
 import LibraryAddCheckIcon from "@mui/icons-material/LibraryAddCheck";
-import { withFirebase } from "../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext";
 import PercentageDisplay from "./common/PercentageDisplay";
 import makeStyles from '@mui/styles/makeStyles';
 import { green } from '@mui/material/colors';

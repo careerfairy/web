@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DraftStreamForm from "../../../draftStreamForm/DraftStreamForm";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { buildLivestreamObject } from "../../../../helperFunctions/streamFormFunctions";
 import {
    GENERAL_ERROR,
@@ -75,7 +75,7 @@ const NewStreamModal = ({
    handleResetCurrentStream,
    handlePublishStream,
 }) => {
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const formRef = useRef();
    const dialogRef = useRef();
    const saveChangesButtonRef = useRef();

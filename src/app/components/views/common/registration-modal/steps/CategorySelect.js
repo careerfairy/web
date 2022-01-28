@@ -1,5 +1,5 @@
 import React, { Fragment, useContext, useEffect, useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import UserCategorySelector from "components/views/profile/UserCategorySelector";
 import {
    Box,
@@ -48,7 +48,7 @@ const CategorySelect = () => {
    } = useContext(RegistrationContext);
    const { userData } = useAuth();
    const classes = useStyles();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const [checkingCategories, setCheckingCategories] = useState(false);
    const [categories, setCategories] = useState([]);
    const [allSelected, setAllSelected] = useState(false);

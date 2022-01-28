@@ -3,3 +3,8 @@
 
 /.firebase/
 /firebase-debug.log
+
+/.idea/
+.DS_Store
+
+*.log

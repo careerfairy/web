@@ -25,7 +25,7 @@ import { ThemedPermanentMarker } from "../../../../materialUI/GlobalTitles";
 import clsx from "clsx";
 import CloseIcon from "@mui/icons-material/Close";
 import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos";
-import { useFirebase } from "../../../../context/firebase";
+import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 const useStyles = makeStyles((theme) => ({
@@ -196,7 +196,7 @@ const ViewerBreakoutRoomModal = ({
    const {
       listenToBreakoutRoomSettings,
       getBreakoutRoomWithIds,
-   } = useFirebase();
+   } = useFirebaseService();
 
    useEffect(() => {
       if (livestreamId) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import makeStyles from '@mui/styles/makeStyles';
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import FeaturedCompanyCard from "./FeaturedCompanyCard";
 import { Box, Grid } from "@mui/material";
 import GroupsUtil from "../../../../data/util/GroupsUtil";
@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 const FeaturedCompanies = ({ handleOpenJoinModal }) => {
    const classes = useStyles();
-   const { getFeaturedCompanies } = useFirebase();
+   const { getFeaturedCompanies } = useFirebaseService();
 
    const [featuredCompanies, setFeaturedCompanies] = useState([]);
    const { userData, authenticatedUser } = useAuth();

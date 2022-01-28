@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, Fragment, useContext } from "react";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import AddIcon from "@mui/icons-material/Add";
 import PollCreationModal from "./polls/poll-creation-modal/PollCreationModal";

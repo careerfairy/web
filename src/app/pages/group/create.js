@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { withFirebase } from "../../context/firebase";
+import { withFirebase } from "../../context/firebase/FirebaseServiceContext";
 import Header from "../../components/views/header/Header";
 import Footer from "../../components/views/footer/Footer";
 import CreateBaseGroup from "../../components/views/group/create/CreateBaseGroup";

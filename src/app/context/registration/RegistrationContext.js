@@ -6,7 +6,7 @@ import React, {
    useState,
 } from "react";
 import GroupsUtil from "../../data/util/GroupsUtil";
-import { useFirebase } from "../firebase";
+import { useFirebaseService } from "../firebase/FirebaseServiceContext";
 import { useAuth } from "../../HOCs/AuthProvider";
 import { useRouter } from "next/router";
 import StatsUtil from "../../data/util/StatsUtil";
@@ -109,7 +109,7 @@ export function RegistrationContextProvider({
       registerToLivestream,
       sendRegistrationConfirmationEmail,
       livestreamQuestionsQuery,
-   } = useFirebase();
+   } = useFirebaseService();
    const {
       query: { referrerId },
    } = useRouter();
@@ -164,8 +164,17 @@ export function RegistrationContextProvider({
          setQuestionSortType(newSortType);
       }
    };
-   const setGroup = (group) =>
-      dispatch({ type: "set-group", payload: group || {} });
+   const setGroup = (group) => {
+      let newGroup = { ...group };
+      if (group?.categories?.length) {
+         // filter out hidden categories if any
+         newGroup = {
+            ...group,
+            categories: group.categories.filter((cat) => !cat.hidden),
+         };
+      }
+      return dispatch({ type: "set-group", payload: newGroup || {} });
+   };
    const setTotalSteps = (totalAmountOfSteps) =>
       dispatch({ type: "set-total-steps", payload: totalAmountOfSteps || 0 });
    const setPolicyGroups = (policyGroups) =>

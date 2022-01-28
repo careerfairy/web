@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { withFirebase } from "../../../../context/firebase";
+import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
 import { Grid, LinearProgress, Typography } from "@mui/material";
 import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 import LazyLoad from "react-lazyload";

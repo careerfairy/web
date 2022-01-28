@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useMemo, useState } from "react";
 import NavBar from "./NavBar";
-import { withFirebase } from "../../context/firebase";
+import { withFirebase } from "../../context/firebase/FirebaseServiceContext";
 import { useAuth } from "../../HOCs/AuthProvider";
 import TopBar from "./TopBar";
 import { Box, CircularProgress } from "@mui/material";

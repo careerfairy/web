@@ -16,7 +16,7 @@ import DateUtil from "../../../../../util/DateUtil";
 import Link from "materialUI/NextNavLink";
 import debounce from "lodash.debounce";
 
-import { useFirebase } from "../../../../../context/firebase";
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext";
 import LowerPreviewContent from "./LowerPreviewContent";
 import LowerMainContent from "./LowerMainContent";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
@@ -231,7 +231,7 @@ const UpcomingLivestreamCard = ({
    const {
       getFollowingGroupsWithCache,
       deregisterFromLivestream,
-   } = useFirebase();
+   } = useFirebaseService();
 
    useEffect(() => {
       (async function () {

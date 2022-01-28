@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import makeStyles from '@mui/styles/makeStyles';
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
 import ViewerTopBar from "./ViewerTopBar";
 import { isLoaded } from "react-redux-firebase";
@@ -74,7 +74,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ViewerLayout = (props) => {
    const { children, isBreakout } = props;
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const {
       query: { livestreamId, breakoutRoomId, token, isRecordingWindow },
       replace,

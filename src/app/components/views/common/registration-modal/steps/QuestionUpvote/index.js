@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import {
    Box,
    Button,
@@ -61,7 +61,7 @@ const QuestionUpvote = () => {
 
       return () => clearTimeout(timeout);
    }, [show]);
-   const { upvoteLivestreamQuestion } = useFirebase();
+   const { upvoteLivestreamQuestion } = useFirebaseService();
 
    const { push } = useRouter();
    const { authenticatedUser } = useAuth();

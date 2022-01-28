@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 
-import { withFirebase } from "../context/firebase/FirebaseContext";
+import { withFirebase } from "../context/firebase/FirebaseServiceContext";
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 

@@ -1,20 +1,20 @@
 import React, {useContext} from 'react';
-import Firebase from '../../data/firebase/Firebase';
+import {firebaseServiceInstance} from "../../data/firebase/FirebaseService"
 
-const FirebaseContext = React.createContext(new Firebase())
+const FirebaseServiceContext = React.createContext(firebaseServiceInstance)
 
 export const withFirebase = Component => props => (
-    <FirebaseContext.Consumer>
+    <FirebaseServiceContext.Consumer>
         {firebase => <Component {...props} firebase={firebase} />}
-    </FirebaseContext.Consumer>
+    </FirebaseServiceContext.Consumer>
 );
 
 export const withFirebasePage = Page => {
     let element = props => {
         return(
-            <FirebaseContext.Consumer>
+            <FirebaseServiceContext.Consumer>
                 {firebase => <Page {...props} firebase={firebase} />}
-            </FirebaseContext.Consumer>
+            </FirebaseServiceContext.Consumer>
         );
     };
     if  (Page.getInitialProps) {
@@ -23,6 +23,6 @@ export const withFirebasePage = Page => {
     return element;
 }
 
-export const useFirebase = () => useContext(FirebaseContext);
+export const useFirebaseService = () => useContext(FirebaseServiceContext);
 
-export default FirebaseContext;
+export default FirebaseServiceContext;

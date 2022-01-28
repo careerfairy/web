@@ -8,7 +8,7 @@ import {useSelector} from "react-redux";
 import {useRouter} from "next/router";
 import {useSnackbar} from "notistack";
 import {GENERAL_ERROR} from "../../../../util/constants";
-import {withFirebase} from "../../../../../context/firebase";
+import {withFirebase} from "../../../../../context/firebase/FirebaseServiceContext";
 
 const useStyles = makeStyles(theme => ({
     root: {

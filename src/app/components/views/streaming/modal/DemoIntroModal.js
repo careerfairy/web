@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import {
    Button,
    CircularProgress,
@@ -13,7 +13,7 @@ import { v4 as uuid } from "uuid";
 import useStreamRef from "../../../custom-hook/useStreamRef";
 
 const DemoIntroModal = ({ open, handleClose }) => {
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const [loading, setLoading] = useState(false);
    const streamRef = useStreamRef();
 

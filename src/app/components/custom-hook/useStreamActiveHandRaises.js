@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import useStreamRef from "./useStreamRef";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 
 const useStreamActiveHandRaises = () => {
    const streamRef = useStreamRef();
-   const { updateHandRaiseRequest, setHandRaiseMode } = useFirebase();
+   const { updateHandRaiseRequest, setHandRaiseMode } = useFirebaseService();
    const handRaises = useSelector(
       (state) => state.firestore.ordered["handRaises"]
    );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import {
    DialogTitle,

@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { Doughnut } from "react-chartjs-2";
 import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
 import { colorsArray } from "../../../../../util/colors";
-import { withFirebase } from "../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext";
 import { convertStringToArray } from "../../../../../helperFunctions/HelperFunctions";
 import CustomLegend from "../../../../../../materialUI/Legends";
 import { customDonutConfig } from "../common/TableUtils";

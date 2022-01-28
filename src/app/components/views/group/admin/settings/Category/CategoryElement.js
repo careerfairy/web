@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
-import { withFirebase } from "context/firebase";
 import CategoryEdit from "./CategoryEdit";
 import {
    Card,
@@ -42,15 +41,18 @@ const useStyles = makeStyles((theme) => ({
       color: "rgb(80,80,80)",
    },
    headerTitle: {},
+   hiddenChip: {
+      marginLeft: theme.spacing(1),
+   },
 }));
 
 function CategoryElement({
    handleUpdateCategory,
    category,
-   firebase,
    handleAddTempCategory,
    handleDeleteLocalCategory,
    group,
+   hidden,
    isLocal,
 }) {
    const classes = useStyles();
@@ -94,8 +96,23 @@ function CategoryElement({
                   titleTypographyProps={{
                      className: classes.headerTitle,
                      gutterBottom: true,
+                     color: hidden ? "textSecondary" : "textPrimary",
                   }}
-                  title={category.name}
+                  title={
+                     <>
+                        {category.name}
+                        {hidden && (
+                           <Tooltip title="This information will not be collected from viewers who register to your events.">
+                              <Chip
+                                 className={classes.hiddenChip}
+                                 variant="outlined"
+                                 color="secondary"
+                                 label="Hidden From Registration"
+                              />
+                           </Tooltip>
+                        )}
+                     </>
+                  }
                   action={
                      <IconButton onClick={() => setEditMode(true)} aria-label="settings" size="large">
                         <EditIcon color="primary" />
@@ -127,11 +144,10 @@ function CategoryElement({
 
 CategoryElement.propTypes = {
    category: PropTypes.any,
-   firebase: PropTypes.object,
    group: PropTypes.object,
    handleAddTempCategory: PropTypes.func,
    handleDeleteLocalCategory: PropTypes.func,
    handleUpdateCategory: PropTypes.func,
    isLocal: PropTypes.bool,
 };
-export default withFirebase(CategoryElement);
+export default CategoryElement;

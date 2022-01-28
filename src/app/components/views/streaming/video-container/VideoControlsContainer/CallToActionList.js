@@ -5,7 +5,7 @@ import useStreamQuery from "../../../../custom-hook/useQuery";
 import { isEmpty, isLoaded, useFirestoreConnect } from "react-redux-firebase";
 import { createSelector } from "reselect";
 import { Box, CircularProgress, Typography } from "@mui/material";
-import { useFirebase } from "../../../../../context/firebase";
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 import CallToActionItem from "./CallToActionItem";
 import TutorialContext from "../../../../../context/tutorials/TutorialContext";
@@ -26,7 +26,7 @@ const CallToActionList = ({
    const { handleConfirmStep, isOpen, tutorialSteps } = useContext(
       TutorialContext
    );
-   const { activateCallToAction, deactivateCallToAction } = useFirebase();
+   const { activateCallToAction, deactivateCallToAction } = useFirebaseService();
    const callToActions = useSelector((state) => callToActionSelector(state));
    const [tutorialCtaId, setTutorialCtaId] = useState("");
 

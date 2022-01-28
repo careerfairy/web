@@ -1,5 +1,5 @@
 import { useEffect, useState, Fragment, useContext } from "react";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import AuthenticatedHeader from "./authenticated-header/AuthenticatedHeader";
 import NonAuthenticatedHeader from "./non-authenticated-header/NonAuthenticatedHeader";

@@ -1,5 +1,5 @@
 import { useCurrentStream } from "context/stream/StreamContext";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import React, { useEffect, useState } from "react";
 import useInfiniteScrollClient from "../../../../../../../components/custom-hook/useInfiniteScrollClient";
 import { AccordionDetails } from "@mui/material";
@@ -35,7 +35,7 @@ const BreakoutRoomAccordionContent = ({
    const {
       currentLivestream: { id: livestreamId },
    } = useCurrentStream();
-   const { getUsersByEmail } = useFirebase();
+   const { getUsersByEmail } = useFirebaseService();
    const [channelMemberIds, setChannelMemberIds] = useState([]);
    const [channelMembers, setChannelMembers] = useState([]);
    const [rtmChannel, setRtmChannel] = useState(null);
