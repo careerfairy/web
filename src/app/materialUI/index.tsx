@@ -1,12 +1,27 @@
 // import { deepmerge } from "@mui/utils";
 // it could be your App.tsx file or theme file that is included in your tsconfig.json
 import { alpha, createTheme, Theme } from "@mui/material/styles";
+import { grey } from "@mui/material/colors";
+
 import React from "react";
 import { PaletteMode } from "@mui/material";
 
 declare module "@mui/styles/defaultTheme" {
    // eslint-disable-next-line @typescript-eslint/no-empty-interface (remove this line if you don't have the rule enabled)
    interface DefaultTheme extends Theme {}
+}
+
+declare module "@mui/material/Button" {
+   interface ButtonPropsColorOverrides {
+      grey: true;
+   }
+}
+
+declare module "@mui/material" {
+   interface Color {
+      main: string;
+      dark: string;
+   }
 }
 
 declare module "@mui/material/styles" {
@@ -42,6 +57,10 @@ export const rootThemeObj = (mode: PaletteMode) =>
             dark: "#00b08f",
             contrastText: "#FFFFFF",
             gradient: "#07c1a7",
+         },
+         grey: {
+            main: grey[300],
+            dark: grey[400],
          },
          secondary: {
             light: "#b4a8ff",
