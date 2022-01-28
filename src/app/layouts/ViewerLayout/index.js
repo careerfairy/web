@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
 import ViewerTopBar from "./ViewerTopBar";
@@ -49,11 +49,6 @@ const useStyles = makeStyles((theme) => ({
          duration: theme.transitions.duration.shortest,
          easing: theme.transitions.easing.easeInOut,
       }),
-      [theme.breakpoints.down(undefined)]: {
-         width: "100%",
-         paddingTop: 0,
-         paddingLeft: 0,
-      },
       [theme.breakpoints.up("mobile")]: {
          paddingTop: ({ focusModeEnabled }) => !focusModeEnabled && 55,
       },

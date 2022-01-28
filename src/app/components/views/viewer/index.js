@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import ViewerComponent from "./viewer-component/ViewerComponent";
 import MiniChatContainer from "../streaming/LeftMenu/categories/chat/MiniChatContainer";
 import IconsContainer from "../streaming/icons-container/IconsContainer";
@@ -51,9 +51,6 @@ const useStyles = makeStyles((theme) => ({
       right: "0",
       bottom: "0",
       top: 0,
-      [theme.breakpoints.down(undefined)]: {
-         width: "100%",
-      },
    },
 }));
 
