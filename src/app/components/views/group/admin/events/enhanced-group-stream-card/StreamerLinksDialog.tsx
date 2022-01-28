@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import {
    Button,
@@ -8,8 +8,10 @@ import {
    DialogContent,
    DialogContentText,
    DialogTitle,
+   Grid,
    TextField,
 } from "@mui/material";
+import CopyLinkButton from "components/views/common/CopyLinkButton";
 
 const StreamerLinksDialogContent = ({
    livestreamId,
@@ -21,27 +23,28 @@ const StreamerLinksDialogContent = ({
    useEffect(() => {
       firebase.getLivestreamSecureToken(livestreamId).then((doc) => {
          if (doc.exists) {
-            let secureToken = doc.data().value;
+            let secureToken : string = doc.data().value;
             setSecureToken(secureToken);
          }
       });
    }, []);
 
-   const createMainStreamerLink = () => {
-      let baseUrl = "https://careerfairy.io";
+   const buildStreamerLink = (variant : string, livestreamId : string, secureToken : string) => {
+      let baseUrl : string = "https://careerfairy.io";
       if (window?.location?.origin) {
          baseUrl = window.location.origin;
       }
-      return `${baseUrl}/streaming/${livestreamId}/main-streamer?token=${secureToken}`;
+      return `${baseUrl}/streaming/${livestreamId}/${variant}?token=${secureToken}`;
    };
 
-   const createJoiningStreamerLink = () => {
-      let baseUrl = "https://careerfairy.io";
-      if (window?.location?.origin) {
-         baseUrl = window.location.origin;
-      }
-      return `${baseUrl}/streaming/${livestreamId}/joining-streamer?token=${secureToken}`;
-   };
+   const mainStreamerLink = useMemo(
+      () => buildStreamerLink("main-streamer", livestreamId, secureToken),
+      [livestreamId, secureToken]
+   );
+   const joiningStreamerLink = useMemo(
+      () => buildStreamerLink("joining-streamer", livestreamId, secureToken),
+      [livestreamId, secureToken]
+   );
 
    return (
       <React.Fragment>
@@ -50,30 +53,44 @@ const StreamerLinksDialogContent = ({
             <DialogContentText>
                Send these links to the streamers of this event.
             </DialogContentText>
-            <TextField
-               autoFocus
-               InputProps={{
-                  readOnly: true,
-               }}
-               value={createMainStreamerLink()}
-               margin="dense"
-               id="name"
-               label="Main Streamer Link"
-               type="text"
-               fullWidth
-            />
-            <TextField
-               autoFocus
-               InputProps={{
-                  readOnly: true,
-               }}
-               value={createJoiningStreamerLink()}
-               margin="dense"
-               id="name"
-               label="Secondary Streamer Link"
-               type="text"
-               fullWidth
-            />
+            <Grid container spacing={2} alignItems="flex-end">
+               <Grid item xs={12} sm={10}>
+                  <TextField
+                     autoFocus
+                     InputProps={{
+                        readOnly: true,
+                     }}
+                     value={mainStreamerLink}
+                     margin="dense"
+                     id="name"
+                     label="Main Streamer Link"
+                     type="text"
+                     fullWidth
+                     disabled
+                  />
+               </Grid>
+               <Grid item xs={12} sm={2}>
+                  <CopyLinkButton linkUrl={mainStreamerLink} />
+               </Grid>
+               <Grid item xs={12} sm={10}>
+                  <TextField
+                     autoFocus
+                     InputProps={{
+                        readOnly: true,
+                     }}
+                     value={joiningStreamerLink}
+                     margin="dense"
+                     id="name"
+                     label="Secondary Streamer Link"
+                     type="text"
+                     fullWidth
+                     disabled
+                  />
+               </Grid>
+               <Grid item xs={12} sm={2}>
+                  <CopyLinkButton linkUrl={joiningStreamerLink} />
+               </Grid>
+            </Grid>
          </DialogContent>
          <DialogActions>
             <Button size="large" onClick={handleClose}>
