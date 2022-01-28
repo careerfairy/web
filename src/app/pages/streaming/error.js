@@ -1,5 +1,5 @@
 import { useState, useEffect, Fragment } from "react";
-import { withFirebasePage } from "context/firebase";
+import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
 import React from "react";
 import makeStyles from '@mui/styles/makeStyles';
 import { Typography } from "@mui/material";

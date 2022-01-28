@@ -10,7 +10,7 @@ const ScrollElements = ({ scrollItems }) => {
    useEffect(() => {
       //  the component must be the child of a scroll to bottom
       if (sticky) {
-         scrollToBottom({ behavior: "smooth" });
+         scrollToBottom({ behavior: "auto" });
       }
    }, [scrollItems]);
 

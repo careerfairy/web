@@ -18,7 +18,7 @@ import { EMAIL_REGEX, GENERAL_ERROR } from "../../../../util/constants";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import { useSnackbar } from "notistack";
-import { withFirebase } from "../../../../../context/firebase";
+import { withFirebase } from "../../../../../context/firebase/FirebaseServiceContext";
 
 const useStyles = makeStyles((theme) => ({}));
 

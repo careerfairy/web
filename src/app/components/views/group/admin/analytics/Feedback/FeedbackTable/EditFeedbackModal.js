@@ -19,7 +19,7 @@ import {
    FormControl,
 } from "@mui/material";
 import { Formik } from "formik";
-import { withFirebase } from "../../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext";
 import { useTheme } from "@mui/material/styles";
 import { LONG_NUMBER } from "../../../../../../util/constants";
 import { getMinutes } from "../../../../../../helperFunctions/HelperFunctions";

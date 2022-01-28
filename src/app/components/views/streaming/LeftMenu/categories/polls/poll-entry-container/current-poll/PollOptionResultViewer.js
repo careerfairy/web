@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 
 function PollOptionResultViewer(props) {
    const colors = ["red", "orange", "pink", "olive"];

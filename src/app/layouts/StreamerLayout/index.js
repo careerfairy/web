@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
 import makeStyles from '@mui/styles/makeStyles';
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import StreamerTopBar from "./StreamerTopBar";
 import PreparationOverlay from "../../components/views/streaming/preparation-overlay/PreparationOverlay";
 import LeftMenu from "../../components/views/streaming/LeftMenu/LeftMenu";
@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamerLayout = (props) => {
    const { children, isBreakout, isMainStreamer } = props;
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const {
       query: { token, livestreamId: baseStreamId, breakoutRoomId, auto },
    } = useRouter();

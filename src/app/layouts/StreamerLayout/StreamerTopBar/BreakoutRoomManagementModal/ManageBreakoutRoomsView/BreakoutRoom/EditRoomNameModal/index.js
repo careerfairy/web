@@ -10,7 +10,7 @@ import {
    TextField,
 } from "@mui/material";
 import { useRouter } from "next/router";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 import { useFormik } from "formik";
@@ -21,7 +21,7 @@ const ModalContent = ({ handleClose, roomTitle, roomId }) => {
    const {
       query: { livestreamId },
    } = useRouter();
-   const { updateBreakoutRoom } = useFirebase();
+   const { updateBreakoutRoom } = useFirebaseService();
    const dispatch = useDispatch();
    const {
       handleChange,

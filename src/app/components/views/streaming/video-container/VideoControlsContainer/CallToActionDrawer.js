@@ -15,7 +15,7 @@ import CloseIcon from "@mui/icons-material/ChevronLeft";
 import clsx from "clsx";
 import CallToActionFormModal from "./CallToActionFormModal";
 import CallToActionList from "./CallToActionList";
-import { useFirebase } from "../../../../../context/firebase";
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips";
 import useSliderFullyOpened from "../../../../custom-hook/useSliderFullyOpened";
@@ -66,7 +66,7 @@ const Content = ({
 }) => {
    const classes = useStyles();
    const streamRef = useStreamRef();
-   const { deleteCallToAction, resendCallToAction } = useFirebase();
+   const { deleteCallToAction, resendCallToAction } = useFirebaseService();
    const [callToActionModalOpen, setCallToActionModalOpen] = useState(false);
    const [callToActionToEdit, setCallToActionToEdit] = useState(null);
 

@@ -147,7 +147,7 @@ const StudentLandingPage = ({}) => {
          >
             <StudentHeroSection big />
             <CompaniesSection
-               title={"299+ companies and startups are waiting for you."}
+               title={"250+ companies and startups are waiting for you."}
             />
             <SpeakersSection
                speakers={speakers}

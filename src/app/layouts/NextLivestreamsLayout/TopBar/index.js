@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme } from "@mui/material/styles";
 import makeStyles from '@mui/styles/makeStyles';
 import IconButton from "@mui/material/IconButton";
-import { withFirebase } from "../../../context/firebase";
+import { withFirebase } from "../../../context/firebase/FirebaseServiceContext";
 import { Button, Hidden, useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
 import { MainLogo } from "../../../components/logos";

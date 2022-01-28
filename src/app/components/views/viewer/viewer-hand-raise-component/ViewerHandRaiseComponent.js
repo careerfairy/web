@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { withFirebasePage } from "context/firebase";
+import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
 import VideoContainer from "components/views/streaming/video-container/VideoContainer";
 import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "../../../../HOCs/AuthProvider";

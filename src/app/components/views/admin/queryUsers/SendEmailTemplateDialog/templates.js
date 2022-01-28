@@ -3,7 +3,7 @@ import { URL_REGEX } from "../../../../util/constants";
 import { basicEmailTemplate } from "constants/images";
 import { getBaseUrl } from "../../../../helperFunctions/HelperFunctions";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useMemo } from "react";
 
 const MAX_SUBJECT_LENGTH = 500;
@@ -110,7 +110,7 @@ const basicFields = [
 ];
 
 const useTemplates = () => {
-   const { sendBasicTemplateEmail } = useFirebase();
+   const { sendBasicTemplateEmail } = useFirebaseService();
 
    return useMemo(
       () => [

@@ -29,7 +29,7 @@ import RegistrationsIcon from "@mui/icons-material/People";
 import ParticipationIcon from "@mui/icons-material/Visibility";
 import JoinIcon from "@mui/icons-material/RecordVoiceOver";
 import { useFirestore } from "react-redux-firebase";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions/index";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
 const StreamCard = ({ stream }) => {
    const classes = useStyles();
    const firestore = useFirestore();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const dispatch = useDispatch();
 
    const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] = useState(

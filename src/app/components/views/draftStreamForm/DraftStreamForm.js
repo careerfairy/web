@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { Formik } from "formik";
 import { v4 as uuidv4 } from "uuid";
-import { withFirebase } from "../../../context/firebase";
+import { withFirebase } from "../../../context/firebase/FirebaseServiceContext";
 import ImageSelect from "./ImageSelect/ImageSelect";
 import makeStyles from "@mui/styles/makeStyles";
 import DateTimePicker from "@mui/lab/DateTimePicker";

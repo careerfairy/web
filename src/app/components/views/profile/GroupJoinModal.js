@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import UserCategorySelector from "components/views/profile/UserCategorySelector";
 import {
    Box,

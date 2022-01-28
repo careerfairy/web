@@ -1,7 +1,6 @@
 import * as React from "react";
 import "styles.css";
-import FirebaseContext from "context/firebase/FirebaseContext";
-import Firebase from "context/firebase";
+import FirebaseServiceContext from "context/firebase/FirebaseServiceContext";
 import * as Sentry from "@sentry/browser";
 import config from "@stahl.luke/react-reveal/globals";
 import { newStore, wrapper } from "../store";
@@ -24,6 +23,7 @@ import Notifier from "../components/views/notifier";
 import { getCookieConsentValue } from "react-cookie-consent";
 import CFCookieConsent from "components/views/common/cookie-consent/CFCookieConsent";
 import { useRouter } from "next/router";
+import {firebaseServiceInstance} from "../data/firebase/FirebaseService"
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext";
 import { useEffect, useState } from "react";
 
@@ -63,8 +63,6 @@ function MyApp(props) {
       pathname,
       query: { isRecordingWindow },
    } = useRouter();
-
-   const firebase = new Firebase();
 
    const [generalError, setGeneralError] = useState("");
    const [disableCookies, setDisableCookies] = useState(false);
@@ -177,7 +175,7 @@ function MyApp(props) {
                >
                   <AuthProvider>
                      <ThemeProviderWrapper>
-                        <FirebaseContext.Provider value={firebase}>
+                        <FirebaseServiceContext.Provider value={firebaseServiceInstance}>
                            <LocalizationProvider dateAdapter={AdapterDateFns}>
                               <ErrorContext.Provider
                                  value={{ generalError, setGeneralError }}
@@ -193,7 +191,7 @@ function MyApp(props) {
                                  />
                               </ErrorContext.Provider>
                            </LocalizationProvider>
-                        </FirebaseContext.Provider>
+                        </FirebaseServiceContext.Provider>
                      </ThemeProviderWrapper>
                   </AuthProvider>
                </TutorialContext.Provider>

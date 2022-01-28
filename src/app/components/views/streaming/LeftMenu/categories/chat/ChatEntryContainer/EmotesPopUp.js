@@ -14,7 +14,7 @@ import React, { Fragment } from "react";
 import { IconButton } from "@mui/material";
 import clsx from "clsx";
 import makeStyles from '@mui/styles/makeStyles';
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import useStreamRef from "../../../../../../custom-hook/useStreamRef";
 
 const useStyles = makeStyles((theme) => ({

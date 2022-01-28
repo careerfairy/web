@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getBaseUrl } from "../helperFunctions/HelperFunctions";
 import { useRouter } from "next/router";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useStreamRef from "./useStreamRef";
 
 /**
@@ -22,7 +22,7 @@ const useStreamToken = (
       getStreamTokenWithRef,
       getLivestreamSecureToken,
       getBreakoutRoomSecureToken,
-   } = useFirebase();
+   } = useFirebaseService();
    const [streamToken, setStreamToken] = useState("");
    const [mainStreamerLink, setMainStreamerLink] = useState("");
    const [joiningStreamerLink, setJoiningStreamerLink] = useState("");

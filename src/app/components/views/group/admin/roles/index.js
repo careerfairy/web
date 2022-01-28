@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import AddMemberModal from "./AddMemberModal";
 import { useSnackbar } from "notistack";
 import { GENERAL_ERROR, PERMISSION_ERROR } from "../../../../util/constants";
-import { withFirebase } from "../../../../../context/firebase";
+import { withFirebase } from "../../../../../context/firebase/FirebaseServiceContext";
 
 const useStyles = makeStyles((theme) => ({
    root: {

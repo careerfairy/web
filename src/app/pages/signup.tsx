@@ -1,5 +1,8 @@
-import React, { Fragment, useState, useEffect, useContext } from "react";
-import { useFirebase, withFirebase } from "context/firebase";
+import React, { Fragment, useState, useEffect } from "react";
+import {
+   useFirebaseService,
+   withFirebase
+} from "context/firebase/FirebaseServiceContext";
 import TheatersRoundedIcon from "@mui/icons-material/TheatersRounded";
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
 import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded";
@@ -11,8 +14,6 @@ import axios from "axios";
 import {
    FormControl,
    Link as MuiLink,
-   MenuItem,
-   Select,
 } from "@mui/material";
 
 import Head from "next/head";
@@ -39,9 +40,10 @@ import GroupProvider from "../components/views/signup/GroupProvider";
 import UniversitySelector from "../components/views/universitySelect/UniversitySelector";
 import UniversityCountrySelector from "../components/views/universitySelect/UniversityCountrySelector";
 import { useAuth } from "../HOCs/AuthProvider";
-import { firebaseConnect } from "react-redux-firebase";
+import {firebaseConnect, useFirebase} from "react-redux-firebase";
+import { createStyles } from '@mui/styles';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => createStyles({
    paper: {
       marginTop: theme.spacing(8),
       display: "flex",
@@ -67,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
    },
    footer: {
       color: "white",
-      fontWeight: "700",
+      fontWeight: 700,
       fontSize: "1.3em",
       margin: "40px 0 30px 0",
       textAlign: "center",
@@ -76,7 +78,7 @@ const useStyles = makeStyles((theme) => ({
    },
    title: {
       color: "white",
-      fontWeight: "500",
+      fontWeight: 500,
       fontSize: "2em",
       margin: "40px 0 30px 0",
       textAlign: "center",
@@ -211,12 +213,14 @@ export default SignUpPage;
 
 const SignUpForm = withFirebase(SignUpFormBase);
 
-const SignUpFormSent = firebaseConnect()(SignUpFormValidate);
+// @ts-ignore
+const SignUpFormSent: any = firebaseConnect()(SignUpFormValidate);
 
 function SignUpFormBase({ firebase, setEmailVerificationSent, setActiveStep }) {
    const classes = useStyles();
    const {
       query: { absolutePath },
+      push
    } = useRouter();
 
    const [emailSent, setEmailSent] = useState(false);
@@ -251,7 +255,7 @@ function SignUpFormBase({ firebase, setEmailVerificationSent, setActiveStep }) {
                universityCountryCode: "",
             }}
             validate={(values) => {
-               let errors = {};
+               let errors: any = {};
                if (!values.email) {
                   errors.email = "Your email is required";
                } else if (
@@ -319,7 +323,7 @@ function SignUpFormBase({ firebase, setEmailVerificationSent, setActiveStep }) {
                            setActiveStep(1);
                         })
                         .catch(() => {
-                           router.push("/login");
+                           push("/login");
                         });
                   })
                   .catch((error) => {
@@ -383,7 +387,6 @@ function SignUpFormBase({ firebase, setEmailVerificationSent, setActiveStep }) {
                               fullWidth
                               id="lastName"
                               inputProps={{ maxLength: 50 }}
-                              maxLength="50"
                               label="Last Name"
                               name="lastName"
                               autoComplete="lname"
@@ -580,7 +583,6 @@ function SignUpFormBase({ firebase, setEmailVerificationSent, setActiveStep }) {
                                  name="subscribed"
                                  onChange={handleChange}
                                  onBlur={handleBlur}
-                                 defaultValue={true}
                                  checked={values.subscribed}
                                  disabled={submitting(isSubmitting)}
                                  color="primary"
@@ -661,7 +663,7 @@ function SignUpFormValidate({
       push,
       query: { absolutePath },
    } = useRouter();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const [errorMessageShown] = useState(false);
    const [incorrectPin, setIncorrectPin] = useState(false);
    const [generalLoading, setGeneralLoading] = useState(false);
@@ -698,7 +700,7 @@ function SignUpFormValidate({
          <Formik
             initialValues={{ pinCode: "" }}
             validate={(values) => {
-               let errors = {};
+               let errors: any = {};
                if (!values.pinCode) {
                   errors.pinCode = "A PIN code is required";
                } else if (!/^[0-9]{4}$/.test(values.pinCode)) {
@@ -719,7 +721,7 @@ function SignUpFormValidate({
                      setTimeout(() => {
                         reloadAuth().then(() => {
                            if (absolutePath) {
-                              push(absolutePath);
+                              push(absolutePath as any);
                            } else {
                               updateActiveStep(2);
                            }
@@ -813,6 +815,7 @@ function SignUpFormValidate({
                         ? "Resending"
                         : "Validate Email"}
                   </Button>
+                  {/* @ts-ignore */}
                   <Typography
                      style={{ marginTop: "0.5rem" }}
                      align="center"

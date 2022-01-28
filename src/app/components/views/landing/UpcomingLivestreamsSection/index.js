@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import { Box } from "@mui/material";
-import { useFirebase } from "../../../../context/firebase";
+import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext";
 import UpcomingLivestreamsCarousel from "./UpcomingLivestreamsCarousel";
 import Link from "../../../../materialUI/NextNavLink";
 import HeroButton from "../HeroSection/HeroButton";
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 
 const UpcomingLivestreamsSection = (props) => {
    const classes = useStyles();
-   const { getUpcomingLivestreams } = useFirebase();
+   const { getUpcomingLivestreams } = useFirebaseService();
    const [upcomingLivestreams, setUpcomingLivestreams] = useState([]);
 
    useEffect(() => {

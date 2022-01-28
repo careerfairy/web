@@ -1,5 +1,5 @@
 import React from "react";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import makeStyles from '@mui/styles/makeStyles';
 import { Box, Chip, Paper } from "@mui/material";
 

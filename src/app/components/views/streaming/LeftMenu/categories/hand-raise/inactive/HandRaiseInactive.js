@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { Button, Grow, Typography } from "@mui/material";
 import { CategoryContainerCentered } from "../../../../../../../materialUI/GlobalContainers";
 import { GreyPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
@@ -24,7 +24,7 @@ function HandRaiseInactive({
    handleStateChange,
 }) {
    const { tutorialSteps, setTutorialSteps } = useContext(TutorialContext);
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const streamRef = useStreamRef();
    const [animating, setAnimating] = useState(false);
    const [hasSeenHandRaiseTip, setHasSeenHandRaiseTip] = useLocalStorage(

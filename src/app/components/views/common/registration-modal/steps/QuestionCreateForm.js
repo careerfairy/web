@@ -13,7 +13,7 @@ import {
 import { RegistrationContext } from "../../../../../context/registration/RegistrationContext";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import { useRouter } from "next/router";
-import { useFirebase } from "../../../../../context/firebase";
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext";
 import { useFormik } from "formik";
 import { questionIcon } from "../../../../../constants/svgs";
 import {
@@ -67,7 +67,7 @@ const QuestionCreateForm = () => {
    );
    const classes = useStyles();
    const { replace } = useRouter();
-   const { putLivestreamQuestion } = useFirebase();
+   const { putLivestreamQuestion } = useFirebaseService();
    const { authenticatedUser, userData } = useAuth();
    const {
       handleChange,

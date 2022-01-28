@@ -6,7 +6,7 @@ import Profile from "./Profile";
 import ProfileDetails from "./ProfileDetails";
 import ProfileCategories from "./ProfileCategories";
 import ProfilePrivacyPolicy from "./ProfilePrivacyPolicy";
-import { withFirebase } from "../../../../../context/firebase";
+import { withFirebase } from "../../../../../context/firebase/FirebaseServiceContext";
 
 const useStyles = makeStyles((theme) => ({
    root: {

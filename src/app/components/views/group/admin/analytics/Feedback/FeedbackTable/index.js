@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
 import { Box, Card, Divider, Grow, Tabs, Tab, IconButton } from "@mui/material";
-import { withFirebase } from "../../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext";
 import {
    addMinutes,
    prettyDate,

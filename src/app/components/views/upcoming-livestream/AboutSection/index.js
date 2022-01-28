@@ -7,6 +7,7 @@ import SectionHeader from "../../common/SectionHeader";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import Fade from "@stahl.luke/react-reveal/Fade";
+import LinkifyText from "../../../util/LinkifyText";
 
 const styles = {
    header: {
@@ -52,13 +53,15 @@ const AboutSection = (props) => {
             )}
             <Fade fraction={props.forceReveal ? 0 : 0.2} bottom>
                <Box>
-                  <Typography
-                     style={{ whiteSpace: "pre-line" }}
-                     color="textSecondary"
-                     variant="h6"
-                  >
-                     {props.summary}
-                  </Typography>
+                  <LinkifyText>
+                     <Typography
+                        style={{ whiteSpace: "pre-line" }}
+                        color="textSecondary"
+                        variant="h6"
+                     >
+                        {props.summary}
+                     </Typography>
+                  </LinkifyText>
                </Box>
             </Fade>
          </SectionContainer>

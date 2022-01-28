@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 
 const useStreamGroups = (groupIds) => {
    const [careerCenters, setCareerCenters] = useState([]);
-   const { getGroupsWithIds } = useFirebase();
+   const { getGroupsWithIds } = useFirebaseService();
 
    useEffect(() => {
       async function getCareerCenters() {

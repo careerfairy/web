@@ -13,7 +13,7 @@ import {
 import Tab from "@mui/material/Tab";
 import Header from "./Header";
 import EventsTable from "./events-table/EventsTable";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { v4 as uuidv4 } from "uuid";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -54,7 +54,7 @@ const EventsOverview = ({ group, scrollRef }) => {
       addLivestream,
       deleteLivestream,
       getAllGroupAdminInfo,
-   } = useFirebase();
+   } = useFirebaseService();
    const [streams, setStreams] = useState([]);
    const [openNewStreamModal, setOpenNewStreamModal] = useState(false);
    const [tabValue, setTabValue] = useState("upcoming");

@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import * as actions from "../../../../../store/actions/index";
 import { useCurrentStream } from "../../../../../context/stream/StreamContext";
-import { withFirebase } from "../../../../../context/firebase";
+import { withFirebase } from "../../../../../context/firebase/FirebaseServiceContext";
 import { useDispatch } from "react-redux";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import {

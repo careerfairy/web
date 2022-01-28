@@ -5,7 +5,7 @@ import ElementTagList from "../common/ElementTagList";
 import CompanyLocationFlags from "../common/CompanyLocationFlags";
 
 import JobDescriptions from "../job-descriptions/JobDescriptions";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import { Container, Grid, Typography } from "@mui/material";
 
 function CompanyDiscoverPage(props) {

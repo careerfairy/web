@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { withFirebasePage } from "context/firebase";
+import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
 import useDevices from "components/custom-hook/useDevices";
 import useMediaSources from "components/custom-hook/useMediaSources";

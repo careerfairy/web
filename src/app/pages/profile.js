@@ -1,6 +1,6 @@
 import React from "react";
 import makeStyles from '@mui/styles/makeStyles';
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import Head from "next/head";
 import ProfileNav from "../components/views/profile/ProfileNav";
 import { useAuth } from "../HOCs/AuthProvider";

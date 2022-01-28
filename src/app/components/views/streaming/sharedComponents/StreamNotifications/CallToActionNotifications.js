@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,7 +23,7 @@ const CallToActionNotifications = ({
       getCallToActionsWithAnArrayOfIds,
       dismissCallToAction,
       clickOnCallToAction,
-   } = useFirebase();
+   } = useFirebaseService();
    const viewerCallToActionModalOpen = useSelector(
       (state) => state.stream.layout.viewerCtaModalOpen
    );

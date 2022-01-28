@@ -18,7 +18,7 @@ import {
 import * as actions from "store/actions";
 import EventOptionPreview from "../../../../common/EventAutoSelect/EventOptionPreview";
 import EventAutoSelect from "../../../../common/EventAutoSelect";
-import { useFirebase } from "../../../../../../context/firebase";
+import { useFirebaseService } from "../../../../../../context/firebase/FirebaseServiceContext";
 import { useDispatch } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
@@ -30,7 +30,7 @@ const Content = ({ onClose, eventData, group }) => {
    const [showOnlyLinkedEvents, setShowOnlyLinkedEvents] = useState(true);
    const [updating, setUpdating] = useState(false);
    const [fetchingEvents, setFetchingEvents] = useState(false);
-   const { getUpcomingLivestreams, updateLivestream } = useFirebase();
+   const { getUpcomingLivestreams, updateLivestream } = useFirebaseService();
    const [allEvents, setAllEvents] = useState([]);
    const [selectedEvents, setSelectedEvents] = useState([]);
    const [filteredEvents, setFilteredEvents] = useState([]);

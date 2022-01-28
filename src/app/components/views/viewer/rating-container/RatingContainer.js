@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { withFirebasePage } from "context/firebase";
+import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
 import { Rating } from "@mui/material";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 import {

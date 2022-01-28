@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { Fragment, memo, useEffect, useMemo, useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import UserUtil from "../../../../../data/util/UserUtil";
 import { useRouter } from "next/router";
 import {
@@ -50,7 +50,7 @@ const GroupStreamCardV2 = memo(
       globalCardHighlighted,
       isAdmin,
    }) => {
-      const firebase = useFirebase();
+      const firebase = useFirebaseService();
       const { absolutePath, pathname, push, query } = useRouter();
       const linkToStream = useMemo(() => {
          const notLoggedIn =

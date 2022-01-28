@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { withFirebasePage } from "context/firebase";
+import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
 import Loader from "components/views/loader/Loader";
 import { useRouter } from "next/router";
 import { Container } from "@mui/material";
