@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
          active
             ? theme.palette.primary.main
             : theme.palette.mode === "light"
-            ? theme.palette.background.offWhite
+            ? theme.palette.background.default
             : theme.palette.background.paper,
       color: ({ active }) => (active ? theme.palette.common.white : "inherit"),
       position: "relative",

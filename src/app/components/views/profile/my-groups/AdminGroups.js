@@ -1,8 +1,8 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { Box, Grid, Typography } from "@mui/material";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import CurrentGroup from "components/views/profile/CurrentGroup";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { Highlights } from "../../groups/Groups";
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers";
 

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../HOCs/AuthProvider";
-import { useFirebase } from "../../context/firebase";
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext";
 
 const useFollowingGroups = () => {
    const { userData } = useAuth();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const [followingGroups, setFollowingGroups] = useState([]);
    const [fetching, setFetching] = useState(false);
    const [error, setError] = useState(null);

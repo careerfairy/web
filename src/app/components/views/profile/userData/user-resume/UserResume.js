@@ -1,25 +1,22 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import FilePickerContainer from "components/ssr/FilePickerContainer";
 import {
-   DeleteForever,
-   GetApp,
    Add,
    ArrowDropDown,
    CheckCircleOutline,
+   DeleteForever,
+   GetApp,
    Publish,
 } from "@mui/icons-material";
 import {
-   Box,
    Button,
    ButtonGroup,
    ClickAwayListener,
-   Container,
    Grow,
    MenuItem,
    MenuList,
    Paper,
    Popper,
-   Slider,
    Switch,
    Typography,
 } from "@mui/material";
@@ -50,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
    },
    buttons: {
       marginTop: 25,
-      backgroundColor: theme.palette.grey.main,
+      backgroundColor: theme.palette.grey[300],
    },
    button: {
       // backgroundColor: theme.palette.background.default,
