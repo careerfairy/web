@@ -131,6 +131,7 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
    useEffect(() => {
       let storedSpeakerString = localStorage.getItem("storedSpeaker");
       if (storedSpeakerString) {
+         let currentSpeaker;
          if (livestream.liveSpeakers?.length > 0) {
             let storedSpeaker = JSON.parse(storedSpeakerString);
             let savedSpeaker = livestream.liveSpeakers?.find((liveSpeaker) => {
@@ -141,14 +142,21 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
                );
             });
             if (savedSpeaker) {
-               setSpeaker(savedSpeaker);
+               currentSpeaker = savedSpeaker;
             } else {
-               setSpeaker(storedSpeaker);
+               currentSpeaker = storedSpeaker;
             }
          } else {
-            let storedSpeaker = JSON.parse(storedSpeakerString);
-            setSpeaker(storedSpeaker);
+            currentSpeaker = JSON.parse(storedSpeakerString);
          }
+         if (currentSpeaker.showLinkedIn !== undefined) {
+            setShowLinkedIn(Boolean(currentSpeaker.showLinkedIn));
+         }
+
+         if (currentSpeaker?.linkedIn) {
+            setLinkedInUrl(currentSpeaker.linkedIn);
+         }
+         setSpeaker(currentSpeaker);
       }
    }, [livestream.liveSpeakers]);
 

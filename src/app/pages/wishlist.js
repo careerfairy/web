@@ -165,7 +165,7 @@ function WishFactoryPlay(props) {
          <Head>
             <title key="title">CareerFairy | Wishlist</title>
          </Head>
-         <GeneralLayout>
+         <GeneralLayout fullScreen>
             <Container
                style={{
                   minHeight: "60vh",
