@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { withFirebase } from "../context/firebase";
+import { withFirebase } from "../context/firebase/FirebaseServiceContext";
 
 import Head from "next/head";
 import { Button, Container, TextField, Typography } from "@material-ui/core";

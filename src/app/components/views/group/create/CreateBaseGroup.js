@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { withFirebase } from "../../../../context/firebase";
+import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
 import PublishIcon from "@material-ui/icons/Publish";
 import { Form as UiForm, Formik } from "formik";
 import FilePickerContainer from "../../../../components/ssr/FilePickerContainer";

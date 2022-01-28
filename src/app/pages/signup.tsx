@@ -1,5 +1,8 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { useFirebase, withFirebase } from "context/firebase";
+import {
+   useFirebaseService,
+   withFirebase
+} from "context/firebase/FirebaseServiceContext";
 import TheatersRoundedIcon from "@material-ui/icons/TheatersRounded";
 import ArrowForwardIosRoundedIcon from "@material-ui/icons/ArrowForwardIosRounded";
 import BusinessCenterRoundedIcon from "@material-ui/icons/BusinessCenterRounded";
@@ -37,7 +40,7 @@ import GroupProvider from "../components/views/signup/GroupProvider";
 import UniversitySelector from "../components/views/universitySelect/UniversitySelector";
 import UniversityCountrySelector from "../components/views/universitySelect/UniversityCountrySelector";
 import { useAuth } from "../HOCs/AuthProvider";
-import { firebaseConnect } from "react-redux-firebase";
+import {firebaseConnect, useFirebase} from "react-redux-firebase";
 import {createStyles} from "@material-ui/styles";
 
 const useStyles = makeStyles((theme) => createStyles({
@@ -660,7 +663,7 @@ function SignUpFormValidate({
       push,
       query: { absolutePath },
    } = useRouter();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const [errorMessageShown] = useState(false);
    const [incorrectPin, setIncorrectPin] = useState(false);
    const [generalLoading, setGeneralLoading] = useState(false);

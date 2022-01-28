@@ -5,7 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Box, Card, IconButton, Popover, Typography } from "@material-ui/core";
 import { getTimeFromNow } from "../../../../../../helperFunctions/HelperFunctions";
 import { useAuth } from "../../../../../../../HOCs/AuthProvider";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import EmojiEmotionsOutlinedIcon from "@material-ui/icons/EmojiEmotionsOutlined";
 import EmotesPreview from "./EmotesPreview";
 import EmotesPopUp from "./EmotesPopUp";
@@ -89,7 +89,7 @@ const ChatEntryContainer = ({
    currentEntry,
    last,
 }) => {
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const isNew = chatEntry.timestamp === null;
    const [anchorEl, setAnchorEl] = useState(null);
    const { authenticatedUser } = useAuth();

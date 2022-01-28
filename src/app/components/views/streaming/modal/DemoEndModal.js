@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { withFirebase } from "../../../../context/firebase";
+import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
 import {
    Box,
    Button,

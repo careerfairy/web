@@ -1,10 +1,10 @@
 import React from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useStreamRef from "./useStreamRef";
 
 const usePreparationOverlay = () => {
    const streamRef = useStreamRef();
-   const { updateSpeakersInLivestream, addSpeakerInLivestream } = useFirebase();
+   const { updateSpeakersInLivestream, addSpeakerInLivestream } = useFirebaseService();
 
    const updateSpeaker = (speaker) => {
       return updateSpeakersInLivestream(streamRef, speaker);

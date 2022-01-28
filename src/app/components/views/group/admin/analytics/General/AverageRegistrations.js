@@ -10,7 +10,7 @@ import {
    Typography,
 } from "@material-ui/core";
 import InsertChartIcon from "@material-ui/icons/InsertChartOutlined";
-import { withFirebase } from "../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext";
 import orange from "@material-ui/core/colors/orange";
 import { makeStyles } from "@material-ui/core/styles";
 

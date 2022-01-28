@@ -6,7 +6,7 @@ import {
 } from "../constants/streamContants";
 import DateUtil from "util/DateUtil";
 
-class Firebase {
+class FirebaseService {
    constructor() {
       // if (!firebase.apps.length) {
       //     firebase.initializeApp(config);
@@ -3341,4 +3341,11 @@ class Firebase {
    };
 }
 
-export default Firebase;
+/**
+ * Singleton instance, since this is quite a big object without localstate
+ * we share the same instance everywhere
+ * @type {FirebaseService}
+ */
+export const firebaseServiceInstance = new FirebaseService()
+
+export default FirebaseService;

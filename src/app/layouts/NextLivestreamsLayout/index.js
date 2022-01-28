@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import NavBar from "./NavBar";
-import { withFirebase } from "../../context/firebase";
+import { withFirebase } from "../../context/firebase/FirebaseServiceContext";
 import styles from "../../materialUI/styles/layoutStyles/nextLivestreamsLayoutStyles";
 import TopBar from "./TopBar";
 import useGeneralLinks from "../../components/custom-hook/useGeneralLinks";

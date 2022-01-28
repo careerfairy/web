@@ -10,7 +10,7 @@ import {
    CircularProgress,
 } from "@material-ui/core";
 import PeopleIcon from "@material-ui/icons/PeopleOutlined";
-import { withFirebase } from "../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext";
 import indigo from "@material-ui/core/colors/indigo";
 import { makeStyles } from "@material-ui/core/styles";
 

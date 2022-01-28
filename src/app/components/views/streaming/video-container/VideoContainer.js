@@ -6,7 +6,7 @@ import React, {
    useState,
 } from "react";
 
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
 import VideoControlsContainer from "./VideoControlsContainer";
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
@@ -38,7 +38,7 @@ function VideoContainer({
    streamerId,
    viewer,
 }) {
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const {
       tutorialSteps,
       setTutorialSteps,

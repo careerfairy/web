@@ -10,7 +10,7 @@ import {
    Tooltip,
 } from "@material-ui/core";
 import SettingsIcon from "@material-ui/icons/Settings";
-import { withFirebasePage } from "context/firebase";
+import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
 import AddIcon from "@material-ui/icons/Add";
 import Loader from "../../components/views/loader/Loader";
 import DateUtil from "../../util/DateUtil";

@@ -10,7 +10,7 @@ import { streamShape } from "types";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import BreakoutRoom from "./BreakoutRoom";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
 import * as actions from "store/actions";
 import Box from "@material-ui/core/Box";
@@ -42,7 +42,7 @@ const ManageBreakoutRoomsView = ({
    const theme = useTheme();
    const mobile = useMediaQuery(theme.breakpoints.down("sm"));
    const links = useStreamToken({ forStreamType: "mainLivestream" });
-   const { openAllBreakoutRooms, closeAllBreakoutRooms } = useFirebase();
+   const { openAllBreakoutRooms, closeAllBreakoutRooms } = useFirebaseService();
    const {
       query: { livestreamId, breakoutRoomId },
    } = useRouter();

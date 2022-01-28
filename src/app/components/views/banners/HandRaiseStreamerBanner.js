@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import StreamBanner from "./StreamBanner";
 import { Button, Tooltip } from "@material-ui/core";
-import { useFirebase } from "../../../context/firebase";
+import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext";
 import useStreamRef from "../../custom-hook/useStreamRef";
 import HandRaiseIcon from "@material-ui/icons/PanToolOutlined";
 
 const HandRaiseStreamerBanner = () => {
    const [buttonMessage] = useState("Deactivate Hand Raise");
-   const { setHandRaiseMode } = useFirebase();
+   const { setHandRaiseMode } = useFirebaseService();
    const streamRef = useStreamRef();
 
    const deactivateHandRaise = () => {

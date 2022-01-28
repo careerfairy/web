@@ -6,7 +6,7 @@ import React, {
    useState,
 } from "react";
 import GroupsUtil from "../../data/util/GroupsUtil";
-import { useFirebase } from "../firebase";
+import { useFirebaseService } from "../firebase/FirebaseServiceContext";
 import { useAuth } from "../../HOCs/AuthProvider";
 import { useRouter } from "next/router";
 import StatsUtil from "../../data/util/StatsUtil";
@@ -109,7 +109,7 @@ export function RegistrationContextProvider({
       registerToLivestream,
       sendRegistrationConfirmationEmail,
       livestreamQuestionsQuery,
-   } = useFirebase();
+   } = useFirebaseService();
    const {
       query: { referrerId },
    } = useRouter();

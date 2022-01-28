@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import ShareIcon from "@material-ui/icons/Share";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import { v4 as uuidv4 } from "uuid";
@@ -39,7 +39,7 @@ const EnhancedGroupStreamCard = ({
    handleEditStream,
    isDraft,
 }) => {
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const classes = useStyles();
    const { authenticatedUser, userData } = useAuth();
    const { enqueueSnackbar } = useSnackbar();

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { useRouter } from "next/router";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import { useFirebase, withFirebase } from "context/firebase";
+import { useFirebaseService, withFirebase } from "context/firebase/FirebaseServiceContext";
 import {
    Card,
    CardContent,
@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 
 const CurrentGroup = ({ userData, group, isAdmin, groupId }) => {
    const { push } = useRouter();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const [open, setOpen] = useState(false);
    const [localGroup, setLocalGroup] = useState({});
    const [noGroup, setNoGroup] = useState(false);

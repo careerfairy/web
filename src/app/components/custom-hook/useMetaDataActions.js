@@ -1,7 +1,7 @@
 import StatsUtil from "data/util/StatsUtil";
 import React, { useCallback, useEffect, useState } from "react";
 import TalentPoolIcon from "@material-ui/icons/HowToRegRounded";
-import { useFirebase } from "../../context/firebase";
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext";
 import { CircularProgress } from "@material-ui/core";
 import { CSVLink } from "react-csv";
 import GetAppIcon from "@material-ui/icons/GetApp";
@@ -14,7 +14,7 @@ import ButtonWithHint from "../views/group/admin/events/events-table/ButtonWithH
 import { useTheme } from "@material-ui/core/styles";
 
 export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const { userData } = useAuth();
    const theme = useTheme();
    const dispatch = useDispatch();

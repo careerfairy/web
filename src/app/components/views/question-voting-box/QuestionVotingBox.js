@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import { useRouter } from "next/router";
-import { withFirebasePage } from "context/firebase";
+import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
 import {
    Button,
    Card,

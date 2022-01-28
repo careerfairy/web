@@ -1,4 +1,4 @@
-import { withFirebase } from "../context/firebase";
+import { withFirebase } from "../context/firebase/FirebaseServiceContext";
 import Head from "next/head";
 import { Container } from "@material-ui/core";
 import GeneralLayout from "../layouts/GeneralLayout";

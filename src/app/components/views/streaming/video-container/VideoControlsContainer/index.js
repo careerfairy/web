@@ -12,7 +12,7 @@ import VideocamIcon from "@material-ui/icons/Videocam";
 import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import ScreenShareIcon from "@material-ui/icons/ScreenShare";
 import SettingsIcon from "@material-ui/icons/Settings";
-import { withFirebasePage } from "context/firebase";
+import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
 import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
 import { ClickAwayListener } from "@material-ui/core";
 import SpeedDial from "@material-ui/lab/SpeedDial";

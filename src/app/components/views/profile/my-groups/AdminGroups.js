@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { Box, Grid, Typography } from "@material-ui/core";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import CurrentGroup from "components/views/profile/CurrentGroup";
 import { makeStyles } from "@material-ui/core/styles";
 import { Highlights } from "../../groups/Groups";

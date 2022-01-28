@@ -9,7 +9,7 @@ import { getServerSideStream, parseStreamDates } from "../../util/serverUtil";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
 import { getStreamMetaInfo } from "../../util/SeoUtil";
 import UpcomingLayout from "../../layouts/UpcomingLayout";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { getResizedUrl } from "../../components/helperFunctions/HelperFunctions";
 import HeroSection from "../../components/views/upcoming-livestream/HeroSection";
 import { useAuth } from "../../HOCs/AuthProvider";
@@ -69,7 +69,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       getDetailLivestreamCareerCenters,
       livestreamQuestionsQuery,
       upvoteLivestreamQuestion,
-   } = useFirebase();
+   } = useFirebaseService();
 
    const questionsQuery = useMemo(
       () => stream && livestreamQuestionsQuery(stream.id, questionSortType),

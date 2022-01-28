@@ -13,7 +13,7 @@ import {
    Switch,
    Typography,
 } from "@material-ui/core";
-import { withFirebase } from "../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext";
 import { colorsArray } from "../../../../../util/colors";
 import {
    getLength,

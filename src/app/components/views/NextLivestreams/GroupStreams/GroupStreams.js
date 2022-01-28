@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { withFirebase } from "../../../../context/firebase";
+import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
 import { Grid, LinearProgress, Typography } from "@material-ui/core";
 import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 import LazyLoad from "react-lazyload";

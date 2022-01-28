@@ -1,7 +1,7 @@
 import React from "react";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import CheckIcon from "@material-ui/icons/Check";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import {
    DialogContentText,
    DialogTitle,

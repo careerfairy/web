@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { grey } from "@material-ui/core/colors";
 import { IconButton, TextField } from "@material-ui/core";
 import { alpha, makeStyles } from "@material-ui/core/styles";
@@ -76,7 +76,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ChatCategory = ({ isStreamer, livestream, selectedState }) => {
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const { authenticatedUser, userData } = useAuth();
    const [focused, setFocused] = useState(false);
    const streamRef = useStreamRef();

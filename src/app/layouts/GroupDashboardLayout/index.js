@@ -3,7 +3,7 @@ import React, { useMemo, useRef, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import NavBar from "./NavBar";
 import { useRouter } from "next/router";
-import { withFirebase } from "../../context/firebase";
+import { withFirebase } from "../../context/firebase/FirebaseServiceContext";
 import { useAuth } from "../../HOCs/AuthProvider";
 import { isEmpty, isLoaded } from "react-redux-firebase";
 import { useSelector } from "react-redux";

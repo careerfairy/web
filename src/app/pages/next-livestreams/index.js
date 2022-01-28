@@ -1,4 +1,4 @@
-import { withFirebase } from "../../context/firebase";
+import { withFirebase } from "../../context/firebase/FirebaseServiceContext";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
 import useUpcomingStreams from "../../components/custom-hook/useUpcomingStreams";
 import usePastStreams from "../../components/custom-hook/usePastStreams";

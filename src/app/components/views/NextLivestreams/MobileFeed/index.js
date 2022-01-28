@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
 import { Box, Button, Grid, Typography } from "@material-ui/core";
-import { withFirebase } from "../../../../context/firebase";
+import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
 import GroupStreams from "../GroupStreams/GroupStreams";
 import { useRouter } from "next/router";
 import GroupJoinModal from "../../profile/GroupJoinModal";

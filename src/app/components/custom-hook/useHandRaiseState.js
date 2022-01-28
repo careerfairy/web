@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { useCurrentStream } from "../../context/stream/StreamContext";
 import { useAuth } from "../../HOCs/AuthProvider";
-import { useFirebase } from "../../context/firebase";
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext";
 import useStreamRef from "./useStreamRef";
 
 const useHandRaiseState = (streamerId) => {
@@ -10,7 +10,7 @@ const useHandRaiseState = (streamerId) => {
    const { authenticatedUser, userData } = useAuth();
 
    const streamRef = useStreamRef();
-   const { createHandRaiseRequest, updateHandRaiseRequest } = useFirebase();
+   const { createHandRaiseRequest, updateHandRaiseRequest } = useFirebaseService();
    const handRaiseState = useSelector(
       (state) => state.firestore.data["handRaiseState"]
    );

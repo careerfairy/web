@@ -12,7 +12,7 @@ import { LogOut as LogoutIcon } from "react-feather";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../store/actions";
 import Link from "../../../materialUI/NextNavLink";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import useGeneralLinks from "../../../components/custom-hook/useGeneralLinks";
 
 const useStyles = makeStyles((theme) => ({

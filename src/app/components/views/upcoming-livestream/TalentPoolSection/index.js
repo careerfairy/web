@@ -18,7 +18,7 @@ import ClearIcon from "@material-ui/icons/Clear";
 import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
 import UserUtil from "../../../../data/util/UserUtil";
 import { useAuth } from "../../../../HOCs/AuthProvider";
-import { useFirebase } from "../../../../context/firebase";
+import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
 import { connectedIcon } from "../../../../constants/svgs";
 import useTraceUpdate from "../../../custom-hook/useTraceUpdate";
@@ -70,7 +70,7 @@ const useStyles = makeStyles((theme) => ({
 const TalentPoolSection = memo((props) => {
    const theme = useTheme();
 
-   const { joinCompanyTalentPool, leaveCompanyTalentPool } = useFirebase();
+   const { joinCompanyTalentPool, leaveCompanyTalentPool } = useFirebaseService();
    const { push, replace, asPath } = useRouter();
    const { userData, authenticatedUser, isLoggedOut } = useAuth();
    const [joiningTalentPool, setJoiningTalentPool] = useState(false);

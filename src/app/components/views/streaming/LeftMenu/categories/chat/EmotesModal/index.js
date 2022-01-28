@@ -16,7 +16,7 @@ import {
 import * as actions from "../../../../../../../store/actions";
 import { GlassDialog } from "../../../../../../../materialUI/GlobalModals";
 import { SwipeablePanel } from "../../../../../../../materialUI/GlobalPanels/GlobalPanels";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import { useCurrentStream } from "../../../../../../../context/stream/StreamContext";
 
 import PanelDisplay from "./PanelDisplay";

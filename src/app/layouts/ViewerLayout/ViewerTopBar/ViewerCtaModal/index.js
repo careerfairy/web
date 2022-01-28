@@ -14,7 +14,7 @@ import {
 import { ThemedPermanentMarker } from "../../../../materialUI/GlobalTitles";
 import CloseIcon from "@material-ui/icons/Close";
 import { useCurrentStream } from "context/stream/StreamContext";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useStreamRef from "components/custom-hook/useStreamRef";
 import { getCtaSnackBarProps } from "components/util/constants/callToActions";
 import CallToActionSnackbar from "components/views/streaming/sharedComponents/StreamNotifications/CallToActionSnackbar";
@@ -61,7 +61,7 @@ const Content = ({ fullyOpened, handleClose, mobile }) => {
    const {
       getCallToActionsWithAnArrayOfIds,
       clickOnCallToAction,
-   } = useFirebase();
+   } = useFirebaseService();
 
    const classes = useStyles();
 

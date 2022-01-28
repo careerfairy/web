@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import * as actions from "../../store/actions";
 import { useDispatch } from "react-redux";
-import { useFirebase } from "../../context/firebase";
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext";
 import { GENERAL_ERROR } from "../util/constants";
 import { useRouter } from "next/router";
 
@@ -24,7 +24,7 @@ export function useAgoraToken(
 ) {
    const { asPath } = useRouter();
    const [agoraToken, setAgoraToken] = useState(null);
-   const { getSecureAgoraToken } = useFirebase();
+   const { getSecureAgoraToken } = useFirebaseService();
    const dispatch = useDispatch();
    const sendError = (message) =>
       dispatch(

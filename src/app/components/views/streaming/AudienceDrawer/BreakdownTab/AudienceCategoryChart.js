@@ -22,7 +22,7 @@ import { percentageDonutConfig } from "../../../../util/chartUtils";
 import { Doughnut } from "react-chartjs-2";
 import CustomLegend from "../../../../../materialUI/Legends";
 import EmptyDisplay from "../displays/EmptyDisplay";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import useStreamGroups from "../../../../custom-hook/useStreamGroups";
 
 Chart.defaults.global.plugins.labels = false;

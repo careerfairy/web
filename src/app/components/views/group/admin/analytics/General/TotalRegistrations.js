@@ -9,7 +9,7 @@ import {
    Grid,
    Typography,
 } from "@material-ui/core";
-import { withFirebase } from "../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext";
 import AddToPhotosRoundedIcon from "@material-ui/icons/AddToPhotosRounded";
 import PercentageDisplay from "./common/PercentageDisplay";
 import { makeStyles } from "@material-ui/core/styles";

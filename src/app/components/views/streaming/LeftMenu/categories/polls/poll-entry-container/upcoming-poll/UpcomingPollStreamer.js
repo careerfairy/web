@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import EditIcon from "@material-ui/icons/Edit";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import PollCreationModal from "../../poll-creation-modal/PollCreationModal";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import {
