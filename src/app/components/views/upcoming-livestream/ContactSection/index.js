@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import HighlightText from "components/views/common/HighlightText";
@@ -10,32 +9,24 @@ import Fade from "@stahl.luke/react-reveal/Fade";
 import { Button } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 
-const useStyles = makeStyles((theme) => ({
-   section: {},
-   subTitle: {},
+const styles = {
    header: {
       "&:not(:last-child)": {
-         marginBottom: theme.spacing(1),
+         marginBottom: (theme) => theme.spacing(1),
       },
    },
    title: {
       fontWeight: 600,
    },
-   talentPoolText: {
-      color: ({ color }) => color,
-   },
    whiteBtn: {
-      borderColor: theme.palette.common.white,
-      color: theme.palette.common.white,
+      borderColor: (theme) => theme.palette.common.white,
+      color: (theme) => theme.palette.common.white,
    },
-}));
+};
 
 const ContactSection = (props) => {
-   const classes = useStyles({ color: props.color });
-
    return (
       <Section
-         className={classes.section}
          big={props.big}
          color={props.color}
          backgroundImageClassName={props.backgroundImageClassName}
@@ -55,10 +46,10 @@ const ContactSection = (props) => {
                <Fade bottom>
                   <SectionHeader
                      color={props.color}
-                     className={classes.header}
+                     sx={styles.header}
                      title={props.title}
                      subtitle={props.subtitle}
-                     titleClassName={classes.title}
+                     titleSx={styles.title}
                   />
                </Fade>
             )}
@@ -71,6 +62,7 @@ const ContactSection = (props) => {
                      >
                         <Button
                            size="large"
+                           color="grey"
                            children="Contact CareerFairy"
                            startIcon={<EmailIcon />}
                            variant="outlined"

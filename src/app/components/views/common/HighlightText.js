@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from "@mui/styles/makeStyles";
 import { Box, Typography } from "@mui/material";
 
 const styles = {

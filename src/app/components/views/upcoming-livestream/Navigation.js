@@ -1,30 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
 import { Tab, Tabs } from "@mui/material";
 import debounce from "lodash.debounce";
 import Link from "materialUI/NextNavLink";
 import SectionContainer from "../common/Section/Container";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    root: {
       position: "sticky !important",
       top: 0,
-      zIndex: theme.zIndex.appBar,
+      zIndex: (theme) => theme.zIndex.appBar,
    },
    tabs: {
-      backgroundColor: theme.palette.background.default,
-      borderRadius: theme.spacing(0, 0, 0.5, 0.5),
+      backgroundColor: (theme) => theme.palette.background.default,
+      borderRadius: (theme) => theme.spacing(0, 0, 0.5, 0.5),
       width: "100%",
-      borderBottom: `1px solid ${alpha(theme.palette.text.secondary, 0.1)}`,
+      borderBottom: (theme) =>
+         `1px solid ${alpha(theme.palette.text.secondary, 0.1)}`,
    },
    navLink: {
       textDecoration: "none !important",
    },
-}));
+};
 
 const Navigation = ({ aboutRef, questionsRef, speakersRef }) => {
-   const classes = useStyles();
    const [value, setValue] = useState("about");
    const [tabs, setTabs] = useState([]);
 
@@ -73,20 +72,22 @@ const Navigation = ({ aboutRef, questionsRef, speakersRef }) => {
    }
 
    return (
-      <SectionContainer maxWidth="lg" className={classes.root}>
+      <SectionContainer maxWidth="lg" sx={styles.root}>
          <Tabs
             value={value}
             onChange={handleChange}
-            className={classes.tabs}
+            sx={styles.tabs}
             aria-label="upcoming event nav"
             centered
+            textColor="secondary"
+            indicatorColor="secondary"
             variant="fullWidth"
          >
             {tabs.map((tab) => (
                <Tab
                   label={tab.label}
                   id={`upcoming-event-nav-link-${tab.value}`}
-                  className={classes.navLink}
+                  sx={styles.navLink}
                   value={tab.value}
                   component={Link}
                   href={{ hash: `#${tab.value}` }}

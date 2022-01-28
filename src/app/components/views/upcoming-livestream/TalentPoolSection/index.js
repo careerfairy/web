@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import React, { memo, useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from "@mui/styles/makeStyles";
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import HighlightText from "components/views/common/HighlightText";
@@ -22,33 +21,27 @@ import { useAuth } from "../../../../HOCs/AuthProvider";
 import { useFirebase } from "../../../../context/firebase";
 import { useRouter } from "next/router";
 import { connectedIcon } from "../../../../constants/svgs";
-import useTraceUpdate from "../../../custom-hook/useTraceUpdate";
 
-const useStyles = makeStyles((theme) => ({
-   section: {},
-   subTitle: {},
+const styles = {
    header: {
       "&:not(:last-child)": {
-         marginBottom: theme.spacing(1),
+         marginBottom: (theme) => theme.spacing(1),
       },
    },
    title: {
       fontWeight: 600,
       textAlign: "left",
    },
-   talentPoolText: {
-      color: ({ color }) => color,
-   },
    whiteBtn: {
-      borderColor: theme.palette.common.white,
-      color: theme.palette.common.white,
+      borderColor: (theme) => theme.palette.common.white,
+      color: (theme) => theme.palette.common.white,
    },
    imgGrid: {
       overflow: "hidden",
    },
    imgWrapper: {
       width: "100%",
-      height: 350,
+      height: "350px",
       position: "relative",
       "& img": {
          position: "absolute",
@@ -58,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
          transform: "translate(-50%, -50%)",
          top: "50%",
          left: "50%",
-         padding: theme.spacing(2),
+         padding: (theme) => theme.spacing(2),
       },
    },
    details: {
@@ -66,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
       flexDirection: "column",
       justifyContent: "center",
    },
-}));
+};
 
 const TalentPoolSection = memo((props) => {
    const theme = useTheme();
@@ -81,7 +74,6 @@ const TalentPoolSection = memo((props) => {
    const color = userIsInTalentPool
       ? theme.palette.common.white
       : theme.palette.common.black;
-   const classes = useStyles({ color });
 
    const title = userIsInTalentPool
       ? "You are part of the talent pool"
@@ -153,7 +145,6 @@ const TalentPoolSection = memo((props) => {
    };
    return (
       <Section
-         className={classes.section}
          big={props.big}
          color={color}
          backgroundImageClassName={props.backgroundImageClassName}
@@ -171,25 +162,22 @@ const TalentPoolSection = memo((props) => {
             )}
 
             <Grid spacing={2} container>
-               <Grid className={classes.details} item xs={12} md={6}>
+               <Grid sx={styles.details} item xs={12} md={6}>
                   {title && (
                      <Fade bottom>
                         <SectionHeader
                            color={color}
-                           className={classes.header}
+                           sx={styles.header}
                            title={title}
                            subtitle={props.subtitle}
-                           titleClassName={classes.title}
+                           titleSx={styles.title}
                         />
                      </Fade>
                   )}
                   <Box width="100%">
                      <Fade bottom>
                         <Box>
-                           <Typography
-                              className={classes.talentPoolText}
-                              variant="body1"
-                           >
+                           <Typography sx={{ color }} variant="body1">
                               We want to make it easy for students and young
                               pros to find the right company for them. To help
                               you let companies know that you're interested in
@@ -207,9 +195,7 @@ const TalentPoolSection = memo((props) => {
                            <Button
                               size="large"
                               style={{ width: 300 }}
-                              className={
-                                 userIsInTalentPool ? classes.whiteBtn : ""
-                              }
+                              sx={[userIsInTalentPool && styles.whiteBtn]}
                               fullWidth
                               disabled={joiningTalentPool || leavingTalentPool}
                               variant={
@@ -247,14 +233,14 @@ const TalentPoolSection = memo((props) => {
                   </Box>
                </Grid>
                <Hidden mdDown>
-                  <Grid className={classes.imgGrid} item xs={12} md={6}>
+                  <Grid sx={styles.imgGrid} item xs={12} md={6}>
                      <Fade right>
-                        <div className={classes.imgWrapper}>
+                        <Box sx={styles.imgWrapper}>
                            <img
                               src={connectedIcon}
                               alt="talent pool illustration"
                            />
-                        </div>
+                        </Box>
                      </Fade>
                   </Grid>
                </Hidden>

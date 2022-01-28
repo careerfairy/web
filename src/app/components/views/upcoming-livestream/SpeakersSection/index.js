@@ -1,34 +1,28 @@
 import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import HighlightText from "components/views/common/HighlightText";
 import SectionHeader from "../../common/SectionHeader";
 import Box from "@mui/material/Box";
-import { Grid, Typography } from "@mui/material";
+import { Grid } from "@mui/material";
 import Fade from "@stahl.luke/react-reveal/Fade";
 import SpeakerCard from "./SpeakerCard";
 
-const useStyles = makeStyles((theme) => ({
-   section: {},
-   subTitle: {},
+const styles = {
    header: {
       "&:not(:last-child)": {
-         marginBottom: theme.spacing(1),
+         marginBottom: (theme) => theme.spacing(1),
       },
    },
    title: {
       fontWeight: 600,
    },
-}));
+};
 
 const SpeakersSection = (props) => {
-   const classes = useStyles();
-
    return (
       <Section
-         className={classes.section}
          big={props.big}
          sectionRef={props.sectionRef}
          sectionId={props.sectionId}
@@ -50,10 +44,10 @@ const SpeakersSection = (props) => {
                <Fade bottom>
                   <SectionHeader
                      color={props.color}
-                     className={classes.header}
+                     sx={styles.header}
                      title={props.title}
                      subtitle={props.subtitle}
-                     titleClassName={classes.title}
+                     titleSx={styles.title}
                   />
                </Fade>
             )}

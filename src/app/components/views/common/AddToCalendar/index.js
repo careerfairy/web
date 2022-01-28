@@ -15,18 +15,17 @@ import {
    outlookYellowIcon,
    yahooIcon,
 } from "../../../../constants/svgs";
-import makeStyles from '@mui/styles/makeStyles';
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    avatar: {
       borderRadius: 0,
-      width: theme.spacing(3),
-      height: theme.spacing(3),
+      width: (theme) => theme.spacing(3),
+      height: (theme) => theme.spacing(3),
       "& img": {
          objectFit: "contain",
       },
    },
-}));
+};
 
 const LinkMenuItem = ({ children, filename = false, href, ...rest }) => (
    <MenuItem
@@ -43,7 +42,6 @@ const LinkMenuItem = ({ children, filename = false, href, ...rest }) => (
 );
 
 const Dropdown = ({ filename, handleClose, anchorEl, urls }) => {
-   const classes = useStyles();
    return (
       <Menu
          id="add to calendar menu"
@@ -57,13 +55,13 @@ const Dropdown = ({ filename, handleClose, anchorEl, urls }) => {
             href={urls.ics}
          >
             <ListItemIcon>
-               <Avatar className={classes.avatar} src={appleIcon} />
+               <Avatar sx={styles.avatar} src={appleIcon} />
             </ListItemIcon>
             <ListItemText primary="Apple Calendar" />
          </LinkMenuItem>
          <LinkMenuItem href={urls.google} onClick={handleClose}>
             <ListItemIcon>
-               <Avatar className={classes.avatar} src={googleIcon} />
+               <Avatar sx={styles.avatar} src={googleIcon} />
             </ListItemIcon>
             <ListItemText primary="Google" />
          </LinkMenuItem>
@@ -73,19 +71,19 @@ const Dropdown = ({ filename, handleClose, anchorEl, urls }) => {
             onClick={handleClose}
          >
             <ListItemIcon>
-               <Avatar className={classes.avatar} src={outlookYellowIcon} />
+               <Avatar sx={styles.avatar} src={outlookYellowIcon} />
             </ListItemIcon>
             <ListItemText primary="Outlook" />
          </LinkMenuItem>
          <LinkMenuItem href={urls.outlook} onClick={handleClose}>
             <ListItemIcon>
-               <Avatar className={classes.avatar} src={outlookBlueIcon} />
+               <Avatar sx={styles.avatar} src={outlookBlueIcon} />
             </ListItemIcon>
             <ListItemText primary="Outlook Web App" />
          </LinkMenuItem>
          <LinkMenuItem href={urls.yahoo} onClick={handleClose}>
             <ListItemIcon>
-               <Avatar className={classes.avatar} src={yahooIcon} />
+               <Avatar sx={styles.avatar} src={yahooIcon} />
             </ListItemIcon>
             <ListItemText primary="Yahoo" />
          </LinkMenuItem>

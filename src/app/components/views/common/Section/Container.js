@@ -16,12 +16,13 @@ const SectionContainer = ({
    className,
    maxWidth = "md",
    children,
+   sx,
    ...props
 }) => {
    return (
       <Container
          className={className}
-         sx={styles.root}
+         sx={[styles.root, sx]}
          maxWidth={maxWidth}
          {...props}
          children={children}

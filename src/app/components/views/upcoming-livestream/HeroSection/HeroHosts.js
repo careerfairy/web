@@ -1,14 +1,12 @@
 import React from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
-import { Avatar, Box, Paper, Typography } from "@mui/material";
-import { AvatarGroup } from '@mui/material';
+import { Avatar, AvatarGroup, Box, Paper, Typography } from "@mui/material";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 import { grey } from "@mui/material/colors";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    root: {},
-   avatar: {
+   avatar: (theme) => ({
       borderColor: alpha(grey["400"], 0.8),
       boxShadow: theme.shadows[10],
       background: theme.palette.common.white,
@@ -19,13 +17,13 @@ const useStyles = makeStyles((theme) => ({
       "& img": {
          objectFit: "contain",
       },
-   },
+   }),
    companyRoot: {
       display: "flex",
       alignItems: "center",
       flexWrap: "wrap-reverse",
    },
-   companyAva: {
+   companyAva: (theme) => ({
       padding: theme.spacing(2),
       borderRadius: theme.spacing(1),
       boxShadow: theme.shadows[4],
@@ -38,10 +36,10 @@ const useStyles = makeStyles((theme) => ({
          maxWidth: 140,
          objectFit: "contain",
       },
-   },
+   }),
    hostInfo: {
-      padding: theme.spacing(1),
-      color: theme.palette.common.white,
+      padding: (theme) => theme.spacing(1),
+      color: (theme) => theme.palette.common.white,
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
@@ -50,44 +48,42 @@ const useStyles = makeStyles((theme) => ({
    hostsCard: {
       display: "flex",
       flexDirection: "column",
-      borderRadius: theme.spacing(1),
+      borderRadius: (theme) => theme.spacing(1),
       width: "fit-content",
       background: "transparent",
       boxShadow: "none",
    },
    hostedText: {
-      color: theme.palette.common.white,
+      color: (theme) => theme.palette.common.white,
    },
-}));
+};
 
 const HeroHosts = ({ hosts }) => {
-   const classes = useStyles();
-
    return hosts.length === 1 ? (
-      <Paper className={classes.hostsCard}>
-         <div className={classes.companyRoot}>
+      <Paper sx={styles.hostsCard}>
+         <Box sx={styles.companyRoot}>
             <Avatar
                title={`${hosts[0].universityName || ""}`}
-               className={classes.companyAva}
+               sx={styles.companyAva}
                variant="rounded"
                src={getResizedUrl(hosts[0].logoUrl, "sm")}
             />
-            <div className={classes.hostInfo}>
+            <Box sx={styles.hostInfo}>
                <Typography variant="body1">Hosted by</Typography>
                <Typography variant="h6">{hosts[0].universityName}</Typography>
-            </div>
-         </div>
+            </Box>
+         </Box>
       </Paper>
    ) : (
       <>
-         <Typography variant="h6" gutterBottom className={classes.hostedText}>
+         <Typography variant="h6" gutterBottom sx={styles.hostedText}>
             Hosted by
          </Typography>
-         <Paper className={classes.hostsCard}>
-            <AvatarGroup className={classes.root}>
+         <Paper sx={styles.hostsCard}>
+            <AvatarGroup sx={styles.root}>
                {hosts.map((host) => (
                   <Avatar
-                     className={classes.avatar}
+                     sx={styles.avatar}
                      key={host.id}
                      variant="rounded"
                      src={getResizedUrl(host.logoUrl, "xs")}

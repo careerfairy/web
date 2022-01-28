@@ -1,5 +1,4 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
 import {
    Card,
    CardContent,
@@ -10,11 +9,11 @@ import {
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 import { speakerPlaceholder } from "../../../util/constants";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    root: {
-      borderRadius: theme.spacing(0.5),
+      borderRadius: (theme) => theme.spacing(0.5),
       overflow: "hidden",
-      color: theme.palette.text.secondary,
+      color: (theme) => theme.palette.text.secondary,
       backgroundColor: "transparent",
    },
    cardMedia: {
@@ -22,39 +21,38 @@ const useStyles = makeStyles((theme) => ({
       backgroundSize: "cover",
       backgroundRepeat: "no-repeat",
       backgroundPosition: "center center",
-      borderRadius: theme.spacing(1),
+      borderRadius: (theme) => theme.spacing(1),
       width: "100%",
       height: "100%",
-      minHeight: 320,
+      minHeight: "320px",
+      boxShadow: 3,
    },
    cardContent: {
-      padding: theme.spacing(2),
-      marginTop: theme.spacing(-5),
+      padding: (theme) => theme.spacing(2),
+      marginTop: (theme) => theme.spacing(-5),
       backgroundColor: "transparent",
    },
    innerCard: {
-      borderRadius: theme.spacing(1),
+      borderRadius: (theme) => theme.spacing(1),
    },
    innerCardContent: {
-      padding: theme.spacing(2),
+      padding: (theme) => theme.spacing(2),
    },
-}));
+};
 const SpeakerCard = ({ speaker }) => {
-   const classes = useStyles();
-
    return (
-      <Card elevation={0} className={classes.root}>
+      <Card elevation={0} sx={styles.root}>
          <CardMedia
-            className={classes.cardMedia}
+            sx={styles.cardMedia}
             image={
                speaker.avatar
                   ? getResizedUrl(speaker.avatar, "md")
                   : speakerPlaceholder
             }
          />
-         <CardContent className={classes.cardContent}>
-            <Card className={classes.innerCard} elevation={3}>
-               <Paper className={classes.innerCardContent}>
+         <CardContent sx={styles.cardContent}>
+            <Card sx={styles.innerCard} elevation={3}>
+               <Paper sx={styles.innerCardContent}>
                   <ListItemText
                      primary={
                         <b>{`${speaker.firstName || ""} ${

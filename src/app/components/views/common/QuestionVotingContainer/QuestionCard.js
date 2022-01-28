@@ -9,23 +9,22 @@ import {
    Paper,
    Typography,
 } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
 import { getTimeFromNow } from "../../../helperFunctions/HelperFunctions";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    paperRoot: {
-      padding: theme.spacing(1),
-      borderRadius: theme.spacing(2),
+      padding: (theme) => theme.spacing(1),
+      borderRadius: (theme) => theme.spacing(2),
       display: "flex",
       flexDirection: "column",
    },
    chipTime: {
-      color: theme.palette.text.secondary,
+      color: (theme) => theme.palette.text.secondary,
+      "& .MuiChip-labelSmall": {
+         fontSize: "0.8rem",
+      },
    },
-   chipLabel: {
-      fontSize: "0.8rem",
-   },
-}));
+};
 
 const QuestionCard = ({
    isPastEvent,
@@ -35,15 +34,13 @@ const QuestionCard = ({
    votingDisabled,
 }) => {
    const [loading, setLoading] = useState(false);
-   const classes = useStyles();
    return (
-      <Paper className={classes.paperRoot} variant="outlined">
+      <Paper sx={styles.paperRoot} variant="outlined">
          <Box>
             <Chip
                variant="outlined"
-               className={classes.chipTime}
+               sx={styles.chipTime}
                size="small"
-               classes={{ label: classes.chipLabel }}
                label={getTimeFromNow(question.timestamp)}
             />
          </Box>
