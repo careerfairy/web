@@ -22,15 +22,18 @@ const DesktopFeed = ({
    selectedOptions,
    isPastLivestreams,
 }) => {
-   const theme = useTheme();
    return (
       <Grow in>
          <Container
             maxWidth="lg"
             disableGutters
-            style={{ flex: 1, display: "flex" }}
+            sx={{ flex: 1, display: "flex" }}
          >
-            <Grid container spacing={4} style={{ margin: theme.spacing(1) }}>
+            <Grid
+               container
+               spacing={4}
+               sx={{ margin: (theme) => theme.spacing(1) }}
+            >
                <GroupCategories
                   mobile={mobile}
                   hasCategories={hasCategories}

@@ -1,23 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Chip, TextField } from "@mui/material";
-import { Autocomplete } from "@mui/material";
+import { Autocomplete, Box, Chip, TextField } from "@mui/material";
 import { convertArrayOfObjectsToDictionaryByProp } from "../../../../data/util/AnalyticsUtil";
-import makeStyles from "@mui/styles/makeStyles";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    inputWrapper: {
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
       "& .MuiTextField-root": {
-         minWidth: 300,
-         borderRadius: theme.spacing(2),
+         minWidth: "300px",
+         borderRadius: (theme) => theme.spacing(2),
       },
    },
-   root: {},
-}));
+};
 const CategoryCard = ({ category, handleToggleActive }) => {
-   const classes = useStyles();
    const [optionsMap, setOptionsMap] = useState({});
    const [arrayOfOptionIds, setArrayOfOptionIds] = useState([]);
    const [value, setValue] = useState([]);
@@ -49,17 +45,16 @@ const CategoryCard = ({ category, handleToggleActive }) => {
          value={value}
          onChange={(e, value) => handleToggleActive(value, category.id)}
          getOptionLabel={(option) => optionsMap[option]?.name}
-         className={classes.root}
          filterSelectedOptions
          renderInput={(params) => (
-            <div className={classes.inputWrapper}>
+            <Box sx={styles.inputWrapper}>
                <TextField
                   {...params}
                   variant="standard"
                   label={category.name}
                   placeholder="Choose options"
                />
-            </div>
+            </Box>
          )}
          renderTags={(value, getTagProps) =>
             value.map((option, index) => (

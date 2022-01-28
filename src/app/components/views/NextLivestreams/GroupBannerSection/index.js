@@ -4,85 +4,82 @@ import SectionHeader from "../../common/SectionHeader";
 import Section from "../../common/Section";
 import StreamsTab from "../StreamsTab";
 import GroupBio from "./groupBio";
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from "clsx";
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    zIndex: 1,
-    "&.MuiContainer-root": {
-      position: "relative",
-    },
-  },
-  logoWrapper: {
-    maxWidth: 400,
-    margin: "auto",
-    height: 200,
-    marginBottom: theme.spacing(2),
-    display: "grid",
-    placeItems: "center",
-  },
-  logo: {
-    width: "90%",
-    height: "90%",
-    "& img": {
-      objectFit: "contain",
-    },
-  },
-  section: {
-    paddingBottom: theme.spacing(1),
-  },
-  disableSectionPadding: {
-    paddingTop: 0,
-  },
-}));
+const styles = {
+   container: {
+      zIndex: 1,
+      "&.MuiContainer-root": {
+         position: "relative",
+      },
+   },
+   logoWrapper: {
+      maxWidth: "400px",
+      margin: "auto",
+      height: "200px",
+      marginBottom: (theme) => theme.spacing(2),
+      display: "grid",
+      placeItems: "center",
+   },
+   logo: {
+      width: "90%",
+      height: "90%",
+      "& img": {
+         objectFit: "contain",
+      },
+   },
+   section: {
+      paddingBottom: (theme) => [theme.spacing(1), "!important"],
+   },
+   disableSectionPadding: {
+      paddingTop: 0,
+   },
+};
 
 const GroupBannerSection = ({
-  backgroundColor,
-  backgroundImage,
-  backgroundImageClassName,
-  disableSectionPadding,
-  backgroundImageOpacity,
-  big,
-  color,
-  groupBio,
-  groupLogo,
-  handleChange,
-  subtitle,
-  title,
-                              tabsColor,
-  value,
+   backgroundColor,
+   backgroundImage,
+   backgroundImageClassName,
+   disableSectionPadding,
+   backgroundImageOpacity,
+   big,
+   color,
+   groupBio,
+   groupLogo,
+   handleChange,
+   subtitle,
+   title,
+   tabsColor,
+   value,
 }) => {
-  const classes = useStyles();
-
-  return (
-    <Section
-      className={clsx(classes.section, {
-        [classes.disableSectionPadding]: disableSectionPadding,
-      })}
-      big={big}
-      color={color}
-      backgroundImageClassName={backgroundImageClassName}
-      backgroundImage={backgroundImage}
-      backgroundImageOpacity={backgroundImageOpacity}
-      backgroundColor={backgroundColor}
-    >
-      <Container className={classes.container}>
-        {groupLogo && (
-          <Paper className={classes.logoWrapper}>
-            <Avatar
-              variant={"square"}
-              className={classes.logo}
-              src={groupLogo}
+   return (
+      <Section
+         sx={{
+            ...styles.section,
+            ...(disableSectionPadding && styles.disableSectionPadding),
+         }}
+         big={big}
+         color={color}
+         backgroundImageClassName={backgroundImageClassName}
+         backgroundImage={backgroundImage}
+         backgroundImageOpacity={backgroundImageOpacity}
+         backgroundColor={backgroundColor}
+      >
+         <Container sx={styles.container}>
+            {groupLogo && (
+               <Paper sx={styles.logoWrapper}>
+                  <Avatar variant={"square"} sx={styles.logo} src={groupLogo} />
+               </Paper>
+            )}
+            <SectionHeader color={color} title={title} subtitle={subtitle} />
+            {groupBio && <GroupBio groupBio={groupBio} />}
+            <StreamsTab
+               tabsColor={tabsColor}
+               handleChange={handleChange}
+               value={value}
             />
-          </Paper>
-        )}
-        <SectionHeader color={color} title={title} subtitle={subtitle} />
-        {groupBio && <GroupBio groupBio={groupBio} />}
-        <StreamsTab tabsColor={tabsColor} handleChange={handleChange} value={value} />
-      </Container>
-    </Section>
-  );
+         </Container>
+      </Section>
+   );
 };
 
 export default GroupBannerSection;

@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { Button } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useRouter } from "next/router";
 import Avatar from "@mui/material/Avatar";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
@@ -21,6 +21,7 @@ const LogoElement = ({
    livestreamId,
    hideFollow,
    className,
+   sx,
    handleOpenJoinModal,
 }) => {
    const classes = useStyles();
@@ -45,6 +46,7 @@ const LogoElement = ({
             variant="rounded"
             key={careerCenter.id}
             className={className}
+            sx={sx}
             src={getResizedUrl(careerCenter.logoUrl)}
             alt={careerCenter.universityName}
          />

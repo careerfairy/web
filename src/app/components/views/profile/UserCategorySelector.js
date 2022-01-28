@@ -1,28 +1,25 @@
-import React from "react";
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from "@mui/styles/makeStyles";
 import {
-   Typography,
-   useMediaQuery,
+   Chip,
+   FormControl,
    InputLabel,
    MenuItem,
-   FormControl,
    Select,
-   Chip,
+   Typography,
+   useMediaQuery,
 } from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    formControl: {
-      margin: theme.spacing(1),
-      minWidth: 120,
+      margin: (theme) => theme.spacing(1),
+      minWidth: "120px",
    },
-}));
+};
 
 const UserCategorySelector = ({ category, handleSetSelected, isNew }) => {
    const theme = useTheme();
    const native = useMediaQuery(theme.breakpoints.down("sm"));
-   const classes = useStyles();
    const [open, setOpen] = React.useState(false);
 
    const handleClose = () => {
@@ -75,7 +72,7 @@ const UserCategorySelector = ({ category, handleSetSelected, isNew }) => {
       <Fragment>
          <FormControl
             style={{ width: native ? "100%" : "100%" }}
-            className={classes.formControl}
+            sx={styles.formControl}
          >
             <InputLabel id="group-category-select">{category.name}</InputLabel>
             <Select

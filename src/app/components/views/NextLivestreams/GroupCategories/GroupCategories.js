@@ -1,23 +1,21 @@
 import React from "react";
 import { Box, Button, Collapse, Divider, Grid } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
 import CategoryCard from "./CategoryCard";
 import FilterIcon from "@mui/icons-material/Tune";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../../store/actions";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    actions: {
       display: "flex",
       flexFlow: "column",
       "& > * + *": {
-         marginTop: theme.spacing(3),
+         marginTop: theme =>theme.spacing(3),
       },
    },
-}));
+}
 
 const GroupCategories = ({ groupData, handleToggleActive, hasCategories }) => {
-   const classes = useStyles();
    const dispatch = useDispatch();
    const filterOpen = useSelector((state) => state.nextLivestreams.filterOpen);
 
@@ -35,7 +33,7 @@ const GroupCategories = ({ groupData, handleToggleActive, hasCategories }) => {
             Filters
          </Button>
          <Collapse in={filterOpen}>
-            <Box className={classes.actions}>
+            <Box sx={styles.actions}>
                {groupData.categories.map((category) => (
                   <CategoryCard
                      key={category.id}

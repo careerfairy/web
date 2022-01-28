@@ -1,17 +1,15 @@
 import PropTypes from "prop-types";
 import React, { Fragment, memo, useEffect, useMemo, useState } from "react";
 import { useFirebase } from "context/firebase";
-import { alpha } from "@mui/material/styles";
-import makeStyles from "@mui/styles/makeStyles";
 import UserUtil from "../../../../../data/util/UserUtil";
 import { useRouter } from "next/router";
-import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import {
    dynamicSort,
    getResizedUrl,
    getResponsiveResizedUrl,
 } from "../../../../helperFunctions/HelperFunctions";
 import {
+   AvatarGroup,
    Card,
    CardHeader,
    ClickAwayListener,
@@ -23,11 +21,9 @@ import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import { AvatarGroup } from "@mui/material";
 import { speakerPlaceholder } from "../../../../util/constants";
 import Tag from "./Tag";
 import Fade from "@stahl.luke/react-reveal/Fade";
-import clsx from "clsx";
 import CopyToClipboard from "../../../common/CopyToClipboard";
 import { DateTimeDisplay } from "./TimeDisplay";
 import { AttendButton, DetailsButton } from "./actionButtons";
@@ -35,199 +31,7 @@ import LogoElement from "../LogoElement";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import { InPersonEventBadge, LimitedRegistrationsBadge } from "./badges";
 import RegistrationModal from "../../../common/registration-modal";
-
-const useStyles = makeStyles((theme) => ({
-   cardHovered: {
-      height: "fit-content",
-      transform: "translateY(-2px)",
-      "& $shadow": {
-         bottom: "-1.5rem",
-      },
-      "& $shadow2": {
-         bottom: "-2.5rem",
-      },
-   },
-   card: {
-      flex: 1,
-      display: "flex",
-      flexDirection: "column",
-      width: "-webkit-fill-available",
-      justifyContent: "space-between",
-      position: "relative",
-      overflow: "visible",
-      borderRadius: "1.5rem",
-      transition: "0.4s",
-      "&:before": {
-         content: '""',
-         position: "absolute",
-         zIndex: 0,
-         display: "block",
-         width: "100%",
-         bottom: -1,
-         height: "100%",
-         borderRadius: "1.5rem",
-         backgroundColor: "rgba(0,0,0,0.08)",
-      },
-   },
-   main: {
-      display: "flex",
-      flex: 1,
-      minHeight: 406,
-      overflow: "hidden",
-      borderTopLeftRadius: "1.5rem",
-      borderTopRightRadius: "1.5rem",
-      zIndex: 1,
-      "&:after": {
-         content: '""',
-         position: "absolute",
-         bottom: 0,
-         display: "block",
-         width: "100%",
-         height: "100%",
-         background: `linear-gradient(to top, ${theme.palette.navyBlue.main}, rgba(0,0,0,0))`,
-      },
-   },
-   mainBooked: {
-      "&:after": {
-         background: theme.palette.primary.dark,
-         opacity: 0.8,
-      },
-   },
-   highlighted: {
-      border: `12px solid ${theme.palette.primary.main}`,
-   },
-   content: {
-      bottom: 0,
-      width: "100%",
-      zIndex: 1,
-      padding: theme.spacing(2, 2, 2),
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-evenly",
-   },
-   avatar: {
-      width: 48,
-      height: 48,
-   },
-   groupLogo: {
-      width: 75,
-      height: 75,
-      background: theme.palette.common.white,
-      "& img": {
-         objectFit: "contain",
-         maxWidth: "90%",
-         maxHeight: "90%",
-      },
-   },
-   groupLogoStacked: {
-      width: 60,
-      height: 60,
-   },
-   title: {
-      fontWeight: 800,
-      color: theme.palette.common.white,
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      display: "-webkit-box",
-      WebkitLineClamp: "3",
-      fontSize: "1.5rem",
-      WebkitBoxOrient: "vertical",
-   },
-   titleHovered: {
-      WebkitLineClamp: "inherit",
-   },
-   author: {
-      zIndex: 1,
-      position: "relative",
-      borderBottomLeftRadius: "1.5rem",
-      borderBottomRightRadius: "1.5rem",
-      display: "flex",
-      flexDirection: "column",
-   },
-   authorHovered: {
-      boxShadow: theme.shadows[3],
-   },
-   shadow: {
-      transition: "0.2s",
-      position: "absolute",
-      zIndex: 0,
-      width: "88%",
-      height: "100%",
-      bottom: 0,
-      borderRadius: "1.5rem",
-      backgroundColor: "rgba(0,0,0,0.06)",
-      left: "50%",
-      transform: "translateX(-50%)",
-   },
-   shadow2: {
-      bottom: 0,
-      width: "72%",
-      backgroundColor: "rgba(0,0,0,0.04)",
-   },
-   previewRow: {
-      width: "100%",
-   },
-   avaLogoWrapper: {
-      flexWrap: "inherit",
-      alignItems: "center",
-   },
-   avaLogoWrapperHovered: {
-      flexWrap: "wrap",
-      maxHeight: 300,
-      overflow: "auto",
-   },
-   top: {
-      zIndex: 995,
-   },
-   groupLogos: {
-      justifyContent: "space-evenly",
-      display: "flex",
-      flexWrap: "wrap",
-   },
-   livestreamCompanyAva: {
-      borderBottomRightRadius: `${theme.spacing(2.5)} !important`,
-      borderTopLeftRadius: `${theme.spacing(2.5)} !important`,
-      width: "100%",
-      height: 100,
-      boxShadow: theme.shadows[5],
-      background: theme.palette.common.white,
-      "& img": {
-         objectFit: "contain",
-         maxWidth: "90%",
-         maxHeight: "90%",
-      },
-   },
-   pulseAnimate: {
-      animation: `$pulse 1.2s infinite`,
-   },
-   "@keyframes pulse": {
-      "0%": {
-         MozBoxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 1)}`,
-         boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 1)}`,
-      },
-      "70%": {
-         MozBoxShadow: `0 0 0 15px ${alpha(theme.palette.primary.main, 0)}`,
-         boxShadow: `0 0 0 15px ${alpha(theme.palette.primary.main, 0)}`,
-      },
-      "100%": {
-         MozBoxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0)}`,
-         boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0)}`,
-      },
-   },
-   bookedIcon: {
-      color: "white",
-      position: "absolute",
-      left: theme.spacing(1),
-      top: 5,
-      display: "flex",
-      alignItems: "center",
-   },
-   bookedText: {
-      marginLeft: theme.spacing(1),
-      fontWeight: "bold",
-      color: theme.palette.common.white,
-   },
-}));
+import styles from "./GroupStreamCardV2Styles";
 
 const maxOptions = 2;
 const GroupStreamCardV2 = memo(
@@ -247,7 +51,6 @@ const GroupStreamCardV2 = memo(
       isAdmin,
    }) => {
       const firebase = useFirebase();
-      const classes = useStyles();
       const { absolutePath, pathname, push, query } = useRouter();
       const linkToStream = useMemo(() => {
          const notLoggedIn =
@@ -402,9 +205,6 @@ const GroupStreamCardV2 = memo(
       };
 
       const handleMouseLeft = () => {
-         if (isHighlighted) {
-            // setGlobalCardHighlighted?.(false)
-         }
          cardHovered && setCardHovered(false);
       };
 
@@ -537,11 +337,12 @@ const GroupStreamCardV2 = memo(
                   onClick={handleCardClick}
                   onMouseEnter={handleMouseEntered}
                   onMouseLeave={handleMouseLeft}
-                  className={clsx(classes.card, {
-                     [classes.top]: cardHovered,
-                     [classes.cardHovered]: cardHovered,
-                     [classes.pulseAnimate]: isHighlighted,
-                  })}
+                  sx={[
+                     styles.card,
+                     cardHovered && styles.top,
+                     cardHovered && styles.cardHovered,
+                     isHighlighted && styles.pulseAnimate,
+                  ]}
                >
                   {livestream.isFaceToFace && (
                      <Box position="absolute" top={5} right={5} zIndex={200}>
@@ -556,10 +357,11 @@ const GroupStreamCardV2 = memo(
                      </Box>
                   )}
                   <Box
-                     className={clsx(classes.main, {
-                        [classes.mainBooked]: registered,
-                        [classes.highlighted]: livestream.highlighted,
-                     })}
+                     sx={[
+                        styles.main,
+                        registered && styles.mainBooked,
+                        livestream.highlighted && styles.highlighted,
+                     ]}
                      position={"relative"}
                   >
                      <CardMedia
@@ -580,7 +382,7 @@ const GroupStreamCardV2 = memo(
                            "md"
                         )}
                      />
-                     <div className={classes.content}>
+                     <Box sx={styles.content}>
                         <CardHeader
                            avatar={
                               <DateTimeDisplay
@@ -591,7 +393,7 @@ const GroupStreamCardV2 = memo(
                            title={
                               <Avatar
                                  variant="rounded"
-                                 className={classes.livestreamCompanyAva}
+                                 sx={styles.livestreamCompanyAva}
                                  src={getResizedUrl(livestream.companyLogoUrl)}
                                  alt={livestream.company}
                               />
@@ -606,9 +408,10 @@ const GroupStreamCardV2 = memo(
                         <Collapse collapsedSize={80} in={cardHovered}>
                            <Typography
                               variant={"h4"}
-                              className={clsx(classes.title, {
-                                 [classes.titleHovered]: cardHovered,
-                              })}
+                              sx={[
+                                 styles.title,
+                                 cardHovered && styles.titleHovered,
+                              ]}
                            >
                               {livestream.title}
                            </Typography>
@@ -653,46 +456,36 @@ const GroupStreamCardV2 = memo(
                               />
                            )}
                            <Grow in={Boolean(userIsRegistered())}>
-                              <div className={classes.bookedIcon}>
+                              <Box sx={styles.bookedIcon}>
                                  <CheckCircleRoundedIcon />
                                  <Typography
                                     variant="h6"
-                                    className={classes.bookedText}
+                                    sx={styles.bookedText}
                                  >
                                     Booked
                                  </Typography>
-                              </div>
+                              </Box>
                            </Grow>
                         </Box>
-                     </div>
+                     </Box>
                   </Box>
                   <Box
-                     className={clsx(classes.author, {
-                        [classes.authorHovered]: cardHovered,
-                     })}
-                     sx={{
-                        bgcolor: "white",
-                        py: 1,
-                        p: 1,
-                        m: 0,
-                        display: "flex",
-                        flexDirection: "row",
-                     }}
+                     sx={[styles.author, cardHovered && styles.authorHovered]}
                   >
-                     <Collapse in={!cardHovered}>
+                     <Collapse sx={{ width: "100%" }} in={!cardHovered}>
                         <Fade timeout={300} unmountOnExit in={!cardHovered}>
                            <Stack
                               direction="row"
                               justifyContent="space-evenly"
                               alignItems="center"
-                              className={classes.avaLogoWrapper}
+                              sx={styles.avaLogoWrapper}
                            >
                               <Box>
                                  <AvatarGroup>
                                     {livestream.speakers?.map((speaker) => (
                                        <Avatar
                                           key={speaker.id}
-                                          className={classes.avatar}
+                                          sx={styles.avatar}
                                           src={
                                              getResizedUrl(
                                                 speaker.avatar,
@@ -710,10 +503,10 @@ const GroupStreamCardV2 = memo(
                                        <Avatar
                                           variant="rounded"
                                           key={careerCenter.id}
-                                          className={clsx(
-                                             classes.groupLogo,
-                                             classes.groupLogoStacked
-                                          )}
+                                          sx={[
+                                             styles.groupLogo,
+                                             styles.groupLogoStacked,
+                                          ]}
                                           src={getResizedUrl(
                                              careerCenter.logoUrl,
                                              "xs"
@@ -726,26 +519,27 @@ const GroupStreamCardV2 = memo(
                            </Stack>
                         </Fade>
                      </Collapse>
-                     <Collapse unmountOnExit in={cardHovered}>
-                        <div
-                           className={clsx(
-                              classes.avaLogoWrapper,
-                              classes.avaLogoWrapperHovered
-                           )}
+                     <Collapse
+                        sx={{ width: "100%" }}
+                        unmountOnExit
+                        in={cardHovered}
+                     >
+                        <Box
+                           sx={[
+                              styles.avaLogoWrapper,
+                              styles.avaLogoWrapperHovered,
+                           ]}
                         >
                            {livestream.speakers?.map((speaker) => (
                               <Stack
                                  direction="row"
                                  justifyContent="flex-start"
-                                 className={classes.previewRow}
+                                 sx={styles.previewRow}
                                  key={speaker.id}
-                                 sx={{
-                                    mb: 1,
-                                 }}
                               >
                                  <Box>
                                     <Avatar
-                                       className={classes.avatar}
+                                       sx={styles.avatar}
                                        src={
                                           getResizedUrl(speaker.avatar, "xs") ||
                                           speakerPlaceholder
@@ -775,13 +569,12 @@ const GroupStreamCardV2 = memo(
                            ))}
                            <Stack
                               direction="row"
-                              sx={{ p: 1 }}
                               style={{ width: "100%" }}
-                              className={classes.groupLogos}
+                              sx={styles.groupLogos}
                            >
                               {filteredGroups.map((careerCenter) => (
                                  <LogoElement
-                                    className={classes.groupLogo}
+                                    sx={styles.groupLogo}
                                     hideFollow={
                                        (!cardHovered && !mobile) || isAdmin
                                     }
@@ -798,11 +591,11 @@ const GroupStreamCardV2 = memo(
                                  />
                               ))}
                            </Stack>
-                        </div>
+                        </Box>
                      </Collapse>
                   </Box>
-                  <div className={classes.shadow} />
-                  <div className={`${classes.shadow} ${classes.shadow2}`} />
+                  <Box sx={styles.shadow} />
+                  <Box sx={[styles.shadow, styles.shadow2]} />
                </Card>
             </ClickAwayListener>
             <RegistrationModal

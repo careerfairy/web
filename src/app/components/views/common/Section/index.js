@@ -73,7 +73,7 @@ Section.propTypes = {
    color: PropTypes.string,
    big: PropTypes.bool,
    className: PropTypes.string,
-   sx: PropTypes.object,
+   sx: PropTypes.oneOfType([PropTypes.object, PropTypes.array, PropTypes.func]),
 };
 
 export default Section;
