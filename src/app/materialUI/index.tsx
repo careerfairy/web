@@ -1,8 +1,38 @@
-import { alpha, createTheme } from "@mui/material/styles";
 // import { deepmerge } from "@mui/utils";
-import { grey } from "@mui/material/colors";
+// it could be your App.tsx file or theme file that is included in your tsconfig.json
+import { alpha, createTheme, Theme } from "@mui/material/styles";
+import React from "react";
+import { PaletteMode } from "@mui/material";
 
-export const rootThemeObj = (mode) =>
+declare module "@mui/styles/defaultTheme" {
+   // eslint-disable-next-line @typescript-eslint/no-empty-interface (remove this line if you don't have the rule enabled)
+   interface DefaultTheme extends Theme {}
+}
+
+declare module "@mui/material/styles" {
+   interface ThemeOptions {
+      whiteShadow?: string;
+      drawerWidth?: { small?: string; medium?: string };
+   }
+   interface PaletteColor {
+      gradient?: string;
+   }
+   interface SimplePaletteColorOptions {
+      gradient?: string;
+   }
+
+   interface Palette {
+      navyBlue: Palette["primary"];
+   }
+   interface PaletteOptions {
+      navyBlue: PaletteOptions["primary"];
+   }
+   interface BreakpointOverrides {
+      mobile: true; // adds the `mobile` breakpoint
+   }
+}
+
+export const rootThemeObj = (mode: PaletteMode) =>
    createTheme({
       palette: {
          mode,
@@ -19,10 +49,6 @@ export const rootThemeObj = (mode) =>
             dark: "#590db6",
             gradient: "#644eec",
             contrastText: "#FFFFFF",
-         },
-         grey: {
-            main: grey[300],
-            dark: grey[400],
          },
          error: {
             main: "#e70026",
@@ -49,15 +75,6 @@ export const rootThemeObj = (mode) =>
                     main: "#424242",
                     light: "#424242",
                  }),
-            // light: "#FFFFFF",
-            // main: "#00d2aa",
-            // contrastText: "#FFFFFF",
-            // dark: "#00b08f",
-            // gradient: "#07c1a7",
-            // info: {
-            //    backgroundColor: `${theme.palette.background.paper} !important`,
-            //    color: `${theme.palette.text.primary} !important`,
-            // },
          },
       },
       breakpoints: {
@@ -80,7 +97,7 @@ export const rootThemeObj = (mode) =>
       drawerWidth: { small: "256px", medium: "300px" },
    });
 
-const getComponents = (theme) => ({
+const getComponents = (theme: Theme) => ({
    // Name of the component
    MuiButton: {
       styleOverrides: {
@@ -156,7 +173,7 @@ const getComponents = (theme) => ({
    },
 });
 
-export const getTheme = (rootThemeObj) => {
+export const getTheme = (rootThemeObj: Theme) => {
    const themeWithMode = createTheme({
       ...rootThemeObj,
       palette: {
@@ -167,9 +184,6 @@ export const getTheme = (rootThemeObj) => {
                  // palette values for light mode
                  background: {
                     ...rootThemeObj.palette.background,
-                    level1: "#212121",
-                    level2: "#333",
-                    offWhite: "#F5F5F5",
                     default: "#F5F5F5",
                     paper: "#fff",
                  },
@@ -178,9 +192,6 @@ export const getTheme = (rootThemeObj) => {
                  // palette values for dark mode
                  background: {
                     ...rootThemeObj.palette.background,
-                    level1: "#212121",
-                    level2: "#424242",
-                    offWhite: "#FAFAFA",
                     default: "#1E1E1E",
                     paper: "#424242",
                  },
@@ -194,6 +205,9 @@ export const getTheme = (rootThemeObj) => {
    };
 };
 
-export const brandedLightTheme = createTheme(getTheme(rootThemeObj("light")));
+export const brandedLightTheme = createTheme(
+   {},
+   getTheme(rootThemeObj("light"))
+);
 
-export const brandedDarkTheme = createTheme(getTheme(rootThemeObj("dark")));
+export const brandedDarkTheme = createTheme({}, getTheme(rootThemeObj("dark")));
