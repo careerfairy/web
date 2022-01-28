@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React, { useMemo, useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import NavBar from "./NavBar";
-import { withFirebase } from "../../context/firebase";
+import { withFirebase } from "../../context/firebase/FirebaseServiceContext";
 import { useAuth } from "../../HOCs/AuthProvider";
 import TopBar from "./TopBar";
 import styles from "../../materialUI/styles/layoutStyles/groupDashboardStyles";

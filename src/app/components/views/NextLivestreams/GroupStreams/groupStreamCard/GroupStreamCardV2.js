@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { Fragment, memo, useEffect, useMemo, useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { alpha, makeStyles } from "@material-ui/core/styles";
 import UserUtil from "../../../../../data/util/UserUtil";
 import { useRouter } from "next/router";
@@ -252,7 +252,7 @@ const GroupStreamCardV2 = memo(
       globalCardHighlighted,
       isAdmin,
    }) => {
-      const firebase = useFirebase();
+      const firebase = useFirebaseService();
       const mediaStyles = useCoverCardMediaStyles();
       const classes = useStyles();
       const { absolutePath, pathname, push, query } = useRouter();

@@ -4,7 +4,7 @@ import ThumbUpRoundedIcon from "@material-ui/icons/ThumbUpRounded";
 import Linkify from "react-linkify";
 import ExpandLessRoundedIcon from "@material-ui/icons/ExpandLessRounded";
 import ExpandMoreRoundedIcon from "@material-ui/icons/ExpandMoreRounded";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import {
    Box,
    Button,

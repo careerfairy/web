@@ -15,7 +15,7 @@ import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
 
 import FilePickerContainer from "components/ssr/FilePickerContainer";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import Box from "@material-ui/core/Box";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { makeStyles } from "@material-ui/core/styles";
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
    const windowSize = useWindowSize();

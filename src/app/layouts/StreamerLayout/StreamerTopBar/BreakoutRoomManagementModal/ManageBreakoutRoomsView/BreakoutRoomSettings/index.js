@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 import PropTypes from "prop-types";
 import List from "@material-ui/core/List";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
 
 const BreakoutRoomSettings = ({ classes, handleClose, onClick }) => {
@@ -22,7 +22,7 @@ const BreakoutRoomSettings = ({ classes, handleClose, onClick }) => {
    const {
       listenToBreakoutRoomSettings,
       updateCanReturnToMainStream,
-   } = useFirebase();
+   } = useFirebaseService();
    const [breakoutRoomSettings, setBreakoutRoomSettings] = useState({});
 
    useEffect(() => {

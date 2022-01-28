@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { useFirebase, withFirebase } from "context/firebase";
+import { useFirebaseService, withFirebase } from "context/firebase/FirebaseServiceContext";
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
 import { Paper } from "@material-ui/core";
 import {
@@ -118,7 +118,7 @@ const NoPollDisplay = () => {
 };
 const PollCategory = ({ livestream, setSelectedState }) => {
    const { authenticatedUser } = useAuth();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const streamRef = useStreamRef();
    const [sessionUuid, setSessionUuid] = useState(uuidv4());
    const dispatch = useDispatch();

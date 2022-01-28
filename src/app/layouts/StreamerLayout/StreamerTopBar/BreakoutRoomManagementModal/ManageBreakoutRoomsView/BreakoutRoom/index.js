@@ -21,7 +21,7 @@ import BreakoutRoomAccordionContent from "./BreakoutRoomAccordionContent";
 import React, { useEffect, useState } from "react";
 import EditRoomNameModal from "./EditRoomNameModal";
 import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -265,7 +265,7 @@ const BreakoutRoom = ({
    });
 
    const { isStreamer, isMainStreamer, isBreakout } = useCurrentStream();
-   const { deleteBreakoutRoom, updateBreakoutRoom } = useFirebase();
+   const { deleteBreakoutRoom, updateBreakoutRoom } = useFirebaseService();
    const {
       query: { livestreamId, breakoutRoomId },
    } = useRouter();

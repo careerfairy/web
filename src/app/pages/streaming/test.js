@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { withFirebasePage } from "context/firebase";
+import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
 import { v4 as uuid } from "uuid";
 
 import { useRouter } from "next/router";

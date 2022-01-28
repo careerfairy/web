@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
 import { Card } from "@material-ui/core";
-import { withFirebase } from "../../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext";
 import {
    defaultTableOptions,
    exportSelectionAction,

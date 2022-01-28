@@ -1,7 +1,7 @@
 import React from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
-import { withFirebase } from "../../../context/firebase";
+import { withFirebase } from "../../../context/firebase/FirebaseServiceContext";
 import { Button, Hidden, useMediaQuery } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import { MainLogo } from "../../../components/logos";

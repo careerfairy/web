@@ -12,7 +12,7 @@ import {
    Grow,
 } from "@material-ui/core";
 import { RegistrationContext } from "../../../../../context/registration/RegistrationContext";
-import { useFirebase } from "../../../../../context/firebase";
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import { connectedIcon } from "../../../../../constants/svgs";
 
@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
 const TalentPoolJoin = () => {
    const { handleNext, group, livestream } = useContext(RegistrationContext);
    const [joiningTalentPool, setJoiningTalentPool] = useState(false);
-   const { joinCompanyTalentPool } = useFirebase();
+   const { joinCompanyTalentPool } = useFirebaseService();
    const classes = useStyles();
    const { userData } = useAuth();
    const joinTalentPool = async () => {

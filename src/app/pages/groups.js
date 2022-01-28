@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { withFirebase } from "../context/firebase";
+import { withFirebase } from "../context/firebase/FirebaseServiceContext";
 import Loader from "../components/views/loader/Loader";
 
 import Head from "next/head";

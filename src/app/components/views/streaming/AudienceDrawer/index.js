@@ -7,7 +7,7 @@ import SwipeableViews from "react-swipeable-views";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import BreakdownTab from "./BreakdownTab";
-import { withFirebase } from "../../../../context/firebase";
+import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
 import { useCurrentStream } from "../../../../context/stream/StreamContext";
 import PeopleWhoJoinedTab from "./PeopleWhoJoinedTab";
 import useStreamRef from "../../../custom-hook/useStreamRef";

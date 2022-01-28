@@ -21,7 +21,7 @@ import {
    Typography,
 } from "@material-ui/core";
 import { colorsArray } from "../../../../../util/colors";
-import { withFirebase } from "../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext";
 import RotateLeftIcon from "@material-ui/icons/RotateLeft";
 import { prettyDate } from "../../../../../helperFunctions/HelperFunctions";
 import CustomLegend from "../../../../../../materialUI/Legends";

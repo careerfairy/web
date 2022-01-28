@@ -25,7 +25,7 @@ import {
 } from "@material-ui/core";
 import QuestionContainer from "./questions/QuestionContainer";
 import HelpIcon from "@material-ui/icons/Help";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import AddIcon from "@material-ui/icons/Add";
 import {
    CategoryContainerTopAligned,

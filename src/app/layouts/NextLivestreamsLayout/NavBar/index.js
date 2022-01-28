@@ -19,7 +19,7 @@ import * as actions from "../../../store/actions";
 import GroupNavLink from "./groupNavLink";
 import NavPrompt from "./navPrompt";
 import { signInImage } from "../../../constants/images";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import useFollowingGroups from "../../../components/custom-hook/useFollowingGroups";
 import LoginButtonComponent from "components/views/common/LoginButton";
 

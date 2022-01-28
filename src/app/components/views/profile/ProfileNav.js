@@ -11,7 +11,7 @@ import {
    Tab,
    Box,
 } from "@material-ui/core";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import JoinedGroups from "./my-groups/JoinedGroups";
 import AdminGroups from "./my-groups/AdminGroups";
 import UserData from "./userData";

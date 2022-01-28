@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import CategoryElement from "components/views/group/admin/settings/Category/CategoryElement";
 import CategoryEdit from "./Category/CategoryEdit";
 import EditIcon from "@material-ui/icons/Edit";

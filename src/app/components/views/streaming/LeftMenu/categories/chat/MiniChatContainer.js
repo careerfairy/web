@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
-import { useFirebase, withFirebase } from "context/firebase";
+import { useFirebaseService, withFirebase } from "context/firebase/FirebaseServiceContext";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import ChatEntryContainer from "./ChatEntryContainer";
 import ExpandLessRoundedIcon from "@material-ui/icons/ExpandLessRounded";
@@ -98,7 +98,7 @@ const now = new Date();
 
 function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
    const { authenticatedUser, userData } = useAuth();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const dispatch = useDispatch();
    const theme = useTheme();
    const { tutorialSteps, setTutorialSteps, handleConfirmStep } = useContext(

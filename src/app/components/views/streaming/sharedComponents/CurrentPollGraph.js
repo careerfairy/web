@@ -13,7 +13,7 @@ import {
 import { PollQuestion } from "../../../../materialUI/GlobalTitles";
 import { colorsArray } from "../../../util/colors";
 import { useTheme, withStyles } from "@material-ui/core/styles";
-import { withFirebase } from "../../../../context/firebase";
+import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
 import { useCurrentStream } from "../../../../context/stream/StreamContext";
 import useMapPollVoters from "../../../custom-hook/useMapPollVoters";
 import useStreamRef from "../../../custom-hook/useStreamRef";

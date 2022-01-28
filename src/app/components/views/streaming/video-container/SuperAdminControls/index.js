@@ -12,7 +12,7 @@ import { useCurrentStream } from "context/stream/StreamContext";
 import ConfirmRecordingDialog from "../../../admin/streams/StreamsContainer/StreamCard/ConfirmRecordingDialog";
 import StopRecordingIcon from "@material-ui/icons/Stop";
 import StartRecordingIcon from "@material-ui/icons/PlayCircleFilledWhite";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import {
    CircularProgress,
    Tooltip,
@@ -87,7 +87,7 @@ const SuperAdminControls = () => {
       query: { spy },
    } = useRouter();
    const [open, setOpen] = useState(false);
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const dispatch = useDispatch();
    const [streamStateChanging, setStreamStateChanging] = useState(false);
    const spyModeEnabled = useSelector(

@@ -10,7 +10,7 @@ import {
    Typography,
 } from "@material-ui/core";
 import LibraryAddCheckIcon from "@material-ui/icons/LibraryAddCheck";
-import { withFirebase } from "../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext";
 import PercentageDisplay from "./common/PercentageDisplay";
 import { makeStyles } from "@material-ui/core/styles";
 import green from "@material-ui/core/colors/green";

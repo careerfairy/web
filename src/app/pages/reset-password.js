@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { withFirebase } from "../context/firebase";
+import { withFirebase } from "../context/firebase/FirebaseServiceContext";
 
 import MicIcon from "@material-ui/icons/Mic";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";

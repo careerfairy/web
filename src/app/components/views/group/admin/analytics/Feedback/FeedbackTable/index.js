@@ -10,7 +10,7 @@ import {
    Tab,
    IconButton,
 } from "@material-ui/core";
-import { withFirebase } from "../../../../../../../context/firebase";
+import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext";
 import {
    addMinutes,
    prettyDate,

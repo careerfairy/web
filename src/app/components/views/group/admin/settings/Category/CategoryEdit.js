@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import AddIcon from "@material-ui/icons/Add";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import {
    AddCategory,
    DeleteCategory,
@@ -90,7 +90,7 @@ function CategoryEditModal({
    isLocal,
 }) {
    const classes = useStyles();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const dispatch = useDispatch();
    const [categoryName, setCategoryName] = useState("");
 

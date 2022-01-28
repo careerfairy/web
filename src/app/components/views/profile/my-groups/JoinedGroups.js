@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button, Grid, Typography } from "@material-ui/core";
 import { useRouter } from "next/router";
-import { useFirebase, withFirebase } from "context/firebase";
+import { useFirebaseService, withFirebase } from "context/firebase/FirebaseServiceContext";
 import AddIcon from "@material-ui/icons/Add";
 import CurrentGroup from "components/views/profile/CurrentGroup";
 import { makeStyles } from "@material-ui/core/styles";
@@ -33,7 +33,7 @@ const JoinedGroups = ({ userData }) => {
       9,
       6
    );
-   const { getFollowingGroups } = useFirebase();
+   const { getFollowingGroups } = useFirebaseService();
 
    useEffect(() => {
       (async function () {

@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import * as actions from "store/actions";
 
 import {
@@ -28,7 +28,7 @@ const CreateBreakoutRoomsView = ({ handleClose }) => {
    const [numberOfRooms, setNumberOfRooms] = useState(1);
    const [assignType, setAssignType] = useState("manually");
    const [loading, setLoading] = useState(false);
-   const { createMultipleBreakoutRooms } = useFirebase();
+   const { createMultipleBreakoutRooms } = useFirebaseService();
 
    const handleChangeNumberOfRooms = (event) => {
       setNumberOfRooms(event.target.value);

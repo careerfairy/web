@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { Box, Container, Typography } from "@material-ui/core";
 import UpcomingLivestreamsCarousel from "../../../landing/UpcomingLivestreamsSection/UpcomingLivestreamsCarousel";
 import { getMaxSlides } from "util/CommonUtil";
@@ -41,7 +41,7 @@ const RecommendedEventsOverlay = ({ recommendedEventIds, mobile }) => {
          groups: dataObj.groups,
          livestream: dataObj.livestream,
       });
-   const { listenToRecommendedEvents } = useFirebase();
+   const { listenToRecommendedEvents } = useFirebaseService();
    const [recommendedEvents, setRecommendedEvents] = useState([]);
 
    useEffect(() => {

@@ -6,7 +6,7 @@ import {
    maxQuestionLength,
    minQuestionLength,
 } from "../../../../constants/forms";
-import { useFirebase } from "../../../../context/firebase";
+import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
 import { Box, Button, CircularProgress, TextField } from "@material-ui/core";
 import { useDispatch } from "react-redux";
@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
    const classes = useStyles();
-   const { putLivestreamQuestion } = useFirebase();
+   const { putLivestreamQuestion } = useFirebaseService();
    const { authenticatedUser } = useAuth();
    const dispatch = useDispatch();
    const { replace, asPath } = useRouter();

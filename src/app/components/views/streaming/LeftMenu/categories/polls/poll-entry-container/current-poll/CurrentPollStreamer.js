@@ -1,5 +1,5 @@
 import React, { Fragment, useContext, useEffect, useState } from "react";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import CurrentPollGraph from "../../../../../sharedComponents/CurrentPollGraph";
 import { Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";

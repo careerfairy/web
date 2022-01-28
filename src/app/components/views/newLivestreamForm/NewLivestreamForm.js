@@ -15,7 +15,7 @@ import {
 } from "@material-ui/core";
 import { Formik } from "formik";
 import { v4 as uuidv4 } from "uuid";
-import { withFirebase } from "../../../context/firebase";
+import { withFirebase } from "../../../context/firebase/FirebaseServiceContext";
 import ImageSelect from "./ImageSelect/ImageSelect";
 import { makeStyles } from "@material-ui/core/styles";
 import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";

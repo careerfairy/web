@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useAuth } from "../../HOCs/AuthProvider";
 import { useCurrentStream } from "../../context/stream/StreamContext";
 import { useDispatch } from "react-redux";
@@ -19,7 +19,7 @@ const useJoinTalentPool = () => {
       getLivestreamCompanyId,
       joinCompanyTalentPool,
       leaveCompanyTalentPool,
-   } = useFirebase();
+   } = useFirebaseService();
    const { isBreakout, currentLivestream } = useCurrentStream();
    const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
    const [loading, setLoading] = useState(false);

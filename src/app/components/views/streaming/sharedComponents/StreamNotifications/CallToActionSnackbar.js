@@ -31,7 +31,7 @@ import {
 import { prettyLocalizedDate } from "../../../../helperFunctions/HelperFunctions";
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips";
 import TutorialContext from "../../../../../context/tutorials/TutorialContext";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useAuth } from "HOCs/AuthProvider";
 import { useCurrentStream } from "context/stream/StreamContext";
 
@@ -161,7 +161,7 @@ const CallToActionSnackbar = forwardRef(
       const { authenticatedUser, userData } = useAuth();
 
       const classes = useStyles();
-      const firebase = useFirebase();
+      const firebase = useFirebaseService();
       const [expanded, setExpanded] = useState(false);
 
       const [isSendingEmail, setIsSendingEmail] = useState(false);

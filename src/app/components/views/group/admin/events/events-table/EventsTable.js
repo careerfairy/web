@@ -16,7 +16,7 @@ import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal";
 import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDialog";
 import GetStreamerLinksIcon from "@material-ui/icons/Share";
 import PublishIcon from "@material-ui/icons/Publish";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { Box, CircularProgress } from "@material-ui/core";
 import { useDispatch } from "react-redux";
 import DraftLinkIcon from "@material-ui/icons/Link";
@@ -48,7 +48,7 @@ const EventsTable = ({
    eventId,
 }) => {
    const [clickedRows, setClickedRows] = useState({});
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const theme = useTheme();
    const { pathname, push, query } = useRouter();
    const { userData } = useAuth();

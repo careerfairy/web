@@ -1,5 +1,5 @@
 import React from "react";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Chip, Paper } from "@material-ui/core";
 

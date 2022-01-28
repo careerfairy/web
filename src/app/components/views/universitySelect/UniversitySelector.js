@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import { withFirebase } from "../../../context/firebase";
+import { withFirebase } from "../../../context/firebase/FirebaseServiceContext";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import {
