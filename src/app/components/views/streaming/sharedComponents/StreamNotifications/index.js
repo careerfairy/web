@@ -9,7 +9,7 @@ import {
    addMinutes,
    getMinutesPassed,
 } from "../../../../helperFunctions/HelperFunctions";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 import CallToActionNotifications from "./CallToActionNotifications";
 

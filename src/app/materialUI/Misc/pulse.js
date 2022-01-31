@@ -1,4 +1,6 @@
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha } from "@mui/material/styles";
+
+import makeStyles from '@mui/styles/makeStyles';
 
 const usePulseStyles = makeStyles((theme) => ({
    pulseAnimate: {

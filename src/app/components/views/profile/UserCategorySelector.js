@@ -1,27 +1,25 @@
-import React from "react";
-import { Fragment } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import React, { Fragment } from "react";
+import { useTheme } from "@mui/material/styles";
 import {
-   Typography,
-   useMediaQuery,
+   Chip,
+   FormControl,
    InputLabel,
    MenuItem,
-   FormControl,
    Select,
-   Chip,
-} from "@material-ui/core";
+   Typography,
+   useMediaQuery,
+} from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    formControl: {
-      margin: theme.spacing(1),
-      minWidth: 120,
+      margin: (theme) => theme.spacing(1),
+      minWidth: "120px",
    },
-}));
+};
 
 const UserCategorySelector = ({ category, handleSetSelected, isNew }) => {
    const theme = useTheme();
-   const native = useMediaQuery(theme.breakpoints.down("xs"));
-   const classes = useStyles();
+   const native = useMediaQuery(theme.breakpoints.down("sm"));
    const [open, setOpen] = React.useState(false);
 
    const handleClose = () => {
@@ -74,14 +72,13 @@ const UserCategorySelector = ({ category, handleSetSelected, isNew }) => {
       <Fragment>
          <FormControl
             style={{ width: native ? "100%" : "100%" }}
-            className={classes.formControl}
+            sx={styles.formControl}
          >
-            <InputLabel id="demo-controlled-open-select-label">
-               {category.name}
-            </InputLabel>
+            <InputLabel id="group-category-select">{category.name}</InputLabel>
             <Select
                open={open}
                fullWidth
+               label={category.name}
                startAdornment={isNew && <Chip color="primary" label={"New!"} />}
                native={native}
                onClose={handleClose}

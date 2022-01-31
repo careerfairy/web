@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { forceCheck } from "react-lazyload";
 import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels";
-import { Container } from "@material-ui/core";
+import { Container } from "@mui/material";
 import * as PropTypes from "prop-types";
 import Streams from "./Streams";
 

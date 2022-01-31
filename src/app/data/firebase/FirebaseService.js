@@ -3346,6 +3346,6 @@ class FirebaseService {
  * we share the same instance everywhere
  * @type {FirebaseService}
  */
-export const firebaseServiceInstance = new FirebaseService()
+export const firebaseServiceInstance = new FirebaseService();
 
 export default FirebaseService;

@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Drawer,
    IconButton,
@@ -8,11 +8,11 @@ import {
    ListItem,
    ListItemSecondaryAction,
    ListItemText,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useFirestoreConnect } from "react-redux-firebase";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../../../store/actions";
-import DeleteIcon from "@material-ui/icons/Delete";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const useStyles = makeStyles((theme) => ({
    drawerPaperRoot: {
@@ -69,7 +69,7 @@ const DrawerContent = ({ handleClose }) => {
                         onClick={() => handleDeleteFilterGroup(id)}
                         edge="end"
                         aria-label="delete"
-                     >
+                        size="large">
                         <DeleteIcon />
                      </IconButton>
                   </ListItemSecondaryAction>

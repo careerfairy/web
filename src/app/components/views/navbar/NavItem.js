@@ -1,55 +1,8 @@
 import React from "react";
-import clsx from "clsx";
 import PropTypes from "prop-types";
-import { Button, ListItem } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Box, Button, ListItem } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "../../../materialUI/NextNavLink";
-
-const useStyles = makeStyles((theme) => ({
-   item: {
-      display: "flex",
-      paddingTop: 0,
-      paddingBottom: 0,
-   },
-   button: {
-      color: (props) =>
-         props.black
-            ? theme.palette.text.secondary
-            : theme.palette.common.white,
-      fontWeight: theme.typography.fontWeightLight,
-      justifyContent: "flex-start",
-      letterSpacing: 0,
-      padding: "10px 8px",
-      textTransform: "none",
-      width: "100%",
-      textDecoration: "none !important",
-      "&:hover": {
-         color: (props) =>
-            props.black
-               ? theme.palette.text.secondary
-               : theme.palette.common.white,
-      },
-      "&.active": {
-         background: theme.palette.common.white,
-         color: theme.palette.text.secondary,
-         // color: theme.palette.primary.main,
-         boxShadow: theme.whiteShadow,
-         "& $title": {
-            fontWeight: theme.typography.fontWeightMedium,
-         },
-         "& $icon": {
-            // color: theme.palette.primary.main
-         },
-      },
-   },
-   icon: {
-      marginRight: theme.spacing(1),
-   },
-   title: {
-      marginRight: "auto",
-   },
-}));
 
 const NavItem = ({
    className,
@@ -62,12 +15,16 @@ const NavItem = ({
    onClick,
    ...rest
 }) => {
-   const classes = useStyles({ black });
    const { pathname } = useRouter();
 
    return (
       <ListItem
-         className={clsx(classes.item, className)}
+         className={className}
+         sx={{
+            display: "flex",
+            paddingTop: 0,
+            paddingBottom: 0,
+         }}
          disableGutters
          {...rest}
       >
@@ -75,16 +32,48 @@ const NavItem = ({
             href={onClick ? undefined : href}
             onClick={onClick}
             component={onClick ? "button" : Link}
-            className={clsx(classes.button, {
-               ["active"]: basePath === pathname,
+            startIcon={
+               svgIcon ? <div>{svgIcon}</div> : Icon && <Icon size="20" />
+            }
+            sx={(theme) => ({
+               color: black
+                  ? theme.palette.text.secondary
+                  : theme.palette.common.white,
+               fontWeight: theme.typography.fontWeightLight,
+               justifyContent: "flex-start",
+               letterSpacing: 0,
+               padding: "10px 8px",
+               textTransform: "none",
+               width: "100%",
+               textDecoration: "none !important",
+               "&:hover": {
+                  color: black
+                     ? theme.palette.text.secondary
+                     : theme.palette.common.white,
+               },
+               "&.active": {
+                  background: theme.palette.common.white,
+                  color: theme.palette.text.secondary,
+                  // color: theme.palette.primary.main,
+                  boxShadow: theme.whiteShadow,
+                  "& $title": {
+                     fontWeight: theme.typography.fontWeightMedium,
+                  },
+                  "& $icon": {
+                     // color: theme.palette.primary.main
+                  },
+               },
             })}
+            className={basePath === pathname ? "active" : ""}
          >
-            {svgIcon ? (
-               <div className={classes.icon}>{svgIcon}</div>
-            ) : (
-               Icon && <Icon className={classes.icon} size="20" />
-            )}
-            <span className={classes.title}>{title}</span>
+            <Box
+               component="span"
+               sx={{
+                  marginRight: "auto",
+               }}
+            >
+               {title}
+            </Box>
          </Button>
       </ListItem>
    );

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from "clsx";
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
-import { Avatar, Grid, Typography } from "@material-ui/core";
-import EventIcon from "@material-ui/icons/Event";
+import { Avatar, Grid, Typography } from "@mui/material";
+import EventIcon from "@mui/icons-material/Event";
 import DateUtil from "../../../../../util/DateUtil";
-import ClockIcon from "@material-ui/icons/AccessTime";
+import ClockIcon from "@mui/icons-material/AccessTime";
 
 const useStyles = makeStyles((theme) => {
    const radiusValue = 5;

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Grid, Typography } from "@material-ui/core";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useFirebaseService, withFirebase } from "context/firebase/FirebaseServiceContext";
-import AddIcon from "@material-ui/icons/Add";
+import AddIcon from "@mui/icons-material/Add";
 import CurrentGroup from "components/views/profile/CurrentGroup";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { Highlights } from "../../groups/Groups";
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers";
 

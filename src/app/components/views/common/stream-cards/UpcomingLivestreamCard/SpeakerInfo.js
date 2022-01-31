@@ -1,23 +1,22 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Avatar, Typography } from "@material-ui/core";
+import { Avatar, Box, Typography } from "@mui/material";
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions";
 import { speakerPlaceholder } from "../../../../util/constants";
 
-const useStyles = makeStyles((theme) => ({
-   root: {
+const styles = {
+   root: (theme) => ({
       display: "flex",
       padding: theme.spacing(0.5, 0.5, 0.5, 0),
       flexWrap: "nowrap",
       alignItems: "center",
-   },
-   speakerAvatar: {
+   }),
+   speakerAvatar: (theme) => ({
       width: theme.spacing(6),
       height: theme.spacing(6),
-   },
+   }),
    speakerInfoWrapper: {
-      paddingLeft: theme.spacing(2),
+      paddingLeft: (theme) => theme.spacing(2),
       flex: 1,
       display: "flex",
       flexDirection: "column",
@@ -42,38 +41,33 @@ const useStyles = makeStyles((theme) => ({
       wordBreak: "break-word",
       overflow: "hidden",
    },
-}));
+};
 
 const SpeakerInfo = ({ speaker }) => {
-   const classes = useStyles();
    return (
-      <div className={classes.root}>
+      <Box sx={styles.root}>
          <Avatar
             src={getResizedUrl(speaker.avatar, "xs") || speakerPlaceholder}
             alt={`${speaker.firstName || ""} - ${
                speaker.lastName || ""
             } - avatar`}
             imgProps={{ loading: "lazy" }}
-            className={classes.speakerAvatar}
+            sx={styles.speakerAvatar}
          />
-         <div className={classes.speakerInfoWrapper}>
-            <Typography
-               variant="h6"
-               align="left"
-               className={classes.speakerName}
-            >
+         <Box sx={styles.speakerInfoWrapper}>
+            <Typography variant="h6" align="left" sx={styles.speakerName}>
                {speaker.firstName}
             </Typography>
             <Typography
                variant="subtitle1"
                align="left"
                color="textSecondary"
-               className={classes.speakerPosition}
+               sx={styles.speakerPosition}
             >
                {speaker.position}
             </Typography>
-         </div>
-      </div>
+         </Box>
+      </Box>
    );
 };
 

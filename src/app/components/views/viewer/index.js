@@ -1,12 +1,12 @@
 import React, { Fragment } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import ViewerComponent from "./viewer-component/ViewerComponent";
 import MiniChatContainer from "../streaming/LeftMenu/categories/chat/MiniChatContainer";
 import IconsContainer from "../streaming/icons-container/IconsContainer";
 import RatingContainer from "./rating-container/RatingContainer";
-import { Backdrop } from "@material-ui/core";
-import VolumeUpRoundedIcon from "@material-ui/icons/VolumeUpRounded";
-import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
+import { Backdrop } from "@mui/material";
+import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded";
+import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import { useCurrentStream } from "../../../context/stream/StreamContext";
 import StreamNotifications from "../streaming/sharedComponents/StreamNotifications";
 import AudienceDrawer from "../streaming/AudienceDrawer";
@@ -51,9 +51,6 @@ const useStyles = makeStyles((theme) => ({
       right: "0",
       bottom: "0",
       top: 0,
-      [theme.breakpoints.down("mobile")]: {
-         width: "100%",
-      },
    },
 }));
 

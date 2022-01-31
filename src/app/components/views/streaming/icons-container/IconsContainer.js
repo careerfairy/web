@@ -8,11 +8,11 @@ import React, {
 } from "react";
 import * as actions from "../../../../store/actions";
 import RubberBand from "@stahl.luke/react-reveal/RubberBand";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { v4 as uuidv4 } from "uuid";
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
-import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
-import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
+import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
+import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import ClappingSVG from "../../../util/CustomSVGs";
 import { useDispatch, useSelector } from "react-redux";
 import { TransitionGroup } from "react-transition-group";

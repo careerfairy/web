@@ -1,7 +1,7 @@
 import React from "react";
 import HeroSection from "../components/views/team/HeroSection";
 import TeamBiosSection from "../components/views/team/TeamBiosSection";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import UpcomingLayout from "../layouts/UpcomingLayout";
 import ValuesSection from "../components/views/team/ValuesSection";
 import { honestyShape, ideaShape, qualityShape } from "../constants/images";

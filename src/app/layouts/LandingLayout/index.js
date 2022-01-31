@@ -1,33 +1,31 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import TopBar from "./TopBar";
 import NavBar from "./NavBar";
-import styles from "../../materialUI/styles/layoutStyles/landingLayoutStyles";
+import { styles } from "../../materialUI/styles/layoutStyles/landingLayoutStyles";
 import FooterV2 from "../../components/views/footer/FooterV2";
 import { getResizedUrl } from "../../components/helperFunctions/HelperFunctions";
-
-const useStyles = makeStyles(styles);
+import { Box } from "@mui/material";
 
 const drawerWidth = 300;
 const LandingLayout = ({ topImage, bottomImage, children }) => {
-   const classes = useStyles({
+   const stylesWithProps = styles({
       topImage,
       bottomImage: getResizedUrl(bottomImage, "md"),
    });
 
    return (
-      <div className={classes.root}>
+      <Box sx={stylesWithProps.root}>
          <TopBar />
          <NavBar anchor="left" drawerWidth={drawerWidth} />
-         <div className={classes.wrapper}>
-            <div className={classes.contentContainer}>
-               <div className={classes.content}>
+         <Box sx={stylesWithProps.wrapper}>
+            <Box sx={stylesWithProps.contentContainer}>
+               <Box sx={stylesWithProps.content}>
                   {children}
                   <FooterV2 background={"transparent"} />
-               </div>
-            </div>
-         </div>
-      </div>
+               </Box>
+            </Box>
+         </Box>
+      </Box>
    );
 };
 

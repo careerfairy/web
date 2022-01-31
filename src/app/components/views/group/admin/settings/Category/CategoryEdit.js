@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import AddIcon from "@material-ui/icons/Add";
+import AddIcon from "@mui/icons-material/Add";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import {
    AddCategory,
@@ -26,10 +26,10 @@ import {
    TextField,
    Tooltip,
    Zoom,
-} from "@material-ui/core";
+} from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
-import { makeStyles } from "@material-ui/core/styles";
-import EditIcon from "@material-ui/icons/Edit";
+import makeStyles from "@mui/styles/makeStyles";
+import EditIcon from "@mui/icons-material/Edit";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 
@@ -391,6 +391,7 @@ function CategoryEditModal({
                   <Button
                      onClick={() => setEditMode(false)}
                      size="small"
+                     color="grey"
                      style={{ marginRight: 10 }}
                   >
                      Cancel

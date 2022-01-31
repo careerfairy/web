@@ -1,6 +1,6 @@
 import React from 'react';
-import {makeStyles} from "@material-ui/core/styles";
-import {Paper, Tab, Tabs} from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import {Paper, Tab, Tabs} from "@mui/material";
 import {supportSections} from "../dumyData";
 import {useRouter} from "next/router";
 

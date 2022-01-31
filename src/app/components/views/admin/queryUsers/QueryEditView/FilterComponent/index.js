@@ -1,5 +1,5 @@
 import React from "react";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import GroupAddButton from "./GroupAddButton";
 import { useDispatch, useSelector } from "react-redux";
 import FilterCard from "./FilterCard";
@@ -32,7 +32,7 @@ const FilterComponent = () => {
       <ResponsiveMasonry
          columnsCountBreakPoints={{ 350: 1, 800: 2, 1280: 2, 1450: 3 }}
       >
-         <Masonry gutter={`${theme.spacing(2)}px`}>
+         <Masonry gutter={theme.spacing(2)}>
             {filters.map((filter) => (
                <FilterCard
                   groupsLoaded={groupsLoaded}

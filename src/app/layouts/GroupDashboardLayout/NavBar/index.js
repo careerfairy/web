@@ -8,17 +8,21 @@ import {
    Hidden,
    List,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { LogOut as LogoutIcon } from "react-feather";
 import NavItem from "./NavItem";
 import { useRouter } from "next/router";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import clsx from "clsx";
 import * as actions from "../../../store/actions";
 import { compose } from "redux";
 import { connect } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
+   drawer: {
+      zIndex: theme.zIndex.drawer + 1,
+   },
    mobileDrawer: {
       width: 256,
    },
@@ -161,7 +165,7 @@ const NavBar = ({
                {content}
             </Drawer>
          </Hidden>
-         <Hidden mdDown>
+         <Hidden lgDown>
             <Drawer
                anchor="left"
                classes={{

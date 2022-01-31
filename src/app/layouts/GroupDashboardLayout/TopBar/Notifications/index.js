@@ -1,6 +1,6 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Card, CardContent, CardHeader, Popover } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Card, CardContent, CardHeader, Popover } from "@mui/material";
 import NotificationItem from "./NotificationItem";
 
 const useStyles = makeStyles((theme) => ({
@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
    },
    notificationsTitle: {},
    content: {
-      padding: `${theme.spacing(0.5)}px !important`,
+      padding: `${theme.spacing(0.5)} !important`,
    },
 }));
 

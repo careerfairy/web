@@ -8,10 +8,10 @@ import {
    Container,
    Typography,
    CircularProgress,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import DisplayCategoryElement from "./DisplayCategoryElement";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useRouter } from "next/router";
 
 const useStyles = makeStyles((theme) => ({

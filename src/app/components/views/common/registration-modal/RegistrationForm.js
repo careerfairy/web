@@ -6,17 +6,17 @@ import QuestionCreateForm from "./steps/QuestionCreateForm";
 import TalentPoolJoin from "./steps/TalentPoolJoin";
 import RegistrationComplete from "./steps/RegistrationComplete";
 import SwipeableViews from "react-swipeable-views";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    panel: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
    },
-}));
-
+};
 const steps = [
    {
       index: 0,
@@ -55,7 +55,6 @@ const RegistrationForm = () => {
       RegistrationContext
    );
    const theme = useTheme();
-   const classes = useStyles();
 
    useEffect(() => {
       setTotalSteps(steps.length);
@@ -73,7 +72,7 @@ const RegistrationForm = () => {
                value={activeStep}
                index={stepData.index}
                key={stepData.index}
-               className={classes.panel}
+               sx={styles.panel}
             >
                {stepData.step}
             </SwipeablePanel>

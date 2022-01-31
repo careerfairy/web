@@ -1,9 +1,9 @@
-import { Tooltip } from "@material-ui/core";
-import VideocamOffIcon from "@material-ui/icons/VideocamOff";
+import { Tooltip } from "@mui/material";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import React, { useEffect, useRef } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import SpeakerInfoOverlay from "./SpeakerInfoOverlay";
-import VolumeOffIcon from "@material-ui/icons/MicOff";
+import VolumeOffIcon from "@mui/icons-material/MicOff";
 
 const mutedOverlayZIndex = 9901;
 const useStyles = makeStyles((theme) => ({

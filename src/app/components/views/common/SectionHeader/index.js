@@ -1,20 +1,19 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import clsx from "clsx";
-import { Typography } from "@material-ui/core";
+import { Box, Typography } from "@mui/material";
 import GeneralSearch from "../GeneralSearch";
+import { useTheme } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme) => ({
-   sectionHeader: {
-      color: (props) => props.color,
+const styles = {
+   sectionHeader: (theme, { color }) => ({
+      color: color,
       // Add bottom margin if element below
       "&:not(:last-child)": {
          marginBottom: "3rem",
       },
-   },
+   }),
    searchWrapper: {
-      marginTop: theme.spacing(5),
+      marginTop: (theme) => theme.spacing(5),
    },
    subtitle: {
       // Subtitle text generally isn't very long
@@ -24,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
       // have alignment controlled by text-align.
       display: "inline-block",
    },
-}));
+};
 
 //
 function SectionHeader({
@@ -35,26 +34,31 @@ function SectionHeader({
    subtitle,
    title,
    titleClassName,
+   subTitleSx,
+   titleSx,
    subTitleVariant = "subtitle1",
    titleVariant = "h3",
+   sx,
 }) {
-   const classes = useStyles({
-      color: color,
-   });
+   const theme = useTheme();
    // Render nothing if no title or subtitle
    if (!title && !subtitle) {
       return null;
    }
    return (
-      <header className={clsx(className, classes.sectionHeader)}>
+      <Box
+         component="header"
+         sx={{ ...styles.sectionHeader(theme, { color }), ...sx }}
+         className={className}
+      >
          {title && (
             <Typography
                gutterBottom
                className={titleClassName}
                align="center"
+               sx={titleSx}
                variant={titleVariant}
                component="h3"
-               margin={20}
             >
                {title}
             </Typography>
@@ -62,17 +66,21 @@ function SectionHeader({
 
          {subtitle && (
             <Typography align="center" component="h5" variant={subTitleVariant}>
-               <span className={clsx(classes.subtitle, subTitleClassName)}>
+               <Box
+                  component="span"
+                  sx={{ ...styles.subtitle, ...subTitleSx }}
+                  className={subTitleClassName}
+               >
                   {subtitle}
-               </span>
+               </Box>
             </Typography>
          )}
          {hasSearch && (
-            <div className={classes.searchWrapper}>
+            <Box sx={styles.searchWrapper}>
                <GeneralSearch />
-            </div>
+            </Box>
          )}
-      </header>
+      </Box>
    );
 }
 
@@ -83,6 +91,7 @@ SectionHeader.propTypes = {
    subTitleClassName: PropTypes.string,
    titleClassName: PropTypes.string,
    color: PropTypes.string,
+   sx: PropTypes.object,
 };
 
 export default SectionHeader;

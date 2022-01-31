@@ -1,4 +1,4 @@
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
 export default function CountdownTimer(props) {

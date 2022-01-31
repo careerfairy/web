@@ -1,31 +1,29 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
 import { analyticsSVG } from "../../../../constants/images";
-import clsx from "clsx";
 import SectionContainer from "../../common/Section/Container";
 import { analyticsShowCaseVideoUrl } from "../../../../constants/videos";
 import Fade from "@stahl.luke/react-reveal/Fade";
 import LightSpeed from "@stahl.luke/react-reveal/LightSpeed";
+import { Box } from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    section: {
       position: "relative",
    },
    subTitle: {
-      color: theme.palette.text.secondary,
+      color: (theme) => theme.palette.text.secondary,
       fontWeight: 500,
    },
    title: {},
    graphicIllustration: {
       width: "100%",
       height: "auto",
-      maxWidth: 600,
+      maxWidth: "600px",
    },
-   analyticsPreviewImage: {},
-   videoWrapper: {
+   videoWrapper: (theme) => ({
       zIndex: 1,
       width: "100%",
       height: "auto",
@@ -36,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
          width: "100%",
          boxShadow: theme.shadows[15],
       },
-   },
+   }),
    imagesWrapper: {
       display: "flex",
       flexDirection: "column",
@@ -57,20 +55,16 @@ const useStyles = makeStyles((theme) => ({
    dashboardDemoWrapper: {
       width: "100%",
    },
-}));
+};
 
 const AnalyticsSection = (props) => {
-   const classes = useStyles();
-
    return (
       <Section
-         className={classes.section}
+         sx={styles.section}
          big={props.big}
          color={props.color}
-         backgroundImageClassName={clsx(
-            props.backgroundImageClassName,
-            classes.analyticsImage
-         )}
+         backgroundImageClassName={props.backgroundImageClassName}
+         backgroundImageSx={styles.analyticsImage}
          backgroundImage={props.backgroundImage}
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
@@ -79,21 +73,22 @@ const AnalyticsSection = (props) => {
             <Fade right>
                <SectionHeader
                   color={props.color}
-                  subTitleClassName={classes.subTitle}
-                  titleClassName={classes.title}
+                  subTitleSx={styles.subTitle}
+                  titleSx={styles.title}
                   title={props.title}
                   subtitle={props.subtitle}
                />
             </Fade>
-            <div className={classes.imagesWrapper}>
+            <Box sx={styles.imagesWrapper}>
                <LightSpeed left>
-                  <img
-                     className={classes.graphicIllustration}
+                  <Box
+                     component="img"
+                     sx={styles.graphicIllustration}
                      src={analyticsSVG}
                      alt="analytics"
                   />
                </LightSpeed>
-               <div className={classes.videoWrapper}>
+               <Box sx={styles.videoWrapper}>
                   <Fade duration={500} left>
                      <video
                         src={analyticsShowCaseVideoUrl}
@@ -102,8 +97,8 @@ const AnalyticsSection = (props) => {
                         loop
                      />
                   </Fade>
-               </div>
-            </div>
+               </Box>
+            </Box>
          </SectionContainer>
       </Section>
    );

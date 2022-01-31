@@ -14,8 +14,8 @@ import {
    MenuItem,
    Select,
    Typography,
-} from "@material-ui/core";
-import Box from "@material-ui/core/Box";
+} from "@mui/material";
+import Box from "@mui/material/Box";
 import { DynamicColorButton } from "materialUI/GlobalButtons/GlobalButtons";
 import { MAX_BREAKOUT_ROOMS } from "constants/breakoutRooms";
 
@@ -122,7 +122,9 @@ const CreateBreakoutRoomsView = ({ handleClose }) => {
             {/*</Box>*/}
          </DialogContent>
          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button color="grey" onClick={handleClose}>
+               Cancel
+            </Button>
             <DynamicColorButton
                color="primary"
                loading={loading}

@@ -8,11 +8,11 @@ import {
    CircularProgress,
    Grid,
    Typography,
-} from "@material-ui/core";
-import InsertChartIcon from "@material-ui/icons/InsertChartOutlined";
+} from "@mui/material";
+import InsertChartIcon from "@mui/icons-material/InsertChartOutlined";
 import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext";
-import orange from "@material-ui/core/colors/orange";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { orange } from '@mui/material/colors';
 
 const useStyles = makeStyles(() => ({
    root: {

@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import {
    Button,
    Dialog,
@@ -9,7 +9,7 @@ import {
    DialogTitle,
    Slide,
    TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useFormik } from "formik";
 import { EMAIL_REGEX } from "../../util/constants";
 import PropTypes from "prop-types";
@@ -68,6 +68,7 @@ const EnterDetailsModal = ({
                   helperText={formik.errors.name}
                   label="Name"
                   autoComplete="name"
+                  sx={{ my: 1 }}
                   disabled={formik.isSubmitting}
                   name="name"
                   onChange={formik.handleChange}
@@ -89,7 +90,9 @@ const EnterDetailsModal = ({
                />
             </DialogContent>
             <DialogActions>
-               <Button onClick={handleClose}>Cancel</Button>
+               <Button color="grey" onClick={handleClose}>
+                  Cancel
+               </Button>
                <Button
                   variant="contained"
                   color="primary"

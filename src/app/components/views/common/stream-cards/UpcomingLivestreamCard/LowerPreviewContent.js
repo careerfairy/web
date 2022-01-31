@@ -1,9 +1,8 @@
 import React from "react";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import StreamAvatarGroup from "./StreamAvatarGroup";
-import { makeStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    lowerMiniWrapper: {
       display: "flex",
       width: "100%",
@@ -20,16 +19,16 @@ const useStyles = makeStyles((theme) => ({
       width: "60%",
       justifyContent: "center",
    },
-}));
+};
+
 const LowerPreviewContent = ({ groups, speakers }) => {
-   const classes = useStyles();
    return (
-      <Box className={classes.lowerMiniWrapper}>
-         <Box className={classes.miniSpeakersWrapper}>
+      <Box sx={styles.lowerMiniWrapper}>
+         <Box sx={styles.miniSpeakersWrapper}>
             <StreamAvatarGroup avatars={speakers} max={3} />
          </Box>
          {!!groups.length && (
-            <Box className={classes.miniGroupsWrapper}>
+            <Box sx={styles.miniGroupsWrapper}>
                <StreamAvatarGroup isLogo avatars={groups} max={5} />
             </Box>
          )}

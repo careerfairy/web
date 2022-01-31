@@ -1,8 +1,8 @@
-import { Card, CardContent, Collapse } from "@material-ui/core";
+import { Card, CardContent, Collapse } from "@mui/material";
 import BioAvatar from "./BioAvatar";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
       },
    },
    greenBorder: {
-      borderBottom: `${theme.spacing(0.5)}px solid ${
+      borderBottom: `${theme.spacing(0.5)} solid ${
          theme.palette.primary.dark
       }`,
    },

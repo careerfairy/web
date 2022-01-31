@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import GroupLogo from "../common/GroupLogo";
 import {
    Button,
@@ -9,7 +9,7 @@ import {
    Grid,
    Slide,
    TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import { RegistrationContext } from "../../../../../context/registration/RegistrationContext";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import { useRouter } from "next/router";

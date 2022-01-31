@@ -11,12 +11,13 @@ import {
    Stepper,
    Step,
    CircularProgress,
-} from "@material-ui/core";
+} from "@mui/material";
 import Step1Chrome from "./Step1Chrome";
 import Step2Camera from "./Step2Camera";
 import Step4Mic from "./Step4Mic";
 import Step5Confirm from "./Step5Confirm";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import { GlassDialog } from "materialUI/GlobalModals";
 import Step3Speakers from "./Step3Speakers";
 
@@ -74,7 +75,7 @@ const StreamPreparationModalV2 = ({
    const [activeStep, setActiveStep] = useState(0);
    const [completed, setCompleted] = useState(new Set());
    const [skipped, setSkipped] = useState(new Set());
-   const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
+   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
    const steps = getSteps();
 
    const totalSteps = () => {
@@ -289,7 +290,7 @@ const StreamPreparationModalV2 = ({
          maxWidth="sm"
          open={streamerConnected && !streamerReady}
       >
-         <DialogTitle disableTypography>
+         <DialogTitle>
             <h3 style={{ color: "rgb(0, 210, 170)" }}>CareerFairy Streaming</h3>
          </DialogTitle>
          <DialogContent className={classes.root}>
@@ -298,6 +299,7 @@ const StreamPreparationModalV2 = ({
                   className={classes.stepper}
                   activeStep={activeStep}
                   alternativeLabel
+                  sx={{ mb: 3 }}
                >
                   {steps.map((label, index) => {
                      const stepProps = {};

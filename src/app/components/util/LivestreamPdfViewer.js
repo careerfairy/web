@@ -10,15 +10,15 @@ import {
    DialogContent,
    IconButton,
    LinearProgress,
-} from "@material-ui/core";
-import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
+} from "@mui/material";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 
 import FilePickerContainer from "components/ssr/FilePickerContainer";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
 
 const useStyles = makeStyles((theme) => ({

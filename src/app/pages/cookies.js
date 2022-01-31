@@ -1,4 +1,4 @@
-import { Button, Container } from "@material-ui/core";
+import { Button, Container } from "@mui/material";
 import Header from "../components/views/header/Header";
 import { Cookies } from "react-cookie-consent";
 import GeneralLayout from "layouts/GeneralLayout";

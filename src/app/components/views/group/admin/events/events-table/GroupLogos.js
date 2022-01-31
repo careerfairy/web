@@ -10,11 +10,11 @@ import {
    ListItemAvatar,
    ListItemText,
    Typography,
-} from "@material-ui/core";
-import { AvatarGroup } from "@material-ui/lab";
+} from "@mui/material";
+import { AvatarGroup } from '@mui/material';
 import clsx from "clsx";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { makeStyles } from "@material-ui/core/styles";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import makeStyles from '@mui/styles/makeStyles';
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
@@ -88,7 +88,7 @@ const GroupLogos = ({ groupsDictionary, groupIds, clicked }) => {
                         })}
                         aria-expanded={clicked}
                         aria-label="show more"
-                     >
+                        size="large">
                         <ExpandMoreIcon />
                      </IconButton>
                   </Box>

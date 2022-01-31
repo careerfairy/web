@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types'
 import React, {useState, useEffect} from "react";
-import {Accordion, AccordionDetails, AccordionSummary, Grow, IconButton, Typography} from "@material-ui/core";
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import {makeStyles} from "@material-ui/core/styles";
-import LinkIcon from '@material-ui/icons/Link';
+import {Accordion, AccordionDetails, AccordionSummary, Grow, IconButton, Typography} from "@mui/material";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import makeStyles from '@mui/styles/makeStyles';
+import LinkIcon from '@mui/icons-material/Link';
 import {copyStringToClipboard} from "../../../../helperFunctions/HelperFunctions";
 import * as actions from "../../../../../store/actions";
 import {useDispatch} from "react-redux";
@@ -82,7 +82,7 @@ const FaqItem = ({answer, href, question}) => {
                         className={classes.summaryLinkIcon}
                         onClick={handleCopyFaqLink}
                         component="a"
-                    >
+                        size="large">
                         <LinkIcon/>
                     </IconButton>
                 </Grow>

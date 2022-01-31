@@ -10,7 +10,7 @@ import {
    DialogTitle,
    Grid,
    TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import CopyLinkButton from "components/views/common/CopyLinkButton";
 
 const StreamerLinksDialogContent = ({

@@ -2,8 +2,8 @@ import React, { memo } from "react";
 import StreamBanner from "./StreamBanner";
 import useStreamToken from "../../custom-hook/useStreamToken";
 import { useCurrentStream } from "../../../context/stream/StreamContext";
-import { Button, Tooltip } from "@material-ui/core";
-import BreakoutRoomIcon from "@material-ui/icons/Widgets";
+import { Button, Tooltip } from "@mui/material";
+import BreakoutRoomIcon from "@mui/icons-material/Widgets";
 
 const BreakoutRoomBanner = memo(() => {
 

@@ -15,11 +15,11 @@ import {
    CircularProgress,
    Button,
    Paper,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import TheatersRoundedIcon from "@material-ui/icons/TheatersRounded";
-import BusinessCenterRoundedIcon from "@material-ui/icons/BusinessCenterRounded";
-import MicOutlinedIcon from "@material-ui/icons/MicOutlined";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import TheatersRoundedIcon from "@mui/icons-material/TheatersRounded";
+import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded";
+import MicOutlinedIcon from "@mui/icons-material/MicOutlined";
 import { useAuth } from "../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({

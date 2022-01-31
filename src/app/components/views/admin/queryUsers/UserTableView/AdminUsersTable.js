@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Card } from "@material-ui/core";
+import { Card } from "@mui/material";
 import {
    defaultTableOptions,
    exportSelectionAction,

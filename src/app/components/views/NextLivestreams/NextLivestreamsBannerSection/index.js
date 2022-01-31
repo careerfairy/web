@@ -1,12 +1,11 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import Section from "../../common/Section";
-import { Container } from "@material-ui/core";
+import { Container } from "@mui/material";
 import SectionHeader from "../../common/SectionHeader";
 import StreamsTab from "../StreamsTab";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    container: {
       zIndex: 1,
       "&.MuiContainer-root": {
@@ -14,20 +13,18 @@ const useStyles = makeStyles((theme) => ({
       },
    },
    section: {
-      paddingBottom: theme.spacing(1),
+      pb: [1, "!important"],
    },
    defaultTitle: {
       fontSize: "1.8rem",
       letterSpacing: "8px",
    },
-}));
+};
 
 const NextLivestreamsBannerSection = (props) => {
-   const classes = useStyles();
-
    return (
       <Section
-         className={classes.section}
+         sx={styles.section}
          big={props.big}
          color={props.color}
          backgroundImageClassName={props.backgroundImageClassName}
@@ -35,12 +32,12 @@ const NextLivestreamsBannerSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         <Container className={classes.container}>
+         <Container sx={styles.container}>
             <SectionHeader
                color={props.color}
                title={props.title}
                subtitle={props.subtitle}
-               titleClassName={classes.defaultTitle}
+               subTitleSx={styles.defaultTitle}
             />
             <StreamsTab handleChange={props.handleChange} value={props.value} />
          </Container>

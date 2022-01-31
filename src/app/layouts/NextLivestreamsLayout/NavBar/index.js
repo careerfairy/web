@@ -1,11 +1,11 @@
 import React, { memo, useEffect, useState } from "react";
 import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
-import ListItem from "@material-ui/core/ListItem";
-import { Box, CircularProgress, Grow, Hidden } from "@material-ui/core";
+import makeStyles from "@mui/styles/makeStyles";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import ListItem from "@mui/material/ListItem";
+import { Box, CircularProgress, Grow, Hidden } from "@mui/material";
 import { useAuth } from "../../../HOCs/AuthProvider";
 import { useRouter } from "next/router";
 import {
@@ -19,7 +19,6 @@ import * as actions from "../../../store/actions";
 import GroupNavLink from "./groupNavLink";
 import NavPrompt from "./navPrompt";
 import { signInImage } from "../../../constants/images";
-import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import useFollowingGroups from "../../../components/custom-hook/useFollowingGroups";
 import LoginButtonComponent from "components/views/common/LoginButton";
 
@@ -61,9 +60,6 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const ListItemWrapper = ({ active, children }) =>
-   active ? <Grow in>{children}</Grow> : <>{children}</>;
-
 function LoginButton() {
    return (
       <ListItem>
@@ -81,7 +77,6 @@ const FeedDrawer = memo(
       drawerBottomLinks,
       drawerTopLinks,
       drawerWidth,
-      firebase,
    }) => {
       const classes = useStyles({ drawerWidth });
       const {
@@ -92,7 +87,7 @@ const FeedDrawer = memo(
       const [groups, setGroups] = useState(null);
       const dispatch = useDispatch();
       const signOut = () => dispatch(actions.signOut());
-      const [followingGroups, loading] = useFollowingGroups(firebase);
+      const [followingGroups, loading] = useFollowingGroups();
 
       useEffect(() => {
          if (userData) {
@@ -146,19 +141,14 @@ const FeedDrawer = memo(
                ) : groups?.length ? (
                   <List>
                      {groups?.map(({ universityName, groupId, logoUrl }) => (
-                        <ListItemWrapper
+                        <GroupNavLink
                            key={groupId}
-                           active={groupIdInQuery === groupId}
-                        >
-                           <GroupNavLink
-                              key={groupId}
-                              groupId={groupId}
-                              onClick={onMobileClose}
-                              groupIdInQuery={groupIdInQuery}
-                              alt={universityName}
-                              src={getResizedUrl(logoUrl, "xs")}
-                           />
-                        </ListItemWrapper>
+                           groupId={groupId}
+                           onClick={onMobileClose}
+                           groupIdInQuery={groupIdInQuery}
+                           alt={universityName}
+                           src={getResizedUrl(logoUrl, "xs")}
+                        />
                      ))}
                   </List>
                ) : (
@@ -208,7 +198,7 @@ const FeedDrawer = memo(
                   {content}
                </Drawer>
             </Hidden>
-            <Hidden mdDown>
+            <Hidden lgDown>
                <Drawer
                   anchor="left"
                   classes={{
@@ -226,4 +216,4 @@ const FeedDrawer = memo(
    }
 );
 
-export default withFirebase(FeedDrawer);
+export default FeedDrawer;

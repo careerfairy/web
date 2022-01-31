@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import LandingLayout from "../layouts/LandingLayout";
 import BookADemoSection from "../components/views/landing/BookADemoSection";
 import TestimonialsSection from "../components/views/landing/TestimonialsSection";
@@ -111,6 +111,14 @@ const LandingPage = ({}) => {
          <ScrollToTop />
       </LandingLayout>
    );
+};
+
+export const getServerSideProps = () => {
+   return {
+      redirect: {
+         destination: "/",
+      },
+   };
 };
 
 export default LandingPage;

@@ -4,12 +4,12 @@ import {
    CardActionArea,
    CardContent,
    CardHeader,
-} from "@material-ui/core";
+} from "@mui/material";
 import Link from "../../../materialUI/NextNavLink";
-import CardMedia from "@material-ui/core/CardMedia";
+import CardMedia from "@mui/material/CardMedia";
 import { searchImage } from "../../../constants/images";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    media: {

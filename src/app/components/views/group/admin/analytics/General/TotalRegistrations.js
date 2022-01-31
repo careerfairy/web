@@ -8,12 +8,12 @@ import {
    CircularProgress,
    Grid,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext";
-import AddToPhotosRoundedIcon from "@material-ui/icons/AddToPhotosRounded";
+import AddToPhotosRoundedIcon from "@mui/icons-material/AddToPhotosRounded";
 import PercentageDisplay from "./common/PercentageDisplay";
-import { makeStyles } from "@material-ui/core/styles";
-import red from "@material-ui/core/colors/red";
+import makeStyles from '@mui/styles/makeStyles';
+import { red } from '@mui/material/colors';
 
 const useStyles = makeStyles((theme) => ({
    root: {

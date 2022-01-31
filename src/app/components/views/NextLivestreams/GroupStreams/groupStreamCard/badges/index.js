@@ -1,34 +1,29 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import WhatshotIcon from "@material-ui/icons/Whatshot";
-import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
-import { Chip } from "@material-ui/core";
-import clsx from "clsx";
+import WhatshotIcon from "@mui/icons-material/Whatshot";
+import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
+import { Chip } from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    warningChip: {
-      backgroundColor: theme.palette.warning.main,
-      color: theme.palette.common.white,
+      backgroundColor: (theme) => theme.palette.warning.main,
+      color: (theme) => theme.palette.common.white,
    },
    badgeWhite: {
-      color: theme.palette.common.white,
-      borderColor: theme.palette.common.white,
+      color: (theme) => theme.palette.common.white,
+      borderColor: (theme) => theme.palette.common.white,
       backgroundColor: "transparent",
    },
-}));
+};
 
 export const LimitedRegistrationsBadge = ({
    numberOfSpotsRemaining,
    white,
 }) => {
-   const classes = useStyles();
    const MIN_NUMBER_OF_DISPLAYED_SPOTS = 10;
    return (
       <Chip
          icon={<WhatshotIcon style={{ color: "white" }} />}
-         className={clsx(classes.warningChip, {
-            [classes.badgeWhite]: white,
-         })}
+         sx={[styles.warningChip, white && styles.badgeWhite]}
          variant={white && "outlined"}
          label={
             numberOfSpotsRemaining < MIN_NUMBER_OF_DISPLAYED_SPOTS
@@ -39,15 +34,12 @@ export const LimitedRegistrationsBadge = ({
    );
 };
 
-export const InPersonEventBadge = ({ numberOfSpotsRemaining, white }) => {
-   const classes = useStyles();
+export const InPersonEventBadge = ({ white }) => {
    return (
       <Chip
          icon={<EmojiPeopleIcon style={{ color: "white" }} />}
          label="In-Person Event"
-         className={clsx({
-            [classes.badgeWhite]: white,
-         })}
+         sx={[white && styles.badgeWhite]}
          variant={white && "outlined"}
          color="secondary"
       />

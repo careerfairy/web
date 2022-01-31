@@ -1,9 +1,9 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
+import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import { useFirebaseService, withFirebase } from "context/firebase/FirebaseServiceContext";
-import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import ChatEntryContainer from "./ChatEntryContainer";
-import ExpandLessRoundedIcon from "@material-ui/icons/ExpandLessRounded";
+import ExpandLessRoundedIcon from "@mui/icons-material/ExpandLessRounded";
 import {
    Accordion,
    AccordionDetails,
@@ -14,9 +14,10 @@ import {
    Typography,
    IconButton,
    Button,
-} from "@material-ui/core";
-import { makeStyles, alpha, useTheme } from "@material-ui/core/styles";
-import { grey } from "@material-ui/core/colors";
+} from "@mui/material";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { grey } from "@mui/material/colors";
 import TutorialContext from "../../../../../../context/tutorials/TutorialContext";
 import {
    TooltipButtonComponent,
@@ -271,7 +272,7 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
             }}
             disabled={isEmpty}
             onClick={() => addNewChatEntry()}
-         >
+            size="large">
             <ChevronRightRoundedIcon className={classes.sendIcon} />
          </IconButton>
       </div>

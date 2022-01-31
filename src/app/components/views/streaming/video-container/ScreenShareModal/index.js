@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { GlassDialog } from "../../../../../materialUI/GlobalModals";
 import PropTypes from "prop-types";
 import GraphicButton from "../../../../../materialUI/GlobalButtons/GraphicButton";
@@ -15,7 +15,7 @@ import {
    Checkbox,
    Typography,
    FormControlLabel,
-} from "@material-ui/core";
+} from "@mui/material";
 import { demoSlides, demoVideo } from "../../../../util/constants";
 
 const sharAudioDemo =

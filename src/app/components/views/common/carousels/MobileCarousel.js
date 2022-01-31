@@ -1,12 +1,13 @@
 import React from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import PropTypes from "prop-types";
 import SwipeableViews from "react-swipeable-views";
 import SpeakerInfoCard from "../stream-cards/SpeakerInfoCard";
 import { autoPlay } from "react-swipeable-views-utils";
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
@@ -16,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(1),
    },
    arrow: {
-      [theme.breakpoints.down("md")]: {
+      [theme.breakpoints.down('lg')]: {
          display: ["none", "!important"],
       },
       zIndex: 1,

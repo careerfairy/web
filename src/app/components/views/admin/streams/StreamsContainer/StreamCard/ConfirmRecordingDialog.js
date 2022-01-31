@@ -5,7 +5,7 @@ import {
    DialogActions,
    DialogContent,
    DialogTitle,
-} from "@material-ui/core";
+} from "@mui/material";
 
 const ConfirmRecordingDialog = ({
    action,
@@ -25,7 +25,9 @@ const ConfirmRecordingDialog = ({
             <DialogTitle>Confirm {action}</DialogTitle>
             <DialogContent>{confirmText}</DialogContent>
             <DialogActions>
-               <Button onClick={() => onclose()}>Cancel</Button>
+               <Button color="grey" onClick={() => onclose()}>
+                  Cancel
+               </Button>
                <Button color="primary" onClick={handleConfirm}>
                   Confirm
                </Button>

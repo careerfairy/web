@@ -2,7 +2,8 @@ import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import SwipeableViews from "react-swipeable-views";
 import General from "./General";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels";
 import Audience from "./Audience";
 import Title from "./Title";
@@ -16,7 +17,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import * as actions from "../../../../../store/actions";
-import { AppBar, Box, Tab, Tabs } from "@material-ui/core";
+import { AppBar, Box, Tab, Tabs } from "@mui/material";
 import {
    checkIfInTalentPool,
    arraysOfIdsEqual,

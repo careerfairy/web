@@ -1,6 +1,7 @@
 import React, { memo, useContext, useEffect, useMemo, useState } from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import Box from "@material-ui/core/Box";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import Box from "@mui/material/Box";
 import {
    Button,
    IconButton,
@@ -12,12 +13,12 @@ import {
    MenuItem,
    Tooltip,
    Typography,
-} from "@material-ui/core";
-import SettingsIcon from "@material-ui/icons/MoreVert";
+} from "@mui/material";
+import SettingsIcon from "@mui/icons-material/MoreVert";
 import LinkifyText from "../../../../util/LinkifyText";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
-import ResendIcon from "@material-ui/icons/Repeat";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ResendIcon from "@mui/icons-material/Repeat";
 import {
    callToActionsDictionary,
    callToActionsSocialsDictionary,

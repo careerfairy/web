@@ -11,7 +11,7 @@ import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
 import VideoControlsContainer from "./VideoControlsContainer";
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
 import useDevices from "components/custom-hook/useDevices";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import TutorialContext from "context/tutorials/TutorialContext";
 import DemoIntroModal from "../modal/DemoIntroModal";
 import DemoEndModal from "../modal/DemoEndModal";

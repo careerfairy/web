@@ -10,9 +10,9 @@ import {
    MenuItem,
    Select,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useAudio } from "components/custom-hook/useAudio";
 
 const useStyles = makeStyles((theme) => ({

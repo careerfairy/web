@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import GroupAddIcon from "@material-ui/icons/GroupAdd";
-import EditIcon from "@material-ui/icons/Edit";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import EditIcon from "@mui/icons-material/Edit";
 import {
    Button,
    Card,
@@ -9,7 +9,7 @@ import {
    CardMedia,
    Grid,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import GroupJoinModal from "./GroupJoinModal";
 import Fade from "@stahl.luke/react-reveal/Fade";
 

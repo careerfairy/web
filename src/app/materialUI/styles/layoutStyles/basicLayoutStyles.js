@@ -1,23 +1,23 @@
-const basicLayoutStyles = (theme) => ({
-   root: {
+export const styles = {
+   root: (theme) => ({
       backgroundColor: theme.palette.background.dark,
       display: "flex",
       height: "100vh",
       overflow: "hidden",
       width: "100%",
-   },
-   wrapper: {
+   }),
+   wrapper: (theme) => ({
       display: "flex",
       flex: "1 1 auto",
       overflow: "hidden",
-      paddingTop: 64,
+      paddingTop: "64px",
       [theme.breakpoints.up("lg")]: {
-         paddingLeft: 256,
+         paddingLeft: "256px",
       },
-      [theme.breakpoints.down("xs")]: {
-         paddingTop: 56,
+      [theme.breakpoints.down("sm")]: {
+         paddingTop: "56px",
       },
-   },
+   }),
    contentContainer: {
       display: "flex",
       flex: "1 1 auto",
@@ -30,6 +30,4 @@ const basicLayoutStyles = (theme) => ({
       display: "flex",
       flexDirection: "column",
    },
-});
-
-export default basicLayoutStyles;
+};

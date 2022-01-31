@@ -22,10 +22,10 @@ import QuestionsSection from "../../components/views/upcoming-livestream/Questio
 import useInfiniteScrollServer from "../../components/custom-hook/useInfiniteScrollServer";
 import SpeakersSection from "../../components/views/upcoming-livestream/SpeakersSection";
 import TalentPoolSection from "../../components/views/upcoming-livestream/TalentPoolSection";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import ContactSection from "../../components/views/upcoming-livestream/ContactSection";
 import Navigation from "../../components/views/upcoming-livestream/Navigation";
-import { useMediaQuery } from "@material-ui/core";
+import { useMediaQuery } from "@mui/material";
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null);
@@ -33,7 +33,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const questionsRef = useRef(null);
 
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+   const mobile = useMediaQuery(theme.breakpoints.down('md'));
 
    const [stream, setStream] = useState(parseStreamDates(serverStream));
    const [registered, setRegistered] = useState(false);

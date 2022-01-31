@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {useTheme} from "@material-ui/core/styles";
+import {useTheme} from "@mui/material/styles";
 import NextLivestreamsLayout from "layouts/NextLivestreamsLayout";
 import GroupBannerSection from "components/views/NextLivestreams/GroupBannerSection";
 import useListenToGroupStreams from "components/custom-hook/useGroupUpcomingStreams";

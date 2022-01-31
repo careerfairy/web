@@ -1,39 +1,26 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import { Grid, Hidden } from "@material-ui/core";
+import { Grid, Hidden } from "@mui/material";
 import LaptopVideo from "./LaptopVideo";
 import GeneralHeroMessage from "./HeroMessage";
 import SectionContainer from "../../common/Section/Container";
-import Slide from "@material-ui/core/Slide";
+import Slide from "@mui/material/Slide";
 
-const useStyles = makeStyles((theme) => ({
-   section: {},
-   heroContainer: {},
-   subTitle: {
-      color: theme.palette.text.secondary,
-      fontWeight: 500,
-   },
-
-   heroContent: {
-      padding: theme.spacing(0, 5),
-      maxWidth: 780,
-   },
-   heroContentWrapper: {
+const styles = {
+   messageGridItem: (theme) => ({
       display: "flex",
       justifyContent: "flex-end",
       alignItems: "flex-end",
-      [theme.breakpoints.down("md")]: {
+      [theme.breakpoints.down("lg")]: {
          justifyContent: "center",
       },
-   },
-   laptopVideoWrapper: {
+   }),
+   laptopGridItem: {
       display: "flex",
       alignItems: "center",
    },
-}));
-
+};
 const HeroSection = ({
    backgroundColor,
    backgroundImage,
@@ -46,11 +33,9 @@ const HeroSection = ({
    title,
    subTitle,
 }) => {
-   const classes = useStyles();
    return (
       <Section
          big={big}
-         className={classes.section}
          color={color}
          backgroundImageClassName={backgroundImageClassName}
          backgroundImage={backgroundImage}
@@ -58,14 +43,9 @@ const HeroSection = ({
          backgroundColor={backgroundColor}
       >
          <SectionContainer maxWidth="xl">
-            <Grid className={classes.heroContainer} spacing={2} container>
+            <Grid spacing={2} container>
                <Slide timeout={1000} in direction="right">
-                  <Grid
-                     className={classes.heroContentWrapper}
-                     item
-                     xs={12}
-                     lg={6}
-                  >
+                  <Grid sx={styles.messageGridItem} item xs={12} lg={6}>
                      <GeneralHeroMessage
                         title={title}
                         subTitle={subTitle}
@@ -74,9 +54,9 @@ const HeroSection = ({
                      />
                   </Grid>
                </Slide>
-               <Hidden mdDown>
+               <Hidden lgDown>
                   <Slide timeout={1000} in direction="left">
-                     <Grid className={classes.laptopVideoWrapper} item md={6}>
+                     <Grid sx={styles.laptopGridItem} item md={6}>
                         <LaptopVideo />
                      </Grid>
                   </Slide>

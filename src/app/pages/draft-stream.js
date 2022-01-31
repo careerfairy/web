@@ -3,7 +3,7 @@ import Head from "next/head";
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 import React, { useEffect, useRef, useState } from "react";
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import DraftStreamForm from "../components/views/draftStreamForm/DraftStreamForm";
 import { buildLivestreamObject } from "../components/helperFunctions/streamFormFunctions";
 import { useSnackbar } from "notistack";

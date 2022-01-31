@@ -11,7 +11,7 @@ import { GlobalBackground } from "../../materialUI/GlobalBackground/GlobalBackGr
 import Loader from "../../components/views/loader/Loader";
 import { useAuth } from "../../HOCs/AuthProvider";
 
-import { Stepper, Step, StepLabel, Container } from "@material-ui/core";
+import { Stepper, Step, StepLabel, Container } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { GENERAL_ERROR } from "../../components/util/constants";
 import defaultCategories from "../../components/views/group/create/defaultCategories";

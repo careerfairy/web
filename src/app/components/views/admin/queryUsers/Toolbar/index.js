@@ -1,20 +1,20 @@
 import PropTypes from "prop-types";
 import React, { useState } from "react";
 import * as actions from "../../../../../store/actions";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import {
    Card,
    CardActions,
    CardHeader,
    TextField,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { DynamicColorButton } from "../../../../../materialUI/GlobalButtons/GlobalButtons";
-import SaveIcon from "@material-ui/icons/Save";
-import DeleteIcon from "@material-ui/icons/DeleteForever";
-import SearchIcon from "@material-ui/icons/Search";
-import AddDatasetIcon from "@material-ui/icons/PostAdd";
+import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/DeleteForever";
+import SearchIcon from "@mui/icons-material/Search";
+import AddDatasetIcon from "@mui/icons-material/PostAdd";
 import DataSetDrawer from "./DataSetDrawer";
 
 const Toolbar = ({ queryDataSet, loading }) => {

@@ -1,17 +1,15 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useRef, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import {
    Checkbox,
    Collapse,
    List,
    ListItem,
-   Slide,
    ListItemIcon,
    ListItemText,
-} from "@material-ui/core";
+} from "@mui/material";
 import { colorsArray } from "../../components/util/colors";
-import { TransitionGroup } from "react-transition-group";
 
 const useStyles = makeStyles((theme) => ({
    list: {
@@ -93,45 +91,39 @@ const CustomLegend = ({
    };
 
    return (
-      <List className={classes.list} dense>
-         <TransitionGroup>
-            {options.length > 0 && (
-               <Slide>
-                  <TransitionGroup>
-                     {legendLabels.map((option) => (
-                        <Collapse key={`${option.name}-${option.index}`}>
-                           <ListItem
-                              dense
-                              onClick={(e) =>
-                                 handleClickLegend(e, option.index)
-                              }
-                              button
-                           >
-                              <ListItemIcon style={{ minWidth: 0 }}>
-                                 <Checkbox
-                                    edge="start"
-                                    style={{ color: colors[option.index] }}
-                                    checked={
-                                       !legendLabels?.[option.index]?.hidden
-                                    }
-                                 />
-                              </ListItemIcon>
-                              <ListItemText>
-                                 {option[optionLabelProp]}
-                                 <br />
-                                 <strong>
-                                    [{option[optionValueProp]} {optionDataType}
-                                    {option[optionValueProp] !== 1 && "s"}]
-                                 </strong>
-                              </ListItemText>
-                           </ListItem>
-                        </Collapse>
-                     ))}
-                  </TransitionGroup>
-               </Slide>
-            )}
-         </TransitionGroup>
-      </List>
+      <Collapse
+         sx={{
+            width: "100%",
+         }}
+         in={Boolean(options.length)}
+      >
+         <List className={classes.list} dense>
+            {legendLabels.map((option) => (
+               <ListItem
+                  dense
+                  key={`${option.name}-${option.index}`}
+                  onClick={(e) => handleClickLegend(e, option.index)}
+                  button
+               >
+                  <ListItemIcon style={{ minWidth: 0 }}>
+                     <Checkbox
+                        edge="start"
+                        style={{ color: colors[option.index] }}
+                        checked={!legendLabels?.[option.index]?.hidden}
+                     />
+                  </ListItemIcon>
+                  <ListItemText>
+                     {option[optionLabelProp]}
+                     <br />
+                     <strong>
+                        [{option[optionValueProp]} {optionDataType}
+                        {option[optionValueProp] !== 1 && "s"}]
+                     </strong>
+                  </ListItemText>
+               </ListItem>
+            ))}
+         </List>
+      </Collapse>
    );
 };
 

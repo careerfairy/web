@@ -7,7 +7,7 @@ import {
    DialogContent,
    DialogContentText,
    DialogTitle,
-} from "@material-ui/core";
+} from "@mui/material";
 import { GlassDialog } from "materialUI/GlobalModals";
 import { v4 as uuid } from "uuid";
 import useStreamRef from "../../../custom-hook/useStreamRef";
@@ -100,27 +100,28 @@ const DemoIntroModal = ({ open, handleClose }) => {
             <DialogContentText>
                Would you like to partake in the tutorial?
             </DialogContentText>
-            <DialogActions>
-               <Button
-                  onClick={handleStartDemo}
-                  startIcon={
-                     loading && <CircularProgress size={20} color="inherit" />
-                  }
-                  disabled={loading}
-                  variant="contained"
-                  color="primary"
-               >
-                  Yes Please
-               </Button>
-               <Button
-                  onClick={() => handleClose(false)}
-                  disabled={loading}
-                  variant="contained"
-               >
-                  No Thanks
-               </Button>
-            </DialogActions>
          </DialogContent>
+
+         <DialogActions>
+            <Button
+               onClick={handleStartDemo}
+               startIcon={
+                  loading && <CircularProgress size={20} color="inherit" />
+               }
+               disabled={loading}
+               variant="contained"
+               color="primary"
+            >
+               Yes Please
+            </Button>
+            <Button
+               onClick={() => handleClose(false)}
+               color="grey"
+               disabled={loading}
+            >
+               No Thanks
+            </Button>
+         </DialogActions>
       </GlassDialog>
    );
 };

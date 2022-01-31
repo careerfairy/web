@@ -1,5 +1,7 @@
 import React from "react";
-import { Divider, makeStyles } from "@material-ui/core";
+import { Divider } from "@mui/material";
+
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    whiteDivider: {

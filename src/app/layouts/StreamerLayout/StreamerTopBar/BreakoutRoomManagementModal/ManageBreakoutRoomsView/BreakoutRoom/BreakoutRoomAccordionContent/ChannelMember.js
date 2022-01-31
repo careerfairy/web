@@ -4,9 +4,9 @@ import {
    ListItem,
    ListItemAvatar,
    ListItemText,
-} from "@material-ui/core";
+} from "@mui/material";
 import React from "react";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 
 const ChannelMember = ({ memberData, index, members, style }) => {
    const itemLoading = index === members.length;

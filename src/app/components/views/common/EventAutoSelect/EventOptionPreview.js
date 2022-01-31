@@ -1,7 +1,8 @@
 import React from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import clsx from "clsx";
-import { Avatar, Typography } from "@material-ui/core";
+import { Avatar, Typography } from "@mui/material";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 import dayjs from "dayjs";
 
@@ -50,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
       overflow: "hidden",
    },
 }));
-const EventOptionPreview = ({ streamData, preview }) => {
+const EventOptionPreview = ({ streamData, preview, selected }) => {
    const classes = useStyles();
    return (
       <div

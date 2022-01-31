@@ -4,7 +4,7 @@ import { getServerSideGroup, serializeServerSideStream } from "util/serverUtil";
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions";
 import { NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL } from "constants/routes";
 import HeadWithMeta from "components/page/HeadWithMeta";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../store/actions";
 import { useFirestoreConnect } from "react-redux-firebase";

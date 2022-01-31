@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import ReactPlayer from "react-player";
 import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import YoutubePreviewer from "components/views/common/YoutubePreviewer";
-import { Container, Dialog, DialogContent, Grid } from "@material-ui/core";
+import { Container, Dialog, DialogContent, Grid } from "@mui/material";
 
 function CompanyWatchPage(props) {
    const [videos, setVideos] = useState([]);

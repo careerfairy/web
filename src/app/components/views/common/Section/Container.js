@@ -1,10 +1,7 @@
 import PropTypes from "prop-types";
-import { Container } from "@material-ui/core";
+import { Container } from "@mui/material";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import clsx from "clsx";
-
-const useStyles = makeStyles((theme) => ({
+const styles = {
    root: {
       zIndex: 1,
       "&.MuiContainer-root": {
@@ -14,22 +11,18 @@ const useStyles = makeStyles((theme) => ({
       flexDirection: "column",
       alignItems: "center",
    },
-   customMaxWidth: {},
-}));
-
+};
 const SectionContainer = ({
    className,
    maxWidth = "md",
    children,
+   sx,
    ...props
 }) => {
-   const classes = useStyles();
    return (
       <Container
-         classes={{
-            maxWidthLg: classes.customMaxWidth,
-         }}
-         className={clsx(classes.root, className)}
+         className={className}
+         sx={[styles.root, sx]}
          maxWidth={maxWidth}
          {...props}
          children={children}

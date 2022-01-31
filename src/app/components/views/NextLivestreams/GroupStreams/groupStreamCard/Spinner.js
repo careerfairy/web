@@ -1,13 +1,12 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Card, CardContent, CardHeader } from "@material-ui/core";
-import Skeleton from "@material-ui/lab/Skeleton";
+import { Card, CardContent, CardHeader } from "@mui/material";
+import Skeleton from "@mui/material/Skeleton";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    root: {
       flex: 1,
       height: "100%",
-      borderRadius: theme.spacing(2),
+      borderRadius: (theme) => theme.spacing(2),
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
@@ -17,22 +16,20 @@ const useStyles = makeStyles((theme) => ({
    },
    timestamp: {
       margin: "0 auto",
-      borderRadius: theme.spacing(1),
+      borderRadius: (theme) => theme.spacing(1),
    },
-}));
+};
 
-const Spinner = ({}) => {
-   const classes = useStyles();
-
+const Spinner = () => {
    return (
-      <Card className={classes.root}>
+      <Card sx={styles.root}>
          <CardHeader
-            className={classes.headerRoot}
+            sx={styles.headerRoot}
             avatar={
                <Skeleton
-                  className={classes.timestamp}
+                  sx={styles.timestamp}
                   animation="wave"
-                  variant="rect"
+                  variant="rectangular"
                   width={55}
                   height={70}
                />
@@ -41,8 +38,8 @@ const Spinner = ({}) => {
          <Skeleton
             animation="wave"
             height={150}
-            variant="rect"
-            className={classes.media}
+            variant="rectangular"
+            sx={styles.media}
          />
          <CardContent>
             <Skeleton
@@ -59,7 +56,7 @@ const Spinner = ({}) => {
             <Skeleton animation="wave" height={10} width="60%" />
          </CardContent>
 
-         <Skeleton animation="wave" height={150} variant="rect" />
+         <Skeleton animation="wave" height={150} variant="rectangular" />
       </Card>
    );
 };

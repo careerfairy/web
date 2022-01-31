@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
 import { Doughnut } from "react-chartjs-2";
-import { Box, Card, CardContent, Divider, Typography } from "@material-ui/core";
+import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
 import { colorsArray } from "../../../../../util/colors";
 import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext";
 import { convertStringToArray } from "../../../../../helperFunctions/HelperFunctions";
 import CustomLegend from "../../../../../../materialUI/Legends";
 import { customDonutConfig } from "../common/TableUtils";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import useMapPollVoters from "../../../../../custom-hook/useMapPollVoters";
 
 const useStyles = makeStyles(() => ({
