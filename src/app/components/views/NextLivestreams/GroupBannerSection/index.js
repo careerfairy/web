@@ -31,7 +31,7 @@ const styles = {
       paddingBottom: (theme) => [theme.spacing(1), "!important"],
    },
    disableSectionPadding: {
-      paddingTop: 0,
+      paddingTop: "0 !important",
    },
 };
 
