@@ -10,8 +10,9 @@ import {
    Divider,
    Fade,
    IconButton,
+   Tooltip,
 } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
    whiteBox: {
@@ -114,7 +115,11 @@ function CategoryElement({
                      </>
                   }
                   action={
-                     <IconButton onClick={() => setEditMode(true)} aria-label="settings" size="large">
+                     <IconButton
+                        onClick={() => setEditMode(true)}
+                        aria-label="settings"
+                        size="large"
+                     >
                         <EditIcon color="primary" />
                      </IconButton>
                   }
