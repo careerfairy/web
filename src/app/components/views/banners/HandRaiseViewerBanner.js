@@ -8,6 +8,7 @@ import makeStyles from "@mui/styles/makeStyles";
 import StopStreamingIcon from "@mui/icons-material/Stop";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
+import { useCurrentStream } from "../../../context/stream/StreamContext";
 
 const useStyles = makeStyles((theme) => ({
    actionsWrapper: {
@@ -27,7 +28,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 const HandRaiseViewerBanner = () => {
    const classes = useStyles();
-   const [handRaiseState, updateRequest] = useHandRaiseState();
+   const { streamerId } = useCurrentStream();
+   const [handRaiseState, updateRequest] = useHandRaiseState(streamerId);
    const [handRaiseActionData, setHandRaiseActionData] = useState({
       title: "Hand Raise is not active",
    });
@@ -123,7 +125,7 @@ const HandRaiseViewerBanner = () => {
 
    return (
       <StreamBanner
-         severity={handRaiseState?.state === "connected" ? "success" : "info"}
+         severity={"success"}
          icon={<HandRaiseIcon />}
          title={handRaiseActionData.title}
          subTitle={handRaiseActionData.subTitle}

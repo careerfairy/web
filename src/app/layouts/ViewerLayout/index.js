@@ -298,7 +298,9 @@ const ViewerLayout = (props) => {
    }
 
    return (
-      <CurrentStreamContext.Provider value={{ currentLivestream, isBreakout }}>
+      <CurrentStreamContext.Provider
+         value={{ currentLivestream, isBreakout, streamerId }}
+      >
          <div className={`${classes.root} notranslate`}>
             <ViewerTopBar
                showAudience={showAudience}

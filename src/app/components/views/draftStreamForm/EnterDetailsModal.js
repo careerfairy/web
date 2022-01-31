@@ -68,6 +68,7 @@ const EnterDetailsModal = ({
                   helperText={formik.errors.name}
                   label="Name"
                   autoComplete="name"
+                  sx={{ my: 1 }}
                   disabled={formik.isSubmitting}
                   name="name"
                   onChange={formik.handleChange}

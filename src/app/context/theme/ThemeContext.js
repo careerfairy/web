@@ -4,7 +4,7 @@ import { responsiveFontSizes, ThemeProvider } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
 import { useRouter } from "next/router";
 import { CssBaseline } from "@mui/material";
-// import makeStyles from "@mui/styles/makeStyles";
+import makeStyles from "@mui/styles/makeStyles";
 
 // import { Button } from "@mui/material";
 
@@ -54,13 +54,13 @@ const ThemeProviderWrapper = ({ children }) => {
       setTheme(responsiveFontSizes(newThemeObj));
    };
 
-   // const useStyles = makeStyles({
-   //    info: {
-   //       backgroundColor: `${theme.palette.background.paper} !important`,
-   //       color: `${theme.palette.text.primary} !important`,
-   //    },
-   // });
-   // const classes = useStyles();
+   const useStyles = makeStyles({
+      info: {
+         backgroundColor: `${theme.palette.background.paper} !important`,
+         color: `${theme.palette.text.primary} !important`,
+      },
+   });
+   const classes = useStyles();
 
    return (
       <ThemeContext.Provider
@@ -70,7 +70,7 @@ const ThemeProviderWrapper = ({ children }) => {
             {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
             <CssBaseline />
             <SnackbarProvider
-               // classes={{ variantInfo: classes.info }}
+               classes={{ variantInfo: classes.info }}
                maxSnack={5}
             >
                {children}
