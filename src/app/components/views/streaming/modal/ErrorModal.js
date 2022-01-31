@@ -4,9 +4,9 @@ import {
    Dialog,
    DialogContent,
    Typography,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { ErrorOutline } from "@material-ui/icons";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { ErrorOutline } from "@mui/icons-material";
 import React, { useState, useEffect, useRef, memo } from "react";
 
 const useStyles = makeStyles((theme) => ({

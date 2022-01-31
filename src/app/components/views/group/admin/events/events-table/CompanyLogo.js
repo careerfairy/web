@@ -1,9 +1,10 @@
 import React from "react";
-import { Avatar, Box, Button } from "@material-ui/core";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { Avatar, Box, Button } from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions";
-import ImageIcon from "@material-ui/icons/Image";
-import EditIcon from "@material-ui/icons/Edit";
+import ImageIcon from "@mui/icons-material/Image";
+import EditIcon from "@mui/icons-material/Edit";
 
 const useStyles = makeStyles((theme) => ({
    root: {

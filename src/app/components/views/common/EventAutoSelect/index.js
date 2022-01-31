@@ -1,12 +1,8 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Autocomplete } from "@material-ui/lab";
-import { TextField } from "@material-ui/core";
+import { Autocomplete } from "@mui/material";
+import { TextField } from "@mui/material";
 import EventOptionPreview from "./EventOptionPreview";
 
-const useStyles = makeStyles((theme) => ({
-   root: {},
-}));
 const EventAutoSelect = ({
    onChange,
    value,
@@ -15,20 +11,23 @@ const EventAutoSelect = ({
    options,
    ...rest
 }) => {
-   const classes = useStyles();
    return (
       <Autocomplete
          value={value}
          onChange={onChange}
          inputValue={inputValue}
          onInputChange={onInputChange}
-         getOptionSelected={(option, value) =>
+         isOptionEqualToValue={(option, value) =>
             option.title === value.title || option.company === value.company
          }
          filterSelectedOptions
          getOptionLabel={(option) => option.title || ""}
          id="event-select-menu"
-         renderOption={(option) => <EventOptionPreview streamData={option} />}
+         renderOption={(props, option, { selected }) => (
+            <li {...props}>
+               <EventOptionPreview selected={selected} streamData={option} />
+            </li>
+         )}
          options={options}
          renderInput={(params) => (
             <TextField {...params} label="Chose an Event" variant="outlined" />

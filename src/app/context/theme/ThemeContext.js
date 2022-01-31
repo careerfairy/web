@@ -1,14 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { baseThemeObj, darkThemeObj } from "../../materialUI";
-import {
-   createTheme,
-   responsiveFontSizes,
-   ThemeProvider,
-   makeStyles,
-} from "@material-ui/core/styles";
+import { brandedDarkTheme, brandedLightTheme } from "../../materialUI";
+import { responsiveFontSizes, ThemeProvider } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
 import { useRouter } from "next/router";
-// import { Button } from "@material-ui/core";
+import { CssBaseline } from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
+
+// import { Button } from "@mui/material";
 
 const ThemeContext = createContext();
 const pathsReadyForDarkMode = [
@@ -21,7 +19,7 @@ const pathsReadyForDarkMode = [
    // "/group/[groupId]/admin/analytics",
 ];
 
-const initialTheme = responsiveFontSizes(createTheme(baseThemeObj));
+const initialTheme = responsiveFontSizes(brandedLightTheme);
 
 const ThemeProviderWrapper = ({ children }) => {
    const { pathname } = useRouter();
@@ -33,34 +31,30 @@ const ThemeProviderWrapper = ({ children }) => {
    }, [pathname]);
 
    const toggleTheme = () => {
-      const newThemeObj =
-         theme.palette.type === "dark" ? baseThemeObj : darkThemeObj;
-      localStorage.setItem("themeMode", newThemeObj.palette.type);
-      const createdTheme = createTheme(newThemeObj);
-      setTheme(responsiveFontSizes(createdTheme));
+      const newTheme =
+         theme.palette.mode === "dark" ? brandedLightTheme : brandedDarkTheme;
+
+      localStorage.setItem("themeMode", newTheme.palette.mode);
+      setTheme(responsiveFontSizes(newTheme));
    };
 
    const getThemeObj = () => {
-      let newThemeObj = { ...baseThemeObj };
+      let newThemeObj = { ...brandedLightTheme };
       if (pathsReadyForDarkMode.includes(pathname)) {
          const cachedThemeMode = localStorage.getItem("themeMode");
          if (cachedThemeMode === "dark" || cachedThemeMode === "light") {
             if (cachedThemeMode === "dark") {
-               newThemeObj = darkThemeObj;
+               newThemeObj = brandedDarkTheme;
             } else {
-               newThemeObj = baseThemeObj;
+               newThemeObj = brandedLightTheme;
             }
          }
       }
 
-      const createdTheme = createTheme(newThemeObj);
-      setTheme(responsiveFontSizes(createdTheme));
+      setTheme(responsiveFontSizes(newThemeObj));
    };
 
    const useStyles = makeStyles({
-      // success: {backgroundColor: 'purple'},
-      // error: {backgroundColor: 'blue'},
-      // warning: {backgroundColor: 'green'},
       info: {
          backgroundColor: `${theme.palette.background.paper} !important`,
          color: `${theme.palette.text.primary} !important`,
@@ -70,13 +64,13 @@ const ThemeProviderWrapper = ({ children }) => {
 
    return (
       <ThemeContext.Provider
-         value={{ toggleTheme, themeMode: theme.palette.type }}
+         value={{ toggleTheme, themeMode: theme.palette.mode }}
       >
          <ThemeProvider theme={theme}>
+            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+            <CssBaseline />
             <SnackbarProvider
-               classes={{
-                  variantInfo: classes.info,
-               }}
+               classes={{ variantInfo: classes.info }}
                maxSnack={5}
             >
                {children}

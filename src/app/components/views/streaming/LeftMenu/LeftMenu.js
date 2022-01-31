@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import PollCategory from "./categories/PollCategory";
 import HandRaiseCategory from "./categories/HandRaiseCategory";
 import QuestionCategory from "../sharedComponents/QuestionCategory";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { TabPanel } from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import SwipeableViews from "react-swipeable-views";
 import clsx from "clsx";
-import { Drawer, Fab } from "@material-ui/core";
-import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
+import { Drawer, Fab } from "@mui/material";
+import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 

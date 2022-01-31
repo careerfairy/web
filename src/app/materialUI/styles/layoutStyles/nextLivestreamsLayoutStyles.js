@@ -1,33 +1,31 @@
-import basicLayoutStyles from "./basicLayoutStyles";
+import { styles as basicStyles } from "./basicLayoutStyles";
 
-const nextLivestreamsLayoutStyles = (theme) => ({
-   ...basicLayoutStyles(theme),
-   wrapper: {
+export const styles = {
+   ...basicStyles,
+   wrapper: (theme) => ({
       display: "flex",
       flex: "1 1 auto",
       overflow: "hidden",
-      paddingTop: 64,
-      [theme.breakpoints.down("md")]: {
+      paddingTop: "64px",
+      [theme.breakpoints.down("lg")]: {
          paddingLeft: 0,
       },
       [theme.breakpoints.up("lg")]: {
-         paddingLeft: (props) => props.drawerWidth,
+         paddingLeft: theme.drawerWidth.medium,
       },
-      [theme.breakpoints.down("xs")]: {
-         paddingTop: 48,
+      [theme.breakpoints.down("sm")]: {
+         paddingTop: "48px",
       },
-   },
-   root: {
+   }),
+   root: (theme) => ({
       backgroundColor: theme.palette.background.dark,
       display: "flex",
       overflow: "hidden",
       width: "100%",
       flexDirection: "column",
-   },
+   }),
    content: {
-      ...basicLayoutStyles(theme).content,
+      ...basicStyles.content,
       overflowX: "hidden",
    },
-});
-
-export default nextLivestreamsLayoutStyles;
+};

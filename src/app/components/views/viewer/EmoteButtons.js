@@ -5,11 +5,12 @@ import {
    ClickAwayListener,
    Fab,
    Grow,
-} from "@material-ui/core";
-import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
-import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import { amber, deepOrange, grey, red } from "@material-ui/core/colors";
+} from "@mui/material";
+import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
+import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
+import { alpha } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
+import { amber, deepOrange, grey, red } from "@mui/material/colors";
 import ClappingSVG from "../../util/CustomSVGs";
 import { useCurrentStream } from "../../../context/stream/StreamContext";
 import { useAuth } from "../../../HOCs/AuthProvider";
@@ -234,7 +235,6 @@ const EmoteButtons = ({ createEmote }) => {
 
    return (
       <ClickAwayListener onClickAway={handleClose}>
-         {/*<Grow in={true} unmountOnExit>*/}
          <div
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -300,7 +300,6 @@ const EmoteButtons = ({ createEmote }) => {
                </div>
             </Box>
          </div>
-         {/*</Grow>*/}
       </ClickAwayListener>
    );
 };

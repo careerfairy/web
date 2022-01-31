@@ -1,13 +1,13 @@
 import React from "react";
-import { Box } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Box } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    globalBackgroundStyles: {
       height: "100%",
       minHeight: "100vh",
       backgroundColor:
-         theme.palette.type === "dark"
+         theme.palette.mode === "dark"
             ? theme.palette.background.default
             : "rgb(250,250,250)",
    },
@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       flexDirection: "column",
       backgroundColor:
-         theme.palette.type === "dark"
+         theme.palette.mode === "dark"
             ? theme.palette.background.default
             : "rgb(230,230,230)",
       height: "100%",

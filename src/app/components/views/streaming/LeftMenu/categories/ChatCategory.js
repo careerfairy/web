@@ -1,10 +1,11 @@
 import PropTypes from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
-import { grey } from "@material-ui/core/colors";
-import { IconButton, TextField } from "@material-ui/core";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
+import { grey } from "@mui/material/colors";
+import { IconButton, TextField } from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import ChatEntryContainer from "./chat/ChatEntryContainer";
 import CustomScrollToBottom from "../../../../util/CustomScrollToBottom";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
@@ -170,7 +171,7 @@ const ChatCategory = ({ isStreamer, livestream, selectedState }) => {
             }}
             disabled={isEmpty}
             onClick={() => addNewChatEntry()}
-         >
+            size="large">
             <ChevronRightRoundedIcon className={classes.sendIcon} />
          </IconButton>
       </div>

@@ -1,7 +1,7 @@
 import React from "react";
-import { Autocomplete } from "@material-ui/lab";
+import { Autocomplete } from '@mui/material';
 import { languageCodes } from "./index";
-import { TextField } from "@material-ui/core";
+import { TextField } from "@mui/material";
 
 export const LanguageSelect = ({ name, value, setFieldValue, ...rest }) => {
    const handleChange = (event, newValue) => {
@@ -14,7 +14,7 @@ export const LanguageSelect = ({ name, value, setFieldValue, ...rest }) => {
          id={name}
          options={languageCodes}
          defaultValue={value}
-         getOptionSelected={(option, value) => option.code === value.code}
+         isOptionEqualToValue={(option, value) => option.code === value.code}
          getOptionLabel={(option) => option.name || ""}
          value={value}
          disableClearable

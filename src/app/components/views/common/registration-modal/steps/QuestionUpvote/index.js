@@ -9,8 +9,9 @@ import {
    DialogTitle,
    Hidden,
    useMediaQuery,
-} from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { RegistrationContext } from "context/registration/RegistrationContext";
 import { useAuth } from "../../../../../../HOCs/AuthProvider";
 import { useRouter } from "next/router";
@@ -48,7 +49,7 @@ const QuestionUpvote = () => {
    const classes = useStyles();
    const [show, setShow] = useState(false);
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down("xs"));
+   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
    const containerHeight = mobile
       ? mobileQuestionsContainerHeight
       : questionsContainerHeight;
@@ -103,7 +104,7 @@ const QuestionUpvote = () => {
    return (
       <div className={classes.root}>
          <Box width="100%" display="flex" justifyContent="center">
-            <Hidden xsDown>
+            <Hidden smDown>
                <GroupLogo logoUrl={group.logoUrl} />
             </Hidden>
          </Box>
@@ -135,7 +136,7 @@ const QuestionUpvote = () => {
                   loadingInitialQuestions={loadingInitialQuestions}
                />
             </Collapse>
-            <Hidden smDown>
+            <Hidden mdDown>
                <DialogActions>
                   <Button
                      variant="contained"

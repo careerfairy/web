@@ -2,7 +2,7 @@ import Header from "../components/views/header/Header";
 import { withFirebase } from "../context/firebase/FirebaseServiceContext";
 
 import Head from "next/head";
-import { Button, Container } from "@material-ui/core";
+import { Button, Container } from "@mui/material";
 import GeneralLayout from "../layouts/GeneralLayout";
 import { Cookies } from "react-cookie-consent";
 

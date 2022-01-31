@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import HandRaiseElement from "./hand-raise-element/HandRaiseElement";
 import NotificationsContext from "context/notifications/NotificationsContext";
-import CloseRoundedIcon from "@material-ui/icons/CloseRounded";
-import PanToolOutlinedIcon from "@material-ui/icons/PanToolOutlined";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import PanToolOutlinedIcon from "@mui/icons-material/PanToolOutlined";
 
 import {
    Box,
@@ -17,7 +17,7 @@ import {
    Paper,
    Select,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { CategoryContainerCentered } from "../../../../../../../materialUI/GlobalContainers";
 import { ThemedPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
@@ -27,10 +27,10 @@ import {
    TooltipTitle,
    WhiteTooltip,
 } from "../../../../../../../materialUI/GlobalTooltips";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import { TransitionGroup } from "react-transition-group";
 import { dynamicSort } from "../../../../../../helperFunctions/HelperFunctions";
-import OrderIcon from "@material-ui/icons/KeyboardArrowUpRounded";
+import OrderIcon from "@mui/icons-material/KeyboardArrowUpRounded";
 import useStreamActiveHandRaises from "../../../../../../custom-hook/useStreamActiveHandRaises";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -68,15 +68,10 @@ const FILTER_MAP = {
    Connected: (handRaise) => handRaise.state === "connected",
 };
 
-function HandRaiseActive({
-   livestream,
-   showMenu,
-   selectedState,
-   sliding,
-}) {
+function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
    const dispatch = useDispatch();
 
-   const closeSnackbar = (...args) => dispatch(actions.closeSnackbar(...args))
+   const closeSnackbar = (...args) => dispatch(actions.closeSnackbar(...args));
 
    const { setNewNotification, setNotificationToRemove } = useContext(
       NotificationsContext
@@ -87,7 +82,11 @@ function HandRaiseActive({
       getActiveTutorialStepKey,
       isOpen: isStepOpen,
    } = useContext(TutorialContext);
-   const { handRaises, handlers, numberOfActiveHandRaisers } = useStreamActiveHandRaises();
+   const {
+      handRaises,
+      handlers,
+      numberOfActiveHandRaisers,
+   } = useStreamActiveHandRaises();
    const [hasEntered, setHasEntered] = useState(false);
    const [hasExited, setHasExited] = useState(false);
    const [sortByNew, setSortByNew] = useState(true);
@@ -172,6 +171,7 @@ function HandRaiseActive({
                         <Select
                            labelId="hand-raise-filter-select-label"
                            id="hand-raise-filter-select"
+                           label="Sort by:"
                            value={filterMapProperty}
                            onChange={handleChangeFilterMapProperty}
                         >
@@ -242,70 +242,78 @@ function HandRaiseActive({
          </Grow>
 
          <Grow mountOnEnter unmountOnExit in={Boolean(!handRaises.length)}>
-            <CategoryContainerCentered>
-               <Box
-                  p={2}
-                  component={Paper}
-                  style={{
-                     width: "90%",
-                     display: "grid",
-                     placeItems: "center",
-                  }}
-               >
-                  <PanToolOutlinedIcon
-                     color="primary"
-                     style={{ fontSize: 40 }}
-                  />
-                  <ThemedPermanentMarker gutterBottom>
-                     Waiting for viewers to raise their hands...
-                  </ThemedPermanentMarker>
-                  <Typography style={{ marginBottom: "1rem" }} align="center">
-                     Your viewers can now request to join the stream. Don't
-                     forget to remind them to join in!
-                  </Typography>
-                  <Typography
+            <span>
+               <CategoryContainerCentered>
+                  <Box
+                     p={2}
+                     component={Paper}
                      style={{
-                        marginBottom: "0.8rem",
-                        textTransform: "uppercase",
+                        width: "90%",
+                        display: "grid",
+                        placeItems: "center",
                      }}
-                     align="center"
                   >
-                     You can invite up to 8 hand raisers
-                  </Typography>
-                  <WhiteTooltip
-                     placement="right-end"
-                     title={
-                        <React.Fragment>
-                           <TooltipTitle>Hand Raise (5/5)</TooltipTitle>
-                           <TooltipText>
-                              You can de-activate the Hand Raise mode to prevent
-                              viewers from making subsequent requests.
-                           </TooltipText>
-                           {activeStep === 13 && (
-                              <TooltipButtonComponent
-                                 onConfirm={() => {
-                                    handlers.setHandRaiseModeInactive();
-                                    handleConfirm(13);
-                                 }}
-                                 buttonText="Ok"
-                              />
-                           )}
-                        </React.Fragment>
-                     }
-                     open={hasExited && isOpen(13)}
-                  >
-                     <Button
-                        variant="contained"
-                        startIcon={<CloseRoundedIcon />}
-                        children="Deactivate Hand Raise"
-                        onClick={() => {
-                           handlers.setHandRaiseModeInactive();
-                           isOpen(13) && activeStep === 13 && handleConfirm(13);
-                        }}
+                     <PanToolOutlinedIcon
+                        color="primary"
+                        style={{ fontSize: 40 }}
                      />
-                  </WhiteTooltip>
-               </Box>
-            </CategoryContainerCentered>
+                     <ThemedPermanentMarker gutterBottom>
+                        Waiting for viewers to raise their hands...
+                     </ThemedPermanentMarker>
+                     <Typography
+                        style={{ marginBottom: "1rem" }}
+                        align="center"
+                     >
+                        Your viewers can now request to join the stream. Don't
+                        forget to remind them to join in!
+                     </Typography>
+                     <Typography
+                        style={{
+                           marginBottom: "0.8rem",
+                           textTransform: "uppercase",
+                        }}
+                        align="center"
+                     >
+                        You can invite up to 8 hand raisers
+                     </Typography>
+                     <WhiteTooltip
+                        placement="right-end"
+                        title={
+                           <React.Fragment>
+                              <TooltipTitle>Hand Raise (5/5)</TooltipTitle>
+                              <TooltipText>
+                                 You can de-activate the Hand Raise mode to
+                                 prevent viewers from making subsequent
+                                 requests.
+                              </TooltipText>
+                              {activeStep === 13 && (
+                                 <TooltipButtonComponent
+                                    onConfirm={() => {
+                                       handlers.setHandRaiseModeInactive();
+                                       handleConfirm(13);
+                                    }}
+                                    buttonText="Ok"
+                                 />
+                              )}
+                           </React.Fragment>
+                        }
+                        open={hasExited && isOpen(13)}
+                     >
+                        <Button
+                           variant="contained"
+                           startIcon={<CloseRoundedIcon />}
+                           children="Deactivate Hand Raise"
+                           onClick={() => {
+                              handlers.setHandRaiseModeInactive();
+                              isOpen(13) &&
+                                 activeStep === 13 &&
+                                 handleConfirm(13);
+                           }}
+                        />
+                     </WhiteTooltip>
+                  </Box>
+               </CategoryContainerCentered>
+            </span>
          </Grow>
       </>
    );

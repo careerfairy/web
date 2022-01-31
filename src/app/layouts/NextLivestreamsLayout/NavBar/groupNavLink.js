@@ -1,10 +1,10 @@
-import ListItem from "@material-ui/core/ListItem";
+import ListItem from "@mui/material/ListItem";
 import Link from "../../../materialUI/NextNavLink";
 import clsx from "clsx";
-import { Avatar, ListItemAvatar, Tooltip } from "@material-ui/core";
-import ListItemText from "@material-ui/core/ListItemText";
+import { Avatar, ListItemAvatar, Tooltip } from "@mui/material";
+import ListItemText from "@mui/material/ListItemText";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import * as PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme) => ({
@@ -57,7 +57,7 @@ const GroupNavLink = (props) => {
             <ListItemText
                primary={props.alt}
                primaryTypographyProps={{ noWrap: true }}
-            ></ListItemText>
+            />
          </Tooltip>
       </ListItem>
    );

@@ -1,18 +1,9 @@
 import React from "react";
-import { Box, Grid } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
-
-const StyledBox = withStyles((theme) => ({
-   root: {
-      background: "white",
-      marginTop: theme.spacing(3),
-      marginBottom: theme.spacing(3),
-   },
-}))(Box);
+import { Box, Grid } from "@mui/material";
 
 const FormGroup = ({
    children,
-   borderRadius = 4,
+   borderRadius = 2,
    container = true,
    spacing = 2,
    p = 1,
@@ -20,17 +11,22 @@ const FormGroup = ({
    ...props
 }) => {
    return (
-      <StyledBox
-         borderRadius={borderRadius}
-         component={Grid}
-         boxShadow={boxShadow}
-         p={p}
-         spacing={spacing}
-         container={container}
-         {...props}
-      >
-         {children}
-      </StyledBox>
+      <Box sx={{ flexGrow: 1, mt: 3, mb: 3, p }}>
+         <Grid
+            sx={{
+               background: "white",
+               boxShadow,
+               borderRadius,
+               pr: spacing,
+               pb: spacing,
+            }}
+            spacing={spacing}
+            container={container}
+            {...props}
+         >
+            {children}
+         </Grid>
+      </Box>
    );
 };
 

@@ -1,11 +1,11 @@
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import TwitterIcon from "@material-ui/icons/Twitter";
-import JobPostingIcon from "@material-ui/icons/Work";
-import CustomIcon from "@material-ui/icons/Info";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import JobPostingIcon from "@mui/icons-material/Work";
+import CustomIcon from "@mui/icons-material/Info";
 import React from "react";
 import { FACEBOOK_COLOR, LINKEDIN_COLOR, TWITTER_COLOR } from "../colors";
-import { baseThemeObj } from "../../../materialUI";
+import { brandedLightTheme } from "../../../materialUI";
 import { makeExternalLink } from "../../helperFunctions/HelperFunctions";
 
 export const defaultDeadlineDate = new Date(
@@ -57,7 +57,7 @@ export const callToActionsDictionary = {
    },
    custom: {
       icon: <CustomIcon />,
-      color: baseThemeObj.palette.primary.main,
+      color: brandedLightTheme.palette.primary.main,
       title: "Custom message",
       type: "custom",
       description:

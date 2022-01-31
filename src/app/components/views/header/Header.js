@@ -1,6 +1,6 @@
 import { useEffect, useState, Fragment, useContext } from "react";
 import { withFirebase } from "context/firebase/FirebaseServiceContext";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import AuthenticatedHeader from "./authenticated-header/AuthenticatedHeader";
 import NonAuthenticatedHeader from "./non-authenticated-header/NonAuthenticatedHeader";
 import { compose } from "redux";
@@ -9,9 +9,9 @@ import { connect } from "react-redux";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import LandingHeader from "./landing-header/LandingHeader";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useAuth } from "../../../HOCs/AuthProvider";
-import { IconButton } from "@material-ui/core";
+import { IconButton } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
    nextLink: {
@@ -96,7 +96,7 @@ function Header(props) {
                   : "sidebar animated slideOutLeft faster"
             }
          >
-            <IconButton aria-label="delete" onClick={toggleSideBar}>
+            <IconButton aria-label="delete" onClick={toggleSideBar} size="large">
                <HighlightOffIcon fontSize="large" style={{ color: "white" }} />
             </IconButton>
             <ul>

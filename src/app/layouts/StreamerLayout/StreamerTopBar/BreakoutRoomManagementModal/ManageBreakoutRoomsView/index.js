@@ -4,23 +4,24 @@ import {
    DialogActions,
    DialogContent,
    DialogTitle,
-} from "@material-ui/core";
+} from "@mui/material";
 import PropTypes from "prop-types";
 import { streamShape } from "types";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import { useDispatch } from "react-redux";
 import BreakoutRoom from "./BreakoutRoom";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
 import * as actions from "store/actions";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import useStreamToken from "../../../../../components/custom-hook/useStreamToken";
 import { useCurrentStream } from "../../../../../context/stream/StreamContext";
 import BreakoutRoomOptions from "./BreakoutRoomOptions";
 import BreakoutRoomSettings from "./BreakoutRoomSettings";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import clsx from "clsx";
-import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
+import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos";
 import { addQueryParam } from "../../../../../components/helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
@@ -40,7 +41,7 @@ const ManageBreakoutRoomsView = ({
    const classes = useStyles();
    const { isMainStreamer } = useCurrentStream();
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+   const mobile = useMediaQuery(theme.breakpoints.down("md"));
    const links = useStreamToken({ forStreamType: "mainLivestream" });
    const { openAllBreakoutRooms, closeAllBreakoutRooms } = useFirebaseService();
    const {
@@ -199,7 +200,9 @@ const ManageBreakoutRoomsView = ({
             ))}
          </DialogContent>
          <DialogActions>
-            <Button onClick={handleClose}>Close</Button>
+            <Button color="grey" onClick={handleClose}>
+               Close
+            </Button>
             {isMainStreamer && (
                <React.Fragment>
                   <Box flex={1} />

@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Container, Grid } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Container, Grid } from "@mui/material";
 import Toolbar from "../Toolbar";
 import { useDispatch, useSelector } from "react-redux";
 import { useFirestore } from "react-redux-firebase";

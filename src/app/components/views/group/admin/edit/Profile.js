@@ -13,13 +13,13 @@ import {
    Grow,
    Typography,
    CircularProgress,
-} from "@material-ui/core";
+} from "@mui/material";
 import FilePickerContainer from "../../../../ssr/FilePickerContainer";
-import PublishIcon from "@material-ui/icons/Publish";
+import PublishIcon from "@mui/icons-material/Publish";
 import { useSnackbar } from "notistack";
 import { GENERAL_ERROR } from "../../../../util/constants";
 import { uploadLogo } from "../../../../helperFunctions/HelperFunctions";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    root: {},

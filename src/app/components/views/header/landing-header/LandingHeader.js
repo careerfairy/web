@@ -1,9 +1,9 @@
 import React, { Fragment } from "react";
-import MenuIcon from "@material-ui/icons/Menu";
+import MenuIcon from "@mui/icons-material/Menu";
 
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Button, IconButton } from "@material-ui/core";
+import { Button, IconButton } from "@mui/material";
 
 const LandingHeader = (props) => {
    const router = useRouter();
@@ -17,7 +17,7 @@ const LandingHeader = (props) => {
          <header id="main-header">
             <ul id="left-menu" className="float-left">
                <li>
-                  <IconButton onClick={props.toggleSideBar}>
+                  <IconButton onClick={props.toggleSideBar} size="large">
                      <MenuIcon
                         id="sidebar-toggle"
                         fontSize="large"

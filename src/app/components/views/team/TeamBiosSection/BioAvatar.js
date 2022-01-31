@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
-import { Avatar, Badge } from "@material-ui/core";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
+import { Avatar, Badge } from "@mui/material";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import React from "react";
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from '@mui/styles/withStyles';
 import clsx from "clsx";
 
 export const SmallAvatar = withStyles((theme) => ({

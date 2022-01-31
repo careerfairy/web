@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import { Menu, MenuItem } from "@material-ui/core";
+import makeStyles from "@mui/styles/makeStyles";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { Menu, MenuItem } from "@mui/material";
 import ButtonWithHint from "./ButtonWithHint";
 
 const useStyles = makeStyles((theme) => ({
@@ -40,6 +40,7 @@ const MoreOptionsMenu = ({
             onClick={handleClick}
             fullWidth
             hintTitle={hintTitle}
+            color="grey"
             variant="outlined"
             startIcon={<MoreVertIcon />}
          >

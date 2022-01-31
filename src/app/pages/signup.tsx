@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useEffect } from "react";
-import TheatersRoundedIcon from "@material-ui/icons/TheatersRounded";
-import ArrowForwardIosRoundedIcon from "@material-ui/icons/ArrowForwardIosRounded";
-import BusinessCenterRoundedIcon from "@material-ui/icons/BusinessCenterRounded";
+import TheatersRoundedIcon from "@mui/icons-material/TheatersRounded";
+import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
+import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Head from "next/head";
@@ -12,12 +12,12 @@ import {
    Stepper,
    Step,
    StepLabel,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { TealBackground } from "../materialUI/GlobalBackground/GlobalBackGround";
 import GroupProvider from "../components/views/signup/GroupProvider";
 import { useAuth } from "../HOCs/AuthProvider";
-import {createStyles} from "@material-ui/styles";
+import { createStyles } from '@mui/styles';
 import SignUpPinForm from "../components/views/signup/SignUpPinForm";
 import SignUpUserForm from "../components/views/signup/SignUpUserForm";
 

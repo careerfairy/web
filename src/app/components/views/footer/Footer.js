@@ -1,28 +1,28 @@
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import InstagramIcon from "@material-ui/icons/Instagram";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import InstagramIcon from "@mui/icons-material/Instagram";
 
 import Link from "next/link";
-import { makeStyles } from "@material-ui/core/styles";
-import { Container, Grid } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Container, Grid } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
    root: {
       backgroundColor: theme.palette.background.paper,
       color:
-         theme.palette.type === "dark"
+         theme.palette.mode === "dark"
             ? theme.palette.text.secondary
             : "rgb(44, 66, 81)",
       padding: "50px 0 50px 0",
       textAlign: "center",
       "& a": {
          color:
-            theme.palette.type === "dark"
+            theme.palette.mode === "dark"
                ? theme.palette.text.secondary
                : "rgb(44, 66, 81)",
          "&:hover": {
             color:
-               theme.palette.type === "dark"
+               theme.palette.mode === "dark"
                   ? theme.palette.text.primary
                   : "rgb(25, 37, 46)",
          },
@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
    },
    icon: {
       color:
-         theme.palette.type === "dark"
+         theme.palette.mode === "dark"
             ? theme.palette.text.secondary
             : "rgb(44, 66, 81)",
       fontSize: "1.8em",

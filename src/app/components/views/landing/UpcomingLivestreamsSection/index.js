@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Section from "components/views/common/Section";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext";
 import UpcomingLivestreamsCarousel from "./UpcomingLivestreamsCarousel";
 import Link from "../../../../materialUI/NextNavLink";
@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
    title: {
       fontSize: "4.5rem",
       fontWeight: 500,
-      [theme.breakpoints.down("xs")]: {
+      [theme.breakpoints.down('sm')]: {
          fontSize: "3.5rem",
       },
    },

@@ -17,10 +17,10 @@ import {
    Button,
    CircularProgress,
    FormControl,
-} from "@material-ui/core";
+} from "@mui/material";
 import { Formik } from "formik";
 import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import { LONG_NUMBER } from "../../../../../../util/constants";
 import { getMinutes } from "../../../../../../helperFunctions/HelperFunctions";
 
@@ -63,7 +63,7 @@ const FeedbackModal = ({
    currentStream,
 }) => {
    const theme = useTheme();
-   const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
+   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
    const isForEnd = (appearAfter) => {
       return Boolean(appearAfter === marks[marks.length - 1]);
@@ -253,7 +253,9 @@ const FeedbackModal = ({
                      {/*</Box>*/}
                   </DialogContent>
                   <DialogActions>
-                     <Button onClick={handleClose}>Cancel</Button>
+                     <Button color="grey" onClick={handleClose}>
+                        Cancel
+                     </Button>
                      <Button
                         variant="contained"
                         endIcon={

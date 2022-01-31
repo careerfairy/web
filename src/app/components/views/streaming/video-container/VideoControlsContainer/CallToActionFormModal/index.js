@@ -1,15 +1,15 @@
 import PropTypes from "prop-types";
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Box,
    Dialog,
    DialogTitle,
    IconButton,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import CallToActionForm from "./CallToActionForm";
-import CloseIcon from "@material-ui/icons/Close";
+import CloseIcon from "@mui/icons-material/Close";
 import CallToActionTypeMenu from "./CallToActionTypeMenu";
 import { callToActionsDictionary } from "../../../../../util/constants/callToActions";
 
@@ -140,7 +140,7 @@ const CallToActionFormModal = memo(
                      </Typography>
                   </Box>
                   <Box>
-                     <IconButton onClick={handleClose}>
+                     <IconButton onClick={handleClose} size="large">
                         <CloseIcon />
                      </IconButton>
                   </Box>

@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { IconButton, Tooltip } from "@material-ui/core";
-import FocusInactiveIcon from "@material-ui/icons/Fullscreen";
-import FocusModeActiveIcon from "@material-ui/icons/FullscreenExit";
+import { IconButton, Tooltip } from "@mui/material";
+import FocusInactiveIcon from "@mui/icons-material/Fullscreen";
+import FocusModeActiveIcon from "@mui/icons-material/FullscreenExit";
 import * as actions from "store/actions";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -51,11 +51,12 @@ const FocusModeButton = ({ primary, mobile, audienceDrawerOpen }) => {
             }
          >
             <IconButton
-               color={focusModeEnabled || primary ? "primary" : "default"}
+               color={focusModeEnabled || primary ? "primary" : undefined}
                onClick={(e) => {
                   e.stopPropagation();
                   toggleFocusMode();
                }}
+               size="large"
             >
                {focusModeEnabled ? (
                   <FocusModeActiveIcon />

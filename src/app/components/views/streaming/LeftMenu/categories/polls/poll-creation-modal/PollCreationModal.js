@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import AddIcon from "@material-ui/icons/Add";
+import AddIcon from "@mui/icons-material/Add";
 import { withFirebase } from "context/firebase/FirebaseServiceContext";
-import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import {
    DialogTitle,
    DialogContent,
@@ -15,8 +15,8 @@ import {
    DialogActions,
    TextField,
    Grow,
-} from "@material-ui/core";
-import { BarChart } from "@material-ui/icons";
+} from "@mui/material";
+import { BarChart } from "@mui/icons-material";
 import { GlassDialog } from "../../../../../../../materialUI/GlobalModals";
 import { v4 as uuidv4 } from "uuid";
 import useStreamRef from "../../../../../../custom-hook/useStreamRef";
@@ -165,7 +165,6 @@ function PollCreationModal({
          onClose={handleClose}
       >
          <DialogTitle
-            disableTypography
             style={{
                display: "flex",
                justifyContent: "center",
@@ -183,42 +182,42 @@ function PollCreationModal({
             </Typography>
          </DialogTitle>
          <DialogContent>
-            <TextField
-               label="Your Question"
-               value={question}
-               fullWidth
-               variant="outlined"
-               onChange={({ currentTarget: { value } }) => setQuestion(value)}
-               placeholder="Write down your question or poll to your audience"
-            />
-            {optionElements}
-            <Button
-               startIcon={<AddIcon />}
-               variant="contained"
-               color="secondary"
-               style={{ marginTop: "1rem" }}
-               children="Add an Option"
-               onClick={increaseNumberOfOptions}
-               disabled={options.length > 3}
-            />
-            <DialogActions>
-               <Button
-                  children="Cancel"
-                  variant="contained"
-                  onClick={handleClose}
-               />
-               <Button
-                  startIcon={
-                     loading && <CircularProgress size={20} color="inherit" />
+            <Box sx={{ py: 1 }}>
+               <TextField
+                  label="Your Question"
+                  value={question}
+                  fullWidth
+                  variant="outlined"
+                  onChange={({ currentTarget: { value } }) =>
+                     setQuestion(value)
                   }
-                  disabled={loading}
-                  children={initialPoll ? "Update Poll" : "Create Poll"}
-                  color="primary"
-                  variant="contained"
-                  onClick={savePoll}
+                  placeholder="Write down your question or poll to your audience"
                />
-            </DialogActions>
+               {optionElements}
+               <Button
+                  startIcon={<AddIcon />}
+                  variant="contained"
+                  color="secondary"
+                  style={{ marginTop: "1rem" }}
+                  children="Add an Option"
+                  onClick={increaseNumberOfOptions}
+                  disabled={options.length > 3}
+               />
+            </Box>
          </DialogContent>
+         <DialogActions>
+            <Button children="Cancel" color="grey" onClick={handleClose} />
+            <Button
+               startIcon={
+                  loading && <CircularProgress size={20} color="inherit" />
+               }
+               disabled={loading}
+               children={initialPoll ? "Update Poll" : "Create Poll"}
+               color="primary"
+               variant="contained"
+               onClick={savePoll}
+            />
+         </DialogActions>
       </GlassDialog>
    );
 }

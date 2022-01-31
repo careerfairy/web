@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import { useRouter } from "next/router";
 import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
 import {
@@ -9,8 +9,8 @@ import {
    CardContent,
    CardHeader,
    Typography,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
    },
    voteText: {
       fontWeight: 700,
-      marginTop: `${theme.spacing(0.5)}px !important`,
+      marginTop: `${theme.spacing(0.5)} !important`,
    },
 }));
 

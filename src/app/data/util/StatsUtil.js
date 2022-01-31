@@ -1,4 +1,4 @@
-import { Category } from "@material-ui/icons";
+import { Category } from "@mui/icons-material";
 
 export default class StatsUtil {
    static getStudentInGroupDataObject(student, group) {

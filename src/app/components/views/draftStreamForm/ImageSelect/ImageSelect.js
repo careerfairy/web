@@ -6,11 +6,11 @@ import {
    CardMedia,
    Collapse,
    FormHelperText,
-} from "@material-ui/core";
-import PublishIcon from "@material-ui/icons/Publish";
+} from "@mui/material";
+import PublishIcon from "@mui/icons-material/Publish";
 import { uploadLogo } from "../../../helperFunctions/HelperFunctions";
 import FilePickerContainer from "../../../ssr/FilePickerContainer";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 
 const logoPlaceholder =

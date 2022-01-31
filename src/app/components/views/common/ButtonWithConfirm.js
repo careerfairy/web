@@ -8,11 +8,13 @@ import {
    IconButton,
    Tooltip,
    useMediaQuery,
-} from "@material-ui/core";
-import CheckIcon from "@material-ui/icons/Check";
-import ClearIcon from "@material-ui/icons/Clear";
+} from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
+import ClearIcon from "@mui/icons-material/Clear";
 import { GlassDialog } from "materialUI/GlobalModals";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
    iconInButton: {
@@ -33,7 +35,7 @@ function ButtonWithConfirm({
    ...rest
 }) {
    const theme = useTheme();
-   const extraSmallScreen = useMediaQuery(theme.breakpoints.down("xs"));
+   const extraSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
    const classes = useStyles({ hasStarted });
    const [modalOpen, setModalOpen] = useState(false);
 
@@ -60,6 +62,7 @@ function ButtonWithConfirm({
                      className={classes.iconInButton}
                      disabled={disabled}
                      onClick={() => setModalOpen(true)}
+                     size="large"
                   >
                      {rest.startIcon}
                   </IconButton>
@@ -85,11 +88,7 @@ function ButtonWithConfirm({
                </DialogContentText>
             </DialogContent>
             <DialogActions>
-               <Button
-                  startIcon={<ClearIcon />}
-                  variant="contained"
-                  onClick={() => setModalOpen(false)}
-               >
+               <Button color="grey" onClick={() => setModalOpen(false)}>
                   Cancel
                </Button>
                <Button

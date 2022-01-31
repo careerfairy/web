@@ -1,7 +1,8 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { Grid } from "@material-ui/core";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { Grid } from "@mui/material";
 import { TeamMemberCard } from "./TeamMemberCard";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import Bounce from "@stahl.luke/react-reveal/Bounce";
@@ -29,7 +30,7 @@ const TeamBios = ({ people }) => {
       <ResponsiveMasonry
          columnsCountBreakPoints={{ 350: 1, 800: 2, 1280: 2, 1450: 3 }}
       >
-         <Masonry gutter={`${theme.spacing(2)}px`}>
+         <Masonry gutter={theme.spacing(2)}>
             {people.map((person, index) => (
                <Bounce
                   key={person.id}

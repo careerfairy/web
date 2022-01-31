@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Button, Dialog, DialogTitle, TextField } from "@material-ui/core";
+import { Button, Dialog, DialogTitle, TextField } from "@mui/material";
 
 const AddNewOption = ({ updateMode, handleAdd, setUpdateMode, open }) => {
    if (!updateMode.mode) {
@@ -67,6 +67,9 @@ const AddNewOption = ({ updateMode, handleAdd, setUpdateMode, open }) => {
                   />
                </div>
                <div style={{ margin: "20px 0 0 0" }}>
+                  <Button color="grey" onClick={() => setUpdateMode({})}>
+                     Cancel
+                  </Button>
                   <Button
                      style={{ marginRight: 10 }}
                      variant="contained"
@@ -74,9 +77,6 @@ const AddNewOption = ({ updateMode, handleAdd, setUpdateMode, open }) => {
                      color="primary"
                   >
                      Confirm
-                  </Button>
-                  <Button variant="contained" onClick={() => setUpdateMode({})}>
-                     Cancel
                   </Button>
                </div>
             </form>

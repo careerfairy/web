@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Button,
    Card,
@@ -10,13 +10,13 @@ import {
    Box,
    Typography,
    Tooltip,
-} from "@material-ui/core";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+} from "@mui/material";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import {
    StyledTooltipWithButton,
    TooltipHighlight,
 } from "../../../../../materialUI/GlobalTooltips";
-import FilterStreamsIcon from "@material-ui/icons/Tune";
+import FilterStreamsIcon from "@mui/icons-material/Tune";
 import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({

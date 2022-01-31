@@ -1,9 +1,10 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import SwipeableViews from "react-swipeable-views";
-import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
-import { Drawer, Fab } from "@material-ui/core";
+import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
+import { Drawer, Fab } from "@mui/material";
 import QuestionCategory from "../../streaming/sharedComponents/QuestionCategory";
 import PollCategory from "./categories/PollCategory";
 import HandRaiseCategory from "./categories/HandRaiseCategory";
@@ -30,12 +31,12 @@ const useStyles = makeStyles((theme) => ({
       textAlign: "center",
       zIndex: 9100,
       background:
-         theme.palette.type === "dark" && theme.palette.background.paper,
+         theme.palette.mode === "dark" && theme.palette.background.paper,
       "&:hover": {
          background:
-            theme.palette.type === "dark" && theme.palette.background.default,
+            theme.palette.mode === "dark" && theme.palette.background.default,
       },
-      color: theme.palette.type === "dark" && theme.palette.secondary.main,
+      color: theme.palette.mode === "dark" && theme.palette.secondary.main,
    },
    slides: {
       // backgroundColor: theme.palette.background.default,

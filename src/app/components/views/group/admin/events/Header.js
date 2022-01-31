@@ -1,7 +1,7 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Box, Card, CardHeader, Collapse, Typography } from "@material-ui/core";
-import useScrollTrigger from "@material-ui/core/useScrollTrigger";
+import makeStyles from '@mui/styles/makeStyles';
+import { Box, Card, CardHeader, Collapse, Typography } from "@mui/material";
+import useScrollTrigger from "@mui/material/useScrollTrigger";
 
 const useStyles = makeStyles((theme) => ({
    root: {

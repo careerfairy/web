@@ -6,8 +6,8 @@ import {
    DialogActions,
    DialogContent,
    DialogTitle,
-} from "@material-ui/core";
-import ScreenShareIcon from "@material-ui/icons/ScreenShare";
+} from "@mui/material";
+import ScreenShareIcon from "@mui/icons-material/ScreenShare";
 
 const ScreenSharePermissionDeniedModal = ({
    screenSharePermissionDenied,

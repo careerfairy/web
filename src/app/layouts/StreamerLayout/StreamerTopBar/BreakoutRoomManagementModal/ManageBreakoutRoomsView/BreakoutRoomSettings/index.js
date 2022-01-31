@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import {
    Button,
    DialogActions,
@@ -9,9 +9,9 @@ import {
    ListItemIcon,
    ListItemText,
    Switch,
-} from "@material-ui/core";
+} from "@mui/material";
 import PropTypes from "prop-types";
-import List from "@material-ui/core/List";
+import List from "@mui/material/List";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
 
@@ -89,7 +89,9 @@ const BreakoutRoomSettings = ({ classes, handleClose, onClick }) => {
             </List>
          </DialogContent>
          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button color="grey" onClick={handleClose}>
+               Cancel
+            </Button>
          </DialogActions>
       </React.Fragment>
    );

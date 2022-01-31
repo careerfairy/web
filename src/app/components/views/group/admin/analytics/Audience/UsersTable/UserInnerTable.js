@@ -1,6 +1,7 @@
 import React from "react";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
-import { Avatar, Collapse, Paper } from "@material-ui/core";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { Avatar, Collapse, Paper } from "@mui/material";
 import {
    defaultTableOptions,
    getPageSize,

@@ -1,11 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Box, Hidden, IconButton } from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
-import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
+import { Box, Hidden, IconButton } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import Link from "materialUI/NextNavLink";
 import { MainLogo } from "components/logos";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import useGeneralLinks from "components/custom-hook/useGeneralLinks";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -24,24 +24,37 @@ const TopBar = () => {
 
    return (
       <GeneralHeader permanent transparent>
-         <Box display="flex" alignItems="center">
+         <Box
+            sx={{
+               display: "flex",
+               alignItems: "center",
+            }}
+         >
             <IconButton
-               style={{ marginRight: "1rem" }}
+               sx={{
+                  marginRight: "1rem",
+               }}
                color="primary"
                onClick={handleDrawerOpen}
+               size="large"
             >
                <MenuIcon />
             </IconButton>
             <MainLogo />
          </Box>
-         <Hidden smDown>
+         <Hidden mdDown>
             <NavLinks
                links={landingLinks}
                navLinksActiveColor={theme.palette.primary.main}
             />
          </Hidden>
-         <Box display="flex" alignItems="center">
-            <Hidden mdDown>
+         <Box
+            sx={{
+               display: "flex",
+               alignItems: "center",
+            }}
+         >
+            <Hidden lgDown>
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <div>
                      <LoginButton />
@@ -52,6 +65,7 @@ const TopBar = () => {
                      component={Link}
                      color="primary"
                      href="/profile"
+                     size="large"
                   >
                      <AccountCircleOutlinedIcon />
                   </IconButton>

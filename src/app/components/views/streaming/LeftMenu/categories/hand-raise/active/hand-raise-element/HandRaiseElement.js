@@ -9,7 +9,7 @@ import {
    ListItem,
    ListItemText,
    Tooltip,
-} from "@material-ui/core";
+} from "@mui/material";
 import TutorialContext from "context/tutorials/TutorialContext";
 import {
    TooltipButtonComponent,
@@ -17,7 +17,8 @@ import {
    TooltipTitle,
    WhiteTooltip,
 } from "materialUI/GlobalTooltips";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { getTimeFromNow } from "../../../../../../../helperFunctions/HelperFunctions";
 import clsx from "clsx";
 

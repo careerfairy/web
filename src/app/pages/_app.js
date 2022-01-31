@@ -1,9 +1,8 @@
-import React, { Fragment, useEffect, useState } from "react";
+import * as React from "react";
 import "styles.css";
 import FirebaseServiceContext from "context/firebase/FirebaseServiceContext";
 import * as Sentry from "@sentry/browser";
 import config from "@stahl.luke/react-reveal/globals";
-import DateFnsUtils from "@date-io/date-fns";
 import { newStore, wrapper } from "../store";
 
 import firebase from "../Firebase/Firebase";
@@ -12,18 +11,24 @@ import TagManager from "react-gtm-module";
 import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar";
 import ErrorContext from "../context/error/ErrorContext";
 import TutorialContext from "context/tutorials/TutorialContext";
-import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import { AuthProvider } from "../HOCs/AuthProvider";
 import { ReactReduxFirebaseProvider } from "react-redux-firebase";
 import { createFirestoreInstance } from "redux-firestore";
 import { Provider } from "react-redux";
-import { ThemeProviderWrapper } from "../context/theme/ThemeContext";
-import { CssBaseline } from "@material-ui/core";
+import { CacheProvider } from "@emotion/react";
+import createEmotionCache from "materialUI/createEmotionCache";
 import Notifier from "../components/views/notifier";
 import { getCookieConsentValue } from "react-cookie-consent";
 import CFCookieConsent from "components/views/common/cookie-consent/CFCookieConsent";
 import { useRouter } from "next/router";
 import {firebaseServiceInstance} from "../data/firebase/FirebaseService"
+import { ThemeProviderWrapper } from "../context/theme/ThemeContext";
+import { useEffect, useState } from "react";
+
+// Client-side cache, shared for the whole session of the user in the browser.
+const clientSideEmotionCache = createEmotionCache();
 
 config({ ssrFadeout: true });
 
@@ -42,7 +47,13 @@ const rrfProps = {
    createFirestoreInstance,
 };
 
-function MyApp({ Component, pageProps }) {
+function MyApp(props) {
+   const {
+      Component,
+      emotionCache = clientSideEmotionCache,
+      pageProps,
+   } = props;
+
    // const classes = useStyles()
    Sentry.init({
       dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031",
@@ -88,14 +99,6 @@ function MyApp({ Component, pageProps }) {
 
    const [showBubbles, setShowBubbles] = useState(false);
    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState);
-
-   useEffect(() => {
-      // Remove the server-side injected CSS.
-      const jssStyles = document.querySelector("#jss-server-side");
-      if (jssStyles) {
-         jssStyles.parentElement.removeChild(jssStyles);
-      }
-   }, []);
 
    const tagManagerArgs = {
       gtmId: "GTM-P29VCWC",
@@ -148,8 +151,12 @@ function MyApp({ Component, pageProps }) {
    };
 
    return (
-      <Fragment>
+      <CacheProvider value={emotionCache}>
          <Head>
+            <meta
+               name="viewport"
+               content="initial-scale=1, width=device-width"
+            />
             <title>CareerFairy | Watch live streams. Get hired.</title>
          </Head>
          <Provider store={store}>
@@ -169,12 +176,10 @@ function MyApp({ Component, pageProps }) {
                   <AuthProvider>
                      <ThemeProviderWrapper>
                         <FirebaseServiceContext.Provider value={firebaseServiceInstance}>
-                           <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                           <LocalizationProvider dateAdapter={AdapterDateFns}>
                               <ErrorContext.Provider
                                  value={{ generalError, setGeneralError }}
                               >
-                                 {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                                 <CssBaseline />
                                  {disableCookies || isRecordingWindow ? null : (
                                     <CFCookieConsent />
                                  )}
@@ -185,14 +190,14 @@ function MyApp({ Component, pageProps }) {
                                     errorMessage={generalError}
                                  />
                               </ErrorContext.Provider>
-                           </MuiPickersUtilsProvider>
+                           </LocalizationProvider>
                         </FirebaseServiceContext.Provider>
                      </ThemeProviderWrapper>
                   </AuthProvider>
                </TutorialContext.Provider>
             </ReactReduxFirebaseProvider>
          </Provider>
-      </Fragment>
+      </CacheProvider>
    );
 }
 

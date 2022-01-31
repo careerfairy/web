@@ -1,10 +1,10 @@
 import PropTypes from "prop-types";
-import Alert from "@material-ui/lab/Alert";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
+import Alert from '@mui/material/Alert';
+import Typography from "@mui/material/Typography";
+import makeStyles from '@mui/styles/makeStyles';
 import OverflowTip from "../../views/tooltips/OverflowTip";
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
-import { AlertTitle } from "@material-ui/lab";
+import { AlertTitle } from '@mui/material';
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({

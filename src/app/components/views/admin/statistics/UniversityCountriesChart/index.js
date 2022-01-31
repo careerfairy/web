@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Box,
    Card,
@@ -7,7 +8,7 @@ import {
    CardHeader,
    IconButton,
    Tooltip,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useSelector } from "react-redux";
 import { Doughnut } from "react-chartjs-2";
 import {
@@ -20,7 +21,7 @@ import { createSelector } from "reselect";
 import { convertStringToArray } from "../../../../helperFunctions/HelperFunctions";
 import { colorsArray } from "../../../../util/colors";
 import Chart from "chart.js";
-import ExportCSVIcon from "@material-ui/icons/GetApp";
+import ExportCSVIcon from "@mui/icons-material/GetApp";
 import { universityCountriesMap } from "../../../../util/constants/universityCountries";
 
 Chart.defaults.global.plugins.labels = false;
@@ -75,7 +76,7 @@ const UniversityCountriesChart = () => {
             title="Student University Country Distribution"
             action={
                <Tooltip title="Export this chart data to CSV">
-                  <IconButton onClick={handleExportChartToCSV}>
+                  <IconButton onClick={handleExportChartToCSV} size="large">
                      <ExportCSVIcon />
                   </IconButton>
                </Tooltip>

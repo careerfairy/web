@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react';
-import {Fab, Grow} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
-import ScrollToTopIcon from '@material-ui/icons/ExpandLessRounded';
+import {Fab, Grow} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import ScrollToTopIcon from '@mui/icons-material/ExpandLessRounded';
 
 const useStyles = makeStyles(theme => ({
     scrollTop: {
@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center",
         justifyContent: "center",
         zIndex: 1000,
-        [theme.breakpoints.down("sm")]: {
+        [theme.breakpoints.down('md')]: {
             width: 50,
             height: 50,
         },

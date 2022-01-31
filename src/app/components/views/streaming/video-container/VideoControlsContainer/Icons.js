@@ -1,7 +1,7 @@
-import ShareIconSvg from "@material-ui/icons/SystemUpdateAlt";
-import PDFSvg from "@material-ui/icons/PictureAsPdf";
-import CallToActionSvg from "@material-ui/icons/Link";
-import { makeStyles } from "@material-ui/core/styles";
+import ShareIconSvg from "@mui/icons-material/SystemUpdateAlt";
+import PDFSvg from "@mui/icons-material/PictureAsPdf";
+import CallToActionSvg from "@mui/icons-material/Link";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    shareIcon: {

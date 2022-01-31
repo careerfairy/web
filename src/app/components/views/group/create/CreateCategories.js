@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Grid, Typography } from "@material-ui/core";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import CategoryEdit from "../admin/settings/Category/CategoryEdit";
 import CategoryElement from "../admin/settings/Category/CategoryElement";
-import AddIcon from "@material-ui/icons/Add";
-import { makeStyles } from "@material-ui/core/styles";
+import AddIcon from "@mui/icons-material/Add";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    root: {

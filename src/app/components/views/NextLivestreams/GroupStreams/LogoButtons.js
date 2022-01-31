@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { ButtonBase, Typography } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { ButtonBase, Typography } from "@mui/material";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 import { RegistrationContext } from "../../../../context/registration/RegistrationContext";
 
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
       flex: 1,
       minWidth: 200,
       margin: "0.5rem",
-      [theme.breakpoints.down("xs")]: {
+      [theme.breakpoints.down('sm')]: {
          padding: 0,
          width: "100% !important", // Overrides inline-style
          height: 100,
@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
    },
    imageTitle: {
       position: "relative",
-      padding: `${theme.spacing(2)}px ${theme.spacing(4)}px ${
+      padding: `${theme.spacing(2)} ${theme.spacing(4)} ${
          theme.spacing(1) + 6
       }px`,
    },

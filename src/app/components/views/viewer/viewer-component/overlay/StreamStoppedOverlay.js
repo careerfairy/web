@@ -1,7 +1,7 @@
-import { Button, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import CardGiftcardIcon from "@material-ui/icons/CardGiftcard";
-import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
+import { Button, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
       height: "100%",
       backgroundColor:
-         theme.palette.type === "dark"
+         theme.palette.mode === "dark"
             ? theme.palette.common.black
             : theme.palette.background.paper,
       zIndex: 999,

@@ -9,14 +9,15 @@ import {
    IconButton,
    Toolbar,
    Tooltip,
-} from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
-import NotificationIcon from "@material-ui/icons/NotificationsOutlined";
-import ActiveNotificationIcon from "@material-ui/icons/Notifications";
-import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import NotificationIcon from "@mui/icons-material/NotificationsOutlined";
+import ActiveNotificationIcon from "@mui/icons-material/Notifications";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import Link from "../../../materialUI/NextNavLink";
 import { MainLogo, MiniLogo } from "../../../components/logos";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { maybePluralize } from "../../../components/helperFunctions/HelperFunctions";
 import Notifications from "./Notifications";
 import NavLinks from "../../../components/views/header/NavLinks";
@@ -59,18 +60,18 @@ const TopBar = ({
          <Toolbar className={classes.toolbar}>
             <Box display="flex" alignItems="center">
                <Hidden lgUp>
-                  <IconButton color="inherit" onClick={onMobileNavOpen}>
+                  <IconButton color="inherit" onClick={onMobileNavOpen} size="large">
                      <MenuIcon />
                   </IconButton>
                </Hidden>
-               <Hidden smDown>
+               <Hidden mdDown>
                   <MainLogo white />
                </Hidden>
                <Hidden mdUp>
                   <MiniLogo />
                </Hidden>
             </Box>
-            <Hidden smDown>
+            <Hidden mdDown>
                <NavLinks
                   links={links}
                   navLinksActiveColor={theme.palette.common.white}
@@ -86,7 +87,7 @@ const TopBar = ({
                      "notification"
                   )}`}
                >
-                  <IconButton onClick={handleClick} color="inherit">
+                  <IconButton onClick={handleClick} color="inherit" size="large">
                      <Badge
                         badgeContent={notifications.length}
                         color="secondary"
@@ -104,13 +105,13 @@ const TopBar = ({
                   handleClose={handleClose}
                   anchorEl={notificationAnchor}
                />
-               <Hidden mdDown>
+               <Hidden lgDown>
                   <IconButton
                      id="profile_icon"
                      component={Link}
                      className={classes.navIconButton}
                      href="/profile"
-                  >
+                     size="large">
                      <AccountCircleOutlinedIcon />
                   </IconButton>
                </Hidden>

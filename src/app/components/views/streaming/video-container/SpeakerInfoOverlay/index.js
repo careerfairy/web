@@ -1,8 +1,9 @@
 import React from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import PropTypes from "prop-types";
-import { IconButton, Tooltip } from "@material-ui/core";
+import { IconButton, Tooltip } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
    speakerInformation: {
@@ -85,7 +86,7 @@ const SpeakerInfoOverlay = ({ speaker, small, zIndex }) => {
                      <IconButton
                         className={classes.speakerLinkedInIconButton}
                         onClick={handleClick}
-                     >
+                        size="large">
                         <LinkedInIcon
                            className={classes.speakerLinkedInButton}
                         />
@@ -118,7 +119,7 @@ const SpeakerInfoOverlay = ({ speaker, small, zIndex }) => {
                      <IconButton
                         className={classes.speakerLinkedInIconButton}
                         onClick={handleClick}
-                     >
+                        size="large">
                         <LinkedInIcon
                            className={classes.speakerLinkedInButton}
                         />

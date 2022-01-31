@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
 import React, { memo, useContext, useEffect, useState } from "react";
-import ThumbUpRoundedIcon from "@material-ui/icons/ThumbUpRounded";
+import ThumbUpRoundedIcon from "@mui/icons-material/ThumbUpRounded";
 import Linkify from "react-linkify";
-import ExpandLessRoundedIcon from "@material-ui/icons/ExpandLessRounded";
-import ExpandMoreRoundedIcon from "@material-ui/icons/ExpandMoreRounded";
+import ExpandLessRoundedIcon from "@mui/icons-material/ExpandLessRounded";
+import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import {
    Box,
@@ -17,8 +17,8 @@ import {
    Slide,
    TextField,
    Typography,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
 import { PlayIconButton } from "materialUI/GlobalButtons/GlobalButtons";
 import {
    TooltipButtonComponent,
@@ -48,8 +48,8 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: ({ active }) =>
          active
             ? theme.palette.primary.main
-            : theme.palette.type === "light"
-            ? theme.palette.background.offWhite
+            : theme.palette.mode === "light"
+            ? theme.palette.background.default
             : theme.palette.background.paper,
       color: ({ active }) => (active ? theme.palette.common.white : "inherit"),
       position: "relative",
@@ -97,7 +97,7 @@ const useStyles = makeStyles((theme) => ({
       background: ({ active }) =>
          active
             ? theme.palette.common.white
-            : theme.palette.type === "dark"
+            : theme.palette.mode === "dark"
             ? theme.palette.background.default
             : theme.palette.background.paper,
       color: ({ active }) =>
@@ -317,7 +317,7 @@ const QuestionContainer = memo(
                <Box
                   key={comment.id}
                   className={classes.questionComment}
-                  borderRadius={8}
+                  borderRadius="8px"
                   mb={1}
                   p={1}
                   component={Card}
@@ -336,185 +336,181 @@ const QuestionContainer = memo(
       });
 
       return (
-         <Grow in>
-            <WhiteTooltip
-               placement="right-start"
-               title={
-                  <React.Fragment>
-                     <TooltipTitle>Student Questions (1/3)</TooltipTitle>
-                     <TooltipText>
-                        These are the questions that students already asked and
-                        upvoted before your event
-                     </TooltipText>
-                     <TooltipButtonComponent
-                        onConfirm={() => handleConfirmStep(0)}
-                        buttonText="Ok"
+         <WhiteTooltip
+            placement="right-start"
+            title={
+               <React.Fragment>
+                  <TooltipTitle>Student Questions (1/3)</TooltipTitle>
+                  <TooltipText>
+                     These are the questions that students already asked and
+                     upvoted before your event
+                  </TooltipText>
+                  <TooltipButtonComponent
+                     onConfirm={() => handleConfirmStep(0)}
+                     buttonText="Ok"
+                  />
+               </React.Fragment>
+            }
+            open={isOpen(0)}
+         >
+            <Paper elevation={4} className={classes.questionContainer}>
+               <div style={{ padding: "20px 20px 5px 20px" }}>
+                  <div className={classes.upVotes}>
+                     <span>{question.votes}</span>
+                     <ThumbUpRoundedIcon
+                        color="inherit"
+                        style={{ verticalAlign: "text-top" }}
+                        fontSize="small"
                      />
-                  </React.Fragment>
-               }
-               open={isOpen(0)}
-            >
-               <Paper elevation={4} className={classes.questionContainer}>
-                  <div style={{ padding: "20px 20px 5px 20px" }}>
-                     <div className={classes.upVotes}>
-                        <span>{question.votes}</span>
-                        <ThumbUpRoundedIcon
-                           color="inherit"
-                           style={{ verticalAlign: "text-top" }}
-                           fontSize="small"
-                        />
-                     </div>
-                     <div className={classes.reactionsQuestion}>
-                        <span>{question.title}</span>
-                     </div>
-                     <Typography
-                        style={{
-                           fontSize: "1em",
-                           verticalAlign: "middle",
-                           fontWeight: 700,
-                           color: active ? "white" : "rgb(200,200,200)",
-                           marginBottom: "1rem",
-                        }}
-                     >
-                        {question.numberOfComments || 0} reaction
-                        {question.numberOfComments !== 1 && <span>s</span>}
-                     </Typography>
-                     {commentsElements[0]}
-                     <Collapse
-                        style={{ width: "100%" }}
-                        in={
-                           showAllReactions &&
-                           !loading &&
-                           question.id === openQuestionId
-                        }
-                     >
-                        {commentsElements.slice(1)}
-                     </Collapse>
-                     {question.numberOfComments > 1 && (
-                        <ReactionsToggle
-                           handleToggle={handleToggle}
-                           active={active}
-                           showAllReactions={showAllReactions}
-                           loading={loading}
-                        />
-                     )}
                   </div>
+                  <div className={classes.reactionsQuestion}>
+                     <span>{question.title}</span>
+                  </div>
+                  <Typography
+                     style={{
+                        fontSize: "1em",
+                        verticalAlign: "middle",
+                        fontWeight: 700,
+                        color: active ? "white" : "rgb(200,200,200)",
+                        marginBottom: "1rem",
+                     }}
+                  >
+                     {question.numberOfComments || 0} reaction
+                     {question.numberOfComments !== 1 && <span>s</span>}
+                  </Typography>
+                  {commentsElements[0]}
+                  <Collapse
+                     style={{ width: "100%" }}
+                     in={
+                        showAllReactions &&
+                        !loading &&
+                        question.id === openQuestionId
+                     }
+                  >
+                     {commentsElements.slice(1)}
+                  </Collapse>
+                  {question.numberOfComments > 1 && (
+                     <ReactionsToggle
+                        handleToggle={handleToggle}
+                        active={active}
+                        showAllReactions={showAllReactions}
+                        loading={loading}
+                     />
+                  )}
+               </div>
+               <WhiteTooltip
+                  placement="right-start"
+                  title={
+                     <React.Fragment>
+                        <TooltipTitle>Student Questions (3/3)</TooltipTitle>
+                        <TooltipText>
+                           In the recruiter-chat a company HR representative can
+                           answer recruiting related questions. Try and type a
+                           comment.
+                        </TooltipText>
+                        <TooltipButtonComponent
+                           onConfirm={() => handleConfirmStep(2)}
+                           buttonText="Ok"
+                        />
+                     </React.Fragment>
+                  }
+                  open={isOpen(2)}
+               >
+                  <Box p={1}>
+                     <TextField
+                        value={newCommentTitle}
+                        className={classes.chatInput}
+                        onKeyPress={addNewCommentOnEnter}
+                        placeholder="Send a reaction..."
+                        fullWidth
+                        size="small"
+                        variant="outlined"
+                        InputProps={{
+                           maxLength: 340,
+                           endAdornment: (
+                              <PlayIconButton
+                                 isEmpty={isEmpty}
+                                 addNewComment={() => {
+                                    addNewComment();
+                                    isOpen(2) && handleConfirmStep(2);
+                                 }}
+                              />
+                           ),
+                        }}
+                        onChange={(event) => {
+                           setNewCommentTitle(event.currentTarget.value);
+                        }}
+                     />
+                  </Box>
+               </WhiteTooltip>
+               {streamer ? (
                   <WhiteTooltip
                      placement="right-start"
                      title={
                         <React.Fragment>
-                           <TooltipTitle>Student Questions (3/3)</TooltipTitle>
+                           <TooltipTitle>Student Questions (2/3)</TooltipTitle>
                            <TooltipText>
-                              In the recruiter-chat a company HR representative
-                              can answer recruiting related questions. Try and
-                              type a comment.
+                              Before answering a question verbally, make sure to
+                              highlight the question with Answer Now
                            </TooltipText>
                            <TooltipButtonComponent
-                              onConfirm={() => handleConfirmStep(2)}
+                              onConfirm={() => {
+                                 goToThisQuestion(question.id);
+                                 handleConfirmStep(1);
+                              }}
                               buttonText="Ok"
                            />
                         </React.Fragment>
                      }
-                     open={isOpen(2)}
+                     open={isOpen(1)}
                   >
-                     <Box p={1}>
-                        <TextField
-                           value={newCommentTitle}
-                           className={classes.chatInput}
-                           onKeyPress={addNewCommentOnEnter}
-                           placeholder="Send a reaction..."
-                           fullWidth
-                           size="small"
-                           variant="outlined"
-                           InputProps={{
-                              maxLength: 340,
-                              endAdornment: (
-                                 <PlayIconButton
-                                    isEmpty={isEmpty}
-                                    addNewComment={() => {
-                                       addNewComment();
-                                       isOpen(2) && handleConfirmStep(2);
-                                    }}
-                                 />
-                              ),
-                           }}
-                           onChange={(event) => {
-                              setNewCommentTitle(event.currentTarget.value);
-                           }}
-                        />
-                     </Box>
-                  </WhiteTooltip>
-                  {streamer ? (
-                     <WhiteTooltip
-                        placement="right-start"
-                        title={
-                           <React.Fragment>
-                              <TooltipTitle>
-                                 Student Questions (2/3)
-                              </TooltipTitle>
-                              <TooltipText>
-                                 Before answering a question verbally, make sure
-                                 to highlight the question with Answer Now
-                              </TooltipText>
-                              <TooltipButtonComponent
-                                 onConfirm={() => {
-                                    goToThisQuestion(question.id);
-                                    handleConfirmStep(1);
-                                 }}
-                                 buttonText="Ok"
-                              />
-                           </React.Fragment>
-                        }
-                        open={isOpen(1)}
-                     >
-                        <Button
-                           startIcon={<ThumbUpRoundedIcon />}
-                           size="small"
-                           disableElevation
-                           disabled={old}
-                           className={classes.questionButton}
-                           fullWidth
-                           color="primary"
-                           onClick={() => {
-                              goToThisQuestion(question.id);
-                              isOpen(1) && handleConfirmStep(1);
-                           }}
-                           variant="contained"
-                        >
-                           {active ? (
-                              <span>Answering</span>
-                           ) : old ? (
-                              <span>Answered</span>
-                           ) : (
-                              <span>Answer Now</span>
-                           )}
-                        </Button>
-                     </WhiteTooltip>
-                  ) : (
                      <Button
                         startIcon={<ThumbUpRoundedIcon />}
                         size="small"
                         disableElevation
+                        disabled={old}
                         className={classes.questionButton}
-                        color="primary"
                         fullWidth
+                        color="primary"
+                        onClick={() => {
+                           goToThisQuestion(question.id);
+                           isOpen(1) && handleConfirmStep(1);
+                        }}
                         variant="contained"
-                        onClick={() => upvoteLivestreamQuestion()}
-                        disabled={old || upvoted}
                      >
-                        {!livestream.test &&
-                        question.emailOfVoters &&
-                        user &&
-                        question.emailOfVoters.indexOf(user.email) > -1 ? (
-                           <span>UPVOTED!</span>
+                        {active ? (
+                           <span>Answering</span>
+                        ) : old ? (
+                           <span>Answered</span>
                         ) : (
-                           <span>UPVOTE</span>
+                           <span>Answer Now</span>
                         )}
                      </Button>
-                  )}
-               </Paper>
-            </WhiteTooltip>
-         </Grow>
+                  </WhiteTooltip>
+               ) : (
+                  <Button
+                     startIcon={<ThumbUpRoundedIcon />}
+                     size="small"
+                     disableElevation
+                     className={classes.questionButton}
+                     color="primary"
+                     fullWidth
+                     variant="contained"
+                     onClick={() => upvoteLivestreamQuestion()}
+                     disabled={old || upvoted}
+                  >
+                     {!livestream.test &&
+                     question.emailOfVoters &&
+                     user &&
+                     question.emailOfVoters.indexOf(user.email) > -1 ? (
+                        <span>UPVOTED!</span>
+                     ) : (
+                        <span>UPVOTE</span>
+                     )}
+                  </Button>
+               )}
+            </Paper>
+         </WhiteTooltip>
       );
    }
 );

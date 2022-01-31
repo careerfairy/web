@@ -1,12 +1,12 @@
 import React from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { IconButton, Modal, useMediaQuery } from "@material-ui/core";
+import { useTheme } from "@mui/material/styles";
+import { Box, IconButton, Modal, useMediaQuery } from "@mui/material";
 import { InlineWidget } from "react-calendly";
 import { useAuth } from "../../../../HOCs/AuthProvider";
-import CloseIcon from "@material-ui/icons/Close";
+import CloseIcon from "@mui/icons-material/Close";
 
 const closeWrapperHeight = 70;
-const useStyles = makeStyles((theme) => ({
+const styles = {
    contentMobile: {
       padding: "0 !important",
       paddingTop: 0,
@@ -17,13 +17,12 @@ const useStyles = makeStyles((theme) => ({
       justifyContent: "flex-end",
    },
    closeIcon: {
-      color: theme.palette.common.white,
+      color: theme => theme.palette.common.white,
       fontSize: "3rem",
       fontWeight: 600,
    },
-}));
-const Content = ({ handleClose, background, primary, text, mobile }) => {
-   const classes = useStyles({ mobile });
+}
+const Content = ({ handleClose, background, primary, text }) => {
    const { userData } = useAuth();
 
    const props = {
@@ -49,20 +48,20 @@ const Content = ({ handleClose, background, primary, text, mobile }) => {
    };
    return (
       <React.Fragment>
-         <div className={classes.closeWrapper}>
+         <Box sx={styles.closeWrapper}>
             <div>
-               <IconButton onClick={handleClose}>
-                  <CloseIcon className={classes.closeIcon} />
+               <IconButton onClick={handleClose} size="large">
+                  <CloseIcon sx={styles.closeIcon} />
                </IconButton>
             </div>
-         </div>
+         </Box>
          <InlineWidget {...props} />
       </React.Fragment>
    );
 };
 const CalendlyModal = ({ open, onClose }) => {
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down("xs"));
+   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
    const handleClose = () => {
       onClose();

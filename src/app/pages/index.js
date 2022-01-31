@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import LandingLayout from "../layouts/LandingLayout";
 import BookADemoSection from "../components/views/landing/BookADemoSection";
 import TestimonialsSection from "../components/views/landing/TestimonialsSection";
@@ -21,7 +21,7 @@ import {
 } from "../constants/images";
 import HeadWithMeta from "../components/page/HeadWithMeta";
 
-const LandingPage = ({}) => {
+const LandingPage = () => {
    const {
       palette: { secondary, common, grey },
    } = useTheme();

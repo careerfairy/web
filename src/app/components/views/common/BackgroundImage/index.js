@@ -1,44 +1,43 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import clsx from "clsx";
+import { Box } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme) => ({
-   backgroundImage: {
-      backgroundImage: (props) => `url(${props.image})`,
-      opacity: (props) => props.opacity,
-      backgroundPosition: (props) => props.imagePosition,
+const styles = {
+   root: (theme, { image, opacity, imagePosition, repeat }) => ({
+      backgroundImage: `url(${image})`,
+      opacity: opacity,
+      backgroundPosition: imagePosition,
       backgroundSize: "cover",
       top: "0",
       left: "0",
       bottom: "0",
       right: "0",
       position: "absolute",
-   },
-   repeat: {
-      backgroundSize: "auto",
-      backgroundPosition: "0% 0%",
-      backgroundRepeat: "true",
-   },
-}));
+      ...(repeat && {
+         backgroundSize: "auto",
+         backgroundPosition: "0% 0%",
+         backgroundRepeat: "true",
+      }),
+   }),
+};
 
 const BackgroundImage = ({
    image,
    opacity,
    repeat,
    className,
+   backgroundImageSx,
    imagePosition = "center center",
 }) => {
-   const classes = useStyles({
-      opacity: opacity,
-      image: image,
-      imagePosition,
-   });
+   const theme = useTheme();
    return (
-      <div
-         className={clsx(classes.backgroundImage, className, {
-            [classes.repeat]: repeat,
-         })}
+      <Box
+         className={className}
+         sx={{
+            ...styles.root(theme, { image, opacity, imagePosition, repeat }),
+            ...backgroundImageSx,
+         }}
       />
    );
 };

@@ -1,14 +1,14 @@
 import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {AppBar, Badge, Box, Hidden, IconButton, Tab, Tabs, Toolbar, Tooltip} from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import NotificationIcon from '@material-ui/icons/NotificationsOutlined';
-import ActiveNotificationIcon from '@material-ui/icons/Notifications';
-import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
+import {AppBar, Badge, Box, Hidden, IconButton, Tab, Tabs, Toolbar, Tooltip} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import NotificationIcon from '@mui/icons-material/NotificationsOutlined';
+import ActiveNotificationIcon from '@mui/icons-material/Notifications';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import Link from '../../../../materialUI/NextNavLink'
 import {MainLogo} from "../../../logos";
-import {makeStyles} from "@material-ui/core/styles"
+import makeStyles from '@mui/styles/makeStyles';
 import {maybePluralize} from "../../../helperFunctions/HelperFunctions";
 import Notifications from "./Notifications";
 import topBarStyles from "../../../../materialUI/styles/topBarStyles";
@@ -31,7 +31,7 @@ const TopBar = ({className, notifications, links, onMobileNavOpen, ...rest}) => 
         <AppBar elevation={1} className={clsx(classes.root, className)} {...rest}>
             <Toolbar className={classes.toolbar}>
                 <MainLogo white/>
-                <Hidden smDown>
+                <Hidden mdDown>
                     <Tabs value={false} classes={{indicator: classes.indicator}}>
                         {links.map((item) => {
                             return (
@@ -48,7 +48,7 @@ const TopBar = ({className, notifications, links, onMobileNavOpen, ...rest}) => 
                 <Box>
                     <Tooltip
                         title={`You have ${notifications.length} unread ${maybePluralize(notifications.length, "notification")}`}>
-                        <IconButton onClick={handleClick} color="inherit">
+                        <IconButton onClick={handleClick} color="inherit" size="large">
                             <Badge
                                 badgeContent={notifications.length}
                                 color="secondary"
@@ -62,17 +62,17 @@ const TopBar = ({className, notifications, links, onMobileNavOpen, ...rest}) => 
                         handleClose={handleClose}
                         anchorEl={notificationAnchor}
                     />
-                    <Hidden mdDown>
+                    <Hidden lgDown>
                         <IconButton
                             component={Link}
                             className={classes.navIconButton}
                             href="/profile"
-                        >
+                            size="large">
                             <AccountCircleOutlinedIcon/>
                         </IconButton>
                     </Hidden>
                     <Hidden lgUp>
-                        <IconButton color="inherit" onClick={onMobileNavOpen}>
+                        <IconButton color="inherit" onClick={onMobileNavOpen} size="large">
                             <MenuIcon/>
                         </IconButton>
                     </Hidden>

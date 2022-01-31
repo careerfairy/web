@@ -1,22 +1,22 @@
 import React, { useContext, useEffect, useState } from "react";
-import EditIcon from "@material-ui/icons/Edit";
+import EditIcon from "@mui/icons-material/Edit";
 import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import PollCreationModal from "../../poll-creation-modal/PollCreationModal";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
    Box,
    Button,
    IconButton,
    List,
    ListItem,
-   Menu,
-   MenuItem,
-   Typography,
    ListItemIcon,
    ListItemText,
+   Menu,
+   MenuItem,
    Paper,
-} from "@material-ui/core";
-import { CloseRounded } from "@material-ui/icons";
+   Typography,
+} from "@mui/material";
+import { CloseRounded } from "@mui/icons-material";
 import { colorsArray } from "../../../../../../../util/colors";
 import TutorialContext from "../../../../../../../../context/tutorials/TutorialContext";
 import {
@@ -25,50 +25,39 @@ import {
    TooltipTitle,
    WhiteTooltip,
 } from "../../../../../../../../materialUI/GlobalTooltips";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
+
 import useStreamRef from "../../../../../../../custom-hook/useStreamRef";
 
-const useStyles = makeStyles((theme) => ({
-   upcomingPoll: {
-      borderRadius: theme.spacing(2),
-   },
-   askButton: {
-      borderRadius: theme.spacing(0, 0, 2, 2),
+const Overlay = styled(Paper)(({ theme }) => ({
+   borderRadius: theme.spacing(2),
+   position: "absolute",
+   height: "100%",
+   top: 0,
+   Bottom: 0,
+   left: 0,
+   right: 0,
+   background: "rgba(100,100,100,0.85)",
+   zIndex: 300,
+   cursor: "pointer",
+   display: "grid",
+   placeItems: "center",
+   "& div": {
+      textAlign: "center",
+      width: "70%",
+      color: "white",
+      fontSize: "1.2em",
    },
 }));
-const Overlay = withStyles((theme) => ({
-   root: {
-      borderRadius: theme.spacing(2),
-      position: "absolute",
-      height: "100%",
-      top: 0,
-      Bottom: 0,
-      left: 0,
-      right: 0,
-      background: "rgba(100,100,100,0.85)",
-      zIndex: 300,
-      cursor: "pointer",
-      display: "grid",
-      placeItems: "center",
-      "& div": {
-         textAlign: "center",
-         width: "70%",
-         color: "white",
-         fontSize: "1.2em",
-      },
-   },
-}))(Paper);
 
-const ListNumber = withStyles((theme) => ({
-   root: {
-      color: "white",
-      borderRadius: "50%",
-      width: 20,
-      height: 20,
-      display: "grid",
-      placeItems: "center",
-   },
-}))(Box);
+const ListNumber = styled(Box)(({ theme }) => ({
+   color: "white",
+   borderRadius: "50%",
+   width: 20,
+   height: 20,
+   display: "grid",
+   placeItems: "center",
+}));
 
 function UpcomingPollStreamer({
    firebase,
@@ -83,7 +72,6 @@ function UpcomingPollStreamer({
    addNewPoll,
 }) {
    const streamRef = useStreamRef();
-   const classes = useStyles();
    const [editPoll, setEditPoll] = useState(false);
    const [showNotEditableMessage, setShowNotEditableMessage] = useState(false);
 
@@ -180,8 +168,11 @@ function UpcomingPollStreamer({
          open={isOpen(5)}
       >
          <Paper
-            className={classes.upcomingPoll}
-            style={{ margin: 10, position: "relative" }}
+            sx={{
+               borderRadius: (theme) => theme.spacing(2),
+               margin: 1,
+               position: "relative",
+            }}
             onMouseEnter={handleSetIsNotEditablePoll}
             onMouseLeave={() => setShowNotEditableMessage(false)}
          >
@@ -253,7 +244,9 @@ function UpcomingPollStreamer({
                   color="primary"
                   children={"Ask the Audience Now"}
                   disabled={somePollIsCurrent || tutorialActive()}
-                  className={classes.askButton}
+                  sx={{
+                     borderRadius: (theme) => theme.spacing(0, 0, 2, 2),
+                  }}
                   onClick={() => {
                      if (isOpen(6)) {
                         handleConfirmStep(6);

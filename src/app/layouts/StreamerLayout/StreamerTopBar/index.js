@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import {
    AppBar,
    Badge,
@@ -12,7 +13,7 @@ import {
    Tooltip,
    Typography,
    useMediaQuery,
-} from "@material-ui/core";
+} from "@mui/material";
 import { MainLogo, MiniLogo } from "../../../components/logos";
 import {
    StandartTooltip,
@@ -21,14 +22,14 @@ import {
    TooltipTitle,
 } from "../../../materialUI/GlobalTooltips";
 import ButtonWithConfirm from "../../../components/views/common/ButtonWithConfirm";
-import StopIcon from "@material-ui/icons/Stop";
-import PlayCircleFilledWhiteIcon from "@material-ui/icons/PlayCircleFilledWhite";
-import PersonAddIcon from "@material-ui/icons/PersonAdd";
-import OpenInBrowserIcon from "@material-ui/icons/OpenInBrowser";
-import Brightness4Icon from "@material-ui/icons/Brightness4";
-import Brightness7Icon from "@material-ui/icons/Brightness7";
-import BreakoutRoomIcon from "@material-ui/icons/Widgets";
-import PeopleIcon from "@material-ui/icons/People";
+import StopIcon from "@mui/icons-material/Stop";
+import PlayCircleFilledWhiteIcon from "@mui/icons-material/PlayCircleFilledWhite";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import StudentViewIcon from "@mui/icons-material/FaceRounded";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import BreakoutRoomIcon from "@mui/icons-material/Widgets";
+import PeopleIcon from "@mui/icons-material/People";
 import { useThemeToggle } from "../../../context/theme/ThemeContext";
 import SpeakerManagementModal from "../../../components/views/streaming/modal/SpeakerManagementModal";
 import { useCurrentStream } from "../../../context/stream/StreamContext";
@@ -78,7 +79,7 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
    const streamRef = useStreamRef();
    const classes = useStyles({ hasStarted: currentLivestream?.hasStarted });
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down("md"));
+   const mobile = useMediaQuery(theme.breakpoints.down("lg"));
    const { toggleTheme, themeMode } = useThemeToggle();
    const numberOfViewers = useSelector((state) =>
       currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0
@@ -122,8 +123,8 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
       <Fragment>
          <AppBar elevation={1} color="transparent">
             <Toolbar className={classes.toolbar}>
-               <Hidden smDown>
-                  <MainLogo white={theme.palette.type === "dark"} />
+               <Hidden mdDown>
+                  <MainLogo white={theme.palette.mode === "dark"} />
                </Hidden>
                <Hidden mdUp>
                   <MiniLogo />
@@ -229,6 +230,7 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                            onClick={() => {
                               setSpeakerManagementOpen(true);
                            }}
+                           size="large"
                         >
                            <PersonAddIcon color="inherit" />
                         </IconButton>
@@ -239,14 +241,19 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                      <IconButton
                         disabled={openStreamerBreakoutRoomModal}
                         onClick={handleOpenBreakoutRoomModal}
+                        size="large"
                      >
                         <BreakoutRoomIcon />
                      </IconButton>
                   </Tooltip>
                   {
                      <Tooltip title="Open Student View">
-                        <IconButton target="_blank" href={viewerLink}>
-                           <OpenInBrowserIcon color="inherit" />
+                        <IconButton
+                           target="_blank"
+                           href={viewerLink}
+                           size="large"
+                        >
+                           <StudentViewIcon color="inherit" />
                         </IconButton>
                      </Tooltip>
                   }
@@ -277,6 +284,7 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                               <IconButton
                                  color="inherit"
                                  onClick={showAudience}
+                                 size="large"
                               >
                                  <Badge
                                     max={999999}

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { User as ProfileIcon } from "react-feather";
 import { useAuth } from "../../HOCs/AuthProvider";
-import NextLivestreamsIcon from "@material-ui/icons/Contacts";
-import FollowGroupIcon from "@material-ui/icons/GroupAdd";
-import WishlistIcon from "@material-ui/icons/Stars";
+import NextLivestreamsIcon from "@mui/icons-material/Contacts";
+import FollowGroupIcon from "@mui/icons-material/GroupAdd";
+import WishlistIcon from "@mui/icons-material/Stars";
 
 const initialMainLinks = [
    {

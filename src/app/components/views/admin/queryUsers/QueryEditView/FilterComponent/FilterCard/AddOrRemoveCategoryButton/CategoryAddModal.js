@@ -8,8 +8,8 @@ import {
    DialogContent,
    DialogTitle,
    TextField,
-} from "@material-ui/core";
-import { Autocomplete } from "@material-ui/lab";
+} from "@mui/material";
+import { Autocomplete } from '@mui/material';
 import { convertArrayOfObjectsToDictionaryByProp } from "../../../../../../../../data/util/AnalyticsUtil";
 import * as actions from "../../../../../../../../store/actions";
 import { useDispatch } from "react-redux";
@@ -53,11 +53,7 @@ const Content = ({ groupCategories, handleClose, filterOptions, groupId }) => {
                )}
                renderTags={(value, getTagProps) =>
                   value.map((option, index) => (
-                     <Chip
-                        variant="default"
-                        label={groupCategoriesMap[option]?.name}
-                        {...getTagProps({ index })}
-                     />
+                     <Chip label={groupCategoriesMap[option]?.name} {...getTagProps({ index })} />
                   ))
                }
             />

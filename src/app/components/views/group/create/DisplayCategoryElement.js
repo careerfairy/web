@@ -1,7 +1,7 @@
 import React from "react";
 import { withFirebase } from "context/firebase/FirebaseServiceContext";
-import { makeStyles } from "@material-ui/core/styles";
-import { Box, Chip, Paper } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Box, Chip, Paper } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
    whiteBox: {

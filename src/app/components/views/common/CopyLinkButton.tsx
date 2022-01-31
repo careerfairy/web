@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { Button, FormControl, Tooltip } from "@material-ui/core";
-import FileCopyIcon from "@material-ui/icons/FileCopy";
+import { Button, FormControl, Tooltip } from "@mui/material";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
 import { useCopyToClipboard } from "react-use";
 
 const CopyLinkButton = ({ linkUrl }) => {

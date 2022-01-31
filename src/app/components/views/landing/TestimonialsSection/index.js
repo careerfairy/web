@@ -1,21 +1,12 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 import SectionHeader from "components/views/common/SectionHeader";
 import SectionContainer from "../../common/Section/Container";
 import TestimonialCarousel from "./TestimonialCarousel";
 
-const useStyles = makeStyles((theme) => ({
-   section: {},
-   bookingButton: {
-      background: theme.palette.common.white,
-      color: theme.palette.secondary.main,
-      "&:hover": {
-         color: theme.palette.common.white,
-      },
-   },
+const styles = {
    testimonialsWrapper: {
       display: "flex",
       width: "100%",
@@ -23,14 +14,11 @@ const useStyles = makeStyles((theme) => ({
    title: {
       fontWeight: 500,
    },
-}));
+};
 
 const TestimonialsSection = (props) => {
-   const classes = useStyles();
-
    return (
       <Section
-         className={classes.section}
          big={props.big}
          color={props.color}
          backgroundImageClassName={props.backgroundImageClassName}
@@ -41,14 +29,14 @@ const TestimonialsSection = (props) => {
          <SectionContainer>
             <SectionHeader
                color={props.color}
-               titleClassName={classes.title}
+               titleSx={styles.title}
                title={props.title}
                subtitle={props.subtitle}
             />
             <Grid
                container
                justifyContent="center"
-               className={classes.testimonialsWrapper}
+               sx={styles.testimonialsWrapper}
             >
                <Grid item xs={12} md={12}>
                   <TestimonialCarousel />

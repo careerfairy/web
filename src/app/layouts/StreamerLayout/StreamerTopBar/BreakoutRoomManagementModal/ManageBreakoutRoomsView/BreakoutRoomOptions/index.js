@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useState } from "react";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import {
    IconButton,
    ListItemIcon,
@@ -8,14 +8,14 @@ import {
    MenuItem,
    Tooltip,
    Typography,
-} from "@material-ui/core";
-import MoreOptionsIcon from "@material-ui/icons/MoreHoriz";
-import AnnouncementIcon from "@material-ui/icons/ContactlessOutlined";
-import RoomSettingsIcon from "@material-ui/icons/Settings";
-import AddRoomIcon from "@material-ui/icons/AddCircleOutline";
-import RefreshRoomsIcon from "@material-ui/icons/Refresh";
+} from "@mui/material";
+import MoreOptionsIcon from "@mui/icons-material/MoreHoriz";
+import AnnouncementIcon from "@mui/icons-material/ContactlessOutlined";
+import RoomSettingsIcon from "@mui/icons-material/Settings";
+import AddRoomIcon from "@mui/icons-material/AddCircleOutline";
+import RefreshRoomsIcon from "@mui/icons-material/Refresh";
 import AnnouncementModal from "./AnnouncementModal";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import AddRoomModal from "./AddRoomModal";
 import { MAX_BREAKOUT_ROOMS } from "constants/breakoutRooms";
 

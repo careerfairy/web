@@ -1,6 +1,12 @@
 html {
     font-size: 14px;
     scroll-behavior: smooth;
+    font-family: Poppins,sans-serif;
+}
+
+body {
+    font-size: 0.875rem;
+    line-height: 1.43;
 }
 
 .pdfContent {

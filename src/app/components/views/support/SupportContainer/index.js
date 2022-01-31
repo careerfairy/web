@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react';
-import {makeStyles} from "@material-ui/core/styles";
-import {Container, Grid, Hidden} from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import {Container, Grid, Hidden} from "@mui/material";
 import SupportNav from "../SupportNav";
 
 const useStyles = makeStyles(theme => ({
@@ -24,7 +24,7 @@ const SupportContainer = ({withNav, children}) => {
                 container
                 spacing={4}
             >
-                <Hidden smDown>
+                <Hidden mdDown>
                     <Grid md={3} item>
                         <SupportNav/>
                     </Grid>

@@ -9,10 +9,10 @@ import {
    Divider,
    Grid,
    Grow,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useSnackbar } from "notistack";
 import { GENERAL_ERROR } from "../../../../util/constants";
-import AddIcon from "@material-ui/icons/Add";
+import AddIcon from "@mui/icons-material/Add";
 import CategoryElement from "../settings/Category/CategoryElement";
 import CategoryEdit from "../settings/Category/CategoryEdit";
 

@@ -3,13 +3,14 @@ import PropTypes from "prop-types";
 import clsx from "clsx";
 import { Film as StreamIcon } from "react-feather";
 import { useSnackbar } from "notistack";
-import { emphasize, makeStyles } from "@material-ui/core/styles";
-import SpeedDial from "@material-ui/lab/SpeedDial";
-import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
-import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
-import OpenInBrowserIcon from "@material-ui/icons/OpenInBrowser";
+import { emphasize } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import SpeedDial from '@mui/material/SpeedDial';
+import SpeedDialIcon from '@mui/material/SpeedDialIcon';
+import SpeedDialAction from '@mui/material/SpeedDialAction';
+import OpenInBrowserIcon from "@mui/icons-material/OpenInBrowser";
 
-import ShareIcon from "@material-ui/icons/Share";
+import ShareIcon from "@mui/icons-material/Share";
 import {
    copyStringToClipboard,
    getBaseUrl,

@@ -1,18 +1,17 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import UpcomingLivestreamCard from "../../../common/stream-cards/UpcomingLivestreamCard";
 import { getMaxSlides } from "util/CommonUtil";
 
-const useStyles = makeStyles((theme) => ({
-   root: {
+const styles = {
+   root: (theme) => ({
       marginLeft: "auto",
       marginRight: "auto",
       width: "95%",
-      [theme.breakpoints.down("md")]: {
+      [theme.breakpoints.down("lg")]: {
          width: "100%",
       },
       "& .slick-dots li.slick-active button:before": {
@@ -25,8 +24,8 @@ const useStyles = makeStyles((theme) => ({
          borderRadius: "100%",
          content: '""',
       },
-   },
-}));
+   }),
+};
 
 const UpcomingLivestreamsCarousel = ({
    upcomingStreams,
@@ -35,8 +34,6 @@ const UpcomingLivestreamsCarousel = ({
    disableAutoPlay,
    noRegister,
 }) => {
-   const classes = useStyles();
-
    const settings = {
       infinite: true,
       speed: 500,
@@ -80,7 +77,7 @@ const UpcomingLivestreamsCarousel = ({
    };
 
    return (
-      <div className={classes.root}>
+      <Box sx={styles.root}>
          <Slider {...settings}>
             {upcomingStreams.map((livestream) => (
                <Box key={livestream.id} p={2}>
@@ -93,7 +90,7 @@ const UpcomingLivestreamsCarousel = ({
                </Box>
             ))}
          </Slider>
-      </div>
+      </Box>
    );
 };
 

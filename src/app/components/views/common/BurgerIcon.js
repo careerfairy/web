@@ -1,4 +1,4 @@
-import { SvgIcon } from "@material-ui/core";
+import { SvgIcon } from "@mui/material";
 import BurgerIconSVG from "public/burger_white.svg";
 
 const BurgerIcon = (props) => {

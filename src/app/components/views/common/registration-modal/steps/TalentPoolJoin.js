@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import GroupLogo from "../common/GroupLogo";
 import {
    Button,
@@ -10,7 +10,7 @@ import {
    DialogTitle,
    Grid,
    Grow,
-} from "@material-ui/core";
+} from "@mui/material";
 import { RegistrationContext } from "../../../../../context/registration/RegistrationContext";
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext";
 import { useAuth } from "../../../../../HOCs/AuthProvider";

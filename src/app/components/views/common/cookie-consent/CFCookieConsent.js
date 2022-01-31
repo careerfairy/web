@@ -1,5 +1,6 @@
-import { Typography } from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import Link from "next/link";
 import { useCallback } from "react";
 import CookieConsent from "react-cookie-consent";

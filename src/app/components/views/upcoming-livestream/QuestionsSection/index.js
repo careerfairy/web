@@ -1,22 +1,19 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionContainer from "../../common/Section/Container";
 import SectionHeader from "../../common/SectionHeader";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import Fade from "@stahl.luke/react-reveal/Fade";
 import CreateQuestion from "./CreateQuestion";
 import QuestionVotingContainer from "../../common/QuestionVotingContainer";
-import { Grid, Hidden } from "@material-ui/core";
+import { Grid, Hidden } from "@mui/material";
 import { questionIcon } from "../../../../constants/svgs";
 
-const useStyles = makeStyles((theme) => ({
-   section: {},
-   subTitle: {},
+const styles = {
    header: {
       "&:not(:last-child)": {
-         marginBottom: theme.spacing(1),
+         marginBottom: (theme) => theme.spacing(1),
       },
    },
    title: {
@@ -24,8 +21,11 @@ const useStyles = makeStyles((theme) => ({
       textAlign: "left",
    },
    imgGrid: {
-      // background: theme.palette.primary.main,
       overflow: "hidden",
+      "& :first-child": {
+         width: "100%",
+         height: "100%",
+      },
    },
    imgWrapper: {
       width: "100%",
@@ -39,17 +39,14 @@ const useStyles = makeStyles((theme) => ({
          transform: "translate(-50%, -50%)",
          top: "50%",
          left: "50%",
-         padding: theme.spacing(2),
+         padding: (theme) => theme.spacing(2),
       },
    },
-}));
+};
 
 const QuestionsSection = (props) => {
-   const classes = useStyles();
-
    return (
       <Section
-         className={classes.section}
          big={props.big}
          sectionRef={props.sectionRef}
          sectionId={props.sectionId}
@@ -61,15 +58,15 @@ const QuestionsSection = (props) => {
       >
          <SectionContainer maxWidth="lg">
             <Grid spacing={2} container>
-               <Hidden smDown>
-                  <Grid className={classes.imgGrid} item xs={12} md={4}>
+               <Hidden mdDown>
+                  <Grid sx={styles.imgGrid} item xs={12} md={4}>
                      <Fade left>
-                        <div className={classes.imgWrapper}>
+                        <Box sx={styles.imgWrapper}>
                            <img
                               src={questionIcon}
                               alt="question prompt illustration"
                            />
-                        </div>
+                        </Box>
                      </Fade>
                   </Grid>
                </Hidden>
@@ -78,10 +75,10 @@ const QuestionsSection = (props) => {
                      <Fade bottom>
                         <SectionHeader
                            color={props.color}
-                           className={classes.header}
+                           sx={styles.header}
                            title={props.title}
                            subtitle={props.subtitle}
-                           titleClassName={classes.title}
+                           titleSx={styles.title}
                         />
                      </Fade>
                   )}

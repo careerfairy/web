@@ -1,27 +1,25 @@
 import React, { useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Box, Drawer, Typography } from "@material-ui/core";
+import { Box, Drawer, Typography } from "@mui/material";
 import CategoryCard from "../GroupCategories/CategoryCard";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../../store/actions";
-import IconButton from "@material-ui/core/IconButton";
-import CloseDrawerIcon from "@material-ui/icons/ExpandMore";
+import IconButton from "@mui/material/IconButton";
+import CloseDrawerIcon from "@mui/icons-material/ExpandMore";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    actions: {
       display: "flex",
       flexFlow: "column",
       "& > * + *": {
-         marginTop: theme.spacing(1),
+         marginTop: (theme) => theme.spacing(1),
       },
    },
    paperRoot: {
-      borderRadius: theme.spacing(2, 2, 0, 0),
+      borderRadius: (theme) => theme.spacing(2, 2, 0, 0),
    },
-}));
+};
 
 const FiltersDrawer = ({ groupData, handleToggleActive, hasCategories }) => {
-   const classes = useStyles();
    const filterOpen = useSelector(
       (state) => state.nextLivestreams.filterOpen && hasCategories
    );
@@ -41,10 +39,10 @@ const FiltersDrawer = ({ groupData, handleToggleActive, hasCategories }) => {
          anchor="bottom"
          open={filterOpen}
          PaperProps={{
-            className: classes.paperRoot,
+            sx: styles.paperRoot,
          }}
       >
-         <Box p={2} className={classes.actions}>
+         <Box p={2} sx={styles.actions}>
             <Box
                display="flex"
                alignItems="center"
@@ -53,7 +51,7 @@ const FiltersDrawer = ({ groupData, handleToggleActive, hasCategories }) => {
                <Typography color="textSecondary" variant="h5">
                   Filters
                </Typography>
-               <IconButton onClick={handleCloseFilter}>
+               <IconButton onClick={handleCloseFilter} size="large">
                   <CloseDrawerIcon />
                </IconButton>
             </Box>

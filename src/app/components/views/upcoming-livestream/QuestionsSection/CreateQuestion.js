@@ -1,5 +1,4 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 import { useFormik } from "formik";
 import {
@@ -8,18 +7,17 @@ import {
 } from "../../../../constants/forms";
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
-import { Box, Button, CircularProgress, TextField } from "@material-ui/core";
+import { Box, Button, CircularProgress, TextField } from "@mui/material";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    root: {
       width: "100%",
-      padding: theme.spacing(1, 2),
+      padding: (theme) => theme.spacing(1, 2),
    },
-}));
+};
 const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
-   const classes = useStyles();
    const { putLivestreamQuestion } = useFirebaseService();
    const { authenticatedUser } = useAuth();
    const dispatch = useDispatch();
@@ -80,7 +78,7 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
       },
    });
    return (
-      <div className={classes.root}>
+      <Box sx={styles.root}>
          <TextField
             variant="outlined"
             id="questionTitle"
@@ -98,10 +96,11 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
             disabled={isSubmitting}
          />
          <Box
-            display="flex"
-            justifyContent="flex-start"
-            marginTop={2}
-            marginBottom={2}
+            sx={{
+               my: 2,
+               display: "flex",
+               justifyContent: "flex-start",
+            }}
          >
             <Button
                variant="contained"
@@ -117,7 +116,7 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
                {isSubmitting ? "submitting" : "Submit Your question"}
             </Button>
          </Box>
-      </div>
+      </Box>
    );
 };
 

@@ -5,9 +5,10 @@ import {
    DialogActions,
    DialogContent,
    TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import * as PropTypes from "prop-types";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from "@mui/material/Autocomplete";
+import EventOptionPreview from "../../../common/EventAutoSelect/EventOptionPreview";
 
 const Content = ({
    handleClose,
@@ -28,7 +29,7 @@ const Content = ({
                selectOnFocus
                id="multiple-email-select"
                options={options}
-               renderOption={(option) => option}
+               renderOption={(props, option) => option}
                freeSolo
                renderInput={(params) => (
                   <TextField

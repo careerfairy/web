@@ -1,32 +1,28 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import { AvatarGroup } from "@material-ui/lab";
-import { Avatar } from "@material-ui/core";
-import clsx from "clsx";
+import { alpha } from "@mui/material/styles";
+import { Avatar, AvatarGroup } from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
+const styles ={
    avatar: {
-      background: theme.palette.common.white,
-      border: `2px solid ${alpha(theme.palette.text.secondary, 0.2)}`,
-      width: theme.spacing(6),
-      height: theme.spacing(6),
+      background: theme => theme.palette.common.white,
+      border:theme => `2px solid ${alpha(theme.palette.text.secondary, 0.2)}`,
+      width:theme => theme.spacing(6),
+      height: theme =>theme.spacing(6),
    },
    logoAvatar: {
       "& img": {
          objectFit: "contain",
       },
    },
-}));
+}
+
 const StreamAvatarGroup = ({ avatars, max = 2, isLogo }) => {
-   const classes = useStyles();
    return avatars.length ? (
       <AvatarGroup max={max}>
          {avatars.map((avatar) => (
             <Avatar
-               className={clsx(classes.avatar, {
-                  [classes.logoAvatar]: isLogo,
-               })}
+               sx={[styles.avatar, isLogo && styles.logoAvatar]}
                imgProps={{ loading: "lazy" }}
                src={avatar.imgPath}
                alt={avatar.label}

@@ -1,22 +1,11 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
 import SectionContainer from "../../common/Section/Container";
 import BenefitsGrid from "../../common/BenefitsGrid";
 
-const useStyles = makeStyles((theme) => ({
-   subTitle: {
-      color: theme.palette.text.secondary,
-      fontWeight: 500,
-   },
-   benefitsWrapper: {},
-}));
-
 const BenefitsSection = (props) => {
-   const classes = useStyles();
-
    return (
       <Section
          big={props.big}
@@ -29,7 +18,6 @@ const BenefitsSection = (props) => {
          <SectionContainer>
             <SectionHeader
                color={props.color}
-               subTitleClassName={classes.subTitle}
                title={props.title}
                subtitle={props.subtitle}
             />

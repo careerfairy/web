@@ -1,5 +1,5 @@
 import React from "react";
-import { Chip, Tooltip, Typography } from "@material-ui/core";
+import { Chip, Tooltip, Typography } from "@mui/material";
 
 const TargetOptions = ({ options, ...props }) => {
    const renderOptions = options.map((option) => {

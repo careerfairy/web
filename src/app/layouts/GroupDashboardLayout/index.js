@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import React, { useMemo, useRef, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import NavBar from "./NavBar";
 import { useRouter } from "next/router";
 import { withFirebase } from "../../context/firebase/FirebaseServiceContext";
@@ -8,19 +7,16 @@ import { useAuth } from "../../HOCs/AuthProvider";
 import { isEmpty, isLoaded } from "react-redux-firebase";
 import { useSelector } from "react-redux";
 import TopBar from "./TopBar";
-import styles from "../../materialUI/styles/layoutStyles/groupDashboardStyles";
 import useDashboardRedirect from "../../components/custom-hook/useDashboardRedirect";
 import useAdminGroup from "../../components/custom-hook/useAdminGroup";
 import useDashboardLinks from "../../components/custom-hook/useDashboardLinks";
-import { CircularProgress } from "@material-ui/core";
-
-const useStyles = makeStyles(styles);
+import { Box, CircularProgress } from "@mui/material";
+import { styles } from "materialUI/styles/layoutStyles/basicLayoutStyles";
 
 const GroupDashboardLayout = (props) => {
    const { children, firebase } = props;
    const scrollRef = useRef(null);
 
-   const classes = useStyles();
    const {
       query: { groupId },
    } = useRouter();
@@ -49,7 +45,7 @@ const GroupDashboardLayout = (props) => {
    ]);
 
    return (
-      <div className={classes.root}>
+      <Box sx={styles.root}>
          <TopBar
             links={headerLinks}
             notifications={notifications}
@@ -65,9 +61,9 @@ const GroupDashboardLayout = (props) => {
                openMobile={isMobileNavOpen}
             />
          )}
-         <div className={classes.wrapper}>
-            <div className={classes.contentContainer}>
-               <div ref={scrollRef} className={classes.content}>
+         <Box sx={styles.wrapper}>
+            <Box sx={styles.contentContainer}>
+               <Box ref={scrollRef} sx={styles.content}>
                   {isLoaded(group) && !isEmpty(group) && isCorrectGroup ? (
                      React.Children.map(children, (child) =>
                         React.cloneElement(child, {
@@ -81,10 +77,10 @@ const GroupDashboardLayout = (props) => {
                   ) : (
                      <CircularProgress style={{ margin: "auto" }} />
                   )}
-               </div>
-            </div>
-         </div>
-      </div>
+               </Box>
+            </Box>
+         </Box>
+      </Box>
    );
 };
 

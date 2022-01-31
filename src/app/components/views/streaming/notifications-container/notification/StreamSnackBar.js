@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { Button } from "@material-ui/core";
+import { Button } from "@mui/material";
 import TutorialContext from "context/tutorials/TutorialContext";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";

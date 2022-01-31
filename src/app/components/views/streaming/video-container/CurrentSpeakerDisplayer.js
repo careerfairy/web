@@ -1,16 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import RemoteVideoContainer from "./RemoteVideoContainer";
 import { useWindowSize } from "../../../custom-hook/useWindowSize";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import LocalVideoContainer from "./LocalVideoContainer";
-import Typography from "@material-ui/core/Typography";
-import { Button, CircularProgress, Tooltip } from "@material-ui/core";
+import Typography from "@mui/material/Typography";
+import { CircularProgress } from "@mui/material";
 import { BREAKOUT_BANNER_HEIGHT } from "../../../../constants/breakoutRooms";
-import Alert from "@material-ui/lab/Alert";
 import { TOP_BAR_HEIGHT } from "constants/streamLayout";
-import useStreamToken from "../../../custom-hook/useStreamToken";
-import { useCurrentStream } from "../../../../context/stream/StreamContext";
-import useTextOverflow from "../../../custom-hook/useTextOverflow";
 import BreakoutRoomBanner from "../../banners/BreakoutRoomBanner";
 
 const useStyles = makeStyles((theme) => ({
@@ -18,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
       height: "100%",
       display: "inline-block",
       width: 250,
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down("md")]: {
          width: 190,
       },
    },
@@ -29,10 +25,6 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 101,
       top: "20vh",
       height: "calc(80vh - 160px)",
-      [theme.breakpoints.down("mobile")]: {
-         top: "15vh",
-         height: "45vh",
-      },
    },
 
    externalSpeakerVideoSolo: {
@@ -49,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
       display: "inline-block",
       verticalAlign: "top",
       margin: "0",
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down("md")]: {
          minWidth: 190,
       },
    },
@@ -312,7 +304,7 @@ function CurrentSpeakerDisplayer(props) {
          </div>
       );
    }
-   console.log("-> external media streams", props.streams);
+   // console.log("-> external media streams", props.streams);
    //TO BE TESTED
 
    return (

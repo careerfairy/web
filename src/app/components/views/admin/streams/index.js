@@ -1,12 +1,12 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useMemo } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    CircularProgress,
    Container,
    Grid,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { isLoaded, useFirestoreConnect, isEmpty } from "react-redux-firebase";
 import { useSelector } from "react-redux";
 import Search from "./Search";

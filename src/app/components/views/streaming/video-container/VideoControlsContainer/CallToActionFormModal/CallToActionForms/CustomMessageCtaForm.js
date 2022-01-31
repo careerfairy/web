@@ -1,5 +1,5 @@
 const { memo } = require("react");
-import { Collapse, Grid, TextField } from "@material-ui/core";
+import { Collapse, Grid, TextField } from "@mui/material";
 
 const CustomMessageCtaForm = memo(
    ({ formik, maxMessageLength, maxButtonTextLength, onEntered, onExited }) => {

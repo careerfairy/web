@@ -1,10 +1,11 @@
 import PropTypes from "prop-types";
 import React, { useEffect } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
-import { AppBar, Box, IconButton, Tab, Tabs } from "@material-ui/core";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import Drawer from "@mui/material/Drawer";
+import { AppBar, Box, IconButton, Tab, Tabs } from "@mui/material";
 import SwipeableViews from "react-swipeable-views";
-import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import BreakdownTab from "./BreakdownTab";
 import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
@@ -17,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
       height: "100%",
       display: "flex",
       flexDirection: "column",
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down('md')]: {
          width: "100vw",
       },
       [theme.breakpoints.up("sm")]: {
@@ -118,7 +119,7 @@ const DrawerContent = ({ isStreamer, hideAudience, firebase }) => {
             color="default"
          >
             <Box p={0.5}>
-               <IconButton onClick={hideAudience} color="inherit">
+               <IconButton onClick={hideAudience} color="inherit" size="large">
                   <ArrowForwardIosIcon />
                </IconButton>
             </Box>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    AppBar,
    Badge,
@@ -9,22 +10,22 @@ import {
    IconButton,
    Toolbar,
    Tooltip,
-} from "@material-ui/core";
+} from "@mui/material";
 import { MainLogo } from "../../../components/logos";
-import Brightness4Icon from "@material-ui/icons/Brightness4";
-import Brightness7Icon from "@material-ui/icons/Brightness7";
-import CallToActionIcon from "@material-ui/icons/Link";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import CallToActionIcon from "@mui/icons-material/Link";
 import PropTypes from "prop-types";
 import Logo from "./Logo";
 import { useThemeToggle } from "../../../context/theme/ThemeContext";
 import { useCurrentStream } from "../../../context/stream/StreamContext";
-import PeopleIcon from "@material-ui/icons/People";
+import PeopleIcon from "@mui/icons-material/People";
 import NewFeatureHint from "../../../components/util/NewFeatureHint";
 import ViewerBreakoutRoomModal from "./ViewerBreakoutRoomModal";
-import BackToMainRoomIcon from "@material-ui/icons/ArrowBackIos";
+import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos";
 import { useRouter } from "next/router";
 import useStreamToken from "../../../components/custom-hook/useStreamToken";
-import BreakoutRoomIcon from "@material-ui/icons/Widgets";
+import BreakoutRoomIcon from "@mui/icons-material/Widgets";
 import { useDispatch, useSelector } from "react-redux";
 import breakoutRoomsSelector from "../../../components/selectors/breakoutRoomsSelector";
 import * as actions from "store/actions";
@@ -151,7 +152,7 @@ const ViewerTopBar = ({
 
                {breakoutRoomOpen && (
                   <Tooltip title="Checkout breakout rooms">
-                     <IconButton onClick={handleOpenBreakoutRoomModal}>
+                     <IconButton onClick={handleOpenBreakoutRoomModal} size="large">
                         <Badge color="secondary" badgeContent={"!"}>
                            <BreakoutRoomIcon />
                         </Badge>
@@ -166,7 +167,7 @@ const ViewerTopBar = ({
                            : ""
                      }`}
                   >
-                     <IconButton onClick={handleOpenCtaModal}>
+                     <IconButton onClick={handleOpenCtaModal} size="large">
                         <Badge
                            color="secondary"
                            badgeContent={ctaStatus.numberActive && "!"}
@@ -183,10 +184,7 @@ const ViewerTopBar = ({
                   tooltipTitle="Hint"
                >
                   <Tooltip title="See who joined">
-                     <IconButton
-                        onClick={showAudience}
-                        className={classes.floatingButton}
-                     >
+                     <IconButton onClick={showAudience} className={classes.floatingButton} size="large">
                         <Badge
                            max={999999}
                            color="secondary"
@@ -223,7 +221,7 @@ const ViewerTopBar = ({
       <React.Fragment>
          <AppBar elevation={1} color="transparent">
             <Toolbar className={classes.toolbar}>
-               <MainLogo white={theme.palette.type === "dark"} />
+               <MainLogo white={theme.palette.mode === "dark"} />
                {logoElements}
                <Box flexGrow={1} />
                {currentLivestream.companyLogoUrl && (
@@ -244,7 +242,7 @@ const ViewerTopBar = ({
                   )}
                   {breakoutRoomOpen && (
                      <Tooltip title="Checkout breakout rooms">
-                        <IconButton onClick={handleOpenBreakoutRoomModal}>
+                        <IconButton onClick={handleOpenBreakoutRoomModal} size="large">
                            <Badge color="secondary" badgeContent={"!"}>
                               <BreakoutRoomIcon />
                            </Badge>
@@ -259,7 +257,7 @@ const ViewerTopBar = ({
                               : ""
                         }`}
                      >
-                        <IconButton onClick={handleOpenCtaModal}>
+                        <IconButton onClick={handleOpenCtaModal} size="large">
                            <Badge
                               color="secondary"
                               badgeContent={ctaStatus.numberActive && "!"}

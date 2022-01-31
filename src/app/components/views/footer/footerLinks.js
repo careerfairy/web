@@ -4,15 +4,15 @@ const footerLinks = [
       links: [
          {
             label: "For Students",
-            href: "/",
+            href: "/students",
          },
          {
             label: "For Companies",
-            href: "https://corporate.careerfairy.io/companies",
+            href: "/",
          },
          {
             label: "For Career Centers",
-            href: "https://corporate.careerfairy.io/career-center",
+            href: "/career-center",
          },
       ],
    },
