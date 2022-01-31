@@ -83,3 +83,6 @@ export const qualityShape =
 
 export const honestyShape =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/ui-icons%2Fhonesty-shape.png?alt=media&token=4d0d5c55-91bb-4f28-ad66-6397cf65f242";
+
+export const placeholderBanner =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0";

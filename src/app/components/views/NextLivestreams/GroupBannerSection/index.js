@@ -29,6 +29,7 @@ const styles = {
    },
    section: {
       paddingBottom: (theme) => [theme.spacing(1), "!important"],
+      position: "relative",
    },
    disableSectionPadding: {
       paddingTop: "0 !important",

@@ -138,10 +138,12 @@ export const isServer = () => {
 };
 export const convertCamelToSentence = (string) => {
    if (typeof string === "string" || string instanceof String) {
-      return string
-         .replace(/([A-Z])/g, " $1")
-         .charAt(0)
-         .toUpperCase() + string.replace(/([A-Z])/g, " $1").slice(1);
+      return (
+         string
+            .replace(/([A-Z])/g, " $1")
+            .charAt(0)
+            .toUpperCase() + string.replace(/([A-Z])/g, " $1").slice(1)
+      );
    } else {
       return "";
    }
@@ -199,22 +201,24 @@ export const mustBeNumber = (value, decimals = 2) => {
 
 export const convertStringToArray = (string, maxChars = 30) => {
    // Split by spaces
-   return string
-      .split(/\s+/)
+   return (
+      string
+         .split(/\s+/)
 
-      // Then join words so that each string section is less then 40
-      .reduce(function (prev, curr) {
-         if (
-            prev.length &&
-            (prev[prev.length - 1] + " " + curr).length <= maxChars
-         ) {
-            prev[prev.length - 1] += " " + curr;
-         } else {
-            prev.push(curr);
-         }
-         return prev;
-      }, [])
-      .map((str) => str);
+         // Then join words so that each string section is less then 40
+         .reduce(function (prev, curr) {
+            if (
+               prev.length &&
+               (prev[prev.length - 1] + " " + curr).length <= maxChars
+            ) {
+               prev[prev.length - 1] += " " + curr;
+            } else {
+               prev.push(curr);
+            }
+            return prev;
+         }, [])
+         .map((str) => str)
+   );
 };
 
 export const mergeArrayOfObjects = (arr1, arr2, property) => {
@@ -381,3 +385,19 @@ export const shuffleArray = (array) =>
       .map((value) => ({ value, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
       .map(({ value }) => value);
+
+export const dataURLtoFile = (dataUrl, filename) => {
+   let arr = dataUrl.split(","),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]),
+      n = bstr.length,
+      u8arr = new Uint8Array(n);
+
+   while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+   }
+   const extension = mime.split("/")[1];
+   return new File([u8arr], `${filename}.${extension}`, {
+      type: mime,
+   });
+};
