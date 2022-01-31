@@ -169,7 +169,7 @@ function UpcomingPollStreamer({
       >
          <Paper
             sx={{
-               borderRadius: 2,
+               borderRadius: (theme) => theme.spacing(2),
                margin: 1,
                position: "relative",
             }}

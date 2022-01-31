@@ -424,7 +424,12 @@ const QuestionCategory = (props) => {
                </Collapse>
             </DialogContent>
             <DialogActions>
-               <Button size="large" color="grey" onClick={handleClose}>
+               <Button
+                  sx={{ color: "white" }}
+                  size="large"
+                  color="grey"
+                  onClick={handleClose}
+               >
                   Cancel
                </Button>
                <Button
