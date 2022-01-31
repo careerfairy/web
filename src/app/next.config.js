@@ -15,7 +15,7 @@ const securityHeaders = [
          "script-src blob: 'self' *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com; " +
          "style-src 'self' *.vitals.vercel-insights.com *.googleapis.com 'unsafe-inline'; " +
          "connect-src vitals.vercel-insights.com *.careerfairy.io wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:*;" +
-         "img-src https: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com;",
+         "img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com;",
    },
    {
       key: "Referrer-Policy",
