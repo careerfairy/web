@@ -19,7 +19,7 @@ import PublishIcon from "@mui/icons-material/Publish";
 import { useSnackbar } from "notistack";
 import { GENERAL_ERROR } from "../../../../util/constants";
 import { uploadLogo } from "../../../../helperFunctions/HelperFunctions";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
