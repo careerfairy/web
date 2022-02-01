@@ -106,6 +106,10 @@ const streamsSelector = createSelector(
                noOfRegistered: streamObj.registeredUsers?.length || 0,
                noOfTalentPool: streamObj.talentPool?.length || 0,
             };
+            if (streamObj.hasNoTalentPool) {
+               livestream.noOfTalentPool = 0;
+               livestream.talentPool = [];
+            }
 
             livestream.date = livestream.start?.toDate();
             for (const userType of userTypes) {
