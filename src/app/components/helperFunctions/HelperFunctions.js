@@ -15,7 +15,20 @@ dayjs.extend(advancedFormat);
 dayjs.extend(localizedFormat);
 dayjs.extend(relativeTime);
 
-export const uploadLogo = (location, fileObject, firebase, callback) => {
+/**
+ * @param {string} location
+ * @param {*} fileObject
+ * @param {FirebaseService} firebase
+ * @param {function} callback
+ * @param {function} progressCallback
+ */
+export const uploadLogo = (
+   location,
+   fileObject,
+   firebase,
+   callback,
+   progressCallback
+) => {
    var storageRef = firebase.getStorageRef();
    let splitters = [" ", "(", ")", "-"];
    let fileName = fileObject.name;
@@ -32,8 +45,15 @@ export const uploadLogo = (location, fileObject, firebase, callback) => {
    uploadTask.on(
       "state_changed",
       function (snapshot) {
-         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+         const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
          console.log("Upload is " + progress + "% done");
+         if (progressCallback) {
+            progressCallback({
+               state: snapshot.state,
+               progress,
+            });
+         }
          switch (snapshot.state) {
             case "paused":
                console.log("Upload is paused");
