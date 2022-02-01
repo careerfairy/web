@@ -142,6 +142,7 @@ const SpeakerForm = ({
                   id={`speakers.${objectKey}.background`}
                   variant="outlined"
                   fullWidth
+                  multiline
                   disabled={isSubmitting}
                   onBlur={handleBlur}
                   label="Background"
