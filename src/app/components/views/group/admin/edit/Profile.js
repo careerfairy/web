@@ -8,11 +8,10 @@ import {
    Card,
    CardActions,
    CardContent,
+   CircularProgress,
    Divider,
    FormHelperText,
    Grow,
-   Typography,
-   CircularProgress,
 } from "@mui/material";
 import FilePickerContainer from "../../../../ssr/FilePickerContainer";
 import PublishIcon from "@mui/icons-material/Publish";
@@ -20,6 +19,9 @@ import { useSnackbar } from "notistack";
 import { GENERAL_ERROR } from "../../../../util/constants";
 import { uploadLogo } from "../../../../helperFunctions/HelperFunctions";
 import makeStyles from "@mui/styles/makeStyles";
+import { useDispatch } from "react-redux";
+import * as actions from "store/actions";
+import Save from "@mui/icons-material/Save";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -43,6 +45,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Profile = ({ group, firebase, className, ...rest }) => {
    const classes = useStyles();
+   const dispatch = useDispatch();
    const [editData, setEditData] = useState({});
    const [filePickerError, setFilePickerError] = useState("");
    const [submittingLogo, setSubmittingLogo] = useState(false);
@@ -57,18 +60,19 @@ const Profile = ({ group, firebase, className, ...rest }) => {
             editData.fileObj,
             firebase,
             async (newUrl, fullPath) => {
-               await firebase.updateCareerCenter(group.id, { logoUrl: newUrl });
+               try {
+                  await firebase.updateCareerCenter(group.id, {
+                     logoUrl: newUrl,
+                  });
+               } catch (e) {
+                  dispatch(actions.sendGeneralError(e));
+               }
+               setEditData({});
+               setSubmittingLogo(false);
             }
          );
-         setEditData({});
-         setSubmittingLogo(false);
       } catch (e) {
-         setSubmittingLogo(false);
-         console.log("-> e", e);
-         enqueueSnackbar(GENERAL_ERROR, {
-            variant: "error",
-            preventDuplicate: true,
-         });
+         dispatch(actions.sendGeneralError(e));
       }
    };
 
@@ -81,17 +85,6 @@ const Profile = ({ group, firebase, className, ...rest }) => {
                   className={classes.avatar}
                   src={editData.logoUrl || group.logoUrl}
                />
-               <Typography
-                  color="textPrimary"
-                  gutterBottom
-                  align="center"
-                  variant="h3"
-               >
-                  {group.universityName}
-               </Typography>
-               <Typography color="textSecondary" variant="body1">
-                  {group.description}
-               </Typography>
             </Box>
          </CardContent>
          <Divider />
@@ -131,13 +124,15 @@ const Profile = ({ group, firebase, className, ...rest }) => {
                   variant="contained"
                   fullWidth
                   disabled={submittingLogo}
-                  endIcon={
-                     submittingLogo && (
+                  startIcon={
+                     submittingLogo ? (
                         <CircularProgress size={20} color="inherit" />
+                     ) : (
+                        <Save />
                      )
                   }
                >
-                  save
+                  {submittingLogo ? "saving" : "save"}
                </Button>
             </Grow>
             <FormHelperText error>{filePickerError}</FormHelperText>

@@ -30,6 +30,10 @@ import { useDispatch } from "react-redux";
 
 import * as actions from "store/actions";
 import ImagePickerContainer from "../../../../ssr/ImagePickerContainer";
+import CloseRounded from "@mui/icons-material/CloseRounded";
+import Save from "@mui/icons-material/Save";
+import PreviewIcon from "@mui/icons-material/Preview";
+import { alpha } from "@mui/material/styles";
 
 const styles = {
    root: {
@@ -39,15 +43,30 @@ const styles = {
       padding: 0,
    },
    previewWrapper: {
-      height: 500,
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       width: "100%",
+      height: "100%",
+      background: "blue",
+      aspectRatio: "5/1",
+      position: "relative",
    },
+   hoverOverlay: (theme) => ({
+      position: "absolute",
+      inset: 0,
+      transition: theme.transitions.create(["opacity"]),
+      opacity: 0,
+      display: "grid",
+      placeItems: "center",
+      color: "white",
+      "&:hover, &:focus": {
+         opacity: 1,
+         background: alpha(theme.palette.common.black, 0.5),
+      },
+   }),
    bannerMedia: {
       padding: 0,
-      marginBottom: (theme) => theme.spacing(1),
       height: "100%",
       width: "100%",
       backgroundColor: (theme) => theme.palette.navyBlue.main,
@@ -56,49 +75,13 @@ const styles = {
          opacity: 0.8,
       },
    },
-   logoWrapper: {
-      padding: 0,
-      position: "absolute",
-
-      height: "50%",
-      width: "30%",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      zIndex: 1,
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-   },
-   logo: {
-      background: "white",
-      width: "100%",
-      height: "80%",
-      borderRadius: 1,
-      boxShadow: 5,
-   },
-   groupTitle: {
-      width: "110%",
-      mt: 2,
-      mb: 1,
-      height: 5,
-      background: "white",
-      borderRadius: 1,
-   },
-   groupSummary: {
-      background: "white",
-      width: "90%",
-      height: 3,
-      borderRadius: 1,
-   },
    lowerPreview: {
       height: "60%",
       width: "60%",
       p: 1,
    },
    upperPreview: {
-      height: "40%",
-      width: "100%",
+      flex: 1,
       position: "relative",
    },
    actionsWrapper: {
@@ -110,6 +93,26 @@ const styles = {
    },
 };
 
+const LowerPreview = () => {
+   return (
+      <Box sx={styles.lowerPreview}>
+         <Grid sx={{ height: "100%" }} container spacing={1}>
+            <Grid xs={6} item>
+               <StreamCardSkeleton />
+            </Grid>
+            <Grid xs={6} item>
+               <StreamCardSkeleton />
+            </Grid>
+            <Grid xs={6} item>
+               <StreamCardSkeleton />
+            </Grid>
+            <Grid xs={6} item>
+               <StreamCardSkeleton />
+            </Grid>
+         </Grid>
+      </Box>
+   );
+};
 const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
    const imageUrl = bannerImageUrl || placeholderBanner;
    const firebase = useFirebaseService();
@@ -142,6 +145,7 @@ const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
                   dispatch(actions.sendGeneralError(e));
                }
                setEditData({});
+               setSubmittingLogo(false);
             }
          );
       } catch (e) {
@@ -150,11 +154,11 @@ const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
             preventDuplicate: true,
          });
       }
-      setSubmittingLogo(false);
    };
 
    const handleRemoveLogo = async () => {
       try {
+         setFilePickerError("");
          setRemovingLogo(true);
          await firebase.updateCareerCenter(id, {
             bannerImageUrl: "",
@@ -168,48 +172,39 @@ const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
    return (
       <Card sx={styles.root}>
          <CardHeader
-            title={"Upload a custom banner"}
+            title={"Change the banner for your events page"}
             subheader={
                <>
                   Change the banner as seen on your{" "}
                   <a target="_blank" href={`/next-livestreams/${id}`}>
                      events
                   </a>{" "}
-                  page. The optimal size is <b>1600x600px.</b>
+                  page. The optimal size is <b>2880x576px</b> at an aspect ratio
+                  of <b>5:1</b>
                </>
             }
          />
          <CardContent sx={styles.content}>
-            <Box alignItems="center" display="flex" flexDirection="column">
-               <Box sx={styles.previewWrapper}>
-                  <Box sx={styles.upperPreview}>
-                     <Box sx={styles.logoWrapper}>
-                        <Box sx={styles.logo} />
-                        <Box sx={styles.groupTitle} />
-                        <Box sx={styles.groupSummary} />
-                     </Box>
-                     <Avatar
-                        variant="square"
-                        sx={styles.bannerMedia}
-                        src={editData.logoUrl || imageUrl}
-                     />
-                  </Box>
-                  <Box sx={styles.lowerPreview}>
-                     <Grid sx={{ height: "100%" }} container spacing={1}>
-                        <Grid xs={6} item>
-                           <StreamCardSkeleton />
-                        </Grid>
-                        <Grid xs={6} item>
-                           <StreamCardSkeleton />
-                        </Grid>
-                        <Grid xs={6} item>
-                           <StreamCardSkeleton />
-                        </Grid>
-                        <Grid xs={6} item>
-                           <StreamCardSkeleton />
-                        </Grid>
-                     </Grid>
-                  </Box>
+            <Box sx={styles.previewWrapper}>
+               <Avatar
+                  variant="square"
+                  sx={styles.bannerMedia}
+                  src={editData.logoUrl || imageUrl}
+               />
+               <Box
+                  component="a"
+                  target="_blank"
+                  href={`/next-livestreams/${id}`}
+                  sx={styles.hoverOverlay}
+               >
+                  <Button
+                     color="info"
+                     variant="text"
+                     size="large"
+                     startIcon={<PreviewIcon fontSize="large" />}
+                  >
+                     View event page
+                  </Button>
                </Box>
             </Box>
          </CardContent>
@@ -218,12 +213,12 @@ const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
             <ImagePickerContainer
                style={{ width: "100%" }}
                extensions={["jpg", "jpeg", "png"]}
-               maxSize={10}
+               maxSize={5}
                dims={{
-                  minWidth: 530,
-                  maxWidth: 3200,
-                  minHeight: 200,
-                  maxHeight: 1200,
+                  minWidth: 864,
+                  maxWidth: 4300,
+                  minHeight: 172,
+                  maxHeight: 900,
                }}
                onChange={(base64Img) => {
                   const fileObject = dataURLtoFile(base64Img, uuidv4());
@@ -240,48 +235,56 @@ const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
                   <Button
                      color="primary"
                      size="large"
-                     disabled={submittingLogo}
+                     disabled={submittingLogo || removingLogo}
                      fullWidth
-                     endIcon={<PublishIcon />}
+                     startIcon={<PublishIcon />}
                   >
                      {editData.logoUrl ? "Change" : "Upload Banner"}
                   </Button>
                </Box>
             </ImagePickerContainer>
-            <Grow unmountOnExit in={Boolean(bannerImageUrl)}>
+
+            <Grow unmountOnExit in={Boolean(editData.fileObj)}>
+               <Button
+                  sx={styles.saveButton}
+                  color="primary"
+                  onClick={handleSubmitLogo}
+                  size="large"
+                  startIcon={
+                     submittingLogo ? (
+                        <CircularProgress size={20} color="inherit" />
+                     ) : (
+                        <Save />
+                     )
+                  }
+                  variant="contained"
+                  fullWidth
+                  disabled={submittingLogo || removingLogo}
+               >
+                  {submittingLogo ? "saving" : "save"}
+               </Button>
+            </Grow>
+            <Grow
+               unmountOnExit
+               in={Boolean(bannerImageUrl && !editData.fileObj)}
+            >
                <Button
                   sx={styles.saveButton}
                   color="grey"
                   onClick={handleRemoveLogo}
                   size="large"
-                  variant="contained"
-                  fullWidth
-                  disabled={removingLogo}
-                  endIcon={
-                     submittingLogo && (
+                  startIcon={
+                     removingLogo ? (
                         <CircularProgress size={20} color="inherit" />
+                     ) : (
+                        <CloseRounded />
                      )
                   }
+                  variant="outlined"
+                  fullWidth
+                  disabled={submittingLogo || removingLogo}
                >
                   Remove Banner
-               </Button>
-            </Grow>
-            <Grow unmountOnExit in={Boolean(editData.fileObj)}>
-               <Button
-                  sx={styles.saveButton}
-                  color="secondary"
-                  onClick={handleSubmitLogo}
-                  size="large"
-                  variant="contained"
-                  fullWidth
-                  disabled={submittingLogo}
-                  endIcon={
-                     submittingLogo && (
-                        <CircularProgress size={20} color="inherit" />
-                     )
-                  }
-               >
-                  save
                </Button>
             </Grow>
             <FormHelperText error>{filePickerError}</FormHelperText>
