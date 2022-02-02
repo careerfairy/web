@@ -75,6 +75,7 @@ export default function useAgoraAsStreamer(
       false,
       path
    );
+   console.log("-> agoraToken", agoraToken);
    const agoraScreenShareToken = useAgoraToken(
       roomId,
       userUid,

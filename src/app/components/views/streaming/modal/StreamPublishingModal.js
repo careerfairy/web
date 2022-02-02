@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import PersonAddIcon from "@material-ui/icons/PersonAdd";
-import CheckIcon from "@material-ui/icons/Check";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import CheckIcon from "@mui/icons-material/Check";
 import {
    DialogTitle,
    Typography,
@@ -16,17 +16,17 @@ import {
    Grid,
    MenuItem,
    Tooltip,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+   IconButton,
+} from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
 import SoundLevelDisplayer from "components/views/common/SoundLevelDisplayer";
 import ButtonWithConfirm from "components/views/common/ButtonWithConfirm";
 import { useSelector } from "react-redux";
 import { AGORA_RTC_CONNECTION_STATE_CONNECTED } from "constants/agora";
-import VideocamIcon from "@material-ui/icons/Videocam";
-import MicIcon from "@material-ui/icons/Mic";
-import IconButton from "@material-ui/core/IconButton";
-import MicOffIcon from "@material-ui/icons/MicOff";
-import VideocamOffIcon from "@material-ui/icons/VideocamOff";
+import VideocamIcon from "@mui/icons-material/Videocam";
+import MicIcon from "@mui/icons-material/Mic";
+import MicOffIcon from "@mui/icons-material/MicOff";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 
 const useStyles = makeStyles((theme) => ({
    actions: {},

@@ -1,5 +1,5 @@
-import { CircularProgress, Dialog, DialogContent } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { CircularProgress, Dialog, DialogContent } from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
 import React, { useEffect } from "react";
 import {
    AGORA_RTC_CONNECTION_STATE_CONNECTED,
@@ -10,7 +10,7 @@ import {
 } from "constants/agora";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
 const useStyles = makeStyles((theme) => ({
    container: {
@@ -40,7 +40,7 @@ const messages = {
    DISCONNECTED: "Disconnected",
    RECONNECTING:
       "It seems like the connection got interrupted. Attempting to reconnect...",
-   CONNECTED: "Disconnecting...",
+   // CONNECTED: "Disconnecting...",
    CONNECTING: "Connecting...",
    CONNECTED: "Connected",
 };

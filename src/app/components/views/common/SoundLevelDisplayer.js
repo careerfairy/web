@@ -1,4 +1,4 @@
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import { Fragment } from "react";
 import makeStyles from "@mui/styles/makeStyles";
 

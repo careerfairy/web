@@ -8,21 +8,26 @@ import React, {
 } from "react";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import MicIcon from "@mui/icons-material/Mic";
-import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import ScreenShareIcon from "@mui/icons-material/ScreenShare";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
-import { alpha, useTheme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import makeStyles from "@mui/styles/makeStyles";
-import { ClickAwayListener } from "@mui/material";
+import {
+   ClickAwayListener,
+   Dialog,
+   DialogActions,
+   DialogContent,
+   DialogContentText,
+   DialogTitle,
+} from "@mui/material";
 import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
 import TutorialContext from "context/tutorials/TutorialContext";
 import {
-   StyledTooltipWithButton,
    TooltipButtonComponent,
    TooltipText,
    TooltipTitle,
@@ -35,6 +40,10 @@ import ShareMenu from "./ShareMenu";
 import CallToActionDrawer from "./CallToActionDrawer";
 import useSliderFullyOpened from "../../../../custom-hook/useSliderFullyOpened";
 import NewFeatureHint from "../../../../util/NewFeatureHint";
+import JoinAsStreamerIcon from "@mui/icons-material/RecordVoiceOver";
+import StudentViewIcon from "@mui/icons-material/FaceRounded";
+import Button from "@mui/material/Button";
+import CheckIcon from "@mui/icons-material/Check";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -270,7 +279,7 @@ function VideoControlsContainer({
       }
    } else if (!viewer) {
       actions.unshift({
-         icon: <LiveTvIcon />,
+         icon: <JoinAsStreamerIcon />,
          name: "Join as streamer",
          onClick: handleOpenPublishingModal,
       });
@@ -328,7 +337,7 @@ function VideoControlsContainer({
 
    if (!viewer && isPublishing) {
       actions.unshift({
-         icon: <ExitToAppIcon fontSize="medium" />,
+         icon: <StudentViewIcon fontSize="medium" />,
          name: "Join as viewer",
          onClick: () => setOpenModal(true),
       });
@@ -435,7 +444,7 @@ function VideoControlsContainer({
                />
             </div>
          </ClickAwayListener>
-         <Dialog open={openModal} onClose={() => setModalOpen(false)}>
+         <Dialog open={openModal} onClose={() => setOpenModal(false)}>
             <DialogTitle>Joining as viewer</DialogTitle>
             <DialogContent>
                <DialogContentText>
@@ -445,9 +454,9 @@ function VideoControlsContainer({
             </DialogContent>
             <DialogActions>
                <Button
-                  startIcon={<ClearIcon />}
-                  variant="contained"
-                  onClick={() => setModalOpen(false)}
+                  variant="text"
+                  color="grey"
+                  onClick={() => setOpenModal(false)}
                >
                   Cancel
                </Button>

@@ -1,7 +1,5 @@
 import React, { memo } from "react";
-import { Button, Grow } from "@material-ui/core";
-import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
-import HandRaiseIcon from "@material-ui/icons/PanToolOutlined";
+import { Button, Grow } from "@mui/material";
 import {
    CategoryContainerCentered,
    CategoryContainerContent,
