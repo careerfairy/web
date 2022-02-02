@@ -10,6 +10,7 @@ import HandRaiseJoinDialog from "./hand-raise/HandRaiseJoinDialog";
 import HandRaisePromptDialog from "./hand-raise/HandRaisePromptDialog";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
+import { useRouter } from "next/router";
 
 const HandRaiseCategory = ({
    streamerId,
@@ -19,6 +20,9 @@ const HandRaiseCategory = ({
    isMobile,
 }) => {
    const dispatch = useDispatch();
+   const {
+      query: { isRecordingWindow },
+   } = useRouter();
    const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState(
       streamerId
    );
@@ -30,8 +34,15 @@ const HandRaiseCategory = ({
       const hasNotRaisedHandYet = Boolean(
          handRaiseState === null && livestream?.handRaiseActive && !isMobile
       );
-      setHandRaisePromptDialogOpen(hasNotRaisedHandYet);
-   }, [livestream?.handRaiseActive, handRaiseState, isMobile]);
+      setHandRaisePromptDialogOpen(
+         Boolean(!isRecordingWindow && hasNotRaisedHandYet)
+      );
+   }, [
+      livestream?.handRaiseActive,
+      handRaiseState,
+      isMobile,
+      isRecordingWindow,
+   ]);
 
    useEffect(() => {
       if (

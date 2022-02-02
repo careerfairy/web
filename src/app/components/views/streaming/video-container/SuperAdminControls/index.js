@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useAuth } from "HOCs/AuthProvider";
-import { SpeedDial, SpeedDialAction } from '@mui/material';
-import SpeedDialIcon from '@mui/material/SpeedDialIcon';
+import { SpeedDial, SpeedDialAction } from "@mui/material";
+import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import SpyIcon from "@mui/icons-material/Visibility";
 import RecordIcon from "@mui/icons-material/FiberManualRecord";
 import { useRouter } from "next/router";
@@ -79,13 +79,13 @@ const SpyingOverlay = () => {
 
 const SuperAdminControls = () => {
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down('md'));
+   const mobile = useMediaQuery(theme.breakpoints.down("md"));
    const { joiningStreamerLink, viewerLink } = useStreamToken();
    const { userData } = useAuth();
    const streamRef = useStreamRef();
    const { currentLivestream, isStreamer, isBreakout } = useCurrentStream();
    const {
-      query: { spy },
+      query: { spy, livestreamId, breakoutRoomId },
    } = useRouter();
    const [open, setOpen] = useState(false);
    const firebase = useFirebaseService();
@@ -118,12 +118,23 @@ const SuperAdminControls = () => {
    const classes = useStyles();
 
    const handleStartRecording = async () => {
-      dispatch(
-         actions.handleStartRecording({
-            firebase,
-            streamId: currentLivestream?.id,
-         })
-      );
+      if (isBreakout && breakoutRoomId) {
+         dispatch(
+            actions.handleStartRecording({
+               firebase,
+               streamId: livestreamId,
+               isBreakout,
+               breakoutRoomId,
+            })
+         );
+      } else {
+         dispatch(
+            actions.handleStartRecording({
+               firebase,
+               streamId: currentLivestream?.id,
+            })
+         );
+      }
    };
 
    const toggleStreamStarted = useCallback(async () => {
@@ -140,12 +151,23 @@ const SuperAdminControls = () => {
    }, [currentLivestream?.hasStarted]);
 
    const handleStopRecording = async () => {
-      dispatch(
-         actions.handleStopRecording({
-            firebase,
-            streamId: currentLivestream?.id,
-         })
-      );
+      if (isBreakout && breakoutRoomId) {
+         dispatch(
+            actions.handleStopRecording({
+               firebase,
+               streamId: livestreamId,
+               isBreakout,
+               breakoutRoomId,
+            })
+         );
+      } else {
+         dispatch(
+            actions.handleStopRecording({
+               firebase,
+               streamId: currentLivestream?.id,
+            })
+         );
+      }
    };
 
    const handleOpenConfirmRecordingDialog = () => {
@@ -200,7 +222,7 @@ const SuperAdminControls = () => {
                disabled: recordingRequestOngoing,
                loading: recordingRequestOngoing,
                active: currentLivestream?.isRecording,
-               hidden: isBreakout || currentLivestream?.test,
+               hidden: currentLivestream?.test,
             },
             {
                icon: <SpyIcon color={spyModeEnabled ? "primary" : "action"} />,
