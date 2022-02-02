@@ -125,7 +125,7 @@ const GroupPage = ({ serverSideGroup, livestreamId, serverSideStream }) => {
                   backgroundColor={navyBlue.main}
                   groupLogo={currentGroup.logoUrl}
                   backgroundImage={
-                     getResizedUrl(currentGroup.bannerImageUrl, "md") ||
+                     getResizedUrl(currentGroup.bannerImageUrl, "lg") ||
                      placeholderBanner
                   }
                   groupBio={currentGroup.extraInfo}
