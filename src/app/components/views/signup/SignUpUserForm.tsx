@@ -1,6 +1,6 @@
-import { useRouter } from "next/router";
-import React, { Fragment, useState } from "react";
-import { Formik } from "formik";
+import {useRouter} from "next/router";
+import React, {Fragment, useContext, useState} from "react";
+import {Formik} from "formik";
 import {
    Button,
    Checkbox,
@@ -20,6 +20,7 @@ import makeStyles from "@mui/styles/makeStyles";
 import { createStyles } from "@mui/styles";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import * as yup from "yup";
+import {IMultiStepContext, MultiStepContext} from "./MultiStepWrapper";
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -68,13 +69,14 @@ const schema = yup.object().shape({
       .oneOf([true], "Please agree to our T&C and our Privacy Policy"),
 });
 
-function SignUpUserForm({ setActiveStep }) {
-   const firebase = useFirebaseService();
-   const classes = useStyles();
-   const {
-      query: { absolutePath },
-      push,
-   } = useRouter();
+function SignUpUserForm() {
+  const firebase = useFirebaseService();
+  const classes = useStyles();
+  const {
+    query: {absolutePath},
+    push
+  } = useRouter();
+  const {nextStep} = useContext<IMultiStepContext>(MultiStepContext)
 
    const [emailSent, setEmailSent] = useState(false);
    const [errorMessage, setErrorMessage] = useState(null);
@@ -98,27 +100,30 @@ function SignUpUserForm({ setActiveStep }) {
       setEmailSent(false);
       setGeneralLoading(true);
 
-      firebase
-         .createUserInAuthAndFirebase(values)
-         .then(() => {
-            firebase
-               .signInWithEmailAndPassword(values.email, values.password)
-               .then(() => {
-                  setSubmitting(false);
-                  setGeneralLoading(false);
-                  setActiveStep(1);
-               })
-               .catch((e) => {
-                  console.error(e);
-                  void push("/login");
-               });
-         })
-         .catch((error) => {
-            setErrorMessage(error);
-            setGeneralLoading(false);
+    firebase
+      .createUserInAuthAndFirebase(values)
+      .then(() => {
+        firebase
+          .signInWithEmailAndPassword(
+            values.email,
+            values.password
+          )
+          .then(() => {
             setSubmitting(false);
-         });
-   };
+            setGeneralLoading(false);
+            nextStep();
+          })
+          .catch((e) => {
+            console.error(e)
+            void push("/login");
+          });
+      })
+      .catch((error) => {
+        setErrorMessage(error);
+        setGeneralLoading(false);
+        setSubmitting(false);
+      });
+  }
 
    return (
       <Fragment>

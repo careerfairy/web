@@ -1,11 +1,13 @@
-import React, { useContext, useEffect, useState, Fragment } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import Groups from "../groups/Groups";
 import { withFirebase } from "../../../context/firebase/FirebaseServiceContext";
 import { Button } from "@mui/material";
 import Link from "next/link";
 import { useAuth } from "../../../HOCs/AuthProvider";
+import {useRouter} from "next/router"
 
-const GroupProvider = ({ firebase, absolutePath }) => {
+const GroupProvider = ({ firebase }) => {
+   const {query: {absolutePath}} = useRouter();
    const { userData } = useAuth();
    const [groups, setGroups] = useState([]);
 
@@ -34,7 +36,7 @@ const GroupProvider = ({ firebase, absolutePath }) => {
             userData={userData}
             groups={groups}
          />
-         <Link href={absolutePath || "/profile"} underline="none">
+         <Link href={absolutePath as string || "/profile"}>
             <Button
                color="primary"
                style={{ position: "sticky", bottom: 10 }}
