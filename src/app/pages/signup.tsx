@@ -1,7 +1,4 @@
 import React, { Fragment, useState, useEffect } from "react";
-import TheatersRoundedIcon from "@mui/icons-material/TheatersRounded";
-import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
-import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Head from "next/head";
@@ -23,6 +20,7 @@ import MultiStepWrapper, {
   MultiStepComponentType,
 } from "../components/views/signup/MultiStepWrapper";
 import PersonaliseSteps from "../components/views/signup/PersonaliseSteps";
+import {MainLogo} from './../components/logos'
 
 const initialStates: MultiStepComponentType[] = [
   {
@@ -63,10 +61,21 @@ const SignUp = () => {
   }, [user])
 
   return (
-    <PageLayout steps={steps} currentStep={currentStep}>
+    <SignUpPageLayout>
+      <Stepper
+        style={{padding: "0 0 24px 0"}}
+        activeStep={currentStep}
+        alternativeLabel
+      >
+        {steps.map((step, i) => (
+          <Step key={i}>
+            <StepLabel>{step.description}</StepLabel>
+          </Step>
+        ))}
+      </Stepper>
       <MultiStepWrapper steps={steps} currentStep={currentStep}
                         setCurrentStep={setCurrentStep}/>
-    </PageLayout>
+    </SignUpPageLayout>
 
   )
 }
@@ -75,7 +84,7 @@ const useStyles = makeStyles((theme) => createStyles({
   box: {
     width: "100%", // Fix IE 11 issue.
     backgroundColor: "white",
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(1),
     borderRadius: 5,
   },
   footer: {
@@ -91,16 +100,18 @@ const useStyles = makeStyles((theme) => createStyles({
     color: "white",
     fontWeight: 500,
     fontSize: "2em",
-    margin: "40px 0 30px 0",
     textAlign: "center",
   },
   icon: {
     margin: "0 10px",
     color: "white",
+  },
+  logo: {
+    margin: "20px 20px 0 20px"
   }
 }));
 
-const PageLayout = ({steps, currentStep, children}) => {
+export const SignUpPageLayout = ({children}) => {
   const classes = useStyles();
   return (
     <Fragment>
@@ -111,39 +122,13 @@ const PageLayout = ({steps, currentStep, children}) => {
         <header>
           <Link href="/">
             <a>
-              <img alt="logo" src="/logo_white.png" style={{
-                width: "150px",
-                margin: "20px",
-                display: "inline-block",
-              }}/>
+              <MainLogo className={classes.logo} white={true} />
             </a>
           </Link>
         </header>
-        <Box display="flex" justifyContent="center">
-          <TheatersRoundedIcon className={classes.icon} fontSize="large"/>
-          <ArrowForwardIosRoundedIcon
-            className={classes.icon}
-            fontSize="large"
-          />
-          <BusinessCenterRoundedIcon
-            className={classes.icon}
-            fontSize="large"
-          />
-        </Box>
         <Typography className={classes.title}>Sign Up</Typography>
         <Container maxWidth="sm">
           <Box boxShadow={1} p={3} className={classes.box}>
-            <Stepper
-              style={{padding: "0 0 24px 0"}}
-              activeStep={currentStep}
-              alternativeLabel
-            >
-              {steps.map((step, i) => (
-                <Step key={i}>
-                  <StepLabel>{step.description}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
             {children}
           </Box>
         </Container>
