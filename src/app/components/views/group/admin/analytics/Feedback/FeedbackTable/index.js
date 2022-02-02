@@ -348,7 +348,7 @@ const FeedbackTable = ({
                   },
                   {
                      icon: tableIcons.ThemedAdd,
-                     hidden: !isFeedback(),
+                     hidden: !isFeedback() || !currentStream,
                      isFreeAction: true,
                      iconProps: { color: "primary" },
                      tooltip: "Add Question",
