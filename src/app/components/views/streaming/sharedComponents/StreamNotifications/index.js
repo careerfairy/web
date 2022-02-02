@@ -9,9 +9,10 @@ import {
    addMinutes,
    getMinutesPassed,
 } from "../../../../helperFunctions/HelperFunctions";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 import CallToActionNotifications from "./CallToActionNotifications";
+import { useRouter } from "next/router";
 
 const useStyles = makeStyles((theme) => ({
    snackBar: {
@@ -26,6 +27,9 @@ const StreamNotifications = ({ isStreamer, firebase }) => {
    const { currentLivestream } = useCurrentStream();
    const [feedbackQuestions, setFeedbackQuestions] = useState([]);
    const [minutesPassed, setMinutesPassed] = useState(null);
+   const {
+      query: { isRecordingWindow },
+   } = useRouter();
 
    useEffect(() => {
       if (currentLivestream?.id && (userData || isStreamer)) {
@@ -148,7 +152,7 @@ const StreamNotifications = ({ isStreamer, firebase }) => {
       );
    };
 
-   return (
+   return isRecordingWindow ? null : (
       <CallToActionNotifications
          currentActiveCallToActionIds={currentLivestream.activeCallToActionIds}
          isStreamer={isStreamer}
