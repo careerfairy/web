@@ -1,11 +1,11 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, Fragment, useContext } from "react";
-import { withFirebase } from "context/firebase";
-import BarChartIcon from "@material-ui/icons/BarChart";
-import AddIcon from "@material-ui/icons/Add";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import AddIcon from "@mui/icons-material/Add";
 import PollCreationModal from "./polls/poll-creation-modal/PollCreationModal";
 import PollEntryContainer from "./polls/poll-entry-container/PollEntryContainer";
-import { Button } from "@material-ui/core";
+import { Button } from "@mui/material";
 import {
    CategoryContainerTopAligned,
    QuestionContainerHeader,
@@ -18,7 +18,7 @@ import {
    TooltipTitle,
    WhiteTooltip,
 } from "../../../../../materialUI/GlobalTooltips";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { getCorrectPollOptionData } from "../../../../../data/util/PollUtil";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 

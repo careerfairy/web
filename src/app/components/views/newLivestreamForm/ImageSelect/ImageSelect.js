@@ -11,14 +11,14 @@ import {
    Typography,
    TextField,
    CircularProgress,
-} from "@material-ui/core";
+} from "@mui/material";
 import match from "autosuggest-highlight/match";
-import PublishIcon from "@material-ui/icons/Publish";
+import PublishIcon from "@mui/icons-material/Publish";
 import parse from "autosuggest-highlight/parse";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from '@mui/material/Autocomplete';
 import { uploadLogo } from "../../../helperFunctions/HelperFunctions";
 import FilePickerContainer from "../../../ssr/FilePickerContainer";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 const logoPlaceholder =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Flogo-placeholder.png?alt=media&token=ef6c8d5a-af92-4b69-a946-ce78a9997382";
@@ -137,7 +137,7 @@ const ImageSelect = ({
             }}
             getOptionLabel={(option) => option.text || ""}
             // value={getSelectedItem()}
-            getOptionSelected={(option, value) => option.value === value.value}
+            isOptionEqualToValue={(option, value) => option.value === value.value}
             options={options}
             loading={loading}
             renderInput={(params) => (

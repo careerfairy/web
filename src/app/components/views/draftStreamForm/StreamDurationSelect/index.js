@@ -1,7 +1,8 @@
 import React from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -35,7 +36,7 @@ const durations = [
 const StreamDurationSelect = (props) => {
    const { disabled, label, setFieldValue, variant, value, fullWidth } = props;
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+   const mobile = useMediaQuery(theme.breakpoints.down('md'));
    const classes = useStyles();
 
    return (

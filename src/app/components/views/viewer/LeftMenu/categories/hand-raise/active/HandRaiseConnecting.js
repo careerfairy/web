@@ -1,6 +1,6 @@
 import React, { memo } from "react";
-import { Button, Grow } from "@material-ui/core";
-import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
+import { Button, Grow } from "@mui/material";
+import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import {
    CategoryContainerCentered,
    CategoryContainerContent,
@@ -11,26 +11,32 @@ const HandRaiseRequested = memo(
    ({ handRaiseState, updateHandRaiseRequest }) => {
       const shouldRender = () =>
          Boolean(
-            handRaiseState?.state === "connecting" ||
-               handRaiseState?.state === "invited"
+            !(
+               !handRaiseState ||
+               (handRaiseState.state !== "connecting" &&
+                  handRaiseState.state !== "invited")
+            )
          );
       return (
          shouldRender() && (
             <Grow unmountOnExit in>
-               <CategoryContainerCentered>
-                  <CategoryContainerContent>
-                     <ThemedPermanentMarker>
-                        Connecting to the stream...
-                     </ThemedPermanentMarker>
-                     <Button
-                        size="large"
-                        startIcon={<ClearRoundedIcon />}
-                        variant="contained"
-                        children="Cancel"
-                        onClick={() => updateHandRaiseRequest("unrequested")}
-                     />
-                  </CategoryContainerContent>
-               </CategoryContainerCentered>
+               <span>
+                  <CategoryContainerCentered>
+                     <CategoryContainerContent>
+                        <ThemedPermanentMarker>
+                           Connecting to the stream...
+                        </ThemedPermanentMarker>
+                        <Button
+                           size="large"
+                           startIcon={<ClearRoundedIcon />}
+                           variant="contained"
+                           color="grey"
+                           children="Cancel"
+                           onClick={() => updateHandRaiseRequest("unrequested")}
+                        />
+                     </CategoryContainerContent>
+                  </CategoryContainerCentered>
+               </span>
             </Grow>
          )
       );

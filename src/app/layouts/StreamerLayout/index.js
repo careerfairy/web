@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { useFirebase } from "context/firebase";
+import makeStyles from '@mui/styles/makeStyles';
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import StreamerTopBar from "./StreamerTopBar";
 import PreparationOverlay from "../../components/views/streaming/preparation-overlay/PreparationOverlay";
 import LeftMenu from "../../components/views/streaming/LeftMenu/LeftMenu";
@@ -11,7 +11,7 @@ import NotificationsContext from "../../context/notifications/NotificationsConte
 import { CurrentStreamContext } from "../../context/stream/StreamContext";
 import { v4 as uuidv4 } from "uuid";
 import { isEmpty, isLoaded } from "react-redux-firebase";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import useStreamConnect from "../../components/custom-hook/useStreamConnect";
 import useStreamRef from "../../components/custom-hook/useStreamRef";
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect";
@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamerLayout = (props) => {
    const { children, isBreakout, isMainStreamer } = props;
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const {
       query: { token, livestreamId: baseStreamId, breakoutRoomId, auto },
    } = useRouter();

@@ -2,7 +2,8 @@ import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import SwipeableViews from "react-swipeable-views";
 import General from "./General";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels";
 import Audience from "./Audience";
 import Title from "./Title";
@@ -16,7 +17,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import * as actions from "../../../../../store/actions";
-import { AppBar, Box, Tab, Tabs } from "@material-ui/core";
+import { AppBar, Box, Tab, Tabs } from "@mui/material";
 import {
    checkIfInTalentPool,
    arraysOfIdsEqual,
@@ -105,6 +106,10 @@ const streamsSelector = createSelector(
                noOfRegistered: streamObj.registeredUsers?.length || 0,
                noOfTalentPool: streamObj.talentPool?.length || 0,
             };
+            if (streamObj.hasNoTalentPool) {
+               livestream.noOfTalentPool = 0;
+               livestream.talentPool = [];
+            }
 
             livestream.date = livestream.start?.toDate();
             for (const userType of userTypes) {

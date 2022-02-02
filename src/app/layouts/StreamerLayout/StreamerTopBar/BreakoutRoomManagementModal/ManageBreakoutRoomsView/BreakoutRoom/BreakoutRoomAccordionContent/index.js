@@ -1,14 +1,14 @@
 import { useCurrentStream } from "context/stream/StreamContext";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import React, { useEffect, useState } from "react";
 import useInfiniteScrollClient from "../../../../../../../components/custom-hook/useInfiniteScrollClient";
-import { AccordionDetails } from "@material-ui/core";
-import Box from "@material-ui/core/Box";
-import EmptyRoomIcon from "@material-ui/icons/SentimentDissatisfied";
-import Typography from "@material-ui/core/Typography";
+import { AccordionDetails } from "@mui/material";
+import Box from "@mui/material/Box";
+import EmptyRoomIcon from "@mui/icons-material/SentimentDissatisfied";
+import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
 import UserList from "./UserList";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
    listWrapper: {
@@ -35,7 +35,7 @@ const BreakoutRoomAccordionContent = ({
    const {
       currentLivestream: { id: livestreamId },
    } = useCurrentStream();
-   const { getUsersByEmail } = useFirebase();
+   const { getUsersByEmail } = useFirebaseService();
    const [channelMemberIds, setChannelMemberIds] = useState([]);
    const [channelMembers, setChannelMembers] = useState([]);
    const [rtmChannel, setRtmChannel] = useState(null);

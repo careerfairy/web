@@ -1,25 +1,25 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import {
    Avatar,
+   Box,
    Card,
    CardContent,
    CardHeader,
    Grid,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
-   root: {
+const styles = {
+   root: (theme) => ({
       display: "flex",
       position: "relative",
       justifyContent: "center",
       padding: theme.spacing(5),
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down("md")]: {
          padding: theme.spacing(1),
       },
-   },
-   backgroundRect: {
+   }),
+   backgroundRect: (theme) => ({
       top: "50%",
       left: "56%",
       width: "86%",
@@ -28,12 +28,12 @@ const useStyles = makeStyles((theme) => ({
       transform: "translate(-50%, -50%)",
       background: "#E1F0EE",
       borderRadius: "2rem",
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down("md")]: {
          left: "50%",
          width: "99%",
       },
       boxShadow: theme.shadows[1],
-   },
+   }),
    innerWrapper: {
       zIndex: 2,
       flex: 1,
@@ -47,13 +47,13 @@ const useStyles = makeStyles((theme) => ({
       height: "100%",
    },
    avatar: {
-      width: 170,
-      height: 170,
-      borderRadius: 50,
+      width: "170px",
+      height: "170px",
+      borderRadius: "50px",
       "& img": {
          objectFit: "contain",
       },
-      boxShadow: theme.shadows[4],
+      boxShadow: (theme) => theme.shadows[4],
    },
    cardHeaderWrapper: {
       display: "flex",
@@ -61,13 +61,13 @@ const useStyles = makeStyles((theme) => ({
    },
    cardTitle: {
       fontWeight: 600,
-      marginRight: theme.spacing(2),
+      marginRight: (theme) => theme.spacing(2),
    },
    rating: {
-      fontSize: theme.spacing(4),
+      fontSize: (theme) => theme.spacing(4),
    },
    cardReview: {
-      marginBottom: theme.spacing(2),
+      marginBottom: (theme) => theme.spacing(2),
       whiteSpace: "pre-line",
    },
    cardAuthor: {
@@ -77,10 +77,10 @@ const useStyles = makeStyles((theme) => ({
       background: "transparent",
       boxShadow: "none",
    },
-   companyImage: {
-      width: 170,
+   companyImage: (theme) => ({
+      width: "170px",
       height: "auto",
-      borderRadius: 10,
+      borderRadius: "10px",
       background: theme.palette.common.white,
       "& img": {
          objectFit: "contain",
@@ -88,8 +88,8 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(1.5),
       boxShadow: theme.shadows[2],
       marginTop: theme.spacing(2),
-   },
-}));
+   }),
+};
 
 const TestimonialCard = ({
    avatarUrl,
@@ -100,47 +100,45 @@ const TestimonialCard = ({
    reviewText,
    companyUrl,
 }) => {
-   const classes = useStyles();
-
    return (
-      <div className={classes.root}>
-         <div className={classes.backgroundRect} />
-         <div className={classes.innerWrapper}>
+      <Box sx={styles.root}>
+         <Box sx={styles.backgroundRect} />
+         <Box sx={styles.innerWrapper}>
             <Grid container>
                <Grid xs={12} md={4} lg={3} item>
-                  <div className={classes.wrapper}>
+                  <Box sx={styles.wrapper}>
                      <Avatar
                         src={avatarUrl}
                         variant="square"
-                        className={classes.avatar}
+                        sx={styles.avatar}
                      />
-                  </div>
+                  </Box>
                </Grid>
                <Grid xs={12} md={8} lg={9} item>
-                  <div className={classes.wrapper}>
-                     <Card className={classes.cardRoot}>
+                  <Box sx={styles.wrapper}>
+                     <Card sx={styles.cardRoot}>
                         <CardHeader
                            title={
-                              <div className={classes.cardHeaderWrapper}>
+                              <Box sx={styles.cardHeaderWrapper}>
                                  <Typography
                                     component="h2"
-                                    className={classes.cardTitle}
+                                    sx={styles.cardTitle}
                                     variant="h5"
                                  >
                                     {`“${title}”`}
                                  </Typography>
                                  {/*<Rating*/}
                                  {/*    defaultValue={2}*/}
-                                 {/*    className={classes.rating}*/}
+                                 {/*    sx={styles.rating}*/}
                                  {/*    name="testimonial-rating"*/}
                                  {/*    value={rating}*/}
                                  {/*/>*/}
-                              </div>
+                              </Box>
                            }
                         />
                         <CardContent>
                            <Typography
-                              className={classes.cardReview}
+                              sx={styles.cardReview}
                               variant="body2"
                               component="p"
                            >
@@ -149,29 +147,26 @@ const TestimonialCard = ({
                            <Typography
                               component="h4"
                               variant="subtitle1"
-                              className={classes.cardAuthor}
+                              sx={styles.cardAuthor}
                            >
                               {name}
                            </Typography>
                            <Typography
                               variant="body2"
                               color="textSecondary"
-                              className={classes.cardAuthor}
+                              sx={styles.cardAuthor}
                               component="p"
                            >
                               {position}
                            </Typography>
-                           <Avatar
-                              src={companyUrl}
-                              className={classes.companyImage}
-                           />
+                           <Avatar src={companyUrl} sx={styles.companyImage} />
                         </CardContent>
                      </Card>
-                  </div>
+                  </Box>
                </Grid>
             </Grid>
-         </div>
-      </div>
+         </Box>
+      </Box>
    );
 };
 

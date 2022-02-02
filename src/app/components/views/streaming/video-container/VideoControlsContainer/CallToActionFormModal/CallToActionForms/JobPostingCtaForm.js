@@ -1,18 +1,6 @@
-const { memo, useEffect, useState, useMemo } = require("react");
-import { Button } from "@material-ui/core";
-import {
-   Collapse,
-   Grid,
-   FormControl,
-   InputLabel,
-   Typography,
-   TextField,
-   MenuItem,
-   Select,
-   Box,
-} from "@material-ui/core";
-import { DateTimePicker } from "@material-ui/pickers";
-import SmartRecruitersDataAccess from "data/dataAccess/SmartRecruitersDataAccess";
+import React, { memo } from "react";
+import { Collapse, Grid, TextField } from "@mui/material";
+import DateTimePicker from "@mui/lab/DateTimePicker";
 
 const JobPostingCtaForm = memo(
    ({ formik, maxMessageLength, onEntered, onExited }) => {
@@ -32,6 +20,7 @@ const JobPostingCtaForm = memo(
                   <InputLabel>Select ATS Position</InputLabel>
                   <Select
                      autoWidth={true}
+                     label="Select ATS Position"
                      value={selectedAtsPosition}
                      onChange={handleChange}
                   >
@@ -113,6 +102,9 @@ const JobPostingCtaForm = memo(
                      id="applicationDeadline"
                      clearable
                      disablePast
+                     renderInput={(params) => (
+                        <TextField fullWidth {...params} />
+                     )}
                      label="Application deadline"
                      value={formik.values.jobData.applicationDeadline}
                      name="jobData.applicationDeadline"
@@ -127,7 +119,6 @@ const JobPostingCtaForm = memo(
                      disabled={formik.isSubmitting}
                      minDate={now}
                      inputVariant="outlined"
-                     fullWidth
                      error={
                         formik.touched.jobData?.applicationDeadline &&
                         Boolean(formik.errors.jobData?.applicationDeadline)

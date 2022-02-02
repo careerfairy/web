@@ -1,32 +1,29 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import testimonialData from "../testimonialData";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import TestimonialCard from "./TestimonialCard";
-import NextIcon from "@material-ui/icons/NavigateNextRounded";
-import PrevIcon from "@material-ui/icons/NavigateBeforeRounded";
-import { Fab } from "@material-ui/core";
+import NextIcon from "@mui/icons-material/NavigateNextRounded";
+import PrevIcon from "@mui/icons-material/NavigateBeforeRounded";
+import { Box, Fab } from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
-   root: {},
-   arrow: {
-      [theme.breakpoints.down("md")]: {
-         display: ["none", "!important"],
+const styles = {
+   arrow: (theme) => ({
+      [theme.breakpoints.down("lg")]: {
+         display: "none !important",
       },
       zIndex: 1,
       "&:before": {
-         display: ["none", "!important"],
+         display: "none !important",
       },
-   },
-}));
+   }),
+};
 
 function SampleNextArrow(props) {
    const { className, onClick } = props;
-   const classes = useStyles();
    return (
-      <div className={`${classes.arrow} ${className}`}>
+      <Box sx={styles.arrow} className={className}>
          <Fab
             size="small"
             onClick={onClick}
@@ -35,15 +32,14 @@ function SampleNextArrow(props) {
          >
             <NextIcon />
          </Fab>
-      </div>
+      </Box>
    );
 }
 
 function SamplePrevArrow(props) {
    const { className, onClick } = props;
-   const classes = useStyles();
    return (
-      <div className={`${classes.arrow} ${className}`}>
+      <Box sx={styles.arrow} className={className}>
          <Fab
             size="small"
             onClick={onClick}
@@ -52,12 +48,11 @@ function SamplePrevArrow(props) {
          >
             <PrevIcon />
          </Fab>
-      </div>
+      </Box>
    );
 }
 
 const TestimonialCarousel = ({}) => {
-   const classes = useStyles();
    const [settings] = useState({
       dots: true,
       infinite: true,
@@ -84,7 +79,7 @@ const TestimonialCarousel = ({}) => {
    });
 
    return (
-      <div className={classes.root}>
+      <div>
          <Slider {...settings}>
             {testimonialData.map(
                (

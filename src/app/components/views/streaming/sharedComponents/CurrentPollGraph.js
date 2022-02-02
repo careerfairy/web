@@ -9,34 +9,14 @@ import {
    ListItemIcon,
    ListItemText,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { PollQuestion } from "../../../../materialUI/GlobalTitles";
 import { colorsArray } from "../../../util/colors";
-import { useTheme, withStyles } from "@material-ui/core/styles";
-import { withFirebase } from "../../../../context/firebase";
+import { useTheme } from "@mui/material/styles";
+import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
 import { useCurrentStream } from "../../../../context/stream/StreamContext";
 import useMapPollVoters from "../../../custom-hook/useMapPollVoters";
 import useStreamRef from "../../../custom-hook/useStreamRef";
-
-const GraphWrapper = withStyles((theme) => ({
-   root: {
-      width: "inherit",
-      overflowY: "auto",
-      display: "flex",
-      flexDirection: "column",
-   },
-}))(Box);
-
-const CountWrapper = withStyles((theme) => ({
-   root: {
-      position: "absolute",
-      top: "50%",
-      right: "50%",
-      borderRadius: "50%",
-      zIndex: 1,
-      transform: "translateY(-50%) translateX(50%)",
-   },
-}))(Box);
 
 const CurrentPollGraph = ({
    currentPoll: { options, question, id: pollId, demoVotes },
@@ -136,7 +116,7 @@ const CurrentPollGraph = ({
             },
          ],
       });
-   }, [pollId, theme.palette.type]);
+   }, [pollId, theme.palette.mode]);
 
    useEffect(() => {
       if (chartRef.current) {
@@ -201,7 +181,14 @@ const CurrentPollGraph = ({
    });
 
    return (
-      <GraphWrapper>
+      <Box
+         sx={{
+            width: "inherit",
+            overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
+         }}
+      >
          <PollQuestion style={{ marginTop: "auto", padding: "0 1rem" }}>
             {question}
          </PollQuestion>
@@ -220,7 +207,16 @@ const CurrentPollGraph = ({
                height={1}
                options={optionsObj}
             />
-            <CountWrapper>
+            <Box
+               sx={{
+                  position: "absolute",
+                  top: "50%",
+                  right: "50%",
+                  borderRadius: "50%",
+                  zIndex: 1,
+                  transform: "translateY(-50%) translateX(50%)",
+               }}
+            >
                <Typography
                   variant="h3"
                   style={{
@@ -235,9 +231,9 @@ const CurrentPollGraph = ({
                <Typography variant="h6" align="center">
                   vote{getTotalVotes() !== 1 && "s"}
                </Typography>
-            </CountWrapper>
+            </Box>
          </div>
-      </GraphWrapper>
+      </Box>
    );
 };
 

@@ -1,6 +1,6 @@
-import { Button, Typography } from "@material-ui/core";
+import { Button, Typography } from "@mui/material";
 import { useState } from "react";
-import BusinessCenterIcon from "@material-ui/icons/BusinessCenter";
+import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 
 function JobDescription(props) {
    const [jobPostingOpen, setJobPostingOpen] = useState(false);

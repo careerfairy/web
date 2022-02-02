@@ -74,3 +74,15 @@ export const suitCaseShape =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fsuitcase-shape.png?alt=media&token=fa4b98a6-3270-4bc6-b8fb-3c460b5a5242";
 export const lightBulbShape =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flight-bulb-shape.png?alt=media&token=1270e061-aac5-4db2-832a-b7413ae13e2b";
+
+export const ideaShape =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/ui-icons%2Fidea-shape.png?alt=media&token=910ea4f6-818b-4400-86ca-eb26e0cca201";
+
+export const qualityShape =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/ui-icons%2Fquality-shape.png?alt=media&token=7dcfaa45-8461-46df-b122-00a34e9ba55d";
+
+export const honestyShape =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/ui-icons%2Fhonesty-shape.png?alt=media&token=4d0d5c55-91bb-4f28-ad66-6397cf65f242";
+
+export const placeholderBanner =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0";

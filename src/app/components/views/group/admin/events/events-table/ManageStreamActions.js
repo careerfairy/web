@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import Button from "@material-ui/core/Button";
-import SettingsIcon from "@material-ui/icons/Settings";
-import { makeStyles } from "@material-ui/core/styles";
+import Button from "@mui/material/Button";
+import SettingsIcon from "@mui/icons-material/Settings";
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from "clsx";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PropTypes from "prop-types";
-import { Box, Collapse } from "@material-ui/core";
+import { Box, Collapse } from "@mui/material";
 import ButtonWithHint from "./ButtonWithHint";
 
 const useStyles = makeStyles((theme) => ({

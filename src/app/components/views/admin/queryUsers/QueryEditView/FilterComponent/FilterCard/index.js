@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useCallback, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Button,
    Card,
@@ -9,13 +9,13 @@ import {
    CardHeader,
    IconButton,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import * as actions from "../../../../../../../store/actions";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import CategorySelect from "./CategorySelect";
-import DeleteFilterIcon from "@material-ui/icons/DeleteForever";
+import DeleteFilterIcon from "@mui/icons-material/DeleteForever";
 import { isEmpty, isLoaded, useFirestore } from "react-redux-firebase";
-import Skeleton from "@material-ui/lab/Skeleton";
+import Skeleton from '@mui/material/Skeleton';
 import GroupsUtil from "../../../../../../../data/util/GroupsUtil";
 import AddOrRemoveCategoryButton from "./AddOrRemoveCategoryButton";
 import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal";
@@ -236,9 +236,7 @@ const FilterCard = ({ filter, handleRemoveGroupFromFilters, groupsLoaded }) => {
             }
             action={
                <React.Fragment>
-                  <IconButton
-                     onClick={() => handlers.handleClickDelete(groupId)}
-                  >
+                  <IconButton onClick={() => handlers.handleClickDelete(groupId)} size="large">
                      <DeleteFilterIcon />
                   </IconButton>
                   <AreYouSureModal

@@ -1,17 +1,17 @@
 import PropTypes from "prop-types";
 import React, { useMemo } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { Item, Row } from "@mui-treasury/components/flex";
 import StreamContainer from "./StreamContainer";
 import clsx from "clsx";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import LivestreamPdfViewer from "../../../../util/LivestreamPdfViewer";
 import {
    STREAM_ELEMENT_BORDER_RADIUS,
    STREAM_ELEMENT_SPACING,
 } from "constants/streams";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
+import { Stack } from "@mui/material";
 
 const STREAMS_ROW_HEIGHT = 125;
 const WIDE_SCREEN_ROW_HEIGHT = 180;
@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
    streamsOverflowWrapper: {
       display: "flex",
       overflowX: "auto",
-      justifyContent: "space-between",
+      // justifyContent: "space-between",
       "&::-webkit-scrollbar": {
          height: 5,
       },
@@ -93,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
 const StreamElementWrapper = ({ children, large, index, squished, first }) => {
    const classes = useStyles();
    return (
-      <Item
+      <Box
          className={clsx({
             [classes.largeSquished]: squished,
             [classes.largeAbsoluteStream]: large,
@@ -104,7 +104,7 @@ const StreamElementWrapper = ({ children, large, index, squished, first }) => {
          }}
       >
          {children}
-      </Item>
+      </Box>
    );
 };
 
@@ -143,15 +143,24 @@ const StreamsLayout = ({
                         hasSmallStreams || (sharingPdf && streamData.length),
                   })}
                >
-                  <Row
-                     p={0}
-                     gap={STREAM_ELEMENT_SPACING}
+                  <Stack
+                     sx={{
+                        p: 0,
+                     }}
+                     spacing={STREAM_ELEMENT_SPACING}
+                     direction="row"
+                     justifyContent="space-between"
                      className={classes.streamsOverflowWrapper}
                      style={{
                         width,
                      }}
                   >
-                     <Box order={0} marginLeft="auto" />
+                     <Box
+                        sx={{
+                           order: 0,
+                           ml: "auto !important",
+                        }}
+                     />
                      {streamData.map((stream, index) => {
                         const isLast = index === streamData.length - 1;
                         const isLarge = isLast && !sharingPdf;
@@ -207,8 +216,13 @@ const StreamsLayout = ({
                            </Typography>
                         </StreamElementWrapper>
                      )}
-                     <Box order={999} marginRight="auto" />
-                  </Row>
+                     <Box
+                        sx={{
+                           order: 999,
+                           mr: "auto !important",
+                        }}
+                     />
+                  </Stack>
                </div>
             </div>
          )}

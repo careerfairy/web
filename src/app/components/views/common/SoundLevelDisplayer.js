@@ -1,6 +1,6 @@
 import { Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
 import { Fragment } from "react";
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
    rect: {

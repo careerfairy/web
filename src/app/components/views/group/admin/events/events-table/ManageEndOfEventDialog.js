@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import {
    Box,
    Button,
@@ -14,11 +14,11 @@ import {
    FormControlLabel,
    Grid,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import * as actions from "store/actions";
 import EventOptionPreview from "../../../../common/EventAutoSelect/EventOptionPreview";
 import EventAutoSelect from "../../../../common/EventAutoSelect";
-import { useFirebase } from "../../../../../../context/firebase";
+import { useFirebaseService } from "../../../../../../context/firebase/FirebaseServiceContext";
 import { useDispatch } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
@@ -30,7 +30,7 @@ const Content = ({ onClose, eventData, group }) => {
    const [showOnlyLinkedEvents, setShowOnlyLinkedEvents] = useState(true);
    const [updating, setUpdating] = useState(false);
    const [fetchingEvents, setFetchingEvents] = useState(false);
-   const { getUpcomingLivestreams, updateLivestream } = useFirebase();
+   const { getUpcomingLivestreams, updateLivestream } = useFirebaseService();
    const [allEvents, setAllEvents] = useState([]);
    const [selectedEvents, setSelectedEvents] = useState([]);
    const [filteredEvents, setFilteredEvents] = useState([]);
@@ -152,7 +152,7 @@ const Content = ({ onClose, eventData, group }) => {
             )}
          </DialogContent>
          <DialogActions>
-            <Button disabled={updating} onClick={onClose}>
+            <Button disabled={updating} color="grey" onClick={onClose}>
                Cancel
             </Button>
             <Button

@@ -1,10 +1,10 @@
-import { useFirebase, withFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import StatsUtil from "data/util/StatsUtil";
 import { useState, useEffect, useCallback } from "react";
 import PollUtil from "../../data/util/PollUtil";
 
 export function useLivestreamMetadata({ livestream, group }) {
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const [metaDataDictionary, setMetaDataDictionary] = useState({});
    // console.log("-> metaDataDictionary", metaDataDictionary);
    let average = (array) => array.reduce((a, b) => a + b) / array.length;

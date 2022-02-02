@@ -1,7 +1,7 @@
-import { Button, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import CardGiftcardIcon from "@material-ui/icons/CardGiftcard";
-import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
+import { Button, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
       height: "100%",
       backgroundColor:
-         theme.palette.type === "dark"
+         theme.palette.mode === "dark"
             ? theme.palette.common.black
             : theme.palette.background.paper,
       zIndex: 999,
@@ -59,7 +59,7 @@ const StreamStoppedOverlay = () => {
                Thanks for joining the stream!
             </Typography>
             <Typography className={classes.mainTitle}>
-               Get Your 30€ Amazon Gift Card
+               Get Your 20€ Amazon Gift Card
             </Typography>
             <Typography>
                We are currently improving CareerFairy to help you land your
@@ -71,7 +71,7 @@ const StreamStoppedOverlay = () => {
                answering a few questions about your experience.
             </Typography>
             <a
-               href="https://calendly.com/federico-spiezia-1/ux-interviews"
+               href="https://calendly.com/federico-spiezia-1/15min"
                target="_blank"
             >
                <Button
@@ -85,7 +85,7 @@ const StreamStoppedOverlay = () => {
                </Button>
             </a>
             <Typography>
-               We'll send you your 30€ Amazon gift card as your reward right
+               We'll send you your 20€ Amazon gift card as your reward right
                after the interview.
             </Typography>
             <Typography>Thank you for your contribution!</Typography>

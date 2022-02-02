@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useMediaQuery } from "@material-ui/core";
-import { useTheme } from "@material-ui/core/styles";
+import { useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import { useRouter } from "next/router";
 import { getServerSideRouterQuery } from "../../helperFunctions/HelperFunctions";
@@ -18,7 +18,7 @@ const NextLivestreams = ({
 }) => {
    const { userData } = useAuth();
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+   const mobile = useMediaQuery(theme.breakpoints.down('md'));
    const router = useRouter();
 
    const careerCenterId = getServerSideRouterQuery("careerCenterId", router);

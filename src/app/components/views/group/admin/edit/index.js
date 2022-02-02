@@ -1,12 +1,13 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Container, Grid } from "@material-ui/core";
+import makeStyles from "@mui/styles/makeStyles";
+import { Container, Grid } from "@mui/material";
 import Profile from "./Profile";
 import ProfileDetails from "./ProfileDetails";
 import ProfileCategories from "./ProfileCategories";
 import ProfilePrivacyPolicy from "./ProfilePrivacyPolicy";
-import { withFirebase } from "../../../../../context/firebase";
+import { withFirebase } from "../../../../../context/firebase/FirebaseServiceContext";
+import ProfileBanner from "./ProfileBanner";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -23,10 +24,17 @@ const EditOverview = ({ firebase, group }) => {
    return (
       <Container className={classes.root} maxWidth="lg">
          <Grid container spacing={3}>
-            <Grid item lg={4} md={6} xs={12}>
-               <Profile firebase={firebase} group={group} />
+            <Grid item lg={5} md={6} xs={12}>
+               <Grid container spacing={3}>
+                  <Grid xs={12} item>
+                     <Profile firebase={firebase} group={group} />
+                  </Grid>
+                  <Grid xs={12} item>
+                     <ProfileBanner group={group} />
+                  </Grid>
+               </Grid>
             </Grid>
-            <Grid item lg={8} md={6} xs={12}>
+            <Grid item lg={7} md={6} xs={12}>
                <Grid spacing={3} container>
                   <Grid item lg={12} md={12} xs={12}>
                      <ProfileDetails firebase={firebase} group={group} />

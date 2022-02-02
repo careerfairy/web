@@ -1,6 +1,6 @@
 import React from "react";
 import * as PropTypes from "prop-types";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 
 export const TabPanel = ({
    hidden,
@@ -35,7 +35,7 @@ export const SwipeablePanel = (props) => {
    const { children, value, index, ...other } = props;
 
    return (
-      <div
+      <Box
          role="tabpanel"
          hidden={value !== index}
          id={`full-width-tabpanel-${index}`}
@@ -43,7 +43,7 @@ export const SwipeablePanel = (props) => {
          {...other}
       >
          {value === index && <>{children}</>}
-      </div>
+      </Box>
    );
 };
 

@@ -1,11 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Box, Hidden, IconButton, Tab, Tabs } from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
-import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
+import { Box, Hidden, IconButton, Tab, Tabs } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import Link from "materialUI/NextNavLink";
 import { MainLogo } from "components/logos";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import useGeneralLinks from "components/custom-hook/useGeneralLinks";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -88,7 +89,7 @@ const TransparentHeaderWithLinks = ({ className, ...rest }) => {
    return (
       <GeneralHeader>
          <MainLogo />
-         <Hidden smDown>
+         <Hidden mdDown>
             <Tabs value={false} classes={{ indicator: classes.indicator }}>
                {mainLinks.map((item) => {
                   return (
@@ -103,7 +104,7 @@ const TransparentHeaderWithLinks = ({ className, ...rest }) => {
             </Tabs>
          </Hidden>
          <Box>
-            <Hidden mdDown>
+            <Hidden lgDown>
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <LoginButton />
                ) : (
@@ -113,13 +114,13 @@ const TransparentHeaderWithLinks = ({ className, ...rest }) => {
                      className={classes.navIconButton}
                      color="primary"
                      href="/profile"
-                  >
+                     size="large">
                      <AccountCircleOutlinedIcon />
                   </IconButton>
                )}
             </Hidden>
             <Hidden lgUp>
-               <IconButton color="primary" onClick={handleDrawerOpen}>
+               <IconButton color="primary" onClick={handleDrawerOpen} size="large">
                   <MenuIcon />
                </IconButton>
             </Hidden>

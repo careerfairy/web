@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import {
    Accordion,
    AccordionSummary,
@@ -11,17 +12,17 @@ import {
    Menu,
    MenuItem,
    Tooltip,
-} from "@material-ui/core";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
-import RenameRoomIcon from "@material-ui/icons/Edit";
-import DeleteRoomIcon from "@material-ui/icons/Close";
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import RenameRoomIcon from "@mui/icons-material/Edit";
+import DeleteRoomIcon from "@mui/icons-material/Close";
 import BreakoutRoomAccordionContent from "./BreakoutRoomAccordionContent";
 import React, { useEffect, useState } from "react";
 import EditRoomNameModal from "./EditRoomNameModal";
 import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -64,6 +65,7 @@ const RoomClosedActions = ({
                   className={clsx({
                      [classes.activeColor]: active,
                   })}
+                  color="grey"
                   disabled={loading}
                >
                   Open
@@ -89,6 +91,7 @@ const RoomClosedActions = ({
                      <Button
                         onClick={handleClickRename}
                         disabled={loading}
+                        color="grey"
                         className={clsx({
                            [classes.activeColor]: active,
                         })}
@@ -118,6 +121,7 @@ const RoomClosedActions = ({
                         className={clsx({
                            [classes.activeColor]: active,
                         })}
+                        color="grey"
                         startIcon={
                            <DeleteRoomIcon
                               htmlColor={theme.palette.error.main}
@@ -266,7 +270,7 @@ const BreakoutRoom = ({
    });
 
    const { isStreamer, isMainStreamer, isBreakout } = useCurrentStream();
-   const { deleteBreakoutRoom, updateBreakoutRoom } = useFirebase();
+   const { deleteBreakoutRoom, updateBreakoutRoom } = useFirebaseService();
    const {
       query: { livestreamId, breakoutRoomId },
    } = useRouter();

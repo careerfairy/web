@@ -1,9 +1,9 @@
-import { Tooltip } from "@material-ui/core";
-import VideocamOffIcon from "@material-ui/icons/VideocamOff";
-import VolumeOffIcon from "@material-ui/icons/MicOff";
-import SignalCellularConnectedNoInternet2BarIcon from "@material-ui/icons/SignalCellularConnectedNoInternet2Bar";
+import { Tooltip } from "@mui/material";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
+import VolumeOffIcon from "@mui/icons-material/MicOff";
+import SignalCellularConnectedNoInternet2BarIcon from "@mui/icons-material/SignalCellularConnectedNoInternet2Bar";
 import React, { useEffect, useRef, useContext } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    TooltipButtonComponent,
    TooltipText,

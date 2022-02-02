@@ -1,4 +1,4 @@
-import { Category } from "@material-ui/icons";
+import { Category } from "@mui/icons-material";
 
 export default class StatsUtil {
    static getStudentInGroupDataObject(student, group) {
@@ -305,7 +305,9 @@ export default class StatsUtil {
       }
       return group.categories.every((groupCategory) => {
          return studentCategoriesForGroup?.categories.find(
-            (studCat) => studCat?.id === groupCategory?.id
+            // check to see if the student has all the non hidden group categories
+            (studCat) =>
+               studCat?.id === groupCategory?.id || groupCategory.hidden
          );
       });
    }

@@ -1,39 +1,39 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
-import { Box, CircularProgress, Divider, Grid } from "@material-ui/core";
+import {
+   Box,
+   CircularProgress,
+   Divider,
+   Grid,
+   ToggleButton,
+   ToggleButtonGroup,
+} from "@mui/material";
 import QuestionCard from "./QuestionCard";
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 
-const useStyles = makeStyles((theme) => ({
-   root: {},
+const styles = {
    filterWrapper: {
-      padding: theme.spacing(1, 2),
+      padding: (theme) => theme.spacing(1, 2),
       display: "flex",
       justifyContent: "space-between",
    },
    toggleGroup: {
       "& btn": {
-         borderRadius: theme.spacing(2),
+         borderRadius: (theme) => theme.spacing(2),
       },
    },
 
    dividerWrapper: {
-      padding: theme.spacing(0, 2),
+      padding: (theme) => theme.spacing(0, 2),
    },
    questionsWrapper: {
-      height: ({ containerHeight }) => containerHeight,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       "& > *": {
          width: "100%",
       },
-      // [theme.breakpoints.down("xs")]: {
-      //    height: mobileQuestionsContainerHeight,
-      // },
    },
-}));
+};
 const QuestionVotingContainer = ({
    questions,
    questionSortType,
@@ -47,16 +47,15 @@ const QuestionVotingContainer = ({
    handleUpvote,
    votingDisabled,
 }) => {
-   const classes = useStyles({ containerHeight });
    return (
       <>
-         <div className={classes.filterWrapper}>
+         <Box sx={styles.filterWrapper}>
             {questions.length > 1 && (
                <ToggleButtonGroup
                   value={questionSortType}
                   exclusive
                   size="small"
-                  className={classes.toggleGroup}
+                  sx={styles.toggleGroup}
                   onChange={handleChangeQuestionSortType}
                   aria-label="text alignment"
                >
@@ -69,11 +68,11 @@ const QuestionVotingContainer = ({
                </ToggleButtonGroup>
             )}
             {headerButton}
-         </div>
-         <div className={classes.dividerWrapper}>
+         </Box>
+         <Box sx={styles.dividerWrapper}>
             <Divider />
-         </div>
-         <div className={classes.questionsWrapper}>
+         </Box>
+         <Box sx={{ ...styles.questionsWrapper, height: containerHeight }}>
             {loadingInitialQuestions ? (
                <CircularProgress />
             ) : (
@@ -100,7 +99,7 @@ const QuestionVotingContainer = ({
                   </Box>
                </CustomInfiniteScroll>
             )}
-         </div>
+         </Box>
       </>
    );
 };

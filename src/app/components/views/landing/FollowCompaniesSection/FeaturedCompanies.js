@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { useFirebase } from "context/firebase";
+import makeStyles from '@mui/styles/makeStyles';
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import FeaturedCompanyCard from "./FeaturedCompanyCard";
-import { Box, Grid } from "@material-ui/core";
+import { Box, Grid } from "@mui/material";
 import GroupsUtil from "../../../../data/util/GroupsUtil";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 
@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 const FeaturedCompanies = ({ handleOpenJoinModal }) => {
    const classes = useStyles();
-   const { getFeaturedCompanies } = useFirebase();
+   const { getFeaturedCompanies } = useFirebaseService();
 
    const [featuredCompanies, setFeaturedCompanies] = useState([]);
    const { userData, authenticatedUser } = useAuth();

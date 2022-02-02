@@ -1,16 +1,17 @@
 import PropTypes from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
-import { withFirebase } from "context/firebase";
-import { grey } from "@material-ui/core/colors";
-import { IconButton, TextField, Typography } from "@material-ui/core";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
-import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
+import { grey } from "@mui/material/colors";
+import { IconButton, TextField } from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import ChatEntryContainer from "./chat/ChatEntryContainer";
 import CustomScrollToBottom from "../../../../util/CustomScrollToBottom";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import EmotesModal from "./chat/EmotesModal";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
+import { MAX_STREAM_CHAT_ENTRIES } from "../../../../../constants/streams";
 
 const useStyles = makeStyles((theme) => ({
    sendIcon: {
@@ -49,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
       },
    },
    entriesWrapper: {
-      padding: theme.spacing(1),
+      padding: theme.spacing(1.4),
    },
    chatContainer: {
       height: "100vh",
@@ -75,7 +76,8 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const ChatCategory = ({ isStreamer, livestream, selectedState, firebase }) => {
+const ChatCategory = ({ isStreamer, livestream, selectedState }) => {
+   const firebase = useFirebaseService();
    const { authenticatedUser, userData } = useAuth();
    const [focused, setFocused] = useState(false);
    const streamRef = useStreamRef();
@@ -93,7 +95,7 @@ const ChatCategory = ({ isStreamer, livestream, selectedState, firebase }) => {
       if (livestream.id) {
          const unsubscribe = firebase.listenToChatEntries(
             streamRef,
-            150,
+            MAX_STREAM_CHAT_ENTRIES,
             (querySnapshot) => {
                const newEntries = querySnapshot.docs
                   .map((doc) => ({ id: doc.id, ...doc.data() }))
@@ -150,10 +152,11 @@ const ChatCategory = ({ isStreamer, livestream, selectedState, firebase }) => {
       setCurrentEntry(chatEntry);
    }, []);
 
-   const chatElements = chatEntries.map((chatEntry) => (
+   const chatElements = chatEntries.map((chatEntry, index, entries) => (
       <ChatEntryContainer
          handleSetCurrentEntry={handleSetCurrentEntry}
          currentEntry={currentEntry}
+         last={index === entries.length - 1}
          key={chatEntry?.id}
          chatEntry={chatEntry}
       />
@@ -168,7 +171,7 @@ const ChatCategory = ({ isStreamer, livestream, selectedState, firebase }) => {
             }}
             disabled={isEmpty}
             onClick={() => addNewChatEntry()}
-         >
+            size="large">
             <ChevronRightRoundedIcon className={classes.sendIcon} />
          </IconButton>
       </div>
@@ -182,12 +185,6 @@ const ChatCategory = ({ isStreamer, livestream, selectedState, firebase }) => {
             scrollItems={chatElements}
          />
          <div className={classes.chatContent}>
-            {/*<div className={classes.chatTitle}>*/}
-            {/*    <ForumOutlinedIcon color="primary" fontSize="small"/>*/}
-            {/*    <Typography style={{marginLeft: "0.6rem"}}>*/}
-            {/*        Main Chat*/}
-            {/*    </Typography>*/}
-            {/*</div>*/}
             <div>
                <TextField
                   variant="outlined"
@@ -217,10 +214,9 @@ const ChatCategory = ({ isStreamer, livestream, selectedState, firebase }) => {
 };
 
 ChatCategory.propTypes = {
-   firebase: PropTypes.object,
    isStreamer: PropTypes.bool,
    livestream: PropTypes.object.isRequired,
    selectedState: PropTypes.string,
 };
 
-export default withFirebase(ChatCategory);
+export default ChatCategory;

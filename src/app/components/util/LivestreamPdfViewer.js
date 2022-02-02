@@ -1,6 +1,7 @@
 import { memo, useEffect, useState } from "react";
-import { Document, Page } from "react-pdf";
-import * as PDFJS from "pdfjs-dist/build/pdf";
+import { pdfjs } from "react-pdf";
+var { Document, Page } = require("react-pdf/dist/esm/entry.webpack");
+
 import { useWindowSize } from "components/custom-hook/useWindowSize";
 import {
    Button,
@@ -9,15 +10,15 @@ import {
    DialogContent,
    IconButton,
    LinearProgress,
-} from "@material-ui/core";
-import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
+} from "@mui/material";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 
 import FilePickerContainer from "components/ssr/FilePickerContainer";
-import { useFirebase } from "context/firebase";
-import Box from "@material-ui/core/Box";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
+import Box from "@mui/material/Box";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
 
 const useStyles = makeStyles((theme) => ({
@@ -37,9 +38,8 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
-   const firebase = useFirebase();
-   PDFJS.GlobalWorkerOptions.workerSrc =
-      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js";
+   const firebase = useFirebaseService();
+   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
    const windowSize = useWindowSize();
    const [pdfObject, setPdfObject] = useState(null);

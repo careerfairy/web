@@ -1,10 +1,10 @@
 import PropTypes from "prop-types";
-import React, { useEffect, useReducer, useRef, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, { useRef } from "react";
+import makeStyles from "@mui/styles/makeStyles";
 import SpeakerInfoOverlay from "../../SpeakerInfoOverlay";
-import { Tooltip } from "@material-ui/core";
-import VideoCamOffIcon from "@material-ui/icons/VideocamOff";
-import VolumeOffIcon from "@material-ui/icons/MicOff";
+import { Tooltip } from "@mui/material";
+import VideoCamOffIcon from "@mui/icons-material/VideocamOff";
+import VolumeOffIcon from "@mui/icons-material/MicOff";
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
 import clsx from "clsx";
 

@@ -1,13 +1,9 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import {
-   blankLaptop,
-   blankUIQAndA,
-   laptopUi,
-} from "../../../../../constants/images";
+import { blankLaptop, laptopUi } from "../../../../../constants/images";
 import { smilingStreamerVideoUrl } from "../../../../../constants/videos";
+import { Box } from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    laptopImage: {
       // minWidth: "80%",
       // height: "90%",
@@ -32,12 +28,12 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 1,
       position: "absolute",
    },
-   laptopScreenInnerDiv: {
+   laptopScreenInnerDiv: (theme) => ({
       position: "relative",
       width: "100%",
       height: "100%",
       background: theme.palette.common.black,
-   },
+   }),
    laptopVideoWrapper: {
       top: "8%",
       left: "3.8%",
@@ -60,35 +56,40 @@ const useStyles = makeStyles((theme) => ({
       "& img": {},
       "& video": {},
    },
-}));
+};
 
 const LaptopVideo = ({}) => {
-   const classes = useStyles();
-
    return (
-      <div className={classes.laptop}>
-         <div className={classes.laptopScreenDiv}>
-            <div className={classes.laptopScreenInnerDiv}>
-               <div className={classes.laptopVideoWrapper}>
-                  <video
-                     className={classes.laptopVideo}
+      <Box sx={styles.laptop}>
+         <Box sx={styles.laptopScreenDiv}>
+            <Box sx={styles.laptopScreenInnerDiv}>
+               <Box sx={styles.laptopVideoWrapper}>
+                  <Box
+                     component="video"
+                     sx={styles.laptopVideo}
                      autoPlay
                      loop
                      muted
                      src={smilingStreamerVideoUrl}
                   />
-               </div>
+               </Box>
                <div>
-                  <img className={classes.laptopUi} src={laptopUi} alt="ui" />
+                  <Box
+                     component="img"
+                     sx={styles.laptopUi}
+                     src={laptopUi}
+                     alt="ui"
+                  />
                </div>
-            </div>
-         </div>
-         <img
-            className={classes.laptopImage}
+            </Box>
+         </Box>
+         <Box
+            component="img"
+            sx={styles.laptopImage}
             src={blankLaptop}
             alt="stream showcase laptop"
          />
-      </div>
+      </Box>
    );
 };
 

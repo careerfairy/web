@@ -1,16 +1,8 @@
 import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import {
-   Box,
-   Card,
-   Divider,
-   Grow,
-   Tabs,
-   Tab,
-   IconButton,
-} from "@material-ui/core";
-import { withFirebase } from "../../../../../../../context/firebase";
+import { Box, Card, Divider, Grow, Tabs, Tab, IconButton } from "@mui/material";
+import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext";
 import {
    addMinutes,
    prettyDate,
@@ -27,8 +19,8 @@ import EditFeedbackModal from "./EditFeedbackModal";
 import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import { useSnackbar } from "notistack";
 import FeedbackGraph from "../FeedbackGraph";
-import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
-import { makeStyles } from "@material-ui/core/styles";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import makeStyles from "@mui/styles/makeStyles";
 import ExportTable from "../../../../../common/Tables/ExportTable";
 
 const useStyles = makeStyles((theme) => ({
@@ -116,9 +108,10 @@ const FeedbackTable = ({
       return (
          <Box display="flex" justifyContent="center">
             <IconButton
-               color={currentRating?.id === rowData.id ? "primary" : "default"}
+               color={currentRating?.id === rowData.id ? undefined : "default"}
                disabled={hasNoData()}
                onClick={handleClick}
+               size="large"
             >
                <ArrowDownwardIcon />
             </IconButton>
@@ -387,17 +380,19 @@ const FeedbackTable = ({
                              render: ({ rowData }) => {
                                 return (
                                    <Grow in>
-                                      <FeedbackGraph
-                                         group={group}
-                                         setCurrentStream={setCurrentStream}
-                                         currentStream={currentStream}
-                                         typesOfOptions={typesOfOptions}
-                                         userTypes={userTypes}
-                                         setUserType={setUserType}
-                                         currentPoll={rowData}
-                                         userType={userType}
-                                         streamDataType={streamDataType}
-                                      />
+                                      <span>
+                                         <FeedbackGraph
+                                            group={group}
+                                            setCurrentStream={setCurrentStream}
+                                            currentStream={currentStream}
+                                            typesOfOptions={typesOfOptions}
+                                            userTypes={userTypes}
+                                            setUserType={setUserType}
+                                            currentPoll={rowData}
+                                            userType={userType}
+                                            streamDataType={streamDataType}
+                                         />
+                                      </span>
                                    </Grow>
                                 );
                              },

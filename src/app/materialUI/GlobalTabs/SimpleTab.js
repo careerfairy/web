@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import Tab from "@material-ui/core/Tab";
+import Tab from "@mui/material/Tab";
 
 function a11yProps(index) {
    return {

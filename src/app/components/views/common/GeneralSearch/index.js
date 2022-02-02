@@ -1,11 +1,10 @@
-import PropTypes from "prop-types";
 import React, { useState } from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import SearchIcon from "@material-ui/icons/Search";
-import { InputAdornment, InputBase, TextField } from "@material-ui/core";
+import { alpha } from "@mui/material/styles";
+import SearchIcon from "@mui/icons-material/Search";
+import { InputAdornment, TextField } from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
-   search: {
+const styles = {
+   search: (theme) => ({
       position: "relative",
       borderRadius: theme.shape.borderRadius,
       backgroundColor: alpha(theme.palette.common.white, 0.15),
@@ -15,27 +14,25 @@ const useStyles = makeStyles((theme) => ({
 
       marginRight: theme.spacing(1),
 
-      [theme.breakpoints.down("sm")]: {
+      [theme.breakpoints.down("md")]: {
          marginLeft: "auto",
       },
-   },
+   }),
    searchIcon: {
-      fontSize: theme.typography.h1.fontSize,
+      fontSize: (theme) => theme.typography.h1.fontSize,
    },
    inputRoot: {
       color: "inherit",
-      fontSize: theme.typography.h1.fontSize,
+      fontSize: (theme) => theme.typography.h1.fontSize,
    },
    inputInput: {
-      transition: theme.transitions.create("width"),
+      transition: (theme) => theme.transitions.create("width"),
       width: "100%",
-      padding: theme.spacing(1, 1, 1, 1),
+      padding: (theme) => theme.spacing(1, 1, 1, 1),
    },
-}));
+};
 
 const GeneralSearch = () => {
-   const classes = useStyles();
-
    const [searchParams, setSearchParams] = useState("");
    const handleChange = (event) => {
       setSearchParams(event.target.value);
@@ -47,21 +44,22 @@ const GeneralSearch = () => {
       <TextField
          placeholder="Search…"
          fullWidth
-         className={classes.root}
+         sx={styles.root}
          onChange={handleChange}
          value={searchParams}
          InputProps={{
             endAdornment: (
                <InputAdornment position="start">
-                  <SearchIcon color="inherit" className={classes.searchIcon} />
+                  <SearchIcon color="inherit" sx={styles.searchIcon} />
                </InputAdornment>
             ),
             "aria-label": "search",
-            classes: {
-               root: classes.inputRoot,
-               input: classes.inputInput,
-            },
-            className: classes.search,
+            inputProps: {},
+            // classes: {
+            // root: classes.inputRoot,
+            // input: classes.inputInput,
+            // },
+            sx: styles.search,
          }}
       />
    );

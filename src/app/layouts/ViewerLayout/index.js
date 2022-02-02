@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { useFirebase } from "context/firebase";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
 import ViewerTopBar from "./ViewerTopBar";
 import { isLoaded } from "react-redux-firebase";
 import { useAuth } from "../../HOCs/AuthProvider";
 import Loader from "../../components/views/loader/Loader";
-import { useMediaQuery } from "@material-ui/core";
+import { useMediaQuery } from "@mui/material";
 import LeftMenu from "../../components/views/viewer/LeftMenu/LeftMenu";
 import { v4 as uuidv4 } from "uuid";
 import { CurrentStreamContext } from "../../context/stream/StreamContext";
@@ -48,11 +49,6 @@ const useStyles = makeStyles((theme) => ({
          duration: theme.transitions.duration.shortest,
          easing: theme.transitions.easing.easeInOut,
       }),
-      [theme.breakpoints.down("mobile")]: {
-         width: "100%",
-         paddingTop: 0,
-         paddingLeft: 0,
-      },
       [theme.breakpoints.up("mobile")]: {
          paddingTop: ({ focusModeEnabled }) => !focusModeEnabled && 55,
       },
@@ -73,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ViewerLayout = (props) => {
    const { children, isBreakout } = props;
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const {
       query: { livestreamId, breakoutRoomId, token, isRecordingWindow },
       replace,
@@ -302,7 +298,9 @@ const ViewerLayout = (props) => {
    }
 
    return (
-      <CurrentStreamContext.Provider value={{ currentLivestream, isBreakout }}>
+      <CurrentStreamContext.Provider
+         value={{ currentLivestream, isBreakout, streamerId }}
+      >
          <div className={`${classes.root} notranslate`}>
             <ViewerTopBar
                showAudience={showAudience}

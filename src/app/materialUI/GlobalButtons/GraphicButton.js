@@ -1,6 +1,6 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { ButtonBase, Typography } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { ButtonBase, Typography } from "@mui/material";
 import { demoVideo } from "../../components/util/constants";
 
 const useStyles = makeStyles((theme) => {
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => {
          flex: 1,
          minWidth: 200,
          margin: "0.5rem",
-         [theme.breakpoints.down("xs")]: {
+         [theme.breakpoints.down('sm')]: {
             width: "100% !important", // Overrides inline-style
             height: 100,
          },

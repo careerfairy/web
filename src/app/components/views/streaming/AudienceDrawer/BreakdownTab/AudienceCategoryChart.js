@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useRef, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useCurrentStream } from "../../../../../context/stream/StreamContext";
 import clsx from "clsx";
 import {
@@ -13,7 +14,7 @@ import {
    Tab,
    Tabs,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { colorsArray } from "../../../../util/colors";
 import { getRandomColor } from "../../../../helperFunctions/HelperFunctions";
 import Chart from "chart.js";
@@ -22,7 +23,7 @@ import { percentageDonutConfig } from "../../../../util/chartUtils";
 import { Doughnut } from "react-chartjs-2";
 import CustomLegend from "../../../../../materialUI/Legends";
 import EmptyDisplay from "../displays/EmptyDisplay";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import useStreamGroups from "../../../../custom-hook/useStreamGroups";
 
 Chart.defaults.global.plugins.labels = false;
@@ -145,11 +146,11 @@ const AudienceCategoryChart = ({ className, audience, firebase, ...rest }) => {
          labels: typesOfOptions.map((option) => option.name),
          ids: typesOfOptions.map((option) => option.id),
       });
-   }, [typesOfOptions, localColors, theme.palette.type]);
+   }, [typesOfOptions, localColors, theme.palette.mode]);
 
    useEffect(() => {
       setChartOptions(getChartOptions(theme));
-   }, [theme.palette.type]);
+   }, [theme.palette.mode]);
 
    const getAggregateCategories = (participants) => {
       let categories = [];

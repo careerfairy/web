@@ -15,7 +15,20 @@ dayjs.extend(advancedFormat);
 dayjs.extend(localizedFormat);
 dayjs.extend(relativeTime);
 
-export const uploadLogo = (location, fileObject, firebase, callback) => {
+/**
+ * @param {string} location
+ * @param {*} fileObject
+ * @param {FirebaseService} firebase
+ * @param {function} callback
+ * @param {function} progressCallback
+ */
+export const uploadLogo = (
+   location,
+   fileObject,
+   firebase,
+   callback,
+   progressCallback
+) => {
    var storageRef = firebase.getStorageRef();
    let splitters = [" ", "(", ")", "-"];
    let fileName = fileObject.name;
@@ -32,8 +45,15 @@ export const uploadLogo = (location, fileObject, firebase, callback) => {
    uploadTask.on(
       "state_changed",
       function (snapshot) {
-         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+         const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
          console.log("Upload is " + progress + "% done");
+         if (progressCallback) {
+            progressCallback({
+               state: snapshot.state,
+               progress,
+            });
+         }
          switch (snapshot.state) {
             case "paused":
                console.log("Upload is paused");
@@ -378,4 +398,26 @@ export const addQueryParam = (url, queryParam) => {
 export const addMinutesToDate = (date, minutes) => {
    const newDate = new Date(date);
    return new Date(newDate.getTime() + minutes * 60000);
+};
+
+export const shuffleArray = (array) =>
+   array
+      .map((value) => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
+
+export const dataURLtoFile = (dataUrl, filename) => {
+   let arr = dataUrl.split(","),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]),
+      n = bstr.length,
+      u8arr = new Uint8Array(n);
+
+   while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+   }
+   const extension = mime.split("/")[1];
+   return new File([u8arr], `${filename}.${extension}`, {
+      type: mime,
+   });
 };

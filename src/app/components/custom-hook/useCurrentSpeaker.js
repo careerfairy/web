@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useCurrentStream } from "../../context/stream/StreamContext";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useStreamRef from "./useStreamRef";
 
 /**
@@ -24,7 +24,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
    } = useCurrentStream();
    const [audioCounter, setAudioCounter] = useState(0);
 
-   const { setLivestreamCurrentSpeakerId } = useFirebase();
+   const { setLivestreamCurrentSpeakerId } = useFirebaseService();
    const [currentSpeakerId, setCurrentSpeakerId] = useState(
       firestoreCurrentSpeaker
    );

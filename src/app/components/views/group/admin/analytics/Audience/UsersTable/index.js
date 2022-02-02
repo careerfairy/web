@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import { Button, Card, Slide, Tab, Tabs } from "@material-ui/core";
-import { withFirebase } from "../../../../../../../context/firebase";
+import { Button, Card, Slide, Tab, Tabs } from "@mui/material";
+import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext";
 import {
    copyStringToClipboard,
    prettyDate,
@@ -16,13 +16,13 @@ import {
    LinkifyText,
    tableIcons,
 } from "../../common/TableUtils";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil";
 import { useDispatch, useSelector } from "react-redux";
 import StatsUtil from "../../../../../../../data/util/StatsUtil";
 import GroupsUtil from "../../../../../../../data/util/GroupsUtil";
 import { universityCountriesMap } from "../../../../../../util/constants/universityCountries";
-import PDFIcon from "@material-ui/icons/PictureAsPdf";
+import PDFIcon from "@mui/icons-material/PictureAsPdf";
 import Link from "materialUI/NextNavLink";
 import JSZip from "jszip";
 import * as actions from "store/actions";

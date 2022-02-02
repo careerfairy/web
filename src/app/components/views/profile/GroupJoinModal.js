@@ -1,21 +1,19 @@
-import { Fragment, useState, useEffect } from "react";
-import React from "react";
-import { withFirebase } from "context/firebase";
+import React, { Fragment, useEffect, useState } from "react";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import UserCategorySelector from "components/views/profile/UserCategorySelector";
 import {
    Box,
+   Button,
    CardMedia,
    CircularProgress,
-   Button,
    Dialog,
    DialogActions,
    DialogContent,
    DialogContentText,
    DialogTitle,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    media: {
       display: "flex",
       justifyContent: "center",
@@ -25,16 +23,16 @@ const useStyles = makeStyles((theme) => ({
    image: {
       objectFit: "contain",
       maxWidth: "80%",
-      padding: theme.spacing(1),
-      borderRadius: theme.spacing(1),
-      background: theme.palette.common.white,
+      padding: (theme) => theme.spacing(1),
+      borderRadius: (theme) => theme.spacing(1),
+      background: (theme) => theme.palette.common.white,
    },
    actions: {
       display: "flex",
       flexFlow: "column",
       alignItems: "center",
    },
-}));
+};
 
 const GroupJoinModal = ({
    group = {},
@@ -45,7 +43,6 @@ const GroupJoinModal = ({
    alreadyJoined,
    fromProfile,
 }) => {
-   const classes = useStyles();
    const [categories, setCategories] = useState([]);
    const [allSelected, setAllSelected] = useState(false);
    const [submitting, setSubmitting] = useState(false);
@@ -150,14 +147,14 @@ const GroupJoinModal = ({
    return (
       <Dialog open={open} onClose={closeModal} fullWidth maxWidth="sm">
          <DialogTitle align="center">Follow live streams from</DialogTitle>
-         <CardMedia className={classes.media}>
-            <img src={group.logoUrl} className={classes.image} alt="" />
+         <CardMedia sx={styles.media}>
+            <Box component="img" src={group.logoUrl} sx={styles.image} alt="" />
          </CardMedia>
          <DialogContent>
             <DialogContentText align="center" noWrap>
                {group.description}
             </DialogContentText>
-            <Box className={classes.actions}>
+            <Box sx={styles.actions}>
                {!!categories.length && renderCategories}
             </Box>
          </DialogContent>

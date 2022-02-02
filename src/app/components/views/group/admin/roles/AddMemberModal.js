@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import { GlassDialog } from "../../../../../materialUI/GlobalModals";
 import {
    Box,
@@ -12,13 +12,13 @@ import {
    DialogTitle,
    Slide,
    TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import { Formik } from "formik";
 import { EMAIL_REGEX, GENERAL_ERROR } from "../../../../util/constants";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import { useSnackbar } from "notistack";
-import { withFirebase } from "../../../../../context/firebase";
+import { withFirebase } from "../../../../../context/firebase/FirebaseServiceContext";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -133,7 +133,9 @@ const AddMemberModal = ({ open = false, onClose, group, firebase }) => {
                   />
                </DialogContent>
                <DialogActions>
-                  <Button onClick={() => handleClose(resetForm)}>Cancel</Button>
+                  <Button color="grey" onClick={() => handleClose(resetForm)}>
+                     Cancel
+                  </Button>
                   <Button
                      variant="contained"
                      endIcon={

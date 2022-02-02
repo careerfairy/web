@@ -1,11 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
 
-import { withFirebase } from "../context/firebase/FirebaseContext";
+import { withFirebase } from "../context/firebase/FirebaseServiceContext";
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 
 import Head from "next/head";
-import { Container, Grid } from "@material-ui/core";
+import { Container, Grid } from "@mui/material";
 
 function HowItWorks(props) {
    const [companies, setCompanies] = useState([]);

@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useRef, useState } from "react";
-import DeleteIcon from "@material-ui/icons/Delete";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
    Box,
    Button,
@@ -15,20 +15,21 @@ import {
    TextField,
    Tooltip,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { Formik } from "formik";
 import { v4 as uuidv4 } from "uuid";
-import { withFirebase } from "../../../context/firebase";
+import { withFirebase } from "../../../context/firebase/FirebaseServiceContext";
 import ImageSelect from "./ImageSelect/ImageSelect";
-import { makeStyles } from "@material-ui/core/styles";
-import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
+import makeStyles from "@mui/styles/makeStyles";
+import DateTimePicker from "@mui/lab/DateTimePicker";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import SpeakerForm from "./SpeakerForm/SpeakerForm";
 import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 import { useRouter } from "next/router";
 import FormGroup from "./FormGroup";
-import WarningIcon from "@material-ui/icons/Warning";
+import WarningIcon from "@mui/icons-material/Warning";
 import {
    getStreamSubCollectionSpeakers,
    handleAddSpeaker,
@@ -479,7 +480,7 @@ const DraftStreamForm = ({
                            <Typography style={{ color: "white" }} variant="h4">
                               Stream Info:
                            </Typography>
-                           <FormGroup>
+                           <FormGroup container>
                               <Grid
                                  xs={groupsSelected() ? 7 : 12}
                                  sm={groupsSelected() ? 7 : 12}
@@ -607,23 +608,23 @@ const DraftStreamForm = ({
                                  />
                               </Grid>
                               <Grid xs={12} sm={6} md={4} item>
-                                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                    <DateTimePicker
-                                       inputVariant="outlined"
-                                       fullWidth
-                                       variant="outlined"
-                                       disabled={isSubmitting}
-                                       label="Livestream Start Date"
-                                       value={values.start}
-                                       onChange={(value) => {
-                                          setFieldValue(
-                                             "start",
-                                             new Date(value),
-                                             true
-                                          );
-                                       }}
-                                    />
-                                 </MuiPickersUtilsProvider>
+                                 <DateTimePicker
+                                    inputVariant="outlined"
+                                    renderInput={(params) => (
+                                       <TextField fullWidth {...params} />
+                                    )}
+                                    variant="outlined"
+                                    disabled={isSubmitting}
+                                    label="Livestream Start Date"
+                                    value={values.start}
+                                    onChange={(value) => {
+                                       setFieldValue(
+                                          "start",
+                                          new Date(value),
+                                          true
+                                       );
+                                    }}
+                                 />
                               </Grid>
                               <Grid xs={12} sm={6} md={4} item>
                                  <StreamDurationSelect
@@ -673,14 +674,7 @@ const DraftStreamForm = ({
                                  </FormControl>
                               </Grid>
 
-                              <Grid
-                                 xs={12}
-                                 sm={12}
-                                 md={12}
-                                 lg={12}
-                                 xl={12}
-                                 item
-                              >
+                              <Grid xs={12} item>
                                  <FormControl fullWidth>
                                     <TextField
                                        name="summary"

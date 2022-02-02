@@ -1,8 +1,13 @@
 import React from "react";
-import { Container, Grid, Grow, withWidth } from "@material-ui/core";
+import { Container, Grid, Grow } from "@mui/material";
 import GroupCategories from "../GroupCategories/GroupCategories";
 import GroupStreams from "../GroupStreams/GroupStreams";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent) => (props) => (
+   <WrappedComponent {...props} width="xs" />
+);
 
 const DesktopFeed = ({
    groupData,
@@ -17,15 +22,18 @@ const DesktopFeed = ({
    selectedOptions,
    isPastLivestreams,
 }) => {
-   const theme = useTheme();
    return (
       <Grow in>
          <Container
             maxWidth="lg"
             disableGutters
-            style={{ flex: 1, display: "flex" }}
+            sx={{ flex: 1, display: "flex" }}
          >
-            <Grid container spacing={4} style={{ margin: theme.spacing(1) }}>
+            <Grid
+               container
+               spacing={4}
+               sx={{ margin: (theme) => theme.spacing(1) }}
+            >
                <GroupCategories
                   mobile={mobile}
                   hasCategories={hasCategories}

@@ -1,19 +1,19 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from "prop-types";
 import {
    Card,
    CardActionArea,
    CardContent,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import {
    getBaseUrl,
    timeAgo,
 } from "../../../../components/helperFunctions/HelperFunctions";
 import { populate } from "react-redux-firebase";
 import { useSelector } from "react-redux";
-import { withFirebase } from "../../../../context/firebase";
+import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
 import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
 import { GENERAL_ERROR } from "../../../../components/util/constants";

@@ -1,13 +1,12 @@
 import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import { isLoaded } from "react-redux-firebase";
 import NextLivestreams from "../NextLivestreams";
-import { CircularProgress } from "@material-ui/core";
+import { Box, CircularProgress } from "@mui/material";
 import * as PropTypes from "prop-types";
 import React, { useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import { forceCheck } from "react-lazyload";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    loaderWrapper: {
       display: "grid",
       width: "100%",
@@ -17,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
    wrapper: {
       minHeight: "80vh",
    },
-}));
+};
 
 export function StreamsSection({
    currentGroup,
@@ -29,12 +28,11 @@ export function StreamsSection({
    listenToUpcoming,
    value,
 }) {
-   const classes = useStyles();
    useEffect(() => {
       forceCheck();
    }, [value]);
    return (
-      <div className={classes.wrapper}>
+      <Box sx={styles.wrapper}>
          <SwipeablePanel value={value} index={"upcomingEvents"}>
             {isLoaded(upcomingLivestreams) ? (
                <NextLivestreams
@@ -46,9 +44,9 @@ export function StreamsSection({
                   currentGroup={currentGroup}
                />
             ) : (
-               <div className={classes.loaderWrapper}>
+               <Box sx={styles.loaderWrapper}>
                   <CircularProgress color="primary" />
-               </div>
+               </Box>
             )}
          </SwipeablePanel>
          <SwipeablePanel value={value} index={"pastEvents"}>
@@ -63,12 +61,12 @@ export function StreamsSection({
                   currentGroup={currentGroup}
                />
             ) : (
-               <div className={classes.loaderWrapper}>
+               <Box sx={styles.loaderWrapper}>
                   <CircularProgress color="primary" />
-               </div>
+               </Box>
             )}
          </SwipeablePanel>
-      </div>
+      </Box>
    );
 }
 

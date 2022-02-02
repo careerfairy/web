@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import { Card } from "@material-ui/core";
-import { withFirebase } from "../../../../../../../context/firebase";
+import { Card } from "@mui/material";
+import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext";
 import {
    defaultTableOptions,
    exportSelectionAction,
@@ -12,7 +12,8 @@ import {
    tableIcons,
 } from "../../common/TableUtils";
 import { prettyDate } from "../../../../../../helperFunctions/HelperFunctions";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import ExportTable from "../../../../../common/Tables/ExportTable";
 
 const useStyles = makeStyles((theme) => ({

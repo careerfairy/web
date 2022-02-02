@@ -1,11 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Box, Hidden, IconButton } from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
-import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
+import { Box, Hidden, IconButton } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import Link from "materialUI/NextNavLink";
 import { MainLogo } from "components/logos";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import useGeneralLinks from "components/custom-hook/useGeneralLinks";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -31,23 +32,18 @@ const TopBar = () => {
    const { authenticatedUser } = useAuth();
 
    return (
-      <GeneralHeader
-         position="absolute"
-         headerColors={theme.palette.primary.main}
-         transparent
-         className={classes.header}
-      >
+      <GeneralHeader position="absolute" transparent className={classes.header}>
          <Box display="flex" alignItems="center">
             <IconButton
                style={{ marginRight: "1rem" }}
                color="inherit"
                onClick={handleDrawerOpen}
-            >
+               size="large">
                <MenuIcon />
             </IconButton>
             <MainLogo white />
          </Box>
-         <Hidden smDown>
+         <Hidden mdDown>
             <NavLinks
                links={mainLinks}
                navLinksActiveColor={theme.palette.common.white}
@@ -55,7 +51,7 @@ const TopBar = () => {
             />
          </Hidden>
          <Box display="flex" alignItems="center">
-            <Hidden mdDown>
+            <Hidden lgDown>
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <div>
                      <LoginButton />
@@ -66,7 +62,7 @@ const TopBar = () => {
                      component={Link}
                      color="inherit"
                      href="/profile"
-                  >
+                     size="large">
                      <AccountCircleOutlinedIcon
                         className={classes.accountIcon}
                         color="inherit"

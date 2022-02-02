@@ -5,10 +5,10 @@ import {
    CardHeader,
    IconButton,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import EditIcon from "@material-ui/icons/Edit";
+import makeStyles from '@mui/styles/makeStyles';
+import EditIcon from "@mui/icons-material/Edit";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -50,7 +50,7 @@ const EmailTemplateCard = ({
                      href={templateEditUrl}
                      target="_blank"
                      aria-label="edit-template"
-                  >
+                     size="large">
                      <EditIcon />
                   </IconButton>
                }

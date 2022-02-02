@@ -1,9 +1,10 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { CircularProgress, Grid, Typography } from "@material-ui/core";
+import makeStyles from "@mui/styles/makeStyles";
+import { CircularProgress, Grid, Typography } from "@mui/material";
 import { isEmpty, isLoaded } from "react-redux-firebase";
 import EmbedStreamCard from "../../../common/stream-cards/EmbedStreamCard";
 import useInfiniteScrollClientWithHandlers from "../../../../custom-hook/useInfiniteScrollClientWithHandlers";
+import Fade from "@stahl.luke/react-reveal/Fade";
 
 const useStyles = makeStyles((theme) => ({
    streamsContainer: {
@@ -46,11 +47,13 @@ const Streams = (props) => {
          ) : (
             slicedLivestreams.map((stream) => (
                <Grid key={stream.id} xs={12} md={6} lg={4} item>
-                  <EmbedStreamCard
-                     currentGroup={currentGroup}
-                     isPast={isPast}
-                     stream={stream}
-                  />
+                  <Fade mountOnEnter>
+                     <EmbedStreamCard
+                        currentGroup={currentGroup}
+                        isPast={isPast}
+                        stream={stream}
+                     />
+                  </Fade>
                </Grid>
             ))
          )}

@@ -1,27 +1,16 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Tab, Tabs, Typography } from "@material-ui/core";
-import clsx from "clsx";
+import { Tab, Tabs, Typography } from "@mui/material";
 import Link from "../../../materialUI/NextNavLink";
 import { useRouter } from "next/router";
 
-const useStyles = makeStyles((theme) => ({
-   root: {},
-   tabs: {
-      display: "flex",
-      justifyContent: "space-around",
-   },
-   indicator: {
-      background: (props) => props.navLinksActiveColor,
-      color: (props) => props.navLinksActiveColor,
-   },
-   navLinks: {
+const styles = {
+   tab: (theme, { navLinksBaseColor, navLinksActiveColor }) => ({
       textDecoration: "none !important",
       textTransform: "uppercase",
-      color: (props) => props.navLinksBaseColor || theme.palette.common.black,
+      color: navLinksBaseColor || theme.palette.common.black,
       padding: 0,
       opacity: 1,
-      minWidth: 72,
+      minWidth: "72px",
       margin: theme.spacing(0, 4),
       transition: theme.transitions.create(["color"], {
          easing: theme.transitions.easing.sharp,
@@ -31,11 +20,11 @@ const useStyles = makeStyles((theme) => ({
          borderRadius: theme.spacing(1),
          content: '""',
          position: "absolute",
-         width: 40,
-         height: 2,
-         bottom: 8,
+         width: "40px",
+         height: "2px",
+         bottom: "8px",
          right: 0,
-         backgroundColor: (props) => props.navLinksActiveColor,
+         backgroundColor: navLinksActiveColor,
          visibility: "visible",
          WebkitTransform: "scaleX(1)",
          transform: "scaleX(1)",
@@ -45,46 +34,54 @@ const useStyles = makeStyles((theme) => ({
          }),
       },
       "&:hover": {
-         color: (props) => props.navLinksActiveColor,
+         color: navLinksActiveColor,
       },
       "&:hover:before": {
-         bottom: 6,
-         height: 4,
+         bottom: "6px",
+         height: "4px",
          width: "100%",
       },
-   },
-
-   active: {
-      color: (props) => props.navLinksActiveColor,
+   }),
+   activeItem: (theme, { navLinksActiveColor }) => ({
+      color: navLinksActiveColor,
       "&:before": {
          content: '""',
          position: "absolute",
          width: "100%",
-         height: 4,
-         bottom: 6,
-         left: "0",
-         backgroundColor: (props) => props.navLinksActiveColor,
+         height: "4px",
+         bottom: "6px",
+         left: 0,
+         backgroundColor: navLinksActiveColor,
          visibility: "visible",
          WebkitTransform: "scaleX(1)",
          transform: "scaleX(1)",
       },
-   },
-}));
+   }),
+};
 const NavLinks = ({ links, navLinksActiveColor, navLinksBaseColor }) => {
-   const classes = useStyles({ navLinksActiveColor, navLinksBaseColor });
    const { pathname } = useRouter();
    return (
       <Tabs
-         className={classes.tabs}
+         sx={{
+            display: "flex",
+            justifyContent: "space-around",
+         }}
          value={false}
-         classes={{ indicator: classes.indicator }}
       >
          {links.map((item) => (
             <Tab
                key={item.title}
-               className={clsx(classes.navLinks, {
-                  [classes.active]: pathname === item.href,
-               })}
+               sx={[
+                  (theme) =>
+                     styles.tab(theme, {
+                        navLinksBaseColor,
+                        navLinksActiveColor,
+                     }),
+                  pathname === item.href
+                     ? (theme) =>
+                          styles.activeItem(theme, { navLinksActiveColor })
+                     : undefined,
+               ]}
                component={Link}
                disableRipple
                label={

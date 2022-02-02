@@ -1,8 +1,8 @@
 import React from "react";
 import HeroSection from "./";
 import HeroButton from "./HeroButton";
-import { Box, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Box, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import Link from "../../../../materialUI/NextNavLink";
 import { playIcon } from "../../../../constants/images";
 const useStyles = makeStyles((theme) => ({

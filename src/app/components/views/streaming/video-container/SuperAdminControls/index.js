@@ -1,32 +1,33 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useAuth } from "HOCs/AuthProvider";
-import { SpeedDial, SpeedDialAction } from "@material-ui/lab";
-import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
-import SpyIcon from "@material-ui/icons/Visibility";
-import RecordIcon from "@material-ui/icons/FiberManualRecord";
+import { SpeedDial, SpeedDialAction } from '@mui/material';
+import SpeedDialIcon from '@mui/material/SpeedDialIcon';
+import SpyIcon from "@mui/icons-material/Visibility";
+import RecordIcon from "@mui/icons-material/FiberManualRecord";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import { useCurrentStream } from "context/stream/StreamContext";
 import ConfirmRecordingDialog from "../../../admin/streams/StreamsContainer/StreamCard/ConfirmRecordingDialog";
-import StopRecordingIcon from "@material-ui/icons/Stop";
-import StartRecordingIcon from "@material-ui/icons/PlayCircleFilledWhite";
-import { useFirebase } from "context/firebase";
+import StopRecordingIcon from "@mui/icons-material/Stop";
+import StartRecordingIcon from "@mui/icons-material/PlayCircleFilledWhite";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import {
    CircularProgress,
    Tooltip,
    Typography,
    useMediaQuery,
-} from "@material-ui/core";
+} from "@mui/material";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
-import SettingsIcon from "@material-ui/icons/Settings";
-import Box from "@material-ui/core/Box";
+import SettingsIcon from "@mui/icons-material/Settings";
+import Box from "@mui/material/Box";
 import ConfirmStartStreamingDialog from "./ConfirmStartStreamingDialog";
-import JoinAsStreamerIcon from "@material-ui/icons/RecordVoiceOver";
+import JoinAsStreamerIcon from "@mui/icons-material/RecordVoiceOver";
 import useStreamToken from "../../../../custom-hook/useStreamToken";
 import clsx from "clsx";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -78,7 +79,7 @@ const SpyingOverlay = () => {
 
 const SuperAdminControls = () => {
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+   const mobile = useMediaQuery(theme.breakpoints.down('md'));
    const { joiningStreamerLink, viewerLink } = useStreamToken();
    const { userData } = useAuth();
    const streamRef = useStreamRef();
@@ -87,7 +88,7 @@ const SuperAdminControls = () => {
       query: { spy },
    } = useRouter();
    const [open, setOpen] = useState(false);
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const dispatch = useDispatch();
    const [streamStateChanging, setStreamStateChanging] = useState(false);
    const spyModeEnabled = useSelector(

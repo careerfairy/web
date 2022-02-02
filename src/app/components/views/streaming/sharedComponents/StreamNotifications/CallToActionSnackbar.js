@@ -7,18 +7,19 @@ import React, {
    useEffect,
 } from "react";
 import clsx from "clsx";
-import { alpha, makeStyles } from "@material-ui/core/styles";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { SnackbarContent } from "notistack";
-import Collapse from "@material-ui/core/Collapse";
-import Typography from "@material-ui/core/Typography";
-import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import Collapse from "@mui/material/Collapse";
+import Typography from "@mui/material/Typography";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import CircularProgress from "@mui/material/CircularProgress";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import {
    CardContent,
    CardMedia,
@@ -27,11 +28,11 @@ import {
    DialogTitle,
    DialogContent,
    DialogContentText,
-} from "@material-ui/core";
+} from "@mui/material";
 import { prettyLocalizedDate } from "../../../../helperFunctions/HelperFunctions";
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips";
 import TutorialContext from "../../../../../context/tutorials/TutorialContext";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useAuth } from "HOCs/AuthProvider";
 import { useCurrentStream } from "context/stream/StreamContext";
 
@@ -161,7 +162,7 @@ const CallToActionSnackbar = forwardRef(
       const { authenticatedUser, userData } = useAuth();
 
       const classes = useStyles();
-      const firebase = useFirebase();
+      const firebase = useFirebaseService();
       const [expanded, setExpanded] = useState(false);
 
       const [isSendingEmail, setIsSendingEmail] = useState(false);
@@ -270,7 +271,7 @@ const CallToActionSnackbar = forwardRef(
                               handleClearSnackTutorialState();
                               onDismiss();
                            }}
-                        >
+                           size="large">
                            <CloseIcon />
                         </IconButton>
                      )}

@@ -9,11 +9,11 @@ import { getServerSideStream, parseStreamDates } from "../../util/serverUtil";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
 import { getStreamMetaInfo } from "../../util/SeoUtil";
 import UpcomingLayout from "../../layouts/UpcomingLayout";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { getResizedUrl } from "../../components/helperFunctions/HelperFunctions";
 import HeroSection from "../../components/views/upcoming-livestream/HeroSection";
 import { useAuth } from "../../HOCs/AuthProvider";
-import { streamIsOld } from "../../util/CommonUtil";
+import { dateIsInUnder24Hours, streamIsOld } from "../../util/CommonUtil";
 import UserUtil from "../../data/util/UserUtil";
 import { useRouter } from "next/router";
 import RegistrationModal from "../../components/views/common/registration-modal";
@@ -22,9 +22,10 @@ import QuestionsSection from "../../components/views/upcoming-livestream/Questio
 import useInfiniteScrollServer from "../../components/custom-hook/useInfiniteScrollServer";
 import SpeakersSection from "../../components/views/upcoming-livestream/SpeakersSection";
 import TalentPoolSection from "../../components/views/upcoming-livestream/TalentPoolSection";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import ContactSection from "../../components/views/upcoming-livestream/ContactSection";
 import Navigation from "../../components/views/upcoming-livestream/Navigation";
+import { useMediaQuery } from "@mui/material";
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null);
@@ -32,6 +33,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const questionsRef = useRef(null);
 
    const theme = useTheme();
+   const mobile = useMediaQuery(theme.breakpoints.down('md'));
 
    const [stream, setStream] = useState(parseStreamDates(serverStream));
    const [registered, setRegistered] = useState(false);
@@ -67,7 +69,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       getDetailLivestreamCareerCenters,
       livestreamQuestionsQuery,
       upvoteLivestreamQuestion,
-   } = useFirebase();
+   } = useFirebaseService();
 
    const questionsQuery = useMemo(
       () => stream && livestreamQuestionsQuery(stream.id, questionSortType),
@@ -194,7 +196,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    useEffect(() => {
       if (
          query.register === stream?.id &&
-         filteredGroups.length &&
+         unfilteredGroups.length &&
          !stream?.registeredUsers.includes(authenticatedUser.email)
       ) {
          (async function handleAutoRegister() {
@@ -217,7 +219,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [
       query.register,
       stream?.id,
-      filteredGroups,
+      unfilteredGroups,
       stream?.registeredUsers,
       authenticatedUser.email,
    ]);
@@ -280,6 +282,14 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          return stream.maxRegistrants - stream.registeredUsers.length;
       }
    });
+
+   const streamAboutToStart = useMemo(() => {
+      return Boolean(
+         !isPastEvent &&
+            !stream?.isFaceToFace &&
+            dateIsInUnder24Hours(stream?.startDate)
+      );
+   }, [isPastEvent, stream?.isFaceToFace, stream?.startDate]);
 
    const startRegistrationProcess = async () => {
       if (isLoggedOut || !authenticatedUser.emailVerified) {
@@ -355,6 +365,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          <HeroSection
             backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}
             stream={stream}
+            streamAboutToStart={streamAboutToStart}
             registerButtonLabel={registerButtonLabel}
             disabled={isRegistrationDisabled}
             registered={registered}
@@ -373,6 +384,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                sectionRef={aboutRef}
                sectionId="about"
                title={`${stream.company}`}
+               forceReveal={mobile}
                big
                overheadText={"ABOUT"}
             />

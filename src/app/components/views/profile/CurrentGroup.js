@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { useRouter } from "next/router";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import { useFirebase, withFirebase } from "context/firebase";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { useFirebaseService, withFirebase } from "context/firebase/FirebaseServiceContext";
 import {
    Card,
    CardContent,
@@ -14,13 +14,13 @@ import {
    CardActions,
    Menu,
    MenuItem,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal";
-import Skeleton from "@material-ui/lab/Skeleton";
+import Skeleton from '@mui/material/Skeleton';
 import GroupJoinModal from "./GroupJoinModal";
 import Link from "next/link";
-import Fade from "react-reveal/Fade";
+import Fade from "@stahl.luke/react-reveal/Fade";
 import { getResizedUrl } from "../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 
 const CurrentGroup = ({ userData, group, isAdmin, groupId }) => {
    const { push } = useRouter();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const [open, setOpen] = useState(false);
    const [localGroup, setLocalGroup] = useState({});
    const [noGroup, setNoGroup] = useState(false);
@@ -185,7 +185,7 @@ const CurrentGroup = ({ userData, group, isAdmin, groupId }) => {
                      <Skeleton
                         className={classes.media}
                         animation="wave"
-                        variant="rect"
+                        variant="rectangular"
                      />
                   ) : (
                      <CardMedia className={classes.media}>

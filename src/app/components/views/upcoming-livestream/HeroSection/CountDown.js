@@ -1,7 +1,9 @@
 import React, { memo, useEffect, useMemo, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import {
+   Alert,
+   Box,
    Button,
+   Collapse,
    Divider,
    Grid,
    Hidden,
@@ -9,22 +11,22 @@ import {
    Paper,
    Tooltip,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import DateUtil from "../../../../util/DateUtil";
-import CheckIcon from "@material-ui/icons/Check";
-import CalendarIcon from "@material-ui/icons/CalendarToday";
+import CheckIcon from "@mui/icons-material/Check";
+import CalendarIcon from "@mui/icons-material/CalendarToday";
 import { useRouter } from "next/router";
 import { AddToCalendar } from "../../common/AddToCalendar";
 
-const useStyles = makeStyles((theme) => ({
-   root: {
+const styles = {
+   root: (theme) => ({
       padding: theme.spacing(2),
       width: "100%",
       [theme.breakpoints.up("sm")]: {
          padding: theme.spacing(3),
       },
       borderRadius: theme.spacing(1),
-   },
+   }),
    countDownWrapper: {
       flexWrap: "nowrap",
       display: "flex",
@@ -42,12 +44,6 @@ const useStyles = makeStyles((theme) => ({
    timeLeft: {
       fontWeight: 700,
    },
-   attendBtn: ({ registered }) => ({
-      "&:disabled": {
-         color: registered && theme.palette.common.white,
-         backgroundColor: registered && theme.palette.secondary.main,
-      },
-   }),
    dateTimeWrapper: {
       display: "flex",
       justifyContent: "space-between",
@@ -57,18 +53,26 @@ const useStyles = makeStyles((theme) => ({
    dateTime: {
       fontWeight: 500,
    },
+   streamStartingNoticeWrapper: (theme) => ({
+      paddingBottom: theme.spacing(1),
+      [theme.breakpoints.up("sm")]: {
+         paddingBottom: theme.spacing(2),
+      },
+   }),
+   alert: {
+      borderRadius: (theme) => theme.spacing(1),
+   },
    addToCalendarIconBtn: {
-      border: `1px solid ${theme.palette.text.secondary}`,
-      borderRadius: theme.spacing(0.5),
+      border: (theme) => `1px solid ${theme.palette.text.secondary}`,
+      borderRadius: (theme) => theme.spacing(0.5),
    },
    addToCalendarBtn: {},
    divider: {
-      margin: theme.spacing(1, 0),
+      margin: (theme) => theme.spacing(1, 0),
    },
-}));
+};
 
 const TimerText = memo(({ time }) => {
-   const classes = useStyles();
    const calculateTimeLeft = () => {
       const difference = time - new Date();
       let timeLeft = {};
@@ -94,18 +98,18 @@ const TimerText = memo(({ time }) => {
       return () => clearTimeout(timeout);
    });
    return (
-      <div className={classes.countDownWrapper}>
+      <Box sx={styles.countDownWrapper}>
          {Object.keys(timeLeft).map((interval, index) => (
-            <div key={index} className={classes.timeElement}>
-               <Typography variant="h3" className={classes.timeLeft}>
+            <Box key={index} sx={styles.timeElement}>
+               <Typography variant="h3" sx={styles.timeLeft}>
                   {timeLeft[interval]}
                </Typography>
-               <Typography variant="body1" className={classes.timeType}>
+               <Typography variant="body1" sx={styles.timeType}>
                   {interval}
                </Typography>
-            </div>
+            </Box>
          ))}
-      </div>
+      </Box>
    );
 });
 
@@ -116,8 +120,8 @@ const CountDown = ({
    onRegisterClick,
    registered,
    stream,
+   streamAboutToStart,
 }) => {
-   const classes = useStyles({ registered });
    const {
       query: { livestreamId, groupId },
    } = useRouter();
@@ -138,18 +142,26 @@ const CountDown = ({
    }, [stream, livestreamId, groupId]);
 
    return (
-      <Paper className={classes.root}>
+      <Paper sx={styles.root}>
          <Grid container spacing={2}>
             <Grid item xs={12}>
-               <div className={classes.dateTimeWrapper}>
-                  <Typography
-                     align="center"
-                     className={classes.dateTime}
-                     variant="h6"
-                  >
+               <Collapse in={streamAboutToStart}>
+                  <Box sx={styles.streamStartingNoticeWrapper}>
+                     <Alert
+                        sx={styles.alert}
+                        variant="standard"
+                        severity="info"
+                     >
+                        PLEASE WAIT HERE! YOU WILL BE REDIRECTED WHEN THE STREAM
+                        STARTS.
+                     </Alert>
+                  </Box>
+               </Collapse>
+               <Box sx={styles.dateTimeWrapper}>
+                  <Typography align="center" sx={styles.dateTime} variant="h6">
                      {DateUtil.getUpcomingDate(time)}
                   </Typography>
-                  <Hidden xsDown>
+                  <Hidden smDown>
                      <AddToCalendar
                         event={event}
                         filename={`${stream.company}-event`}
@@ -162,8 +174,9 @@ const CountDown = ({
                            >
                               <IconButton
                                  onClick={handleClick}
-                                 className={classes.addToCalendarIconBtn}
+                                 sx={styles.addToCalendarIconBtn}
                                  variant="outlined"
+                                 size="large"
                               >
                                  <CalendarIcon />
                               </IconButton>
@@ -171,8 +184,9 @@ const CountDown = ({
                         )}
                      </AddToCalendar>
                   </Hidden>
-               </div>
-               <Divider className={classes.divider} />
+               </Box>
+               <Divider sx={styles.divider} />
+
                <TimerText time={time} />
             </Grid>
             <Hidden smUp>
@@ -192,7 +206,7 @@ const CountDown = ({
                               variant="outlined"
                               fullWidth
                               size="large"
-                              className={classes.addToCalendarBtn}
+                              sx={styles.addToCalendarBtn}
                               startIcon={<CalendarIcon />}
                            >
                               ADD TO CALENDAR
@@ -205,7 +219,14 @@ const CountDown = ({
             <Grid item xs={12}>
                <Button
                   id="register-button"
-                  className={classes.attendBtn}
+                  sx={{
+                     "&:disabled": {
+                        color: (theme) =>
+                           registered && theme.palette.common.white,
+                        backgroundColor: (theme) =>
+                           registered && theme.palette.secondary.main,
+                     },
+                  }}
                   color={registered ? "secondary" : "primary"}
                   variant={"contained"}
                   fullWidth

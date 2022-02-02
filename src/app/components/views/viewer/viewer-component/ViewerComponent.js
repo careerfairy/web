@@ -1,14 +1,14 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { withFirebasePage } from "context/firebase";
+import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
 import useDevices from "components/custom-hook/useDevices";
 import { useFirebase } from "context/firebase";
 import useMediaSources from "components/custom-hook/useMediaSources";
 import VideoControlsContainer from "components/views/streaming/video-container/VideoControlsContainer";
 import { useAuth } from "HOCs/AuthProvider";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import SettingsModal from "../../streaming/video-container/SettingsModal";
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import ScreenShareModal from "../../streaming/video-container/ScreenShareModal";
 import LoadingModal from "components/views/streaming/modal/LoadingModal";
 import ErrorModal from "components/views/streaming/modal/ErrorModal";
@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
       height: "100%",
       backgroundColor:
-         theme.palette.type === "dark"
+         theme.palette.mode === "dark"
             ? theme.palette.common.black
             : theme.palette.background.paper,
       zIndex: 999,

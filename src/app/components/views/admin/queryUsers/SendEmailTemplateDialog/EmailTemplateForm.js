@@ -9,9 +9,10 @@ import {
    Paper,
    TextField,
    Typography,
-} from "@material-ui/core";
-import { DateTimePicker } from "@material-ui/pickers";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import DateTimePicker from "@mui/lab/DateTimePicker";
+
+import makeStyles from "@mui/styles/makeStyles";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 import DateUtil from "../../../../../util/DateUtil";
@@ -241,6 +242,9 @@ const EmailTemplateForm = ({
                                           id={field.name}
                                           clearable
                                           disablePast
+                                          renderInput={(params) => (
+                                             <TextField fullWidth {...params} />
+                                          )}
                                           label={field.label}
                                           labelFunc={(date) =>
                                              DateUtil.getRelativeDate(date) +
@@ -264,7 +268,6 @@ const EmailTemplateForm = ({
                                           }
                                           minDate={now}
                                           inputVariant="outlined"
-                                          fullWidth
                                           error={
                                              formik.touched[field.name] &&
                                              Boolean(formik.errors[field.name])

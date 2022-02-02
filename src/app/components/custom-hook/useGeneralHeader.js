@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import GeneralHeader from "../views/header/GeneralHeader";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 
 const useGeneralHeader = (options = { dark: false }) => {
    const theme = useTheme();

@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Box,
    Button,
@@ -7,14 +8,14 @@ import {
    Drawer,
    IconButton,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import PropTypes from "prop-types";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import CloseIcon from "@material-ui/icons/ChevronLeft";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import CloseIcon from "@mui/icons-material/ChevronLeft";
 import clsx from "clsx";
 import CallToActionFormModal from "./CallToActionFormModal";
 import CallToActionList from "./CallToActionList";
-import { useFirebase } from "../../../../../context/firebase";
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext";
 import useStreamRef from "../../../../custom-hook/useStreamRef";
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips";
 import useSliderFullyOpened from "../../../../custom-hook/useSliderFullyOpened";
@@ -65,7 +66,7 @@ const Content = ({
 }) => {
    const classes = useStyles();
    const streamRef = useStreamRef();
-   const { deleteCallToAction, resendCallToAction } = useFirebase();
+   const { deleteCallToAction, resendCallToAction } = useFirebaseService();
    const [callToActionModalOpen, setCallToActionModalOpen] = useState(false);
    const [callToActionToEdit, setCallToActionToEdit] = useState(null);
 
@@ -115,7 +116,7 @@ const Content = ({
                   <Typography noWrap className={classes.ctaTitle} variant="h4">
                      Send a call to action
                   </Typography>
-                  <IconButton onClick={handleClose}>
+                  <IconButton onClick={handleClose} size="large">
                      <CloseIcon />
                   </IconButton>
                </div>
@@ -180,7 +181,7 @@ const CallToActionDrawer = ({
    isTestStream,
 }) => {
    const theme = useTheme();
-   const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
+   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
    const [fullyOpened, onEntered, onExited] = useSliderFullyOpened();
 

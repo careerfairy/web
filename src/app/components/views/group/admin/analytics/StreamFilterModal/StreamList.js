@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { prettyDate } from "../../../../../helperFunctions/HelperFunctions";
 import MaterialTable from "@material-table/core";
 import {

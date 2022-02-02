@@ -1,39 +1,35 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import clsx from "clsx";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import BackgroundImage from "../BackgroundImage";
 
-const useStyles = makeStyles((theme) => ({
-   sectionComponent: {
+const styles = {
+   section: (theme, { big, backgroundColor }) => ({
       transition: theme.transitions.create(["background", "color"], {
          easing: theme.transitions.easing.easeInOut,
          duration: theme.transitions.duration.standard,
       }),
-      background: (props) => props.backgroundColor,
+      background: backgroundColor,
       display: "block",
       position: "relative",
       [theme.breakpoints.up("sm")]: {
-         paddingTop: (props) => (props.big ? 160 : 60),
-         paddingBottom: (props) => (props.big ? 160 : 60),
+         paddingTop: big ? "160px" : "60px",
+         paddingBottom: big ? "160px" : "60px",
       },
-      [theme.breakpoints.down("sm")]: {
-         paddingTop: 48,
-         paddingBottom: 48,
+      [theme.breakpoints.down("md")]: {
+         paddingTop: "48px",
+         paddingBottom: "48px",
       },
-   },
-   isWhite: {
-      borderTop: `1px solid ${theme.palette.text.secondary}`,
-   },
-}));
-
+   }),
+};
 const Section = (props) => {
    const {
       color,
       backgroundImage,
       backgroundImageOpacity,
       backgroundImageRepeat,
+      backgroundImagePosition,
+      backgroundImageSx,
       children,
       backgroundColor,
       backgroundImageClassName,
@@ -41,18 +37,16 @@ const Section = (props) => {
       className,
       sectionRef,
       sectionId,
+      sx,
       // Passed to section element
       ...otherProps
    } = props;
 
-   const classes = useStyles({
-      backgroundColor: backgroundColor,
-      big: big,
-   });
-
    return (
-      <section
-         className={clsx(classes.sectionComponent, className)}
+      <Box
+         component="section"
+         className={className}
+         sx={[(theme) => styles.section(theme, { big, backgroundColor }), sx]}
          ref={sectionRef}
          id={sectionId}
          {...otherProps}
@@ -61,12 +55,14 @@ const Section = (props) => {
          {backgroundImage && (
             <BackgroundImage
                className={backgroundImageClassName}
+               imagePosition={backgroundImagePosition}
+               backgroundImageSx={backgroundImageSx}
                image={backgroundImage}
                opacity={backgroundImageOpacity}
                repeat={backgroundImageRepeat}
             />
          )}
-      </section>
+      </Box>
    );
 };
 Section.propTypes = {
@@ -77,6 +73,7 @@ Section.propTypes = {
    color: PropTypes.string,
    big: PropTypes.bool,
    className: PropTypes.string,
+   sx: PropTypes.oneOfType([PropTypes.object, PropTypes.array, PropTypes.func]),
 };
 
 export default Section;

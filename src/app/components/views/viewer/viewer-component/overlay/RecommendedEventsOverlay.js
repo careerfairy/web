@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { useFirebase } from "context/firebase";
-import { Box, Container, Typography } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
+import { Box, Container, Typography } from "@mui/material";
 import UpcomingLivestreamsCarousel from "../../../landing/UpcomingLivestreamsSection/UpcomingLivestreamsCarousel";
 import { getMaxSlides } from "util/CommonUtil";
 import RegistrationModal from "../../../common/registration-modal";
@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
       height: "100%",
       backgroundColor:
-         theme.palette.type === "dark"
+         theme.palette.mode === "dark"
             ? theme.palette.common.black
             : theme.palette.background.paper,
       zIndex: 999,
@@ -41,7 +41,7 @@ const RecommendedEventsOverlay = ({ recommendedEventIds, mobile }) => {
          groups: dataObj.groups,
          livestream: dataObj.livestream,
       });
-   const { listenToRecommendedEvents } = useFirebase();
+   const { listenToRecommendedEvents } = useFirebaseService();
    const [recommendedEvents, setRecommendedEvents] = useState([]);
 
    useEffect(() => {

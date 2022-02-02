@@ -1,21 +1,22 @@
 import React, { useEffect, useMemo } from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import SignalWifi0BarRoundedIcon from "@material-ui/icons/SignalWifi0BarRounded";
-import SignalWifi1BarRoundedIcon from "@material-ui/icons/SignalWifi1BarRounded";
-import SignalWifi2BarRoundedIcon from "@material-ui/icons/SignalWifi2BarRounded";
-import SignalWifi3BarRoundedIcon from "@material-ui/icons/SignalWifi3BarRounded";
-import SignalWifi4BarRoundedIcon from "@material-ui/icons/SignalWifi4BarRounded";
-import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
-import CachedIcon from "@material-ui/icons/Cached";
-import WarningIcon from "@material-ui/icons/Warning";
+import { alpha } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
+import SignalWifi0BarRoundedIcon from "@mui/icons-material/SignalWifi0BarRounded";
+import SignalWifi1BarRoundedIcon from "@mui/icons-material/SignalWifi1BarRounded";
+import SignalWifi2BarRoundedIcon from "@mui/icons-material/SignalWifi2BarRounded";
+import SignalWifi3BarRoundedIcon from "@mui/icons-material/SignalWifi3BarRounded";
+import SignalWifi4BarRoundedIcon from "@mui/icons-material/SignalWifi4BarRounded";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import CachedIcon from "@mui/icons-material/Cached";
+import WarningIcon from "@mui/icons-material/Warning";
 import { ArrowDown, ArrowUp } from "react-feather";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { Box, Tooltip } from "@material-ui/core";
+import { Box, Tooltip } from "@mui/material";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
-import InternetIcon from "@material-ui/icons/Wifi";
-import ServerIcon from "@material-ui/icons/CheckCircleOutline";
+import InternetIcon from "@mui/icons-material/Wifi";
+import ServerIcon from "@mui/icons-material/CheckCircleOutline";
 const gradient = [
    "rgba(0,0,0,0.5)",
    "#54db00",

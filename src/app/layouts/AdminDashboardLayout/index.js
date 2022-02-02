@@ -1,22 +1,18 @@
 import PropTypes from "prop-types";
-import React, { useMemo, useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, { useEffect, useMemo, useState } from "react";
 import NavBar from "./NavBar";
-import { withFirebase } from "../../context/firebase";
+import { withFirebase } from "../../context/firebase/FirebaseServiceContext";
 import { useAuth } from "../../HOCs/AuthProvider";
 import TopBar from "./TopBar";
-import styles from "../../materialUI/styles/layoutStyles/groupDashboardStyles";
-import { CircularProgress } from "@material-ui/core";
+import { Box, CircularProgress } from "@mui/material";
 import useAdminLinks from "../../components/custom-hook/useAdminLinks";
 import { useRouter } from "next/router";
 import * as actions from "../../store/actions";
 import { useDispatch } from "react-redux";
-
-const useStyles = makeStyles(styles);
+import { styles } from "materialUI/styles/layoutStyles/basicLayoutStyles";
 
 const AdminDashboardLayout = (props) => {
    const { children } = props;
-   const classes = useStyles();
    const dispatch = useDispatch();
    const [isMobileNavOpen, setMobileNavOpen] = useState(false);
    const { userData, authenticatedUser } = useAuth();
@@ -50,7 +46,7 @@ const AdminDashboardLayout = (props) => {
    const isAdmin = useMemo(() => userData?.isAdmin, [userData?.isAdmin]);
 
    return (
-      <div className={classes.root}>
+      <Box sx={styles.root}>
          <TopBar
             links={headerLinks}
             onMobileNavOpen={() => setMobileNavOpen(true)}
@@ -64,9 +60,9 @@ const AdminDashboardLayout = (props) => {
                openMobile={isMobileNavOpen}
             />
          )}
-         <div className={classes.wrapper}>
-            <div className={classes.contentContainer}>
-               <div className={classes.content}>
+         <Box sx={styles.wrapper}>
+            <Box sx={styles.contentContainer}>
+               <Box sx={styles.content}>
                   {isAdmin ? (
                      React.Children.map(children, (child) =>
                         React.cloneElement(child, {
@@ -77,10 +73,10 @@ const AdminDashboardLayout = (props) => {
                   ) : (
                      <CircularProgress style={{ margin: "auto" }} />
                   )}
-               </div>
-            </div>
-         </div>
-      </div>
+               </Box>
+            </Box>
+         </Box>
+      </Box>
    );
 };
 

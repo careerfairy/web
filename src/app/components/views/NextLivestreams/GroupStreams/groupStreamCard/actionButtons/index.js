@@ -1,10 +1,10 @@
-import { Button } from "@material-ui/core";
-import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
-import AddToPhotosRoundedIcon from "@material-ui/icons/AddToPhotosRounded";
+import { Button } from "@mui/material";
+import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
+import AddToPhotosRoundedIcon from "@mui/icons-material/AddToPhotosRounded";
 import Link from "next/link";
-import LibraryBooksIcon from "@material-ui/icons/LibraryBooks";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
    actionButton: {
@@ -42,7 +42,7 @@ export const AttendButton = ({
                <AddToPhotosRoundedIcon />
             )
          }
-         color={user && checkIfRegistered() ? "default" : "primary"}
+         color={user && checkIfRegistered() ? "grey" : "primary"}
          children={attendButtonLabel}
          onClick={handleRegisterClick}
       />
@@ -59,6 +59,22 @@ export const DetailsButton = ({
    ...props
 }) => {
    const classes = useStyles();
+   // const link = useMemo(() => {
+   //    let newLink = `/upcoming-livestream/${livestream.id}`;
+   //    const searchParams = {
+   //       ...(!listenToUpcoming && { groupId: groupData.groupId }),
+   //       ...(referrerId && { referrerId }),
+   //    };
+   //
+   //    const params = new URLSearchParams(searchParams).toString();
+   //    if (params) {
+   //       newLink += `?${params}`;
+   //    }
+   //    if (isPastLivestreams) {
+   //       newLink += "#about";
+   //    }
+   //    return newLink;
+   // }, [isPastLivestreams, listenToUpcoming, groupData.groupId, referrerId]);
    return (
       <Link
          href={{

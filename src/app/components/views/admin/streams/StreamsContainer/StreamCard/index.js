@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Avatar,
    Box,
@@ -20,19 +20,19 @@ import {
    Menu,
    MenuItem,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import {
    getBaseUrl,
    prettyDate,
 } from "../../../../../helperFunctions/HelperFunctions";
-import RegistrationsIcon from "@material-ui/icons/People";
-import ParticipationIcon from "@material-ui/icons/Visibility";
-import JoinIcon from "@material-ui/icons/RecordVoiceOver";
+import RegistrationsIcon from "@mui/icons-material/People";
+import ParticipationIcon from "@mui/icons-material/Visibility";
+import JoinIcon from "@mui/icons-material/RecordVoiceOver";
 import { useFirestore } from "react-redux-firebase";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions/index";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog";
 import { streamType } from "../../../../../../types";
 import ConfirmRecordingDialog from "./ConfirmRecordingDialog";
@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
 const StreamCard = ({ stream }) => {
    const classes = useStyles();
    const firestore = useFirestore();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const dispatch = useDispatch();
 
    const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] = useState(
@@ -147,7 +147,7 @@ const StreamCard = ({ stream }) => {
             subheader={prettyDate(stream.start)}
             action={
                <React.Fragment>
-                  <IconButton onClick={handleClick}>
+                  <IconButton onClick={handleClick} size="large">
                      <MoreVertIcon />
                   </IconButton>
                   {

@@ -1,7 +1,7 @@
-import { makeStyles } from "@material-ui/core/styles";
-import { Tooltip, Typography } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Tooltip, Typography } from "@mui/material";
 import React from "react";
-import HelpIcon from "@material-ui/icons/HelpOutlineOutlined";
+import HelpIcon from "@mui/icons-material/HelpOutlineOutlined";
 import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme) => ({

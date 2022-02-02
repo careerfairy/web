@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Button,
    Dialog,
@@ -8,7 +8,7 @@ import {
    DialogContent,
    DialogTitle,
    Slide,
-} from "@material-ui/core";
+} from "@mui/material";
 import StreamList from "./StreamList";
 import { useSelector } from "react-redux";
 import { createSelector } from "reselect";

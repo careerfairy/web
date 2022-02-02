@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { withFirebase } from "../../../../context/firebase";
+import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
 import {
    Box,
    Button,
@@ -10,9 +10,9 @@ import {
    DialogActions,
    Grow,
    Collapse,
-} from "@material-ui/core";
-import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
-import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
+} from "@mui/material";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { TooltipHighlight } from "../../../../materialUI/GlobalTooltips";
 import { GlassDialog } from "../../../../materialUI/GlobalModals";
 
@@ -66,7 +66,7 @@ const DemoEndModal = ({ open, handleClose }) => {
                         }
                         variant="contained"
                         startIcon={<PeopleAltIcon />}
-                        color={hasJoinedTalentPool ? "default" : "primary"}
+                        color={hasJoinedTalentPool ? "" : "primary"}
                      />
                   </TooltipHighlight>
                   <Collapse in={hasJoinedTalentPool}>

@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
-import { useFirebase, withFirebase } from "context/firebase";
+import { useFirebaseService, withFirebase } from "context/firebase/FirebaseServiceContext";
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
-import { Paper } from "@material-ui/core";
+import { Paper } from "@mui/material";
 import {
    GreyPermanentMarker,
    PollQuestion,
@@ -10,7 +10,8 @@ import {
 import { CategoryContainerCentered } from "../../../../../materialUI/GlobalContainers";
 import { colorsArray } from "../../../../util/colors";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { DynamicColorButton } from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import { getCorrectPollOptionData } from "../../../../../data/util/PollUtil";
 import { isServer } from "../../../../helperFunctions/HelperFunctions";
@@ -118,7 +119,7 @@ const NoPollDisplay = () => {
 };
 const PollCategory = ({ livestream, setSelectedState }) => {
    const { authenticatedUser } = useAuth();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const streamRef = useStreamRef();
    const [sessionUuid, setSessionUuid] = useState(uuidv4());
    const dispatch = useDispatch();

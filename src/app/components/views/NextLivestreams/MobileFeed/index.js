@@ -1,54 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
 
-import { Box, Button, Grid, Typography } from "@material-ui/core";
-import { withFirebase } from "../../../../context/firebase";
+import { Box, Button, Grid, Typography } from "@mui/material";
+import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
 import GroupStreams from "../GroupStreams/GroupStreams";
 import { useRouter } from "next/router";
 import GroupJoinModal from "../../profile/GroupJoinModal";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 import FiltersDrawer from "./FiltersDrawer";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    streamsGrid: {
       height: "100%",
    },
-   bar: {
-      boxShadow: "none",
-      position: "sticky",
-      top: 0,
-      zIndex: 1,
-   },
-   panel: {
-      minHeight: 300,
-   },
    followButton: {
-      marginTop: 5,
+      marginTop: "5px",
       position: "sticky",
-      top: 165,
+      top: "165px",
       zIndex: 20,
    },
-   tabPanel: {},
-   sticky: {
-      zIndex: 1,
-   },
-}));
-
-function TabPanel({ children, value, index, ...other }) {
-   const classes = useStyles();
-   return (
-      <Box className={classes.tabPanel} p={1} {...other}>
-         {children}
-      </Box>
-   );
-}
-
-function a11yProps(index) {
-   return {
-      id: `full-width-tab-${index}`,
-      "aria-controls": `full-width-tabpanel-${index}`,
-   };
-}
+};
 
 const MobileFeed = ({
    handleToggleActive,
@@ -65,22 +34,12 @@ const MobileFeed = ({
    selectedOptions,
    isPastLivestreams,
 }) => {
-   const classes = useStyles();
-   const theme = useTheme();
    const router = useRouter();
    const absolutePath = router.asPath;
    const [value, setValue] = useState(0);
    const [openJoinModal, setOpenJoinModal] = useState(false);
-   const [topOffset, setTopOffset] = useState(0);
-   const matches = useMediaQuery(theme.breakpoints.up("sm"));
    const { query } = useRouter();
 
-   useEffect(() => {
-      const newOffset = matches
-         ? theme.mixins.toolbar["@media (min-width:600px)"].minHeight
-         : theme.mixins.toolbar.minHeight;
-      setTopOffset(newOffset);
-   }, [matches]);
    useEffect(() => {
       if (groupData) {
          handleResetView();
@@ -93,18 +52,8 @@ const MobileFeed = ({
       }
    }, [value, query]);
 
-   const handleChange = (event, newValue) => {
-      setValue(newValue);
-   };
-
    const handleResetView = () => {
       setValue(0);
-   };
-
-   const handleChangeIndex = (index) => {
-      if (index === 0 || index === 1) {
-         setValue(index);
-      }
    };
 
    const handleCloseJoinModal = () => {
@@ -128,7 +77,7 @@ const MobileFeed = ({
             !listenToUpcoming && (
                <>
                   <Button
-                     className={classes.followButton}
+                     sx={styles.followButton}
                      onClick={handleJoin}
                      size="large"
                      variant="contained"
@@ -149,7 +98,7 @@ const MobileFeed = ({
                   />
                </>
             )}
-         <Grid className={classes.streamsGrid} container spacing={2}>
+         <Grid sx={styles.streamsGrid} container spacing={2}>
             <GroupStreams
                mobile={true}
                livestreamId={livestreamId}

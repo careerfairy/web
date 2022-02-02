@@ -1,10 +1,10 @@
-import { withFirebase } from "../../context/firebase";
+import { withFirebase } from "../../context/firebase/FirebaseServiceContext";
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout";
 import useUpcomingStreams from "../../components/custom-hook/useUpcomingStreams";
 import usePastStreams from "../../components/custom-hook/usePastStreams";
 import NextLivestreamsBannerSection from "../../components/views/NextLivestreams/NextLivestreamsBannerSection";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import { StreamsSection } from "../../components/views/NextLivestreams/StreamsSection";
 import HeadWithMeta from "../../components/page/HeadWithMeta";
 import {

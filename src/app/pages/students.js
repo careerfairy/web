@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 import LandingLayout from "../layouts/LandingLayout";
 import BookADemoSection from "../components/views/landing/BookADemoSection";
 import CompaniesSection from "../components/views/landing/CompaniesSection";
@@ -147,7 +147,7 @@ const StudentLandingPage = ({}) => {
          >
             <StudentHeroSection big />
             <CompaniesSection
-               title={"299+ companies and startups are waiting for you."}
+               title={"250+ companies and startups are waiting for you."}
             />
             <SpeakersSection
                speakers={speakers}

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
    Box,
    Button,
@@ -7,7 +7,7 @@ import {
    DialogContent,
    Grow,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { RegistrationContext } from "../../../../../../context/registration/RegistrationContext";
 import SuccessCheckmark from "./SuccessCheckmark";
 import Link from "materialUI/NextNavLink";

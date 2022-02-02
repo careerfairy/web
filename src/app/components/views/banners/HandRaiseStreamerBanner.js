@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import StreamBanner from "./StreamBanner";
-import { Button, Tooltip } from "@material-ui/core";
-import { useFirebase } from "../../../context/firebase";
+import { Button, Tooltip } from "@mui/material";
+import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext";
 import useStreamRef from "../../custom-hook/useStreamRef";
-import HandRaiseIcon from "@material-ui/icons/PanToolOutlined";
+import HandRaiseIcon from "@mui/icons-material/PanToolOutlined";
 
 const HandRaiseStreamerBanner = () => {
    const [buttonMessage] = useState("Deactivate Hand Raise");
-   const { setHandRaiseMode } = useFirebase();
+   const { setHandRaiseMode } = useFirebaseService();
    const streamRef = useStreamRef();
 
    const deactivateHandRaise = () => {
@@ -17,7 +17,7 @@ const HandRaiseStreamerBanner = () => {
    return (
       <StreamBanner
          severity="info"
-         icon={<HandRaiseIcon />}
+         icon={<HandRaiseIcon color="primary" />}
          title={`Hand Raise is Active`}
          subTitle={"Your audience can now request to join via audio and video."}
          action={

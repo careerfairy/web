@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import LocalStreamItem from "./LocalStreamItem";
 import RemoteStreamItem from "./RemoteStreamItem";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 
 const StreamContainer = ({
    stream,
@@ -12,7 +12,7 @@ const StreamContainer = ({
    videoMutedBackgroundImg,
    livestreamId,
 }) => {
-   const { getUserData } = useFirebase();
+   const { getUserData } = useFirebaseService();
    const [speaker, setSpeaker] = useState(null);
    const [fetching, setFetching] = useState(false);
    useEffect(() => {

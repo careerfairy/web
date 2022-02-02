@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import * as actions from "store/actions";
 
 import {
@@ -14,8 +14,8 @@ import {
    MenuItem,
    Select,
    Typography,
-} from "@material-ui/core";
-import Box from "@material-ui/core/Box";
+} from "@mui/material";
+import Box from "@mui/material/Box";
 import { DynamicColorButton } from "materialUI/GlobalButtons/GlobalButtons";
 import { MAX_BREAKOUT_ROOMS } from "constants/breakoutRooms";
 
@@ -28,7 +28,7 @@ const CreateBreakoutRoomsView = ({ handleClose }) => {
    const [numberOfRooms, setNumberOfRooms] = useState(1);
    const [assignType, setAssignType] = useState("manually");
    const [loading, setLoading] = useState(false);
-   const { createMultipleBreakoutRooms } = useFirebase();
+   const { createMultipleBreakoutRooms } = useFirebaseService();
 
    const handleChangeNumberOfRooms = (event) => {
       setNumberOfRooms(event.target.value);
@@ -122,7 +122,9 @@ const CreateBreakoutRoomsView = ({ handleClose }) => {
             {/*</Box>*/}
          </DialogContent>
          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button color="grey" onClick={handleClose}>
+               Cancel
+            </Button>
             <DynamicColorButton
                color="primary"
                loading={loading}

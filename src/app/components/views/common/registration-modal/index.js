@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { memo } from "react";
-import { Dialog, Grow } from "@material-ui/core";
+import { Dialog, Grow } from "@mui/material";
 import { RegistrationContextProvider } from "context/registration/RegistrationContext";
 import RegistrationForm from "./RegistrationForm";
 

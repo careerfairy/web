@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState, Fragment } from "react";
 import Groups from "../groups/Groups";
-import { withFirebase } from "../../../context/firebase";
-import { Button } from "@material-ui/core";
+import { withFirebase } from "../../../context/firebase/FirebaseServiceContext";
+import { Button } from "@mui/material";
 import Link from "next/link";
 import { useAuth } from "../../../HOCs/AuthProvider";
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Grid, TextField, Typography } from "@material-ui/core";
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import { Grid, TextField, Typography } from "@mui/material";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 const Step5Confirm = ({ audioSource, videoSource, devices, speakerSource }) => {
    const [labels, setLabels] = useState({

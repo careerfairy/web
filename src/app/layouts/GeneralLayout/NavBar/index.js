@@ -1,18 +1,18 @@
 import React, { memo, useEffect } from "react";
 import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
-import ListItem from "@material-ui/core/ListItem";
-import { Box, Button, Hidden } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import ListItem from "@mui/material/ListItem";
+import { Box, Button, Hidden } from "@mui/material";
 import { useAuth } from "../../../HOCs/AuthProvider";
 import NavItem from "../../../components/views/navbar/NavItem";
 import { LogOut as LogoutIcon } from "react-feather";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../store/actions";
 import Link from "../../../materialUI/NextNavLink";
-import { withFirebase } from "context/firebase";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
 import useGeneralLinks from "../../../components/custom-hook/useGeneralLinks";
 
 const useStyles = makeStyles((theme) => ({

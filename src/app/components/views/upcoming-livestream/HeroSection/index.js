@@ -1,5 +1,5 @@
 import React from "react";
-import { darken, makeStyles } from "@material-ui/core/styles";
+import { darken } from "@mui/material/styles";
 import {
    Avatar,
    Box,
@@ -7,7 +7,7 @@ import {
    Grid,
    Hidden,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import CountDown from "./CountDown";
 import HeroSpeakers from "./HeroSpeakers";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
@@ -17,8 +17,8 @@ import {
    LimitedRegistrationsBadge,
 } from "../../NextLivestreams/GroupStreams/groupStreamCard/badges";
 
-const useStyles = makeStyles((theme) => ({
-   root: {
+const styles = {
+   root: (theme) => ({
       minHeight: "auto",
       height: "auto",
       position: "relative",
@@ -26,7 +26,6 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 2,
       backgroundPosition: "right center",
       backgroundAttachment: "fixed",
-      backgroundImage: ({ backgroundImage }) => `url(${backgroundImage});`,
       [theme.breakpoints.up("md")]: {
          minHeight: "100vh",
       },
@@ -41,8 +40,8 @@ const useStyles = makeStyles((theme) => ({
          backgroundAttachment: "fixed",
          opacity: 0.7,
       },
-   },
-   containerWrapper: {
+   }),
+   containerWrapper: (theme) => ({
       [theme.breakpoints.up("md")]: {
          position: "absolute",
          top: "50%",
@@ -52,8 +51,8 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 2,
       position: "relative",
       top: 0,
-   },
-   container: {
+   }),
+   container: (theme) => ({
       [theme.breakpoints.up("sm")]: {
          paddingTop: theme.spacing(8),
          paddingBottom: theme.spacing(6),
@@ -64,21 +63,21 @@ const useStyles = makeStyles((theme) => ({
       },
       paddingTop: theme.spacing(8),
       paddingBottom: theme.spacing(4),
-   },
+   }),
    gridContainer: {
-      color: theme.palette.common.white,
+      color: (theme) => theme.palette.common.white,
    },
    leftGridItem: {
       display: "flex",
       justifyContent: "space-evenly",
       flexDirection: "column",
    },
-   title: {
-      [theme.breakpoints.down("sm")]: {
+   title: (theme) => ({
+      [theme.breakpoints.down("md")]: {
          fontSize: "calc(1.5em + 1.5vw)",
       },
       fontWeight: 600,
-   },
+   }),
    timerWrapper: {
       display: "flex",
       width: "100%",
@@ -88,29 +87,30 @@ const useStyles = makeStyles((theme) => ({
       flexDirection: "column",
    },
    companyLogo: {
-      padding: theme.spacing(2),
-      borderRadius: theme.spacing(1),
-      boxShadow: theme.shadows[4],
-      background: theme.palette.common.white,
+      padding: (theme) => theme.spacing(2),
+      borderRadius: (theme) => theme.spacing(1),
+      boxShadow: (theme) => theme.shadows[4],
+      background: (theme) => theme.palette.common.white,
       width: "fit-content",
       height: "fit-content",
       "& img": {
-         borderRadius: theme.spacing(1),
+         borderRadius: (theme) => theme.spacing(1),
          maxHeight: 90,
          maxWidth: 280,
          objectFit: "contain",
       },
    },
    heroSpeakersWrapper: {
-      marginTop: theme.spacing(2),
+      marginTop: (theme) => theme.spacing(2),
       color: "inherit",
       textDecoration: "none !important",
-   },
-   streamStatuses: {
-      paddingTop: theme.spacing(2),
       display: "flex",
    },
-}));
+   streamStatuses: {
+      paddingTop: (theme) => theme.spacing(2),
+      display: "flex",
+   },
+};
 
 const HeroSection = ({
    backgroundImage,
@@ -121,20 +121,26 @@ const HeroSection = ({
    stream,
    hosts,
    numberOfSpotsRemaining,
+   streamAboutToStart,
 }) => {
-   const classes = useStyles({ backgroundImage });
-
    return (
-      <div className={classes.root}>
-         <div className={classes.containerWrapper}>
-            <Container className={classes.container}>
-               <Grid className={classes.gridContainer} spacing={2} container>
-                  <Grid className={classes.leftGridItem} item xs={12} md={6}>
-                     <Typography variant="h2" className={classes.title}>
+      <Box
+         sx={[
+            styles.root,
+            {
+               backgroundImage: `url(${backgroundImage});`,
+            },
+         ]}
+      >
+         <Box sx={styles.containerWrapper}>
+            <Container sx={styles.container}>
+               <Grid sx={styles.gridContainer} spacing={2} container>
+                  <Grid sx={styles.leftGridItem} item xs={12} md={6}>
+                     <Typography variant="h2" sx={styles.title}>
                         {stream.title}
                      </Typography>
                      {(stream.isFaceToFace || stream.maxRegistrants) && (
-                        <Box className={classes.streamStatuses}>
+                        <Box sx={styles.streamStatuses}>
                            {stream.isFaceToFace && <InPersonEventBadge white />}
                            {stream.maxRegistrants && (
                               <LimitedRegistrationsBadge
@@ -145,13 +151,14 @@ const HeroSection = ({
                         </Box>
                      )}
                      {!!stream.speakers.length && (
-                        <Hidden xsDown>
-                           <a
-                              className={classes.heroSpeakersWrapper}
+                        <Hidden smDown>
+                           <Box
+                              component="a"
+                              sx={styles.heroSpeakersWrapper}
                               href="#speakers"
                            >
                               <HeroSpeakers speakers={stream.speakers} />
-                           </a>
+                           </Box>
                         </Hidden>
                      )}
                   </Grid>
@@ -165,16 +172,17 @@ const HeroSection = ({
                                     stream.companyLogoUrl,
                                     "md"
                                  )}
-                                 className={classes.companyLogo}
+                                 sx={styles.companyLogo}
                               />
                            </Box>
                         </Grid>
                         <Grid item xs={12}>
-                           <Box className={classes.timerWrapper}>
+                           <Box sx={styles.timerWrapper}>
                               <CountDown
                                  registerButtonLabel={registerButtonLabel}
                                  time={stream.startDate}
                                  stream={stream}
+                                 streamAboutToStart={streamAboutToStart}
                                  onRegisterClick={onRegisterClick}
                                  disabled={disabled}
                                  registered={registered}
@@ -190,8 +198,8 @@ const HeroSection = ({
                   </Grid>
                </Grid>
             </Container>
-         </div>
-      </div>
+         </Box>
+      </Box>
    );
 };
 

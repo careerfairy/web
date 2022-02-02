@@ -9,10 +9,10 @@ import {
    Box,
    Typography,
    Button,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import PersonAddIcon from "@material-ui/icons/PersonAdd";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
 const useStyles = makeStyles((theme) => ({
    formGrid: {
@@ -142,6 +142,7 @@ const SpeakerForm = ({
                   id={`speakers.${objectKey}.background`}
                   variant="outlined"
                   fullWidth
+                  multiline
                   disabled={isSubmitting}
                   onBlur={handleBlur}
                   label="Background"

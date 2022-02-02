@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Button } from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
 import { useRouter } from "next/router";
-import Avatar from "@material-ui/core/Avatar";
+import Avatar from "@mui/material/Avatar";
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
@@ -21,6 +21,7 @@ const LogoElement = ({
    livestreamId,
    hideFollow,
    className,
+   sx,
    handleOpenJoinModal,
 }) => {
    const classes = useStyles();
@@ -45,6 +46,7 @@ const LogoElement = ({
             variant="rounded"
             key={careerCenter.id}
             className={className}
+            sx={sx}
             src={getResizedUrl(careerCenter.logoUrl)}
             alt={careerCenter.universityName}
          />

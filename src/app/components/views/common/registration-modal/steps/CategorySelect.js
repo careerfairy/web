@@ -1,5 +1,5 @@
 import React, { Fragment, useContext, useEffect, useState } from "react";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import UserCategorySelector from "components/views/profile/UserCategorySelector";
 import {
    Box,
@@ -10,8 +10,8 @@ import {
    DialogContentText,
    DialogTitle,
    Typography,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
 import StatsUtil from "../../../../../data/util/StatsUtil";
 import LogoButtons from "../../../NextLivestreams/GroupStreams/LogoButtons";
 import { RegistrationContext } from "context/registration/RegistrationContext";
@@ -48,7 +48,7 @@ const CategorySelect = () => {
    } = useContext(RegistrationContext);
    const { userData } = useAuth();
    const classes = useStyles();
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const [checkingCategories, setCheckingCategories] = useState(false);
    const [categories, setCategories] = useState([]);
    const [allSelected, setAllSelected] = useState(false);
@@ -219,7 +219,7 @@ const CategorySelect = () => {
                </DialogContent>
                <DialogActions>
                   {!livestream?.hasStarted && cancelable && (
-                     <Button size="large" onClick={handleClose}>
+                     <Button size="large" color="grey" onClick={handleClose}>
                         Cancel
                      </Button>
                   )}

@@ -1,14 +1,15 @@
 import React from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
-import { withFirebase } from "../../../context/firebase";
-import { Button, Hidden, useMediaQuery } from "@material-ui/core";
-import Box from "@material-ui/core/Box";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import IconButton from "@mui/material/IconButton";
+import { withFirebase } from "../../../context/firebase/FirebaseServiceContext";
+import { Button, Hidden, useMediaQuery } from "@mui/material";
+import Box from "@mui/material/Box";
 import { MainLogo } from "../../../components/logos";
 import Link from "../../../materialUI/NextNavLink";
-import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
-import MenuIcon from "@material-ui/icons/Menu";
-import FilterIcon from "@material-ui/icons/Tune";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import MenuIcon from "@mui/icons-material/Menu";
+import FilterIcon from "@mui/icons-material/Tune";
 import { useDispatch } from "react-redux";
 import * as actions from "../../../store/actions";
 import { useAuth } from "../../../HOCs/AuthProvider";
@@ -37,16 +38,16 @@ const TopBar = ({ links, onMobileNavOpen, currentGroup }) => {
       dispatch(actions.toggleNextLivestreamsFilter());
 
    return (
-      <GeneralHeader headerColors={headerColors} permanent={showHeaderLinks}>
+      <GeneralHeader permanent={showHeaderLinks}>
          <Box display="flex" alignItems="center">
             <Hidden lgUp>
-               <IconButton color="primary" onClick={onMobileNavOpen}>
+               <IconButton color="primary" onClick={onMobileNavOpen} size="large">
                   <MenuIcon />
                </IconButton>
             </Hidden>
             <MainLogo />
          </Box>
-         <Hidden mdDown>
+         <Hidden lgDown>
             {showHeaderLinks && (
                <NavLinks
                   links={links}
@@ -55,7 +56,7 @@ const TopBar = ({ links, onMobileNavOpen, currentGroup }) => {
             )}
          </Hidden>
          <Box>
-            <Hidden mdDown>
+            <Hidden lgDown>
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <Button
                      component={Link}
@@ -73,17 +74,14 @@ const TopBar = ({ links, onMobileNavOpen, currentGroup }) => {
                      color="primary"
                      className={classes.navIconButton}
                      href="/profile"
-                  >
+                     size="large">
                      <AccountCircleOutlinedIcon />
                   </IconButton>
                )}
             </Hidden>
             {currentGroup?.categories && (
                <Hidden lgUp>
-                  <IconButton
-                     color="primary"
-                     onClick={handleToggleNextLivestreamsFilter}
-                  >
+                  <IconButton color="primary" onClick={handleToggleNextLivestreamsFilter} size="large">
                      <FilterIcon />
                   </IconButton>
                </Hidden>

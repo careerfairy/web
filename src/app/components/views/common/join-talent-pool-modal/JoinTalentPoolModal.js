@@ -1,16 +1,16 @@
 import { Fragment, useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
-import { useFirebase, withFirebase } from "context/firebase";
+import { useFirebaseService, withFirebase } from "context/firebase/FirebaseServiceContext";
 import UserResume from "components/views/profile/userData/user-resume/UserResume";
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import {
    Dialog,
    DialogContent,
    ButtonGroup,
    Button,
    Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 
@@ -53,7 +53,7 @@ function JoinTalentPoolModal({
    modalOpen,
    setModalOpen,
 }) {
-   const firebase = useFirebase();
+   const firebase = useFirebaseService();
    const classes = useStyles();
    const [withCV, setWithCV] = useState(undefined);
    const [loading, setLoading] = useState(false);

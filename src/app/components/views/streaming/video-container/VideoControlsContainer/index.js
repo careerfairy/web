@@ -6,30 +6,20 @@ import React, {
    useRef,
    useState,
 } from "react";
-import MicOffIcon from "@material-ui/icons/MicOff";
-import MicIcon from "@material-ui/icons/Mic";
-import CheckIcon from "@material-ui/icons/Check";
-import ClearIcon from "@material-ui/icons/Clear";
-import VideocamIcon from "@material-ui/icons/Videocam";
-import VideocamOffIcon from "@material-ui/icons/VideocamOff";
-import ScreenShareIcon from "@material-ui/icons/ScreenShare";
-import SettingsIcon from "@material-ui/icons/Settings";
-import LiveTvIcon from "@material-ui/icons/LiveTv";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import { withFirebasePage } from "context/firebase";
-import { alpha, makeStyles, useTheme } from "@material-ui/core/styles";
-import {
-   Button,
-   ClickAwayListener,
-   Dialog,
-   DialogActions,
-   DialogContent,
-   DialogContentText,
-   DialogTitle,
-} from "@material-ui/core";
-import SpeedDial from "@material-ui/lab/SpeedDial";
-import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
-import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
+import MicOffIcon from "@mui/icons-material/MicOff";
+import MicIcon from "@mui/icons-material/Mic";
+import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
+import VideocamIcon from "@mui/icons-material/Videocam";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
+import ScreenShareIcon from "@mui/icons-material/ScreenShare";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
+import { alpha, useTheme } from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
+import { ClickAwayListener } from "@mui/material";
+import SpeedDial from "@mui/material/SpeedDial";
+import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+import SpeedDialAction from "@mui/material/SpeedDialAction";
 import TutorialContext from "context/tutorials/TutorialContext";
 import {
    StyledTooltipWithButton,

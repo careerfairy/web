@@ -1,4 +1,4 @@
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress } from "@mui/material";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => {
@@ -10,13 +10,12 @@ const useStyles = makeStyles((theme) => {
          left: 0,
          backgroundColor: themeWhite,
          height: "100%",
-         width: "100%"
-      }
+         width: "100%",
+      },
    };
 });
 
 const Loader = () => {
-
    const classes = useStyles();
 
    return (

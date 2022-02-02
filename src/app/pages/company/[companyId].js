@@ -2,7 +2,7 @@ import { Fragment, useState, useEffect, useRef } from "react";
 
 import { useRouter } from "next/router";
 
-import { withFirebasePage } from "../../context/firebase";
+import { withFirebasePage } from "../../context/firebase/FirebaseServiceContext";
 import CompanyLandingPage from "../../components/views/company-profile/CompanyLandingPage";
 import CompanyDiscoverPage from "../../components/views/company-profile/CompanyDiscoverPage";
 import CompanyWatchPage from "../../components/views/company-profile/CompanyWatchPage";

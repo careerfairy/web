@@ -1,7 +1,8 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { alpha, makeStyles } from "@material-ui/core/styles";
-import { AppBar, Box, CircularProgress, Tabs } from "@material-ui/core";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import { AppBar, Box, CircularProgress, Tabs } from "@mui/material";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import NewStreamModal from "./NewStreamModal";
 import { useRouter } from "next/router";
@@ -9,10 +10,10 @@ import {
    prettyLocalizedDate,
    repositionElement,
 } from "../../../../helperFunctions/HelperFunctions";
-import Tab from "@material-ui/core/Tab";
+import Tab from "@mui/material/Tab";
 import Header from "./Header";
 import EventsTable from "./events-table/EventsTable";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { v4 as uuidv4 } from "uuid";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -53,13 +54,14 @@ const EventsOverview = ({ group, scrollRef }) => {
       addLivestream,
       deleteLivestream,
       getAllGroupAdminInfo,
-   } = useFirebase();
+   } = useFirebaseService();
    const [streams, setStreams] = useState([]);
    const [openNewStreamModal, setOpenNewStreamModal] = useState(false);
    const [tabValue, setTabValue] = useState("upcoming");
    const [fetching, setFetching] = useState(false);
    const [currentStream, setCurrentStream] = useState(null);
    const [fetchingQueryEvent, setFetchingQueryEvent] = useState(false);
+   const [triggered, setTriggered] = useState(false);
    const [publishingDraft, setPublishingDraft] = useState(false);
    const [groupsDictionary, setGroupsDictionary] = useState({});
 
@@ -81,6 +83,14 @@ const EventsOverview = ({ group, scrollRef }) => {
          }
          setFetching(true);
          const unsubscribe = query(group.id, (querySnapshot) => {
+            if (
+               tabValue === "upcoming" &&
+               !querySnapshot.docs.length &&
+               !triggered
+            ) {
+               setTabValue("past");
+               setTriggered(true);
+            }
             const streamsData = querySnapshot.docs.map((doc) => ({
                id: doc.id,
                rowId: doc.id,
@@ -88,6 +98,7 @@ const EventsOverview = ({ group, scrollRef }) => {
                date: doc.data().start?.toDate?.(),
                ...doc.data(),
             }));
+
             if (eventId) {
                const queryEventIndex = streamsData.findIndex(
                   (el) => el.id === eventId

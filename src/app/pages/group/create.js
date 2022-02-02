@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { withFirebase } from "../../context/firebase";
+import { withFirebase } from "../../context/firebase/FirebaseServiceContext";
 import Header from "../../components/views/header/Header";
 import Footer from "../../components/views/footer/Footer";
 import CreateBaseGroup from "../../components/views/group/create/CreateBaseGroup";
@@ -11,7 +11,7 @@ import { GlobalBackground } from "../../materialUI/GlobalBackground/GlobalBackGr
 import Loader from "../../components/views/loader/Loader";
 import { useAuth } from "../../HOCs/AuthProvider";
 
-import { Stepper, Step, StepLabel, Container } from "@material-ui/core";
+import { Stepper, Step, StepLabel, Container } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { GENERAL_ERROR } from "../../components/util/constants";
 import defaultCategories from "../../components/views/group/create/defaultCategories";

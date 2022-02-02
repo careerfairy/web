@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { withFirebase } from "../../../../context/firebase";
-import { Grid, LinearProgress, Typography } from "@material-ui/core";
+import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
+import { Grid, LinearProgress, Typography } from "@mui/material";
 import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 import LazyLoad from "react-lazyload";
 import Spinner from "./groupStreamCard/Spinner";
-import clsx from "clsx";
-import {useAuth} from "../../../../HOCs/AuthProvider";
+import { useAuth } from "../../../../HOCs/AuthProvider";
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers";
 
 const gridItemHeight = 530;
-const useStyles = makeStyles((theme) => ({
+const styles = {
    root: {
       flex: 1,
       paddingTop: 0,
@@ -19,9 +17,9 @@ const useStyles = makeStyles((theme) => ({
    },
    followButton: {
       position: "sticky",
-      top: 165,
+      top: "165px",
       zIndex: 101,
-      marginBottom: 14,
+      marginBottom: "14px",
    },
    emptyMessage: {
       maxWidth: "400px",
@@ -41,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
    dynamicHeight: {
       height: "auto",
    },
-}));
+};
 
 const Wrapper = ({ children, streamId }) => {
    return (
@@ -60,23 +58,25 @@ const Wrapper = ({ children, streamId }) => {
 };
 
 const GroupStreams = ({
-                          groupData,
-                          livestreams,
-                          mobile,
-                          searching,
-                          livestreamId,
-                          careerCenterId,
-                          listenToUpcoming,
-                          selectedOptions,
-                          isPastLivestreams,
-                      }) => {
-        const classes = useStyles()
-        const {userData, authenticatedUser: user} = useAuth()
-        const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
-        const searchedButNoResults = selectedOptions?.length && !searching && !livestreams?.length
-        const [slicedLivestreams] = useInfiniteScrollClientWithHandlers(livestreams, 6, 3);
-
-
+   groupData,
+   livestreams,
+   mobile,
+   searching,
+   livestreamId,
+   careerCenterId,
+   listenToUpcoming,
+   selectedOptions,
+   isPastLivestreams,
+}) => {
+   const { userData, authenticatedUser: user } = useAuth();
+   const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false);
+   const searchedButNoResults =
+      selectedOptions?.length && !searching && !livestreams?.length;
+   const [slicedLivestreams] = useInfiniteScrollClientWithHandlers(
+      livestreams,
+      6,
+      3
+   );
 
    useEffect(() => {
       if (globalCardHighlighted) {
@@ -88,9 +88,7 @@ const GroupStreams = ({
       if (livestream) {
          return (
             <Grid
-               className={clsx(classes.streamGridItem, {
-                  [classes.dynamicHeight]: mobile,
-               })}
+               sx={[styles.streamGridItem, mobile && styles.dynamicHeight]}
                key={livestream.id}
                xs={12}
                sm={12}
@@ -126,13 +124,7 @@ const GroupStreams = ({
          <Grid container spacing={mobile ? 2 : 4}>
             {groupData.id || listenToUpcoming ? (
                searching ? (
-                  <Grid
-                     md={12}
-                     lg={12}
-                     xl={12}
-                     item
-                     className={classes.loaderWrapper}
-                  >
+                  <Grid md={12} lg={12} xl={12} item sx={styles.loaderWrapper}>
                      <LinearProgress style={{ width: "80%" }} color="primary" />
                   </Grid>
                ) : livestreams.length ? (
@@ -145,10 +137,10 @@ const GroupStreams = ({
                      lg={12}
                      xl={12}
                      item
-                     className={classes.loaderWrapper}
+                     sx={styles.loaderWrapper}
                   >
                      <Typography
-                        className={classes.emptyMessage}
+                        sx={styles.emptyMessage}
                         align="center"
                         variant="h5"
                         style={{ marginTop: 100 }}

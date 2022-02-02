@@ -4,8 +4,8 @@ import {
    DialogActions,
    DialogContent,
    DialogTitle,
-} from "@material-ui/core";
-import SettingsIcon from "@material-ui/icons/Settings";
+} from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { GlassDialog } from "../../../../../materialUI/GlobalModals";
 import DeviceSelectMenu from "../../sharedComponents/DeviceSelectMenu";
 
