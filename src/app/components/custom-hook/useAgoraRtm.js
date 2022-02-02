@@ -1,5 +1,5 @@
 import { EMOTE_MESSAGE_TEXT_TYPE } from "components/util/constants";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as actions from "../../store/actions";
@@ -16,7 +16,7 @@ export default function useAgoraRtm(roomId, userId) {
       msg: "RTM_INITIAL",
    });
 
-   const { fetchAgoraRtmToken } = useFirebase();
+   const { fetchAgoraRtmToken } = useFirebaseService();
    const dispatch = useDispatch();
 
    useEffect(() => {

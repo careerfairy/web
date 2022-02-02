@@ -3,7 +3,7 @@ import window from "global";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import useStreamRef from "./useStreamRef";
-import { useFirebase } from "context/firebase";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useAgoraClientConfig from "./useAgoraClientConfig";
 import * as actions from "store/actions";
 
@@ -24,7 +24,7 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
    const [primaryRtcClient, setPrimaryRtcClient] = useState(null);
    const [primaryRtcClientHost, setPrimaryRtcClientHost] = useState(false);
 
-   const { fetchAgoraRtcToken } = useFirebase();
+   const { fetchAgoraRtcToken } = useFirebaseService();
    const dispatch = useDispatch();
 
    const [screenShareStream, setScreenShareStream] = useState(null);
