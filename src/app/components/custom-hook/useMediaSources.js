@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSoundMeter } from "./useSoundMeter";
 
 export default function useMediaSources(
@@ -7,35 +7,36 @@ export default function useMediaSources(
    showSoundMeter,
    active
 ) {
+   // console.count("-> useMediaSources");
    const [audioSource, setAudioSource] = useState(null);
    const [videoSource, setVideoSource] = useState(null);
 
    const [localMediaStream, setLocalMediaStream] = useState(null);
 
-   useEffect(() => {
-      if (active && localStream) {
-         let mediaStream = undefined;
-         if (!localMediaStream) {
-            mediaStream = new MediaStream();
-         } else {
-            mediaStream = localMediaStream;
-            cleanupDisplayableMediaStream(mediaStream);
-         }
-         if (localStream.audioTrack) {
-            mediaStream.addTrack(localStream.audioTrack.getMediaStreamTrack());
-         }
-         if (localStream.videoTrack) {
-            mediaStream.addTrack(localStream.videoTrack.getMediaStreamTrack());
-         }
-         setLocalMediaStream(mediaStream);
-      }
-   }, [
-      localStream,
-      localStream?.audioTrack,
-      localStream?.videoTrack,
-      localStream?.videoTrack?.getMediaStreamTrack().getSettings().deviceId,
-      active,
-   ]);
+   // useEffect(() => {
+   //    if (active && localStream) {
+   //       let mediaStream = undefined;
+   //       if (!localMediaStream) {
+   //          mediaStream = new MediaStream();
+   //       } else {
+   //          mediaStream = localMediaStream;
+   //          cleanupDisplayableMediaStream(mediaStream);
+   //       }
+   //       if (localStream.audioTrack) {
+   //          mediaStream.addTrack(localStream.audioTrack.getMediaStreamTrack());
+   //       }
+   //       if (localStream.videoTrack) {
+   //          mediaStream.addTrack(localStream.videoTrack.getMediaStreamTrack());
+   //       }
+   //       setLocalMediaStream(mediaStream);
+   //    }
+   // }, [
+   //    localStream,
+   //    localStream?.audioTrack,
+   //    localStream?.videoTrack,
+   //    localStream?.videoTrack?.getMediaStreamTrack().getSettings().deviceId,
+   //    active,
+   // ]);
 
    const cleanupDisplayableMediaStream = (mediaStream) => {
       const audioTracks = mediaStream.getAudioTracks();
@@ -53,34 +54,35 @@ export default function useMediaSources(
       localStream?.audioTrack?.getMediaStreamTrack()
    );
 
-   useEffect(() => {
-      if (active && devices && localStream) {
-         if (devices.audioInputList && devices.audioInputList.length > 0) {
-            if (localStream.audioTrack) {
-               updateAudioSource(devices.audioInputList[0].value);
-            }
-         }
-         if (devices.videoDeviceList && devices.videoDeviceList.length > 0) {
-            if (localStream.videoTrack) {
-               updateVideoSource(devices.videoDeviceList[0].value);
-            }
-         }
-      }
-   }, [devices, localStream?.uid, active]);
+   // useEffect(() => {
+   //    if (active && devices && localStream) {
+   //       if (devices.audioInputList && devices.audioInputList.length > 0) {
+   //          if (localStream.audioTrack) {
+   //             updateAudioSource(devices.audioInputList[0].value);
+   //          }
+   //       }
+   //       if (devices.videoDeviceList && devices.videoDeviceList.length > 0) {
+   //          if (localStream.videoTrack) {
+   //             updateVideoSource(devices.videoDeviceList[0].value);
+   //          }
+   //       }
+   //    }
+   // }, [devices, localStream?.uid, active]);
 
-   useEffect(() => {
-      if (localStream) {
-         if (!localStream.audioTrack) {
-            setAudioSource(null);
-         }
-         if (!localStream.videoTrack) {
-            setVideoSource(null);
-         }
-      }
-   }, [localStream?.audioTrack, localStream?.videoTrack]);
+   // useEffect(() => {
+   //    if (localStream) {
+   //       if (!localStream.audioTrack) {
+   //          setAudioSource(null);
+   //       }
+   //       if (!localStream.videoTrack) {
+   //          setVideoSource(null);
+   //       }
+   //    }
+   // }, [localStream?.audioTrack, localStream?.videoTrack]);
 
    const updateAudioSource = useCallback(
       (deviceId) => {
+         if (!localStream.audioTrack) return;
          const currentDeviceId = localStream.audioTrack
             .getMediaStreamTrack()
             .getSettings().deviceId;
@@ -97,6 +99,7 @@ export default function useMediaSources(
 
    const updateVideoSource = useCallback(
       (deviceId) => {
+         if (!localStream.videoTrack) return;
          const currentDeviceId = localStream.videoTrack
             .getMediaStreamTrack()
             .getSettings().deviceId;
@@ -111,14 +114,24 @@ export default function useMediaSources(
       [localStream?.videoTrack]
    );
 
-   return {
-      mediaControls: {
+   const mediaControls = useMemo(() => {
+      console.log("-> Media controls changed!");
+      return {
          audioSource,
          updateAudioSource,
          videoSource,
          updateVideoSource,
          audioLevel,
-      },
+      };
+   }, [
+      audioSource,
+      updateAudioSource,
+      videoSource,
+      updateVideoSource,
+      audioLevel,
+   ]);
+   return {
+      mediaControls,
       localMediaStream,
    };
 }

@@ -1,7 +1,14 @@
 import React from "react";
-import StreamerOverview from "../../../../../components/views/streaming";
-import StreamerLayout from "../../../../../layouts/StreamerLayout";
+import dynamic from "next/dynamic";
 
+const StreamerOverview = dynamic(
+   () => import("../../../../../components/views/streaming"),
+   { ssr: false }
+);
+const StreamerLayout = dynamic(
+   () => import("../../../../../layouts/StreamerLayout"),
+   { ssr: false }
+);
 const StreamerPage = () => {
    return (
       <StreamerLayout isBreakout>

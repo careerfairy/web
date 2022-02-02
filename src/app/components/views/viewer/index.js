@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import makeStyles from "@mui/styles/makeStyles";
 import ViewerComponent from "./viewer-component/ViewerComponent";
 import MiniChatContainer from "../streaming/LeftMenu/categories/chat/MiniChatContainer";
@@ -67,7 +67,7 @@ const ViewerOverview = ({
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
    );
-
+   const [mounted, setMounted] = useState(false);
    const { currentLivestream, isBreakout } = useCurrentStream();
    const dispatch = useDispatch();
    const { videoIsMuted, videoIsPaused } = useSelector(
@@ -75,6 +75,13 @@ const ViewerOverview = ({
    );
 
    const classes = useStyles({ mobile });
+
+   useEffect(() => {
+      setMounted(true);
+   }, []);
+
+   if (!mounted) return null;
+
    return (
       <Fragment>
          <div className={classes.blackFrame}>

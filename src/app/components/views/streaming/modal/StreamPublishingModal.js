@@ -2,32 +2,35 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import CheckIcon from "@mui/icons-material/Check";
 import {
-   DialogTitle,
-   Typography,
-   Slide,
-   DialogContent,
-   DialogActions,
-   Dialog,
-   Button,
-   FormControl,
-   InputLabel,
-   Select,
-   OutlinedInput,
-   Grid,
-   MenuItem,
-   Tooltip,
-   IconButton,
    Box,
+   Button,
+   CircularProgress,
+   Dialog,
+   DialogActions,
+   DialogContent,
+   DialogTitle,
+   FormControl,
+   Grid,
+   IconButton,
+   InputLabel,
+   MenuItem,
+   Select,
+   Slide,
+   Tooltip,
+   Typography,
 } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
 import SoundLevelDisplayer from "components/views/common/SoundLevelDisplayer";
 import ButtonWithConfirm from "components/views/common/ButtonWithConfirm";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AGORA_RTC_CONNECTION_STATE_CONNECTED } from "constants/agora";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
+import LoadingButton from "@mui/lab/LoadingButton";
+import * as actions from "store/actions";
+import useLocalStorageMediaSources from "../../../custom-hook/useLocalStorageMediaSources";
+import { useEffectOnce } from "react-use";
 
 const styles = {
    actions: {},
@@ -39,12 +42,28 @@ const styles = {
       paddingBottom: 3,
       textAlign: "center",
    },
+   dialogTitle: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+   },
+   iconWrapper: {
+      mt: 1,
+      alignItems: "center",
+      display: "flex",
+      justifyContent: "center",
+   },
    title: {
       textAlign: "center",
       marginBottom: 2,
       fontWeight: "700",
       fontSize: "0.9rem",
       color: (theme) => theme.palette.grey[300],
+   },
+   gridItemContent: {
+      display: "flex",
+      flexDirection: "column",
+      height: "100%",
    },
 };
 
@@ -59,9 +78,18 @@ function StreamPublishingModal({
    localMediaEnabling,
    labels,
 }) {
+   const [activatingCamera, setActivatingCamera] = useState(false);
+   const [activatingMic, setActivatingMic] = useState(false);
+   const [publishingStream, setPublishingStream] = useState(false);
+   const {
+      storeNewMediaSources,
+      storedVideoSourceId,
+      storedAudioSourceId,
+      setStoredPreferredMediaControls,
+   } = useLocalStorageMediaSources();
+
    const testVideoRef = useRef(null);
-   const inputLabel = useRef(null);
-   const [labelWidth, setLabelWidth] = useState(0);
+   const dispatch = useDispatch();
 
    const agoraRtcConnectionState = useSelector((state) => {
       return state.stream.agoraState.rtcConnectionState;
@@ -75,6 +103,11 @@ function StreamPublishingModal({
    }, [open, agoraRtcConnectionState]);
 
    useEffect(() => {
+      console.log("-> SETTING");
+      // setStoredPreferredMediaControls(mediaControls, devices);
+   }, [devices, mediaControls]);
+
+   useEffect(() => {
       if (
          openModal &&
          displayableMediaStream &&
@@ -84,12 +117,6 @@ function StreamPublishingModal({
          testVideoRef.current.srcObject = displayableMediaStream;
       }
    }, [displayableMediaStream, openModal, testVideoRef.current]);
-
-   useEffect(() => {
-      if (inputLabel?.cursrent?.offsetWidth) {
-         setLabelWidth(inputLabel?.current.offsetWidth);
-      }
-   }, []);
 
    useEffect(() => {
       if (openModal) {
@@ -104,10 +131,29 @@ function StreamPublishingModal({
          initializeMediaDevices();
       }
    }, [openModal]);
+   const handleConfirmPublishStream = async () => {
+      try {
+         setPublishingStream(true);
+         await onConfirmStream();
+         storeNewMediaSources({
+            audioSourceId: mediaControls.audioSource,
+            videoSourceId: mediaControls.videoSource,
+         });
+      } catch (e) {
+         dispatch(actions.sendGeneralError(e));
+      }
+      setPublishingStream(false);
+   };
 
    const handleInitializeCamera = async () => {
-      await localMediaEnabling.initializeLocalVideoStream();
-      localStorage.setItem("hasEnabledCamera", "true");
+      try {
+         setActivatingCamera(true);
+         await localMediaEnabling.initializeLocalVideoStream();
+         localStorage.setItem("hasEnabledCamera", "true");
+      } catch (e) {
+         dispatch(actions.sendGeneralError(e));
+      }
+      setActivatingCamera(false);
    };
 
    const handleCloseCamera = () => {
@@ -116,8 +162,14 @@ function StreamPublishingModal({
    };
 
    const handleInitializeMic = async () => {
-      await localMediaEnabling.initializeLocalAudioStream();
-      localStorage.setItem("hasEnabledMicrophone", "true");
+      try {
+         setActivatingMic(true);
+         await localMediaEnabling.initializeLocalAudioStream();
+         localStorage.setItem("hasEnabledMicrophone", "true");
+      } catch (e) {
+         dispatch(actions.sendGeneralError(e));
+      }
+      setActivatingMic(false);
    };
    const handleCloseMic = () => {
       localMediaEnabling.closeLocalMicrophoneTrack();
@@ -148,14 +200,7 @@ function StreamPublishingModal({
 
    return (
       <Dialog TransitionComponent={Slide} open={openModal} fullWidth>
-         <DialogTitle
-            disableTypography
-            sx={{
-               display: "flex",
-               justifyContent: "center",
-               alignItems: "center",
-            }}
-         >
+         <DialogTitle disableTypography sx={styles.dialogTitle}>
             <PersonAddIcon sx={{ mr: 2 }} fontSize="medium" />
             <Typography
                style={{ fontSize: "1.2em", fontWeight: 500 }}
@@ -167,159 +212,154 @@ function StreamPublishingModal({
          <DialogContent dividers>
             <Grid container spacing={2}>
                <Grid item sx={styles.actions} lg={6} md={6} sm={6} xs={12}>
-                  <Typography sx={styles.title}>WITH VIDEO</Typography>
-                  {hasVideoTrack ? (
-                     <>
-                        <FormControl
-                           disabled={!devices.videoDeviceList.length}
-                           sx={{
-                              marginBottom: 2,
-                              fontSize: "0.8rem",
-                              width: "100%",
-                              maxHeight: 200,
-                           }}
-                           size="small"
-                           variant="outlined"
-                        >
-                           <InputLabel
-                              shrink
-                              ref={inputLabel}
-                              htmlFor="cameraSelect"
-                           >
-                              Select Camera
-                           </InputLabel>
-                           <Select
-                              value={mediaControls.videoSource || ""}
-                              onChange={handleChangeCam}
+                  <Box sx={styles.gridItemContent}>
+                     <Typography sx={styles.title}>WITH VIDEO</Typography>
+                     {hasVideoTrack ? (
+                        <>
+                           <FormControl
+                              disabled={!devices.videoDeviceList.length}
+                              sx={{
+                                 marginBottom: 2,
+                                 fontSize: "0.8rem",
+                                 width: "100%",
+                                 maxHeight: 200,
+                              }}
+                              size="small"
                               variant="outlined"
-                              id="cameraSelect"
-                              input={
-                                 <OutlinedInput
-                                    notched
-                                    labelWidth={labelWidth}
-                                    name="camera"
-                                    id="cameraSelect"
-                                 />
-                              }
-                              label="Select Camera"
                            >
-                              <MenuItem value="" disabled>
+                              <InputLabel id="camera-select-label">
                                  Select Camera
-                              </MenuItem>
-                              {devices.videoDeviceList.map((device) => {
-                                 return (
-                                    <MenuItem
-                                       key={device.value}
-                                       value={device.value}
-                                    >
-                                       {device.text}
-                                    </MenuItem>
-                                 );
-                              })}
-                           </Select>
-                        </FormControl>
-                        <video
-                           style={{
-                              boxShadow: "0 0 3px rgb(200,200,200)",
-                              borderRadius: "5px",
-                              width: "100%",
-                              height: 150,
-                              background: "black",
-                           }}
-                           ref={testVideoRef}
-                           muted={true}
-                           autoPlay
-                        />
-                        <div style={{ textAlign: "center" }}>
-                           <IconButton
-                              aria-label="delete"
-                              size="medium"
-                              onClick={handleCloseCamera}
+                              </InputLabel>
+                              <Select
+                                 labelId="camera-select-label"
+                                 defaultValue={storedVideoSourceId}
+                                 value={mediaControls.videoSource || ""}
+                                 onChange={handleChangeCam}
+                                 id="cameraSelect"
+                                 label="Select Camera"
+                              >
+                                 <MenuItem value="" disabled>
+                                    Select Camera
+                                 </MenuItem>
+                                 {devices.videoDeviceList.map((device) => {
+                                    return (
+                                       <MenuItem
+                                          key={device.value}
+                                          value={device.value}
+                                       >
+                                          {device.text}
+                                       </MenuItem>
+                                    );
+                                 })}
+                              </Select>
+                           </FormControl>
+                           <video
+                              style={{
+                                 boxShadow: "0 0 3px rgb(200,200,200)",
+                                 borderRadius: "5px",
+                                 width: "100%",
+                                 height: 150,
+                                 background: "black",
+                              }}
+                              ref={testVideoRef}
+                              muted={true}
+                              autoPlay
+                           />
+                           <Box sx={styles.iconWrapper}>
+                              <IconButton
+                                 aria-label="turn-off-video-icon"
+                                 size="medium"
+                                 onClick={handleCloseCamera}
+                              >
+                                 <VideocamOffIcon fontSize="inherit" />
+                              </IconButton>
+                           </Box>
+                        </>
+                     ) : (
+                        <Box sx={styles.container}>
+                           <LoadingButton
+                              variant="contained"
+                              loading={activatingCamera}
+                              onClick={handleInitializeCamera}
+                              startIcon={<VideocamIcon />}
                            >
-                              <VideocamOffIcon fontSize="inherit" />
-                           </IconButton>
-                        </div>
-                     </>
-                  ) : (
-                     <Box sx={styles.container}>
-                        <Button
-                           variant="contained"
-                           onClick={handleInitializeCamera}
-                           startIcon={<VideocamIcon />}
-                        >
-                           Activate Camera
-                        </Button>
-                     </Box>
-                  )}
+                              Activate Camera
+                           </LoadingButton>
+                        </Box>
+                     )}
+                  </Box>
                </Grid>
                <Grid item lg={6} md={6} sm={6} xs={12}>
-                  <Typography sx={styles.title}>WITH AUDIO</Typography>
-                  {hasAudioTrack ? (
-                     <>
-                        <FormControl
-                           sx={{ marginBottom: 2 }}
-                           disabled={!devices.audioInputList.length}
-                           fullWidth
-                           variant="outlined"
-                           size="small"
-                        >
-                           <InputLabel id="microphoneSelect">
-                              Select Microphone
-                           </InputLabel>
-                           <Select
-                              value={mediaControls.audioSource || ""}
+                  <Box sx={styles.gridItemContent}>
+                     <Typography sx={styles.title}>WITH AUDIO</Typography>
+                     {hasAudioTrack ? (
+                        <>
+                           <FormControl
+                              sx={{ marginBottom: 2 }}
+                              disabled={!devices.audioInputList.length}
                               fullWidth
-                              onChange={handleChangeMic}
                               variant="outlined"
-                              id="microphoneSelect"
-                              label="Select Microphone"
+                              size="small"
                            >
-                              <MenuItem value="" disabled>
-                                 Select a Microphone
-                              </MenuItem>
-                              {devices.audioInputList.map((device) => {
-                                 return (
-                                    <MenuItem
-                                       key={device.value}
-                                       value={device.value}
-                                    >
-                                       {device.text}
-                                    </MenuItem>
-                                 );
-                              })}
-                           </Select>
-                        </FormControl>
-                        <Box
-                           sx={{
-                              width: "100%",
-                              height: 150,
-                           }}
-                        >
-                           <SoundLevelDisplayer
-                              audioLevel={mediaControls.audioLevel}
-                           />
-                        </Box>
-                        <Box sx={{ textAlign: "center" }}>
-                           <IconButton
-                              aria-label="delete"
-                              size="medium"
-                              onClick={handleCloseMic}
+                              <InputLabel id="microphone-select-label">
+                                 Select Microphone
+                              </InputLabel>
+                              <Select
+                                 value={mediaControls.audioSource || ""}
+                                 defaultValue={storedAudioSourceId}
+                                 fullWidth
+                                 labelId="microphone-select-label"
+                                 onChange={handleChangeMic}
+                                 id="microphoneSelect"
+                                 label="Select Microphone"
+                              >
+                                 <MenuItem value="" disabled>
+                                    Select a Microphone
+                                 </MenuItem>
+                                 {devices.audioInputList.map((device) => {
+                                    return (
+                                       <MenuItem
+                                          key={device.value}
+                                          value={device.value}
+                                       >
+                                          {device.text}
+                                       </MenuItem>
+                                    );
+                                 })}
+                              </Select>
+                           </FormControl>
+                           <Box
+                              sx={{
+                                 flex: 1,
+                              }}
                            >
-                              <MicOffIcon fontSize="inherit" />
-                           </IconButton>
+                              <SoundLevelDisplayer
+                                 audioLevel={mediaControls.audioLevel}
+                              />
+                           </Box>
+                           <Box sx={styles.iconWrapper}>
+                              <IconButton
+                                 aria-label="microphone-off-icon"
+                                 size="medium"
+                                 onClick={handleCloseMic}
+                              >
+                                 <MicOffIcon fontSize="inherit" />
+                              </IconButton>
+                           </Box>
+                        </>
+                     ) : (
+                        <Box sx={styles.container}>
+                           <LoadingButton
+                              variant="contained"
+                              loading={activatingMic}
+                              onClick={handleInitializeMic}
+                              startIcon={<MicIcon />}
+                           >
+                              Activate Microphone
+                           </LoadingButton>
                         </Box>
-                     </>
-                  ) : (
-                     <Box sx={styles.container}>
-                        <Button
-                           variant="contained"
-                           onClick={handleInitializeMic}
-                           startIcon={<MicIcon />}
-                        >
-                           Activate Microphone
-                        </Button>
-                     </Box>
-                  )}
+                     )}
+                  </Box>
                </Grid>
             </Grid>
          </DialogContent>
@@ -332,21 +372,29 @@ function StreamPublishingModal({
                   buttonLabel={joinButtonLabel}
                   variant="contained"
                   color="primary"
-                  startIcon={<CheckIcon />}
+                  disabled={publishingStream}
+                  startIcon={
+                     publishingStream ? (
+                        <CircularProgress color="inherit" size={20} />
+                     ) : (
+                        <CheckIcon />
+                     )
+                  }
                   tooltipTitle={labels.joinWithoutCameraTooltip}
-                  buttonAction={onConfirmStream}
+                  buttonAction={handleConfirmPublishStream}
                   confirmDescription={
                      labels.joinWithoutCameraConfirmDescription
                   }
                />
             ) : (
-               <Button
+               <LoadingButton
                   children={joinButtonLabel}
+                  loading={publishingStream}
                   variant="contained"
                   color="primary"
                   disabled={!hasAudioTrack}
                   startIcon={hasAudioTrack && <CheckIcon />}
-                  onClick={onConfirmStream}
+                  onClick={handleConfirmPublishStream}
                />
             )}
          </DialogActions>

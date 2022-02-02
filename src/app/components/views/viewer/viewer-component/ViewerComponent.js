@@ -1,12 +1,15 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
+import {
+   useFirebaseService,
+   withFirebasePage,
+} from "context/firebase/FirebaseServiceContext";
 import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
 import useDevices from "components/custom-hook/useDevices";
 import { useFirebase } from "context/firebase";
 import useMediaSources from "components/custom-hook/useMediaSources";
 import VideoControlsContainer from "components/views/streaming/video-container/VideoControlsContainer";
 import { useAuth } from "HOCs/AuthProvider";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import SettingsModal from "../../streaming/video-container/SettingsModal";
 import { Typography } from "@mui/material";
 import ScreenShareModal from "../../streaming/video-container/ScreenShareModal";
@@ -55,13 +58,13 @@ const useStyles = makeStyles((theme) => ({
 
 function ViewerComponent({
    currentLivestream,
-   firebase,
    handRaiseActive,
    isBreakout,
    showMenu,
    streamerId,
    mobile,
 }) {
+   const firebase = useFirebaseService();
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
    );
@@ -371,4 +374,4 @@ function ViewerComponent({
    );
 }
 
-export default withFirebasePage(ViewerComponent);
+export default ViewerComponent;

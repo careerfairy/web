@@ -1,8 +1,14 @@
 import React from "react";
-import ViewerLayout from "../../../layouts/ViewerLayout";
-import ViewerOverview from "../../../components/views/viewer";
 import Head from "next/head";
+import dynamic from "next/dynamic";
 
+const ViewerLayout = dynamic(() => import("../../../layouts/ViewerLayout"), {
+   ssr: false,
+});
+const ViewerOverview = dynamic(
+   () => import("../../../components/views/viewer"),
+   { ssr: false }
+);
 const ViewerPage = () => {
    return (
       <React.Fragment>
