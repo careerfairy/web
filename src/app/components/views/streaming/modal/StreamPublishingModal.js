@@ -5,8 +5,8 @@ import {
    DialogTitle,
    Typography,
    Slide,
-   DialogContent as MuiDialogContent,
-   DialogActions as MuiDialogActions,
+   DialogContent,
+   DialogActions,
    Dialog,
    Button,
    FormControl,
@@ -17,6 +17,7 @@ import {
    MenuItem,
    Tooltip,
    IconButton,
+   Box,
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import SoundLevelDisplayer from "components/views/common/SoundLevelDisplayer";
@@ -28,24 +29,24 @@ import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    actions: {},
    button: {
       height: "100%",
    },
    container: {
-      paddingTop: 10,
-      paddingBottom: 30,
+      paddingTop: 1,
+      paddingBottom: 3,
       textAlign: "center",
    },
    title: {
       textAlign: "center",
-      marginBottom: 20,
+      marginBottom: 2,
       fontWeight: "700",
       fontSize: "0.9rem",
-      color: "rgb(200,200,200)",
+      color: (theme) => theme.palette.grey[300],
    },
-}));
+};
 
 function StreamPublishingModal({
    displayableMediaStream,
@@ -61,8 +62,6 @@ function StreamPublishingModal({
    const testVideoRef = useRef(null);
    const inputLabel = useRef(null);
    const [labelWidth, setLabelWidth] = useState(0);
-
-   const classes = useStyles();
 
    const agoraRtcConnectionState = useSelector((state) => {
       return state.stream.agoraState.rtcConnectionState;
@@ -151,17 +150,13 @@ function StreamPublishingModal({
       <Dialog TransitionComponent={Slide} open={openModal} fullWidth>
          <DialogTitle
             disableTypography
-            style={{
+            sx={{
                display: "flex",
                justifyContent: "center",
-               alignItems: "flex-end",
+               alignItems: "center",
             }}
-            align="center"
          >
-            <PersonAddIcon
-               style={{ marginRight: "0.5rem" }}
-               fontSize="medium"
-            />{" "}
+            <PersonAddIcon sx={{ mr: 2 }} fontSize="medium" />
             <Typography
                style={{ fontSize: "1.2em", fontWeight: 500 }}
                variant="h5"
@@ -169,23 +164,16 @@ function StreamPublishingModal({
                {labels.mainTitle}
             </Typography>
          </DialogTitle>
-         <MuiDialogContent dividers>
+         <DialogContent dividers>
             <Grid container spacing={2}>
-               <Grid
-                  item
-                  className={classes.actions}
-                  lg={6}
-                  md={6}
-                  sm={6}
-                  xs={12}
-               >
-                  <Typography className={classes.title}>WITH VIDEO</Typography>
+               <Grid item sx={styles.actions} lg={6} md={6} sm={6} xs={12}>
+                  <Typography sx={styles.title}>WITH VIDEO</Typography>
                   {hasVideoTrack ? (
                      <>
                         <FormControl
                            disabled={!devices.videoDeviceList.length}
-                           style={{
-                              marginBottom: 20,
+                           sx={{
+                              marginBottom: 2,
                               fontSize: "0.8rem",
                               width: "100%",
                               maxHeight: 200,
@@ -253,7 +241,7 @@ function StreamPublishingModal({
                         </div>
                      </>
                   ) : (
-                     <div className={classes.container}>
+                     <Box sx={styles.container}>
                         <Button
                            variant="contained"
                            onClick={handleInitializeCamera}
@@ -261,15 +249,15 @@ function StreamPublishingModal({
                         >
                            Activate Camera
                         </Button>
-                     </div>
+                     </Box>
                   )}
                </Grid>
                <Grid item lg={6} md={6} sm={6} xs={12}>
-                  <Typography className={classes.title}>WITH AUDIO</Typography>
+                  <Typography sx={styles.title}>WITH AUDIO</Typography>
                   {hasAudioTrack ? (
                      <>
                         <FormControl
-                           style={{ marginBottom: 10 }}
+                           sx={{ marginBottom: 2 }}
                            disabled={!devices.audioInputList.length}
                            fullWidth
                            variant="outlined"
@@ -301,8 +289,8 @@ function StreamPublishingModal({
                               })}
                            </Select>
                         </FormControl>
-                        <div
-                           style={{
+                        <Box
+                           sx={{
                               width: "100%",
                               height: 150,
                            }}
@@ -310,8 +298,8 @@ function StreamPublishingModal({
                            <SoundLevelDisplayer
                               audioLevel={mediaControls.audioLevel}
                            />
-                        </div>
-                        <div style={{ textAlign: "center" }}>
+                        </Box>
+                        <Box sx={{ textAlign: "center" }}>
                            <IconButton
                               aria-label="delete"
                               size="medium"
@@ -319,10 +307,10 @@ function StreamPublishingModal({
                            >
                               <MicOffIcon fontSize="inherit" />
                            </IconButton>
-                        </div>
+                        </Box>
                      </>
                   ) : (
-                     <div className={classes.container}>
+                     <Box sx={styles.container}>
                         <Button
                            variant="contained"
                            onClick={handleInitializeMic}
@@ -330,12 +318,12 @@ function StreamPublishingModal({
                         >
                            Activate Microphone
                         </Button>
-                     </div>
+                     </Box>
                   )}
                </Grid>
             </Grid>
-         </MuiDialogContent>
-         <MuiDialogActions>
+         </DialogContent>
+         <DialogActions>
             <Tooltip title={labels.refuseTooltip}>
                <Button children={labels.refuseLabel} onClick={onRefuseStream} />
             </Tooltip>
@@ -361,7 +349,7 @@ function StreamPublishingModal({
                   onClick={onConfirmStream}
                />
             )}
-         </MuiDialogActions>
+         </DialogActions>
       </Dialog>
    );
 }
