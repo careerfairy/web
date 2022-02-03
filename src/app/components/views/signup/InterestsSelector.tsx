@@ -58,16 +58,10 @@ export const interestsSubmitHandler = async (interests: InterestsSelectedState,
                                              existingUserInterests?: string[]) => {
   if (!userEmail) return
 
-  const data = []
-  for (let interestUid in interests) {
-    if (interests[interestUid].isSelected) {
-      data.push(interestUid)
-    }
-  }
+  const data = formatInterests(interests)
 
-  // Should we update the user data?
-  if (existingUserInterests && _.isEqual(data.sort(), [...existingUserInterests].sort())) {
-    return // skip, the user data is the same
+  if (userInterestsDidNotChange(data, existingUserInterests)) {
+    return
   }
 
   try {
@@ -75,6 +69,21 @@ export const interestsSubmitHandler = async (interests: InterestsSelectedState,
   } catch (e) {
     dispatch(actions.sendGeneralError(e))
   }
+}
+
+export const userInterestsDidNotChange = (interests: string[], existingUserInterests?: string[]): boolean => {
+  return existingUserInterests && _.isEqual([...interests].sort(), [...existingUserInterests].sort())
+}
+
+export const formatInterests = (interests: InterestsSelectedState): string[] => {
+  const data = []
+  for (let interestUid in interests) {
+    if (interests[interestUid].isSelected) {
+      data.push(interestUid)
+    }
+  }
+
+  return data
 }
 
 export const InterestsChipsSelector = ({interests, setInterests}) => {
