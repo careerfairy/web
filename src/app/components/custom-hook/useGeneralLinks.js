@@ -41,6 +41,11 @@ const initialSecondaryLinks = [
       title: "For Career Centers",
       basePath: "/career-center",
    },
+   {
+      href: `/about-us`,
+      title: "About Us",
+      basePath: "/about-us",
+   },
 ];
 
 const landingLinks = [...initialSecondaryLinks];
