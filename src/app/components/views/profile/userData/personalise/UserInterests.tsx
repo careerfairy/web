@@ -1,9 +1,10 @@
 import {Button, Typography, Box, CircularProgress} from "@mui/material";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
+  formatInterests,
   InterestsChipsSelector,
   InterestsSelectedState,
-  interestsSubmitHandler,
+  interestsSubmitHandler, userInterestsDidNotChange,
 } from "../../../signup/InterestsSelector";
 import {useDispatch} from "react-redux";
 
@@ -17,6 +18,7 @@ const styles = {
 
 const UserInterests = ({userData}) => {
   const [isLoading, setLoading] = useState(false)
+  const [isEditable, setEditable] = useState(false)
   const [interests, setInterests] = useState<InterestsSelectedState>({})
   const dispatch = useDispatch()
 
@@ -25,7 +27,16 @@ const UserInterests = ({userData}) => {
     await interestsSubmitHandler(interests, userData?.id, dispatch, userData?.interestsIds)
     setLoading(false)
   }
-  
+
+  useEffect(() => {
+    if (userInterestsDidNotChange(formatInterests(interests), userData?.interestsIds)) {
+      setEditable(false)
+    } else {
+      setEditable(true)
+    }
+  }, [userData, interests])
+
+
   return (
     <>
       <Typography sx={styles.title} variant="h4">
@@ -43,7 +54,7 @@ const UserInterests = ({userData}) => {
 
       <Box style={{textAlign: 'center'}}>
         <Button variant="contained" color="primary"
-                disabled={isLoading}
+                disabled={!isEditable || isLoading}
                 startIcon={
                   isLoading && (<CircularProgress size={20} color="inherit"/>)
                 }
