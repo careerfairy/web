@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { isEmpty, isLoaded } from "react-redux-firebase";
 import {
-   Archive as PastStreamIcon,
    BarChart2 as AnalyticsIcon,
    Edit as EditGroupIcon,
-   FileText as DraftStreamIcon,
    Film as StreamIcon,
    User as ProfileIcon,
    Users as RolesIcon,
@@ -29,6 +27,11 @@ const initialDrawerBottomLinks = [
    {
       href: `https://corporate.careerfairy.io/career-center`,
       title: "FOR CAREER CENTERS",
+   },
+   {
+      href: `/about-us`,
+      title: "About Us",
+      basePath: "/about-us",
    },
 ];
 const useDashboardLinks = (group) => {

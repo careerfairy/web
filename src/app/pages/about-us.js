@@ -1,15 +1,13 @@
 import React from "react";
-import HeroSection from "../components/views/team/HeroSection";
-import TeamBiosSection from "../components/views/team/TeamBiosSection";
+import HeroSection from "../components/views/aboutUs/HeroSection";
+import TeamBiosSection from "../components/views/aboutUs/TeamBiosSection";
 import { useTheme } from "@mui/material/styles";
 import UpcomingLayout from "../layouts/UpcomingLayout";
-import ValuesSection from "../components/views/team/ValuesSection";
+import ValuesSection from "../components/views/aboutUs/ValuesSection";
 import { honestyShape, ideaShape, qualityShape } from "../constants/images";
 
-const placeholderBackground =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2F6098fdd8-f209-4736-8db7-d86025eb1806_CF.PNG?alt=media";
 const teamPhoto =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fteam-photo.jpeg?alt=media&token=42a24b6a-8b26-4493-a460-75fb20e11bf9";
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fgroup-photo-cropped.jpg?alt=media&token=35319d7b-38a0-474f-935f-4f5890c37717";
 const TeamPage = () => {
    const {
       palette: {
@@ -50,8 +48,7 @@ const TeamPage = () => {
          <HeroSection
             color={white}
             backgroundColor={navyBlue.main}
-            // backgroundImage={placeholderBackground}
-            backgroundImagePosition="top"
+            backgroundImagePosition="center center"
             backgroundImage={teamPhoto}
             backgroundImageOpacity={0.2}
             title="About Us"
