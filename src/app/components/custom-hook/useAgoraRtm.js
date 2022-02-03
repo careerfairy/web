@@ -27,10 +27,8 @@ export default function useAgoraRtm(roomId, userId) {
    }, []);
 
    useEffect(() => {
-      if (rtmClient) {
-         joinAgoraRtmChannel(rtmClient, roomId, userId);
-      }
-   }, [rtmClient]);
+      joinAgoraRtmChannel(roomId, userId);
+   }, []);
 
    const onConnectionStateChanged = (newState, reason) => {
       if (newState === "DISCONNECTED") {
@@ -51,7 +49,7 @@ export default function useAgoraRtm(roomId, userId) {
       }
    };
 
-   const joinAgoraRtmChannel = async (rtmClient, roomId, userUid) => {
+   const joinAgoraRtmChannel = async (roomId, userUid) => {
       const { data } = await fetchAgoraRtmToken({
          uid: userUid,
       });
