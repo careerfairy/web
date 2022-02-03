@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { AppBar, Box, CircularProgress, Tabs } from "@mui/material";
 import { useAuth } from "../../../../../HOCs/AuthProvider";
 import NewStreamModal from "./NewStreamModal";
@@ -54,6 +54,7 @@ const EventsOverview = ({ group, scrollRef }) => {
       addLivestream,
       deleteLivestream,
       getAllGroupAdminInfo,
+      sendNewlyPublishedEventEmail,
    } = useFirebaseService();
    const [streams, setStreams] = useState([]);
    const [openNewStreamModal, setOpenNewStreamModal] = useState(false);
@@ -160,27 +161,23 @@ const EventsOverview = ({ group, scrollRef }) => {
             );
 
             const senderName = `${userData.firstName} ${userData.lastName}`;
-            const senderEmail = userData.userEmail;
 
-            await DataAccessUtil.sendNewlyPublishedEventEmail({
-               adminsInfo,
+            await sendNewlyPublishedEventEmail({
+               adminsInfo: adminsInfo || [],
                senderName,
                stream: newStream,
                submitTime,
-               senderEmail,
             });
             await deleteLivestream(streamObj.id, "draftLivestreams");
-            await replace(
-               asPath,
-               { query: { eventId: publishedStreamId } },
-               { shallow: true }
+            replace(
+               `/group/${group.id}/admin/events?eventId=${publishedStreamId}`
             );
          } catch (e) {
             setPublishingDraft(false);
             dispatch(actions.sendGeneralError(e));
          }
       },
-      [dispatch, userData]
+      [dispatch, userData, group.id, replace]
    );
 
    const handleChange = (event, newValue) => {

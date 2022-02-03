@@ -94,6 +94,13 @@ class FirebaseService {
       return createUserInAuthAndFirebase({ userData });
    };
 
+   sendNewlyPublishedEventEmail = async (emailData) => {
+      const sendNewlyPublishedEventEmail = this.functions.httpsCallable(
+         "sendNewlyPublishedEventEmail"
+      );
+      return sendNewlyPublishedEventEmail(emailData);
+   };
+
    validateUserEmailWithPin = async (userInfo) => {
       const validateUserEmailWithPin = this.functions.httpsCallable(
          "validateUserEmailWithPin"

@@ -26,6 +26,11 @@ const initialDrawerBottomLinks = [
       href: `https://corporate.careerfairy.io/career-center`,
       title: "FOR CAREER CENTERS",
    },
+   {
+      href: `/about-us`,
+      title: "About Us",
+      basePath: "/about-us",
+   },
 ];
 const useAdminLinks = () => {
    const { authenticatedUser, userData } = useAuth();

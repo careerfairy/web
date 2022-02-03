@@ -1,5 +1,5 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { Container } from "@mui/material";
 import TeamBios from "./TeamBios";
 import Section from "../../common/Section";
@@ -21,7 +21,7 @@ const people = [
    {
       id: 1,
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fthomas.png?alt=media&token=59096526-3f08-45db-843c-d3a46bf4a672",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fthomas.jpg?alt=media&token=0edea68e-b08e-40fe-a33a-fd48657a5865",
       name: "Thomas Schulz",
       role: "CEO",
       bio:
@@ -32,7 +32,7 @@ const people = [
    {
       id: 2,
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fmax.png?alt=media&token=a44fa587-3528-4b26-afb2-a2534efbea24",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fmax.jpg?alt=media&token=0ec96792-9c2d-4741-9f73-75c668a78153",
       name: "Maximilian Voss",
       role: "CTO",
       bio:
@@ -43,27 +43,27 @@ const people = [
    {
       id: 3,
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fhabib.png?alt=media&token=3e63007f-075b-473b-bc29-a16fa624cc66",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fhabib.jpg?alt=media&token=572dadf8-2e04-4da8-81d2-08f6060cdca8",
       name: "Habib Kadiri",
       role: "Software Engineer",
       bio:
          "With his training as a Full-Stack developer at SIT Academy and with a strong passion for coding, Habib’s knowledgeable understanding of front-end frameworks allows him to design and implement features based on the needs of our ever growing platform. \n\nIn his free time, he likes to workout and help others get in shape.\n",
       linkedinUrl: "https://www.linkedin.com/in/habib-kadiri/",
    },
-   {
-      id: 4,
-      avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fsolene.png?alt=media&token=f050377b-1d62-4775-8893-88a059bb9627",
-      name: "Solène Wolf",
-      role: "Business Development & Strategy",
-      bio:
-         "Solène owns a Master in Management from Skema Business School in France and started her international path during her exchange semesters in Munich, Germany and Québec, Canada.\nStarting her career in HR Marketing for Alstom in Switzerland made her decide to join Randstad Professionals to deepen her knowledge in recruitment. This experiences were later applied at the Career Center of the Swiss Federal Institute of Technology (ETH Zürich), where she helped students find the right career start. This path naturally lead her to CareerFairy where she enables companies to attract their next generation of talents and realises her purpose: helping students get the insights they need to start their career. \n\nShe loves to spend time with her friends and family, hiking or skiing in the Swiss mountains.\n",
-      linkedinUrl: "https://www.linkedin.com/in/solwolff/",
-   },
+   // {
+   //    id: 4,
+   //    avatar:
+   //       "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fsolene.png?alt=media&token=f050377b-1d62-4775-8893-88a059bb9627",
+   //    name: "Solène Wolf",
+   //    role: "Business Development & Strategy",
+   //    bio:
+   //       "Solène owns a Master in Management from Skema Business School in France and started her international path during her exchange semesters in Munich, Germany and Québec, Canada.\nStarting her career in HR Marketing for Alstom in Switzerland made her decide to join Randstad Professionals to deepen her knowledge in recruitment. This experiences were later applied at the Career Center of the Swiss Federal Institute of Technology (ETH Zürich), where she helped students find the right career start. This path naturally lead her to CareerFairy where she enables companies to attract their next generation of talents and realises her purpose: helping students get the insights they need to start their career. \n\nShe loves to spend time with her friends and family, hiking or skiing in the Swiss mountains.\n",
+   //    linkedinUrl: "https://www.linkedin.com/in/solwolff/",
+   // },
    {
       id: 5,
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Ffabian.png?alt=media&token=24c885e3-36e8-4c53-a95e-f3081a352a1a",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Ffabian.jpg?alt=media&token=77bab994-e8b9-4894-ae18-c2442c4c3ced",
       name: "Fabian Koolstra",
       role: "Sales",
       bio:
@@ -73,7 +73,7 @@ const people = [
    {
       id: 6,
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FKandee.jfif?alt=media&token=2906ff55-a50b-4667-a045-f726304e8436",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fkandee.jpg?alt=media&token=c2424e74-a6b5-4ffc-b9e8-6d3344960984",
       name: "Kandeeban Uthayarajah",
       role: "Business Development",
       bio:
@@ -84,7 +84,7 @@ const people = [
    {
       id: 7,
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FRamona.jfif?alt=media&token=11cc6d3b-dfed-49f3-9dc6-511d270936a8",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Framona.jpg?alt=media&token=49030c21-a7ad-4bae-8a1a-e027234e9215",
       name: "Ramona Neff",
       role: "Marketing",
       bio:
@@ -94,7 +94,7 @@ const people = [
    {
       id: 8,
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FMikhail.jfif?alt=media&token=68926cde-2e93-4262-8915-9a308d18acf2",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fmikhail.jpg?alt=media&token=36f7ebfa-e4b0-4b37-a546-973d5c2b9aaa",
       name: "Mikhail Asryan",
       role: "Business Development",
       bio:
@@ -104,7 +104,7 @@ const people = [
    {
       id: 9,
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FGary.jfif?alt=media&token=bf7b86a0-e9a7-4212-9a2e-a5c0800d74c8",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fgary.jpg?alt=media&token=c5893021-c141-43af-89cc-b3d440cbad78",
       name: "Gary Terol",
       role: "Business Development & Strategy",
       bio: "",
@@ -113,7 +113,7 @@ const people = [
    {
       id: 10,
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fcarlos.jfif?alt=media&token=970b3bda-001a-4612-abc3-19b6c97b93ef",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fcarlos.jpg?alt=media&token=be83b56c-a848-4028-8a2f-a1a293a80c62",
       name: "Carlos Florêncio",
       role: "Software Engineer",
       bio:
@@ -121,6 +121,29 @@ const people = [
          "\n" +
          "In his free time, he's developing side projects and spending time with friends.\n",
       linkedinUrl: "https://www.linkedin.com/in/carlosflorencio/",
+   },
+   {
+      id: 11,
+      avatar:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Flinda.jpg?alt=media&token=c8585b38-ca90-4093-9f28-eb37d485d8ed",
+      name: "Linda Fairgrieve",
+      role: "B2B Content Marketing",
+      bio:
+         "After obtaining the Swiss Federal Marketing Diploma as a generalist, Linda gained her digital marketing scars on the front lines of Swiss Digital Agencies. Passionate about B2B sector and communication, she never stops learning and has found that Content Management for startup growth is her playground of choice.\n\n" +
+         "When she is not reading marketing blogs or testing new martech tools, she makes memories in the company of her colourful ‘family of friends’ discovering new wine varieties.",
+      linkedinUrl: "https://www.linkedin.com/in/lindafairgrieve/",
+   },
+   {
+      id: 12,
+      avatar:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fzippy.jpg?alt=media&token=e7221990-e3fe-4453-9fc8-f4377251e448",
+      name: "Zarbab Aamir",
+      role: "Marketing Intern",
+      bio:
+         "Zarbab (but call her Zippy) has recently graduated with a bachelor’s in International Business Management with a major in Digital Marketing. Zippy joined the team as a marketing intern to gain further skills and knowledge in the field of marketing. She believes this experience will give her the right skill-set when moving forward with her career. \n" +
+         "\n" +
+         "In her free-time she loves to DJ, listen to lots of music, read and spend time with her friends.\n",
+      linkedinUrl: "https://www.linkedin.com/in/zarbab-aamir-601065b1/",
    },
 ];
 

@@ -1,13 +1,21 @@
 import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { Box, Container, Typography } from "@mui/material";
 import Section from "../../common/Section";
 import SectionHeader from "../../common/SectionHeader";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
+   section: {
+      height: {
+         sm: "100%",
+         lg: "100vh",
+      },
+      display: "flex",
+      alignItems: "center",
+   },
    container: {
-      paddingTop: theme.spacing(2),
+      paddingTop: (theme) => theme.spacing(2),
       zIndex: 1,
       "&.MuiContainer-root": {
          position: "relative",
@@ -16,41 +24,34 @@ const useStyles = makeStyles((theme) => ({
    title: {
       fontWeight: 500,
    },
-   subTitle: {},
    bodyText: {
-      color: theme.palette.common.white,
+      color: (theme) => theme.palette.common.white,
       opacity: 0.9,
    },
-}));
+};
 
 const HeroSection = (props) => {
-   const classes = useStyles();
-
    return (
       <Section
          big
          color={props.color}
+         sx={styles.section}
          backgroundImage={props.backgroundImage}
          backgroundImagePosition={props.backgroundImagePosition}
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         <Container className={classes.container}>
+         <Container sx={styles.container}>
             <SectionHeader
                color={props.color}
                title={props.title}
-               titleClassName={classes.title}
-               subTitleClassName={classes.subTitle}
+               titleSx={styles.title}
                subTitleVariant="h5"
                titleVariant="h3"
                subtitle={props.subtitle}
             />
             <Box marginTop={3}>
-               <Typography
-                  align="center"
-                  variant="h6"
-                  className={classes.bodyText}
-               >
+               <Typography align="center" variant="h6" sx={styles.bodyText}>
                   {props.bodyText}
                </Typography>
             </Box>
