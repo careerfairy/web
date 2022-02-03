@@ -1,11 +1,6 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import {
-   useFirebaseService,
-   withFirebasePage,
-} from "context/firebase/FirebaseServiceContext";
-import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useDevices from "components/custom-hook/useDevices";
-import { useFirebase } from "context/firebase";
 import useMediaSources from "components/custom-hook/useMediaSources";
 import VideoControlsContainer from "components/views/streaming/video-container/VideoControlsContainer";
 import { useAuth } from "HOCs/AuthProvider";
@@ -13,8 +8,6 @@ import makeStyles from "@mui/styles/makeStyles";
 import SettingsModal from "../../streaming/video-container/SettingsModal";
 import { Typography } from "@mui/material";
 import ScreenShareModal from "../../streaming/video-container/ScreenShareModal";
-import LoadingModal from "components/views/streaming/modal/LoadingModal";
-import ErrorModal from "components/views/streaming/modal/ErrorModal";
 import useStreamRef from "../../../custom-hook/useStreamRef";
 import EmoteButtons from "../EmoteButtons";
 import { useDispatch, useSelector } from "react-redux";
@@ -64,7 +57,10 @@ function ViewerComponent({
    streamerId,
    mobile,
 }) {
-   const firebase = useFirebaseService();
+   const {
+      setDesktopMode: setDesktopModeInstanceMethod,
+      updateHandRaiseRequest,
+   } = useFirebaseService();
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
    );
@@ -80,7 +76,6 @@ function ViewerComponent({
       showLocalStreamPublishingModal,
       setShowLocalStreamPublishingModal,
    ] = useState(false);
-   const { updateHandRaiseRequest } = useFirebase();
    const [handRaiseState, updateRequest] = useHandRaiseState(streamerId);
    const streamRef = useStreamRef();
    const {
@@ -184,7 +179,8 @@ function ViewerComponent({
    const setDesktopMode = async (mode, initiatorId) => {
       let screenSharerId =
          mode === "desktop" ? initiatorId : currentLivestream.screenSharerId;
-      await firebase.setDesktopMode(streamRef, mode, screenSharerId);
+      await setDesktopModeInstanceMethod,
+         updateHandRaiseRequest(streamRef, mode, screenSharerId);
    };
 
    const shareDesktopOrSlides = () =>
