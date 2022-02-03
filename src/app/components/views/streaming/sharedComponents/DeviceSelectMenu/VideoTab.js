@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types";
 import React, { useEffect, useRef, useState } from "react";
 import {
    Button,
@@ -13,7 +13,8 @@ import {
    DialogContent,
    OutlinedInput,
 } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
+import useLocalStorageMediaSources from "../../../../custom-hook/useLocalStorageMediaSources";
 
 const useStyles = makeStyles((theme) => ({
    actions: {
@@ -33,8 +34,7 @@ const VideoTab = ({
    displayableMediaStream,
 }) => {
    const classes = useStyles();
-// console.log("-> devices in video Tab", devices);
-// console.log("-> setVideoSource", setVideoSource);
+   const { setVideoSourceId } = useLocalStorageMediaSources();
    const testVideoRef = useRef(null);
    const inputLabel = useRef(null);
    const [labelWidth, setLabelWidth] = useState(0);
@@ -50,7 +50,9 @@ const VideoTab = ({
    }, []);
 
    const handleChangeCam = (event) => {
-      setVideoSource(event.target.value);
+      const id = event.target.value;
+      setVideoSourceId(id);
+      setVideoSource(id);
    };
 
    return (
@@ -118,11 +120,10 @@ const VideoTab = ({
 };
 
 VideoTab.propTypes = {
-  devices: PropTypes.array,
-  displayableMediaStream: PropTypes.object,
-  setVideoSource: PropTypes.func.isRequired,
-  videoSource: PropTypes.any
-}
+   devices: PropTypes.array,
+   displayableMediaStream: PropTypes.object,
+   setVideoSource: PropTypes.func.isRequired,
+   videoSource: PropTypes.any,
+};
 
 export default VideoTab;
-

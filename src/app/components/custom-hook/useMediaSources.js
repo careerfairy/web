@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSoundMeter } from "./useSoundMeter";
+import { useDispatch } from "react-redux";
+import * as actions from "store/actions";
+import useLocalStorageMediaSources from "./useLocalStorageMediaSources";
 
 export default function useMediaSources(
    devices,
@@ -7,36 +10,40 @@ export default function useMediaSources(
    showSoundMeter,
    active
 ) {
-   // console.count("-> useMediaSources");
+   const {
+      storedAudioSourceId,
+      storedVideoSourceId,
+   } = useLocalStorageMediaSources();
+   const dispatch = useDispatch();
    const [audioSource, setAudioSource] = useState(null);
    const [videoSource, setVideoSource] = useState(null);
 
    const [localMediaStream, setLocalMediaStream] = useState(null);
 
-   // useEffect(() => {
-   //    if (active && localStream) {
-   //       let mediaStream = undefined;
-   //       if (!localMediaStream) {
-   //          mediaStream = new MediaStream();
-   //       } else {
-   //          mediaStream = localMediaStream;
-   //          cleanupDisplayableMediaStream(mediaStream);
-   //       }
-   //       if (localStream.audioTrack) {
-   //          mediaStream.addTrack(localStream.audioTrack.getMediaStreamTrack());
-   //       }
-   //       if (localStream.videoTrack) {
-   //          mediaStream.addTrack(localStream.videoTrack.getMediaStreamTrack());
-   //       }
-   //       setLocalMediaStream(mediaStream);
-   //    }
-   // }, [
-   //    localStream,
-   //    localStream?.audioTrack,
-   //    localStream?.videoTrack,
-   //    localStream?.videoTrack?.getMediaStreamTrack().getSettings().deviceId,
-   //    active,
-   // ]);
+   useEffect(() => {
+      if (active && localStream) {
+         let mediaStream = undefined;
+         if (!localMediaStream) {
+            mediaStream = new MediaStream();
+         } else {
+            mediaStream = localMediaStream;
+            cleanupDisplayableMediaStream(mediaStream);
+         }
+         if (localStream.audioTrack) {
+            mediaStream.addTrack(localStream.audioTrack.getMediaStreamTrack());
+         }
+         if (localStream.videoTrack) {
+            mediaStream.addTrack(localStream.videoTrack.getMediaStreamTrack());
+         }
+         setLocalMediaStream(mediaStream);
+      }
+   }, [
+      localStream,
+      localStream?.audioTrack,
+      localStream?.videoTrack,
+      localStream?.videoTrack?.getMediaStreamTrack().getSettings().deviceId,
+      active,
+   ]);
 
    const cleanupDisplayableMediaStream = (mediaStream) => {
       const audioTracks = mediaStream.getAudioTracks();
@@ -54,68 +61,95 @@ export default function useMediaSources(
       localStream?.audioTrack?.getMediaStreamTrack()
    );
 
-   // useEffect(() => {
-   //    if (active && devices && localStream) {
-   //       if (devices.audioInputList && devices.audioInputList.length > 0) {
-   //          if (localStream.audioTrack) {
-   //             updateAudioSource(devices.audioInputList[0].value);
-   //          }
-   //       }
-   //       if (devices.videoDeviceList && devices.videoDeviceList.length > 0) {
-   //          if (localStream.videoTrack) {
-   //             updateVideoSource(devices.videoDeviceList[0].value);
-   //          }
-   //       }
-   //    }
-   // }, [devices, localStream?.uid, active]);
+   useEffect(() => {
+      if (
+         active &&
+         devices.videoDeviceList?.length &&
+         localStream?.videoTrack
+      ) {
+         const newVideoSource =
+            devices.videoDeviceList.find(
+               (device) => device.value === storedVideoSourceId
+            )?.value || devices.videoDeviceList[0].value;
+         return updateVideoSource(newVideoSource);
+      }
+   }, [
+      devices,
+      localStream?.uid,
+      active,
+      localStream.videoTrack,
+      storedVideoSourceId,
+   ]);
 
-   // useEffect(() => {
-   //    if (localStream) {
-   //       if (!localStream.audioTrack) {
-   //          setAudioSource(null);
-   //       }
-   //       if (!localStream.videoTrack) {
-   //          setVideoSource(null);
-   //       }
-   //    }
-   // }, [localStream?.audioTrack, localStream?.videoTrack]);
+   useEffect(() => {
+      if (active && devices.audioInputList?.length && localStream?.audioTrack) {
+         const newAudioSource =
+            devices.audioInputList.find(
+               (device) => device.value === storedAudioSourceId
+            )?.value || devices.audioInputList[0].value;
+         return updateAudioSource(newAudioSource);
+      }
+   }, [
+      devices,
+      localStream?.uid,
+      active,
+      localStream.audioTrack,
+      storedAudioSourceId,
+   ]);
+
+   useEffect(() => {
+      if (localStream) {
+         if (!localStream.audioTrack) {
+            setAudioSource(null);
+         }
+         if (!localStream.videoTrack) {
+            setVideoSource(null);
+         }
+      }
+   }, [localStream?.audioTrack, localStream?.videoTrack]);
 
    const updateAudioSource = useCallback(
-      (deviceId) => {
+      async (deviceId) => {
          if (!localStream.audioTrack) return;
-         const currentDeviceId = localStream.audioTrack
-            .getMediaStreamTrack()
-            .getSettings().deviceId;
-         if (currentDeviceId !== deviceId) {
-            localStream.audioTrack.setDevice(deviceId).then(() => {
+         try {
+            const currentDeviceId = localStream.audioTrack
+               .getMediaStreamTrack()
+               .getSettings().deviceId;
+            if (currentDeviceId !== deviceId) {
+               localStream.audioTrack.setDevice(deviceId).then(() => {
+                  setAudioSource(deviceId);
+               });
+            } else {
                setAudioSource(deviceId);
-            });
-         } else {
-            setAudioSource(deviceId);
+            }
+         } catch (e) {
+            dispatch(actions.sendGeneralError(e));
          }
       },
       [localStream?.audioTrack]
    );
 
    const updateVideoSource = useCallback(
-      (deviceId) => {
+      async (deviceId) => {
          if (!localStream.videoTrack) return;
-         const currentDeviceId = localStream.videoTrack
-            .getMediaStreamTrack()
-            .getSettings().deviceId;
-         if (currentDeviceId !== deviceId) {
-            localStream.videoTrack.setDevice(deviceId).then(() => {
+         try {
+            const currentDeviceId = localStream.videoTrack
+               .getMediaStreamTrack()
+               .getSettings().deviceId;
+            if (currentDeviceId !== deviceId) {
+               await localStream.videoTrack.setDevice(deviceId);
                setVideoSource(deviceId);
-            });
-         } else {
-            setVideoSource(deviceId);
+            } else {
+               setVideoSource(deviceId);
+            }
+         } catch (e) {
+            dispatch(actions.sendGeneralError(e));
          }
       },
       [localStream?.videoTrack]
    );
 
    const mediaControls = useMemo(() => {
-      console.log("-> Media controls changed!");
       return {
          audioSource,
          updateAudioSource,

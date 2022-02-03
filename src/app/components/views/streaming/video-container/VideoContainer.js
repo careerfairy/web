@@ -303,28 +303,28 @@ function VideoContainer({
             livestreamId={currentLivestream.id}
             presenter
          />
-         {/*<StreamPublishingModal*/}
-         {/*   open={showLocalStreamPublishingModal}*/}
-         {/*   setOpen={setShowLocalStreamPublishingModal}*/}
-         {/*   localStream={localStream}*/}
-         {/*   displayableMediaStream={displayableMediaStream}*/}
-         {/*   devices={devices}*/}
-         {/*   mediaControls={mediaControls}*/}
-         {/*   onConfirmStream={handlePublishLocalStream}*/}
-         {/*   onRefuseStream={handleJoinAsViewer}*/}
-         {/*   localMediaEnabling={localMediaEnabling}*/}
-         {/*   labels={{*/}
-         {/*      mainTitle: "Join the Stream",*/}
-         {/*      refuseTooltip:*/}
-         {/*         "Join without camera nor microphone. You will still be able to watch the streamers, give written answers to questions, share your screen and control slides.",*/}
-         {/*      refuseLabel: "I am only watching",*/}
-         {/*      joinWithoutCameraLabel: "Join without camera",*/}
-         {/*      joinWithoutCameraTooltip:*/}
-         {/*         "We recommend to activate your camera for a better experience.",*/}
-         {/*      joinButtonLabel: "Join as streamer",*/}
-         {/*      disabledJoinButtonLabel: "Activate microphone to join",*/}
-         {/*   }}*/}
-         {/*/>*/}
+         <StreamPublishingModal
+            open={showLocalStreamPublishingModal}
+            setOpen={setShowLocalStreamPublishingModal}
+            localStream={localStream}
+            displayableMediaStream={displayableMediaStream}
+            devices={devices}
+            mediaControls={mediaControls}
+            onConfirmStream={handlePublishLocalStream}
+            onRefuseStream={handleJoinAsViewer}
+            localMediaEnabling={localMediaEnabling}
+            labels={{
+               mainTitle: "Join the Stream",
+               refuseTooltip:
+                  "Join without camera nor microphone. You will still be able to watch the streamers, give written answers to questions, share your screen and control slides.",
+               refuseLabel: "I am only watching",
+               joinWithoutCameraLabel: "Join without camera",
+               joinWithoutCameraTooltip:
+                  "We recommend to activate your camera for a better experience.",
+               joinButtonLabel: "Join as streamer",
+               disabledJoinButtonLabel: "Activate microphone to join",
+            }}
+         />
          <VideoControlsContainer
             currentLivestream={currentLivestream}
             handleClickScreenShareButton={handleClickScreenShareButton}

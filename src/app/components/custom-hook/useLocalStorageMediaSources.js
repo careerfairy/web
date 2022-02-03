@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useLocalStorage } from "react-use";
-// import { getDevices } from "agora-rtc-sdk";
 
 const useLocalStorageMediaSources = () => {
-   const [devices, setDevices] = useState([]);
    const [
       storedAudioSourceId,
       setAudioSourceId,
@@ -14,15 +12,6 @@ const useLocalStorageMediaSources = () => {
       setVideoSourceId,
       removeVideoSourceId,
    ] = useLocalStorage("videoSourceId");
-
-   useEffect(() => {
-      initDevices();
-   }, []);
-
-   const initDevices = async () => {
-      // const newDevices = await getDevices();
-      // console.log("-> newDevices", newDevices);
-   };
 
    const storeNewMediaSources = useCallback(
       ({ audioSourceId, videoSourceId }) => {

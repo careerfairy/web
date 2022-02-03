@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types";
 import React, { useEffect, useRef, useState } from "react";
 import {
    Box,
@@ -12,8 +12,9 @@ import {
    Typography,
 } from "@mui/material";
 import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useAudio } from "components/custom-hook/useAudio";
+import useLocalStorageMediaSources from "../../../../custom-hook/useLocalStorageMediaSources";
 
 const useStyles = makeStyles((theme) => ({
    button: {
@@ -50,12 +51,16 @@ const useStyles = makeStyles((theme) => ({
 
 const AudioTab = ({ audioLevel, audioSource, devices, setAudioSource }) => {
    const classes = useStyles();
+   const { setAudioSourceId } = useLocalStorageMediaSources();
+
    const [playing, toggle, audio] = useAudio(
       "https://www.kozco.com/tech/piano2-CoolEdit.mp3"
    );
 
    const handleChangeMic = (event) => {
-      setAudioSource(event.target.value);
+      const id = event.target.value;
+      setAudioSource(id);
+      setAudioSourceId(id);
    };
 
    return (
@@ -118,8 +123,8 @@ const AudioTab = ({ audioLevel, audioSource, devices, setAudioSource }) => {
 export default AudioTab;
 
 AudioTab.propTypes = {
-  audioLevel: PropTypes.any,
-  audioSource: PropTypes.any,
-  devices: PropTypes.array,
-  setAudioSource: PropTypes.func.isRequired
-}
+   audioLevel: PropTypes.any,
+   audioSource: PropTypes.any,
+   devices: PropTypes.array,
+   setAudioSource: PropTypes.func.isRequired,
+};

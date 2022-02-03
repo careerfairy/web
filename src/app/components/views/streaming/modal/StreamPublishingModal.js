@@ -81,12 +81,7 @@ function StreamPublishingModal({
    const [activatingCamera, setActivatingCamera] = useState(false);
    const [activatingMic, setActivatingMic] = useState(false);
    const [publishingStream, setPublishingStream] = useState(false);
-   const {
-      storeNewMediaSources,
-      storedVideoSourceId,
-      storedAudioSourceId,
-      setStoredPreferredMediaControls,
-   } = useLocalStorageMediaSources();
+   const { storeNewMediaSources } = useLocalStorageMediaSources();
 
    const testVideoRef = useRef(null);
    const dispatch = useDispatch();
@@ -101,11 +96,6 @@ function StreamPublishingModal({
          agoraRtcConnectionState === AGORA_RTC_CONNECTION_STATE_CONNECTED
       );
    }, [open, agoraRtcConnectionState]);
-
-   useEffect(() => {
-      console.log("-> SETTING");
-      // setStoredPreferredMediaControls(mediaControls, devices);
-   }, [devices, mediaControls]);
 
    useEffect(() => {
       if (
@@ -232,7 +222,6 @@ function StreamPublishingModal({
                               </InputLabel>
                               <Select
                                  labelId="camera-select-label"
-                                 defaultValue={storedVideoSourceId}
                                  value={mediaControls.videoSource || ""}
                                  onChange={handleChangeCam}
                                  id="cameraSelect"
@@ -306,7 +295,6 @@ function StreamPublishingModal({
                               </InputLabel>
                               <Select
                                  value={mediaControls.audioSource || ""}
-                                 defaultValue={storedAudioSourceId}
                                  fullWidth
                                  labelId="microphone-select-label"
                                  onChange={handleChangeMic}
