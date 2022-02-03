@@ -53,11 +53,9 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(
    }
 );
 
-exports.sendNewlyPublishedEventEmail = functions.https.onRequest(
-   async (req, res) => {
-      setHeaders(req, res);
-
-      const adminsInfo = req.body.adminsInfo || [];
+exports.sendNewlyPublishedEventEmail = functions.https.onCall(async (data) => {
+   try {
+      const { adminsInfo, senderName, stream, submitTime } = data;
 
       functions.logger.log("admins Info in newly published event", adminsInfo);
 
@@ -67,12 +65,12 @@ exports.sendNewlyPublishedEventEmail = functions.https.onRequest(
             From: "CareerFairy <noreply@careerfairy.io>",
             To: email,
             TemplateModel: {
-               sender_name: req.body.sender_name,
+               sender_name: senderName,
                dashboard_link: eventDashboardLink,
                next_livestreams_link: nextLivestreamsLink,
-               livestream_title: req.body.livestream_title,
-               livestream_company_name: req.body.livestream_company_name,
-               submit_time: req.body.submit_time,
+               livestream_title: stream.title,
+               livestream_company_name: stream.company,
+               submit_time: submitTime,
             },
          })
       );
@@ -85,16 +83,19 @@ exports.sendNewlyPublishedEventEmail = functions.https.onRequest(
                   response
                )
             );
-            return res.send(200);
          },
          (error) => {
-            functions.logger.error("error:" + error);
-            console.log("error:" + error);
-            return res.status(400).send(error);
+            functions.logger.error(
+               "sendEmailBatchWithTemplates error:" + error
+            );
+            throw new functions.https.HttpsError("unknown", error);
          }
       );
+   } catch (e) {
+      functions.logger.error("e:" + e);
+      throw new functions.https.HttpsError("unknown", e);
    }
-);
+});
 
 exports.getLivestreamReportData = functions.https.onCall(
    async (data, context) => {
