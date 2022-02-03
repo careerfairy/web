@@ -5,10 +5,11 @@ import {useFirebaseService} from "../../context/firebase/FirebaseServiceContext"
  * Fetch a Firestore collection
  *
  * We should migrate to something like ReactFire
+ * TODO: Add query support
  * @param collection Name of the collection
  * @param realtime Listens for updates on the documents
  */
-function useCollection<T>(collection: string, realtime: boolean = false): T[] {
+function useCollection<T extends Identifiable>(collection: string, realtime: boolean = false): T[] {
   const {firestore} = useFirebaseService();
   const [interests, setInterests] = useState<T[]>([])
 
@@ -24,7 +25,10 @@ function useCollection<T>(collection: string, realtime: boolean = false): T[] {
     function updateLocal(querySnapshot) {
       const list = []
       querySnapshot.forEach(doc => {
-        list.push(doc.data())
+        list.push({
+          ...doc.data(),
+          id: doc.id
+        })
       })
       setInterests(list)
     }
@@ -33,5 +37,12 @@ function useCollection<T>(collection: string, realtime: boolean = false): T[] {
 
   return interests;
 };
+
+/**
+ * Every firebase document should have an ID
+ */
+export interface Identifiable {
+  id: string
+}
 
 export default useCollection;
