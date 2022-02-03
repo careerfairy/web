@@ -7,19 +7,16 @@ import React, {
 } from "react";
 
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
-import useAgoraAsStreamer from "components/custom-hook/useAgoraAsStreamer";
 import VideoControlsContainer from "./VideoControlsContainer";
-import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
 import useDevices from "components/custom-hook/useDevices";
-import makeStyles from "@mui/styles/makeStyles";
 import TutorialContext from "context/tutorials/TutorialContext";
 import DemoIntroModal from "../modal/DemoIntroModal";
 import DemoEndModal from "../modal/DemoEndModal";
 
 import useMediaSources from "components/custom-hook/useMediaSources";
 import WifiIndicator from "./WifiIndicator";
-import LoadingModal from "../modal/LoadingModal";
-import ErrorModal from "../modal/ErrorModal";
+// import LoadingModal from "../modal/LoadingModal";
+// import ErrorModal from "../modal/ErrorModal";
 import SettingsModal from "./SettingsModal";
 import ScreenShareModal from "./ScreenShareModal";
 import useStreamRef from "../../../custom-hook/useStreamRef";
@@ -42,7 +39,6 @@ function VideoContainer({
    streamerId,
    viewer,
 }) {
-   // console.count("VideoContainer");
    const firebase = useFirebaseService();
    const {
       tutorialSteps,

@@ -3,11 +3,14 @@ import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as actions from "../../store/actions";
+import AgoraRTM from "agora-rtm-sdk";
 
 const AGORA_APP_ID = "53675bc6d3884026a72ecb1de3d19eb1";
+const rtmClient = AgoraRTM.createInstance(AGORA_APP_ID, {
+   logFilter: AgoraRTM.LOG_FILTER_ERROR,
+});
 
 export default function useAgoraRtm(roomId, userId) {
-   const [rtmClient, setRtmClient] = useState(null);
    const [rtmChannel, setRtmChannel] = useState(null);
    const [joinedChannel, setJoinedChannel] = useState(false);
 
@@ -20,30 +23,14 @@ export default function useAgoraRtm(roomId, userId) {
    const dispatch = useDispatch();
 
    useEffect(() => {
-      if (window) {
-         let client = createAgoraRtmClient();
-         setRtmClient(client);
-      }
-   }, [window]);
+      rtmClient.on("ConnectionStateChanged", onConnectionStateChanged);
+   }, []);
 
    useEffect(() => {
       if (rtmClient) {
          joinAgoraRtmChannel(rtmClient, roomId, userId);
       }
    }, [rtmClient]);
-
-   const getAgoraRTM = () => {
-      return require("agora-rtm-sdk");
-   };
-
-   const createAgoraRtmClient = () => {
-      let AgoraRTM = getAgoraRTM();
-      let rtmClient = AgoraRTM.createInstance(AGORA_APP_ID, {
-         logFilter: AgoraRTM.LOG_FILTER_ERROR,
-      });
-      rtmClient.on("ConnectionStateChanged", onConnectionStateChanged);
-      return rtmClient;
-   };
 
    const onConnectionStateChanged = (newState, reason) => {
       if (newState === "DISCONNECTED") {
