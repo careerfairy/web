@@ -164,7 +164,6 @@ const ManageBreakoutRoomsView = ({
                   style={{ marginRight: 16 }}
                >
                   Back to main Room
-                  {/*{mobile ? "Back" : "Back to main Room"}*/}
                </Button>
             )}
             {isMainStreamer && (

@@ -323,6 +323,8 @@ function VideoContainer({
                   "We recommend to activate your camera for a better experience.",
                joinButtonLabel: "Join as streamer",
                disabledJoinButtonLabel: "Activate microphone to join",
+               joinWithoutCameraConfirmDescription:
+                  "You intend to join this stream with only with your microphone?",
             }}
          />
          <VideoControlsContainer

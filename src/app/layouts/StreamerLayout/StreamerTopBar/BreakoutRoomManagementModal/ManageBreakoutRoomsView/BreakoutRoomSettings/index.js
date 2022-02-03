@@ -42,8 +42,7 @@ const BreakoutRoomSettings = ({ classes, handleClose, onClick }) => {
    const assignOptions = [
       {
          primaryText: "Main Room Availability",
-         secondaryText:
-            "Allow participants can return to the main event stream",
+         secondaryText: "Allow participants to return the main event stream",
          onClick: () =>
             updateCanReturnToMainStream(
                livestreamId,

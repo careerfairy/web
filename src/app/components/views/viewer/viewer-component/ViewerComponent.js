@@ -292,6 +292,8 @@ function ViewerComponent({
                   "We recommend to activate your camera for a better experience.",
                joinButtonLabel: "Confirm Hand Raise",
                disabledJoinButtonLabel: "Activate Microphone to Join",
+               joinWithoutCameraConfirmDescription:
+                  "You intend to join this stream with only with your microphone?",
             }}
          />
          {handRaiseActive && (

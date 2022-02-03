@@ -353,7 +353,11 @@ function StreamPublishingModal({
          </DialogContent>
          <DialogActions>
             <Tooltip title={labels.refuseTooltip}>
-               <Button children={labels.refuseLabel} onClick={onRefuseStream} />
+               <Button
+                  color="grey"
+                  children={labels.refuseLabel}
+                  onClick={onRefuseStream}
+               />
             </Tooltip>
             {!hasVideoTrack && hasAudioTrack ? (
                <ButtonWithConfirm

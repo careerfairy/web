@@ -1,11 +1,21 @@
-import { useEffect, useState, useRef } from "react";
-import window from "global";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import useStreamRef from "./useStreamRef";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useAgoraClientConfig from "./useAgoraClientConfig";
+import AgoraRTC from "agora-rtc-sdk-ng";
 import * as actions from "store/actions";
+
+const rtcClient = AgoraRTC.createClient({
+   mode: "live",
+   codec: "vp8",
+});
+
+const screenShareRtcClient = AgoraRTC.createClient({
+   mode: "live",
+   codec: "vp8",
+});
 
 const AGORA_APP_ID = "53675bc6d3884026a72ecb1de3d19eb1";
 
@@ -21,63 +31,41 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
       isVideoPublished: false,
       isLocal: true,
    });
-   const [primaryRtcClient, setPrimaryRtcClient] = useState(null);
-   const [primaryRtcClientHost, setPrimaryRtcClientHost] = useState(false);
+   const [rtcClientHost, setPrimaryRtcClientHost] = useState(false);
 
    const { fetchAgoraRtcToken } = useFirebaseService();
    const dispatch = useDispatch();
 
    const [screenShareStream, setScreenShareStream] = useState(null);
    const screenShareStreamRef = useRef(screenShareStream);
-   const [screenShareRtcClient, setScreenShareRtcClient] = useState(null);
    const screenShareRtcClientRef = useRef(screenShareRtcClient);
 
    const { remoteStreams, networkQuality } = useAgoraClientConfig(
-      primaryRtcClient,
+      rtcClient,
       streamerId
    );
 
    useEffect(() => {
-      if (window) {
-         let client = createAgoraClient();
-         setPrimaryRtcClient(client);
-      }
-   }, [window]);
-
-   useEffect(() => {
-      if (primaryRtcClient) {
+      if (rtcClient) {
          joinAgoraRoomWithPrimaryClient();
       }
-   }, [primaryRtcClient]);
+   }, [rtcClient]);
 
    useEffect(() => {
-      if (!isStreamer && primaryRtcClient) {
+      if (!isStreamer && rtcClient) {
          if (localStream) {
             closeLocalStream();
          }
       }
-   }, [isStreamer, primaryRtcClient]);
+   }, [isStreamer, rtcClient]);
 
    const updateScreenShareRtcClient = (newScreenShareRtcClient) => {
       screenShareRtcClientRef.current = newScreenShareRtcClient;
-      setScreenShareRtcClient(newScreenShareRtcClient);
    };
 
    const updateScreenShareStream = (newScreenShareStream) => {
       screenShareStreamRef.current = newScreenShareStream;
       setScreenShareStream(newScreenShareStream);
-   };
-
-   const getAgoraRTC = () => {
-      return require("agora-rtc-sdk-ng");
-   };
-
-   const createAgoraClient = () => {
-      let AgoraRTC = getAgoraRTC();
-      return AgoraRTC.createClient({
-         mode: "live",
-         codec: "vp8",
-      });
    };
 
    const joinAgoraRoom = async (rtcClient, roomId, userUid, isStreamer) => {
@@ -112,7 +100,7 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
 
    const joinAgoraRoomWithPrimaryClient = async () => {
       try {
-         await joinAgoraRoom(primaryRtcClient, roomId, streamerId, isStreamer);
+         await joinAgoraRoom(rtcClient, roomId, streamerId, isStreamer);
       } catch (error) {
          dispatch(actions.setAgoraRtcError(error));
       }
@@ -120,7 +108,6 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
 
    const initializeLocalAudioStream = async () => {
       return new Promise(async (resolve, reject) => {
-         let AgoraRTC = getAgoraRTC();
          try {
             const localAudio = await AgoraRTC.createMicrophoneAudioTrack();
             setLocalStream((localStream) => ({
@@ -137,7 +124,6 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
 
    const initializeLocalVideoStream = async () => {
       return new Promise(async (resolve, reject) => {
-         let AgoraRTC = getAgoraRTC();
          try {
             const localVideo = await AgoraRTC.createCameraVideoTrack({
                encoderConfig: "480p_9",
@@ -192,7 +178,7 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
       if (tracks) {
          return new Promise(async (resolve, reject) => {
             try {
-               if (streamType === "screen" || !primaryRtcClientHost) {
+               if (streamType === "screen" || !rtcClientHost) {
                   await client.setClientRole("host");
                }
                await client.publish(tracks);
@@ -215,7 +201,7 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
       return new Promise(async (resolve, reject) => {
          try {
             let localStreamTracks = [localStream.videoTrack];
-            await publishTracks(primaryRtcClient, localStreamTracks, "video");
+            await publishTracks(rtcClient, localStreamTracks, "video");
             setLocalStream((localStream) => ({
                ...localStream,
                isVideoPublished: true,
@@ -233,8 +219,8 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
             if (localStream.videoTrack) {
                if (localStream.isVideoPublished) {
                   let localStreamTracks = [localStream.videoTrack];
-                  await primaryRtcClient.unpublish(localStreamTracks);
-                  await primaryRtcClient.disableDualStream();
+                  await rtcClient.unpublish(localStreamTracks);
+                  await rtcClient.disableDualStream();
                }
                localStream.videoTrack.close();
                setLocalStream((localStream) => ({
@@ -254,7 +240,7 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
       return new Promise(async (resolve, reject) => {
          try {
             let localStreamTracks = [localStream.audioTrack];
-            await publishTracks(primaryRtcClient, localStreamTracks, "audio");
+            await publishTracks(rtcClient, localStreamTracks, "audio");
             setLocalStream((localStream) => ({
                ...localStream,
                isAudioPublished: true,
@@ -272,7 +258,7 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
             if (localStream.audioTrack) {
                if (localStream.isAudioPublished) {
                   let localStreamTracks = [localStream.audioTrack];
-                  await primaryRtcClient.unpublish(localStreamTracks);
+                  await rtcClient.unpublish(localStreamTracks);
                }
                setLocalStream((localStream) => ({
                   ...localStream,
@@ -290,8 +276,8 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
    };
 
    const returnToAudience = async () => {
-      if (primaryRtcClient) {
-         await primaryRtcClient.setClientRole("audience");
+      if (rtcClient) {
+         await rtcClient.setClientRole("audience");
       }
    };
 
@@ -300,21 +286,20 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
       onScreenShareStopped
    ) => {
       return new Promise(async (resolve, reject) => {
-         let screenShareClient = createAgoraClient();
          try {
             const screenShareUid = `${streamerId}screen`;
             await joinAgoraRoom(
-               screenShareClient,
+               screenShareRtcClient,
                roomId,
                screenShareUid,
                true
             );
-            publishScreenShareTracks(
-               screenShareClient,
+            await publishScreenShareTracks(
+               screenShareRtcClient,
                screenSharingMode,
                onScreenShareStopped
             );
-            updateScreenShareRtcClient(screenShareClient);
+            updateScreenShareRtcClient(screenShareRtcClient);
             resolve();
          } catch (error) {
             reject(error);
@@ -343,7 +328,7 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
    };
 
    const publishScreenShareTracks = async (
-      screenShareClient,
+      screenShareRtcClient,
       screenSharingMode,
       onScreenShareStopped
    ) => {
@@ -352,7 +337,7 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
          onScreenShareStopped
       );
       updateScreenShareStream(screenShareTracks);
-      return publishTracks(screenShareClient, screenShareTracks, "screen");
+      return publishTracks(screenShareRtcClient, screenShareTracks, "screen");
    };
 
    const getScreenShareStream = async (
@@ -363,7 +348,7 @@ export default function useAgoraRtc(streamerId, roomId, isStreamer) {
          let screenShareVideoResolution =
             screenSharingMode === "motion" ? "720p_2" : "1080p_1";
          try {
-            const tracksObject = await getAgoraRTC().createScreenVideoTrack(
+            const tracksObject = await AgoraRTC.createScreenVideoTrack(
                {
                   encoderConfig: screenShareVideoResolution,
                },

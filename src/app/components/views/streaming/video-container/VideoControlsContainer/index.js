@@ -44,6 +44,9 @@ import JoinAsStreamerIcon from "@mui/icons-material/RecordVoiceOver";
 import StudentViewIcon from "@mui/icons-material/FaceRounded";
 import Button from "@mui/material/Button";
 import CheckIcon from "@mui/icons-material/Check";
+import { useDispatch } from "react-redux";
+import * as storeActions from "store/actions";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -111,6 +114,7 @@ function VideoControlsContainer({
    joinAsViewer,
    localMediaControls,
 }) {
+   const dispatch = useDispatch();
    const shareButtonRef = useRef();
    const streamRef = useStreamRef();
    const { tutorialSteps, setTutorialSteps } = useContext(TutorialContext);
@@ -120,6 +124,7 @@ function VideoControlsContainer({
    const [openModal, setOpenModal] = useState(false);
    const classes = useStyles({ open });
    const [delayHandler, setDelayHandler] = useState(null);
+   const [joiningAsViewer, setJoiningAsViewer] = useState(false);
    const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
    const [isVideoInactive, setIsVideoInactive] = useState(false);
    const [shareMenuAnchorEl, setShareMenuAnchorEl] = useState(null);
@@ -190,8 +195,14 @@ function VideoControlsContainer({
    };
 
    const handleJoinAsViewer = async () => {
-      await joinAsViewer();
-      setOpenModal(false);
+      try {
+         setJoiningAsViewer(true);
+         await joinAsViewer();
+         setOpenModal(false);
+      } catch (e) {
+         dispatch(storeActions.sendGeneralError(e));
+      }
+      setJoiningAsViewer(false);
    };
 
    function toggleMicrophone() {
@@ -456,18 +467,20 @@ function VideoControlsContainer({
                <Button
                   variant="text"
                   color="grey"
+                  disabled={joiningAsViewer}
                   onClick={() => setOpenModal(false)}
                >
                   Cancel
                </Button>
-               <Button
+               <LoadingButton
                   startIcon={<CheckIcon />}
                   variant="contained"
                   color="primary"
+                  loading={joiningAsViewer}
                   onClick={() => handleJoinAsViewer()}
                >
-                  Confirm
-               </Button>
+                  {joiningAsViewer ? "Joining" : "Confirm"}
+               </LoadingButton>
             </DialogActions>
          </Dialog>
       </>
