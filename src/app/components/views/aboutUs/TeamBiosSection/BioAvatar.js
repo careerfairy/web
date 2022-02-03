@@ -2,8 +2,7 @@ import PropTypes from "prop-types";
 import { Avatar, Badge } from "@mui/material";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import React from "react";
-import withStyles from '@mui/styles/withStyles';
-import clsx from "clsx";
+import withStyles from "@mui/styles/withStyles";
 
 export const SmallAvatar = withStyles((theme) => ({
    root: {
@@ -16,7 +15,7 @@ export const SmallAvatar = withStyles((theme) => ({
    },
 }))(Avatar);
 
-const BioAvatar = (props) => (
+const BioAvatar = ({ styles, hovered, person }) => (
    <Badge
       overlap="circular"
       anchorOrigin={{
@@ -27,7 +26,7 @@ const BioAvatar = (props) => (
          <SmallAvatar
             component="a"
             target="_blank"
-            href={props.person.linkedinUrl}
+            href={person.linkedinUrl}
             alt="linkedin"
          >
             <LinkedInIcon fontSize="medium" />
@@ -35,19 +34,15 @@ const BioAvatar = (props) => (
       }
    >
       <Avatar
-         src={props.person.avatar}
-         classes={{
-            root: clsx(props.classes.avatar, {
-               [props.classes.avatarHovered]: props.hovered,
-            }),
-         }}
-         alt={props.person.name}
+         src={person.avatar}
+         sx={[styles.avatar, hovered && styles.avatarHovered]}
+         alt={person.name}
       />
    </Badge>
 );
 
 BioAvatar.propTypes = {
-   classes: PropTypes.any,
+   styles: PropTypes.any,
    hovered: PropTypes.bool,
    person: PropTypes.shape({
       linkedinUrl: PropTypes.string,
