@@ -12,6 +12,7 @@ export default function useDevices(localStream) {
 
    useEffect(() => {
       (async function init() {
+         if (!localStream) return;
          const devices = await AgoraRTC.getDevices();
          const deviceList = mapDevices(devices);
          AgoraRTC.onMicrophoneChanged = (info) => {
@@ -29,7 +30,7 @@ export default function useDevices(localStream) {
          };
          setDeviceList(deviceList);
       })();
-   }, []);
+   }, [Boolean(localStream)]);
 
    // useEffect(() => {
    //    if (navigator && Boolean(localStream)) {
