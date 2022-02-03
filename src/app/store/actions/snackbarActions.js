@@ -9,6 +9,7 @@ import { careerfairyLogo } from "../../constants/images";
 import * as actions from "./index";
 import CallToActionSnackbar from "../../components/views/streaming/sharedComponents/StreamNotifications/CallToActionSnackbar";
 import React from "react";
+import * as Sentry from "@sentry/browser";
 
 /**
  * Enqueue a snackbar managed in redux state.
@@ -49,6 +50,7 @@ export const removeSnackbar = (key) => ({
 
 export const sendGeneralError = (error = "") => async (dispatch) => {
    console.error("error", error);
+   Sentry.captureException(error);
    let message = GENERAL_ERROR;
    if (process.env.NODE_ENV === "development") {
       const devInfo =
