@@ -5,6 +5,7 @@ import { Button } from "@mui/material";
 import Link from "next/link";
 import { useAuth } from "../../../HOCs/AuthProvider";
 import {useRouter} from "next/router"
+import {SIGNUP_REDIRECT_PATH} from "../../../pages/signup";
 
 const GroupProvider = ({ firebase }) => {
    const {query: {absolutePath}} = useRouter();
@@ -36,7 +37,7 @@ const GroupProvider = ({ firebase }) => {
             userData={userData}
             groups={groups}
          />
-         <Link href={absolutePath as string || "/profile"}>
+         <Link href={absolutePath as string || SIGNUP_REDIRECT_PATH}>
             <Button
                color="primary"
                style={{ position: "sticky", bottom: 10 }}
