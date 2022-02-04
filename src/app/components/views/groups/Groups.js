@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from "react";
-import { Button, Grid, TextField, Typography } from "@mui/material";
+import { Button, Grid, TextField } from "@mui/material";
 import NewGroup from "../profile/NewGroup";
 import Autocomplete from "@mui/material/Autocomplete";
 import parse from "autosuggest-highlight/parse";
@@ -16,7 +16,6 @@ export const Highlights = ({
       <div
          style={{
             position: "sticky",
-            top: 10,
             zIndex: 10,
             marginBottom: 10,
             display: "flex",
@@ -82,7 +81,7 @@ export const Highlights = ({
    );
 };
 
-const Groups = ({ groups, userData, makeSix, absolutePath }) => {
+const Groups = ({ groups, userData, makeSix, absolutePath, hideNextLiveStreamsButton }) => {
    const [selectedGroup, setSelectedGroup] = useState(null);
 
    const handleSelectGroup = (event, value) => {
@@ -103,13 +102,11 @@ const Groups = ({ groups, userData, makeSix, absolutePath }) => {
    });
    return (
       <Fragment>
-         <Typography align="center" variant="h3" gutterBottom>
-            Follow More Career&nbsp;Groups
-         </Typography>
          <Highlights
             handleSelectGroup={handleSelectGroup}
             absolutePath={absolutePath}
             groups={groups}
+            hideButton={!!hideNextLiveStreamsButton}
          />
          <Grid style={{ marginBottom: makeSix ? 0 : 50 }} container spacing={3}>
             {selectedGroup ? (
