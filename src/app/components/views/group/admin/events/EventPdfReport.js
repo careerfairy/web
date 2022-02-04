@@ -39,26 +39,22 @@ const styles = StyleSheet.create({
       display: "flex",
       flexDirection: "row",
       justifyContent: "space-between",
-      marginBottom: "10vw",
+      alignItems: "center",
+      marginBottom: "4vw",
    },
-   cfLogoContainer: {
-      width: "25vw",
-      display: "flex",
-      alignItems: "center !important",
-      justifyContent: "flex-start !important",
-      height: "100px",
-   },
-   cfLogoContainerSmall: {
-      width: "20vw",
+   topMargin: {
+     marginTop: "10vw"
    },
    cfLogo: {
-      // minWidth: "15vw",
-      width: "auto",
-      // marginRight: "auto",
-      // marginBottom: "auto",
-      // marginTop: "auto",
+      maxWidth: "20vw",
    },
-   companyLogo: { maxHeight: "25vw", width: "auto", height: "auto" },
+   companyLogoContainer: {
+      maxWidth: "20vw",
+      maxHeight: "20vw"
+   },
+   companyLogo: {
+      maxHeight: "70px"
+   },
    groupLogoImage: {
       maxHeight: "20vw",
       width: "auto",
@@ -235,20 +231,13 @@ const CFPage = (props) => <Page {...props} style={styles.cfPage} />;
 
 const TopView = (props) => <View {...props} style={styles.topView} />;
 
-const CFLogoContainer = (props) => (
-   <View {...props} style={styles.cfLogoContainer} />
-);
-
-const CFLogoContainerSmall = (props) => (
-   <View
-      {...props}
-      style={{ ...styles.cfLogoContainer, ...styles.cfLogoContainerSmall }}
-   />
-);
-
 const CFLogo = (props) => <Image {...props} style={styles.cfLogo} />;
 
 const CompanyLogo = (props) => <Image {...props} style={styles.companyLogo} />;
+
+const CompanyLogoView = (props) => (
+  <View {...props} style={styles.companyLogoContainer} />
+);
 
 const GroupLogoImage = (props) => (
    <Image {...props} style={styles.groupLogoImage} />
@@ -657,187 +646,193 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                fixed
             />
             <TopView>
-               <CFLogoContainer>
-                  <CFLogo src={summary.requestingGroup.logoUrl} />
-               </CFLogoContainer>
-               <CFLogoContainerSmall>
+               <CompanyLogoView>
+                  <CompanyLogo src={resolveImage(summary.requestingGroup.logoUrl)} />
+               </CompanyLogoView>
+               <View>
                   <CFLogo src="https://www.careerfairy.io/logo_teal.png" />
-               </CFLogoContainerSmall>
-            </TopView>
-            <View>
-               <View style={{ maxWidth: "25vw", marginBottom: "20px" }}>
-                  <CompanyLogo src={summary.livestream.companyLogoUrl} />
                </View>
-               <Label>Live Stream Report </Label>
-               <Title>{summary.livestream.title}</Title>
-               <DateText>
-                  {DateUtil.getPrettyDate(
-                     new Date(Date.parse(summary.livestream.startDateString))
+            </TopView>
+            <View style={styles.topMargin}>
+               {summary.requestingGroup.universityCode ? (
+                 <TopView>
+                    <CompanyLogoView>
+                       <CompanyLogo src={resolveImage(summary.livestream.companyLogoUrl)} />
+                    </CompanyLogoView>
+                 </TopView>
+               ) : null}
+               <View>
+                  <Label>Live Stream Report </Label>
+                  <Title>{summary.livestream.title}</Title>
+                  <DateText>
+                     {DateUtil.getPrettyDate(
+                       new Date(Date.parse(summary.livestream.startDateString))
+                     )}
+                  </DateText>
+                  <SubTitle>Speakers</SubTitle>
+                  <SpeakersViewElement speakers={summary.speakers} />
+                  {!!universityReports.length && (
+                    <View wrap={false}>
+                       <SubTitle>Hosts</SubTitle>
+                       <PartnersWrapper>
+                          {universityReports.map((report) => (
+                            <PartnerItem key={report.group.id}>
+                               <PartnerLogo src={report.group.logoUrl} />
+                            </PartnerItem>
+                          ))}
+                          {companyReport && (
+                            <PartnerItem>
+                               <PartnerLogo src={companyReport.group.logoUrl} />
+                            </PartnerItem>
+                          )}
+                       </PartnersWrapper>
+                    </View>
                   )}
-               </DateText>
-               <SubTitle>Speakers</SubTitle>
-               <SpeakersViewElement speakers={summary.speakers} />
-               {!!universityReports.length && (
+                  <View break wrap={false}>
+                     <SubTitle>Your Audience</SubTitle>
+                     <View>
+                        <View>
+                           <SubHeader>Total Participating Students: </SubHeader>
+                        </View>
+                        <ColorText>
+                           <Text>{summary.totalParticipating}</Text>
+                        </ColorText>
+                     </View>
+                     <View>
+                        <View>
+                           <SubHeader>
+                              Total Students registered to the Talent Pool:{" "}
+                           </SubHeader>
+                        </View>
+                        <ColorText>
+                           <Text>{summary.totalStudentsInTalentPool}</Text>
+                        </ColorText>
+                     </View>
+                  </View>
                   <View wrap={false}>
-                     <SubTitle>Hosts</SubTitle>
+                     <SubTitle>Where They Came From</SubTitle>
                      <PartnersWrapper>
-                        {universityReports.map((report) => (
-                           <PartnerItem key={report.group.id}>
-                              <PartnerLogo src={report.group.logoUrl} />
-                           </PartnerItem>
+                        {[...universityReports]
+                        .sort(dynamicSort("totalParticipantsFromGroup"))
+                        .map((report) => (
+                          <PartnerBreakdown
+                            key={report.group.id}
+                            name={report.group.universityName}
+                            numberOfStudents={
+                               report.numberOfStudentsFromUniversity
+                            }
+                          />
                         ))}
                         {companyReport && (
-                           <PartnerItem>
-                              <PartnerLogo src={companyReport.group.logoUrl} />
-                           </PartnerItem>
+                          <PartnerBreakdown
+                            name={companyReport.group.universityName}
+                            numberOfStudents={
+                               companyReport.numberOfStudentsFollowingCompany
+                            }
+                          />
                         )}
                      </PartnersWrapper>
                   </View>
-               )}
-               <View break wrap={false}>
-                  <SubTitle>Your Audience</SubTitle>
-                  <View>
-                     <View>
-                        <SubHeader>Total Participating Students: </SubHeader>
-                     </View>
-                     <ColorText>
-                        <Text>{summary.totalParticipating}</Text>
-                     </ColorText>
+                  <View wrap={false}>
+                     <SubTitle>Viewer Ratings</SubTitle>
+                     <FlexParent>
+                        <RatingChild>
+                           <View>
+                              <RatingText>
+                                 How would you rate this live stream?
+                              </RatingText>
+                           </View>
+                           <ColorText>
+                              <Text>{summary.overallRating} / 5.0</Text>
+                           </ColorText>
+                        </RatingChild>
+                        <RatingChild>
+                           <View>
+                              <RatingText>
+                                 How happy are you with the content of this
+                                 livestream ?
+                              </RatingText>
+                           </View>
+                           <ColorText>
+                              <Text>{summary.contentRating} / 5.0</Text>
+                           </ColorText>
+                        </RatingChild>
+                     </FlexParent>
                   </View>
-                  <View>
-                     <View>
-                        <SubHeader>
-                           Total Students registered to the Talent Pool:{" "}
-                        </SubHeader>
-                     </View>
-                     <ColorText>
-                        <Text>{summary.totalStudentsInTalentPool}</Text>
-                     </ColorText>
+                  <View wrap={false}>
+                     <SubTitle>Engagement Figures</SubTitle>
+                     <FlexParent>
+                        <EngagementChild>
+                           <View>
+                              <Text># Questions</Text>
+                           </View>
+                           <ColorText>
+                              <Text>{summary.questions.length}</Text>
+                           </ColorText>
+                        </EngagementChild>
+                        <EngagementChild>
+                           <View>
+                              <Text># Reactions</Text>
+                           </View>
+                           <ColorText>
+                              <Text>{summary.numberOfIcons}</Text>
+                           </ColorText>
+                        </EngagementChild>
+                        <EngagementChild>
+                           <View>
+                              <Text># Upvotes</Text>
+                           </View>
+                           <ColorText>
+                              <Text>{numberOfVotes}</Text>
+                           </ColorText>
+                        </EngagementChild>
+                     </FlexParent>
                   </View>
-               </View>
-               <View wrap={false}>
-                  <SubTitle>Where They Came From</SubTitle>
-                  <PartnersWrapper>
-                     {[...universityReports]
-                        .sort(dynamicSort("totalParticipantsFromGroup"))
-                        .map((report) => (
-                           <PartnerBreakdown
-                              key={report.group.id}
-                              name={report.group.universityName}
-                              numberOfStudents={
-                                 report.numberOfStudentsFromUniversity
-                              }
-                           />
-                        ))}
-                     {companyReport && (
-                        <PartnerBreakdown
-                           name={companyReport.group.universityName}
-                           numberOfStudents={
-                              companyReport.numberOfStudentsFollowingCompany
-                           }
-                        />
-                     )}
-                  </PartnersWrapper>
-               </View>
-               <View wrap={false}>
-                  <SubTitle>Viewer Ratings</SubTitle>
-                  <FlexParent>
-                     <RatingChild>
-                        <View>
-                           <RatingText>
-                              How would you rate this live stream?
-                           </RatingText>
-                        </View>
-                        <ColorText>
-                           <Text>{summary.overallRating} / 5.0</Text>
-                        </ColorText>
-                     </RatingChild>
-                     <RatingChild>
-                        <View>
-                           <RatingText>
-                              How happy are you with the content of this
-                              livestream ?
-                           </RatingText>
-                        </View>
-                        <ColorText>
-                           <Text>{summary.contentRating} / 5.0</Text>
-                        </ColorText>
-                     </RatingChild>
-                  </FlexParent>
-               </View>
-               <View wrap={false}>
-                  <SubTitle>Engagement Figures</SubTitle>
-                  <FlexParent>
-                     <EngagementChild>
-                        <View>
-                           <Text># Questions</Text>
-                        </View>
-                        <ColorText>
-                           <Text>{summary.questions.length}</Text>
-                        </ColorText>
-                     </EngagementChild>
-                     <EngagementChild>
-                        <View>
-                           <Text># Reactions</Text>
-                        </View>
-                        <ColorText>
-                           <Text>{summary.numberOfIcons}</Text>
-                        </ColorText>
-                     </EngagementChild>
-                     <EngagementChild>
-                        <View>
-                           <Text># Upvotes</Text>
-                        </View>
-                        <ColorText>
-                           <Text>{numberOfVotes}</Text>
-                        </ColorText>
-                     </EngagementChild>
-                  </FlexParent>
-               </View>
-               <View wrap={false}>
-                  <SubTitle>Most upvoted questions</SubTitle>
-                  {questionElements}
-               </View>
-               {universityReports.map((report) => (
-                  <ReportPage
-                     key={report.group.groupId}
-                     report={report}
-                     categoryElements={getCategoryElements(
+                  <View wrap={false}>
+                     <SubTitle>Most upvoted questions</SubTitle>
+                     {questionElements}
+                  </View>
+                  {universityReports.map((report) => (
+                    <ReportPage
+                      key={report.group.groupId}
+                      report={report}
+                      categoryElements={getCategoryElements(
                         report.studentStats,
                         report
-                     )}
-                     followersWithMissingData={getNumberOfFollowersWithNoCategories(
+                      )}
+                      followersWithMissingData={getNumberOfFollowersWithNoCategories(
                         report
-                     )}
-                  />
-               ))}
-               {companyReport && (
-                  <ReportPage
-                     followersWithMissingData={getNumberOfFollowersWithNoCategories(
+                      )}
+                    />
+                  ))}
+                  {companyReport && (
+                    <ReportPage
+                      followersWithMissingData={getNumberOfFollowersWithNoCategories(
                         companyReport
-                     )}
-                     categoryElements={getCategoryElements(
+                      )}
+                      categoryElements={getCategoryElements(
                         companyReport.studentStats,
                         companyReport
-                     )}
-                     onlyCompany={Boolean(!universityReports?.length)}
-                     report={companyReport}
-                  />
-               )}
-               {summary.numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent >
-                  0 && (
-                  <View break>
-                     <DisclaimerTitle>Disclaimer</DisclaimerTitle>
-                     <GroupDisclaimerText>
-                        *{" "}
-                        {
-                           summary.numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent
-                        }{" "}
-                        of the total {summary.totalParticipating} participants
-                        for the event came from other sources
-                     </GroupDisclaimerText>
-                  </View>
-               )}
+                      )}
+                      onlyCompany={Boolean(!universityReports?.length)}
+                      report={companyReport}
+                    />
+                  )}
+                  {summary.numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent >
+                    0 && (
+                      <View break>
+                         <DisclaimerTitle>Disclaimer</DisclaimerTitle>
+                         <GroupDisclaimerText>
+                            *{" "}
+                            {
+                               summary.numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent
+                            }{" "}
+                            of the total {summary.totalParticipating} participants
+                            for the event came from other sources
+                         </GroupDisclaimerText>
+                      </View>
+                    )}
+               </View>
             </View>
          </CFPage>
       </Document>
@@ -882,5 +877,42 @@ EventPdfReport.propTypes = {
       isUniversity: PropTypes.bool,
    }),
 };
+
+/**
+ * Some PNG images aren't rendered correctly
+ *
+ * @param url
+ * @returns {Promise<unknown>|*}
+ */
+const resolveImage = (url) => {
+   if(url.toLowerCase().indexOf('.png') !== -1) {
+      // react-pdf accepts a Promise
+      return convertImgToBase64URL(url)
+   } else {
+      return url
+   }
+}
+
+//https://github.com/diegomura/react-pdf/issues/676#issuecomment-821109460
+const convertImgToBase64URL = (url, outputFormat) =>
+  new Promise((resolve, reject) => {
+     const img = document.createElement('img');
+     img.crossOrigin = 'Anonymous';
+     img.onerror = (e) => {
+        reject(e);
+     };
+     img.onload = function () {
+        let canvas = document.createElement('CANVAS');
+        const ctx = canvas.getContext('2d');
+        let dataURL;
+        canvas.height = img.height;
+        canvas.width = img.width;
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+        dataURL = canvas.toDataURL(outputFormat);
+        canvas = null;
+        resolve(dataURL);
+     };
+     img.src = url;
+  });
 
 export default EventPdfReport;
