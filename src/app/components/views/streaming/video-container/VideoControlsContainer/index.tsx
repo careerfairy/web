@@ -12,10 +12,10 @@ import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import ScreenShareIcon from "@mui/icons-material/ScreenShare";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { withFirebasePage } from "context/firebase/FirebaseServiceContext";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from "@mui/styles/makeStyles";
 import {
+   Box,
    ClickAwayListener,
    Dialog,
    DialogActions,
@@ -33,7 +33,6 @@ import {
    TooltipTitle,
    WhiteTooltip,
 } from "materialUI/GlobalTooltips";
-import PropTypes from "prop-types";
 import useStreamRef from "components/custom-hook/useStreamRef";
 import { CallToActionIcon, ShareIcon, SharePdfIcon } from "./Icons";
 import ShareMenu from "./ShareMenu";
@@ -47,8 +46,9 @@ import CheckIcon from "@mui/icons-material/Check";
 import { useDispatch } from "react-redux";
 import * as storeActions from "store/actions";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { StreamData } from "types";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    root: {
       position: "absolute",
       right: 0,
@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
       height: "50%",
       transform: "translateY(50%)",
       width: 120,
-      padding: 30,
+      padding: "30px",
       backgroundColor: "transparent",
       display: "flex",
       alignItems: "center",
@@ -65,47 +65,65 @@ const useStyles = makeStyles((theme) => ({
    },
    speedDial: {
       transition: "transform 0.2s",
-      transitionTimingFunction: theme.transitions.easeInOut,
-      transform: ({ open }) =>
-         open ? "" : "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
-      "-moz-transform": ({ open }) =>
-         open ? "" : "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
-      "-o-transform": ({ open }) =>
-         open ? "" : "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
-      "-webkit-transform": ({ open }) =>
-         open ? "" : "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
+      transitionTimingFunction: (theme) => theme.transitions.easeInOut,
+      transform: "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
+      "-moz-transform": "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
+      "-o-transform": "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
+      "-webkit-transform": "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
    },
+   speedDialOpen: {
+      transform: "",
+      "-moz-transform": "",
+      "-o-transform": "",
+      "-webkit-transform": "",
+   },
+   speedDialAction: {
+      "& .MuiSpeedDialAction-staticTooltipLabel": {
+         transition: "all 0.8s",
+         transitionTimingFunction: (theme) => theme.transitions.easeInOut,
+         display: "none",
+         whiteSpace: "nowrap",
+      },
+   },
+
    actionButton: {
       width: 40,
       height: 40,
-      // color: "white",
-      // "&:disabled": {
-      //    backgroundColor: alpha(theme.palette.primary.main, 0.5),
-      //    color: "white",
-      // },
-      // "&:hover": {
-      //    backgroundColor: theme.palette.primary.dark,
-      // },
    },
-   cardHovered: {},
-   tooltip: {
-      transition: "all 0.8s",
-      transitionTimingFunction: theme.transitions.easeInOut,
-      display: ({ open }) => (open ? "block" : "none"),
-      whiteSpace: "nowrap",
+   speedDialActionOpen: {
+      "& .MuiSpeedDialAction-staticTooltipLabel": {
+         display: "block",
+      },
    },
    dialButton: {
       display: "none",
    },
-}));
+};
 const VIEWER_VIDEO_CONTROLS_HINT_LOCAL_KEY = "hasSeenVideoControlsAsViewer";
-
-function VideoControlsContainer({
-   currentLivestream: { mode, id, speakerSwitchMode, screenSharerId, test },
+interface Props {
+   currentLivestream: StreamData;
+   streamerId: string;
+   viewer: boolean;
+   showSettings: boolean;
+   setShowSettings: React.Dispatch<React.SetStateAction<boolean>>;
+   handleClickScreenShareButton: () => Promise<any>;
+   isMainStreamer: boolean;
+   localStreamIsPublished: {
+      audio?: boolean;
+      video?: boolean;
+   };
+   joinAsViewer: () => Promise<any>;
+   localMediaControls: {
+      setLocalAudioEnabled: (enabled: boolean) => void;
+      setLocalVideoEnabled: (enabled: boolean) => void;
+   };
+   openPublishingModal: () => void;
+}
+const VideoControlsContainer = ({
+   currentLivestream: { mode, screenSharerId, test },
    viewer,
    setShowSettings,
    showSettings,
-   firebase,
    streamerId,
    handleClickScreenShareButton,
    isMainStreamer,
@@ -113,7 +131,8 @@ function VideoControlsContainer({
    openPublishingModal,
    joinAsViewer,
    localMediaControls,
-}) {
+}: Props) => {
+   const firebase = useFirebaseService();
    const dispatch = useDispatch();
    const shareButtonRef = useRef();
    const streamRef = useStreamRef();
@@ -122,7 +141,6 @@ function VideoControlsContainer({
    const DELAY = 3000; //3 seconds
    const [open, setOpen] = useState(true);
    const [openModal, setOpenModal] = useState(false);
-   const classes = useStyles({ open });
    const [delayHandler, setDelayHandler] = useState(null);
    const [joiningAsViewer, setJoiningAsViewer] = useState(false);
    const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
@@ -131,7 +149,6 @@ function VideoControlsContainer({
    const [callToActionDrawerOpen, setCallToActionDrawerOpen] = useState(false);
    const [fullyOpened, onEntered, onExited] = useSliderFullyOpened();
    const presentMode = mode === "presentation";
-   const automaticMode = speakerSwitchMode === "automatic";
    const desktopMode = mode === "desktop";
 
    useEffect(() => {
@@ -215,6 +232,11 @@ function VideoControlsContainer({
    }
 
    function toggleVideo() {
+      const isPublishingWithoutVideo =
+         isPublishing && localStreamIsPublished.video === false;
+
+      if (isPublishingWithoutVideo) {
+      }
       if (isVideoInactive) {
          localMediaControls.setLocalVideoEnabled(true);
       } else {
@@ -263,19 +285,19 @@ function VideoControlsContainer({
    }, [localStreamIsPublished.video, isLocalMicMuted]);
 
    const actions = [];
+   console.log("-> isPublishing", isPublishing);
+   console.log("-> localStreamIsPublished", localStreamIsPublished);
 
    if (isPublishing) {
-      if (localStreamIsPublished.video) {
-         actions.unshift({
-            icon: isVideoInactive ? (
-               <VideocamOffIcon fontSize="medium" style={{ color: "red" }} />
-            ) : (
-               <VideocamIcon fontSize="medium" color="primary" />
-            ),
-            name: localCameraLabel,
-            onClick: toggleVideo,
-         });
-      }
+      actions.unshift({
+         icon: isVideoInactive ? (
+            <VideocamOffIcon fontSize="medium" style={{ color: "red" }} />
+         ) : (
+            <VideocamIcon fontSize="medium" color="primary" />
+         ),
+         name: localCameraLabel,
+         onClick: toggleVideo,
+      });
 
       if (localStreamIsPublished.audio) {
          actions.unshift({
@@ -357,10 +379,10 @@ function VideoControlsContainer({
    return (
       <>
          <ClickAwayListener onClickAway={handleClose}>
-            <div
+            <Box
                onMouseEnter={handleMouseEnter}
                onMouseLeave={handleMouseLeave}
-               className={classes.root}
+               sx={styles.root}
             >
                <NewFeatureHint
                   localStorageKey={VIEWER_VIDEO_CONTROLS_HINT_LOCAL_KEY}
@@ -373,7 +395,8 @@ function VideoControlsContainer({
                      placement="top"
                      style={{
                         transition: "transform 0.2s",
-                        transitionTimingFunction: theme.transitions.easeInOut,
+                        transitionTimingFunction:
+                           theme.transitions.easing.easeInOut,
                         transform: open
                            ? ""
                            : "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
@@ -399,13 +422,15 @@ function VideoControlsContainer({
                   >
                      <SpeedDial
                         ariaLabel="interaction-selector"
-                        className={classes.speedDial}
+                        sx={[styles.speedDial, open && styles.speedDialOpen]}
                         FabProps={{
                            onClick: handleToggle,
-                           className: classes.dialButton,
+                           sx: styles.dialButton,
                         }}
                         TransitionProps={{
+                           // @ts-ignore
                            onEntered,
+                           // @ts-ignore
                            onExited,
                         }}
                         icon={<SpeedDialIcon />}
@@ -424,12 +449,13 @@ function VideoControlsContainer({
                                  icon={action.icon}
                                  tooltipPlacement="left"
                                  tooltipTitle={action.name}
-                                 classes={{
-                                    staticTooltipLabel: classes.tooltip,
-                                 }}
+                                 sx={[
+                                    styles.speedDialAction,
+                                    open && styles.speedDialActionOpen,
+                                 ]}
                                  tooltipOpen={Boolean(action.name.length)}
                                  FabProps={{
-                                    classes: { root: classes.actionButton },
+                                    sx: styles.actionButton,
                                  }}
                                  onClick={action.onClick}
                               />
@@ -453,7 +479,7 @@ function VideoControlsContainer({
                   onClose={handleCloseCallToActionDrawer}
                   open={callToActionDrawerOpen}
                />
-            </div>
+            </Box>
          </ClickAwayListener>
          <Dialog open={openModal} onClose={() => setOpenModal(false)}>
             <DialogTitle>Joining as viewer</DialogTitle>
@@ -485,17 +511,6 @@ function VideoControlsContainer({
          </Dialog>
       </>
    );
-}
-
-VideoControlsContainer.prototypes = {
-   currentLivestream: PropTypes.object.isRequired,
-   viewer: PropTypes.bool,
-   streamerId: PropTypes.string,
-   handleClickScreenShareButton: PropTypes.func,
-   isMainStreamer: PropTypes.bool,
-   showSettings: PropTypes.bool,
-   setShowSettings: PropTypes.func.isRequired,
-   localMediaControls: PropTypes.object,
 };
 
-export default withFirebasePage(VideoControlsContainer);
+export default VideoControlsContainer;

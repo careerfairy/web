@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import {
    Avatar,
    Box,
@@ -34,7 +34,6 @@ import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions/index";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog";
-import { streamType } from "../../../../../../types";
 import ConfirmRecordingDialog from "./ConfirmRecordingDialog";
 
 const useStyles = makeStyles((theme) => ({
@@ -273,7 +272,6 @@ const StreamCard = ({ stream }) => {
 };
 
 StreamCard.propTypes = {
-   stream: streamType.isRequired,
 };
 
 export default StreamCard;

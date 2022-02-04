@@ -30,7 +30,6 @@ import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import LoadingButton from "@mui/lab/LoadingButton";
 import * as actions from "store/actions";
 import useLocalStorageMediaSources from "../../../custom-hook/useLocalStorageMediaSources";
-import { useEffectOnce } from "react-use";
 
 const styles = {
    actions: {},
@@ -190,7 +189,7 @@ function StreamPublishingModal({
 
    return (
       <Dialog TransitionComponent={Slide} open={openModal} fullWidth>
-         <DialogTitle disableTypography sx={styles.dialogTitle}>
+         <DialogTitle component="div" sx={styles.dialogTitle}>
             <PersonAddIcon sx={{ mr: 2 }} fontSize="medium" />
             <Typography
                style={{ fontSize: "1.2em", fontWeight: 500 }}

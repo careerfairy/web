@@ -1,10 +1,8 @@
-import PropTypes from "prop-types";
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { CircularProgress, Grid } from "@mui/material";
 import StreamCard from "./StreamCard";
 import { isEmpty, isLoaded } from "react-redux-firebase";
-import { streamType } from "../../../../../types";
 
 const useStyles = makeStyles((theme) => ({
    loader: {
@@ -43,7 +41,6 @@ const StreamsContainer = ({ streams }) => {
 };
 
 StreamsContainer.propTypes = {
-   streams: PropTypes.arrayOf(streamType).isRequired,
 };
 
 export default StreamsContainer;

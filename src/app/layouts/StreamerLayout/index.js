@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import StreamerTopBar from "./StreamerTopBar";
 import PreparationOverlay from "../../components/views/streaming/preparation-overlay/PreparationOverlay";
@@ -17,6 +17,7 @@ import useStreamRef from "../../components/custom-hook/useStreamRef";
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
+import AgoraRTMProvider from "context/agoraRTM/AgoraRTMProvider";
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -234,58 +235,60 @@ const StreamerLayout = (props) => {
    }
 
    return (
-      <NotificationsContext.Provider
-         value={{ setNewNotification, setNotificationToRemove }}
-      >
-         <CurrentStreamContext.Provider
-            value={{
-               currentLivestream,
-               isBreakout,
-               isMainStreamer,
-               isStreamer: true,
-               streamerId,
-            }}
+      <AgoraRTMProvider roomId={currentLivestream.id} userId={streamerId}>
+         <NotificationsContext.Provider
+            value={{ setNewNotification, setNotificationToRemove }}
          >
-            <div className={classes.root}>
-               <StreamerTopBar
-                  firebase={firebase}
-                  showAudience={showAudience}
-               />
-               <LeftMenu
-                  handleStateChange={handleStateChange}
-                  selectedState={selectedState}
-                  smallScreen={smallScreen}
-                  streamer={true}
-                  sliding={sliding}
-                  setSliding={setSliding}
-                  livestream={currentLivestream}
-               />
+            <CurrentStreamContext.Provider
+               value={{
+                  currentLivestream,
+                  isBreakout,
+                  isMainStreamer,
+                  isStreamer: true,
+                  streamerId,
+               }}
+            >
+               <div className={classes.root}>
+                  <StreamerTopBar
+                     firebase={firebase}
+                     showAudience={showAudience}
+                  />
+                  <LeftMenu
+                     handleStateChange={handleStateChange}
+                     selectedState={selectedState}
+                     smallScreen={smallScreen}
+                     streamer={true}
+                     sliding={sliding}
+                     setSliding={setSliding}
+                     livestream={currentLivestream}
+                  />
 
-               <div className={classes.wrapper}>
-                  <div className={classes.contentContainer}>
-                     <div className={classes.content}>
-                        {React.cloneElement(children, {
-                           ...props,
-                           newNotification,
-                           isMainStreamer,
-                           isStreamer: true,
-                           hideAudience,
-                           audienceDrawerOpen,
-                           setSliding,
-                           smallScreen,
-                           selectedState,
-                           handleStateChange,
-                           showAudience,
-                           showMenu,
-                           notifications,
-                           streamerId,
-                        })}
+                  <div className={classes.wrapper}>
+                     <div className={classes.contentContainer}>
+                        <div className={classes.content}>
+                           {React.cloneElement(children, {
+                              ...props,
+                              newNotification,
+                              isMainStreamer,
+                              isStreamer: true,
+                              hideAudience,
+                              audienceDrawerOpen,
+                              setSliding,
+                              smallScreen,
+                              selectedState,
+                              handleStateChange,
+                              showAudience,
+                              showMenu,
+                              notifications,
+                              streamerId,
+                           })}
+                        </div>
                      </div>
                   </div>
                </div>
-            </div>
-         </CurrentStreamContext.Provider>
-      </NotificationsContext.Provider>
+            </CurrentStreamContext.Provider>
+         </NotificationsContext.Provider>
+      </AgoraRTMProvider>
    );
 };
 

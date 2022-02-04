@@ -1,4 +1,10 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, {
+   Fragment,
+   useCallback,
+   useContext,
+   useEffect,
+   useState,
+} from "react";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useDevices from "components/custom-hook/useDevices";
 import useMediaSources from "components/custom-hook/useMediaSources";
@@ -23,6 +29,7 @@ import StreamPublishingModal from "components/views/streaming/modal/StreamPublis
 import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay";
 import useHandRaiseState from "components/custom-hook/useHandRaiseState";
 import RecommendedEventsOverlay from "./overlay/RecommendedEventsOverlay";
+import AgoraRTMContext from "../../../../context/agoraRTM/AgoraRTMContext";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -98,10 +105,7 @@ function ViewerComponent({
       publishLocalStreamTracks,
    } = useAgoraRtc(streamerId, currentLivestream.id, handRaiseActive);
 
-   const { agoraHandlers, createEmote } = useAgoraRtm(
-      currentLivestream.id,
-      streamerId
-   );
+   const { agoraHandlers, createEmote } = useContext(AgoraRTMContext);
 
    const devices = useDevices(localStream);
    // console.log("-> agoraRtcStatus.msg", agoraRtcStatus.msg);

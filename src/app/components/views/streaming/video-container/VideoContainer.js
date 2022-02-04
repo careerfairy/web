@@ -25,7 +25,6 @@ import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 import Streams from "./Streams";
 import DraggableComponent from "../../banners/DraggableComponent";
 import useAgoraRtc from "components/custom-hook/useAgoraRtc";
-import useAgoraRtm from "components/custom-hook/useAgoraRtm";
 import StreamPublishingModal from "../modal/StreamPublishingModal";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
@@ -75,8 +74,6 @@ function VideoContainer({
       leaveAgoraRoom,
       localMediaEnabling,
    } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer);
-
-   const { agoraHandlers } = useAgoraRtm(currentLivestream.id, streamerId);
 
    const devices = useDevices(localStream);
 
@@ -280,10 +277,7 @@ function VideoContainer({
 
    return (
       <Fragment>
-         <BreakoutRoomManagementModal
-            leaveAgoraRoom={leaveAgoraRoom}
-            agoraHandlers={agoraHandlers}
-         />
+         <BreakoutRoomManagementModal leaveAgoraRoom={leaveAgoraRoom} />
          <Streams
             externalMediaStreams={remoteStreams}
             localMediaStream={localStream}

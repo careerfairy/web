@@ -259,7 +259,6 @@ const BreakoutRoom = ({
    handleClose,
    refreshing,
    mobile,
-   agoraHandlers,
    leaveAgoraRoom,
 }) => {
    const classes = useStyles();
@@ -492,7 +491,6 @@ const BreakoutRoom = ({
             </AccordionSummary>
             <BreakoutRoomAccordionContent
                roomId={id}
-               agoraHandlers={agoraHandlers}
                leaveAgoraRoom={leaveAgoraRoom}
                liveSpeakers={liveSpeakers}
                updateMemberCount={updateMemberCount}

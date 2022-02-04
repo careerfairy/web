@@ -1,12 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
    Button,
    DialogActions,
    DialogContent,
    DialogTitle,
 } from "@mui/material";
-import PropTypes from "prop-types";
-import { streamShape } from "types";
 import { useTheme } from "@mui/material/styles";
 import makeStyles from "@mui/styles/makeStyles";
 import { useDispatch } from "react-redux";
@@ -23,6 +21,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import clsx from "clsx";
 import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos";
 import { addQueryParam } from "../../../../../components/helperFunctions/HelperFunctions";
+import AgoraRTMContext from "../../../../../context/agoraRTM/AgoraRTMContext";
 
 const useStyles = makeStyles((theme) => ({
    breakoutRoomsContent: {
@@ -36,9 +35,10 @@ const useStyles = makeStyles((theme) => ({
 const ManageBreakoutRoomsView = ({
    breakoutRooms,
    handleClose,
-   agoraHandlers,
    leaveAgoraRoom,
 }) => {
+   const { agoraHandlers } = useContext(AgoraRTMContext);
+
    const classes = useStyles();
    const { isMainStreamer } = useCurrentStream();
    const theme = useTheme();
@@ -187,7 +187,6 @@ const ManageBreakoutRoomsView = ({
                   updateMemberCount={updateMemberCount}
                   index={index}
                   isMainStreamer={isMainStreamer}
-                  agoraHandlers={agoraHandlers}
                   leaveAgoraRoom={leaveAgoraRoom}
                   openRoom={openRoom}
                   refreshing={refreshing}
@@ -234,8 +233,6 @@ const ManageBreakoutRoomsView = ({
       </React.Fragment>
    );
 };
-ManageBreakoutRoomsView.propTypes = {
-   breakoutRooms: PropTypes.arrayOf(PropTypes.shape(streamShape)).isRequired,
-};
+ManageBreakoutRoomsView.propTypes = {};
 
 export default ManageBreakoutRoomsView;

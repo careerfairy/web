@@ -1,6 +1,6 @@
 import { EMOTE_MESSAGE_TEXT_TYPE } from "components/util/constants";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as actions from "../../store/actions";
 import AgoraRTM from "agora-rtm-sdk";
@@ -11,6 +11,7 @@ const rtmClient = AgoraRTM.createInstance(AGORA_APP_ID, {
 });
 
 export default function useAgoraRtm(roomId, userId) {
+   const rtmClient = useRef();
    const [rtmChannel, setRtmChannel] = useState(null);
    const [joinedChannel, setJoinedChannel] = useState(false);
 

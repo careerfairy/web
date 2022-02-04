@@ -19,6 +19,7 @@ import * as actions from "store/actions";
 import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHandRaiseConnect";
 import StatsUtil from "../../data/util/StatsUtil";
 import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu";
+import AgoraRTMProvider from "context/agoraRTM/AgoraRTMProvider";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -298,48 +299,50 @@ const ViewerLayout = (props) => {
    }
 
    return (
-      <CurrentStreamContext.Provider
-         value={{ currentLivestream, isBreakout, streamerId }}
-      >
-         <div className={`${classes.root} notranslate`}>
-            <ViewerTopBar
-               showAudience={showAudience}
-               showMenu={showMenu}
-               audienceDrawerOpen={audienceDrawerOpen}
-               mobile={mobile}
-            />
-            <LeftMenu
-               streamerId={streamerId}
-               handRaiseActive={handRaiseActive}
-               setHandRaiseActive={setHandRaiseActive}
-               streamer={false}
-               handleStateChange={handleStateChange}
-               selectedState={selectedState}
-               setSelectedState={setSelectedState}
-               livestream={currentLivestream}
-               isMobile={mobile}
-            />
+      <AgoraRTMProvider roomId={currentLivestream.id} userId={streamerId}>
+         <CurrentStreamContext.Provider
+            value={{ currentLivestream, isBreakout, streamerId }}
+         >
+            <div className={`${classes.root} notranslate`}>
+               <ViewerTopBar
+                  showAudience={showAudience}
+                  showMenu={showMenu}
+                  audienceDrawerOpen={audienceDrawerOpen}
+                  mobile={mobile}
+               />
+               <LeftMenu
+                  streamerId={streamerId}
+                  handRaiseActive={handRaiseActive}
+                  setHandRaiseActive={setHandRaiseActive}
+                  streamer={false}
+                  handleStateChange={handleStateChange}
+                  selectedState={selectedState}
+                  setSelectedState={setSelectedState}
+                  livestream={currentLivestream}
+                  isMobile={mobile}
+               />
 
-            <div className={classes.wrapper}>
-               <div className={classes.contentContainer}>
-                  <div className={classes.content}>
-                     {React.cloneElement(children, {
-                        handRaiseActive,
-                        handleStateChange,
-                        selectedState,
-                        setSelectedState,
-                        showMenu,
-                        streamerId,
-                        mobile,
-                        showAudience,
-                        hideAudience,
-                        audienceDrawerOpen,
-                     })}
+               <div className={classes.wrapper}>
+                  <div className={classes.contentContainer}>
+                     <div className={classes.content}>
+                        {React.cloneElement(children, {
+                           handRaiseActive,
+                           handleStateChange,
+                           selectedState,
+                           setSelectedState,
+                           showMenu,
+                           streamerId,
+                           mobile,
+                           showAudience,
+                           hideAudience,
+                           audienceDrawerOpen,
+                        })}
+                     </div>
                   </div>
                </div>
             </div>
-         </div>
-      </CurrentStreamContext.Provider>
+         </CurrentStreamContext.Provider>
+      </AgoraRTMProvider>
    );
 };
 

@@ -87,10 +87,6 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
    const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
    const [hideTooltip, setHideTooltip] = useState(false);
    const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
-   const [
-      openStreamerBreakoutRoomModal,
-      setOpenStreamerBreakoutRoomModal,
-   ] = useState(false);
    const { joiningStreamerLink, viewerLink } = useStreamToken();
 
    const streamerIsPublished = useSelector((state) => {
@@ -247,7 +243,6 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
 
                   <Tooltip title="Manage breakout rooms">
                      <IconButton
-                        disabled={openStreamerBreakoutRoomModal}
                         onClick={handleOpenBreakoutRoomModal}
                         size="large"
                      >
