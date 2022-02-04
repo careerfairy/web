@@ -1,12 +1,11 @@
 import React from "react";
-import makeStyles from "@mui/styles/makeStyles";
 import { Container } from "@mui/material";
 import TeamBios from "./TeamBios";
 import Section from "../../common/Section";
 import SectionHeader from "../../common/SectionHeader";
 import { shuffleArray } from "../../../helperFunctions/HelperFunctions";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    container: {
       zIndex: 1,
       "&.MuiContainer-root": {
@@ -16,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
    title: {
       fontWeight: 500,
    },
-}));
+};
 const people = [
    {
       id: 1,
@@ -106,8 +105,11 @@ const people = [
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fgary.jpg?alt=media&token=c5893021-c141-43af-89cc-b3d440cbad78",
       name: "Gary Terol",
-      role: "Business Development & Strategy",
-      bio: "",
+      role: "Business Development",
+      bio:
+         "Gary is a serial entrepreneur who cannot be inactive for more than 2 minutes. He likes to challenge established ways of thinking and believes everybody he speaks with can teach him something. \n" +
+         "\n" +
+         "After graduating from the University of St.Gallen and completing two exchange semesters in Medellin (COL) and, respectively, Cologne (GER), he entered the world of entrepreneurship.",
       linkedinUrl: "https://www.linkedin.com/in/gary-terol/",
    },
    {
@@ -150,7 +152,6 @@ const people = [
 const shuffledPeople = shuffleArray(people);
 
 const TeamBiosSection = (props) => {
-   const classes = useStyles();
    return (
       <Section
          color={props.color}
@@ -158,11 +159,11 @@ const TeamBiosSection = (props) => {
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
-         <Container className={classes.container}>
+         <Container sx={styles.container}>
             <SectionHeader
                title={props.title}
                subtitle={props.subtitle}
-               titleClassName={classes.title}
+               titleSx={styles.title}
                color={props.color}
                size={3}
                spaced={true}
