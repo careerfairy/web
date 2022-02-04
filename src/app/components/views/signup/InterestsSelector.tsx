@@ -1,32 +1,34 @@
 import {useAuth} from "../../../HOCs/AuthProvider";
-import React, {useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import {useDispatch} from "react-redux";
 import userRepo from "../../../data/firebase/UserRepository";
 import {
   Box,
-  Button, Chip, CircularProgress,
+  Chip,
   Typography
 } from "@mui/material";
 import useCollection from "../../custom-hook/useCollection";
 import {Interest} from "../../../types/interests";
 import CircularLoader from "../loader/CircularLoader";
 import * as actions from "../../../store/actions/snackbarActions"
-import {IMultiStepContext, MultiStepContext} from "./MultiStepWrapper";
 import _ from "lodash";
 
 const InterestsSelector = () => {
   const {authenticatedUser: user, userData} = useAuth()
   const [interests, setInterests] = useState<InterestsSelectedState>({})
-  const {nextStep} = useContext<IMultiStepContext>(MultiStepContext)
-  const [isLoading, setLoading] = useState(false)
+  const [hasChanged, setChanged] = useState(false)
   const dispatch = useDispatch()
 
-  const handleSubmit = async () => {
-    setLoading(true)
-    await interestsSubmitHandler(interests, user?.email, dispatch, userData?.interestsIds)
-    void nextStep()
-    setLoading(false)
-  }
+  const onChange = useCallback(() => {
+    setChanged(true)
+  }, [])
+
+  useEffect(() => {
+    if (hasChanged && Object.keys(interests).length > 0) {
+      interestsSubmitHandler(interests, user?.email, dispatch, userData?.interestsIds)
+        .catch(console.error)
+    }
+  }, [interests, hasChanged])
 
   return (
     <Box px={6}>
@@ -37,16 +39,8 @@ const InterestsSelector = () => {
 
       <Box my={2}>
         <InterestsChipsSelector interests={interests}
-                                setInterests={setInterests}/>
-      </Box>
-
-      <Box style={{textAlign: 'center'}}>
-        <Button variant="contained"
-                onClick={handleSubmit}
-                disabled={isLoading}
-                startIcon={
-                  isLoading && (<CircularProgress size={20} color="inherit"/>)
-                }>Continue</Button>
+                                setInterests={setInterests}
+                                onChange={onChange}/>
       </Box>
     </Box>
   )
@@ -86,7 +80,11 @@ export const formatInterests = (interests: InterestsSelectedState): string[] => 
   return data
 }
 
-export const InterestsChipsSelector = ({interests, setInterests}) => {
+export const InterestsChipsSelector = ({
+                                         interests,
+                                         setInterests,
+                                         onChange
+                                       }: InterestsChipsSelectorProps) => {
   const allInterests = useCollection<Interest>("interests")
   const {userData} = useAuth()
 
@@ -104,6 +102,10 @@ export const InterestsChipsSelector = ({interests, setInterests}) => {
         isSelected: !prevState[id].isSelected
       }
     }))
+
+    if (onChange) {
+      onChange(id)
+    }
   }
 
   if (interestsKeys.length === 0) {
@@ -121,6 +123,12 @@ export const InterestsChipsSelector = ({interests, setInterests}) => {
       ))}
     </React.Fragment>
   )
+}
+
+type InterestsChipsSelectorProps = {
+  interests: InterestsSelectedState,
+  setInterests: React.Dispatch<any>,
+  onChange?: (id: string) => void
 }
 
 export type InterestsSelectedState = { [index: string]: { name: string, isSelected: boolean } }

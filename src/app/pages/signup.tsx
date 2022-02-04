@@ -57,6 +57,7 @@ const SignUp = () => {
     if (!user.emailVerified) {
       return setCurrentStep(1);
     }
+
   }, [user])
 
   return (
