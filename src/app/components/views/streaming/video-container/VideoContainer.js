@@ -30,6 +30,19 @@ import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 import AgoraRtcStateModal from "../modal/AgoraRtcStateModal";
 
+const labels = {
+   mainTitle: "Join the Stream",
+   refuseTooltip:
+      "Join without camera nor microphone. You will still be able to watch the streamers, give written answers to questions, share your screen and control slides.",
+   refuseLabel: "I am only watching",
+   joinWithoutCameraLabel: "Join without camera",
+   joinWithoutCameraTooltip:
+      "We recommend to activate your camera for a better experience.",
+   joinButtonLabel: "Join as streamer",
+   disabledJoinButtonLabel: "Activate microphone to join",
+   joinWithoutCameraConfirmDescription:
+      "You intend to join this stream with only with your microphone?",
+};
 function VideoContainer({
    currentLivestream,
    isPlayMode,
@@ -42,7 +55,6 @@ function VideoContainer({
    const {
       tutorialSteps,
       setTutorialSteps,
-      showBubbles,
       setShowBubbles,
       handleConfirmStep,
       getActiveTutorialStepKey,
@@ -72,7 +84,7 @@ function VideoContainer({
       publishScreenShareStream,
       unpublishScreenShareStream,
       leaveAgoraRoom,
-      localMediaEnabling,
+      localMediaHandlers,
    } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer);
 
    const devices = useDevices(localStream);
@@ -83,8 +95,9 @@ function VideoContainer({
    } = useMediaSources(
       devices,
       localStream,
-      (showLocalStreamPublishingModal || showSettings) &&
-         localStream.audioTrack,
+      // (showLocalStreamPublishingModal || showSettings) &&
+      //    localStream.audioTrack,
+
       true
    );
 
@@ -168,7 +181,7 @@ function VideoContainer({
       await firebase.setDesktopMode(streamRef, mode, screenSharerId);
    };
 
-   const handlePublishLocalStream = async () => {
+   const handlePublishLocalStream = useCallback(async () => {
       if (localStream.audioTrack && !localStream.isAudioPublished) {
          await publishLocalStreamTracks.publishLocalMicrophoneTrack();
       }
@@ -177,14 +190,19 @@ function VideoContainer({
       }
       await dispatch(actions.setStreamerIsPublished(true));
       setShowLocalStreamPublishingModal(false);
-   };
+   }, [
+      localStream.audioTrack,
+      localStream.videoTrack,
+      localStream.isAudioPublished,
+      localStream.isVideoPublished,
+   ]);
 
-   const handleJoinAsViewer = async () => {
-      await localMediaEnabling.closeLocalCameraTrack();
-      await localMediaEnabling.closeLocalMicrophoneTrack();
+   const handleJoinAsViewer = useCallback(async () => {
+      await localMediaHandlers.closeLocalCameraTrack();
+      await localMediaHandlers.closeLocalMicrophoneTrack();
       await dispatch(actions.setStreamerIsPublished(false));
       setShowLocalStreamPublishingModal(false);
-   };
+   }, []);
 
    useEffect(() => {
       const activeStep = getActiveTutorialStepKey();
@@ -298,24 +316,16 @@ function VideoContainer({
             setOpen={setShowLocalStreamPublishingModal}
             localStream={localStream}
             displayableMediaStream={displayableMediaStream}
+            showSoundMeter={Boolean(
+               (showLocalStreamPublishingModal || showSettings) &&
+                  localStream.audioTrack
+            )}
             devices={devices}
             mediaControls={mediaControls}
             onConfirmStream={handlePublishLocalStream}
             onRefuseStream={handleJoinAsViewer}
-            localMediaEnabling={localMediaEnabling}
-            labels={{
-               mainTitle: "Join the Stream",
-               refuseTooltip:
-                  "Join without camera nor microphone. You will still be able to watch the streamers, give written answers to questions, share your screen and control slides.",
-               refuseLabel: "I am only watching",
-               joinWithoutCameraLabel: "Join without camera",
-               joinWithoutCameraTooltip:
-                  "We recommend to activate your camera for a better experience.",
-               joinButtonLabel: "Join as streamer",
-               disabledJoinButtonLabel: "Activate microphone to join",
-               joinWithoutCameraConfirmDescription:
-                  "You intend to join this stream with only with your microphone?",
-            }}
+            localMediaHandlers={localMediaHandlers}
+            labels={labels}
          />
          <VideoControlsContainer
             currentLivestream={currentLivestream}

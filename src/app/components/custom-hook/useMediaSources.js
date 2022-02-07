@@ -1,15 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSoundMeter } from "./useSoundMeter";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 import useLocalStorageMediaSources from "./useLocalStorageMediaSources";
 
-export default function useMediaSources(
-   devices,
-   localStream,
-   showSoundMeter,
-   active
-) {
+export default function useMediaSources(devices, localStream, active) {
    const {
       storedAudioSourceId,
       storedVideoSourceId,
@@ -55,11 +49,6 @@ export default function useMediaSources(
          mediaStream.removeTrack(videoTracks[0]);
       }
    };
-
-   const audioLevel = useSoundMeter(
-      showSoundMeter,
-      localStream?.audioTrack?.getMediaStreamTrack()
-   );
 
    useEffect(() => {
       if (
@@ -150,20 +139,15 @@ export default function useMediaSources(
    );
 
    const mediaControls = useMemo(() => {
+      console.log("-> mediaControls");
+
       return {
          audioSource,
          updateAudioSource,
          videoSource,
          updateVideoSource,
-         audioLevel,
       };
-   }, [
-      audioSource,
-      updateAudioSource,
-      videoSource,
-      updateVideoSource,
-      audioLevel,
-   ]);
+   }, [audioSource, updateAudioSource, videoSource, updateVideoSource]);
    return {
       mediaControls,
       localMediaStream,

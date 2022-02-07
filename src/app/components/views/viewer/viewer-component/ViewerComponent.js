@@ -24,7 +24,6 @@ import Streams from "../../streaming/video-container/Streams";
 import DraggableComponent from "../../banners/DraggableComponent";
 import WifiIndicator from "../../streaming/video-container/WifiIndicator";
 import useAgoraRtc from "components/custom-hook/useAgoraRtc";
-import useAgoraRtm from "components/custom-hook/useAgoraRtm";
 import StreamPublishingModal from "components/views/streaming/modal/StreamPublishingModal";
 import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay";
 import useHandRaiseState from "components/custom-hook/useHandRaiseState";
@@ -101,11 +100,11 @@ function ViewerComponent({
       localStream,
       localMediaControls,
       remoteStreams,
-      localMediaEnabling,
+      localMediaHandlers,
       publishLocalStreamTracks,
    } = useAgoraRtc(streamerId, currentLivestream.id, handRaiseActive);
 
-   const { agoraHandlers, createEmote } = useContext(AgoraRTMContext);
+   const { createEmote } = useContext(AgoraRTMContext);
 
    const devices = useDevices(localStream);
    // console.log("-> agoraRtcStatus.msg", agoraRtcStatus.msg);
@@ -114,13 +113,7 @@ function ViewerComponent({
    const {
       mediaControls,
       localMediaStream: displayableMediaStream,
-   } = useMediaSources(
-      devices,
-      localStream,
-      (showLocalStreamPublishingModal || showSettings) &&
-         localStream?.audioTrack,
-      true
-   );
+   } = useMediaSources(devices, localStream, true);
 
    const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams);
 
@@ -235,18 +228,18 @@ function ViewerComponent({
 
    const handleLeaveAsHandRaiser = async () => {
       if (localStream.audioTrack && localStream.isAudioPublished) {
-         await localMediaEnabling.closeLocalMicrophoneTrack();
+         await localMediaHandlers.closeLocalMicrophoneTrack();
       }
       if (localStream.videoTrack && localStream.isVideoPublished) {
-         await localMediaEnabling.closeLocalCameraTrack();
+         await localMediaHandlers.closeLocalCameraTrack();
       }
       await publishLocalStreamTracks.returnToAudience();
       await dispatch(actions.setStreamerIsPublished(false));
    };
 
    const handleJoinAsViewer = async () => {
-      await localMediaEnabling.closeLocalCameraTrack();
-      await localMediaEnabling.closeLocalMicrophoneTrack();
+      await localMediaHandlers.closeLocalCameraTrack();
+      await localMediaHandlers.closeLocalMicrophoneTrack();
       await dispatch(actions.setStreamerIsPublished(false));
       await updateHandRaiseState("unrequested");
       setShowLocalStreamPublishingModal(false);
@@ -280,13 +273,17 @@ function ViewerComponent({
          <StreamPublishingModal
             open={showLocalStreamPublishingModal}
             setOpen={setShowLocalStreamPublishingModal}
+            showSoundMeter={Boolean(
+               (showLocalStreamPublishingModal || showSettings) &&
+                  localStream?.audioTrack
+            )}
             localStream={localStream}
             displayableMediaStream={displayableMediaStream}
             devices={devices}
             mediaControls={mediaControls}
             onConfirmStream={requestHandRaise}
             onRefuseStream={handleJoinAsViewer}
-            localMediaEnabling={localMediaEnabling}
+            localMediaHandlers={localMediaHandlers}
             labels={{
                mainTitle: "Activate Your Devices To Join The Stream",
                refuseTooltip: "Cancel Hand Raise",

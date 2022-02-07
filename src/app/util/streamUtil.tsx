@@ -1,8 +1,5 @@
 import { MediaDeviceInfo } from "agora-rtc-sdk";
-export interface DeviceOption {
-   value: MediaDeviceInfo["deviceId"];
-   text: MediaDeviceInfo["label"] | string;
-}
+import { DeviceOption } from "../types";
 
 const getDeviceKindLabel = (deviceKind: MediaDeviceInfo["kind"]) => {
    if (deviceKind === "audioinput") return "microphone";

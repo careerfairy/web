@@ -11,7 +11,7 @@ import {
    Select,
    Typography,
 } from "@mui/material";
-import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
+import SoundLevelDisplay from "../../../common/SoundLevelDisplay";
 import makeStyles from "@mui/styles/makeStyles";
 import { useAudio } from "components/custom-hook/useAudio";
 import useLocalStorageMediaSources from "../../../../custom-hook/useLocalStorageMediaSources";
@@ -96,7 +96,7 @@ const AudioTab = ({ audioLevel, audioSource, devices, setAudioSource }) => {
                      })}
                   </Select>
                </FormControl>
-               <SoundLevelDisplayer audioLevel={audioLevel} />
+               <SoundLevelDisplay audioLevel={audioLevel} />
             </Grid>
          )}
          {devices.audioOutputList.length && (

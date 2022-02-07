@@ -53,13 +53,7 @@ class FirebaseService {
 
    /**
     * Call an on call cloud function to generate a secure agora token.
-    * @param {({
-    * isStreamer: boolean,
-    * uid: string,
-    * sentToken: string,
-    * channel: string,
-    * streamDocumentPath: string,
-    * })} data
+    * @param {{isStreamer: any; uid: any; streamDocumentPath: string; sentToken: string; channelName: string}} data
     * @return {Promise<firebase.functions.HttpsCallableResult>}
     */
 

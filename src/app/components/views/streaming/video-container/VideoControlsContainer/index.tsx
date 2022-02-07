@@ -112,7 +112,7 @@ interface Props {
       audio?: boolean;
       video?: boolean;
    };
-   joinAsViewer: () => Promise<any>;
+   joinAsViewer?: () => Promise<any>;
    localMediaControls: {
       setLocalAudioEnabled: (enabled: boolean) => void;
       setLocalVideoEnabled: (enabled: boolean) => void;
@@ -182,7 +182,7 @@ const VideoControlsContainer = ({
       });
    };
 
-   const handleMouseEnter = (event) => {
+   const handleMouseEnter = () => {
       clearTimeout(delayHandler);
       handleOpen();
    };
@@ -285,8 +285,8 @@ const VideoControlsContainer = ({
    }, [localStreamIsPublished.video, isLocalMicMuted]);
 
    const actions = [];
-   console.log("-> isPublishing", isPublishing);
-   console.log("-> localStreamIsPublished", localStreamIsPublished);
+   // console.log("-> isPublishing", isPublishing);
+   // console.log("-> localStreamIsPublished", localStreamIsPublished);
 
    if (isPublishing) {
       actions.unshift({

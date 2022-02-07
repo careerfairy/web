@@ -22,7 +22,7 @@ export function useSoundMeter(showAudioMeter, audioTrack) {
    }, [showAudioMeter, audioTrack, navigator]);
 
    async function onMicrophoneGranted(stream) {
-      audioContext = new AudioContext();
+      let audioContext = new AudioContext();
 
       audioContext.audioWorklet
          .addModule("/volume-meter-processor.js")

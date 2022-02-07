@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
 import AgoraRTC from "agora-rtc-sdk-ng";
 import {
-   DeviceOption,
    getDeviceKindListName,
    getDeviceList,
    mapDevices,
 } from "util/streamUtil";
 import { MediaDeviceInfo } from "agora-rtc-sdk";
-
-export interface DeviceList {
-   audioInputList: DeviceOption[];
-   audioOutputList: DeviceOption[];
-   videoDeviceList: DeviceOption[];
-}
+import { DeviceList } from "types";
+import { useDispatch } from "react-redux";
+import * as actions from "store/actions";
 
 export default function useDevices(localStream) {
    const [deviceList, setDeviceList] = useState<DeviceList>({
@@ -20,13 +16,17 @@ export default function useDevices(localStream) {
       audioOutputList: [],
       videoDeviceList: [],
    });
-
+   const dispatch = useDispatch();
    useEffect(() => {
       (async function init() {
-         if (!localStream) return;
-         const devices = await AgoraRTC.getDevices();
-         const deviceList = mapDevices(devices);
-         setDeviceList(deviceList);
+         try {
+            if (!localStream) return;
+            const devices = await AgoraRTC.getDevices();
+            const deviceList = mapDevices(devices);
+            setDeviceList(deviceList);
+         } catch (e) {
+            dispatch(actions.sendGeneralError(e));
+         }
       })();
    }, [Boolean(localStream)]);
 
