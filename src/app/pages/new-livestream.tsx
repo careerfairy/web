@@ -5,11 +5,8 @@ import Footer from "../components/views/footer/Footer";
 import NewLivestreamForm from "../components/views/newLivestreamForm/NewLivestreamForm";
 import React from "react";
 import { Typography } from "@mui/material";
-import { useAuth } from "../HOCs/AuthProvider";
 
 const newLivestream = () => {
-   const { authenticatedUser: user } = useAuth();
-
    return (
       <TealBackground style={{ paddingBottom: 0 }}>
          <Head>
@@ -25,7 +22,7 @@ const newLivestream = () => {
          >
             Create a Live Stream
          </Typography>
-         <NewLivestreamForm user={user} />
+         <NewLivestreamForm />
          <Footer />
       </TealBackground>
    );
