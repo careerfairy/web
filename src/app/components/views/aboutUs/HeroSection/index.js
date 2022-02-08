@@ -26,6 +26,10 @@ const styles = {
    bodyText: {
       color: (theme) => theme.palette.common.white,
       opacity: 0.9,
+      fontSize: {
+         md: '1.5rem',
+         lg: '2rem'
+      }
    },
 };
 
