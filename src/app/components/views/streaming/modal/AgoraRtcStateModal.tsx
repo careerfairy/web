@@ -1,4 +1,4 @@
-import { CircularProgress, Dialog, DialogContent } from "@mui/material";
+import { Box, CircularProgress, Dialog, DialogContent } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import React, { useEffect } from "react";
 import {
@@ -11,8 +11,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import RootState from "../../../../store/reducers";
+import { ConnectionState } from "agora-rtc-sdk-ng";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    container: {
       position: "relative",
       minWidth: 300,
@@ -34,31 +36,33 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
       textAlign: "center",
    },
-}));
+} as const;
 
-const messages = {
+type Messages = {
+   [key in ConnectionState]?: string;
+};
+
+const messages: Messages = {
    DISCONNECTED: "Disconnected",
    RECONNECTING:
       "It seems like the connection got interrupted. Attempting to reconnect...",
-   // CONNECTED: "Disconnecting...",
    CONNECTING: "Connecting...",
    CONNECTED: "Connected",
 };
 
 const AgoraRtcStateModal = () => {
-   const classes = useStyles();
    const dispatch = useDispatch();
 
-   const agoraRtcConnectionStatus = useSelector((state) => {
+   const agoraRtcConnectionStatus = useSelector((state: RootState) => {
       return state.stream.agoraState.rtcConnectionState;
    });
 
-   const agoraRtcError = useSelector((state) => {
+   const agoraRtcError = useSelector((state: RootState) => {
       return state.stream.agoraState.rtcError;
    });
 
    useEffect(() => {
-      if (agoraRtcConnectionStatus === AGORA_RTC_CONNECTION_STATE_CONNECTED) {
+      if (agoraRtcConnectionStatus === "CONNECTED") {
          dispatch(
             actions.enqueueSnackbar({
                message: "Connected",
@@ -72,32 +76,23 @@ const AgoraRtcStateModal = () => {
    }, [agoraRtcConnectionStatus]);
 
    return (
-      <Dialog
-         open={
-            agoraRtcConnectionStatus !== AGORA_RTC_CONNECTION_STATE_CONNECTED &&
-            !agoraRtcError
-         }
-      >
+      <Dialog open={agoraRtcConnectionStatus !== "CONNECTED" && !agoraRtcError}>
          <DialogContent>
-            <div className={classes.container}>
-               <div className={classes.progress}>
-                  {(agoraRtcConnectionStatus ===
-                     AGORA_RTC_CONNECTION_STATE_CONNECTING ||
-                     agoraRtcConnectionStatus ===
-                        AGORA_RTC_CONNECTION_STATE_RECONNECTING ||
-                     agoraRtcConnectionStatus ===
-                        AGORA_RTC_CONNECTION_STATE_DISCONNECTING) && (
+            <Box sx={styles.container}>
+               <Box sx={styles.progress}>
+                  {(agoraRtcConnectionStatus === "CONNECTING" ||
+                     agoraRtcConnectionStatus === "RECONNECTING" ||
+                     agoraRtcConnectionStatus === "DISCONNECTING") && (
                      <CircularProgress />
                   )}
-                  {agoraRtcConnectionStatus ===
-                     AGORA_RTC_CONNECTION_STATE_DISCONNECTED && (
-                     <HighlightOffIcon className={classes.icon} />
+                  {agoraRtcConnectionStatus === "DISCONNECTED" && (
+                     <HighlightOffIcon sx={styles.icon} />
                   )}
-               </div>
-               <div className={classes.content}>
+               </Box>
+               <Box sx={styles.content}>
                   {messages[agoraRtcConnectionStatus]}
-               </div>
-            </div>
+               </Box>
+            </Box>
          </DialogContent>
       </Dialog>
    );

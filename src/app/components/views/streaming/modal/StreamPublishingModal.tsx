@@ -22,7 +22,6 @@ import {
 import SoundLevelDisplay from "components/views/common/SoundLevelDisplay";
 import ButtonWithConfirm from "components/views/common/ButtonWithConfirm";
 import { useDispatch, useSelector } from "react-redux";
-import { AGORA_RTC_CONNECTION_STATE_CONNECTED } from "constants/agora";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
@@ -123,10 +122,7 @@ const StreamPublishingModal = memo(
       });
 
       const openModal = useMemo(() => {
-         return (
-            open &&
-            agoraRtcConnectionState === AGORA_RTC_CONNECTION_STATE_CONNECTED
-         );
+         return open && agoraRtcConnectionState === "CONNECTED";
       }, [open, agoraRtcConnectionState]);
 
       useEffect(() => {

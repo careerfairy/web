@@ -31,6 +31,7 @@ export default function useAgoraRtc(
    const {
       query: { token, withProxy },
    } = useRouter();
+   const [isUsingCloudProxy, setIsUsingCloudProxy] = useState(false);
 
    const [localStream, setLocalStream] = useState({
       uid: streamerId,
@@ -49,10 +50,30 @@ export default function useAgoraRtc(
    const screenShareStreamRef = useRef(screenShareStream);
    const screenShareRtcClientRef = useRef(screenShareRtcClient);
 
-   const { remoteStreams, networkQuality } = useAgoraClientConfig(
-      rtcClient,
-      streamerId
-   );
+   const { remoteStreams, networkQuality } = useAgoraClientConfig(rtcClient, {
+      isUsingCloudProxy,
+   });
+
+   useEffect(() => {
+      if ("WebSocket" in window && window.WebSocket.CLOSING === 2) {
+         // supported
+         console.log("->   WS SUPPORTED");
+      } else {
+         console.log("->   WS NOT SUPPORTED");
+      }
+   }, []);
+
+   useEffect(() => {
+      rtcClient.on("connection-state-change", (curState, prevState, reason) => {
+         console.log("-> curState", curState);
+         console.log("-> prevState", prevState);
+         console.log("-> reason", reason);
+      });
+      rtcClient.on("is-using-cloud-proxy", (isUsingProxy) => {
+         console.log("-> is using proxy in emit", isUsingProxy);
+         setIsUsingCloudProxy(isUsingProxy);
+      });
+   }, []);
 
    useEffect(() => {
       if (rtcClient) {
@@ -358,8 +379,8 @@ export default function useAgoraRtc(
    };
 
    const getScreenShareStream = async (
-      screenSharingMode,
-      onScreenShareStopped
+      screenSharingMode: string,
+      onScreenShareStopped: () => void
    ) => {
       return new Promise(async (resolve, reject) => {
          let screenShareVideoResolution: ScreenVideoTrackInitConfig["encoderConfig"] =

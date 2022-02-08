@@ -1,20 +1,29 @@
 import { useEffect, useState, useRef } from "react";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
+import {
+   IAgoraRTCClient,
+   IAgoraRTCRemoteUser,
+   NetworkQuality,
+} from "agora-rtc-sdk-ng";
+import { RemoteStreamUser, RTCSubscribeErrorCodes } from "types";
 
-export default function useAgoraClientConfig(rtcClient, streamerId) {
+interface ClientConfigOptions {
+   isUsingCloudProxy?: boolean;
+}
+export default function useAgoraClientConfig(
+   rtcClient: IAgoraRTCClient,
+   clientConfigOptions?: ClientConfigOptions
+) {
    const [remoteStreams, setRemoteStreams] = useState([]);
-   const [networkQuality, setNetworkQuality] = useState({
+   const [networkQuality, setNetworkQuality] = useState<NetworkQuality>({
       downlinkNetworkQuality: 0,
-      type: "network-quality",
       uplinkNetworkQuality: 0,
    });
 
-   const remoteStreamsRef = useRef(remoteStreams);
    const dispatch = useDispatch();
 
    const updateRemoteStreams = (newRemoteStreams) => {
-      remoteStreamsRef.current = newRemoteStreams;
       setRemoteStreams(newRemoteStreams);
    };
 
@@ -24,24 +33,18 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
       }
    }, [rtcClient]);
 
-   const removeStreamFromList = (uid, streamList) => {
-      const streamListCopy = [...streamList];
-      const streamEntry = streamListCopy.find((entry) => {
-         return entry.uid === uid;
-      });
-      if (streamEntry) {
-         streamListCopy.splice(streamListCopy.indexOf(streamEntry), 1);
-      }
-      return streamListCopy;
+   const removeStreamFromList = (
+      uid: IAgoraRTCRemoteUser["uid"],
+      streamList
+   ) => {
+      return streamList.filter((entry) => entry.uid !== uid);
    };
 
    const configureAgoraClient = () => {
-      let AgoraRTC = require("agora-rtc-sdk-ng");
-      AgoraRTC.onAudioAutoplayFailed = () => {};
       rtcClient.on("user-joined", async (remoteUser) => {
          let cleanedRemoteStreams = removeStreamFromList(
             remoteUser.uid,
-            remoteStreamsRef.current
+            remoteStreams
          );
          updateRemoteStreams([
             ...cleanedRemoteStreams,
@@ -51,9 +54,9 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
       rtcClient.on("user-left", async (remoteUser) => {
          let cleanedRemoteStreams = removeStreamFromList(
             remoteUser.uid,
-            remoteStreamsRef.current
+            remoteStreams
          );
-         updateRemoteStreams([...cleanedRemoteStreams]);
+         updateRemoteStreams(cleanedRemoteStreams);
       });
 
       rtcClient.on("connection-state-change", (curState, prevState) => {
@@ -64,22 +67,25 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
          try {
             await rtcClient.subscribe(remoteUser, mediaType);
          } catch (error) {
+            handleCatchRtcSubscribeError(error?.code);
             // handleRtcError(error);
          }
-         let remoteStreams = [...remoteStreamsRef.current];
-         remoteStreams.forEach((user) => {
-            if (user.uid === remoteUser.uid) {
-               if (mediaType === "audio") {
-                  user.audioTrack = remoteUser.audioTrack;
-                  user.audioMuted = false;
-                  remoteUser.audioTrack.play();
-               } else if (mediaType === "video") {
-                  user.videoTrack = remoteUser.videoTrack;
-                  user.videoMuted = false;
+         const newRemoteStreams = remoteStreams.map(
+            (user: RemoteStreamUser) => {
+               if (user.uid === remoteUser.uid) {
+                  if (mediaType === "audio") {
+                     user.audioTrack = remoteUser.audioTrack;
+                     user.audioMuted = false;
+                     remoteUser.audioTrack.play();
+                  } else if (mediaType === "video") {
+                     user.videoTrack = remoteUser.videoTrack;
+                     user.videoMuted = false;
+                  }
                }
+               return user;
             }
-         });
-         updateRemoteStreams(remoteStreams);
+         );
+         updateRemoteStreams(newRemoteStreams);
       });
 
       rtcClient.on("user-unpublished", async (remoteUser, mediaType) => {
@@ -88,8 +94,7 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
          } catch (error) {
             // handleRtcError(error);
          }
-         let remoteStreams = [...remoteStreamsRef.current];
-         remoteStreams.forEach((user) => {
+         const newRemoteStreams = remoteStreams.map((user) => {
             if (user.uid === remoteUser.uid) {
                if (mediaType === "audio") {
                   user.audioTrack = null;
@@ -99,13 +104,25 @@ export default function useAgoraClientConfig(rtcClient, streamerId) {
                   user.videoMuted = true;
                }
             }
+            return user;
          });
-         updateRemoteStreams(remoteStreams);
+         updateRemoteStreams(newRemoteStreams);
       });
 
       rtcClient.on("network-quality", (networkStats) => {
          setNetworkQuality(networkStats);
       });
+   };
+
+   const handleCatchRtcSubscribeError = (
+      errorCode?: RTCSubscribeErrorCodes
+   ) => {
+      if (errorCode === "NO_ICE_CANDIDATE") {
+         if (clientConfigOptions.isUsingCloudProxy) {
+            dispatch(actions.setAgoraRtcError({}));
+         } else {
+         }
+      }
    };
 
    return { remoteStreams, networkQuality };
