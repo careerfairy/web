@@ -52,7 +52,6 @@ export const handleError = (key, fieldName, errors, touched) => {
 
 export const buildLivestreamObject = (
    values,
-   targetCategories,
    updateMode,
    streamId,
    firebase
@@ -66,11 +65,10 @@ export const buildLivestreamObject = (
       companyLogoUrl: values.companyLogoUrl,
       start: firebase.getFirebaseTimestamp(values.start),
       duration: values.duration,
-      targetGroups: [],
-      targetCategories: targetCategories,
+      interestsIds: [...new Set(values.interestsIds)],
       type: "upcoming",
       test: false,
-      groupIds: values.groupIds,
+      groupIds: [...new Set(values.groupIds)],
       hidden: values.hidden,
       universities: [],
       summary: values.summary,
