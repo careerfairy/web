@@ -119,8 +119,12 @@ export default function useAgoraClientConfig(
    ) => {
       if (errorCode === "NO_ICE_CANDIDATE") {
          if (clientConfigOptions.isUsingCloudProxy) {
-            dispatch(actions.setAgoraRtcError({}));
+            //  - Check whether you have whitelisted the IP addresses and ports that Agora provides for cloud proxy
+            //  - ensure that the local client can connect to the TURN server
          } else {
+            //  - turn it on
+            //  - Check whether the browser has any plugins that disable WebRTC.
+            //  - Ensure that you have enabled UDP in the system firewall, and added the [specified domains and ports to the whitelist](https://docs.agora.io/en/Agora%20Platform/firewall?platform=All%20Platforms#web-sdk).
          }
       }
    };
