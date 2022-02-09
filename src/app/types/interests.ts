@@ -1,5 +1,5 @@
-import {Identifiable} from "../components/custom-hook/useCollection";
+import { Identifiable } from "./commonTypes";
 
-export interface Interest extends Identifiable{
+export interface Interest extends Identifiable {
   name: string
 }
