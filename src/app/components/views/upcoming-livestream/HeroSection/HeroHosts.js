@@ -31,7 +31,7 @@ const styles = {
       width: "fit-content",
       height: "fit-content",
       "& img": {
-         borderRadius: theme.spacing(1),
+         borderRadius: theme.spacing(0.2),
          maxHeight: 45,
          maxWidth: 140,
          objectFit: "contain",
