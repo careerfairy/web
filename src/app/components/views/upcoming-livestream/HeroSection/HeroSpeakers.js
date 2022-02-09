@@ -5,9 +5,14 @@ import { speakerPlaceholder } from "../../../util/constants";
 
 const styles = {
    avatar: (theme) => ({
-      [theme.breakpoints.up("sm")]: {
-         width: theme.spacing(8),
-         height: theme.spacing(8),
+      background: "white",
+      width: {
+         sm: theme.spacing(8),
+         md: theme.spacing(14),
+      },
+      height: {
+         sm: theme.spacing(8),
+         md: theme.spacing(14),
       },
    }),
    speakerRoot: {
