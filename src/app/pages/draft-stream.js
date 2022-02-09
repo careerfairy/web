@@ -1,7 +1,5 @@
 import { TealBackground } from "../materialUI/GlobalBackground/GlobalBackGround";
 import Head from "next/head";
-import Header from "../components/views/header/Header";
-import Footer from "../components/views/footer/Footer";
 import React, { useEffect, useRef, useState } from "react";
 import { Typography } from "@mui/material";
 import DraftStreamForm from "../components/views/draftStreamForm/DraftStreamForm";
@@ -82,7 +80,6 @@ const draftStream = ({ firebase }) => {
    const onSubmit = async (
       values,
       { setSubmitting },
-      targetCategories,
       updateMode,
       draftStreamId,
       setFormData,
@@ -93,7 +90,6 @@ const draftStream = ({ firebase }) => {
          setSubmitting(true);
          const livestream = buildLivestreamObject(
             values,
-            targetCategories,
             updateMode,
             draftStreamId,
             firebase
