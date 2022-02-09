@@ -123,10 +123,12 @@ const streamsSelector = createSelector(
                }
                livestream[userType.propertyDataName] = livestream[
                   userType.propertyName
-               ]?.map((userEmail) => ({
-                  ...userDataSetDictionary?.[userEmail],
-                  isInTalentPool: checkIfInTalentPool(livestream, userEmail),
-               }));
+               ]
+                  ?.filter((userEmail) => userDataSetDictionary?.[userEmail])
+                  ?.map((userEmail) => ({
+                     ...userDataSetDictionary?.[userEmail],
+                     isInTalentPool: checkIfInTalentPool(livestream, userEmail),
+                  }));
             }
             return livestream;
          });
