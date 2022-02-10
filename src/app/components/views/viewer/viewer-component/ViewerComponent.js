@@ -107,8 +107,6 @@ function ViewerComponent({
    const { createEmote } = useContext(AgoraRTMContext);
 
    const devices = useDevices(localStream);
-   // console.log("-> agoraRtcStatus.msg", agoraRtcStatus.msg);
-   // console.log("-> devices from use devices", devices);
 
    const {
       mediaControls,

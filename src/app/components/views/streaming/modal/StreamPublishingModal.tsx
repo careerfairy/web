@@ -107,7 +107,6 @@ const StreamPublishingModal = memo(
       open,
       showSoundMeter,
    }: Props) => {
-      console.log("-> devices", devices);
       const noCameras = Boolean(!devices.videoDeviceList.length);
       const noMicrophones = Boolean(!devices.audioInputList.length);
       const [activatingCamera, setActivatingCamera] = useState(false);
@@ -122,7 +121,7 @@ const StreamPublishingModal = memo(
       });
 
       const openModal = useMemo(() => {
-         return open && agoraRtcConnectionState === "CONNECTED";
+         return open && agoraRtcConnectionState.curState === "CONNECTED";
       }, [open, agoraRtcConnectionState]);
 
       useEffect(() => {

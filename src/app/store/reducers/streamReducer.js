@@ -72,6 +72,14 @@ const streamReducer = (state = initialState, { type, payload }) => {
                rtcError: payload,
             },
          };
+      case actions.CLEAR_AGORA_RTC_ERROR:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               rtcError: initialState.agoraState.rtcError,
+            },
+         };
       case actions.TOGGLE_LEFT_MENU:
          return {
             ...state,

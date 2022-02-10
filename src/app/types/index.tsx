@@ -1,5 +1,7 @@
 import { Timestamp } from "@firebase/firestore-types";
 import {
+   ConnectionDisconnectedReason,
+   ConnectionState,
    IAgoraRTCRemoteUser,
    ICameraVideoTrack,
    IMicrophoneAudioTrack,
@@ -147,14 +149,34 @@ export enum RTCPublishErrorCodes {
     *      The local network exit cannot be found, possibly because a network firewall does not allow the connection or a browser plug-in disables WebRTC. See [FAQ](https://docs.agora.io/en/faq/console_error_web#none-ice-candidate-not-alloweda-namecandidatea) for details.
     */
 }
-
-export interface RTCCustomErrors extends Error {
+export enum CustomRTCErrors {
+   /*
+    * If cloud proxy is on, the SDK gets relay candidates from a TURN server so:
+    *       - Check whether you have whitelisted the IP addresses and ports that Agora provides for cloud proxy
+    *       - ensure that the local client can connect to the TURN server
+    */
+   FAILED_TO_SUBSCRIBE_WITH_PROXY = "FAILED_TO_SUBSCRIBE_WITH_PROXY",
+   /*
+    *  If cloud proxy is off, you can:
+    *       - turn it on
+    *       - Check whether the browser has any plugins that disable WebRTC.
+    *       - Ensure that you have enabled UDP in the system firewall, and added the [specified domains and ports to the whitelist](https://docs.agora.io/en/Agora%20Platform/firewall?platform=All%20Platforms#web-sdk).
+    */
+   FAILED_TO_SUBSCRIBE_WITHOUT_PROXY = "FAILED_TO_SUBSCRIBE_WITHOUT_PROXY",
+}
+export interface RTCError extends Error {
    readonly code:
       | string
       | RTCSubscribeErrorCodes
       | RTCPublishErrorCodes
-      | "FAILED_TO_SUBSCRIBE_WITH_PROXY";
+      | CustomRTCErrors;
    readonly message: string;
-   readonly data?: any;
    readonly name: string;
+   readonly data?: any;
+}
+
+export interface RTCConnectionState {
+   curState: ConnectionState;
+   prevState: ConnectionState;
+   reason?: ConnectionDisconnectedReason;
 }

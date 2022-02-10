@@ -1,4 +1,5 @@
 import * as actions from "./actionTypes";
+import { RTCConnectionState, RTCError } from "../../types";
 
 // Toggle the open state of the streamer breakoutModal
 export const openStreamerBreakoutModal = () => async (dispatch) => {
@@ -105,19 +106,24 @@ export const setFocusMode = (mode, mobile) => async (dispatch, getState) => {
    }
 };
 
-export const setAgoraRtcConnectionState = (connectionState) => async (
-   dispatch
-) => {
+export const setAgoraRtcConnectionState = (
+   connectionState: RTCConnectionState
+) => async (dispatch) => {
    dispatch({
       type: actions.SET_AGORA_RTC_CONNECTION_STATE,
       payload: connectionState,
    });
 };
 
-export const setAgoraRtcError = (rtcError) => async (dispatch) => {
+export const setAgoraRtcError = (rtcError: RTCError) => async (dispatch) => {
    dispatch({
       type: actions.SET_AGORA_RTC_ERROR,
       payload: rtcError,
+   });
+};
+export const clearAgoraRtcError = () => async (dispatch) => {
+   dispatch({
+      type: actions.CLEAR_AGORA_RTC_ERROR,
    });
 };
 

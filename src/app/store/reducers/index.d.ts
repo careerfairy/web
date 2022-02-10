@@ -1,5 +1,5 @@
 import { DefaultRootState } from "react-redux";
-import { ConnectionState } from "agora-rtc-sdk-ng";
+import { RTCConnectionState, RTCError } from "../../types";
 
 interface AuthReducer {
    error: null | string;
@@ -46,8 +46,8 @@ interface StreamReducer {
       spyModeEnabled: boolean;
    };
    agoraState: {
-      rtcConnectionState: ConnectionState;
-      rtcError: null | string;
+      rtcConnectionState?: RTCConnectionState;
+      rtcError?: RTCError;
    };
 }
 

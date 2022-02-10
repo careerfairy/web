@@ -9,6 +9,7 @@ import AgoraRTC, {
    ScreenVideoTrackInitConfig,
 } from "agora-rtc-sdk-ng";
 import * as actions from "store/actions";
+import useLocalProxyType from "./useLocalProxyType";
 
 const rtcClient = AgoraRTC.createClient({
    mode: "live",
@@ -31,6 +32,7 @@ export default function useAgoraRtc(
    const {
       query: { token, withProxy },
    } = useRouter();
+   const { setProxyType, storedProxyType } = useLocalProxyType();
    const [isUsingCloudProxy, setIsUsingCloudProxy] = useState(false);
 
    const [localStream, setLocalStream] = useState({
@@ -64,11 +66,6 @@ export default function useAgoraRtc(
    }, []);
 
    useEffect(() => {
-      rtcClient.on("connection-state-change", (curState, prevState, reason) => {
-         console.log("-> curState", curState);
-         console.log("-> prevState", prevState);
-         console.log("-> reason", reason);
-      });
       rtcClient.on("is-using-cloud-proxy", (isUsingProxy) => {
          console.log("-> is using proxy in emit", isUsingProxy);
          setIsUsingCloudProxy(isUsingProxy);
@@ -77,7 +74,15 @@ export default function useAgoraRtc(
 
    useEffect(() => {
       if (rtcClient) {
-         joinAgoraRoomWithPrimaryClient();
+         let proxyCode = undefined;
+         if (storedProxyType === "strict") {
+            proxyCode = 4;
+         }
+         if (storedProxyType === "normal") {
+            proxyCode = 3;
+         }
+         console.log("-> storedProxyType", storedProxyType);
+         joinAgoraRoomWithPrimaryClient(proxyCode);
       }
    }, [rtcClient]);
 
@@ -98,11 +103,26 @@ export default function useAgoraRtc(
       setScreenShareStream(newScreenShareStream);
    };
 
+   const handleEnableCloudProxy = async (strictMode?: boolean) => {
+      try {
+         await leaveAgoraRoom();
+      } catch (e) {
+         console.log("-> e in leaving Room", e);
+      }
+
+      try {
+         await joinAgoraRoomWithPrimaryClient(strictMode ? 4 : 3);
+      } catch (e) {
+         console.log("-> e in joining Room with Proxy", e);
+      }
+   };
+
    const joinAgoraRoom = async (
       rtcClient: IAgoraRTCClient,
       roomId: string,
       userUid: string,
-      isStreamer: boolean
+      isStreamer: boolean,
+      proxyCode?: 3 | 4
    ) => {
       try {
          const cfToken = token || "";
@@ -114,6 +134,9 @@ export default function useAgoraRtc(
             channelName: roomId,
             streamDocumentPath: path,
          });
+         if (proxyCode) {
+            rtcClient.startProxyServer(proxyCode);
+         }
          return rtcClient.join(
             AGORA_APP_ID,
             roomId,
@@ -127,6 +150,9 @@ export default function useAgoraRtc(
 
    const leaveAgoraRoom = async () => {
       try {
+         if (isUsingCloudProxy) {
+            rtcClient.stopProxyServer();
+         }
          if (rtcClient) {
             await rtcClient.leave();
          }
@@ -135,9 +161,15 @@ export default function useAgoraRtc(
       }
    };
 
-   const joinAgoraRoomWithPrimaryClient = async () => {
+   const joinAgoraRoomWithPrimaryClient = async (proxyCode?: 3 | 4) => {
       try {
-         await joinAgoraRoom(rtcClient, roomId, streamerId, isStreamer);
+         await joinAgoraRoom(
+            rtcClient,
+            roomId,
+            streamerId,
+            isStreamer,
+            proxyCode
+         );
       } catch (error) {
          dispatch(actions.setAgoraRtcError(error));
       }
@@ -438,5 +470,6 @@ export default function useAgoraRtc(
       publishScreenShareStream,
       unpublishScreenShareStream,
       leaveAgoraRoom,
+      handleEnableCloudProxy,
    };
 }

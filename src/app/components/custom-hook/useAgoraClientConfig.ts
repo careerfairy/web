@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 import {
@@ -6,7 +6,12 @@ import {
    IAgoraRTCRemoteUser,
    NetworkQuality,
 } from "agora-rtc-sdk-ng";
-import { RemoteStreamUser, RTCSubscribeErrorCodes } from "types";
+import {
+   CustomRTCErrors,
+   RemoteStreamUser,
+   RTCError,
+   RTCSubscribeErrorCodes,
+} from "types";
 
 interface ClientConfigOptions {
    isUsingCloudProxy?: boolean;
@@ -16,16 +21,13 @@ export default function useAgoraClientConfig(
    clientConfigOptions?: ClientConfigOptions
 ) {
    const [remoteStreams, setRemoteStreams] = useState([]);
+   console.log("-> remoteStreams", remoteStreams);
    const [networkQuality, setNetworkQuality] = useState<NetworkQuality>({
       downlinkNetworkQuality: 0,
       uplinkNetworkQuality: 0,
    });
 
    const dispatch = useDispatch();
-
-   const updateRemoteStreams = (newRemoteStreams) => {
-      setRemoteStreams(newRemoteStreams);
-   };
 
    useEffect(() => {
       if (rtcClient) {
@@ -42,25 +44,29 @@ export default function useAgoraClientConfig(
 
    const configureAgoraClient = () => {
       rtcClient.on("user-joined", async (remoteUser) => {
-         let cleanedRemoteStreams = removeStreamFromList(
-            remoteUser.uid,
-            remoteStreams
-         );
-         updateRemoteStreams([
-            ...cleanedRemoteStreams,
-            { uid: remoteUser.uid },
-         ]);
+         setRemoteStreams((prevRemoteStreams) => {
+            let cleanedRemoteStreams = removeStreamFromList(
+               remoteUser.uid,
+               prevRemoteStreams
+            );
+            const newStreams = [
+               ...cleanedRemoteStreams,
+               { uid: remoteUser.uid },
+            ];
+            console.log("-> newStreams on user-joined", newStreams);
+            return newStreams;
+         });
       });
       rtcClient.on("user-left", async (remoteUser) => {
-         let cleanedRemoteStreams = removeStreamFromList(
-            remoteUser.uid,
-            remoteStreams
-         );
-         updateRemoteStreams(cleanedRemoteStreams);
+         setRemoteStreams((prevRemoteStreams) => {
+            return removeStreamFromList(remoteUser.uid, prevRemoteStreams);
+         });
       });
 
-      rtcClient.on("connection-state-change", (curState, prevState) => {
-         dispatch(actions.setAgoraRtcConnectionState(curState));
+      rtcClient.on("connection-state-change", (curState, prevState, reason) => {
+         dispatch(
+            actions.setAgoraRtcConnectionState({ curState, prevState, reason })
+         );
       });
 
       rtcClient.on("user-published", async (remoteUser, mediaType) => {
@@ -68,10 +74,13 @@ export default function useAgoraClientConfig(
             await rtcClient.subscribe(remoteUser, mediaType);
          } catch (error) {
             handleCatchRtcSubscribeError(error?.code);
-            // handleRtcError(error);
          }
-         const newRemoteStreams = remoteStreams.map(
-            (user: RemoteStreamUser) => {
+         setRemoteStreams((prevRemoteStreams) => {
+            console.log(
+               "-> prevRemoteStreams in user-published",
+               prevRemoteStreams
+            );
+            return prevRemoteStreams.map((user: RemoteStreamUser) => {
                if (user.uid === remoteUser.uid) {
                   if (mediaType === "audio") {
                      user.audioTrack = remoteUser.audioTrack;
@@ -83,9 +92,8 @@ export default function useAgoraClientConfig(
                   }
                }
                return user;
-            }
-         );
-         updateRemoteStreams(newRemoteStreams);
+            });
+         });
       });
 
       rtcClient.on("user-unpublished", async (remoteUser, mediaType) => {
@@ -94,19 +102,20 @@ export default function useAgoraClientConfig(
          } catch (error) {
             // handleRtcError(error);
          }
-         const newRemoteStreams = remoteStreams.map((user) => {
-            if (user.uid === remoteUser.uid) {
-               if (mediaType === "audio") {
-                  user.audioTrack = null;
-                  user.audioMuted = true;
-               } else if (mediaType === "video") {
-                  user.videoTrack = null;
-                  user.videoMuted = true;
+         setRemoteStreams((prevRemoteStreams) => {
+            return prevRemoteStreams.map((user) => {
+               if (user.uid === remoteUser.uid) {
+                  if (mediaType === "audio") {
+                     user.audioTrack = null;
+                     user.audioMuted = true;
+                  } else if (mediaType === "video") {
+                     user.videoTrack = null;
+                     user.videoMuted = true;
+                  }
                }
-            }
-            return user;
+               return user;
+            });
          });
-         updateRemoteStreams(newRemoteStreams);
       });
 
       rtcClient.on("network-quality", (networkStats) => {
@@ -114,18 +123,38 @@ export default function useAgoraClientConfig(
       });
    };
 
-   const handleCatchRtcSubscribeError = (
-      errorCode?: RTCSubscribeErrorCodes
-   ) => {
-      if (errorCode === "NO_ICE_CANDIDATE") {
-         if (clientConfigOptions.isUsingCloudProxy) {
-            //  - Check whether you have whitelisted the IP addresses and ports that Agora provides for cloud proxy
-            //  - ensure that the local client can connect to the TURN server
-         } else {
-            //  - turn it on
-            //  - Check whether the browser has any plugins that disable WebRTC.
-            //  - Ensure that you have enabled UDP in the system firewall, and added the [specified domains and ports to the whitelist](https://docs.agora.io/en/Agora%20Platform/firewall?platform=All%20Platforms#web-sdk).
-         }
+   const handleCatchRtcSubscribeError = (error: RTCError) => {
+      console.error("error in handleCatchRtcSubscribeError", error);
+      switch (error.code) {
+         case RTCSubscribeErrorCodes.NO_ICE_CANDIDATE:
+            if (clientConfigOptions.isUsingCloudProxy) {
+               dispatch(
+                  actions.setAgoraRtcError({
+                     ...error,
+                     code: CustomRTCErrors.FAILED_TO_SUBSCRIBE_WITH_PROXY,
+                  })
+               );
+            } else {
+               dispatch(
+                  actions.setAgoraRtcError({
+                     ...error,
+                     code: CustomRTCErrors.FAILED_TO_SUBSCRIBE_WITHOUT_PROXY,
+                  })
+               );
+            }
+            break;
+         case RTCSubscribeErrorCodes.INVALID_OPERATION:
+            break;
+         case RTCSubscribeErrorCodes.INVALID_REMOTE_USER:
+            break;
+         case RTCSubscribeErrorCodes.OPERATION_ABORTED:
+            break;
+         case RTCSubscribeErrorCodes.REMOTE_USER_IS_NOT_PUBLISHED:
+            break;
+         case RTCSubscribeErrorCodes.UNEXPECTED_RESPONSE:
+         default:
+            console.log("UNKNOWN ERROR", error);
+            break;
       }
    };
 

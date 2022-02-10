@@ -81,6 +81,7 @@ export {
    setSpyMode,
    setAgoraRtcConnectionState,
    setAgoraRtcError,
+   clearAgoraRtcError,
 } from "./streamActions";
 
 export {

@@ -139,8 +139,6 @@ export default function useMediaSources(devices, localStream, active) {
    );
 
    const mediaControls = useMemo(() => {
-      console.log("-> mediaControls");
-
       return {
          audioSource,
          updateAudioSource,

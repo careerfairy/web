@@ -29,6 +29,7 @@ import StreamPublishingModal from "../modal/StreamPublishingModal";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 import AgoraRtcStateModal from "../modal/AgoraRtcStateModal";
+import AgoraErrorHandler from "../modal/agoraErrorModal/AgoraErrorHandler";
 
 const labels = {
    mainTitle: "Join the Stream",
@@ -85,6 +86,7 @@ function VideoContainer({
       unpublishScreenShareStream,
       leaveAgoraRoom,
       localMediaHandlers,
+      handleEnableCloudProxy,
    } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer);
 
    const devices = useDevices(localStream);
@@ -358,6 +360,7 @@ function VideoContainer({
             />
          </DraggableComponent>
          <AgoraRtcStateModal />
+         <AgoraErrorHandler handleEnableCloudProxy={handleEnableCloudProxy} />
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}
