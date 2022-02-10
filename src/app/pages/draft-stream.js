@@ -13,7 +13,6 @@ import {
 } from "../components/util/constants";
 import { withFirebase } from "../context/firebase/FirebaseServiceContext";
 import { useAuth } from "../HOCs/AuthProvider";
-import DataAccessUtil from "../util/DataAccessUtil";
 import EnterDetailsModal from "../components/views/draftStreamForm/EnterDetailsModal";
 import { prettyLocalizedDate } from "../components/helperFunctions/HelperFunctions";
 import GeneralLayout from "../layouts/GeneralLayout";
@@ -139,13 +138,13 @@ const draftStream = ({ firebase }) => {
             );
             const senderName = userInfo.name;
             const senderEmail = userInfo.email;
-            await DataAccessUtil.sendDraftApprovalRequestEmail(
+            await firebase.sendDraftApprovalRequestEmail({
                adminsInfo,
                senderName,
                livestream,
                submitTime,
-               senderEmail
-            );
+               senderEmail,
+            });
             await sendApprovalNotifications(livestream.groupIds || [], id);
          }
 
