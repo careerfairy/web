@@ -135,7 +135,7 @@ const DraftStreamForm = ({
    const [allFetched, setAllFetched] = useState(false);
    const [updateMode, setUpdateMode] = useState(false);
 
-   const { data: existingInterests, isLoading: fetchingInterests } = useInterests();
+   const { data: existingInterests } = useInterests();
 
    const [draftId, setDraftId] = useState("");
 
@@ -345,6 +345,8 @@ const DraftStreamForm = ({
    const handleClickSubmitForApproval = () => {
       setStatus(SUBMIT_FOR_APPROVAL);
    };
+
+   const isNotAdmin = () => !Boolean(userData?.isAdmin || group?.id);
 
    const SuccessMessage = () => {
       const directLink = getDirectLink();
@@ -799,7 +801,9 @@ const DraftStreamForm = ({
                                           label: "Add some Groups",
                                           placeholder: "Add some partner groups"
                                         }}
-                                        disabledValues={group?.id ? [group.id] : []}
+                                        disabledValues={
+                                         isNotAdmin() ? existingGroups.map(g => g.id) : []
+                                        }
                                       />
                                     </Grid>
 
