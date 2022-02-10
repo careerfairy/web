@@ -802,7 +802,7 @@ const DraftStreamForm = ({
                                           placeholder: "Add some partner groups"
                                         }}
                                         disabledValues={
-                                         isNotAdmin() ? existingGroups.map(g => g.id) : []
+                                         isNotAdmin() ? existingGroups.map(g => g.id) : [group?.id]
                                         }
                                       />
                                     </Grid>
