@@ -100,6 +100,12 @@ class FirebaseService {
       );
       return sendNewlyPublishedEventEmail(emailData);
    };
+   sendDraftApprovalRequestEmail = async (data) => {
+      const sendDraftApprovalRequestEmail = this.functions.httpsCallable(
+         "sendDraftApprovalRequestEmail"
+      );
+      return sendDraftApprovalRequestEmail(data);
+   };
 
    validateUserEmailWithPin = async (userInfo) => {
       const validateUserEmailWithPin = this.functions.httpsCallable(
