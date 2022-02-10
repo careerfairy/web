@@ -13,11 +13,16 @@ const {
 const { client } = require("./api/postmark");
 const { admin } = require("./api/firestoreAdmin");
 
-exports.sendDraftApprovalRequestEmail = functions.https.onRequest(
-   async (req, res) => {
-      setHeaders(req, res);
-
-      const adminsInfo = req.body.adminsInfo || [];
+exports.sendDraftApprovalRequestEmail = functions.https.onCall(async (data) => {
+   try {
+      const {
+         adminsInfo,
+         senderName,
+         livestream,
+         submitTime,
+         // TODO Update the cloud function to send the sender an email of the draft they submitted
+         // senderEmail,
+      } = data;
 
       functions.logger.log("admins Info in approval request", adminsInfo);
 
@@ -26,11 +31,11 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(
          From: "CareerFairy <noreply@careerfairy.io>",
          To: email,
          TemplateModel: {
-            sender_name: req.body.sender_name,
-            livestream_title: req.body.livestream_title,
-            livestream_company_name: req.body.livestream_company_name,
+            sender_name: senderName,
+            livestream_title: livestream.title,
+            livestream_company_name: livestream.company,
             draft_stream_link: eventDashboardLink,
-            submit_time: req.body.submit_time,
+            submit_time: submitTime,
          },
       }));
 
@@ -42,16 +47,17 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(
                   response
                )
             );
-            return res.send(200);
          },
          (error) => {
             functions.logger.error("error:" + error);
             console.log("error:" + error);
-            return res.status(400).send(error);
          }
       );
+   } catch (e) {
+      functions.logger.error("e:" + e);
+      throw new functions.https.HttpsError("unknown", e);
    }
-);
+});
 
 exports.sendNewlyPublishedEventEmail = functions.https.onCall(async (data) => {
    try {
