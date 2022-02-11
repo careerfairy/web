@@ -205,11 +205,15 @@ function ViewerComponent({
    );
 
    const requestHandRaise = async () => {
-      await updateHandRaiseRequest(
-         streamRef,
-         authenticatedUser.email,
-         "requested"
-      );
+      try {
+         await updateHandRaiseRequest(
+            streamRef,
+            authenticatedUser.email,
+            "requested"
+         );
+      } catch (e) {
+         console.log("-> e", e);
+      }
       setShowLocalStreamPublishingModal(false);
    };
 

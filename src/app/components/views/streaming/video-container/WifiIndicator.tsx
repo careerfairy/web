@@ -32,7 +32,7 @@ const styles = {
    root: {
       fontSize: "0.8rem",
       cursor: "move",
-      borderRadius: 10,
+      borderRadius: 2,
       padding: (theme) => theme.spacing(1),
       boxShadow: (theme) => theme.shadows[2],
       backgroundColor: (theme) => alpha(theme.palette.common.black, 0.4),

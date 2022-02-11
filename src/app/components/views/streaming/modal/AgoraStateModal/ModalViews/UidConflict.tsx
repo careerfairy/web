@@ -4,15 +4,15 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { Stack } from "@mui/material";
 import OptionCard from "../common/OptionCard";
-import { useRouter } from "next/router";
 
-interface Props {}
-const UidConflict: FC<Props> = (props) => {
-   const router = useRouter();
+interface Props {
+   handleReconnectAgora: () => Promise<void>;
+}
+const UidConflict: FC<Props> = ({ handleReconnectAgora }) => {
    const [steps] = useState([
       {
          title: "Close the stream and continue here",
-         onClick: router.reload,
+         onClick: handleReconnectAgora,
       },
    ]);
 

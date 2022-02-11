@@ -86,6 +86,7 @@ function VideoContainer({
       leaveAgoraRoom,
       localMediaHandlers,
       handleEnableCloudProxy,
+      handleReconnectAgora,
    } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer);
 
    const devices = useDevices(localStream);
@@ -196,7 +197,7 @@ function VideoContainer({
       await localMediaHandlers.closeLocalMicrophoneTrack();
       await dispatch(actions.setStreamerIsPublished(false));
       setShowLocalStreamPublishingModal(false);
-   }, []);
+   }, [localMediaHandlers]);
 
    useEffect(() => {
       const activeStep = getActiveTutorialStepKey();
@@ -350,7 +351,10 @@ function VideoContainer({
                agoraRtcConnectionStatus={{}}
             />
          </DraggableComponent>
-         <AgoraStateHandler handleEnableCloudProxy={handleEnableCloudProxy} />
+         <AgoraStateHandler
+            handleReconnectAgora={handleReconnectAgora}
+            handleEnableCloudProxy={handleEnableCloudProxy}
+         />
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}

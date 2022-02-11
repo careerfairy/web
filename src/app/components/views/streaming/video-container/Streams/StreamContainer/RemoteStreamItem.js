@@ -66,12 +66,6 @@ const RemoteStreamItem = ({
       }
    }, [muteAllRemoteVideos]);
 
-   // useEffect(() => {
-   //    if (stream?.stream?.audio === false && stream?.stream?.video === false) {
-   //       setRemovedStream(stream.uid);
-   //    }
-   // }, [stream?.stream?.audio, stream?.stream?.video]);
-
    function playVideo() {
       if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
          stream.videoTrack?.play(stream.uid, {

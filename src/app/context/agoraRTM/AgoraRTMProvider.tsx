@@ -127,13 +127,15 @@ const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
             return await rtmClient.current.getChannelMemberCount(channelIds);
          },
          handleDisconnect: async () => {
-            if (rtmChannel) {
+            if (rtmChannel.current) {
                rtmChannel.current.removeAllListeners();
                await rtmChannel.current.leave();
             }
-            if (rtmClient) {
+            if (rtmClient.current) {
                rtmClient.current.removeAllListeners();
-               await rtmClient.current.logout();
+               await rtmClient.current
+                  .logout()
+                  .catch((error) => console.error(error));
             }
          },
          joinChannel: async (

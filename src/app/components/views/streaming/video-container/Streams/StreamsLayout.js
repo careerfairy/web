@@ -77,6 +77,7 @@ const useStyles = makeStyles((theme) => ({
       right: 0,
       bottom: 0,
       padding: theme.spacing(STREAM_ELEMENT_SPACING),
+      marginLeft: "0 !important",
       transition: theme.transitions.create(["top"], {
          duration: theme.transitions.duration.complex,
          easing: theme.transitions.easing.easeInOut,

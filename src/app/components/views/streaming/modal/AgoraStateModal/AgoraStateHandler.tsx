@@ -10,9 +10,13 @@ import UidConflict from "./ModalViews/UidConflict";
 
 interface Props {
    handleEnableCloudProxy: () => Promise<void>;
+   handleReconnectAgora: () => Promise<void>;
 }
 
-const AgoraStateHandler: FC<Props> = ({ handleEnableCloudProxy }) => {
+const AgoraStateHandler: FC<Props> = ({
+   handleEnableCloudProxy,
+   handleReconnectAgora,
+}) => {
    const dispatch = useDispatch();
    const [view, setView] = useState(null);
    const agoraRtcConnectionStatus = useSelector((state: RootState) => {
@@ -53,7 +57,9 @@ const AgoraStateHandler: FC<Props> = ({ handleEnableCloudProxy }) => {
             case "DISCONNECTED":
                if (prevState === "CONNECTING") return;
                if (reason === "UID_BANNED") {
-                  setView(() => <UidConflict />);
+                  return setView(() => (
+                     <UidConflict handleReconnectAgora={handleReconnectAgora} />
+                  ));
                }
                setView(() => (
                   <ConnectionStateModal
@@ -94,7 +100,9 @@ const AgoraStateHandler: FC<Props> = ({ handleEnableCloudProxy }) => {
                ));
                break;
             case "UID_CONFLICT":
-               setView(() => <UidConflict />);
+               setView(() => (
+                  <UidConflict handleReconnectAgora={handleReconnectAgora} />
+               ));
                break;
             default:
                return null;

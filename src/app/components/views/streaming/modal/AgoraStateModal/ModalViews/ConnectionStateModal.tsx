@@ -9,7 +9,7 @@ import {
    Typography,
 } from "@mui/material";
 import * as actions from "store/actions";
-
+import { RTC_CLIENT_JOIN_TIME_LIMIT } from "constants/streams";
 import { ConnectionState } from "agora-rtc-sdk-ng";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -54,7 +54,7 @@ const messages: Messages = {
    CONNECTED: "Connected",
    DISCONNECTING: "",
 };
-const loadingTimeLimit = 10000;
+const loadingTimeLimit = RTC_CLIENT_JOIN_TIME_LIMIT + 2000;
 const ConnectionStateModal: FC<Props> = ({ handleEnableCloudProxy }) => {
    const dispatch = useDispatch();
    const [enablingCompatMode, setEnablingCompatMode] = useState(false);

@@ -10,6 +10,7 @@ import AgoraRTC, {
 } from "agora-rtc-sdk-ng";
 import * as actions from "store/actions";
 import { useSessionStorage } from "react-use";
+import { RTC_CLIENT_JOIN_TIME_LIMIT } from "constants/streams";
 
 const rtcClient = AgoraRTC.createClient({
    mode: "live",
@@ -22,7 +23,6 @@ const screenShareRtcClient = AgoraRTC.createClient({
 });
 
 const AGORA_APP_ID = "53675bc6d3884026a72ecb1de3d19eb1";
-const JOIN_TIME_LIMIT = 10000;
 export default function useAgoraRtc(
    streamerId: string,
    roomId: string,
@@ -68,13 +68,27 @@ export default function useAgoraRtc(
       });
    }, []);
 
+   useEffect(() => {
+      let isAudioAutoplayFailed = false;
+      AgoraRTC.onAudioAutoplayFailed = () => {
+         console.log("-> In OnAudioAutoplayFailed");
+         if (isAudioAutoplayFailed) return;
+         isAudioAutoplayFailed = true;
+         const btn = document.createElement("button");
+         btn.innerText = "Click me to resume the audio playback";
+         btn.onclick = () => {
+            isAudioAutoplayFailed = false;
+            btn.remove();
+         };
+         document.body.append(btn);
+      };
+   }, []);
+
    // @ts-ignore
    useEffect(() => {
-      if (rtcClient) {
-         return joinAgoraRoomWithPrimaryClient(sessionIsUsingCloudProxy);
-      }
-      return () => leaveAgoraRoom();
-   }, [rtcClient]);
+      void init();
+      return () => close();
+   }, []);
 
    useEffect(() => {
       if (!isStreamer && rtcClient) {
@@ -89,6 +103,19 @@ export default function useAgoraRtc(
          actions.setSessionIsUsingCloudProxy(Boolean(sessionIsUsingCloudProxy))
       );
    }, [sessionIsUsingCloudProxy]);
+
+   const init = async () => {
+      return joinAgoraRoomWithPrimaryClient(sessionIsUsingCloudProxy);
+   };
+
+   const close = async () => {
+      return leaveAgoraRoom();
+   };
+
+   const handleReconnectAgora = async () => {
+      await close();
+      await init();
+   };
 
    const updateScreenShareRtcClient = (newScreenShareRtcClient) => {
       screenShareRtcClientRef.current = newScreenShareRtcClient;
@@ -137,9 +164,9 @@ export default function useAgoraRtc(
          if (sessionIsUsingCloudProxy) {
             rtcClient.startProxyServer(3);
          } else {
-            // timeout = setTimeout(async () => {
-            //    await handleEnableCloudProxy();
-            // }, JOIN_TIME_LIMIT);
+            timeout = setTimeout(async () => {
+               await handleEnableCloudProxy();
+            }, RTC_CLIENT_JOIN_TIME_LIMIT);
          }
          console.log("-> JOINING CLIENT");
          await rtcClient.join(
@@ -148,6 +175,7 @@ export default function useAgoraRtc(
             data.token.rtcToken,
             userUid
          );
+         console.log("-> JOINED CLIENT");
       } catch (error) {
          console.error("-> error in JOIN AGORA ROOM", error);
          dispatch(actions.setAgoraRtcError(error));
@@ -156,7 +184,7 @@ export default function useAgoraRtc(
          clearTimeout(timeout);
       }
    };
-
+   //
    const leaveAgoraRoom = async () => {
       console.log("-> LEAVING");
 
@@ -485,5 +513,6 @@ export default function useAgoraRtc(
       unpublishScreenShareStream,
       leaveAgoraRoom,
       handleEnableCloudProxy,
+      handleReconnectAgora,
    };
 }
