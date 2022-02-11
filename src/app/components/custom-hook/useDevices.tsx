@@ -5,7 +5,6 @@ import {
    getDeviceList,
    mapDevices,
 } from "util/streamUtil";
-import { MediaDeviceInfo } from "agora-rtc-sdk";
 import { DeviceList } from "types";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";

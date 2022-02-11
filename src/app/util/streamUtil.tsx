@@ -1,4 +1,3 @@
-import { MediaDeviceInfo } from "agora-rtc-sdk";
 import { DeviceOption } from "../types";
 
 const getDeviceKindLabel = (deviceKind: MediaDeviceInfo["kind"]) => {

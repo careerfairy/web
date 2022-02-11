@@ -126,6 +126,14 @@ export const clearAgoraRtcError = () => async (dispatch) => {
       type: actions.CLEAR_AGORA_RTC_ERROR,
    });
 };
+export const setSessionIsUsingCloudProxy = (isUsing: boolean) => async (
+   dispatch
+) => {
+   dispatch({
+      type: actions.SET_SESSION_IS_USING_CLOUD_PROXY,
+      payload: isUsing,
+   });
+};
 
 // Action to set streamer state, this is to prevent feature hints to show up before the streamer has published
 export const setStreamerIsPublished = (isPublished) => async (dispatch) => {

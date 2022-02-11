@@ -14,14 +14,13 @@ import {
 } from "types";
 
 interface ClientConfigOptions {
-   isUsingCloudProxy?: boolean;
+   clientIsUsingCloudProxy?: boolean;
 }
 export default function useAgoraClientConfig(
    rtcClient: IAgoraRTCClient,
    clientConfigOptions?: ClientConfigOptions
 ) {
    const [remoteStreams, setRemoteStreams] = useState([]);
-   console.log("-> remoteStreams", remoteStreams);
    const [networkQuality, setNetworkQuality] = useState<NetworkQuality>({
       downlinkNetworkQuality: 0,
       uplinkNetworkQuality: 0,
@@ -49,12 +48,7 @@ export default function useAgoraClientConfig(
                remoteUser.uid,
                prevRemoteStreams
             );
-            const newStreams = [
-               ...cleanedRemoteStreams,
-               { uid: remoteUser.uid },
-            ];
-            console.log("-> newStreams on user-joined", newStreams);
-            return newStreams;
+            return [...cleanedRemoteStreams, { uid: remoteUser.uid }];
          });
       });
       rtcClient.on("user-left", async (remoteUser) => {
@@ -76,10 +70,6 @@ export default function useAgoraClientConfig(
             handleCatchRtcSubscribeError(error?.code);
          }
          setRemoteStreams((prevRemoteStreams) => {
-            console.log(
-               "-> prevRemoteStreams in user-published",
-               prevRemoteStreams
-            );
             return prevRemoteStreams.map((user: RemoteStreamUser) => {
                if (user.uid === remoteUser.uid) {
                   if (mediaType === "audio") {
@@ -127,7 +117,7 @@ export default function useAgoraClientConfig(
       console.error("error in handleCatchRtcSubscribeError", error);
       switch (error.code) {
          case RTCSubscribeErrorCodes.NO_ICE_CANDIDATE:
-            if (clientConfigOptions.isUsingCloudProxy) {
+            if (clientConfigOptions.clientIsUsingCloudProxy) {
                dispatch(
                   actions.setAgoraRtcError({
                      ...error,

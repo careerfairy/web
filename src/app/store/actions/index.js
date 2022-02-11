@@ -82,6 +82,7 @@ export {
    setAgoraRtcConnectionState,
    setAgoraRtcError,
    clearAgoraRtcError,
+   setSessionIsUsingCloudProxy,
 } from "./streamActions";
 
 export {

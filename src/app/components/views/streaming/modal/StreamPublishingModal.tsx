@@ -219,10 +219,7 @@ const StreamPublishingModal = memo(
          <Dialog TransitionComponent={Slide} open={openModal} fullWidth>
             <DialogTitle sx={styles.dialogTitle}>
                <PersonAddIcon sx={{ mr: 2 }} fontSize="medium" />
-               <Typography
-                  style={{ fontSize: "1.2em", fontWeight: 500 }}
-                  variant="h5"
-               >
+               <Typography style={{ fontSize: "1.2em", fontWeight: 500 }}>
                   {labels.mainTitle}
                </Typography>
             </DialogTitle>

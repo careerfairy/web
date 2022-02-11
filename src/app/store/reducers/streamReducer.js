@@ -25,8 +25,19 @@ const initialState = {
       spyModeEnabled: false,
    },
    agoraState: {
-      rtcConnectionState: AGORA_RTC_CONNECTION_STATE_CONNECTING,
-      rtcError: null,
+      rtcConnectionState: {
+         curState: AGORA_RTC_CONNECTION_STATE_CONNECTING,
+         prevState: undefined,
+         reason: undefined,
+         warning: undefined,
+      },
+      rtcError: {
+         code: undefined,
+         message: undefined,
+         name: undefined,
+         data: undefined,
+      },
+      sessionIsUsingCloudProxy: false,
    },
 };
 
@@ -70,6 +81,14 @@ const streamReducer = (state = initialState, { type, payload }) => {
             agoraState: {
                ...state.agoraState,
                rtcError: payload,
+            },
+         };
+      case actions.SET_SESSION_IS_USING_CLOUD_PROXY:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               sessionIsUsingCloudProxy: payload,
             },
          };
       case actions.CLEAR_AGORA_RTC_ERROR:

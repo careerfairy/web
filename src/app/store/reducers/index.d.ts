@@ -48,6 +48,7 @@ interface StreamReducer {
    agoraState: {
       rtcConnectionState?: RTCConnectionState;
       rtcError?: RTCError;
+      sessionIsUsingCloudProxy: boolean;
    };
 }
 

@@ -1,9 +1,7 @@
 import React, { FC, useState } from "react";
-import Box from "@mui/material/Box";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { useRouter } from "next/router";
 import { Stack } from "@mui/material";
 import OptionCard from "../common/OptionCard";
 
@@ -11,7 +9,6 @@ interface Props {
    handleEnableProxy: () => Promise<any>;
 }
 const FailedToSubscribeWithoutProxy: FC<Props> = (props) => {
-   const router = useRouter();
 
    const [steps] = useState([
       {

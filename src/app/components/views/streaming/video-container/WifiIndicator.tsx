@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo } from "react";
+import React, { FC, useEffect, useMemo } from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from "@mui/styles/makeStyles";
 import SignalWifi0BarRoundedIcon from "@mui/icons-material/SignalWifi0BarRounded";
 import SignalWifi1BarRoundedIcon from "@mui/icons-material/SignalWifi1BarRounded";
 import SignalWifi2BarRoundedIcon from "@mui/icons-material/SignalWifi2BarRounded";
@@ -10,13 +9,15 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import CachedIcon from "@mui/icons-material/Cached";
 import WarningIcon from "@mui/icons-material/Warning";
 import { ArrowDown, ArrowUp } from "react-feather";
-import PropTypes from "prop-types";
 import clsx from "clsx";
 import { Box, Tooltip } from "@mui/material";
 import * as actions from "store/actions";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import InternetIcon from "@mui/icons-material/Wifi";
 import ServerIcon from "@mui/icons-material/CheckCircleOutline";
+import RootState from "../../../../store/reducers";
+import { ConnectionState, NetworkQuality } from "agora-rtc-sdk-ng";
+
 const gradient = [
    "rgba(0,0,0,0.5)",
    "#54db00",
@@ -27,19 +28,20 @@ const gradient = [
    "#e70026",
 ];
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    root: {
       fontSize: "0.8rem",
       cursor: "move",
       borderRadius: 10,
-      padding: theme.spacing(1),
-      boxShadow: theme.shadows[2],
-      backgroundColor: alpha(theme.palette.common.black, 0.4),
+      padding: (theme) => theme.spacing(1),
+      boxShadow: (theme) => theme.shadows[2],
+      backgroundColor: (theme) => alpha(theme.palette.common.black, 0.4),
       backdropFilter: "blur(5px)",
-      transition: theme.transitions.create("transform", {
-         easing: theme.transitions.easing.easeInOut,
-         duration: theme.transitions.duration.standard,
-      }),
+      transition: (theme) =>
+         theme.transitions.create("transform", {
+            easing: theme.transitions.easing.easeInOut,
+            duration: theme.transitions.duration.standard,
+         }),
       "&:hover": {
          transform: `scale(1.05)`,
       },
@@ -47,79 +49,37 @@ const useStyles = makeStyles((theme) => ({
    subBox: {
       display: "flex",
    },
-   uplinkWifiIcon: {
-      color: ({ uplinkIndex }) => gradient[uplinkIndex],
-   },
    svgShadow: {
       filter: `drop-shadow(0px 0px 2px rgba(0,0,0,0.4))`,
    },
-   downlinkWifiIcon: {
-      color: ({ downlinkIndex }) => gradient[downlinkIndex],
-   },
    arrowUplinkIcon: {
-      color: ({ uplinkIndex }) => gradient[uplinkIndex],
-      width: theme.spacing(2),
+      width: (theme) => theme.spacing(2),
    },
    arrowDownlinkIcon: {
-      color: ({ downlinkIndex }) => gradient[downlinkIndex],
-      width: theme.spacing(2),
+      width: (theme) => theme.spacing(2),
    },
    svg: {
       fontSize: "1.9em",
    },
    text: {
-      color: theme.palette.common.white,
+      color: (theme) => theme.palette.common.white,
    },
-}));
+} as const;
 
-const WifiIndicator = ({
-   isDownLink,
+interface WifiIndicatorProps {
+   uplink: NetworkQuality["uplinkNetworkQuality"];
+   downlink: NetworkQuality["downlinkNetworkQuality"];
+}
+
+const WifiIndicator: FC<WifiIndicatorProps> = ({
    uplink,
-   agoraRtcStatus,
-   agoraRtcConnectionStatus,
-   agoraRtmStatus,
    downlink,
-   className,
    ...rest
 }) => {
+   const agoraRtcConnectionStatus = useSelector((state: RootState) => {
+      return state.stream.agoraState.rtcConnectionState;
+   });
    const dispatch = useDispatch();
-   useEffect(() => {
-      if (!agoraRtcConnectionStatus) return;
-      if (agoraRtcConnectionStatus.curState === "CONNECTING") {
-         enqueueSnackbar("Connecting...", "ConnectingStatus", "warning", true);
-         return () => dispatch(actions.closeSnackbar("ConnectingStatus"));
-      }
-      if (agoraRtcConnectionStatus.curState === "CONNECTED") {
-         enqueueSnackbar("Connected!", "ConnectedStatus", "success", false);
-         return () => dispatch(actions.closeSnackbar("ConnectedStatus"));
-      }
-      if (
-         agoraRtcConnectionStatus.prevState === "CONNECTED" &&
-         agoraRtcConnectionStatus.curState === "DISCONNECTED"
-      ) {
-         enqueueSnackbar(
-            "Disconnected. Check your connection...",
-            "DisconnectedStatus",
-            "error",
-            true
-         );
-         return () => dispatch(actions.closeSnackbar("DisconnectedStatus"));
-      }
-   }, [agoraRtcConnectionStatus]);
-
-   const enqueueSnackbar = (message, key, variant, persist) => {
-      dispatch(
-         actions.enqueueSnackbar({
-            message: message,
-            options: {
-               variant: variant,
-               key: key,
-               preventDuplicate: true,
-               persist: persist,
-            },
-         })
-      );
-   };
 
    useEffect(() => {
       return () => {
@@ -134,23 +94,26 @@ const WifiIndicator = ({
       };
    }, []);
 
-   const classes = useStyles({
-      uplinkIndex: uplink,
-      downlinkIndex: downlink,
-   });
-
-   const getNetWorkInfo = (isUplink) => {
-      let newClasses = isUplink
-         ? classes.uplinkWifiIcon
-         : classes.downlinkWifiIcon;
-      newClasses = clsx(newClasses, classes.svgShadow, classes.svg);
+   const getNetWorkInfo = (isUplink?: boolean) => {
+      let newStyles = isUplink
+         ? {
+              color: gradient[uplink],
+           }
+         : {
+              color: gradient[downlink],
+           };
+      newStyles = {
+         ...newStyles,
+         ...styles.svgShadow,
+         ...styles.svg,
+      };
       return [
          {
             rating: 0,
             description: `The ${
                isUplink ? "upload" : "download"
             } network quality is unknown.`,
-            icon: <SignalWifi0BarRoundedIcon className={newClasses} />,
+            icon: <SignalWifi0BarRoundedIcon sx={newStyles} />,
             color: gradient[0],
          },
          {
@@ -158,7 +121,7 @@ const WifiIndicator = ({
             description: `The ${
                isUplink ? "upload" : "download"
             } network quality is excellent.`,
-            icon: <SignalWifi4BarRoundedIcon className={newClasses} />,
+            icon: <SignalWifi4BarRoundedIcon sx={newStyles} />,
             color: gradient[1],
          },
          {
@@ -166,7 +129,7 @@ const WifiIndicator = ({
             description: `The ${
                isUplink ? "upload" : "download"
             } network quality is good, but the bitrate may be slightly lower than optimal.`,
-            icon: <SignalWifi3BarRoundedIcon className={newClasses} />,
+            icon: <SignalWifi3BarRoundedIcon sx={newStyles} />,
             color: gradient[2],
          },
          {
@@ -174,7 +137,7 @@ const WifiIndicator = ({
             description: `Users experience slightly impaired communication with this ${
                isUplink ? "upload" : "download"
             } quality.`,
-            icon: <SignalWifi3BarRoundedIcon className={newClasses} />,
+            icon: <SignalWifi3BarRoundedIcon sx={newStyles} />,
             color: gradient[3],
          },
          {
@@ -182,7 +145,7 @@ const WifiIndicator = ({
             description: `Users cannot communicate smoothly with this ${
                isUplink ? "upload" : "download"
             } quality.`,
-            icon: <SignalWifi2BarRoundedIcon className={newClasses} />,
+            icon: <SignalWifi2BarRoundedIcon sx={newStyles} />,
             color: gradient[4],
          },
          {
@@ -190,7 +153,7 @@ const WifiIndicator = ({
             description: `The ${
                isUplink ? "upload" : "download"
             } network quality is so poor that users can barely communicate.`,
-            icon: <SignalWifi2BarRoundedIcon className={newClasses} />,
+            icon: <SignalWifi2BarRoundedIcon sx={newStyles} />,
             color: gradient[5],
          },
          {
@@ -198,39 +161,33 @@ const WifiIndicator = ({
             description: `The ${
                isUplink ? "upload" : "download"
             } network quality is down and users cannot communicate at all.`,
-            icon: <SignalWifi1BarRoundedIcon className={newClasses} />,
+            icon: <SignalWifi1BarRoundedIcon sx={newStyles} />,
             color: gradient[6],
          },
       ];
    };
 
-   const getRtmConnectionInfo = (status) => {
-      switch (status) {
-         case "RTM_CONNECTED":
+   const getRtmConnectionInfo = (curState: ConnectionState) => {
+      switch (curState) {
+         case "CONNECTED":
             return {
                icon: (
-                  <InternetIcon
-                     className={classes.svg}
-                     style={{ color: "#00F92C" }}
-                  />
+                  <InternetIcon sx={styles.svg} style={{ color: "#00F92C" }} />
                ),
                message: "You are connected to the internet",
             };
-         case "RTM_NETWORK_INTERRUPTED":
+         case "RECONNECTING":
             return {
                icon: (
-                  <WarningIcon
-                     className={classes.svg}
-                     style={{ color: "#FFEF00" }}
-                  />
+                  <WarningIcon sx={styles.svg} style={{ color: "#FFEF00" }} />
                ),
                message: "Attempting to connect to the internet...",
             };
-         case "RTM_DISCONNECTED":
+         case "DISCONNECTED":
             return {
                icon: (
                   <ErrorOutlineIcon
-                     className={classes.svg}
+                     sx={styles.svg}
                      style={{ color: "#FF3200" }}
                   />
                ),
@@ -238,7 +195,7 @@ const WifiIndicator = ({
             };
          default:
             return {
-               icon: <CachedIcon className={classes.svg} />,
+               icon: <CachedIcon sx={styles.svg} />,
                message: "Waiting for connection status...",
             };
       }
@@ -249,20 +206,14 @@ const WifiIndicator = ({
          case "CONNECTED":
             return {
                icon: (
-                  <ServerIcon
-                     className={classes.svg}
-                     style={{ color: "#00F92C" }}
-                  />
+                  <ServerIcon sx={styles.svg} style={{ color: "#00F92C" }} />
                ),
                message: "You are connected to our streaming server",
             };
          case "CONNECTING":
             return {
                icon: (
-                  <WarningIcon
-                     className={classes.svg}
-                     style={{ color: "#FFEF00" }}
-                  />
+                  <WarningIcon sx={styles.svg} style={{ color: "#FFEF00" }} />
                ),
                message: "Attempting to connect to our streaming server...",
             };
@@ -270,7 +221,7 @@ const WifiIndicator = ({
             return {
                icon: (
                   <ErrorOutlineIcon
-                     className={classes.svg}
+                     sx={styles.svg}
                      style={{ color: "#FF3200" }}
                   />
                ),
@@ -278,7 +229,7 @@ const WifiIndicator = ({
             };
          default:
             return {
-               icon: <CachedIcon className={classes.svg} />,
+               icon: <CachedIcon sx={styles.svg} />,
                message: "Waiting for connection status...",
             };
       }
@@ -288,8 +239,8 @@ const WifiIndicator = ({
    const downlinkInfo = useMemo(() => getNetWorkInfo()[downlink], [downlink]);
 
    const rtmConnectionInfo = useMemo(
-      () => getRtmConnectionInfo(agoraRtmStatus.msg),
-      [agoraRtmStatus.msg]
+      () => getRtmConnectionInfo(agoraRtcConnectionStatus.curState),
+      [agoraRtcConnectionStatus.curState]
    );
    const rtcConnectionInfo = useMemo(
       () => getRtcConnectionInfo(agoraRtcConnectionStatus?.curState),
@@ -297,19 +248,19 @@ const WifiIndicator = ({
    );
 
    return (
-      <Box {...rest} className={clsx(classes.root, className)}>
+      <Box {...rest} sx={styles.root}>
          <Box>
             <Tooltip title={rtmConnectionInfo.message}>
                <Box
                   marginRight={1}
                   marginBottom={1}
                   alignItems="left"
-                  className={classes.subBox}
+                  sx={styles.subBox}
                >
                   <Box display="flex" marginRight={1}>
                      {rtmConnectionInfo.icon}
                   </Box>
-                  <Box display="flex" className={classes.text}>
+                  <Box display="flex" sx={styles.text}>
                      Internet
                   </Box>
                </Box>
@@ -319,18 +270,18 @@ const WifiIndicator = ({
                   marginRight={1}
                   marginBottom={1}
                   alignItems="left"
-                  className={classes.subBox}
+                  sx={styles.subBox}
                >
                   <Box display="flex" marginRight={1}>
                      {rtcConnectionInfo.icon}
                   </Box>
-                  <Box display="flex" className={classes.text}>
+                  <Box display="flex" sx={styles.text}>
                      Streaming
                   </Box>
                </Box>
             </Tooltip>
          </Box>
-         <Box className={classes.subBox}>
+         <Box sx={styles.subBox}>
             <Tooltip
                style={{ color: uplinkInfo.color }}
                placement="top"
@@ -338,11 +289,13 @@ const WifiIndicator = ({
             >
                <Box marginRight={1} alignItems="center" display="flex">
                   {uplinkInfo.icon}
-                  <ArrowUp
-                     className={clsx(
-                        classes.arrowUplinkIcon,
-                        classes.svgShadow
-                     )}
+                  <Box
+                     component={ArrowUp}
+                     sx={[
+                        styles.arrowUplinkIcon,
+                        styles.svgShadow,
+                        { color: gradient[uplink] },
+                     ]}
                   />
                </Box>
             </Tooltip>
@@ -353,23 +306,19 @@ const WifiIndicator = ({
             >
                <Box alignItems="center" display="flex">
                   {downlinkInfo.icon}
-                  <ArrowDown
-                     className={clsx(
-                        classes.arrowDownlinkIcon,
-                        classes.svgShadow
-                     )}
+                  <Box
+                     component={ArrowDown}
+                     sx={[
+                        styles.arrowDownlinkIcon,
+                        styles.svgShadow,
+                        { color: gradient[downlink] },
+                     ]}
                   />
                </Box>
             </Tooltip>
          </Box>
       </Box>
    );
-};
-
-WifiIndicator.propTypes = {
-   downlink: PropTypes.number,
-   uplink: PropTypes.number,
-   className: PropTypes.string,
 };
 
 export default WifiIndicator;

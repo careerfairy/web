@@ -138,7 +138,6 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                            !hideTooltip &&
                            streamerIsPublished
                         }
-                        interactive
                         placement="bottom"
                         title={
                            <React.Fragment>

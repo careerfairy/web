@@ -39,7 +39,7 @@ const styles = {
 interface OptionCardProps {
    title: string;
    description?: string;
-   number: number;
+   number: number | string;
    onClick?: () => void;
 }
 const OptionCard: FC<OptionCardProps> = (props) => {
@@ -52,14 +52,16 @@ const OptionCard: FC<OptionCardProps> = (props) => {
          }}
       >
          <Grid container spacing={2}>
-            <Grid xs={2} item>
-               <Box sx={styles.numberWrapper}>
-                  <Typography color="text.secondary" sx={styles.number}>
-                     {props.number}
-                  </Typography>
-               </Box>
-            </Grid>
-            <Grid xs={10} item>
+            {props.number && (
+               <Grid xs={2} item>
+                  <Box sx={styles.numberWrapper}>
+                     <Typography color="text.secondary" sx={styles.number}>
+                        {props.number}
+                     </Typography>
+                  </Box>
+               </Grid>
+            )}
+            <Grid xs={props.number ? 10 : 12} item>
                <Box sx={styles.detailsWrapper}>
                   <Typography
                      gutterBottom={Boolean(props.description)}

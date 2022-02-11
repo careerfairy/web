@@ -164,6 +164,14 @@ export enum CustomRTCErrors {
     */
    FAILED_TO_SUBSCRIBE_WITHOUT_PROXY = "FAILED_TO_SUBSCRIBE_WITHOUT_PROXY",
 }
+
+enum CustomConnectionDisconnectedReason {
+   /*
+    * This reason will be used when the RTCClient join method takes too long without throwing an exception.
+    * Most common reason for this is that the client is still trying to find a port
+    */
+   SLOW_CONNECTING = "SLOW_CONNECTING",
+}
 export interface RTCError extends Error {
    readonly code:
       | string
@@ -179,4 +187,5 @@ export interface RTCConnectionState {
    curState: ConnectionState;
    prevState: ConnectionState;
    reason?: ConnectionDisconnectedReason;
+   warning?: CustomConnectionDisconnectedReason;
 }

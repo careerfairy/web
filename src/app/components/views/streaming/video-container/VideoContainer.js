@@ -28,8 +28,7 @@ import useAgoraRtc from "components/custom-hook/useAgoraRtc";
 import StreamPublishingModal from "../modal/StreamPublishingModal";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
-import AgoraRtcStateModal from "../modal/AgoraRtcStateModal";
-import AgoraErrorHandler from "../modal/agoraErrorModal/AgoraErrorHandler";
+import AgoraStateHandler from "../modal/AgoraStateModal/AgoraStateHandler";
 
 const labels = {
    mainTitle: "Join the Stream",
@@ -94,14 +93,7 @@ function VideoContainer({
    const {
       mediaControls,
       localMediaStream: displayableMediaStream,
-   } = useMediaSources(
-      devices,
-      localStream,
-      // (showLocalStreamPublishingModal || showSettings) &&
-      //    localStream.audioTrack,
-
-      true
-   );
+   } = useMediaSources(devices, localStream, true);
 
    const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams);
 
@@ -356,11 +348,9 @@ function VideoContainer({
                uplink={networkQuality.uplinkNetworkQuality}
                downlink={networkQuality.downlinkNetworkQuality}
                agoraRtcConnectionStatus={{}}
-               agoraRtmStatus={{}}
             />
          </DraggableComponent>
-         <AgoraRtcStateModal />
-         <AgoraErrorHandler handleEnableCloudProxy={handleEnableCloudProxy} />
+         <AgoraStateHandler handleEnableCloudProxy={handleEnableCloudProxy} />
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}
