@@ -15,14 +15,19 @@ import { getResizedUrl } from "components/helperFunctions/HelperFunctions";
 import ScrollToTop from "components/views/common/ScrollToTop";
 import { placeholderBanner } from "../../../constants/images";
 
-const GroupPage = ({ serverSideGroup, livestreamId, serverSideStream }) => {
+const GroupPage = ({
+   serverSideGroup,
+   livestreamId,
+   serverSideStream,
+   initialTabValue,
+}) => {
    const {
       palette: {
          common: { white },
          navyBlue,
       },
    } = useTheme();
-   const [value, setValue] = useState("upcomingEvents");
+   const [value, setValue] = useState(initialTabValue || "upcomingEvents");
 
    const [selectedOptions, setSelectedOptions] = useState([]);
    const currentGroup = useSelector(
@@ -66,6 +71,9 @@ const GroupPage = ({ serverSideGroup, livestreamId, serverSideStream }) => {
    }, [livestreamId, Boolean(upcomingLivestreams), Boolean(pastLivestreams)]);
 
    useEffect(() => {
+      if (initialTabValue) {
+         return;
+      }
       if (!livestreamId) {
          // Only find tab with streams if there isn't a livestreamId in query
          (function handleFindTabWithStreams() {
@@ -153,15 +161,20 @@ const GroupPage = ({ serverSideGroup, livestreamId, serverSideStream }) => {
 
 export async function getServerSideProps({
    params: { groupId },
-   query: { livestreamId },
+   query: { livestreamId, type },
 }) {
    const serverSideStream = await getServerSideStream(livestreamId);
    const serverSideGroup = await getServerSideGroup(groupId);
+   let initialTabValue = null;
+   if (type === "upcomingEvents" || type === "pastEvents") {
+      initialTabValue = type;
+   }
    return {
       props: {
          serverSideGroup,
          livestreamId: livestreamId || "",
          serverSideStream,
+         initialTabValue,
       }, // will be passed to the page component as props
    };
 }
