@@ -93,8 +93,6 @@ function LogInPage({ firebase }) {
             );
          } else {
             replace(absolutePath || "/next-livestreams");
-
-            setGeneralLoading(false);
          }
       }
    }, [authenticatedUser, absolutePath, userData]);
