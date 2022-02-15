@@ -33,8 +33,8 @@ const InterestsSelector = () => {
   return (
     <Box px={6}>
       <Typography variant='h6'>What are your interests?</Typography>
-      <Typography variant="body2" component="p">
-        Select some to improve your site experience:
+      <Typography variant="body2" component="p" color="textSecondary">
+        We'll highlight the best events for you:
       </Typography>
 
       <Box my={2}>
