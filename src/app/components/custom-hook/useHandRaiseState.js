@@ -1,54 +1,80 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useCurrentStream } from "../../context/stream/StreamContext";
-import { useAuth } from "../../HOCs/AuthProvider";
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext";
+import { useCurrentStream } from "context/stream/StreamContext";
+import { useAuth } from "HOCs/AuthProvider";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useStreamRef from "./useStreamRef";
+import { MAX_STREAM_DEFAULT_ACTIVE_HAND_RAISERS } from "constants/streams";
 
 const useHandRaiseState = (streamerId) => {
-   const { currentLivestream } = useCurrentStream();
+   const { currentLivestream, handRaiseId } = useCurrentStream();
    const { authenticatedUser, userData } = useAuth();
 
    const streamRef = useStreamRef();
-   const { createHandRaiseRequest, updateHandRaiseRequest } = useFirebaseService();
+   const {
+      createHandRaiseRequest,
+      updateHandRaiseRequest,
+   } = useFirebaseService();
+
+   const numberOfActiveHandRaises = useSelector(
+      (state) =>
+         state.firestore.ordered["handRaises"]?.filter(
+            (handRaise) =>
+               ["connecting", "connected", "invited"].includes(
+                  handRaise.state
+               ) && handRaise.id !== handRaiseId
+         )?.length || 0
+   );
+
    const handRaiseState = useSelector(
-      (state) => state.firestore.data["handRaiseState"]
+      (state) => state.firestore.data["handRaises"]?.[handRaiseId]
    );
 
    const updateRequest = useCallback(
-      (state) => {
-         if (
+      async (state) => {
+         const isAnon = Boolean(
             currentLivestream.test ||
-            currentLivestream.openStream ||
-            authenticatedUser.email
-         ) {
-            let authEmail =
-               currentLivestream.test || currentLivestream.openStream
-                  ? "anonymous" + streamerId
-                  : authenticatedUser.email;
-            let checkedUserData =
-               currentLivestream.test || currentLivestream.openStream
-                  ? { firstName: "Hand Raiser", lastName: "Streamer" }
-                  : userData;
+               currentLivestream.openStream ||
+               !authenticatedUser?.email
+         );
+         let checkedUserData = isAnon
+            ? {
+                 firstName: userData?.firstName || "Hand Raiser",
+                 lastName: userData?.lastName || "Streamer",
+              }
+            : userData;
+         try {
             if (handRaiseState) {
-               updateHandRaiseRequest(streamRef, authEmail, state);
+               await updateHandRaiseRequest(streamRef, handRaiseId, state);
             } else {
-               createHandRaiseRequest(streamRef, authEmail, checkedUserData);
+               await createHandRaiseRequest(
+                  streamRef,
+                  handRaiseId,
+                  checkedUserData
+               );
             }
+         } catch (e) {
+            console.error(e);
          }
       },
       [
          currentLivestream.test,
          currentLivestream.openStream,
-         authenticatedUser.email,
+         authenticatedUser?.email,
          userData,
          streamerId,
          streamRef,
          handRaiseState,
       ]
    );
+   const hasRoom = useMemo(
+      () =>
+         numberOfActiveHandRaises < currentLivestream.maxHandRaisers ??
+         MAX_STREAM_DEFAULT_ACTIVE_HAND_RAISERS,
+      [currentLivestream?.maxHandRaisers, numberOfActiveHandRaises]
+   );
 
-   return [handRaiseState, updateRequest];
+   return [handRaiseState, updateRequest, hasRoom];
 };
 
 export default useHandRaiseState;

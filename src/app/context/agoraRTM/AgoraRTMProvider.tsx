@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import AgoraRTM, { RtmMessage, RtmStatusCode } from "agora-rtm-sdk";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import AgoraRTM, { RtmMessage } from "agora-rtm-sdk";
 import { useFirebaseService } from "../firebase/FirebaseServiceContext";
 
 import { useDispatch } from "react-redux";
@@ -22,11 +22,6 @@ const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
    const rtmClient = useRef<AgoraRTMContextInterface["rtmClient"]>(null!);
    const rtmChannel = useRef<AgoraRTMContextInterface["rtmChannel"]>(null!);
 
-   const [agoraRtmStatus, setAgoraRtmStatus] = useState({
-      type: "INFO",
-      msg: "RTM_INITIAL",
-   });
-
    const { fetchAgoraRtmToken } = useFirebaseService();
    const dispatch = useDispatch();
 
@@ -38,12 +33,9 @@ const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
    }, []);
 
    const init = () => {
-      const newRtmClient = AgoraRTM.createInstance(AGORA_APP_ID, {
+      rtmClient.current = AgoraRTM.createInstance(AGORA_APP_ID, {
          logFilter: AgoraRTM.LOG_FILTER_ERROR,
       });
-      newRtmClient.on("ConnectionStateChanged", onConnectionStateChanged);
-
-      rtmClient.current = newRtmClient;
    };
 
    const end = () => {
@@ -55,28 +47,6 @@ const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
          void joinAgoraRtmChannel(roomId, userId);
       }
    }, [roomId, userId]);
-
-   const onConnectionStateChanged = (
-      newState: RtmStatusCode.ConnectionState,
-      reason: RtmStatusCode.ConnectionChangeReason
-   ) => {
-      if (newState === "DISCONNECTED") {
-         setAgoraRtmStatus({
-            type: "INFO",
-            msg: "RTM_DISCONNECTED",
-         });
-      } else if (newState === "RECONNECTING" && reason === "INTERRUPTED") {
-         setAgoraRtmStatus({
-            type: "ERROR",
-            msg: "RTM_NETWORK_INTERRUPTED",
-         });
-      } else if (newState === "CONNECTED") {
-         setAgoraRtmStatus({
-            type: "INFO",
-            msg: "RTM_CONNECTED",
-         });
-      }
-   };
 
    const joinAgoraRtmChannel = async (roomId: string, userUid: string) => {
       const { data } = await fetchAgoraRtmToken({
@@ -127,15 +97,19 @@ const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
             return await rtmClient.current.getChannelMemberCount(channelIds);
          },
          handleDisconnect: async () => {
-            if (rtmChannel.current) {
-               rtmChannel.current.removeAllListeners();
+            try {
                await rtmChannel.current.leave();
-            }
-            if (rtmClient.current) {
-               rtmClient.current.removeAllListeners();
-               await rtmClient.current
-                  .logout()
-                  .catch((error) => console.error(error));
+               if (rtmChannel.current) {
+                  rtmChannel.current.removeAllListeners();
+               }
+               if (rtmClient.current) {
+                  rtmClient.current.removeAllListeners();
+                  await rtmClient.current
+                     .logout()
+                     .catch((error) => console.error(error));
+               }
+            } catch (e) {
+               console.error(e);
             }
          },
          joinChannel: async (

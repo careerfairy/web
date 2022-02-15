@@ -29,6 +29,7 @@ import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay";
 import useHandRaiseState from "components/custom-hook/useHandRaiseState";
 import RecommendedEventsOverlay from "./overlay/RecommendedEventsOverlay";
 import AgoraRTMContext from "../../../../context/agoraRTM/AgoraRTMContext";
+import AgoraStateHandler from "../../streaming/modal/AgoraStateModal/AgoraStateHandler";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -65,7 +66,6 @@ function ViewerComponent({
 }) {
    const {
       setDesktopMode: setDesktopModeInstanceMethod,
-      updateHandRaiseRequest,
    } = useFirebaseService();
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
@@ -82,12 +82,16 @@ function ViewerComponent({
       showLocalStreamPublishingModal,
       setShowLocalStreamPublishingModal,
    ] = useState(false);
-   const [handRaiseState, updateRequest] = useHandRaiseState(streamerId);
+   const [handRaiseState, updateRequest, hasRoom] = useHandRaiseState(
+      streamerId
+   );
+
    const streamRef = useStreamRef();
    const {
       query: { livestreamId },
    } = useRouter();
-   const { authenticatedUser } = useAuth();
+
+   const { authenticatedUser, userData } = useAuth();
    const hasActiveRooms = useSelector((state) =>
       Boolean(
          state.firestore.ordered?.[`Active BreakoutRooms of ${livestreamId}`]
@@ -95,6 +99,9 @@ function ViewerComponent({
       )
    );
 
+   const shouldInitializeAgora = Boolean(
+      currentLivestream.hasStarted || (userData?.isAdmin && spyModeEnabled)
+   );
    const {
       networkQuality,
       localStream,
@@ -102,11 +109,20 @@ function ViewerComponent({
       remoteStreams,
       localMediaHandlers,
       publishLocalStreamTracks,
-   } = useAgoraRtc(streamerId, currentLivestream.id, handRaiseActive);
+      handleEnableCloudProxy,
+   } = useAgoraRtc(
+      streamerId,
+      currentLivestream.id,
+      handRaiseActive,
+      shouldInitializeAgora,
+      { isAHandRaiser: handRaiseActive }
+   );
 
    const { createEmote } = useContext(AgoraRTMContext);
 
-   const devices = useDevices(localStream);
+   const devices = useDevices(localStream, {
+      initialize: Boolean(handRaiseActive),
+   });
 
    const {
       mediaControls,
@@ -153,29 +169,10 @@ function ViewerComponent({
       }
    }, [handRaiseActive, handRaiseState]);
 
-   const updateHandRaiseState = (newState) => {
-      if (currentLivestream) {
-         if (currentLivestream.test || currentLivestream.openStream) {
-            return updateHandRaiseRequest(
-               streamRef,
-               "anonymous" + streamerId,
-               newState
-            );
-         } else {
-            return updateHandRaiseRequest(
-               streamRef,
-               authenticatedUser.email,
-               newState
-            );
-         }
-      }
-   };
-
    const setDesktopMode = async (mode, initiatorId) => {
       let screenSharerId =
          mode === "desktop" ? initiatorId : currentLivestream.screenSharerId;
-      await setDesktopModeInstanceMethod,
-         updateHandRaiseRequest(streamRef, mode, screenSharerId);
+      await setDesktopModeInstanceMethod(streamRef, mode, screenSharerId);
    };
 
    const shareDesktopOrSlides = () =>
@@ -203,14 +200,19 @@ function ViewerComponent({
       },
       [currentLivestream?.mode, optimizationMode, streamerId]
    );
-
    const requestHandRaise = async () => {
       try {
-         await updateHandRaiseRequest(
-            streamRef,
-            authenticatedUser.email,
-            "requested"
-         );
+         if (
+            // If you were previously connected
+            handRaiseState?.state === "connected" &&
+            // and there is still room
+            hasRoom
+         ) {
+            // go straight to the connecting phase
+            await updateRequest("connecting");
+         } else {
+            await updateRequest("requested");
+         }
       } catch (e) {
          console.log("-> e", e);
       }
@@ -224,7 +226,7 @@ function ViewerComponent({
       if (localStream.videoTrack && !localStream.isVideoPublished) {
          await publishLocalStreamTracks.publishLocalCameraTrack();
       }
-      await updateHandRaiseState("connected");
+      await updateRequest("connected");
       await dispatch(actions.setStreamerIsPublished(true));
    };
 
@@ -243,7 +245,7 @@ function ViewerComponent({
       await localMediaHandlers.closeLocalCameraTrack();
       await localMediaHandlers.closeLocalMicrophoneTrack();
       await dispatch(actions.setStreamerIsPublished(false));
-      await updateHandRaiseState("unrequested");
+      await updateRequest("unrequested");
       setShowLocalStreamPublishingModal(false);
    };
 
@@ -272,6 +274,7 @@ function ViewerComponent({
             showMenu={showMenu}
             livestreamId={currentLivestream.id}
          />
+         <AgoraStateHandler handleEnableCloudProxy={handleEnableCloudProxy} />
          <StreamPublishingModal
             open={showLocalStreamPublishingModal}
             setOpen={setShowLocalStreamPublishingModal}

@@ -31,7 +31,6 @@ const Streams = memo(
       sharingPdf,
       showMenu,
       livestreamId,
-      setRemovedStream,
       presenter,
       openStream,
       videoMutedBackgroundImg,
@@ -136,7 +135,6 @@ const Streams = memo(
                   hasManySpeakers={hasManySpeakers}
                   sharingScreen={sharingScreen}
                   videoMutedBackgroundImg={videoMutedBackgroundImg}
-                  setRemovedStream={setRemovedStream}
                   currentSpeakerId={currentSpeakerId}
                   showMenu={showMenu}
                   livestreamId={livestreamId}

@@ -112,7 +112,6 @@ const StreamElementWrapper = ({ children, large, index, squished, first }) => {
 const StreamsLayout = ({
    streamData,
    liveSpeakers,
-   setRemovedStream,
    sharingPdf,
    showMenu,
    livestreamId,
@@ -184,7 +183,6 @@ const StreamsLayout = ({
                                  videoMutedBackgroundImg={
                                     videoMutedBackgroundImg
                                  }
-                                 setRemovedStream={setRemovedStream}
                                  liveSpeakers={liveSpeakers}
                               />
                            </StreamElementWrapper>

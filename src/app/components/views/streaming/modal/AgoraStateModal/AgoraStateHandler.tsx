@@ -10,13 +10,9 @@ import UidConflict from "./ModalViews/UidConflict";
 
 interface Props {
    handleEnableCloudProxy: () => Promise<void>;
-   handleReconnectAgora: () => Promise<void>;
 }
 
-const AgoraStateHandler: FC<Props> = ({
-   handleEnableCloudProxy,
-   handleReconnectAgora,
-}) => {
+const AgoraStateHandler: FC<Props> = ({ handleEnableCloudProxy }) => {
    const dispatch = useDispatch();
    const [view, setView] = useState(null);
    const agoraRtcConnectionStatus = useSelector((state: RootState) => {
@@ -57,9 +53,7 @@ const AgoraStateHandler: FC<Props> = ({
             case "DISCONNECTED":
                if (prevState === "CONNECTING") return;
                if (reason === "UID_BANNED") {
-                  return setView(() => (
-                     <UidConflict handleReconnectAgora={handleReconnectAgora} />
-                  ));
+                  return setView(() => <UidConflict />);
                }
                setView(() => (
                   <ConnectionStateModal
@@ -84,7 +78,7 @@ const AgoraStateHandler: FC<Props> = ({
 
    useEffect(() => {
       (function handleError() {
-         switch (agoraRtcError.code) {
+         switch (agoraRtcError?.code) {
             case "FAILED_TO_SUBSCRIBE_WITH_PROXY":
                setView(() => (
                   <FailedToSubscribeWithProxy
@@ -100,15 +94,13 @@ const AgoraStateHandler: FC<Props> = ({
                ));
                break;
             case "UID_CONFLICT":
-               setView(() => (
-                  <UidConflict handleReconnectAgora={handleReconnectAgora} />
-               ));
+               setView(() => <UidConflict />);
                break;
             default:
                return null;
          }
       })();
-   }, [agoraRtcError.code]);
+   }, [agoraRtcError?.code]);
 
    const sendConnectedToast = () => {
       dispatch(

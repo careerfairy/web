@@ -20,6 +20,7 @@ import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHan
 import StatsUtil from "../../data/util/StatsUtil";
 import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu";
 import AgoraRTMProvider from "context/agoraRTM/AgoraRTMProvider";
+import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -109,8 +110,13 @@ const ViewerLayout = (props) => {
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
 
    const currentLivestream = useStreamConnect();
+   const handRaiseId =
+      (currentLivestream?.test || currentLivestream?.openStream) &&
+      !authenticatedUser?.email
+         ? "anonymous" + streamerId
+         : authenticatedUser.email;
 
-   useViewerHandRaiseConnect(currentLivestream, streamerId);
+   useStreamerActiveHandRaisesConnect({ withAll: true });
 
    useEffect(() => {
       if (currentLivestream && !currentLivestream.test) {
@@ -301,7 +307,13 @@ const ViewerLayout = (props) => {
    return (
       <AgoraRTMProvider roomId={currentLivestream.id} userId={streamerId}>
          <CurrentStreamContext.Provider
-            value={{ currentLivestream, isBreakout, streamerId }}
+            value={{
+               currentLivestream,
+               isBreakout,
+               streamerId,
+               isStreamer: false,
+               handRaiseId,
+            }}
          >
             <div className={`${classes.root} notranslate`}>
                <ViewerTopBar

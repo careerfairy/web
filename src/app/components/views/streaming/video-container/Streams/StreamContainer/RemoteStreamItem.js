@@ -12,7 +12,6 @@ import {
 
 const RemoteStreamItem = ({
    speaker,
-   setRemovedStream,
    stream,
    big,
    index,
@@ -38,7 +37,7 @@ const RemoteStreamItem = ({
       if (stream.uid === "demoStream") {
          generateDemoHandRaiser();
       } else {
-         playVideo();
+         !muteAllRemoteVideos && playVideo();
       }
    }, [stream.uid, stream.videoTrack]);
 
@@ -70,7 +69,8 @@ const RemoteStreamItem = ({
             });
          }
       } catch (e) {
-         console.log("-> error in PLAY VIDEO", e);
+         setAVideoIsMuted();
+         console.error("-> error in PLAY VIDEO", e);
       }
    }
 

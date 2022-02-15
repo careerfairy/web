@@ -9,17 +9,21 @@ import { DeviceList } from "types";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 
-export default function useDevices(localStream) {
+export default function useDevices(
+   localStream,
+   options?: { initialize: boolean }
+) {
    const [deviceList, setDeviceList] = useState<DeviceList>({
       audioInputList: [],
       audioOutputList: [],
       videoDeviceList: [],
    });
    const dispatch = useDispatch();
+
    useEffect(() => {
       (async function init() {
          try {
-            if (!localStream) return;
+            if (!localStream || !options?.initialize) return;
             const devices = await AgoraRTC.getDevices();
             const deviceList = mapDevices(devices);
             setDeviceList(deviceList);
@@ -27,7 +31,7 @@ export default function useDevices(localStream) {
             dispatch(actions.sendGeneralError(e));
          }
       })();
-   }, [Boolean(localStream)]);
+   }, [Boolean(localStream), options?.initialize]);
 
    useEffect(() => {
       AgoraRTC.onMicrophoneChanged = (info) => {

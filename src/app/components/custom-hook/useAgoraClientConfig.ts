@@ -115,6 +115,9 @@ export default function useAgoraClientConfig(
 
    const handleCatchRtcSubscribeError = (error: RTCError) => {
       console.error("error in handleCatchRtcSubscribeError", error);
+      if (!error?.code) {
+         return;
+      }
       switch (error.code) {
          case RTCSubscribeErrorCodes.NO_ICE_CANDIDATE:
             if (clientConfigOptions.clientIsUsingCloudProxy) {

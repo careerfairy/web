@@ -29,7 +29,9 @@ const HandRaiseCategory = ({
 
    useEffect(() => {
       const hasNotRaisedHandYet = Boolean(
-         handRaiseState === null && livestream?.handRaiseActive && !isMobile
+         handRaiseState === undefined &&
+            livestream?.handRaiseActive &&
+            !isMobile
       );
       setHandRaisePromptDialogOpen(hasNotRaisedHandYet);
    }, [livestream?.handRaiseActive, handRaiseState, isMobile]);
@@ -58,6 +60,13 @@ const HandRaiseCategory = ({
       livestream.hasStarted,
       isMobile,
    ]);
+
+   useEffect(() => {
+      if (handRaiseState?.state === "invited") {
+         // You should be able to immediately join after being invited, as your devices are set
+         startConnectingHandRaise();
+      }
+   }, [handRaiseState?.state]);
 
    const requestHandRaise = async () => {
       try {

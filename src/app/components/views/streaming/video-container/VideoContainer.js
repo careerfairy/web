@@ -80,17 +80,15 @@ function VideoContainer({
       localStream,
       localMediaControls,
       remoteStreams,
-      publishLocalStreamTracks,
       publishScreenShareStream,
       unpublishScreenShareStream,
       leaveAgoraRoom,
       localMediaHandlers,
       handleEnableCloudProxy,
-      handleReconnectAgora,
       handlePublishLocalStream,
-   } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer);
+   } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer, true);
 
-   const devices = useDevices(localStream);
+   const devices = useDevices(localStream, { initialize: true });
 
    const {
       mediaControls,
@@ -345,10 +343,7 @@ function VideoContainer({
                agoraRtcConnectionStatus={{}}
             />
          </DraggableComponent>
-         <AgoraStateHandler
-            handleReconnectAgora={handleReconnectAgora}
-            handleEnableCloudProxy={handleEnableCloudProxy}
-         />
+         <AgoraStateHandler handleEnableCloudProxy={handleEnableCloudProxy} />
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}

@@ -8,7 +8,6 @@ const StreamContainer = ({
    big,
    liveSpeakers,
    index,
-   setRemovedStream,
    videoMutedBackgroundImg,
    livestreamId,
 }) => {
@@ -77,7 +76,6 @@ const StreamContainer = ({
    ) : (
       <RemoteStreamItem
          big={big}
-         setRemovedStream={setRemovedStream}
          index={index}
          stream={stream}
          speaker={speaker}

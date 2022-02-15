@@ -34,9 +34,9 @@ import {
    LocalMediaHandlers,
    LocalStream,
    MediaControls,
-} from "../../../../types";
+} from "types";
 import { Theme } from "@mui/system";
-import RootState from "../../../../store/reducers";
+import RootState from "store/reducers";
 
 const styles = {
    actions: {},
@@ -44,7 +44,6 @@ const styles = {
       height: "100%",
    },
    container: {
-      paddingTop: 1,
       paddingBottom: 3,
       textAlign: "center",
    },

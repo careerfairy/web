@@ -1,20 +1,17 @@
 import React, { useMemo } from "react";
 import { useFirestoreConnect } from "react-redux-firebase";
 import { useRouter } from "next/router";
-import { useAuth } from "../../HOCs/AuthProvider";
 
-const useStreamerActiveHandRaisesConnect = () => {
+const useStreamerActiveHandRaisesConnect = (options = { withAll: false }) => {
    const {
       query: { livestreamId, breakoutRoomId },
    } = useRouter();
 
    const query = useMemo(() => {
       let query = [];
-      const whereQuery = [
-         "state",
-         "not-in",
-         ["denied", "unrequested", "acquire_media"],
-      ];
+      const whereQuery = options?.withAll
+         ? undefined
+         : [["state", "not-in", ["denied", "unrequested", "acquire_media"]]];
       if (livestreamId) {
          if (breakoutRoomId) {
             query = [
@@ -28,7 +25,7 @@ const useStreamerActiveHandRaisesConnect = () => {
                         subcollections: [
                            {
                               collection: "handRaises",
-                              where: [whereQuery],
+                              where: whereQuery,
                            },
                         ],
                      },
@@ -45,7 +42,7 @@ const useStreamerActiveHandRaisesConnect = () => {
                   subcollections: [
                      {
                         collection: "handRaises",
-                        where: [whereQuery],
+                        where: whereQuery,
                      },
                   ],
                },

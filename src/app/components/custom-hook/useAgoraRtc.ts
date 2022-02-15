@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import useStreamRef from "./useStreamRef";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useAgoraClientConfig from "./useAgoraClientConfig";
+
 import AgoraRTC, {
    IAgoraRTCClient,
    ScreenVideoTrackInitConfig,
@@ -26,12 +27,15 @@ const AGORA_APP_ID = "53675bc6d3884026a72ecb1de3d19eb1";
 export default function useAgoraRtc(
    streamerId: string,
    roomId: string,
-   isStreamer: boolean
+   isStreamer: boolean,
+   initialize: boolean,
+   options?: { isAHandRaiser?: boolean }
 ) {
    const { path } = useStreamRef();
    const {
       query: { token },
    } = useRouter();
+
    const [sessionIsUsingCloudProxy, setSessionIsUsingProxy] = useSessionStorage<
       boolean
    >("is-using-cloud-proxy", false);
@@ -63,7 +67,6 @@ export default function useAgoraRtc(
 
    useEffect(() => {
       rtcClient.on("is-using-cloud-proxy", (isUsing) => {
-         console.log("-> isUsing proxy in emit", isUsing);
          setClientIsUsingCloudProxy(isUsing);
       });
    }, []);
@@ -71,15 +74,16 @@ export default function useAgoraRtc(
    useEffect(() => {
       AgoraRTC.onAudioAutoplayFailed = () => {
          dispatch(actions.setVideoIsPaused());
-         console.log("-> In OnAudioAutoplayFailed");
       };
    }, []);
 
    // @ts-ignore
    useEffect(() => {
-      void init();
-      return () => close();
-   }, []);
+      if (initialize) {
+         void init();
+         return () => close();
+      }
+   }, [initialize]);
 
    useEffect(() => {
       if (!isStreamer && rtcClient) {
@@ -153,9 +157,8 @@ export default function useAgoraRtc(
       let timeout;
       try {
          const cfToken = token || "";
-
          const { data } = await fetchAgoraRtcToken({
-            isStreamer: isStreamer,
+            isStreamer: options?.isAHandRaiser ? false : isStreamer,
             uid: userUid,
             sentToken: cfToken.toString(),
             channelName: roomId,
@@ -184,7 +187,7 @@ export default function useAgoraRtc(
          clearTimeout(timeout);
       }
    };
-   //
+
    const leaveAgoraRoom = async () => {
       console.log("-> LEAVING");
 
@@ -484,7 +487,6 @@ export default function useAgoraRtc(
    };
 
    const handlePublishLocalStream = useCallback(async () => {
-      console.log("-> localStream", localStream);
       if (localStream.audioTrack && !localStream.isAudioPublished) {
          await publishLocalMicrophoneTrack();
       }
