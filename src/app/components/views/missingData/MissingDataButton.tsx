@@ -37,7 +37,10 @@ const MissingDataButton = ({
 
   // confirm with localstorage if we should hide or not
   useEffect(() => {
-    if (missingFields.length === 0) return;
+    if (missingFields.length === 0) {
+      setHidden(true);
+      return;
+    }
 
     if (dismissedAt) {
       try {
@@ -68,7 +71,7 @@ const MissingDataButton = ({
         setLargeButton(true);
       }, switchInterval, missingFields);
 
-      return () => clearInterval(timer);
+      return () => clearTimeout(timer);
     }
   }, [switchInterval, missingFields, isModalOpen]);
 
