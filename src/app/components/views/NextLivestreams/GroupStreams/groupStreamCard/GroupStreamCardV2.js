@@ -481,7 +481,7 @@ const GroupStreamCardV2 = memo(
                               sx={styles.avaLogoWrapper}
                            >
                               <Box>
-                                 <AvatarGroup>
+                                 <AvatarGroup max={4}>
                                     {livestream.speakers?.map((speaker) => (
                                        <Avatar
                                           key={speaker.id}
@@ -498,7 +498,7 @@ const GroupStreamCardV2 = memo(
                                  </AvatarGroup>
                               </Box>
                               <Box>
-                                 <AvatarGroup>
+                                 <AvatarGroup max={4}>
                                     {filteredGroups.map((careerCenter) => (
                                        <Avatar
                                           variant="rounded"

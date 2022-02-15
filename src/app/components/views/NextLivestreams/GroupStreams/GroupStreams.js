@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
 import { Grid, LinearProgress, Typography } from "@mui/material";
 import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 import LazyLoad from "react-lazyload";
@@ -83,7 +82,6 @@ const GroupStreams = ({
          setGlobalCardHighlighted(false);
       }
    }, [groupData]);
-
    const renderStreamCards = slicedLivestreams?.map((livestream, index) => {
       if (livestream) {
          return (
@@ -91,9 +89,8 @@ const GroupStreams = ({
                sx={[styles.streamGridItem, mobile && styles.dynamicHeight]}
                key={livestream.id}
                xs={12}
-               sm={12}
                md={6}
-               lg={4}
+               lg={6}
                xl={4}
                item
             >
@@ -124,21 +121,13 @@ const GroupStreams = ({
          <Grid container spacing={mobile ? 2 : 4}>
             {groupData.id || listenToUpcoming ? (
                searching ? (
-                  <Grid md={12} lg={12} xl={12} item sx={styles.loaderWrapper}>
+                  <Grid xs={12} item sx={styles.loaderWrapper}>
                      <LinearProgress style={{ width: "80%" }} color="primary" />
                   </Grid>
                ) : livestreams.length ? (
                   renderStreamCards
                ) : (
-                  <Grid
-                     sm={12}
-                     xs={12}
-                     md={12}
-                     lg={12}
-                     xl={12}
-                     item
-                     sx={styles.loaderWrapper}
-                  >
+                  <Grid xs={12} item sx={styles.loaderWrapper}>
                      <Typography
                         sx={styles.emptyMessage}
                         align="center"
@@ -162,4 +151,4 @@ const GroupStreams = ({
       </Grid>
    );
 };
-export default withFirebase(GroupStreams);
+export default GroupStreams;
