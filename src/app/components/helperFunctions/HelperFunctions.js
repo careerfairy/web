@@ -421,3 +421,14 @@ export const dataURLtoFile = (dataUrl, filename) => {
       type: mime,
    });
 };
+
+export const getMaxLineStyles = (maxLines = 2) => ({
+   display: "-webkit-box",
+   boxOrient: "vertical",
+   lineClamp: maxLines,
+   WebkitLineClamp: maxLines,
+   overflow: "hidden",
+   textOverflow: "ellipsis",
+   "-webkit-line-clamp": maxLines,
+   "-webkit-box-orient": "vertical",
+});
