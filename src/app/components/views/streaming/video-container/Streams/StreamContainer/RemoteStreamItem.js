@@ -38,11 +38,7 @@ const RemoteStreamItem = ({
       if (stream.uid === "demoStream") {
          generateDemoHandRaiser();
       } else {
-         if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
-            stream.videoTrack?.play(stream.uid, {
-               fit: isScreenShareVideo ? "contain" : "cover",
-            });
-         }
+         playVideo();
       }
    }, [stream.uid, stream.videoTrack]);
 
@@ -67,10 +63,14 @@ const RemoteStreamItem = ({
    }, [muteAllRemoteVideos]);
 
    function playVideo() {
-      if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
-         stream.videoTrack?.play(stream.uid, {
-            fit: isScreenShareVideo ? "contain" : "cover",
-         });
+      try {
+         if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
+            stream.videoTrack?.play(stream.uid, {
+               fit: isScreenShareVideo ? "contain" : "cover",
+            });
+         }
+      } catch (e) {
+         console.log("-> error in PLAY VIDEO", e);
       }
    }
 

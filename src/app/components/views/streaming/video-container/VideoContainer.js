@@ -87,6 +87,7 @@ function VideoContainer({
       localMediaHandlers,
       handleEnableCloudProxy,
       handleReconnectAgora,
+      handlePublishLocalStream,
    } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer);
 
    const devices = useDevices(localStream);
@@ -119,6 +120,15 @@ function VideoContainer({
       currentLivestream.currentSpeakerId,
       currentLivestream.mode,
    ]);
+
+   const handlePublish = async () => {
+      try {
+         await handlePublishLocalStream();
+         setShowLocalStreamPublishingModal(false);
+      } catch (e) {
+         console.log("-> error in HANDLE PUBLISH", e);
+      }
+   };
 
    const dynamicallyUpdateVideoProfile = async () => {
       if (localStream?.videoTrack) {
@@ -175,22 +185,6 @@ function VideoContainer({
          mode === "desktop" ? initiatorId : currentLivestream.screenSharerId;
       await firebase.setDesktopMode(streamRef, mode, screenSharerId);
    };
-
-   const handlePublishLocalStream = useCallback(async () => {
-      if (localStream.audioTrack && !localStream.isAudioPublished) {
-         await publishLocalStreamTracks.publishLocalMicrophoneTrack();
-      }
-      if (localStream.videoTrack && !localStream.isVideoPublished) {
-         await publishLocalStreamTracks.publishLocalCameraTrack();
-      }
-      await dispatch(actions.setStreamerIsPublished(true));
-      setShowLocalStreamPublishingModal(false);
-   }, [
-      localStream.audioTrack,
-      localStream.videoTrack,
-      localStream.isAudioPublished,
-      localStream.isVideoPublished,
-   ]);
 
    const handleJoinAsViewer = useCallback(async () => {
       await localMediaHandlers.closeLocalCameraTrack();
@@ -317,7 +311,7 @@ function VideoContainer({
             )}
             devices={devices}
             mediaControls={mediaControls}
-            onConfirmStream={handlePublishLocalStream}
+            onConfirmStream={handlePublish}
             onRefuseStream={handleJoinAsViewer}
             localMediaHandlers={localMediaHandlers}
             labels={labels}

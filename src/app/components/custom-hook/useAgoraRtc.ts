@@ -69,18 +69,9 @@ export default function useAgoraRtc(
    }, []);
 
    useEffect(() => {
-      let isAudioAutoplayFailed = false;
       AgoraRTC.onAudioAutoplayFailed = () => {
+         dispatch(actions.setVideoIsPaused());
          console.log("-> In OnAudioAutoplayFailed");
-         if (isAudioAutoplayFailed) return;
-         isAudioAutoplayFailed = true;
-         const btn = document.createElement("button");
-         btn.innerText = "Click me to resume the audio playback";
-         btn.onclick = () => {
-            isAudioAutoplayFailed = false;
-            btn.remove();
-         };
-         document.body.append(btn);
       };
    }, []);
 
@@ -112,9 +103,18 @@ export default function useAgoraRtc(
       return leaveAgoraRoom();
    };
 
-   const handleReconnectAgora = async () => {
+   const handleReconnectAgora = async (options: { rePublish?: boolean }) => {
       await close();
       await init();
+      if (options.rePublish) {
+         try {
+            await closeLocalCameraTrack();
+            await closeLocalMicrophoneTrack();
+            await handlePublishLocalStream();
+         } catch (e) {
+            console.log("-> error in Republish in reconnect", e);
+         }
+      }
    };
 
    const updateScreenShareRtcClient = (newScreenShareRtcClient) => {
@@ -483,6 +483,22 @@ export default function useAgoraRtc(
       });
    };
 
+   const handlePublishLocalStream = useCallback(async () => {
+      console.log("-> localStream", localStream);
+      if (localStream.audioTrack && !localStream.isAudioPublished) {
+         await publishLocalMicrophoneTrack();
+      }
+      if (localStream.videoTrack && !localStream.isVideoPublished) {
+         await publishLocalCameraTrack();
+      }
+      await dispatch(actions.setStreamerIsPublished(true));
+   }, [
+      localStream.audioTrack,
+      localStream.videoTrack,
+      localStream.isAudioPublished,
+      localStream.isVideoPublished,
+   ]);
+
    const localMediaHandlers = useMemo(
       () => ({
          initializeLocalAudioStream,
@@ -509,6 +525,7 @@ export default function useAgoraRtc(
          publishLocalMicrophoneTrack,
          returnToAudience,
       },
+      handlePublishLocalStream,
       publishScreenShareStream,
       unpublishScreenShareStream,
       leaveAgoraRoom,

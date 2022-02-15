@@ -6,13 +6,13 @@ import { Stack } from "@mui/material";
 import OptionCard from "../common/OptionCard";
 
 interface Props {
-   handleReconnectAgora: () => Promise<void>;
+   handleReconnectAgora: (options: { rePublish?: boolean }) => Promise<void>;
 }
 const UidConflict: FC<Props> = ({ handleReconnectAgora }) => {
    const [steps] = useState([
       {
          title: "Close the stream and continue here",
-         onClick: handleReconnectAgora,
+         onClick: () => handleReconnectAgora({ rePublish: true }),
       },
    ]);
 
