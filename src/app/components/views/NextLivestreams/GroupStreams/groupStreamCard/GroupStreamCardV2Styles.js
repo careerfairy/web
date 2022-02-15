@@ -71,12 +71,12 @@ export default {
       justifyContent: "space-evenly",
    },
    avatar: {
-      width: 48,
-      height: 48,
+      width: 45,
+      height: 45,
    },
    groupLogo: {
-      width: { xs: 60, lg: 70 },
-      height: { xs: 60, lg: 70 },
+      width: { xs: 60, lg: 60 },
+      height: { xs: 60, lg: 60 },
       background: (theme) => theme.palette.common.white,
       "& img": {
          objectFit: "contain",
