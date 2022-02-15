@@ -248,8 +248,11 @@ const EventsTable = ({
             tooltip: isDraft ? "Delete Draft" : "Delete Event",
             onClick: () => handleClickDeleteStream(rowData.id),
             hintTitle: isDraft ? "Delete Draft" : "Delete Event",
-            hintDescription:
-               "Deleting an event is a permanent action and cannot be undone.",
+            hidden:
+               rowData.author?.groupId !== group.groupId && !userData?.isAdmin,
+            hintDescription: userData?.isAdmin
+               ? "You can delete this event because you are a CF admin"
+               : "Deleting an event is a permanent action and cannot be undone.",
          },
          {
             icon: publishingDraft ? (
