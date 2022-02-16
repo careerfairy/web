@@ -1,14 +1,12 @@
 import React, { FC, useEffect, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
-import { Box, CircularProgress, Collapse, Stack, Typography } from "@mui/material";
-import * as actions from "store/actions";
+import { Box, CircularProgress } from "@mui/material";
 import { RTC_CLIENT_JOIN_TIME_LIMIT } from "constants/streams";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import LoadingButton from "@mui/lab/LoadingButton";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import RootState from "store/reducers";
-import { rtcMessages } from "../../../../../../types";
+import { rtcMessages } from "types";
 
 const styles = {
    container: {
@@ -92,6 +90,8 @@ const ConnectionStateModal: FC<Props> = ( ) => {
                <Box sx={styles.content}>
                   {rtcMessages[agoraRtcConnectionStatus.curState]}
                </Box>
+
+               {/*TODO show a button for showing debug options*/}
                {/*<Collapse in={showDebugPrompt}>*/}
                {/*   <Stack spacing={1}>*/}
                {/*      <Typography>*/}
