@@ -1,8 +1,9 @@
 import React, { FC } from "react";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import { Typography } from "@mui/material";
+import { ButtonProps, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 
 const styles = {
    root: {
@@ -36,11 +37,12 @@ const styles = {
       placeItems: "center start",
    },
 } as const;
-interface OptionCardProps {
+export interface OptionCardProps {
    title: string;
    description?: string;
-   number: number | string;
+   number?: number | string;
    onClick?: () => void;
+   actionButtonProps?: ButtonProps;
 }
 const OptionCard: FC<OptionCardProps> = (props) => {
    return (
@@ -73,6 +75,9 @@ const OptionCard: FC<OptionCardProps> = (props) => {
                      <Typography variant="body1" color="text.secondary">
                         {props.description}
                      </Typography>
+                  )}
+                  {props.actionButtonProps && (
+                     <Button {...props.actionButtonProps} />
                   )}
                </Box>
             </Grid>

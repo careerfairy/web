@@ -254,6 +254,28 @@ export default function useAgoraRtc(
       });
    };
 
+   const initializeVideoCameraAudioTrack = useCallback(async () => {
+      try {
+         let audioTrack;
+         let videoTrack;
+
+         [audioTrack, videoTrack] = await Promise.all([
+            // Create local tracks, using microphone and camera
+            AgoraRTC.createMicrophoneAudioTrack(),
+            AgoraRTC.createCameraVideoTrack({
+               encoderConfig: "480p_9",
+            }),
+         ]);
+         setLocalStream((localStream) => ({
+            ...localStream,
+            audioTrack: audioTrack,
+            videoTrack: videoTrack,
+         }));
+      } catch (error) {
+         dispatch(actions.setAgoraRtcError(error));
+      }
+   }, []);
+
    const closeLocalStream = () => {
       if (localStream) {
          if (localStream.videoTrack) {
@@ -505,6 +527,7 @@ export default function useAgoraRtc(
       () => ({
          initializeLocalAudioStream,
          initializeLocalVideoStream,
+         initializeVideoCameraAudioTrack,
          closeLocalCameraTrack,
          closeLocalMicrophoneTrack,
       }),
@@ -531,7 +554,6 @@ export default function useAgoraRtc(
       publishScreenShareStream,
       unpublishScreenShareStream,
       leaveAgoraRoom,
-      handleEnableCloudProxy,
       handleReconnectAgora,
    };
 }

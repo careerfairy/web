@@ -109,7 +109,6 @@ function ViewerComponent({
       remoteStreams,
       localMediaHandlers,
       publishLocalStreamTracks,
-      handleEnableCloudProxy,
    } = useAgoraRtc(
       streamerId,
       currentLivestream.id,
@@ -274,7 +273,7 @@ function ViewerComponent({
             showMenu={showMenu}
             livestreamId={currentLivestream.id}
          />
-         <AgoraStateHandler isViewer handleEnableCloudProxy={handleEnableCloudProxy} />
+         <AgoraStateHandler />
          <StreamPublishingModal
             open={showLocalStreamPublishingModal}
             setOpen={setShowLocalStreamPublishingModal}

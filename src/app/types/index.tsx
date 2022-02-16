@@ -55,6 +55,7 @@ export interface LocalStream {
 export interface LocalMediaHandlers {
    initializeLocalAudioStream: () => Promise<any>;
    initializeLocalVideoStream: () => Promise<any>;
+   initializeVideoCameraAudioTrack: () => Promise<any>;
    closeLocalCameraTrack: () => Promise<any>;
    closeLocalMicrophoneTrack: () => Promise<any>;
 }

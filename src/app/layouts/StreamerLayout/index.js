@@ -18,6 +18,8 @@ import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/use
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import AgoraRTMProvider from "context/agoraRTM/AgoraRTMProvider";
+import AgoraRTC from "agora-rtc-sdk-ng";
+import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay";
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -78,6 +80,10 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamerLayout = (props) => {
    const { children, isBreakout, isMainStreamer } = props;
+   const [browserIsCompatible, setBrowserIsCompatible] = useState(
+      AgoraRTC.checkSystemRequirements
+   );
+   console.log("-> browserIsCompatible", browserIsCompatible);
    const firebase = useFirebaseService();
    const {
       query: { token, livestreamId: baseStreamId, breakoutRoomId, auto },
@@ -215,6 +221,10 @@ const StreamerLayout = (props) => {
          return tokenChecked;
       }
    };
+
+   if (browserIsCompatible) {
+      return <BrowserIncompatibleOverlay />;
+   }
 
    if (
       !isLoaded(currentLivestream) ||

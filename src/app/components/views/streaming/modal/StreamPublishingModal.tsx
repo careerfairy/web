@@ -137,10 +137,17 @@ const StreamPublishingModal = memo(
       useEffect(() => {
          (async function initializeMediaDevices() {
             if (openModal) {
-               if (localStorage.getItem("hasEnabledCamera") === "true") {
+               const hasEnabledCamera =
+                  localStorage.getItem("hasEnabledCamera") === "true";
+               const hasEnabledMic =
+                  localStorage.getItem("hasEnabledMicrophone") === "true";
+               if (hasEnabledCamera && hasEnabledMic) {
+                  return await localMediaHandlers.initializeVideoCameraAudioTrack();
+               }
+               if (hasEnabledCamera) {
                   return await localMediaHandlers.initializeLocalVideoStream();
                }
-               if (localStorage.getItem("hasEnabledMicrophone") === "true") {
+               if (hasEnabledMic) {
                   return await localMediaHandlers.initializeLocalAudioStream();
                }
             } else return;
@@ -207,6 +214,7 @@ const StreamPublishingModal = memo(
       const hasVideoTrack = useMemo(() => {
          return Boolean(localStream) && Boolean(localStream.videoTrack);
       }, [localStream, localStream?.videoTrack]);
+      console.log("-> hasVideoTrack", hasVideoTrack);
 
       const joinButtonLabel = useMemo(() => {
          if (hasAudioTrack && hasVideoTrack) return labels.joinButtonLabel;

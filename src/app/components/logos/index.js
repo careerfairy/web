@@ -8,7 +8,7 @@ const LogoImage = styled("img")({
    width: "150px",
    display: "inline-block",
 });
-export const MainLogo = ({ white, className }) => {
+export const MainLogo = ({ white, className, sx }) => {
    return (
       <Link href="/">
          <Box
@@ -21,6 +21,7 @@ export const MainLogo = ({ white, className }) => {
                alt="CareerFairy Logo"
                src={white ? "/logo_white.svg" : "/logo_teal.svg"}
                className={className}
+               sx={sx}
             />
          </Box>
       </Link>

@@ -84,7 +84,6 @@ function VideoContainer({
       unpublishScreenShareStream,
       leaveAgoraRoom,
       localMediaHandlers,
-      handleEnableCloudProxy,
       handlePublishLocalStream,
    } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer, true);
 
@@ -343,7 +342,7 @@ function VideoContainer({
                agoraRtcConnectionStatus={{}}
             />
          </DraggableComponent>
-         <AgoraStateHandler handleEnableCloudProxy={handleEnableCloudProxy} />
+         <AgoraStateHandler />
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}

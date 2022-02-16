@@ -4,19 +4,19 @@ import * as actions from "store/actions";
 import RootState from "store/reducers";
 import { ConnectionState } from "agora-rtc-sdk-ng";
 import ConnectionStateModal from "./ModalViews/ConnectionStateModal";
-import FailedToSubscribeWithProxy from "./ModalViews/FailedToSubscribeWithProxy";
-import FailedToSubscribeWithoutProxy from "./ModalViews/FailedToSubscribeWithoutProxy";
+import DebugModal from "./ModalViews/DebugModal";
 import UidConflict from "./ModalViews/UidConflict";
-import { rtcMessages } from "../../../../../types";
+import { rtcMessages } from "types";
 import { AlertProps } from "@mui/material/Alert/Alert";
+import { OptionCardProps } from "./common/OptionCard";
+import { useRouter } from "next/router";
 
-interface Props {
-   handleEnableCloudProxy: () => Promise<void>;
-   isViewer?: boolean
-}
+interface Props {}
 
-const AgoraStateHandler: FC<Props> = ({ handleEnableCloudProxy, isViewer }) => {
+const AgoraStateHandler: FC<Props> = () => {
    const dispatch = useDispatch();
+   const router = useRouter();
+
    const [view, setView] = useState(null);
    const agoraRtcConnectionStatus = useSelector((state: RootState) => {
       return state.stream.agoraState.rtcConnectionState;
@@ -24,6 +24,20 @@ const AgoraStateHandler: FC<Props> = ({ handleEnableCloudProxy, isViewer }) => {
    const agoraRtcError = useSelector((state: RootState) => {
       return state.stream.agoraState.rtcError;
    });
+
+   const [steps] = useState<OptionCardProps[]>([
+      {
+         title: "Change Network",
+         description:
+            "Try disconnecting from any VPN, switching to another " +
+            "network or use a mobile hotspot.",
+         actionButtonProps: {
+            onClick: router.reload,
+            children: "Click here to refresh once done ",
+            sx: { mt: 1, mx: "auto" },
+         },
+      },
+   ]);
 
    useEffect(() => {
       (function handleStatus() {
@@ -39,36 +53,18 @@ const AgoraStateHandler: FC<Props> = ({ handleEnableCloudProxy, isViewer }) => {
                break;
             case "RECONNECTING":
                if (prevState === "CONNECTED") {
-                  if(isViewer){
-                     sendReconnectingToast()
-                  } else {
-                  setView(() => (
-                     <ConnectionStateModal
-                     />
-                  ));
-
-                  }
+                  showConnectionStateModal();
                }
                break;
             case "CONNECTING":
-               if(isViewer){
-                  sendConnectingToast()
-               } else {
-               setView(() => (
-                  <ConnectionStateModal
-                  />
-               ));
-               }
+               showConnectionStateModal();
                break;
             case "DISCONNECTED":
                if (prevState === "CONNECTING") return;
                if (reason === "UID_BANNED") {
-                  return setView(() => <UidConflict />);
+                  return showUidConflictModal();
                }
-               setView(() => (
-                  <ConnectionStateModal
-                  />
-               ));
+               showConnectionStateModal();
                break;
             case "DISCONNECTING":
                setView(null);
@@ -89,21 +85,13 @@ const AgoraStateHandler: FC<Props> = ({ handleEnableCloudProxy, isViewer }) => {
       (function handleError() {
          switch (agoraRtcError?.code) {
             case "FAILED_TO_SUBSCRIBE_WITH_PROXY":
-               setView(() => (
-                  <FailedToSubscribeWithProxy
-                     handleEnableProxy={handleEnableCloudProxy}
-                  />
-               ));
+               showDebugModal();
                break;
             case "FAILED_TO_SUBSCRIBE_WITHOUT_PROXY":
-               setView(() => (
-                  <FailedToSubscribeWithoutProxy
-                     handleEnableProxy={handleEnableCloudProxy}
-                  />
-               ));
+               showDebugModal();
                break;
             case "UID_CONFLICT":
-               setView(() => <UidConflict />);
+               showUidConflictModal();
                break;
             default:
                return null;
@@ -111,7 +99,11 @@ const AgoraStateHandler: FC<Props> = ({ handleEnableCloudProxy, isViewer }) => {
       })();
    }, [agoraRtcError?.code]);
 
-   const sendRTCSateToast = (rtcStatus: ConnectionState, variant:AlertProps['severity'], persist?:boolean ) => {
+   const sendRTCSateToast = (
+      rtcStatus: ConnectionState,
+      variant: AlertProps["severity"],
+      persist?: boolean
+   ) => {
       dispatch(
          actions.enqueueSnackbar({
             message: rtcMessages[rtcStatus],
@@ -119,15 +111,21 @@ const AgoraStateHandler: FC<Props> = ({ handleEnableCloudProxy, isViewer }) => {
                variant: variant,
                preventDuplicate: true,
                key: rtcStatus,
-               persist: Boolean(persist)
+               persist: Boolean(persist),
             },
          })
       );
    };
 
-   const sendConnectedToast = () =>sendRTCSateToast("CONNECTED", "success")
-   const sendConnectingToast = () =>sendRTCSateToast("CONNECTING", "info")
-   const sendReconnectingToast = () =>sendRTCSateToast("RECONNECTING", "warning", true)
+   const showConnectionStateModal = () =>
+      setView(() => <ConnectionStateModal steps={steps} />);
+   const showDebugModal = () => setView(() => <DebugModal steps={steps} />);
+   const showUidConflictModal = () => setView(() => <UidConflict />);
+
+   const sendConnectedToast = () => sendRTCSateToast("CONNECTED", "success");
+   const sendConnectingToast = () => sendRTCSateToast("CONNECTING", "info");
+   const sendReconnectingToast = () =>
+      sendRTCSateToast("RECONNECTING", "warning", true);
 
    const closeToast = (key: ConnectionState) => {
       dispatch(actions.closeSnackbar(key));
