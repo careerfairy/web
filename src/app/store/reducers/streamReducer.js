@@ -26,7 +26,8 @@ const initialState = {
    },
    agoraState: {
       rtcConnectionState: {
-         curState: AGORA_RTC_CONNECTION_STATE_CONNECTING,
+         curState: undefined,
+         // curState: AGORA_RTC_CONNECTION_STATE_CONNECTING,
          prevState: undefined,
          reason: undefined,
          warning: undefined,
