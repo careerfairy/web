@@ -189,3 +189,14 @@ export interface RTCConnectionState {
    reason?: ConnectionDisconnectedReason;
    warning?: CustomConnectionDisconnectedReason;
 }
+type Messages = {
+   [key in ConnectionState]?: string;
+};
+export const rtcMessages: Messages = {
+   DISCONNECTED: "Disconnected",
+   RECONNECTING:
+      "It seems like the connection got interrupted. Attempting to reconnect...",
+   CONNECTING: "Connecting...",
+   CONNECTED: "Connected",
+   DISCONNECTING: "",
+};

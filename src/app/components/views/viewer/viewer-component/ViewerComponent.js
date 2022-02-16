@@ -274,7 +274,7 @@ function ViewerComponent({
             showMenu={showMenu}
             livestreamId={currentLivestream.id}
          />
-         <AgoraStateHandler handleEnableCloudProxy={handleEnableCloudProxy} />
+         <AgoraStateHandler isViewer handleEnableCloudProxy={handleEnableCloudProxy} />
          <StreamPublishingModal
             open={showLocalStreamPublishingModal}
             setOpen={setShowLocalStreamPublishingModal}

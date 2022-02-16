@@ -9,8 +9,9 @@ import useHandRaiseState from "../../../../custom-hook/useHandRaiseState";
 import HandRaiseJoinDialog from "./hand-raise/HandRaiseJoinDialog";
 import HandRaisePromptDialog from "./hand-raise/HandRaisePromptDialog";
 import * as actions from "store/actions";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import HandRaiseAcquiringMedia from "./hand-raise/active/HandRaiseAcquiringMedia";
+import { useAuth } from "../../../../../HOCs/AuthProvider";
 
 const HandRaiseCategory = ({
    streamerId,
@@ -26,15 +27,22 @@ const HandRaiseCategory = ({
    const [handRaisePromptDialogOpen, setHandRaisePromptDialogOpen] = useState(
       false
    );
+   const spyModeEnabled = useSelector(
+      (state) => state.stream.streaming.spyModeEnabled
+   );
+   const {userData} = useAuth()
 
    useEffect(() => {
+      const canSeeLivestream = Boolean(
+         livestream?.hasStarted || (userData?.isAdmin && spyModeEnabled)
+      )
       const hasNotRaisedHandYet = Boolean(
          handRaiseState === undefined &&
             livestream?.handRaiseActive &&
             !isMobile
       );
-      setHandRaisePromptDialogOpen(hasNotRaisedHandYet);
-   }, [livestream?.handRaiseActive, handRaiseState, isMobile]);
+      setHandRaisePromptDialogOpen(hasNotRaisedHandYet && canSeeLivestream);
+   }, [livestream?.handRaiseActive,livestream?.hasStarted, handRaiseState, isMobile, userData?.isAdmin, spyModeEnabled]);
 
    useEffect(() => {
       if (

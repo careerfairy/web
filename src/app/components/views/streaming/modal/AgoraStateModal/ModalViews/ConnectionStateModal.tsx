@@ -1,20 +1,14 @@
 import React, { FC, useEffect, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
-import {
-   Box,
-   CircularProgress,
-   Collapse,
-   Stack,
-   Typography,
-} from "@mui/material";
+import { Box, CircularProgress, Collapse, Stack, Typography } from "@mui/material";
 import * as actions from "store/actions";
 import { RTC_CLIENT_JOIN_TIME_LIMIT } from "constants/streams";
-import { ConnectionState } from "agora-rtc-sdk-ng";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useDispatch, useSelector } from "react-redux";
 import RootState from "store/reducers";
+import { rtcMessages } from "../../../../../../types";
 
 const styles = {
    container: {
@@ -39,26 +33,15 @@ const styles = {
       textAlign: "center",
    },
 } as const;
-interface Props {
-   handleEnableCloudProxy: () => Promise<void>;
-}
-type Messages = {
-   [key in ConnectionState]?: string;
-};
 
-const messages: Messages = {
-   DISCONNECTED: "Disconnected",
-   RECONNECTING:
-      "It seems like the connection got interrupted. Attempting to reconnect...",
-   CONNECTING: "Connecting...",
-   CONNECTED: "Connected",
-   DISCONNECTING: "",
-};
-const loadingTimeLimit = RTC_CLIENT_JOIN_TIME_LIMIT + 2000;
-const ConnectionStateModal: FC<Props> = ({ handleEnableCloudProxy }) => {
-   const dispatch = useDispatch();
-   const [enablingCompatMode, setEnablingCompatMode] = useState(false);
-   const [showEnableProxyPrompt, setShowEnableProxyPrompt] = useState(false);
+interface Props {
+}
+
+
+
+const loadingTimeLimit = RTC_CLIENT_JOIN_TIME_LIMIT + 3000;
+const ConnectionStateModal: FC<Props> = ( ) => {
+   const [showDebugPrompt, setShowDebugPrompt] = useState(false);
    const agoraRtcConnectionStatus = useSelector((state: RootState) => {
       return state.stream.agoraState.rtcConnectionState;
    });
@@ -68,7 +51,7 @@ const ConnectionStateModal: FC<Props> = ({ handleEnableCloudProxy }) => {
    });
 
    useEffect(() => {
-      (function handlePromptUseCloudProxy() {
+      (function handlePromptUseDebug() {
          const { curState } = agoraRtcConnectionStatus;
          let timeout;
          const inALoadingState = [
@@ -76,12 +59,12 @@ const ConnectionStateModal: FC<Props> = ({ handleEnableCloudProxy }) => {
             "RECONNECTING",
             "DISCONNECTED",
          ].includes(curState);
-         if (inALoadingState && !sessionIsUsingCloudProxy) {
+         if (inALoadingState) {
             timeout = setTimeout(async () => {
-               setShowEnableProxyPrompt(true);
+               setShowDebugPrompt(true);
             }, loadingTimeLimit);
          } else {
-            setShowEnableProxyPrompt(false);
+            setShowDebugPrompt(false);
             if (timeout) {
                clearTimeout(timeout);
             }
@@ -92,13 +75,6 @@ const ConnectionStateModal: FC<Props> = ({ handleEnableCloudProxy }) => {
    }, [agoraRtcConnectionStatus, sessionIsUsingCloudProxy]);
 
    const handleEnableCompat = async () => {
-      try {
-         setEnablingCompatMode(true);
-         await handleEnableCloudProxy();
-      } catch (e) {
-         dispatch(actions.sendGeneralError(e));
-      }
-      setEnablingCompatMode(false);
    };
 
    return (
@@ -114,25 +90,22 @@ const ConnectionStateModal: FC<Props> = ({ handleEnableCloudProxy }) => {
                   )}
                </Box>
                <Box sx={styles.content}>
-                  {messages[agoraRtcConnectionStatus.curState]}
+                  {rtcMessages[agoraRtcConnectionStatus.curState]}
                </Box>
-               <Collapse in={showEnableProxyPrompt}>
-                  <Stack spacing={1}>
-                     <Typography>
-                        This is taking a little longer than usual
-                     </Typography>
-                     <LoadingButton
-                        onClick={handleEnableCompat}
-                        variant="contained"
-                        color="primary"
-                        loading={enablingCompatMode}
-                     >
-                        {enablingCompatMode
-                           ? "Enabling Compatability Mode"
-                           : "Try compatability mode"}
-                     </LoadingButton>
-                  </Stack>
-               </Collapse>
+               {/*<Collapse in={showDebugPrompt}>*/}
+               {/*   <Stack spacing={1}>*/}
+               {/*      <Typography>*/}
+               {/*         This is taking a little longer than usual*/}
+               {/*      </Typography>*/}
+               {/*      <LoadingButton*/}
+               {/*         onClick={handleEnableCompat}*/}
+               {/*         variant="contained"*/}
+               {/*         color="primary"*/}
+               {/*      >*/}
+               {/*            Try compatability mode*/}
+               {/*      </LoadingButton>*/}
+               {/*   </Stack>*/}
+               {/*</Collapse>*/}
             </Box>
          </DialogContent>
       </Dialog>
