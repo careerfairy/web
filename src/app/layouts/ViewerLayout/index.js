@@ -16,11 +16,12 @@ import PropTypes from "prop-types";
 import useStreamRef from "../../components/custom-hook/useStreamRef";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
-import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHandRaiseConnect";
 import StatsUtil from "../../data/util/StatsUtil";
 import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu";
 import AgoraRTMProvider from "context/agoraRTM/AgoraRTMProvider";
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect";
+import AgoraRTC from "agora-rtc-sdk-ng";
+import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -70,6 +71,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ViewerLayout = (props) => {
+   const [browserIsCompatible] = useState(AgoraRTC.checkSystemRequirements);
    const { children, isBreakout } = props;
    const firebase = useFirebaseService();
    const {
@@ -285,6 +287,10 @@ const ViewerLayout = (props) => {
    const hideAudience = useCallback(() => {
       setAudienceDrawerOpen(false);
    }, []);
+
+   if (!browserIsCompatible) {
+      return <BrowserIncompatibleOverlay />;
+   }
 
    if (
       !isLoaded(currentLivestream) ||

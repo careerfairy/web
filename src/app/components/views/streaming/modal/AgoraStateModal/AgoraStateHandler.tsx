@@ -6,7 +6,7 @@ import { ConnectionState } from "agora-rtc-sdk-ng";
 import ConnectionStateModal from "./ModalViews/ConnectionStateModal";
 import DebugModal from "./ModalViews/DebugModal";
 import UidConflict from "./ModalViews/UidConflict";
-import { rtcMessages } from "types";
+import { rtcMessages } from "types/streaming";
 import { AlertProps } from "@mui/material/Alert/Alert";
 import { OptionCardProps } from "./common/OptionCard";
 import { useRouter } from "next/router";

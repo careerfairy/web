@@ -46,7 +46,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import { useDispatch } from "react-redux";
 import * as storeActions from "store/actions";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { StreamData } from "types";
+import { StreamData } from "types/streaming";
 
 const styles = {
    root: {
@@ -111,6 +111,8 @@ interface Props {
    localStreamIsPublished: {
       audio?: boolean;
       video?: boolean;
+      videoEnabled: boolean;
+      audioEnabled: boolean;
    };
    joinAsViewer?: () => Promise<any>;
    localMediaControls: {
@@ -150,6 +152,13 @@ const VideoControlsContainer = ({
    const [fullyOpened, onEntered, onExited] = useSliderFullyOpened();
    const presentMode = mode === "presentation";
    const desktopMode = mode === "desktop";
+
+   useEffect(() => {
+      setIsLocalMicMuted(!localStreamIsPublished.audioEnabled);
+   }, [localStreamIsPublished.audioEnabled]);
+   useEffect(() => {
+      setIsVideoInactive(!localStreamIsPublished.videoEnabled);
+   }, [localStreamIsPublished.videoEnabled]);
 
    useEffect(() => {
       if (isOpen(16)) {
@@ -278,16 +287,13 @@ const VideoControlsContainer = ({
 
    const localCameraLabel = useMemo(() => {
       if (localStreamIsPublished.video) {
-         return isLocalMicMuted ? "Switch camera on" : "Switch camera off";
+         return isVideoInactive ? "Switch camera on" : "Switch camera off";
       } else {
          return "Join with video";
       }
-   }, [localStreamIsPublished.video, isLocalMicMuted]);
+   }, [localStreamIsPublished.video, isVideoInactive]);
 
    const actions = [];
-   // console.log("-> isPublishing", isPublishing);
-   // console.log("-> localStreamIsPublished", localStreamIsPublished);
-
    if (isPublishing) {
       actions.unshift({
          icon: isVideoInactive ? (
@@ -362,11 +368,13 @@ const VideoControlsContainer = ({
       });
    }
 
-   actions.unshift({
-      icon: <SettingsIcon fontSize="medium" />,
-      name: "Settings",
-      onClick: () => setShowSettings(!showSettings),
-   });
+   if (isPublishing) {
+      actions.unshift({
+         icon: <SettingsIcon fontSize="medium" />,
+         name: "Settings",
+         onClick: () => setShowSettings(!showSettings),
+      });
+   }
 
    if (!viewer && isPublishing) {
       actions.unshift({

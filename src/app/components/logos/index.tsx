@@ -1,14 +1,14 @@
 import React from "react";
 import Link from "next/link";
-import { Box } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { Box, SxProps } from "@mui/material";
+import { styled, Theme } from "@mui/material/styles";
 
 const LogoImage = styled("img")({
    cursor: "pointer",
    width: "150px",
    display: "inline-block",
 });
-export const MainLogo = ({ white, className, sx }) => {
+export const MainLogo = ({ white, className, sx }: MainLogoProps) => {
    return (
       <Link href="/">
          <Box
@@ -27,7 +27,8 @@ export const MainLogo = ({ white, className, sx }) => {
       </Link>
    );
 };
-export const MiniLogo = ({ size = 30 }) => {
+
+export const MiniLogo = ({ size = 30 }: MiniLogoProps) => {
    return (
       <Link href="/">
          <a>
@@ -40,4 +41,12 @@ export const MiniLogo = ({ size = 30 }) => {
          </a>
       </Link>
    );
+};
+type MiniLogoProps = {
+   size?: number;
+};
+type MainLogoProps = {
+   white?: boolean;
+   sx?: SxProps<Theme>;
+   className?: string;
 };

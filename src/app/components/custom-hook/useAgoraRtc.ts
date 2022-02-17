@@ -7,11 +7,13 @@ import useAgoraClientConfig from "./useAgoraClientConfig";
 
 import AgoraRTC, {
    IAgoraRTCClient,
+   ILocalTrack,
    ScreenVideoTrackInitConfig,
 } from "agora-rtc-sdk-ng";
 import * as actions from "store/actions";
 import { useSessionStorage } from "react-use";
 import { RTC_CLIENT_JOIN_TIME_LIMIT } from "constants/streams";
+import { LocalStream } from "../../types/streaming";
 
 const rtcClient = AgoraRTC.createClient({
    mode: "live",
@@ -44,7 +46,7 @@ export default function useAgoraRtc(
       false
    );
 
-   const [localStream, setLocalStream] = useState({
+   const [localStream, setLocalStream] = useState<LocalStream>({
       uid: streamerId,
       isAudioPublished: false,
       isVideoPublished: false,
@@ -88,7 +90,7 @@ export default function useAgoraRtc(
    useEffect(() => {
       if (!isStreamer && rtcClient) {
          if (localStream) {
-            closeLocalStream();
+            void closeAndUnpublishedLocalStream();
          }
       }
    }, [isStreamer, rtcClient]);
@@ -276,23 +278,42 @@ export default function useAgoraRtc(
       }
    }, []);
 
-   const closeLocalStream = () => {
+   const closeAndUnpublishedLocalStream = useCallback(async () => {
       if (localStream) {
+         let tracks = [];
          if (localStream.videoTrack) {
-            localStream.videoTrack.close();
+            tracks.push(localStream.videoTrack);
          }
          if (localStream.audioTrack) {
-            localStream.audioTrack.close();
+            tracks.push(localStream.audioTrack);
          }
+         try {
+            if (tracks.length) {
+               console.log("-> tracks in unpublish", tracks);
+               await rtcClient.unpublish(tracks);
+               for (const track of tracks) {
+                  if (track.trackMediaType === "video") {
+                     await rtcClient.disableDualStream();
+                  }
+                  track.close();
+               }
+            }
+            await returnToAudience();
+         } catch (error) {
+            console.error(error);
+            dispatch(actions.setAgoraRtcError(error));
+         }
+         setLocalStream((localStream) => ({
+            ...localStream,
+            isAudioPublished: false,
+            isVideoPublished: false,
+            videoTrack: null,
+            audioTrack: null,
+            videoMuted: false,
+            audioMuted: false,
+         }));
       }
-      setLocalStream((localStream) => ({
-         ...localStream,
-         isAudioPublished: false,
-         isVideoPublished: false,
-         videoTrack: null,
-         audioTrack: null,
-      }));
-   };
+   }, [rtcClient, localStream]);
 
    const setLocalAudioEnabled = (value) => {
       localStream.audioTrack.setEnabled(value);
@@ -310,7 +331,7 @@ export default function useAgoraRtc(
       }));
    };
 
-   const publishTracks = (client, tracks, streamType) => {
+   const publishTracks = (client: IAgoraRTCClient, tracks, streamType) => {
       if (tracks) {
          return new Promise<void>(async (resolve, reject) => {
             try {
@@ -412,9 +433,11 @@ export default function useAgoraRtc(
    };
 
    const returnToAudience = async () => {
-      if (rtcClient) {
-         await rtcClient.setClientRole("audience");
-      }
+      return await rtcClient.setClientRole("audience");
+   };
+
+   const returnToHost = async () => {
+      return await rtcClient.setClientRole("host");
    };
 
    const publishScreenShareStream = useCallback(
@@ -509,12 +532,14 @@ export default function useAgoraRtc(
    };
 
    const handlePublishLocalStream = useCallback(async () => {
+      await returnToHost();
       if (localStream.audioTrack && !localStream.isAudioPublished) {
          await publishLocalMicrophoneTrack();
       }
       if (localStream.videoTrack && !localStream.isVideoPublished) {
          await publishLocalCameraTrack();
       }
+
       await dispatch(actions.setStreamerIsPublished(true));
    }, [
       localStream.audioTrack,
@@ -555,5 +580,6 @@ export default function useAgoraRtc(
       unpublishScreenShareStream,
       leaveAgoraRoom,
       handleReconnectAgora,
+      closeAndUnpublishedLocalStream,
    };
 }

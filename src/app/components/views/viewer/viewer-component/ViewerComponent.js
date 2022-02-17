@@ -325,6 +325,8 @@ function ViewerComponent({
                   localStreamIsPublished={{
                      audio: localStream?.isAudioPublished,
                      video: localStream?.isVideoPublished,
+                     videoEnabled: Boolean(localStream.videoTrack?.enabled),
+                     audioEnabled: Boolean(localStream.audioTrack?.enabled),
                   }}
                   openPublishingModal={() =>
                      setShowLocalStreamPublishingModal(true)

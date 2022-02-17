@@ -1,10 +1,12 @@
-import React, { useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useCurrentStream } from "context/stream/StreamContext";
 import { useAuth } from "HOCs/AuthProvider";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useStreamRef from "./useStreamRef";
 import { MAX_STREAM_DEFAULT_ACTIVE_HAND_RAISERS } from "constants/streams";
+import RootState from "store/reducers";
+import { HandRaise } from "types/handraise";
 
 const useHandRaiseState = (streamerId) => {
    const { currentLivestream, handRaiseId } = useCurrentStream();
@@ -17,21 +19,21 @@ const useHandRaiseState = (streamerId) => {
    } = useFirebaseService();
 
    const numberOfActiveHandRaises = useSelector(
-      (state) =>
+      (state: RootState) =>
          state.firestore.ordered["handRaises"]?.filter(
-            (handRaise) =>
+            (handRaise: HandRaise) =>
                ["connecting", "connected", "invited"].includes(
                   handRaise.state
                ) && handRaise.id !== handRaiseId
          )?.length || 0
    );
 
-   const handRaiseState = useSelector(
-      (state) => state.firestore.data["handRaises"]?.[handRaiseId]
+   const handRaiseState: HandRaise = useSelector(
+      (state: RootState) => state.firestore.data["handRaises"]?.[handRaiseId]
    );
 
    const updateRequest = useCallback(
-      async (state) => {
+      async (state: HandRaise["state"]) => {
          const isAnon = Boolean(
             currentLivestream.test ||
                currentLivestream.openStream ||
@@ -67,10 +69,13 @@ const useHandRaiseState = (streamerId) => {
          handRaiseState,
       ]
    );
-   const hasRoom = useMemo(
+   const hasRoom: boolean = useMemo(
       () =>
-         numberOfActiveHandRaises < currentLivestream.maxHandRaisers ??
-         MAX_STREAM_DEFAULT_ACTIVE_HAND_RAISERS,
+         Boolean(
+            numberOfActiveHandRaises <
+               (currentLivestream.maxHandRaisers ??
+                  MAX_STREAM_DEFAULT_ACTIVE_HAND_RAISERS)
+         ),
       [currentLivestream?.maxHandRaisers, numberOfActiveHandRaises]
    );
 

@@ -34,7 +34,7 @@ import {
    LocalMediaHandlers,
    LocalStream,
    MediaControls,
-} from "types";
+} from "types/streaming";
 import { Theme } from "@mui/system";
 import RootState from "store/reducers";
 
@@ -214,7 +214,6 @@ const StreamPublishingModal = memo(
       const hasVideoTrack = useMemo(() => {
          return Boolean(localStream) && Boolean(localStream.videoTrack);
       }, [localStream, localStream?.videoTrack]);
-      console.log("-> hasVideoTrack", hasVideoTrack);
 
       const joinButtonLabel = useMemo(() => {
          if (hasAudioTrack && hasVideoTrack) return labels.joinButtonLabel;

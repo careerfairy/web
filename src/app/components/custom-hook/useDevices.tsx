@@ -5,7 +5,7 @@ import {
    getDeviceList,
    mapDevices,
 } from "util/streamUtil";
-import { DeviceList } from "types";
+import { DeviceList } from "types/streaming";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
 

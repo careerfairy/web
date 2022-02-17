@@ -11,7 +11,7 @@ import {
    RemoteStreamUser,
    RTCError,
    RTCSubscribeErrorCodes,
-} from "types";
+} from "types/streaming";
 
 interface ClientConfigOptions {
    clientIsUsingCloudProxy?: boolean;
@@ -52,6 +52,7 @@ export default function useAgoraClientConfig(
          });
       });
       rtcClient.on("user-left", async (remoteUser) => {
+         console.log("-> user-left", remoteUser);
          setRemoteStreams((prevRemoteStreams) => {
             return removeStreamFromList(remoteUser.uid, prevRemoteStreams);
          });
@@ -87,6 +88,7 @@ export default function useAgoraClientConfig(
       });
 
       rtcClient.on("user-unpublished", async (remoteUser, mediaType) => {
+         console.log("-> user-unpublished", remoteUser);
          try {
             await rtcClient.unsubscribe(remoteUser, mediaType);
          } catch (error) {

@@ -1,4 +1,4 @@
-import { DeviceOption } from "../types";
+import { DeviceOption } from "../types/streaming";
 
 const getDeviceKindLabel = (deviceKind: MediaDeviceInfo["kind"]) => {
    if (deviceKind === "audioinput") return "microphone";

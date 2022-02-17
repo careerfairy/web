@@ -4,14 +4,15 @@ import { Button, Grow } from "@mui/material";
 import {
    CategoryContainerCentered,
    CategoryContainerContent,
-} from "../../../../../../../materialUI/GlobalContainers";
+} from "materialUI/GlobalContainers";
 import {
    CategorySubtitle,
    ThemedPermanentMarker,
-} from "../../../../../../../materialUI/GlobalTitles";
+} from "materialUI/GlobalTitles";
+import { HandRaise, HandRaiseState } from "types/handraise";
 
 const HandRaisePriorRequest = memo(
-   ({ handRaiseState, updateHandRaiseRequest }) => {
+   ({ handRaiseState, updateHandRaiseRequest }: Props) => {
       const shouldRender = () =>
          Boolean(!(handRaiseState && handRaiseState.state !== "unrequested"));
       return (
@@ -43,7 +44,9 @@ const HandRaisePriorRequest = memo(
                               }
                               children="Raise my hand"
                               onClick={() =>
-                                 updateHandRaiseRequest("requested")
+                                 updateHandRaiseRequest(
+                                    HandRaiseState.acquire_media
+                                 )
                               }
                               color="primary"
                            />
@@ -57,4 +60,8 @@ const HandRaisePriorRequest = memo(
    }
 );
 
+type Props = {
+   handRaiseState: HandRaise;
+   updateHandRaiseRequest: (state: HandRaiseState) => Promise<void>;
+};
 export default HandRaisePriorRequest;

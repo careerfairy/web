@@ -85,6 +85,7 @@ function VideoContainer({
       leaveAgoraRoom,
       localMediaHandlers,
       handlePublishLocalStream,
+      closeAndUnpublishedLocalStream,
    } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer, true);
 
    const devices = useDevices(localStream, { initialize: true });
@@ -184,8 +185,7 @@ function VideoContainer({
    };
 
    const handleJoinAsViewer = useCallback(async () => {
-      await localMediaHandlers.closeLocalCameraTrack();
-      await localMediaHandlers.closeLocalMicrophoneTrack();
+      await closeAndUnpublishedLocalStream();
       await dispatch(actions.setStreamerIsPublished(false));
       setShowLocalStreamPublishingModal(false);
    }, [localMediaHandlers]);
@@ -321,6 +321,8 @@ function VideoContainer({
             localStreamIsPublished={{
                audio: localStream?.isAudioPublished,
                video: localStream?.isVideoPublished,
+               videoEnabled: Boolean(localStream.videoTrack?.enabled),
+               audioEnabled: Boolean(localStream.audioTrack?.enabled),
             }}
             openPublishingModal={() => setShowLocalStreamPublishingModal(true)}
             joinAsViewer={handleJoinAsViewer}

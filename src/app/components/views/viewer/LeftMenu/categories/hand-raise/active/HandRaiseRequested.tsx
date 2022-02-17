@@ -5,12 +5,13 @@ import HandRaiseIcon from "@mui/icons-material/PanToolOutlined";
 import {
    CategoryContainerCentered,
    CategoryContainerContent,
-} from "../../../../../../../materialUI/GlobalContainers";
+} from "materialUI/GlobalContainers";
 import {
    CategorySubtitle,
    ThemedPermanentMarker,
-} from "../../../../../../../materialUI/GlobalTitles";
-import useTimeOut from "../../../../../../custom-hook/useTimeOut";
+} from "materialUI/GlobalTitles";
+import useTimeOut from "components/custom-hook/useTimeOut";
+import { HandRaise, HandRaiseState } from "types/handraise";
 
 const DELAY_IN_SECONDS = 5;
 
@@ -20,16 +21,21 @@ const HandRaiseRequested = memo(
       handRaiseActive,
       requestHandRaise,
       unRequestHandRaise,
-   }) => {
+   }: Props) => {
       const { startCountDown, isCountingDown } = useTimeOut({
          delay: DELAY_IN_SECONDS * 1000,
       });
       const shouldRender = () =>
-         Boolean(!(!handRaiseState || handRaiseState.state !== "requested"));
+         Boolean(
+            !(
+               !handRaiseState ||
+               handRaiseState.state !== HandRaiseState.requested
+            )
+         );
 
-      const onClick = () => {
+      const onClick = async () => {
          if (!handRaiseActive) return unRequestHandRaise();
-         requestHandRaise();
+         await requestHandRaise();
          startCountDown();
       };
 
@@ -58,7 +64,7 @@ const HandRaiseRequested = memo(
                                  )
                               }
                               variant="contained"
-                              color={handRaiseActive && "primary"}
+                              color={handRaiseActive ? "primary" : "grey"}
                               children={
                                  isCountingDown
                                     ? `disabled for ${DELAY_IN_SECONDS} seconds`
@@ -77,5 +83,12 @@ const HandRaiseRequested = memo(
       );
    }
 );
+
+type Props = {
+   handRaiseState: HandRaise;
+   handRaiseActive?: boolean;
+   requestHandRaise: () => Promise<void>;
+   unRequestHandRaise: () => Promise<void>;
+};
 
 export default HandRaiseRequested;

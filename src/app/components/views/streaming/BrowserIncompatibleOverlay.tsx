@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { MainLogo } from "components/logos";
 // @ts-ignore
-import { edgeLogo, chromeLogo, safariLogo } from "constants/images";
+import { chromeLogo, edgeLogo, safariLogo } from "constants/images";
 
 import { Stack, Typography } from "@mui/material";
 import ReportIcon from "@mui/icons-material/Report";

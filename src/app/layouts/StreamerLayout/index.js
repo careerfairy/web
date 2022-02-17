@@ -80,10 +80,7 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamerLayout = (props) => {
    const { children, isBreakout, isMainStreamer } = props;
-   const [browserIsCompatible, setBrowserIsCompatible] = useState(
-      AgoraRTC.checkSystemRequirements
-   );
-   console.log("-> browserIsCompatible", browserIsCompatible);
+   const [browserIsCompatible] = useState(AgoraRTC.checkSystemRequirements);
    const firebase = useFirebaseService();
    const {
       query: { token, livestreamId: baseStreamId, breakoutRoomId, auto },
@@ -222,7 +219,7 @@ const StreamerLayout = (props) => {
       }
    };
 
-   if (browserIsCompatible) {
+   if (!browserIsCompatible) {
       return <BrowserIncompatibleOverlay />;
    }
 

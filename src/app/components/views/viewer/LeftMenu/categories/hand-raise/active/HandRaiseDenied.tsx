@@ -4,13 +4,16 @@ import { Button, Grow } from "@mui/material";
 import {
    CategoryContainerCentered,
    CategoryContainerContent,
-} from "../../../../../../../materialUI/GlobalContainers";
-import { ThemedPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
+} from "materialUI/GlobalContainers";
+import { ThemedPermanentMarker } from "materialUI/GlobalTitles";
+import { HandRaise, HandRaiseState } from "types/handraise";
 
 const HandRaiseRequested = memo(
-   ({ handRaiseState, updateHandRaiseRequest }) => {
+   ({ handRaiseState, updateHandRaiseRequest }: Props) => {
       const shouldRender = () =>
-         Boolean(!(!handRaiseState || handRaiseState.state !== "denied"));
+         Boolean(
+            !(!handRaiseState || handRaiseState.state !== HandRaiseState.denied)
+         );
       return (
          shouldRender() && (
             <Grow unmountOnExit in>
@@ -26,7 +29,9 @@ const HandRaiseRequested = memo(
                            variant="contained"
                            children="Cancel"
                            color="grey"
-                           onClick={() => updateHandRaiseRequest("unrequested")}
+                           onClick={() =>
+                              updateHandRaiseRequest(HandRaiseState.unrequested)
+                           }
                         />
                      </CategoryContainerContent>
                   </CategoryContainerCentered>
@@ -36,5 +41,9 @@ const HandRaiseRequested = memo(
       );
    }
 );
+type Props = {
+   handRaiseState: HandRaise;
+   updateHandRaiseRequest: (state: HandRaiseState) => Promise<void>;
+};
 
 export default HandRaiseRequested;

@@ -7,8 +7,9 @@ import {
    CategorySubtitle,
    ThemedPermanentMarker,
 } from "../../../../../../../materialUI/GlobalTitles";
+import { HandRaise } from "../../../../../../../types/handraise";
 
-const HandRaiseAcquiringMedia = memo(({ handRaiseState }) => {
+const HandRaiseAcquiringMedia = memo(({ handRaiseState }: Props) => {
    const shouldRender = () =>
       Boolean(handRaiseState?.state === "acquire_media");
 
@@ -27,5 +28,7 @@ const HandRaiseAcquiringMedia = memo(({ handRaiseState }) => {
       )
    );
 });
-
+type Props = {
+   handRaiseState: HandRaise;
+};
 export default HandRaiseAcquiringMedia;

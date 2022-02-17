@@ -4,8 +4,8 @@ import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import {
    CategoryContainerCentered,
    CategoryContainerContent,
-} from "../../../../../../../materialUI/GlobalContainers";
-import { ThemedPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
+} from "materialUI/GlobalContainers";
+import { ThemedPermanentMarker } from "materialUI/GlobalTitles";
 
 const HandRaiseRequested = memo(
    ({ handRaiseState, updateHandRaiseRequest }) => {

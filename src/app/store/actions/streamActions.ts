@@ -1,5 +1,5 @@
 import * as actions from "./actionTypes";
-import { RTCConnectionState, RTCError } from "../../types";
+import { RTCConnectionState, RTCError } from "../../types/streaming";
 
 // Toggle the open state of the streamer breakoutModal
 export const openStreamerBreakoutModal = () => async (dispatch) => {

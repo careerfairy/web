@@ -50,6 +50,7 @@ export interface LocalStream {
    audioTrack?: IMicrophoneAudioTrack;
    videoTrack?: ICameraVideoTrack;
    videoMuted?: boolean;
+   audioMuted?: boolean;
 }
 
 export interface LocalMediaHandlers {

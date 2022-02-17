@@ -11,7 +11,7 @@ import {
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { useSelector } from "react-redux";
 import RootState from "store/reducers";
-import { rtcMessages } from "types";
+import { rtcMessages } from "types/streaming";
 import OptionCard, { OptionCardProps } from "../common/OptionCard";
 // @ts-ignore
 import { RTC_CLIENT_RECONNECT_LIMIT } from "constants/streams";

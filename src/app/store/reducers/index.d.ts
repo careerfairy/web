@@ -1,5 +1,11 @@
 import { DefaultRootState } from "react-redux";
-import { RTCConnectionState, RTCError } from "../../types";
+import {
+   RTCConnectionState,
+   RTCError,
+   StreamData,
+} from "../../types/streaming";
+import { FirebaseReducer, FirestoreReducer } from "react-redux-firebase";
+import { HandRaise } from "../../types/handraise";
 
 interface AuthReducer {
    error: null | string;
@@ -52,7 +58,16 @@ interface StreamReducer {
    };
 }
 
+// Optional: You can define the schema of your Firebase Redux store.
+// This will give you type-checking for state.firebase.data.livestreams and state.firebase.ordered.livestreams
+interface Schema {
+   livestreams: StreamData;
+   handRaises: HandRaise;
+}
+
 export default interface RootState extends DefaultRootState {
    auth: AuthReducer;
    stream: StreamReducer;
+   firebase: FirebaseReducer.Reducer<{}, Schema>;
+   firestore: FirestoreReducer.Reducer<{}, Schema>;
 }
