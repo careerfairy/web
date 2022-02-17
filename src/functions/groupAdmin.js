@@ -12,6 +12,7 @@ const {
 } = require("./util");
 const { client } = require("./api/postmark");
 const { admin } = require("./api/firestoreAdmin");
+const { marketingTeamEmails } = require("./misc/marketingTeamEmails");
 
 exports.sendDraftApprovalRequestEmail = functions.https.onCall(async (data) => {
    try {
@@ -62,10 +63,25 @@ exports.sendDraftApprovalRequestEmail = functions.https.onCall(async (data) => {
 exports.sendNewlyPublishedEventEmail = functions.https.onCall(async (data) => {
    try {
       const { adminsInfo, senderName, stream, submitTime } = data;
-
       functions.logger.log("admins Info in newly published event", adminsInfo);
+      const adminLinks = {
+         eventDashboardLink:
+            adminsInfo[0] && adminsInfo[0].eventDashboardLink
+               ? adminsInfo[0].eventDashboardLink
+               : "",
+         nextLivestreamsLink:
+            adminsInfo[0] && adminsInfo[0].nextLivestreamsLink
+               ? adminsInfo[0].nextLivestreamsLink
+               : "",
+      };
 
-      const emails = adminsInfo.map(
+      const marketingTeamInfo = marketingTeamEmails.map((email) => ({
+         email,
+         eventDashboardLink: adminLinks.eventDashboardLink,
+         nextLivestreamsLink: adminLinks.nextLivestreamsLink,
+      }));
+
+      const emails = [...adminsInfo, ...marketingTeamInfo].map(
          ({ email, eventDashboardLink, nextLivestreamsLink }) => ({
             TemplateId: 25484780,
             From: "CareerFairy <noreply@careerfairy.io>",
