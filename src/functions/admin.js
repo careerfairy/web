@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const { client } = require("./api/postmark");
 const { createNestedArrayOfTemplates } = require("./util");
-const { emailsToRemove } = require("./emailsToRemove");
+const { emailsToRemove } = require("./misc/emailsToRemove");
 
 exports.sendBasicTemplateEmail = functions.https.onCall(
    async (data, context) => {
