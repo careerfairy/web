@@ -14,7 +14,12 @@ import { HandRaise, HandRaiseState } from "types/handraise";
 const HandRaisePriorRequest = memo(
    ({ handRaiseState, updateHandRaiseRequest }: Props) => {
       const shouldRender = () =>
-         Boolean(!(handRaiseState && handRaiseState.state !== "unrequested"));
+         Boolean(
+            !(
+               handRaiseState &&
+               handRaiseState.state !== HandRaiseState.unrequested
+            )
+         );
       return (
          shouldRender() && (
             <Grow unmountOnExit in>

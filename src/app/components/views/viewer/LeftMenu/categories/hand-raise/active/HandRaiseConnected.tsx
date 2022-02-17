@@ -4,12 +4,14 @@ import { Button, Grow } from "@mui/material";
 import {
    CategoryContainerCentered,
    CategoryContainerContent,
-} from "../../../../../../../materialUI/GlobalContainers";
-import { ThemedPermanentMarker } from "../../../../../../../materialUI/GlobalTitles";
+} from "materialUI/GlobalContainers";
+import { ThemedPermanentMarker } from "materialUI/GlobalTitles";
+import { HandRaise, HandRaiseState } from "types/handraise";
 
 const HandRaiseRequested = memo(
-   ({ handRaiseState, updateHandRaiseRequest }) => {
-      const shouldRender = () => Boolean(handRaiseState?.state === "connected");
+   ({ handRaiseState, updateHandRaiseRequest }: Props) => {
+      const shouldRender = () =>
+         Boolean(handRaiseState?.state === HandRaiseState.connected);
       return (
          shouldRender() && (
             <Grow unmountOnExit in>
@@ -24,7 +26,9 @@ const HandRaiseRequested = memo(
                            startIcon={<ClearRoundedIcon />}
                            variant="contained"
                            children="Stop Streaming"
-                           onClick={() => updateHandRaiseRequest("unrequested")}
+                           onClick={() =>
+                              updateHandRaiseRequest(HandRaiseState.unrequested)
+                           }
                         />
                      </CategoryContainerContent>
                   </CategoryContainerCentered>
@@ -34,5 +38,9 @@ const HandRaiseRequested = memo(
       );
    }
 );
+type Props = {
+   handRaiseState: HandRaise;
+   updateHandRaiseRequest: (state: HandRaiseState) => Promise<void>;
+};
 
 export default HandRaiseRequested;

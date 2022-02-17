@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import HandRaisePriorRequest from "./hand-raise/active/HandRaisePriorRequest";
 import HandRaiseRequested from "./hand-raise/active/HandRaiseRequested";
 import HandRaiseDenied from "./hand-raise/active/HandRaiseDenied";
@@ -9,40 +9,19 @@ import useHandRaiseState from "../../../../custom-hook/useHandRaiseState";
 import HandRaiseJoinDialog from "./hand-raise/HandRaiseJoinDialog";
 import HandRaisePromptDialog from "./hand-raise/HandRaisePromptDialog";
 import * as actions from "store/actions";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import HandRaiseAcquiringMedia from "./hand-raise/active/HandRaiseAcquiringMedia";
-import { useAuth } from "../../../../../HOCs/AuthProvider";
+import { HandRaiseState } from "types/handraise";
+import { StreamData } from "types/streaming";
 
 const HandRaiseCategory = ({
-   streamerId,
    livestream,
    selectedState,
    setHandRaiseActive,
    isMobile,
-}) => {
+}: Props) => {
    const dispatch = useDispatch();
-   const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState(
-      streamerId
-   );
-   const [handRaisePromptDialogOpen, setHandRaisePromptDialogOpen] = useState(
-      false
-   );
-   const spyModeEnabled = useSelector(
-      (state) => state.stream.streaming.spyModeEnabled
-   );
-   const {userData} = useAuth()
-
-   useEffect(() => {
-      const canSeeLivestream = Boolean(
-         livestream?.hasStarted || (userData?.isAdmin && spyModeEnabled)
-      )
-      const hasNotRaisedHandYet = Boolean(
-         handRaiseState === undefined &&
-            livestream?.handRaiseActive &&
-            !isMobile
-      );
-      setHandRaisePromptDialogOpen(hasNotRaisedHandYet && canSeeLivestream);
-   }, [livestream?.handRaiseActive,livestream?.hasStarted, handRaiseState, isMobile, userData?.isAdmin, spyModeEnabled]);
+   const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState();
 
    useEffect(() => {
       if (
@@ -51,12 +30,12 @@ const HandRaiseCategory = ({
          livestream.handRaiseActive &&
          handRaiseState &&
          [
-            "connecting",
-            "connected",
-            "requested",
-            "invited",
-            "acquire_media",
-         ].includes(handRaiseState?.state)
+            HandRaiseState.connecting,
+            HandRaiseState.connected,
+            HandRaiseState.requested,
+            HandRaiseState.invited,
+            HandRaiseState.acquire_media,
+         ].includes(handRaiseState.state)
       ) {
          setHandRaiseActive(true);
       } else {
@@ -72,27 +51,24 @@ const HandRaiseCategory = ({
    useEffect(() => {
       if (handRaiseState?.state === "invited") {
          // You should be able to immediately join after being invited, as your devices are set
-         startConnectingHandRaise();
+         void startConnectingHandRaise();
       }
    }, [handRaiseState?.state]);
 
    const requestHandRaise = async () => {
       try {
-         await updateHandRaiseRequest("requested");
+         await updateHandRaiseRequest(HandRaiseState.requested);
          dispatch(actions.enqueueSuccessfulHandRaiseRequest());
       } catch (e) {
          dispatch(actions.sendGeneralError(e));
       }
    };
    const unRequestHandRaise = () => {
-      return updateHandRaiseRequest("unrequested");
+      return updateHandRaiseRequest(HandRaiseState.unrequested);
    };
    const startConnectingHandRaise = () => {
-      return updateHandRaiseRequest("connecting");
+      return updateHandRaiseRequest(HandRaiseState.connecting);
    };
-
-   const handleCloseHandRaisePromptDialog = () =>
-      setHandRaisePromptDialogOpen(false);
 
    if (!livestream.handRaiseActive || !livestream.hasStarted) {
       return <HandRaiseInactive selectedState={selectedState} />;
@@ -103,14 +79,8 @@ const HandRaiseCategory = ({
          <HandRaisePriorRequest
             handRaiseState={handRaiseState}
             updateHandRaiseRequest={updateHandRaiseRequest}
-            handRaiseActive={livestream.handRaiseActive}
          />
-         <HandRaiseAcquiringMedia
-            handRaiseState={handRaiseState}
-            requestHandRaise={requestHandRaise}
-            unRequestHandRaise={unRequestHandRaise}
-            handRaiseActive={livestream.handRaiseActive}
-         />
+         <HandRaiseAcquiringMedia handRaiseState={handRaiseState} />
          <HandRaiseRequested
             handRaiseState={handRaiseState}
             requestHandRaise={requestHandRaise}
@@ -124,25 +94,24 @@ const HandRaiseCategory = ({
          <HandRaiseConnecting
             handRaiseState={handRaiseState}
             updateHandRaiseRequest={updateHandRaiseRequest}
-            handRaiseActive={livestream.handRaiseActive}
          />
          <HandRaiseConnected
             handRaiseState={handRaiseState}
             updateHandRaiseRequest={updateHandRaiseRequest}
-            handRaiseActive={livestream.handRaiseActive}
          />
          <HandRaiseJoinDialog
-            open={handRaiseState?.state === "invited"}
+            open={handRaiseState?.state === HandRaiseState.invited}
             onClose={unRequestHandRaise}
             startConnectingHandRaise={startConnectingHandRaise}
          />
-         <HandRaisePromptDialog
-            requestHandRaise={requestHandRaise}
-            onClose={handleCloseHandRaisePromptDialog}
-            open={handRaisePromptDialogOpen}
-         />
+         <HandRaisePromptDialog />
       </>
    );
 };
-
+type Props = {
+   livestream: StreamData;
+   selectedState: string;
+   setHandRaiseActive: (active: boolean) => any;
+   isMobile: boolean;
+};
 export default HandRaiseCategory;

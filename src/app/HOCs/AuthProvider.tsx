@@ -2,15 +2,22 @@ import React, { createContext, useContext, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { useSelector } from "react-redux";
-import { useFirestoreConnect } from "react-redux-firebase";
+import { FirebaseReducer, useFirestoreConnect } from "react-redux-firebase";
+import RootState from "../store/reducers";
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
 });
 
-const AuthContext = createContext({
+type DefaultContext = {
+   authenticatedUser?: FirebaseReducer.AuthState;
+   userData?: any;
+   isLoggedOut: boolean;
+};
+const AuthContext = createContext<DefaultContext>({
    authenticatedUser: undefined,
    userData: undefined,
+   isLoggedOut: undefined,
 });
 
 const securePaths = [
@@ -28,7 +35,7 @@ const securePaths = [
 const adminPaths = ["/group/create", "/new-livestream"];
 
 const AuthProvider = ({ children }) => {
-   const auth = useSelector((state) => state.firebase.auth);
+   const auth = useSelector((state: RootState) => state.firebase.auth);
 
    const { pathname, replace, asPath } = useRouter();
 
@@ -49,18 +56,18 @@ const AuthProvider = ({ children }) => {
    useFirestoreConnect(query);
 
    const userData = useSelector(
-      ({ firestore }) => firestore.data["userProfile"]
+      ({ firestore }: RootState) => firestore.data["userProfile"]
    );
 
    useEffect(() => {
       // Check that initial route is OK
       if (isSecurePath() && isLoggedOut()) {
-         replace({
+         void replace({
             pathname: `/login`,
             query: { absolutePath: asPath },
          });
       } else if (isAdminPath() && userData && !userData.isAdmin) {
-         replace(`/`);
+         void replace(`/`);
       }
    }, [auth, userData, pathname]);
 

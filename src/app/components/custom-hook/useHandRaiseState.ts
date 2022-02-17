@@ -8,7 +8,7 @@ import { MAX_STREAM_DEFAULT_ACTIVE_HAND_RAISERS } from "constants/streams";
 import RootState from "store/reducers";
 import { HandRaise } from "types/handraise";
 
-const useHandRaiseState = (streamerId) => {
+const useHandRaiseState = () => {
    const { currentLivestream, handRaiseId } = useCurrentStream();
    const { authenticatedUser, userData } = useAuth();
 
@@ -28,12 +28,14 @@ const useHandRaiseState = (streamerId) => {
          )?.length || 0
    );
 
-   const handRaiseState: HandRaise = useSelector(
+   const handRaise: HandRaise = useSelector(
       (state: RootState) => state.firestore.data["handRaises"]?.[handRaiseId]
    );
 
-   const updateRequest = useCallback(
-      async (state: HandRaise["state"]) => {
+   const updateRequest: (
+      state: HandRaise["state"]
+   ) => Promise<void> = useCallback(
+      async (state) => {
          const isAnon = Boolean(
             currentLivestream.test ||
                currentLivestream.openStream ||
@@ -46,7 +48,7 @@ const useHandRaiseState = (streamerId) => {
               }
             : userData;
          try {
-            if (handRaiseState) {
+            if (handRaise) {
                await updateHandRaiseRequest(streamRef, handRaiseId, state);
             } else {
                await createHandRaiseRequest(
@@ -64,9 +66,8 @@ const useHandRaiseState = (streamerId) => {
          currentLivestream.openStream,
          authenticatedUser?.email,
          userData,
-         streamerId,
          streamRef,
-         handRaiseState,
+         handRaise,
       ]
    );
    const hasRoom: boolean = useMemo(
@@ -79,7 +80,7 @@ const useHandRaiseState = (streamerId) => {
       [currentLivestream?.maxHandRaisers, numberOfActiveHandRaises]
    );
 
-   return [handRaiseState, updateRequest, hasRoom];
+   return [handRaise, updateRequest, hasRoom] as const;
 };
 
 export default useHandRaiseState;

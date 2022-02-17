@@ -219,7 +219,7 @@ const StreamPublishingModal = memo(
          if (hasAudioTrack && hasVideoTrack) return labels.joinButtonLabel;
          if (!hasAudioTrack) return labels.disabledJoinButtonLabel;
          if (!hasVideoTrack) return labels.joinWithoutCameraLabel;
-      }, [hasAudioTrack, hasVideoTrack]);
+      }, [hasAudioTrack, hasVideoTrack, labels.joinButtonLabel]);
 
       return (
          <Dialog TransitionComponent={Slide} open={openModal} fullWidth>

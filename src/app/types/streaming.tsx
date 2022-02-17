@@ -26,6 +26,8 @@ export interface StreamData {
       code: string;
       name: string;
    };
+   handRaiseActive?: boolean;
+   hasStarted?: boolean;
    screenSharerId: string;
    registeredUsers: string[];
    talentPool: string[];

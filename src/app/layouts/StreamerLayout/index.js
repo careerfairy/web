@@ -253,6 +253,7 @@ const StreamerLayout = (props) => {
                   isMainStreamer,
                   isStreamer: true,
                   streamerId,
+                  isMobile: undefined,
                }}
             >
                <div className={classes.root}>

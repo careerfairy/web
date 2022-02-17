@@ -1,6 +1,5 @@
 import React from "react";
-import makeStyles from "@mui/styles/makeStyles";
-import { GlassDialog } from "../../../../../../../materialUI/GlobalModals";
+import { GlassDialog } from "materialUI/GlobalModals";
 import {
    Button,
    DialogActions,
@@ -9,20 +8,19 @@ import {
    Typography,
 } from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    title: {
       fontFamily: "Permanent Marker",
       fontSize: "2rem",
-      color: theme.palette.primary.main,
+      color: (theme) => theme.palette.primary.main,
    },
-}));
+} as const;
 
-const Content = ({ handleClose, startConnectingHandRaise }) => {
-   const classes = useStyles();
+const Content = ({ handleClose, startConnectingHandRaise }: ContentProps) => {
    return (
       <React.Fragment>
          <DialogTitle>
-            <Typography className={classes.title} align="center">
+            <Typography sx={styles.title} align="center">
                You've been invited to join with audio and video!
             </Typography>
          </DialogTitle>
@@ -38,7 +36,11 @@ const Content = ({ handleClose, startConnectingHandRaise }) => {
       </React.Fragment>
    );
 };
-const HandRaiseJoinDialog = ({ open, onClose, startConnectingHandRaise }) => {
+const HandRaiseJoinDialog = ({
+   open,
+   onClose,
+   startConnectingHandRaise,
+}: DialogProps) => {
    const handleClose = () => {
       onClose();
    };
@@ -51,6 +53,16 @@ const HandRaiseJoinDialog = ({ open, onClose, startConnectingHandRaise }) => {
          />
       </GlassDialog>
    );
+};
+
+type DialogProps = {
+   open?: boolean;
+   onClose: () => any;
+   startConnectingHandRaise: () => Promise<void>;
+};
+type ContentProps = {
+   handleClose: () => any;
+   startConnectingHandRaise: () => Promise<void>;
 };
 
 export default HandRaiseJoinDialog;

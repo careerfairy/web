@@ -2,12 +2,12 @@ import React, { memo } from "react";
 import {
    CategoryContainerCentered,
    CategoryContainerContent,
-} from "../../../../../../../materialUI/GlobalContainers";
+} from "materialUI/GlobalContainers";
 import {
    CategorySubtitle,
    ThemedPermanentMarker,
-} from "../../../../../../../materialUI/GlobalTitles";
-import { HandRaise } from "../../../../../../../types/handraise";
+} from "materialUI/GlobalTitles";
+import { HandRaise } from "types/handraise";
 
 const HandRaiseAcquiringMedia = memo(({ handRaiseState }: Props) => {
    const shouldRender = () =>

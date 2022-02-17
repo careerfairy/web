@@ -319,6 +319,7 @@ const ViewerLayout = (props) => {
                streamerId,
                isStreamer: false,
                handRaiseId,
+               isMobile: mobile,
             }}
          >
             <div className={`${classes.root} notranslate`}>
@@ -329,7 +330,6 @@ const ViewerLayout = (props) => {
                   mobile={mobile}
                />
                <LeftMenu
-                  streamerId={streamerId}
                   handRaiseActive={handRaiseActive}
                   setHandRaiseActive={setHandRaiseActive}
                   streamer={false}

@@ -131,9 +131,7 @@ function ViewerComponent({
    const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams);
 
    useEffect(() => {
-      if (handRaiseActive) {
-         setShowLocalStreamPublishingModal(true);
-      }
+      setShowLocalStreamPublishingModal(Boolean(handRaiseActive));
    }, [handRaiseActive]);
 
    useEffect(() => {
@@ -151,11 +149,18 @@ function ViewerComponent({
       if (
          handRaiseActive &&
          handRaiseState &&
-         handRaiseState.state === "connecting"
+         handRaiseState.state === "connecting" &&
+         // Make sure not to auto invite if the viewer is still in the publishing modal
+         !showLocalStreamPublishingModal
       ) {
          handleJoinAsHandRaiser();
       }
-   }, [handRaiseState]);
+   }, [handRaiseState, showLocalStreamPublishingModal]);
+
+   useEffect(() => {
+      if (handRaiseState?.state === "requested") {
+      }
+   }, []);
 
    useEffect(() => {
       if (
@@ -209,8 +214,20 @@ function ViewerComponent({
          ) {
             // go straight to the connecting phase
             await updateRequest("connecting");
+         } else if (handRaiseState.state === "connecting") {
+            // After being in a connecting state for god knows how long, you finally clicked join.
+            if (hasRoom) {
+               // At the time of clicking join there is still room, so you can join in the stream as a HR
+               await handleJoinAsHandRaiser();
+            } else {
+               //  At the time of clicking join there is no more room, which means you
+               //  have to go back into the queue as a HR
+               await updateRequest("requested");
+               dispatch(actions.enqueueSuccessfulHandRaiseRequest());
+            }
          } else {
             await updateRequest("requested");
+            dispatch(actions.enqueueSuccessfulHandRaiseRequest());
          }
       } catch (e) {
          console.log("-> e", e);
@@ -295,7 +312,11 @@ function ViewerComponent({
                joinWithoutCameraLabel: "Join without camera",
                joinWithoutCameraTooltip:
                   "We recommend to activate your camera for a better experience.",
-               joinButtonLabel: "Confirm Hand Raise",
+               joinButtonLabel: ["connecting", "connected"].includes(
+                  handRaiseState.state
+               )
+                  ? "Enter now"
+                  : "Confirm Hand Raise",
                disabledJoinButtonLabel: "Activate Microphone to Join",
                joinWithoutCameraConfirmDescription:
                   "You intend to join this stream with only with your microphone?",

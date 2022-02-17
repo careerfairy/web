@@ -6,15 +6,16 @@ import {
    CategoryContainerContent,
 } from "materialUI/GlobalContainers";
 import { ThemedPermanentMarker } from "materialUI/GlobalTitles";
+import { HandRaise, HandRaiseState } from "types/handraise";
 
 const HandRaiseRequested = memo(
-   ({ handRaiseState, updateHandRaiseRequest }) => {
+   ({ handRaiseState, updateHandRaiseRequest }: Props) => {
       const shouldRender = () =>
          Boolean(
             !(
                !handRaiseState ||
-               (handRaiseState.state !== "connecting" &&
-                  handRaiseState.state !== "invited")
+               (handRaiseState.state !== HandRaiseState.connecting &&
+                  handRaiseState.state !== HandRaiseState.invited)
             )
          );
       return (
@@ -32,7 +33,9 @@ const HandRaiseRequested = memo(
                            variant="contained"
                            color="grey"
                            children="Cancel"
-                           onClick={() => updateHandRaiseRequest("unrequested")}
+                           onClick={() =>
+                              updateHandRaiseRequest(HandRaiseState.unrequested)
+                           }
                         />
                      </CategoryContainerContent>
                   </CategoryContainerCentered>
@@ -42,5 +45,10 @@ const HandRaiseRequested = memo(
       );
    }
 );
+
+type Props = {
+   handRaiseState: HandRaise;
+   updateHandRaiseRequest: (state: HandRaiseState) => Promise<void>;
+};
 
 export default HandRaiseRequested;
