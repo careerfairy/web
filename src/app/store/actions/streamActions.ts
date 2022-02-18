@@ -1,6 +1,5 @@
 import * as actions from "./actionTypes";
 import { RTCConnectionState, RTCError } from "../../types/streaming";
-import { SET_DEVICE_DENIED_ERROR } from "./actionTypes";
 
 // Toggle the open state of the streamer breakoutModal
 export const openStreamerBreakoutModal = () => async (dispatch) => {
@@ -122,14 +121,61 @@ export const setAgoraRtcError = (rtcError: RTCError) => async (dispatch) => {
       payload: rtcError,
    });
 };
-export const setDeviceDeniedError = (
-   deviceType: "cameraDenied" | "microphoneDenied",
-   denied: boolean
+
+export const handleSetMicrophoneDenied = (denied: boolean) => async (
+   dispatch
+) => {
+   dispatch(setDeviceError("microphoneDenied", denied));
+};
+export const handleSetCameraDenied = (denied: boolean) => async (dispatch) => {
+   dispatch(setDeviceError("cameraDenied", denied));
+};
+export const handleSetMicIsInUse = (isInUse: boolean) => async (dispatch) => {
+   dispatch(setDeviceError("microphoneIsUsedByOtherApp", isInUse));
+};
+export const handleSetCamIsInUse = (isInUse: boolean) => async (dispatch) => {
+   dispatch(setDeviceError("cameraIsUsedByOtherApp", isInUse));
+};
+
+export const setDeviceError = (
+   deviceErrorType:
+      | "cameraIsUsedByOtherApp"
+      | "microphoneIsUsedByOtherApp"
+      | "cameraDenied"
+      | "microphoneDenied",
+   isInUse: boolean
 ) => async (dispatch) => {
    dispatch({
-      type: actions.SET_DEVICE_DENIED_ERROR,
-      payload: { [deviceType]: denied },
+      type: actions.SET_DEVICE_ERROR,
+      payload: { [deviceErrorType]: isInUse },
    });
+};
+
+export const handleSetDeviceError = (
+   error: RTCError,
+   deviceType: "microphone" | "camera",
+   denied: boolean
+) => (dispatch) => {
+   if (error?.code === "PERMISSION_DENIED") {
+      switch (deviceType) {
+         case "camera":
+            dispatch(handleSetCameraDenied(denied));
+            break;
+         case "microphone":
+            dispatch(handleSetMicrophoneDenied(denied));
+            break;
+      }
+   }
+   if (error?.code === "NOT_READABLE") {
+      switch (deviceType) {
+         case "camera":
+            dispatch(handleSetCamIsInUse(denied));
+            break;
+         case "microphone":
+            dispatch(handleSetMicIsInUse(denied));
+            break;
+      }
+   }
 };
 export const clearAgoraRtcError = () => async (dispatch) => {
    dispatch({

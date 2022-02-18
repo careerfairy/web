@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback } from "react";
 import { useLocalStorage } from "react-use";
 
 const useLocalStorageMediaSources = () => {
@@ -62,8 +62,8 @@ const useLocalStorageMediaSources = () => {
    );
 
    const clearStoredMediaSources = useCallback(() => {
-      removeAudioSourceId(undefined);
-      removeVideoSourceId(undefined);
+      removeAudioSourceId();
+      removeVideoSourceId();
    }, []);
 
    return {

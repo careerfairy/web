@@ -13,7 +13,12 @@ import AgoraRTC, {
 import * as actions from "store/actions";
 import { useSessionStorage } from "react-use";
 import { RTC_CLIENT_JOIN_TIME_LIMIT } from "constants/streams";
-import { LocalStream } from "../../types/streaming";
+import { LocalStream, RTCError } from "../../types/streaming";
+import {
+   handleSetCameraDenied,
+   handleSetDeviceError,
+   handleSetMicrophoneDenied,
+} from "../../store/actions";
 
 const rtcClient = AgoraRTC.createClient({
    mode: "live",
@@ -231,8 +236,7 @@ export default function useAgoraRtc(
             }));
             resolve();
          } catch (error) {
-            console.log("-> error", error);
-            dispatch(actions.setAgoraRtcError(error));
+            dispatch(actions.handleSetDeviceError(error, "microphone", true));
             reject(error);
          }
       });
@@ -250,32 +254,41 @@ export default function useAgoraRtc(
             }));
             resolve();
          } catch (error) {
-            dispatch(actions.setAgoraRtcError(error));
+            dispatch(actions.handleSetDeviceError(error, "camera", true));
             reject(error);
          }
       });
    };
 
    const initializeVideoCameraAudioTrack = useCallback(async () => {
-      try {
-         let audioTrack;
-         let videoTrack;
+      let audioTrack = null;
+      let videoTrack = null;
 
-         [audioTrack, videoTrack] = await Promise.all([
-            // Create local tracks, using microphone and camera
-            AgoraRTC.createMicrophoneAudioTrack(),
-            AgoraRTC.createCameraVideoTrack({
-               encoderConfig: "480p_9",
-            }),
-         ]);
-         setLocalStream((localStream) => ({
-            ...localStream,
-            audioTrack: audioTrack,
-            videoTrack: videoTrack,
-         }));
+      try {
+         audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
       } catch (error) {
-         dispatch(actions.setAgoraRtcError(error));
+         dispatch(actions.handleSetDeviceError(error, "microphone", true));
       }
+
+      try {
+         videoTrack = await AgoraRTC.createCameraVideoTrack({
+            encoderConfig: "480p_9",
+         });
+      } catch (error) {
+         dispatch(actions.handleSetDeviceError(error, "camera", true));
+      }
+      // [audioTrack, videoTrack] = await Promise.all([
+      //    // Create local tracks, using microphone and camera
+      //    AgoraRTC.createMicrophoneAudioTrack(),
+      //    AgoraRTC.createCameraVideoTrack({
+      //       encoderConfig: "480p_9",
+      //    }),
+      // ]);
+      setLocalStream((localStream) => ({
+         ...localStream,
+         audioTrack: audioTrack,
+         videoTrack: videoTrack,
+      }));
    }, []);
 
    const closeAndUnpublishedLocalStream = useCallback(async () => {

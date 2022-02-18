@@ -1,5 +1,6 @@
 import { AGORA_RTC_CONNECTION_STATE_CONNECTING } from "constants/agora";
 import * as actions from "../actions/actionTypes";
+import { SET_DEVICE_IN_USE_BY_ANOTHER_APP } from "../actions/actionTypes";
 
 const initialState = {
    layout: {
@@ -39,8 +40,10 @@ const initialState = {
          data: undefined,
       },
       deviceErrors: {
-         cameraDenied: undefined,
-         microphoneDenied: undefined,
+         cameraDenied: false,
+         microphoneDenied: false,
+         cameraIsUsedByOtherApp: false,
+         microphoneIsUsedByOtherApp: false,
       },
       sessionIsUsingCloudProxy: false,
    },
@@ -128,7 +131,7 @@ const streamReducer = (state = initialState, { type, payload }) => {
                leftMenuOpen: false,
             },
          };
-      case actions.SET_DEVICE_DENIED_ERROR:
+      case actions.SET_DEVICE_ERROR:
          return {
             ...state,
             agoraState: {

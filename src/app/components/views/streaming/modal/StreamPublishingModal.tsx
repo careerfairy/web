@@ -78,6 +78,16 @@ const styles = {
       alignItems: "center",
       width: "100%",
    },
+   videoBox: {
+      boxShadow: "0 0 3px rgb(200,200,200)",
+      borderRadius: "5px",
+      width: "100%",
+      height: 150,
+      background: "black",
+      color: "white",
+      display: "grid",
+      placeItems: "center",
+   },
 } as const;
 
 interface Props {
@@ -132,6 +142,13 @@ const StreamPublishingModal = memo(
       const micDenied = useSelector((state: RootState) => {
          return state.stream.agoraState.deviceErrors.microphoneDenied;
       });
+      const micInUseByAnotherApp = useSelector((state: RootState) => {
+         return state.stream.agoraState.deviceErrors.microphoneIsUsedByOtherApp;
+      });
+      const camInUseByAnotherApp = useSelector((state: RootState) => {
+         return state.stream.agoraState.deviceErrors.cameraIsUsedByOtherApp;
+      });
+      console.log("-> camInUseByAnotherApp", camInUseByAnotherApp);
 
       const openModal = useMemo(() => {
          return open && agoraRtcConnectionState.curState === "CONNECTED";
@@ -242,8 +259,11 @@ const StreamPublishingModal = memo(
             }
             return "No Camera Detected";
          }
+         if (camInUseByAnotherApp) {
+            return "This camera is currently being used by another app";
+         }
          return "Activate Camera";
-      }, [noMicrophones, cameraDenied]);
+      }, [noMicrophones, cameraDenied, camInUseByAnotherApp]);
 
       const activateMicButtonLabel = useMemo(() => {
          if (noMicrophones) {
@@ -306,18 +326,22 @@ const StreamPublishingModal = memo(
                                     })}
                                  </Select>
                               </FormControl>
-                              <video
-                                 style={{
-                                    boxShadow: "0 0 3px rgb(200,200,200)",
-                                    borderRadius: "5px",
-                                    width: "100%",
-                                    height: 150,
-                                    background: "black",
-                                 }}
-                                 ref={testVideoRef}
-                                 muted={true}
-                                 autoPlay
-                              />
+                              {camInUseByAnotherApp ? (
+                                 <Box sx={styles.videoBox}>
+                                    <Typography align="center" variant="body1">
+                                       This device is currently being used by
+                                       another app
+                                    </Typography>
+                                 </Box>
+                              ) : (
+                                 <Box
+                                    sx={styles.videoBox}
+                                    component="video"
+                                    ref={testVideoRef}
+                                    muted={true}
+                                    autoPlay
+                                 />
+                              )}
                               <Box sx={styles.iconWrapper}>
                                  <IconButton
                                     aria-label="turn-off-video-icon"
@@ -333,7 +357,11 @@ const StreamPublishingModal = memo(
                               <LoadingButton
                                  variant="contained"
                                  loading={activatingCamera}
-                                 disabled={noCameras || cameraDenied}
+                                 disabled={
+                                    noCameras ||
+                                    cameraDenied ||
+                                    camInUseByAnotherApp
+                                 }
                                  onClick={handleInitializeCamera}
                                  startIcon={<VideocamIcon />}
                               >

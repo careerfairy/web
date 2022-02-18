@@ -81,7 +81,11 @@ export {
    setSpyMode,
    setAgoraRtcConnectionState,
    setAgoraRtcError,
-   setDeviceDeniedError,
+   handleSetCameraDenied,
+   handleSetMicrophoneDenied,
+   handleSetMicIsInUse,
+   handleSetCamIsInUse,
+   handleSetDeviceError,
    clearAgoraRtcError,
    setSessionIsUsingCloudProxy,
 } from "./streamActions";

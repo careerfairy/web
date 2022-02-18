@@ -22,33 +22,29 @@ export default function useDevices(
 
    useEffect(() => {
       (async function init() {
+         if (!localStream || !options?.initialize) return;
+         let cameraDevices;
+         let microphoneDevices;
          try {
-            if (!localStream || !options?.initialize) return;
-            let cameraDevices;
-            let microphoneDevices;
-            try {
-               cameraDevices = await AgoraRTC.getCameras();
-            } catch (e) {
-               dispatch(actions.setDeviceDeniedError("cameraDenied", true));
+            cameraDevices = await AgoraRTC.getCameras();
+         } catch (error) {
+            dispatch(actions.handleSetDeviceError(error, "camera", true));
+         }
+         try {
+            microphoneDevices = await AgoraRTC.getMicrophones();
+         } catch (error) {
+            dispatch(actions.handleSetDeviceError(error, "microphone", true));
+         }
+         if (microphoneDevices || cameraDevices) {
+            const deviceArray = [];
+            if (microphoneDevices) {
+               deviceArray.push(...microphoneDevices);
             }
-            try {
-               microphoneDevices = await AgoraRTC.getMicrophones();
-            } catch (e) {
-               dispatch(actions.setDeviceDeniedError("microphoneDenied", true));
+            if (cameraDevices) {
+               deviceArray.push(...cameraDevices);
             }
-            if (microphoneDevices || cameraDevices) {
-               const deviceArray = [];
-               if (microphoneDevices) {
-                  deviceArray.push(...microphoneDevices);
-               }
-               if (cameraDevices) {
-                  deviceArray.push(...cameraDevices);
-               }
-               const newDeviceList = mapDevices(deviceArray);
-               setDeviceList(newDeviceList);
-            }
-         } catch (e) {
-            dispatch(actions.setAgoraRtcError(e));
+            const newDeviceList = mapDevices(deviceArray);
+            setDeviceList(newDeviceList);
          }
       })();
    }, [Boolean(localStream), options?.initialize]);

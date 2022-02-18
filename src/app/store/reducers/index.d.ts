@@ -56,8 +56,10 @@ interface StreamReducer {
       rtcError?: RTCError;
       sessionIsUsingCloudProxy: boolean;
       deviceErrors: {
-         cameraDenied?: boolean;
-         microphoneDenied?: boolean;
+         cameraDenied: boolean;
+         microphoneDenied: boolean;
+         cameraIsUsedByOtherApp: boolean;
+         microphoneIsUsedByOtherApp: boolean;
       };
    };
 }
