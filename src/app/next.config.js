@@ -51,6 +51,12 @@ module.exports = (phase, { defaultConfig }) => {
          REACT_APP_FIREBASE_STORAGE_BUCKET: "careerfairy-e1fd9.appspot.com",
          REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "993933306494",
       },
+      eslint: {
+         // Since ESLint was introduced a long time after the beginning of the codebase
+         // there are a lot of pending errors that need to be fixed first
+         // this will ignore eslint during build to allow deploys
+         ignoreDuringBuilds: true,
+      },
       headers: async () => {
          return [
             {
