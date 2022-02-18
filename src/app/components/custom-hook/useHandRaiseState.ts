@@ -28,7 +28,7 @@ const useHandRaiseState = () => {
          )?.length || 0
    );
 
-   const handRaise: HandRaise = useSelector(
+   const handRaise: HandRaise | undefined = useSelector(
       (state: RootState) => state.firestore.data["handRaises"]?.[handRaiseId]
    );
 

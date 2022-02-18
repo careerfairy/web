@@ -313,7 +313,7 @@ function ViewerComponent({
                joinWithoutCameraTooltip:
                   "We recommend to activate your camera for a better experience.",
                joinButtonLabel: ["connecting", "connected"].includes(
-                  handRaiseState.state
+                  handRaiseState?.state
                )
                   ? "Enter now"
                   : "Confirm Hand Raise",

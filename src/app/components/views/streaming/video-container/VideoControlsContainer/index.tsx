@@ -47,6 +47,8 @@ import { useDispatch } from "react-redux";
 import * as storeActions from "store/actions";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { StreamData } from "types/streaming";
+import useHandRaiseState from "components/custom-hook/useHandRaiseState";
+import { HandRaiseState } from "types/handraise";
 
 const styles = {
    root: {
@@ -149,6 +151,8 @@ const VideoControlsContainer = ({
    const [isVideoInactive, setIsVideoInactive] = useState(false);
    const [shareMenuAnchorEl, setShareMenuAnchorEl] = useState(null);
    const [callToActionDrawerOpen, setCallToActionDrawerOpen] = useState(false);
+   const [handRaiseState] = useHandRaiseState();
+
    const [fullyOpened, onEntered, onExited] = useSliderFullyOpened();
    const presentMode = mode === "presentation";
    const desktopMode = mode === "desktop";
@@ -262,6 +266,7 @@ const VideoControlsContainer = ({
       if (desktopMode) {
          return isMainStreamer || streamerId === screenSharerId;
       } else {
+         if (viewer) return handRaiseState?.state === HandRaiseState.connected;
          return true;
       }
    };

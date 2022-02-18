@@ -62,7 +62,6 @@ const HandRaisePromptDialog = () => {
       (state: RootState) => state.stream.streaming.spyModeEnabled
    );
    const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState();
-   console.log("-> handRaiseState", handRaiseState?.state);
 
    const { userData } = useAuth();
    useEffect(() => {
