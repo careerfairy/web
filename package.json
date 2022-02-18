@@ -21,7 +21,8 @@
     "predeploy": "rimraf dist/ && npm run build",
     "deploy": "npm run firebase deploy --only functions,hosting",
     "start:functions:withProdDb": "firebase emulators:exec --only functions \"cd ./src/app && npm run dev:windows\"",
-    "start:functions:withLocalDb": "firebase emulators:exec --only functions,firestore \"cd ./src/app && npm run dev:windows\""
+    "start:functions:withLocalDb": "firebase emulators:exec --only functions,firestore \"cd ./src/app && npm run dev:windows\"",
+    "prepare": "husky install"
   },
   "dependencies": {
     "agora-access-token": "^2.0.4",
@@ -43,6 +44,9 @@
   "engines": {
     "node": "16"
   },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  },
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
@@ -55,6 +59,8 @@
     "cross-env": "^5.2.0",
     "firebase-functions-test": "^0.1.6",
     "firebase-tools": "^7.16.2",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.3.4",
     "prettier": "2.1.1",
     "webpack": "^5.32.0"
   }
