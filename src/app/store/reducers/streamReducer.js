@@ -38,6 +38,10 @@ const initialState = {
          name: undefined,
          data: undefined,
       },
+      deviceErrors: {
+         cameraDenied: undefined,
+         microphoneDenied: undefined,
+      },
       sessionIsUsingCloudProxy: false,
    },
 };
@@ -122,6 +126,17 @@ const streamReducer = (state = initialState, { type, payload }) => {
             layout: {
                ...state.layout,
                leftMenuOpen: false,
+            },
+         };
+      case actions.SET_DEVICE_DENIED_ERROR:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               deviceErrors: {
+                  ...state.agoraState.deviceErrors,
+                  ...payload,
+               },
             },
          };
       case actions.TOGGLE_LOCAL_VIDEO:

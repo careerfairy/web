@@ -341,7 +341,6 @@ function VideoContainer({
             <WifiIndicator
                uplink={networkQuality.uplinkNetworkQuality}
                downlink={networkQuality.downlinkNetworkQuality}
-               agoraRtcConnectionStatus={{}}
             />
          </DraggableComponent>
          <AgoraStateHandler />
@@ -350,6 +349,7 @@ function VideoContainer({
             close={() => setShowSettings(false)}
             smallScreen={smallScreen}
             devices={devices}
+            localStream={localStream}
             displayableMediaStream={displayableMediaStream}
             mediaControls={mediaControls}
          />

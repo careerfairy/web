@@ -24,11 +24,31 @@ export default function useDevices(
       (async function init() {
          try {
             if (!localStream || !options?.initialize) return;
-            const devices = await AgoraRTC.getDevices();
-            const deviceList = mapDevices(devices);
-            setDeviceList(deviceList);
+            let cameraDevices;
+            let microphoneDevices;
+            try {
+               cameraDevices = await AgoraRTC.getCameras();
+            } catch (e) {
+               dispatch(actions.setDeviceDeniedError("cameraDenied", true));
+            }
+            try {
+               microphoneDevices = await AgoraRTC.getMicrophones();
+            } catch (e) {
+               dispatch(actions.setDeviceDeniedError("microphoneDenied", true));
+            }
+            if (microphoneDevices || cameraDevices) {
+               const deviceArray = [];
+               if (microphoneDevices) {
+                  deviceArray.push(...microphoneDevices);
+               }
+               if (cameraDevices) {
+                  deviceArray.push(...cameraDevices);
+               }
+               const newDeviceList = mapDevices(deviceArray);
+               setDeviceList(newDeviceList);
+            }
          } catch (e) {
-            dispatch(actions.sendGeneralError(e));
+            dispatch(actions.setAgoraRtcError(e));
          }
       })();
    }, [Boolean(localStream), options?.initialize]);

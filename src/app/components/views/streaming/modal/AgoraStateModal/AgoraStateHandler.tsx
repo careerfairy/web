@@ -41,7 +41,6 @@ const AgoraStateHandler: FC<Props> = () => {
 
    useEffect(() => {
       (function handleStatus() {
-         console.log("-> agoraRtcConnectionStatus", agoraRtcConnectionStatus);
          const { prevState, curState, reason } = agoraRtcConnectionStatus;
 
          if (reason === "LEAVE") return;

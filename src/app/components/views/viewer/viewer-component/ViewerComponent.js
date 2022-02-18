@@ -334,8 +334,6 @@ function ViewerComponent({
                   <WifiIndicator
                      uplink={networkQuality.uplinkNetworkQuality}
                      downlink={networkQuality.downlinkNetworkQuality}
-                     agoraRtcConnectionStatus={{}}
-                     agoraRtmStatus={{}}
                   />
                </DraggableComponent>
                <VideoControlsContainer
@@ -362,6 +360,7 @@ function ViewerComponent({
                   open={showSettings}
                   close={() => setShowSettings(false)}
                   devices={devices}
+                  localStream={localStream}
                   displayableMediaStream={displayableMediaStream}
                   mediaControls={mediaControls}
                />

@@ -1,5 +1,6 @@
 import * as actions from "./actionTypes";
 import { RTCConnectionState, RTCError } from "../../types/streaming";
+import { SET_DEVICE_DENIED_ERROR } from "./actionTypes";
 
 // Toggle the open state of the streamer breakoutModal
 export const openStreamerBreakoutModal = () => async (dispatch) => {
@@ -119,6 +120,15 @@ export const setAgoraRtcError = (rtcError: RTCError) => async (dispatch) => {
    dispatch({
       type: actions.SET_AGORA_RTC_ERROR,
       payload: rtcError,
+   });
+};
+export const setDeviceDeniedError = (
+   deviceType: "cameraDenied" | "microphoneDenied",
+   denied: boolean
+) => async (dispatch) => {
+   dispatch({
+      type: actions.SET_DEVICE_DENIED_ERROR,
+      payload: { [deviceType]: denied },
    });
 };
 export const clearAgoraRtcError = () => async (dispatch) => {

@@ -1,9 +1,7 @@
 import PropTypes from "prop-types";
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import {
-   Box,
    Button,
-   DialogContent,
    FormControl,
    Grid,
    InputLabel,
@@ -14,7 +12,7 @@ import {
 import SoundLevelDisplay from "../../../common/SoundLevelDisplay";
 import makeStyles from "@mui/styles/makeStyles";
 import { useAudio } from "components/custom-hook/useAudio";
-import useLocalStorageMediaSources from "../../../../custom-hook/useLocalStorageMediaSources";
+import useLocalStorageMediaSources from "components/custom-hook/useLocalStorageMediaSources";
 
 const useStyles = makeStyles((theme) => ({
    button: {
@@ -49,7 +47,13 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const AudioTab = ({ audioLevel, audioSource, devices, setAudioSource }) => {
+const AudioTab = ({
+   audioSource,
+   devices,
+   setAudioSource,
+   localStream,
+   showSoundMeter,
+}) => {
    const classes = useStyles();
    const { setAudioSourceId } = useLocalStorageMediaSources();
 
@@ -96,7 +100,10 @@ const AudioTab = ({ audioLevel, audioSource, devices, setAudioSource }) => {
                      })}
                   </Select>
                </FormControl>
-               <SoundLevelDisplay audioLevel={audioLevel} />
+               <SoundLevelDisplay
+                  showSoundMeter={showSoundMeter}
+                  localStream={localStream}
+               />
             </Grid>
          )}
          {devices.audioOutputList.length && (

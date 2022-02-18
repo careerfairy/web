@@ -1,13 +1,17 @@
 import React from "react";
 import Head from "next/head";
 import dynamic from "next/dynamic";
+import StreamingLoader from "../../../components/views/loader/StreamingLoader";
 
 const ViewerLayout = dynamic(() => import("../../../layouts/ViewerLayout"), {
    ssr: false,
 });
 const ViewerOverview = dynamic(
    () => import("../../../components/views/viewer"),
-   { ssr: false }
+   {
+      ssr: false,
+      loading: () => <StreamingLoader />,
+   }
 );
 const ViewerPage = () => {
    return (

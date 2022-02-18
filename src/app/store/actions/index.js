@@ -81,6 +81,7 @@ export {
    setSpyMode,
    setAgoraRtcConnectionState,
    setAgoraRtcError,
+   setDeviceDeniedError,
    clearAgoraRtcError,
    setSessionIsUsingCloudProxy,
 } from "./streamActions";

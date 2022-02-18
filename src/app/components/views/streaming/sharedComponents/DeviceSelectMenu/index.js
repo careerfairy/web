@@ -1,5 +1,5 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { Grid, Tab, Tabs } from "@mui/material";
 import VideoTab from "./VideoTab";
 import AudioTab from "./AudioTab";
@@ -42,9 +42,10 @@ const DeviceSelectMenu = ({
    displayableMediaStream,
    videoSource,
    updateVideoSource,
-   audioLevel,
    audioSource,
    updateAudioSource,
+   localStream,
+   showSoundMeter,
 }) => {
    const classes = useStyles();
 
@@ -89,7 +90,8 @@ const DeviceSelectMenu = ({
                <TabPanel value={value} index={1}>
                   <AudioTab
                      devices={devices}
-                     audioLevel={audioLevel}
+                     localStream={localStream}
+                     showSoundMeter={showSoundMeter}
                      audioSource={audioSource}
                      setAudioSource={updateAudioSource}
                   />

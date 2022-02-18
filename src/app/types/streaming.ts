@@ -154,23 +154,31 @@ export enum RTCPublishErrorCodes {
     */
 }
 export enum CustomRTCErrors {
-   /*
+   /**
     * If cloud proxy is on, the SDK gets relay candidates from a TURN server so:
     *       - Check whether you have whitelisted the IP addresses and ports that Agora provides for cloud proxy
     *       - ensure that the local client can connect to the TURN server
     */
    FAILED_TO_SUBSCRIBE_WITH_PROXY = "FAILED_TO_SUBSCRIBE_WITH_PROXY",
-   /*
+   /**
     *  If cloud proxy is off, you can:
     *       - turn it on
     *       - Check whether the browser has any plugins that disable WebRTC.
     *       - Ensure that you have enabled UDP in the system firewall, and added the [specified domains and ports to the whitelist](https://docs.agora.io/en/Agora%20Platform/firewall?platform=All%20Platforms#web-sdk).
     */
    FAILED_TO_SUBSCRIBE_WITHOUT_PROXY = "FAILED_TO_SUBSCRIBE_WITHOUT_PROXY",
+   /**
+    *  Browser has denied access to microphone
+    */
+   MICROPHONE_PERMISSION_DENIED = "MICROPHONE_PERMISSION_DENIED",
+   /**
+    *  Browser has denied access to camera
+    */
+   CAMERA_PERMISSION_DENIED = "CAMERA_PERMISSION_DENIED",
 }
 
 enum CustomConnectionDisconnectedReason {
-   /*
+   /**
     * This reason will be used when the RTCClient join method takes too long without throwing an exception.
     * Most common reason for this is that the client is still trying to find a port
     */

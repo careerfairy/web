@@ -28,7 +28,9 @@ import MicOffIcon from "@mui/icons-material/MicOff";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import LoadingButton from "@mui/lab/LoadingButton";
 import * as actions from "store/actions";
-import useLocalStorageMediaSources from "../../../custom-hook/useLocalStorageMediaSources";
+import useLocalStorageMediaSources from "components/custom-hook/useLocalStorageMediaSources";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+
 import {
    DeviceList,
    LocalMediaHandlers,
@@ -69,6 +71,12 @@ const styles = {
       display: "flex",
       flexDirection: "column",
       height: "100%",
+   },
+   deviceDeniedWrapper: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      width: "100%",
    },
 } as const;
 
@@ -117,6 +125,12 @@ const StreamPublishingModal = memo(
 
       const agoraRtcConnectionState = useSelector((state: RootState) => {
          return state.stream.agoraState.rtcConnectionState;
+      });
+      const cameraDenied = useSelector((state: RootState) => {
+         return state.stream.agoraState.deviceErrors.cameraDenied;
+      });
+      const micDenied = useSelector((state: RootState) => {
+         return state.stream.agoraState.deviceErrors.microphoneDenied;
       });
 
       const openModal = useMemo(() => {
@@ -221,6 +235,26 @@ const StreamPublishingModal = memo(
          if (!hasVideoTrack) return labels.joinWithoutCameraLabel;
       }, [hasAudioTrack, hasVideoTrack, labels.joinButtonLabel]);
 
+      const activateCameraButtonLabel = useMemo(() => {
+         if (noCameras) {
+            if (cameraDenied) {
+               return "Camera Access Is Not Authorized";
+            }
+            return "No Camera Detected";
+         }
+         return "Activate Camera";
+      }, [noMicrophones, cameraDenied]);
+
+      const activateMicButtonLabel = useMemo(() => {
+         if (noMicrophones) {
+            if (micDenied) {
+               return "Microphone Access Is Not Authorized";
+            }
+            return "No Microphone Detected";
+         }
+         return "Activate Microphone";
+      }, [noMicrophones, micDenied]);
+
       return (
          <Dialog TransitionComponent={Slide} open={openModal} fullWidth>
             <DialogTitle sx={styles.dialogTitle}>
@@ -299,13 +333,11 @@ const StreamPublishingModal = memo(
                               <LoadingButton
                                  variant="contained"
                                  loading={activatingCamera}
-                                 disabled={noCameras}
+                                 disabled={noCameras || cameraDenied}
                                  onClick={handleInitializeCamera}
                                  startIcon={<VideocamIcon />}
                               >
-                                 {noCameras
-                                    ? "No Camera Detected"
-                                    : "Activate Camera"}
+                                 {activateCameraButtonLabel}
                               </LoadingButton>
                            </Box>
                         )}
@@ -376,18 +408,36 @@ const StreamPublishingModal = memo(
                               <LoadingButton
                                  variant="contained"
                                  loading={activatingMic}
-                                 disabled={noMicrophones}
+                                 disabled={noMicrophones || micDenied}
                                  onClick={handleInitializeMic}
                                  startIcon={<MicIcon />}
                               >
-                                 {noMicrophones
-                                    ? "No Microphone Detected"
-                                    : "Activate Microphone"}
+                                 {activateMicButtonLabel}
                               </LoadingButton>
                            </Box>
                         )}
                      </Box>
                   </Grid>
+                  {(micDenied || cameraDenied) && (
+                     <Box sx={styles.deviceDeniedWrapper}>
+                        <Typography variant="body1" align="center" gutterBottom>
+                           Please allow access to your webcam and your
+                           microphone.
+                        </Typography>
+                        <Button
+                           endIcon={<OpenInNewIcon />}
+                           href={
+                              "https://support.google.com/chrome/answer/2693767?hl=en&co=GENIE.Platform%3DDesktop#zippy=%2Cturn-on-permissions-in-computer-settings"
+                           }
+                           target="_blank"
+                           color="grey"
+                           variant="text"
+                           size="small"
+                        >
+                           Learn how to authorize access
+                        </Button>
+                     </Box>
+                  )}
                </Grid>
             </DialogContent>
             <DialogActions>
