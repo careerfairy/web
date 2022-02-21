@@ -112,7 +112,7 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
          .filter((handRaise) => FILTER_MAP[filterMapProperty](handRaise))
          .map((handRaise) => ({
             ...handRaise,
-            date: handRaise.timestamp.toDate(),
+            date: handRaise.timestamp?.toDate() || new Date(),
          }))
          .sort(dynamicSort("date", sortByNew));
       setFilteredHandRaises(newFilteredHandRaises);

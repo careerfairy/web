@@ -7,18 +7,12 @@ import useAgoraClientConfig from "./useAgoraClientConfig";
 
 import AgoraRTC, {
    IAgoraRTCClient,
-   ILocalTrack,
    ScreenVideoTrackInitConfig,
 } from "agora-rtc-sdk-ng";
 import * as actions from "store/actions";
 import { useSessionStorage } from "react-use";
 import { RTC_CLIENT_JOIN_TIME_LIMIT } from "constants/streams";
-import { LocalStream, RTCError } from "../../types/streaming";
-import {
-   handleSetCameraDenied,
-   handleSetDeviceError,
-   handleSetMicrophoneDenied,
-} from "../../store/actions";
+import { LocalStream } from "types/streaming";
 
 const rtcClient = AgoraRTC.createClient({
    mode: "live",
@@ -197,7 +191,6 @@ export default function useAgoraRtc(
 
    const leaveAgoraRoom = async () => {
       console.log("-> LEAVING");
-
       try {
          if (clientIsUsingCloudProxy) {
             rtcClient.stopProxyServer();
@@ -236,7 +229,7 @@ export default function useAgoraRtc(
             }));
             resolve();
          } catch (error) {
-            dispatch(actions.handleSetDeviceError(error, "microphone", true));
+            dispatch(actions.handleSetDeviceError(error, "microphone"));
             reject(error);
          }
       });
@@ -254,7 +247,7 @@ export default function useAgoraRtc(
             }));
             resolve();
          } catch (error) {
-            dispatch(actions.handleSetDeviceError(error, "camera", true));
+            dispatch(actions.handleSetDeviceError(error, "camera"));
             reject(error);
          }
       });
@@ -267,7 +260,7 @@ export default function useAgoraRtc(
       try {
          audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
       } catch (error) {
-         dispatch(actions.handleSetDeviceError(error, "microphone", true));
+         dispatch(actions.handleSetDeviceError(error, "microphone"));
       }
 
       try {
@@ -275,15 +268,8 @@ export default function useAgoraRtc(
             encoderConfig: "480p_9",
          });
       } catch (error) {
-         dispatch(actions.handleSetDeviceError(error, "camera", true));
+         dispatch(actions.handleSetDeviceError(error, "camera"));
       }
-      // [audioTrack, videoTrack] = await Promise.all([
-      //    // Create local tracks, using microphone and camera
-      //    AgoraRTC.createMicrophoneAudioTrack(),
-      //    AgoraRTC.createCameraVideoTrack({
-      //       encoderConfig: "480p_9",
-      //    }),
-      // ]);
       setLocalStream((localStream) => ({
          ...localStream,
          audioTrack: audioTrack,
@@ -302,7 +288,6 @@ export default function useAgoraRtc(
          }
          try {
             if (tracks.length) {
-               console.log("-> tracks in unpublish", tracks);
                await rtcClient.unpublish(tracks);
                for (const track of tracks) {
                   if (track.trackMediaType === "video") {
@@ -353,6 +338,7 @@ export default function useAgoraRtc(
                }
                await client.publish(tracks);
                if (streamType === "video") {
+                  console.log("-> PUBLISHING DUAL", tracks, streamType);
                   await client.enableDualStream();
                }
                if (streamType === "audio") {

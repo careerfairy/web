@@ -48,12 +48,20 @@ const HandRaiseCategory = ({
       isMobile,
    ]);
 
+   // useEffect(() => {
+   //    if (handRaiseState?.state === "invited") {
+   //       // You should be able to immediately join after being invited, as your devices are set
+   //       void startConnectingHandRaise();
+   //    }
+   // }, [handRaiseState?.state]);
+
    useEffect(() => {
-      if (handRaiseState?.state === "invited") {
-         // You should be able to immediately join after being invited, as your devices are set
-         void startConnectingHandRaise();
+      if (handRaiseState?.state === "connected") {
+         // If you mount or reload the stream page after previously being
+         // connected, you should be put back in the connecting phase
+         void updateHandRaiseRequest(HandRaiseState.connecting);
       }
-   }, [handRaiseState?.state]);
+   }, []);
 
    const requestHandRaise = async () => {
       try {
@@ -99,11 +107,11 @@ const HandRaiseCategory = ({
             handRaiseState={handRaiseState}
             updateHandRaiseRequest={updateHandRaiseRequest}
          />
-         <HandRaiseJoinDialog
-            open={handRaiseState?.state === HandRaiseState.invited}
-            onClose={unRequestHandRaise}
-            startConnectingHandRaise={startConnectingHandRaise}
-         />
+         {/*<HandRaiseJoinDialog*/}
+         {/*   open={handRaiseState?.state === HandRaiseState.invited}*/}
+         {/*   onClose={unRequestHandRaise}*/}
+         {/*   startConnectingHandRaise={startConnectingHandRaise}*/}
+         {/*/>*/}
          <HandRaisePromptDialog />
       </>
    );

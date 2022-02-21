@@ -171,7 +171,7 @@ HandRaiseListItem.propTypes = {
    timestamp: PropTypes.object,
 };
 const getId = ({ request: { id, timestamp } }) => {
-   return `${id}-${timestamp.seconds}`;
+   return `${id}-${timestamp?.seconds || "new"}`;
 };
 
 function RequestedHandRaiseElement(props) {

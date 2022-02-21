@@ -2246,10 +2246,11 @@ class FirebaseService {
 
    updateHandRaiseRequest = (streamRef, userEmail, state) => {
       let ref = streamRef.collection("handRaises").doc(userEmail);
+      console.log("-> updating state with", state);
       return ref.set(
          {
             state: state,
-            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+            timestamp: this.getServerTimestamp(),
          },
          { merge: true }
       );

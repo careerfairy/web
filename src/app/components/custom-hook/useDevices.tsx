@@ -28,12 +28,12 @@ export default function useDevices(
          try {
             cameraDevices = await AgoraRTC.getCameras();
          } catch (error) {
-            dispatch(actions.handleSetDeviceError(error, "camera", true));
+            dispatch(actions.handleSetDeviceError(error, "camera"));
          }
          try {
             microphoneDevices = await AgoraRTC.getMicrophones();
          } catch (error) {
-            dispatch(actions.handleSetDeviceError(error, "microphone", true));
+            dispatch(actions.handleSetDeviceError(error, "microphone"));
          }
          if (microphoneDevices || cameraDevices) {
             const deviceArray = [];

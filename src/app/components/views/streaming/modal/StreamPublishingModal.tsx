@@ -148,7 +148,6 @@ const StreamPublishingModal = memo(
       const camInUseByAnotherApp = useSelector((state: RootState) => {
          return state.stream.agoraState.deviceErrors.cameraIsUsedByOtherApp;
       });
-      console.log("-> camInUseByAnotherApp", camInUseByAnotherApp);
 
       const openModal = useMemo(() => {
          return open && agoraRtcConnectionState.curState === "CONNECTED";

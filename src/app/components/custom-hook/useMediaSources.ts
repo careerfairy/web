@@ -113,11 +113,9 @@ export default function useMediaSources(
                try {
                   await localStream.audioTrack.setDevice(deviceId);
                   setAudioSource(deviceId);
-                  handleSetMicIsInUse(false);
+                  handleSetMicIsNotInUse();
                } catch (error) {
-                  dispatch(
-                     actions.handleSetDeviceError(error, "microphone", true)
-                  );
+                  handleSetMicInUse(error);
                }
             } else {
                setAudioSource(deviceId);
@@ -129,11 +127,15 @@ export default function useMediaSources(
       [localStream?.audioTrack]
    );
 
-   const handleSetMicIsInUse = (isInUse: boolean) =>
-      dispatch(actions.handleSetMicIsInUse(isInUse));
+   const handleSetMicIsNotInUse = () =>
+      dispatch(actions.handleClearDeviceError("microphoneIsUsedByOtherApp"));
+   const handleSetMicInUse = (error) =>
+      dispatch(actions.handleSetDeviceError(error, "microphone"));
 
-   const handleSetCamIsInUse = (isInUse: boolean) =>
-      dispatch(actions.handleSetCamIsInUse(isInUse));
+   const handleSetCamIsInUse = (error) =>
+      dispatch(actions.handleSetDeviceError(error, "camera"));
+   const handleSetCamIsNotInUse = () =>
+      dispatch(actions.handleClearDeviceError("microphoneIsUsedByOtherApp"));
 
    const updateVideoSource = useCallback(
       async (deviceId: MediaDeviceInfo["deviceId"]) => {
@@ -145,13 +147,11 @@ export default function useMediaSources(
             if (currentDeviceId !== deviceId) {
                try {
                   await localStream.videoTrack.setDevice(deviceId);
-                  handleSetCamIsInUse(false);
+                  handleSetCamIsNotInUse();
                   setVideoSource(deviceId);
                } catch (e) {
+                  handleSetCamIsInUse(e);
                   console.log("-> error in setDevice", e);
-                  if (e?.code === "NOT_READABLE") {
-                     handleSetCamIsInUse(true);
-                  }
                }
             } else {
                setVideoSource(deviceId);

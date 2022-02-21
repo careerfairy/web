@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useCurrentStream } from "context/stream/StreamContext";
 import { useAuth } from "HOCs/AuthProvider";
@@ -11,6 +11,7 @@ import { HandRaise } from "types/handraise";
 const useHandRaiseState = () => {
    const { currentLivestream, handRaiseId } = useCurrentStream();
    const { authenticatedUser, userData } = useAuth();
+   const prevHandRaiseState = useRef<HandRaise>(null);
 
    const streamRef = useStreamRef();
    const {
@@ -80,7 +81,11 @@ const useHandRaiseState = () => {
       [currentLivestream?.maxHandRaisers, numberOfActiveHandRaises]
    );
 
-   return [handRaise, updateRequest, hasRoom] as const;
+   useEffect(() => {
+      prevHandRaiseState.current = handRaise;
+   }, [handRaise]);
+
+   return [handRaise, updateRequest, hasRoom, prevHandRaiseState] as const;
 };
 
 export default useHandRaiseState;

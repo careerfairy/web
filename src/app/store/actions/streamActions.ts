@@ -136,43 +136,48 @@ export const handleSetMicIsInUse = (isInUse: boolean) => async (dispatch) => {
 export const handleSetCamIsInUse = (isInUse: boolean) => async (dispatch) => {
    dispatch(setDeviceError("cameraIsUsedByOtherApp", isInUse));
 };
+type DeviceErrorType =
+   | "cameraIsUsedByOtherApp"
+   | "microphoneIsUsedByOtherApp"
+   | "cameraDenied"
+   | "microphoneDenied";
 
 export const setDeviceError = (
-   deviceErrorType:
-      | "cameraIsUsedByOtherApp"
-      | "microphoneIsUsedByOtherApp"
-      | "cameraDenied"
-      | "microphoneDenied",
-   isInUse: boolean
+   deviceErrorType: DeviceErrorType,
+   isTrue: boolean
 ) => async (dispatch) => {
    dispatch({
       type: actions.SET_DEVICE_ERROR,
-      payload: { [deviceErrorType]: isInUse },
+      payload: { [deviceErrorType]: isTrue },
    });
 };
 
+export const handleClearDeviceError = (deviceErrorType: DeviceErrorType) => (
+   dispatch
+) => {
+   return dispatch(setDeviceError(deviceErrorType, false));
+};
 export const handleSetDeviceError = (
    error: RTCError,
-   deviceType: "microphone" | "camera",
-   denied: boolean
+   deviceType: "microphone" | "camera"
 ) => (dispatch) => {
    if (error?.code === "PERMISSION_DENIED") {
       switch (deviceType) {
          case "camera":
-            dispatch(handleSetCameraDenied(denied));
+            dispatch(handleSetCameraDenied(true));
             break;
          case "microphone":
-            dispatch(handleSetMicrophoneDenied(denied));
+            dispatch(handleSetMicrophoneDenied(true));
             break;
       }
    }
    if (error?.code === "NOT_READABLE") {
       switch (deviceType) {
          case "camera":
-            dispatch(handleSetCamIsInUse(denied));
+            dispatch(handleSetCamIsInUse(true));
             break;
          case "microphone":
-            dispatch(handleSetMicIsInUse(denied));
+            dispatch(handleSetMicIsInUse(true));
             break;
       }
    }

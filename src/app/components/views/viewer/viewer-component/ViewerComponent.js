@@ -81,10 +81,13 @@ function ViewerComponent({
    const [
       showLocalStreamPublishingModal,
       setShowLocalStreamPublishingModal,
-   ] = useState(false);
-   const [handRaiseState, updateRequest, hasRoom] = useHandRaiseState(
-      streamerId
-   );
+   ] = useState(null);
+   const [
+      handRaiseState,
+      updateRequest,
+      hasRoom,
+      prevHandRaiseState,
+   ] = useHandRaiseState(streamerId);
 
    const streamRef = useStreamRef();
    const {
@@ -109,6 +112,7 @@ function ViewerComponent({
       remoteStreams,
       localMediaHandlers,
       publishLocalStreamTracks,
+      handlePublishLocalStream,
    } = useAgoraRtc(
       streamerId,
       currentLivestream.id,
@@ -146,21 +150,34 @@ function ViewerComponent({
    }, [Boolean(remoteStreams?.length), isBreakout, hasActiveRooms]);
 
    useEffect(() => {
+      // console.log("-> handRaiseActive", handRaiseActive);
+      // console.log(
+      //    "-> prevHandRaiseState.current?.state",
+      //    prevHandRaiseState.current?.state
+      // );
+      // console.log("-> handRaiseState.state", handRaiseState.state);
+      // console.log(
+      //    "-> showLocalStreamPublishingModal",
+      //    showLocalStreamPublishingModal
+      // );
+      console.log("-> handRaiseState?.state", handRaiseState?.state);
+      console.log(
+         "-> prevHandRaiseState.current?.state",
+         prevHandRaiseState.current?.state
+      );
       if (
          handRaiseActive &&
-         handRaiseState &&
-         handRaiseState.state === "connecting" &&
+         prevHandRaiseState.current?.state === "invited" &&
          // Make sure not to auto invite if the viewer is still in the publishing modal
-         !showLocalStreamPublishingModal
+         showLocalStreamPublishingModal === false
       ) {
+         console.log("-> handleJoinAsHandRaiser");
          handleJoinAsHandRaiser();
       }
-   }, [handRaiseState, showLocalStreamPublishingModal]);
-
-   useEffect(() => {
-      if (handRaiseState?.state === "requested") {
-      }
-   }, []);
+   }, [
+      prevHandRaiseState.current?.state === "invited",
+      showLocalStreamPublishingModal,
+   ]);
 
    useEffect(() => {
       if (
@@ -206,6 +223,20 @@ function ViewerComponent({
    );
    const requestHandRaise = async () => {
       try {
+         switch (handRaiseState?.state) {
+            case "connected":
+               // If you were previously connected
+               if (hasRoom) {
+                  // and there is still room
+                  await updateRequest("connecting");
+               }
+               break;
+            case "connecting":
+               // After being in a connecting state for god knows how long, you finally clicked join.
+               if (hasRoom) {
+                  await handleJoinAsHandRaiser();
+               }
+         }
          if (
             // If you were previously connected
             handRaiseState?.state === "connected" &&
@@ -236,14 +267,9 @@ function ViewerComponent({
    };
 
    const handleJoinAsHandRaiser = async () => {
-      if (localStream.audioTrack && !localStream.isAudioPublished) {
-         await publishLocalStreamTracks.publishLocalMicrophoneTrack();
-      }
-      if (localStream.videoTrack && !localStream.isVideoPublished) {
-         await publishLocalStreamTracks.publishLocalCameraTrack();
-      }
+      await handlePublishLocalStream();
       await updateRequest("connected");
-      await dispatch(actions.setStreamerIsPublished(true));
+      // await dispatch(actions.setStreamerIsPublished(true));
    };
 
    const handleLeaveAsHandRaiser = async () => {
