@@ -181,7 +181,6 @@ export default function useAgoraRtc(
          );
          console.log("-> JOINED CLIENT");
       } catch (error) {
-         console.error("-> error in JOIN AGORA ROOM", error);
          dispatch(actions.setAgoraRtcError(error));
       }
       if (timeout) {
@@ -207,14 +206,16 @@ export default function useAgoraRtc(
       sessionIsUsingCloudProxy: boolean
    ) => {
       try {
-         return await joinAgoraRoom(
+         await joinAgoraRoom(
             rtcClient,
             roomId,
             streamerId,
             isStreamer,
             sessionIsUsingCloudProxy
          );
+         return dispatch(actions.setAgoraPrimaryClientJoined(true));
       } catch (error) {
+         dispatch(actions.setAgoraPrimaryClientJoined(false));
          dispatch(actions.setAgoraRtcError(error));
       }
    };
@@ -313,20 +314,28 @@ export default function useAgoraRtc(
       }
    }, [rtcClient, localStream]);
 
-   const setLocalAudioEnabled = (value) => {
-      localStream.audioTrack.setEnabled(value);
-      setLocalStream((localStream) => ({
-         ...localStream,
-         audioMuted: !value,
-      }));
+   const setLocalAudioEnabled = async (value) => {
+      try {
+         await localStream.audioTrack.setEnabled(value);
+         setLocalStream((localStream) => ({
+            ...localStream,
+            audioMuted: !value,
+         }));
+      } catch (e) {
+         console.log("-> error in toggling mic", e);
+      }
    };
 
-   const setLocalVideoEnabled = (value) => {
-      localStream.videoTrack.setEnabled(value);
-      setLocalStream((localStream) => ({
-         ...localStream,
-         videoMuted: !value,
-      }));
+   const setLocalVideoEnabled = async (value) => {
+      try {
+         await localStream.videoTrack.setEnabled(value);
+         setLocalStream((localStream) => ({
+            ...localStream,
+            videoMuted: !value,
+         }));
+      } catch (e) {
+         console.log("-> error in toggling cam", e);
+      }
    };
 
    const publishTracks = (client: IAgoraRTCClient, tracks, streamType) => {
@@ -338,7 +347,6 @@ export default function useAgoraRtc(
                }
                await client.publish(tracks);
                if (streamType === "video") {
-                  console.log("-> PUBLISHING DUAL", tracks, streamType);
                   await client.enableDualStream();
                }
                if (streamType === "audio") {
@@ -414,7 +422,11 @@ export default function useAgoraRtc(
             if (localStream.audioTrack) {
                if (localStream.isAudioPublished) {
                   let localStreamTracks = [localStream.audioTrack];
-                  await rtcClient.unpublish(localStreamTracks);
+                  try {
+                     await rtcClient.unpublish(localStreamTracks);
+                  } catch (e) {
+                     console.log("-> error in unPublish", e);
+                  }
                }
                setLocalStream((localStream) => ({
                   ...localStream,

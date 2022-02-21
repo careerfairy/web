@@ -150,29 +150,13 @@ function ViewerComponent({
    }, [Boolean(remoteStreams?.length), isBreakout, hasActiveRooms]);
 
    useEffect(() => {
-      // console.log("-> handRaiseActive", handRaiseActive);
-      // console.log(
-      //    "-> prevHandRaiseState.current?.state",
-      //    prevHandRaiseState.current?.state
-      // );
-      // console.log("-> handRaiseState.state", handRaiseState.state);
-      // console.log(
-      //    "-> showLocalStreamPublishingModal",
-      //    showLocalStreamPublishingModal
-      // );
-      console.log("-> handRaiseState?.state", handRaiseState?.state);
-      console.log(
-         "-> prevHandRaiseState.current?.state",
-         prevHandRaiseState.current?.state
-      );
       if (
          handRaiseActive &&
          prevHandRaiseState.current?.state === "invited" &&
          // Make sure not to auto invite if the viewer is still in the publishing modal
          showLocalStreamPublishingModal === false
       ) {
-         console.log("-> handleJoinAsHandRaiser");
-         handleJoinAsHandRaiser();
+         void handleJoinAsHandRaiser();
       }
    }, [
       prevHandRaiseState.current?.state === "invited",
@@ -195,10 +179,6 @@ function ViewerComponent({
          mode === "desktop" ? initiatorId : currentLivestream.screenSharerId;
       await setDesktopModeInstanceMethod(streamRef, mode, screenSharerId);
    };
-
-   const shareDesktopOrSlides = () =>
-      currentLivestream.mode === "presentation" ||
-      currentLivestream.mode === "desktop";
 
    const handleCloseScreenShareModal = useCallback(() => {
       setShowScreenShareModal(false);
@@ -229,36 +209,38 @@ function ViewerComponent({
                if (hasRoom) {
                   // and there is still room
                   await updateRequest("connecting");
+               } else {
+                  await updateRequest("requested");
                }
                break;
             case "connecting":
                // After being in a connecting state for god knows how long, you finally clicked join.
                if (hasRoom) {
+                  // At the time of clicking join there is still room, so you can join in the stream as a HR
                   await handleJoinAsHandRaiser();
+               } else {
+                  //  At the time of clicking join there is no more room, which means you
+                  //  have to go back into the queue as a HR
+                  await updateRequest("requested");
+                  dispatch(actions.enqueueSuccessfulHandRaiseRequest());
                }
-         }
-         if (
-            // If you were previously connected
-            handRaiseState?.state === "connected" &&
-            // and there is still room
-            hasRoom
-         ) {
-            // go straight to the connecting phase
-            await updateRequest("connecting");
-         } else if (handRaiseState.state === "connecting") {
-            // After being in a connecting state for god knows how long, you finally clicked join.
-            if (hasRoom) {
-               // At the time of clicking join there is still room, so you can join in the stream as a HR
-               await handleJoinAsHandRaiser();
-            } else {
-               //  At the time of clicking join there is no more room, which means you
-               //  have to go back into the queue as a HR
+               break;
+            case "invited":
+               debugger;
+               // If you are currently invited
+               if (hasRoom) {
+                  // and there is still room
+                  await handleJoinAsHandRaiser();
+               } else {
+                  // If there is no room go back into queue
+                  await updateRequest("requested");
+                  dispatch(actions.enqueueSuccessfulHandRaiseRequest());
+               }
+               break;
+            default:
                await updateRequest("requested");
                dispatch(actions.enqueueSuccessfulHandRaiseRequest());
-            }
-         } else {
-            await updateRequest("requested");
-            dispatch(actions.enqueueSuccessfulHandRaiseRequest());
+               break;
          }
       } catch (e) {
          console.log("-> e", e);
@@ -310,13 +292,12 @@ function ViewerComponent({
             videoMutedBackgroundImg={currentLivestream.companyLogoUrl}
             liveSpeakers={currentLivestream.liveSpeakers}
             isBroadCasting={handRaiseActive}
-            openStream={currentLivestream.openStream}
             sharingScreen={currentLivestream.mode === "desktop"}
             sharingPdf={currentLivestream.mode === "presentation"}
             showMenu={showMenu}
             livestreamId={currentLivestream.id}
          />
-         <AgoraStateHandler />
+         {shouldInitializeAgora && <AgoraStateHandler />}
          <StreamPublishingModal
             open={showLocalStreamPublishingModal}
             setOpen={setShowLocalStreamPublishingModal}
@@ -370,9 +351,9 @@ function ViewerComponent({
                   localStreamIsPublished={{
                      audio: localStream?.isAudioPublished,
                      video: localStream?.isVideoPublished,
-                     videoEnabled: Boolean(localStream.videoTrack?.enabled),
-                     audioEnabled: Boolean(localStream.audioTrack?.enabled),
                   }}
+                  microphoneMuted={!Boolean(localStream.audioTrack?.enabled)}
+                  cameraInactive={!Boolean(localStream.videoTrack?.enabled)}
                   openPublishingModal={() =>
                      setShowLocalStreamPublishingModal(true)
                   }

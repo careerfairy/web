@@ -2246,7 +2246,6 @@ class FirebaseService {
 
    updateHandRaiseRequest = (streamRef, userEmail, state) => {
       let ref = streamRef.collection("handRaises").doc(userEmail);
-      console.log("-> updating state with", state);
       return ref.set(
          {
             state: state,

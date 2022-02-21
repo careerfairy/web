@@ -55,6 +55,7 @@ interface StreamReducer {
       rtcConnectionState?: RTCConnectionState;
       rtcError?: RTCError;
       sessionIsUsingCloudProxy: boolean;
+      primaryClientJoined: boolean;
       deviceErrors: {
          cameraDenied: boolean;
          microphoneDenied: boolean;

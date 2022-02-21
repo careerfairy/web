@@ -43,9 +43,9 @@ const StreamContainer = ({
 
    const getSpeakerInfoFromDB = async (userId) => {
       let fetchedSpeaker = {
-         firstName: "",
+         firstName: "Anonymous",
          lastName: "",
-         position: "",
+         position: "✋ Hand Raiser",
       };
       try {
          setFetching(true);

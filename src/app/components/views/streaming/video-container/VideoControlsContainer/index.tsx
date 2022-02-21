@@ -16,6 +16,7 @@ import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import { useTheme } from "@mui/material/styles";
 import {
    Box,
+   CircularProgress,
    ClickAwayListener,
    Dialog,
    DialogActions,
@@ -113,18 +114,28 @@ interface Props {
    localStreamIsPublished: {
       audio?: boolean;
       video?: boolean;
-      videoEnabled: boolean;
-      audioEnabled: boolean;
    };
+   microphoneMuted: boolean;
+   cameraInactive: boolean;
    joinAsViewer?: () => Promise<any>;
    localMediaControls: {
-      setLocalAudioEnabled: (enabled: boolean) => void;
-      setLocalVideoEnabled: (enabled: boolean) => void;
+      setLocalAudioEnabled: (enabled: boolean) => Promise<void>;
+      setLocalVideoEnabled: (enabled: boolean) => Promise<void>;
    };
    openPublishingModal: () => void;
 }
+type Action = {
+   icon: JSX.Element;
+   name: string;
+   onClick: (event: any) => any;
+   disabled?: boolean;
+   loading?: boolean;
+   id?: string;
+};
 const VideoControlsContainer = ({
    currentLivestream: { mode, screenSharerId, test },
+   microphoneMuted,
+   cameraInactive,
    viewer,
    setShowSettings,
    showSettings,
@@ -147,22 +158,17 @@ const VideoControlsContainer = ({
    const [openModal, setOpenModal] = useState(false);
    const [delayHandler, setDelayHandler] = useState(null);
    const [joiningAsViewer, setJoiningAsViewer] = useState(false);
-   const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
-   const [isVideoInactive, setIsVideoInactive] = useState(false);
    const [shareMenuAnchorEl, setShareMenuAnchorEl] = useState(null);
+   const [togglingMicrophone, setTogglingMicrophone] = useState(false);
+   const [togglingCamera, setTogglingCamera] = useState(false);
    const [callToActionDrawerOpen, setCallToActionDrawerOpen] = useState(false);
+   const [actions, setActions] = useState<Action[]>([]);
+   const [shareActions, setShareActions] = useState<Action[]>([]);
    const [handRaiseState] = useHandRaiseState();
 
    const [fullyOpened, onEntered, onExited] = useSliderFullyOpened();
    const presentMode = mode === "presentation";
    const desktopMode = mode === "desktop";
-
-   useEffect(() => {
-      setIsLocalMicMuted(!localStreamIsPublished.audioEnabled);
-   }, [localStreamIsPublished.audioEnabled]);
-   useEffect(() => {
-      setIsVideoInactive(!localStreamIsPublished.videoEnabled);
-   }, [localStreamIsPublished.videoEnabled]);
 
    useEffect(() => {
       if (isOpen(16)) {
@@ -235,28 +241,25 @@ const VideoControlsContainer = ({
       setJoiningAsViewer(false);
    };
 
-   function toggleMicrophone() {
-      if (isLocalMicMuted) {
-         localMediaControls.setLocalAudioEnabled(true);
-      } else {
-         localMediaControls.setLocalAudioEnabled(false);
+   const toggleMicrophone = async () => {
+      try {
+         setTogglingMicrophone(true);
+         await localMediaControls.setLocalAudioEnabled(microphoneMuted);
+      } catch (e) {
+         console.log("-> error in toggling microphone", e);
       }
-      setIsLocalMicMuted(!isLocalMicMuted);
-   }
+      setTogglingMicrophone(false);
+   };
 
-   function toggleVideo() {
-      const isPublishingWithoutVideo =
-         isPublishing && localStreamIsPublished.video === false;
-
-      if (isPublishingWithoutVideo) {
+   const toggleVideo = async () => {
+      try {
+         setTogglingCamera(true);
+         await localMediaControls.setLocalVideoEnabled(cameraInactive);
+      } catch (e) {
+         console.log("-> error in toggling video", e);
       }
-      if (isVideoInactive) {
-         localMediaControls.setLocalVideoEnabled(true);
-      } else {
-         localMediaControls.setLocalVideoEnabled(false);
-      }
-      setIsVideoInactive(!isVideoInactive);
-   }
+      setTogglingCamera(false);
+   };
 
    function setLivestreamMode(mode) {
       firebase.setLivestreamMode(streamRef, mode);
@@ -284,110 +287,138 @@ const VideoControlsContainer = ({
 
    const localMicrophoneLabel = useMemo(() => {
       if (localStreamIsPublished.audio) {
-         return isLocalMicMuted ? "Unmute microphone" : "Mute microphone";
+         return microphoneMuted ? "Unmute microphone" : "Mute microphone";
       } else {
          return "Join with audio";
       }
-   }, [localStreamIsPublished.audio, isLocalMicMuted]);
+   }, [localStreamIsPublished.audio, microphoneMuted]);
 
    const localCameraLabel = useMemo(() => {
       if (localStreamIsPublished.video) {
-         return isVideoInactive ? "Switch camera on" : "Switch camera off";
+         return cameraInactive ? "Switch camera on" : "Switch camera off";
       } else {
          return "Join with video";
       }
-   }, [localStreamIsPublished.video, isVideoInactive]);
+   }, [localStreamIsPublished.video, cameraInactive]);
 
-   const actions = [];
-   if (isPublishing) {
-      actions.unshift({
-         icon: isVideoInactive ? (
-            <VideocamOffIcon fontSize="medium" style={{ color: "red" }} />
-         ) : (
-            <VideocamIcon fontSize="medium" color="primary" />
-         ),
-         name: localCameraLabel,
-         onClick: toggleVideo,
-      });
-
-      if (localStreamIsPublished.audio) {
-         actions.unshift({
-            icon: isLocalMicMuted ? (
-               <MicOffIcon fontSize="medium" style={{ color: "red" }} />
+   useEffect(() => {
+      const newActions: Action[] = [];
+      if (isPublishing) {
+         newActions.unshift({
+            icon: cameraInactive ? (
+               <VideocamOffIcon fontSize="medium" style={{ color: "red" }} />
             ) : (
-               <MicIcon fontSize="medium" color="primary" />
+               <VideocamIcon fontSize="medium" color="primary" />
             ),
-            name: localMicrophoneLabel,
-            onClick: toggleMicrophone,
+            name: localCameraLabel,
+            onClick: toggleVideo,
+            disabled: togglingCamera,
+            loading: togglingCamera,
+         });
+
+         if (localStreamIsPublished.audio) {
+            newActions.unshift({
+               icon: microphoneMuted ? (
+                  <MicOffIcon fontSize="medium" style={{ color: "red" }} />
+               ) : (
+                  <MicIcon fontSize="medium" color="primary" />
+               ),
+               name: localMicrophoneLabel,
+               onClick: toggleMicrophone,
+               disabled: togglingMicrophone,
+               loading: togglingMicrophone,
+            });
+         }
+      } else if (!viewer) {
+         newActions.unshift({
+            icon: <JoinAsStreamerIcon />,
+            name: "Join as streamer",
+            onClick: handleOpenPublishingModal,
          });
       }
-   } else if (!viewer) {
-      actions.unshift({
-         icon: <JoinAsStreamerIcon />,
-         name: "Join as streamer",
-         onClick: handleOpenPublishingModal,
-      });
-   }
 
-   const shareActions = [];
+      if (shareActions.length) {
+         newActions.unshift({
+            icon: <ShareIcon fontSize="small" />,
+            name: "Share",
+            onClick: handleClickShare,
+         });
+      }
 
-   if (showScreenShareButtons()) {
-      shareActions.unshift({
-         icon: <ScreenShareIcon color={desktopMode ? "primary" : "inherit"} />,
-         name: desktopMode ? "Stop sharing screen" : "Share screen",
-         onClick: () => handleClickScreenShareButton(),
-         id: "shareScreenAction",
-      });
-   }
+      if (isPublishing) {
+         newActions.unshift({
+            icon: <SettingsIcon fontSize="medium" />,
+            name: "Settings",
+            onClick: () => setShowSettings(!showSettings),
+         });
+      }
 
-   if (!viewer) {
-      shareActions.unshift(
-         {
+      if (!viewer && isPublishing) {
+         newActions.unshift({
+            icon: <StudentViewIcon fontSize="medium" />,
+            name: "Join as viewer",
+            onClick: () => setOpenModal(true),
+         });
+      }
+      setActions(newActions);
+   }, [
+      isPublishing,
+      togglingMicrophone,
+      togglingCamera,
+      localStreamIsPublished.audio,
+      cameraInactive,
+      microphoneMuted,
+      localMicrophoneLabel,
+      localCameraLabel,
+      viewer,
+      isPublishing,
+      shareActions.length,
+   ]);
+
+   useEffect(() => {
+      const newShareActions: Action[] = [];
+
+      if (showScreenShareButtons()) {
+         newShareActions.unshift({
             icon: (
-               <SharePdfIcon
-                  // fontSize="small"
-                  color={presentMode ? "primary" : "inherit"}
-               />
+               <ScreenShareIcon color={desktopMode ? "primary" : "inherit"} />
             ),
-            name: presentMode
-               ? "Stop Sharing PDF presentation"
-               : "Share PDF presentation",
-            onClick: () =>
-               setLivestreamMode(presentMode ? "default" : "presentation"),
-            id: "sharePdfAction",
-         },
-         {
-            icon: <CallToActionIcon />,
-            name: "Send a call to action",
-            onClick: () => handleOpenCallToActionDrawer(),
-            id: "sendCtaAction",
-         }
-      );
-   }
+            name: desktopMode ? "Stop sharing screen" : "Share screen",
+            onClick: () => handleClickScreenShareButton(),
+            id: "shareScreenAction",
+         });
+      }
 
-   if (shareActions.length) {
-      actions.unshift({
-         icon: <ShareIcon fontSize="small" />,
-         name: "Share",
-         onClick: handleClickShare,
-      });
-   }
+      if (!viewer) {
+         newShareActions.unshift(
+            {
+               icon: (
+                  <SharePdfIcon color={presentMode ? "primary" : "inherit"} />
+               ),
+               name: presentMode
+                  ? "Stop Sharing PDF presentation"
+                  : "Share PDF presentation",
+               onClick: () =>
+                  setLivestreamMode(presentMode ? "default" : "presentation"),
+               id: "sharePdfAction",
+            },
+            {
+               icon: <CallToActionIcon />,
+               name: "Send a call to action",
+               onClick: () => handleOpenCallToActionDrawer(),
+               id: "sendCtaAction",
+            }
+         );
+      }
 
-   if (isPublishing) {
-      actions.unshift({
-         icon: <SettingsIcon fontSize="medium" />,
-         name: "Settings",
-         onClick: () => setShowSettings(!showSettings),
-      });
-   }
-
-   if (!viewer && isPublishing) {
-      actions.unshift({
-         icon: <StudentViewIcon fontSize="medium" />,
-         name: "Join as viewer",
-         onClick: () => setOpenModal(true),
-      });
-   }
+      setShareActions(newShareActions);
+   }, [
+      showScreenShareButtons(),
+      desktopMode,
+      handleClickScreenShareButton,
+      viewer,
+      presentMode,
+   ]);
 
    return (
       <>
@@ -459,7 +490,13 @@ const VideoControlsContainer = ({
                                        ? shareButtonRef
                                        : undefined
                                  }
-                                 icon={action.icon}
+                                 icon={
+                                    action.loading ? (
+                                       <CircularProgress />
+                                    ) : (
+                                       action.icon
+                                    )
+                                 }
                                  tooltipPlacement="left"
                                  tooltipTitle={action.name}
                                  sx={[
@@ -468,7 +505,13 @@ const VideoControlsContainer = ({
                                  ]}
                                  tooltipOpen={Boolean(action.name.length)}
                                  FabProps={{
-                                    sx: styles.actionButton,
+                                    sx: [
+                                       styles.actionButton,
+                                       (action.loading || action.disabled) && {
+                                          cursor: "pointer",
+                                       },
+                                    ],
+                                    disabled: action.disabled,
                                  }}
                                  onClick={action.onClick}
                               />

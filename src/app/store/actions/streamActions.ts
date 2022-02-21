@@ -152,6 +152,15 @@ export const setDeviceError = (
    });
 };
 
+export const setAgoraPrimaryClientJoined = (hasJoined: boolean) => (
+   dispatch
+) => {
+   dispatch({
+      type: actions.SET_AGORA_PRIMARY_CLIENT_JOINED,
+      payload: hasJoined,
+   });
+};
+
 export const handleClearDeviceError = (deviceErrorType: DeviceErrorType) => (
    dispatch
 ) => {

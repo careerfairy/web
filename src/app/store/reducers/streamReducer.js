@@ -1,6 +1,5 @@
 import { AGORA_RTC_CONNECTION_STATE_CONNECTING } from "constants/agora";
 import * as actions from "../actions/actionTypes";
-import { SET_DEVICE_IN_USE_BY_ANOTHER_APP } from "../actions/actionTypes";
 
 const initialState = {
    layout: {
@@ -46,6 +45,7 @@ const initialState = {
          microphoneIsUsedByOtherApp: false,
       },
       sessionIsUsingCloudProxy: false,
+      primaryClientJoined: false,
    },
 };
 
@@ -140,6 +140,14 @@ const streamReducer = (state = initialState, { type, payload }) => {
                   ...state.agoraState.deviceErrors,
                   ...payload,
                },
+            },
+         };
+      case actions.SET_AGORA_PRIMARY_CLIENT_JOINED:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               primaryClientJoined: payload,
             },
          };
       case actions.TOGGLE_LOCAL_VIDEO:

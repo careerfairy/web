@@ -52,7 +52,6 @@ export default function useAgoraClientConfig(
          });
       });
       rtcClient.on("user-left", async (remoteUser) => {
-         console.log("-> user-left", remoteUser);
          setRemoteStreams((prevRemoteStreams) => {
             return removeStreamFromList(remoteUser.uid, prevRemoteStreams);
          });
@@ -67,9 +66,7 @@ export default function useAgoraClientConfig(
       rtcClient.on("user-published", async (remoteUser, mediaType) => {
          try {
             await rtcClient.subscribe(remoteUser, mediaType);
-         } catch (error) {
-            handleCatchRtcSubscribeError(error?.code);
-         }
+         } catch (error) {}
          setRemoteStreams((prevRemoteStreams) => {
             return prevRemoteStreams.map((user: RemoteStreamUser) => {
                if (user.uid === remoteUser.uid) {
@@ -88,7 +85,6 @@ export default function useAgoraClientConfig(
       });
 
       rtcClient.on("user-unpublished", async (remoteUser, mediaType) => {
-         console.log("-> user-unpublished", remoteUser);
          try {
             await rtcClient.unsubscribe(remoteUser, mediaType);
          } catch (error) {
@@ -115,43 +111,43 @@ export default function useAgoraClientConfig(
       });
    };
 
-   const handleCatchRtcSubscribeError = (error: RTCError) => {
-      console.error("error in handleCatchRtcSubscribeError", error);
-      if (!error?.code) {
-         return;
-      }
-      switch (error.code) {
-         case RTCSubscribeErrorCodes.NO_ICE_CANDIDATE:
-            if (clientConfigOptions.clientIsUsingCloudProxy) {
-               dispatch(
-                  actions.setAgoraRtcError({
-                     ...error,
-                     code: CustomRTCErrors.FAILED_TO_SUBSCRIBE_WITH_PROXY,
-                  })
-               );
-            } else {
-               dispatch(
-                  actions.setAgoraRtcError({
-                     ...error,
-                     code: CustomRTCErrors.FAILED_TO_SUBSCRIBE_WITHOUT_PROXY,
-                  })
-               );
-            }
-            break;
-         case RTCSubscribeErrorCodes.INVALID_OPERATION:
-            break;
-         case RTCSubscribeErrorCodes.INVALID_REMOTE_USER:
-            break;
-         case RTCSubscribeErrorCodes.OPERATION_ABORTED:
-            break;
-         case RTCSubscribeErrorCodes.REMOTE_USER_IS_NOT_PUBLISHED:
-            break;
-         case RTCSubscribeErrorCodes.UNEXPECTED_RESPONSE:
-         default:
-            console.log("UNKNOWN ERROR", error);
-            break;
-      }
-   };
+   // const handleCatchRtcSubscribeError = (error: RTCError) => {
+   //    console.error("error in handleCatchRtcSubscribeError", error);
+   //    if (!error?.code) {
+   //       return;
+   //    }
+   //    switch (error.code) {
+   //       case RTCSubscribeErrorCodes.NO_ICE_CANDIDATE:
+   //          if (clientConfigOptions.clientIsUsingCloudProxy) {
+   //             dispatch(
+   //                actions.setAgoraRtcError({
+   //                   ...error,
+   //                   code: CustomRTCErrors.FAILED_TO_SUBSCRIBE_WITH_PROXY,
+   //                })
+   //             );
+   //          } else {
+   //             dispatch(
+   //                actions.setAgoraRtcError({
+   //                   ...error,
+   //                   code: CustomRTCErrors.FAILED_TO_SUBSCRIBE_WITHOUT_PROXY,
+   //                })
+   //             );
+   //          }
+   //          break;
+   //       case RTCSubscribeErrorCodes.INVALID_OPERATION:
+   //          break;
+   //       case RTCSubscribeErrorCodes.INVALID_REMOTE_USER:
+   //          break;
+   //       case RTCSubscribeErrorCodes.OPERATION_ABORTED:
+   //          break;
+   //       case RTCSubscribeErrorCodes.REMOTE_USER_IS_NOT_PUBLISHED:
+   //          break;
+   //       case RTCSubscribeErrorCodes.UNEXPECTED_RESPONSE:
+   //       default:
+   //          console.log("UNKNOWN ERROR", error);
+   //          break;
+   //    }
+   // };
 
    return { remoteStreams, networkQuality };
 }

@@ -70,7 +70,7 @@ function VideoContainer({
       showLocalStreamPublishingModal,
       setShowLocalStreamPublishingModal,
    ] = useState(true);
-   const [optimizationMode, setOptimizationMode] = useState("detail");
+   const [optimizationMode] = useState("detail");
 
    const [showSettings, setShowSettings] = useState(false);
 
@@ -321,9 +321,9 @@ function VideoContainer({
             localStreamIsPublished={{
                audio: localStream?.isAudioPublished,
                video: localStream?.isVideoPublished,
-               videoEnabled: Boolean(localStream.videoTrack?.enabled),
-               audioEnabled: Boolean(localStream.audioTrack?.enabled),
             }}
+            microphoneMuted={!Boolean(localStream.audioTrack?.enabled)}
+            cameraInactive={!Boolean(localStream.videoTrack?.enabled)}
             openPublishingModal={() => setShowLocalStreamPublishingModal(true)}
             joinAsViewer={handleJoinAsViewer}
             viewer={viewer}

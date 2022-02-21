@@ -61,6 +61,9 @@ const HandRaisePromptDialog = () => {
    const spyModeEnabled = useSelector(
       (state: RootState) => state.stream.streaming.spyModeEnabled
    );
+   const primaryClientJoined = useSelector(
+      (state: RootState) => state.stream.agoraState.primaryClientJoined
+   );
    const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState();
 
    const { userData } = useAuth();
@@ -73,7 +76,7 @@ const HandRaisePromptDialog = () => {
             currentLivestream?.handRaiseActive &&
             !isMobile
       );
-      setOpen(hasNotRaisedHandYet && canSeeLivestream);
+      setOpen(hasNotRaisedHandYet && canSeeLivestream && primaryClientJoined);
    }, [
       currentLivestream?.handRaiseActive,
       currentLivestream?.hasStarted,
@@ -81,6 +84,7 @@ const HandRaisePromptDialog = () => {
       isMobile,
       userData?.isAdmin,
       spyModeEnabled,
+      primaryClientJoined,
    ]);
    const handleClose = () => {
       setOpen(false);

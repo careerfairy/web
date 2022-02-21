@@ -32,7 +32,6 @@ const Streams = memo(
       showMenu,
       livestreamId,
       presenter,
-      openStream,
       videoMutedBackgroundImg,
       handRaiseActive,
       mobile,
@@ -117,13 +116,12 @@ const Streams = memo(
       const handleGetSmallStream = (allStreams, largeStream) => {
          return allStreams.filter((stream) => stream.uid !== largeStream.uid);
       };
-
       return (
          <div className={classes.root}>
             {!bannersBottom && (
                <Banners
                   presenter={presenter}
-                  handRaiseActive={handRaiseActive && !openStream}
+                  handRaiseActive={handRaiseActive}
                   mobile={mobile}
                />
             )}
@@ -146,7 +144,7 @@ const Streams = memo(
                <Banners
                   isBottom
                   presenter={presenter}
-                  handRaiseActive={handRaiseActive && !openStream}
+                  handRaiseActive={handRaiseActive}
                   mobile={mobile}
                />
             )}
