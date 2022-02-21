@@ -32,7 +32,7 @@ export default function useAgoraAsStreamer(
    });
 
    const router = useRouter();
-   const { withProxy } = router.query;
+   const { withProxy, withHighQuality } = router.query;
 
    const token = router.query.token || "";
 
@@ -480,7 +480,13 @@ export default function useAgoraAsStreamer(
                   audio: true,
                   video: true,
                });
-               localStream.setVideoProfile("480p_9");
+
+               if (withHighQuality) {
+                  localStream.setVideoProfile("720p_3");
+                  localStream.setAudioProfile("high_quality_stereo");
+               } else {
+                  localStream.setVideoProfile("480p_9");
+               }
 
                setAgoraRtcStatus({
                   type: "INFO",
