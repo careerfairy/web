@@ -1,21 +1,14 @@
-import React from "react";
-import { darken } from "@mui/material/styles";
-import {
-   Avatar,
-   Box,
-   Container,
-   Grid,
-   Hidden,
-   Typography,
-} from "@mui/material";
-import CountDown from "./CountDown";
-import HeroSpeakers from "./HeroSpeakers";
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
-import HeroHosts from "./HeroHosts";
+import React from "react"
+import { darken } from "@mui/material/styles"
+import { Avatar, Box, Container, Grid, Hidden, Typography } from "@mui/material"
+import CountDown from "./CountDown"
+import HeroSpeakers from "./HeroSpeakers"
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
+import HeroHosts from "./HeroHosts"
 import {
    InPersonEventBadge,
    LimitedRegistrationsBadge,
-} from "../../NextLivestreams/GroupStreams/groupStreamCard/badges";
+} from "../../NextLivestreams/GroupStreams/groupStreamCard/badges"
 
 const styles = {
    root: (theme) => ({
@@ -110,7 +103,7 @@ const styles = {
       paddingTop: (theme) => theme.spacing(2),
       display: "flex",
    },
-};
+}
 
 const HeroSection = ({
    backgroundImage,
@@ -136,7 +129,10 @@ const HeroSection = ({
             <Container sx={styles.container}>
                <Grid sx={styles.gridContainer} spacing={2} container>
                   <Grid sx={styles.leftGridItem} item xs={12} md={6}>
-                     <Typography variant="h2" sx={styles.title}>
+                     <Typography
+                        variant={stream?.title?.length > 120 ? "h4" : "h2"}
+                        sx={styles.title}
+                     >
                         {stream.title}
                      </Typography>
                      {(stream.isFaceToFace || stream.maxRegistrants) && (
@@ -200,7 +196,7 @@ const HeroSection = ({
             </Container>
          </Box>
       </Box>
-   );
-};
+   )
+}
 
-export default HeroSection;
+export default HeroSection

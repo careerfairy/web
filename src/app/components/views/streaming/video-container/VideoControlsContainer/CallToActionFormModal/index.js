@@ -1,25 +1,19 @@
-import PropTypes from "prop-types";
-import React, { memo, useCallback, useEffect, useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
-import {
-   Box,
-   Dialog,
-   DialogTitle,
-   IconButton,
-   Typography,
-} from "@mui/material";
-import CallToActionForm from "./CallToActionForm";
-import CloseIcon from "@mui/icons-material/Close";
-import CallToActionTypeMenu from "./CallToActionTypeMenu";
-import { callToActionsDictionary } from "../../../../../util/constants/callToActions";
+import PropTypes from "prop-types"
+import React, { memo, useCallback, useEffect, useState } from "react"
+import makeStyles from "@mui/styles/makeStyles"
+import { Box, Dialog, DialogTitle, IconButton, Typography } from "@mui/material"
+import CallToActionForm from "./CallToActionForm"
+import CloseIcon from "@mui/icons-material/Close"
+import CallToActionTypeMenu from "./CallToActionTypeMenu"
+import { callToActionsDictionary } from "../../../../../util/constants/callToActions"
 
 const useStyles = makeStyles((theme) => ({
    closeBtn: {
       marginLeft: "auto",
    },
-}));
+}))
 
-const { social } = callToActionsDictionary;
+const { social } = callToActionsDictionary
 
 const defaultInitialValues = {
    message: social.message,
@@ -41,11 +35,11 @@ const defaultInitialValues = {
    socialData: {
       socialType: social.socialTypes.linkedIn.socialType,
    },
-};
+}
 
 const CallToActionFormModal = memo(
    ({ onClose, open, callToActionToEdit, isTestStream }) => {
-      const [initialValues, setInitialValues] = useState(defaultInitialValues);
+      const [initialValues, setInitialValues] = useState(defaultInitialValues)
 
       const buildSocialCtaInitialValues = (cta) => {
          return {
@@ -54,8 +48,8 @@ const CallToActionFormModal = memo(
                   cta.socialData?.socialType ||
                   defaultInitialValues.socialData.socialType,
             },
-         };
-      };
+         }
+      }
 
       const buildJobPostingCtaInitialValues = (cta) => {
          return {
@@ -68,18 +62,18 @@ const CallToActionFormModal = memo(
                isAtsPosition: cta.jobData?.isAtsPosition || false,
                atsUuid: cta.jobData?.atsUuid || "",
             },
-         };
-      };
+         }
+      }
 
       const buildCustomCtaInitialValues = (cta) => {
          return {
             buttonText: cta.buttonText,
-         };
-      };
+         }
+      }
 
       useEffect(() => {
          if (callToActionToEdit) {
-            let cta = callToActionToEdit;
+            let cta = callToActionToEdit
             const newInitialValues = {
                type: cta.type,
                id: cta.id,
@@ -98,16 +92,16 @@ const CallToActionFormModal = memo(
                ...buildSocialCtaInitialValues(cta),
                ...buildJobPostingCtaInitialValues(cta),
                ...buildCustomCtaInitialValues(cta),
-            };
-            setInitialValues(newInitialValues);
+            }
+            setInitialValues(newInitialValues)
          } else {
-            setInitialValues({ ...defaultInitialValues });
+            setInitialValues({ ...defaultInitialValues })
          }
-      }, [callToActionToEdit]);
+      }, [callToActionToEdit])
 
       const handleClose = useCallback(() => {
-         onClose();
-      }, [onClose]);
+         onClose()
+      }, [onClose])
 
       const handleSetCallToActionType = ({
          newType,
@@ -125,8 +119,8 @@ const CallToActionFormModal = memo(
             value: newValue,
             color: newColor,
             title: newTitle,
-         });
-      };
+         })
+      }
 
       return (
          <Dialog maxWidth="md" fullWidth onClose={handleClose} open={open}>
@@ -145,11 +139,11 @@ const CallToActionFormModal = memo(
                      </IconButton>
                   </Box>
                </Box>
+               <CallToActionTypeMenu
+                  initialValues={initialValues}
+                  handleSetCallToActionType={handleSetCallToActionType}
+               />
             </DialogTitle>
-            <CallToActionTypeMenu
-               initialValues={initialValues}
-               handleSetCallToActionType={handleSetCallToActionType}
-            />
             <CallToActionForm
                initialValues={initialValues}
                isTestStream={isTestStream}
@@ -159,9 +153,9 @@ const CallToActionFormModal = memo(
                isJobPosting={initialValues.type === "jobPosting"}
             />
          </Dialog>
-      );
+      )
    }
-);
+)
 
 CallToActionFormModal.propTypes = {
    callToActionToEdit: PropTypes.shape({
@@ -173,6 +167,6 @@ CallToActionFormModal.propTypes = {
    }),
    onClose: PropTypes.func.isRequired,
    open: PropTypes.bool.isRequired,
-};
+}
 
-export default CallToActionFormModal;
+export default CallToActionFormModal

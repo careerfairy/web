@@ -1,23 +1,23 @@
-import PropTypes from "prop-types";
-import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
-import { AppBar, Box, CircularProgress, Tabs } from "@mui/material";
-import { useAuth } from "../../../../../HOCs/AuthProvider";
-import NewStreamModal from "./NewStreamModal";
-import { useRouter } from "next/router";
+import PropTypes from "prop-types"
+import React, { Fragment, useCallback, useEffect, useState } from "react"
+import { alpha } from "@mui/material/styles"
+import makeStyles from "@mui/styles/makeStyles"
+import { AppBar, Box, CircularProgress, Tabs } from "@mui/material"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
+import NewStreamModal from "./NewStreamModal"
+import { useRouter } from "next/router"
 import {
    prettyLocalizedDate,
    repositionElement,
-} from "../../../../helperFunctions/HelperFunctions";
-import Tab from "@mui/material/Tab";
-import Header from "./Header";
-import EventsTable from "./events-table/EventsTable";
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
-import { v4 as uuidv4 } from "uuid";
-import * as actions from "store/actions";
-import { useDispatch } from "react-redux";
-import DataAccessUtil from "../../../../../util/DataAccessUtil";
+} from "../../../../helperFunctions/HelperFunctions"
+import Tab from "@mui/material/Tab"
+import Header from "./Header"
+import EventsTable from "./events-table/EventsTable"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { v4 as uuidv4 } from "uuid"
+import * as actions from "store/actions"
+import { useDispatch } from "react-redux"
+import DataAccessUtil from "../../../../../util/DataAccessUtil"
 
 const useStyles = makeStyles((theme) => ({
    containerRoot: {
@@ -40,12 +40,12 @@ const useStyles = makeStyles((theme) => ({
    title: {
       background: theme.palette.common.white,
    },
-}));
+}))
 
 const EventsOverview = ({ group, scrollRef }) => {
-   const classes = useStyles();
-   const dispatch = useDispatch();
-   const { userData, authenticatedUser } = useAuth();
+   const classes = useStyles()
+   const dispatch = useDispatch()
+   const { userData, authenticatedUser } = useAuth()
    const {
       listenToDraftLiveStreamsByGroupId,
       listenToUpcomingLiveStreamsByGroupId,
@@ -54,42 +54,43 @@ const EventsOverview = ({ group, scrollRef }) => {
       addLivestream,
       deleteLivestream,
       getAllGroupAdminInfo,
-   } = useFirebaseService();
-   const [streams, setStreams] = useState([]);
-   const [openNewStreamModal, setOpenNewStreamModal] = useState(false);
-   const [tabValue, setTabValue] = useState("upcoming");
-   const [fetching, setFetching] = useState(false);
-   const [currentStream, setCurrentStream] = useState(null);
-   const [fetchingQueryEvent, setFetchingQueryEvent] = useState(false);
-   const [triggered, setTriggered] = useState(false);
-   const [publishingDraft, setPublishingDraft] = useState(false);
-   const [groupsDictionary, setGroupsDictionary] = useState({});
+      sendNewlyPublishedEventEmail,
+   } = useFirebaseService()
+   const [streams, setStreams] = useState([])
+   const [openNewStreamModal, setOpenNewStreamModal] = useState(false)
+   const [tabValue, setTabValue] = useState("upcoming")
+   const [fetching, setFetching] = useState(false)
+   const [currentStream, setCurrentStream] = useState(null)
+   const [fetchingQueryEvent, setFetchingQueryEvent] = useState(false)
+   const [triggered, setTriggered] = useState(false)
+   const [publishingDraft, setPublishingDraft] = useState(false)
+   const [groupsDictionary, setGroupsDictionary] = useState({})
 
    const {
       query: { eventId },
       replace,
       asPath,
-   } = useRouter();
+   } = useRouter()
 
    useEffect(() => {
       if (group?.id) {
-         let query;
+         let query
          if (tabValue === "upcoming") {
-            query = listenToUpcomingLiveStreamsByGroupId;
+            query = listenToUpcomingLiveStreamsByGroupId
          } else if (tabValue === "past") {
-            query = listenToPastLiveStreamsByGroupId;
+            query = listenToPastLiveStreamsByGroupId
          } else {
-            query = listenToDraftLiveStreamsByGroupId;
+            query = listenToDraftLiveStreamsByGroupId
          }
-         setFetching(true);
+         setFetching(true)
          const unsubscribe = query(group.id, (querySnapshot) => {
             if (
                tabValue === "upcoming" &&
                !querySnapshot.docs.length &&
                !triggered
             ) {
-               setTabValue("past");
-               setTriggered(true);
+               setTabValue("past")
+               setTriggered(true)
             }
             const streamsData = querySnapshot.docs.map((doc) => ({
                id: doc.id,
@@ -97,39 +98,39 @@ const EventsOverview = ({ group, scrollRef }) => {
                rowID: doc.id,
                date: doc.data().start?.toDate?.(),
                ...doc.data(),
-            }));
+            }))
 
             if (eventId) {
                const queryEventIndex = streamsData.findIndex(
                   (el) => el.id === eventId
-               );
+               )
                if (queryEventIndex > -1) {
-                  repositionElement(streamsData, queryEventIndex, 0);
+                  repositionElement(streamsData, queryEventIndex, 0)
                }
             }
-            setStreams(streamsData);
-            setFetching(false);
-         });
-         return () => unsubscribe();
+            setStreams(streamsData)
+            setFetching(false)
+         })
+         return () => unsubscribe()
       }
-   }, [tabValue]);
+   }, [tabValue])
 
    useEffect(() => {
       if (eventId) {
-         (async function getQueryEvent() {
+         ;(async function getQueryEvent() {
             try {
-               setFetchingQueryEvent(true);
+               setFetchingQueryEvent(true)
                const { targetStream, typeOfStream } = await findTargetEvent(
                   eventId
-               );
+               )
                if (typeOfStream && targetStream) {
-                  setTabValue(typeOfStream);
+                  setTabValue(typeOfStream)
                }
             } catch (e) {}
-            setFetchingQueryEvent(false);
-         })();
+            setFetchingQueryEvent(false)
+         })()
       }
-   }, [eventId]);
+   }, [eventId])
 
    const getAuthor = (livestream) => {
       return livestream?.author?.email
@@ -137,75 +138,71 @@ const EventsOverview = ({ group, scrollRef }) => {
          : {
               email: authenticatedUser.email,
               ...(group?.id && { groupId: group.id }),
-           };
-   };
+           }
+   }
    const handlePublishStream = useCallback(
       async (streamObj) => {
          try {
-            setPublishingDraft(true);
-            const newStream = { ...streamObj };
-            newStream.companyId = uuidv4();
-            const author = getAuthor(newStream);
+            setPublishingDraft(true)
+            const newStream = { ...streamObj }
+            newStream.companyId = uuidv4()
+            const author = getAuthor(newStream)
             const publishedStreamId = await addLivestream(
                newStream,
                "livestreams",
                author
-            );
-            newStream.id = publishedStreamId;
+            )
+            newStream.id = publishedStreamId
 
-            const submitTime = prettyLocalizedDate(new Date());
+            const submitTime = prettyLocalizedDate(new Date())
             const adminsInfo = await getAllGroupAdminInfo(
                newStream.groupIds || [],
                streamObj.id
-            );
+            )
 
-            const senderName = `${userData.firstName} ${userData.lastName}`;
-            const senderEmail = userData.userEmail;
+            const senderName = `${userData.firstName} ${userData.lastName}`
 
-            await DataAccessUtil.sendNewlyPublishedEventEmail({
-               adminsInfo,
+            await sendNewlyPublishedEventEmail({
+               adminsInfo: adminsInfo || [],
                senderName,
                stream: newStream,
                submitTime,
-               senderEmail,
-            });
-            await deleteLivestream(streamObj.id, "draftLivestreams");
-            await replace(
-               asPath,
-               { query: { eventId: publishedStreamId } },
-               { shallow: true }
-            );
+            })
+            await deleteLivestream(streamObj.id, "draftLivestreams")
+            replace(
+               `/group/${group.id}/admin/events?eventId=${publishedStreamId}`
+            )
          } catch (e) {
-            setPublishingDraft(false);
-            dispatch(actions.sendGeneralError(e));
+            setPublishingDraft(false)
+            dispatch(actions.sendGeneralError(e))
          }
       },
-      [dispatch, userData]
-   );
+      [dispatch, userData, group.id, replace]
+   )
 
    const handleChange = (event, newValue) => {
-      setTabValue(newValue);
-   };
+      setTabValue(newValue)
+   }
 
    const handleOpenNewStreamModal = () => {
-      setOpenNewStreamModal(true);
-   };
+      setOpenNewStreamModal(true)
+   }
 
    const handleCloseNewStreamModal = () => {
-      handleResetCurrentStream();
-      setOpenNewStreamModal(false);
-   };
+      handleResetCurrentStream()
+      setOpenNewStreamModal(false)
+   }
 
    const handleResetCurrentStream = () => {
-      setCurrentStream(null);
-   };
+      setCurrentStream(null)
+   }
 
    const handleEditStream = (streamObj) => {
       if (streamObj) {
-         setCurrentStream(streamObj);
-         handleOpenNewStreamModal();
+         setCurrentStream(streamObj)
+         handleOpenNewStreamModal()
       }
-   };
+   }
 
    return (
       <Fragment>
@@ -275,12 +272,12 @@ const EventsOverview = ({ group, scrollRef }) => {
             onClose={handleCloseNewStreamModal}
          />
       </Fragment>
-   );
-};
+   )
+}
 
 EventsOverview.propTypes = {
    group: PropTypes.object,
    isAdmin: PropTypes.bool,
-};
+}
 
-export default EventsOverview;
+export default EventsOverview

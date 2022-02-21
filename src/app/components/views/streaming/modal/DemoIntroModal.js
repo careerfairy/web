@@ -1,21 +1,31 @@
-import React, { useState } from "react";
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
+import React, { useState } from "react"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import {
+   Box,
    Button,
+   Checkbox,
    CircularProgress,
    DialogActions,
    DialogContent,
    DialogContentText,
    DialogTitle,
-} from "@mui/material";
-import { GlassDialog } from "materialUI/GlobalModals";
-import { v4 as uuid } from "uuid";
-import useStreamRef from "../../../custom-hook/useStreamRef";
+   FormControlLabel,
+} from "@mui/material"
+import { GlassDialog } from "materialUI/GlobalModals"
+import { v4 as uuid } from "uuid"
+import useStreamRef from "../../../custom-hook/useStreamRef"
+import { useLocalStorage } from "react-use"
 
 const DemoIntroModal = ({ open, handleClose }) => {
-   const firebase = useFirebaseService();
-   const [loading, setLoading] = useState(false);
-   const streamRef = useStreamRef();
+   const firebase = useFirebaseService()
+   const [loading, setLoading] = useState(false)
+   const streamRef = useStreamRef()
+   const [_, setHasDismissedStreamTutorial] = useLocalStorage(
+      "hasDismissedStreamTutorial",
+      false
+   )
+
+   const [dismissTutorial, setDismissTutorial] = useState(false)
 
    const createTestLivestream = async () => {
       const testChatEntries = [
@@ -37,7 +47,7 @@ const DemoIntroModal = ({ open, handleClose }) => {
             message: "Hi there!",
             timestamp: firebase.getFirebaseTimestamp("March 17, 2020 03:44:00"),
          },
-      ];
+      ]
       const testQuestionsEntries = [
          {
             author: "john@ethz.ch",
@@ -53,7 +63,7 @@ const DemoIntroModal = ({ open, handleClose }) => {
             timestamp: firebase.getFirebaseTimestamp("March 17, 2020 03:34:00"),
             votes: 20,
          },
-      ];
+      ]
       const testPolls = [
          {
             question: "What should we discuss next?",
@@ -74,24 +84,25 @@ const DemoIntroModal = ({ open, handleClose }) => {
             ],
             timestamp: firebase.getFirebaseTimestamp("March 17, 2020 03:24:00"),
          },
-      ];
+      ]
       try {
-         setLoading(true);
+         setLoading(true)
          await firebase.resetTestStream(
             streamRef,
             testChatEntries,
             testQuestionsEntries,
             testPolls
-         );
-         handleClose(true); // handleClose should trigger some emotes
+         )
+         handleClose(true) // handleClose should trigger some emotes
       } catch (e) {
-         console.log(e);
+         console.log(e)
       }
-   };
+   }
 
    const handleStartDemo = async () => {
-      await createTestLivestream();
-   };
+      setHasDismissedStreamTutorial(dismissTutorial)
+      await createTestLivestream()
+   }
 
    return (
       <GlassDialog open={open}>
@@ -99,6 +110,20 @@ const DemoIntroModal = ({ open, handleClose }) => {
          <DialogContent>
             <DialogContentText>
                Would you like to partake in the tutorial?
+               <Box sx={{ pt: 1 }}>
+                  <FormControlLabel
+                     control={
+                        <Checkbox
+                           checked={dismissTutorial}
+                           onChange={(event) => {
+                              setDismissTutorial(event.target.checked)
+                           }}
+                           name="stream-tutorial-prompt-dismiss"
+                        />
+                     }
+                     label="Don't prompt me again."
+                  />
+               </Box>
             </DialogContentText>
          </DialogContent>
 
@@ -115,7 +140,10 @@ const DemoIntroModal = ({ open, handleClose }) => {
                Yes Please
             </Button>
             <Button
-               onClick={() => handleClose(false)}
+               onClick={() => {
+                  setHasDismissedStreamTutorial(dismissTutorial)
+                  handleClose(false)
+               }}
                color="grey"
                disabled={loading}
             >
@@ -123,7 +151,7 @@ const DemoIntroModal = ({ open, handleClose }) => {
             </Button>
          </DialogActions>
       </GlassDialog>
-   );
-};
+   )
+}
 
-export default DemoIntroModal;
+export default DemoIntroModal

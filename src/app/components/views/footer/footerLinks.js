@@ -37,8 +37,8 @@ const footerLinks = [
       category: "3",
       links: [
          {
-            label: "Team",
-            href: "/team",
+            label: "About us",
+            href: "/about-us",
          },
          {
             label: "Companies",
@@ -50,6 +50,6 @@ const footerLinks = [
          },
       ],
    },
-];
+]
 
-export default footerLinks;
+export default footerLinks

@@ -1,33 +1,33 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
-import { useAuth } from "HOCs/AuthProvider";
-import { SpeedDial, SpeedDialAction } from '@mui/material';
-import SpeedDialIcon from '@mui/material/SpeedDialIcon';
-import SpyIcon from "@mui/icons-material/Visibility";
-import RecordIcon from "@mui/icons-material/FiberManualRecord";
-import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
-import * as actions from "store/actions";
-import { useCurrentStream } from "context/stream/StreamContext";
-import ConfirmRecordingDialog from "../../../admin/streams/StreamsContainer/StreamCard/ConfirmRecordingDialog";
-import StopRecordingIcon from "@mui/icons-material/Stop";
-import StartRecordingIcon from "@mui/icons-material/PlayCircleFilledWhite";
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { useTheme } from "@mui/material/styles"
+import makeStyles from "@mui/styles/makeStyles"
+import { useAuth } from "HOCs/AuthProvider"
+import { SpeedDial, SpeedDialAction } from "@mui/material"
+import SpeedDialIcon from "@mui/material/SpeedDialIcon"
+import SpyIcon from "@mui/icons-material/Visibility"
+import RecordIcon from "@mui/icons-material/FiberManualRecord"
+import { useRouter } from "next/router"
+import { useDispatch, useSelector } from "react-redux"
+import * as actions from "store/actions"
+import { useCurrentStream } from "context/stream/StreamContext"
+import ConfirmRecordingDialog from "../../../admin/streams/StreamsContainer/StreamCard/ConfirmRecordingDialog"
+import StopRecordingIcon from "@mui/icons-material/Stop"
+import StartRecordingIcon from "@mui/icons-material/PlayCircleFilledWhite"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import {
    CircularProgress,
    Tooltip,
    Typography,
    useMediaQuery,
-} from "@mui/material";
-import useStreamRef from "../../../../custom-hook/useStreamRef";
-import SettingsIcon from "@mui/icons-material/Settings";
-import Box from "@mui/material/Box";
-import ConfirmStartStreamingDialog from "./ConfirmStartStreamingDialog";
-import JoinAsStreamerIcon from "@mui/icons-material/RecordVoiceOver";
-import useStreamToken from "../../../../custom-hook/useStreamToken";
-import clsx from "clsx";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+} from "@mui/material"
+import useStreamRef from "../../../../custom-hook/useStreamRef"
+import SettingsIcon from "@mui/icons-material/Settings"
+import Box from "@mui/material/Box"
+import ConfirmStartStreamingDialog from "./ConfirmStartStreamingDialog"
+import JoinAsStreamerIcon from "@mui/icons-material/RecordVoiceOver"
+import useStreamToken from "../../../../custom-hook/useStreamToken"
+import clsx from "clsx"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -64,113 +64,135 @@ const useStyles = makeStyles((theme) => ({
    rotated: {
       transform: `rotate(180deg)`,
    },
-}));
+}))
 
 const SpyingOverlay = () => {
-   const classes = useStyles();
+   const classes = useStyles()
    return (
       <Box className={classes.overlayRoot}>
          <Typography className={classes.overlayText} variant="h1">
             CURRENTLY SPYING!
          </Typography>
       </Box>
-   );
-};
+   )
+}
 
 const SuperAdminControls = () => {
-   const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down('md'));
-   const { joiningStreamerLink, viewerLink } = useStreamToken();
-   const { userData } = useAuth();
-   const streamRef = useStreamRef();
-   const { currentLivestream, isStreamer, isBreakout } = useCurrentStream();
+   const theme = useTheme()
+   const mobile = useMediaQuery(theme.breakpoints.down("md"))
+   const { joiningStreamerLink, viewerLink } = useStreamToken()
+   const { userData } = useAuth()
+   const streamRef = useStreamRef()
+   const { currentLivestream, isStreamer, isBreakout } = useCurrentStream()
    const {
-      query: { spy },
-   } = useRouter();
-   const [open, setOpen] = useState(false);
-   const firebase = useFirebaseService();
-   const dispatch = useDispatch();
-   const [streamStateChanging, setStreamStateChanging] = useState(false);
+      query: { spy, livestreamId, breakoutRoomId },
+   } = useRouter()
+   const [open, setOpen] = useState(false)
+   const firebase = useFirebaseService()
+   const dispatch = useDispatch()
+   const [streamStateChanging, setStreamStateChanging] = useState(false)
    const spyModeEnabled = useSelector(
       (state) => state.stream.streaming.spyModeEnabled
-   );
+   )
    const recordingRequestOngoing = useSelector(
       (state) => state.streamAdmin.recording.recordingRequestOngoing
-   );
+   )
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
-   );
+   )
    const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] = useState(
       false
-   );
+   )
    const [
       confirmStartStreamingDialogOpen,
       setConfirmStartStreamingDialogOpen,
-   ] = useState(false);
+   ] = useState(false)
 
    useEffect(() => {
       if (spy === "true" && userData?.isAdmin && !isStreamer) {
-         dispatch(actions.setSpyMode(true));
-         setOpen(true);
+         dispatch(actions.setSpyMode(true))
+         setOpen(true)
       }
-   }, [spy, dispatch.userData?.isAdmin, isStreamer]);
+   }, [spy, dispatch.userData?.isAdmin, isStreamer])
 
-   const classes = useStyles();
+   const classes = useStyles()
 
    const handleStartRecording = async () => {
-      dispatch(
-         actions.handleStartRecording({
-            firebase,
-            streamId: currentLivestream?.id,
-         })
-      );
-   };
+      if (isBreakout && breakoutRoomId) {
+         dispatch(
+            actions.handleStartRecording({
+               firebase,
+               streamId: livestreamId,
+               isBreakout,
+               breakoutRoomId,
+            })
+         )
+      } else {
+         dispatch(
+            actions.handleStartRecording({
+               firebase,
+               streamId: currentLivestream?.id,
+            })
+         )
+      }
+   }
 
    const toggleStreamStarted = useCallback(async () => {
       try {
-         setStreamStateChanging(true);
+         setStreamStateChanging(true)
          await firebase.setLivestreamHasStarted(
             Boolean(!currentLivestream?.hasStarted),
             streamRef
-         );
+         )
       } catch (e) {
-         dispatch(actions.sendGeneralError(e));
+         dispatch(actions.sendGeneralError(e))
       }
-      setStreamStateChanging(false);
-   }, [currentLivestream?.hasStarted]);
+      setStreamStateChanging(false)
+   }, [currentLivestream?.hasStarted])
 
    const handleStopRecording = async () => {
-      dispatch(
-         actions.handleStopRecording({
-            firebase,
-            streamId: currentLivestream?.id,
-         })
-      );
-   };
+      if (isBreakout && breakoutRoomId) {
+         dispatch(
+            actions.handleStopRecording({
+               firebase,
+               streamId: livestreamId,
+               isBreakout,
+               breakoutRoomId,
+            })
+         )
+      } else {
+         dispatch(
+            actions.handleStopRecording({
+               firebase,
+               streamId: currentLivestream?.id,
+            })
+         )
+      }
+   }
 
    const handleOpenConfirmRecordingDialog = () => {
-      setConfirmRecordingDialogOpen(true);
-   };
+      setConfirmRecordingDialogOpen(true)
+   }
    const handleCloseConfirmRecordingDialog = () => {
-      setConfirmRecordingDialogOpen(false);
-   };
+      setConfirmRecordingDialogOpen(false)
+   }
    const handleOpenConfirmStartStreamingDialog = () => {
-      setConfirmStartStreamingDialogOpen(true);
-   };
+      setConfirmStartStreamingDialogOpen(true)
+   }
    const handleCloseConfirmStartStreamingDialog = () => {
-      setConfirmStartStreamingDialogOpen(false);
-   };
+      setConfirmStartStreamingDialogOpen(false)
+   }
 
    const toggle = () => {
-      setOpen(!open);
-   };
+      setOpen(!open)
+   }
 
    const handleJoinAsViewer = async () => {
-      window?.open(viewerLink, "_self");
-   };
+      window?.open(viewerLink, "_self")
+   }
    const handleJoinAsStreamer = async () => {
-      window?.open(joiningStreamerLink, "_self");
-   };
+      window?.open(joiningStreamerLink, "_self")
+   }
 
    const superAdminActions = useMemo(
       () =>
@@ -200,7 +222,7 @@ const SuperAdminControls = () => {
                disabled: recordingRequestOngoing,
                loading: recordingRequestOngoing,
                active: currentLivestream?.isRecording,
-               hidden: isBreakout || currentLivestream?.test,
+               hidden: currentLivestream?.test,
             },
             {
                icon: <SpyIcon color={spyModeEnabled ? "primary" : "action"} />,
@@ -242,10 +264,10 @@ const SuperAdminControls = () => {
          isBreakout,
          mobile,
       ]
-   );
+   )
 
    if (!userData?.isAdmin) {
-      return;
+      return
    }
 
    return (
@@ -333,7 +355,7 @@ const SuperAdminControls = () => {
             }
          />
       </>
-   );
-};
+   )
+}
 
-export default SuperAdminControls;
+export default SuperAdminControls

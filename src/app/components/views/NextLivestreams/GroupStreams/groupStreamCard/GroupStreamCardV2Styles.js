@@ -1,4 +1,4 @@
-import { alpha } from "@mui/material/styles";
+import { alpha } from "@mui/material/styles"
 
 export default {
    cardHovered: {
@@ -71,12 +71,12 @@ export default {
       justifyContent: "space-evenly",
    },
    avatar: {
-      width: "48px",
-      height: "48px",
+      width: 45,
+      height: 45,
    },
    groupLogo: {
-      width: "75px",
-      height: "75px",
+      width: { xs: 60, lg: 60 },
+      height: { xs: 60, lg: 60 },
       background: (theme) => theme.palette.common.white,
       "& img": {
          objectFit: "contain",
@@ -205,4 +205,4 @@ export default {
       fontWeight: "bold",
       color: (theme) => theme.palette.common.white,
    },
-};
+}

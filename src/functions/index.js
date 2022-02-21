@@ -121,6 +121,8 @@ exports.updateUserDataAnalytcicsOnWrite =
 //Recording
 exports.startRecordingLivestream = recording.startRecordingLivestream;
 exports.stopRecordingLivestream = recording.stopRecordingLivestream;
+exports.startRecordingBreakoutRoom = recording.startRecordingBreakoutRoom;
+exports.stopRecordingBreakoutRoom = recording.stopRecordingBreakoutRoom;
 exports.startRecordingLivestreamApi = recording.startRecordingLivestreamApi;
 exports.stopRecordingLivestreamApi = recording.stopRecordingLivestreamApi;
 

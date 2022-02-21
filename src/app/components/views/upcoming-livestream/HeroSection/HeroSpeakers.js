@@ -1,13 +1,18 @@
-import React from "react";
-import { Avatar, AvatarGroup, Box, Typography } from "@mui/material";
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
-import { speakerPlaceholder } from "../../../util/constants";
+import React from "react"
+import { Avatar, AvatarGroup, Box, Typography } from "@mui/material"
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
+import { speakerPlaceholder } from "../../../util/constants"
 
 const styles = {
    avatar: (theme) => ({
-      [theme.breakpoints.up("sm")]: {
-         width: theme.spacing(8),
-         height: theme.spacing(8),
+      background: "white",
+      width: {
+         sm: theme.spacing(8),
+         md: theme.spacing(14),
+      },
+      height: {
+         sm: theme.spacing(8),
+         md: theme.spacing(14),
       },
    }),
    speakerRoot: {
@@ -24,7 +29,7 @@ const styles = {
    speakerInfo: {
       padding: (theme) => theme.spacing(0, 2),
    },
-};
+}
 
 const HeroSpeakers = ({ speakers }) => {
    return speakers.length === 1 ? (
@@ -64,7 +69,7 @@ const HeroSpeakers = ({ speakers }) => {
             />
          ))}
       </AvatarGroup>
-   );
-};
+   )
+}
 
-export default HeroSpeakers;
+export default HeroSpeakers

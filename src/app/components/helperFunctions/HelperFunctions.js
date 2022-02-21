@@ -1,19 +1,19 @@
-import { isEmpty } from "lodash/fp";
-import React from "react";
-import { LONG_NUMBER } from "../util/constants";
-import { v4 as uuidv4 } from "uuid";
+import { isEmpty } from "lodash/fp"
+import React from "react"
+import { LONG_NUMBER } from "../util/constants"
+import { v4 as uuidv4 } from "uuid"
 
-var dayjs = require("dayjs");
-var relativeTime = require("dayjs/plugin/relativeTime");
-var localizedFormat = require("dayjs/plugin/localizedFormat");
-var advancedFormat = require("dayjs/plugin/advancedFormat");
-var utc = require("dayjs/plugin/utc"); // dependent on utc plugin
-var timezone = require("dayjs/plugin/timezone");
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.extend(advancedFormat);
-dayjs.extend(localizedFormat);
-dayjs.extend(relativeTime);
+var dayjs = require("dayjs")
+var relativeTime = require("dayjs/plugin/relativeTime")
+var localizedFormat = require("dayjs/plugin/localizedFormat")
+var advancedFormat = require("dayjs/plugin/advancedFormat")
+var utc = require("dayjs/plugin/utc") // dependent on utc plugin
+var timezone = require("dayjs/plugin/timezone")
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(advancedFormat)
+dayjs.extend(localizedFormat)
+dayjs.extend(relativeTime)
 
 /**
  * @param {string} location
@@ -29,133 +29,133 @@ export const uploadLogo = (
    callback,
    progressCallback
 ) => {
-   var storageRef = firebase.getStorageRef();
-   let splitters = [" ", "(", ")", "-"];
-   let fileName = fileObject.name;
+   var storageRef = firebase.getStorageRef()
+   let splitters = [" ", "(", ")", "-"]
+   let fileName = fileObject.name
    let imageName = splitters
       .reduce((old, c) => old.map((v) => v.split(c)).flat(), [fileName])
-      .join("_");
+      .join("_")
    if (imageName.length > 10) {
-      imageName = imageName.slice(-10);
+      imageName = imageName.slice(-10)
    }
-   let fullPath = `${location}/${uuidv4()}_${imageName}`;
-   let companyLogoRef = storageRef.child(fullPath);
-   var uploadTask = companyLogoRef.put(fileObject);
+   let fullPath = `${location}/${uuidv4()}_${imageName}`
+   let companyLogoRef = storageRef.child(fullPath)
+   var uploadTask = companyLogoRef.put(fileObject)
 
    uploadTask.on(
       "state_changed",
       function (snapshot) {
          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-         console.log("Upload is " + progress + "% done");
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+         console.log("Upload is " + progress + "% done")
          if (progressCallback) {
             progressCallback({
                state: snapshot.state,
                progress,
-            });
+            })
          }
          switch (snapshot.state) {
             case "paused":
-               console.log("Upload is paused");
-               break;
+               console.log("Upload is paused")
+               break
             case "running":
-               console.log("Upload is running");
-               break;
+               console.log("Upload is running")
+               break
             default:
-               break;
+               break
          }
       },
       function (error) {
          switch (error.code) {
             case "storage/unauthorized":
                // User doesn't have permission to access the object
-               break;
+               break
 
             case "storage/canceled":
                // User canceled the upload
-               break;
+               break
 
             case "storage/unknown":
                // Unknown error occurred, inspect error.serverResponse
-               break;
+               break
             default:
-               break;
+               break
          }
       },
       function () {
          // Upload completed successfully, now we can get the download URL
          uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-            console.log("-> downloadURL", downloadURL);
-            callback(downloadURL, fullPath);
-            console.log("File available at", downloadURL);
-         });
+            console.log("-> downloadURL", downloadURL)
+            callback(downloadURL, fullPath)
+            console.log("File available at", downloadURL)
+         })
       }
-   );
-};
+   )
+}
 
 export const timeAgo = (date = new Date()) => {
-   return dayjs(date).fromNow();
-};
+   return dayjs(date).fromNow()
+}
 
 export function getTimeFromNow(firebaseTimestamp) {
    if (firebaseTimestamp) {
-      const dateString = dayjs(firebaseTimestamp.toDate()).fromNow();
+      const dateString = dayjs(firebaseTimestamp.toDate()).fromNow()
       if (dateString === "in a few seconds") {
-         return "just now";
+         return "just now"
       } else {
-         return dateString;
+         return dateString
       }
    } else {
-      return "";
+      return ""
    }
 }
 
 export const prettyDate = (firebaseTimestamp) => {
    if (firebaseTimestamp) {
-      return dayjs(firebaseTimestamp.toDate()).format("LL LT");
+      return dayjs(firebaseTimestamp.toDate()).format("LL LT")
    } else {
-      return "";
+      return ""
    }
-};
+}
 export const prettyLocalizedDate = (javascriptDate) => {
    if (javascriptDate) {
-      return dayjs(javascriptDate).format("LL LT zzz");
+      return dayjs(javascriptDate).format("LL LT zzz")
    } else {
-      return "";
+      return ""
    }
-};
+}
 
 export const repositionElement = (arr, fromIndex, toIndex) => {
-   const element = arr[fromIndex];
-   arr.splice(fromIndex, 1);
-   arr.splice(toIndex, 0, element);
-};
+   const element = arr[fromIndex]
+   arr.splice(fromIndex, 1)
+   arr.splice(toIndex, 0, element)
+}
 
 export const repositionElementInArray = (arr, fromIndex, toIndex) => {
-   const newArray = [...arr];
-   const element = arr[fromIndex];
-   newArray.splice(fromIndex, 1);
-   newArray.splice(toIndex, 0, element);
-   return newArray;
-};
+   const newArray = [...arr]
+   const element = arr[fromIndex]
+   newArray.splice(fromIndex, 1)
+   newArray.splice(toIndex, 0, element)
+   return newArray
+}
 
 export const getLength = (arr, prop) => {
    return arr.map((el) => {
-      return el?.[prop]?.length || 0;
-   });
-};
+      return el?.[prop]?.length || 0
+   })
+}
 
 export const isEmptyObject = (obj) => {
-   return isEmpty(obj);
-};
+   return isEmpty(obj)
+}
 
 export const isNotEmptyString = (myString) => {
-   return myString && myString.match(/^\s+$/) === null;
-};
+   return myString && myString.match(/^\s+$/) === null
+}
 
 export const isServer = () => {
-   return typeof window === "undefined";
-};
+   return typeof window === "undefined"
+}
 export const convertCamelToSentence = (string) => {
    if (typeof string === "string" || string instanceof String) {
       return (
@@ -163,61 +163,59 @@ export const convertCamelToSentence = (string) => {
             .replace(/([A-Z])/g, " $1")
             .charAt(0)
             .toUpperCase() + string.replace(/([A-Z])/g, " $1").slice(1)
-      );
+      )
    } else {
-      return "";
+      return ""
    }
-};
+}
 export const getServerSideRouterQuery = (queryKey, router) => {
    if (router.query[queryKey]) {
-      return router.query[queryKey];
+      return router.query[queryKey]
    } else {
-      const query = router.asPath.match(
-         new RegExp(`[&?]${queryKey}=(.*)(&|$)`)
-      );
+      const query = router.asPath.match(new RegExp(`[&?]${queryKey}=(.*)(&|$)`))
       if (query) {
-         return query[1];
+         return query[1]
       } else {
-         return null;
+         return null
       }
    }
-};
+}
 
 export const snapShotsToData = (snapShots) => {
-   let dataArray = [];
+   let dataArray = []
    snapShots.forEach((doc) => {
-      const data = doc.data();
-      data.id = doc.id;
-      dataArray.push(data);
-   });
-   return dataArray;
-};
+      const data = doc.data()
+      data.id = doc.id
+      dataArray.push(data)
+   })
+   return dataArray
+}
 
 export const singleSnapToData = (snapShot) => {
-   let data = {};
+   let data = {}
    if (snapShot.exists) {
-      data = snapShot.data();
-      data.id = snapShot.id;
+      data = snapShot.data()
+      data.id = snapShot.id
    }
-   return data;
-};
+   return data
+}
 
 export const MultilineText = ({ text }) => {
-   return text.split("\\n").map((item, i) => <p key={i}>{item}</p>);
-};
+   return text.split("\\n").map((item, i) => <p key={i}>{item}</p>)
+}
 
 export const copyStringToClipboard = (string) => {
-   navigator.clipboard.writeText(string);
-};
+   navigator.clipboard.writeText(string)
+}
 
 export const mustBeNumber = (value, decimals = 2) => {
    function round(value, decimals) {
-      return Number(Math.round(value + "e" + decimals) + "e-" + decimals);
+      return Number(Math.round(value + "e" + decimals) + "e-" + decimals)
    }
 
    // checks to see if value is an int or float, if not it will return zero
-   return Number.isFinite(value) ? round(value, decimals) : 0;
-};
+   return Number.isFinite(value) ? round(value, decimals) : 0
+}
 
 export const convertStringToArray = (string, maxChars = 30) => {
    // Split by spaces
@@ -231,112 +229,112 @@ export const convertStringToArray = (string, maxChars = 30) => {
                prev.length &&
                (prev[prev.length - 1] + " " + curr).length <= maxChars
             ) {
-               prev[prev.length - 1] += " " + curr;
+               prev[prev.length - 1] += " " + curr
             } else {
-               prev.push(curr);
+               prev.push(curr)
             }
-            return prev;
+            return prev
          }, [])
          .map((str) => str)
-   );
-};
+   )
+}
 
 export const mergeArrayOfObjects = (arr1, arr2, property) => {
-   let merged = [];
+   let merged = []
    for (let i = 0; i < arr1.length; i++) {
       merged.push({
          ...arr1[i],
          ...arr2.find((itmInner) => itmInner[property] === arr1[i][property]),
-      });
+      })
    }
-   return merged;
-};
+   return merged
+}
 
 export const getMinutes = (value) =>
-   value === LONG_NUMBER ? "stream Ends" : `${value} minutes`;
+   value === LONG_NUMBER ? "stream Ends" : `${value} minutes`
 
 export const dynamicSort = (property, reverse) => {
-   let sortOrder = reverse ? 1 : -1;
+   let sortOrder = reverse ? 1 : -1
    if (property[0] === "-") {
-      sortOrder = -1;
-      property = property.substr(1);
+      sortOrder = -1
+      property = property.substr(1)
    }
    return function (a, b) {
       /* next line works with strings and numbers,
        * and you may want to customize it to your needs
        */
       const result =
-         a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0;
-      return result * sortOrder;
-   };
-};
+         a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0
+      return result * sortOrder
+   }
+}
 export const truncate = (str, n) => {
-   return str.length > n ? str.substr(0, n - 1) + "..." : str;
-};
+   return str.length > n ? str.substr(0, n - 1) + "..." : str
+}
 
 export const getBaseUrl = () => {
-   let baseUrl = "https://careerfairy.io";
+   let baseUrl = "https://careerfairy.io"
    if (window?.location?.origin) {
-      baseUrl = window.location.origin;
+      baseUrl = window.location.origin
    }
-   return baseUrl;
-};
+   return baseUrl
+}
 
 export const maybePluralize = (count, noun, suffix = "s") =>
-   `${noun}${count !== 1 ? suffix : ""}`;
+   `${noun}${count !== 1 ? suffix : ""}`
 
 export const getMinutesPassed = (livestream) => {
-   const now = new Date();
+   const now = new Date()
    if (livestream?.start?.toDate()) {
-      const diff = Math.abs(now - livestream.start.toDate());
-      return Math.floor(diff / 1000 / 60);
+      const diff = Math.abs(now - livestream.start.toDate())
+      return Math.floor(diff / 1000 / 60)
    } else {
-      return null;
+      return null
    }
-};
+}
 
 export const addMinutes = (date, minutes) => {
-   return new Date(date.getTime() + minutes * 60000);
-};
+   return new Date(date.getTime() + minutes * 60000)
+}
 
 export const toTitleCase = (str) => {
    return str.replace(/\w\S*/g, function (txt) {
-      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-   });
-};
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+   })
+}
 
 export const makeExternalLink = (url) => {
    const urlPattern = new RegExp(
       /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/
-   );
-   let string = url;
+   )
+   let string = url
 
    if (urlPattern.test(string)) {
       //string is url
 
       ///clear http && https from string
-      string = string.replace("https://", "").replace("http://", "");
+      string = string.replace("https://", "").replace("http://", "")
 
       //add https to string
-      string = `https://${string}`;
+      string = `https://${string}`
    }
-   return string;
-};
+   return string
+}
 
 export const getRandomColor = () => {
-   const max = 0xffffff;
-   return "#" + Math.round(Math.random() * max).toString(16);
-};
+   const max = 0xffffff
+   return "#" + Math.round(Math.random() * max).toString(16)
+}
 
 export const getRandomInt = (min, max) => {
-   min = Math.ceil(min);
-   max = Math.floor(max);
-   return Math.floor(Math.random() * (max - min + 1)) + min;
-};
+   min = Math.ceil(min)
+   max = Math.floor(max)
+   return Math.floor(Math.random() * (max - min + 1)) + min
+}
 
 export const getRandomWeightedInt = (min, max, index) => {
-   return Math.floor((Math.random() * (max - min + 1) + min) / (index + 1));
-};
+   return Math.floor((Math.random() * (max - min + 1) + min) / (index + 1))
+}
 
 /**
  * Get Resized Url.
@@ -350,24 +348,24 @@ export const getResizedUrl = (url, size = "sm") => {
       sm: "400x400",
       md: "680x680",
       lg: "1200x900",
-   };
+   }
 
    if (typeof url === "undefined") {
-      return "";
+      return ""
    }
    if (typeof url !== "string") {
-      console.warn("Invalid url provided to getResizedUrl helper fn");
-      return "";
+      console.warn("Invalid url provided to getResizedUrl helper fn")
+      return ""
    }
 
-   const targetSize = imageSizes[size];
+   const targetSize = imageSizes[size]
 
    if (!targetSize) {
-      console.warn("provided wrong size, must be one of [xs, sm, md, lg]");
-      return url;
+      console.warn("provided wrong size, must be one of [xs, sm, md, lg]")
+      return url
    }
-   return url.replace(/.(?=[^.]*$)/, `_${targetSize}.`);
-};
+   return url.replace(/.(?=[^.]*$)/, `_${targetSize}.`)
+}
 
 /**
  * Get Responsive Resized Url.
@@ -384,40 +382,51 @@ export const getResponsiveResizedUrl = (
    mobileSize = "sm",
    desktopSize = "lg"
 ) => {
-   return getResizedUrl(url, isMobile ? mobileSize : desktopSize);
-};
+   return getResizedUrl(url, isMobile ? mobileSize : desktopSize)
+}
 
 export const addQueryParam = (url, queryParam) => {
-   if (!queryParam) return url;
+   if (!queryParam) return url
    if (url.includes("?")) {
-      return `${url}&${queryParam}`;
+      return `${url}&${queryParam}`
    }
-   return `${url}?${queryParam}`;
-};
+   return `${url}?${queryParam}`
+}
 
 export const addMinutesToDate = (date, minutes) => {
-   const newDate = new Date(date);
-   return new Date(newDate.getTime() + minutes * 60000);
-};
+   const newDate = new Date(date)
+   return new Date(newDate.getTime() + minutes * 60000)
+}
 
 export const shuffleArray = (array) =>
    array
       .map((value) => ({ value, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
-      .map(({ value }) => value);
+      .map(({ value }) => value)
 
 export const dataURLtoFile = (dataUrl, filename) => {
    let arr = dataUrl.split(","),
       mime = arr[0].match(/:(.*?);/)[1],
       bstr = atob(arr[1]),
       n = bstr.length,
-      u8arr = new Uint8Array(n);
+      u8arr = new Uint8Array(n)
 
    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
+      u8arr[n] = bstr.charCodeAt(n)
    }
-   const extension = mime.split("/")[1];
+   const extension = mime.split("/")[1]
    return new File([u8arr], `${filename}.${extension}`, {
       type: mime,
-   });
-};
+   })
+}
+
+export const getMaxLineStyles = (maxLines = 2) => ({
+   display: "-webkit-box",
+   boxOrient: "vertical",
+   lineClamp: maxLines,
+   WebkitLineClamp: maxLines,
+   overflow: "hidden",
+   textOverflow: "ellipsis",
+   "-webkit-line-clamp": maxLines,
+   "-webkit-box-orient": "vertical",
+})

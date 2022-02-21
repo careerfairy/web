@@ -1,14 +1,14 @@
-import React, { useCallback, useContext, useEffect } from "react";
-import StreamItem from "./StreamItem";
-import { useDispatch, useSelector } from "react-redux";
-import * as actions from "store/actions";
-import TutorialContext from "context/tutorials/TutorialContext";
+import React, { useCallback, useContext, useEffect } from "react"
+import StreamItem from "./StreamItem"
+import { useDispatch, useSelector } from "react-redux"
+import * as actions from "store/actions"
+import TutorialContext from "context/tutorials/TutorialContext"
 import {
    TooltipButtonComponent,
    TooltipText,
    TooltipTitle,
    WhiteTooltip,
-} from "materialUI/GlobalTooltips";
+} from "materialUI/GlobalTooltips"
 
 const RemoteStreamItem = ({
    speaker,
@@ -19,73 +19,75 @@ const RemoteStreamItem = ({
 }) => {
    const { getActiveTutorialStepKey, handleConfirmStep } = useContext(
       TutorialContext
-   );
-   const activeStep = getActiveTutorialStepKey();
-   const isScreenShareVideo = stream.uid.includes("screen");
+   )
+   const activeStep = getActiveTutorialStepKey()
+   const isScreenShareVideo = stream.uid.includes("screen")
 
    const {
       playAllRemoteVideos,
       muteAllRemoteVideos,
       unmuteFailedMutedRemoteVideos,
-   } = useSelector((state) => state.stream.streaming);
+   } = useSelector((state) => state.stream.streaming)
 
-   const dispatch = useDispatch();
+   const dispatch = useDispatch()
 
-   const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted());
+   const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted())
 
    useEffect(() => {
       if (stream.uid === "demoStream") {
-         generateDemoHandRaiser();
+         generateDemoHandRaiser()
       } else {
-         !muteAllRemoteVideos && playVideo();
+         !muteAllRemoteVideos && playVideo()
       }
-   }, [stream.uid, stream.videoTrack]);
+   }, [stream.uid, stream.videoTrack])
 
    useEffect(() => {
       if (playAllRemoteVideos) {
-         playVideo();
+         playVideo()
       }
-   }, [playAllRemoteVideos]);
+   }, [playAllRemoteVideos])
 
    useEffect(() => {
       if (unmuteFailedMutedRemoteVideos) {
-         stream?.audioTrack?.play();
+         stream?.audioTrack?.play()
       }
-   }, [unmuteFailedMutedRemoteVideos]);
+   }, [unmuteFailedMutedRemoteVideos])
 
    useEffect(() => {
       if (muteAllRemoteVideos) {
-         stream?.stream?.audioTrack?.stop();
+         stream?.stream?.audioTrack?.stop()
       } else {
-         stream?.stream?.audioTrack?.play();
+         stream?.stream?.audioTrack?.play()
       }
-   }, [muteAllRemoteVideos]);
+   }, [muteAllRemoteVideos])
 
    function playVideo() {
       try {
          if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
             stream.videoTrack?.play(stream.uid, {
                fit: isScreenShareVideo ? "contain" : "cover",
-            });
+            })
          }
       } catch (e) {
-         setAVideoIsMuted();
-         console.error("-> error in PLAY VIDEO", e);
+         setAVideoIsMuted()
+         console.error("-> error in PLAY VIDEO", e)
       }
    }
 
    const generateDemoHandRaiser = useCallback(() => {
-      let video = document.createElement("video");
-      const videoContainer = document.querySelector("#" + stream.uid);
-      videoContainer.appendChild(video);
-      video.src = stream.url;
-      video.loop = true;
-      video.play();
-   }, [stream.url]);
+      let video = document.createElement("video")
+      const videoContainer = document.querySelector("#" + stream.uid)
+      videoContainer.style.zIndex = 1000
+      videoContainer.style.backgroundColor = "black"
+      videoContainer.appendChild(video)
+      video.src = stream.url
+      video.loop = true
+      video.play()
+   }, [stream.url])
 
    return (
       <WhiteTooltip
-         placement="right"
+         placement="top"
          title={
             <React.Fragment>
                <TooltipTitle>Hand Raise (3/5)</TooltipTitle>
@@ -96,7 +98,7 @@ const RemoteStreamItem = ({
                {activeStep === 11 && (
                   <TooltipButtonComponent
                      onConfirm={() => {
-                        handleConfirmStep(11);
+                        handleConfirmStep(11)
                      }}
                      buttonText="Ok"
                   />
@@ -119,7 +121,7 @@ const RemoteStreamItem = ({
             videoMutedBackgroundImg={videoMutedBackgroundImg}
          />
       </WhiteTooltip>
-   );
-};
+   )
+}
 
-export default RemoteStreamItem;
+export default RemoteStreamItem

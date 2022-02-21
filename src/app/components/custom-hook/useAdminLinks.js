@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"
 import {
    BarChart2 as StatisticsIcon,
    Film as StreamIcon,
    User as ProfileIcon,
    Search as FindIcon,
-} from "react-feather";
-import { useAuth } from "../../HOCs/AuthProvider";
+} from "react-feather"
+import { useAuth } from "../../HOCs/AuthProvider"
 
 const initialHeaderLinks = [
    {
@@ -16,7 +16,7 @@ const initialHeaderLinks = [
       href: `/wishlist`,
       title: "WISHLIST",
    },
-];
+]
 const initialDrawerBottomLinks = [
    {
       href: `https://corporate.careerfairy.io/companies`,
@@ -26,15 +26,20 @@ const initialDrawerBottomLinks = [
       href: `https://corporate.careerfairy.io/career-center`,
       title: "FOR CAREER CENTERS",
    },
-];
+   {
+      href: `/about-us`,
+      title: "About Us",
+      basePath: "/about-us",
+   },
+]
 const useAdminLinks = () => {
-   const { authenticatedUser, userData } = useAuth();
+   const { authenticatedUser, userData } = useAuth()
 
-   const [headerLinks, setHeaderLinks] = useState(initialHeaderLinks);
+   const [headerLinks, setHeaderLinks] = useState(initialHeaderLinks)
    const [drawerBottomLinks, setDrawerBottomLinks] = useState(
       initialDrawerBottomLinks
-   );
-   const [drawerTopLinks, setDrawerTopLinks] = useState([]);
+   )
+   const [drawerTopLinks, setDrawerTopLinks] = useState([])
 
    useEffect(() => {
       if (authenticatedUser?.emailVerified) {
@@ -45,7 +50,7 @@ const useAdminLinks = () => {
                title: "FOLLOW GROUPS",
                basePath: "/groups",
             },
-         ]);
+         ])
 
          setDrawerBottomLinks([
             ...initialDrawerBottomLinks,
@@ -55,9 +60,9 @@ const useAdminLinks = () => {
                icon: ProfileIcon,
                basePath: "/profile",
             },
-         ]);
+         ])
       }
-   }, [authenticatedUser?.emailVerified]);
+   }, [authenticatedUser?.emailVerified])
 
    useEffect(() => {
       if (userData?.isAdmin) {
@@ -80,13 +85,13 @@ const useAdminLinks = () => {
                title: "Query and Manage Users",
                basePath: `/admin/query-users`,
             },
-         ]);
+         ])
       } else {
-         setDrawerTopLinks([]);
+         setDrawerTopLinks([])
       }
-   }, [userData?.isAdmin]);
+   }, [userData?.isAdmin])
 
-   return { drawerBottomLinks, drawerTopLinks, headerLinks };
-};
+   return { drawerBottomLinks, drawerTopLinks, headerLinks }
+}
 
-export default useAdminLinks;
+export default useAdminLinks

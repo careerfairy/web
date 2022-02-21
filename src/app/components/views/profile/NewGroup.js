@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import EditIcon from "@mui/icons-material/Edit";
+import React, { useState } from "react"
+import GroupAddIcon from "@mui/icons-material/GroupAdd"
+import EditIcon from "@mui/icons-material/Edit"
 import {
    Button,
    Card,
@@ -8,20 +8,42 @@ import {
    CardContent,
    CardMedia,
    Grid,
+   Tooltip,
    Typography,
-} from "@mui/material";
-import GroupJoinModal from "./GroupJoinModal";
-import Fade from "@stahl.luke/react-reveal/Fade";
+} from "@mui/material"
+import GroupJoinModal from "./GroupJoinModal"
+import Fade from "@stahl.luke/react-reveal/Fade"
+import { getMaxLineStyles } from "../../helperFunctions/HelperFunctions"
+
+const styles = {
+   media: {
+      display: "flex",
+      justifyContent: "center",
+      padding: "1.5em 1em 1em 1em",
+      height: "90px",
+      "& img": {
+         objectFit: "contain",
+         maxWidth: "80%",
+      },
+   },
+   groupName: {
+      fontSize: "1.1rem",
+      ...getMaxLineStyles(2),
+   },
+   groupDesc: {
+      ...getMaxLineStyles(2),
+   },
+}
 
 const NewGroup = ({ group, userData, makeSix, selected }) => {
-   const [openJoinModal, setOpenJoinModal] = useState(false);
+   const [openJoinModal, setOpenJoinModal] = useState(false)
 
    const handleCloseJoinModal = () => {
-      setOpenJoinModal(false);
-   };
+      setOpenJoinModal(false)
+   }
    const handleOpenJoinModal = () => {
-      setOpenJoinModal(true);
-   };
+      setOpenJoinModal(true)
+   }
 
    return (
       <Grid
@@ -34,41 +56,30 @@ const NewGroup = ({ group, userData, makeSix, selected }) => {
       >
          <Fade ssrFadeout bottom duration={600}>
             <Card>
-               <CardMedia
-                  style={{
-                     display: "flex",
-                     justifyContent: "center",
-                     padding: "1.5em 1em 1em 1em",
-                     height: "90px",
-                  }}
-               >
-                  <img
-                     src={group.logoUrl}
-                     style={{
-                        objectFit: "contain",
-                        maxWidth: "80%",
-                     }}
-                     alt=""
-                  />
+               <CardMedia sx={styles.media}>
+                  <img src={group.logoUrl} style={{}} alt="" />
                </CardMedia>
                <CardContent style={{ height: "115px" }}>
-                  <Typography
-                     style={{ fontSize: 18 }}
-                     align="center"
-                     gutterBottom
-                     variant="h5"
-                     component="h2"
-                  >
-                     {group.universityName}
-                  </Typography>
-                  <Typography
-                     variant="body2"
-                     align="center"
-                     color="textSecondary"
-                     component="p"
-                  >
-                     {group.description}
-                  </Typography>
+                  <Tooltip title={group.universityName} enterDelay={1000}>
+                     <Typography
+                        sx={styles.groupName}
+                        align="center"
+                        gutterBottom
+                     >
+                        {group.universityName}
+                     </Typography>
+                  </Tooltip>
+                  <Tooltip title={group.description} enterDelay={1000}>
+                     <Typography
+                        variant="body2"
+                        sx={styles.groupDesc}
+                        align="center"
+                        color="textSecondary"
+                        component="p"
+                     >
+                        {group.description}
+                     </Typography>
+                  </Tooltip>
                </CardContent>
                <CardActions>
                   {userData.groupIds?.includes(group.id) ? (
@@ -104,7 +115,7 @@ const NewGroup = ({ group, userData, makeSix, selected }) => {
             </Card>
          </Fade>
       </Grid>
-   );
-};
+   )
+}
 
-export default NewGroup;
+export default NewGroup

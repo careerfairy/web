@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext";
-import { Grid, LinearProgress, Typography } from "@mui/material";
-import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
-import LazyLoad from "react-lazyload";
-import Spinner from "./groupStreamCard/Spinner";
-import { useAuth } from "../../../../HOCs/AuthProvider";
-import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers";
+import React, { useEffect, useState } from "react"
+import { Grid, LinearProgress, Typography } from "@mui/material"
+import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2"
+import LazyLoad from "react-lazyload"
+import Spinner from "./groupStreamCard/Spinner"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers"
 
-const gridItemHeight = 530;
+const gridItemHeight = 530
 const styles = {
    root: {
       flex: 1,
@@ -39,7 +38,7 @@ const styles = {
    dynamicHeight: {
       height: "auto",
    },
-};
+}
 
 const Wrapper = ({ children, streamId }) => {
    return (
@@ -54,8 +53,8 @@ const Wrapper = ({ children, streamId }) => {
       >
          {children}
       </LazyLoad>
-   );
-};
+   )
+}
 
 const GroupStreams = ({
    groupData,
@@ -68,22 +67,21 @@ const GroupStreams = ({
    selectedOptions,
    isPastLivestreams,
 }) => {
-   const { userData, authenticatedUser: user } = useAuth();
-   const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false);
+   const { userData, authenticatedUser: user } = useAuth()
+   const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
    const searchedButNoResults =
-      selectedOptions?.length && !searching && !livestreams?.length;
+      selectedOptions?.length && !searching && !livestreams?.length
    const [slicedLivestreams] = useInfiniteScrollClientWithHandlers(
       livestreams,
       6,
       3
-   );
+   )
 
    useEffect(() => {
       if (globalCardHighlighted) {
-         setGlobalCardHighlighted(false);
+         setGlobalCardHighlighted(false)
       }
-   }, [groupData]);
-
+   }, [groupData])
    const renderStreamCards = slicedLivestreams?.map((livestream, index) => {
       if (livestream) {
          return (
@@ -91,9 +89,8 @@ const GroupStreams = ({
                sx={[styles.streamGridItem, mobile && styles.dynamicHeight]}
                key={livestream.id}
                xs={12}
-               sm={12}
                md={6}
-               lg={4}
+               lg={6}
                xl={4}
                item
             >
@@ -115,30 +112,22 @@ const GroupStreams = ({
                   />
                </Wrapper>
             </Grid>
-         );
+         )
       }
-   });
+   })
 
    return (
       <Grid item xs={12}>
          <Grid container spacing={mobile ? 2 : 4}>
             {groupData.id || listenToUpcoming ? (
                searching ? (
-                  <Grid md={12} lg={12} xl={12} item sx={styles.loaderWrapper}>
+                  <Grid xs={12} item sx={styles.loaderWrapper}>
                      <LinearProgress style={{ width: "80%" }} color="primary" />
                   </Grid>
                ) : livestreams.length ? (
                   renderStreamCards
                ) : (
-                  <Grid
-                     sm={12}
-                     xs={12}
-                     md={12}
-                     lg={12}
-                     xl={12}
-                     item
-                     sx={styles.loaderWrapper}
-                  >
+                  <Grid xs={12} item sx={styles.loaderWrapper}>
                      <Typography
                         sx={styles.emptyMessage}
                         align="center"
@@ -160,6 +149,6 @@ const GroupStreams = ({
             ) : null}
          </Grid>
       </Grid>
-   );
-};
-export default withFirebase(GroupStreams);
+   )
+}
+export default GroupStreams

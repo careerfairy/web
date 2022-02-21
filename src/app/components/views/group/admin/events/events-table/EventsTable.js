@@ -1,38 +1,38 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { defaultTableOptions, tableIcons } from "components/util/tableUtils";
-import MaterialTable, { MTableAction } from "@material-table/core";
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { defaultTableOptions, tableIcons } from "components/util/tableUtils"
+import MaterialTable, { MTableAction } from "@material-table/core"
 import {
    copyStringToClipboard,
    getBaseUrl,
    getResizedUrl,
    prettyDate,
-} from "../../../../../helperFunctions/HelperFunctions";
-import PropTypes from "prop-types";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Speakers from "./Speakers";
-import CompanyLogo from "./CompanyLogo";
-import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal";
-import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDialog";
-import GetStreamerLinksIcon from "@mui/icons-material/Share";
-import PublishIcon from "@mui/icons-material/Publish";
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
-import { Box, CircularProgress } from "@mui/material";
-import { useDispatch } from "react-redux";
-import DraftLinkIcon from "@mui/icons-material/Link";
-import { useMetaDataActions } from "components/custom-hook/useMetaDataActions";
-import PdfReportDownloadDialog from "../PdfReportDownloadDialog";
-import GroupLogos from "./GroupLogos";
-import AddBoxIcon from "@mui/icons-material/AddBox";
-import ToolbarActionsDialog from "../ToolbarActionsDialog";
-import { useTheme } from "@mui/material/styles";
-import * as storeActions from "store/actions";
-import ManageStreamActions from "./ManageStreamActions";
-import ToolbarDialogAction from "./ToolbarDialogAction";
-import { useRouter } from "next/router";
-import MoreOptionsMenu from "./MoreOptionsMenu";
-import ManageEndOfEventDialog from "./ManageEndOfEventDialog";
-import { useAuth } from "../../../../../../HOCs/AuthProvider";
+} from "../../../../../helperFunctions/HelperFunctions"
+import PropTypes from "prop-types"
+import EditIcon from "@mui/icons-material/Edit"
+import DeleteIcon from "@mui/icons-material/Delete"
+import Speakers from "./Speakers"
+import CompanyLogo from "./CompanyLogo"
+import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal"
+import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDialog"
+import GetStreamerLinksIcon from "@mui/icons-material/Share"
+import PublishIcon from "@mui/icons-material/Publish"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { Box, CircularProgress } from "@mui/material"
+import { useDispatch } from "react-redux"
+import DraftLinkIcon from "@mui/icons-material/Link"
+import { useMetaDataActions } from "components/custom-hook/useMetaDataActions"
+import PdfReportDownloadDialog from "../PdfReportDownloadDialog"
+import GroupLogos from "./GroupLogos"
+import AddBoxIcon from "@mui/icons-material/AddBox"
+import ToolbarActionsDialog from "../ToolbarActionsDialog"
+import { useTheme } from "@mui/material/styles"
+import * as storeActions from "store/actions"
+import ManageStreamActions from "./ManageStreamActions"
+import ToolbarDialogAction from "./ToolbarDialogAction"
+import { useRouter } from "next/router"
+import MoreOptionsMenu from "./MoreOptionsMenu"
+import ManageEndOfEventDialog from "./ManageEndOfEventDialog"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
 
 const EventsTable = ({
    streams,
@@ -47,18 +47,18 @@ const EventsTable = ({
    groupsDictionary,
    eventId,
 }) => {
-   const [clickedRows, setClickedRows] = useState({});
-   const firebase = useFirebaseService();
-   const theme = useTheme();
-   const { pathname, push, query } = useRouter();
-   const { userData } = useAuth();
-   const [deletingEvent, setDeletingEvent] = useState(false);
-   const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null);
-   const [allGroups, setAllGroups] = useState([]);
+   const [clickedRows, setClickedRows] = useState({})
+   const firebase = useFirebaseService()
+   const theme = useTheme()
+   const { pathname, push, query } = useRouter()
+   const { userData } = useAuth()
+   const [deletingEvent, setDeletingEvent] = useState(false)
+   const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null)
+   const [allGroups, setAllGroups] = useState([])
    const [toolbarActionsDialogOpen, setToolbarActionsDialogOpen] = useState(
       false
-   );
-   const [endOfEventDialogData, setEndOfEventDialogData] = useState(null);
+   )
+   const [endOfEventDialogData, setEndOfEventDialogData] = useState(null)
 
    const {
       talentPoolAction,
@@ -73,65 +73,65 @@ const EventsTable = ({
       group,
       isPast,
       isDraft,
-   });
+   })
 
-   const dispatch = useDispatch();
+   const dispatch = useDispatch()
 
    const [
       targetLivestreamStreamerLinksId,
       setTargetLivestreamStreamerLinksId,
-   ] = useState("");
+   ] = useState("")
 
    useEffect(() => {
       if (eventId) {
-         handleRowClick(_, { id: eventId });
+         handleRowClick(_, { id: eventId })
       }
-   }, [eventId]);
+   }, [eventId])
 
    useEffect(() => {
       firebase.getAllCareerCenters().then((querySnapshot) => {
-         let careerCenters = [];
+         let careerCenters = []
          querySnapshot.forEach((doc) => {
-            let cc = doc.data();
-            cc.id = doc.id;
-            careerCenters.push(cc);
-         });
-         setAllGroups(careerCenters);
-      });
-   }, []);
+            let cc = doc.data()
+            cc.id = doc.id
+            careerCenters.push(cc)
+         })
+         setAllGroups(careerCenters)
+      })
+   }, [])
 
    useEffect(() => {
       if (streams?.length) {
          const handleGetGroups = async () => {
             const groupsWithoutData = streams.reduce((acc, currentStream) => {
-               const newIdsOfGroupsThatNeedData = [];
+               const newIdsOfGroupsThatNeedData = []
                if (currentStream.groupIds.length) {
                   currentStream.groupIds.forEach((groupId) => {
                      if (!groupsDictionary[groupId]) {
-                        newIdsOfGroupsThatNeedData.push(groupId);
+                        newIdsOfGroupsThatNeedData.push(groupId)
                      }
-                  });
+                  })
                }
-               return acc.concat(newIdsOfGroupsThatNeedData);
-            }, []);
+               return acc.concat(newIdsOfGroupsThatNeedData)
+            }, [])
             const newGroupLogoDictionary = await firebase.getGroupsInfo([
                ...new Set(groupsWithoutData),
-            ]);
+            ])
             setGroupsDictionary((prevState) => ({
                ...prevState,
                ...newGroupLogoDictionary,
-            }));
-         };
-         handleGetGroups();
+            }))
+         }
+         handleGetGroups()
       }
-   }, [streams]);
+   }, [streams])
 
    const handleCloseEndOfEventDialog = () => {
-      setEndOfEventDialogData(null);
-   };
+      setEndOfEventDialogData(null)
+   }
    const handleOpenEndOfEventDialog = ({ rowData }) => {
-      setEndOfEventDialogData(rowData);
-   };
+      setEndOfEventDialogData(rowData)
+   }
 
    const handleSpeakerSearch = useCallback(
       (term, rowData) =>
@@ -142,7 +142,7 @@ const EventsTable = ({
                speaker.lastName.toLowerCase().indexOf(term.toLowerCase()) >= 0
          ),
       []
-   );
+   )
 
    const handleHostsSearch = useCallback(
       (term, rowData) =>
@@ -153,47 +153,47 @@ const EventsTable = ({
                   .indexOf(term.toLowerCase()) >= 0
          ),
       [groupsDictionary]
-   );
+   )
    const handleCompanySearch = useCallback(
       (term, rowData) =>
          rowData.company?.toLowerCase?.().indexOf(term.toLowerCase()) >= 0,
       []
-   );
+   )
 
    const handleOpenToolbarActionsDialog = useCallback(() => {
-      setToolbarActionsDialogOpen(true);
-   }, []);
+      setToolbarActionsDialogOpen(true)
+   }, [])
    const handleCloseToolbarActionsDialog = useCallback(() => {
-      setToolbarActionsDialogOpen(false);
-   }, []);
+      setToolbarActionsDialogOpen(false)
+   }, [])
 
    const handleDeleteStream = async () => {
       try {
-         setDeletingEvent(true);
-         const targetCollection = isDraft ? "draftLivestreams" : "livestreams";
-         await firebase.deleteLivestream(streamIdToBeDeleted, targetCollection);
-         setDeletingEvent(false);
+         setDeletingEvent(true)
+         const targetCollection = isDraft ? "draftLivestreams" : "livestreams"
+         await firebase.deleteLivestream(streamIdToBeDeleted, targetCollection)
+         setDeletingEvent(false)
       } catch (e) {
-         setDeletingEvent(false);
+         setDeletingEvent(false)
       }
-      setStreamIdToBeDeleted(null);
-   };
+      setStreamIdToBeDeleted(null)
+   }
 
    const handleOpenStreamerLinksModal = useCallback((rowData) => {
       if (rowData.id) {
-         setTargetLivestreamStreamerLinksId(rowData.id);
+         setTargetLivestreamStreamerLinksId(rowData.id)
       }
-   }, []);
+   }, [])
    const handleCloseStreamerLinksModal = useCallback(() => {
-      setTargetLivestreamStreamerLinksId("");
-   }, []);
+      setTargetLivestreamStreamerLinksId("")
+   }, [])
 
    const handleCreateExternalLink = useCallback(
       (rowData) => {
-         let baseUrl = getBaseUrl();
-         const draftId = rowData.id;
-         const targetPath = `${baseUrl}/draft-stream?draftStreamId=${draftId}`;
-         copyStringToClipboard(targetPath);
+         let baseUrl = getBaseUrl()
+         const draftId = rowData.id
+         const targetPath = `${baseUrl}/draft-stream?draftStreamId=${draftId}`
+         copyStringToClipboard(targetPath)
          dispatch(
             storeActions.enqueueSnackbar({
                message: "Link has been copied to your clipboard!",
@@ -203,14 +203,14 @@ const EventsTable = ({
                   key: targetPath,
                },
             })
-         );
+         )
       },
       [dispatch]
-   );
+   )
 
    const handleClickDeleteStream = useCallback((streamId) => {
-      setStreamIdToBeDeleted(streamId);
-   }, []);
+      setStreamIdToBeDeleted(streamId)
+   }, [])
 
    const manageStreamActions = useCallback(
       (rowData) => [
@@ -248,8 +248,11 @@ const EventsTable = ({
             tooltip: isDraft ? "Delete Draft" : "Delete Event",
             onClick: () => handleClickDeleteStream(rowData.id),
             hintTitle: isDraft ? "Delete Draft" : "Delete Event",
-            hintDescription:
-               "Deleting an event is a permanent action and cannot be undone.",
+            hidden:
+               rowData.author?.groupId !== group.groupId && !userData?.isAdmin,
+            hintDescription: userData?.isAdmin
+               ? "You can delete this event because you are a CF admin"
+               : "Deleting an event is a permanent action and cannot be undone.",
          },
          {
             icon: publishingDraft ? (
@@ -297,7 +300,7 @@ const EventsTable = ({
          isDraft,
          userData?.isAdmin,
       ]
-   );
+   )
 
    const actions = useMemo(
       () => [
@@ -309,7 +312,7 @@ const EventsTable = ({
          },
       ],
       [streams]
-   );
+   )
 
    const columns = useMemo(
       () => [
@@ -331,8 +334,8 @@ const EventsTable = ({
             render: (rowData) => (
                <CompanyLogo
                   onClick={(event) => {
-                     event.stopPropagation();
-                     handleEditStream(rowData);
+                     event.stopPropagation()
+                     handleEditStream(rowData)
                   }}
                   livestream={rowData}
                />
@@ -359,7 +362,7 @@ const EventsTable = ({
             field: "date",
             title: "Event Date",
             render: (rowData) => {
-               return prettyDate(rowData.start);
+               return prettyDate(rowData.start)
             },
             type: "date",
          },
@@ -380,7 +383,7 @@ const EventsTable = ({
                      clicked={Boolean(clickedRows[rowData?.id])}
                      speakers={rowData.speakers}
                   />
-               );
+               )
             },
             customFilterAndSearch: handleSpeakerSearch,
          },
@@ -393,7 +396,7 @@ const EventsTable = ({
                      clicked={Boolean(clickedRows[rowData?.id])}
                      groupsDictionary={groupsDictionary}
                   />
-               );
+               )
             },
             customFilterAndSearch: handleHostsSearch,
          },
@@ -408,7 +411,7 @@ const EventsTable = ({
          registeredStudentsFromGroupDictionary,
          clickedRows,
       ]
-   );
+   )
 
    const customOptions = useMemo(
       () => ({
@@ -419,36 +422,36 @@ const EventsTable = ({
          actionsCellStyle: {},
          rowStyle: (rowData) => {
             if (rowData.id === eventId) {
-               return { border: `5px solid ${theme.palette.primary.main}` };
+               return { border: `5px solid ${theme.palette.primary.main}` }
             }
-            return {};
+            return {}
          },
       }),
       [eventId]
-   );
+   )
 
    const handleRemoveEventId = () => {
       if (eventId) {
-         const newQuery = { ...query };
+         const newQuery = { ...query }
          if (newQuery.eventId) {
-            delete newQuery.eventId;
+            delete newQuery.eventId
          }
          return push({
             pathname,
             query: {
                ...newQuery,
             },
-         });
+         })
       }
-   };
+   }
 
    const handleRowClick = (event, rowData) => {
       setClickedRows((prevState) => {
-         const newClickedRows = { ...prevState };
-         newClickedRows[rowData.id] = !Boolean(newClickedRows[rowData.id]);
-         return newClickedRows;
-      });
-   };
+         const newClickedRows = { ...prevState }
+         newClickedRows[rowData.id] = !Boolean(newClickedRows[rowData.id])
+         return newClickedRows
+      })
+   }
 
    return (
       <>
@@ -463,7 +466,7 @@ const EventsTable = ({
                         <ToolbarDialogAction {...props.action} />
                      ) : (
                         <MTableAction {...props} />
-                     );
+                     )
                   },
                }}
                onRowClick={handleRowClick}
@@ -504,10 +507,10 @@ const EventsTable = ({
             handleClose={handleCloseEndOfEventDialog}
          />
       </>
-   );
-};
+   )
+}
 
-export default EventsTable;
+export default EventsTable
 
 Speakers.propTypes = {
    speakers: PropTypes.arrayOf(
@@ -520,4 +523,4 @@ Speakers.propTypes = {
          position: PropTypes.string,
       })
    ),
-};
+}

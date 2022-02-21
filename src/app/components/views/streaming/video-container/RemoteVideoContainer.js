@@ -1,20 +1,20 @@
-import { Tooltip } from "@mui/material";
-import VideocamOffIcon from "@mui/icons-material/VideocamOff";
-import VolumeOffIcon from "@mui/icons-material/MicOff";
-import SignalCellularConnectedNoInternet2BarIcon from "@mui/icons-material/SignalCellularConnectedNoInternet2Bar";
-import React, { useEffect, useRef, useContext } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import { Tooltip } from "@mui/material"
+import VideocamOffIcon from "@mui/icons-material/VideocamOff"
+import VolumeOffIcon from "@mui/icons-material/MicOff"
+import SignalCellularConnectedNoInternet2BarIcon from "@mui/icons-material/SignalCellularConnectedNoInternet2Bar"
+import React, { useEffect, useRef, useContext } from "react"
+import makeStyles from "@mui/styles/makeStyles"
 import {
    TooltipButtonComponent,
    TooltipText,
    TooltipTitle,
    WhiteTooltip,
-} from "materialUI/GlobalTooltips";
-import TutorialContext from "context/tutorials/TutorialContext";
-import SpeakerInfoOverlay from "./SpeakerInfoOverlay";
-import { useSelector } from "react-redux";
+} from "materialUI/GlobalTooltips"
+import TutorialContext from "context/tutorials/TutorialContext"
+import SpeakerInfoOverlay from "./SpeakerInfoOverlay"
+import { useSelector } from "react-redux"
 
-const mutedOverlayZIndex = 9901;
+const mutedOverlayZIndex = 9901
 
 const useStyles = makeStyles((theme) => ({
    companyIcon: {
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
    svgShadow: {
       filter: `drop-shadow(0px 0px 2px rgba(0,0,0,0.4))`,
    },
-}));
+}))
 
 const RemoteVideoContainer = ({
    currentLivestream,
@@ -65,72 +65,72 @@ const RemoteVideoContainer = ({
 }) => {
    const { playAllRemoteVideos, muteAllRemoteVideos } = useSelector(
       (state) => state.stream.streaming
-   );
+   )
    const { getActiveTutorialStepKey, handleConfirmStep } = useContext(
       TutorialContext
-   );
-   const activeStep = getActiveTutorialStepKey();
-   const videoElement = useRef({ current: {} });
+   )
+   const activeStep = getActiveTutorialStepKey()
+   const videoElement = useRef({ current: {} })
 
-   const isScreenShareVideo = stream.uid.includes("screen");
-   const classes = useStyles({ isScreenShareVideo });
+   const isScreenShareVideo = stream.uid.includes("screen")
+   const classes = useStyles({ isScreenShareVideo })
 
    useEffect(() => {
       if (stream.uid === "demoStream") {
-         generateDemoHandRaiser();
+         generateDemoHandRaiser()
       } else {
          if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
             stream.videoTrack?.play(stream.uid, {
                fit: isScreenShareVideo ? "contain" : "cover",
-            });
+            })
          }
       }
-   }, [stream.uid, stream.videoTrack]);
+   }, [stream.uid, stream.videoTrack])
 
    useEffect(() => {
       if (!muteAllRemoteVideos) {
-         stream?.audioTrack?.play();
+         stream?.audioTrack?.play()
       }
-   }, [muteAllRemoteVideos]);
+   }, [muteAllRemoteVideos])
 
    useEffect(() => {
       if (playAllRemoteVideos) {
-         playVideo();
+         playVideo()
       }
-   }, [playAllRemoteVideos]);
+   }, [playAllRemoteVideos])
 
    useEffect(() => {
       if (muteAllRemoteVideos) {
-         stream?.stream?.audioTrack?.stop();
+         stream?.stream?.audioTrack?.stop()
       } else {
-         stream?.stream?.audioTrack?.play();
+         stream?.stream?.audioTrack?.play()
       }
-   }, [muteAllRemoteVideos]);
+   }, [muteAllRemoteVideos])
 
    useEffect(() => {
       if (stream?.stream?.audio === false && stream?.stream?.video === false) {
-         setRemovedStream(stream.uid);
+         setRemovedStream(stream.uid)
       }
-   }, [stream?.stream?.audio, stream?.stream?.video]);
+   }, [stream?.stream?.audio, stream?.stream?.video])
 
    function generateDemoHandRaiser() {
-      let video = document.createElement("video");
-      const videoContainer = document.querySelector("#" + stream.uid);
-      videoContainer.appendChild(video);
-      video.src = stream.url;
-      video.loop = true;
-      video.play();
+      let video = document.createElement("video")
+      const videoContainer = document.querySelector("#" + stream.uid)
+      videoContainer.appendChild(video)
+      video.src = stream.url
+      video.loop = true
+      video.play()
    }
 
    const speaker = !isScreenShareVideo
       ? currentLivestream.liveSpeakers.find(
            (speaker) => speaker.speakerUuid === stream.uid
         )
-      : null;
+      : null
 
    return (
       <WhiteTooltip
-         placement="bottom"
+         placement="left"
          title={
             <React.Fragment>
                <TooltipTitle>Hand Raise (3/5)</TooltipTitle>
@@ -141,7 +141,7 @@ const RemoteVideoContainer = ({
                {activeStep === 11 && (
                   <TooltipButtonComponent
                      onConfirm={() => {
-                        handleConfirmStep(11);
+                        handleConfirmStep(11)
                      }}
                      buttonText="Ok"
                   />
@@ -218,7 +218,7 @@ const RemoteVideoContainer = ({
             )}
          </div>
       </WhiteTooltip>
-   );
-};
+   )
+}
 
-export default RemoteVideoContainer;
+export default RemoteVideoContainer

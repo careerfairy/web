@@ -1,13 +1,13 @@
-import PropTypes from "prop-types";
-import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
-import { Box, Container, Typography } from "@mui/material";
-import Section from "../../common/Section";
-import SectionHeader from "../../common/SectionHeader";
+import PropTypes from "prop-types"
+import React from "react"
+import makeStyles from "@mui/styles/makeStyles"
+import { Box, Container, Typography } from "@mui/material"
+import Section from "../../common/Section"
+import SectionHeader from "../../common/SectionHeader"
+import BenefitsGrid from "../../common/BenefitsGrid"
 
 const useStyles = makeStyles((theme) => ({
    container: {
-      paddingTop: theme.spacing(2),
       zIndex: 1,
       "&.MuiContainer-root": {
          position: "relative",
@@ -19,19 +19,16 @@ const useStyles = makeStyles((theme) => ({
    subTitle: {},
    bodyText: {
       color: theme.palette.common.white,
-      opacity: 0.9,
    },
-}));
+}))
 
-const HeroSection = (props) => {
-   const classes = useStyles();
+const ValuesSection = (props) => {
+   const classes = useStyles()
 
    return (
       <Section
-         big
          color={props.color}
          backgroundImage={props.backgroundImage}
-         backgroundImagePosition={props.backgroundImagePosition}
          backgroundImageOpacity={props.backgroundImageOpacity}
          backgroundColor={props.backgroundColor}
       >
@@ -46,25 +43,19 @@ const HeroSection = (props) => {
                subtitle={props.subtitle}
             />
             <Box marginTop={3}>
-               <Typography
-                  align="center"
-                  variant="h6"
-                  className={classes.bodyText}
-               >
-                  {props.bodyText}
-               </Typography>
+               <BenefitsGrid benefits={props.valuesData} />
             </Box>
          </Container>
       </Section>
-   );
-};
+   )
+}
 
-HeroSection.propTypes = {
+ValuesSection.propTypes = {
    backgroundColor: PropTypes.string,
    backgroundImage: PropTypes.string,
    backgroundImageOpacity: PropTypes.number,
    color: PropTypes.string,
    subtitle: PropTypes.string,
    title: PropTypes.string,
-};
-export default HeroSection;
+}
+export default ValuesSection

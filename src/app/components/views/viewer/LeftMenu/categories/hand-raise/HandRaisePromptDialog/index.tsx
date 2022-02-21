@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { GlassDialog } from "materialUI/GlobalModals";
+import React, { useEffect, useState } from "react"
+import { GlassDialog } from "materialUI/GlobalModals"
 import {
    Button,
    DialogActions,
@@ -8,14 +8,15 @@ import {
    DialogTitle,
    Slide,
    Typography,
-} from "@mui/material";
-import { useCurrentStream } from "context/stream/StreamContext";
-import { useAuth } from "HOCs/AuthProvider";
-import { useDispatch, useSelector } from "react-redux";
-import RootState from "store/reducers";
-import useHandRaiseState from "components/custom-hook/useHandRaiseState";
-import { HandRaiseState } from "types/handraise";
-import * as actions from "store/actions";
+} from "@mui/material"
+import { useCurrentStream } from "context/stream/StreamContext"
+import { useAuth } from "HOCs/AuthProvider"
+import { useDispatch, useSelector } from "react-redux"
+import RootState from "store/reducers"
+import useHandRaiseState from "components/custom-hook/useHandRaiseState"
+import { HandRaiseState } from "types/handraise"
+import * as actions from "store/actions"
+import { useRouter } from "next/router"
 
 const styles = {
    title: {
@@ -26,7 +27,7 @@ const styles = {
    contentText: {
       marginBottom: 0,
    },
-} as const;
+} as const
 
 const Content = ({ handleClose, requestHandRaise }: ContentProps) => {
    return (
@@ -52,31 +53,39 @@ const Content = ({ handleClose, requestHandRaise }: ContentProps) => {
             />
          </DialogActions>
       </React.Fragment>
-   );
-};
+   )
+}
 const HandRaisePromptDialog = () => {
-   const [open, setOpen] = useState(false);
-   const { currentLivestream, isMobile } = useCurrentStream();
-   const dispatch = useDispatch();
+   const {
+      query: { isRecordingWindow },
+   } = useRouter()
+   const [open, setOpen] = useState(false)
+   const { currentLivestream, isMobile } = useCurrentStream()
+   const dispatch = useDispatch()
    const spyModeEnabled = useSelector(
       (state: RootState) => state.stream.streaming.spyModeEnabled
-   );
+   )
    const primaryClientJoined = useSelector(
       (state: RootState) => state.stream.agoraState.primaryClientJoined
-   );
-   const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState();
+   )
+   const [handRaiseState, updateHandRaiseRequest] = useHandRaiseState()
 
-   const { userData } = useAuth();
+   const { userData } = useAuth()
    useEffect(() => {
       const canSeeLivestream = Boolean(
          currentLivestream?.hasStarted || (userData?.isAdmin && spyModeEnabled)
-      );
+      )
       const hasNotRaisedHandYet = Boolean(
          handRaiseState === undefined &&
             currentLivestream?.handRaiseActive &&
             !isMobile
-      );
-      setOpen(hasNotRaisedHandYet && canSeeLivestream && primaryClientJoined);
+      )
+      setOpen(
+         !isRecordingWindow &&
+            hasNotRaisedHandYet &&
+            canSeeLivestream &&
+            primaryClientJoined
+      )
    }, [
       currentLivestream?.handRaiseActive,
       currentLivestream?.hasStarted,
@@ -85,18 +94,19 @@ const HandRaisePromptDialog = () => {
       userData?.isAdmin,
       spyModeEnabled,
       primaryClientJoined,
-   ]);
+      isRecordingWindow,
+   ])
    const handleClose = () => {
-      setOpen(false);
-   };
+      setOpen(false)
+   }
 
    const requestHandRaise = async () => {
       try {
-         await updateHandRaiseRequest(HandRaiseState.requested);
+         await updateHandRaiseRequest(HandRaiseState.requested)
       } catch (e) {
-         dispatch(actions.sendGeneralError(e));
+         dispatch(actions.sendGeneralError(e))
       }
-   };
+   }
 
    return (
       <GlassDialog TransitionComponent={Slide} open={open}>
@@ -105,12 +115,12 @@ const HandRaisePromptDialog = () => {
             requestHandRaise={requestHandRaise}
          />
       </GlassDialog>
-   );
-};
+   )
+}
 
 type ContentProps = {
-   handleClose: () => any;
-   requestHandRaise: () => Promise<void>;
-};
+   handleClose: () => any
+   requestHandRaise: () => Promise<void>
+}
 
-export default HandRaisePromptDialog;
+export default HandRaisePromptDialog
