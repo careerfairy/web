@@ -104,6 +104,8 @@ exports.sendPhysicalEventRegistrationConfirmationEmail =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail;
 exports.sendHybridEventRegistrationConfirmationEmail =
    livestreams.sendHybridEventRegistrationConfirmationEmail;
+exports.notifySlackWhenALivestreamStarts =
+   livestreams.notifySlackWhenALivestreamStarts;
 
 // University Emails
 exports.sendEmailToStudentOfUniversityAndField =

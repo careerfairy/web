@@ -1,12 +1,8 @@
 const functions = require("firebase-functions");
-
 const { admin } = require("./api/firestoreAdmin");
 const { client } = require("./api/postmark");
-
-const { setHeaders } = require("./util");
-
-const { DateTime } = require("luxon");
-const ical = require("ical-generator");
+const config = require("./config");
+const { notifyLivestreamStarting } = require("./api/slack");
 
 exports.assertLivestreamRegistrationWasCompleted = functions.firestore
    .document("livestreams/{livestreamId}/registeredStudents/{studentId}")
@@ -224,5 +220,29 @@ exports.setFirstCommentOfQuestionOnCreate = functions.firestore
             "error in setFirstCommentOfQuestionOnCreate",
             e
          );
+      }
+   });
+
+exports.notifySlackWhenALivestreamStarts = functions
+   .region(config.region)
+   .firestore.document("livestreams/{livestreamId}")
+   .onUpdate(async (change, context) => {
+      const previousValue = change.before.data();
+      const newValue = change.after.data();
+
+      if (!newValue.test && !previousValue.hasStarted && newValue.hasStarted) {
+         functions.logger.log("Detected the livestream has started");
+         const webhookUrl = config.slackWebhooks.livestreamAlerts;
+
+         try {
+            await notifyLivestreamStarting(webhookUrl, newValue);
+         } catch (e) {
+            functions.logger.error(
+               "error in notifySlackWhenALivestreamStarts",
+               e
+            );
+         }
+      } else {
+         functions.logger.log("The livestream has not started yet");
       }
    });
