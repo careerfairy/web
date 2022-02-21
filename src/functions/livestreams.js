@@ -2,7 +2,10 @@ const functions = require("firebase-functions");
 const { admin } = require("./api/firestoreAdmin");
 const { client } = require("./api/postmark");
 const config = require("./config");
-const { notifyLivestreamStarting } = require("./api/slack");
+const {
+   notifyLivestreamStarting,
+   notifyLivestreamCreated,
+} = require("./api/slack");
 
 exports.assertLivestreamRegistrationWasCompleted = functions.firestore
    .document("livestreams/{livestreamId}/registeredStudents/{studentId}")
@@ -234,6 +237,14 @@ exports.notifySlackWhenALivestreamStarts = functions
          functions.logger.log("Detected the livestream has started");
          const webhookUrl = config.slackWebhooks.livestreamAlerts;
 
+         // cancel notification if the event start date is more than 1h away than now
+         if (Math.abs(Date.now() - newValue.start?.toMillis()) > 3600 * 1000) {
+            functions.logger.log(
+               "The livestream start date is too far from now, skipping the notification"
+            );
+            return;
+         }
+
          try {
             await notifyLivestreamStarting(webhookUrl, newValue);
          } catch (e) {
@@ -244,5 +255,54 @@ exports.notifySlackWhenALivestreamStarts = functions
          }
       } else {
          functions.logger.log("The livestream has not started yet");
+      }
+   });
+
+exports.notifySlackWhenALivestreamIsCreated = functions
+   .region(config.region)
+   .firestore.document("livestreams/{livestreamId}")
+   .onCreate(async (snap, context) => {
+      const event = snap.data();
+      let publisherEmailOrName = event.author?.email;
+
+      if (event.test) {
+         functions.logger.log(
+            "The livestream is a test, skipping the notification"
+         );
+         return;
+      }
+
+      // cancel notification if the event start date is more than 1w in the past
+      // we create events in the past to test, we don't want to notify in that case
+      const oneWeekMs = 7 * 24 * 3600 * 1000;
+      if (event.start?.toMillis() - Date.now() < -oneWeekMs) {
+         functions.logger.log(
+            "The livestream start date is more than 7 days in the past, skipping the notification"
+         );
+         return;
+      }
+
+      try {
+         // Fetch the author details
+         if (publisherEmailOrName) {
+            let userDoc = await admin
+               .firestore()
+               .collection("userData")
+               .doc(publisherEmailOrName)
+               .get();
+
+            if (userDoc.exists) {
+               const user = userDoc.data();
+               publisherEmailOrName = `${user.firstName} ${user.lastName}`;
+            }
+         }
+
+         const webhookUrl = config.slackWebhooks.livestreamAlerts;
+         await notifyLivestreamCreated(webhookUrl, publisherEmailOrName, event);
+      } catch (e) {
+         functions.logger.error(
+            "error in notifySlackWhenALivestreamIsCreated",
+            e
+         );
       }
    });
