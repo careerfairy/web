@@ -444,7 +444,7 @@ const GroupStreamCardV2 = memo(
                               livestream={livestream}
                            />
 
-                           {!isPastLivestreams && !livestream.openStream && (
+                           {!isPastLivestreams && (
                               <AttendButton
                                  size="small"
                                  mobile={mobile}
