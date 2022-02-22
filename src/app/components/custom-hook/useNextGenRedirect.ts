@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 
-//
 const useNextGenRedirect = (isBeta: boolean) => {
    useEffect(() => {
       const isInProdEnvironment = process.env.NODE_ENV === "production";
@@ -9,11 +8,11 @@ const useNextGenRedirect = (isBeta: boolean) => {
       const isInBetaDomain = host === "nextgen.careerfairy.io";
 
       if (!isInProdEnvironment || typeof isBeta !== "boolean") return;
-      if (isBeta === true) {
+      if (isBeta) {
          if (!isInBetaDomain) {
             window.location.href = `https://nextgen.careerfairy.io${pathname}${query}`;
          }
-      } else if (isBeta === false) {
+      } else {
          if (isInBetaDomain) {
             window.location.href = `https://careerfairy.io${pathname}${query}`;
          }
