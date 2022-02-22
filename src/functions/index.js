@@ -34,6 +34,7 @@ const algolia = require("./algolia");
 const analytics = require("./analytics");
 const breakoutRooms = require("./breakoutRooms");
 const recording = require("./recording");
+const slack = require("./slack");
 
 // Hosting
 exports.production = hosting.production;
@@ -104,6 +105,10 @@ exports.sendPhysicalEventRegistrationConfirmationEmail =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail;
 exports.sendHybridEventRegistrationConfirmationEmail =
    livestreams.sendHybridEventRegistrationConfirmationEmail;
+exports.notifySlackWhenALivestreamStarts =
+   livestreams.notifySlackWhenALivestreamStarts;
+exports.notifySlackWhenALivestreamIsCreated =
+   livestreams.notifySlackWhenALivestreamIsCreated;
 
 // University Emails
 exports.sendEmailToStudentOfUniversityAndField =
@@ -132,3 +137,6 @@ exports.stopRecordingLivestreamApi = recording.stopRecordingLivestreamApi;
 // Breakout Rooms
 exports.updateBreakoutRoomStatusOnWrite =
    breakoutRooms.updateBreakoutRoomStatusOnWrite;
+
+// Slack Interaction Handler
+exports.slackHandleInteractions = slack.slackHandleInteractions;
