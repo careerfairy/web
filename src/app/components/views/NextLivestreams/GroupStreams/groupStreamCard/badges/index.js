@@ -19,30 +19,34 @@ const styles = {
 export const LimitedRegistrationsBadge = ({
    numberOfSpotsRemaining,
    white,
+   sx,
+   ...resProps
 }) => {
    const MIN_NUMBER_OF_DISPLAYED_SPOTS = 10;
    return (
       <Chip
          icon={<WhatshotIcon style={{ color: "white" }} />}
-         sx={[styles.warningChip, white && styles.badgeWhite]}
+         sx={[styles.warningChip, white && styles.badgeWhite, sx]}
          variant={white && "outlined"}
          label={
             numberOfSpotsRemaining < MIN_NUMBER_OF_DISPLAYED_SPOTS
                ? `${numberOfSpotsRemaining} spots left`
                : "Limited spots!"
          }
+         {...resProps}
       />
    );
 };
 
-export const InPersonEventBadge = ({ white }) => {
+export const InPersonEventBadge = ({ white, sx, ...resProps }) => {
    return (
       <Chip
          icon={<EmojiPeopleIcon style={{ color: "white" }} />}
          label="In-Person Event"
-         sx={[white && styles.badgeWhite]}
+         sx={[white && styles.badgeWhite, sx]}
          variant={white && "outlined"}
          color="secondary"
+         {...resProps}
       />
    );
 };

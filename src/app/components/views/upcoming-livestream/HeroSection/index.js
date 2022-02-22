@@ -110,6 +110,17 @@ const styles = {
    streamStatuses: {
       paddingTop: (theme) => theme.spacing(2),
       display: "flex",
+      flexWrap: "wrap",
+   },
+   chip: {
+      height: { sm: "2.78rem" },
+      margin: { sm: "0.6em" },
+      "& svg": {
+         fontSize: { sm: "2.25rem" },
+      },
+      "& span": {
+         fontSize: { sm: "1.7rem" },
+      },
    },
 };
 
@@ -148,15 +159,19 @@ const HeroSection = ({
                         stream.maxRegistrants ||
                         streamLanguage) && (
                         <Box sx={styles.streamStatuses}>
-                           {stream.isFaceToFace && <InPersonEventBadge white />}
+                           {stream.isFaceToFace && (
+                              <InPersonEventBadge sx={styles.chip} white />
+                           )}
                            {stream.maxRegistrants && (
                               <LimitedRegistrationsBadge
+                                 sx={styles.chip}
                                  white
                                  numberOfSpotsRemaining={numberOfSpotsRemaining}
                               />
                            )}
                            {streamLanguage && (
                               <LanguageBadge
+                                 sx={styles.chip}
                                  white
                                  streamLanguage={streamLanguage}
                               />
