@@ -109,7 +109,7 @@ const ViewerLayout = (props) => {
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
 
    const currentLivestream = useStreamConnect();
-   useNextGenRedirect(Boolean(currentLivestream?.isBeta));
+   useNextGenRedirect(currentLivestream?.isBeta);
    useViewerHandRaiseConnect(currentLivestream, streamerId);
 
    useEffect(() => {
