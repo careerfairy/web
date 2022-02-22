@@ -1,5 +1,6 @@
 import { GetServerSidePropsContext } from "next/types";
 import { getServerSideStream } from "./serverUtil";
+import { shouldWeRedirectNextGen } from "./StreamUtil";
 
 export const handleRedirectToNextGen = async (
    context: GetServerSidePropsContext
@@ -15,32 +16,22 @@ export const handleRedirectToNextGen = async (
          },
       };
    }
-   const isInProdEnvironment = process.env.NODE_ENV === "production";
+   const currentEnv = process.env.NODE_ENV;
 
-   const isInBetaDomain = context.req.headers.host === "nextgen.careerfairy.io";
-   const isBeta = serverSideStream.isBeta;
    const props = { serverSideStream };
-   if (!isInProdEnvironment || typeof isBeta !== "boolean") {
+   const urlToRedirect = shouldWeRedirectNextGen(
+      context.req.headers.host,
+      currentEnv,
+      serverSideStream.isBeta,
+      context.req.url
+   );
+
+   if (urlToRedirect) {
       return {
-         props, // will be passed to the page component as props
+         redirect: {
+            destination: urlToRedirect,
+         },
       };
-   }
-   if (isBeta) {
-      if (!isInBetaDomain) {
-         return {
-            redirect: {
-               destination: `https://nextgen.careerfairy.io${context.req.url}`,
-            },
-         };
-      }
-   } else {
-      if (isInBetaDomain) {
-         return {
-            redirect: {
-               destination: `https://careerfairy.io${context.req.url}`,
-            },
-         };
-      }
    }
 
    return {
