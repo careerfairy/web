@@ -104,7 +104,7 @@ const StreamerLayout = (props) => {
    const [sliding, setSliding] = useState(false)
 
    const currentLivestream = useStreamConnect()
-   useNextGenRedirect(Boolean(currentLivestream?.isBeta))
+   useNextGenRedirect(currentLivestream?.isBeta)
    useStreamerActiveHandRaisesConnect()
 
    const classes = useStyles({
