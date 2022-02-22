@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 
+//
 const useNextGenRedirect = (isBeta: boolean) => {
    useEffect(() => {
       const isInProdEnvironment = process.env.NODE_ENV === "production";
