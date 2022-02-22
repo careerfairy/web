@@ -1,7 +1,8 @@
 import React from "react";
 import WhatshotIcon from "@mui/icons-material/Whatshot";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
-import { Chip } from "@mui/material";
+import LanguageIcon from "@mui/icons-material/Language";
+import { Chip, Tooltip } from "@mui/material";
 
 const styles = {
    warningChip: {
@@ -44,4 +45,29 @@ export const InPersonEventBadge = ({ white }) => {
          color="secondary"
       />
    );
+};
+
+export const LanguageBadge = ({
+   streamLanguage,
+   white,
+   sx,
+   noTip = false,
+   ...restProps
+}) => {
+   return streamLanguage ? (
+      <Tooltip
+         placement="top"
+         arrow
+         title={noTip ? "" : `This event is in ${streamLanguage.name}`}
+      >
+         <Chip
+            icon={<LanguageIcon />}
+            label={streamLanguage.shortName.toUpperCase()}
+            sx={[white && styles.badgeWhite, sx]}
+            variant={white && "outlined"}
+            color="info"
+            {...restProps}
+         />
+      </Tooltip>
+   ) : null;
 };

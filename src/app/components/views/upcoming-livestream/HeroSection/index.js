@@ -14,6 +14,7 @@ import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 import HeroHosts from "./HeroHosts";
 import {
    InPersonEventBadge,
+   LanguageBadge,
    LimitedRegistrationsBadge,
 } from "../../NextLivestreams/GroupStreams/groupStreamCard/badges";
 
@@ -122,6 +123,7 @@ const HeroSection = ({
    hosts,
    numberOfSpotsRemaining,
    streamAboutToStart,
+   streamLanguage,
 }) => {
    return (
       <Box
@@ -142,13 +144,21 @@ const HeroSection = ({
                      >
                         {stream.title}
                      </Typography>
-                     {(stream.isFaceToFace || stream.maxRegistrants) && (
+                     {(stream.isFaceToFace ||
+                        stream.maxRegistrants ||
+                        streamLanguage) && (
                         <Box sx={styles.streamStatuses}>
                            {stream.isFaceToFace && <InPersonEventBadge white />}
                            {stream.maxRegistrants && (
                               <LimitedRegistrationsBadge
                                  white
                                  numberOfSpotsRemaining={numberOfSpotsRemaining}
+                              />
+                           )}
+                           {streamLanguage && (
+                              <LanguageBadge
+                                 white
+                                 streamLanguage={streamLanguage}
                               />
                            )}
                         </Box>
