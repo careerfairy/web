@@ -6,8 +6,6 @@ const useNextGenRedirect = (isBeta) => {
       const { host, pathname, search: query } = window.location
 
       const isInBetaDomain = host === "nextgen.careerfairy.io"
-      console.log("-> host", host)
-      console.log("-> isInBetaDomain", isInBetaDomain)
 
       if (!isInProdEnvironment) return
       if (isBeta) {
