@@ -5,7 +5,7 @@ const useNextGenRedirect = (isBeta) => {
       const isInProdEnvironment = process.env.NODE_ENV === "production"
       const { host, pathname, search: query } = window.location
 
-      const isInBetaDomain = host === "nextgen.careerfairy"
+      const isInBetaDomain = host === "nextgen.careerfairy.io"
       console.log("-> host", host)
       console.log("-> isInBetaDomain", isInBetaDomain)
 
