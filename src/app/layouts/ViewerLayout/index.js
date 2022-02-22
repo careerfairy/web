@@ -19,6 +19,7 @@ import * as actions from "store/actions";
 import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHandRaiseConnect";
 import StatsUtil from "../../data/util/StatsUtil";
 import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu";
+import useNextGenRedirect from "../../components/custom-hook/useNextGenRedirect";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -108,7 +109,7 @@ const ViewerLayout = (props) => {
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
 
    const currentLivestream = useStreamConnect();
-
+   useNextGenRedirect(Boolean(currentLivestream?.isBeta));
    useViewerHandRaiseConnect(currentLivestream, streamerId);
 
    useEffect(() => {
