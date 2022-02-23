@@ -133,6 +133,6 @@
       "webpack-bundle-analyzer": "^4.4.0"
    },
    "engines": {
-      "node": "^16"
+      "node": "^14"
    }
 }
