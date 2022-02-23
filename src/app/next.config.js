@@ -1,4 +1,5 @@
-"use strict";
+const { withSentryConfig } = require("@sentry/nextjs");
+
 // const withBundleAnalyzer = require("@next/bundle-analyzer")({
 //    enabled: process.env.ANALYZE === "true",
 // });
@@ -14,7 +15,7 @@ const securityHeaders = [
          "default-src blob: 'self' *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; " +
          "script-src blob: 'self' *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com; " +
          "style-src 'self' *.vitals.vercel-insights.com *.googleapis.com 'unsafe-inline'; " +
-         "connect-src vitals.vercel-insights.com *.careerfairy.io wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* sentry.io;" +
+         "connect-src vitals.vercel-insights.com *.careerfairy.io wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io sentry.io;" +
          "img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com;",
    },
    {
@@ -34,62 +35,76 @@ const iFrameSecurityHeaders = [
    },
 ];
 
-module.exports = (phase, { defaultConfig }) => {
-   // Only uncomment if you want to host build on firebase, keep commented out if hosting on Vercel
-   // if (phase === PHASE_PRODUCTION_BUILD) {
-   //     config.distDir = '../../dist/client'
-   // }
-   /* config options for all phases except development here */
-   // return withBundleAnalyzer(config);
-   return {
-      env: {
-         REACT_APP_FIREBASE_API_KEY: "AIzaSyAMx1wVVxqo4fooh0OMVSeSTOqNKzMbch0",
-         REACT_APP_FIREBASE_AUTH_DOMAIN: "careerfairy-e1fd9.firebaseapp.com",
-         REACT_APP_FIREBASE_DATABASE_URL:
-            "https://careerfairy-e1fd9.firebaseio.com",
-         REACT_APP_FIREBASE_PROJECT_ID: "careerfairy-e1fd9",
-         REACT_APP_FIREBASE_STORAGE_BUCKET: "careerfairy-e1fd9.appspot.com",
-         REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "993933306494",
-      },
-      eslint: {
-         // Since ESLint was introduced a long time after the beginning of the codebase
-         // there are a lot of pending errors that need to be fixed first
-         // this will ignore eslint during build to allow deploys
-         ignoreDuringBuilds: true,
-      },
-      headers: async () => {
-         return [
-            {
-               source: "/(.*)",
-               headers: securityHeaders,
-            },
-            {
-               source: "/next-livestreams/:groupId/embed",
-               headers: iFrameSecurityHeaders,
-            },
-         ];
-      },
-      webpackDevMiddleware: (config) => {
-         config.watchOptions = {
-            poll: 1000,
-            aggregateTimeout: 300,
-         };
-         return config;
-      },
-      webpack: (config) => {
-         config.module.rules.push({
-            test: /\.wav$/,
-            loader: "file-loader",
-         });
-         config.module.rules.push({
-            test: /\.svg$/,
-            use: ["@svgr/webpack"],
-         });
-         // config.module.rules.push({
-         //    test: /\.(woff(2)?|ttf)(\?v=\d+\.\d+\.\d+)?$/,
-         //    loader: "file-loader",
-         // });
-         return config;
-      },
-   };
+const moduleExports = {
+   env: {
+      REACT_APP_FIREBASE_API_KEY: "AIzaSyAMx1wVVxqo4fooh0OMVSeSTOqNKzMbch0",
+      REACT_APP_FIREBASE_AUTH_DOMAIN: "careerfairy-e1fd9.firebaseapp.com",
+      REACT_APP_FIREBASE_DATABASE_URL:
+         "https://careerfairy-e1fd9.firebaseio.com",
+      REACT_APP_FIREBASE_PROJECT_ID: "careerfairy-e1fd9",
+      REACT_APP_FIREBASE_STORAGE_BUCKET: "careerfairy-e1fd9.appspot.com",
+      REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "993933306494",
+   },
+   eslint: {
+      // Since ESLint was introduced a long time after the beginning of the codebase
+      // there are a lot of pending errors that need to be fixed first
+      // this will ignore eslint during build to allow deploys
+      ignoreDuringBuilds: true,
+   },
+   headers: async () => {
+      return [
+         {
+            source: "/(.*)",
+            headers: securityHeaders,
+         },
+         {
+            source: "/next-livestreams/:groupId/embed",
+            headers: iFrameSecurityHeaders,
+         },
+      ];
+   },
+   webpackDevMiddleware: (config) => {
+      config.watchOptions = {
+         poll: 1000,
+         aggregateTimeout: 300,
+      };
+      return config;
+   },
+   webpack: (config) => {
+      config.module.rules.push({
+         test: /\.wav$/,
+         loader: "file-loader",
+      });
+      config.module.rules.push({
+         test: /\.svg$/,
+         use: ["@svgr/webpack"],
+      });
+      // config.module.rules.push({
+      //    test: /\.(woff(2)?|ttf)(\?v=\d+\.\d+\.\d+)?$/,
+      //    loader: "file-loader",
+      // });
+      return config;
+   },
 };
+
+const sentryWebpackPluginOptions = {
+   // Additional config options for the Sentry Webpack plugin. Keep in mind that
+   // the following options are set automatically, and overriding them is not
+   // recommended:
+   //   release, url, org, project, authToken, configFile, stripPrefix,
+   //   urlPrefix, include, ignore
+
+   silent: true, // Suppresses all logs
+   // For all available options, see:
+   // https://github.com/getsentry/sentry-webpack-plugin#options.
+};
+
+/**
+ * withSentryConfig() docs:
+ *
+ * Automatically call the code in sentry.server.config.js and sentry.client.config.js, at server start up and client
+ * page load, respectively. Using withSentryConfig is the only way to guarantee that the SDK is initialized early
+ * enough to catch all errors and start performance monitoring.
+ * Generate and upload source maps to Sentry, so that your stacktraces contain original, demangled code.
+ */
+module.exports = withSentryConfig(moduleExports, sentryWebpackPluginOptions);

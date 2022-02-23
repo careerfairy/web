@@ -3,3 +3,9 @@
 /semantic/dist/
 /.idea/
 .DS_Store
+
+# Sentry
+.sentryclirc
+
+# Sentry
+.sentryclirc
