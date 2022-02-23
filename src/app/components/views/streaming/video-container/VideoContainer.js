@@ -4,32 +4,31 @@ import React, {
    useContext,
    useEffect,
    useState,
-} from "react"
+} from "react";
 
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import VideoControlsContainer from "./VideoControlsContainer"
-import useDevices from "components/custom-hook/useDevices"
-import TutorialContext from "context/tutorials/TutorialContext"
-import DemoIntroModal from "../modal/DemoIntroModal"
-import DemoEndModal from "../modal/DemoEndModal"
-import { useLocalStorage } from "react-use"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
+import VideoControlsContainer from "./VideoControlsContainer";
+import useDevices from "components/custom-hook/useDevices";
+import TutorialContext from "context/tutorials/TutorialContext";
+import DemoIntroModal from "../modal/DemoIntroModal";
+import DemoEndModal from "../modal/DemoEndModal";
+import { useLocalStorage } from "react-use";
 
-import useMediaSources from "components/custom-hook/useMediaSources"
-import WifiIndicator from "./WifiIndicator"
-// import LoadingModal from "../modal/LoadingModal";
-// import ErrorModal from "../modal/ErrorModal";
-import SettingsModal from "./SettingsModal"
-import ScreenShareModal from "./ScreenShareModal"
-import useStreamRef from "../../../custom-hook/useStreamRef"
-import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/StreamerTopBar/BreakoutRoomManagementModal"
-import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker"
-import Streams from "./Streams"
-import DraggableComponent from "../../banners/DraggableComponent"
-import useAgoraRtc from "components/custom-hook/useAgoraRtc"
-import StreamPublishingModal from "../modal/StreamPublishingModal"
-import { useDispatch } from "react-redux"
-import * as actions from "store/actions"
-import AgoraStateHandler from "../modal/AgoraStateModal/AgoraStateHandler"
+import useMediaSources from "components/custom-hook/useMediaSources";
+import WifiIndicator from "./WifiIndicator";
+import SettingsModal from "./SettingsModal";
+import ScreenShareModal from "./ScreenShareModal";
+import useStreamRef from "../../../custom-hook/useStreamRef";
+import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/StreamerTopBar/BreakoutRoomManagementModal";
+import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
+import Streams from "./Streams";
+import DraggableComponent from "../../banners/DraggableComponent";
+import useAgoraRtc from "components/custom-hook/useAgoraRtc";
+import StreamPublishingModal from "../modal/StreamPublishingModal";
+import { useDispatch } from "react-redux";
+import * as actions from "store/actions";
+import AgoraStateHandler from "../modal/AgoraStateModal/AgoraStateHandler";
+import { useRouter } from "next/router";
 
 const labels = {
    mainTitle: "Join the Stream",
@@ -43,7 +42,7 @@ const labels = {
    disabledJoinButtonLabel: "Activate microphone to join",
    joinWithoutCameraConfirmDescription:
       "You intend to join this stream with only with your microphone?",
-}
+};
 function VideoContainer({
    currentLivestream,
    isPlayMode,
@@ -52,7 +51,7 @@ function VideoContainer({
    streamerId,
    viewer,
 }) {
-   const firebase = useFirebaseService()
+   const firebase = useFirebaseService();
    const {
       tutorialSteps,
       setTutorialSteps,
@@ -60,26 +59,26 @@ function VideoContainer({
       handleConfirmStep,
       getActiveTutorialStepKey,
       endTutorial,
-   } = useContext(TutorialContext)
-   const isMainStreamer = streamerId === currentLivestream.id
-   const streamRef = useStreamRef()
-   const dispatch = useDispatch()
+   } = useContext(TutorialContext);
+   const isMainStreamer = streamerId === currentLivestream.id;
+   const streamRef = useStreamRef();
+   const dispatch = useDispatch();
    const [hasDismissedStreamTutorial] = useLocalStorage(
       "hasDismissedStreamTutorial",
       false
-   )
-   const [showDemoIntroModal, setShowDemoIntroModal] = useState(false)
+   );
+   const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
+   const {
+      query: { withHighQuality },
+   } = useRouter();
+   const [showScreenShareModal, setShowScreenShareModal] = useState(false);
+   const [showLocalStreamPublishingModal, setShowLocalStreamPublishingModal] =
+      useState(true);
+   const [optimizationMode] = useState("detail");
 
-   const [showScreenShareModal, setShowScreenShareModal] = useState(false)
-   const [
-      showLocalStreamPublishingModal,
-      setShowLocalStreamPublishingModal,
-   ] = useState(true)
-   const [optimizationMode] = useState("detail")
+   const [showSettings, setShowSettings] = useState(false);
 
-   const [showSettings, setShowSettings] = useState(false)
-
-   const isStreamer = true
+   const isStreamer = true;
    const {
       networkQuality,
       localStream,
@@ -92,16 +91,14 @@ function VideoContainer({
       handlePublishLocalStream,
       closeAndUnpublishedLocalStream,
       demoStreamHandlers,
-   } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer, true)
+   } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer, true);
 
-   const devices = useDevices(localStream, { initialize: true })
+   const devices = useDevices(localStream, { initialize: true });
 
-   const {
-      mediaControls,
-      localMediaStream: displayableMediaStream,
-   } = useMediaSources(devices, localStream, true)
+   const { mediaControls, localMediaStream: displayableMediaStream } =
+      useMediaSources(devices, localStream, true);
 
-   const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams)
+   const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams);
 
    useEffect(() => {
       if (streamerId && currentLivestream.id) {
@@ -109,179 +106,152 @@ function VideoContainer({
             currentLivestream.mode === "desktop" &&
             currentLivestream.screenSharerId === streamerId
          ) {
-            setDesktopMode("default", streamerId)
+            setDesktopMode("default", streamerId);
          }
       }
-   }, [streamerId, currentLivestream.id])
+   }, [streamerId, currentLivestream.id]);
 
-   const [timeoutState, setTimeoutState] = useState(null)
+   const [timeoutState, setTimeoutState] = useState(null);
 
    useEffect(() => {
-      dynamicallyUpdateVideoProfile()
-   }, [
-      localStream,
-      remoteStreams,
-      currentLivestream.currentSpeakerId,
-      currentLivestream.mode,
-   ])
-
-   const handlePublish = async () => {
-      try {
-         await handlePublishLocalStream()
-         setShowLocalStreamPublishingModal(false)
-         if (currentLivestream.test && !hasDismissedStreamTutorial) {
-            handleOpenDemoIntroModal()
-         }
-      } catch (e) {
-         console.log("-> error in HANDLE PUBLISH", e)
-      }
-   }
-
-   const dynamicallyUpdateVideoProfile = async () => {
-      if (localStream?.videoTrack) {
-         if (remoteStreams?.length > 3) {
+      if (localStream && remoteStreams && !withHighQuality) {
+         if (remoteStreams.length > 3) {
             if (
-               streamerId === currentLivestream.currentSpeakerId &&
+               streamerId === currentSpeakerId &&
                currentLivestream.mode !== "desktop" &&
                currentLivestream.mode !== "presentation"
             ) {
                if (timeoutState) {
-                  clearTimeout(timeoutState)
+                  clearTimeout(timeoutState);
                }
-               let newTimeout = scheduleEncoderConfigurationSwitchTo("480p_9")
-               setTimeoutState(newTimeout)
+               let newTimeout = setTimeout(() => {
+                  localMediaStream.stream.setVideoProfile("480p_9");
+               }, 20000);
+               setTimeoutState(newTimeout);
             } else {
                if (timeoutState) {
-                  clearTimeout(timeoutState)
+                  clearTimeout(timeoutState);
                }
-               let newTimeout = scheduleEncoderConfigurationSwitchTo("180p")
-               setTimeoutState(newTimeout)
+               let newTimeout = setTimeout(() => {
+                  localStream.stream.setVideoProfile("180p");
+               }, 15000);
+               setTimeoutState(newTimeout);
             }
          } else {
-            if (localStream?.isVideoPublished) {
-               try {
-                  await localStream.videoTrack.setEncoderConfiguration("480p_9")
-               } catch (error) {
-                  if (error.code === "TRACK_IS_DISABLED") {
-                     console.log("Couldn't process encoding configuration")
-                  }
-               }
-            }
+            localMediaStream.stream.setVideoProfile("480p_9");
          }
       }
-   }
+   }, [localStream, remoteStreams, currentSpeakerId, currentLivestream.mode]);
 
-   const scheduleEncoderConfigurationSwitchTo = (videoResolution) => {
-      return setTimeout(async () => {
-         try {
-            await localStream.videoTrack.setEncoderConfiguration(
-               videoResolution
-            )
-         } catch (error) {
-            if (error.code === "TRACK_IS_DISABLED") {
-               console.log("Couldn't process encoding configuration")
-            }
+   const handlePublish = async () => {
+      try {
+         await handlePublishLocalStream();
+         setShowLocalStreamPublishingModal(false);
+         if (currentLivestream.test && !hasDismissedStreamTutorial) {
+            handleOpenDemoIntroModal();
          }
-      }, 20000)
-   }
+      } catch (e) {
+         console.log("-> error in HANDLE PUBLISH", e);
+      }
+   };
 
    const setDesktopMode = async (mode, initiatorId) => {
       let screenSharerId =
-         mode === "desktop" ? initiatorId : currentLivestream.screenSharerId
-      await firebase.setDesktopMode(streamRef, mode, screenSharerId)
-   }
+         mode === "desktop" ? initiatorId : currentLivestream.screenSharerId;
+      await firebase.setDesktopMode(streamRef, mode, screenSharerId);
+   };
 
    const handleJoinAsViewer = useCallback(async () => {
-      await closeAndUnpublishedLocalStream()
-      await dispatch(actions.setStreamerIsPublished(false))
-      setShowLocalStreamPublishingModal(false)
+      await closeAndUnpublishedLocalStream();
+      await dispatch(actions.setStreamerIsPublished(false));
+      setShowLocalStreamPublishingModal(false);
       if (currentLivestream.test && !hasDismissedStreamTutorial) {
-         handleOpenDemoIntroModal()
+         handleOpenDemoIntroModal();
       }
-   }, [localMediaHandlers])
+   }, [localMediaHandlers]);
 
    useEffect(() => {
-      const activeStep = getActiveTutorialStepKey()
+      const activeStep = getActiveTutorialStepKey();
       if (localStream && activeStep > 0) {
          if (activeStep > 10 && activeStep < 13) {
             if (!remoteStreams.some((stream) => stream.uid === "demoStream")) {
-               demoStreamHandlers.addDemoStream()
+               demoStreamHandlers.addDemoStream();
             }
          } else {
-            demoStreamHandlers.removeDemoStream()
+            demoStreamHandlers.removeDemoStream();
          }
       }
-   }, [tutorialSteps])
+   }, [tutorialSteps]);
 
    const isOpen = (property) => {
       return Boolean(
          currentLivestream.test &&
             tutorialSteps.streamerReady &&
             tutorialSteps[property]
-      )
-   }
+      );
+   };
 
    const handleCloseDemoIntroModal = (wantsDemo) => {
-      setShowDemoIntroModal(false)
+      setShowDemoIntroModal(false);
       if (wantsDemo) {
-         setShowBubbles(true)
+         setShowBubbles(true);
          setTutorialSteps({
             ...tutorialSteps,
             streamerReady: true,
-         })
+         });
       } else {
-         setShowBubbles(true)
+         setShowBubbles(true);
       }
-   }
+   };
    const handleOpenDemoIntroModal = () => {
-      const activeStep = getActiveTutorialStepKey()
+      const activeStep = getActiveTutorialStepKey();
       if (activeStep === 0) {
-         setShowDemoIntroModal(true)
+         setShowDemoIntroModal(true);
       }
-   }
+   };
    const handleCloseDemoEndModal = () => {
-      handleConfirmStep(23)
-      endTutorial()
-      setShowBubbles(true)
-   }
+      handleConfirmStep(23);
+      endTutorial();
+      setShowBubbles(true);
+   };
 
    const handleCloseScreenShareModal = useCallback(() => {
-      setShowScreenShareModal(false)
-   }, [])
+      setShowScreenShareModal(false);
+   }, []);
 
    const handleClickScreenShareButton = async () => {
       if (currentLivestream.mode === "desktop") {
          unpublishScreenShareStream().then(async () => {
-            return await setDesktopMode("default", streamerId)
-         })
+            return await setDesktopMode("default", streamerId);
+         });
       } else {
-         setShowScreenShareModal(true)
+         setShowScreenShareModal(true);
       }
-   }
+   };
 
    const onScreenShareStopped = useCallback(() => {
       unpublishScreenShareStream().then(async () => {
-         await setDesktopMode("default", streamerId)
-      })
-   }, [unpublishScreenShareStream])
+         await setDesktopMode("default", streamerId);
+      });
+   }, [unpublishScreenShareStream]);
 
    const handleScreenShare = useCallback(
       async (optimizationMode = "detail") => {
          if (currentLivestream.mode === "desktop") {
             unpublishScreenShareStream().then(async () => {
-               await setDesktopMode("default", streamerId)
-            })
+               await setDesktopMode("default", streamerId);
+            });
          } else {
             publishScreenShareStream(
                optimizationMode,
                onScreenShareStopped
             ).then(async () => {
-               await setDesktopMode("desktop", streamerId)
-            })
+               await setDesktopMode("desktop", streamerId);
+            });
          }
       },
       [optimizationMode, currentLivestream?.mode, streamerId]
-   )
+   );
 
    return (
       <Fragment>
@@ -377,7 +347,7 @@ function VideoContainer({
             handleClose={handleCloseDemoEndModal}
          />
       </Fragment>
-   )
+   );
 }
 
-export default VideoContainer
+export default VideoContainer;

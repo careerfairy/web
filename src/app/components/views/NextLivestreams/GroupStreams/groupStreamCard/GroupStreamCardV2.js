@@ -1,13 +1,13 @@
-import PropTypes from "prop-types"
-import React, { Fragment, memo, useEffect, useMemo, useState } from "react"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import UserUtil from "../../../../../data/util/UserUtil"
-import { useRouter } from "next/router"
+import PropTypes from "prop-types";
+import React, { Fragment, memo, useEffect, useMemo, useState } from "react";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
+import UserUtil from "../../../../../data/util/UserUtil";
+import { useRouter } from "next/router";
 import {
    dynamicSort,
    getResizedUrl,
    getResponsiveResizedUrl,
-} from "../../../../helperFunctions/HelperFunctions"
+} from "../../../../helperFunctions/HelperFunctions";
 import {
    AvatarGroup,
    Card,
@@ -16,24 +16,24 @@ import {
    Collapse,
    Grow,
    Stack,
-} from "@mui/material"
-import Avatar from "@mui/material/Avatar"
-import Box from "@mui/material/Box"
-import CardMedia from "@mui/material/CardMedia"
-import Typography from "@mui/material/Typography"
-import { speakerPlaceholder } from "../../../../util/constants"
-import Tag from "./Tag"
-import Fade from "@stahl.luke/react-reveal/Fade"
-import CopyToClipboard from "../../../common/CopyToClipboard"
-import { DateTimeDisplay } from "./TimeDisplay"
-import { AttendButton, DetailsButton } from "./actionButtons"
-import LogoElement from "../LogoElement"
-import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded"
-import { InPersonEventBadge, LimitedRegistrationsBadge } from "./badges"
-import RegistrationModal from "../../../common/registration-modal"
-import styles from "./GroupStreamCardV2Styles"
+} from "@mui/material";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
+import { speakerPlaceholder } from "../../../../util/constants";
+import Tag from "./Tag";
+import Fade from "@stahl.luke/react-reveal/Fade";
+import CopyToClipboard from "../../../common/CopyToClipboard";
+import { DateTimeDisplay } from "./TimeDisplay";
+import { AttendButton, DetailsButton } from "./actionButtons";
+import LogoElement from "../LogoElement";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
+import { InPersonEventBadge, LimitedRegistrationsBadge } from "./badges";
+import RegistrationModal from "../../../common/registration-modal";
+import styles from "./GroupStreamCardV2Styles";
 
-const maxOptions = 2
+const maxOptions = 2;
 const GroupStreamCardV2 = memo(
    ({
       livestream,
@@ -50,20 +50,26 @@ const GroupStreamCardV2 = memo(
       globalCardHighlighted,
       isAdmin,
    }) => {
-      const firebase = useFirebaseService()
-      const { absolutePath, pathname, push, query } = useRouter()
+      const firebase = useFirebaseService();
+      const { absolutePath, pathname, push, query } = useRouter();
       const linkToStream = useMemo(() => {
          const notLoggedIn =
-            (user.isLoaded && user.isEmpty) || !user.emailVerified
-         const registerQuery = notLoggedIn ? `&register=${livestream.id}` : ""
+            (user.isLoaded && user.isEmpty) || !user.emailVerified;
+         const registerQuery = notLoggedIn ? `&register=${livestream.id}` : "";
          const referrerQuery = query.referrerId
             ? `&referrerId=${query.referrerId}`
-            : ""
-         const queries = `${registerQuery}${referrerQuery}`
+            : "";
+         const queries = `${registerQuery}${referrerQuery}`;
          return pathname === "/next-livestreams/[groupId]"
             ? `/next-livestreams/${groupData.groupId}?livestreamId=${livestream.id}${queries}`
-            : `/next-livestreams?livestreamId=${livestream.id}${queries}`
-      }, [pathname, livestream?.id, groupData?.groupId, query.referrerId, user])
+            : `/next-livestreams?livestreamId=${livestream.id}${queries}`;
+      }, [
+         pathname,
+         livestream?.id,
+         groupData?.groupId,
+         query.referrerId,
+         user,
+      ]);
 
       function userIsRegistered() {
          if (
@@ -71,36 +77,37 @@ const GroupStreamCardV2 = memo(
             !livestream.registeredUsers ||
             isAdmin
          ) {
-            return false
+            return false;
          }
-         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
+         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1);
       }
 
-      const registered = useMemo(() => userIsRegistered(), [
-         livestream.registeredUsers,
-      ])
+      const registered = useMemo(
+         () => userIsRegistered(),
+         [livestream.registeredUsers]
+      );
 
-      const [cardHovered, setCardHovered] = useState(false)
-      const [targetOptions, setTargetOptions] = useState([])
-      const [filteredGroups, setFilteredGroups] = useState([])
-      const [unfilteredGroups, setUnfilteredGroups] = useState([])
-      const [isHighlighted, setIsHighlighted] = useState(false)
-      const [targetGroupId, setTargetGroupId] = useState("")
-      const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
-      const handleCloseJoinModal = () => setJoinGroupModalData(undefined)
+      const [cardHovered, setCardHovered] = useState(false);
+      const [targetOptions, setTargetOptions] = useState([]);
+      const [filteredGroups, setFilteredGroups] = useState([]);
+      const [unfilteredGroups, setUnfilteredGroups] = useState([]);
+      const [isHighlighted, setIsHighlighted] = useState(false);
+      const [targetGroupId, setTargetGroupId] = useState("");
+      const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
+      const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
       const handleOpenJoinModal = (dataObj) =>
          setJoinGroupModalData({
             groups: dataObj.groups,
             targetGroupId: targetGroupId,
             livestream: dataObj?.livestream,
-         })
+         });
       useEffect(() => {
          if (checkIfHighlighted() && !isHighlighted) {
-            setIsHighlighted(true)
+            setIsHighlighted(true);
          } else if (checkIfHighlighted() && isHighlighted) {
-            setIsHighlighted(false)
+            setIsHighlighted(false);
          }
-      }, [livestreamId, id, careerCenterId, groupData.groupId])
+      }, [livestreamId, id, careerCenterId, groupData.groupId]);
 
       useEffect(() => {
          if (
@@ -108,19 +115,19 @@ const GroupStreamCardV2 = memo(
             unfilteredGroups.length &&
             !livestream.registeredUsers.includes(user.email)
          ) {
-            ;(async function handleAutoRegister() {
-               const newQuery = { ...query }
+            (async function handleAutoRegister() {
+               const newQuery = { ...query };
                if (newQuery.register) {
-                  delete newQuery.register
+                  delete newQuery.register;
                }
                await push({
                   pathname: pathname,
                   query: {
                      ...newQuery,
                   },
-               })
-               handleOpenJoinModal({ groups: unfilteredGroups, livestream })
-            })()
+               });
+               handleOpenJoinModal({ groups: unfilteredGroups, livestream });
+            })();
          }
       }, [
          query.register,
@@ -128,28 +135,28 @@ const GroupStreamCardV2 = memo(
          unfilteredGroups,
          livestream.registeredUsers,
          user.email,
-      ])
+      ]);
 
       useEffect(() => {
          if (groupData.categories && livestream.targetCategories) {
-            const { groupId, categories } = groupData
-            let totalOptions = []
+            const { groupId, categories } = groupData;
+            let totalOptions = [];
             categories.forEach((category) =>
                totalOptions.push(category.options)
-            )
+            );
             const flattenedOptions = totalOptions.reduce(function (a, b) {
-               return a.concat(b)
-            }, [])
-            const matchedOptions = livestream.targetCategories[groupId]
+               return a.concat(b);
+            }, []);
+            const matchedOptions = livestream.targetCategories[groupId];
             if (matchedOptions) {
                const filteredOptions = flattenedOptions
                   .filter((option) => matchedOptions.includes(option.id))
                   .sort(dynamicSort("name"))
-                  .reverse()
-               setTargetOptions(filteredOptions)
+                  .reverse();
+               setTargetOptions(filteredOptions);
             }
          }
-      }, [groupData, livestream])
+      }, [groupData, livestream]);
 
       useEffect(() => {
          if (
@@ -164,46 +171,46 @@ const GroupStreamCardV2 = memo(
                   const groupList = querySnapshot.docs.map((doc) => ({
                      id: doc.id,
                      ...doc.data(),
-                  }))
+                  }));
 
-                  let targetGroupId = groupData?.groupId
+                  let targetGroupId = groupData?.groupId;
                   if (listenToUpcoming) {
                      const companyThatPublishedStream = groupList.find(
                         (group) =>
                            !group.universityCode &&
                            group.id === livestream?.author?.groupId
-                     )
+                     );
                      if (companyThatPublishedStream?.id) {
-                        targetGroupId = companyThatPublishedStream.id
+                        targetGroupId = companyThatPublishedStream.id;
                      }
                   }
                   const targetGroup = groupList.find(
                      (group) => group.id === targetGroupId
-                  )
+                  );
                   if (targetGroup) {
-                     setTargetGroupId(targetGroup.id)
+                     setTargetGroupId(targetGroup.id);
                   }
-                  setFilteredGroups(targetGroup ? [targetGroup] : groupList)
-                  setUnfilteredGroups(groupList)
+                  setFilteredGroups(targetGroup ? [targetGroup] : groupList);
+                  setUnfilteredGroups(groupList);
                })
                .catch((e) => {
-                  console.log("error", e)
-               })
+                  console.log("error", e);
+               });
          }
-      }, [groupData?.groupId, listenToUpcoming, livestream?.author?.groupId])
+      }, [groupData?.groupId, listenToUpcoming, livestream?.author?.groupId]);
 
       const handleMouseEntered = () => {
          if (!cardHovered && !globalCardHighlighted) {
-            setCardHovered(true)
+            setCardHovered(true);
          }
-      }
+      };
 
       const handleMouseLeft = () => {
-         cardHovered && setCardHovered(false)
-      }
+         cardHovered && setCardHovered(false);
+      };
 
       const checkIfHighlighted = () => {
-         if (isTargetDraft) return true
+         if (isTargetDraft) return true;
          if (
             careerCenterId &&
             livestreamId &&
@@ -211,18 +218,18 @@ const GroupStreamCardV2 = memo(
             livestreamId === id &&
             groupData.groupId === careerCenterId
          ) {
-            return true
-         } else return livestreamId && !careerCenterId && livestreamId === id
-      }
+            return true;
+         } else return livestreamId && !careerCenterId && livestreamId === id;
+      };
 
       const checkIfUserFollows = (careerCenter) => {
          if (user.isLoaded && !user.isEmpty && userData && userData.groupIds) {
-            const { groupId } = careerCenter
-            return userData.groupIds.includes(groupId)
+            const { groupId } = careerCenter;
+            return userData.groupIds.includes(groupId);
          } else {
-            return false
+            return false;
          }
-      }
+      };
 
       function deregisterFromLivestream() {
          if (user.isLoaded && user.isEmpty) {
@@ -231,10 +238,10 @@ const GroupStreamCardV2 = memo(
                query: {
                   absolutePath: absolutePath,
                },
-            })
+            });
          }
 
-         firebase.deregisterFromLivestream(livestream.id, user.email)
+         firebase.deregisterFromLivestream(livestream.id, user.email);
       }
 
       async function startRegistrationProcess() {
@@ -244,83 +251,85 @@ const GroupStreamCardV2 = memo(
                query: {
                   absolutePath: linkToStream,
                },
-            })
+            });
          }
 
          if (!userData || !UserUtil.userProfileIsComplete(userData)) {
             return push({
                pathname: "/profile",
-            })
+            });
          }
 
-         setCardHovered(false)
+         setCardHovered(false);
 
          handleOpenJoinModal({
             groups: unfilteredGroups,
             livestream,
-         })
+         });
       }
 
       const handleRegisterClick = () => {
          if (user && livestream.registeredUsers?.indexOf(user.email) > -1) {
-            deregisterFromLivestream()
+            deregisterFromLivestream();
          } else {
-            startRegistrationProcess()
+            startRegistrationProcess();
          }
-      }
+      };
 
       const checkIfRegistered = () => {
-         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
-      }
+         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1);
+      };
 
       const handleCardClick = () => {
          if (mobile) {
-            setCardHovered(true)
+            setCardHovered(true);
          }
-      }
+      };
 
       const handleClickAwayDetails = () => {
          if (mobile) {
-            setCardHovered(false)
+            setCardHovered(false);
          }
-      }
+      };
 
       const registrationDisabled = useMemo(() => {
-         if (isPastLivestreams) return true
+         if (isPastLivestreams) return true;
          //User should always be able to cancel registration
-         if (userIsRegistered()) return false
+         if (userIsRegistered()) return false;
          //Disable registration if max number of registrants is reached
          if (livestream.maxRegistrants && livestream.maxRegistrants > 0) {
             return livestream.registeredUsers
                ? livestream.maxRegistrants <= livestream.registeredUsers.length
-               : false
+               : false;
          }
-         return false
-      }, [isPastLivestreams, livestream, user, registered])
+         return false;
+      }, [isPastLivestreams, livestream, user, registered]);
 
       const mainButtonLabel = useMemo(() => {
-         if (userIsRegistered()) return "Cancel"
+         if (userIsRegistered()) return "Cancel";
          if (
             livestream.maxRegistrants &&
             livestream.maxRegistrants > 0 &&
             livestream.registeredUsers &&
             livestream.maxRegistrants <= livestream.registeredUsers.length
          ) {
-            return "No spots left"
+            return "No spots left";
          } else if (user) {
-            return "I'll attend"
+            return "I'll attend";
          } else {
-            return "Join to attend"
+            return "Join to attend";
          }
-      }, [user, registered, livestream])
+      }, [user, registered, livestream]);
 
       const numberOfSpotsRemaining = useMemo(() => {
-         if (!livestream.maxRegistrants) return 0
-         else if (!livestream.registeredUsers) return livestream.maxRegistrants
+         if (!livestream.maxRegistrants) return 0;
+         else if (!livestream.registeredUsers) return livestream.maxRegistrants;
          else {
-            return livestream.maxRegistrants - livestream.registeredUsers.length
+            return (
+               livestream.maxRegistrants - livestream.registeredUsers.length
+            );
          }
-      }, [livestream?.maxRegistrants, livestream.registeredUsers?.length])
+      }, [livestream?.maxRegistrants, livestream.registeredUsers?.length]);
 
       return (
          <Fragment>
@@ -436,7 +445,7 @@ const GroupStreamCardV2 = memo(
                               livestream={livestream}
                            />
 
-                           {!isPastLivestreams && !livestream.openStream && (
+                           {!isPastLivestreams && (
                               <AttendButton
                                  size="small"
                                  mobile={mobile}
@@ -604,9 +613,9 @@ const GroupStreamCardV2 = memo(
                }
             />
          </Fragment>
-      )
+      );
    }
-)
+);
 
 GroupStreamCardV2.propTypes = {
    careerCenterId: PropTypes.string,
@@ -624,6 +633,6 @@ GroupStreamCardV2.propTypes = {
    user: PropTypes.object,
    userData: PropTypes.object,
    isPastLivestreams: PropTypes.bool,
-}
+};
 
-export default GroupStreamCardV2
+export default GroupStreamCardV2;

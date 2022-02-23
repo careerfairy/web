@@ -14,6 +14,7 @@ import ButtonComponent from "../streaming/sharedComponents/ButtonComponent";
 import StreamClosedCountdown from "../streaming/sharedComponents/StreamClosedCountdown";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
+import { useRouter } from "next/router";
 
 const useStyles = makeStyles((theme) => ({
    iconsContainer: {
@@ -68,6 +69,10 @@ const ViewerOverview = ({
       (state) => state.stream.layout.focusModeEnabled
    );
    const [mounted, setMounted] = useState(false);
+
+   const {
+      query: { isRecordingWindow },
+   } = useRouter();
    const { currentLivestream, isBreakout } = useCurrentStream();
    const dispatch = useDispatch();
    const { videoIsMuted, videoIsPaused } = useSelector(
@@ -130,7 +135,7 @@ const ViewerOverview = ({
          )}
          <StreamNotifications isStreamer={false} />
          <Backdrop
-            open={videoIsMuted}
+            open={videoIsMuted && !isRecordingWindow}
             className={classes.backdrop}
             onClick={() => dispatch(actions.unmuteMutedRemoteVideosAfterFail())}
          >
@@ -140,7 +145,7 @@ const ViewerOverview = ({
             </div>
          </Backdrop>
          <Backdrop
-            open={videoIsPaused}
+            open={videoIsPaused && !isRecordingWindow}
             className={classes.backdrop}
             onClick={() => dispatch(actions.unpauseRemoteVideosAfterFail())}
          >

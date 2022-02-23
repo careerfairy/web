@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useRef, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import window, { document } from "global";
 import { useAgoraToken } from "./useAgoraToken";
 import { useDispatch } from "react-redux";
@@ -13,21 +13,17 @@ export default function useAgoraAsStreamer(
    screenSharingMode,
    roomId,
    streamId,
-   isViewer,
-   optimizationMode,
-   setShowVideoButton
+   isViewer
 ) {
    const dispatch = useDispatch();
    const { path } = useStreamRef();
    const [localMediaStream, setLocalMediaStream] = useState(null);
-
-   const [externalUsers, setExternalUsers] = useState([]);
-   const externalUsersRef = useRef(externalUsers);
-
-   const updateExternalUsers = (newExternalUsers) => {
-      externalUsersRef.current = newExternalUsers;
-      setExternalUsers(newExternalUsers);
-   };
+   const [addedStream, setAddedStream] = useState(null);
+   const [updatedStream, setUpdatedStream] = useState(null);
+   const [removedStream, setRemovedStream] = useState(null);
+   const [externalMediaStreams, setExternalMediaStreams] = useState([]);
+   const [joinedChannel, setJoinedChannel] = useState(false);
+   const [timeoutNumber, setTimeoutNumber] = useState(null);
 
    const [networkQuality, setNetworkQuality] = useState({
       downlinkNetworkQuality: 0,
@@ -36,16 +32,12 @@ export default function useAgoraAsStreamer(
    });
 
    const router = useRouter();
-   const { withProxy } = router.query;
+   const { withProxy, withHighQuality } = router.query;
 
    const token = router.query.token || "";
 
    const [agoraRTC, setAgoraRTC] = useState(null);
    const [rtcClient, setRtcClient] = useState(null);
-   const [proxyMode, setProxyMode] = useState(false);
-   const [timeoutNumber, setTimeoutNumber] = useState(null);
-   const [joinedChannel, setJoinedChannel] = useState(false);
-
    const [screenShareRtcClient, setScreenShareRtcClient] = useState(null);
    const [screenShareRtcStream, setScreenShareRtcStream] = useState(null);
 
@@ -54,8 +46,6 @@ export default function useAgoraAsStreamer(
 
    const [userUid, setUserUid] = useState(null);
    const [readyToConnect, setReadyToConnect] = useState(false);
-   const [numberOfViewers, setNumberOfViewers] = useState(0);
-
    const [agoraRtcStatus, setAgoraRtcStatus] = useState({
       type: "INFO",
       msg: "RTC_INITIAL",
@@ -64,9 +54,8 @@ export default function useAgoraAsStreamer(
       type: "INFO",
       msg: "RTM_INITIAL",
    });
-   const [agoraRtcConnectionStatus, setAgoraRtcConnectionStatus] = useState(
-      "INITIAL"
-   );
+   const [agoraRtcConnectionStatus, setAgoraRtcConnectionStatus] =
+      useState("INITIAL");
    const agoraToken = useAgoraToken(
       roomId,
       userUid,
@@ -75,7 +64,6 @@ export default function useAgoraAsStreamer(
       false,
       path
    );
-   console.log("-> agoraToken", agoraToken);
    const agoraScreenShareToken = useAgoraToken(
       roomId,
       userUid,
@@ -94,18 +82,57 @@ export default function useAgoraAsStreamer(
    }, [streamId]);
 
    useEffect(() => {
-      if (
-         window &&
-         userUid &&
-         streamerReady &&
-         roomId &&
-         streamId &&
-         agoraToken &&
-         agoraScreenShareToken &&
-         document
-      ) {
-         setReadyToConnect(true);
+      if (addedStream) {
+         let cleanedExternalMediaStreams = removeStreamFromList(
+            addedStream.streamId,
+            externalMediaStreams
+         );
+         setExternalMediaStreams([...cleanedExternalMediaStreams, addedStream]);
       }
+   }, [addedStream]);
+
+   useEffect(() => {
+      if (updatedStream) {
+         let externalMediaStreamsCopy = [...externalMediaStreams];
+         externalMediaStreamsCopy.forEach((stream) => {
+            if (stream.streamId === updatedStream.streamId) {
+               Object.keys(updatedStream.propertiesToUpdate).forEach((key) => {
+                  stream[key] = updatedStream.propertiesToUpdate[key];
+               });
+            }
+         });
+         setExternalMediaStreams(externalMediaStreamsCopy);
+      }
+   }, [updatedStream]);
+
+   useEffect(() => {
+      // console.log("externalMediaStreams", externalMediaStreams);
+   }, [externalMediaStreams]);
+
+   useEffect(() => {
+      if (removedStream) {
+         let cleanedExternalMediaStreams = removeStreamFromList(
+            removedStream,
+            externalMediaStreams
+         );
+         setExternalMediaStreams([...cleanedExternalMediaStreams]);
+      }
+      setRemovedStream(null);
+   }, [removedStream]);
+   useEffect(() => {
+      setReadyToConnect(
+         Boolean(
+            window &&
+               userUid &&
+               streamerReady &&
+               roomId &&
+               streamId &&
+               agoraToken &&
+               agoraScreenShareToken &&
+               document &&
+               router
+         )
+      );
    }, [
       window,
       userUid,
@@ -115,7 +142,18 @@ export default function useAgoraAsStreamer(
       agoraToken,
       agoraScreenShareToken,
       document,
+      router.asPath,
    ]);
+
+   useEffect(() => {
+      if (readyToConnect) {
+         handleConnectClients();
+      }
+   }, [readyToConnect]);
+
+   useEffect(() => {
+      handleSwitchRooms();
+   }, [router.asPath]);
 
    useEffect(() => {
       if (timeoutNumber) {
@@ -126,37 +164,14 @@ export default function useAgoraAsStreamer(
          agoraRtcStatus.msg === "RTC_PUBLISHING_STREAM"
       ) {
          let number = setTimeout(() => {
-            if (proxyMode === true) {
-               setAgoraRtcStatus({
-                  type: "ERROR",
-                  msg: "RTC_CONNECTION_ERROR",
-               });
-            } else {
-               setProxyMode(true);
-            }
+            setAgoraRtcStatus({
+               type: "ERROR",
+               msg: "RTC_CONNECTION_ERROR",
+            });
          }, 15000);
          setTimeoutNumber(number);
       }
    }, [agoraRtcStatus]);
-
-   useEffect(() => {
-      if (readyToConnect) {
-         if (rtcClient) {
-            rtcClient.leave().then(() => {
-               connectAgoraRTC();
-            });
-         } else {
-            connectAgoraRTC();
-         }
-         if (!rtmClient) {
-            connectAgoraRTM();
-         }
-      }
-   }, [readyToConnect, proxyMode]);
-
-   useEffect(() => {
-      handleSwitchRooms();
-   }, [router.asPath]);
 
    const agoraHandlers = useMemo(
       () => ({
@@ -173,7 +188,7 @@ export default function useAgoraAsStreamer(
                await rtmClient.logout();
             }
             if (rtcClient) {
-               await disconnectRtc();
+               await rtcClient.leave();
             }
          },
          joinChannel: async (
@@ -209,11 +224,15 @@ export default function useAgoraAsStreamer(
       [rtmClient, rtmChannel, rtcClient, roomId]
    );
 
+   const handleConnectClients = () => {
+      connectAgoraRTC();
+      connectAgoraRTM();
+   };
    const handleSwitchRooms = async () => {
       if (rtcClient || rtmClient || rtmChannel) {
          removeAllClients();
       }
-      setExternalUsers([]);
+      setExternalMediaStreams([]);
    };
 
    const removeAllClients = () => {
@@ -221,10 +240,6 @@ export default function useAgoraAsStreamer(
       setScreenShareRtcClient(null);
       setScreenShareRtcStream(null);
    };
-
-   useEffect(() => {
-      handleSwitchRooms();
-   }, [router.asPath]);
 
    const createEmote = useCallback(
       async (emoteType) => {
@@ -238,106 +253,211 @@ export default function useAgoraAsStreamer(
       [dispatch, rtmChannel]
    );
 
-   const connectAgoraRTC = async () => {
+   const connectAgoraRTC = () => {
       setAgoraRtcStatus({
          type: "INFO",
          msg: "RTC_INITIALIZING",
       });
 
-      let AgoraRTC = require("agora-rtc-sdk-ng");
-
+      let AgoraRTC = require("agora-rtc-sdk");
       setAgoraRTC(AgoraRTC);
-
-      AgoraRTC.onAudioAutoplayFailed = () => {
-         console.log("onAudioAutoplayFailed");
-         setShowVideoButton({ paused: false, muted: true });
-      };
-
       let rtcClient = AgoraRTC.createClient({
          mode: "live",
-         codec: "h264",
+         codec: "vp8",
       });
-
-      setRtcClient(rtcClient);
-
-      if (proxyMode === true) {
-         rtcClient.startProxyServer(3);
-      }
+      rtcClient.init(AGORA_APP_ID);
+      AgoraRTC.Logger.setLogLevel(AgoraRTC.Logger.ERROR);
 
       setAgoraRtcStatus({
          type: "INFO",
          msg: "RTC_JOINING_CHANNEL",
       });
 
-      rtcClient.on("user-joined", async (remoteUser) => {
-         let cleanedExternalUsers = removeStreamFromList(
-            remoteUser.uid,
-            externalUsersRef.current
-         );
-         updateExternalUsers([
-            ...cleanedExternalUsers,
-            { uid: remoteUser.uid },
-         ]);
-      });
-      rtcClient.on("user-left", async (remoteUser) => {
-         let cleanedExternalUsers = removeStreamFromList(
-            remoteUser.uid,
-            externalUsersRef.current
-         );
-         updateExternalUsers([...cleanedExternalUsers]);
-      });
-
-      rtcClient.on("connection-state-change", (curState, prevState) => {
-         setAgoraRtcConnectionStatus({
-            curState,
-            prevState,
-         });
-      });
-
-      rtcClient.on("user-published", async (remoteUser, mediaType) => {
-         if (remoteUser.uid === `${userUid}screen`) {
-            return;
-         }
-         try {
-            await rtcClient.subscribe(remoteUser, mediaType);
-         } catch (error) {
-            handleRtcError(error);
-         }
-         let externalUsers = [...externalUsersRef.current];
-         externalUsers.forEach((user) => {
-            if (user.uid === remoteUser.uid) {
-               if (mediaType === "audio") {
-                  user.audioTrack = remoteUser.audioTrack;
-                  remoteUser.audioTrack.play();
-               } else if (mediaType === "video") {
-                  user.videoTrack = remoteUser.videoTrack;
-               }
+      rtcClient.on("stream-published", function (evt) {
+         rtcClient.enableDualStream(
+            () => {
+               // console.log("-> dualStream enabled on rtc client");
+            },
+            function (err) {
+               console.log("-> dualStream failed on rtc client", err);
+               setAgoraRtcStatus({
+                  type: "WARN",
+                  msg: "RTC_DUAL_STREAM_INACTIVE",
+               });
             }
+         );
+
+         setAgoraRtcStatus({
+            type: "INFO",
+            msg: "RTC_STREAM_PUBLISHED",
          });
-         updateExternalUsers(externalUsers);
+      });
+      rtcClient.on("stream-added", function (evt) {
+         if (evt.stream.getId() !== userUid + "screen") {
+            rtcClient.subscribe(evt.stream, handleError);
+         }
       });
 
-      rtcClient.on("user-unpublished", async (remoteUser, mediaType) => {
-         try {
-            await rtcClient.unsubscribe(remoteUser, mediaType);
-         } catch (error) {
-            handleRtcError(error);
-         }
-         let externalUsers = [...externalUsersRef.current];
-         externalUsers.forEach((user) => {
-            if (user.uid === remoteUser.uid) {
-               if (mediaType === "audio") {
-                  user.audioTrack = null;
-               } else if (mediaType === "video") {
-                  user.videoTrack = null;
-               }
-            }
+      rtcClient.on("stream-subscribed", function (evt) {
+         let stream = evt.stream;
+         let streamId = String(stream.getId());
+         console.log("--> stream-added");
+         rtcClient.setStreamFallbackOption(stream, 2);
+         setAddedStream({
+            streamId: streamId,
+            stream: stream,
+            streamQuality: "high",
+            videoMuted: false,
+            audioMuted: false,
+            fallbackToAudio: false,
          });
-         updateExternalUsers(externalUsers);
+      });
+
+      rtcClient.on("stream-removed", function (evt) {
+         console.log("--> stream-removed");
+         if (evt.stream) {
+            let stream = evt.stream;
+            let streamId = String(stream.getId());
+            stream.close();
+            setRemovedStream(streamId);
+         }
+      });
+
+      rtcClient.on("peer-leave", function (evt) {
+         console.log("--> peer-leave");
+         if (evt.stream) {
+            let stream = evt.stream;
+            let streamId = String(stream.getId());
+            stream.close();
+            setRemovedStream(streamId);
+         }
+      });
+
+      let localStream = null;
+      rtcClient.on("client-role-changed", function (evt) {
+         console.log("-> client-role-changed", evt);
+         let role = evt.role;
+         if (role === "host") {
+            localStream = AgoraRTC.createStream({
+               audio: true,
+               video: true,
+            });
+            localStream.setVideoProfile("480p_9");
+            localStream.init(() => {
+               // localStream.play(streamId);
+               rtcClient.publish(localStream, handleError);
+               setLocalMediaStream({
+                  streamId: streamId,
+                  stream: localStream,
+                  isLocal: true,
+               });
+            }, handleStreamInitializationError);
+         }
+         if (role === "audience") {
+            if (localStream) {
+               rtcClient.unpublish(localStream, handleError);
+               localStream.close();
+               setLocalMediaStream(null);
+            }
+         }
+      });
+
+      rtcClient.on("stream-type-changed", (evt) => {
+         // SHOW MESSAGE DESCRIBING THAT THE USER WILL RECEIVE LOW QUALITY STREAMS DUE TO NETWORK CONDITIONS
+         console.log("stream-type-changed", evt);
+         let streamToUpdate = {
+            streamId: evt.uid,
+            propertiesToUpdate: {
+               streamQuality: evt.streamType === 0 ? "high" : "low",
+            },
+         };
+         setUpdatedStream(streamToUpdate);
+      });
+
+      rtcClient.on("stream-fallback", (evt) => {
+         // SHOW MESSAGE DESCRIBING THAT THE USER WILL ONLY RECEIVE AUDIO STREAM DUE TO NETWORK CONDITIONS
+         console.log("stream-fallback", evt);
+         let streamToUpdate = {
+            streamId: evt.uid,
+            propertiesToUpdate: {
+               fallbackToAudio: evt.attr === 1,
+            },
+         };
+         setUpdatedStream(streamToUpdate);
       });
 
       rtcClient.on("network-quality", function (networkStats) {
+         // NETWORK QUALITY
          setNetworkQuality(networkStats);
+      });
+      // rtcClient.on("peer-online", function (event) {
+      //     // PEER ONLINE
+      //     console.log("-> peer-online event", event);
+      // });
+
+      rtcClient.on("mute-audio", function (evt) {
+         // STREAMER HAS MUTED AUDIO
+         console.log("mute-audio", evt);
+         let streamToUpdate = {
+            streamId: evt.uid,
+            propertiesToUpdate: {
+               audioMuted: true,
+            },
+         };
+         setUpdatedStream(streamToUpdate);
+      });
+
+      rtcClient.on("connection-state-change", function (evt) {
+         setAgoraRtcConnectionStatus(evt);
+      });
+
+      rtcClient.on("unmute-audio", function (evt) {
+         // STREAMER HAS UNMUTED AUDIO
+         console.log("mute-audio", evt);
+         let streamToUpdate = {
+            streamId: evt.uid,
+            propertiesToUpdate: {
+               audioMuted: false,
+            },
+         };
+         setUpdatedStream(streamToUpdate);
+      });
+
+      rtcClient.on("mute-video", function (evt) {
+         // STREAMER HAS MUTED VIDEO
+         console.log("mute-video", evt);
+         let streamToUpdate = {
+            streamId: evt.uid,
+            propertiesToUpdate: {
+               videoMuted: true,
+            },
+         };
+         setUpdatedStream(streamToUpdate);
+      });
+
+      rtcClient.on("unmute-video", function (evt) {
+         // STREAMER HAS MUTED VIDEO
+         console.log("unmute-video", evt);
+         let streamToUpdate = {
+            streamId: evt.uid,
+            propertiesToUpdate: {
+               videoMuted: false,
+            },
+         };
+         setUpdatedStream(streamToUpdate);
+      });
+
+      rtcClient.on("volume-indicator", function (evt) {
+         // STREAMER HAS MUTED VIDEO
+         // console.log("volume-indicator", evt)
+      });
+
+      rtcClient.on("reconnect", function (evt) {
+         setExternalMediaStreams([]);
+      });
+
+      rtcClient.on("exception", function (evt) {
+         // NETWORK QUALITY
       });
 
       if (!isViewer) {
@@ -345,71 +465,73 @@ export default function useAgoraAsStreamer(
             rtcClient.startProxyServer(3);
          }
          rtcClient.setClientRole("host");
-         try {
-            await rtcClient.join(
-               AGORA_APP_ID,
-               roomId,
-               agoraToken.rtcToken,
-               userUid
-            );
-            setAgoraRtcStatus({
-               type: "INFO",
-               msg: "RTC_JOINED_CHANNEL",
-            });
+         rtcClient.join(
+            agoraToken.rtcToken,
+            roomId,
+            userUid,
+            (uid) => {
+               setAgoraRtcStatus({
+                  type: "INFO",
+                  msg: "RTC_JOINED_CHANNEL",
+               });
 
-            setAgoraRtcStatus({
-               type: "INFO",
-               msg: "RTC_REQUESTING_MEDIA_ACCESS",
-            });
+               let localStream = AgoraRTC.createStream({
+                  audio: true,
+                  video: true,
+               });
 
-            const localAudio = await AgoraRTC.createMicrophoneAudioTrack();
-            const localVideo = await AgoraRTC.createCameraVideoTrack({
-               encoderConfig: "480p_9",
-            });
+               if (withHighQuality) {
+                  localStream.setVideoProfile("720p_3");
+                  localStream.setAudioProfile("high_quality_stereo");
+               } else {
+                  localStream.setVideoProfile("480p_9");
+               }
 
-            setAgoraRtcStatus({
-               type: "INFO",
-               msg: "RTC_PUBLISHING_STREAM",
-            });
+               setAgoraRtcStatus({
+                  type: "INFO",
+                  msg: "RTC_REQUEST_MEDIA_ACCESS",
+               });
 
-            localVideo.play(videoId);
-            await rtcClient.setClientRole("host");
-            await rtcClient.publish([localAudio, localVideo]);
-            await rtcClient.enableDualStream();
-            rtcClient.enableAudioVolumeIndicator();
-            setAgoraRtcStatus({
-               type: "INFO",
-               msg: "RTC_STREAM_PUBLISHED",
-            });
-            setLocalMediaStream({
-               streamId: userUid,
-               videoTrack: localVideo,
-               audioTrack: localAudio,
-            });
-         } catch (error) {
-            handleRtcError(error);
-         }
+               localStream.init(() => {
+                  setAgoraRtcStatus({
+                     type: "INFO",
+                     msg: "RTC_PUBLISH_STREAM",
+                  });
+
+                  // localStream.play(streamId);
+                  rtcClient.publish(localStream, handleStreamPublishingError);
+                  setLocalMediaStream({
+                     streamId: streamId,
+                     stream: localStream,
+                     isLocal: true,
+                  });
+                  // Publish the local stream
+               }, handleStreamInitializationError);
+            },
+            handleClientJoinChannelError
+         );
       } else {
          if (withProxy) {
             rtcClient.startProxyServer(3);
          }
-         await rtcClient.setClientRole("audience");
-         try {
-            const uid = await rtcClient.join(
-               AGORA_APP_ID,
-               roomId,
-               agoraToken.rtcToken,
-               userUid
-            );
-
-            setAgoraRtcStatus({
-               type: "INFO",
-               msg: "RTC_JOINED_CHANNEL",
-            });
-         } catch (error) {
-            handleRtcError(error);
-         }
+         rtcClient.setClientRole("audience");
+         rtcClient.join(
+            agoraToken.rtcToken,
+            roomId,
+            userUid,
+            (uid) => {
+               setAgoraRtcStatus({
+                  type: "INFO",
+                  msg: "RTC_STREAM_JOINED_AS_VIEWER",
+               });
+               if (!isPlayMode) rtcClient.setClientRole("host");
+            },
+            handleClientJoinChannelError
+         );
       }
+      rtcClient.enableAudioVolumeIndicator();
+
+      setRtcClient(rtcClient);
    };
 
    const createDemoStream = useCallback((streamData) => {
@@ -488,171 +610,145 @@ export default function useAgoraAsStreamer(
    useEffect(() => {
       if (!isPlayMode) {
          if (agoraRTC && agoraScreenShareToken && screenSharingMode) {
-            setupScreenShare();
+            if (!screenShareRtcClient) {
+               let screenShareClient = agoraRTC.createClient({
+                  mode: "live",
+                  codec: "vp8",
+               });
+               screenShareClient.setClientRole("host");
+               if (withProxy) {
+                  screenShareClient.startProxyServer(3);
+               }
+
+               screenShareClient.init(AGORA_APP_ID, () => {
+                  publishScreenShareStream(screenShareClient);
+               });
+
+               setScreenShareRtcClient(screenShareClient);
+            } else {
+               publishScreenShareStream(screenShareRtcClient);
+            }
          } else {
             if (screenShareRtcClient) {
                if (screenShareRtcStream) {
-                  unpublishScreenShareStream();
+                  screenShareRtcClient.unpublish(
+                     screenShareRtcStream,
+                     handleError
+                  );
+                  screenShareRtcStream.close();
+                  setScreenShareRtcStream(null);
                }
                screenShareRtcClient.leave();
-               setScreenShareRtcClient(null);
             }
          }
       }
    }, [agoraRTC, screenSharingMode, isPlayMode, agoraScreenShareToken]);
 
-   const setupScreenShare = async () => {
-      if (!screenShareRtcClient) {
-         let screenShareClient = agoraRTC.createClient({
-            mode: "live",
-            codec: "vp8",
-         });
-         if (proxyMode === true) {
-            screenShareClient.startProxyServer(3);
-         }
-         try {
-            await screenShareClient.setClientRole("host");
-            await screenShareClient.join(
-               AGORA_APP_ID,
-               roomId,
-               agoraScreenShareToken.rtcToken,
-               userUid + "screen"
+   const publishScreenShareStream = (client) => {
+      client.join(
+         agoraScreenShareToken.rtcToken,
+         roomId,
+         userUid + "screen",
+         (uid) => {
+            let screenShareStream = agoraRTC.createStream({
+               streamID: uid,
+               audio: false,
+               video: false,
+               screen: true,
+               screenAudio: true,
+               optimizationMode: screenSharingMode,
+            });
+
+            if (screenSharingMode === "motion") {
+               screenShareStream.setScreenProfile("720p_2");
+            } else {
+               screenShareStream.setScreenProfile("1080p_1");
+            }
+            setAgoraRtcStatus({
+               type: "INFO",
+               msg: "RTC_SCREEN_SHARE_STARTED",
+            });
+
+            screenShareStream.init(
+               () => {
+                  // screenShareStream.play("Screen");
+                  setAddedStream({
+                     streamId: uid,
+                     audio: false,
+                     video: false,
+                     screen: true,
+                     screenAudio: true,
+                     optimizationMode: screenSharingMode,
+                     isLocal: true,
+                     stream: screenShareStream,
+                  });
+                  client.publish(
+                     screenShareStream,
+                     handleStreamPublishingError
+                  );
+                  setScreenShareRtcStream(screenShareStream);
+               },
+               (err) => {
+                  if (err) {
+                     if (
+                        err.type === "error" &&
+                        err.msg === "NotAllowedError" &&
+                        err.info === "Permission denied by system"
+                     ) {
+                        setAgoraRtcStatus({
+                           type: "ERROR",
+                           msg: "RTC_SCREEN_SHARE_NOT_ALLOWED",
+                        });
+                     } else if (
+                        err.type === "error" &&
+                        err.msg === "NotAllowedError"
+                     ) {
+                        setAgoraRtcStatus({
+                           type: "INFO",
+                           msg: "RTC_SCREEN_SHARE_STOPPED",
+                        });
+                     } else {
+                        handleStreamInitializationError(err);
+                     }
+                  }
+               }
             );
-            publishScreenShareStream(screenShareClient);
-            setScreenShareRtcClient(screenShareClient);
-         } catch (error) {
-            handleRtcError(error);
-         }
-      } else {
-         publishScreenShareStream(screenShareRtcClient);
-      }
-   };
-
-   const publishScreenShareStream = async (client) => {
-      let screenShareVideoResolution =
-         screenSharingMode === "motion" ? "720p_2" : "1080p_1";
-
-      try {
-         const tracksObject = await agoraRTC.createScreenVideoTrack(
-            {
-               encoderConfig: screenShareVideoResolution,
-            },
-            "auto"
-         );
-
-         setAgoraRtcStatus({
-            type: "INFO",
-            msg: "RTC_SCREEN_SHARE_STARTED",
-         });
-
-         const videoTrack = Array.isArray(tracksObject)
-            ? tracksObject[0]
-            : tracksObject;
-         videoTrack.play("Screen", { fit: "contain" });
-         videoTrack.on("track-ended", function (evt) {
-            setAgoraRtcStatus({
-               type: "INFO",
-               msg: "RTC_SCREEN_SHARE_STOPPED",
+            screenShareStream.on("stopScreenSharing", function (evt) {
+               setAgoraRtcStatus({
+                  type: "INFO",
+                  msg: "RTC_SCREEN_SHARE_STOPPED",
+               });
             });
-         });
+         },
+         handleClientJoinChannelError
+      );
 
-         await client.publish(tracksObject);
-      } catch (error) {
-         if (error.code === "PERMISSION_DENIED") {
-            setAgoraRtcStatus({
-               type: "INFO",
-               msg: "RTC_SCREEN_SHARE_STOPPED",
-            });
-         } else if (error.code === "SHARE_AUDIO_NOT_ALLOWED") {
-            setAgoraRtcStatus({
-               type: "WARN",
-               msg: "SHARE_AUDIO_NOT_ALLOWED",
-            });
-         } else {
-            handleRtcError(error);
-         }
-      }
-   };
-
-   const unpublishScreenShareStream = async () => {
-      try {
-         await screenShareRtcClient.unpublish(screenShareRtcStream);
-         if (Array.isArray(screenShareRtcStream)) {
-            screenShareRtcStream.forEach((track) => track.close());
-         } else {
-            screenShareRtcStream.close();
-         }
-         setScreenShareRtcStream(null);
-      } catch (error) {
-         handleRtcError(error);
-      }
+      // DUAL STREAM MAYBE NOT SUPPORT FOR SCREEN SHARE?!
+      // client.enableDualStream(() => {
+      //     console.log("-> screenShareDualStream enabled ");
+      // }, function (err) {
+      //     console.log("-> screenShareDualStream failed ", err);
+      //     setAgoraRtcStatus({
+      //         type: "WARN",
+      //         msg: "RTC_DUAL_STREAM_INACTIVE"
+      //     })
+      // });
    };
 
    useEffect(() => {
-      updateClientRole();
-   }, [isPlayMode]);
-
-   const updateClientRole = async () => {
       if (isViewer && agoraRTC && rtcClient) {
          if (!isPlayMode) {
-            try {
-               await rtcClient.setClientRole("host");
-               setAgoraRtcStatus({
-                  type: "INFO",
-                  msg: "RTC_JOINED_CHANNEL",
-               });
-
-               setAgoraRtcStatus({
-                  type: "INFO",
-                  msg: "RTC_REQUEST_MEDIA_ACCESS",
-               });
-
-               const localAudio = await agoraRTC.createMicrophoneAudioTrack({
-                  encoderConfig: "speech_standard",
-               });
-               const localVideo = await agoraRTC.createCameraVideoTrack({
-                  encoderConfig: "480p_9",
-               });
-
-               setAgoraRtcStatus({
-                  type: "INFO",
-                  msg: "RTC_PUBLISH_STREAM",
-               });
-
-               localVideo.play(videoId);
-               await rtcClient.publish([localAudio, localVideo]);
-               await rtcClient.enableDualStream();
-               setAgoraRtcStatus({
-                  type: "INFO",
-                  msg: "RTC_STREAM_PUBLISHED",
-               });
-               setLocalMediaStream({
-                  streamId: userUid,
-                  videoTrack: localVideo,
-                  audioTrack: localAudio,
-               });
-            } catch (error) {
-               handleRtcError(error);
-            }
+            rtcClient.setClientRole("host");
          } else {
-            try {
-               await rtcClient.disableDualStream();
-               await rtcClient.unpublish([
-                  localMediaStream.audioTrack,
-                  localMediaStream.videoTrack,
-               ]);
-               await rtcClient.setClientRole("audience");
-            } catch (error) {
-               handleRtcError(error);
-            }
+            rtcClient.setClientRole("audience");
          }
       }
-   };
+   }, [isPlayMode, agoraRTC, rtcClient]);
 
-   const removeStreamFromList = (uid, streamList) => {
+   const removeStreamFromList = (streamId, streamList) => {
       const streamListCopy = [...streamList];
       const streamEntry = streamListCopy.find((entry) => {
-         return entry.uid === uid;
+         return entry.streamId === streamId;
       });
       if (streamEntry) {
          streamListCopy.splice(streamListCopy.indexOf(streamEntry), 1);
@@ -660,26 +756,135 @@ export default function useAgoraAsStreamer(
       return streamListCopy;
    };
 
-   const handleRtcError = (err) => {
+   const handleError = (err) => {
+      console.log("Error: ", err);
+   };
+
+   const handleClientJoinChannelError = (err) => {
       if (err) {
-         console.log("handleRtcError", err);
-         setAgoraRtcStatus({
-            type: "ERROR",
-            error: err,
-         });
+         if (err.type === "error") {
+            if (err.msg === "INVALID_OPERATION") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_JOIN_INVALID_OPERATION",
+               });
+            } else if (err.msg === "UID_CONFLICT") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_JOIN_UID_CONFLICT",
+               });
+            } else if (err.msg === "ERR_REPEAT_JOIN") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_JOIN_ERR_REPEAT_JOIN",
+               });
+            } else if (err.msg === "SOCKET_ERROR") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_JOIN_SOCKET_ERROR",
+               });
+            } else if (err.msg === "CANNOT_MEET_AREA_DEMAND") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_JOIN_CANNOT_MEET_AREA_DEMAND",
+               });
+            }
+         }
+      }
+   };
+
+   const handleStreamInitializationError = (err) => {
+      if (err) {
+         if (err.type === "error") {
+            if (err.msg === "NotAllowedError") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_MEDIA_PERMISSION_DENIED",
+               });
+            } else if (err.msg === "MEDIA_OPTION_INVALID") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_MEDIA_OPTION_INVALID",
+               });
+            } else if (err.msg === "DEVICES_NOT_FOUND") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_DEVICES_NOT_FOUND",
+               });
+            } else if (err.msg === "NOT_SUPPORTED") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_NOT_SUPPORTED",
+               });
+            } else if (err.msg === "PERMISSION_DENIED") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_MEDIA_PERMISSION_DENIED",
+               });
+            } else if (err.msg === "CONSTRAINT_NOT_SATISFIED") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_CONSTRAINT_NOT_SATISFIED",
+               });
+            } else if (err.msg === "UNDEFINED") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_UNDEFINED_ERROR",
+               });
+            }
+         }
+      }
+   };
+
+   const handleStreamPublishingError = (err) => {
+      if (err) {
+         if (err.type === "error") {
+            if (err.msg === "STREAM_ALREADY_PUBLISHED") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_STREAM_ALREADY_PUBLISHED",
+               });
+            } else if (err.msg === "INVALID_LOCAL_STREAM") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_INVALID_LOCAL_STREAM",
+               });
+            } else if (err.msg === "INVALID_OPERATION") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_INVALID_OPERATION",
+               });
+            } else if (err.msg === "PUBLISH_STREAM_FAILED") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_PUBLISH_STREAM_FAILED",
+               });
+            } else if (err.msg === "PEERCONNECTION_FAILED") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_PEERCONNECTION_FAILED",
+               });
+            } else if (err.msg === "REQUEST_ABORT") {
+               setAgoraRtcStatus({
+                  type: "ERROR",
+                  msg: "RTC_REQUEST_ABORT",
+               });
+            }
+         }
       }
    };
 
    return {
       localMediaStream,
       setLocalMediaStream,
-      externalUsers,
+      externalMediaStreams,
       agoraRtcStatus,
       agoraRtcConnectionStatus,
       agoraRtmStatus,
       networkQuality,
-      numberOfViewers,
       createDemoStream,
+      setAddedStream,
+      setRemovedStream,
       createEmote,
       agoraHandlers,
       joinedChannel,

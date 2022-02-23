@@ -1,25 +1,23 @@
-import { useEffect } from "react"
+import { useEffect } from "react";
+import { shouldWeRedirectNextGen } from "../../util/StreamUtil";
 
 const useNextGenRedirect = (isBeta: boolean) => {
    useEffect(() => {
-      const isInProdEnvironment = process.env.NODE_ENV === "production"
-      const { host, pathname, search: query } = window.location
-
-      const isInBetaDomain = host === "nextgen.careerfairy.io"
-
-      if (!isInProdEnvironment || typeof isBeta !== "boolean") return
-      if (isBeta === true) {
-         if (!isInBetaDomain) {
-            window.location.href = `https://nextgen.careerfairy.io${pathname}${query}`
-         }
-      } else if (isBeta === false) {
-         if (isInBetaDomain) {
-            window.location.href = `https://careerfairy.io${pathname}${query}`
-         }
+      const { host, pathname, search: query } = window.location;
+      const currentEnv = process.env.NODE_ENV;
+      const requestOptions = `${pathname}${query}`;
+      const urlToRedirect = shouldWeRedirectNextGen(
+         host,
+         currentEnv,
+         isBeta,
+         requestOptions
+      );
+      if (urlToRedirect) {
+         window.location.href = urlToRedirect;
       }
-   }, [isBeta])
+   }, [isBeta]);
 
-   return null
-}
+   return null;
+};
 
-export default useNextGenRedirect
+export default useNextGenRedirect;
