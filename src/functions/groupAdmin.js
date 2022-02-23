@@ -238,17 +238,38 @@ exports.getLivestreamReportData = functions.https.onCall(
             .orderBy("votes", "desc")
             .get();
 
-         const contentRatingsSnap = await streamSnap.ref
-            .collection("rating")
-            .doc("company")
-            .collection("voters")
-            .get();
+         const ratingsSnap = await streamSnap.ref.collection("rating").get();
 
-         const overallRatingsSnap = await streamSnap.ref
-            .collection("rating")
-            .doc("overall")
-            .collection("voters")
-            .get();
+         let ratings = [];
+         ratingsSnap.docs
+            .filter((doc) => !doc.data().noStars)
+            .map((doc) => {
+               ratings = [
+                  ...ratings,
+                  {
+                     id: doc.id,
+                     question: doc.data().question,
+                  },
+               ];
+            });
+
+         ratings.forEach(async (rating) => {
+            const individualRatingSnap = await streamSnap.ref
+               .collection("rating")
+               .doc(rating.id)
+               .collection("voters")
+               .get();
+
+            rating.ratings = individualRatingSnap.docs.map((doc) => ({
+               id: doc.id,
+               ...doc.data(),
+            }));
+
+            rating.overallRating =
+               rating.ratings.length > 0
+                  ? getRatingsAverage(rating.ratings).toFixed(2)
+                  : "N.A.";
+         });
 
          // Extraction of snap Data
 
@@ -281,25 +302,6 @@ exports.getLivestreamReportData = functions.https.onCall(
             options: convertPollOptionsObjectToArray(doc.data().options || {}),
          }));
 
-         const contentRatings = contentRatingsSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-         }));
-         const overallRatings = overallRatingsSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-         }));
-
-         const overallRatingValue =
-            overallRatings.length > 0
-               ? getRatingsAverage(overallRatings).toFixed(2)
-               : "N.A.";
-
-         const contentRatingValue =
-            contentRatings.length > 0
-               ? getRatingsAverage(contentRatings).toFixed(2)
-               : "N.A.";
-
          let totalSumOfParticipatingStudentsWithStats = 0;
          let totalSumOfUniversityStudents = 0;
          let numberOfStudentsFollowingCompany = 0;
@@ -325,9 +327,10 @@ exports.getLivestreamReportData = functions.https.onCall(
                );
                const numberOfStudentsFromUniversity =
                   studentsFromUniversity.length;
-               const universityStudentsThatFollowingUniversity = studentsFromUniversity.filter(
-                  (student) => studentBelongsToGroup(student, groupData)
-               );
+               const universityStudentsThatFollowingUniversity =
+                  studentsFromUniversity.filter((student) =>
+                     studentBelongsToGroup(student, groupData)
+                  );
 
                participatingStudents = markStudentStatsInUse(
                   participatingStudents,
@@ -392,8 +395,7 @@ exports.getLivestreamReportData = functions.https.onCall(
                requestingGroup: requestingGroupData,
                speakers,
                totalStudentsInTalentPool: talentPoolForReport.length,
-               overallRating: overallRatingValue,
-               contentRating: contentRatingValue,
+               ratings: ratings,
                livestream: livestreamData,
                questions,
                polls,
