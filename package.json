@@ -22,7 +22,7 @@
       "deploy": "npm run firebase deploy --only functions,hosting",
       "start:functions:withProdDb": "firebase emulators:exec --only functions \"cd ./src/app && npm run dev:windows\"",
       "start:functions:withLocalDb": "firebase emulators:exec --only functions,firestore \"cd ./src/app && npm run dev:windows\"",
-      "prepare": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi"
+      "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi"
    },
    "dependencies": {
       "agora-access-token": "^2.0.4",
