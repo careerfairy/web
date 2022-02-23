@@ -106,7 +106,7 @@ const AudioTab = ({
                />
             </Grid>
          )}
-         {devices.audioOutputList.length && (
+         {!!devices.audioOutputList.length && (
             <Grid item lg={12} md={12} sm={12} xs={12}>
                <Button
                   variant="outlined"

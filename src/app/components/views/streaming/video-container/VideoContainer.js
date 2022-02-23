@@ -111,37 +111,47 @@ function VideoContainer({
       }
    }, [streamerId, currentLivestream.id]);
 
-   const [timeoutState, setTimeoutState] = useState(null);
-
    useEffect(() => {
-      if (localStream && remoteStreams && !withHighQuality) {
-         if (remoteStreams.length > 3) {
-            if (
+      if (
+         localStream &&
+         remoteStreams &&
+         !withHighQuality &&
+         localStream.videoTrack
+      ) {
+         const manyStreams = remoteStreams.length > 3;
+         if (manyStreams) {
+            const IAmCurrentlySpeakingAndBig =
                streamerId === currentSpeakerId &&
                currentLivestream.mode !== "desktop" &&
-               currentLivestream.mode !== "presentation"
-            ) {
-               if (timeoutState) {
-                  clearTimeout(timeoutState);
-               }
-               let newTimeout = setTimeout(() => {
-                  localMediaStream.stream.setVideoProfile("480p_9");
+               currentLivestream.mode !== "presentation";
+            if (IAmCurrentlySpeakingAndBig) {
+               const makeStreamerHigherQualityTimeout = setTimeout(() => {
+                  void setVideoQuality("480p_9");
                }, 20000);
-               setTimeoutState(newTimeout);
+
+               return () => clearTimeout(makeStreamerHigherQualityTimeout);
             } else {
-               if (timeoutState) {
-                  clearTimeout(timeoutState);
-               }
-               let newTimeout = setTimeout(() => {
-                  localStream.stream.setVideoProfile("180p");
+               const makeStreamerLowerQualityTimeout = setTimeout(() => {
+                  void setVideoQuality("180p");
                }, 15000);
-               setTimeoutState(newTimeout);
+
+               return () => clearTimeout(makeStreamerLowerQualityTimeout);
             }
          } else {
-            localMediaStream.stream.setVideoProfile("480p_9");
+            // if not manyStreams then make the streams high quality
+            void setVideoQuality("480p_9");
          }
       }
    }, [localStream, remoteStreams, currentSpeakerId, currentLivestream.mode]);
+
+   const setVideoQuality = async (quality) => {
+      try {
+         await localStream.videoTrack.setEncoderConfiguration(quality);
+      } catch (e) {
+         console.log("-> e in set video quality", e);
+         dispatch(actions.setAgoraRtcError(e));
+      }
+   };
 
    const handlePublish = async () => {
       try {

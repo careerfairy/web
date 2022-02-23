@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment } from "react";
 import makeStyles from "@mui/styles/makeStyles";
 import ViewerComponent from "./viewer-component/ViewerComponent";
 import MiniChatContainer from "../streaming/LeftMenu/categories/chat/MiniChatContainer";
@@ -68,7 +68,6 @@ const ViewerOverview = ({
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
    );
-   const [mounted, setMounted] = useState(false);
 
    const {
       query: { isRecordingWindow },
@@ -80,12 +79,6 @@ const ViewerOverview = ({
    );
 
    const classes = useStyles({ mobile });
-
-   useEffect(() => {
-      setMounted(true);
-   }, []);
-
-   if (!mounted) return null;
 
    return (
       <Fragment>
