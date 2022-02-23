@@ -419,6 +419,306 @@ exports.getLivestreamReportData = functions.https.onCall(
    }
 );
 
+exports.getLivestreamReportData_TEMP_NAME = functions.https.onCall(
+   async (data, context) => {
+      const { targetStreamId, targetGroupId, userEmail } = data;
+      const universityReports = [];
+      let companyReport = null;
+
+      const authEmail = context.auth.token.email || null;
+
+      if (!targetStreamId || !targetGroupId || !userEmail) {
+         throw new functions.https.HttpsError(
+            "invalid-argument",
+            "You must provide the following arguments: targetStreamId, targetGroupId, userEmail"
+         );
+      }
+
+      if (!authEmail || authEmail !== userEmail) {
+         throw new functions.https.HttpsError(
+            "permission-denied",
+            "You do not have permission to access this data"
+         );
+      }
+
+      const getUsersByEmail = async (
+         arrayOfEmails = [],
+         options = { withEmpty: false }
+      ) => {
+         let totalUsers = [];
+         let i,
+            j,
+            tempArray,
+            chunk = 800;
+         for (i = 0, j = arrayOfEmails.length; i < j; i += chunk) {
+            tempArray = arrayOfEmails.slice(i, i + chunk);
+            const userSnaps = await Promise.all(
+               tempArray
+                  .filter((email) => email)
+                  .map((email) =>
+                     admin.firestore().collection("userData").doc(email).get()
+                  )
+            );
+            let newUsers;
+            if (options.withEmpty) {
+               newUsers = userSnaps.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+               }));
+            } else {
+               newUsers = userSnaps
+                  .filter((doc) => doc.exists)
+                  .map((doc) => ({ id: doc.id, ...doc.data() }));
+            }
+            totalUsers = [...totalUsers, ...newUsers];
+         }
+         return totalUsers;
+      };
+
+      const groupSnap = await admin
+         .firestore()
+         .collection("careerCenterData")
+         .doc(targetGroupId)
+         .get();
+
+      const streamSnap = await admin
+         .firestore()
+         .collection("livestreams")
+         .doc(targetStreamId)
+         .get();
+
+      const userSnap = await admin
+         .firestore()
+         .collection("userData")
+         .doc(userEmail)
+         .get();
+
+      if (!groupSnap.exists || !streamSnap.exists || !userSnap.exists) {
+         const missingDataType = !groupSnap.exists
+            ? "targetGroupId"
+            : !streamSnap.exists
+            ? "targetStreamId"
+            : "userEmail";
+
+         throw new functions.https.HttpsError(
+            "not-found",
+            `The ${missingDataType} provided does not exist`
+         );
+      }
+
+      try {
+         const livestreamData = {
+            ...streamSnap.data(),
+            id: streamSnap.id,
+            startDateString: getDateString(streamSnap.data()),
+         };
+         const requestingGroupData = { id: groupSnap.id, ...groupSnap.data() };
+         const livestreamGroupIds = makeRequestingGroupIdFirst(
+            livestreamData.groupIds,
+            requestingGroupData.id
+         );
+
+         // Declaration of Snaps promises, todo turn into Promise.all()
+         const talentPoolSnap = await admin
+            .firestore()
+            .collection("userData")
+            .where("talentPools", "array-contains", livestreamData.companyId)
+            .get();
+         const pollsSnap = await streamSnap.ref
+            .collection("polls")
+            .orderBy("timestamp", "asc")
+            .get();
+
+         const iconsSnap = await streamSnap.ref
+            .collection("icons")
+            .orderBy("timestamp", "desc")
+            .get();
+         const questionsSnap = await streamSnap.ref
+            .collection("questions")
+            .orderBy("votes", "desc")
+            .get();
+
+         const ratingsSnap = await streamSnap.ref.collection("rating").get();
+
+         let ratings = [];
+         ratingsSnap.docs
+            .filter((doc) => !doc.data().noStars)
+            .map((doc) => {
+               ratings = [
+                  ...ratings,
+                  {
+                     id: doc.id,
+                     question: doc.data().question,
+                  },
+               ];
+            });
+
+         ratings.forEach(async (rating) => {
+            const individualRatingSnap = await streamSnap.ref
+               .collection("rating")
+               .doc(rating.id)
+               .collection("voters")
+               .get();
+
+            rating.ratings = individualRatingSnap.docs.map((doc) => ({
+               id: doc.id,
+               ...doc.data(),
+            }));
+
+            rating.overallRating =
+               rating.ratings.length > 0
+                  ? getRatingsAverage(rating.ratings).toFixed(2)
+                  : "N.A.";
+         });
+
+         // Extraction of snap Data
+
+         // Its let since this array will be modified
+         let participatingStudents = await getUsersByEmail(
+            livestreamData.participatingStudents || []
+         );
+
+         const talentPoolForReport = talentPoolSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }));
+
+         const speakers = livestreamData.speakers || [];
+
+         const questions = questionsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }));
+
+         const polls = pollsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            options: convertPollOptionsObjectToArray(doc.data().options),
+         }));
+
+         const icons = iconsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            options: convertPollOptionsObjectToArray(doc.data().options || {}),
+         }));
+
+         let totalSumOfParticipatingStudentsWithStats = 0;
+         let totalSumOfUniversityStudents = 0;
+         let numberOfStudentsFollowingCompany = 0;
+         for (const groupId of livestreamGroupIds) {
+            let groupData;
+            if (groupId === requestingGroupData.id) {
+               groupData = requestingGroupData;
+            } else {
+               const otherGroupSnap = await admin
+                  .firestore()
+                  .collection("careerCenterData")
+                  .doc(groupId)
+                  .get();
+               if (!otherGroupSnap.exists) continue;
+               groupData = { id: otherGroupSnap.id, ...otherGroupSnap.data() };
+            }
+            if (groupData.universityCode) {
+               // Generate university Report Data
+               const studentsFromUniversity = participatingStudents.filter(
+                  (student) =>
+                     student.university &&
+                     student.university.code === groupData.universityCode
+               );
+               const numberOfStudentsFromUniversity =
+                  studentsFromUniversity.length;
+               const universityStudentsThatFollowingUniversity =
+                  studentsFromUniversity.filter((student) =>
+                     studentBelongsToGroup(student, groupData)
+                  );
+
+               participatingStudents = markStudentStatsInUse(
+                  participatingStudents,
+                  groupData
+               );
+               const studentStats = getRegisteredStudentsStats(
+                  universityStudentsThatFollowingUniversity,
+                  groupData
+               );
+
+               const universityReport = {
+                  numberOfStudentsFromUniversity,
+                  studentStats,
+                  numberOfUniversityStudentsWithNoStats:
+                     numberOfStudentsFromUniversity -
+                     universityStudentsThatFollowingUniversity.length,
+                  numberOfUniversityStudentsThatFollowingUniversity:
+                     universityStudentsThatFollowingUniversity.length,
+                  group: groupData,
+                  groupName: groupData.universityName,
+                  groupId: groupData.id,
+                  isUniversity: Boolean(groupData.universityCode),
+               };
+
+               totalSumOfUniversityStudents += numberOfStudentsFromUniversity;
+               universityReports.push(universityReport);
+            } else if (groupData.id === requestingGroupData.id) {
+               // Generate company Data
+               const studentsThatFollowCompany = participatingStudents.filter(
+                  (student) => studentBelongsToGroup(student, groupData)
+               );
+               participatingStudents = markStudentStatsInUse(
+                  participatingStudents,
+                  groupData
+               );
+
+               numberOfStudentsFollowingCompany =
+                  studentsThatFollowCompany.length;
+
+               const studentStats = getRegisteredStudentsStats(
+                  studentsThatFollowCompany,
+                  groupData
+               );
+               companyReport = {
+                  numberOfStudentsFollowingCompany,
+                  studentStats,
+                  group: groupData,
+                  groupName: groupData.universityName,
+                  groupId: groupData.id,
+                  isUniversity: Boolean(groupData.universityCode),
+               };
+            }
+         }
+
+         return {
+            universityReports,
+            companyReport,
+            summary: {
+               totalParticipating: participatingStudents.length,
+               totalSumOfParticipatingStudentsWithStats,
+               requestingGroupId: targetGroupId,
+               requestingGroup: requestingGroupData,
+               speakers,
+               totalStudentsInTalentPool: talentPoolForReport.length,
+               ratings: ratings,
+               livestream: livestreamData,
+               questions,
+               polls,
+               numberOfIcons: icons.length,
+               totalSumOfUniversityStudents,
+               numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent:
+                  participatingStudents.length -
+                  (totalSumOfUniversityStudents +
+                     numberOfStudentsFollowingCompany),
+            },
+         };
+      } catch (e) {
+         console.error(e);
+         throw new functions.https.HttpsError(
+            "unknown",
+            `Unhandled error: ${e.message}`
+         );
+      }
+      // fetch all cc docs in the groupIds of the streamDoc
+      // If use users stats only once per report data, once a users stats are used, flag them as already used
+   }
+);
+
 exports.sendDashboardInviteEmail = functions.https.onRequest(
    async (req, res) => {
       setHeaders(req, res);
