@@ -1,117 +1,46 @@
-import PropTypes from "prop-types";
 import React from "react";
-import {
-   Button,
-   FormControl,
-   Grid,
-   InputLabel,
-   MenuItem,
-   Select,
-   Typography,
-} from "@mui/material";
-import SoundLevelDisplay from "../../../common/SoundLevelDisplay";
-import makeStyles from "@mui/styles/makeStyles";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { useAudio } from "components/custom-hook/useAudio";
-import useLocalStorageMediaSources from "components/custom-hook/useLocalStorageMediaSources";
+import DeviceSelect from "../DeviceSelect";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    button: {
       marginTop: 10,
       marginBottom: 10,
    },
-   warning: {
-      display: "flex",
-      alignItems: "center",
-      flexDirection: "column",
-   },
-   buttons: {
-      display: "flex",
-      justifyContent: "center",
-      marginBottom: 5,
-      "& .MuiButton-root": {
-         margin: "0 5px",
-      },
-   },
-   label: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-   },
-   emphasis: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      "& <": {
-         margin: "0 5px",
-      },
-   },
-}));
+};
 
 const AudioTab = ({
-   audioSource,
    devices,
-   setAudioSource,
+   openModal,
    localStream,
-   showSoundMeter,
+   mediaControls,
+   localMediaHandlers,
+   displayableMediaStream,
 }) => {
-   const classes = useStyles();
-   const { setAudioSourceId } = useLocalStorageMediaSources();
-
    const [playing, toggle, audio] = useAudio(
       "https://www.kozco.com/tech/piano2-CoolEdit.mp3"
    );
 
-   const handleChangeMic = (event) => {
-      const id = event.target.value;
-      setAudioSource(id);
-      setAudioSourceId(id);
-   };
-
    return (
-      <Grid container spacing={2}>
-         {devices.audioInputList.length && (
-            <Grid item lg={12} md={12} sm={12} xs={12}>
-               <FormControl
-                  style={{ marginBottom: 10 }}
-                  disabled={!devices.audioInputList.length}
-                  fullWidth
-                  variant="outlined"
-               >
-                  <InputLabel id="microphoneSelect">
-                     Select Microphone
-                  </InputLabel>
-                  <Select
-                     value={audioSource}
-                     fullWidth
-                     onChange={handleChangeMic}
-                     variant="outlined"
-                     id="microphoneSelect"
-                     label="Select Microphone"
-                  >
-                     <MenuItem value="" disabled>
-                        Select a Microphone
-                     </MenuItem>
-                     {devices.audioInputList.map((device) => {
-                        return (
-                           <MenuItem key={device.value} value={device.value}>
-                              {device.text}
-                           </MenuItem>
-                        );
-                     })}
-                  </Select>
-               </FormControl>
-               <SoundLevelDisplay
-                  showSoundMeter={showSoundMeter}
-                  localStream={localStream}
-               />
-            </Grid>
-         )}
+      <Stack spacing={2}>
+         <DeviceSelect
+            devices={devices}
+            localStream={localStream}
+            showSoundMeter={openModal}
+            displayableMediaStream={displayableMediaStream}
+            localMediaHandlers={localMediaHandlers}
+            openModal={openModal}
+            mediaControls={mediaControls}
+            mediaDeviceType={"microphone"}
+            selectTitle={"Select Microphone"}
+         />
          {!!devices.audioOutputList.length && (
-            <Grid item lg={12} md={12} sm={12} xs={12}>
+            <Box>
                <Button
                   variant="outlined"
                   onClick={toggle}
-                  className={classes.button}
+                  className={styles.button}
                >
                   {playing ? "Stop playing" : "Play some music"}
                </Button>
@@ -121,17 +50,10 @@ const AudioTab = ({
                      your computer or increase the volume on your device.
                   </Typography>
                )}
-            </Grid>
+            </Box>
          )}
-      </Grid>
+      </Stack>
    );
 };
 
 export default AudioTab;
-
-AudioTab.propTypes = {
-   audioLevel: PropTypes.any,
-   audioSource: PropTypes.any,
-   devices: PropTypes.array,
-   setAudioSource: PropTypes.func.isRequired,
-};

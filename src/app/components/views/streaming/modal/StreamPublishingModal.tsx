@@ -9,23 +9,13 @@ import {
    DialogActions,
    DialogContent,
    DialogTitle,
-   FormControl,
    Grid,
-   IconButton,
-   InputLabel,
-   MenuItem,
-   Select,
    Slide,
    Tooltip,
    Typography,
 } from "@mui/material";
-import SoundLevelDisplay from "components/views/common/SoundLevelDisplay";
 import ButtonWithConfirm from "components/views/common/ButtonWithConfirm";
 import { useDispatch, useSelector } from "react-redux";
-import VideocamIcon from "@mui/icons-material/Videocam";
-import MicIcon from "@mui/icons-material/Mic";
-import MicOffIcon from "@mui/icons-material/MicOff";
-import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import LoadingButton from "@mui/lab/LoadingButton";
 import * as actions from "store/actions";
 import useLocalStorageMediaSources from "components/custom-hook/useLocalStorageMediaSources";
@@ -37,56 +27,20 @@ import {
    LocalStream,
    MediaControls,
 } from "types/streaming";
-import { Theme } from "@mui/system";
 import RootState from "store/reducers";
+import DeviceSelect from "../sharedComponents/DeviceSelect";
 
 const styles = {
-   actions: {},
-   button: {
-      height: "100%",
-   },
-   container: {
-      paddingBottom: 3,
-      textAlign: "center",
-   },
    dialogTitle: {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-   },
-   iconWrapper: {
-      mt: 1,
-      alignItems: "center",
-      display: "flex",
-      justifyContent: "center",
-   },
-   title: {
-      textAlign: "center",
-      marginBottom: 2,
-      fontWeight: "700",
-      fontSize: "0.9rem",
-      color: (theme: Theme) => theme.palette.grey[300],
-   },
-   gridItemContent: {
-      display: "flex",
-      flexDirection: "column",
-      height: "100%",
    },
    deviceDeniedWrapper: {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       width: "100%",
-   },
-   videoBox: {
-      boxShadow: "0 0 3px rgb(200,200,200)",
-      borderRadius: "5px",
-      width: "100%",
-      height: 150,
-      background: "black",
-      color: "white",
-      display: "grid",
-      placeItems: "center",
    },
 } as const;
 
@@ -124,10 +78,6 @@ const StreamPublishingModal = memo(
       open,
       showSoundMeter,
    }: Props) => {
-      const noCameras = Boolean(!devices.videoDeviceList.length);
-      const noMicrophones = Boolean(!devices.audioInputList.length);
-      const [activatingCamera, setActivatingCamera] = useState(false);
-      const [activatingMic, setActivatingMic] = useState(false);
       const [publishingStream, setPublishingStream] = useState(false);
       const { storeNewMediaSources } = useLocalStorageMediaSources();
       const testVideoRef = useRef(null);
@@ -141,12 +91,6 @@ const StreamPublishingModal = memo(
       });
       const micDenied = useSelector((state: RootState) => {
          return state.stream.agoraState.deviceErrors.microphoneDenied;
-      });
-      const micInUseByAnotherApp = useSelector((state: RootState) => {
-         return state.stream.agoraState.deviceErrors.microphoneIsUsedByOtherApp;
-      });
-      const camInUseByAnotherApp = useSelector((state: RootState) => {
-         return state.stream.agoraState.deviceErrors.cameraIsUsedByOtherApp;
       });
 
       const openModal = useMemo(() => {
@@ -198,45 +142,6 @@ const StreamPublishingModal = memo(
          setPublishingStream(false);
       };
 
-      const handleInitializeCamera = async () => {
-         try {
-            setActivatingCamera(true);
-            await localMediaHandlers.initializeLocalVideoStream();
-            localStorage.setItem("hasEnabledCamera", "true");
-         } catch (e) {
-            dispatch(actions.sendGeneralError(e));
-         }
-         setActivatingCamera(false);
-      };
-
-      const handleCloseCamera = async () => {
-         await localMediaHandlers.closeLocalCameraTrack();
-         localStorage.setItem("hasEnabledCamera", "false");
-      };
-
-      const handleInitializeMic = async () => {
-         try {
-            setActivatingMic(true);
-            await localMediaHandlers.initializeLocalAudioStream();
-            localStorage.setItem("hasEnabledMicrophone", "true");
-         } catch (e) {
-            dispatch(actions.sendGeneralError(e));
-         }
-         setActivatingMic(false);
-      };
-      const handleCloseMic = async () => {
-         await localMediaHandlers.closeLocalMicrophoneTrack();
-         localStorage.setItem("hasEnabledMicrophone", "false");
-      };
-
-      const handleChangeCam = async (event) => {
-         await mediaControls.updateVideoSource(event.target.value);
-      };
-
-      const handleChangeMic = async (event) => {
-         await mediaControls.updateAudioSource(event.target.value);
-      };
-
       const hasAudioTrack = useMemo(() => {
          return Boolean(localStream) && Boolean(localStream.audioTrack);
       }, [localStream, localStream?.audioTrack]);
@@ -251,29 +156,6 @@ const StreamPublishingModal = memo(
          if (!hasVideoTrack) return labels.joinWithoutCameraLabel;
       }, [hasAudioTrack, hasVideoTrack, labels.joinButtonLabel]);
 
-      const activateCameraButtonLabel = useMemo(() => {
-         if (noCameras) {
-            if (cameraDenied) {
-               return "Camera Access Is Not Authorized";
-            }
-            return "No Camera Detected";
-         }
-         if (camInUseByAnotherApp) {
-            return "This camera is currently being used by another app";
-         }
-         return "Activate Camera";
-      }, [noMicrophones, cameraDenied, camInUseByAnotherApp]);
-
-      const activateMicButtonLabel = useMemo(() => {
-         if (noMicrophones) {
-            if (micDenied) {
-               return "Microphone Access Is Not Authorized";
-            }
-            return "No Microphone Detected";
-         }
-         return "Activate Microphone";
-      }, [noMicrophones, micDenied]);
-
       return (
          <Dialog TransitionComponent={Slide} open={openModal} fullWidth>
             <DialogTitle sx={styles.dialogTitle}>
@@ -284,166 +166,33 @@ const StreamPublishingModal = memo(
             </DialogTitle>
             <DialogContent dividers>
                <Grid container spacing={2}>
-                  <Grid item sx={styles.actions} lg={6} md={6} sm={6} xs={12}>
-                     <Box sx={styles.gridItemContent}>
-                        <Typography sx={styles.title}>WITH VIDEO</Typography>
-                        {hasVideoTrack ? (
-                           <>
-                              <FormControl
-                                 disabled={!devices.videoDeviceList.length}
-                                 sx={{
-                                    marginBottom: 2,
-                                    fontSize: "0.8rem",
-                                    width: "100%",
-                                    maxHeight: 200,
-                                 }}
-                                 size="small"
-                                 variant="outlined"
-                              >
-                                 <InputLabel id="camera-select-label">
-                                    Select Camera
-                                 </InputLabel>
-                                 <Select
-                                    labelId="camera-select-label"
-                                    value={mediaControls.videoSource || ""}
-                                    onChange={handleChangeCam}
-                                    id="cameraSelect"
-                                    label="Select Camera"
-                                 >
-                                    <MenuItem value="" disabled>
-                                       Select Camera
-                                    </MenuItem>
-                                    {devices.videoDeviceList.map((device) => {
-                                       return (
-                                          <MenuItem
-                                             key={device.value}
-                                             value={device.value}
-                                          >
-                                             {device.text}
-                                          </MenuItem>
-                                       );
-                                    })}
-                                 </Select>
-                              </FormControl>
-                              {camInUseByAnotherApp ? (
-                                 <Box sx={styles.videoBox}>
-                                    <Typography align="center" variant="body1">
-                                       This device is currently being used by
-                                       another app
-                                    </Typography>
-                                 </Box>
-                              ) : (
-                                 <Box
-                                    sx={styles.videoBox}
-                                    component="video"
-                                    ref={testVideoRef}
-                                    muted={true}
-                                    autoPlay
-                                 />
-                              )}
-                              <Box sx={styles.iconWrapper}>
-                                 <IconButton
-                                    aria-label="turn-off-video-icon"
-                                    size="medium"
-                                    onClick={handleCloseCamera}
-                                 >
-                                    <VideocamOffIcon fontSize="inherit" />
-                                 </IconButton>
-                              </Box>
-                           </>
-                        ) : (
-                           <Box sx={styles.container}>
-                              <LoadingButton
-                                 variant="contained"
-                                 loading={activatingCamera}
-                                 disabled={
-                                    noCameras ||
-                                    cameraDenied ||
-                                    camInUseByAnotherApp
-                                 }
-                                 onClick={handleInitializeCamera}
-                                 startIcon={<VideocamIcon />}
-                              >
-                                 {activateCameraButtonLabel}
-                              </LoadingButton>
-                           </Box>
-                        )}
-                     </Box>
+                  <Grid item lg={6} md={6} sm={6} xs={12}>
+                     <DeviceSelect
+                        devices={devices}
+                        localStream={localStream}
+                        showSoundMeter={showSoundMeter}
+                        displayableMediaStream={displayableMediaStream}
+                        localMediaHandlers={localMediaHandlers}
+                        openModal={openModal}
+                        mediaControls={mediaControls}
+                        mediaDeviceType={"camera"}
+                        selectTitle={"Select Camera"}
+                        title={"Select Camera"}
+                     />
                   </Grid>
                   <Grid item lg={6} md={6} sm={6} xs={12}>
-                     <Box sx={styles.gridItemContent}>
-                        <Typography sx={styles.title}>WITH AUDIO</Typography>
-                        {hasAudioTrack ? (
-                           <>
-                              <FormControl
-                                 sx={{ marginBottom: 2 }}
-                                 disabled={!devices.audioInputList.length}
-                                 fullWidth
-                                 variant="outlined"
-                                 size="small"
-                              >
-                                 <InputLabel id="microphone-select-label">
-                                    Select Microphone
-                                 </InputLabel>
-                                 <Select
-                                    value={mediaControls.audioSource || ""}
-                                    fullWidth
-                                    labelId="microphone-select-label"
-                                    onChange={handleChangeMic}
-                                    id="microphoneSelect"
-                                    label="Select Microphone"
-                                 >
-                                    <MenuItem value="" disabled>
-                                       Select a Microphone
-                                    </MenuItem>
-                                    {devices.audioInputList.map((device) => {
-                                       return (
-                                          <MenuItem
-                                             key={device.value}
-                                             value={device.value}
-                                          >
-                                             {device.text}
-                                          </MenuItem>
-                                       );
-                                    })}
-                                 </Select>
-                              </FormControl>
-                              <Box
-                                 sx={{
-                                    flex: 1,
-                                 }}
-                              >
-                                 {showSoundMeter && (
-                                    <SoundLevelDisplay
-                                       localStream={localStream}
-                                       showSoundMeter={showSoundMeter}
-                                    />
-                                 )}
-                              </Box>
-                              <Box sx={styles.iconWrapper}>
-                                 <IconButton
-                                    aria-label="microphone-off-icon"
-                                    size="medium"
-                                    onClick={handleCloseMic}
-                                 >
-                                    <MicOffIcon fontSize="inherit" />
-                                 </IconButton>
-                              </Box>
-                           </>
-                        ) : (
-                           <Box sx={styles.container}>
-                              <LoadingButton
-                                 variant="contained"
-                                 loading={activatingMic}
-                                 disabled={noMicrophones || micDenied}
-                                 onClick={handleInitializeMic}
-                                 startIcon={<MicIcon />}
-                              >
-                                 {activateMicButtonLabel}
-                              </LoadingButton>
-                           </Box>
-                        )}
-                     </Box>
+                     <DeviceSelect
+                        devices={devices}
+                        localStream={localStream}
+                        showSoundMeter={showSoundMeter}
+                        displayableMediaStream={displayableMediaStream}
+                        localMediaHandlers={localMediaHandlers}
+                        openModal={openModal}
+                        mediaControls={mediaControls}
+                        mediaDeviceType={"microphone"}
+                        selectTitle={"Select Microphone"}
+                        title={"Select Microphone"}
+                     />
                   </Grid>
                   {(micDenied || cameraDenied) && (
                      <Box sx={styles.deviceDeniedWrapper}>

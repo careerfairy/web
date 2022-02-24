@@ -11,7 +11,6 @@ const useStyles = makeStyles((theme) => ({
    tab: {
       minWidth: "0 !important",
    },
-   gridItem: {},
 }));
 
 function TabPanel(props) {
@@ -40,12 +39,10 @@ function a11yProps(index) {
 const DeviceSelectMenu = ({
    devices,
    displayableMediaStream,
-   videoSource,
-   updateVideoSource,
-   audioSource,
-   updateAudioSource,
    localStream,
-   showSoundMeter,
+   openModal,
+   localMediaHandlers,
+   mediaControls,
 }) => {
    const classes = useStyles();
 
@@ -57,7 +54,12 @@ const DeviceSelectMenu = ({
 
    return (
       <div className={classes.grid}>
-         <Grid container spacing={3}>
+         <Grid
+            justifyContent="center"
+            alignItems="center"
+            container
+            spacing={3}
+         >
             <Grid xs={3} item>
                <Tabs
                   orientation="vertical"
@@ -78,22 +80,25 @@ const DeviceSelectMenu = ({
                   />
                </Tabs>
             </Grid>
-            <Grid xs={9} item className={classes.gridItem}>
+            <Grid xs={9} item>
                <TabPanel value={value} index={0}>
                   <VideoTab
                      devices={devices}
+                     openModal={openModal}
+                     localStream={localStream}
+                     mediaControls={mediaControls}
+                     localMediaHandlers={localMediaHandlers}
                      displayableMediaStream={displayableMediaStream}
-                     videoSource={videoSource}
-                     setVideoSource={updateVideoSource}
                   />
                </TabPanel>
                <TabPanel value={value} index={1}>
                   <AudioTab
                      devices={devices}
+                     openModal={openModal}
                      localStream={localStream}
-                     showSoundMeter={showSoundMeter}
-                     audioSource={audioSource}
-                     setAudioSource={updateAudioSource}
+                     mediaControls={mediaControls}
+                     localMediaHandlers={localMediaHandlers}
+                     displayableMediaStream={displayableMediaStream}
                   />
                </TabPanel>
             </Grid>

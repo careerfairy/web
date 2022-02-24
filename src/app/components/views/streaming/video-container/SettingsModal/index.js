@@ -17,6 +17,7 @@ function SettingsModal({
    displayableMediaStream,
    mediaControls,
    localStream,
+   localMediaHandlers,
 }) {
    return (
       <GlassDialog fullScreen={smallScreen} fullWidth maxWidth="sm" open={open}>
@@ -33,13 +34,11 @@ function SettingsModal({
          <DialogContent dividers>
             <DeviceSelectMenu
                devices={devices}
-               showSoundMeter={open}
-               updateAudioSource={mediaControls.updateAudioSource}
-               updateVideoSource={mediaControls.updateVideoSource}
-               videoSource={mediaControls.videoSource}
+               openModal={open}
                localStream={localStream}
+               mediaControls={mediaControls}
                displayableMediaStream={displayableMediaStream}
-               audioSource={mediaControls.audioSource}
+               localMediaHandlers={localMediaHandlers}
             />
          </DialogContent>
          <DialogActions>

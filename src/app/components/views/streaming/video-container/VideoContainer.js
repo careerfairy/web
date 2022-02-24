@@ -333,6 +333,7 @@ function VideoContainer({
             close={() => setShowSettings(false)}
             smallScreen={smallScreen}
             devices={devices}
+            localMediaHandlers={localMediaHandlers}
             localStream={localStream}
             displayableMediaStream={displayableMediaStream}
             mediaControls={mediaControls}

@@ -1,129 +1,30 @@
-import PropTypes from "prop-types";
-import React, { useEffect, useRef, useState } from "react";
-import {
-   Button,
-   Grid,
-   MenuItem,
-   Select,
-   Typography,
-   InputLabel,
-   FormControl,
-   FormControlLabel,
-   Checkbox,
-   DialogContent,
-   OutlinedInput,
-} from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
-import useLocalStorageMediaSources from "../../../../custom-hook/useLocalStorageMediaSources";
-
-const useStyles = makeStyles((theme) => ({
-   actions: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-   },
-   button: {
-      height: "100%",
-   },
-}));
+import React from "react";
+import { Stack } from "@mui/material";
+import DeviceSelect from "../DeviceSelect";
 
 const VideoTab = ({
-   videoSource,
    devices,
-   setVideoSource,
+   openModal,
+   localStream,
+   mediaControls,
+   localMediaHandlers,
    displayableMediaStream,
 }) => {
-   const classes = useStyles();
-   const { setVideoSourceId } = useLocalStorageMediaSources();
-   const testVideoRef = useRef(null);
-   const inputLabel = useRef(null);
-   const [labelWidth, setLabelWidth] = useState(0);
-
-   useEffect(() => {
-      if (displayableMediaStream) {
-         testVideoRef.current.srcObject = displayableMediaStream;
-      }
-   }, [displayableMediaStream]);
-
-   React.useEffect(() => {
-      setLabelWidth(inputLabel.current.offsetWidth);
-   }, []);
-
-   const handleChangeCam = (event) => {
-      const id = event.target.value;
-      setVideoSourceId(id);
-      setVideoSource(id);
-   };
-
    return (
-      <Grid container spacing={2}>
-         <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
-            <FormControl
-               disabled={!devices.videoDeviceList.length}
-               fullWidth
-               variant="outlined"
-            >
-               <InputLabel shrink ref={inputLabel} htmlFor="cameraSelect">
-                  Select Camera
-               </InputLabel>
-               <Select
-                  value={videoSource || ""}
-                  fullWidth
-                  onChange={handleChangeCam}
-                  variant="outlined"
-                  id="cameraSelect"
-                  input={
-                     <OutlinedInput
-                        notched
-                        labelWidth={labelWidth}
-                        name="camera"
-                        id="cameraSelect"
-                     />
-                  }
-                  label="Select Camera"
-               >
-                  <MenuItem value="" disabled>
-                     Select Camera
-                  </MenuItem>
-                  {devices.videoDeviceList.map((device) => {
-                     return (
-                        <MenuItem key={device.value} value={device.value}>
-                           {device.text}
-                        </MenuItem>
-                     );
-                  })}
-               </Select>
-            </FormControl>
-         </Grid>
-         <Grid sm={12} xs={12} item>
-            <div
-               style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-               }}
-            >
-               <video
-                  style={{
-                     boxShadow: "0 0 3px rgb(200,200,200)",
-                     borderRadius: "5px",
-                  }}
-                  ref={testVideoRef}
-                  muted={true}
-                  autoPlay
-                  width={"100%"}
-               />
-            </div>
-         </Grid>
-      </Grid>
+      <Stack spacing={2}>
+         <DeviceSelect
+            devices={devices}
+            localStream={localStream}
+            showSoundMeter={openModal}
+            displayableMediaStream={displayableMediaStream}
+            localMediaHandlers={localMediaHandlers}
+            openModal={openModal}
+            mediaControls={mediaControls}
+            mediaDeviceType={"camera"}
+            selectTitle={"Select Camera"}
+         />
+      </Stack>
    );
-};
-
-VideoTab.propTypes = {
-   devices: PropTypes.array,
-   displayableMediaStream: PropTypes.object,
-   setVideoSource: PropTypes.func.isRequired,
-   videoSource: PropTypes.any,
 };
 
 export default VideoTab;

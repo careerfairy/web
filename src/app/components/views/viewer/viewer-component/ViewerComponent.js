@@ -4,32 +4,32 @@ import React, {
    useContext,
    useEffect,
    useState,
-} from "react"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import useDevices from "components/custom-hook/useDevices"
-import useMediaSources from "components/custom-hook/useMediaSources"
-import VideoControlsContainer from "components/views/streaming/video-container/VideoControlsContainer"
-import { useAuth } from "HOCs/AuthProvider"
-import makeStyles from "@mui/styles/makeStyles"
-import SettingsModal from "../../streaming/video-container/SettingsModal"
-import { Typography } from "@mui/material"
-import ScreenShareModal from "../../streaming/video-container/ScreenShareModal"
-import useStreamRef from "../../../custom-hook/useStreamRef"
-import EmoteButtons from "../EmoteButtons"
-import { useDispatch, useSelector } from "react-redux"
-import { useRouter } from "next/router"
-import * as actions from "store/actions"
-import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker"
-import Streams from "../../streaming/video-container/Streams"
-import DraggableComponent from "../../banners/DraggableComponent"
-import WifiIndicator from "../../streaming/video-container/WifiIndicator"
-import useAgoraRtc from "components/custom-hook/useAgoraRtc"
-import StreamPublishingModal from "components/views/streaming/modal/StreamPublishingModal"
-import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay"
-import useHandRaiseState from "components/custom-hook/useHandRaiseState"
-import RecommendedEventsOverlay from "./overlay/RecommendedEventsOverlay"
-import AgoraRTMContext from "../../../../context/agoraRTM/AgoraRTMContext"
-import AgoraStateHandler from "../../streaming/modal/AgoraStateModal/AgoraStateHandler"
+} from "react";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
+import useDevices from "components/custom-hook/useDevices";
+import useMediaSources from "components/custom-hook/useMediaSources";
+import VideoControlsContainer from "components/views/streaming/video-container/VideoControlsContainer";
+import { useAuth } from "HOCs/AuthProvider";
+import makeStyles from "@mui/styles/makeStyles";
+import SettingsModal from "../../streaming/video-container/SettingsModal";
+import { Typography } from "@mui/material";
+import ScreenShareModal from "../../streaming/video-container/ScreenShareModal";
+import useStreamRef from "../../../custom-hook/useStreamRef";
+import EmoteButtons from "../EmoteButtons";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/router";
+import * as actions from "store/actions";
+import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
+import Streams from "../../streaming/video-container/Streams";
+import DraggableComponent from "../../banners/DraggableComponent";
+import WifiIndicator from "../../streaming/video-container/WifiIndicator";
+import useAgoraRtc from "components/custom-hook/useAgoraRtc";
+import StreamPublishingModal from "components/views/streaming/modal/StreamPublishingModal";
+import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay";
+import useHandRaiseState from "components/custom-hook/useHandRaiseState";
+import RecommendedEventsOverlay from "./overlay/RecommendedEventsOverlay";
+import AgoraRTMContext from "../../../../context/agoraRTM/AgoraRTMContext";
+import AgoraStateHandler from "../../streaming/modal/AgoraStateModal/AgoraStateHandler";
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
       textAlign: "center",
       padding: theme.spacing(0, 3),
    },
-}))
+}));
 
 function ViewerComponent({
    currentLivestream,
@@ -64,45 +64,40 @@ function ViewerComponent({
    streamerId,
    mobile,
 }) {
-   const { setDesktopMode: setDesktopModeInstanceMethod } = useFirebaseService()
+   const { setDesktopMode: setDesktopModeInstanceMethod } =
+      useFirebaseService();
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
-   )
+   );
    const spyModeEnabled = useSelector(
       (state) => state.stream.streaming.spyModeEnabled
-   )
-   const classes = useStyles()
-   const dispatch = useDispatch()
-   const [showSettings, setShowSettings] = useState(false)
-   const [showScreenShareModal, setShowScreenShareModal] = useState(false)
-   const [optimizationMode, setOptimizationMode] = useState("detail")
-   const [
-      showLocalStreamPublishingModal,
-      setShowLocalStreamPublishingModal,
-   ] = useState(null)
-   const [
-      handRaiseState,
-      updateRequest,
-      hasRoom,
-      prevHandRaiseState,
-   ] = useHandRaiseState(streamerId)
+   );
+   const classes = useStyles();
+   const dispatch = useDispatch();
+   const [showSettings, setShowSettings] = useState(false);
+   const [showScreenShareModal, setShowScreenShareModal] = useState(false);
+   const [optimizationMode, setOptimizationMode] = useState("detail");
+   const [showLocalStreamPublishingModal, setShowLocalStreamPublishingModal] =
+      useState(null);
+   const [handRaiseState, updateRequest, hasRoom, prevHandRaiseState] =
+      useHandRaiseState(streamerId);
 
-   const streamRef = useStreamRef()
+   const streamRef = useStreamRef();
    const {
       query: { livestreamId },
-   } = useRouter()
+   } = useRouter();
 
-   const { authenticatedUser, userData } = useAuth()
+   const { authenticatedUser, userData } = useAuth();
    const hasActiveRooms = useSelector((state) =>
       Boolean(
          state.firestore.ordered?.[`Active BreakoutRooms of ${livestreamId}`]
             ?.length
       )
-   )
+   );
 
    const shouldInitializeAgora = Boolean(
       currentLivestream.hasStarted || (userData?.isAdmin && spyModeEnabled)
-   )
+   );
    const {
       networkQuality,
       localStream,
@@ -117,35 +112,33 @@ function ViewerComponent({
       handRaiseActive,
       shouldInitializeAgora,
       { isAHandRaiser: handRaiseActive }
-   )
+   );
 
-   const { createEmote } = useContext(AgoraRTMContext)
+   const { createEmote } = useContext(AgoraRTMContext);
 
    const devices = useDevices(localStream, {
       initialize: Boolean(handRaiseActive),
-   })
+   });
 
-   const {
-      mediaControls,
-      localMediaStream: displayableMediaStream,
-   } = useMediaSources(devices, localStream, true)
+   const { mediaControls, localMediaStream: displayableMediaStream } =
+      useMediaSources(devices, localStream, true);
 
-   const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams)
+   const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams);
 
    useEffect(() => {
-      setShowLocalStreamPublishingModal(Boolean(handRaiseActive))
-   }, [handRaiseActive])
+      setShowLocalStreamPublishingModal(Boolean(handRaiseActive));
+   }, [handRaiseActive]);
 
    useEffect(() => {
       if (!isBreakout && !remoteStreams?.length && hasActiveRooms) {
          const timout = setTimeout(function () {
             //Start the timer
-            dispatch(actions.openViewerBreakoutModal())
-         }, 3000) // Only open modal If no streams appear after 3 seconds
+            dispatch(actions.openViewerBreakoutModal());
+         }, 3000); // Only open modal If no streams appear after 3 seconds
 
-         return () => clearTimeout(timout) // Cancel opening modal if streams appear before 3 seconds
+         return () => clearTimeout(timout); // Cancel opening modal if streams appear before 3 seconds
       }
-   }, [Boolean(remoteStreams?.length), isBreakout, hasActiveRooms])
+   }, [Boolean(remoteStreams?.length), isBreakout, hasActiveRooms]);
 
    useEffect(() => {
       if (
@@ -154,12 +147,12 @@ function ViewerComponent({
          // Make sure not to auto invite if the viewer is still in the publishing modal
          showLocalStreamPublishingModal === false
       ) {
-         void handleJoinAsHandRaiser()
+         void handleJoinAsHandRaiser();
       }
    }, [
       prevHandRaiseState.current?.state === "invited",
       showLocalStreamPublishingModal,
-   ])
+   ]);
 
    useEffect(() => {
       if (
@@ -168,37 +161,37 @@ function ViewerComponent({
             (handRaiseState.state === "unrequested" ||
                handRaiseState.state === "denied"))
       ) {
-         handleLeaveAsHandRaiser()
+         handleLeaveAsHandRaiser();
       }
-   }, [handRaiseActive, handRaiseState])
+   }, [handRaiseActive, handRaiseState]);
 
    const setDesktopMode = async (mode, initiatorId) => {
       let screenSharerId =
-         mode === "desktop" ? initiatorId : currentLivestream.screenSharerId
-      await setDesktopModeInstanceMethod(streamRef, mode, screenSharerId)
-   }
+         mode === "desktop" ? initiatorId : currentLivestream.screenSharerId;
+      await setDesktopModeInstanceMethod(streamRef, mode, screenSharerId);
+   };
 
    const handleCloseScreenShareModal = useCallback(() => {
-      setShowScreenShareModal(false)
-   }, [])
+      setShowScreenShareModal(false);
+   }, []);
 
    const handleClickScreenShareButton = async () => {
       if (currentLivestream.mode === "desktop") {
-         return await setDesktopMode("default", authenticatedUser.email)
+         return await setDesktopMode("default", authenticatedUser.email);
       }
-      setShowScreenShareModal(true)
-   }
+      setShowScreenShareModal(true);
+   };
 
    const handleScreenShare = useCallback(
       async (optimizationMode = "detail") => {
-         setOptimizationMode(optimizationMode)
+         setOptimizationMode(optimizationMode);
          await setDesktopMode(
             currentLivestream.mode === "desktop" ? "default" : "desktop",
             authenticatedUser.email
-         )
+         );
       },
       [currentLivestream?.mode, optimizationMode, streamerId]
-   )
+   );
    const requestHandRaise = async () => {
       try {
          switch (handRaiseState?.state) {
@@ -206,72 +199,72 @@ function ViewerComponent({
                // If you were previously connected
                if (hasRoom) {
                   // and there is still room
-                  await updateRequest("connecting")
+                  await updateRequest("connecting");
                } else {
-                  await updateRequest("requested")
+                  await updateRequest("requested");
                }
-               break
+               break;
             case "connecting":
                // After being in a connecting state for god knows how long, you finally clicked join.
                if (hasRoom) {
                   // At the time of clicking join there is still room, so you can join in the stream as a HR
-                  await handleJoinAsHandRaiser()
+                  await handleJoinAsHandRaiser();
                } else {
                   //  At the time of clicking join there is no more room, which means you
                   //  have to go back into the queue as a HR
-                  await updateRequest("requested")
-                  dispatch(actions.enqueueSuccessfulHandRaiseRequest())
+                  await updateRequest("requested");
+                  dispatch(actions.enqueueSuccessfulHandRaiseRequest());
                }
-               break
+               break;
             case "invited":
                // If you are currently invited
                if (hasRoom) {
                   // and there is still room
-                  await handleJoinAsHandRaiser()
+                  await handleJoinAsHandRaiser();
                } else {
                   // If there is no room go back into queue
-                  await updateRequest("requested")
-                  dispatch(actions.enqueueSuccessfulHandRaiseRequest())
+                  await updateRequest("requested");
+                  dispatch(actions.enqueueSuccessfulHandRaiseRequest());
                }
-               break
+               break;
             default:
-               await updateRequest("requested")
-               dispatch(actions.enqueueSuccessfulHandRaiseRequest())
-               break
+               await updateRequest("requested");
+               dispatch(actions.enqueueSuccessfulHandRaiseRequest());
+               break;
          }
       } catch (e) {
-         console.log("-> e", e)
+         console.log("-> e", e);
       }
-      setShowLocalStreamPublishingModal(false)
-   }
+      setShowLocalStreamPublishingModal(false);
+   };
 
    const handleJoinAsHandRaiser = async () => {
-      await handlePublishLocalStream()
-      await updateRequest("connected")
+      await handlePublishLocalStream();
+      await updateRequest("connected");
       // await dispatch(actions.setStreamerIsPublished(true));
-   }
+   };
 
    const handleLeaveAsHandRaiser = async () => {
       if (localStream.audioTrack && localStream.isAudioPublished) {
-         await localMediaHandlers.closeLocalMicrophoneTrack()
+         await localMediaHandlers.closeLocalMicrophoneTrack();
       }
       if (localStream.videoTrack && localStream.isVideoPublished) {
-         await localMediaHandlers.closeLocalCameraTrack()
+         await localMediaHandlers.closeLocalCameraTrack();
       }
-      await publishLocalStreamTracks.returnToAudience()
-      await dispatch(actions.setStreamerIsPublished(false))
-   }
+      await publishLocalStreamTracks.returnToAudience();
+      await dispatch(actions.setStreamerIsPublished(false));
+   };
 
    const handleJoinAsViewer = async () => {
-      await localMediaHandlers.closeLocalCameraTrack()
-      await localMediaHandlers.closeLocalMicrophoneTrack()
-      await dispatch(actions.setStreamerIsPublished(false))
-      await updateRequest("unrequested")
-      setShowLocalStreamPublishingModal(false)
-   }
+      await localMediaHandlers.closeLocalCameraTrack();
+      await localMediaHandlers.closeLocalMicrophoneTrack();
+      await dispatch(actions.setStreamerIsPublished(false));
+      await updateRequest("unrequested");
+      setShowLocalStreamPublishingModal(false);
+   };
 
    if (!currentLivestream) {
-      return null
+      return null;
    }
 
    return (
@@ -367,6 +360,7 @@ function ViewerComponent({
                   localStream={localStream}
                   displayableMediaStream={displayableMediaStream}
                   mediaControls={mediaControls}
+                  localMediaHandlers={localMediaHandlers}
                />
                <ScreenShareModal
                   open={showScreenShareModal}
@@ -400,7 +394,7 @@ function ViewerComponent({
                <StreamStoppedOverlay />
             ))}
       </React.Fragment>
-   )
+   );
 }
 
-export default ViewerComponent
+export default ViewerComponent;
