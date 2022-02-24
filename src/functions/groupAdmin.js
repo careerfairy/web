@@ -51,7 +51,6 @@ exports.sendDraftApprovalRequestEmail = functions.https.onCall(async (data) => {
          },
          (error) => {
             functions.logger.error("error:" + error);
-            console.log("error:" + error);
          }
       );
    } catch (e) {
@@ -402,7 +401,7 @@ exports.getLivestreamReportData = functions.https.onCall(
             },
          };
       } catch (e) {
-         console.error(e);
+         functions.logger.error(e);
          throw new functions.https.HttpsError(
             "unknown",
             `Unhandled error: ${e.message}`
@@ -702,7 +701,7 @@ exports.getLivestreamReportData_TEMP_NAME = functions.https.onCall(
             },
          };
       } catch (e) {
-         console.error(e);
+         functions.logger.error(e);
          throw new functions.https.HttpsError(
             "unknown",
             `Unhandled error: ${e.message}`
@@ -733,7 +732,7 @@ exports.sendDashboardInviteEmail = functions.https.onRequest(
             return res.send(200);
          },
          (error) => {
-            console.log("error:" + error);
+            functions.logger.error(error);
             return res.status(400).send(error);
          }
       );
