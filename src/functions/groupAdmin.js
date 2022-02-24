@@ -240,18 +240,12 @@ exports.getLivestreamReportData = functions.https.onCall(
 
          const ratingsSnap = await streamSnap.ref.collection("rating").get();
 
-         let ratings = [];
-         ratingsSnap.docs
+         let ratings = ratingsSnap.docs
             .filter((doc) => !doc.data().noStars)
-            .map((doc) => {
-               ratings = [
-                  ...ratings,
-                  {
-                     id: doc.id,
-                     question: doc.data().question,
-                  },
-               ];
-            });
+            .map((doc) => ({
+               id: doc.id,
+               question: doc.data().question,
+            }));
 
          ratings.forEach(async (rating) => {
             const individualRatingSnap = await streamSnap.ref
