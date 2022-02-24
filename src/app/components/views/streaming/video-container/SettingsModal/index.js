@@ -18,6 +18,7 @@ function SettingsModal({
    mediaControls,
    localStream,
    localMediaHandlers,
+   deviceInitializers,
 }) {
    return (
       <GlassDialog fullScreen={smallScreen} fullWidth maxWidth="sm" open={open}>
@@ -39,6 +40,7 @@ function SettingsModal({
                mediaControls={mediaControls}
                displayableMediaStream={displayableMediaStream}
                localMediaHandlers={localMediaHandlers}
+               deviceInitializers={deviceInitializers}
             />
          </DialogContent>
          <DialogActions>

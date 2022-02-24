@@ -9,10 +9,8 @@ export default function useMediaSources(
    localStream: LocalStream,
    active: boolean
 ) {
-   const {
-      storedAudioSourceId,
-      storedVideoSourceId,
-   } = useLocalStorageMediaSources();
+   const { storedAudioSourceId, storedVideoSourceId } =
+      useLocalStorageMediaSources();
    const dispatch = useDispatch();
    const [audioSource, setAudioSource] = useState(null);
    const [videoSource, setVideoSource] = useState(null);
@@ -136,7 +134,6 @@ export default function useMediaSources(
       dispatch(actions.handleSetDeviceError(error, "camera"));
    const handleSetCamIsNotInUse = () =>
       dispatch(actions.handleClearDeviceError("microphoneIsUsedByOtherApp"));
-
    const updateVideoSource = useCallback(
       async (deviceId: MediaDeviceInfo["deviceId"]) => {
          if (!localStream.videoTrack) return;

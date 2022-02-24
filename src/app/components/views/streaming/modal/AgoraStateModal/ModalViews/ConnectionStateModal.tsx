@@ -59,7 +59,7 @@ const ConnectionStateModal: FC<Props> = (props) => {
    return (
       <Dialog open={true}>
          <DialogTitle>
-            <Stack alignItems="center" spacing={2}>
+            <Stack alignItems="center" sx={{ py: 3 }} spacing={2}>
                {["CONNECTING", "RECONNECTING", "DISCONNECTING"].includes(
                   agoraRtcConnectionStatus.curState
                ) && <CircularProgress />}

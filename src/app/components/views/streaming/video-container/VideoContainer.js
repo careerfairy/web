@@ -93,7 +93,9 @@ function VideoContainer({
       demoStreamHandlers,
    } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer, true);
 
-   const devices = useDevices(localStream, { initialize: true });
+   const { devices, deviceInitializers } = useDevices(localStream, {
+      initialize: true,
+   });
 
    const { mediaControls, localMediaStream: displayableMediaStream } =
       useMediaSources(devices, localStream, true);
@@ -285,6 +287,7 @@ function VideoContainer({
             open={showLocalStreamPublishingModal}
             setOpen={setShowLocalStreamPublishingModal}
             localStream={localStream}
+            deviceInitializers={deviceInitializers}
             displayableMediaStream={displayableMediaStream}
             showSoundMeter={Boolean(
                (showLocalStreamPublishingModal || showSettings) &&
@@ -333,6 +336,7 @@ function VideoContainer({
             close={() => setShowSettings(false)}
             smallScreen={smallScreen}
             devices={devices}
+            deviceInitializers={deviceInitializers}
             localMediaHandlers={localMediaHandlers}
             localStream={localStream}
             displayableMediaStream={displayableMediaStream}

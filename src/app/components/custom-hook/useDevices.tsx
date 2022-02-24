@@ -1,10 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AgoraRTC from "agora-rtc-sdk-ng";
-import {
-   getDeviceKindListName,
-   getDeviceList,
-   mapDevices,
-} from "util/streamUtil";
+import { getDeviceKindListName, getDeviceList } from "util/streamUtil";
 import { DeviceList } from "types/streaming";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
@@ -13,7 +9,7 @@ export default function useDevices(
    localStream,
    options?: { initialize: boolean }
 ) {
-   const [deviceList, setDeviceList] = useState<DeviceList>({
+   const [devices, setDevices] = useState<DeviceList>({
       audioInputList: [],
       audioOutputList: [],
       videoDeviceList: [],
@@ -21,33 +17,72 @@ export default function useDevices(
    const dispatch = useDispatch();
 
    useEffect(() => {
-      (async function init() {
-         if (!localStream || !options?.initialize) return;
-         let cameraDevices;
-         let microphoneDevices;
-         try {
-            cameraDevices = await AgoraRTC.getCameras();
-         } catch (error) {
-            dispatch(actions.handleSetDeviceError(error, "camera"));
-         }
-         try {
-            microphoneDevices = await AgoraRTC.getMicrophones();
-         } catch (error) {
-            dispatch(actions.handleSetDeviceError(error, "microphone"));
-         }
-         if (microphoneDevices || cameraDevices) {
-            const deviceArray = [];
-            if (microphoneDevices) {
-               deviceArray.push(...microphoneDevices);
-            }
-            if (cameraDevices) {
-               deviceArray.push(...cameraDevices);
-            }
-            const newDeviceList = mapDevices(deviceArray);
-            setDeviceList(newDeviceList);
-         }
-      })();
+      // (async function init() {
+      //    if (!localStream || !options?.initialize) return;
+      //    let cameraDevices;
+      //    let microphoneDevices;
+      //    try {
+      //       cameraDevices = await AgoraRTC.getCameras();
+      //    } catch (error) {
+      //       dispatch(actions.handleSetDeviceError(error, "camera"));
+      //    }
+      //    try {
+      //       microphoneDevices = await AgoraRTC.getMicrophones();
+      //    } catch (error) {
+      //       dispatch(actions.handleSetDeviceError(error, "microphone"));
+      //    }
+      //    if (microphoneDevices || cameraDevices) {
+      //       const deviceArray = [];
+      //       if (microphoneDevices) {
+      //          deviceArray.push(...microphoneDevices);
+      //       }
+      //       if (cameraDevices) {
+      //          deviceArray.push(...cameraDevices);
+      //       }
+      //       const newDeviceList = mapDevices(deviceArray);
+      //       setDevices(newDeviceList);
+      //    }
+      // })();
    }, [Boolean(localStream), options?.initialize]);
+
+   const initializeMicrophones = async () => {
+      if (!localStream || !options?.initialize) return;
+      let microphoneDevices;
+      try {
+         microphoneDevices = await AgoraRTC.getMicrophones();
+      } catch (error) {
+         dispatch(actions.handleSetDeviceError(error, "microphone"));
+      }
+      if (microphoneDevices) {
+         const deviceArray = [];
+         if (microphoneDevices) {
+            deviceArray.push(...microphoneDevices);
+         }
+         setDevices((prevState) => ({
+            ...prevState,
+            audioInputList: getDeviceList(deviceArray, "audioinput"),
+         }));
+      }
+   };
+   const initializeCameras = async () => {
+      if (!localStream || !options?.initialize) return;
+      let cameraDevices;
+      try {
+         cameraDevices = await AgoraRTC.getCameras();
+      } catch (error) {
+         dispatch(actions.handleSetDeviceError(error, "camera"));
+      }
+      if (cameraDevices) {
+         const deviceArray = [];
+         if (cameraDevices) {
+            deviceArray.push(...cameraDevices);
+         }
+         setDevices((prevState) => ({
+            ...prevState,
+            videoDeviceList: getDeviceList(deviceArray, "videoinput"),
+         }));
+      }
+   };
 
    useEffect(() => {
       AgoraRTC.onMicrophoneChanged = (info) => {
@@ -76,7 +111,7 @@ export default function useDevices(
    ) => {
       console.log(`-> ADDING ${deviceType}`);
       const listName = getDeviceKindListName(deviceType);
-      setDeviceList((prevDeviceList) => {
+      setDevices((prevDeviceList) => {
          // Add microphone to audioInputList list
          return {
             ...prevDeviceList,
@@ -95,7 +130,7 @@ export default function useDevices(
       console.log(`-> REMOVING ${deviceType}`);
       const listName = getDeviceKindListName(deviceType);
 
-      setDeviceList((prevDeviceList) => {
+      setDevices((prevDeviceList) => {
          // Remove microphone from audioInputList list
          return {
             ...prevDeviceList,
@@ -119,5 +154,10 @@ export default function useDevices(
       handleRemoveDevice(deviceId, "videoinput");
    };
 
-   return deviceList;
+   const deviceInitializers = useMemo(
+      () => ({ initializeCameras, initializeMicrophones }),
+      [localStream, options]
+   );
+
+   return { devices, deviceInitializers };
 }

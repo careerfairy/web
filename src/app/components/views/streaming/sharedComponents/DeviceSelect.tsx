@@ -59,7 +59,7 @@ const styles = {
       textAlign: "center",
    },
 } as const;
-type Props = {
+export type DeviceSelectProps = {
    localStream: LocalStream;
    title?: string;
    selectTitle: string;
@@ -70,6 +70,12 @@ type Props = {
    localMediaHandlers: LocalMediaHandlers;
    openModal: boolean;
    displayableMediaStream: MediaStream;
+   showDisableIcon?: boolean;
+   disableInitialize?: boolean;
+   deviceInitializers: {
+      initializeCameras: () => Promise<any>;
+      initializeMicrophones: () => Promise<any>;
+   };
 };
 const DeviceSelect = ({
    localStream,
@@ -82,7 +88,11 @@ const DeviceSelect = ({
    localMediaHandlers,
    openModal,
    displayableMediaStream,
-}: Props) => {
+   deviceInitializers,
+   showDisableIcon,
+   disableInitialize,
+}: DeviceSelectProps) => {
+   const [hasEnabledDevice, setHasEnabledDevice] = useState(false);
    const [activatingDevice, setActivatingDevice] = useState(false);
    const testVideoRef = useRef(null);
    const dispatch = useDispatch();
@@ -93,12 +103,13 @@ const DeviceSelect = ({
       deniedError,
       deviceList,
       inUseError,
-      initializeMethod,
+      initializeTrackMethod,
       localStorageKey,
       mediaCloseMethod,
       source,
       track,
       updateMethod,
+      initializeDeviceMethod,
    } = useMemo(() => {
       return {
          deviceList: isCamera ? "videoDeviceList" : "audioInputList",
@@ -115,9 +126,12 @@ const DeviceSelect = ({
             ? "hasEnabledCamera"
             : "hasEnabledMicrophone",
          deniedError: isCamera ? "cameraDenied" : "microphoneDenied",
-         initializeMethod: isCamera
+         initializeTrackMethod: isCamera
             ? "initializeLocalVideoStream"
             : "initializeLocalAudioStream",
+         initializeDeviceMethod: isCamera
+            ? "initializeCameras"
+            : "initializeMicrophones",
       };
    }, [isCamera]);
 
@@ -135,6 +149,18 @@ const DeviceSelect = ({
       }
    }, [displayableMediaStream, openModal, testVideoRef.current, isCamera]);
 
+   useEffect(() => {
+      setHasEnabledDevice(localStorage.getItem(localStorageKey) === "true");
+   }, []);
+
+   useEffect(() => {
+      if (!disableInitialize && hasEnabledDevice && openModal) {
+         (async function initDevice() {
+            return handleInitializeDevice();
+         })();
+      }
+   }, [hasEnabledDevice, openModal, disableInitialize]);
+
    const deviceInUseByAnotherApp = useSelector((state: RootState) => {
       return state.stream.agoraState.deviceErrors[inUseError];
    });
@@ -143,22 +169,21 @@ const DeviceSelect = ({
       return state.stream.agoraState.deviceErrors[deniedError];
    });
 
+   // console.log(`-> ${mediaDeviceType} Denied?`, deviceDenied);
+
    const activateDeviceButtonLabel = useMemo(() => {
+      const deviceName = isCamera ? "Camera" : "Microphone";
+      const activateLabel = `Activate ${deviceName}`;
+      if (deviceDenied) return `${deviceName} Access Is Not Authorized`;
+      if (!hasEnabledDevice) return activateLabel;
       if (noDevices) {
-         if (deviceDenied) {
-            return `${
-               isCamera ? "Camera" : "Microphone"
-            } Access Is Not Authorized`;
-         }
-         return `No ${isCamera ? "Camera" : "Microphone"} Detected`;
+         return `No ${deviceName} Detected`;
       }
       if (deviceInUseByAnotherApp) {
-         return `This ${
-            isCamera ? "Camera" : "Microphone"
-         } is currently being used by another app`;
+         return `This ${deviceName} is currently being used by another app`;
       }
-      return `Activate ${isCamera ? "Camera" : "Microphone"}`;
-   }, [noDevices, deviceDenied, deviceInUseByAnotherApp]);
+      return activateLabel;
+   }, [noDevices, deviceDenied, deviceInUseByAnotherApp, hasEnabledDevice]);
 
    const handleChangeDevice = async (event) => {
       await mediaControls[updateMethod](event.target.value);
@@ -172,10 +197,11 @@ const DeviceSelect = ({
    const handleInitializeDevice = async () => {
       try {
          setActivatingDevice(true);
-         await localMediaHandlers[initializeMethod]();
+         await deviceInitializers[initializeDeviceMethod]();
+         await localMediaHandlers[initializeTrackMethod]();
          localStorage.setItem(localStorageKey, "true");
       } catch (e) {
-         dispatch(actions.sendGeneralError(e));
+         console.error(e);
       }
       setActivatingDevice(false);
    };
@@ -260,23 +286,25 @@ const DeviceSelect = ({
                      )}
                   </>
                )}
-               <Box sx={styles.iconWrapper}>
-                  <IconButton
-                     aria-label={
-                        isCamera
-                           ? "turn-off-video-icon"
-                           : "turn-off-camera-icon"
-                     }
-                     size="medium"
-                     onClick={handleCloseDevice}
-                  >
-                     {isCamera ? (
-                        <VideocamOffIcon fontSize="inherit" />
-                     ) : (
-                        <MicOffIcon fontSize="inherit" />
-                     )}
-                  </IconButton>
-               </Box>
+               {showDisableIcon && (
+                  <Box sx={styles.iconWrapper}>
+                     <IconButton
+                        aria-label={
+                           isCamera
+                              ? "turn-off-video-icon"
+                              : "turn-off-camera-icon"
+                        }
+                        size="medium"
+                        onClick={handleCloseDevice}
+                     >
+                        {isCamera ? (
+                           <VideocamOffIcon fontSize="inherit" />
+                        ) : (
+                           <MicOffIcon fontSize="inherit" />
+                        )}
+                     </IconButton>
+                  </Box>
+               )}
             </>
          ) : (
             <Box sx={styles.container}>
@@ -284,7 +312,9 @@ const DeviceSelect = ({
                   variant="contained"
                   loading={activatingDevice}
                   disabled={
-                     noDevices || deviceDenied || deviceInUseByAnotherApp
+                     deviceDenied ||
+                     (hasEnabledDevice &&
+                        (noDevices || deviceInUseByAnotherApp))
                   }
                   onClick={handleInitializeDevice}
                   startIcon={isCamera ? <VideocamIcon /> : <MicIcon />}

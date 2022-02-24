@@ -116,7 +116,7 @@ function ViewerComponent({
 
    const { createEmote } = useContext(AgoraRTMContext);
 
-   const devices = useDevices(localStream, {
+   const { devices, deviceInitializers } = useDevices(localStream, {
       initialize: Boolean(handRaiseActive),
    });
 
@@ -298,6 +298,7 @@ function ViewerComponent({
             localStream={localStream}
             displayableMediaStream={displayableMediaStream}
             devices={devices}
+            deviceInitializers={deviceInitializers}
             mediaControls={mediaControls}
             onConfirmStream={requestHandRaise}
             onRefuseStream={handleJoinAsViewer}
@@ -357,6 +358,7 @@ function ViewerComponent({
                   open={showSettings}
                   close={() => setShowSettings(false)}
                   devices={devices}
+                  deviceInitializers={deviceInitializers}
                   localStream={localStream}
                   displayableMediaStream={displayableMediaStream}
                   mediaControls={mediaControls}

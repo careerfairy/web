@@ -1,8 +1,9 @@
-import React, { memo, useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useMemo, useState } from "react";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import CheckIcon from "@mui/icons-material/Check";
 import {
-   Box,
+   Alert,
+   AlertTitle,
    Button,
    CircularProgress,
    Dialog,
@@ -64,6 +65,10 @@ interface Props {
    open: boolean;
    onRefuseStream: () => Promise<any>;
    onConfirmStream: () => Promise<any>;
+   deviceInitializers: {
+      initializeCameras: () => Promise<any>;
+      initializeMicrophones: () => Promise<any>;
+   };
 }
 const StreamPublishingModal = memo(
    ({
@@ -77,10 +82,10 @@ const StreamPublishingModal = memo(
       onRefuseStream,
       open,
       showSoundMeter,
+      deviceInitializers,
    }: Props) => {
       const [publishingStream, setPublishingStream] = useState(false);
       const { storeNewMediaSources } = useLocalStorageMediaSources();
-      const testVideoRef = useRef(null);
       const dispatch = useDispatch();
 
       const agoraRtcConnectionState = useSelector((state: RootState) => {
@@ -96,37 +101,6 @@ const StreamPublishingModal = memo(
       const openModal = useMemo(() => {
          return open && agoraRtcConnectionState.curState === "CONNECTED";
       }, [open, agoraRtcConnectionState]);
-
-      useEffect(() => {
-         if (
-            openModal &&
-            displayableMediaStream &&
-            displayableMediaStream.getVideoTracks().length > 0 &&
-            testVideoRef.current
-         ) {
-            testVideoRef.current.srcObject = displayableMediaStream;
-         }
-      }, [displayableMediaStream, openModal, testVideoRef.current]);
-
-      useEffect(() => {
-         (async function initializeMediaDevices() {
-            if (openModal) {
-               const hasEnabledCamera =
-                  localStorage.getItem("hasEnabledCamera") === "true";
-               const hasEnabledMic =
-                  localStorage.getItem("hasEnabledMicrophone") === "true";
-               if (hasEnabledCamera && hasEnabledMic) {
-                  return await localMediaHandlers.initializeVideoCameraAudioTrack();
-               }
-               if (hasEnabledCamera) {
-                  return await localMediaHandlers.initializeLocalVideoStream();
-               }
-               if (hasEnabledMic) {
-                  return await localMediaHandlers.initializeLocalAudioStream();
-               }
-            } else return;
-         })();
-      }, [openModal]);
 
       const handleConfirmPublishStream = async () => {
          try {
@@ -174,6 +148,8 @@ const StreamPublishingModal = memo(
                         displayableMediaStream={displayableMediaStream}
                         localMediaHandlers={localMediaHandlers}
                         openModal={openModal}
+                        showDisableIcon
+                        deviceInitializers={deviceInitializers}
                         mediaControls={mediaControls}
                         mediaDeviceType={"camera"}
                         selectTitle={"Select Camera"}
@@ -185,34 +161,38 @@ const StreamPublishingModal = memo(
                         devices={devices}
                         localStream={localStream}
                         showSoundMeter={showSoundMeter}
+                        deviceInitializers={deviceInitializers}
                         displayableMediaStream={displayableMediaStream}
                         localMediaHandlers={localMediaHandlers}
                         openModal={openModal}
                         mediaControls={mediaControls}
+                        showDisableIcon
                         mediaDeviceType={"microphone"}
                         selectTitle={"Select Microphone"}
                         title={"Select Microphone"}
                      />
                   </Grid>
                   {(micDenied || cameraDenied) && (
-                     <Box sx={styles.deviceDeniedWrapper}>
-                        <Typography variant="body1" align="center" gutterBottom>
-                           Please allow access to your webcam and your
+                     <Grid item xs={12}>
+                        <Alert severity="warning">
+                           <AlertTitle>Device Permissions Denied</AlertTitle>
+                           Please allow access to your webcam and/or your
                            microphone.
-                        </Typography>
-                        <Button
-                           endIcon={<OpenInNewIcon />}
-                           href={
-                              "https://support.google.com/chrome/answer/2693767?hl=en&co=GENIE.Platform%3DDesktop#zippy=%2Cturn-on-permissions-in-computer-settings"
-                           }
-                           target="_blank"
-                           color="grey"
-                           variant="text"
-                           size="small"
-                        >
-                           Learn how to authorize access
-                        </Button>
-                     </Box>
+                           <Button
+                              sx={{ m1: 1, mx: "auto" }}
+                              endIcon={<OpenInNewIcon />}
+                              href={
+                                 "https://support.google.com/chrome/answer/2693767?hl=en&co=GENIE.Platform%3DDesktop#zippy=%2Cturn-on-permissions-in-computer-settings"
+                              }
+                              target="_blank"
+                              color="grey"
+                              variant="text"
+                              size="small"
+                           >
+                              Learn how to authorize access
+                           </Button>
+                        </Alert>
+                     </Grid>
                   )}
                </Grid>
             </DialogContent>

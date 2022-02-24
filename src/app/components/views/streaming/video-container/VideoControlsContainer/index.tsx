@@ -252,6 +252,9 @@ const VideoControlsContainer = ({
    };
 
    const toggleVideo = async () => {
+      if (!localStreamIsPublished.video) {
+         return openPublishingModal();
+      }
       try {
          setTogglingCamera(true);
          await localMediaControls.setLocalVideoEnabled(cameraInactive);

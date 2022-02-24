@@ -1,5 +1,6 @@
 import * as actions from "./actionTypes";
 import { RTCConnectionState, RTCError } from "../../types/streaming";
+import * as actionMethods from "./index";
 
 // Toggle the open state of the streamer breakoutModal
 export const openStreamerBreakoutModal = () => async (dispatch) => {
@@ -106,14 +107,13 @@ export const setFocusMode = (mode, mobile) => async (dispatch, getState) => {
    }
 };
 
-export const setAgoraRtcConnectionState = (
-   connectionState: RTCConnectionState
-) => async (dispatch) => {
-   dispatch({
-      type: actions.SET_AGORA_RTC_CONNECTION_STATE,
-      payload: connectionState,
-   });
-};
+export const setAgoraRtcConnectionState =
+   (connectionState: RTCConnectionState) => async (dispatch) => {
+      dispatch({
+         type: actions.SET_AGORA_RTC_CONNECTION_STATE,
+         payload: connectionState,
+      });
+   };
 
 export const setAgoraRtcError = (rtcError: RTCError) => async (dispatch) => {
    dispatch({
@@ -122,11 +122,10 @@ export const setAgoraRtcError = (rtcError: RTCError) => async (dispatch) => {
    });
 };
 
-export const handleSetMicrophoneDenied = (denied: boolean) => async (
-   dispatch
-) => {
-   dispatch(setDeviceError("microphoneDenied", denied));
-};
+export const handleSetMicrophoneDenied =
+   (denied: boolean) => async (dispatch) => {
+      dispatch(setDeviceError("microphoneDenied", denied));
+   };
 export const handleSetCameraDenied = (denied: boolean) => async (dispatch) => {
    dispatch(setDeviceError("cameraDenied", denied));
 };
@@ -142,68 +141,64 @@ type DeviceErrorType =
    | "cameraDenied"
    | "microphoneDenied";
 
-export const setDeviceError = (
-   deviceErrorType: DeviceErrorType,
-   isTrue: boolean
-) => async (dispatch) => {
-   dispatch({
-      type: actions.SET_DEVICE_ERROR,
-      payload: { [deviceErrorType]: isTrue },
-   });
-};
+export const setDeviceError =
+   (deviceErrorType: DeviceErrorType, isTrue: boolean) => async (dispatch) => {
+      dispatch({
+         type: actions.SET_DEVICE_ERROR,
+         payload: { [deviceErrorType]: isTrue },
+      });
+   };
 
-export const setAgoraPrimaryClientJoined = (hasJoined: boolean) => (
-   dispatch
-) => {
-   dispatch({
-      type: actions.SET_AGORA_PRIMARY_CLIENT_JOINED,
-      payload: hasJoined,
-   });
-};
+export const setAgoraPrimaryClientJoined =
+   (hasJoined: boolean) => (dispatch) => {
+      dispatch({
+         type: actions.SET_AGORA_PRIMARY_CLIENT_JOINED,
+         payload: hasJoined,
+      });
+   };
 
-export const handleClearDeviceError = (deviceErrorType: DeviceErrorType) => (
-   dispatch
-) => {
-   return dispatch(setDeviceError(deviceErrorType, false));
-};
-export const handleSetDeviceError = (
-   error: RTCError,
-   deviceType: "microphone" | "camera"
-) => (dispatch) => {
-   if (error?.code === "PERMISSION_DENIED") {
-      switch (deviceType) {
-         case "camera":
-            dispatch(handleSetCameraDenied(true));
-            break;
-         case "microphone":
-            dispatch(handleSetMicrophoneDenied(true));
-            break;
+export const handleClearDeviceError =
+   (deviceErrorType: DeviceErrorType) => (dispatch) => {
+      return dispatch(setDeviceError(deviceErrorType, false));
+   };
+export const handleSetDeviceError =
+   (error: RTCError, deviceType: "microphone" | "camera") => (dispatch) => {
+      if (error?.code === "UNEXPECTED_ERROR") {
+         dispatch(actionMethods.sendGeneralError(error));
       }
-   }
-   if (error?.code === "NOT_READABLE") {
-      switch (deviceType) {
-         case "camera":
-            dispatch(handleSetCamIsInUse(true));
-            break;
-         case "microphone":
-            dispatch(handleSetMicIsInUse(true));
-            break;
+      if (error?.code === "PERMISSION_DENIED") {
+         switch (deviceType) {
+            case "camera":
+               dispatch(handleSetCameraDenied(true));
+               break;
+            case "microphone":
+               dispatch(handleSetMicrophoneDenied(true));
+               break;
+         }
       }
-   }
-};
+      if (error?.code === "NOT_READABLE") {
+         switch (deviceType) {
+            case "camera":
+               dispatch(handleSetCamIsInUse(true));
+               break;
+            case "microphone":
+               dispatch(handleSetMicIsInUse(true));
+               break;
+         }
+      }
+   };
 export const clearAgoraRtcError = () => async (dispatch) => {
    dispatch({
       type: actions.CLEAR_AGORA_RTC_ERROR,
    });
 };
-export const setSessionIsUsingCloudProxy = (isUsing: boolean) => async (
-   dispatch
-) => {
-   dispatch({
-      type: actions.SET_SESSION_IS_USING_CLOUD_PROXY,
-      payload: isUsing,
-   });
-};
+export const setSessionIsUsingCloudProxy =
+   (isUsing: boolean) => async (dispatch) => {
+      dispatch({
+         type: actions.SET_SESSION_IS_USING_CLOUD_PROXY,
+         payload: isUsing,
+      });
+   };
 
 // Action to set streamer state, this is to prevent feature hints to show up before the streamer has published
 export const setStreamerIsPublished = (isPublished) => async (dispatch) => {

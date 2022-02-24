@@ -43,6 +43,7 @@ const DeviceSelectMenu = ({
    openModal,
    localMediaHandlers,
    mediaControls,
+   deviceInitializers,
 }) => {
    const classes = useStyles();
 
@@ -89,6 +90,10 @@ const DeviceSelectMenu = ({
                      mediaControls={mediaControls}
                      localMediaHandlers={localMediaHandlers}
                      displayableMediaStream={displayableMediaStream}
+                     mediaDeviceType={"camera"}
+                     disableInitialize
+                     deviceInitializers={deviceInitializers}
+                     selectTitle={"Select Camera"}
                   />
                </TabPanel>
                <TabPanel value={value} index={1}>
@@ -97,8 +102,13 @@ const DeviceSelectMenu = ({
                      openModal={openModal}
                      localStream={localStream}
                      mediaControls={mediaControls}
+                     deviceInitializers={deviceInitializers}
                      localMediaHandlers={localMediaHandlers}
                      displayableMediaStream={displayableMediaStream}
+                     mediaDeviceType={"microphone"}
+                     selectTitle={"Select Microphone"}
+                     disableInitialize
+                     showSoundMeter={value === 1}
                   />
                </TabPanel>
             </Grid>

@@ -579,17 +579,22 @@ export default function useAgoraRtc(
       ]
    );
 
+   const publishLocalStreamTracks = useMemo(
+      () => ({
+         publishLocalCameraTrack,
+         publishLocalMicrophoneTrack,
+         returnToAudience,
+      }),
+      [localStream.videoTrack, localStream.audioTrack, rtcClient]
+   );
+
    return {
       networkQuality,
       localStream,
       localMediaHandlers,
       localMediaControls: { setLocalAudioEnabled, setLocalVideoEnabled },
       remoteStreams,
-      publishLocalStreamTracks: {
-         publishLocalCameraTrack,
-         publishLocalMicrophoneTrack,
-         returnToAudience,
-      },
+      publishLocalStreamTracks,
       handlePublishLocalStream,
       publishScreenShareStream,
       unpublishScreenShareStream,

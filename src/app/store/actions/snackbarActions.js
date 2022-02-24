@@ -2,14 +2,14 @@ import {
    CLOSE_SNACKBAR,
    ENQUEUE_SNACKBAR,
    REMOVE_SNACKBAR,
-} from "./actionTypes"
-import { GENERAL_ERROR } from "../../components/util/constants"
-import { getCtaSnackBarProps } from "../../components/util/constants/callToActions"
-import { careerfairyLogo } from "../../constants/images"
-import * as actions from "./index"
-import CallToActionSnackbar from "../../components/views/streaming/sharedComponents/StreamNotifications/CallToActionSnackbar"
-import React from "react"
-import * as Sentry from "@sentry/browser"
+} from "./actionTypes";
+import { GENERAL_ERROR } from "../../components/util/constants";
+import { getCtaSnackBarProps } from "../../components/util/constants/callToActions";
+import { careerfairyLogo } from "../../constants/images";
+import * as actions from "./index";
+import CallToActionSnackbar from "../../components/views/streaming/sharedComponents/StreamNotifications/CallToActionSnackbar";
+import React from "react";
+import * as Sentry from "@sentry/browser";
 
 /**
  * Enqueue a snackbar managed in redux state.
@@ -26,7 +26,7 @@ import * as Sentry from "@sentry/browser"
 export const enqueueSnackbar = (
    notification = { message: "", options: {} }
 ) => {
-   const key = notification.options && notification.options.key
+   const key = notification.options && notification.options.key;
 
    return {
       type: ENQUEUE_SNACKBAR,
@@ -34,32 +34,33 @@ export const enqueueSnackbar = (
          ...notification,
          key: key || new Date().getTime() + Math.random(),
       },
-   }
-}
+   };
+};
 
 export const closeSnackbar = (key) => ({
    type: CLOSE_SNACKBAR,
    dismissAll: !key, // dismiss all if no key has been defined
    key,
-})
+});
 
 export const removeSnackbar = (key) => ({
    type: REMOVE_SNACKBAR,
    key,
-})
+});
 
-export const sendGeneralError = (error = "") => async (dispatch) => {
-   console.error("error", error)
-   Sentry.captureException(error)
-   let message = GENERAL_ERROR
+export const sendGeneralError = (errorInstance) => async (dispatch) => {
+   const error = errorInstance || "";
+   console.error("error", error);
+   Sentry.captureException(error);
+   let message = GENERAL_ERROR;
    if (process.env.NODE_ENV === "development") {
       const devInfo =
-         "This type of error only appears in development, it will just show a general error in production."
+         "This type of error only appears in development, it will just show a general error in production.";
       if (typeof error === "string") {
-         message = `${error} - ${devInfo}`
+         message = `${error} - ${devInfo}`;
       }
       if (typeof error?.message === "string") {
-         message = `${error.message} - ${devInfo}`
+         message = `${error.message} - ${devInfo}`;
       }
    }
    dispatch(
@@ -70,126 +71,127 @@ export const sendGeneralError = (error = "") => async (dispatch) => {
             preventDuplicate: true,
          },
       })
-   )
-}
+   );
+};
 
-export const sendSuccessMessage = (message = "Success") => async (dispatch) => {
-   dispatch(
-      enqueueSnackbar({
-         message: message,
-         options: {
-            variant: "success",
-            preventDuplicate: true,
-            key: message,
-         },
-      })
-   )
-}
-export const enqueueBroadcastMessage = (message = "", action) => async (
-   dispatch
-) => {
-   dispatch(
-      enqueueSnackbar({
-         message: message,
-         options: {
-            variant: "warning",
-            preventDuplicate: true,
-            key: message,
-            action,
-            anchorOrigin: {
-               vertical: "top",
-               horizontal: "center",
+export const sendSuccessMessage =
+   (message = "Success") =>
+   async (dispatch) => {
+      dispatch(
+         enqueueSnackbar({
+            message: message,
+            options: {
+               variant: "success",
+               preventDuplicate: true,
+               key: message,
             },
-         },
-      })
-   )
-}
-export const enqueueCallToAction = ({ content, callToActionId }) => async (
-   dispatch
-) => {
-   dispatch(
-      enqueueSnackbar({
-         options: {
-            variant: "info",
-            preventDuplicate: true,
-            persist: true,
-            key: callToActionId,
-            content,
-            anchorOrigin: {
-               vertical: "top",
-               horizontal: "center",
+         })
+      );
+   };
+export const enqueueBroadcastMessage =
+   (message = "", action) =>
+   async (dispatch) => {
+      dispatch(
+         enqueueSnackbar({
+            message: message,
+            options: {
+               variant: "warning",
+               preventDuplicate: true,
+               key: message,
+               action,
+               anchorOrigin: {
+                  vertical: "top",
+                  horizontal: "center",
+               },
             },
-         },
-      })
-   )
-}
+         })
+      );
+   };
+export const enqueueCallToAction =
+   ({ content, callToActionId }) =>
+   async (dispatch) => {
+      dispatch(
+         enqueueSnackbar({
+            options: {
+               variant: "info",
+               preventDuplicate: true,
+               persist: true,
+               key: callToActionId,
+               content,
+               anchorOrigin: {
+                  vertical: "top",
+                  horizontal: "center",
+               },
+            },
+         })
+      );
+   };
 
-export const enqueueJobPostingCta = (
-   callToActionDataWithId,
-   handleClick,
-   handleDismiss
-) => async (dispatch) => {
-   const {
-      icon,
-      buttonUrl,
-      buttonText,
-      callToActionId,
-      salary,
-      applicationDeadline,
-      snackBarImage,
-      message,
-      jobTitle,
-      isJobPosting,
-      isForTutorial,
-   } = getCtaSnackBarProps(callToActionDataWithId, careerfairyLogo)
-
-   dispatch(
-      actions.enqueueCallToAction({
-         message,
+export const enqueueJobPostingCta =
+   (callToActionDataWithId, handleClick, handleDismiss) => async (dispatch) => {
+      const {
+         icon,
+         buttonUrl,
+         buttonText,
          callToActionId,
-         content: (
-            <CallToActionSnackbar
-               onClick={handleClick}
-               onDismiss={handleDismiss}
-               icon={icon}
-               isForTutorial={isForTutorial}
-               buttonText={buttonText}
-               buttonUrl={buttonUrl}
-               jobTitle={jobTitle}
-               salary={salary}
-               snackBarImage={snackBarImage}
-               applicationDeadline={applicationDeadline}
-               isJobPosting={isJobPosting}
-               message={message}
-            />
-         ),
-      })
-   )
-}
+         salary,
+         applicationDeadline,
+         snackBarImage,
+         message,
+         jobTitle,
+         isJobPosting,
+         isForTutorial,
+      } = getCtaSnackBarProps(callToActionDataWithId, careerfairyLogo);
+
+      dispatch(
+         actions.enqueueCallToAction({
+            message,
+            callToActionId,
+            content: (
+               <CallToActionSnackbar
+                  onClick={handleClick}
+                  onDismiss={handleDismiss}
+                  icon={icon}
+                  isForTutorial={isForTutorial}
+                  buttonText={buttonText}
+                  buttonUrl={buttonUrl}
+                  jobTitle={jobTitle}
+                  salary={salary}
+                  snackBarImage={snackBarImage}
+                  applicationDeadline={applicationDeadline}
+                  isJobPosting={isJobPosting}
+                  message={message}
+               />
+            ),
+         })
+      );
+   };
 
 /**
  * Call an on call cloud function to generate a secure agora token.
  * @param {{options: {anchorOrigin: {horizontal: string, vertical: string}, key: string}, message: string}} data
  */
-export const sendCustomError = (data = {}) => async (dispatch) => {
-   console.error("error", data.message)
-   dispatch(
-      enqueueSnackbar({
-         message: data.message,
-         options: {
-            variant: "error",
-            preventDuplicate: true,
-            ...data.options,
-         },
-      })
-   )
-}
+export const sendCustomError =
+   (data = {}) =>
+   async (dispatch) => {
+      console.error("error", data.message);
+      dispatch(
+         enqueueSnackbar({
+            message: data.message,
+            options: {
+               variant: "error",
+               preventDuplicate: true,
+               ...data.options,
+            },
+         })
+      );
+   };
 
 // enqueue hand raise request sent
 
 export const enqueueSuccessfulHandRaiseRequest = () => async (dispatch) => {
    const message =
-      "Your hand raise request has been sent, please wait to be invited."
+      "Your hand raise request has been sent, please wait to be invited.";
    return dispatch(
       enqueueSnackbar({
          message,
@@ -199,5 +201,5 @@ export const enqueueSuccessfulHandRaiseRequest = () => async (dispatch) => {
             preventDuplicate: true,
          },
       })
-   )
-}
+   );
+};
