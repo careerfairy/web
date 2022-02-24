@@ -18,38 +18,69 @@ export default function useMediaSources(
    const [localMediaStream, setLocalMediaStream] = useState(null);
 
    useEffect(() => {
-      if (active && localStream) {
-         let mediaStream: MediaStream;
+      if (localStream) {
+         let newMediaStream: MediaStream;
          if (!localMediaStream) {
-            mediaStream = new MediaStream();
+            newMediaStream = new MediaStream();
          } else {
-            mediaStream = localMediaStream;
-            cleanupDisplayableMediaStream(mediaStream);
+            newMediaStream = localMediaStream;
          }
-         if (localStream.audioTrack) {
-            mediaStream.addTrack(localStream.audioTrack.getMediaStreamTrack());
+         const liveAudioStreamTrack =
+            localStream?.audioTrack?.getMediaStreamTrack();
+         if (liveAudioStreamTrack?.readyState === "live") {
+            addTrackToMediaStream(
+               newMediaStream,
+               liveAudioStreamTrack,
+               "audio"
+            );
          }
-         if (localStream.videoTrack) {
-            mediaStream.addTrack(localStream.videoTrack.getMediaStreamTrack());
+         const liveVideoStreamTrack =
+            localStream?.videoTrack?.getMediaStreamTrack();
+         if (liveVideoStreamTrack?.readyState === "live") {
+            addTrackToMediaStream(
+               newMediaStream,
+               liveVideoStreamTrack,
+               "video"
+            );
          }
-         setLocalMediaStream(mediaStream);
+         if (!localMediaStream) {
+            setLocalMediaStream(newMediaStream);
+         }
       }
    }, [
-      localStream,
       localStream?.audioTrack,
-      localStream?.videoTrack,
-      localStream?.videoTrack?.getMediaStreamTrack().getSettings().deviceId,
-      active,
+      localStream?.videoTrack?.getMediaStreamTrack().readyState,
+      localStream?.videoTrack?.getMediaStreamTrack().id,
    ]);
 
-   const cleanupDisplayableMediaStream = (mediaStream: MediaStream) => {
+   const addTrackToMediaStream = (
+      mediaStream: MediaStream,
+      trackToAdd: MediaStreamTrack,
+      trackType: "audio" | "video"
+   ) => {
       const audioTracks = mediaStream.getAudioTracks();
       const videoTracks = mediaStream.getVideoTracks();
-      if (audioTracks.length > 0) {
-         mediaStream.removeTrack(audioTracks[0]);
+      if (trackType === "video") {
+         handleAddAndRemove(videoTracks, mediaStream, trackToAdd);
       }
-      if (videoTracks.length > 0) {
-         mediaStream.removeTrack(videoTracks[0]);
+      if (trackType === "audio") {
+         handleAddAndRemove(audioTracks, mediaStream, trackToAdd);
+      }
+   };
+
+   const handleAddAndRemove = (
+      currentTrackList: MediaStreamTrack[],
+      mediaStream: MediaStream,
+      trackToAdd: MediaStreamTrack
+   ) => {
+      currentTrackList.forEach(
+         (track) => track.id !== trackToAdd.id && mediaStream.removeTrack(track)
+      );
+      const isAlreadyInTracks = currentTrackList.find(
+         (track) => track.id === trackToAdd.id
+      );
+      if (!isAlreadyInTracks) {
+         mediaStream.addTrack(trackToAdd);
       }
    };
 
@@ -130,6 +161,7 @@ export default function useMediaSources(
    const updateVideoSource = useCallback(
       async (deviceId: MediaDeviceInfo["deviceId"]) => {
          if (!localStream.videoTrack) return;
+         console.log("-> UPDATING VIDEO SOURCE");
          try {
             try {
                await localStream.videoTrack.setDevice(deviceId);

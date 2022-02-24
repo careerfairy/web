@@ -148,7 +148,9 @@ function VideoContainer({
 
    const setVideoQuality = async (quality) => {
       try {
-         await localStream.videoTrack.setEncoderConfiguration(quality);
+         if (localStream.isVideoPublished) {
+            await localStream.videoTrack.setEncoderConfiguration(quality);
+         }
       } catch (e) {
          console.log("-> e in set video quality", e);
          dispatch(actions.setAgoraRtcError(e));

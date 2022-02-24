@@ -141,7 +141,7 @@ const DeviceSelect = ({
          isCamera &&
          openModal &&
          displayableMediaStream &&
-         displayableMediaStream.getVideoTracks().length > 0 &&
+         displayableMediaStream.getVideoTracks().length &&
          testVideoRef.current
       ) {
          testVideoRef.current.srcObject = displayableMediaStream;
@@ -169,12 +169,15 @@ const DeviceSelect = ({
    });
 
    // console.log(`-> ${mediaDeviceType} Denied?`, deviceDenied);
-   // if (mediaDeviceType === "camera") {
-   //    console.log(
-   //       `-> ${mediaControls[source]?.title} in use?`,
-   //       deviceInUseByAnotherApp
-   //    );
-   // }
+   if (mediaDeviceType === "camera") {
+      // console.log("-> displayableMediaStream", displayableMediaStream);
+      // console.log("-> localStream", localStream);
+      // console.log("-> mediaControls[source]", mediaControls[source]);
+      // console.log(
+      //    `-> ${mediaControls[source]?.title} in use?`,
+      //    deviceInUseByAnotherApp
+      // );
+   }
 
    const activateDeviceButtonLabel = useMemo(() => {
       const deviceName = isCamera ? "Camera" : "Microphone";
@@ -191,7 +194,6 @@ const DeviceSelect = ({
    }, [noDevices, deviceDenied, deviceInUseByAnotherApp, hasEnabledDevice]);
 
    const handleChangeDevice = async (event) => {
-      console.log("-> handleChangeDevice event", event);
       await mediaControls[updateMethod](event.target.value);
    };
 
