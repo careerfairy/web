@@ -95,7 +95,6 @@ const DeviceSelect = ({
    const [hasEnabledDevice, setHasEnabledDevice] = useState(false);
    const [activatingDevice, setActivatingDevice] = useState(false);
    const testVideoRef = useRef(null);
-   const dispatch = useDispatch();
 
    const isCamera = mediaDeviceType === "camera";
 
@@ -170,6 +169,12 @@ const DeviceSelect = ({
    });
 
    // console.log(`-> ${mediaDeviceType} Denied?`, deviceDenied);
+   // if (mediaDeviceType === "camera") {
+   //    console.log(
+   //       `-> ${mediaControls[source]?.title} in use?`,
+   //       deviceInUseByAnotherApp
+   //    );
+   // }
 
    const activateDeviceButtonLabel = useMemo(() => {
       const deviceName = isCamera ? "Camera" : "Microphone";
@@ -186,6 +191,7 @@ const DeviceSelect = ({
    }, [noDevices, deviceDenied, deviceInUseByAnotherApp, hasEnabledDevice]);
 
    const handleChangeDevice = async (event) => {
+      console.log("-> handleChangeDevice event", event);
       await mediaControls[updateMethod](event.target.value);
    };
 
@@ -206,10 +212,14 @@ const DeviceSelect = ({
       setActivatingDevice(false);
    };
 
+   const currentDeviceIsBeingUsedButThereAreOtherOnesAvailable =
+      deviceInUseByAnotherApp && devices[deviceList].length > 1;
+
    return (
       <Box sx={styles.gridItemContent}>
          {title && <Typography sx={styles.title}>{title}</Typography>}
-         {localStream?.[track] ? (
+         {localStream?.[track] ||
+         currentDeviceIsBeingUsedButThereAreOtherOnesAvailable ? (
             <>
                <FormControl
                   disabled={!devices[deviceList].length}
@@ -247,7 +257,20 @@ const DeviceSelect = ({
                      </MenuItem>
                      {devices[deviceList].map((device) => {
                         return (
-                           <MenuItem key={device.value} value={device.value}>
+                           <MenuItem
+                              onClick={() => {
+                                 if (
+                                    currentDeviceIsBeingUsedButThereAreOtherOnesAvailable &&
+                                    device.value === mediaControls[source]
+                                 ) {
+                                    return mediaControls[updateMethod](
+                                       device.value
+                                    );
+                                 }
+                              }}
+                              key={device.value}
+                              value={device.value}
+                           >
                               {device.text}
                            </MenuItem>
                         );

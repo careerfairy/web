@@ -104,19 +104,12 @@ export default function useMediaSources(
       async (deviceId) => {
          if (!localStream.audioTrack) return;
          try {
-            const currentDeviceId = localStream.audioTrack
-               .getMediaStreamTrack()
-               .getSettings().deviceId;
-            if (currentDeviceId !== deviceId) {
-               try {
-                  await localStream.audioTrack.setDevice(deviceId);
-                  setAudioSource(deviceId);
-                  handleSetMicIsNotInUse();
-               } catch (error) {
-                  handleSetMicInUse(error);
-               }
-            } else {
+            try {
+               await localStream.audioTrack.setDevice(deviceId);
                setAudioSource(deviceId);
+               handleSetMicIsNotInUse();
+            } catch (error) {
+               handleSetMicInUse(error);
             }
          } catch (e) {
             dispatch(actions.sendGeneralError(e));
@@ -133,25 +126,18 @@ export default function useMediaSources(
    const handleSetCamIsInUse = (error) =>
       dispatch(actions.handleSetDeviceError(error, "camera"));
    const handleSetCamIsNotInUse = () =>
-      dispatch(actions.handleClearDeviceError("microphoneIsUsedByOtherApp"));
+      dispatch(actions.handleClearDeviceError("cameraIsUsedByOtherApp"));
    const updateVideoSource = useCallback(
       async (deviceId: MediaDeviceInfo["deviceId"]) => {
          if (!localStream.videoTrack) return;
          try {
-            const currentDeviceId = localStream.videoTrack
-               .getMediaStreamTrack()
-               .getSettings().deviceId;
-            if (currentDeviceId !== deviceId) {
-               try {
-                  await localStream.videoTrack.setDevice(deviceId);
-                  handleSetCamIsNotInUse();
-                  setVideoSource(deviceId);
-               } catch (e) {
-                  handleSetCamIsInUse(e);
-                  console.log("-> error in setDevice", e);
-               }
-            } else {
+            try {
+               await localStream.videoTrack.setDevice(deviceId);
+               handleSetCamIsNotInUse();
                setVideoSource(deviceId);
+            } catch (e) {
+               handleSetCamIsInUse(e);
+               console.log("-> error in setDevice", e);
             }
          } catch (e) {
             dispatch(actions.sendGeneralError(e));
