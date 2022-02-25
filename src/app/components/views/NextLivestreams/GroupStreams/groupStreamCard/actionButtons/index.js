@@ -27,25 +27,26 @@ export const AttendButton = ({
 }) => {
    const classes = useStyles();
    return (
-      <Button
-         className={classes.actionButton}
-         classes={{ disabled: classes.disabledButton }}
-         size="large"
-         style={{ marginLeft: 5 }}
-         variant="contained"
-         {...props}
-         disabled={disabled}
-         startIcon={
-            user && checkIfRegistered() ? (
-               <ClearRoundedIcon />
-            ) : (
-               <AddToPhotosRoundedIcon />
-            )
-         }
-         color={user && checkIfRegistered() ? "grey" : "primary"}
-         children={attendButtonLabel}
-         onClick={handleRegisterClick}
-      />
+      <span>
+         <Button
+            className={classes.actionButton}
+            size="large"
+            style={{ marginLeft: 5 }}
+            variant="contained"
+            {...props}
+            disabled={disabled}
+            startIcon={
+               user && checkIfRegistered() ? (
+                  <ClearRoundedIcon />
+               ) : (
+                  <AddToPhotosRoundedIcon />
+               )
+            }
+            color={user && checkIfRegistered() ? "grey" : "primary"}
+            children={attendButtonLabel}
+            onClick={handleRegisterClick}
+         />
+      </span>
    );
 };
 
@@ -59,22 +60,6 @@ export const DetailsButton = ({
    ...props
 }) => {
    const classes = useStyles();
-   // const link = useMemo(() => {
-   //    let newLink = `/upcoming-livestream/${livestream.id}`;
-   //    const searchParams = {
-   //       ...(!listenToUpcoming && { groupId: groupData.groupId }),
-   //       ...(referrerId && { referrerId }),
-   //    };
-   //
-   //    const params = new URLSearchParams(searchParams).toString();
-   //    if (params) {
-   //       newLink += `?${params}`;
-   //    }
-   //    if (isPastLivestreams) {
-   //       newLink += "#about";
-   //    }
-   //    return newLink;
-   // }, [isPastLivestreams, listenToUpcoming, groupData.groupId, referrerId]);
    return (
       <Link
          href={{
