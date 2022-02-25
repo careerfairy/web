@@ -27,7 +27,7 @@
       "@mui/utils": "^5.3.0",
       "@react-pdf/renderer": "^2.1.0",
       "@reactivers/use-measure": "^1.0.0",
-      "@sentry/browser": "^5.13.2",
+      "@sentry/nextjs": "^6.17.9",
       "@stahl.luke/react-reveal": "^1.2.3",
       "agora-rtc-sdk": "^3.4.0",
       "agora-rtc-sdk-ng": "^4.4.0",
@@ -134,6 +134,6 @@
       "webpack-bundle-analyzer": "^4.4.0"
    },
    "engines": {
-      "node": "^14"
+      "node": "14.x"
    }
 }

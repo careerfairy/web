@@ -59,7 +59,7 @@ const CallToActionTypeButton = ({
 
    return (
       <ConditionalWrapper
-         condition={tutorialStepOpen}
+         condition={Boolean(tutorialStepOpen)}
          wrapper={(children) => (
             <StyledTooltipWithButton
                open={tutorialStepOpen}

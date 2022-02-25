@@ -1,14 +1,22 @@
-import React from "react"
-import { darken } from "@mui/material/styles"
-import { Avatar, Box, Container, Grid, Hidden, Typography } from "@mui/material"
-import CountDown from "./CountDown"
-import HeroSpeakers from "./HeroSpeakers"
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
-import HeroHosts from "./HeroHosts"
+import React from "react";
+import { darken } from "@mui/material/styles";
+import {
+   Avatar,
+   Box,
+   Container,
+   Grid,
+   Hidden,
+   Typography,
+} from "@mui/material";
+import CountDown from "./CountDown";
+import HeroSpeakers from "./HeroSpeakers";
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
+import HeroHosts from "./HeroHosts";
 import {
    InPersonEventBadge,
+   LanguageBadge,
    LimitedRegistrationsBadge,
-} from "../../NextLivestreams/GroupStreams/groupStreamCard/badges"
+} from "../../NextLivestreams/GroupStreams/groupStreamCard/badges";
 
 const styles = {
    root: (theme) => ({
@@ -102,8 +110,19 @@ const styles = {
    streamStatuses: {
       paddingTop: (theme) => theme.spacing(2),
       display: "flex",
+      flexWrap: "wrap",
    },
-}
+   chip: {
+      height: { sm: "2.78rem" },
+      margin: { sm: "0.6em" },
+      "& svg": {
+         fontSize: { sm: "2.25rem" },
+      },
+      "& span": {
+         fontSize: { sm: "1.7rem" },
+      },
+   },
+};
 
 const HeroSection = ({
    backgroundImage,
@@ -115,6 +134,7 @@ const HeroSection = ({
    hosts,
    numberOfSpotsRemaining,
    streamAboutToStart,
+   streamLanguage,
 }) => {
    return (
       <Box
@@ -135,13 +155,25 @@ const HeroSection = ({
                      >
                         {stream.title}
                      </Typography>
-                     {(stream.isFaceToFace || stream.maxRegistrants) && (
+                     {(stream.isFaceToFace ||
+                        stream.maxRegistrants ||
+                        streamLanguage) && (
                         <Box sx={styles.streamStatuses}>
-                           {stream.isFaceToFace && <InPersonEventBadge white />}
+                           {stream.isFaceToFace && (
+                              <InPersonEventBadge sx={styles.chip} white />
+                           )}
                            {stream.maxRegistrants && (
                               <LimitedRegistrationsBadge
+                                 sx={styles.chip}
                                  white
                                  numberOfSpotsRemaining={numberOfSpotsRemaining}
+                              />
+                           )}
+                           {streamLanguage && (
+                              <LanguageBadge
+                                 sx={styles.chip}
+                                 white
+                                 streamLanguage={streamLanguage}
                               />
                            )}
                         </Box>
@@ -196,7 +228,7 @@ const HeroSection = ({
             </Container>
          </Box>
       </Box>
-   )
-}
+   );
+};
 
-export default HeroSection
+export default HeroSection;

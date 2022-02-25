@@ -1,7 +1,6 @@
 import * as React from "react";
 import "styles.css";
 import FirebaseServiceContext from "context/firebase/FirebaseServiceContext";
-import * as Sentry from "@sentry/browser";
 import config from "@stahl.luke/react-reveal/globals";
 import { newStore, wrapper } from "../store";
 
@@ -23,7 +22,7 @@ import Notifier from "../components/views/notifier";
 import { getCookieConsentValue } from "react-cookie-consent";
 import CFCookieConsent from "components/views/common/cookie-consent/CFCookieConsent";
 import { useRouter } from "next/router";
-import {firebaseServiceInstance} from "../data/firebase/FirebaseService"
+import { firebaseServiceInstance } from "../data/firebase/FirebaseService";
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext";
 import { useEffect, useState } from "react";
 
@@ -55,9 +54,6 @@ function MyApp(props) {
    } = props;
 
    // const classes = useStyles()
-   Sentry.init({
-      dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031",
-   });
 
    const {
       pathname,
@@ -175,7 +171,9 @@ function MyApp(props) {
                >
                   <AuthProvider>
                      <ThemeProviderWrapper>
-                        <FirebaseServiceContext.Provider value={firebaseServiceInstance}>
+                        <FirebaseServiceContext.Provider
+                           value={firebaseServiceInstance}
+                        >
                            <LocalizationProvider dateAdapter={AdapterDateFns}>
                               <ErrorContext.Provider
                                  value={{ generalError, setGeneralError }}

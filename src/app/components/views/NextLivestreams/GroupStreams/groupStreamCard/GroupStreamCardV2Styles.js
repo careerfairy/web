@@ -1,4 +1,4 @@
-import { alpha } from "@mui/material/styles"
+import { alpha } from "@mui/material/styles";
 
 export default {
    cardHovered: {
@@ -60,6 +60,11 @@ export default {
    },
    highlighted: {
       border: (theme) => `12px solid ${theme.palette.primary.main}`,
+   },
+   buttonsWrapper: {
+      mt: 1,
+      display: "flex",
+      alignItems: "center",
    },
    content: {
       bottom: 0,
@@ -205,4 +210,4 @@ export default {
       fontWeight: "bold",
       color: (theme) => theme.palette.common.white,
    },
-}
+};

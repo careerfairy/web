@@ -9,7 +9,7 @@ import { careerfairyLogo } from "../../constants/images";
 import * as actions from "./index";
 import CallToActionSnackbar from "../../components/views/streaming/sharedComponents/StreamNotifications/CallToActionSnackbar";
 import React from "react";
-import * as Sentry from "@sentry/browser";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * Enqueue a snackbar managed in redux state.
