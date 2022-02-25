@@ -99,12 +99,19 @@ const sentryWebpackPluginOptions = {
    // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
-/**
- * withSentryConfig() docs:
- *
- * Automatically call the code in sentry.server.config.js and sentry.client.config.js, at server start up and client
- * page load, respectively. Using withSentryConfig is the only way to guarantee that the SDK is initialized early
- * enough to catch all errors and start performance monitoring.
- * Generate and upload source maps to Sentry, so that your stacktraces contain original, demangled code.
- */
-module.exports = withSentryConfig(moduleExports, sentryWebpackPluginOptions);
+// Only use sentry if we're building the app from continuous integration (Vercel)
+// This allows us to build the app locally without having a SENTRY_AUTH_TOKEN variable
+// which is required for sentry to upload the sourcemaps files
+if (process.env.CI) {
+   /**
+    * withSentryConfig() docs:
+    *
+    * Automatically call the code in sentry.server.config.js and sentry.client.config.js, at server start up and client
+    * page load, respectively. Using withSentryConfig is the only way to guarantee that the SDK is initialized early
+    * enough to catch all errors and start performance monitoring.
+    * Generate and upload source maps to Sentry, so that your stacktraces contain original, demangled code.
+    */
+   module.exports = withSentryConfig(moduleExports, sentryWebpackPluginOptions);
+} else {
+   module.exports = moduleExports;
+}
