@@ -115,9 +115,8 @@ class FirebaseService {
    };
 
    sendReminderEmailAboutApplicationLink = async (data) => {
-      const sendReminderEmailAboutApplicationLink = this.functions.httpsCallable(
-         "sendReminderEmailAboutApplicationLink"
-      );
+      const sendReminderEmailAboutApplicationLink =
+         this.functions.httpsCallable("sendReminderEmailAboutApplicationLink");
       return sendReminderEmailAboutApplicationLink(data);
    };
 
@@ -150,9 +149,8 @@ class FirebaseService {
    };
 
    joinGroupDashboard = async (data) => {
-      const joinGroupDashboard = this.functions.httpsCallable(
-         "joinGroupDashboard"
-      );
+      const joinGroupDashboard =
+         this.functions.httpsCallable("joinGroupDashboard");
       return joinGroupDashboard(data);
    };
 
@@ -167,7 +165,7 @@ class FirebaseService {
     */
    getLivestreamReportData = async (data) => {
       const handleGetLivestreamReportData = this.functions.httpsCallable(
-         "getLivestreamReportData"
+         "getLivestreamReportData_TEMP_NAME"
       );
       return handleGetLivestreamReportData(data);
    };
@@ -199,9 +197,10 @@ class FirebaseService {
       userData,
       livestream
    ) => {
-      const sendLivestreamRegistrationConfirmationEmail = this.functions.httpsCallable(
-         "sendLivestreamRegistrationConfirmationEmail"
-      );
+      const sendLivestreamRegistrationConfirmationEmail =
+         this.functions.httpsCallable(
+            "sendLivestreamRegistrationConfirmationEmail"
+         );
       return sendLivestreamRegistrationConfirmationEmail({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
@@ -215,9 +214,10 @@ class FirebaseService {
    };
 
    sendPhysicalEventEmailRegistrationConfirmation = (user, userData, event) => {
-      const sendPhysicalEventRegistrationConfirmation = this.functions.httpsCallable(
-         "sendPhysicalEventRegistrationConfirmationEmail"
-      );
+      const sendPhysicalEventRegistrationConfirmation =
+         this.functions.httpsCallable(
+            "sendPhysicalEventRegistrationConfirmationEmail"
+         );
       return sendPhysicalEventRegistrationConfirmation({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
@@ -230,9 +230,10 @@ class FirebaseService {
    };
 
    sendHybridEventEmailRegistrationConfirmation = (user, userData, event) => {
-      const sendHybridEventEmailRegistrationConfirmation = this.functions.httpsCallable(
-         "sendHybridEventRegistrationConfirmationEmail"
-      );
+      const sendHybridEventEmailRegistrationConfirmation =
+         this.functions.httpsCallable(
+            "sendHybridEventRegistrationConfirmationEmail"
+         );
       return sendHybridEventEmailRegistrationConfirmation({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
@@ -450,15 +451,17 @@ class FirebaseService {
                   );
                   batch.update(userRef, {
                      registeredGroups: filteredRegisteredGroups,
-                     groupIds: firebase.firestore.FieldValue.arrayRemove(
-                        careerCenterId
-                     ),
+                     groupIds:
+                        firebase.firestore.FieldValue.arrayRemove(
+                           careerCenterId
+                        ),
                   });
                } else {
                   batch.update(userRef, {
-                     groupIds: firebase.firestore.FieldValue.arrayRemove(
-                        careerCenterId
-                     ),
+                     groupIds:
+                        firebase.firestore.FieldValue.arrayRemove(
+                           careerCenterId
+                        ),
                   });
                }
                if (index === querySnapshot.size - 1) {
@@ -1752,15 +1755,13 @@ class FirebaseService {
          // Return early and only increment fields when the user is not logged in
          if (isDismissAction) {
             return await callToActionRef.update({
-               numberOfUsersWhoDismissed: firebase.firestore.FieldValue.increment(
-                  1
-               ),
+               numberOfUsersWhoDismissed:
+                  firebase.firestore.FieldValue.increment(1),
             });
          }
          return await callToActionRef.update({
-            numberOfUsersWhoClickedLink: firebase.firestore.FieldValue.increment(
-               1
-            ),
+            numberOfUsersWhoClickedLink:
+               firebase.firestore.FieldValue.increment(1),
          });
       }
       let batch = this.firestore.batch();
@@ -1777,8 +1778,10 @@ class FirebaseService {
       const userSnap = await userRef.get();
       if (userSnap.exists) {
          const userData = userSnap.data();
-         const userInUsersWhoDismissedSnap = await userInUsersWhoDismissedRef.get();
-         const userInUsersWhoClickedSnap = await userInUsersWhoClickedLinkRef.get();
+         const userInUsersWhoDismissedSnap =
+            await userInUsersWhoDismissedRef.get();
+         const userInUsersWhoClickedSnap =
+            await userInUsersWhoClickedLinkRef.get();
          const hasAlreadyDismissed = userInUsersWhoDismissedSnap.exists;
          const hasAlreadyClicked = userInUsersWhoClickedSnap.exists;
          let callToActionUpdateData = {};
@@ -1789,9 +1792,8 @@ class FirebaseService {
                dismissedCallToActionAt: this.getServerTimestamp(),
             });
             batch.update(callToActionRef, {
-               numberOfUsersWhoDismissed: firebase.firestore.FieldValue.increment(
-                  1
-               ),
+               numberOfUsersWhoDismissed:
+                  firebase.firestore.FieldValue.increment(1),
             });
 
             return await batch.commit();
@@ -1803,9 +1805,8 @@ class FirebaseService {
                clickedCallToActionLinkAt: this.getServerTimestamp(),
             });
             batch.update(callToActionRef, {
-               numberOfUsersWhoClickedLink: firebase.firestore.FieldValue.increment(
-                  1
-               ),
+               numberOfUsersWhoClickedLink:
+                  firebase.firestore.FieldValue.increment(1),
             });
             return await batch.commit();
          }
@@ -1815,9 +1816,8 @@ class FirebaseService {
                dismissedCallToActionAt: this.getServerTimestamp(),
             });
             if (!hasAlreadyDismissed) {
-               callToActionUpdateData[
-                  "numberOfUsersWhoDismissed"
-               ] = firebase.firestore.FieldValue.increment(1);
+               callToActionUpdateData["numberOfUsersWhoDismissed"] =
+                  firebase.firestore.FieldValue.increment(1);
             }
 
             if (hasAlreadyClicked) {
@@ -1830,9 +1830,8 @@ class FirebaseService {
                clickedCallToActionLinkAt: this.getServerTimestamp(),
             });
             if (!hasAlreadyClicked) {
-               callToActionUpdateData[
-                  "numberOfUsersWhoClickedLink"
-               ] = firebase.firestore.FieldValue.increment(1);
+               callToActionUpdateData["numberOfUsersWhoClickedLink"] =
+                  firebase.firestore.FieldValue.increment(1);
             }
 
             if (hasAlreadyDismissed) {
@@ -1862,9 +1861,8 @@ class FirebaseService {
       batch.delete(callToActionRef);
 
       batch.update(streamRef, {
-         activeCallToActionIds: firebase.firestore.FieldValue.arrayRemove(
-            callToActionId
-         ),
+         activeCallToActionIds:
+            firebase.firestore.FieldValue.arrayRemove(callToActionId),
       });
 
       return batch.commit();
@@ -1887,9 +1885,8 @@ class FirebaseService {
          });
 
          batch.update(streamRef, {
-            activeCallToActionIds: firebase.firestore.FieldValue.arrayUnion(
-               callToActionId
-            ),
+            activeCallToActionIds:
+               firebase.firestore.FieldValue.arrayUnion(callToActionId),
          });
 
          return await batch.commit();
@@ -1911,9 +1908,8 @@ class FirebaseService {
          });
 
          batch.update(streamRef, {
-            activeCallToActionIds: firebase.firestore.FieldValue.arrayRemove(
-               callToActionId
-            ),
+            activeCallToActionIds:
+               firebase.firestore.FieldValue.arrayRemove(callToActionId),
          });
 
          return await batch.commit();
@@ -1981,17 +1977,19 @@ class FirebaseService {
       userId
    ) => {
       const callToActionsRef = streamRef.collection("callToActions");
-      const arrayOfCallToActionIdsThatUserHasNotInteractedWith = await Promise.all(
-         activeCallToActionIds.map(async (id) => {
-            if (!userId) return id;
-            const callToActionRef = callToActionsRef.doc(id);
-            const hasChecked = await this.checkIfUserInteractedWithCallToAction(
-               callToActionRef,
-               userId
-            );
-            return hasChecked ? undefined : id;
-         })
-      );
+      const arrayOfCallToActionIdsThatUserHasNotInteractedWith =
+         await Promise.all(
+            activeCallToActionIds.map(async (id) => {
+               if (!userId) return id;
+               const callToActionRef = callToActionsRef.doc(id);
+               const hasChecked =
+                  await this.checkIfUserInteractedWithCallToAction(
+                     callToActionRef,
+                     userId
+                  );
+               return hasChecked ? undefined : id;
+            })
+         );
       return arrayOfCallToActionIdsThatUserHasNotInteractedWith.filter(
          (id) => id
       );
@@ -2353,9 +2351,8 @@ class FirebaseService {
                   registrants: firebase.firestore.FieldValue.arrayUnion(
                      user.authId
                   ),
-                  registeredUsers: firebase.firestore.FieldValue.arrayUnion(
-                     userId
-                  ),
+                  registeredUsers:
+                     firebase.firestore.FieldValue.arrayUnion(userId),
                });
 
                for (const groupId of idsOfGroupsWithPolicies) {
@@ -2415,9 +2412,8 @@ class FirebaseService {
             if (userSnap.exists) {
                const userData = userSnap.data();
                transaction.update(userRef, {
-                  talentPools: firebase.firestore.FieldValue.arrayUnion(
-                     companyId
-                  ),
+                  talentPools:
+                     firebase.firestore.FieldValue.arrayUnion(companyId),
                });
                transaction.update(streamRef, {
                   talentPool: firebase.firestore.FieldValue.arrayUnion(
@@ -2508,10 +2504,11 @@ class FirebaseService {
       const participationPromise = batch.commit();
       let promises = [participationPromise];
       if (userData.authId && livestreamId) {
-         const referralCompletionPromise = this.#markLivestreamReferralAsCompleted(
-            livestreamId,
-            userData.authId
-         );
+         const referralCompletionPromise =
+            this.#markLivestreamReferralAsCompleted(
+               livestreamId,
+               userData.authId
+            );
          promises.push(referralCompletionPromise);
       }
       return await Promise.all(promises);
