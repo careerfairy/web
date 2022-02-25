@@ -16,35 +16,6 @@ export default function useDevices(
    });
    const dispatch = useDispatch();
 
-   useEffect(() => {
-      // (async function init() {
-      //    if (!localStream || !options?.initialize) return;
-      //    let cameraDevices;
-      //    let microphoneDevices;
-      //    try {
-      //       cameraDevices = await AgoraRTC.getCameras();
-      //    } catch (error) {
-      //       dispatch(actions.handleSetDeviceError(error, "camera"));
-      //    }
-      //    try {
-      //       microphoneDevices = await AgoraRTC.getMicrophones();
-      //    } catch (error) {
-      //       dispatch(actions.handleSetDeviceError(error, "microphone"));
-      //    }
-      //    if (microphoneDevices || cameraDevices) {
-      //       const deviceArray = [];
-      //       if (microphoneDevices) {
-      //          deviceArray.push(...microphoneDevices);
-      //       }
-      //       if (cameraDevices) {
-      //          deviceArray.push(...cameraDevices);
-      //       }
-      //       const newDeviceList = mapDevices(deviceArray);
-      //       setDevices(newDeviceList);
-      //    }
-      // })();
-   }, [Boolean(localStream), options?.initialize]);
-
    const initializeMicrophones = async () => {
       if (!localStream || !options?.initialize) return;
       let microphoneDevices;

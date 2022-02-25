@@ -23,7 +23,7 @@ export default function useMediaSources(
          if (!localMediaStream) {
             newMediaStream = new MediaStream();
          } else {
-            newMediaStream = localMediaStream;
+            newMediaStream = localMediaStream.clone();
          }
          const liveAudioStreamTrack =
             localStream?.audioTrack?.getMediaStreamTrack();
@@ -43,9 +43,7 @@ export default function useMediaSources(
                "video"
             );
          }
-         if (!localMediaStream) {
-            setLocalMediaStream(newMediaStream);
-         }
+         setLocalMediaStream(newMediaStream);
       }
    }, [
       localStream?.audioTrack,
