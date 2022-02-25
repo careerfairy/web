@@ -3,6 +3,7 @@ import WhatshotIcon from "@mui/icons-material/Whatshot";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import LanguageIcon from "@mui/icons-material/Language";
 import { Chip, Tooltip } from "@mui/material";
+import ConditionalWrapper from "../../../../common/ConditionalWrapper";
 
 const styles = {
    warningChip: {
@@ -59,10 +60,17 @@ export const LanguageBadge = ({
    ...restProps
 }) => {
    return streamLanguage ? (
-      <Tooltip
-         placement="top"
-         arrow
-         title={noTip ? "" : `This event is in ${streamLanguage.name}`}
+      <ConditionalWrapper
+         condition={!Boolean(noTip)}
+         wrapper={(children) => (
+            <Tooltip
+               placement="top"
+               arrow
+               title={noTip ? "" : `This event is in ${streamLanguage.name}`}
+            >
+               {children}
+            </Tooltip>
+         )}
       >
          <Chip
             icon={<LanguageIcon />}
@@ -72,6 +80,6 @@ export const LanguageBadge = ({
             color="info"
             {...restProps}
          />
-      </Tooltip>
+      </ConditionalWrapper>
    ) : null;
 };
