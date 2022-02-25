@@ -68,6 +68,8 @@ function VideoContainer({
       false
    );
    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
+   const [hasProposedDemo, setHasProposedDemo] = useState(false);
+
    const {
       query: { withHighQuality },
    } = useRouter();
@@ -161,7 +163,7 @@ function VideoContainer({
       try {
          await handlePublishLocalStream();
          setShowLocalStreamPublishingModal(false);
-         if (currentLivestream.test && !hasDismissedStreamTutorial) {
+         if (currentLivestream.test) {
             handleOpenDemoIntroModal();
          }
       } catch (e) {
@@ -175,6 +177,14 @@ function VideoContainer({
       await firebase.setDesktopMode(streamRef, mode, screenSharerId);
    };
 
+   const handleOpenDemoIntroModal = useCallback(() => {
+      const activeStep = getActiveTutorialStepKey();
+      if (activeStep === 0 && !hasDismissedStreamTutorial && !hasProposedDemo) {
+         setShowDemoIntroModal(true);
+         setHasProposedDemo(true);
+      }
+   }, [hasDismissedStreamTutorial, hasProposedDemo, getActiveTutorialStepKey]);
+
    const handleJoinAsViewer = useCallback(async () => {
       await closeAndUnpublishedLocalStream();
       await dispatch(actions.setStreamerIsPublished(false));
@@ -182,7 +192,7 @@ function VideoContainer({
       if (currentLivestream.test && !hasDismissedStreamTutorial) {
          handleOpenDemoIntroModal();
       }
-   }, [localMediaHandlers]);
+   }, [localMediaHandlers, handleOpenDemoIntroModal]);
 
    useEffect(() => {
       const activeStep = getActiveTutorialStepKey();
@@ -217,12 +227,7 @@ function VideoContainer({
          setShowBubbles(true);
       }
    };
-   const handleOpenDemoIntroModal = () => {
-      const activeStep = getActiveTutorialStepKey();
-      if (activeStep === 0) {
-         setShowDemoIntroModal(true);
-      }
-   };
+
    const handleCloseDemoEndModal = () => {
       handleConfirmStep(23);
       endTutorial();

@@ -24,7 +24,7 @@ import CFCookieConsent from "components/views/common/cookie-consent/CFCookieCons
 import { useRouter } from "next/router";
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService";
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -114,14 +114,14 @@ function MyApp(props) {
       );
    }, [pathname]);
 
-   const getActiveTutorialStepKey = () => {
+   const getActiveTutorialStepKey = useCallback(() => {
       const activeStep = Object.keys(tutorialSteps).find((key) => {
          if (tutorialSteps[key]) {
             return key;
          }
       });
       return Number(activeStep);
-   };
+   }, [tutorialSteps]);
 
    const endTutorial = () => {
       setTutorialSteps((prevState) => ({

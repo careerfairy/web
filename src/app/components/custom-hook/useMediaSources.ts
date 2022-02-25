@@ -15,7 +15,7 @@ export default function useMediaSources(
    const [audioSource, setAudioSource] = useState(null);
    const [videoSource, setVideoSource] = useState(null);
 
-   const [localMediaStream, setLocalMediaStream] = useState(null);
+   const [localMediaStream, setLocalMediaStream] = useState<MediaStream>(null);
 
    useEffect(() => {
       if (localStream) {
