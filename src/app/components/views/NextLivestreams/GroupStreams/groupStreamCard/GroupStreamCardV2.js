@@ -29,9 +29,14 @@ import { DateTimeDisplay } from "./TimeDisplay";
 import { AttendButton, DetailsButton } from "./actionButtons";
 import LogoElement from "../LogoElement";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
-import { InPersonEventBadge, LimitedRegistrationsBadge } from "./badges";
+import {
+   InPersonEventBadge,
+   LanguageBadge,
+   LimitedRegistrationsBadge,
+} from "./badges";
 import RegistrationModal from "../../../common/registration-modal";
 import styles from "./GroupStreamCardV2Styles";
+import { languageCodesDict } from "../../../../helperFunctions/streamFormFunctions";
 
 const maxOptions = 2;
 const GroupStreamCardV2 = memo(
@@ -93,6 +98,7 @@ const GroupStreamCardV2 = memo(
       const [isHighlighted, setIsHighlighted] = useState(false);
       const [targetGroupId, setTargetGroupId] = useState("");
       const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
+      const streamLanguage = languageCodesDict?.[livestream?.language?.code];
       const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
       const handleOpenJoinModal = (dataObj) =>
          setJoinGroupModalData({
@@ -349,6 +355,7 @@ const GroupStreamCardV2 = memo(
                         <InPersonEventBadge />
                      </Box>
                   )}
+
                   {livestream.maxRegistrants && (
                      <Box position="absolute" top={5} left={5} zIndex={200}>
                         <LimitedRegistrationsBadge
@@ -433,7 +440,7 @@ const GroupStreamCardV2 = memo(
                                  <Tag option={{ id: "hasMore", name: "..." }} />
                               )}
                         </Box>
-                        <Box marginTop={1}>
+                        <Box sx={styles.buttonsWrapper}>
                            <DetailsButton
                               size="small"
                               mobile={mobile}
@@ -453,6 +460,13 @@ const GroupStreamCardV2 = memo(
                                  handleRegisterClick={handleRegisterClick}
                                  checkIfRegistered={checkIfRegistered}
                                  user={user}
+                              />
+                           )}
+                           {streamLanguage && (
+                              <LanguageBadge
+                                 sx={{ ml: "auto" }}
+                                 white
+                                 streamLanguage={streamLanguage}
                               />
                            )}
                            <Grow in={Boolean(userIsRegistered())}>

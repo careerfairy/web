@@ -184,32 +184,47 @@ export const languageCodes = [
    {
       code: "en",
       name: "English",
+      shortName: "eng",
    },
    {
       code: "de",
       name: "German",
+      shortName: "ger",
    },
    {
       code: "fr",
       name: "French",
+      shortName: "fra",
    },
    {
       code: "it",
       name: "Italian",
+      shortName: "ita",
    },
    {
       code: "es",
       name: "Spanish",
+      shortName: "spa",
    },
    {
       code: "nl",
       name: "Dutch",
+      shortName: "nld",
    },
    {
       code: "pt",
       name: "Portuguese",
+      shortName: "por",
    },
 ];
+
+export const languageCodesDict = languageCodes.reduce(
+   (acc, curr) => ({
+      ...acc,
+      [curr.code]: curr,
+   }),
+   {}
+);
 
 export const getDownloadUrl = (fileElement) => {
    console.log("-> fileElement", fileElement);
