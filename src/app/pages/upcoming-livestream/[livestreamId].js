@@ -26,6 +26,7 @@ import { useTheme } from "@mui/material/styles";
 import ContactSection from "../../components/views/upcoming-livestream/ContactSection";
 import Navigation from "../../components/views/upcoming-livestream/Navigation";
 import { useMediaQuery } from "@mui/material";
+import { languageCodesDict } from "../../components/helperFunctions/streamFormFunctions";
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null);
@@ -33,7 +34,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const questionsRef = useRef(null);
 
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down('md'));
+   const mobile = useMediaQuery(theme.breakpoints.down("md"));
 
    const [stream, setStream] = useState(parseStreamDates(serverStream));
    const [registered, setRegistered] = useState(false);
@@ -62,6 +63,8 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const [isPastEvent, setIsPastEvent] = useState(
       streamIsOld(stream?.startDate)
    );
+
+   const streamLanguage = languageCodesDict?.[stream?.language?.code];
 
    const {
       listenToScheduledLivestreamById,
@@ -369,6 +372,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             registerButtonLabel={registerButtonLabel}
             disabled={isRegistrationDisabled}
             registered={registered}
+            streamLanguage={streamLanguage}
             numberOfSpotsRemaining={numberOfSpotsRemaining}
             hosts={filteredGroups}
             onRegisterClick={handleRegisterClick}

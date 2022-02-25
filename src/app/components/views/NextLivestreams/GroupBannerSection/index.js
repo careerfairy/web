@@ -34,6 +34,9 @@ const styles = {
    disableSectionPadding: {
       paddingTop: "0 !important",
    },
+   title: {
+      textShadow: (theme) => theme.darkTextShadow,
+   },
 };
 
 const GroupBannerSection = ({
@@ -71,7 +74,12 @@ const GroupBannerSection = ({
                   <Avatar variant={"square"} sx={styles.logo} src={groupLogo} />
                </Paper>
             )}
-            <SectionHeader color={color} title={title} subtitle={subtitle} />
+            <SectionHeader
+               sx={styles.title}
+               color={color}
+               title={title}
+               subtitle={subtitle}
+            />
             {groupBio && <GroupBio groupBio={groupBio} />}
             <StreamsTab
                tabsColor={tabsColor}
