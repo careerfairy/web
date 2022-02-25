@@ -16,13 +16,11 @@ Font.register({
    family: "Poppins",
    fonts: [
       {
-         src:
-            "https://fonts.gstatic.com/s/poppins/v13/pxiByp8kv8JHgFVrLGT9Z1xlEN2JQEk.ttf",
+         src: "https://fonts.gstatic.com/s/poppins/v13/pxiByp8kv8JHgFVrLGT9Z1xlEN2JQEk.ttf",
          fontWeight: "normal",
       },
       {
-         src:
-            "https://fonts.gstatic.com/s/poppins/v13/pxiByp8kv8JHgFVrLDD4Z1xlEN2JQEk.ttf",
+         src: "https://fonts.gstatic.com/s/poppins/v13/pxiByp8kv8JHgFVrLDD4Z1xlEN2JQEk.ttf",
          fontWeight: "bold",
       },
    ],
@@ -43,17 +41,17 @@ const styles = StyleSheet.create({
       marginBottom: "4vw",
    },
    topMargin: {
-     marginTop: "10vw"
+      marginTop: "10vw",
    },
    cfLogo: {
       maxWidth: "20vw",
    },
    companyLogoContainer: {
       maxWidth: "20vw",
-      maxHeight: "20vw"
+      maxHeight: "20vw",
    },
    companyLogo: {
-      maxHeight: "70px"
+      maxHeight: "70px",
    },
    groupLogoImage: {
       maxHeight: "20vw",
@@ -236,7 +234,7 @@ const CFLogo = (props) => <Image {...props} style={styles.cfLogo} />;
 const CompanyLogo = (props) => <Image {...props} style={styles.companyLogo} />;
 
 const CompanyLogoView = (props) => (
-  <View {...props} style={styles.companyLogoContainer} />
+   <View {...props} style={styles.companyLogoContainer} />
 );
 
 const GroupLogoImage = (props) => (
@@ -377,6 +375,19 @@ const QuestionView = ({ question }) => {
             <QuestionVotes>{question.votes} votes</QuestionVotes>
          </View>
       </View>
+   );
+};
+
+const RatingView = ({ rating }) => {
+   return (
+      <RatingChild>
+         <View>
+            <RatingText>{rating.question}</RatingText>
+         </View>
+         <ColorText>
+            <Text>{rating.overallRating} / 5.0</Text>
+         </ColorText>
+      </RatingChild>
    );
 };
 
@@ -522,6 +533,7 @@ const PartnerBreakdown = ({ name, numberOfStudents }) => {
 };
 const EventPdfReport = ({ universityReports, companyReport, summary }) => {
    let questionElements = [];
+   let ratingsElements = [];
 
    function compareOptions(optionA, optionB, studentStats) {
       return (
@@ -631,6 +643,10 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
       return <QuestionView key={question.id} question={question} />;
    });
 
+   ratingsElements = summary.ratings.map((rating) => {
+      return <RatingView key={rating.id} rating={rating} />;
+   });
+
    let numberOfVotes = 0;
    summary.questions.forEach((question) => (numberOfVotes += question.votes));
 
@@ -647,7 +663,9 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
             />
             <TopView>
                <CompanyLogoView>
-                  <CompanyLogo src={resolveImage(summary.requestingGroup.logoUrl)} />
+                  <CompanyLogo
+                     src={resolveImage(summary.requestingGroup.logoUrl)}
+                  />
                </CompanyLogoView>
                <View>
                   <CFLogo src="https://www.careerfairy.io/logo_teal.png" />
@@ -655,38 +673,42 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
             </TopView>
             <View style={styles.topMargin}>
                {summary.requestingGroup.universityCode ? (
-                 <TopView>
-                    <CompanyLogoView>
-                       <CompanyLogo src={resolveImage(summary.livestream.companyLogoUrl)} />
-                    </CompanyLogoView>
-                 </TopView>
+                  <TopView>
+                     <CompanyLogoView>
+                        <CompanyLogo
+                           src={resolveImage(summary.livestream.companyLogoUrl)}
+                        />
+                     </CompanyLogoView>
+                  </TopView>
                ) : null}
                <View>
                   <Label>Live Stream Report </Label>
                   <Title>{summary.livestream.title}</Title>
                   <DateText>
                      {DateUtil.getPrettyDate(
-                       new Date(Date.parse(summary.livestream.startDateString))
+                        new Date(Date.parse(summary.livestream.startDateString))
                      )}
                   </DateText>
                   <SubTitle>Speakers</SubTitle>
                   <SpeakersViewElement speakers={summary.speakers} />
                   {!!universityReports.length && (
-                    <View wrap={false}>
-                       <SubTitle>Hosts</SubTitle>
-                       <PartnersWrapper>
-                          {universityReports.map((report) => (
-                            <PartnerItem key={report.group.id}>
-                               <PartnerLogo src={report.group.logoUrl} />
-                            </PartnerItem>
-                          ))}
-                          {companyReport && (
-                            <PartnerItem>
-                               <PartnerLogo src={companyReport.group.logoUrl} />
-                            </PartnerItem>
-                          )}
-                       </PartnersWrapper>
-                    </View>
+                     <View wrap={false}>
+                        <SubTitle>Hosts</SubTitle>
+                        <PartnersWrapper>
+                           {universityReports.map((report) => (
+                              <PartnerItem key={report.group.id}>
+                                 <PartnerLogo src={report.group.logoUrl} />
+                              </PartnerItem>
+                           ))}
+                           {companyReport && (
+                              <PartnerItem>
+                                 <PartnerLogo
+                                    src={companyReport.group.logoUrl}
+                                 />
+                              </PartnerItem>
+                           )}
+                        </PartnersWrapper>
+                     </View>
                   )}
                   <View break wrap={false}>
                      <SubTitle>Your Audience</SubTitle>
@@ -713,51 +735,29 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                      <SubTitle>Where They Came From</SubTitle>
                      <PartnersWrapper>
                         {[...universityReports]
-                        .sort(dynamicSort("totalParticipantsFromGroup"))
-                        .map((report) => (
-                          <PartnerBreakdown
-                            key={report.group.id}
-                            name={report.group.universityName}
-                            numberOfStudents={
-                               report.numberOfStudentsFromUniversity
-                            }
-                          />
-                        ))}
+                           .sort(dynamicSort("totalParticipantsFromGroup"))
+                           .map((report) => (
+                              <PartnerBreakdown
+                                 key={report.group.id}
+                                 name={report.group.universityName}
+                                 numberOfStudents={
+                                    report.numberOfStudentsFromUniversity
+                                 }
+                              />
+                           ))}
                         {companyReport && (
-                          <PartnerBreakdown
-                            name={companyReport.group.universityName}
-                            numberOfStudents={
-                               companyReport.numberOfStudentsFollowingCompany
-                            }
-                          />
+                           <PartnerBreakdown
+                              name={companyReport.group.universityName}
+                              numberOfStudents={
+                                 companyReport.numberOfStudentsFollowingCompany
+                              }
+                           />
                         )}
                      </PartnersWrapper>
                   </View>
                   <View wrap={false}>
                      <SubTitle>Viewer Ratings</SubTitle>
-                     <FlexParent>
-                        <RatingChild>
-                           <View>
-                              <RatingText>
-                                 How would you rate this live stream?
-                              </RatingText>
-                           </View>
-                           <ColorText>
-                              <Text>{summary.overallRating} / 5.0</Text>
-                           </ColorText>
-                        </RatingChild>
-                        <RatingChild>
-                           <View>
-                              <RatingText>
-                                 How happy are you with the content of this
-                                 livestream ?
-                              </RatingText>
-                           </View>
-                           <ColorText>
-                              <Text>{summary.contentRating} / 5.0</Text>
-                           </ColorText>
-                        </RatingChild>
-                     </FlexParent>
+                     <FlexParent>{ratingsElements}</FlexParent>
                   </View>
                   <View wrap={false}>
                      <SubTitle>Engagement Figures</SubTitle>
@@ -793,45 +793,45 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                      {questionElements}
                   </View>
                   {universityReports.map((report) => (
-                    <ReportPage
-                      key={report.group.groupId}
-                      report={report}
-                      categoryElements={getCategoryElements(
-                        report.studentStats,
-                        report
-                      )}
-                      followersWithMissingData={getNumberOfFollowersWithNoCategories(
-                        report
-                      )}
-                    />
+                     <ReportPage
+                        key={report.group.groupId}
+                        report={report}
+                        categoryElements={getCategoryElements(
+                           report.studentStats,
+                           report
+                        )}
+                        followersWithMissingData={getNumberOfFollowersWithNoCategories(
+                           report
+                        )}
+                     />
                   ))}
                   {companyReport && (
-                    <ReportPage
-                      followersWithMissingData={getNumberOfFollowersWithNoCategories(
-                        companyReport
-                      )}
-                      categoryElements={getCategoryElements(
-                        companyReport.studentStats,
-                        companyReport
-                      )}
-                      onlyCompany={Boolean(!universityReports?.length)}
-                      report={companyReport}
-                    />
+                     <ReportPage
+                        followersWithMissingData={getNumberOfFollowersWithNoCategories(
+                           companyReport
+                        )}
+                        categoryElements={getCategoryElements(
+                           companyReport.studentStats,
+                           companyReport
+                        )}
+                        onlyCompany={Boolean(!universityReports?.length)}
+                        report={companyReport}
+                     />
                   )}
                   {summary.numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent >
-                    0 && (
-                      <View break>
-                         <DisclaimerTitle>Disclaimer</DisclaimerTitle>
-                         <GroupDisclaimerText>
-                            *{" "}
-                            {
-                               summary.numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent
-                            }{" "}
-                            of the total {summary.totalParticipating} participants
-                            for the event came from other sources
-                         </GroupDisclaimerText>
-                      </View>
-                    )}
+                     0 && (
+                     <View break>
+                        <DisclaimerTitle>Disclaimer</DisclaimerTitle>
+                        <GroupDisclaimerText>
+                           *{" "}
+                           {
+                              summary.numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent
+                           }{" "}
+                           of the total {summary.totalParticipating}{" "}
+                           participants for the event came from other sources
+                        </GroupDisclaimerText>
+                     </View>
+                  )}
                </View>
             </View>
          </CFPage>
@@ -885,34 +885,34 @@ EventPdfReport.propTypes = {
  * @returns {Promise<unknown>|*}
  */
 const resolveImage = (url) => {
-   if(url.toLowerCase().indexOf('.png') !== -1) {
+   if (url.toLowerCase().indexOf(".png") !== -1) {
       // react-pdf accepts a Promise
-      return convertImgToBase64URL(url)
+      return convertImgToBase64URL(url);
    } else {
-      return url
+      return url;
    }
-}
+};
 
 //https://github.com/diegomura/react-pdf/issues/676#issuecomment-821109460
 const convertImgToBase64URL = (url, outputFormat) =>
-  new Promise((resolve, reject) => {
-     const img = document.createElement('img');
-     img.crossOrigin = 'Anonymous';
-     img.onerror = (e) => {
-        reject(e);
-     };
-     img.onload = function () {
-        let canvas = document.createElement('CANVAS');
-        const ctx = canvas.getContext('2d');
-        let dataURL;
-        canvas.height = img.height;
-        canvas.width = img.width;
-        ctx.drawImage(img, 0, 0, img.width, img.height);
-        dataURL = canvas.toDataURL(outputFormat);
-        canvas = null;
-        resolve(dataURL);
-     };
-     img.src = url;
-  });
+   new Promise((resolve, reject) => {
+      const img = document.createElement("img");
+      img.crossOrigin = "Anonymous";
+      img.onerror = (e) => {
+         reject(e);
+      };
+      img.onload = function () {
+         let canvas = document.createElement("CANVAS");
+         const ctx = canvas.getContext("2d");
+         let dataURL;
+         canvas.height = img.height;
+         canvas.width = img.width;
+         ctx.drawImage(img, 0, 0, img.width, img.height);
+         dataURL = canvas.toDataURL(outputFormat);
+         canvas = null;
+         resolve(dataURL);
+      };
+      img.src = url;
+   });
 
 export default EventPdfReport;
