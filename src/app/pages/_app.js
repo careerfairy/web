@@ -1,15 +1,14 @@
 import * as React from "react";
 import "styles.css";
-import FirebaseServiceContext from "context/firebase/FirebaseServiceContext";
+import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext";
 import config from "@stahl.luke/react-reveal/globals";
 import { newStore, wrapper } from "../store";
 
-import firebase from "../Firebase/Firebase";
 import Head from "next/head";
 import TagManager from "react-gtm-module";
 import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar";
 import ErrorContext from "../context/error/ErrorContext";
-import TutorialContext from "context/tutorials/TutorialContext";
+import TutorialContext from "../context/tutorials/TutorialContext";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import { AuthProvider } from "../HOCs/AuthProvider";
@@ -17,14 +16,15 @@ import { ReactReduxFirebaseProvider } from "react-redux-firebase";
 import { createFirestoreInstance } from "redux-firestore";
 import { Provider } from "react-redux";
 import { CacheProvider } from "@emotion/react";
-import createEmotionCache from "materialUI/createEmotionCache";
+import createEmotionCache from "../materialUI/createEmotionCache";
 import Notifier from "../components/views/notifier";
 import { getCookieConsentValue } from "react-cookie-consent";
-import CFCookieConsent from "components/views/common/cookie-consent/CFCookieConsent";
+import CFCookieConsent from "../components/views/common/cookie-consent/CFCookieConsent";
 import { useRouter } from "next/router";
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService";
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext";
 import { useEffect, useState } from "react";
+import firebaseApp from "../data/firebase/FirebaseInstance";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -40,7 +40,7 @@ const rrfConfig = {
 
 export const store = newStore();
 const rrfProps = {
-   firebase,
+   firebase: firebaseApp,
    config: rrfConfig,
    dispatch: store.dispatch,
    createFirestoreInstance,
