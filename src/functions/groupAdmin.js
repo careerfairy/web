@@ -51,7 +51,6 @@ exports.sendDraftApprovalRequestEmail = functions.https.onCall(async (data) => {
          },
          (error) => {
             functions.logger.error("error:" + error);
-            console.log("error:" + error);
          }
       );
    } catch (e) {
@@ -240,18 +239,12 @@ exports.getLivestreamReportData = functions.https.onCall(
 
          const ratingsSnap = await streamSnap.ref.collection("rating").get();
 
-         let ratings = [];
-         ratingsSnap.docs
+         let ratings = ratingsSnap.docs
             .filter((doc) => !doc.data().noStars)
-            .map((doc) => {
-               ratings = [
-                  ...ratings,
-                  {
-                     id: doc.id,
-                     question: doc.data().question,
-                  },
-               ];
-            });
+            .map((doc) => ({
+               id: doc.id,
+               question: doc.data().question,
+            }));
 
          ratings.forEach(async (rating) => {
             const individualRatingSnap = await streamSnap.ref
@@ -408,7 +401,7 @@ exports.getLivestreamReportData = functions.https.onCall(
             },
          };
       } catch (e) {
-         console.error(e);
+         functions.logger.error(e);
          throw new functions.https.HttpsError(
             "unknown",
             `Unhandled error: ${e.message}`
@@ -708,7 +701,7 @@ exports.getLivestreamReportData_TEMP_NAME = functions.https.onCall(
             },
          };
       } catch (e) {
-         console.error(e);
+         functions.logger.error(e);
          throw new functions.https.HttpsError(
             "unknown",
             `Unhandled error: ${e.message}`
@@ -739,7 +732,7 @@ exports.sendDashboardInviteEmail = functions.https.onRequest(
             return res.send(200);
          },
          (error) => {
-            console.log("error:" + error);
+            functions.logger.error(error);
             return res.status(400).send(error);
          }
       );
