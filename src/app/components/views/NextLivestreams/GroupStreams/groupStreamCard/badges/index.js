@@ -66,7 +66,7 @@ export const LanguageBadge = ({
       >
          <Chip
             icon={<LanguageIcon />}
-            label={streamLanguage.shortName.toUpperCase()}
+            label={streamLanguage.code.toUpperCase()}
             sx={[white && styles.badgeWhite, sx]}
             variant={white && "outlined"}
             color="info"
