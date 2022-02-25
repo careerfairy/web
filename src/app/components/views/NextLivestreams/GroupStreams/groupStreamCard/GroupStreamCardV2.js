@@ -87,9 +87,10 @@ const GroupStreamCardV2 = memo(
          return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1);
       }
 
-      const registered = useMemo(() => userIsRegistered(), [
-         livestream.registeredUsers,
-      ]);
+      const registered = useMemo(
+         () => userIsRegistered(),
+         [livestream.registeredUsers]
+      );
 
       const [cardHovered, setCardHovered] = useState(false);
       const [targetOptions, setTargetOptions] = useState([]);
