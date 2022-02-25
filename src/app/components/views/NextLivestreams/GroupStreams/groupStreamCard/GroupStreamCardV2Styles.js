@@ -61,6 +61,11 @@ export default {
    highlighted: {
       border: (theme) => `12px solid ${theme.palette.primary.main}`,
    },
+   buttonsWrapper: {
+      mt: 1,
+      display: "flex",
+      alignItems: "center",
+   },
    content: {
       bottom: 0,
       width: "100%",
