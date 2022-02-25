@@ -393,7 +393,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                overheadText={"ABOUT"}
             />
          )}
-         {!!stream.speakers.length && (
+         {!!stream?.speakers?.length && (
             <SpeakersSection
                overheadText={"OUR SPEAKERS"}
                sectionRef={speakersRef}
