@@ -13,6 +13,7 @@ import { useCurrentStream } from "context/stream/StreamContext";
 import ConfirmRecordingDialog from "../../../admin/streams/StreamsContainer/StreamCard/ConfirmRecordingDialog";
 import StopRecordingIcon from "@mui/icons-material/Stop";
 import StartRecordingIcon from "@mui/icons-material/PlayCircleFilledWhite";
+import NextGenIcon from "@mui/icons-material/FiberNew";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import {
    CircularProgress,
@@ -28,6 +29,7 @@ import JoinAsStreamerIcon from "@mui/icons-material/RecordVoiceOver";
 import useStreamToken from "../../../../custom-hook/useStreamToken";
 import clsx from "clsx";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { nextGenSubDomain } from "../../../../../constants/domains";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -83,7 +85,8 @@ const SuperAdminControls = () => {
    const { joiningStreamerLink, viewerLink } = useStreamToken();
    const { userData } = useAuth();
    const streamRef = useStreamRef();
-   const { currentLivestream, isStreamer, isBreakout } = useCurrentStream();
+   const { currentLivestream, isStreamer, isBreakout, streamAdminPreferences } =
+      useCurrentStream();
    const {
       query: { spy, livestreamId, breakoutRoomId },
    } = useRouter();
@@ -91,6 +94,8 @@ const SuperAdminControls = () => {
    const firebase = useFirebaseService();
    const dispatch = useDispatch();
    const [streamStateChanging, setStreamStateChanging] = useState(false);
+   const [isNextGenDomain, setIsNextGenDomain] = useState(false);
+
    const spyModeEnabled = useSelector(
       (state) => state.stream.streaming.spyModeEnabled
    );
@@ -100,14 +105,14 @@ const SuperAdminControls = () => {
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
    );
-   const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] = useState(
-      false
-   );
-   const [
-      confirmStartStreamingDialogOpen,
-      setConfirmStartStreamingDialogOpen,
-   ] = useState(false);
+   const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] =
+      useState(false);
+   const [confirmStartStreamingDialogOpen, setConfirmStartStreamingDialogOpen] =
+      useState(false);
 
+   useEffect(() => {
+      setIsNextGenDomain(Boolean(streamAdminPreferences?.isNextGen));
+   }, [streamAdminPreferences]);
    useEffect(() => {
       if (spy === "true" && userData?.isAdmin && !isStreamer) {
          dispatch(actions.setSpyMode(true));
@@ -169,6 +174,10 @@ const SuperAdminControls = () => {
          );
       }
    };
+
+   const handleToggleNextGen = useCallback(async () => {
+      await firebase.toggleNextGenMode(livestreamId);
+   }, []);
 
    const handleOpenConfirmRecordingDialog = () => {
       setConfirmRecordingDialogOpen(true);
@@ -245,6 +254,16 @@ const SuperAdminControls = () => {
                loading: streamStateChanging,
                disabled: streamStateChanging,
             },
+            {
+               icon: (
+                  <NextGenIcon color={isNextGenDomain ? "primary" : "action"} />
+               ),
+               name: isNextGenDomain
+                  ? "Disable Nextgen Mode"
+                  : "Enable Nextgen Mode",
+               onClick: handleToggleNextGen,
+               active: isNextGenDomain,
+            },
          ].filter((action) => !action.hidden),
       [
          spyModeEnabled,
@@ -263,6 +282,7 @@ const SuperAdminControls = () => {
          joiningStreamerLink,
          isBreakout,
          mobile,
+         isNextGenDomain,
       ]
    );
 

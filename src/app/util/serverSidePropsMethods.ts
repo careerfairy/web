@@ -1,5 +1,8 @@
 import { GetServerSidePropsContext } from "next/types";
-import { getServerSideStream } from "./serverUtil";
+import {
+   getServerSideStream,
+   getServerSideStreamAdminPreferences,
+} from "./serverUtil";
 import { shouldWeRedirectNextGen } from "./StreamUtil";
 
 export const handleRedirectToNextGen = async (
@@ -8,6 +11,10 @@ export const handleRedirectToNextGen = async (
    const serverSideStream = await getServerSideStream(
       context.params.livestreamId
    );
+   const adminPreferences = await getServerSideStreamAdminPreferences(
+      context.params.livestreamId
+   );
+
    if (!serverSideStream) {
       return {
          props: {},
@@ -22,7 +29,7 @@ export const handleRedirectToNextGen = async (
    const urlToRedirect = shouldWeRedirectNextGen(
       context.req.headers.host,
       currentEnv,
-      serverSideStream.isBeta,
+      adminPreferences?.isNextGen,
       context.req.url
    );
 
