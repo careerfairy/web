@@ -26,10 +26,13 @@ export const handleRedirectToNextGen = async (
    const currentEnv = process.env.NODE_ENV;
 
    const props = { serverSideStream };
+   const isNextGen = adminPreferences?.isNextGen
+      ? adminPreferences?.isNextGen
+      : null;
    const urlToRedirect = shouldWeRedirectNextGen(
       context.req.headers.host,
       currentEnv,
-      adminPreferences?.isNextGen,
+      isNextGen,
       context.req.url
    );
 

@@ -100,7 +100,7 @@ const StreamerLayout = (props) => {
    const [sliding, setSliding] = useState(false);
 
    const currentLivestream = useStreamConnect();
-   const streamAdminPreferences = useStreamAdminPreferences();
+   const streamAdminPreferences = useStreamAdminPreferences(baseStreamId);
    useNextGenRedirect(streamAdminPreferences?.isNextGen);
    useStreamerActiveHandRaisesConnect();
 

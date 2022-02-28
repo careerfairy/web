@@ -108,7 +108,7 @@ const ViewerLayout = (props) => {
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
 
    const currentLivestream = useStreamConnect();
-   const streamAdminPreferences = useStreamAdminPreferences();
+   const streamAdminPreferences = useStreamAdminPreferences(livestreamId);
    useNextGenRedirect(streamAdminPreferences?.isNextGen);
    useViewerHandRaiseConnect(currentLivestream, streamerId);
 
