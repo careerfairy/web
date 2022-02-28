@@ -56,17 +56,10 @@ const getFirestoreSettings = (
    if (typeof window !== "undefined") {
       if (SessionStorageUtil.getIsLongPollingMode()) {
          firestoreDefaultSettings["experimentalForceLongPolling"] = true;
+         console.warn(
+            "Firestore settings with experimentalForceLongPolling=true"
+         );
       }
-   }
-
-   // In case we want to deploy a different environment with these turned on
-   if (process.env.NEXT_PUBLIC_FIREBASE_LONG_POLLING) {
-      console.log("FIREBASE_LONG_POLLING exists", process.env);
-      firestoreDefaultSettings["experimentalForceLongPolling"] = true;
-   }
-
-   if (process.env.NEXT_PUBLIC_FIREBASE_AUTO_DETECT_LONG_POLLING) {
-      firestoreDefaultSettings["experimentalAutoDetectLongPolling"] = true;
    }
 
    return Object.assign(firestoreDefaultSettings, firestoreSettings);
