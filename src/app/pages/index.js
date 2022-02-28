@@ -69,7 +69,6 @@ const LandingPage = () => {
             image={"https://careerfairy.io/logo_padding_teal.png"}
             description={""}
          />
-         />
          <LandingLayout
             bottomImage={landingBottomBackground}
             topImage={mainBackground}
