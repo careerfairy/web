@@ -71,6 +71,8 @@ exports.sendDraftApprovalRequestEmail =
    groupAdmin.sendDraftApprovalRequestEmail;
 exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail;
 exports.getLivestreamReportData = groupAdmin.getLivestreamReportData;
+exports.getLivestreamReportData_TEMP_NAME =
+   groupAdmin.getLivestreamReportData_TEMP_NAME;
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus;
 exports.joinGroupDashboard = groupAdmin.joinGroupDashboard;
 
