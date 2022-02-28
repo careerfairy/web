@@ -5,7 +5,7 @@ import {
 } from "../constants/streamContants";
 import DateUtil from "util/DateUtil";
 import firebaseApp from "./FirebaseInstance";
-import { Timestamp } from "firebase/firestore";
+import firebase from "firebase/app";
 
 class FirebaseService {
    private readonly app: firebase.app.App;
@@ -24,7 +24,6 @@ class FirebaseService {
    }
 
    getFirebaseTimestamp = (dateString) => {
-      Timestamp;
       return firebase.firestore.Timestamp.fromDate(new Date(dateString));
    };
 
