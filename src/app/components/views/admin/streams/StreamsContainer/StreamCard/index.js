@@ -9,6 +9,7 @@ import {
    CardContent,
    CardHeader,
    CardMedia,
+   Chip,
    CircularProgress,
    Dialog,
    DialogContent,
@@ -35,20 +36,35 @@ import * as actions from "store/actions/index";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog";
 import ConfirmRecordingDialog from "./ConfirmRecordingDialog";
+import useStreamAdminPreferences from "../../../../../custom-hook/useStreamAdminPreferences";
+import NextGenIcon from "@mui/icons-material/FiberNew";
+import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    root: {
-      // maxWidth: 345,
+      position: "relative",
+   },
+   chipContainer: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      p: 1,
+      display: "flex",
+      flexWrap: "wrap",
+      "& .MuiChip-root": {
+         opacity: 0.9,
+      },
    },
    media: {
       objectFit: "contain",
-      padding: theme.spacing(1),
+      padding: (theme) => theme.spacing(1),
    },
    list: {
       width: "100%",
    },
    spyButton: {
-      color: `${theme.palette.common.white} !important`,
+      color: (theme) => `${theme.palette.common.white} !important`,
+      mr: 1,
    },
    cardHeader: {
       "& .MuiCardHeader-content": {
@@ -62,24 +78,24 @@ const useStyles = makeStyles((theme) => ({
       textTransform: "uppercase",
       fontWeight: 800,
    },
-}));
+};
 
 const StreamCard = ({ stream }) => {
-   const classes = useStyles();
    const firestore = useFirestore();
    const firebase = useFirebaseService();
    const dispatch = useDispatch();
-
-   const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] = useState(
-      false
-   );
+   const [togglingNextGen, setTogglingNextGen] = useState(false);
+   const [nextGenModalOpen, setNextGenModalOpen] = useState(false);
+   const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] =
+      useState(false);
    const [anchorEl, setAnchorEl] = React.useState(null);
-   const [openStreamerLinksDialog, setOpenStreamerLinksDialog] = React.useState(
-      false
-   );
+   const [openStreamerLinksDialog, setOpenStreamerLinksDialog] =
+      React.useState(false);
    const recordingRequestOngoing = useSelector(
       (state) => state.streamAdmin.recording.recordingRequestOngoing
    );
+
+   const streamAdminPreferences = useStreamAdminPreferences(stream.id);
 
    const handleClick = (event) => {
       setAnchorEl(event.currentTarget);
@@ -129,18 +145,42 @@ const StreamCard = ({ stream }) => {
       dispatch(actions.handleStopRecording({ firebase, streamId: stream.id }));
    };
 
+   const handleToggleNextGen = async () => {
+      try {
+         setTogglingNextGen(true);
+         const wasNextGen = Boolean(streamAdminPreferences?.isNextGen);
+         await firebase.toggleNextGenMode(stream.id);
+         dispatch(
+            actions.sendSuccessMessage(
+               `NextGen mode has been ${
+                  wasNextGen ? "disabled" : "enabled"
+               } for ${stream.title}`
+            )
+         );
+      } catch (e) {
+         console.error(e);
+      }
+      setTogglingNextGen(false);
+      setNextGenModalOpen(false);
+   };
+
    return (
-      <Card className={classes.root}>
+      <Card sx={styles.root}>
+         <Box sx={styles.chipContainer}>
+            {streamAdminPreferences?.isNextGen && (
+               <Chip icon={<NextGenIcon />} color="warning" label={"NEXTGEN"} />
+            )}
+         </Box>
          <CardMedia
             component="img"
             alt="Contemplative Reptile"
             height="140"
-            className={classes.media}
+            sx={styles.media}
             image={stream.companyLogoUrl}
             title={stream.company}
          />
          <CardHeader
-            className={classes.cardHeader}
+            sx={styles.cardHeader}
             title={stream.company}
             titleTypographyProps={{ noWrap: true }}
             subheader={prettyDate(stream.start)}
@@ -167,6 +207,16 @@ const StreamCard = ({ stream }) => {
                            onClick={() => setOpenStreamerLinksDialog(true)}
                         >
                            Get streamer links
+                        </MenuItem>
+                        <MenuItem
+                           onClick={() => {
+                              setNextGenModalOpen(true);
+                              handleClose();
+                           }}
+                        >
+                           {streamAdminPreferences?.isNextGen
+                              ? "Disable NextGen Mode"
+                              : "Enable NextGen Mode"}
                         </MenuItem>
                         <MenuItem
                            disabled={recordingRequestOngoing}
@@ -200,11 +250,11 @@ const StreamCard = ({ stream }) => {
          />
          <CardContent>
             {stream.isRecording && (
-               <Typography className={classes.recording}>
+               <Typography sx={styles.recording}>
                   Recording in progress
                </Typography>
             )}
-            <List dense className={classes.list}>
+            <List dense sx={styles.list}>
                <ListItem>
                   <ListItemAvatar>
                      <Avatar>
@@ -232,7 +282,7 @@ const StreamCard = ({ stream }) => {
          <CardActions>
             <Button
                variant="contained"
-               className={classes.spyButton}
+               sx={styles.spyButton}
                target="_blank"
                startIcon={<ParticipationIcon />}
                href={`${getBaseUrl()}/streaming/${stream.id}/viewer?spy=true`}
@@ -249,6 +299,26 @@ const StreamCard = ({ stream }) => {
                Join as streamer
             </Button>
          </CardActions>
+         <AreYouSureModal
+            message={
+               streamAdminPreferences?.isNextGen ? (
+                  <>
+                     Are you sure you want to <b>disable</b> the NextGen mode
+                     for <b>{stream.title}</b> and switch back to the normal
+                     mode?
+                  </>
+               ) : (
+                  <>
+                     Are you sure you want to <b>enable</b> the NextGen mode for{" "}
+                     <b>{stream.title}</b> and all its participants and hosts?
+                  </>
+               )
+            }
+            loading={togglingNextGen}
+            handleClose={() => setNextGenModalOpen(false)}
+            open={nextGenModalOpen}
+            handleConfirm={handleToggleNextGen}
+         />
          <StreamerLinksDialog
             onClose={handleClose}
             livestreamId={stream.id}
@@ -257,7 +327,7 @@ const StreamCard = ({ stream }) => {
          />
          <Dialog open={recordingRequestOngoing}>
             <DialogContent>
-               <Box p={3} textAlign="center">
+               <Box sx={{ p: 3 }} textAlign="center">
                   <div>
                      <CircularProgress />
                   </div>
@@ -271,7 +341,6 @@ const StreamCard = ({ stream }) => {
    );
 };
 
-StreamCard.propTypes = {
-};
+StreamCard.propTypes = {};
 
 export default StreamCard;

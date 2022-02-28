@@ -8,6 +8,7 @@ const CurrentStreamContext = React.createContext({
    streamerId: "",
    handRaiseId: undefined,
    isMobile: undefined,
+   streamAdminPreferences: undefined,
 });
 
 const useCurrentStream = () => useContext(CurrentStreamContext);

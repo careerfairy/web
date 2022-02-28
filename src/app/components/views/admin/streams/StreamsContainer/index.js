@@ -1,18 +1,9 @@
 import React from "react";
-import makeStyles from "@mui/styles/makeStyles";
 import { CircularProgress, Grid } from "@mui/material";
 import StreamCard from "./StreamCard";
 import { isEmpty, isLoaded } from "react-redux-firebase";
 
-const useStyles = makeStyles((theme) => ({
-   loader: {
-      margin: "auto",
-   },
-}));
-
 const StreamsContainer = ({ streams }) => {
-   const classes = useStyles();
-
    if (!isLoaded(streams)) {
       return <CircularProgress />;
    }
@@ -40,7 +31,6 @@ const StreamsContainer = ({ streams }) => {
    );
 };
 
-StreamsContainer.propTypes = {
-};
+StreamsContainer.propTypes = {};
 
 export default StreamsContainer;
