@@ -18,6 +18,7 @@ import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/use
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import useNextGenRedirect from "../../components/custom-hook/useNextGenRedirect";
+import useStreamAdminPreferences from "../../components/custom-hook/useStreamAdminPreferences";
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -99,7 +100,8 @@ const StreamerLayout = (props) => {
    const [sliding, setSliding] = useState(false);
 
    const currentLivestream = useStreamConnect();
-   useNextGenRedirect(currentLivestream?.isBeta);
+   const streamAdminPreferences = useStreamAdminPreferences(baseStreamId);
+   useNextGenRedirect(streamAdminPreferences?.isNextGen);
    useStreamerActiveHandRaisesConnect();
 
    const classes = useStyles({
@@ -245,6 +247,7 @@ const StreamerLayout = (props) => {
                isMainStreamer,
                isStreamer: true,
                streamerId,
+               streamAdminPreferences,
             }}
          >
             <div className={classes.root}>

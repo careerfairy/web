@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from "@mui/styles/makeStyles";
 import Section from "components/views/common/Section";
 import SectionHeader from "components/views/common/SectionHeader";
 import RoundButton from "materialUI/GlobalButtons/RoundButton";
@@ -9,7 +8,7 @@ import Link from "materialUI/NextNavLink";
 import SectionContainer from "../../common/Section/Container";
 import Pulse from "@stahl.luke/react-reveal/Pulse";
 import { Box } from "@mui/material";
-import clsx from "clsx";
+import { hubSpotFunnelLink } from "../../../../constants/links";
 
 const styles = {
    section: (theme, { dividerColor }) => ({
@@ -30,9 +29,11 @@ const styles = {
          color: (theme) => theme.palette.common.white,
       },
    },
+   linkBtn: {
+      textDecoration: "none !important",
+   },
    goToBtn: {
       margin: (theme) => theme.spacing(2),
-      textDecoration: "none !important",
    },
    bookADemoHeader: {
       marginBottom: (theme) => [theme.spacing(2), "!important"],
@@ -72,7 +73,7 @@ const BookADemoSection = (props) => {
                >
                   {props.goTo ? (
                      <RoundButton
-                        sx={styles.goToBtn}
+                        sx={[styles.goToBtn, styles.linkBtn]}
                         color="secondary"
                         size="large"
                         variant="contained"
@@ -86,11 +87,13 @@ const BookADemoSection = (props) => {
                         sx={{
                            ...styles.bookingButton,
                            ...(props.bookingWhite && styles.bookingWhite),
+                           ...styles.linkBtn,
                         }}
                         color="secondary"
                         size="large"
+                        target="_blank"
+                        href={hubSpotFunnelLink}
                         variant="contained"
-                        onClick={props.handleOpenCalendly}
                      >
                         Book a Demo
                      </RoundButton>
