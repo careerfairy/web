@@ -32,6 +32,26 @@ export const getServerSideStream = async (livestreamId) => {
    return serverSideStream;
 };
 
+export const getServerSideStreamAdminPreferences = async (livestreamId) => {
+   let streamAdminPreferences = null;
+   if (livestreamId) {
+      const preferenceSnap = await store.firestore.get({
+         collection: "livestreams",
+         doc: livestreamId,
+         subcollections: [
+            {
+               collection: "preferences",
+               doc: "adminPreference",
+            },
+         ],
+      });
+      if (preferenceSnap.exists) {
+         streamAdminPreferences = preferenceSnap.data();
+      }
+   }
+   return streamAdminPreferences;
+};
+
 export const serializeServerSideStream = (serverSideStream) => {
    const serverSideLivestream = { ...serverSideStream };
    delete serverSideLivestream.registeredUsers;
