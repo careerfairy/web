@@ -3,6 +3,7 @@ import "firebase/firestore";
 import "firebase/auth";
 import "firebase/storage";
 import "firebase/functions";
+import SessionStorageUtil from "../../util/SessionStorageUtil";
 
 const config = {
    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -30,20 +31,45 @@ export const createFirebaseInstance = (
 
    const app = firebase.initializeApp(config, name);
 
-   if (firestoreSettings) {
-      app.firestore().settings(firestoreSettings);
-   }
+   app.firestore().settings(getFirestoreSettings(firestoreSettings));
 
+   // we'll want to use the emulators at some point
    // if (
    //    process.env.NODE_ENV === "development" &&
    //    process.env.FIREBASE_EMULATORS
    // ) {
-   //    firebaseInstance.auth().useEmulator("http://localhost:9099");
-   //    firebaseInstance.firestore().useEmulator("localhost", 8080);
-   //    firebaseInstance.functions().useEmulator("localhost", 5001);
+   //    app.auth().useEmulator("http://localhost:9099");
+   //    app.firestore().useEmulator("localhost", 8080);
+   //    app.functions().useEmulator("localhost", 5001);
    // }
 
    return app;
+};
+
+const getFirestoreSettings = (
+   firestoreSettings?: firebase.firestore.Settings
+) => {
+   const firestoreDefaultSettings = {};
+
+   // The user doesn't seem to have Firestore connectivity, let's enable the long polling mode
+   // This mode is set on FirebaseUtils.js
+   if (typeof window !== "undefined") {
+      if (SessionStorageUtil.getIsLongPollingMode()) {
+         firestoreDefaultSettings["experimentalForceLongPolling"] = true;
+      }
+   }
+
+   // In case we want to deploy a different environment with these turned on
+   if (process.env.NEXT_PUBLIC_FIREBASE_LONG_POLLING) {
+      console.log("FIREBASE_LONG_POLLING exists", process.env);
+      firestoreDefaultSettings["experimentalForceLongPolling"] = true;
+   }
+
+   if (process.env.NEXT_PUBLIC_FIREBASE_AUTO_DETECT_LONG_POLLING) {
+      firestoreDefaultSettings["experimentalAutoDetectLongPolling"] = true;
+   }
+
+   return Object.assign(firestoreDefaultSettings, firestoreSettings);
 };
 
 // Default instance that we can re-use, default settings for firestore, auth, etc

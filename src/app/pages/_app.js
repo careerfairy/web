@@ -26,6 +26,8 @@ import { ThemeProviderWrapper } from "../context/theme/ThemeContext";
 import { useEffect, useState } from "react";
 import firebaseApp from "../data/firebase/FirebaseInstance";
 
+import "../util/FirebaseUtils";
+
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
 
