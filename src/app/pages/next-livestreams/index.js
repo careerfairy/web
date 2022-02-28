@@ -18,7 +18,7 @@ import ScrollToTop from "../../components/views/common/ScrollToTop";
 const placeholderBanner =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0";
 
-const nextLivestreamsPage = ({
+const NextLivestreamsPage = ({
    livestreamId,
    serverSideStream,
    initialTabValue,
@@ -153,4 +153,4 @@ export async function getServerSideProps({
    };
 }
 
-export default withFirebase(nextLivestreamsPage);
+export default withFirebase(NextLivestreamsPage);
