@@ -8,11 +8,11 @@ import firebaseApp from "./FirebaseInstance";
 import firebase from "firebase/app";
 
 class FirebaseService {
-   private readonly app: firebase.app.App;
-   private readonly firestore: firebase.firestore.Firestore;
-   private readonly auth: firebase.auth.Auth;
-   private readonly storage: firebase.storage.Storage;
-   private readonly functions: firebase.functions.Functions;
+   public readonly app: firebase.app.App;
+   public readonly firestore: firebase.firestore.Firestore;
+   public readonly auth: firebase.auth.Auth;
+   public readonly storage: firebase.storage.Storage;
+   public readonly functions: firebase.functions.Functions;
 
    constructor(firebaseInstance: firebase.app.App) {
       this.app = firebaseInstance;
