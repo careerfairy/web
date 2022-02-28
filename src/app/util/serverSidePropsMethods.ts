@@ -8,12 +8,10 @@ import { shouldWeRedirectNextGen } from "./StreamUtil";
 export const handleRedirectToNextGen = async (
    context: GetServerSidePropsContext
 ) => {
-   const serverSideStream = await getServerSideStream(
-      context.params.livestreamId
-   );
-   const adminPreferences = await getServerSideStreamAdminPreferences(
-      context.params.livestreamId
-   );
+   const [serverSideStream, adminPreferences] = await Promise.all([
+      getServerSideStream(context.params.livestreamId),
+      getServerSideStreamAdminPreferences(context.params.livestreamId),
+   ]);
 
    if (!serverSideStream) {
       return {
