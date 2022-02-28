@@ -5,19 +5,27 @@ import {
 } from "../constants/streamContants";
 import DateUtil from "util/DateUtil";
 import firebaseApp from "./FirebaseInstance";
+import { Timestamp } from "firebase/firestore";
 
 class FirebaseService {
-   constructor(firebaseInstance) {
+   private readonly app: firebase.app.App;
+   private readonly firestore: firebase.firestore.Firestore;
+   private readonly auth: firebase.auth.Auth;
+   private readonly storage: firebase.storage.Storage;
+   private readonly functions: firebase.functions.Functions;
+
+   constructor(firebaseInstance: firebase.app.App) {
       this.app = firebaseInstance;
 
-      this.auth = this.app.auth();
-      this.firestore = this.app.firestore();
-      this.storage = this.app.storage();
-      this.functions = this.app.functions();
+      this.auth = firebaseInstance.auth();
+      this.firestore = firebaseInstance.firestore();
+      this.storage = firebaseInstance.storage();
+      this.functions = firebaseInstance.functions();
    }
 
    getFirebaseTimestamp = (dateString) => {
-      return this.firestore.Timestamp.fromDate(new Date(dateString));
+      Timestamp;
+      return firebase.firestore.Timestamp.fromDate(new Date(dateString));
    };
 
    // *** Functions Api ***
@@ -312,7 +320,7 @@ class FirebaseService {
    setgroups = (userId, arrayOfIds, arrayOfGroupObjects) => {
       let userRef = this.firestore.collection("userData").doc(userId);
       return userRef.update({
-         groupIds: [...new Set(arrayOfIds)],
+         groupIds: Array.from(new Set(arrayOfIds)),
          registeredGroups: arrayOfGroupObjects,
       });
    };
@@ -424,12 +432,16 @@ class FirebaseService {
                   batch.update(userRef, {
                      registeredGroups: filteredRegisteredGroups,
                      groupIds:
-                        this.firestore.FieldValue.arrayRemove(careerCenterId),
+                        firebase.firestore.FieldValue.arrayRemove(
+                           careerCenterId
+                        ),
                   });
                } else {
                   batch.update(userRef, {
                      groupIds:
-                        this.firestore.FieldValue.arrayRemove(careerCenterId),
+                        firebase.firestore.FieldValue.arrayRemove(
+                           careerCenterId
+                        ),
                   });
                }
                if (index === querySnapshot.size - 1) {
@@ -472,7 +484,7 @@ class FirebaseService {
          wish: wish,
          fulfilled: false,
          vote: 1,
-         date: this.firestore.Timestamp.fromDate(new Date()),
+         date: firebase.firestore.Timestamp.fromDate(new Date()),
       });
    };
 
@@ -640,7 +652,7 @@ class FirebaseService {
          companyId: "CareerFairy",
          test: true,
          universities: [],
-         start: this.firestore.Timestamp.fromDate(
+         start: firebase.firestore.Timestamp.fromDate(
             new Date("March 17, 2020 03:24:00")
          ),
       });
@@ -761,14 +773,14 @@ class FirebaseService {
    addStreamIdToLivestreamStreamers = (livestreamId, streamId) => {
       let ref = this.firestore.collection("livestreams").doc(livestreamId);
       return ref.update({
-         streamIds: this.firestore.FieldValue.arrayUnion(streamId),
+         streamIds: firebase.firestore.FieldValue.arrayUnion(streamId),
       });
    };
 
    removeStreamIdFromLivestreamStreamers = (livestreamId, streamId) => {
       let ref = this.firestore.collection("livestreams").doc(livestreamId);
       return ref.update({
-         streamIds: this.firestore.FieldValue.arrayRemove(streamId),
+         streamIds: firebase.firestore.FieldValue.arrayRemove(streamId),
       });
    };
 
@@ -1001,7 +1013,7 @@ class FirebaseService {
    updateSpeakersInLivestream = (livestreamRef, speaker) => {
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(livestreamRef).then((livestreamDoc) => {
-            let livestream = livestreamDoc.data();
+            let livestream: any = livestreamDoc.data();
             let updatedSpeakers =
                livestream.liveSpeakers?.filter(
                   (existingSpeaker) => existingSpeaker.id !== speaker.id
@@ -1024,7 +1036,7 @@ class FirebaseService {
    addSpeakerInLivestream = (livestreamRef, speaker) => {
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(livestreamRef).then((livestreamDoc) => {
-            let livestream = livestreamDoc.data();
+            let livestream: any = livestreamDoc.data();
             let speakerRef = livestreamRef.collection("speakers").doc();
             speaker.id = speakerRef.id;
             let updatedSpeakers = livestream.liveSpeakers
@@ -1071,9 +1083,9 @@ class FirebaseService {
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(questionRef).then((question) => {
             if (question.exists) {
-               const questionData = question.data();
-               const questionDataToUpdate = {
-                  numberOfComments: this.firestore.FieldValue.increment(1),
+               const questionData: any = question.data();
+               const questionDataToUpdate: any = {
+                  numberOfComments: firebase.firestore.FieldValue.increment(1),
                };
                if (!questionData.firstComment) {
                   questionDataToUpdate.firstComment = newComment;
@@ -1086,7 +1098,7 @@ class FirebaseService {
    };
 
    putLivestreamQuestion = (livestreamId, question) => {
-      question.timestamp = this.firestore.Timestamp.fromDate(new Date());
+      question.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
       let ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -1095,7 +1107,7 @@ class FirebaseService {
    };
 
    addLivestreamQuestion = (streamRef, question) => {
-      question.timestamp = this.firestore.Timestamp.fromDate(new Date());
+      question.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
       let ref = streamRef.collection("questions");
       return ref.add(question);
    };
@@ -1108,21 +1120,21 @@ class FirebaseService {
          .doc(question.id);
 
       return ref.update({
-         votes: this.firestore.FieldValue.increment(1),
-         emailOfVoters: this.firestore.FieldValue.arrayUnion(userEmail),
+         votes: firebase.firestore.FieldValue.increment(1),
+         emailOfVoters: firebase.firestore.FieldValue.arrayUnion(userEmail),
       });
    };
 
    upvoteLivestreamQuestionWithRef = (streamRef, question, userEmail) => {
       let ref = streamRef.collection("questions").doc(question.id);
       return ref.update({
-         votes: this.firestore.FieldValue.increment(1),
-         emailOfVoters: this.firestore.FieldValue.arrayUnion(userEmail),
+         votes: firebase.firestore.FieldValue.increment(1),
+         emailOfVoters: firebase.firestore.FieldValue.arrayUnion(userEmail),
       });
    };
 
    putLivestreamComment = (livestreamId, comment) => {
-      comment.timestamp = this.firestore.Timestamp.fromDate(new Date());
+      comment.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
       let ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -1157,22 +1169,22 @@ class FirebaseService {
       );
       const chatEntryRef = streamRef.collection("chatEntries").doc(chatEntryId);
       const data = {
-         [fieldProp]: this.firestore.FieldValue.arrayUnion(userEmail),
+         [fieldProp]: firebase.firestore.FieldValue.arrayUnion(userEmail),
       };
       otherProps.forEach((otherProp) => {
-         data[otherProp] = this.firestore.FieldValue.arrayRemove(userEmail);
+         data[otherProp] = firebase.firestore.FieldValue.arrayRemove(userEmail);
       });
       return chatEntryRef.update(data);
    };
    unEmoteComment = (streamRef, chatEntryId, fieldProp, userEmail) => {
       const chatEntryRef = streamRef.collection("chatEntries").doc(chatEntryId);
       return chatEntryRef.update({
-         [fieldProp]: this.firestore.FieldValue.arrayRemove(userEmail),
+         [fieldProp]: firebase.firestore.FieldValue.arrayRemove(userEmail),
       });
    };
 
    setLivestreamHasStarted = (hasStarted, streamRef) => {
-      const data = {
+      const data: any = {
          hasStarted,
       };
       if (!hasStarted) {
@@ -1362,7 +1374,7 @@ class FirebaseService {
    };
 
    getFollowingGroups = async (groupIds = []) => {
-      const uniqueGroupIds = [...new Set(groupIds)];
+      const uniqueGroupIds = Array.from(new Set(groupIds));
       const groupSnaps = await Promise.all(
          uniqueGroupIds.map((groupId) =>
             this.firestore.collection("careerCenterData").doc(groupId).get()
@@ -1374,9 +1386,9 @@ class FirebaseService {
    };
 
    getFollowingGroupsWithCache = async (groupIds = []) => {
-      const uniqueGroupIds = [...new Set(groupIds)];
+      const uniqueGroupIds = Array.from(new Set(groupIds));
       const getFromCache = async (groupId) => {
-         let snap = { notInCache: true, groupId };
+         let snap: any = { notInCache: true, groupId };
          try {
             snap = await this.firestore
                .collection("careerCenterData")
@@ -1447,7 +1459,7 @@ class FirebaseService {
       let groupRef = this.firestore.collection("careerCenterData").doc(groupId);
 
       return groupRef.update({
-         categories: this.firestore.FieldValue.arrayUnion(newCategoryObj),
+         categories: firebase.firestore.FieldValue.arrayUnion(newCategoryObj),
       });
    };
 
@@ -1533,7 +1545,7 @@ class FirebaseService {
       }
       if (newValues.type === "jobPosting") {
          const deadline = newValues.jobData.applicationDeadline
-            ? this.firestore.Timestamp.fromDate(
+            ? firebase.firestore.Timestamp.fromDate(
                  newValues.jobData.applicationDeadline
               )
             : null;
@@ -1579,11 +1591,12 @@ class FirebaseService {
          if (isDismissAction) {
             return await callToActionRef.update({
                numberOfUsersWhoDismissed:
-                  this.firestore.FieldValue.increment(1),
+                  firebase.firestore.FieldValue.increment(1),
             });
          }
          return await callToActionRef.update({
-            numberOfUsersWhoClickedLink: this.firestore.FieldValue.increment(1),
+            numberOfUsersWhoClickedLink:
+               firebase.firestore.FieldValue.increment(1),
          });
       }
       let batch = this.firestore.batch();
@@ -1615,7 +1628,7 @@ class FirebaseService {
             });
             batch.update(callToActionRef, {
                numberOfUsersWhoDismissed:
-                  this.firestore.FieldValue.increment(1),
+                  firebase.firestore.FieldValue.increment(1),
             });
 
             return await batch.commit();
@@ -1628,7 +1641,7 @@ class FirebaseService {
             });
             batch.update(callToActionRef, {
                numberOfUsersWhoClickedLink:
-                  this.firestore.FieldValue.increment(1),
+                  firebase.firestore.FieldValue.increment(1),
             });
             return await batch.commit();
          }
@@ -1639,7 +1652,7 @@ class FirebaseService {
             });
             if (!hasAlreadyDismissed) {
                callToActionUpdateData["numberOfUsersWhoDismissed"] =
-                  this.firestore.FieldValue.increment(1);
+                  firebase.firestore.FieldValue.increment(1);
             }
 
             if (hasAlreadyClicked) {
@@ -1653,7 +1666,7 @@ class FirebaseService {
             });
             if (!hasAlreadyClicked) {
                callToActionUpdateData["numberOfUsersWhoClickedLink"] =
-                  this.firestore.FieldValue.increment(1);
+                  firebase.firestore.FieldValue.increment(1);
             }
 
             if (hasAlreadyDismissed) {
@@ -1684,7 +1697,7 @@ class FirebaseService {
 
       batch.update(streamRef, {
          activeCallToActionIds:
-            this.firestore.FieldValue.arrayRemove(callToActionId),
+            firebase.firestore.FieldValue.arrayRemove(callToActionId),
       });
 
       return batch.commit();
@@ -1708,7 +1721,7 @@ class FirebaseService {
 
          batch.update(streamRef, {
             activeCallToActionIds:
-               this.firestore.FieldValue.arrayUnion(callToActionId),
+               firebase.firestore.FieldValue.arrayUnion(callToActionId),
          });
 
          return await batch.commit();
@@ -1731,7 +1744,7 @@ class FirebaseService {
 
          batch.update(streamRef, {
             activeCallToActionIds:
-               this.firestore.FieldValue.arrayRemove(callToActionId),
+               firebase.firestore.FieldValue.arrayRemove(callToActionId),
          });
 
          return await batch.commit();
@@ -1870,7 +1883,7 @@ class FirebaseService {
    createLivestreamPoll = (streamRef, pollQuestion, pollOptions) => {
       let ref = streamRef.collection("polls");
       let pollObject = {
-         timestamp: this.firestore.Timestamp.fromDate(new Date()),
+         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
          question: pollQuestion,
          options: pollOptions,
          voters: [],
@@ -2013,7 +2026,7 @@ class FirebaseService {
       let ref = streamRef.collection("handRaises").doc(userEmail);
       return ref.set({
          state: "requested",
-         timestamp: this.firestore.Timestamp.fromDate(new Date()),
+         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
          name: userData.firstName + " " + userData.lastName,
       });
    };
@@ -2022,7 +2035,7 @@ class FirebaseService {
       let ref = streamRef.collection("handRaises").doc(userEmail);
       return ref.update({
          state: state,
-         timestamp: this.firestore.Timestamp.fromDate(new Date()),
+         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
       });
    };
 
@@ -2089,7 +2102,7 @@ class FirebaseService {
          .doc(livestreamId)
          .collection("registeredStudents")
          .doc(userId);
-      const referralPromise = this.#createLivestreamReferral(
+      const referralPromise = this.createLivestreamReferral(
          referrerAuthId,
          authId,
          livestreamId
@@ -2099,10 +2112,11 @@ class FirebaseService {
             return transaction.get(userRef).then((userDoc) => {
                const user = userDoc.data();
                transaction.update(livestreamRef, {
-                  registrants: this.firestore.FieldValue.arrayUnion(
+                  registrants: firebase.firestore.FieldValue.arrayUnion(
                      user.authId
                   ),
-                  registeredUsers: this.firestore.FieldValue.arrayUnion(userId),
+                  registeredUsers:
+                     firebase.firestore.FieldValue.arrayUnion(userId),
                });
 
                for (const groupId of idsOfGroupsWithPolicies) {
@@ -2138,7 +2152,7 @@ class FirebaseService {
          .doc(userId);
       let batch = this.firestore.batch();
       batch.update(livestreamRef, {
-         registeredUsers: this.firestore.FieldValue.arrayRemove(userId),
+         registeredUsers: firebase.firestore.FieldValue.arrayRemove(userId),
       });
       batch.delete(registeredUsersRef);
       return batch.commit();
@@ -2162,13 +2176,14 @@ class FirebaseService {
             if (userSnap.exists) {
                const userData = userSnap.data();
                transaction.update(userRef, {
-                  talentPools: this.firestore.FieldValue.arrayUnion(companyId),
+                  talentPools:
+                     firebase.firestore.FieldValue.arrayUnion(companyId),
                });
                transaction.update(streamRef, {
-                  talentPool: this.firestore.FieldValue.arrayUnion(
+                  talentPool: firebase.firestore.FieldValue.arrayUnion(
                      userData.userEmail
                   ),
-                  registrants: this.firestore.FieldValue.arrayUnion(
+                  registrants: firebase.firestore.FieldValue.arrayUnion(
                      userData.authId
                   ),
                });
@@ -2207,11 +2222,13 @@ class FirebaseService {
          .collection("talentPool")
          .doc(userData.userEmail);
       batch.update(userRef, {
-         talentPools: this.firestore.FieldValue.arrayRemove(companyId),
-         registrants: this.firestore.FieldValue.arrayUnion(userData.authId),
+         talentPools: firebase.firestore.FieldValue.arrayRemove(companyId),
+         registrants: firebase.firestore.FieldValue.arrayUnion(userData.authId),
       });
       batch.update(streamRef, {
-         talentPool: this.firestore.FieldValue.arrayRemove(userData.userEmail),
+         talentPool: firebase.firestore.FieldValue.arrayRemove(
+            userData.userEmail
+         ),
       });
 
       batch.delete(userInTalentPoolCollectionRef);
@@ -2244,7 +2261,7 @@ class FirebaseService {
          joined: this.getServerTimestamp(),
       });
       batch.update(livestreamRef, {
-         participatingStudents: this.firestore.FieldValue.arrayUnion(
+         participatingStudents: firebase.firestore.FieldValue.arrayUnion(
             userData.userEmail
          ),
       });
@@ -2252,7 +2269,7 @@ class FirebaseService {
       let promises = [participationPromise];
       if (userData.authId && livestreamId) {
          const referralCompletionPromise =
-            this.#markLivestreamReferralAsCompleted(
+            this.markLivestreamReferralAsCompleted(
                livestreamId,
                userData.authId
             );
@@ -2272,7 +2289,7 @@ class FirebaseService {
          joined: this.getServerTimestamp(),
       });
       batch.update(streamRef, {
-         participatingStudents: this.firestore.FieldValue.arrayUnion(
+         participatingStudents: firebase.firestore.FieldValue.arrayUnion(
             userData.userEmail
          ),
       });
@@ -2296,7 +2313,7 @@ class FirebaseService {
          .collection("icons");
       return ref.add({
          name: iconName,
-         timestamp: this.firestore.Timestamp.fromDate(new Date()),
+         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
          authorEmail: authorEmail,
       });
    };
@@ -2428,7 +2445,7 @@ class FirebaseService {
             const email = userData?.userEmail || userEmail;
 
             transaction.update(groupRef, {
-               adminEmails: this.firestore.FieldValue.arrayRemove(email),
+               adminEmails: firebase.firestore.FieldValue.arrayRemove(email),
             });
             let groupAdminRef = this.firestore
                .collection("careerCenterData")
@@ -2671,7 +2688,8 @@ class FirebaseService {
                breakoutRoomRef.id,
                isTestStream,
                title,
-               companyLogo
+               companyLogo,
+               false
             );
             transaction.set(breakoutRoomRef, newBreakoutRoom);
             if (!isTestStream) {
@@ -2861,14 +2879,14 @@ class FirebaseService {
    };
 
    // Livestream Referral methods
-   #markLivestreamReferralAsCompleted = async (
+   private markLivestreamReferralAsCompleted = async (
       livestreamId,
       recipientAuthId
    ) => {
       try {
          return await this.firestore
             .collection("livestreamReferrals")
-            .doc(this.#getReferralDocId(livestreamId, recipientAuthId))
+            .doc(this.getReferralDocId(livestreamId, recipientAuthId))
             .update({
                attendedStreamAt: this.getServerTimestamp(),
                recipientAttendedLivestream: true,
@@ -2882,7 +2900,7 @@ class FirebaseService {
     * @param {string} recipientAuthId
     * @param {string} livestreamId
     */
-   #createLivestreamReferral = async (
+   private createLivestreamReferral = async (
       referrerAuthId,
       recipientAuthId,
       livestreamId
@@ -2896,11 +2914,12 @@ class FirebaseService {
          return false;
       }
 
-      const [refAlreadyExists, data] = await this.checkIfReferralAlreadyExists(
-         referrerAuthId,
-         recipientAuthId,
-         livestreamId
-      );
+      const [refAlreadyExists, data]: any =
+         await this.checkIfReferralAlreadyExists(
+            referrerAuthId,
+            recipientAuthId,
+            livestreamId
+         );
       // if the livestream has already been attended by the invited that means that the referral if complete, no need to update anything
       if (data?.recipientAttendedLivestream) {
          return false;
@@ -2908,7 +2927,7 @@ class FirebaseService {
 
       const referralRef = this.firestore
          .collection("livestreamReferrals")
-         .doc(this.#getReferralDocId(livestreamId, recipientAuthId));
+         .doc(this.getReferralDocId(livestreamId, recipientAuthId));
 
       if (refAlreadyExists) {
          // If it's the same referer, then just return out of this function, no need to update anything
@@ -2946,12 +2965,12 @@ class FirebaseService {
       if (!referrerAuthId || !recipientAuthId || !livestreamId) return false;
       const referralSnap = await this.firestore
          .collection("livestreamReferrals")
-         .doc(this.#getReferralDocId(livestreamId, recipientAuthId))
+         .doc(this.getReferralDocId(livestreamId, recipientAuthId))
          .get();
       return [referralSnap.exists, referralSnap.data?.()];
    };
 
-   #getReferralDocId = (livestreamId, recipientAuthId) => {
+   private getReferralDocId = (livestreamId, recipientAuthId) => {
       return `${livestreamId}-${recipientAuthId}`;
    };
 
@@ -2988,7 +3007,7 @@ class FirebaseService {
    };
 
    getServerTimestamp = () => {
-      return this.firestore.FieldValue.serverTimestamp();
+      return firebase.firestore.FieldValue.serverTimestamp();
    };
 }
 

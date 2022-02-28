@@ -1,7 +1,7 @@
 import SessionStorageUtil from "./SessionStorageUtil";
 
 /**
- * Patch console.error function
+ * Patch console.error function to listen for Firestore connectivity issues
  */
 if (typeof window !== "undefined") {
    const originalFn = console["error"];
