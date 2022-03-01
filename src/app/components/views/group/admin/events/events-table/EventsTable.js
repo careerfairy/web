@@ -55,9 +55,8 @@ const EventsTable = ({
    const [deletingEvent, setDeletingEvent] = useState(false);
    const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null);
    const [allGroups, setAllGroups] = useState([]);
-   const [toolbarActionsDialogOpen, setToolbarActionsDialogOpen] = useState(
-      false
-   );
+   const [toolbarActionsDialogOpen, setToolbarActionsDialogOpen] =
+      useState(false);
    const [endOfEventDialogData, setEndOfEventDialogData] = useState(null);
 
    const {
@@ -77,10 +76,8 @@ const EventsTable = ({
 
    const dispatch = useDispatch();
 
-   const [
-      targetLivestreamStreamerLinksId,
-      setTargetLivestreamStreamerLinksId,
-   ] = useState("");
+   const [targetLivestreamStreamerLinksId, setTargetLivestreamStreamerLinksId] =
+      useState("");
 
    useEffect(() => {
       if (eventId) {
@@ -283,7 +280,7 @@ const EventsTable = ({
                />
             ),
             tooltip: "More options",
-            hidden: isDraft || !userData.isAdmin,
+            hidden: isDraft || !userData?.isAdmin,
          },
       ],
       [

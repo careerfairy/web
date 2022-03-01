@@ -165,6 +165,13 @@ export async function getServerSideProps({
 }) {
    const serverSideStream = await getServerSideStream(livestreamId);
    const serverSideGroup = await getServerSideGroup(groupId);
+
+   if (!serverSideGroup || Object.keys(serverSideGroup)?.length === 0) {
+      return {
+         notFound: true,
+      };
+   }
+
    let initialTabValue = null;
    if (type === "upcomingEvents" || type === "pastEvents") {
       initialTabValue = type;
