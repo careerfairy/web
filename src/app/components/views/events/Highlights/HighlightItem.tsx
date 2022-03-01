@@ -27,9 +27,28 @@ const styles = {
       display: "flex",
       color: "white",
       m: 1,
+      "&:hover": {
+         background: (theme: Theme) =>
+            `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.primary.gradient})`,
+         "& svg": {
+            color: (theme) => theme.palette.primary.main,
+            fontSize: (theme) => ({
+               xs: theme.spacing(itemSpacingSize * 0.5),
+               md: theme.spacing(itemSpacingSize * 0.8),
+            }),
+            textShadow: (theme) => theme.darkTextShadow,
+         },
+         "& .overlay": {
+            opacity: 0.5,
+         },
+         "& .innerWrapper": {
+            padding: 0,
+         },
+      },
    },
    innerWrapper: {
       background: (theme: Theme) => theme.palette.background.paper,
+      transition: (theme) => theme.transitions.create(["padding"]),
       padding: 0.5,
       borderRadius: "50%",
       flex: 1,
@@ -42,19 +61,6 @@ const styles = {
       flex: 1,
       display: "grid",
       placeItems: "center",
-      "&:hover": {
-         "& svg": {
-            color: (theme) => theme.palette.primary.main,
-            fontSize: (theme) => ({
-               xs: theme.spacing(itemSpacingSize * 0.5),
-               md: theme.spacing(itemSpacingSize * 0.8),
-            }),
-            textShadow: (theme) => theme.darkTextShadow,
-         },
-         "& .overlay": {
-            opacity: 0.5,
-         },
-      },
    },
    imageOverlay: {
       background: "black",
@@ -104,7 +110,7 @@ const HighlightItem = ({
    return (
       <Box onClick={() => handleOpenVideoDialog(videoUrl)} sx={styles.root}>
          <Box sx={styles.circleRoot}>
-            <Box sx={styles.innerWrapper}>
+            <Box className="innerWrapper" sx={styles.innerWrapper}>
                <Box sx={styles.imageWrapper}>
                   <Box
                      sx={styles.thumbnailImage}
