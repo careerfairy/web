@@ -7,6 +7,7 @@ import { calendarIcon, playIcon } from "constants/images";
 import React from "react";
 import { alpha } from "@mui/material/styles";
 import SvgIcon from "@mui/material/SvgIcon";
+import { hubSpotFunnelLink } from "../../../../../constants/links";
 
 const styles = {
    linkButton: {
@@ -107,7 +108,8 @@ const GeneralHeroMessage = ({
                         color="secondary"
                         fullWidth
                         withGradient
-                        onClick={handleOpenCalendly}
+                        target="_blank"
+                        href={hubSpotFunnelLink}
                         iconUrl={calendarIcon}
                         variant="contained"
                      >
