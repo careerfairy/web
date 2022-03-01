@@ -178,7 +178,7 @@ const HeroSection = ({
                            )}
                         </Box>
                      )}
-                     {!!stream.speakers?.length && (
+                     {!!stream?.speakers?.length && (
                         <Hidden smDown>
                            <Box
                               component="a"
