@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 
 import Slider from "react-slick";
 import { Box } from "@mui/material";
@@ -59,6 +59,11 @@ interface BasicCarouselProps {
    sx?: SxProps<Theme>;
 }
 const BasicCarousel: FC<BasicCarouselProps> = (props) => {
+   const [isClient, setIsClient] = useState(false);
+   useEffect(() => {
+      setIsClient(true);
+   }, []);
+
    const propsWithDefaults = useMemo(
       () => ({
          dots: true,
@@ -92,7 +97,13 @@ const BasicCarousel: FC<BasicCarouselProps> = (props) => {
             ...(Array.isArray(props.sx) ? props.sx : [props.sx]),
          ]}
       >
-         <Slider {...propsWithDefaults}>{props.children}</Slider>
+         <Slider
+            key={isClient ? "client" : "server"}
+            responsive={isClient ? props.responsive : null}
+            {...propsWithDefaults}
+         >
+            {props.children}
+         </Slider>
       </Box>
    );
 };
