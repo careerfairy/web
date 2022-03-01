@@ -158,7 +158,7 @@ function MyApp(props) {
             />
             <title>CareerFairy | Watch live streams. Get hired.</title>
          </Head>
-         <NextNProgress color="#00d2aa" options={{ showSpinner: false }} />
+         <NextNProgress color={brandedLightTheme.pallete.primary.main} options={{ showSpinner: false }} />
          <Provider store={store}>
             <ReactReduxFirebaseProvider {...rrfProps}>
                <TutorialContext.Provider
