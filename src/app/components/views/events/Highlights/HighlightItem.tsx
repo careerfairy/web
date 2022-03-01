@@ -42,25 +42,39 @@ const styles = {
       flex: 1,
       display: "grid",
       placeItems: "center",
+      "&:hover": {
+         "& svg": {
+            color: (theme) => theme.palette.primary.main,
+            fontSize: (theme) => ({
+               xs: theme.spacing(itemSpacingSize * 0.5),
+               md: theme.spacing(itemSpacingSize * 0.8),
+            }),
+            textShadow: (theme) => theme.darkTextShadow,
+         },
+         "& .overlay": {
+            opacity: 0.5,
+         },
+      },
+   },
+   imageOverlay: {
+      background: "black",
+      borderRadius: "50%",
+      opacity: 0,
+      transition: (theme) => theme.transitions.create(["opacity"]),
+      position: "absolute",
+      inset: 0,
    },
    thumbnailImage: {
       borderRadius: "50%",
       margin: 1,
    },
    icon: {
-      zIndex: 1,
+      zIndex: 2,
       fontSize: (theme) => ({
          xs: theme.spacing(itemSpacingSize * 0.4),
          md: theme.spacing(itemSpacingSize * 0.7),
       }),
       transition: (theme) => theme.transitions.create(["color", "font-size"]),
-      "&:hover": {
-         color: (theme) => theme.palette.primary.main,
-         fontSize: (theme) => ({
-            xs: theme.spacing(itemSpacingSize * 0.5),
-            md: theme.spacing(itemSpacingSize * 0.8),
-         }),
-      },
    },
    logoRoot: {
       height: (theme) => ({
@@ -98,6 +112,7 @@ const HighlightItem = ({
                      src={thumbnail}
                      component={Image}
                   />
+                  <Box className={"overlay"} sx={styles.imageOverlay} />
                   <PlayIcon sx={styles.icon} />
                </Box>
             </Box>
