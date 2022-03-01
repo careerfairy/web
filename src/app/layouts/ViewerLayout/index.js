@@ -20,6 +20,7 @@ import useViewerHandRaiseConnect from "../../components/custom-hook/useViewerHan
 import StatsUtil from "../../data/util/StatsUtil";
 import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu";
 import useNextGenRedirect from "../../components/custom-hook/useNextGenRedirect";
+import useStreamAdminPreferences from "../../components/custom-hook/useStreamAdminPreferences";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -97,19 +98,18 @@ const ViewerLayout = (props) => {
    const classes = useStyles({ showMenu, mobile, focusModeEnabled });
    const [selectedState, setSelectedState] = useState("questions");
    const [notAuthorized, setNotAuthorized] = useState(false);
-   const [checkingForCategoryData, setCheckingForCategoryData] = useState(
-      false
-   );
-   const [hasCheckedForCategoryData, setHasCheckedForCategoryData] = useState(
-      false
-   );
+   const [checkingForCategoryData, setCheckingForCategoryData] =
+      useState(false);
+   const [hasCheckedForCategoryData, setHasCheckedForCategoryData] =
+      useState(false);
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
    const handleOpenJoinModal = ({ groups }) =>
       setJoinGroupModalData({ groups });
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
 
    const currentLivestream = useStreamConnect();
-   useNextGenRedirect(currentLivestream?.isBeta);
+   const streamAdminPreferences = useStreamAdminPreferences(livestreamId);
+   useNextGenRedirect(streamAdminPreferences?.isNextGen);
    useViewerHandRaiseConnect(currentLivestream, streamerId);
 
    useEffect(() => {
@@ -220,10 +220,11 @@ const ViewerLayout = (props) => {
                const livestreamGroups = await firebase.getGroupsWithIds(
                   currentLivestream.groupIds
                );
-               const groupThatUserFollows = StatsUtil.getGroupThatStudentBelongsTo(
-                  userData,
-                  livestreamGroups
-               );
+               const groupThatUserFollows =
+                  StatsUtil.getGroupThatStudentBelongsTo(
+                     userData,
+                     livestreamGroups
+                  );
 
                if (!groupThatUserFollows) {
                   // If user is not following any of the groups bring up group following Dialog
@@ -234,10 +235,11 @@ const ViewerLayout = (props) => {
                   }
                } else {
                   // If user is following one of the groups, please check if the user has all the categories of the group
-                  const userHasAllCategoriesOfGroup = StatsUtil.studentHasAllCategoriesOfGroup(
-                     userData,
-                     groupThatUserFollows
-                  );
+                  const userHasAllCategoriesOfGroup =
+                     StatsUtil.studentHasAllCategoriesOfGroup(
+                        userData,
+                        groupThatUserFollows
+                     );
                   if (!userHasAllCategoriesOfGroup) {
                      // Open the category select dialog...
                      handleOpenJoinModal({ groups: [groupThatUserFollows] });
@@ -300,7 +302,12 @@ const ViewerLayout = (props) => {
 
    return (
       <CurrentStreamContext.Provider
-         value={{ currentLivestream, isBreakout, streamerId }}
+         value={{
+            currentLivestream,
+            isBreakout,
+            streamerId,
+            streamAdminPreferences,
+         }}
       >
          <div className={`${classes.root} notranslate`}>
             <ViewerTopBar
