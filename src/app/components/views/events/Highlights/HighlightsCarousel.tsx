@@ -6,7 +6,6 @@ import HighlightVideoDialog from "./HighlightVideoDialog";
 const arrowFontSize = 30;
 const styles = {
    root: {
-      width: "100%",
       "& .slick-next": {
          right: "10px",
          "&:before": {
