@@ -5,15 +5,15 @@ import Link from "next/link";
 import footerLinks from "./footerLinks";
 import icons from "./icons";
 
-const FooterV2 = ({ background }) => {
+const FooterV2 = ({ background, sx }) => {
    const theme = useTheme();
    const greyColor = alpha(theme.palette.text.secondary, 0.5);
-
    return (
       <Box
-         sx={{
-            background: (theme) => background || theme.palette.common.white,
-         }}
+         sx={[
+            { background: (theme) => background || theme.palette.common.white },
+            sx,
+         ]}
       >
          <Container
             sx={(theme) => ({
