@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import HighlightItem, { HighLightType } from "./HighlightItem";
-import { DefaultTheme, SxProps } from "@mui/system";
-import { Theme } from "@mui/material/styles";
 import BasicCarousel from "components/views/common/carousels/BasicCarousel";
 import HighlightVideoDialog from "./HighlightVideoDialog";
-import { Box } from "@mui/material";
 
 const arrowFontSize = 30;
 const styles = {
    root: {
+      width: "100%",
       "& .slick-next": {
          right: "10px",
          "&:before": {
