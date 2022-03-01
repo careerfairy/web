@@ -149,8 +149,6 @@ function MyApp(props) {
       return Boolean(activeStep === property);
    };
 
-   console.log("theme", brandedLightTheme);
-
    return (
       <CacheProvider value={emotionCache}>
          <Head>
