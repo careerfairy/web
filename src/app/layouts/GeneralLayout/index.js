@@ -20,7 +20,7 @@ const GeneralLayout = ({ children, fullScreen }) => {
             <Box sx={styles.contentContainer}>
                <Box sx={styles.content}>
                   {children}
-                  <FooterV2 />
+                  <FooterV2 sx={fullScreen && { mt: "auto" }} />
                </Box>
             </Box>
          </Box>
