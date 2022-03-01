@@ -58,6 +58,7 @@
       "next": "^12.1.0",
       "next-fonts": "^1.5.1",
       "next-redux-wrapper": "^6.0.2",
+      "nextjs-progressbar": "^0.0.14",
       "notistack": "^2.0.3",
       "react": "^17.0.2",
       "react-calendly": "^2.0.2",
