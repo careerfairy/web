@@ -9,6 +9,7 @@ const Content = ({ videoUrl, onClose }: ContentProps) => {
       <Box
          sx={{
             width: "100%",
+            height: "100%",
             borderRadius: 2,
             boxShadow: 4,
             background: "black",
