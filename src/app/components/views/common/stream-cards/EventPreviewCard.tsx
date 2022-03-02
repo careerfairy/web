@@ -3,7 +3,6 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import ShareIcon from "@mui/icons-material/Share";
-import { LiveStreamEvent } from "../../../../tempTypes/event";
 import DateUtil from "../../../../util/DateUtil";
 import { Button, IconButton } from "@mui/material";
 import { alpha, Theme } from "@mui/material/styles";
@@ -11,6 +10,7 @@ import LanguageIcon from "@mui/icons-material/Language";
 import { getMaxLineStyles } from "../../../helperFunctions/HelperFunctions";
 import WhiteTagChip from "../chips/TagChip";
 import { existingDummyInterests } from "../../events/dummyData";
+import { LiveStreamEvent } from "types/event";
 const styles = {
    root: {},
    dateShareWrapper: {
@@ -28,8 +28,21 @@ const styles = {
       width: "100%",
       color: "white",
       boxShadow: 5,
-      backgroundSize: "cover",
+      "&:before": {
+         backgroundSize: "cover",
+         content: "''",
+         position: "absolute",
+         inset: 0,
+         transition: (theme: Theme) =>
+            theme.transitions.create(["transform"], {
+               duration: theme.transitions.duration.standard,
+               easing: theme.transitions.easing.easeInOut,
+            }),
+      },
       "&:hover, &:focus-within": {
+         "&:before": {
+            transform: "scale(1.1)",
+         },
          "& .title": {
             ...getMaxLineStyles(3),
          },
@@ -135,7 +148,11 @@ const EventPreviewCard = ({ event }: EventPreviewCardProps) => {
          <Box
             sx={[
                styles.mainContentWrapper,
-               { backgroundImage: `url(${event.backgroundImageUrl})` },
+               {
+                  "&:before": {
+                     backgroundImage: `url(${event.backgroundImageUrl})`,
+                  },
+               },
             ]}
          >
             <Stack spacing={2} className="mainContent" sx={styles.mainContent}>

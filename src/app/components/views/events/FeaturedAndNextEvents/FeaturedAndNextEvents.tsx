@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
-import { LiveStreamEvent } from "tempTypes/event";
+import { LiveStreamEvent } from "types/event";
 import { delay } from "../../../helperFunctions/HelperFunctions";
 import { dummyEvent } from "../dummyData";
 import EventPreviewCard from "../../common/stream-cards/EventPreviewCard";
