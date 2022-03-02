@@ -25,6 +25,6 @@ export interface LiveStreamEvent extends Identifiable {
    test?: boolean;
    title?: string;
    type?: string;
-   start: Timestamp;
+   start?: Timestamp;
    startDate?: Date;
 }

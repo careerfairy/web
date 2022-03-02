@@ -4,13 +4,20 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import ShareIcon from "@mui/icons-material/Share";
 import DateUtil from "../../../../util/DateUtil";
-import { Button, IconButton } from "@mui/material";
+import { AvatarGroup, Button, CardMedia, IconButton } from "@mui/material";
 import { alpha, Theme } from "@mui/material/styles";
 import LanguageIcon from "@mui/icons-material/Language";
-import { getMaxLineStyles } from "../../../helperFunctions/HelperFunctions";
+import {
+   getMaxLineStyles,
+   getResizedUrl,
+} from "../../../helperFunctions/HelperFunctions";
 import WhiteTagChip from "../chips/TagChip";
 import { existingDummyInterests } from "../../events/dummyData";
 import { LiveStreamEvent } from "types/event";
+import Image from "next/image";
+import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext";
+import Avatar from "@mui/material/Avatar";
+
 const styles = {
    root: {},
    dateShareWrapper: {
@@ -19,26 +26,7 @@ const styles = {
    date: {
       fontWeight: 600,
    },
-   mainContentWrapper: {
-      position: "relative",
-      height: (theme) => theme.spacing(32),
-      display: "flex",
-      alignItems: "flex-end",
-      overflow: "hidden",
-      width: "100%",
-      color: "white",
-      boxShadow: 5,
-      "&:before": {
-         backgroundSize: "cover",
-         content: "''",
-         position: "absolute",
-         inset: 0,
-         transition: (theme: Theme) =>
-            theme.transitions.create(["transform"], {
-               duration: theme.transitions.duration.standard,
-               easing: theme.transitions.easing.easeInOut,
-            }),
-      },
+   mainContentHoverStyles: {
       "&:hover, &:focus-within": {
          "&:before": {
             transform: "scale(1.1)",
@@ -65,6 +53,28 @@ const styles = {
             transform: "translateY(-50%)",
          },
       },
+   },
+   mainContentWrapper: {
+      position: "relative",
+      height: (theme) => theme.spacing(32),
+      display: "flex",
+      alignItems: "flex-end",
+      overflow: "hidden",
+      width: "100%",
+      color: "white",
+      boxShadow: 5,
+      "&:before": {
+         backgroundSize: "cover",
+         content: "''",
+         position: "absolute",
+         inset: 0,
+         transition: (theme: Theme) =>
+            theme.transitions.create(["transform"], {
+               duration: theme.transitions.duration.standard,
+               easing: theme.transitions.easing.easeInOut,
+            }),
+      },
+
       "&:after": {
          content: "''",
          display: "block",
@@ -118,10 +128,41 @@ const styles = {
       flex: 0.5,
       borderRadius: 0.3,
    },
+   logosWrapper: {
+      py: 1,
+      display: "flex",
+      justifyContent: "space-between",
+      height: (theme) => theme.spacing(12),
+      "& > *": {
+         flex: 0.5,
+      },
+   },
+   hostsWrapper: {
+      display: "flex",
+      alignItems: "flex-end",
+      justifyContent: "center",
+      flexDirection: "column",
+   },
+   hostedText: {
+      fontWeight: 600,
+   },
+   hostAvatar: {
+      padding: 1,
+      backgroundColor: "white",
+      border: "1px solid black !important",
+      boxShadow: 3,
+   },
+   nextImageWrapper: {
+      position: "relative",
+      width: "100%",
+      height: "100%",
+   },
 } as const;
-const EventPreviewCard = ({ event }: EventPreviewCardProps) => {
+const EventPreviewCard = ({ event, loading }: EventPreviewCardProps) => {
    const [eventInterests, setSetEventInterests] = useState([]);
-
+   const [hosts, setHosts] = useState(undefined);
+   console.log("-> hosts", hosts);
+   const firebase = useFirebaseService();
    useEffect(() => {
       setSetEventInterests(
          existingDummyInterests.filter((interest) =>
@@ -129,6 +170,16 @@ const EventPreviewCard = ({ event }: EventPreviewCardProps) => {
          )
       );
    }, [event.interestsIds]);
+
+   useEffect(() => {
+      (async function getHosts() {
+         const newHosts = await firebase.getCareerCentersByGroupId(
+            event.groupIds || []
+         );
+         setHosts(newHosts.length ? newHosts : null);
+      })();
+   }, [event.groupIds]);
+
    return (
       <Box sx={styles.root}>
          <Stack
@@ -153,6 +204,7 @@ const EventPreviewCard = ({ event }: EventPreviewCardProps) => {
                      backgroundImage: `url(${event.backgroundImageUrl})`,
                   },
                },
+               !loading && styles.mainContentHoverStyles,
             ]}
          >
             <Stack spacing={2} className="mainContent" sx={styles.mainContent}>
@@ -216,11 +268,56 @@ const EventPreviewCard = ({ event }: EventPreviewCardProps) => {
                </Stack>
             </Stack>
          </Box>
+         <Stack spacing={2} direction={"row"} sx={styles.logosWrapper}>
+            <CardMedia title="Your title">
+               <div
+                  style={{
+                     position: "relative",
+                     width: "100%",
+                     height: "100%",
+                  }}
+               >
+                  <Image
+                     src={event.companyLogoUrl}
+                     layout="fill"
+                     objectFit="contain"
+                  />
+               </div>
+            </CardMedia>
+            <Box sx={styles.hostsWrapper}>
+               {hosts && (
+                  <Box>
+                     <Typography sx={styles.hostedText} color="text.secondary">
+                        HOSTED BY
+                     </Typography>
+                     <AvatarGroup max={4}>
+                        {hosts.map((host) => (
+                           <Avatar
+                              variant="rounded"
+                              key={host.id}
+                              title={`${host.universityName}`}
+                              sx={styles.hostAvatar}
+                           >
+                              <Box sx={styles.nextImageWrapper}>
+                                 <Image
+                                    src={host.logoUrl}
+                                    layout="fill"
+                                    objectFit="contain"
+                                 />
+                              </Box>
+                           </Avatar>
+                        ))}
+                     </AvatarGroup>
+                  </Box>
+               )}
+            </Box>
+         </Stack>
       </Box>
    );
 };
 
 interface EventPreviewCardProps {
    event: LiveStreamEvent;
+   loading?: boolean;
 }
 export default EventPreviewCard;
