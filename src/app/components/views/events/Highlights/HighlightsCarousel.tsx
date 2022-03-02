@@ -3,6 +3,7 @@ import HighlightItem, { HighLightType } from "./HighlightItem";
 import BasicCarousel from "components/views/common/carousels/BasicCarousel";
 import HighlightVideoDialog from "./HighlightVideoDialog";
 import { useWindowSize } from "react-use";
+import { dummyHighlights } from "../dummyData";
 
 const arrowFontSize = 30;
 const styles = {
@@ -26,7 +27,7 @@ const styles = {
       },
    },
 };
-const HighlightsCarousel = ({ highLights }: HighlightsCarouselProps) => {
+const HighlightsCarousel = () => {
    const [isTouchScreen, setIsTouchScreen] = useState(false);
    const dimensions = useWindowSize();
 
@@ -58,7 +59,7 @@ const HighlightsCarousel = ({ highLights }: HighlightsCarouselProps) => {
             initialSlide={0}
             variableWidth
          >
-            {highLights.map((highlight, index) => (
+            {dummyHighlights.map((highlight, index) => (
                <HighlightItem
                   handleOpenVideoDialog={handleOpenVideoDialog}
                   key={index}
@@ -74,7 +75,4 @@ const HighlightsCarousel = ({ highLights }: HighlightsCarouselProps) => {
    );
 };
 
-interface HighlightsCarouselProps {
-   highLights: HighLightType[];
-}
 export default HighlightsCarousel;
