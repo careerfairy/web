@@ -50,7 +50,6 @@ const HighlightsCarousel = () => {
          <BasicCarousel
             sx={styles.root}
             dots={false}
-            slidesToShow={4}
             infinite
             arrows
             swipeToSlide

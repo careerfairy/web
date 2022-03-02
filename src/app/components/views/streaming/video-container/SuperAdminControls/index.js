@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
    },
    expandIcon: {
       transition: theme.transitions.create(["transform"], {
-         duration: theme.transitions.duration.complex,
+         duration: theme.transitions.duration.standard,
          easing: theme.transitions.easing.easeInOut,
       }),
       marginLeft: 5,

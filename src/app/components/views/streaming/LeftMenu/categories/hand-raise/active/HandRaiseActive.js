@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
    },
    orderIcon: {
       transition: theme.transitions.create(["transform"], {
-         duration: theme.transitions.duration.complex,
+         duration: theme.transitions.duration.standard,
          easing: theme.transitions.easing.easeInOut,
       }),
       transform: ({ up }) => up && `rotate(180deg)`,
@@ -73,20 +73,16 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
 
    const closeSnackbar = (...args) => dispatch(actions.closeSnackbar(...args));
 
-   const { setNewNotification, setNotificationToRemove } = useContext(
-      NotificationsContext
-   );
+   const { setNewNotification, setNotificationToRemove } =
+      useContext(NotificationsContext);
    const {
       tutorialSteps,
       setTutorialSteps,
       getActiveTutorialStepKey,
       isOpen: isStepOpen,
    } = useContext(TutorialContext);
-   const {
-      handRaises,
-      handlers,
-      numberOfActiveHandRaisers,
-   } = useStreamActiveHandRaises();
+   const { handRaises, handlers, numberOfActiveHandRaisers } =
+      useStreamActiveHandRaises();
    const [hasEntered, setHasEntered] = useState(false);
    const [hasExited, setHasExited] = useState(false);
    const [sortByNew, setSortByNew] = useState(true);
