@@ -424,7 +424,6 @@ export const dataURLtoFile = (dataUrl, filename) => {
 
 export const getMaxLineStyles = (maxLines = 2) => ({
    display: "-webkit-box",
-   boxOrient: "vertical",
    lineClamp: maxLines,
    WebkitLineClamp: maxLines,
    overflow: "hidden",

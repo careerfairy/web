@@ -20,7 +20,7 @@ const styles = {
    groupBioIcon: {
       transition: (theme) =>
          theme.transitions.create("transform", {
-            duration: theme.transitions.duration.complex,
+            duration: theme.transitions.duration.standard,
             easing: theme.transitions.easing.easeInOut,
          }),
    },
