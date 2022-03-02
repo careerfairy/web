@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import ShareIcon from "@mui/icons-material/Share";
 import { LiveStreamEvent } from "../../../../tempTypes/event";
 import DateUtil from "../../../../util/DateUtil";
-import { IconButton } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
+import { alpha, Theme } from "@mui/material/styles";
+import LanguageIcon from "@mui/icons-material/Language";
+import { getMaxLineStyles } from "../../../helperFunctions/HelperFunctions";
+import WhiteTagChip from "../chips/TagChip";
+import { existingDummyInterests } from "../../events/dummyData";
 const styles = {
    root: {},
    dateShareWrapper: {
@@ -16,61 +21,36 @@ const styles = {
    },
    mainContentWrapper: {
       position: "relative",
-      height: (theme) => theme.spacing(20),
+      height: (theme) => theme.spacing(32),
       display: "flex",
       alignItems: "flex-end",
       overflow: "hidden",
-      padding: "1rem",
       width: "100%",
-      textAlign: "center",
-      color: "whitesmoke",
-      backgroundColor: "whitesmoke",
+      color: "white",
       boxShadow: 5,
       backgroundSize: "cover",
-      "&:hover:after": {
-         transform: "translateY(0)",
-      },
       "&:hover, &:focus-within": {
-         alignItems: "center",
-         "&:before": { transform: "translateY(-4%)" },
-         "&:after": { transform: "translateY(-50%)" },
-         ".content": {
-            transform: "translateY(0)",
-            "& > *:not(.title)": {
-               opacity: 1,
-               transform: "translateY(0)",
-               transitionDelay: "calc(700ms / 8)",
-            },
+         "& .title": {
+            ...getMaxLineStyles(3),
          },
-      },
-      "&:hover": {
-         ".card:focus-within": {
-            "&:before, &:after, .mainContent, .mainContent > *:not(.title)": {
-               transitionDuration: "0s",
-            },
+         "& .chipsWrapper": {
+            display: "none",
          },
          "& .mainContent": {
-            transform: "translateY(calc(100% - 4.5rem))",
-            "> *:not(.title)": {
-               opacity: 0,
-               transform: "translateY(1rem)",
-               transition:
-                  "transform 700ms cubic-bezier(0.19, 1, 0.22, 1), opacity 700ms cubic-bezier(0.19, 1, 0.22, 1)",
+            transform: "translateY(0)",
+            opacity: 1,
+            "& > *:not(.titleWrapper)": {
+               opacity: 1,
+               transition: (theme: Theme) =>
+                  theme.transitions.create(["opacity"], {
+                     duration: theme.transitions.duration.standard,
+                     easing: theme.transitions.easing.easeInOut,
+                  }),
             },
          },
-      },
-      "&:before": {
-         content: "''",
-         position: "absolute",
-         top: "0",
-         left: "0",
-         width: "100%",
-         height: "110%",
-         backgroundSize: "cover",
-         backgroundPosition: "0 0",
-         transition:
-            "transform calc(700ms * 1.5) cubic-bezier(0.19, 1, 0.22, 1)",
-         pointerEvents: "none",
+         "&:after": {
+            transform: "translateY(-50%)",
+         },
       },
       "&:after": {
          content: "''",
@@ -81,30 +61,61 @@ const styles = {
          width: "100%",
          height: "200%",
          pointerEvents: "none",
-         backgroundImage:
-            "linear-gradient(to bottom,hsla(0, 0%, 0%, 0) 0%, hsla(0, 0%, 0%, 0.009) 11.7%, hsla(0, 0%, 0%, 0.034) 22.1%, hsla(0, 0%, 0%, 0.072) 31.2%, hsla(0, 0%, 0%, 0.123) 39.4%, hsla(0, 0%, 0%, 0.182) 46.6%, hsla(0, 0%, 0%, 0.249) 53.1%, hsla(0, 0%, 0%, 0.320) 58.9%, hsla(0, 0%, 0%, 0.394) 64.3%, hsla(0, 0%, 0%, 0.468) 69.3%, hsla(0, 0%, 0%, 0.540) 74.1%, hsla(0, 0%, 0%, 0.607) 78.8%, hsla(0, 0%, 0%, 0.668) 83.6%, hsla(0, 0%, 0%, 0.721) 88.7%, hsla(0, 0%, 0%, 0.762) 94.1%, hsla(0, 0%, 0%, 0.790) 100%)",
-         transform: "translateY(-50%)",
-         transition: "transform calc(700ms * 2) cubic-bezier(0.19, 1, 0.22, 1)",
+         transition: (theme: Theme) =>
+            theme.transitions.create(["transform"], {
+               duration: theme.transitions.duration.standard,
+            }),
+         backgroundImage: (theme) =>
+            `linear-gradient(0deg, ${alpha(
+               theme.palette.common.black,
+               0.7
+            )}, ${alpha(theme.palette.common.black, 0)})`,
+         transform: "translateY(0)",
       },
    },
    mainContent: {
-      position: "relative",
+      transform: {
+         xs: "translateY(calc(100% - 9rem))",
+         sm: "translateY(calc(100% - 10rem))",
+      },
+
+      "& > *:not(& .titleWrapper)": {
+         opacity: 0,
+      },
       display: "flex",
       flexDirection: "column",
-      alignItems: "center",
+      justifyContent: "center",
+      position: "absolute",
+      inset: 0,
       width: "100%",
-      padding: "1rem",
-      transition: "transform 700ms cubic-bezier(0.19, 1, 0.22, 1)",
+      padding: { xs: 2, sm: 3 },
+      transition: (theme: Theme) =>
+         `transform ${theme.transitions.duration.complex}ms cubic-bezier(0.19, 1, 0.22, 1)`,
       zIndex: 1,
-      "> * + *": { marginTop: "1rem" },
    },
+   titleWrapper: {},
    title: {
       fontWeight: 600,
+      ...getMaxLineStyles(2),
    },
-   summary: {},
+   summary: {
+      ...getMaxLineStyles(3),
+   },
+   btn: {
+      flex: 0.5,
+      borderRadius: 0.3,
+   },
 } as const;
 const EventPreviewCard = ({ event }: EventPreviewCardProps) => {
-   console.log("-> event.backgroundImageUrl", event.backgroundImageUrl);
+   const [eventInterests, setSetEventInterests] = useState([]);
+
+   useEffect(() => {
+      setSetEventInterests(
+         existingDummyInterests.filter((interest) =>
+            event.interestsIds.includes(interest.id)
+         )
+      );
+   }, [event.interestsIds]);
    return (
       <Box sx={styles.root}>
          <Stack
@@ -127,12 +138,66 @@ const EventPreviewCard = ({ event }: EventPreviewCardProps) => {
                { backgroundImage: `url(${event.backgroundImageUrl})` },
             ]}
          >
-            <Box className="mainContent" sx={styles.mainContent}>
-               <Typography className="title" sx={styles.title}>
-                  {event.title}
-               </Typography>
+            <Stack spacing={2} className="mainContent" sx={styles.mainContent}>
+               <Box sx={styles.titleWrapper} className="titleWrapper">
+                  <Typography
+                     variant={"h6"}
+                     className="title"
+                     sx={styles.title}
+                  >
+                     {event.title + event.title}
+                  </Typography>
+                  <Stack
+                     alignItems={"center"}
+                     flexWrap="wrap"
+                     sx={{ mt: 1 }}
+                     direction={"row"}
+                     spacing={1}
+                     className="chipsWrapper"
+                  >
+                     {event.language?.code && (
+                        <WhiteTagChip
+                           icon={<LanguageIcon />}
+                           variant="filled"
+                           tooltipText={`This event is in ${event.language.name}`}
+                           label={event.language.code.toUpperCase()}
+                        />
+                     )}
+                     {eventInterests.slice(0, 1).map((interest) => (
+                        <WhiteTagChip
+                           key={interest.id}
+                           variant="filled"
+                           label={interest.name}
+                        />
+                     ))}
+                     {eventInterests.length > 2 && (
+                        <WhiteTagChip
+                           variant="outlined"
+                           label={`+ ${eventInterests.length - 2} more`}
+                        />
+                     )}
+                  </Stack>
+               </Box>
                <Typography sx={styles.summary}>{event.summary}</Typography>
-            </Box>
+               <Stack spacing={1} direction="row">
+                  <Button
+                     sx={styles.btn}
+                     variant={"contained"}
+                     color="primary"
+                     size={"small"}
+                  >
+                     I'll attend
+                  </Button>
+                  <Button
+                     sx={styles.btn}
+                     variant={"contained"}
+                     color={"secondary"}
+                     size={"small"}
+                  >
+                     see details{" "}
+                  </Button>
+               </Stack>
+            </Stack>
          </Box>
       </Box>
    );
