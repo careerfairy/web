@@ -22,6 +22,9 @@ declare module "@mui/material" {
       main: string;
       dark: string;
    }
+   interface Transition {
+      long: number;
+   }
 }
 
 declare module "@mui/material/styles" {
@@ -50,6 +53,11 @@ declare module "@mui/material/styles" {
 
 export const rootThemeObj = (mode: PaletteMode) =>
    createTheme({
+      transitions: {
+         duration: {
+            complex: 700,
+         },
+      },
       palette: {
          mode,
          primary: {

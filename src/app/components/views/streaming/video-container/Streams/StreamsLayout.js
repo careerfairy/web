@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       height: 0,
       transition: theme.transitions.create(["height"], {
-         duration: theme.transitions.duration.complex,
+         duration: theme.transitions.duration.standard,
          easing: theme.transitions.easing.easeInOut,
       }),
       padding: theme.spacing(STREAM_ELEMENT_SPACING, STREAM_ELEMENT_SPACING, 0),
@@ -78,7 +78,7 @@ const useStyles = makeStyles((theme) => ({
       bottom: 0,
       padding: theme.spacing(STREAM_ELEMENT_SPACING),
       transition: theme.transitions.create(["top"], {
-         duration: theme.transitions.duration.complex,
+         duration: theme.transitions.duration.standard,
          easing: theme.transitions.easing.easeInOut,
       }),
    },
