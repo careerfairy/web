@@ -1,7 +1,7 @@
 import { Identifiable } from "./commonTypes";
 import { Timestamp } from "@firebase/firestore-types";
 
-export interface LiveStreamEvent extends Identifiable {
+export interface LiveStreamEventsdf extends Identifiable {
    author?: {
       email: string;
       groupId: string;
