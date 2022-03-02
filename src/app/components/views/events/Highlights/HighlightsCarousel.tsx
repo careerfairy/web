@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import HighlightItem, { HighLightType } from "./HighlightItem";
 import BasicCarousel from "components/views/common/carousels/BasicCarousel";
 import HighlightVideoDialog from "./HighlightVideoDialog";
+import { useWindowSize } from "react-use";
 
 const arrowFontSize = 30;
 const styles = {
@@ -26,6 +27,14 @@ const styles = {
    },
 };
 const HighlightsCarousel = ({ highLights }: HighlightsCarouselProps) => {
+   const [isTouchScreen, setIsTouchScreen] = useState(false);
+   const dimensions = useWindowSize();
+
+   useEffect(() => {
+      const touch = matchMedia("(hover: none)").matches;
+      setIsTouchScreen(touch);
+   }, [dimensions]);
+
    const [videoUrl, setVideoUrl] = useState(null);
    const handleOpenVideoDialog = (videoUrl: string) => {
       setVideoUrl(videoUrl);
@@ -41,35 +50,13 @@ const HighlightsCarousel = ({ highLights }: HighlightsCarouselProps) => {
             sx={styles.root}
             dots={false}
             slidesToShow={4}
+            infinite
             arrows
+            swipeToSlide
+            swipe={isTouchScreen}
             slidesToScroll={4}
             initialSlide={0}
             variableWidth
-            responsive={[
-               {
-                  breakpoint: 1024,
-                  settings: {
-                     slidesToShow: 3,
-                     slidesToScroll: 3,
-                     infinite: true,
-                  },
-               },
-               {
-                  breakpoint: 600,
-                  settings: {
-                     slidesToShow: 2,
-                     slidesToScroll: 2,
-                     initialSlide: 2,
-                  },
-               },
-               {
-                  breakpoint: 480,
-                  settings: {
-                     slidesToShow: 1,
-                     slidesToScroll: 1,
-                  },
-               },
-            ]}
          >
             {highLights.map((highlight, index) => (
                <HighlightItem

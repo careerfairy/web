@@ -99,7 +99,7 @@ const BasicCarousel: FC<BasicCarouselProps> = (props) => {
       >
          <Slider
             key={isClient ? "client" : "server"}
-            responsive={isClient ? props.responsive : null}
+            responsive={isClient ? propsWithDefaults.responsive : null}
             {...propsWithDefaults}
          >
             {props.children}
