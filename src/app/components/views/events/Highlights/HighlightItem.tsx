@@ -104,15 +104,11 @@ const styles = {
    },
 } as const;
 const HighlightItem = ({
-   highLight: { id, videoUrl, thumbnail, logo },
+   highLight: { videoUrl, thumbnail, logo },
    handleOpenVideoDialog,
 }: HighlightItemProps) => {
    return (
-      <Box
-         // onClick={
-         // () => handleOpenVideoDialog(videoUrl)}
-         sx={styles.root}
-      >
+      <Box onClick={() => handleOpenVideoDialog(videoUrl)} sx={styles.root}>
          <Box sx={styles.circleRoot}>
             <Box className="innerWrapper" sx={styles.innerWrapper}>
                <Box sx={styles.imageWrapper}>
