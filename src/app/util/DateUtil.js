@@ -8,6 +8,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(advancedFormat);
 dayjs.extend(calendar);
+dayjs.tz.setDefault("Europe/Paris");
 
 export default class DateUtil {
    static getTodaysISODate() {
@@ -20,6 +21,10 @@ export default class DateUtil {
       let todaysDate =
          today.getDate() > 9 ? today.getDate() : "0" + today.getDate();
       return todaysYear + "-" + todaysMonth + "-" + todaysDate;
+   }
+
+   static eventPreviewDate(JSDate) {
+      return dayjs(JSDate).format("MMMM Do, HH:mm z");
    }
 
    static getUpcomingDate(JSDate) {
