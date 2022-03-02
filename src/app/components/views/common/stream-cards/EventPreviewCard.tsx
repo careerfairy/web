@@ -7,10 +7,7 @@ import DateUtil from "../../../../util/DateUtil";
 import { AvatarGroup, Button, CardMedia, IconButton } from "@mui/material";
 import { alpha, Theme } from "@mui/material/styles";
 import LanguageIcon from "@mui/icons-material/Language";
-import {
-   getMaxLineStyles,
-   getResizedUrl,
-} from "../../../helperFunctions/HelperFunctions";
+import { getMaxLineStyles } from "../../../helperFunctions/HelperFunctions";
 import WhiteTagChip from "../chips/TagChip";
 import { existingDummyInterests } from "../../events/dummyData";
 import { LiveStreamEvent } from "types/event";
@@ -18,6 +15,7 @@ import Image from "next/image";
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext";
 import Avatar from "@mui/material/Avatar";
 
+const logosWrapperSpacing = 12;
 const styles = {
    root: {},
    dateShareWrapper: {
@@ -132,7 +130,7 @@ const styles = {
       py: 1,
       display: "flex",
       justifyContent: "space-between",
-      height: (theme) => theme.spacing(12),
+      height: (theme) => theme.spacing(logosWrapperSpacing),
       "& > *": {
          flex: 0.5,
       },
@@ -151,6 +149,7 @@ const styles = {
       backgroundColor: "white",
       border: "1px solid black !important",
       boxShadow: 3,
+      width: (theme) => theme.spacing(logosWrapperSpacing * 0.7),
    },
    nextImageWrapper: {
       position: "relative",
@@ -161,7 +160,7 @@ const styles = {
 const EventPreviewCard = ({ event, loading }: EventPreviewCardProps) => {
    const [eventInterests, setSetEventInterests] = useState([]);
    const [hosts, setHosts] = useState(undefined);
-   console.log("-> hosts", hosts);
+
    const firebase = useFirebaseService();
    useEffect(() => {
       setSetEventInterests(
@@ -290,7 +289,7 @@ const EventPreviewCard = ({ event, loading }: EventPreviewCardProps) => {
                      <Typography sx={styles.hostedText} color="text.secondary">
                         HOSTED BY
                      </Typography>
-                     <AvatarGroup max={4}>
+                     <AvatarGroup max={2}>
                         {hosts.map((host) => (
                            <Avatar
                               variant="rounded"

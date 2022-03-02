@@ -13,6 +13,7 @@ const Content = ({ videoUrl, onClose }: ContentProps) => {
             borderRadius: 2,
             boxShadow: 4,
             background: "black",
+            maxHeight: "inherit",
          }}
          component="video"
          controls
@@ -40,6 +41,7 @@ const HighlightVideoDialog = ({
                borderRadius: 2,
                boxShadow: 4,
                background: "black",
+               maxHeight: "calc(100vh - 64px)",
             },
          }}
          fullWidth
