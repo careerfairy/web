@@ -2201,13 +2201,17 @@ class FirebaseService {
                // To be depreciated
                transaction.set(registeredUsersRef, {
                   ...user,
+                  livestreamId,
                   dateRegistered: this.getServerTimestamp(),
+                  authId: uid,
                });
 
                // To be used from now on
                transaction.set(registrantSubCollectionRef, {
                   ...user,
+                  livestreamId,
                   dateRegistered: this.getServerTimestamp(),
+                  authId: uid,
                });
             });
          }
