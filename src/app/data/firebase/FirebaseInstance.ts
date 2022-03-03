@@ -33,7 +33,6 @@ export const createFirebaseInstance = (
 
    app.firestore().settings(getFirestoreSettings(firestoreSettings));
 
-   // we'll want to use the emulators at some point
    if (
       process.env.NODE_ENV === "development" &&
       process.env.NEXT_PUBLIC_FIREBASE_EMULATORS
