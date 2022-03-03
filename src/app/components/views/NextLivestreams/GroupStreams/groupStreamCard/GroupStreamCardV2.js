@@ -37,6 +37,7 @@ import {
 import RegistrationModal from "../../../common/registration-modal";
 import styles from "./GroupStreamCardV2Styles";
 import { languageCodesDict } from "../../../../helperFunctions/streamFormFunctions";
+import { useAuth } from "../../../../../HOCs/AuthProvider";
 
 const maxOptions = 2;
 const GroupStreamCardV2 = memo(
@@ -56,6 +57,7 @@ const GroupStreamCardV2 = memo(
       isAdmin,
    }) => {
       const firebase = useFirebaseService();
+      const { authenticatedUser } = useAuth();
       const { absolutePath, pathname, push, query } = useRouter();
       const linkToStream = useMemo(() => {
          const notLoggedIn =
@@ -247,7 +249,7 @@ const GroupStreamCardV2 = memo(
             });
          }
 
-         firebase.deregisterFromLivestream(livestream.id, user.email);
+         firebase.deregisterFromLivestream(livestream.id, authenticatedUser);
       }
 
       async function startRegistrationProcess() {
@@ -456,7 +458,10 @@ const GroupStreamCardV2 = memo(
                               <AttendButton
                                  size="small"
                                  mobile={mobile}
-                                 disabled={registrationDisabled}
+                                 disabled={
+                                    registrationDisabled ||
+                                    Boolean(joinGroupModalData)
+                                 }
                                  attendButtonLabel={mainButtonLabel}
                                  handleRegisterClick={handleRegisterClick}
                                  checkIfRegistered={checkIfRegistered}

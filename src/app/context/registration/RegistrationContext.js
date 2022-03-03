@@ -211,14 +211,12 @@ export function RegistrationContextProvider({
       (async function () {
          if (groups?.length) {
             setGettingPolicyStatus(true);
-            const {
-               hasAgreedToAll,
-               groupsWithPolicies,
-            } = await GroupsUtil.getPolicyStatus(
-               groups,
-               authenticatedUser.email,
-               checkIfUserAgreedToGroupPolicy
-            );
+            const { hasAgreedToAll, groupsWithPolicies } =
+               await GroupsUtil.getPolicyStatus(
+                  groups,
+                  authenticatedUser.email,
+                  checkIfUserAgreedToGroupPolicy
+               );
             setPolicyGroups(groupsWithPolicies);
             setHasAgreedToAll(hasAgreedToAll);
          } else {
@@ -234,7 +232,7 @@ export function RegistrationContextProvider({
          if (livestream) {
             await registerToLivestream(
                livestream.id,
-               userData,
+               authenticatedUser,
                groupsWithPolicies,
                referrerId
             );
