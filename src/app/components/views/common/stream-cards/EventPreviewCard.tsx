@@ -19,7 +19,7 @@ const logosWrapperSpacing = 12;
 const styles = {
    root: {},
    dateShareWrapper: {
-      p: 1,
+      py: 1,
    },
    date: {
       fontWeight: 600,
@@ -157,7 +157,7 @@ const styles = {
       height: "100%",
    },
 } as const;
-const EventPreviewCard = ({ event, loading }: EventPreviewCardProps) => {
+const EventPreviewCard = ({ event, loading, light }: EventPreviewCardProps) => {
    const [eventInterests, setSetEventInterests] = useState([]);
    const [hosts, setHosts] = useState(undefined);
 
@@ -165,18 +165,20 @@ const EventPreviewCard = ({ event, loading }: EventPreviewCardProps) => {
    useEffect(() => {
       setSetEventInterests(
          existingDummyInterests.filter((interest) =>
-            event.interestsIds.includes(interest.id)
+            event.interestsIds?.includes(interest.id)
          )
       );
    }, [event.interestsIds]);
 
    useEffect(() => {
-      (async function getHosts() {
-         const newHosts = await firebase.getCareerCentersByGroupId(
-            event.groupIds || []
-         );
-         setHosts(newHosts.length ? newHosts : null);
-      })();
+      if (!light) {
+         (async function getHosts() {
+            const newHosts = await firebase.getCareerCentersByGroupId(
+               event.groupIds || []
+            );
+            setHosts(newHosts.length ? newHosts : null);
+         })();
+      }
    }, [event.groupIds]);
 
    return (
@@ -192,7 +194,7 @@ const EventPreviewCard = ({ event, loading }: EventPreviewCardProps) => {
                {DateUtil.eventPreviewDate(event.startDate)}
             </Typography>
             <IconButton>
-               <ShareIcon fontSize={"large"} />
+               <ShareIcon />
             </IconButton>
          </Stack>
          <Box
@@ -267,50 +269,55 @@ const EventPreviewCard = ({ event, loading }: EventPreviewCardProps) => {
                </Stack>
             </Stack>
          </Box>
-         <Stack spacing={2} direction={"row"} sx={styles.logosWrapper}>
-            <CardMedia title="Your title">
-               <div
-                  style={{
-                     position: "relative",
-                     width: "100%",
-                     height: "100%",
-                  }}
-               >
-                  <Image
-                     src={event.companyLogoUrl}
-                     layout="fill"
-                     objectFit="contain"
-                  />
-               </div>
-            </CardMedia>
-            <Box sx={styles.hostsWrapper}>
-               {hosts && (
-                  <Box>
-                     <Typography sx={styles.hostedText} color="text.secondary">
-                        HOSTED BY
-                     </Typography>
-                     <AvatarGroup max={2}>
-                        {hosts.map((host) => (
-                           <Avatar
-                              variant="rounded"
-                              key={host.id}
-                              title={`${host.universityName}`}
-                              sx={styles.hostAvatar}
-                           >
-                              <Box sx={styles.nextImageWrapper}>
-                                 <Image
-                                    src={host.logoUrl}
-                                    layout="fill"
-                                    objectFit="contain"
-                                 />
-                              </Box>
-                           </Avatar>
-                        ))}
-                     </AvatarGroup>
-                  </Box>
-               )}
-            </Box>
-         </Stack>
+         {!light && (
+            <Stack spacing={2} direction={"row"} sx={styles.logosWrapper}>
+               <CardMedia title="Your title">
+                  <div
+                     style={{
+                        position: "relative",
+                        width: "100%",
+                        height: "100%",
+                     }}
+                  >
+                     <Image
+                        src={event.companyLogoUrl}
+                        layout="fill"
+                        objectFit="contain"
+                     />
+                  </div>
+               </CardMedia>
+               <Box sx={styles.hostsWrapper}>
+                  {hosts && (
+                     <Box>
+                        <Typography
+                           sx={styles.hostedText}
+                           color="text.secondary"
+                        >
+                           HOSTED BY
+                        </Typography>
+                        <AvatarGroup max={2}>
+                           {hosts.map((host) => (
+                              <Avatar
+                                 variant="rounded"
+                                 key={host.id}
+                                 title={`${host.universityName}`}
+                                 sx={styles.hostAvatar}
+                              >
+                                 <Box sx={styles.nextImageWrapper}>
+                                    <Image
+                                       src={host.logoUrl}
+                                       layout="fill"
+                                       objectFit="contain"
+                                    />
+                                 </Box>
+                              </Avatar>
+                           ))}
+                        </AvatarGroup>
+                     </Box>
+                  )}
+               </Box>
+            </Stack>
+         )}
       </Box>
    );
 };
@@ -318,5 +325,6 @@ const EventPreviewCard = ({ event, loading }: EventPreviewCardProps) => {
 interface EventPreviewCardProps {
    event: LiveStreamEvent;
    loading?: boolean;
+   light?: boolean;
 }
 export default EventPreviewCard;

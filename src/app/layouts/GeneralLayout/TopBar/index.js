@@ -6,7 +6,7 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import Link from "materialUI/NextNavLink";
 import { MainLogo } from "components/logos";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import useGeneralLinks from "components/custom-hook/useGeneralLinks";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -14,8 +14,7 @@ import { useAuth } from "../../../HOCs/AuthProvider";
 import LoginButton from "../../../components/views/common/LoginButton";
 import useGeneralHeader from "../../../components/custom-hook/useGeneralHeader";
 import NavLinks from "../../../components/views/header/NavLinks";
-import MissingDataButton
-   from "../../../components/views/missingData/MissingDataButton";
+import MissingDataButton from "../../../components/views/missingData/MissingDataButton";
 
 const useStyles = makeStyles((theme) => ({
    navIconButton: {
@@ -25,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const TopBar = () => {
+const TopBar = ({ hideNavOnScroll }) => {
    const theme = useTheme();
    const { GeneralHeader, headerColors } = useGeneralHeader();
    const classes = useStyles({
@@ -37,13 +36,15 @@ const TopBar = () => {
    const { authenticatedUser } = useAuth();
 
    return (
-      <GeneralHeader permanent>
+      <GeneralHeader permanent={!hideNavOnScroll}>
          <Box display="flex" alignItems="center">
             <IconButton
                style={{ marginRight: "1rem" }}
                color="primary"
                onClick={handleDrawerOpen}
-               size="large">
+               autoFocus
+               size="large"
+            >
                <MenuIcon />
             </IconButton>
             <MainLogo />
@@ -53,8 +54,9 @@ const TopBar = () => {
                links={mainLinks}
                navLinksActiveColor={theme.palette.primary.main}
             />
-         </Hidden>s
-         <Box sx={{display: "flex", alignItems: "center"}}>
+         </Hidden>
+         s
+         <Box sx={{ display: "flex", alignItems: "center" }}>
             <Hidden lgDown>
                <MissingDataButton />
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
@@ -68,7 +70,8 @@ const TopBar = () => {
                      className={classes.navIconButton}
                      color="primary"
                      href="/profile"
-                     size="large">
+                     size="large"
+                  >
                      <AccountCircleOutlinedIcon />
                   </IconButton>
                )}

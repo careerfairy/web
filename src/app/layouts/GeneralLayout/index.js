@@ -6,7 +6,7 @@ import FooterV2 from "../../components/views/footer/FooterV2";
 import { Box } from "@mui/material";
 
 const drawerWidth = 300;
-const GeneralLayout = ({ children, fullScreen }) => {
+const GeneralLayout = ({ children, fullScreen, hideNavOnScroll = false }) => {
    return (
       <Box
          sx={(theme) => ({
@@ -14,7 +14,7 @@ const GeneralLayout = ({ children, fullScreen }) => {
             minHeight: fullScreen && "100vh",
          })}
       >
-         <TopBar />
+         <TopBar hideNavOnScroll={hideNavOnScroll} />
          <NavBar drawerWidth={drawerWidth} />
          <Box sx={styles.wrapper}>
             <Box sx={styles.contentContainer}>

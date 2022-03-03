@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import { LiveStreamEvent } from "types/event";
-import { delay } from "../../../helperFunctions/HelperFunctions";
-import { dummyEvent } from "../dummyData";
-import EventPreviewCard from "../../common/stream-cards/EventPreviewCard";
+import { delay } from "../../helperFunctions/HelperFunctions";
+import { dummyEvent } from "./dummyData";
+import EventPreviewCard from "../common/stream-cards/EventPreviewCard";
 
 const FeaturedAndNextEvents = () => {
    const [featuredEvent, setFeaturedEvent] =
@@ -33,10 +33,10 @@ const FeaturedAndNextEvents = () => {
    };
 
    return (
-      <Grid container spacing={2}>
+      <Grid sx={{ mb: 3 }} container spacing={2}>
          {featuredEvent && (
             <Grid item xs={12} sm={nextEvents ? 6 : 12}>
-               <EventPreviewCard event={featuredEvent} />
+               <EventPreviewCard light event={featuredEvent} />
             </Grid>
          )}
          {nextEvents && (
