@@ -40,6 +40,7 @@ import ConfirmRecordingDialog from "./ConfirmRecordingDialog";
 import useStreamAdminPreferences from "../../../../../custom-hook/useStreamAdminPreferences";
 import NextGenIcon from "@mui/icons-material/FiberNew";
 import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
+import PropTypes from "prop-types";
 
 const styles = {
    root: {
