@@ -431,6 +431,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          />
          <RegistrationModal
             open={Boolean(joinGroupModalData)}
+            handleClose={handleCloseJoinModal}
             onFinish={handleCloseJoinModal}
             promptOtherEventsOnFinal
             livestream={joinGroupModalData?.livestream}
