@@ -3,7 +3,7 @@ import HighlightItem, { HighLightType } from "./HighlightItem";
 import BasicCarousel from "components/views/common/carousels/BasicCarousel";
 import HighlightVideoDialog from "./HighlightVideoDialog";
 import { useWindowSize } from "react-use";
-import { dummyHighlights } from "../dummyData";
+import { dummyHighlights } from "./dummyData";
 
 const arrowFontSize = 30;
 const styles = {
