@@ -15,12 +15,14 @@
 -  `gsutil ls "gs://careerfairy-backup/Thu Mar 03 2022*"`: Find the most recent backup folder
    -  Modify the date to your current time
    -  Or check the most recent job on the [Google Cloud Dashboard](https://console.cloud.google.com/firestore/import-export?authuser=1&project=careerfairy-e1fd9)
--  `gsutil -m cp -r "gs://careerfairy-backup/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)/" emulatorData/`: Will download the backup folder into the local folder `emulatorData/`
+-  `gsutil -m cp -r "gs://careerfairy-backup/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)/" emulatorData/`: Will download the backup folder into the local folder `emulatorData/` (you need to create this folder)
 
 ### Start the emulators
 
 -  With backup data:
    -  `./scripts/run-locally-with-emulators.sh "./emulatorData/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)"`
-   -  Heads up! Importing data into the emulator could take a while, you also need at least ~7GB of free memory for the emulator heap.
+   -  Heads up! Importing data into the emulator could take a while, you also need at least ~10GB of free memory for the emulator heap.
+   -  To save your firestore data changes, run the script with the arg `--export-on-exit`:
+      -  `./scripts/run-locally-with-emulators.sh "./emulatorData/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)" --export-on-exit`
 -  Empty data:
    -  `./scripts/run-locally-with-emulators.sh` or `npm run start:emulators`

@@ -2,6 +2,7 @@
 /node_modules/
 
 /emulatorData/
+/firebase-export-*/
 
 /.firebase/
 /firebase-debug.log
@@ -10,3 +11,4 @@
 .DS_Store
 
 *.log
+
