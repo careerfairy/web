@@ -13,6 +13,7 @@ const EventsPage = () => {
          <Container>
             <HighlightsCarousel />
             <FeaturedAndNextEvents />
+            <EventsPreview typeOfEvents={EventsTypes.recommended} />
             <EventsPreview typeOfEvents={EventsTypes.comingUp} />
             <EventsPreview typeOfEvents={EventsTypes.myNext} />
          </Container>

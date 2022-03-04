@@ -7,7 +7,10 @@ import DateUtil from "../../../../util/DateUtil";
 import { AvatarGroup, Button, CardMedia, IconButton } from "@mui/material";
 import { alpha, Theme } from "@mui/material/styles";
 import LanguageIcon from "@mui/icons-material/Language";
-import { getMaxLineStyles } from "../../../helperFunctions/HelperFunctions";
+import {
+   getMaxLineStyles,
+   getResizedUrl,
+} from "../../../helperFunctions/HelperFunctions";
 import WhiteTagChip from "../chips/TagChip";
 import { existingDummyInterests } from "../../events/dummyData";
 import { LiveStreamEvent } from "types/event";
@@ -24,9 +27,16 @@ const styles = {
    date: {
       fontWeight: 600,
    },
+   backgroundImage: {
+      transition: (theme: Theme) =>
+         theme.transitions.create(["transform"], {
+            duration: theme.transitions.duration.standard,
+            easing: theme.transitions.easing.easeInOut,
+         }),
+   },
    mainContentHoverStyles: {
       "&:hover, &:focus-within": {
-         "&:before": {
+         "& .backgroundImage": {
             transform: "scale(1.1)",
          },
          "& .title": {
@@ -61,17 +71,7 @@ const styles = {
       width: "100%",
       color: "white",
       boxShadow: 5,
-      "&:before": {
-         backgroundSize: "cover",
-         content: "''",
-         position: "absolute",
-         inset: 0,
-         transition: (theme: Theme) =>
-            theme.transitions.create(["transform"], {
-               duration: theme.transitions.duration.standard,
-               easing: theme.transitions.easing.easeInOut,
-            }),
-      },
+      "&:before": {},
 
       "&:after": {
          content: "''",
@@ -200,14 +200,19 @@ const EventPreviewCard = ({ event, loading, light }: EventPreviewCardProps) => {
          <Box
             sx={[
                styles.mainContentWrapper,
-               {
-                  "&:before": {
-                     backgroundImage: `url(${event.backgroundImageUrl})`,
-                  },
-               },
                !loading && styles.mainContentHoverStyles,
             ]}
          >
+            <Box
+               alt="Illustration"
+               src={getResizedUrl(event.backgroundImageUrl, "lg")}
+               layout="fill"
+               className="backgroundImage"
+               sx={styles.backgroundImage}
+               component={Image}
+               priority
+               objectFit="cover"
+            />
             <Stack spacing={2} className="mainContent" sx={styles.mainContent}>
                <Box sx={styles.titleWrapper} className="titleWrapper">
                   <Typography
@@ -280,7 +285,7 @@ const EventPreviewCard = ({ event, loading, light }: EventPreviewCardProps) => {
                      }}
                   >
                      <Image
-                        src={event.companyLogoUrl}
+                        src={getResizedUrl(event.companyLogoUrl, "lg")}
                         layout="fill"
                         objectFit="contain"
                      />
@@ -305,7 +310,7 @@ const EventPreviewCard = ({ event, loading, light }: EventPreviewCardProps) => {
                               >
                                  <Box sx={styles.nextImageWrapper}>
                                     <Image
-                                       src={host.logoUrl}
+                                       src={getResizedUrl(host.logoUrl, "lg")}
                                        layout="fill"
                                        objectFit="contain"
                                     />
