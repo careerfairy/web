@@ -2195,6 +2195,10 @@ class FirebaseService {
                      ...user,
                      dateAgreed: this.getServerTimestamp(),
                   });
+                  transaction.set(authUserInPolicyRef, {
+                     ...user,
+                     dateAgreed: this.getServerTimestamp(),
+                  });
                }
                // To be depreciated
                transaction.set(registeredUsersRef, {
