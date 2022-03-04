@@ -615,16 +615,12 @@ const GroupStreamCardV2 = memo(
             </ClickAwayListener>
             <RegistrationModal
                open={Boolean(joinGroupModalData)}
+               handleClose={handleCloseJoinModal}
                onFinish={handleCloseJoinModal}
                promptOtherEventsOnFinal={!query.groupId}
                livestream={joinGroupModalData?.livestream}
                groups={joinGroupModalData?.groups}
                targetGroupId={joinGroupModalData?.targetGroupId}
-               handleClose={
-                  joinGroupModalData?.livestream
-                     ? undefined
-                     : handleCloseJoinModal
-               }
             />
          </Fragment>
       );
