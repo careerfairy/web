@@ -1,12 +1,7 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useMemo } from "react";
-import makeStyles from '@mui/styles/makeStyles';
-import {
-   CircularProgress,
-   Container,
-   Grid,
-   Typography,
-} from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
+import { CircularProgress, Container, Grid, Typography } from "@mui/material";
 import { isLoaded, useFirestoreConnect, isEmpty } from "react-redux-firebase";
 import { useSelector } from "react-redux";
 import Search from "./Search";
@@ -36,13 +31,14 @@ const AdminStreams = ({ typeOfStream }) => {
             where: [
                [
                   "start",
-                  ">",
+                  typeOfStream === "upcoming" ? ">" : "<",
                   new Date(Date.now() - fortyFiveMinutesInMilliseconds),
                ],
                ["test", "==", false],
             ],
-            orderBy: ["start", "asc"],
-            storeAs: "upcoming-livestreams",
+            orderBy: ["start", typeOfStream === "upcoming" ? "asc" : "desc"],
+            limit: 50,
+            storeAs: `${typeOfStream}-livestreams`,
          },
       ],
       [typeOfStream]
@@ -51,7 +47,7 @@ const AdminStreams = ({ typeOfStream }) => {
    useFirestoreConnect(query);
 
    const streams = useSelector(
-      (state) => state.firestore.ordered["upcoming-livestreams"]
+      (state) => state.firestore.ordered[`${typeOfStream}-livestreams`]
    );
 
    return (
@@ -72,7 +68,10 @@ const AdminStreams = ({ typeOfStream }) => {
                            <Typography>No upcoming streams...</Typography>
                         </Grid>
                      ) : (
-                        <StreamsContainer streams={streams} />
+                        <StreamsContainer
+                           isUpcoming={typeOfStream === "upcoming"}
+                           streams={streams}
+                        />
                      )}
                   </Grid>
                </Grid>
