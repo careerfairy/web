@@ -80,6 +80,12 @@ const useAdminLinks = () => {
                basePath: `/admin/upcoming-livestreams`,
             },
             {
+               href: `/admin/past-livestreams`,
+               icon: StreamIcon,
+               title: "Past Streams",
+               basePath: `/admin/past-livestreams`,
+            },
+            {
                href: `/admin/query-users`,
                icon: FindIcon,
                title: "Query and Manage Users",
