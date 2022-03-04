@@ -2397,8 +2397,6 @@ class FirebaseService {
             return transaction.get(userRef).then((userDoc) => {
                const user = userDoc.data();
                transaction.update(livestreamRef, {
-                  // To be used from now on
-                  registrants: firebase.firestore.FieldValue.arrayUnion(uid),
                   // To be depreciated
                   registeredUsers:
                      firebase.firestore.FieldValue.arrayUnion(email),
@@ -2465,7 +2463,6 @@ class FirebaseService {
       let batch = this.firestore.batch();
       batch.update(livestreamRef, {
          registeredUsers: firebase.firestore.FieldValue.arrayRemove(email),
-         registrants: firebase.firestore.FieldValue.arrayRemove(uid),
       });
       // To be depreciated
       batch.delete(registeredUsersRef);
