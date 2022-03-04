@@ -101,7 +101,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
    const streamAdminPreferences = useStreamAdminPreferences(stream.id);
 
    useEffect(async () => {
-      if (stream.id) {
+      if (stream?.id) {
          const tokenDoc = await firebase.getLivestreamRecordingSid(stream.id);
          const recordingSid = tokenDoc.data()?.sid;
          if (recordingSid) {
