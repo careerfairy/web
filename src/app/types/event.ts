@@ -16,6 +16,7 @@ export interface LiveStreamEvent extends Identifiable {
    duration?: number;
    groupIds?: string[];
    interestsIds?: string[];
+   registeredUsers?: string[];
    isRecording?: boolean;
    language?: {
       code?: string;

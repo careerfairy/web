@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import livestreamRepo from "../../../../data/firebase/LivestreamRepository";
-import { QuerySnapshot } from "@firebase/firestore-types";
-import { CircularProgress, Grid, Typography } from "@mui/material";
+import { CircularProgress, Typography } from "@mui/material";
 import { LiveStreamEvent } from "../../../../types/event";
 import EventPreviewCard from "../../common/stream-cards/EventPreviewCard";
 import { useDispatch } from "react-redux";
@@ -14,7 +13,7 @@ const styles = {
       display: "grid",
       gap: (theme) => theme.spacing(2),
       gridAutoFlow: "column",
-      gridAutoColumns: (theme) => theme.spacing(36),
+      gridAutoColumns: (theme) => theme.spacing(40),
       scrollSnapType: "x",
       transition: "transform 0.5s ease-out 0s",
       willChange: "transform",
@@ -27,30 +26,27 @@ const EventsPreview = ({ typeOfEvents, limit = 12 }: EventsProps) => {
    const dispatch = useDispatch();
    const [events, setEvents] = useState<LiveStreamEvent[]>(undefined);
    const [loading, setLoading] = useState(true);
-   const { authenticatedUser } = useAuth();
-
+   const { authenticatedUser, userData } = useAuth();
    useEffect(() => {
       (async function getEvents() {
-         let newEvents = null;
-         let snapshots: QuerySnapshot;
+         let newEvents: LiveStreamEvent[] | null;
          try {
             setLoading(true);
             if (typeOfEvents === EventsTypes.comingUp) {
-               snapshots = await livestreamRepo.getUpcomingEvents(limit);
+               newEvents = await livestreamRepo.getUpcomingEvents(limit);
             }
             if (typeOfEvents === EventsTypes.recommended) {
-            }
-            if (typeOfEvents === EventsTypes.myNext) {
-               snapshots = await livestreamRepo.getRegisteredEvents(
+               newEvents = await livestreamRepo.getRecommendEvents(
                   authenticatedUser.email,
+                  userData?.interestsIds,
                   limit
                );
             }
-            if (snapshots && !snapshots.empty) {
-               newEvents = snapshots.docs.map((doc) => ({
-                  id: doc.id,
-                  ...doc.data(),
-               }));
+            if (typeOfEvents === EventsTypes.myNext) {
+               newEvents = await livestreamRepo.getRegisteredEvents(
+                  authenticatedUser.email,
+                  limit
+               );
             }
          } catch (e) {
             dispatch(actions.sendGeneralError(e));
@@ -58,7 +54,7 @@ const EventsPreview = ({ typeOfEvents, limit = 12 }: EventsProps) => {
          setLoading(false);
          setEvents(newEvents);
       })();
-   }, [typeOfEvents, authenticatedUser.email]);
+   }, [typeOfEvents, authenticatedUser.email, userData?.interestsIds]);
 
    const getTitle = () => {
       switch (typeOfEvents) {
