@@ -162,6 +162,8 @@ const QuestionContainer = memo(
       const { authenticatedUser, userData } = useAuth();
       const { tutorialSteps, handleConfirmStep } = useContext(TutorialContext);
       const [loading, setLoading] = useState(false);
+      const [loadingComment, setLoadingComment] = useState(false);
+
       const isEmpty =
          !newCommentTitle.trim() ||
          (!userData && !(livestream?.test || livestream.openStream));
@@ -223,6 +225,7 @@ const QuestionContainer = memo(
                return;
             }
 
+            setLoadingComment(true);
             const newComment = streamer
                ? {
                     title: newCommentTitle,
@@ -250,6 +253,7 @@ const QuestionContainer = memo(
             }
 
             setNewCommentTitle("");
+            setLoadingComment(false);
             makeGloballyActive();
          } catch (error) {
             console.log("Error: " + error);
@@ -422,6 +426,7 @@ const QuestionContainer = memo(
                         className={classes.chatInput}
                         onKeyPress={addNewCommentOnEnter}
                         placeholder="Send a reaction..."
+                        disabled={loadingComment}
                         fullWidth
                         size="small"
                         variant="outlined"
@@ -429,6 +434,7 @@ const QuestionContainer = memo(
                            maxLength: 340,
                            endAdornment: (
                               <PlayIconButton
+                                 disabled={loadingComment}
                                  isEmpty={isEmpty}
                                  addNewComment={() => {
                                     addNewComment();
