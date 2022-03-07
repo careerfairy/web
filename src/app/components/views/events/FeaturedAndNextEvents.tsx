@@ -42,7 +42,13 @@ const FeaturedAndNextEvents = () => {
 
    return (
       <Stack sx={styles.root} direction={"row"} spacing={2}>
-         {featuredEvent && <EventPreviewCard light event={featuredEvent} />}
+         {(featuredEvent || loadingFeaturedEvent) && (
+            <EventPreviewCard
+               loading={loadingFeaturedEvent}
+               light
+               event={featuredEvent}
+            />
+         )}
          {nextEvents && <Typography>Next Events</Typography>}
       </Stack>
    );
