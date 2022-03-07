@@ -28,7 +28,7 @@ const ScreenShareDeniedModal = () => {
             }}
          >
             <ScreenShareIcon sx={{ mr: 1 }} />
-            Missing Permissions
+            Screen Share Not Allowed
          </DialogTitle>
          <DialogContent dividers>
             <DialogContentText>
