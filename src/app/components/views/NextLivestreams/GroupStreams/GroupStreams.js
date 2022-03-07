@@ -45,13 +45,14 @@ const styles = {
 const Wrapper = ({ children, streamId }) => {
    return (
       <LazyLoad
-         style={{ flex: 1, display: "flex", width: "-webkit-fill-available" }}
          key={streamId}
+         style={{ width: "100%" }}
          height={405}
-         // unmountIfInvisible
+         debounce={500}
+         unmountIfInvisible
          scroll
          offset={[0, 0]}
-         placeholder={<Spinner />}
+         placeholder={<EventPreviewCard loading />}
       >
          {children}
       </LazyLoad>
@@ -100,27 +101,27 @@ const GroupStreams = ({
                xl={4}
                item
             >
-               {/*<Wrapper index={index} streamId={livestream.id}>*/}
-               <EventPreviewCard
-                  onRegisterClick={handleClickRegister}
-                  event={livestream}
-               />
-               {/*<GroupStreamCardV2*/}
-               {/*   mobile={mobile}*/}
-               {/*   isPastLivestreams={isPastLivestreams}*/}
-               {/*   setGlobalCardHighlighted={setGlobalCardHighlighted}*/}
-               {/*   globalCardHighlighted={globalCardHighlighted}*/}
-               {/*   groupData={groupData}*/}
-               {/*   listenToUpcoming={listenToUpcoming}*/}
-               {/*   careerCenterId={careerCenterId}*/}
-               {/*   livestreamId={livestreamId}*/}
-               {/*   user={user}*/}
-               {/*   userData={userData}*/}
-               {/*   id={livestream.id}*/}
-               {/*   key={livestream.id}*/}
-               {/*   livestream={livestream}*/}
-               {/*/>*/}
-               {/*</Wrapper>*/}
+               <Wrapper streamId={livestream.id}>
+                  <EventPreviewCard
+                     onRegisterClick={handleClickRegister}
+                     event={livestream}
+                  />
+                  {/*<GroupStreamCardV2*/}
+                  {/*   mobile={mobile}*/}
+                  {/*   isPastLivestreams={isPastLivestreams}*/}
+                  {/*   setGlobalCardHighlighted={setGlobalCardHighlighted}*/}
+                  {/*   globalCardHighlighted={globalCardHighlighted}*/}
+                  {/*   groupData={groupData}*/}
+                  {/*   listenToUpcoming={listenToUpcoming}*/}
+                  {/*   careerCenterId={careerCenterId}*/}
+                  {/*   livestreamId={livestreamId}*/}
+                  {/*   user={user}*/}
+                  {/*   userData={userData}*/}
+                  {/*   id={livestream.id}*/}
+                  {/*   key={livestream.id}*/}
+                  {/*   livestream={livestream}*/}
+                  {/*/>*/}
+               </Wrapper>
             </Grid>
          );
       }
