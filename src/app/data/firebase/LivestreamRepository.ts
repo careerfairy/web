@@ -2,6 +2,7 @@ import firebase from "firebase/app";
 import firebaseApp from "./FirebaseInstance";
 import { QuerySnapshot } from "@firebase/firestore-types";
 import { LiveStreamEvent } from "../../types/event";
+import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../../constants/streams";
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LiveStreamEvent[] | null>;
@@ -15,12 +16,29 @@ export interface ILivestreamRepository {
       limit?: number
    ): Promise<LiveStreamEvent[] | null>;
    getDocumentData(documentSnapshot: QuerySnapshot): LiveStreamEvent[] | null;
+   listenToRecommendedEvents(
+      userEmail: string,
+      userInterestsIds: string[],
+      limit: number,
+      callback: (snapshot: QuerySnapshot) => void
+   );
+   listenToRegisteredEvents(
+      userEmail: string,
+      limit: number,
+      callback: (snapshot: QuerySnapshot) => void
+   );
+   listenToUpcomingEvents(
+      limit: number,
+      callback: (snapshot: QuerySnapshot) => void
+   );
 }
 
 class FirebaseLivestreamRepository implements ILivestreamRepository {
    private earliestEventBufferTime: Date;
    constructor(private readonly firestore: firebase.firestore.Firestore) {
-      this.earliestEventBufferTime = new Date(Date.now() - 2700000);
+      this.earliestEventBufferTime = new Date(
+         Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
+      );
    }
 
    getDocumentData(documentSnapshot: QuerySnapshot): LiveStreamEvent[] | null {
@@ -29,6 +47,7 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          docs = documentSnapshot.docs.map((doc) => ({
             ...doc.data(),
             id: doc.id,
+            startDate: doc.data().start?.toDate?.(),
          }));
       }
       return docs;
@@ -47,6 +66,21 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
       return this.getDocumentData(snapshots);
    }
 
+   listenToUpcomingEvents(
+      limit: number,
+      callback: (snapshot: QuerySnapshot) => void
+   ) {
+      let livestreamRef = this.firestore
+         .collection("livestreams")
+         .where("start", ">", this.earliestEventBufferTime)
+         .where("test", "==", false)
+         .orderBy("start", "asc");
+      if (limit) {
+         livestreamRef = livestreamRef.limit(limit);
+      }
+      return livestreamRef.onSnapshot(callback);
+   }
+
    async getRegisteredEvents(
       userEmail: string,
       limit?: number
@@ -63,6 +97,24 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
       }
       const snapshots = await livestreamRef.get();
       return this.getDocumentData(snapshots);
+   }
+
+   listenToRegisteredEvents(
+      userEmail: string,
+      limit: number,
+      callback: (snapshot: QuerySnapshot) => void
+   ) {
+      if (!userEmail) return null;
+      let livestreamRef = this.firestore
+         .collection("livestreams")
+         .where("start", ">", this.earliestEventBufferTime)
+         .where("test", "==", false)
+         .where("registeredUsers", "array-contains", userEmail)
+         .orderBy("start", "asc");
+      if (limit) {
+         livestreamRef = livestreamRef.limit(limit);
+      }
+      return livestreamRef.onSnapshot(callback);
    }
 
    async getRecommendEvents(
@@ -88,6 +140,24 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          );
       }
       return interestedEvents;
+   }
+
+   listenToRecommendedEvents(
+      userEmail: string,
+      userInterestsIds: string[],
+      limit: number,
+      callback: (snapshot: QuerySnapshot) => void
+   ) {
+      let livestreamRef = this.firestore
+         .collection("livestreams")
+         .where("start", ">", this.earliestEventBufferTime)
+         .where("test", "==", false)
+         .where("interestsIds", "array-contains-any", userInterestsIds)
+         .orderBy("start", "asc");
+      if (limit) {
+         livestreamRef = livestreamRef.limit(limit);
+      }
+      return livestreamRef.onSnapshot(callback);
    }
 }
 

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Grid, LinearProgress, Typography } from "@mui/material";
-import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 import LazyLoad from "react-lazyload";
 import Spinner from "./groupStreamCard/Spinner";
-import { useAuth } from "../../../../HOCs/AuthProvider";
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers";
+import EventPreviewCard from "../../common/stream-cards/EventPreviewCard";
+import RegistrationModal from "../../common/registration-modal";
+import { useRouter } from "next/router";
+import useRegistrationModal from "../../../custom-hook/useRegistrationModal";
 
 const gridItemHeight = 530;
 const styles = {
@@ -32,11 +34,11 @@ const styles = {
       minHeight: "50vh",
    },
    streamGridItem: {
-      height: gridItemHeight,
-      display: "flex",
+      // height: gridItemHeight,
+      // display: "flex",
    },
    dynamicHeight: {
-      height: "auto",
+      // height: "auto",
    },
 };
 
@@ -45,7 +47,7 @@ const Wrapper = ({ children, streamId }) => {
       <LazyLoad
          style={{ flex: 1, display: "flex", width: "-webkit-fill-available" }}
          key={streamId}
-         height={gridItemHeight}
+         height={405}
          // unmountIfInvisible
          scroll
          offset={[0, 0]}
@@ -67,7 +69,11 @@ const GroupStreams = ({
    selectedOptions,
    isPastLivestreams,
 }) => {
-   const { userData, authenticatedUser: user } = useAuth();
+   const {
+      query: { groupId },
+   } = useRouter();
+   const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
+      useRegistrationModal();
    const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false);
    const searchedButNoResults =
       selectedOptions?.length && !searching && !livestreams?.length;
@@ -94,61 +100,81 @@ const GroupStreams = ({
                xl={4}
                item
             >
-               <Wrapper index={index} streamId={livestream.id}>
-                  <GroupStreamCardV2
-                     mobile={mobile}
-                     isPastLivestreams={isPastLivestreams}
-                     setGlobalCardHighlighted={setGlobalCardHighlighted}
-                     globalCardHighlighted={globalCardHighlighted}
-                     groupData={groupData}
-                     listenToUpcoming={listenToUpcoming}
-                     careerCenterId={careerCenterId}
-                     livestreamId={livestreamId}
-                     user={user}
-                     userData={userData}
-                     id={livestream.id}
-                     key={livestream.id}
-                     livestream={livestream}
-                  />
-               </Wrapper>
+               {/*<Wrapper index={index} streamId={livestream.id}>*/}
+               <EventPreviewCard
+                  onRegisterClick={handleClickRegister}
+                  event={livestream}
+               />
+               {/*<GroupStreamCardV2*/}
+               {/*   mobile={mobile}*/}
+               {/*   isPastLivestreams={isPastLivestreams}*/}
+               {/*   setGlobalCardHighlighted={setGlobalCardHighlighted}*/}
+               {/*   globalCardHighlighted={globalCardHighlighted}*/}
+               {/*   groupData={groupData}*/}
+               {/*   listenToUpcoming={listenToUpcoming}*/}
+               {/*   careerCenterId={careerCenterId}*/}
+               {/*   livestreamId={livestreamId}*/}
+               {/*   user={user}*/}
+               {/*   userData={userData}*/}
+               {/*   id={livestream.id}*/}
+               {/*   key={livestream.id}*/}
+               {/*   livestream={livestream}*/}
+               {/*/>*/}
+               {/*</Wrapper>*/}
             </Grid>
          );
       }
    });
 
    return (
-      <Grid item xs={12}>
-         <Grid container spacing={mobile ? 2 : 4}>
-            {groupData.id || listenToUpcoming ? (
-               searching ? (
-                  <Grid xs={12} item sx={styles.loaderWrapper}>
-                     <LinearProgress style={{ width: "80%" }} color="primary" />
-                  </Grid>
-               ) : livestreams.length ? (
-                  renderStreamCards
-               ) : (
-                  <Grid xs={12} item sx={styles.loaderWrapper}>
-                     <Typography
-                        sx={styles.emptyMessage}
-                        align="center"
-                        variant="h5"
-                        style={{ marginTop: 100 }}
-                     >
-                        {searchedButNoResults ? (
-                           "We couldn't find anything... 😕"
-                        ) : (
-                           <strong>
-                              {groupData.universityName} currently has no{" "}
-                              {isPastLivestreams ? "past" : "scheduled"} live
-                              streams
-                           </strong>
-                        )}
-                     </Typography>
-                  </Grid>
-               )
-            ) : null}
+      <>
+         <Grid item xs={12}>
+            <Grid container spacing={mobile ? 2 : 4}>
+               {groupData.id || listenToUpcoming ? (
+                  searching ? (
+                     <Grid xs={12} item sx={styles.loaderWrapper}>
+                        <LinearProgress
+                           style={{ width: "80%" }}
+                           color="primary"
+                        />
+                     </Grid>
+                  ) : livestreams.length ? (
+                     renderStreamCards
+                  ) : (
+                     <Grid xs={12} item sx={styles.loaderWrapper}>
+                        <Typography
+                           sx={styles.emptyMessage}
+                           align="center"
+                           variant="h5"
+                           style={{ marginTop: 100 }}
+                        >
+                           {searchedButNoResults ? (
+                              "We couldn't find anything... 😕"
+                           ) : (
+                              <strong>
+                                 {groupData.universityName} currently has no{" "}
+                                 {isPastLivestreams ? "past" : "scheduled"} live
+                                 streams
+                              </strong>
+                           )}
+                        </Typography>
+                     </Grid>
+                  )
+               ) : null}
+            </Grid>
          </Grid>
-      </Grid>
+         {joinGroupModalData && (
+            <RegistrationModal
+               open={Boolean(joinGroupModalData)}
+               onFinish={handleCloseJoinModal}
+               promptOtherEventsOnFinal={!groupId}
+               livestream={joinGroupModalData?.livestream}
+               groups={joinGroupModalData?.groups}
+               targetGroupId={joinGroupModalData?.targetGroupId}
+               handleClose={handleCloseJoinModal}
+            />
+         )}
+      </>
    );
 };
 export default GroupStreams;

@@ -191,8 +191,8 @@ const getComponents = (theme: Theme) => ({
             fontSize: "1rem",
          },
          root: {
-            margin: "0.5em",
-            marginLeft: 0,
+            // margin: "0.5em",
+            // marginLeft: 0,
          },
       },
    },

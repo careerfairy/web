@@ -1,4 +1,6 @@
 import { mainProductionDomain, nextGenSubDomain } from "../constants/domains";
+import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../constants/streams";
+import { LiveStreamEvent } from "../types/event";
 
 export const shouldWeRedirectNextGen = (
    currentHost: string,
@@ -27,4 +29,37 @@ export const shouldWeRedirectNextGen = (
 
    // we don't need to redirect
    return null;
+};
+
+export const chekIfPast = (eventStartDate: Date) =>
+   eventStartDate >
+   new Date(NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST);
+
+export const getRelevantHosts = (
+   targetHostGroupId: string,
+   event: LiveStreamEvent,
+   groupList: any[]
+) => {
+   let targetGroupId = targetHostGroupId;
+   if (!targetGroupId) {
+      const companyThatPublishedStream = groupList.find(
+         (group) => !group.universityCode && group.id === event?.author?.groupId
+      );
+      if (companyThatPublishedStream?.id) {
+         targetGroupId = companyThatPublishedStream.id;
+      }
+   }
+   const relevantHost = groupList.find((group) => group.id === targetGroupId);
+   return relevantHost ? [relevantHost] : groupList;
+};
+
+export const getLinkToStream = (
+   event: LiveStreamEvent,
+   groupId: string,
+   shouldAutoRegister?: boolean
+) => {
+   const registerQuery = shouldAutoRegister ? `&register=${event.id}` : "";
+   return groupId
+      ? `/next-livestreams/${groupId}?livestreamId=${event.id}${registerQuery}`
+      : `/next-livestreams?livestreamId=${event.id}${registerQuery}`;
 };
