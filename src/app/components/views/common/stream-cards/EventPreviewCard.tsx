@@ -217,7 +217,7 @@ const EventPreviewCard = ({
    const firebase = useFirebaseService();
    const { authenticatedUser } = useAuth();
    const [hosts, setHosts] = useState(undefined);
-   const [isPast, setIsPast] = useState(chekIfPast(event.startDate));
+   const [isPast, setIsPast] = useState(chekIfPast(event?.startDate));
    const [showHosts, setShowHosts] = useState(false);
    const [_, copyToClipboard] = useCopyToClipboard();
    const dispatch = useDispatch();
@@ -234,24 +234,28 @@ const EventPreviewCard = ({
    }, [hosts]);
 
    useEffect(() => {
-      setSetEventInterests(
-         existingDummyInterests.filter((interest) =>
-            event.interestsIds?.includes(interest.id)
-         )
-      );
-   }, [event.interestsIds]);
+      if (!loading) {
+         setSetEventInterests(
+            existingDummyInterests.filter((interest) =>
+               event?.interestsIds?.includes(interest.id)
+            )
+         );
+      }
+   }, [event?.interestsIds, loading]);
 
    useEffect(() => {
-      setHasRegistered(
-         Boolean(event.registeredUsers?.includes(authenticatedUser?.email))
-      );
-   }, [event.registeredUsers]);
+      if (!loading) {
+         setHasRegistered(
+            Boolean(event?.registeredUsers?.includes(authenticatedUser?.email))
+         );
+      }
+   }, [event?.registeredUsers, loading]);
 
    useEffect(() => {
-      if (!light) {
+      if (!light && !loading) {
          (async function getHosts() {
             const newHosts = await firebase.getCareerCentersByGroupId(
-               event.groupIds || []
+               event?.groupIds || []
             );
 
             setHosts(
@@ -261,20 +265,24 @@ const EventPreviewCard = ({
             );
          })();
       }
-   }, [event.groupIds, groupId]);
+   }, [event?.groupIds, groupId, loading]);
 
    useEffect(() => {
-      setIsPast(chekIfPast(event.startDate));
-   }, [event.startDate]);
+      if (!loading) {
+         setIsPast(chekIfPast(event?.startDate));
+      }
+   }, [event?.startDate, loading]);
 
    const handleShareClick = () => {
-      const linkToEvent = groupId
-         ? `/next-livestreams/${groupId}?livestreamId=${event.id}`
-         : `/next-livestreams?livestreamId=${event.id}`;
+      const linkToEvent = event
+         ? groupId
+            ? `/next-livestreams/${groupId}?livestreamId=${event.id}`
+            : `/next-livestreams?livestreamId=${event.id}`
+         : "";
       copyToClipboard(`${getBaseUrl()}${linkToEvent}`);
       dispatch(
          actions.enqueueSnackbar({
-            message: `Link to ${event.title} has been copied!`,
+            message: `Link to ${event?.title} has been copied!`,
             options: {
                variant: "success",
             },
@@ -300,7 +308,7 @@ const EventPreviewCard = ({
                   {loading ? (
                      <Skeleton width={120} />
                   ) : (
-                     DateUtil.eventPreviewDate(event.startDate)
+                     DateUtil.eventPreviewDate(event?.startDate)
                   )}
                </Typography>
                {loading ? (
@@ -332,7 +340,7 @@ const EventPreviewCard = ({
                   ) : (
                      <Box
                         alt="Illustration"
-                        src={getResizedUrl(event.backgroundImageUrl, "lg")}
+                        src={getResizedUrl(event?.backgroundImageUrl, "lg")}
                         layout="fill"
                         className="backgroundImage"
                         sx={styles.backgroundImage}
@@ -353,7 +361,7 @@ const EventPreviewCard = ({
                         </>
                      ) : (
                         <>
-                           {event.hasStarted && (
+                           {event?.hasStarted && (
                               <Chip
                                  icon={<LiveIcon />}
                                  color="error"
@@ -385,7 +393,7 @@ const EventPreviewCard = ({
                            {loading ? (
                               <Skeleton />
                            ) : (
-                              `${event.title} ${event.title}`
+                              `${event?.title} ${event?.title}`
                            )}
                         </Typography>
                         <Stack
@@ -403,12 +411,12 @@ const EventPreviewCard = ({
                               </>
                            ) : (
                               <>
-                                 {event.language?.code && (
+                                 {event?.language?.code && (
                                     <WhiteTagChip
                                        icon={<LanguageIcon />}
                                        variant="filled"
-                                       tooltipText={`This event is in ${event.language.name}`}
-                                       label={event.language.code.toUpperCase()}
+                                       tooltipText={`This event is in ${event?.language.name}`}
+                                       label={event?.language.code.toUpperCase()}
                                     />
                                  )}
                                  {eventInterests.slice(0, 1).map((interest) => (
@@ -435,7 +443,7 @@ const EventPreviewCard = ({
                      ) : (
                         <>
                            <Typography sx={styles.summary}>
-                              {event.summary}
+                              {event?.summary}
                            </Typography>
                            <Stack spacing={1} direction="row">
                               {onRegisterClick && (
@@ -454,10 +462,10 @@ const EventPreviewCard = ({
                               )}
                               <Link
                                  href={{
-                                    pathname: `/upcoming-livestream/${event.id}`,
+                                    pathname: `/upcoming-livestream/${event?.id}`,
                                     hash: isPast && "#about",
                                     query: {
-                                       ...(event.groupIds?.includes(
+                                       ...(event?.groupIds?.includes(
                                           groupId as string
                                        ) && { groupId }),
                                     },
@@ -483,7 +491,7 @@ const EventPreviewCard = ({
                   <Stack spacing={2} direction={"row"} sx={styles.logosWrapper}>
                      <CardMedia
                         sx={{ p: 1, display: "grid", placeItems: "center" }}
-                        title={event.company}
+                        title={event?.company}
                      >
                         {loading ? (
                            <Skeleton
@@ -502,7 +510,10 @@ const EventPreviewCard = ({
                               }}
                            >
                               <Image
-                                 src={getResizedUrl(event.companyLogoUrl, "lg")}
+                                 src={getResizedUrl(
+                                    event?.companyLogoUrl,
+                                    "lg"
+                                 )}
                                  layout="fill"
                                  objectFit="contain"
                               />
@@ -551,7 +562,7 @@ const EventPreviewCard = ({
 };
 
 interface EventPreviewCardProps {
-   event: LiveStreamEvent;
+   event?: LiveStreamEvent;
    loading?: boolean;
    light?: boolean;
    registering?: boolean;
