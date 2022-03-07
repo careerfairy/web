@@ -10,6 +10,7 @@ import { rtcMessages } from "types/streaming";
 import { AlertProps } from "@mui/material/Alert/Alert";
 import { OptionCardProps } from "./common/OptionCard";
 import { useRouter } from "next/router";
+import ScreenShareDeniedModal from "./ModalViews/ScreenShareDeniedModal";
 
 interface Props {}
 
@@ -130,7 +131,12 @@ const AgoraStateHandler: FC<Props> = () => {
       dispatch(actions.closeSnackbar(key));
    };
 
-   return view || null;
+   return (
+      <>
+         {view || null}
+         {<ScreenShareDeniedModal />}
+      </>
+   );
 };
 
 export default AgoraStateHandler;

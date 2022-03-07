@@ -7,6 +7,8 @@ import useAgoraClientConfig from "./useAgoraClientConfig";
 
 import AgoraRTC, {
    IAgoraRTCClient,
+   ILocalAudioTrack,
+   ILocalVideoTrack,
    ScreenVideoTrackInitConfig,
 } from "agora-rtc-sdk-ng";
 import * as actions from "store/actions";
@@ -55,9 +57,10 @@ export default function useAgoraRtc(
 
    const { fetchAgoraRtcToken } = useFirebaseService();
    const dispatch = useDispatch();
+   const [screenShareStream, setScreenShareStream] = useState<
+      ILocalVideoTrack | [ILocalVideoTrack, ILocalAudioTrack]
+   >(null);
 
-   const [screenShareStream, setScreenShareStream] = useState(null);
-   const screenShareStreamRef = useRef(screenShareStream);
    const screenShareRtcClientRef = useRef(screenShareRtcClient);
 
    const { remoteStreams, networkQuality, demoStreamHandlers } =
@@ -125,8 +128,11 @@ export default function useAgoraRtc(
       screenShareRtcClientRef.current = newScreenShareRtcClient;
    };
 
-   const updateScreenShareStream = (newScreenShareStream) => {
-      screenShareStreamRef.current = newScreenShareStream;
+   const updateScreenShareStream = (
+      newScreenShareStream:
+         | ILocalVideoTrack
+         | [ILocalVideoTrack, ILocalAudioTrack]
+   ) => {
       setScreenShareStream(newScreenShareStream);
    };
 
@@ -459,6 +465,12 @@ export default function useAgoraRtc(
          return new Promise<void>(async (resolve, reject) => {
             try {
                const screenShareUid = `${streamerId}screen`;
+               const screenShareTracks = await getScreenShareStream(
+                  screenSharingMode,
+                  onScreenShareStopped
+               );
+               updateScreenShareStream(screenShareTracks);
+
                await joinAgoraRoom(
                   screenShareRtcClient,
                   roomId,
@@ -467,9 +479,8 @@ export default function useAgoraRtc(
                   sessionIsUsingCloudProxy
                );
                await publishScreenShareTracks(
-                  screenShareRtcClient,
-                  screenSharingMode,
-                  onScreenShareStopped
+                  screenShareTracks,
+                  screenShareRtcClient
                );
                updateScreenShareRtcClient(screenShareRtcClient);
                resolve();
@@ -481,11 +492,10 @@ export default function useAgoraRtc(
       [sessionIsUsingCloudProxy, screenShareRtcClient, streamerId, roomId]
    );
 
-   const unpublishScreenShareStream = async () => {
+   const unPublishScreenShareStream = async () => {
       return new Promise<void>(async (resolve, reject) => {
          try {
             let screenShareRtcClient = screenShareRtcClientRef.current;
-            let screenShareStream = screenShareStreamRef.current;
             await screenShareRtcClient.unpublish(screenShareStream);
             if (Array.isArray(screenShareStream)) {
                screenShareStream.forEach((track) => track.close());
@@ -502,22 +512,24 @@ export default function useAgoraRtc(
    };
 
    const publishScreenShareTracks = async (
-      screenShareRtcClient,
-      screenSharingMode,
-      onScreenShareStopped
+      screenShareTracks,
+      screenShareRtcClient
    ) => {
-      let screenShareTracks = await getScreenShareStream(
-         screenSharingMode,
-         onScreenShareStopped
-      );
-      updateScreenShareStream(screenShareTracks);
-      return publishTracks(screenShareRtcClient, screenShareTracks, "screen");
+      try {
+         return publishTracks(
+            screenShareRtcClient,
+            screenShareTracks,
+            "screen"
+         );
+      } catch (e) {
+         console.error(e);
+      }
    };
 
    const getScreenShareStream = async (
       screenSharingMode: string,
       onScreenShareStopped: () => void
-   ) => {
+   ): Promise<ILocalVideoTrack | [ILocalVideoTrack, ILocalAudioTrack]> => {
       return new Promise(async (resolve, reject) => {
          let screenShareVideoResolution: ScreenVideoTrackInitConfig["encoderConfig"] =
             screenSharingMode === "motion" ? "720p_2" : "1080p_1";
@@ -534,13 +546,7 @@ export default function useAgoraRtc(
             videoTrack.on("track-ended", onScreenShareStopped);
             resolve(tracksObject);
          } catch (error) {
-            if (error.code === "PERMISSION_DENIED") {
-               //handle case that user has cancel screen share within browser
-            } else if (error.code === "SHARE_AUDIO_NOT_ALLOWED") {
-               // handle share audio not allowed
-            } else {
-               reject(error);
-            }
+            dispatch(actions.handleScreenShareDeniedError(error));
          }
       });
    };
@@ -597,7 +603,7 @@ export default function useAgoraRtc(
       publishLocalStreamTracks,
       handlePublishLocalStream,
       publishScreenShareStream,
-      unpublishScreenShareStream,
+      unPublishScreenShareStream,
       leaveAgoraRoom,
       handleReconnectAgora,
       closeAndUnpublishedLocalStream,

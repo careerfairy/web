@@ -87,7 +87,7 @@ function VideoContainer({
       localMediaControls,
       remoteStreams,
       publishScreenShareStream,
-      unpublishScreenShareStream,
+      unPublishScreenShareStream,
       leaveAgoraRoom,
       localMediaHandlers,
       handlePublishLocalStream,
@@ -110,7 +110,7 @@ function VideoContainer({
             currentLivestream.mode === "desktop" &&
             currentLivestream.screenSharerId === streamerId
          ) {
-            setDesktopMode("default", streamerId);
+            void setDesktopMode("default", streamerId);
          }
       }
    }, [streamerId, currentLivestream.id]);
@@ -240,7 +240,7 @@ function VideoContainer({
 
    const handleClickScreenShareButton = async () => {
       if (currentLivestream.mode === "desktop") {
-         unpublishScreenShareStream().then(async () => {
+         unPublishScreenShareStream().then(async () => {
             return await setDesktopMode("default", streamerId);
          });
       } else {
@@ -249,15 +249,15 @@ function VideoContainer({
    };
 
    const onScreenShareStopped = useCallback(() => {
-      unpublishScreenShareStream().then(async () => {
+      unPublishScreenShareStream().then(async () => {
          await setDesktopMode("default", streamerId);
       });
-   }, [unpublishScreenShareStream]);
+   }, [unPublishScreenShareStream]);
 
    const handleScreenShare = useCallback(
       async (optimizationMode = "detail") => {
          if (currentLivestream.mode === "desktop") {
-            unpublishScreenShareStream().then(async () => {
+            unPublishScreenShareStream().then(async () => {
                await setDesktopMode("default", streamerId);
             });
          } else {

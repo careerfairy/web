@@ -56,6 +56,7 @@ interface StreamReducer {
       rtcError?: RTCError;
       sessionIsUsingCloudProxy: boolean;
       primaryClientJoined: boolean;
+      screenSharePermissionDenied: boolean;
       deviceErrors: {
          cameraDenied: boolean;
          microphoneDenied: boolean;

@@ -149,6 +149,29 @@ export const setDeviceError =
       });
    };
 
+export const setScreenShareDeniedError = (denied: boolean) => (dispatch) => {
+   return dispatch({
+      type: actions.SET_SCREEN_SHARE_DENIED_ERROR,
+      payload: denied,
+   });
+};
+export const handleScreenShareDeniedError =
+   (error: RTCError) => async (dispatch) => {
+      switch (error?.code) {
+         case "PERMISSION_DENIED":
+            const errorMessage = error?.message?.toLowerCase?.();
+            if (errorMessage?.includes("permission denied by system")) {
+               dispatch(setScreenShareDeniedError(true));
+            } else if (errorMessage?.includes("permission denied")) {
+            }
+            break;
+         case "SHARE_AUDIO_NOT_ALLOWED":
+            break;
+         default:
+            break;
+      }
+   };
+
 export const setAgoraPrimaryClientJoined =
    (hasJoined: boolean) => (dispatch) => {
       dispatch({

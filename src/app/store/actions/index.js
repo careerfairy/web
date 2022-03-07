@@ -82,6 +82,8 @@ export {
    setAgoraRtcConnectionState,
    setAgoraRtcError,
    handleSetDeviceError,
+   handleScreenShareDeniedError,
+   setScreenShareDeniedError,
    handleClearDeviceError,
    setAgoraPrimaryClientJoined,
    clearAgoraRtcError,

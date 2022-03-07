@@ -44,6 +44,7 @@ const initialState = {
          cameraIsUsedByOtherApp: false,
          microphoneIsUsedByOtherApp: false,
       },
+      screenSharePermissionDenied: false,
       sessionIsUsingCloudProxy: false,
       primaryClientJoined: false,
    },
@@ -140,6 +141,14 @@ const streamReducer = (state = initialState, { type, payload }) => {
                   ...state.agoraState.deviceErrors,
                   ...payload,
                },
+            },
+         };
+      case actions.SET_SCREEN_SHARE_DENIED_ERROR:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               screenSharePermissionDenied: payload,
             },
          };
       case actions.SET_AGORA_PRIMARY_CLIENT_JOINED:
