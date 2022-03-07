@@ -3,29 +3,58 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import ShareIcon from "@mui/icons-material/Share";
-import DateUtil from "../../../../util/DateUtil";
-import { AvatarGroup, Button, CardMedia, IconButton } from "@mui/material";
+import DateUtil from "util/DateUtil";
+import AvatarGroup from "@mui/material/AvatarGroup";
+import Button from "@mui/material/Button";
+import CardMedia from "@mui/material/CardMedia";
+import IconButton from "@mui/material/IconButton";
 import { alpha, Theme } from "@mui/material/styles";
 import LanguageIcon from "@mui/icons-material/Language";
+import CheckIcon from "@mui/icons-material/CheckCircle";
 import {
+   getBaseUrl,
    getMaxLineStyles,
    getResizedUrl,
-} from "../../../helperFunctions/HelperFunctions";
+} from "components/helperFunctions/HelperFunctions";
 import WhiteTagChip from "../chips/TagChip";
 import { existingDummyInterests } from "../../events/dummyData";
 import { LiveStreamEvent } from "types/event";
 import Image from "next/image";
-import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import Avatar from "@mui/material/Avatar";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { chekIfPast, getRelevantHosts } from "util/StreamUtil";
+import { useCopyToClipboard } from "react-use";
+import { useDispatch } from "react-redux";
+import * as actions from "store/actions";
+import { useAuth } from "HOCs/AuthProvider";
+import LiveIcon from "@mui/icons-material/RadioButtonChecked";
+import Skeleton from "@mui/material/Skeleton";
+
+import { Chip } from "@mui/material";
 
 const logosWrapperSpacing = 12;
 const styles = {
-   root: {},
+   root: {
+      "& .MuiChip-root": {
+         boxShadow: 2,
+      },
+   },
    dateShareWrapper: {
       py: 1,
    },
    date: {
       fontWeight: 600,
+   },
+   statusWrapper: {
+      position: "absolute",
+      "& .MuiChip-root": {
+         // margin: 0,
+      },
+      inset: 0,
+      padding: (theme) => theme.spacing(1, 3),
+      transition: (theme: Theme) => theme.transitions.create(["opacity"]),
    },
    backgroundImage: {
       transition: (theme: Theme) =>
@@ -34,8 +63,17 @@ const styles = {
             easing: theme.transitions.easing.easeInOut,
          }),
    },
+   backgroundImageLoader: {
+      position: "absolute",
+      inset: 0,
+      height: "auto",
+   },
    mainContentHoverStyles: {
-      "&:hover, &:focus-within": {
+      "&:hover, &:focus": {
+         // "&:hover, &:focus-within": {
+         "& .statusWrapper": {
+            opacity: 0,
+         },
          "& .backgroundImage": {
             transform: "scale(1.1)",
          },
@@ -62,6 +100,12 @@ const styles = {
          },
       },
    },
+   mainAndLowerContentWrapper: {
+      backgroundColor: (theme: Theme) => theme.palette.background.paper,
+      borderRadius: (theme) => theme.spacing(0.2, 0.2, 1, 1),
+      boxShadow: 1,
+      overflow: "hidden",
+   },
    mainContentWrapper: {
       position: "relative",
       height: (theme) => theme.spacing(32),
@@ -70,7 +114,6 @@ const styles = {
       overflow: "hidden",
       width: "100%",
       color: "white",
-      boxShadow: 5,
       "&:before": {},
 
       "&:after": {
@@ -127,12 +170,13 @@ const styles = {
       borderRadius: 0.3,
    },
    logosWrapper: {
-      py: 1,
+      p: 1,
       display: "flex",
       justifyContent: "space-between",
       height: (theme) => theme.spacing(logosWrapperSpacing),
       "& > *": {
          flex: 0.5,
+         mx: "auto",
       },
    },
    hostsWrapper: {
@@ -147,21 +191,48 @@ const styles = {
    hostAvatar: {
       padding: 1,
       backgroundColor: "white",
-      border: "1px solid black !important",
-      boxShadow: 3,
-      width: (theme) => theme.spacing(logosWrapperSpacing * 0.7),
+      width: (theme) => theme.spacing(logosWrapperSpacing * 0.6),
    },
    nextImageWrapper: {
       position: "relative",
       width: "100%",
       height: "100%",
    },
+   chipLoader: {
+      height: 40,
+      width: 50,
+      borderRadius: 4,
+   },
 } as const;
-const EventPreviewCard = ({ event, loading, light }: EventPreviewCardProps) => {
-   const [eventInterests, setSetEventInterests] = useState([]);
-   const [hosts, setHosts] = useState(undefined);
 
+const EventPreviewCard = ({
+   event,
+   loading,
+   light,
+   onRegisterClick,
+   registering,
+}: EventPreviewCardProps) => {
+   const [eventInterests, setSetEventInterests] = useState([]);
+   const [hasRegistered, setHasRegistered] = useState(false);
    const firebase = useFirebaseService();
+   const { authenticatedUser } = useAuth();
+   const [hosts, setHosts] = useState(undefined);
+   const [isPast, setIsPast] = useState(chekIfPast(event.startDate));
+   const [showHosts, setShowHosts] = useState(false);
+   const [_, copyToClipboard] = useCopyToClipboard();
+   const dispatch = useDispatch();
+
+   const {
+      query: { groupId },
+   } = useRouter();
+
+   useEffect(() => {
+      const shouldHide = Boolean(
+         hosts?.length === 1 && !hosts[0]?.universityCode
+      );
+      setShowHosts(!shouldHide);
+   }, [hosts]);
+
    useEffect(() => {
       setSetEventInterests(
          existingDummyInterests.filter((interest) =>
@@ -171,159 +242,311 @@ const EventPreviewCard = ({ event, loading, light }: EventPreviewCardProps) => {
    }, [event.interestsIds]);
 
    useEffect(() => {
+      setHasRegistered(
+         Boolean(event.registeredUsers?.includes(authenticatedUser?.email))
+      );
+   }, [event.registeredUsers]);
+
+   useEffect(() => {
       if (!light) {
          (async function getHosts() {
             const newHosts = await firebase.getCareerCentersByGroupId(
                event.groupIds || []
             );
-            setHosts(newHosts.length ? newHosts : null);
+
+            setHosts(
+               newHosts.length
+                  ? getRelevantHosts(groupId as string, event, newHosts)
+                  : null
+            );
          })();
       }
-   }, [event.groupIds]);
+   }, [event.groupIds, groupId]);
+
+   useEffect(() => {
+      setIsPast(chekIfPast(event.startDate));
+   }, [event.startDate]);
+
+   const handleShareClick = () => {
+      const linkToEvent = groupId
+         ? `/next-livestreams/${groupId}?livestreamId=${event.id}`
+         : `/next-livestreams?livestreamId=${event.id}`;
+      copyToClipboard(`${getBaseUrl()}${linkToEvent}`);
+      dispatch(
+         actions.enqueueSnackbar({
+            message: `Link to ${event.title} has been copied!`,
+            options: {
+               variant: "success",
+            },
+         })
+      );
+   };
+
+   const onClickRegister = () => {
+      onRegisterClick(event, hosts[0]?.id, hosts, hasRegistered);
+   };
 
    return (
-      <Box sx={styles.root}>
-         <Stack
-            spacing={2}
-            sx={styles.dateShareWrapper}
-            justifyContent="space-between"
-            alignItems={"center"}
-            direction="row"
-         >
-            <Typography variant={"subtitle1"} sx={styles.date}>
-               {DateUtil.eventPreviewDate(event.startDate)}
-            </Typography>
-            <IconButton>
-               <ShareIcon />
-            </IconButton>
-         </Stack>
-         <Box
-            sx={[
-               styles.mainContentWrapper,
-               !loading && styles.mainContentHoverStyles,
-            ]}
-         >
+      <>
+         <Box sx={styles.root}>
+            <Stack
+               spacing={2}
+               sx={styles.dateShareWrapper}
+               justifyContent="space-between"
+               alignItems={"center"}
+               direction="row"
+            >
+               <Typography component={"div"} variant={"h6"} sx={styles.date}>
+                  {loading ? (
+                     <Skeleton width={120} />
+                  ) : (
+                     DateUtil.eventPreviewDate(event.startDate)
+                  )}
+               </Typography>
+               {loading ? (
+                  <Skeleton variant={"circular"} height={20} width={20} />
+               ) : (
+                  <IconButton onClick={handleShareClick}>
+                     <ShareIcon />
+                  </IconButton>
+               )}
+            </Stack>
             <Box
-               alt="Illustration"
-               src={getResizedUrl(event.backgroundImageUrl, "lg")}
-               layout="fill"
-               className="backgroundImage"
-               sx={styles.backgroundImage}
-               component={Image}
-               priority
-               objectFit="cover"
-            />
-            <Stack spacing={2} className="mainContent" sx={styles.mainContent}>
-               <Box sx={styles.titleWrapper} className="titleWrapper">
-                  <Typography
-                     variant={"h6"}
-                     className="title"
-                     sx={styles.title}
-                  >
-                     {event.title + event.title}
-                  </Typography>
+               sx={[
+                  styles.mainAndLowerContentWrapper,
+                  light && { borderRadius: 0 },
+               ]}
+            >
+               <Box
+                  sx={[
+                     styles.mainContentWrapper,
+                     !loading && styles.mainContentHoverStyles,
+                  ]}
+               >
+                  {loading ? (
+                     <Skeleton
+                        animation="wave"
+                        variant="rectangular"
+                        sx={styles.backgroundImageLoader}
+                     />
+                  ) : (
+                     <Box
+                        alt="Illustration"
+                        src={getResizedUrl(event.backgroundImageUrl, "lg")}
+                        layout="fill"
+                        className="backgroundImage"
+                        sx={styles.backgroundImage}
+                        component={Image}
+                        priority
+                        objectFit="cover"
+                     />
+                  )}
                   <Stack
-                     alignItems={"center"}
-                     flexWrap="wrap"
-                     sx={{ mt: 1 }}
                      direction={"row"}
-                     spacing={1}
-                     className="chipsWrapper"
+                     className="statusWrapper"
+                     spacing={2}
+                     sx={[styles.statusWrapper]}
                   >
-                     {event.language?.code && (
-                        <WhiteTagChip
-                           icon={<LanguageIcon />}
-                           variant="filled"
-                           tooltipText={`This event is in ${event.language.name}`}
-                           label={event.language.code.toUpperCase()}
-                        />
+                     {loading ? (
+                        <>
+                           <Skeleton sx={styles.chipLoader} />
+                        </>
+                     ) : (
+                        <>
+                           {event.hasStarted && (
+                              <Chip
+                                 icon={<LiveIcon />}
+                                 color="error"
+                                 label={"LIVE"}
+                              />
+                           )}
+                           {hasRegistered && (
+                              <Chip
+                                 icon={<CheckIcon />}
+                                 color="primary"
+                                 label={"Booked!"}
+                              />
+                           )}
+                        </>
                      )}
-                     {eventInterests.slice(0, 1).map((interest) => (
-                        <WhiteTagChip
-                           key={interest.id}
-                           variant="filled"
-                           label={interest.name}
-                        />
-                     ))}
-                     {eventInterests.length > 2 && (
-                        <WhiteTagChip
-                           variant="outlined"
-                           label={`+ ${eventInterests.length - 2} more`}
-                        />
+                  </Stack>
+                  <Stack
+                     spacing={2}
+                     className="mainContent"
+                     sx={styles.mainContent}
+                  >
+                     <Box sx={styles.titleWrapper} className="titleWrapper">
+                        <Typography
+                           variant={"h6"}
+                           component="div"
+                           className="title"
+                           sx={styles.title}
+                        >
+                           {loading ? (
+                              <Skeleton />
+                           ) : (
+                              `${event.title} ${event.title}`
+                           )}
+                        </Typography>
+                        <Stack
+                           alignItems={"center"}
+                           flexWrap="wrap"
+                           sx={{ mt: 1 }}
+                           direction={"row"}
+                           spacing={1}
+                           className="chipsWrapper"
+                        >
+                           {loading ? (
+                              <>
+                                 <Skeleton sx={styles.chipLoader} />
+                                 <Skeleton sx={styles.chipLoader} />
+                              </>
+                           ) : (
+                              <>
+                                 {event.language?.code && (
+                                    <WhiteTagChip
+                                       icon={<LanguageIcon />}
+                                       variant="filled"
+                                       tooltipText={`This event is in ${event.language.name}`}
+                                       label={event.language.code.toUpperCase()}
+                                    />
+                                 )}
+                                 {eventInterests.slice(0, 1).map((interest) => (
+                                    <WhiteTagChip
+                                       key={interest.id}
+                                       variant="filled"
+                                       label={interest.name}
+                                    />
+                                 ))}
+                                 {eventInterests.length > 2 && (
+                                    <WhiteTagChip
+                                       variant="outlined"
+                                       label={`+ ${
+                                          eventInterests.length - 2
+                                       } more`}
+                                    />
+                                 )}
+                              </>
+                           )}
+                        </Stack>
+                     </Box>
+                     {loading ? (
+                        <Box sx={{ height: 50 }} />
+                     ) : (
+                        <>
+                           <Typography sx={styles.summary}>
+                              {event.summary}
+                           </Typography>
+                           <Stack spacing={1} direction="row">
+                              {onRegisterClick && (
+                                 <Button
+                                    sx={styles.btn}
+                                    onClick={onClickRegister}
+                                    variant={
+                                       hasRegistered ? "outlined" : "contained"
+                                    }
+                                    color={hasRegistered ? "info" : "primary"}
+                                    disabled={registering}
+                                    size={"small"}
+                                 >
+                                    {hasRegistered ? "cancel" : "I'll attend"}
+                                 </Button>
+                              )}
+                              <Link
+                                 href={{
+                                    pathname: `/upcoming-livestream/${event.id}`,
+                                    hash: isPast && "#about",
+                                    query: {
+                                       ...(event.groupIds?.includes(
+                                          groupId as string
+                                       ) && { groupId }),
+                                    },
+                                 }}
+                              >
+                                 <a>
+                                    <Button
+                                       sx={styles.btn}
+                                       variant={"contained"}
+                                       color={"secondary"}
+                                       size={"small"}
+                                    >
+                                       see details
+                                    </Button>
+                                 </a>
+                              </Link>
+                           </Stack>
+                        </>
                      )}
                   </Stack>
                </Box>
-               <Typography sx={styles.summary}>{event.summary}</Typography>
-               <Stack spacing={1} direction="row">
-                  <Button
-                     sx={styles.btn}
-                     variant={"contained"}
-                     color="primary"
-                     size={"small"}
-                  >
-                     I'll attend
-                  </Button>
-                  <Button
-                     sx={styles.btn}
-                     variant={"contained"}
-                     color={"secondary"}
-                     size={"small"}
-                  >
-                     see details{" "}
-                  </Button>
-               </Stack>
-            </Stack>
-         </Box>
-         {!light && (
-            <Stack spacing={2} direction={"row"} sx={styles.logosWrapper}>
-               <CardMedia title="Your title">
-                  <div
-                     style={{
-                        position: "relative",
-                        width: "100%",
-                        height: "100%",
-                     }}
-                  >
-                     <Image
-                        src={getResizedUrl(event.companyLogoUrl, "lg")}
-                        layout="fill"
-                        objectFit="contain"
-                     />
-                  </div>
-               </CardMedia>
-               <Box sx={styles.hostsWrapper}>
-                  {hosts && (
-                     <Box>
-                        <Typography
-                           sx={styles.hostedText}
-                           color="text.secondary"
-                        >
-                           HOSTED BY
-                        </Typography>
-                        <AvatarGroup max={2}>
-                           {hosts.map((host) => (
-                              <Avatar
-                                 variant="rounded"
-                                 key={host.id}
-                                 title={`${host.universityName}`}
-                                 sx={styles.hostAvatar}
+               {!light && (
+                  <Stack spacing={2} direction={"row"} sx={styles.logosWrapper}>
+                     <CardMedia
+                        sx={{ p: 1, display: "grid", placeItems: "center" }}
+                        title={event.company}
+                     >
+                        {loading ? (
+                           <Skeleton
+                              animation="wave"
+                              variant="rectangular"
+                              sx={{ borderRadius: 2 }}
+                              width={180}
+                              height={60}
+                           />
+                        ) : (
+                           <div
+                              style={{
+                                 position: "relative",
+                                 width: "100%",
+                                 height: "100%",
+                              }}
+                           >
+                              <Image
+                                 src={getResizedUrl(event.companyLogoUrl, "lg")}
+                                 layout="fill"
+                                 objectFit="contain"
+                              />
+                           </div>
+                        )}
+                     </CardMedia>
+                     {!loading && hosts && showHosts && (
+                        <Box sx={styles.hostsWrapper}>
+                           <Box>
+                              <Typography
+                                 sx={styles.hostedText}
+                                 color="text.secondary"
                               >
-                                 <Box sx={styles.nextImageWrapper}>
-                                    <Image
-                                       src={getResizedUrl(host.logoUrl, "lg")}
-                                       layout="fill"
-                                       objectFit="contain"
-                                    />
-                                 </Box>
-                              </Avatar>
-                           ))}
-                        </AvatarGroup>
-                     </Box>
-                  )}
-               </Box>
-            </Stack>
-         )}
-      </Box>
+                                 HOSTED BY
+                              </Typography>
+                              <AvatarGroup max={2}>
+                                 {hosts.map((host) => (
+                                    <Avatar
+                                       variant="rounded"
+                                       key={host.id}
+                                       title={`${host.universityName}`}
+                                       sx={styles.hostAvatar}
+                                    >
+                                       <Box sx={styles.nextImageWrapper}>
+                                          <Image
+                                             src={getResizedUrl(
+                                                host.logoUrl,
+                                                "lg"
+                                             )}
+                                             layout="fill"
+                                             objectFit="contain"
+                                          />
+                                       </Box>
+                                    </Avatar>
+                                 ))}
+                              </AvatarGroup>
+                           </Box>
+                        </Box>
+                     )}
+                  </Stack>
+               )}
+            </Box>
+         </Box>
+      </>
    );
 };
 
@@ -331,5 +554,12 @@ interface EventPreviewCardProps {
    event: LiveStreamEvent;
    loading?: boolean;
    light?: boolean;
+   registering?: boolean;
+   onRegisterClick?: (
+      event: LiveStreamEvent,
+      targetGroupId: string,
+      groups: any[],
+      hasRegistered: boolean
+   ) => any;
 }
 export default EventPreviewCard;

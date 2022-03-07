@@ -23,6 +23,7 @@ export interface LiveStreamEvent extends Identifiable {
       name?: string;
    };
    talentPool?: string[];
+   hasStarted?: boolean;
    test?: boolean;
    title?: string;
    type?: string;
