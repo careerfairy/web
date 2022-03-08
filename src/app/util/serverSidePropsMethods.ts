@@ -31,7 +31,7 @@ export const handleRedirectToNextGen = async (
       context.req.headers.host,
       currentEnv,
       isNextGen,
-      context.req.url
+      context.resolvedUrl
    );
 
    if (urlToRedirect) {
