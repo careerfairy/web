@@ -241,8 +241,11 @@ const EmoteButtons = ({ createEmote }) => {
             className={classes.actionArea}
          >
             <Box
-               className={classes.miniButtons}
-               classes={{ root: open ? classes.cardHovered : "" }}
+               className={
+                  open
+                     ? `${classes.miniButtons} ${classes.cardHovered}`
+                     : classes.miniButtons
+               }
             >
                <div className={classes.wrapper}>
                   <Fab
