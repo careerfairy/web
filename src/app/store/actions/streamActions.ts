@@ -166,9 +166,7 @@ export const handleScreenShareDeniedError =
             }
             break;
          case "DEVICE_NOT_FOUND":
-            if (errorMessage?.includes("the object not be found here")) {
-               dispatch(setScreenShareDeniedError(true));
-            }
+            dispatch(setScreenShareDeniedError(true));
             break;
          case "SHARE_AUDIO_NOT_ALLOWED":
             break;
