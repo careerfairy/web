@@ -28,10 +28,6 @@ const ConnectionStateModal: FC<Props> = (props) => {
       (state: RootState) => state.stream.agoraState.rtcConnectionState
    );
 
-   const sessionIsUsingCloudProxy = useSelector((state: RootState) => {
-      return state.stream.agoraState.sessionIsUsingCloudProxy;
-   });
-
    useEffect(() => {
       (function handlePromptUseDebug() {
          const { curState } = agoraRtcConnectionStatus;
@@ -54,7 +50,7 @@ const ConnectionStateModal: FC<Props> = (props) => {
 
          return () => clearTimeout(timeout);
       })();
-   }, [agoraRtcConnectionStatus, sessionIsUsingCloudProxy]);
+   }, [agoraRtcConnectionStatus]);
 
    return (
       <Dialog open={true}>

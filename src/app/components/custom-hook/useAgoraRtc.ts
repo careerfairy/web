@@ -35,9 +35,7 @@ export default function useAgoraRtc(
    options?: { isAHandRaiser?: boolean }
 ) {
    const { path } = useStreamRef();
-   const {
-      query: { token, withHighQuality },
-   } = useRouter();
+   const router = useRouter();
 
    const [sessionIsUsingCloudProxy, setSessionIsUsingProxy] =
       useSessionStorage<boolean>("is-using-cloud-proxy", false);
@@ -71,11 +69,16 @@ export default function useAgoraRtc(
    useEffect(() => {
       rtcClient.on("is-using-cloud-proxy", (isUsing) => {
          setClientIsUsingCloudProxy(isUsing);
+         dispatch(
+            actions.setSessionIsUsingCloudProxy(
+               Boolean(sessionIsUsingCloudProxy)
+            )
+         );
       });
    }, []);
 
    useEffect(() => {
-      AgoraRTC.onAudioAutoplayFailed = () => {
+      AgoraRTC.onAutoplayFailed = () => {
          dispatch(actions.setVideoIsPaused());
       };
    }, []);
@@ -95,12 +98,6 @@ export default function useAgoraRtc(
          }
       }
    }, [isStreamer, rtcClient]);
-
-   useEffect(() => {
-      dispatch(
-         actions.setSessionIsUsingCloudProxy(Boolean(sessionIsUsingCloudProxy))
-      );
-   }, [sessionIsUsingCloudProxy]);
 
    const init = async () => {
       return joinAgoraRoomWithPrimaryClient(sessionIsUsingCloudProxy);
@@ -136,23 +133,42 @@ export default function useAgoraRtc(
       setScreenShareStream(newScreenShareStream);
    };
 
-   const handleEnableCloudProxy = async () => {
-      try {
-         await leaveAgoraRoom();
-      } catch (e) {
-         console.log("-> e in leaving Room", e);
-      }
+   // const handleEnableCloudProxy = async () => {
+   //    try {
+   //       await leaveAgoraRoom();
+   //    } catch (e) {
+   //       console.log("-> e in leaving Room", e);
+   //    }
+   //
+   //    try {
+   //       const sessionShouldUseCloudProxy = true;
+   //       console.log("-> Setting session is using cp true");
+   //       setSessionIsUsingProxy(sessionShouldUseCloudProxy);
+   //       // return router.reload();
+   //       setTimeout(
+   //          async () =>
+   //             await joinAgoraRoomWithPrimaryClient(sessionShouldUseCloudProxy),
+   //          2000
+   //       );
+   //    } catch (e) {
+   //       console.log("-> e in joining Room with Proxy", e);
+   //    }
+   // };
 
-      try {
-         const sessionShouldUseCloudProxy = true;
-         console.log("-> Setting session is using cp true");
-         setSessionIsUsingProxy(sessionShouldUseCloudProxy);
-         await joinAgoraRoomWithPrimaryClient(sessionShouldUseCloudProxy);
-      } catch (e) {
-         console.log("-> e in joining Room with Proxy", e);
-      }
+   const logStatus = (
+      type: "JOIN" | "LEAVE",
+      isSuccess: boolean,
+      isUsingProxy: boolean,
+      error?: any
+   ) => {
+      const proxyStatus = isUsingProxy ? "WITH" : "WITHOUT";
+      const successMessage = isSuccess ? "SUCCESS" : "";
+      const errorMessage = error ? "ERROR IN" : "";
+      return console.log(
+         `-> ${errorMessage} ${type} CLIENT ${proxyStatus} PROXY ${successMessage}`,
+         error || ""
+      );
    };
-
    const joinAgoraRoom = async (
       rtcClient: IAgoraRTCClient,
       roomId: string,
@@ -162,7 +178,7 @@ export default function useAgoraRtc(
    ) => {
       let timeout;
       try {
-         const cfToken = token || "";
+         const cfToken = router.query.token || "";
          const { data } = await fetchAgoraRtcToken({
             isStreamer: options?.isAHandRaiser ? false : isStreamer,
             uid: userUid,
@@ -174,18 +190,33 @@ export default function useAgoraRtc(
             rtcClient.startProxyServer(3);
          } else {
             timeout = setTimeout(async () => {
-               await handleEnableCloudProxy();
+               // Start reconnecting with Cloud Proxy Process
+               logStatus("LEAVE", false, sessionIsUsingCloudProxy);
+               await rtcClient.leave();
+               logStatus("LEAVE", true, sessionIsUsingCloudProxy);
+               const shouldUseProxy = true;
+               setSessionIsUsingProxy(shouldUseProxy);
+               rtcClient.startProxyServer(3);
+               return await joinAgoraRoom(
+                  rtcClient,
+                  roomId,
+                  userUid,
+                  isStreamer,
+                  shouldUseProxy
+               );
             }, RTC_CLIENT_JOIN_TIME_LIMIT);
          }
-         console.log("-> JOINING CLIENT");
+         logStatus("JOIN", false, sessionIsUsingCloudProxy);
+
          await rtcClient.join(
             AGORA_APP_ID,
             roomId,
             data.token.rtcToken,
             userUid
          );
-         console.log("-> JOINED CLIENT");
+         logStatus("JOIN", true, sessionIsUsingCloudProxy);
       } catch (error) {
+         logStatus("JOIN", false, sessionIsUsingCloudProxy, error);
          dispatch(actions.setAgoraRtcError(error));
       }
       if (timeout) {
@@ -200,7 +231,7 @@ export default function useAgoraRtc(
             rtcClient.stopProxyServer();
          }
          if (rtcClient) {
-            await rtcClient.leave();
+            return await rtcClient.leave();
          }
       } catch (error) {
          console.log(error);
@@ -229,7 +260,9 @@ export default function useAgoraRtc(
       return new Promise<void>(async (resolve, reject) => {
          try {
             const localAudio = await AgoraRTC.createMicrophoneAudioTrack({
-               ...(withHighQuality && { encoderConfig: "high_quality_stereo" }),
+               ...(router.query.withHighQuality && {
+                  encoderConfig: "high_quality_stereo",
+               }),
             });
             setLocalStream((localStream) => ({
                ...localStream,
@@ -247,7 +280,9 @@ export default function useAgoraRtc(
       return new Promise<void>(async (resolve, reject) => {
          try {
             const localVideo = await AgoraRTC.createCameraVideoTrack({
-               encoderConfig: withHighQuality ? "720p_3" : "480p_9",
+               encoderConfig: router.query.withHighQuality
+                  ? "720p_3"
+                  : "480p_9",
             });
             setLocalStream((localStream) => ({
                ...localStream,
@@ -267,7 +302,9 @@ export default function useAgoraRtc(
 
       try {
          audioTrack = await AgoraRTC.createMicrophoneAudioTrack({
-            ...(withHighQuality && { encoderConfig: "high_quality_stereo" }),
+            ...(router.query.withHighQuality && {
+               encoderConfig: "high_quality_stereo",
+            }),
          });
       } catch (error) {
          dispatch(actions.handleSetDeviceError(error, "microphone"));
@@ -275,7 +312,7 @@ export default function useAgoraRtc(
 
       try {
          videoTrack = await AgoraRTC.createCameraVideoTrack({
-            encoderConfig: withHighQuality ? "720p_3" : "480p_9",
+            encoderConfig: router.query.withHighQuality ? "720p_3" : "480p_9",
          });
       } catch (error) {
          dispatch(actions.handleSetDeviceError(error, "camera"));
@@ -285,7 +322,7 @@ export default function useAgoraRtc(
          audioTrack: audioTrack,
          videoTrack: videoTrack,
       }));
-   }, [withHighQuality]);
+   }, [router.query.withHighQuality]);
 
    const closeAndUnpublishedLocalStream = useCallback(async () => {
       if (localStream) {
@@ -581,7 +618,7 @@ export default function useAgoraRtc(
          localStream.isVideoPublished,
          localStream.audioTrack,
          localStream.isAudioPublished,
-         withHighQuality,
+         router.query.withHighQuality,
       ]
    );
 

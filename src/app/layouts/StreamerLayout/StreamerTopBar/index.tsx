@@ -41,55 +41,59 @@ import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import { TOP_BAR_HEIGHT } from "constants/streamLayout";
 import { localStorageAudienceDrawerKey } from "constants/localStorageKeys";
+import RootState from "../../../store/reducers";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    toolbar: {
-      minHeight: TOP_BAR_HEIGHT,
+      minHeight: [TOP_BAR_HEIGHT, "important"],
       display: "flex",
       justifyContent: "space-between",
    },
    streamStatusText: {
       fontWeight: 600,
-      color: ({ hasStarted }) =>
-         hasStarted ? theme.palette.primary.main : theme.palette.warning.main,
+   },
+   statusActiveColor: {
+      color: (theme) => theme.palette.primary.main,
+   },
+   statusInactiveColor: {
+      color: (theme) => theme.palette.warning.main,
    },
    viewCount: {
       // background: theme.palette.primary.main,
-      color: theme.palette.primary.main,
-      padding: theme.spacing(0, 1),
+      color: (theme) => theme.palette.primary.main,
+      padding: (theme) => theme.spacing(0, 1),
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
    },
    viewCountText: {
       fontWeight: 600,
-      marginLeft: theme.spacing(0.5),
+      marginLeft: (theme) => theme.spacing(0.5),
    },
-}));
+};
 
 const StreamerTopBar = ({ firebase, showAudience }) => {
-   const {
-      currentLivestream,
-      isBreakout,
-      isMainStreamer,
-      isStreamer,
-   } = useCurrentStream();
+   const { currentLivestream, isBreakout, isMainStreamer, isStreamer } =
+      useCurrentStream();
 
    const dispatch = useDispatch();
    const streamRef = useStreamRef();
-   const classes = useStyles({ hasStarted: currentLivestream?.hasStarted });
    const theme = useTheme();
    const mobile = useMediaQuery(theme.breakpoints.down("lg"));
    const { toggleTheme, themeMode } = useThemeToggle();
-   const numberOfViewers = useSelector((state) =>
+   const numberOfViewers = useSelector((state: RootState) =>
       currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0
    );
+
+   const sessionIsUsingCloudProxy = useSelector((state: RootState) => {
+      return state.stream.agoraState.sessionIsUsingCloudProxy;
+   });
    const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
    const [hideTooltip, setHideTooltip] = useState(false);
    const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
    const { joiningStreamerLink, viewerLink } = useStreamToken();
 
-   const streamerIsPublished = useSelector((state) => {
+   const streamerIsPublished = useSelector((state: RootState) => {
       return state.stream.streaming.isPublished;
    });
 
@@ -122,7 +126,7 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
    return (
       <Fragment>
          <AppBar elevation={1} color="transparent">
-            <Toolbar className={classes.toolbar}>
+            <Toolbar sx={styles.toolbar}>
                <Hidden mdDown>
                   <MainLogo white={theme.palette.mode === "dark"} />
                </Hidden>
@@ -201,7 +205,12 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                      }
                   >
                      <Typography
-                        className={classes.streamStatusText}
+                        sx={[
+                           styles.streamStatusText,
+                           currentLivestream?.hasStarted
+                              ? styles.statusActiveColor
+                              : styles.statusInactiveColor,
+                        ]}
                         variant="h5"
                      >
                         {currentLivestream.hasStarted ? "LIVE" : "NOT LIVE"}
@@ -214,7 +223,12 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                      justifyContent="center"
                   >
                      <Typography
-                        className={classes.streamStatusText}
+                        sx={[
+                           styles.streamStatusText,
+                           currentLivestream?.hasStarted
+                              ? styles.statusActiveColor
+                              : styles.statusInactiveColor,
+                        ]}
                         variant="h5"
                      >
                         {currentLivestream.hasStarted
@@ -275,13 +289,13 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                      />
                   </Tooltip>
                   <NewFeatureHint
-                     onClick={showAudience}
+                     // onClick={showAudience}
                      hide={!streamerIsPublished}
                      tooltipText="Click here to see who's joined the stream since the start"
                      localStorageKey={localStorageAudienceDrawerKey}
                      tooltipTitle="Hint"
                   >
-                     <Box className={classes.viewCount}>
+                     <Box sx={styles.viewCount}>
                         {mobile ? (
                            <Tooltip title="See who joined">
                               <IconButton

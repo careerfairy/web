@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import RootState from "store/reducers";
@@ -26,19 +26,32 @@ const AgoraStateHandler: FC<Props> = () => {
       return state.stream.agoraState.rtcError;
    });
 
-   const [steps] = useState<OptionCardProps[]>([
-      {
-         title: "Change Network",
-         description:
-            "Try disconnecting from any VPN, switching to another " +
-            "network or use a mobile hotspot.",
-         actionButtonProps: {
-            onClick: router.reload,
-            children: "Click here to refresh once done ",
-            sx: { mt: 1, mx: "auto" },
-         },
+   const networkErrorStep = {
+      description: "Sometimes a simple refresh might resolve the issue.",
+      actionButtonProps: {
+         children: "Refresh",
+         onClick: router.reload,
+         sx: { mt: 1, mx: "auto" },
       },
-   ]);
+      onClick: () => router.reload(),
+      title: "Try Refreshing",
+   };
+   const steps: OptionCardProps[] = useMemo(
+      () => [
+         {
+            title: "Change Network",
+            description:
+               "Try disconnecting from any VPN, switching to another " +
+               "network or use a mobile hotspot.",
+            actionButtonProps: {
+               onClick: router.reload,
+               children: "Click here to refresh once done ",
+               sx: { mt: 1, mx: "auto" },
+            },
+         },
+      ],
+      []
+   );
 
    useEffect(() => {
       (function handleStatus() {
@@ -63,6 +76,9 @@ const AgoraStateHandler: FC<Props> = () => {
                if (prevState === "CONNECTING") return;
                if (reason === "UID_BANNED") {
                   return showUidConflictModal();
+               }
+               if (reason === "NETWORK_ERROR") {
+                  return showConnectionStateModal([networkErrorStep]);
                }
                showConnectionStateModal();
                break;
@@ -117,8 +133,12 @@ const AgoraStateHandler: FC<Props> = () => {
       );
    };
 
-   const showConnectionStateModal = () =>
-      setView(() => <ConnectionStateModal steps={steps} />);
+   const showConnectionStateModal = (additionalSteps?: OptionCardProps[]) =>
+      setView(() => (
+         <ConnectionStateModal
+            steps={additionalSteps ? [...additionalSteps, ...steps] : steps}
+         />
+      ));
    const showDebugModal = () => setView(() => <DebugModal steps={steps} />);
    const showUidConflictModal = () => setView(() => <UidConflict />);
 
