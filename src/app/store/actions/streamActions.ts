@@ -157,12 +157,17 @@ export const setScreenShareDeniedError = (denied: boolean) => (dispatch) => {
 };
 export const handleScreenShareDeniedError =
    (error: RTCError) => async (dispatch) => {
+      const errorMessage = error?.message?.toLowerCase?.();
       switch (error?.code) {
          case "PERMISSION_DENIED":
-            const errorMessage = error?.message?.toLowerCase?.();
             if (errorMessage?.includes("permission denied by system")) {
                dispatch(setScreenShareDeniedError(true));
             } else if (errorMessage?.includes("permission denied")) {
+            }
+            break;
+         case "DEVICE_NOT_FOUND":
+            if (errorMessage?.includes("the object not be found here")) {
+               dispatch(setScreenShareDeniedError(true));
             }
             break;
          case "SHARE_AUDIO_NOT_ALLOWED":
