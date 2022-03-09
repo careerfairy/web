@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo } from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 import { alpha } from "@mui/material/styles";
 import SignalWifi0BarRoundedIcon from "@mui/icons-material/SignalWifi0BarRounded";
 import SignalWifi1BarRoundedIcon from "@mui/icons-material/SignalWifi1BarRounded";
@@ -6,11 +6,13 @@ import SignalWifi2BarRoundedIcon from "@mui/icons-material/SignalWifi2BarRounded
 import SignalWifi3BarRoundedIcon from "@mui/icons-material/SignalWifi3BarRounded";
 import SignalWifi4BarRoundedIcon from "@mui/icons-material/SignalWifi4BarRounded";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import ProxyIcon from "@mui/icons-material/CellTower";
 import CachedIcon from "@mui/icons-material/Cached";
 import WarningIcon from "@mui/icons-material/Warning";
 import { ArrowDown, ArrowUp } from "react-feather";
-import clsx from "clsx";
-import { Box, Tooltip } from "@mui/material";
+import Box from "@mui/material/Box";
+import Tooltip from "@mui/material/Tooltip";
+import Stack from "@mui/material/Stack";
 import * as actions from "store/actions";
 import { useDispatch, useSelector } from "react-redux";
 import InternetIcon from "@mui/icons-material/Wifi";
@@ -20,7 +22,7 @@ import { ConnectionState, NetworkQuality } from "agora-rtc-sdk-ng";
 
 const gradient = [
    "rgba(0,0,0,0.5)",
-   "#54db00",
+   "#00F92C",
    "#aeca45",
    "#ca9f00",
    "#df6a00",
@@ -33,7 +35,6 @@ const styles = {
       fontSize: "0.8rem",
       cursor: "move",
       borderRadius: 2,
-      padding: (theme) => theme.spacing(1),
       boxShadow: (theme) => theme.shadows[2],
       backgroundColor: (theme) => alpha(theme.palette.common.black, 0.4),
       backdropFilter: "blur(5px)",
@@ -45,21 +46,22 @@ const styles = {
       "&:hover": {
          transform: `scale(1.05)`,
       },
+      p: 1,
    },
    subBox: {
       display: "flex",
+      width: "100%",
    },
    svgShadow: {
       filter: `drop-shadow(0px 0px 2px rgba(0,0,0,0.4))`,
    },
-   arrowUplinkIcon: {
-      width: (theme) => theme.spacing(2),
-   },
-   arrowDownlinkIcon: {
-      width: (theme) => theme.spacing(2),
-   },
    svg: {
       fontSize: "1.9em",
+      mt: "auto",
+   },
+   smallSvg: {
+      width: 14,
+      height: 14,
    },
    text: {
       color: (theme) => theme.palette.common.white,
@@ -71,14 +73,15 @@ interface WifiIndicatorProps {
    downlink: NetworkQuality["downlinkNetworkQuality"];
 }
 
-const WifiIndicator: FC<WifiIndicatorProps> = ({
-   uplink,
-   downlink,
-   ...rest
-}) => {
+const WifiIndicator: FC<WifiIndicatorProps> = ({ uplink, downlink }) => {
    const agoraRtcConnectionStatus = useSelector((state: RootState) => {
       return state.stream.agoraState.rtcConnectionState;
    });
+   const proxyActive = useSelector((state: RootState) => {
+      return state.stream.agoraState.sessionIsUsingCloudProxy;
+   });
+
+   const [open, setOpen] = useState(false);
    const dispatch = useDispatch();
 
    useEffect(() => {
@@ -93,6 +96,9 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({
          });
       };
    }, []);
+
+   const handleOpen = () => setOpen(true);
+   const handleClose = () => setOpen(false);
 
    const getNetWorkInfo = (isUplink?: boolean) => {
       let newStyles = isUplink
@@ -120,7 +126,7 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({
             rating: 1,
             description: `The ${
                isUplink ? "upload" : "download"
-            } network quality is excellent.`,
+            } network quality is excellent`,
             icon: <SignalWifi4BarRoundedIcon sx={newStyles} />,
             color: gradient[1],
          },
@@ -128,7 +134,7 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({
             rating: 2,
             description: `The ${
                isUplink ? "upload" : "download"
-            } network quality is good, but the bitrate may be slightly lower than optimal.`,
+            } network quality is good, but the bitrate may be slightly lower than optimal`,
             icon: <SignalWifi3BarRoundedIcon sx={newStyles} />,
             color: gradient[2],
          },
@@ -136,7 +142,7 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({
             rating: 3,
             description: `Users experience slightly impaired communication with this ${
                isUplink ? "upload" : "download"
-            } quality.`,
+            } quality`,
             icon: <SignalWifi3BarRoundedIcon sx={newStyles} />,
             color: gradient[3],
          },
@@ -144,7 +150,7 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({
             rating: 4,
             description: `Users cannot communicate smoothly with this ${
                isUplink ? "upload" : "download"
-            } quality.`,
+            } quality`,
             icon: <SignalWifi2BarRoundedIcon sx={newStyles} />,
             color: gradient[4],
          },
@@ -152,7 +158,7 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({
             rating: 5,
             description: `The ${
                isUplink ? "upload" : "download"
-            } network quality is so poor that users can barely communicate.`,
+            } network quality is so poor that users can barely communicate`,
             icon: <SignalWifi2BarRoundedIcon sx={newStyles} />,
             color: gradient[5],
          },
@@ -160,7 +166,7 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({
             rating: 6,
             description: `The ${
                isUplink ? "upload" : "download"
-            } network quality is down and users cannot communicate at all.`,
+            } network quality is down and users cannot communicate at all`,
             icon: <SignalWifi1BarRoundedIcon sx={newStyles} />,
             color: gradient[6],
          },
@@ -248,76 +254,116 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({
    );
 
    return (
-      <Box {...rest} sx={styles.root}>
-         <Box>
-            <Tooltip title={rtmConnectionInfo.message}>
-               <Box
-                  marginRight={1}
-                  marginBottom={1}
+      <Stack
+         onMouseEnter={handleOpen}
+         onMouseLeave={handleClose}
+         spacing={1}
+         sx={styles.root}
+      >
+         <Stack
+            justifyContent="center"
+            alignItems={"center"}
+            direction={open ? "column" : "row"}
+            spacing={1}
+         >
+            <Tooltip arrow placement="right" title={rtmConnectionInfo.message}>
+               <Stack
+                  sx={{ width: open ? "100%" : "auto" }}
+                  spacing={1}
                   alignItems="left"
-                  sx={styles.subBox}
+                  direction={"row"}
                >
-                  <Box display="flex" marginRight={1}>
-                     {rtmConnectionInfo.icon}
-                  </Box>
-                  <Box display="flex" sx={styles.text}>
-                     Internet
-                  </Box>
-               </Box>
+                  <Box display="flex">{rtmConnectionInfo.icon}</Box>
+                  {open && (
+                     <Box display="flex" sx={styles.text}>
+                        Internet
+                     </Box>
+                  )}
+               </Stack>
             </Tooltip>
-            <Tooltip title={rtcConnectionInfo.message}>
-               <Box
-                  marginRight={1}
-                  marginBottom={1}
-                  alignItems="left"
-                  sx={styles.subBox}
+            <Tooltip arrow placement="right" title={rtcConnectionInfo.message}>
+               <Stack
+                  sx={{ width: open ? "100%" : "auto" }}
+                  spacing={1}
+                  direction={"row"}
                >
-                  <Box display="flex" marginRight={1}>
-                     {rtcConnectionInfo.icon}
-                  </Box>
-                  <Box display="flex" sx={styles.text}>
-                     Streaming
-                  </Box>
-               </Box>
+                  <Box display="flex">{rtcConnectionInfo.icon}</Box>
+                  {open && (
+                     <Box display="flex" sx={styles.text}>
+                        Streaming
+                     </Box>
+                  )}
+               </Stack>
             </Tooltip>
-         </Box>
-         <Box sx={styles.subBox}>
-            <Tooltip
-               style={{ color: uplinkInfo.color }}
-               placement="top"
-               title={uplinkInfo.description}
+            {proxyActive && (
+               <Tooltip
+                  arrow
+                  placement="right"
+                  title={"You are currently connected through a proxy"}
+               >
+                  <Stack
+                     sx={{ width: open ? "100%" : "auto" }}
+                     spacing={1}
+                     direction={"row"}
+                  >
+                     <ProxyIcon sx={{ color: "#00F92C" }} />
+                     {open && (
+                        <Box display="flex" sx={styles.text}>
+                           Using Proxy
+                        </Box>
+                     )}
+                  </Stack>
+               </Tooltip>
+            )}
+         </Stack>
+         {open && (
+            <Stack
+               justifyContent={"space-around"}
+               direction={"row"}
+               sx={{ width: "100%" }}
+               spacing={1}
             >
-               <Box marginRight={1} alignItems="center" display="flex">
-                  {uplinkInfo.icon}
-                  <Box
-                     component={ArrowUp}
-                     sx={[
-                        styles.arrowUplinkIcon,
-                        styles.svgShadow,
-                        { color: gradient[uplink] },
-                     ]}
-                  />
-               </Box>
-            </Tooltip>
-            <Tooltip
-               style={{ color: downlinkInfo.color }}
-               placement="top"
-               title={downlinkInfo.description}
-            >
-               <Box alignItems="center" display="flex">
-                  {downlinkInfo.icon}
-                  <Box
-                     component={ArrowDown}
-                     sx={[
-                        styles.arrowDownlinkIcon,
-                        styles.svgShadow,
-                        { color: gradient[downlink] },
-                     ]}
-                  />
-               </Box>
-            </Tooltip>
-         </Box>
-      </Box>
+               <Tooltip
+                  arrow
+                  placement="right"
+                  style={{ color: uplinkInfo.color }}
+                  title={uplinkInfo.description}
+               >
+                  <Box marginRight={1} alignItems="center" display="flex">
+                     {uplinkInfo.icon}
+                     <Box
+                        component={ArrowUp}
+                        sx={[
+                           styles.smallSvg,
+                           styles.svgShadow,
+                           styles.svg,
+                           { color: gradient[uplink] },
+                        ]}
+                     />
+                  </Box>
+               </Tooltip>
+               <Tooltip
+                  arrow
+                  placement="right"
+                  style={{ color: downlinkInfo.color }}
+                  title={downlinkInfo.description}
+               >
+                  <Box alignItems="center" display="flex">
+                     {downlinkInfo.icon}
+                     <Box
+                        component={ArrowDown}
+                        sx={[
+                           styles.smallSvg,
+                           styles.svgShadow,
+                           styles.svg,
+                           { color: gradient[downlink] },
+                        ]}
+                     />
+                  </Box>
+               </Tooltip>
+            </Stack>
+         )}
+      </Stack>
    );
 };
 

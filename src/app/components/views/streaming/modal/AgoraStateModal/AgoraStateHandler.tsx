@@ -73,12 +73,12 @@ const AgoraStateHandler: FC<Props> = () => {
                showConnectionStateModal();
                break;
             case "DISCONNECTED":
+               if (reason === "NETWORK_ERROR") {
+                  return showConnectionStateModal([networkErrorStep]);
+               }
                if (prevState === "CONNECTING") return;
                if (reason === "UID_BANNED") {
                   return showUidConflictModal();
-               }
-               if (reason === "NETWORK_ERROR") {
-                  return showConnectionStateModal([networkErrorStep]);
                }
                showConnectionStateModal();
                break;

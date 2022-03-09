@@ -85,9 +85,6 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
       currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0
    );
 
-   const sessionIsUsingCloudProxy = useSelector((state: RootState) => {
-      return state.stream.agoraState.sessionIsUsingCloudProxy;
-   });
    const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
    const [hideTooltip, setHideTooltip] = useState(false);
    const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);

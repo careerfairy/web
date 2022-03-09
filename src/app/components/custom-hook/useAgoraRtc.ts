@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import useStreamRef from "./useStreamRef";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
@@ -15,6 +15,8 @@ import * as actions from "store/actions";
 import { useSessionStorage } from "react-use";
 import { RTC_CLIENT_JOIN_TIME_LIMIT } from "constants/streams";
 import { LocalStream } from "types/streaming";
+import RootState from "../../store/reducers";
+import { sleep } from "../helperFunctions/HelperFunctions";
 
 const rtcClient = AgoraRTC.createClient({
    mode: "live",
@@ -37,11 +39,11 @@ export default function useAgoraRtc(
    const { path } = useStreamRef();
    const router = useRouter();
 
-   const [sessionIsUsingCloudProxy, setSessionIsUsingProxy] =
+   const [sessionShouldUseCloudProxy, setSessionShouldUseProxy] =
       useSessionStorage<boolean>("is-using-cloud-proxy", false);
-
-   const [clientIsUsingCloudProxy, setClientIsUsingCloudProxy] =
-      useState(false);
+   const sessionIsUsingCloudProxy = useSelector((state: RootState) => {
+      return state.stream.agoraState.sessionIsUsingCloudProxy;
+   });
 
    const [localStream, setLocalStream] = useState<LocalStream>({
       uid: streamerId,
@@ -62,20 +64,7 @@ export default function useAgoraRtc(
    const screenShareRtcClientRef = useRef(screenShareRtcClient);
 
    const { remoteStreams, networkQuality, demoStreamHandlers } =
-      useAgoraClientConfig(rtcClient, {
-         clientIsUsingCloudProxy,
-      });
-
-   useEffect(() => {
-      rtcClient.on("is-using-cloud-proxy", (isUsing) => {
-         setClientIsUsingCloudProxy(isUsing);
-         dispatch(
-            actions.setSessionIsUsingCloudProxy(
-               Boolean(sessionIsUsingCloudProxy)
-            )
-         );
-      });
-   }, []);
+      useAgoraClientConfig(rtcClient);
 
    useEffect(() => {
       AgoraRTC.onAutoplayFailed = () => {
@@ -100,7 +89,7 @@ export default function useAgoraRtc(
    }, [isStreamer, rtcClient]);
 
    const init = async () => {
-      return joinAgoraRoomWithPrimaryClient(sessionIsUsingCloudProxy);
+      return joinAgoraRoomWithPrimaryClient(sessionShouldUseCloudProxy);
    };
 
    const close = async () => {
@@ -133,28 +122,6 @@ export default function useAgoraRtc(
       setScreenShareStream(newScreenShareStream);
    };
 
-   // const handleEnableCloudProxy = async () => {
-   //    try {
-   //       await leaveAgoraRoom();
-   //    } catch (e) {
-   //       console.log("-> e in leaving Room", e);
-   //    }
-   //
-   //    try {
-   //       const sessionShouldUseCloudProxy = true;
-   //       console.log("-> Setting session is using cp true");
-   //       setSessionIsUsingProxy(sessionShouldUseCloudProxy);
-   //       // return router.reload();
-   //       setTimeout(
-   //          async () =>
-   //             await joinAgoraRoomWithPrimaryClient(sessionShouldUseCloudProxy),
-   //          2000
-   //       );
-   //    } catch (e) {
-   //       console.log("-> e in joining Room with Proxy", e);
-   //    }
-   // };
-
    const logStatus = (
       type: "JOIN" | "LEAVE",
       isSuccess: boolean,
@@ -174,7 +141,7 @@ export default function useAgoraRtc(
       roomId: string,
       userUid: string,
       isStreamer: boolean,
-      sessionIsUsingCloudProxy: boolean
+      sessionShouldUseCloudProxy: boolean
    ) => {
       let timeout;
       try {
@@ -186,27 +153,34 @@ export default function useAgoraRtc(
             channelName: roomId,
             streamDocumentPath: path,
          });
-         if (sessionIsUsingCloudProxy) {
+         if (sessionShouldUseCloudProxy) {
             rtcClient.startProxyServer(3);
          } else {
             timeout = setTimeout(async () => {
                // Start reconnecting with Cloud Proxy Process
-               logStatus("LEAVE", false, sessionIsUsingCloudProxy);
+               logStatus("LEAVE", false, sessionShouldUseCloudProxy);
                await rtcClient.leave();
-               logStatus("LEAVE", true, sessionIsUsingCloudProxy);
-               const shouldUseProxy = true;
-               setSessionIsUsingProxy(shouldUseProxy);
+               logStatus("LEAVE", true, sessionShouldUseCloudProxy);
+
+               // Normally client.leave() method should abort the initial join according to the docs.
+               // But that is not the case, so one must wait/sleep a bit before re-joining
+               await sleep(2000);
+               setSessionShouldUseProxy(sessionShouldUseCloudProxy);
                rtcClient.startProxyServer(3);
-               return await joinAgoraRoom(
-                  rtcClient,
-                  roomId,
-                  userUid,
-                  isStreamer,
-                  shouldUseProxy
-               );
+               try {
+                  await rtcClient.join(
+                     AGORA_APP_ID,
+                     roomId,
+                     data.token.rtcToken,
+                     userUid
+                  );
+               } catch (e) {
+                  console.log("-> ERROR IN RECONNECT WITH Proxy", e);
+               }
+               return;
             }, RTC_CLIENT_JOIN_TIME_LIMIT);
          }
-         logStatus("JOIN", false, sessionIsUsingCloudProxy);
+         logStatus("JOIN", false, sessionShouldUseCloudProxy);
 
          await rtcClient.join(
             AGORA_APP_ID,
@@ -214,9 +188,9 @@ export default function useAgoraRtc(
             data.token.rtcToken,
             userUid
          );
-         logStatus("JOIN", true, sessionIsUsingCloudProxy);
+         logStatus("JOIN", true, sessionShouldUseCloudProxy);
       } catch (error) {
-         logStatus("JOIN", false, sessionIsUsingCloudProxy, error);
+         logStatus("JOIN", false, sessionShouldUseCloudProxy, error);
          dispatch(actions.setAgoraRtcError(error));
       }
       if (timeout) {
@@ -227,11 +201,11 @@ export default function useAgoraRtc(
    const leaveAgoraRoom = async () => {
       console.log("-> LEAVING");
       try {
-         if (clientIsUsingCloudProxy) {
-            rtcClient.stopProxyServer();
-         }
          if (rtcClient) {
             return await rtcClient.leave();
+         }
+         if (sessionIsUsingCloudProxy) {
+            rtcClient.stopProxyServer();
          }
       } catch (error) {
          console.log(error);
@@ -239,7 +213,7 @@ export default function useAgoraRtc(
    };
 
    const joinAgoraRoomWithPrimaryClient = async (
-      sessionIsUsingCloudProxy: boolean
+      sessionShouldUseCloudProxy: boolean
    ) => {
       try {
          await joinAgoraRoom(
@@ -247,7 +221,7 @@ export default function useAgoraRtc(
             roomId,
             streamerId,
             isStreamer,
-            sessionIsUsingCloudProxy
+            sessionShouldUseCloudProxy
          );
          return dispatch(actions.setAgoraPrimaryClientJoined(true));
       } catch (error) {
@@ -513,7 +487,7 @@ export default function useAgoraRtc(
                   roomId,
                   screenShareUid,
                   true,
-                  sessionIsUsingCloudProxy
+                  sessionShouldUseCloudProxy
                );
                await publishScreenShareTracks(
                   screenShareTracks,
@@ -526,7 +500,7 @@ export default function useAgoraRtc(
             }
          });
       },
-      [sessionIsUsingCloudProxy, screenShareRtcClient, streamerId, roomId]
+      [sessionShouldUseCloudProxy, screenShareRtcClient, streamerId, roomId]
    );
 
    const unPublishScreenShareStream = async () => {

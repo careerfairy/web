@@ -37,6 +37,10 @@ const ConnectionStateModal: FC<Props> = (props) => {
             "RECONNECTING",
             "DISCONNECTED",
          ].includes(curState);
+         if (agoraRtcConnectionStatus.curState === "DISCONNECTED") {
+            setShowDebugPrompt(true);
+            return;
+         }
          if (inALoadingState) {
             timeout = setTimeout(async () => {
                setShowDebugPrompt(true);
