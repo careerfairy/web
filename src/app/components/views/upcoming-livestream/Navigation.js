@@ -45,6 +45,11 @@ const Navigation = ({ aboutRef, questionsRef, speakersRef }) => {
    }, [aboutRef.current, questionsRef.current, speakersRef.current]);
 
    useEffect(() => {
+      if (!"IntersectionObserver" in window) {
+         // this browser doesn't seem to support the IntersectionObserver API, do nothing
+         return;
+      }
+
       let observer;
       if (tabs.length) {
          const options = {

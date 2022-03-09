@@ -3,7 +3,7 @@ import { CircularProgress, Grid } from "@mui/material";
 import StreamCard from "./StreamCard";
 import { isEmpty, isLoaded } from "react-redux-firebase";
 
-const StreamsContainer = ({ streams }) => {
+const StreamsContainer = ({ isUpcoming, streams }) => {
    if (!isLoaded(streams)) {
       return <CircularProgress />;
    }
@@ -24,13 +24,16 @@ const StreamsContainer = ({ streams }) => {
                lg={4}
                xl={3}
             >
-               <StreamCard stream={stream} />
+               <StreamCard isUpcoming={isUpcoming} stream={stream} />
             </Grid>
          ))}
       </React.Fragment>
    );
 };
 
-StreamsContainer.propTypes = {};
+StreamsContainer.propTypes = {
+   streams: PropTypes.arrayOf(streamType).isRequired,
+   isUpcoming: PropTypes.bool,
+};
 
 export default StreamsContainer;

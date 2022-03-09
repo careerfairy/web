@@ -3,7 +3,8 @@ import "styles.css";
 import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext";
 import config from "@stahl.luke/react-reveal/globals";
 import { newStore, wrapper } from "../store";
-
+import NextNProgress from "nextjs-progressbar";
+import { brandedLightTheme } from "../materialUI";
 import Head from "next/head";
 import TagManager from "react-gtm-module";
 import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar";
@@ -157,6 +158,10 @@ function MyApp(props) {
             />
             <title>CareerFairy | Watch live streams. Get hired.</title>
          </Head>
+         <NextNProgress
+            color={brandedLightTheme.palette.primary.main}
+            options={{ showSpinner: false }}
+         />
          <Provider store={store}>
             <ReactReduxFirebaseProvider {...rrfProps}>
                <TutorialContext.Provider

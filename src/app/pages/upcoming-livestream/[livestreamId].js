@@ -360,6 +360,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       }
       return question.emailOfVoters.indexOf(authenticatedUser.email) > -1;
    }
+
    return (
       <UpcomingLayout>
          <HeadWithMeta
@@ -431,6 +432,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          />
          <RegistrationModal
             open={Boolean(joinGroupModalData)}
+            handleClose={handleCloseJoinModal}
             onFinish={handleCloseJoinModal}
             promptOtherEventsOnFinal
             livestream={joinGroupModalData?.livestream}
@@ -445,6 +447,12 @@ export async function getServerSideProps({
    query: { groupId },
 }) {
    const serverStream = await getServerSideStream(livestreamId);
+
+   if (!serverStream) {
+      return {
+         notFound: true,
+      };
+   }
 
    // TODO check if groupId is part of stream.groupIds
    return {
