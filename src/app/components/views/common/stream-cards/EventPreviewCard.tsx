@@ -2,12 +2,9 @@ import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import ShareIcon from "@mui/icons-material/Share";
-import DateUtil from "util/DateUtil";
 import AvatarGroup from "@mui/material/AvatarGroup";
 import Button from "@mui/material/Button";
 import CardMedia from "@mui/material/CardMedia";
-import IconButton from "@mui/material/IconButton";
 import { alpha, Theme } from "@mui/material/styles";
 import LanguageIcon from "@mui/icons-material/Language";
 import CheckIcon from "@mui/icons-material/CheckCircle";
@@ -33,6 +30,7 @@ import LiveIcon from "@mui/icons-material/RadioButtonChecked";
 import Skeleton from "@mui/material/Skeleton";
 
 import { Chip } from "@mui/material";
+import DateAndShareDisplay from "./common/DateAndShareDisplay";
 
 const logosWrapperSpacing = 12;
 const styles = {
@@ -41,19 +39,14 @@ const styles = {
          boxShadow: 2,
       },
    },
-   dateShareWrapper: {
-      py: 1,
-   },
-   date: {
-      fontWeight: 600,
-   },
+
    statusWrapper: {
       position: "absolute",
       "& .MuiChip-root": {
          // margin: 0,
       },
       inset: 0,
-      padding: (theme) => theme.spacing(1, 3),
+      padding: (theme) => theme.spacing(3),
       transition: (theme: Theme) => theme.transitions.create(["opacity"]),
    },
    backgroundImage: {
@@ -139,7 +132,7 @@ const styles = {
    },
    mainContent: {
       transform: {
-         xs: "translateY(calc(100% - 9rem))",
+         xs: "translateY(calc(100% - 10rem))",
          sm: "translateY(calc(100% - 10rem))",
       },
 
@@ -152,7 +145,7 @@ const styles = {
       position: "absolute",
       inset: 0,
       width: "100%",
-      padding: { xs: 2, sm: 3 },
+      padding: { xs: 3, sm: 3 },
       transition: (theme: Theme) =>
          `transform ${theme.transitions.duration.complex}ms cubic-bezier(0.19, 1, 0.22, 1)`,
       zIndex: 1,
@@ -161,6 +154,7 @@ const styles = {
    title: {
       fontWeight: 600,
       ...getMaxLineStyles(2),
+      textShadow: (theme) => theme.darkTextShadow,
    },
    summary: {
       ...getMaxLineStyles(3),
@@ -176,7 +170,7 @@ const styles = {
       height: (theme) => theme.spacing(logosWrapperSpacing),
       "& > *": {
          flex: 0.5,
-         mx: "auto",
+         // mx: "auto",
       },
    },
    hostsWrapper: {
@@ -212,12 +206,14 @@ const EventPreviewCard = ({
    onRegisterClick,
    registering,
 }: EventPreviewCardProps) => {
+   const getStartDate = () => event?.start?.toDate?.();
+
    const [eventInterests, setSetEventInterests] = useState([]);
    const [hasRegistered, setHasRegistered] = useState(false);
    const firebase = useFirebaseService();
    const { authenticatedUser } = useAuth();
    const [hosts, setHosts] = useState(undefined);
-   const [isPast, setIsPast] = useState(chekIfPast(event?.startDate));
+   const [isPast, setIsPast] = useState(chekIfPast(getStartDate()));
    const [showHosts, setShowHosts] = useState(false);
    const [_, copyToClipboard] = useCopyToClipboard();
    const dispatch = useDispatch();
@@ -269,9 +265,9 @@ const EventPreviewCard = ({
 
    useEffect(() => {
       if (!loading) {
-         setIsPast(chekIfPast(event?.startDate));
+         setIsPast(chekIfPast(getStartDate()));
       }
-   }, [event?.startDate, loading]);
+   }, [event?.start, loading]);
 
    const handleShareClick = () => {
       const linkToEvent = event
@@ -297,28 +293,11 @@ const EventPreviewCard = ({
    return (
       <>
          <Box sx={styles.root}>
-            <Stack
-               spacing={2}
-               sx={styles.dateShareWrapper}
-               justifyContent="space-between"
-               alignItems={"center"}
-               direction="row"
-            >
-               <Typography component={"div"} variant={"h6"} sx={styles.date}>
-                  {loading ? (
-                     <Skeleton width={120} />
-                  ) : (
-                     DateUtil.eventPreviewDate(event?.startDate)
-                  )}
-               </Typography>
-               {loading ? (
-                  <Skeleton variant={"circular"} height={20} width={20} />
-               ) : (
-                  <IconButton onClick={handleShareClick}>
-                     <ShareIcon />
-                  </IconButton>
-               )}
-            </Stack>
+            <DateAndShareDisplay
+               startDate={getStartDate()}
+               loading={loading}
+               onShareClick={handleShareClick}
+            />
             <Box
                sx={[
                   styles.mainAndLowerContentWrapper,
@@ -390,11 +369,7 @@ const EventPreviewCard = ({
                            className="title"
                            sx={styles.title}
                         >
-                           {loading ? (
-                              <Skeleton />
-                           ) : (
-                              `${event?.title} ${event?.title}`
-                           )}
+                           {loading ? <Skeleton /> : event?.title}
                         </Typography>
                         <Stack
                            alignItems={"center"}

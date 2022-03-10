@@ -8,14 +8,7 @@ import { usePagination } from "use-pagination-firestore";
 const MyNextEvents = ({ limit }: Props) => {
    const { authenticatedUser } = useAuth();
 
-   const {
-      items: events,
-      isLoading,
-      isStart,
-      isEnd,
-      getPrev,
-      getNext,
-   } = usePagination<LiveStreamEvent>(
+   const { items: events, isLoading } = usePagination<LiveStreamEvent>(
       livestreamRepo.registeredEventsQuery(authenticatedUser.email),
       {
          limit: limit,
@@ -31,11 +24,7 @@ const MyNextEvents = ({ limit }: Props) => {
          limit={limit}
          events={events}
          title={"MY NEXT EVENTS"}
-         isStart={isStart}
-         isEnd={isEnd}
          loading={isLoading}
-         getPrev={getPrev}
-         getNext={getNext}
       />
    );
 };

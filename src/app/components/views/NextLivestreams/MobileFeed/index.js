@@ -98,19 +98,17 @@ const MobileFeed = ({
                   />
                </>
             )}
-         <Grid sx={styles.streamsGrid} container spacing={2}>
-            <GroupStreams
-               mobile={true}
-               livestreamId={livestreamId}
-               listenToUpcoming={listenToUpcoming}
-               careerCenterId={careerCenterId}
-               isPastLivestreams={isPastLivestreams}
-               selectedOptions={selectedOptions}
-               searching={searching}
-               livestreams={livestreams}
-               groupData={groupData}
-            />
-         </Grid>
+         <GroupStreams
+            mobile={true}
+            livestreamId={livestreamId}
+            listenToUpcoming={listenToUpcoming}
+            careerCenterId={careerCenterId}
+            isPastLivestreams={isPastLivestreams}
+            selectedOptions={selectedOptions}
+            searching={searching}
+            livestreams={livestreams}
+            groupData={groupData}
+         />
          <FiltersDrawer
             groupData={groupData}
             hasCategories={hasCategories}
@@ -120,4 +118,4 @@ const MobileFeed = ({
    );
 };
 
-export default withFirebase(MobileFeed);
+export default MobileFeed;

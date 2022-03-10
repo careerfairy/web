@@ -37,7 +37,7 @@ export const chekIfPast = (eventStartDate: Date) =>
 
 export const getRelevantHosts = (
    targetHostGroupId: string,
-   event?: LiveStreamEvent,
+   event: LiveStreamEvent,
    groupList: any[]
 ) => {
    if (!event) return [];
