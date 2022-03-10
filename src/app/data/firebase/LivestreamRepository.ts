@@ -31,6 +31,15 @@ export interface ILivestreamRepository {
       limit: number,
       callback: (snapshot: QuerySnapshot) => void
    );
+   recommendEventsQuery(
+      userInterestsIds?: string[]
+   ): firebase.firestore.Query<firebase.firestore.DocumentData>;
+   upcomingEventsQuery(
+      userInterestsIds?: string[]
+   ): firebase.firestore.Query<firebase.firestore.DocumentData>;
+   registeredEventsQuery(
+      userEmail: string
+   ): firebase.firestore.Query<firebase.firestore.DocumentData>;
 }
 
 class FirebaseLivestreamRepository implements ILivestreamRepository {
@@ -53,6 +62,13 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
       return docs;
    }
 
+   upcomingEventsQuery() {
+      return this.firestore
+         .collection("livestreams")
+         .where("start", ">", this.earliestEventBufferTime)
+         .where("test", "==", false)
+         .orderBy("start", "asc");
+   }
    async getUpcomingEvents(limit?: number): Promise<LiveStreamEvent[] | null> {
       let livestreamRef = this.firestore
          .collection("livestreams")
@@ -81,6 +97,14 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
       return livestreamRef.onSnapshot(callback);
    }
 
+   registeredEventsQuery(userEmail: string) {
+      return this.firestore
+         .collection("livestreams")
+         .where("start", ">", this.earliestEventBufferTime)
+         .where("test", "==", false)
+         .where("registeredUsers", "array-contains", userEmail || "")
+         .orderBy("start", "asc");
+   }
    async getRegisteredEvents(
       userEmail: string,
       limit?: number
@@ -116,7 +140,14 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
       }
       return livestreamRef.onSnapshot(callback);
    }
-
+   recommendEventsQuery(userInterestsIds?: string[]) {
+      return this.firestore
+         .collection("livestreams")
+         .where("start", ">", this.earliestEventBufferTime)
+         .where("test", "==", false)
+         .where("interestsIds", "array-contains-any", userInterestsIds || [])
+         .orderBy("start", "asc");
+   }
    async getRecommendEvents(
       userEmail: string,
       userInterestsIds?: string[],
