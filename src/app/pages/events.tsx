@@ -15,9 +15,9 @@ const EventsPage = () => {
             <Stack spacing={{ xs: 1, sm: 3 }}>
                <HighlightsCarousel />
                <FeaturedAndNextEvents />
-               <RecommendedEvents limit={20} />
-               <ComingUpNextEvents limit={12} />
-               <MyNextEvents limit={12} />
+               <RecommendedEvents maxLimitIncreaseTimes={5} limit={30} />
+               <ComingUpNextEvents limit={20} />
+               <MyNextEvents limit={20} />
             </Stack>
          </Container>
       </GeneralLayout>

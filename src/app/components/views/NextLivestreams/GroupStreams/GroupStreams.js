@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Grid, LinearProgress, Typography } from "@mui/material";
+import { Box, Grid, LinearProgress, Typography } from "@mui/material";
 import LazyLoad from "react-lazyload";
-import Spinner from "./groupStreamCard/Spinner";
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers";
 import EventPreviewCard from "../../common/stream-cards/EventPreviewCard";
 import RegistrationModal from "../../common/registration-modal";
 import { useRouter } from "next/router";
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal";
 
-const gridItemHeight = 530;
 const styles = {
    root: {
       flex: 1,
@@ -48,10 +46,10 @@ const Wrapper = ({ children, streamId }) => {
          key={streamId}
          style={{ width: "100%" }}
          height={405}
-         debounce={500}
+         debounce={100}
          unmountIfInvisible
          scroll
-         offset={[0, 0]}
+         offset={[0, 600]}
          placeholder={<EventPreviewCard loading />}
       >
          {children}
@@ -89,7 +87,7 @@ const GroupStreams = ({
          setGlobalCardHighlighted(false);
       }
    }, [groupData]);
-   const renderStreamCards = slicedLivestreams?.map((livestream, index) => {
+   const renderStreamCards = slicedLivestreams?.map((livestream) => {
       if (livestream) {
          return (
             <Grid
@@ -106,21 +104,6 @@ const GroupStreams = ({
                      onRegisterClick={handleClickRegister}
                      event={livestream}
                   />
-                  {/*<GroupStreamCardV2*/}
-                  {/*   mobile={mobile}*/}
-                  {/*   isPastLivestreams={isPastLivestreams}*/}
-                  {/*   setGlobalCardHighlighted={setGlobalCardHighlighted}*/}
-                  {/*   globalCardHighlighted={globalCardHighlighted}*/}
-                  {/*   groupData={groupData}*/}
-                  {/*   listenToUpcoming={listenToUpcoming}*/}
-                  {/*   careerCenterId={careerCenterId}*/}
-                  {/*   livestreamId={livestreamId}*/}
-                  {/*   user={user}*/}
-                  {/*   userData={userData}*/}
-                  {/*   id={livestream.id}*/}
-                  {/*   key={livestream.id}*/}
-                  {/*   livestream={livestream}*/}
-                  {/*/>*/}
                </Wrapper>
             </Grid>
          );
@@ -129,7 +112,7 @@ const GroupStreams = ({
 
    return (
       <>
-         <Grid item xs={12}>
+         <Box sx={{ p: { xs: 0, sm: 2 } }}>
             <Grid container spacing={mobile ? 2 : 4}>
                {groupData.id || listenToUpcoming ? (
                   searching ? (
@@ -163,7 +146,7 @@ const GroupStreams = ({
                   )
                ) : null}
             </Grid>
-         </Grid>
+         </Box>
          {joinGroupModalData && (
             <RegistrationModal
                open={Boolean(joinGroupModalData)}

@@ -40,6 +40,7 @@ export interface ILivestreamRepository {
    registeredEventsQuery(
       userEmail: string
    ): firebase.firestore.Query<firebase.firestore.DocumentData>;
+   featuredEventQuery(): firebase.firestore.Query<firebase.firestore.DocumentData>;
 }
 
 class FirebaseLivestreamRepository implements ILivestreamRepository {
@@ -67,6 +68,7 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          .collection("livestreams")
          .where("start", ">", this.earliestEventBufferTime)
          .where("test", "==", false)
+         .where("hidden", "==", false)
          .orderBy("start", "asc");
    }
    async getUpcomingEvents(limit?: number): Promise<LiveStreamEvent[] | null> {
@@ -145,8 +147,18 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          .collection("livestreams")
          .where("start", ">", this.earliestEventBufferTime)
          .where("test", "==", false)
+         .where("hidden", "==", false)
          .where("interestsIds", "array-contains-any", userInterestsIds || [])
          .orderBy("start", "asc");
+   }
+
+   featuredEventQuery() {
+      return this.firestore
+         .collection("livestreams")
+         .where("test", "==", false)
+         .where("hidden", "==", false)
+         .where("featured", "==", true)
+         .orderBy("start", "desc");
    }
    async getRecommendEvents(
       userEmail: string,

@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useMemo, useRef, useState } from "react";
 import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import { LiveStreamEvent } from "../../../../types/event";
 import EventPreviewCard from "../../common/stream-cards/EventPreviewCard";
@@ -8,22 +7,28 @@ import Link from "next/link";
 import RegistrationModal from "components/views/common/registration-modal";
 import { useRouter } from "next/router";
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal";
-import BasicCarousel from "../../common/carousels/BasicCarousel";
+import { useTheme } from "@mui/material/styles";
+import Slider from "react-slick";
+import Stack from "@mui/material/Stack";
+import useMediaQuery from "@mui/material/useMediaQuery";
+
 const arrowFontSize = 30;
 
 const styles = {
-   eventsGrid: {
-      // display: "grid",
-      // gap: (theme) => theme.spacing(2),
-      // gridAutoFlow: "column",
-      // gridAutoColumns: (theme) => theme.spacing(40),
-      // scrollSnapType: "x",
-      // transition: "transform 0.5s ease-out 0s",
-      // willChange: "transform",
-      // overflowX: "scroll",
-      // padding: (theme) => theme.spacing(0, 0, 2),
+   carouselButtonDisabled: {
+      width: 0,
+   },
+   buttonLeft: {
+      left: 0,
+   },
+   buttonRight: {
+      right: 0,
    },
    carousel: {
+      "& .slick-track": {
+         ml: 0,
+         mr: 0,
+      },
       "& .slick-next": {
          right: "10px",
          "&:before": {
@@ -60,17 +65,36 @@ const EventsPreview = ({
    loading,
    limit,
    events,
-   isStart,
-   isEnd,
-   getPrev,
-   getNext,
 }: EventsProps) => {
+   const sliderRef = useRef(null);
    const {
       query: { groupId },
    } = useRouter();
    const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
       useRegistrationModal();
 
+   const {
+      breakpoints: { up },
+   } = useTheme();
+   const isSmall = useMediaQuery(up("xs"));
+   const isMedium = useMediaQuery(up("md"));
+   const isLarge = useMediaQuery(up("lg"));
+
+   const numSlides: number = useMemo(() => {
+      return isLarge ? 3 : isMedium ? 2 : 1;
+   }, [isSmall, isMedium, isLarge]);
+
+   const [cardsLoaded, setCardsLoaded] = useState({});
+
+   const handleCardsLoaded = (cardsIndexLoaded: number[]) => {
+      setCardsLoaded((prev) => ({
+         ...prev,
+         ...cardsIndexLoaded.reduce(
+            (acc, curr) => ({ ...acc, [curr]: true }),
+            {}
+         ),
+      }));
+   };
    return (
       <>
          <Box>
@@ -89,38 +113,42 @@ const EventsPreview = ({
                   </Link>
                )}
             </Box>
-            <Box sx={styles.eventsGrid}>
-               {events === undefined || loading ? (
-                  <CircularProgress />
-               ) : events === null ? (
+            <Stack>
+               {!loading && !events.length ? (
                   <Typography>No Events</Typography>
                ) : (
-                  <BasicCarousel
+                  <Box
                      sx={styles.carousel}
-                     dots={false}
-                     infinite={false}
+                     ref={sliderRef}
+                     component={Slider}
                      autoplay={false}
+                     lazyLoad
+                     infinite={false}
+                     onLazyLoad={handleCardsLoaded}
                      arrows
-                     swipeToSlide
-                     // swipe={isTouchScreen}
-
-                     // slidesToShow={limit - 1}
-                     // slidesToScroll={limit - 1}
+                     slidesToShow={numSlides}
+                     slidesToScroll={numSlides}
                      initialSlide={0}
-                     variableWidth={true}
                   >
-                     {events.map((event) => (
-                        <Box key={event.id} sx={{ minWidth: 350, pr: 2 }}>
-                           <EventPreviewCard
-                              onRegisterClick={handleClickRegister}
-                              key={event.id}
-                              event={event}
-                           />
-                        </Box>
-                     ))}
-                  </BasicCarousel>
+                     {loading
+                        ? Array(numSlides).fill(
+                             <Box sx={{ pr: 2 }}>
+                                <EventPreviewCard loading />
+                             </Box>
+                          )
+                        : events.map((event, index) => (
+                             <Box key={event.id} sx={{ pr: 2 }}>
+                                <EventPreviewCard
+                                   loading={!cardsLoaded[index]}
+                                   onRegisterClick={handleClickRegister}
+                                   key={event.id}
+                                   event={event}
+                                />
+                             </Box>
+                          ))}
+                  </Box>
                )}
-            </Box>
+            </Stack>
          </Box>
          {joinGroupModalData && (
             <RegistrationModal
@@ -158,10 +186,6 @@ export interface EventsProps {
    title?: string;
    loading: boolean;
    limit: number;
-   isStart: boolean;
-   isEnd: boolean;
-   getNext: () => void;
-   getPrev: () => void;
 }
 
 export default EventsPreview;

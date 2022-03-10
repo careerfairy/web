@@ -5,16 +5,12 @@ import { LiveStreamEvent } from "../../../../types/event";
 import { usePagination } from "use-pagination-firestore";
 
 const ComingUpNextEvents = ({ limit }: Props) => {
-   const {
-      items: events,
-      isLoading,
-      isStart,
-      isEnd,
-      getPrev,
-      getNext,
-   } = usePagination<LiveStreamEvent>(livestreamRepo.upcomingEventsQuery(), {
-      limit: limit,
-   });
+   const { items: events, isLoading } = usePagination<LiveStreamEvent>(
+      livestreamRepo.upcomingEventsQuery(),
+      {
+         limit: limit,
+      }
+   );
 
    return (
       <EventsPreview
@@ -22,11 +18,7 @@ const ComingUpNextEvents = ({ limit }: Props) => {
          title={"COMING UP NEXT"}
          events={events}
          seeMoreLink={"/next-livestreams"}
-         isStart={isStart}
-         isEnd={isEnd}
          loading={isLoading}
-         getPrev={getPrev}
-         getNext={getNext}
       />
    );
 };
