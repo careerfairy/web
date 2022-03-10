@@ -2,6 +2,7 @@ import React from "react";
 import { CircularProgress, Grid } from "@mui/material";
 import StreamCard from "./StreamCard";
 import { isEmpty, isLoaded } from "react-redux-firebase";
+import PropTypes from "prop-types";
 
 const StreamsContainer = ({ isUpcoming, streams }) => {
    if (!isLoaded(streams)) {
@@ -32,7 +33,7 @@ const StreamsContainer = ({ isUpcoming, streams }) => {
 };
 
 StreamsContainer.propTypes = {
-   streams: PropTypes.arrayOf(streamType).isRequired,
+   streams: PropTypes.arrayOf(PropTypes.object).isRequired,
    isUpcoming: PropTypes.bool,
 };
 

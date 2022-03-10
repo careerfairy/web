@@ -378,7 +378,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
 };
 
 StreamCard.propTypes = {
-   stream: streamType.isRequired,
+   stream: PropTypes.object,
    isUpcoming: PropTypes.bool,
 };
 
