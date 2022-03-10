@@ -291,7 +291,7 @@ function VideoContainer({
             presenter
          />
          <StreamPublishingModal
-            open={showLocalStreamPublishingModal}
+            open={Boolean(showLocalStreamPublishingModal)}
             setOpen={setShowLocalStreamPublishingModal}
             localStream={localStream}
             deviceInitializers={deviceInitializers}

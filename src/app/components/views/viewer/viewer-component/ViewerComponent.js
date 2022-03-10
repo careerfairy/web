@@ -106,6 +106,8 @@ function ViewerComponent({
       localMediaHandlers,
       publishLocalStreamTracks,
       handlePublishLocalStream,
+      publishScreenShareStream,
+      unPublishScreenShareStream,
    } = useAgoraRtc(
       streamerId,
       currentLivestream.id,
@@ -177,18 +179,34 @@ function ViewerComponent({
 
    const handleClickScreenShareButton = async () => {
       if (currentLivestream.mode === "desktop") {
-         return await setDesktopMode("default", authenticatedUser.email);
+         unPublishScreenShareStream().then(async () => {
+            return await setDesktopMode("default", streamerId);
+         });
+      } else {
+         setShowScreenShareModal(true);
       }
-      setShowScreenShareModal(true);
    };
+
+   const onScreenShareStopped = useCallback(() => {
+      unPublishScreenShareStream().then(async () => {
+         await setDesktopMode("default", streamerId);
+      });
+   }, [unPublishScreenShareStream]);
 
    const handleScreenShare = useCallback(
       async (optimizationMode = "detail") => {
-         setOptimizationMode(optimizationMode);
-         await setDesktopMode(
-            currentLivestream.mode === "desktop" ? "default" : "desktop",
-            authenticatedUser.email
-         );
+         if (currentLivestream.mode === "desktop") {
+            unPublishScreenShareStream().then(async () => {
+               await setDesktopMode("default", streamerId);
+            });
+         } else {
+            publishScreenShareStream(
+               optimizationMode,
+               onScreenShareStopped
+            ).then(async () => {
+               await setDesktopMode("desktop", streamerId);
+            });
+         }
       },
       [currentLivestream?.mode, optimizationMode, streamerId]
    );
@@ -289,7 +307,7 @@ function ViewerComponent({
          />
          {shouldInitializeAgora && <AgoraStateHandler />}
          <StreamPublishingModal
-            open={showLocalStreamPublishingModal}
+            open={Boolean(showLocalStreamPublishingModal)}
             setOpen={setShowLocalStreamPublishingModal}
             showSoundMeter={Boolean(
                (showLocalStreamPublishingModal || showSettings) &&

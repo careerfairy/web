@@ -14,10 +14,8 @@ const useHandRaiseState = () => {
    const prevHandRaiseState = useRef<HandRaise>(null);
 
    const streamRef = useStreamRef();
-   const {
-      createHandRaiseRequest,
-      updateHandRaiseRequest,
-   } = useFirebaseService();
+   const { createHandRaiseRequest, updateHandRaiseRequest } =
+      useFirebaseService();
 
    const numberOfActiveHandRaises = useSelector(
       (state: RootState) =>
@@ -33,44 +31,44 @@ const useHandRaiseState = () => {
       (state: RootState) => state.firestore.data["handRaises"]?.[handRaiseId]
    );
 
-   const updateRequest: (
-      state: HandRaise["state"]
-   ) => Promise<void> = useCallback(
-      async (state) => {
-         const isAnon = Boolean(
-            currentLivestream.test ||
-               currentLivestream.openStream ||
-               !authenticatedUser?.email
-         );
-         let checkedUserData = isAnon
-            ? {
-                 firstName: userData?.firstName || "Hand Raiser",
-                 lastName: userData?.lastName || "Streamer",
-              }
-            : userData;
-         try {
-            if (handRaise) {
-               await updateHandRaiseRequest(streamRef, handRaiseId, state);
-            } else {
-               await createHandRaiseRequest(
-                  streamRef,
-                  handRaiseId,
-                  checkedUserData
-               );
+   const updateRequest: (state: HandRaise["state"]) => Promise<void> =
+      useCallback(
+         async (state) => {
+            const isAnon = Boolean(
+               currentLivestream.test ||
+                  currentLivestream.openStream ||
+                  !authenticatedUser?.email
+            );
+            let checkedUserData = isAnon
+               ? {
+                    firstName: userData?.firstName || "Hand Raiser",
+                    lastName: userData?.lastName || "Streamer",
+                 }
+               : userData;
+            try {
+               if (handRaise) {
+                  await updateHandRaiseRequest(streamRef, handRaiseId, state);
+               } else {
+                  await createHandRaiseRequest(
+                     streamRef,
+                     handRaiseId,
+                     checkedUserData,
+                     state
+                  );
+               }
+            } catch (e) {
+               console.error(e);
             }
-         } catch (e) {
-            console.error(e);
-         }
-      },
-      [
-         currentLivestream.test,
-         currentLivestream.openStream,
-         authenticatedUser?.email,
-         userData,
-         streamRef,
-         handRaise,
-      ]
-   );
+         },
+         [
+            currentLivestream.test,
+            currentLivestream.openStream,
+            authenticatedUser?.email,
+            userData,
+            streamRef,
+            handRaise,
+         ]
+      );
    const hasRoom: boolean = useMemo(
       () =>
          Boolean(

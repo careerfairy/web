@@ -6,6 +6,7 @@ import {
 import DateUtil from "util/DateUtil";
 import firebaseApp from "./FirebaseInstance";
 import firebase from "firebase/app";
+import { HandRaiseState } from "types/handraise";
 
 class FirebaseService {
    public readonly app: firebase.app.App;
@@ -855,7 +856,7 @@ class FirebaseService {
    };
 
    setLivestreamCurrentSpeakerId = (streamRef, id) => {
-      return streamRef.update({
+      return streamRef?.update({
          currentSpeakerId: id,
       });
    };
@@ -2081,10 +2082,15 @@ class FirebaseService {
       }
    };
 
-   createHandRaiseRequest = (streamRef, userEmail, userData) => {
+   createHandRaiseRequest = (
+      streamRef,
+      userEmail,
+      userData,
+      state?: HandRaiseState
+   ) => {
       let ref = streamRef.collection("handRaises").doc(userEmail);
       return ref.set({
-         state: "requested",
+         state: state || "requested",
          timestamp: this.getServerTimestamp(),
          name: userData.firstName + " " + userData.lastName,
       });

@@ -421,6 +421,10 @@ const VideoControlsContainer = ({
       handleClickScreenShareButton,
       viewer,
       presentMode,
+      isMainStreamer,
+      screenSharerId,
+      streamerId,
+      handRaiseState?.state,
    ]);
 
    return (

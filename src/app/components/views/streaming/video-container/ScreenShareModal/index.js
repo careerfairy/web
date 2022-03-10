@@ -1,20 +1,19 @@
 import React, { memo, useEffect, useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { GlassDialog } from "../../../../../materialUI/GlobalModals";
 import PropTypes from "prop-types";
 import GraphicButton from "../../../../../materialUI/GlobalButtons/GraphicButton";
 
 import {
    Button,
+   Checkbox,
    DialogActions,
    DialogContent,
    DialogContentText,
    DialogTitle,
-   Grid,
-   Grow,
-   Checkbox,
-   Typography,
    FormControlLabel,
+   Grid,
+   Typography,
 } from "@mui/material";
 import { demoSlides, demoVideo } from "../../../../util/constants";
 
