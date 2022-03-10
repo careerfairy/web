@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { FirebaseReducer, useFirestoreConnect } from "react-redux-firebase";
 import RootState from "../store/reducers";
 import * as Sentry from "@sentry/nextjs";
-
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
 });
@@ -69,6 +68,16 @@ const AuthProvider = ({ children }) => {
          });
       } else if (isAdminPath() && userData && !userData.isAdmin) {
          void replace(`/`);
+      }
+
+      // Set Sentry User information
+      // https://docs.sentry.io/platforms/javascript/guides/nextjs/enriching-events/identify-user/
+      if (auth?.isLoaded && auth?.uid) {
+         try {
+            Sentry.setUser({ id: auth.uid });
+         } catch (e) {
+            console.error(e);
+         }
       }
 
       // Set Sentry User information
