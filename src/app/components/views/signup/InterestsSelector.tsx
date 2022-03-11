@@ -1,5 +1,5 @@
 import {useAuth} from "../../../HOCs/AuthProvider";
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {useDispatch} from "react-redux";
 import userRepo from "../../../data/firebase/UserRepository";
 import {
@@ -7,7 +7,7 @@ import {
   Chip,
   Typography
 } from "@mui/material";
-import useCollection from "../../custom-hook/useCollection";
+import { useInterests } from "../../custom-hook/useCollection";
 import {Interest} from "../../../types/interests";
 import CircularLoader from "../loader/CircularLoader";
 import * as actions from "../../../store/actions/snackbarActions"
@@ -85,7 +85,7 @@ export const InterestsChipsSelector = ({
                                          setInterests,
                                          onChange
                                        }: InterestsChipsSelectorProps) => {
-  const allInterests = useCollection<Interest>("interests")
+  const {data: allInterests} = useInterests()
   const {userData} = useAuth()
 
   const interestsKeys = Object.keys(interests)

@@ -15,6 +15,7 @@ import * as actions from "../../../store/actions";
 import { useAuth } from "../../../HOCs/AuthProvider";
 import useGeneralHeader from "../../../components/custom-hook/useGeneralHeader";
 import NavLinks from "../../../components/views/header/NavLinks";
+import MissingDataButton from "../../../components/views/missingData/MissingDataButton";
 
 const useStyles = makeStyles((theme) => ({
    navIconButton: {
@@ -55,8 +56,9 @@ const TopBar = ({ links, onMobileNavOpen, currentGroup }) => {
                />
             )}
          </Hidden>
-         <Box>
+         <Box sx={{display: 'flex', alignItems: 'center'}}>
             <Hidden lgDown>
+              <MissingDataButton />
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <Button
                      component={Link}
