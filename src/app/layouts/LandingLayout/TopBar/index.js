@@ -13,6 +13,7 @@ import { useAuth } from "../../../HOCs/AuthProvider";
 import LoginButton from "../../../components/views/common/LoginButton";
 import GeneralHeader from "../../../components/views/header/GeneralHeader";
 import NavLinks from "../../../components/views/header/NavLinks";
+import MissingDataButton from "../../../components/views/missingData/MissingDataButton";
 
 const TopBar = () => {
    const theme = useTheme();
@@ -55,6 +56,7 @@ const TopBar = () => {
             }}
          >
             <Hidden lgDown>
+               <MissingDataButton />
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <div>
                      <LoginButton />

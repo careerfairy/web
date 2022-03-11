@@ -1,11 +1,11 @@
-import React, { Fragment, useState, useEffect, useContext } from "react"
-import { useRouter } from "next/router"
-import Link from "next/link"
-import { Formik } from "formik"
-import axios from "axios"
-import Head from "next/head"
-import { withFirebase } from "context/firebase/FirebaseServiceContext"
-import { TealBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
+import React, { Fragment, useState, useEffect, useContext } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { Formik } from "formik";
+import axios from "axios";
+import Head from "next/head";
+import { withFirebase } from "context/firebase/FirebaseServiceContext";
+import { TealBackground } from "../materialUI/GlobalBackground/GlobalBackGround";
 import {
    Box,
    Container,
@@ -15,12 +15,12 @@ import {
    CircularProgress,
    Button,
    Paper,
-} from "@mui/material"
-import makeStyles from "@mui/styles/makeStyles"
-import TheatersRoundedIcon from "@mui/icons-material/TheatersRounded"
-import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded"
-import MicOutlinedIcon from "@mui/icons-material/MicOutlined"
-import { useAuth } from "../HOCs/AuthProvider"
+} from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
+import TheatersRoundedIcon from "@mui/icons-material/TheatersRounded";
+import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded";
+import MicOutlinedIcon from "@mui/icons-material/MicOutlined";
+import { useAuth } from "../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
    box: {
@@ -65,16 +65,16 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: "#fcfff5",
       margin: "1rem 0",
    },
-}))
+}));
 
 function LogInPage({ firebase }) {
-   const { authenticatedUser, userData } = useAuth()
-   const [userEmailNotValidated, setUserEmailNotValidated] = useState(false)
-   const [generalLoading, setGeneralLoading] = useState(false)
+   const { authenticatedUser, userData } = useAuth();
+   const [userEmailNotValidated, setUserEmailNotValidated] = useState(false);
+   const [generalLoading, setGeneralLoading] = useState(false);
    const {
       query: { absolutePath },
       replace,
-   } = useRouter()
+   } = useRouter();
 
    useEffect(() => {
       if (
@@ -90,18 +90,18 @@ function LogInPage({ firebase }) {
                        query: { absolutePath },
                     }
                   : "/signup"
-            )
+            );
          } else {
-            replace(absolutePath || "/next-livestreams")
+            replace(absolutePath || "/next-livestreams");
          }
       }
-   }, [authenticatedUser, absolutePath, userData])
+   }, [authenticatedUser, absolutePath, userData]);
 
    useEffect(() => {
       if (userEmailNotValidated) {
-         replace("/signup")
+         replace("/signup");
       }
-   }, [userEmailNotValidated])
+   }, [userEmailNotValidated]);
 
    return (
       <TealBackground>
@@ -130,12 +130,12 @@ function LogInPage({ firebase }) {
             generalLoading={generalLoading}
          />
       </TealBackground>
-   )
+   );
 }
 
-export default withFirebase(LogInPage)
+export default withFirebase(LogInPage);
 
-const LogInForm = withFirebase(LogInFormBase)
+const LogInForm = withFirebase(LogInFormBase);
 
 export function LogInFormBase({
    userEmailNotValidated,
@@ -145,31 +145,30 @@ export function LogInFormBase({
    firebase,
    generalLoading,
 }) {
-   const classes = useStyles()
+   const classes = useStyles();
 
-   const [errorMessageShown, setErrorMessageShown] = useState(false)
-   const [noAccountMessageShown, setNoAccountMessageShown] = useState(false)
-   const [emailVerificationSent, setEmailVerificationSent] = useState(false)
+   const [errorMessageShown, setErrorMessageShown] = useState(false);
+   const [noAccountMessageShown, setNoAccountMessageShown] = useState(false);
+   const [emailVerificationSent, setEmailVerificationSent] = useState(false);
 
    function resendEmailVerificationLink(email) {
-      setErrorMessageShown(false)
-      setGeneralLoading(true)
+      setErrorMessageShown(false);
+      setGeneralLoading(true);
       axios({
          method: "post",
-         url:
-            "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmail",
+         url: "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmail",
          data: {
             recipientEmail: email,
             redirect_link: "https://careerfairy.io/login",
          },
       })
          .then((response) => {
-            setEmailVerificationSent(true)
-            setGeneralLoading(false)
+            setEmailVerificationSent(true);
+            setGeneralLoading(false);
          })
          .catch((error) => {
-            setGeneralLoading(false)
-         })
+            setGeneralLoading(false);
+         });
    }
 
    return (
@@ -180,39 +179,39 @@ export function LogInFormBase({
          <Formik
             initialValues={{ email: "", password: "" }}
             validate={(values) => {
-               let errors = {}
+               let errors = {};
                if (!values.email) {
-                  errors.email = "Your email is required"
+                  errors.email = "Your email is required";
                } else if (
                   !/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i.test(
                      values.email
                   )
                ) {
-                  errors.email = "Please enter a valid email address"
+                  errors.email = "Please enter a valid email address";
                }
                if (!values.password) {
-                  errors.password = "A password is required"
+                  errors.password = "A password is required";
                }
-               return errors
+               return errors;
             }}
             onSubmit={(values, { setSubmitting }) => {
-               setGeneralLoading(true)
-               setErrorMessageShown(false)
-               setUserEmailNotValidated(false)
+               setGeneralLoading(true);
+               setErrorMessageShown(false);
+               setUserEmailNotValidated(false);
                firebase
                   .signInWithEmailAndPassword(values.email, values.password)
                   .then(() => {
-                     setSubmitting(false)
+                     setSubmitting(false);
                   })
                   .catch((error) => {
-                     setSubmitting(false)
-                     setGeneralLoading(false)
+                     setSubmitting(false);
+                     setGeneralLoading(false);
                      if (error.code === "auth/user-not-found") {
-                        return setNoAccountMessageShown(true)
+                        return setNoAccountMessageShown(true);
                      } else {
-                        return setErrorMessageShown(true)
+                        return setErrorMessageShown(true);
                      }
-                  })
+                  });
             }}
          >
             {({
@@ -385,5 +384,5 @@ export function LogInFormBase({
          </Formik>
          <Typography className={classes.footer}>Meet Your Future</Typography>
       </Fragment>
-   )
+   );
 }

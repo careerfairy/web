@@ -1,36 +1,34 @@
-import { TealBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
-import Head from "next/head"
-import Header from "../components/views/header/Header"
-import Footer from "../components/views/footer/Footer"
-import React, { useEffect, useRef, useState } from "react"
-import { Typography } from "@mui/material"
-import DraftStreamForm from "../components/views/draftStreamForm/DraftStreamForm"
-import { buildLivestreamObject } from "../components/helperFunctions/streamFormFunctions"
-import { useSnackbar } from "notistack"
-import { useRouter } from "next/router"
+import { TealBackground } from "../materialUI/GlobalBackground/GlobalBackGround";
+import Head from "next/head";
+import React, { useEffect, useRef, useState } from "react";
+import { Typography } from "@mui/material";
+import DraftStreamForm from "../components/views/draftStreamForm/DraftStreamForm";
+import { buildLivestreamObject } from "../components/helperFunctions/streamFormFunctions";
+import { useSnackbar } from "notistack";
+import { useRouter } from "next/router";
 import {
    GENERAL_ERROR,
    SAVE_WITH_NO_VALIDATION,
    SUBMIT_FOR_APPROVAL,
-} from "../components/util/constants"
-import { withFirebase } from "../context/firebase/FirebaseServiceContext"
-import { useAuth } from "../HOCs/AuthProvider"
-import EnterDetailsModal from "../components/views/draftStreamForm/EnterDetailsModal"
-import { prettyLocalizedDate } from "../components/helperFunctions/HelperFunctions"
-import GeneralLayout from "../layouts/GeneralLayout"
+} from "../components/util/constants";
+import { withFirebase } from "../context/firebase/FirebaseServiceContext";
+import { useAuth } from "../HOCs/AuthProvider";
+import EnterDetailsModal from "../components/views/draftStreamForm/EnterDetailsModal";
+import { prettyLocalizedDate } from "../components/helperFunctions/HelperFunctions";
+import GeneralLayout from "../layouts/GeneralLayout";
 
 const draftStream = ({ firebase }) => {
-   const [showEnterDetailsModal, setShowEnterDetailsModal] = useState(false)
-   const [submitted, setSubmitted] = useState(false)
-   const { authenticatedUser, userData } = useAuth()
-   const [userInfo, setUserInfo] = useState({})
-   const { enqueueSnackbar } = useSnackbar()
-   const router = useRouter()
-   const formRef = useRef()
+   const [showEnterDetailsModal, setShowEnterDetailsModal] = useState(false);
+   const [submitted, setSubmitted] = useState(false);
+   const { authenticatedUser, userData } = useAuth();
+   const [userInfo, setUserInfo] = useState({});
+   const { enqueueSnackbar } = useSnackbar();
+   const router = useRouter();
+   const formRef = useRef();
    const {
       query: { absolutePath },
       push,
-   } = router
+   } = router;
 
    useEffect(() => {
       if (userData) {
@@ -38,23 +36,23 @@ const draftStream = ({ firebase }) => {
             ...userData,
             name: `${userData.firstName} ${userData.lastName}`,
             email: userData.email || userData.userEmail,
-         })
+         });
       }
-   }, [userData])
+   }, [userData]);
 
    const handleOpenShowEnterDetailsModal = () => {
-      setShowEnterDetailsModal(true)
-   }
+      setShowEnterDetailsModal(true);
+   };
    const handleCloseShowEnterDetailsModal = () => {
-      setShowEnterDetailsModal(false)
-   }
+      setShowEnterDetailsModal(false);
+   };
 
    const handleSubmit = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" })
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
       if (formRef.current) {
-         formRef.current.handleSubmit()
+         formRef.current.handleSubmit();
       }
-   }
+   };
 
    const sendApprovalNotifications = async (
       groupIds = ["groupIds"],
@@ -67,21 +65,20 @@ const draftStream = ({ firebase }) => {
             receiver: groupId,
             draftId: streamId,
             type: "draftApprovalRequest",
-         }
+         };
          const notificationRef = await firebase.createNotification(
             notificationDetails,
             { force: true }
-         )
+         );
          console.info(
             `notification Ref was created with ID ${notificationRef.id}`
-         )
+         );
       }
-   }
+   };
 
    const onSubmit = async (
       values,
       { setSubmitting },
-      targetCategories,
       updateMode,
       draftStreamId,
       setFormData,
@@ -89,92 +86,91 @@ const draftStream = ({ firebase }) => {
       status
    ) => {
       try {
-         setSubmitting(true)
+         setSubmitting(true);
          const livestream = buildLivestreamObject(
             values,
-            targetCategories,
             updateMode,
             draftStreamId,
             firebase
-         )
+         );
          if (status === SUBMIT_FOR_APPROVAL) {
             if (!userInfo.email || !userInfo.name) {
-               handleOpenShowEnterDetailsModal()
-               return
+               handleOpenShowEnterDetailsModal();
+               return;
             }
             const newStatus = {
                pendingApproval: true,
                seen: false,
-            }
-            livestream.status = newStatus
-            setFormData((prevState) => ({ ...prevState, status: newStatus }))
+            };
+            livestream.status = newStatus;
+            setFormData((prevState) => ({ ...prevState, status: newStatus }));
          }
-         let id
+         let id;
          if (updateMode) {
-            id = livestream.id
+            id = livestream.id;
             if (!livestream.author) {
                livestream.author = {
                   email:
                      authenticatedUser?.email || userInfo.email || "anonymous",
-               }
+               };
             }
-            await firebase.updateLivestream(livestream, "draftLivestreams")
+            await firebase.updateLivestream(livestream, "draftLivestreams");
 
             // console.log("-> Draft livestream was updated with id", id);
          } else {
             const author = {
                email: authenticatedUser?.email || userInfo.email || "anonymous",
-            }
+            };
             id = await firebase.addLivestream(
                livestream,
                "draftLivestreams",
                author
-            )
+            );
             // console.log("-> Draft livestream was created with id", id);
-            push(`/draft-stream?draftStreamId=${id}`)
+            push(`/draft-stream?draftStreamId=${id}`);
          }
 
          if (status === SUBMIT_FOR_APPROVAL) {
-            const submitTime = prettyLocalizedDate(new Date())
+            const submitTime = prettyLocalizedDate(new Date());
             const adminsInfo = await firebase.getAllGroupAdminInfo(
                livestream.groupIds || [],
                id
-            )
-            const senderName = userInfo.name
-            const senderEmail = userInfo.email
+            );
+            const senderName = userInfo.name;
+            const senderEmail = userInfo.email;
             await firebase.sendDraftApprovalRequestEmail({
                adminsInfo,
                senderName,
                livestream,
                submitTime,
                senderEmail,
-            })
-            await sendApprovalNotifications(livestream.groupIds || [], id)
+            });
+            await sendApprovalNotifications(livestream.groupIds || [], id);
          }
 
          if (absolutePath) {
             return push({
                pathname: absolutePath,
-            })
+            });
          }
-         setDraftId(id)
-         setSubmitted(true)
-         window.scrollTo({ top: 0, left: 0, behavior: "smooth" })
+         setDraftId(id);
+         setSubmitted(true);
+         window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
          if (status === SAVE_WITH_NO_VALIDATION) {
             enqueueSnackbar("You changes have been saved!", {
                variant: "default",
                preventDuplicate: true,
-            })
+            });
          }
       } catch (e) {
          enqueueSnackbar(GENERAL_ERROR, {
             variant: "error",
             preventDuplicate: true,
-         })
-         console.log("-> e", e)
+         });
+         console.log("-> e", e);
       }
-      setSubmitting(false)
-   }
+      setSubmitting(false);
+   };
 
    return (
       <>
@@ -210,7 +206,7 @@ const draftStream = ({ firebase }) => {
             </TealBackground>
          </GeneralLayout>
       </>
-   )
-}
+   );
+};
 
-export default withFirebase(draftStream)
+export default withFirebase(draftStream);
