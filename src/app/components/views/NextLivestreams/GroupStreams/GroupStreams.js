@@ -104,6 +104,7 @@ const GroupStreams = ({
                   <EventPreviewCard
                      onRegisterClick={handleClickRegister}
                      interests={existingInterests}
+                     autoRegister
                      event={livestream}
                   />
                </Wrapper>

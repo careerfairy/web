@@ -1,14 +1,14 @@
 import React from "react";
 import GeneralLayout from "layouts/GeneralLayout";
-import HighlightsCarousel from "../components/views/events/HighlightsCarousel";
+import HighlightsCarousel from "../components/views/portal/HighlightsCarousel";
 import Container from "@mui/material/Container";
-import FeaturedAndNextEvents from "../components/views/events/FeaturedAndNextEvents";
-import RecommendedEvents from "../components/views/events/events-prview/RecommendedEvents";
-import ComingUpNextEvents from "../components/views/events/events-prview/ComingUpNextEvents";
-import MyNextEvents from "../components/views/events/events-prview/MyNextEvents";
-import WidgetsWrapper from "../components/views/events/WidgetsWrapper";
+import FeaturedAndNextEvents from "../components/views/portal/FeaturedAndNextEvents";
+import RecommendedEvents from "../components/views/portal/events-prview/RecommendedEvents";
+import ComingUpNextEvents from "../components/views/portal/events-prview/ComingUpNextEvents";
+import MyNextEvents from "../components/views/portal/events-prview/MyNextEvents";
+import WidgetsWrapper from "../components/views/portal/WidgetsWrapper";
 
-const EventsPage = () => {
+const PortalPage = () => {
    return (
       <GeneralLayout hideNavOnScroll fullScreen>
          <Container>
@@ -24,4 +24,4 @@ const EventsPage = () => {
    );
 };
 
-export default EventsPage;
+export default PortalPage;

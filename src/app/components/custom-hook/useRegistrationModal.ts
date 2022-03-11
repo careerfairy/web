@@ -7,11 +7,17 @@ import { LiveStreamEvent } from "types/event";
 import { getLinkToStream } from "util/StreamUtil";
 import * as actions from "store/actions";
 
-const useRegistrationModal = () => {
+const useRegistrationModal = (
+   // if redirected to signup when clicking
+   // and the user has finished signing up
+   // they should be re-directed to the origin path
+   useCurrentPath?: boolean
+) => {
    const firebase = useFirebaseService();
    const {
       push,
       query: { groupId },
+      asPath,
    } = useRouter();
    const { authenticatedUser } = useAuth();
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined);
@@ -55,7 +61,8 @@ const useRegistrationModal = () => {
                         absolutePath: getLinkToStream(
                            event,
                            groupId as string,
-                           true
+                           true,
+                           useCurrentPath ? asPath : undefined
                         ),
                      },
                   });
@@ -66,7 +73,7 @@ const useRegistrationModal = () => {
             dispatch(actions.sendGeneralError(e));
          }
       },
-      [authenticatedUser, groupId]
+      [authenticatedUser, groupId, asPath, useCurrentPath]
    );
 
    return { handleClickRegister, joinGroupModalData, handleCloseJoinModal };
