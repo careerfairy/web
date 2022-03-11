@@ -1,3 +1,5 @@
+import { mainProductionDomain } from "../constants/domains";
+
 const makeDuration = function (event) {
    const minutes = Math.floor(
       (+new Date(event.endsAt) - +new Date(event.startsAt)) / 60 / 1000
@@ -88,4 +90,8 @@ export const makeUrls = function (event) {
       yahoo: makeYahooCalendarUrl(event),
       ics: makeICSCalendarUrl(event),
    };
+};
+
+export const makeReferralUrl = (userReferralCode) => {
+   return `https://${mainProductionDomain}/?referral=${userReferralCode}`;
 };
