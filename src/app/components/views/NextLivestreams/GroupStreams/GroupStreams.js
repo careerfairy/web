@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Grid, LinearProgress, Typography } from "@mui/material";
-import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
-import LazyLoad from "react-lazyload";
-import Spinner from "./groupStreamCard/Spinner";
-import { useAuth } from "../../../../HOCs/AuthProvider";
-import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers";
+import React, { useEffect, useState } from "react"
+import { Grid, LinearProgress, Typography } from "@mui/material"
+import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2"
+import LazyLoad from "react-lazyload"
+import Spinner from "./groupStreamCard/Spinner"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers"
 
-const gridItemHeight = 530;
+const gridItemHeight = 530
 const styles = {
    root: {
       flex: 1,
@@ -38,7 +38,7 @@ const styles = {
    dynamicHeight: {
       height: "auto",
    },
-};
+}
 
 const Wrapper = ({ children, streamId }) => {
    return (
@@ -53,8 +53,8 @@ const Wrapper = ({ children, streamId }) => {
       >
          {children}
       </LazyLoad>
-   );
-};
+   )
+}
 
 const GroupStreams = ({
    groupData,
@@ -67,21 +67,21 @@ const GroupStreams = ({
    selectedOptions,
    isPastLivestreams,
 }) => {
-   const { userData, authenticatedUser: user } = useAuth();
-   const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false);
+   const { userData, authenticatedUser: user } = useAuth()
+   const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
    const searchedButNoResults =
-      selectedOptions?.length && !searching && !livestreams?.length;
+      selectedOptions?.length && !searching && !livestreams?.length
    const [slicedLivestreams] = useInfiniteScrollClientWithHandlers(
       livestreams,
       6,
       3
-   );
+   )
 
    useEffect(() => {
       if (globalCardHighlighted) {
-         setGlobalCardHighlighted(false);
+         setGlobalCardHighlighted(false)
       }
-   }, [groupData]);
+   }, [groupData])
    const renderStreamCards = slicedLivestreams?.map((livestream, index) => {
       if (livestream) {
          return (
@@ -112,9 +112,9 @@ const GroupStreams = ({
                   />
                </Wrapper>
             </Grid>
-         );
+         )
       }
-   });
+   })
 
    return (
       <Grid item xs={12}>
@@ -149,6 +149,6 @@ const GroupStreams = ({
             ) : null}
          </Grid>
       </Grid>
-   );
-};
-export default GroupStreams;
+   )
+}
+export default GroupStreams

@@ -35,7 +35,6 @@ import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions/index";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog";
-import { streamType } from "../../../../../../types";
 import ConfirmRecordingDialog from "./ConfirmRecordingDialog";
 import useStreamAdminPreferences from "../../../../../custom-hook/useStreamAdminPreferences";
 import NextGenIcon from "@mui/icons-material/FiberNew";
@@ -379,7 +378,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
 };
 
 StreamCard.propTypes = {
-   stream: streamType.isRequired,
+   stream: PropTypes.object,
    isUpcoming: PropTypes.bool,
 };
 

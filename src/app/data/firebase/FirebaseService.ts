@@ -6,6 +6,7 @@ import {
 import DateUtil from "util/DateUtil";
 import firebaseApp from "./FirebaseInstance";
 import firebase from "firebase/app";
+import { HandRaiseState } from "types/handraise";
 
 class FirebaseService {
    public readonly app: firebase.app.App;
@@ -39,15 +40,22 @@ class FirebaseService {
 
    /**
     * Call an on call cloud function to generate a secure agora token.
-    * @param {({
-    * isStreamer: boolean,
-    * uid: string,
-    * sentToken: string,
-    * channel: string,
-    * streamDocumentPath: string,
-    * })} data
+    * @param {{isStreamer: any; uid: any; streamDocumentPath: string; sentToken: string; channelName: string}} data
     * @return {Promise<firebase.functions.HttpsCallableResult>}
     */
+
+   fetchAgoraRtcToken = async (data) => {
+      const fetchAgoraRtcToken =
+         this.functions.httpsCallable("fetchAgoraRtcToken");
+      return await fetchAgoraRtcToken(data);
+   };
+
+   fetchAgoraRtmToken = async (data) => {
+      const fetchAgoraRtmToken =
+         this.functions.httpsCallable("fetchAgoraRtmToken");
+      return await fetchAgoraRtmToken(data);
+   };
+
    getSecureAgoraToken = async (data) => {
       const getSecureAgoraToken = this.functions.httpsCallable(
          "generateAgoraTokenSecureOnCall"
@@ -848,7 +856,7 @@ class FirebaseService {
    };
 
    setLivestreamCurrentSpeakerId = (streamRef, id) => {
-      return streamRef.update({
+      return streamRef?.update({
          currentSpeakerId: id,
       });
    };
@@ -2074,21 +2082,29 @@ class FirebaseService {
       }
    };
 
-   createHandRaiseRequest = (streamRef, userEmail, userData) => {
+   createHandRaiseRequest = (
+      streamRef,
+      userEmail,
+      userData,
+      state?: HandRaiseState
+   ) => {
       let ref = streamRef.collection("handRaises").doc(userEmail);
       return ref.set({
-         state: "requested",
-         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+         state: state || "requested",
+         timestamp: this.getServerTimestamp(),
          name: userData.firstName + " " + userData.lastName,
       });
    };
 
    updateHandRaiseRequest = (streamRef, userEmail, state) => {
       let ref = streamRef.collection("handRaises").doc(userEmail);
-      return ref.update({
-         state: state,
-         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
-      });
+      return ref.set(
+         {
+            state: state,
+            timestamp: this.getServerTimestamp(),
+         },
+         { merge: true }
+      );
    };
 
    listenToPolls = (streamRef, callback) => {
@@ -2275,7 +2291,6 @@ class FirebaseService {
          .doc(userData.userEmail);
       batch.update(userRef, {
          talentPools: firebase.firestore.FieldValue.arrayRemove(companyId),
-         registrants: firebase.firestore.FieldValue.arrayUnion(userData.authId),
       });
       batch.update(streamRef, {
          talentPool: firebase.firestore.FieldValue.arrayRemove(

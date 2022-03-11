@@ -1,18 +1,17 @@
-import React, { useCallback, useContext, useEffect } from "react";
-import StreamItem from "./StreamItem";
-import { useDispatch, useSelector } from "react-redux";
-import * as actions from "store/actions";
-import TutorialContext from "context/tutorials/TutorialContext";
+import React, { useCallback, useContext, useEffect } from "react"
+import StreamItem from "./StreamItem"
+import { useDispatch, useSelector } from "react-redux"
+import * as actions from "store/actions"
+import TutorialContext from "context/tutorials/TutorialContext"
 import {
    TooltipButtonComponent,
    TooltipText,
    TooltipTitle,
    WhiteTooltip,
-} from "materialUI/GlobalTooltips";
+} from "materialUI/GlobalTooltips"
 
 const RemoteStreamItem = ({
    speaker,
-   setRemovedStream,
    stream,
    big,
    index,
@@ -20,89 +19,75 @@ const RemoteStreamItem = ({
 }) => {
    const { getActiveTutorialStepKey, handleConfirmStep } = useContext(
       TutorialContext
-   );
-   const activeStep = getActiveTutorialStepKey();
-   const { playAllRemoteVideos, muteAllRemoteVideos, unmuteFailedMutedRemoteVideos } = useSelector(
-      (state) => state.stream.streaming
-   );
+   )
+   const activeStep = getActiveTutorialStepKey()
+   const isScreenShareVideo = stream.uid.includes("screen")
 
-   const dispatch = useDispatch();
+   const {
+      playAllRemoteVideos,
+      muteAllRemoteVideos,
+      unmuteFailedMutedRemoteVideos,
+   } = useSelector((state) => state.stream.streaming)
 
-   const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted());
+   const dispatch = useDispatch()
+
+   const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted())
 
    useEffect(() => {
-      if (stream.streamId === "demoStream") {
-         generateDemoHandRaiser();
+      if (stream.uid === "demoStream") {
+         generateDemoHandRaiser()
       } else {
-         if (!stream.stream.isPlaying()) {
-            stream?.stream?.play(
-               stream.streamId,
-               { fit: stream.streamId.includes("screen") ? "contain" : "cover" },
-               (err) => {
-                  if (err) {
-                     setAVideoIsMuted();
-                  }
-               }
-            );
-         }
+         !muteAllRemoteVideos && playVideo()
       }
-   }, [stream.streamId]);
+   }, [stream.uid, stream.videoTrack])
 
    useEffect(() => {
       if (playAllRemoteVideos) {
-         playVideo();
+         playVideo()
       }
-   }, [playAllRemoteVideos]);
+   }, [playAllRemoteVideos])
 
    useEffect(() => {
       if (unmuteFailedMutedRemoteVideos) {
-         stream.stream?.play(stream.streamId, { muted: false });
+         stream?.audioTrack?.play()
       }
-   }, [unmuteFailedMutedRemoteVideos]);
+   }, [unmuteFailedMutedRemoteVideos])
 
    useEffect(() => {
       if (muteAllRemoteVideos) {
-         stream?.stream?.muteAudio();
+         stream?.stream?.audioTrack?.stop()
       } else {
-         stream?.stream?.unmuteAudio();
+         stream?.stream?.audioTrack?.play()
       }
-   }, [muteAllRemoteVideos]);
-
-   useEffect(() => {
-      if (stream?.stream?.audio === false && stream?.stream?.video === false) {
-         setRemovedStream(stream.streamId);
-      }
-   }, [stream?.stream?.audio, stream?.stream?.video]);
+   }, [muteAllRemoteVideos])
 
    function playVideo() {
-      if (!stream.stream.isPlaying()) {
-         stream.stream.play(
-            stream.streamId,
-            {
-               fit: stream.streamId.includes("screen") ? "contain" : "cover",
-               muted: true,
-            },
-            (err) => {
-               if (err) {
-                  setAVideoIsMuted();
-               }
-            }
-         );
+      try {
+         if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
+            stream.videoTrack?.play(stream.uid, {
+               fit: isScreenShareVideo ? "contain" : "cover",
+            })
+         }
+      } catch (e) {
+         setAVideoIsMuted()
+         console.error("-> error in PLAY VIDEO", e)
       }
    }
 
    const generateDemoHandRaiser = useCallback(() => {
-      let video = document.createElement("video");
-      const videoContainer = document.querySelector("#" + stream.streamId);
-      videoContainer.appendChild(video);
-      video.src = stream.url;
-      video.loop = true;
-      video.play();
-   }, [stream.url]);
+      let video = document.createElement("video")
+      const videoContainer = document.querySelector("#" + stream.uid)
+      videoContainer.style.zIndex = 1000
+      videoContainer.style.backgroundColor = "black"
+      videoContainer.appendChild(video)
+      video.src = stream.url
+      video.loop = true
+      video.play()
+   }, [stream.url])
 
    return (
       <WhiteTooltip
-         placement="right"
+         placement="top"
          title={
             <React.Fragment>
                <TooltipTitle>Hand Raise (3/5)</TooltipTitle>
@@ -113,14 +98,14 @@ const RemoteStreamItem = ({
                {activeStep === 11 && (
                   <TooltipButtonComponent
                      onConfirm={() => {
-                        handleConfirmStep(11);
+                        handleConfirmStep(11)
                      }}
                      buttonText="Ok"
                   />
                )}
             </React.Fragment>
          }
-         open={activeStep === 11 && stream.streamId === "demoStream"}
+         open={activeStep === 11 && stream.uid === "demoStream"}
          style={{
             width: "100%",
             display: "flex",
@@ -129,12 +114,14 @@ const RemoteStreamItem = ({
          <StreamItem
             speaker={speaker}
             stream={stream}
+            videoMuted={!stream.videoTrack || stream.videoMuted}
+            audioMuted={stream.audioMuted}
             index={index}
             big={big}
             videoMutedBackgroundImg={videoMutedBackgroundImg}
          />
       </WhiteTooltip>
-   );
-};
+   )
+}
 
-export default RemoteStreamItem;
+export default RemoteStreamItem

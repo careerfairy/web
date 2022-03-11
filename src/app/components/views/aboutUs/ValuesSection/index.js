@@ -1,10 +1,10 @@
-import PropTypes from "prop-types";
-import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
-import { Box, Container, Typography } from "@mui/material";
-import Section from "../../common/Section";
-import SectionHeader from "../../common/SectionHeader";
-import BenefitsGrid from "../../common/BenefitsGrid";
+import PropTypes from "prop-types"
+import React from "react"
+import makeStyles from "@mui/styles/makeStyles"
+import { Box, Container, Typography } from "@mui/material"
+import Section from "../../common/Section"
+import SectionHeader from "../../common/SectionHeader"
+import BenefitsGrid from "../../common/BenefitsGrid"
 
 const useStyles = makeStyles((theme) => ({
    container: {
@@ -20,10 +20,10 @@ const useStyles = makeStyles((theme) => ({
    bodyText: {
       color: theme.palette.common.white,
    },
-}));
+}))
 
 const ValuesSection = (props) => {
-   const classes = useStyles();
+   const classes = useStyles()
 
    return (
       <Section
@@ -47,8 +47,8 @@ const ValuesSection = (props) => {
             </Box>
          </Container>
       </Section>
-   );
-};
+   )
+}
 
 ValuesSection.propTypes = {
    backgroundColor: PropTypes.string,
@@ -57,5 +57,5 @@ ValuesSection.propTypes = {
    color: PropTypes.string,
    subtitle: PropTypes.string,
    title: PropTypes.string,
-};
-export default ValuesSection;
+}
+export default ValuesSection

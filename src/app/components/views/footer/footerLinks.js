@@ -50,6 +50,6 @@ const footerLinks = [
          },
       ],
    },
-];
+]
 
-export default footerLinks;
+export default footerLinks

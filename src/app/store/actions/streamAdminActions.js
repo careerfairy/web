@@ -1,5 +1,5 @@
-import * as actions from "./actionTypes";
-import { sendGeneralError } from "./index";
+import * as actions from "./actionTypes"
+import { sendGeneralError } from "./index"
 
 // Create a new filter group and store it in redux as current filter group
 
@@ -9,7 +9,7 @@ const getTokenDoc = async ({
    breakoutRoomId,
    streamId,
 }) => {
-   let tokenDoc = undefined;
+   let tokenDoc = undefined
    if (isBreakout && breakoutRoomId) {
       tokenDoc = await firestore.get({
          collection: "livestreams",
@@ -26,7 +26,7 @@ const getTokenDoc = async ({
                ],
             },
          ],
-      });
+      })
    } else {
       tokenDoc = await firestore.get({
          collection: "livestreams",
@@ -37,10 +37,10 @@ const getTokenDoc = async ({
                doc: "secureToken",
             },
          ],
-      });
+      })
    }
-   return tokenDoc;
-};
+   return tokenDoc
+}
 
 export const handleStartRecording = ({
    firebase,
@@ -48,34 +48,34 @@ export const handleStartRecording = ({
    isBreakout,
    breakoutRoomId,
 }) => async (dispatch, getState, { getFirestore }) => {
-   dispatch({ type: actions.SET_RECORDING_REQUEST_STARTED });
+   dispatch({ type: actions.SET_RECORDING_REQUEST_STARTED })
    try {
-      const firestore = getFirestore();
+      const firestore = getFirestore()
       let tokenDoc = await getTokenDoc({
          firestore,
          isBreakout,
          breakoutRoomId,
          streamId,
-      });
+      })
       if (tokenDoc.exists) {
-         const secureToken = tokenDoc.data().value;
+         const secureToken = tokenDoc.data().value
          await firebase.startLivestreamRecording({
             isBreakout: isBreakout,
             streamId: streamId,
             breakoutRoomId: breakoutRoomId,
             token: secureToken,
-         });
+         })
 
-         dispatch({ type: actions.SET_RECORDING_REQUEST_STOPPED });
+         dispatch({ type: actions.SET_RECORDING_REQUEST_STOPPED })
       } else {
-         dispatch({ type: actions.SET_RECORDING_REQUEST_STOPPED });
-         dispatch(sendGeneralError("This stream has no token"));
+         dispatch({ type: actions.SET_RECORDING_REQUEST_STOPPED })
+         dispatch(sendGeneralError("This stream has no token"))
       }
    } catch (e) {
-      dispatch({ type: actions.SET_RECORDING_REQUEST_STOPPED });
-      dispatch(sendGeneralError(e));
+      dispatch({ type: actions.SET_RECORDING_REQUEST_STOPPED })
+      dispatch(sendGeneralError(e))
    }
-};
+}
 
 export const handleStopRecording = ({
    firebase,
@@ -83,30 +83,30 @@ export const handleStopRecording = ({
    isBreakout,
    breakoutRoomId,
 }) => async (dispatch, getState, { getFirestore }) => {
-   dispatch({ type: actions.SET_RECORDING_REQUEST_STARTED });
+   dispatch({ type: actions.SET_RECORDING_REQUEST_STARTED })
    try {
-      const firestore = getFirestore();
+      const firestore = getFirestore()
       const tokenDoc = await getTokenDoc({
          firestore,
          isBreakout,
          breakoutRoomId,
          streamId,
-      });
+      })
       if (tokenDoc.exists) {
-         const secureToken = tokenDoc.data().value;
+         const secureToken = tokenDoc.data().value
          await firebase.stopLivestreamRecording({
             isBreakout: isBreakout,
             streamId: streamId,
             breakoutRoomId: breakoutRoomId,
             token: secureToken,
-         });
-         dispatch({ type: actions.SET_RECORDING_REQUEST_STOPPED });
+         })
+         dispatch({ type: actions.SET_RECORDING_REQUEST_STOPPED })
       } else {
-         dispatch({ type: actions.SET_RECORDING_REQUEST_STOPPED });
-         dispatch(sendGeneralError("This stream has no token"));
+         dispatch({ type: actions.SET_RECORDING_REQUEST_STOPPED })
+         dispatch(sendGeneralError("This stream has no token"))
       }
    } catch (e) {
-      dispatch({ type: actions.SET_RECORDING_REQUEST_STOPPED });
-      dispatch(sendGeneralError(e));
+      dispatch({ type: actions.SET_RECORDING_REQUEST_STOPPED })
+      dispatch(sendGeneralError(e))
    }
-};
+}

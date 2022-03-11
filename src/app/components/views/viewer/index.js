@@ -79,6 +79,7 @@ const ViewerOverview = ({
    );
 
    const classes = useStyles({ mobile });
+
    return (
       <Fragment>
          <div className={classes.blackFrame}>

@@ -1,13 +1,7 @@
 import React, { Fragment, useEffect, useState } from "react";
 import ImageSelect from "../ImageSelect/ImageSelect";
-import {
-   FormControl,
-   Collapse,
-   Grid,
-   TextField,
-   Button,
-} from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import { FormControl, Collapse, Grid, TextField, Button } from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
 const useStyles = makeStyles((theme) => ({

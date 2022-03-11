@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { alpha } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import {
    AppBar,
    Button,
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
       alignItems: "center",
    },
    contentRoot: {
-      [theme.breakpoints.down('md')]: {
+      [theme.breakpoints.down("md")]: {
          padding: 0,
       },
    },
@@ -319,7 +319,8 @@ const NewStreamModal = ({
                   color="inherit"
                   onClick={handleCloseDialog}
                   aria-label="close"
-                  size="large">
+                  size="large"
+               >
                   <CloseIcon />
                </IconButton>
                <Typography variant="h4" className={classes.title}>

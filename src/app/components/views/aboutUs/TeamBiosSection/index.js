@@ -1,9 +1,9 @@
-import React from "react";
-import { Container } from "@mui/material";
-import TeamBios from "./TeamBios";
-import Section from "../../common/Section";
-import SectionHeader from "../../common/SectionHeader";
-import { shuffleArray } from "../../../helperFunctions/HelperFunctions";
+import React from "react"
+import { Container } from "@mui/material"
+import TeamBios from "./TeamBios"
+import Section from "../../common/Section"
+import SectionHeader from "../../common/SectionHeader"
+import { shuffleArray } from "../../../helperFunctions/HelperFunctions"
 
 const styles = {
    container: {
@@ -15,7 +15,7 @@ const styles = {
    title: {
       fontWeight: 500,
    },
-};
+}
 const people = [
    {
       id: 1,
@@ -147,9 +147,9 @@ const people = [
          "In her free-time she loves to DJ, listen to lots of music, read and spend time with her friends.\n",
       linkedinUrl: "https://www.linkedin.com/in/zarbab-aamir-601065b1/",
    },
-];
+]
 
-const shuffledPeople = shuffleArray(people);
+const shuffledPeople = shuffleArray(people)
 
 const TeamBiosSection = (props) => {
    return (
@@ -172,7 +172,7 @@ const TeamBiosSection = (props) => {
             <TeamBios people={shuffledPeople} />
          </Container>
       </Section>
-   );
-};
+   )
+}
 
-export default TeamBiosSection;
+export default TeamBiosSection

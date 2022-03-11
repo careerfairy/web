@@ -1,5 +1,5 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { Grid, Tab, Tabs } from "@mui/material";
 import VideoTab from "./VideoTab";
 import AudioTab from "./AudioTab";
@@ -11,7 +11,6 @@ const useStyles = makeStyles((theme) => ({
    tab: {
       minWidth: "0 !important",
    },
-   gridItem: {},
 }));
 
 function TabPanel(props) {
@@ -40,11 +39,11 @@ function a11yProps(index) {
 const DeviceSelectMenu = ({
    devices,
    displayableMediaStream,
-   videoSource,
-   updateVideoSource,
-   audioLevel,
-   audioSource,
-   updateAudioSource,
+   localStream,
+   openModal,
+   localMediaHandlers,
+   mediaControls,
+   deviceInitializers,
 }) => {
    const classes = useStyles();
 
@@ -56,7 +55,12 @@ const DeviceSelectMenu = ({
 
    return (
       <div className={classes.grid}>
-         <Grid container spacing={3}>
+         <Grid
+            justifyContent="center"
+            alignItems="center"
+            container
+            spacing={3}
+         >
             <Grid xs={3} item>
                <Tabs
                   orientation="vertical"
@@ -77,21 +81,34 @@ const DeviceSelectMenu = ({
                   />
                </Tabs>
             </Grid>
-            <Grid xs={9} item className={classes.gridItem}>
+            <Grid xs={9} item>
                <TabPanel value={value} index={0}>
                   <VideoTab
                      devices={devices}
+                     openModal={openModal}
+                     localStream={localStream}
+                     mediaControls={mediaControls}
+                     localMediaHandlers={localMediaHandlers}
                      displayableMediaStream={displayableMediaStream}
-                     videoSource={videoSource}
-                     setVideoSource={updateVideoSource}
+                     mediaDeviceType={"camera"}
+                     disableInitialize
+                     deviceInitializers={deviceInitializers}
+                     selectTitle={"Select Camera"}
                   />
                </TabPanel>
                <TabPanel value={value} index={1}>
                   <AudioTab
                      devices={devices}
-                     audioLevel={audioLevel}
-                     audioSource={audioSource}
-                     setAudioSource={updateAudioSource}
+                     openModal={openModal}
+                     localStream={localStream}
+                     mediaControls={mediaControls}
+                     deviceInitializers={deviceInitializers}
+                     localMediaHandlers={localMediaHandlers}
+                     displayableMediaStream={displayableMediaStream}
+                     mediaDeviceType={"microphone"}
+                     selectTitle={"Select Microphone"}
+                     disableInitialize
+                     showSoundMeter={value === 1}
                   />
                </TabPanel>
             </Grid>

@@ -1,6 +1,6 @@
 import React from "react";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import IconButton from "@mui/material/IconButton";
 import { withFirebase } from "../../../context/firebase/FirebaseServiceContext";
 import { Button, Hidden, useMediaQuery } from "@mui/material";
@@ -42,7 +42,11 @@ const TopBar = ({ links, onMobileNavOpen, currentGroup }) => {
       <GeneralHeader permanent={showHeaderLinks}>
          <Box display="flex" alignItems="center">
             <Hidden lgUp>
-               <IconButton color="primary" onClick={onMobileNavOpen} size="large">
+               <IconButton
+                  color="primary"
+                  onClick={onMobileNavOpen}
+                  size="large"
+               >
                   <MenuIcon />
                </IconButton>
             </Hidden>
@@ -56,9 +60,9 @@ const TopBar = ({ links, onMobileNavOpen, currentGroup }) => {
                />
             )}
          </Hidden>
-         <Box sx={{display: 'flex', alignItems: 'center'}}>
+         <Box sx={{ display: "flex", alignItems: "center" }}>
             <Hidden lgDown>
-              <MissingDataButton />
+               <MissingDataButton />
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <Button
                      component={Link}
@@ -76,14 +80,19 @@ const TopBar = ({ links, onMobileNavOpen, currentGroup }) => {
                      color="primary"
                      className={classes.navIconButton}
                      href="/profile"
-                     size="large">
+                     size="large"
+                  >
                      <AccountCircleOutlinedIcon />
                   </IconButton>
                )}
             </Hidden>
             {currentGroup?.categories && (
                <Hidden lgUp>
-                  <IconButton color="primary" onClick={handleToggleNextLivestreamsFilter} size="large">
+                  <IconButton
+                     color="primary"
+                     onClick={handleToggleNextLivestreamsFilter}
+                     size="large"
+                  >
                      <FilterIcon />
                   </IconButton>
                </Hidden>

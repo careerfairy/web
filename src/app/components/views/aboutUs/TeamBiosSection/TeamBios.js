@@ -1,30 +1,30 @@
-import PropTypes from "prop-types";
-import React, { useEffect, useState } from "react";
-import { useTheme } from "@mui/material/styles";
-import makeStyles from "@mui/styles/makeStyles";
-import { Grid } from "@mui/material";
-import { TeamMemberCard } from "./TeamMemberCard";
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import Bounce from "@stahl.luke/react-reveal/Bounce";
+import PropTypes from "prop-types"
+import React, { useEffect, useState } from "react"
+import { useTheme } from "@mui/material/styles"
+import makeStyles from "@mui/styles/makeStyles"
+import { Grid } from "@mui/material"
+import { TeamMemberCard } from "./TeamMemberCard"
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
+import Bounce from "@stahl.luke/react-reveal/Bounce"
 
 const useStyles = makeStyles((theme) => ({
    gridItem: {
       display: "flex",
    },
-}));
+}))
 
 TeamMemberCard.propTypes = {
    person: PropTypes.any,
    classes: PropTypes.any,
-};
+}
 const TeamBios = ({ people }) => {
-   const classes = useStyles();
-   const [mounted, setMounted] = useState(false);
-   const theme = useTheme();
+   const classes = useStyles()
+   const [mounted, setMounted] = useState(false)
+   const theme = useTheme()
    useEffect(() => {
       // Masonry library malfunctions on the server side, so mui grid is used initially
-      setMounted(true);
-   }, []);
+      setMounted(true)
+   }, [])
 
    return mounted ? (
       <ResponsiveMasonry
@@ -72,8 +72,8 @@ const TeamBios = ({ people }) => {
             </Grid>
          ))}
       </Grid>
-   );
-};
+   )
+}
 
 TeamBios.propTypes = {
    people: PropTypes.arrayOf(
@@ -87,5 +87,5 @@ TeamBios.propTypes = {
          linkedinUrl: PropTypes.string,
       })
    ),
-};
-export default TeamBios;
+}
+export default TeamBios

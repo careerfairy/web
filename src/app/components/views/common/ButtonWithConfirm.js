@@ -10,7 +10,6 @@ import {
    useMediaQuery,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
-import ClearIcon from "@mui/icons-material/Clear";
 import { GlassDialog } from "materialUI/GlobalModals";
 import { useTheme } from "@mui/material/styles";
 
@@ -27,7 +26,6 @@ function ButtonWithConfirm({
    color,
    disabled,
    buttonAction,
-   mobile,
    buttonLabel,
    hasStarted,
    confirmDescription,

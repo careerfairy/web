@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { isEmpty, isLoaded } from "react-redux-firebase";
+import React, { useEffect, useState } from "react"
+import { isEmpty, isLoaded } from "react-redux-firebase"
 import {
    BarChart2 as AnalyticsIcon,
    Edit as EditGroupIcon,
    Film as StreamIcon,
    User as ProfileIcon,
    Users as RolesIcon,
-} from "react-feather";
-import { useAuth } from "../../HOCs/AuthProvider";
+} from "react-feather"
+import { useAuth } from "../../HOCs/AuthProvider"
 
 const initialHeaderLinks = [
    {
@@ -18,7 +18,7 @@ const initialHeaderLinks = [
       href: `/wishlist`,
       title: "WISHLIST",
    },
-];
+]
 const initialDrawerBottomLinks = [
    {
       href: `https://corporate.careerfairy.io/companies`,
@@ -33,15 +33,15 @@ const initialDrawerBottomLinks = [
       title: "About Us",
       basePath: "/about-us",
    },
-];
+]
 const useDashboardLinks = (group) => {
-   const { authenticatedUser } = useAuth();
+   const { authenticatedUser } = useAuth()
 
-   const [headerLinks, setHeaderLinks] = useState(initialHeaderLinks);
+   const [headerLinks, setHeaderLinks] = useState(initialHeaderLinks)
    const [drawerBottomLinks, setDrawerBottomLinks] = useState(
       initialDrawerBottomLinks
-   );
-   const [drawerTopLinks, setDrawerTopLinks] = useState([]);
+   )
+   const [drawerTopLinks, setDrawerTopLinks] = useState([])
 
    useEffect(() => {
       if (authenticatedUser?.emailVerified) {
@@ -52,7 +52,7 @@ const useDashboardLinks = (group) => {
                title: "FOLLOW GROUPS",
                basePath: "/groups",
             },
-         ]);
+         ])
 
          setDrawerBottomLinks([
             ...initialDrawerBottomLinks,
@@ -62,14 +62,14 @@ const useDashboardLinks = (group) => {
                icon: ProfileIcon,
                basePath: "/profile",
             },
-         ]);
+         ])
       }
-   }, [authenticatedUser?.emailVerified]);
+   }, [authenticatedUser?.emailVerified])
 
    useEffect(() => {
       if (isLoaded(group) && !isEmpty(group)) {
-         const baseHrefPath = "group";
-         const baseParam = "[groupId]";
+         const baseHrefPath = "group"
+         const baseParam = "[groupId]"
          setDrawerTopLinks([
             {
                href: `/${baseHrefPath}/${group.id}/admin/events`,
@@ -95,13 +95,13 @@ const useDashboardLinks = (group) => {
                title: "Roles",
                basePath: `/${baseHrefPath}/${baseParam}/admin/roles`,
             },
-         ]);
+         ])
       } else {
-         setDrawerTopLinks([]);
+         setDrawerTopLinks([])
       }
-   }, [group?.id]);
+   }, [group?.id])
 
-   return { drawerBottomLinks, drawerTopLinks, headerLinks };
-};
+   return { drawerBottomLinks, drawerTopLinks, headerLinks }
+}
 
-export default useDashboardLinks;
+export default useDashboardLinks

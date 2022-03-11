@@ -1,9 +1,19 @@
 import React from "react";
-import ViewerLayout from "../../../layouts/ViewerLayout";
-import ViewerOverview from "../../../components/views/viewer";
 import Head from "next/head";
+import dynamic from "next/dynamic";
+import StreamingLoader from "../../../components/views/loader/StreamingLoader";
 import { handleRedirectToNextGen } from "../../../util/serverSidePropsMethods";
 
+const ViewerLayout = dynamic(() => import("../../../layouts/ViewerLayout"), {
+   ssr: false,
+});
+const ViewerOverview = dynamic(
+   () => import("../../../components/views/viewer"),
+   {
+      ssr: false,
+      loading: () => <StreamingLoader />,
+   }
+);
 const ViewerPage = () => {
    return (
       <React.Fragment>

@@ -16,19 +16,19 @@ const useGlassStyles = makeStyles((theme) => ({
 }));
 
 const GlassDialog = ({
-   open,
-   PaperProps,
-   className,
-   fullWidth,
-   maxWidth,
-   onBackdropClick,
-   onClose,
-   scroll,
-   TransitionComponent,
-   disableBackdropClick,
-   classes,
-   TransitionProps,
-   forceGlass,
+   open = false,
+   PaperProps = {},
+   className = "",
+   fullWidth = false,
+   maxWidth = undefined,
+   onBackdropClick = undefined,
+   onClose = undefined,
+   scroll = undefined,
+   TransitionComponent = undefined,
+   disableBackdropClick = undefined,
+   classes = undefined,
+   TransitionProps = undefined,
+   forceGlass = undefined,
    ...rest
 }) => {
    const paperClasses = useGlassStyles();
