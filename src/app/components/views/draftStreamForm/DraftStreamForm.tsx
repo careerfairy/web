@@ -49,50 +49,52 @@ import MultiListSelect from "../common/MultiListSelect";
 import { useInterests } from "../../custom-hook/useCollection";
 import { createStyles } from "@mui/styles";
 
-const useStyles = makeStyles((theme) => createStyles({
-   root: {
-      flex: 1,
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      minHeight: "20vh",
-      borderRadius: 5,
-      marginBottom: ({ isGroupAdmin }: any) => !isGroupAdmin && 30,
-   },
-   form: {
-      width: "100%",
-   },
-   speakersLabel: {
-      color: "white",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-   },
-   submit: {
-      color: theme.palette.primary.main,
-      background: "white",
-      marginTop: theme.spacing(2),
-      "&:hover": {
-         color: "white",
-         background: theme.palette.primary.main,
+const useStyles = makeStyles((theme) =>
+   createStyles({
+      root: {
+         flex: 1,
+         display: "flex",
+         flexDirection: "column",
+         alignItems: "center",
+         minHeight: "20vh",
+         borderRadius: 5,
+         marginBottom: ({ isGroupAdmin }: any) => !isGroupAdmin && 30,
       },
-   },
-   whiteBtn: {
-      color: theme.palette.primary.main,
-      background: "white",
-      margin: theme.spacing(1),
-      "&:hover": {
-         color: "white",
-         background: theme.palette.primary.main,
+      form: {
+         width: "100%",
       },
-   },
-   buttonGroup: {
-      // @ts-ignore
-      visibility: ({ isGroupAdmin }) => isGroupAdmin && "hidden",
-      // @ts-ignore
-      position: ({ isGroupAdmin }) => isGroupAdmin && "fixed",
-   },
-}));
+      speakersLabel: {
+         color: "white",
+         display: "flex",
+         alignItems: "center",
+         justifyContent: "space-between",
+      },
+      submit: {
+         color: theme.palette.primary.main,
+         background: "white",
+         marginTop: theme.spacing(2),
+         "&:hover": {
+            color: "white",
+            background: theme.palette.primary.main,
+         },
+      },
+      whiteBtn: {
+         color: theme.palette.primary.main,
+         background: "white",
+         margin: theme.spacing(1),
+         "&:hover": {
+            color: "white",
+            background: theme.palette.primary.main,
+         },
+      },
+      buttonGroup: {
+         // @ts-ignore
+         visibility: ({ isGroupAdmin }) => isGroupAdmin && "hidden",
+         // @ts-ignore
+         position: ({ isGroupAdmin }) => isGroupAdmin && "fixed",
+      },
+   })
+);
 
 const speakerObj = {
    avatar: "",
@@ -269,7 +271,11 @@ const DraftStreamForm = ({
                } else {
                   await handleSetGroupIds([], livestream.groupIds, newFormData);
                }
-               setSelectedInterests(existingInterests.filter(i => newFormData.interestsIds.includes(i.id)));
+               setSelectedInterests(
+                  existingInterests.filter((i) =>
+                     newFormData.interestsIds.includes(i.id)
+                  )
+               );
                setUpdateMode(true);
             } else {
                setUpdateMode(false);
@@ -789,40 +795,56 @@ const DraftStreamForm = ({
                                        xl={12}
                                        item
                                     >
-                                      <MultiListSelect
-                                        inputName="groupIds"
-                                        onSelectItems={setSelectedGroups}
-                                        selectedItems={selectedGroups}
-                                        allValues={existingGroups}
-                                        disabled={isSubmitting || isNotAdmin()}
-                                        getLabelFn={mapGroupLabel}
-                                        setFieldValue={setFieldValue}
-                                        inputProps={{
-                                          label: "Add some Groups",
-                                          placeholder: "Add some partner groups"
-                                        }}
-                                        disabledValues={
-                                         isNotAdmin() ? existingGroups.map(g => g.id) : [group?.id]
-                                        }
-                                      />
+                                       <MultiListSelect
+                                          inputName="groupIds"
+                                          onSelectItems={setSelectedGroups}
+                                          selectedItems={selectedGroups}
+                                          allValues={existingGroups}
+                                          disabled={
+                                             isSubmitting || isNotAdmin()
+                                          }
+                                          getLabelFn={mapGroupLabel}
+                                          setFieldValue={setFieldValue}
+                                          inputProps={{
+                                             label: "Add some Groups",
+                                             placeholder:
+                                                "Add some partner groups",
+                                          }}
+                                          disabledValues={
+                                             isNotAdmin()
+                                                ? existingGroups.map(
+                                                     (g) => g.id
+                                                  )
+                                                : [group?.id]
+                                          }
+                                       />
                                     </Grid>
 
-                                    <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                                    <Grid
+                                       xs={12}
+                                       sm={12}
+                                       md={12}
+                                       lg={12}
+                                       xl={12}
+                                       item
+                                    >
                                        <MultiListSelect
-                                         inputName="interestsIds"
-                                         onSelectItems={setSelectedInterests}
-                                         selectedItems={selectedInterests}
-                                         allValues={existingInterests}
-                                         disabled={isSubmitting}
-                                         setFieldValue={setFieldValue}
-                                         inputProps={{
-                                            label: "Add some Categories",
-                                            placeholder: "Choose categories that best describe this event"
-                                         }}
-                                         chipProps={{
-                                            variant: "outlined"
-                                         }}
-                                         isCheckbox={true}
+                                          inputName="interestsIds"
+                                          onSelectItems={setSelectedInterests}
+                                          selectedItems={selectedInterests}
+                                          allValues={existingInterests}
+                                          disabled={isSubmitting}
+                                          limit={5}
+                                          setFieldValue={setFieldValue}
+                                          inputProps={{
+                                             label: "Add some Categories",
+                                             placeholder:
+                                                "Choose 5 categories that best describe this event",
+                                          }}
+                                          chipProps={{
+                                             variant: "outlined",
+                                          }}
+                                          isCheckbox={true}
                                        />
                                     </Grid>
                                  </FormGroup>
