@@ -15,15 +15,13 @@ import {
 } from "@mui/material";
 import { Formik } from "formik";
 import { v4 as uuidv4 } from "uuid";
-import { withFirebase } from "../../../context/firebase/FirebaseServiceContext";
+import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext";
 import ImageSelect from "./ImageSelect/ImageSelect";
 import makeStyles from "@mui/styles/makeStyles";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DateTimePicker from "@mui/lab/DateTimePicker";
 import SpeakerForm from "./SpeakerForm/SpeakerForm";
-import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
-import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 import { useRouter } from "next/router";
 import FormGroup from "./FormGroup";
 import ErrorContext from "../../../context/error/ErrorContext";
@@ -33,12 +31,14 @@ import {
    handleAddSpeaker,
    handleDeleteSpeaker,
    handleError,
-   handleFlattenOptions,
    languageCodes,
    validateStreamForm,
 } from "../../helperFunctions/streamFormFunctions";
 import { useAuth } from "../../../HOCs/AuthProvider";
 import { LanguageSelect } from "../../helperFunctions/streamFormFunctions/components";
+import MultiListSelect from "../common/MultiListSelect";
+import { useGroups, useInterests } from "../../custom-hook/useCollection";
+import StreamDurationSelect from "../draftStreamForm/StreamDurationSelect";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -78,39 +78,40 @@ const speakerObj = {
    background: "",
 };
 
-const NewLivestreamForm = ({ firebase }) => {
+const NewLivestreamForm = () => {
    const router = useRouter();
+   const firebase = useFirebaseService();
    const { userData, authenticatedUser } = useAuth();
 
    const {
       query: { livestreamId, draftStreamId, absolutePath, groupId },
       push,
-      replace,
    } = router;
    const classes = useStyles();
 
    const { setGeneralError } = useContext(ErrorContext);
-   const [targetCategories, setTargetCategories] = useState({});
    const [selectedGroups, setSelectedGroups] = useState([]);
-   const [groupData, setGroupData] = useState(null);
+   const [selectedInterests, setSelectedInterests] = useState([]);
    const [fetchingBackgrounds, setFetchingBackgrounds] = useState(true);
    const [fetchingLogos, setFetchingLogos] = useState(true);
-   const [fetchingGroups, setFetchingGroups] = useState(true);
    const [fetchingAvatars, setFetchingAvatars] = useState(true);
    const [allFetched, setAllFetched] = useState(false);
    const [updateMode, setUpdateMode] = useState(undefined);
 
+   const { data: existingGroups, isLoading: fetchingGroups } = useGroups();
+   const { data: existingInterests, isLoading: fetchingInterests } =
+      useInterests();
+
    const [existingLogos, setExistingLogos] = useState([]);
    const [existingAvatars, setExistingAvatars] = useState([]);
    const [existingBackgrounds, setExistingBackgrounds] = useState([]);
-   const [existingGroups, setExistingGroups] = useState([]);
-   const [formData, setFormData] = useState({
+   const [formData, setFormData] = useState<any>({
       companyLogoUrl: "",
       backgroundImageUrl: "",
       company: "",
       companyId: "",
       title: "",
-      targetCategories: {},
+      interestsIds: [],
       groupIds: [],
       start: new Date(),
       hidden: false,
@@ -155,9 +156,10 @@ const NewLivestreamForm = ({ firebase }) => {
                   backgroundImageUrl: livestream.backgroundImageUrl || "",
                   company: livestream.company || "",
                   companyId: livestream.companyId || "",
+                  duration: livestream.duration,
                   title: livestream.title || "",
-                  targetCategories: {},
                   groupIds: livestream.groupIds || [],
+                  interestsIds: livestream.interestsIds || [],
                   start: livestream.start.toDate() || new Date(),
                   hidden: livestream.hidden || false,
                   summary: livestream.summary || "",
@@ -168,8 +170,16 @@ const NewLivestreamForm = ({ firebase }) => {
                   language: livestream.language || languageCodes[0],
                };
                setFormData(newFormData);
-               handleSetDefaultGroups(livestream.groupIds);
-               setTargetCategories(livestream.targetCategories || {});
+               setSelectedInterests(
+                  existingInterests.filter((i) =>
+                     newFormData.interestsIds.includes(i.id)
+                  )
+               );
+               setSelectedGroups(
+                  existingGroups.filter((g) =>
+                     newFormData.groupIds.includes(g.id)
+                  )
+               );
                if (forLivestream) {
                   setUpdateMode(true);
                }
@@ -182,12 +192,16 @@ const NewLivestreamForm = ({ firebase }) => {
             }
          })();
       } else {
-         if (groupId) {
-            handleSetDefaultGroups([groupId]);
-         }
          setUpdateMode(false);
       }
-   }, [livestreamId, allFetched, draftStreamId, groupId]);
+   }, [
+      livestreamId,
+      allFetched,
+      draftStreamId,
+      groupId,
+      existingInterests,
+      existingGroups,
+   ]);
 
    useEffect(() => {
       handleGetFiles(
@@ -204,36 +218,16 @@ const NewLivestreamForm = ({ firebase }) => {
    }, [firebase]);
 
    useEffect(() => {
-      const unsubscribe = firebase.listenToGroups((querySnapshot) => {
-         let careerCenters = [];
-         querySnapshot.forEach((doc) => {
-            let careerCenter = doc.data();
-            careerCenter.id = doc.id;
-            careerCenter.selected = false;
-            careerCenters.push(careerCenter);
-         });
-         setFetchingGroups(false);
-         setExistingGroups(careerCenters);
-      });
-      return () => unsubscribe();
-   }, [groupId]);
-
-   useEffect(() => {
       if (
          !fetchingBackgrounds &&
          !fetchingLogos &&
          !fetchingAvatars &&
-         !fetchingGroups
+         !fetchingGroups &&
+         !fetchingInterests
       ) {
          setAllFetched(true);
       }
-   }, [fetchingAvatars, fetchingBackgrounds, fetchingLogos, fetchingGroups]);
-
-   const handleSetGroupCategories = (groupId, targetOptionIds) => {
-      const newTargetCategories = { ...targetCategories };
-      newTargetCategories[groupId] = targetOptionIds;
-      setTargetCategories(newTargetCategories);
-   };
+   }, [fetchingAvatars, fetchingBackgrounds, fetchingLogos]);
 
    const getDownloadUrl = (fileElement) => {
       if (fileElement) {
@@ -245,28 +239,6 @@ const NewLivestreamForm = ({ firebase }) => {
       } else {
          console.log("-> no fileElement", fileElement);
          return "";
-      }
-   };
-
-   const handleSetDefaultGroups = async (arrayOfGroupIds) => {
-      if (Array.isArray(arrayOfGroupIds)) {
-         let groupsWithFlattenedOptions = [];
-         arrayOfGroupIds.forEach((id) => {
-            const targetGroup = existingGroups.find(
-               (group) => group.groupId === id
-            );
-            if (targetGroup) {
-               targetGroup.flattenedOptions = handleFlattenOptions(targetGroup);
-               groupsWithFlattenedOptions.push(targetGroup);
-            }
-         });
-
-         // If ur not a super admin and ur also not an admin of any of the groups in the stream, get lost....
-         if (!hasPermissionToEdit(groupsWithFlattenedOptions)) {
-            // redirect if ur not a group admin!
-            // replace("/")
-         }
-         setSelectedGroups(groupsWithFlattenedOptions);
       }
    };
 
@@ -292,9 +264,8 @@ const NewLivestreamForm = ({ firebase }) => {
       try {
          setGeneralError("");
          setSubmitting(true);
-         const livestream = buildLivestreamObject(
+         const livestream: any = buildLivestreamObject(
             values,
-            targetCategories,
             updateMode,
             livestreamId,
             firebase
@@ -320,7 +291,7 @@ const NewLivestreamForm = ({ firebase }) => {
          }
          if (absolutePath) {
             return push({
-               pathname: absolutePath,
+               pathname: absolutePath as string,
             });
          } else if (values.hidden && values.groupIds.length) {
             return push(
@@ -330,18 +301,11 @@ const NewLivestreamForm = ({ firebase }) => {
             return push(`/upcoming-livestream/${id}`);
          }
       } catch (e) {
+         console.error(e);
          setGeneralError("Something went wrong");
       }
    };
 
-   const hasPermissionToEdit = (arrayOfGroups) => {
-      return Boolean(
-         userData.isAdmin ||
-            arrayOfGroups.some((group) =>
-               group.adminEmails.includes(authenticatedUser?.email)
-            )
-      );
-   };
    const hasPermissionToCreate = () => {
       return Boolean(userData?.isAdmin);
    };
@@ -448,7 +412,6 @@ const NewLivestreamForm = ({ firebase }) => {
                         <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                            <ImageSelect
                               getDownloadUrl={getDownloadUrl}
-                              values={values}
                               firebase={firebase}
                               setFieldValue={setFieldValue}
                               isSubmitting={isSubmitting}
@@ -465,12 +428,12 @@ const NewLivestreamForm = ({ firebase }) => {
                                  touched.companyLogoUrl &&
                                  errors.companyLogoUrl
                               }
+                              isAvatar={false}
                            />
                         </Grid>
                         <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                            <ImageSelect
                               getDownloadUrl={getDownloadUrl}
-                              values={values}
                               firebase={firebase}
                               setFieldValue={setFieldValue}
                               isSubmitting={isSubmitting}
@@ -487,6 +450,7 @@ const NewLivestreamForm = ({ firebase }) => {
                                  touched.backgroundImageUrl &&
                                  errors.backgroundImageUrl
                               }
+                              isAvatar={false}
                            />
                         </Grid>
                         <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
@@ -545,14 +509,12 @@ const NewLivestreamForm = ({ firebase }) => {
                               </Collapse>
                            </FormControl>
                         </Grid>
-                        <Grid xs={12} sm={7} md={8} item>
+                        <Grid xs={12} sm={6} md={4} item>
                            <LocalizationProvider dateAdapter={AdapterDateFns}>
                               <DateTimePicker
-                                 inputVariant="outlined"
                                  renderInput={(params) => (
                                     <TextField fullWidth {...params} />
                                  )}
-                                 variant="outlined"
                                  disabled={isSubmitting}
                                  label="Live Stream Start Date"
                                  value={values.start}
@@ -566,7 +528,18 @@ const NewLivestreamForm = ({ firebase }) => {
                               />
                            </LocalizationProvider>
                         </Grid>
-                        <Grid xs={12} sm={5} md={4} item>
+                        <Grid xs={12} sm={6} md={4} item>
+                           <StreamDurationSelect
+                              value={values.duration}
+                              start={values.start}
+                              disabled={isSubmitting}
+                              label="Estimated Duration"
+                              setFieldValue={setFieldValue}
+                              fullWidth
+                              variant="outlined"
+                           />
+                        </Grid>
+                        <Grid xs={12} sm={12} md={4} item>
                            <LanguageSelect
                               value={values.language}
                               setFieldValue={setFieldValue}
@@ -583,7 +556,6 @@ const NewLivestreamForm = ({ firebase }) => {
                                  id="summary"
                                  label="Summary"
                                  rows={2}
-                                 maxRows={7}
                                  inputProps={{ maxLength: 5000 }}
                                  onBlur={handleBlur}
                                  value={values.summary}
@@ -636,7 +608,6 @@ const NewLivestreamForm = ({ firebase }) => {
                                     handleAddSpeaker={handleAddSpeaker}
                                     objectKey={key}
                                     index={index}
-                                    errors={errors}
                                     firstNameError={handleError(
                                        key,
                                        "firstName",
@@ -665,11 +636,9 @@ const NewLivestreamForm = ({ firebase }) => {
                                     loading={fetchingAvatars}
                                     speaker={values.speakers[key]}
                                     values={values}
-                                    touched={touched}
                                     firebase={firebase}
                                     setFieldValue={setFieldValue}
                                     isSubmitting={isSubmitting}
-                                    path="mentors-pictures"
                                     handleBlur={handleBlur}
                                     options={existingAvatars}
                                  />
@@ -678,48 +647,47 @@ const NewLivestreamForm = ({ firebase }) => {
                         );
                      })}
                      <Typography style={{ color: "white" }} variant="h4">
-                        Group Info:
+                        Groups & Categories:
                      </Typography>
                      <FormGroup>
                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                           <MultiGroupSelect
-                              handleChange={handleChange}
-                              handleBlur={handleBlur}
-                              values={values}
-                              isSuperAdmin={userData.isAdmin}
-                              isSubmitting={isSubmitting}
-                              selectedGroups={selectedGroups}
-                              setTargetCategories={setTargetCategories}
-                              targetCategories={targetCategories}
-                              handleFlattenOptions={handleFlattenOptions}
-                              setSelectedGroups={setSelectedGroups}
+                           <MultiListSelect
+                              inputName="groupIds"
+                              onSelectItems={setSelectedGroups}
+                              selectedItems={selectedGroups}
+                              allValues={existingGroups}
+                              disabled={isSubmitting}
+                              getLabelFn={mapGroupLabel}
                               setFieldValue={setFieldValue}
-                              groups={existingGroups}
+                              inputProps={{
+                                 label: "Add some Groups",
+                                 placeholder: "Add partner groups",
+                              }}
                            />
                         </Grid>
-                        {selectedGroups.map((group) => {
-                           return (
-                              <Grid
-                                 key={group.groupId}
-                                 xs={12}
-                                 sm={12}
-                                 md={12}
-                                 lg={12}
-                                 xl={12}
-                                 item
-                              >
-                                 <GroupCategorySelect
-                                    handleSetGroupCategories={
-                                       handleSetGroupCategories
-                                    }
-                                    targetCategories={targetCategories}
-                                    isSubmitting={isSubmitting}
-                                    group={group}
-                                 />
-                              </Grid>
-                           );
-                        })}
+
+                        <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                           <MultiListSelect
+                              inputName="interestsIds"
+                              onSelectItems={setSelectedInterests}
+                              selectedItems={selectedInterests}
+                              allValues={existingInterests}
+                              disabled={isSubmitting}
+                              limit={5}
+                              setFieldValue={setFieldValue}
+                              inputProps={{
+                                 label: "Add some Categories",
+                                 placeholder:
+                                    "Choose 5 categories that best describe this event",
+                              }}
+                              chipProps={{
+                                 variant: "outlined",
+                              }}
+                              isCheckbox={true}
+                           />
+                        </Grid>
                      </FormGroup>
+
                      <Button
                         type="submit"
                         disabled={isSubmitting}
@@ -753,4 +721,6 @@ const NewLivestreamForm = ({ firebase }) => {
    );
 };
 
-export default withFirebase(NewLivestreamForm);
+const mapGroupLabel = (obj) => obj.universityName;
+
+export default NewLivestreamForm;

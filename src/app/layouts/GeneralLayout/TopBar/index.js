@@ -14,6 +14,8 @@ import { useAuth } from "../../../HOCs/AuthProvider";
 import LoginButton from "../../../components/views/common/LoginButton";
 import useGeneralHeader from "../../../components/custom-hook/useGeneralHeader";
 import NavLinks from "../../../components/views/header/NavLinks";
+import MissingDataButton
+   from "../../../components/views/missingData/MissingDataButton";
 
 const useStyles = makeStyles((theme) => ({
    navIconButton: {
@@ -51,9 +53,10 @@ const TopBar = () => {
                links={mainLinks}
                navLinksActiveColor={theme.palette.primary.main}
             />
-         </Hidden>
-         <Box display="flex" alignItems="center">
+         </Hidden>s
+         <Box sx={{display: "flex", alignItems: "center"}}>
             <Hidden lgDown>
+               <MissingDataButton />
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <div>
                      <LoginButton />
