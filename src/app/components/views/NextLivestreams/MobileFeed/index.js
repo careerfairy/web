@@ -72,7 +72,7 @@ const MobileFeed = ({
    };
 
    return (
-      <Box p={2}>
+      <Box p={1}>
          {!userData?.groupIds?.includes(groupData.groupId) &&
             !listenToUpcoming && (
                <>

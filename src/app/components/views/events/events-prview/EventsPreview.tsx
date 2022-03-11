@@ -11,6 +11,10 @@ import { useTheme } from "@mui/material/styles";
 import Slider from "react-slick";
 import Stack from "@mui/material/Stack";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import Heading from "../common/Heading";
+import { useInterests } from "../../../custom-hook/useCollection";
+import SearchIcon from "@mui/icons-material/Search";
+import { Button } from "@mui/material";
 
 const arrowFontSize = 30;
 
@@ -57,6 +61,9 @@ const styles = {
       fontSize: "1.2rem",
       fontWeight: 600,
    },
+   noEventsWrapper: {
+      p: 2,
+   },
 } as const;
 
 const EventsPreview = ({
@@ -65,6 +72,8 @@ const EventsPreview = ({
    loading,
    limit,
    events,
+   hidePreview,
+   type,
 }: EventsProps) => {
    const sliderRef = useRef(null);
    const {
@@ -72,6 +81,7 @@ const EventsPreview = ({
    } = useRouter();
    const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
       useRegistrationModal();
+   const { data: existingInterests } = useInterests();
 
    const {
       breakpoints: { up },
@@ -97,59 +107,89 @@ const EventsPreview = ({
    };
    return (
       <>
-         <Box>
-            <Box sx={styles.eventsHeader}>
-               <Typography fontWeight={500} variant="h5">
-                  {title}
-               </Typography>
-
-               {events?.length >= limit && (
-                  <Link href={seeMoreLink}>
-                     <a>
-                        <Typography sx={styles.seeMoreText} color="grey">
-                           See more
+         {!hidePreview && (
+            <Box>
+               <Box sx={styles.eventsHeader}>
+                  <Heading>{title}</Heading>
+                  {events?.length >= limit && (
+                     <Link href={seeMoreLink}>
+                        <a>
+                           <Typography sx={styles.seeMoreText} color="grey">
+                              See more
+                           </Typography>
+                        </a>
+                     </Link>
+                  )}
+               </Box>
+               <Stack>
+                  {!loading && !events.length ? (
+                     <Stack
+                        spacing={2}
+                        direction={"column"}
+                        alignItems={"center"}
+                        justifyContent="center"
+                        sx={styles.noEventsWrapper}
+                     >
+                        <Typography variant="h6">
+                           {type === EventsTypes.myNext
+                              ? "You’re not registered for any event yet."
+                              : "There currently aren't any scheduled events"}
                         </Typography>
-                     </a>
-                  </Link>
-               )}
+                        <Link
+                           href={
+                              type === EventsTypes.myNext
+                                 ? "/next-livestreams"
+                                 : "/next-livestreams?type=pastEvents"
+                           }
+                        >
+                           <a>
+                              <Button
+                                 variant="contained"
+                                 endIcon={<SearchIcon />}
+                              >
+                                 {type === EventsTypes.myNext
+                                    ? "Find an event"
+                                    : "See Past Events"}
+                              </Button>
+                           </a>
+                        </Link>
+                     </Stack>
+                  ) : (
+                     <Box
+                        sx={styles.carousel}
+                        ref={sliderRef}
+                        component={Slider}
+                        autoplay={false}
+                        lazyLoad
+                        infinite={false}
+                        onLazyLoad={handleCardsLoaded}
+                        arrows
+                        slidesToShow={numSlides}
+                        slidesToScroll={numSlides}
+                        initialSlide={0}
+                     >
+                        {loading
+                           ? [...Array(numSlides)].map((_, i) => (
+                                <Box key={i} sx={{ pr: 2 }}>
+                                   <EventPreviewCard loading />
+                                </Box>
+                             ))
+                           : events.map((event, index) => (
+                                <Box key={event.id} sx={{ pr: 2 }}>
+                                   <EventPreviewCard
+                                      loading={!cardsLoaded[index]}
+                                      interests={existingInterests}
+                                      onRegisterClick={handleClickRegister}
+                                      key={event.id}
+                                      event={event}
+                                   />
+                                </Box>
+                             ))}
+                     </Box>
+                  )}
+               </Stack>
             </Box>
-            <Stack>
-               {!loading && !events.length ? (
-                  <Typography>No Events</Typography>
-               ) : (
-                  <Box
-                     sx={styles.carousel}
-                     ref={sliderRef}
-                     component={Slider}
-                     autoplay={false}
-                     lazyLoad
-                     infinite={false}
-                     onLazyLoad={handleCardsLoaded}
-                     arrows
-                     slidesToShow={numSlides}
-                     slidesToScroll={numSlides}
-                     initialSlide={0}
-                  >
-                     {loading
-                        ? Array(numSlides).fill(
-                             <Box sx={{ pr: 2 }}>
-                                <EventPreviewCard loading />
-                             </Box>
-                          )
-                        : events.map((event, index) => (
-                             <Box key={event.id} sx={{ pr: 2 }}>
-                                <EventPreviewCard
-                                   loading={!cardsLoaded[index]}
-                                   onRegisterClick={handleClickRegister}
-                                   key={event.id}
-                                   event={event}
-                                />
-                             </Box>
-                          ))}
-                  </Box>
-               )}
-            </Stack>
-         </Box>
+         )}
          {joinGroupModalData && (
             <RegistrationModal
                open={Boolean(joinGroupModalData)}
@@ -186,6 +226,8 @@ export interface EventsProps {
    title?: string;
    loading: boolean;
    limit: number;
+   hidePreview?: boolean;
+   type: EventsTypes;
 }
 
 export default EventsPreview;

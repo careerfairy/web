@@ -1,5 +1,3 @@
-import { LiveStreamEvent } from "types/event";
-
 const logo =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/highlights%2Flogos%2Fdownload%201.png?alt=media&token=a435b542-b1df-4f46-8159-42d5f31c6b8e";
 const demoMan =
@@ -14,30 +12,3 @@ const highlightDoc = {
    logo: logo,
 };
 export const dummyHighlights = Array(numData).fill(highlightDoc);
-
-export const dummyEvent: LiveStreamEvent = {
-   title: "Modern way of software craftmanship",
-   language: { code: "en", name: "English" },
-   startDate: new Date(),
-   id: "1231",
-   groupIds: ["GXW3MtpTehSmAe0aP1J4", "rjotrGrg47t38iwC9KfE"],
-   interestsIds: [
-      "MPY3KTjYH1GiePa4I0kZ",
-      "pyfkBYzhJ3ewnmGAoz1l",
-      "zzBbeQvTajFdx10kz6X0",
-   ],
-   summary:
-      "We live in a world that changes constantly. Things that were completely fine several. We live in a world that changes constantly. Things that were completely fine several",
-   backgroundImageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fdemo-thumbnail.png?alt=media&token=5642cd91-a2f5-4e07-856e-6db2ba8f51b7",
-   companyLogoUrl:
-      "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fa68ee229-ca64-4044-9e84-2a3e7ef576d2_47x280%202.png?alt=media&token=5024316d-393e-44c5-8b93-3a648e76caae",
-};
-
-export const existingDummyInterests = [
-   { id: "MPY3KTjYH1GiePa4I0kZ", name: "R&D" },
-   { id: "OjIkyLu7oxICHqweTT04", name: "Cinema" },
-   { id: "bcs4xerUoed6G28AVjSZ", name: "Business" },
-   { id: "pyfkBYzhJ3ewnmGAoz1l", name: "Computer Science" },
-   { id: "zzBbeQvTajFdx10kz6X0", name: "Product Management" },
-];

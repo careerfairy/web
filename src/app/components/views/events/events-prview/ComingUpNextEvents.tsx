@@ -1,5 +1,5 @@
 import React from "react";
-import EventsPreview from "./EventsPreview";
+import EventsPreview, { EventsTypes } from "./EventsPreview";
 import livestreamRepo from "../../../../data/firebase/LivestreamRepository";
 import { LiveStreamEvent } from "../../../../types/event";
 import { usePagination } from "use-pagination-firestore";
@@ -16,6 +16,7 @@ const ComingUpNextEvents = ({ limit }: Props) => {
       <EventsPreview
          limit={limit}
          title={"COMING UP NEXT"}
+         type={EventsTypes.comingUp}
          events={events}
          seeMoreLink={"/next-livestreams"}
          loading={isLoading}

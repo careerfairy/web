@@ -1,5 +1,5 @@
 import React from "react";
-import EventsPreview from "./EventsPreview";
+import EventsPreview, { EventsTypes } from "./EventsPreview";
 import livestreamRepo from "../../../../data/firebase/LivestreamRepository";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 import { LiveStreamEvent } from "../../../../types/event";
@@ -22,6 +22,7 @@ const MyNextEvents = ({ limit }: Props) => {
    return (
       <EventsPreview
          limit={limit}
+         type={EventsTypes.myNext}
          events={events}
          title={"MY NEXT EVENTS"}
          loading={isLoading}
