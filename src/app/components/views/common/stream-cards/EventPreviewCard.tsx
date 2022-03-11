@@ -98,7 +98,7 @@ const styles = {
    mainAndLowerContentWrapper: {
       backgroundColor: (theme: Theme) => theme.palette.background.paper,
       borderRadius: (theme) => theme.spacing(0.2, 0.2, 1, 1),
-      boxShadow: 1,
+      boxShadow: 2,
       overflow: "hidden",
    },
    mainContentWrapper: {
@@ -209,9 +209,10 @@ const EventPreviewCard = ({
    registering,
    interests,
    animation,
+   autoRegister,
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)");
-
+   const { query, push, pathname } = useRouter();
    const getStartDate = () => event?.start?.toDate?.();
    const [eventInterests, setSetEventInterests] = useState([]);
    const [hasRegistered, setHasRegistered] = useState(false);
@@ -250,7 +251,7 @@ const EventPreviewCard = ({
             Boolean(event?.registeredUsers?.includes(authenticatedUser?.email))
          );
       }
-   }, [event?.registeredUsers, loading]);
+   }, [event?.registeredUsers, loading, authenticatedUser?.email]);
 
    useEffect(() => {
       if (!light && !loading) {
@@ -273,6 +274,37 @@ const EventPreviewCard = ({
          setIsPast(chekIfPast(getStartDate()));
       }
    }, [event?.start, loading]);
+
+   useEffect(() => {
+      if (
+         autoRegister &&
+         query.register &&
+         query.register === event?.id &&
+         hosts?.length &&
+         !event.registeredUsers.includes(authenticatedUser.email)
+      ) {
+         (async function handleAutoRegister() {
+            const newQuery = { ...query };
+            if (newQuery.register) {
+               delete newQuery.register;
+            }
+            await push({
+               pathname: pathname,
+               query: {
+                  ...newQuery,
+               },
+            });
+            onClickRegister();
+         })();
+      }
+   }, [
+      query.register,
+      event?.id,
+      hosts,
+      event?.registeredUsers,
+      authenticatedUser.email,
+      autoRegister,
+   ]);
 
    const handleShareClick = () => {
       const linkToEvent = event
@@ -486,7 +518,12 @@ const EventPreviewCard = ({
                {!light && (
                   <Stack spacing={2} direction={"row"} sx={styles.logosWrapper}>
                      <CardMedia
-                        sx={{ p: 1, display: "grid", placeItems: "center" }}
+                        sx={{
+                           p: 1,
+                           display: "grid",
+                           placeItems: "center",
+                           flex: 0.3,
+                        }}
                         title={event?.company}
                      >
                         {loading ? (
@@ -562,6 +599,7 @@ interface EventPreviewCardProps {
    loading?: boolean;
    light?: boolean;
    registering?: boolean;
+   autoRegister?: boolean;
    interests?: Interest[];
    onRegisterClick?: (
       event: LiveStreamEvent,

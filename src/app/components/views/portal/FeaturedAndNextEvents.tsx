@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { LiveStreamEvent } from "types/event";
 import EventPreviewCard from "../common/stream-cards/EventPreviewCard";
 import Stack from "@mui/material/Stack";
@@ -103,42 +103,39 @@ const FeaturedAndNextEvents = () => {
             <Grid item xs={12} md={6} sx={styles.section}>
                <Heading sx={styles.verticalHeading}>MY NEXT EVENTS</Heading>
                <Stack sx={styles.eventsStack} spacing={1}>
-                  <Box sx={styles.stackOverlay}>
-                     <Typography
-                        sx={styles.overlayText}
-                        align="center"
-                        variant="h5"
-                        component={"div"}
-                     >
-                        {isLoggedOut ? (
-                           <>
-                              Don't have an account?
-                              <br />
-                              <Button
-                                 sx={{ mt: 2 }}
-                                 component={Link}
-                                 href={`/signup?absolutePath=${asPath}`}
-                                 variant="contained"
-                                 size="large"
-                              >
-                                 Click here to register and start your journey!
-                              </Button>
-                           </>
-                        ) : (
-                           <>
-                              "You don't seem to have registered to any
-                              events..."
-                           </>
-                        )}
-                     </Typography>
-                  </Box>
+                  {noEvents && (
+                     <Box sx={styles.stackOverlay}>
+                        <Typography
+                           sx={styles.overlayText}
+                           align="center"
+                           variant="h5"
+                           component={"div"}
+                        >
+                           {isLoggedOut
+                              ? "Don't have an account?"
+                              : "You don't seem to have registered to any events..."}
+                           <br />
+                           <Button
+                              sx={{ mt: 2 }}
+                              component={Link}
+                              href={
+                                 isLoggedOut
+                                    ? `/signup?absolutePath=${asPath}`
+                                    : "#upcoming-events"
+                              }
+                              variant="contained"
+                              size="large"
+                           >
+                              {isLoggedOut
+                                 ? "Register and start your journey!"
+                                 : "Start Registering to events!"}
+                           </Button>
+                        </Typography>
+                     </Box>
+                  )}
                   {nextEvents.length
                      ? nextEvents.map((nextEvent) => (
-                          <EventNameCard
-                             loading
-                             key={nextEvent.id}
-                             event={nextEvent}
-                          />
+                          <EventNameCard key={nextEvent.id} event={nextEvent} />
                        ))
                      : [...Array(3)].map((_, i) => (
                           <EventNameCard

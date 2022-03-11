@@ -1,6 +1,6 @@
 import firebase from "firebase/app";
 import firebaseApp from "./FirebaseInstance";
-import { QuerySnapshot } from "@firebase/firestore-types";
+import { DocumentSnapshot, QuerySnapshot } from "@firebase/firestore-types";
 import { LiveStreamEvent } from "../../types/event";
 import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../../constants/streams";
 
@@ -41,6 +41,10 @@ export interface ILivestreamRepository {
       userEmail: string
    ): firebase.firestore.Query<firebase.firestore.DocumentData>;
    featuredEventQuery(): firebase.firestore.Query<firebase.firestore.DocumentData>;
+   listenToSingleEvent(
+      eventId: string,
+      callback: (snapshot: DocumentSnapshot) => void
+   );
 }
 
 class FirebaseLivestreamRepository implements ILivestreamRepository {
@@ -70,6 +74,18 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          .where("test", "==", false)
          .where("hidden", "==", false)
          .orderBy("start", "asc");
+   }
+   listenToSingleEvent(
+      eventId: string,
+      callback: (snapshot: DocumentSnapshot) => void
+   ) {
+      return (
+         this.firestore
+            .collection("livestreams")
+            .doc(eventId)
+            // @ts-ignore
+            .onSnapshot(callback)
+      );
    }
    async getUpcomingEvents(limit?: number): Promise<LiveStreamEvent[] | null> {
       let livestreamRef = this.firestore

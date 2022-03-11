@@ -74,6 +74,8 @@ const EventsPreview = ({
    events,
    hidePreview,
    type,
+   id,
+   autoRegister,
 }: EventsProps) => {
    const sliderRef = useRef(null);
    const {
@@ -108,7 +110,7 @@ const EventsPreview = ({
    return (
       <>
          {!hidePreview && (
-            <Box>
+            <Box id={id}>
                <Box sx={styles.eventsHeader}>
                   <Heading>{title}</Heading>
                   {events?.length >= limit && (
@@ -179,6 +181,7 @@ const EventsPreview = ({
                                    <EventPreviewCard
                                       loading={!cardsLoaded[index]}
                                       interests={existingInterests}
+                                      autoRegister
                                       onRegisterClick={handleClickRegister}
                                       key={event.id}
                                       event={event}
@@ -228,6 +231,8 @@ export interface EventsProps {
    limit: number;
    hidePreview?: boolean;
    type: EventsTypes;
+   id?: string;
+   autoRegister?: boolean;
 }
 
 export default EventsPreview;

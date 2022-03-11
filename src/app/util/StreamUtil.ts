@@ -57,9 +57,11 @@ export const getRelevantHosts = (
 export const getLinkToStream = (
    event: LiveStreamEvent,
    groupId: string,
-   shouldAutoRegister?: boolean
+   shouldAutoRegister?: boolean,
+   asPath?: string
 ) => {
    const registerQuery = shouldAutoRegister ? `&register=${event.id}` : "";
+   if (asPath) return `${asPath}?livestreamId=${event.id}${registerQuery}`;
    return groupId
       ? `/next-livestreams/${groupId}?livestreamId=${event.id}${registerQuery}`
       : `/next-livestreams?livestreamId=${event.id}${registerQuery}`;

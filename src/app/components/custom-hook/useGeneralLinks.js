@@ -3,20 +3,18 @@ import { User as ProfileIcon } from "react-feather";
 import { useAuth } from "../../HOCs/AuthProvider";
 import NextLivestreamsIcon from "@mui/icons-material/Contacts";
 import FollowGroupIcon from "@mui/icons-material/GroupAdd";
-import WishlistIcon from "@mui/icons-material/Stars";
 
 const initialMainLinks = [
+   {
+      href: `/portal`,
+      title: "PORTAL",
+      basePath: "/portal",
+   },
    {
       href: `/next-livestreams`,
       title: "NEXT LIVE STREAMS",
       basePath: "/next-livestreams",
       icon: NextLivestreamsIcon,
-   },
-   {
-      href: `/wishlist`,
-      title: "WISHLIST",
-      basePath: "/wishlist",
-      icon: WishlistIcon,
    },
    {
       href: `/groups`,

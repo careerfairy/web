@@ -48,7 +48,6 @@ const styles = {
 
 const EventNameCard = ({ event, loading, animation }: Props) => {
    const getStartDate = () => event?.start?.toDate?.();
-
    return (
       <Link href={`/upcoming-livestream/${event?.id}`}>
          <a>
