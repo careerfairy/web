@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, darken, IconButton, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import DateAndShareDisplay from "./common/DateAndShareDisplay";
 import { LiveStreamEvent } from "types/event";
 import Stack from "@mui/material/Stack";
@@ -12,12 +12,14 @@ import {
 } from "../../../helperFunctions/HelperFunctions";
 import { ChevronRight } from "@mui/icons-material";
 import Link from "next/link";
+import { alpha, Theme } from "@mui/material/styles";
 
+const radius = 1;
 const styles = {
    details: {
-      backgroundColor: (theme) => darken(theme.palette.background.default, 0.1),
-      borderRadius: 2,
-      boxShadow: 1,
+      backgroundColor: (theme: Theme) =>
+         alpha(theme.palette.grey["dark"], 0.21),
+      borderRadius: radius,
       "& svg": {
          color: "text.secondary",
       },
@@ -26,28 +28,35 @@ const styles = {
       ...getMaxLineStyles(2),
       fontWeight: 600,
       color: "text.secondary",
+      mr: "auto !important",
+      flex: 1,
+      px: 2,
    },
    logo: {
-      width: 60,
-      minWidth: 60,
+      width: 70,
+      minWidth: 70,
       height: 40,
       p: 0.5,
       m: 1,
       display: "grid",
       placeItems: "center",
       backgroundColor: (theme) => theme.palette.common.white,
-      borderRadius: 2,
-      boxShadow: 1,
+      borderRadius: radius,
+      border: (theme) => `2px solid ${theme.palette.grey["300"]}`,
    },
 } as const;
 
-const EventNameCard = ({ event, loading }: Props) => {
+const EventNameCard = ({ event, loading, animation }: Props) => {
    const getStartDate = () => event?.start?.toDate?.();
 
    return (
       <Link href={`/upcoming-livestream/${event?.id}`}>
          <a>
-            <DateAndShareDisplay startDate={getStartDate()} loading={loading} />
+            <DateAndShareDisplay
+               animation={animation}
+               startDate={getStartDate()}
+               loading={loading}
+            />
             <Stack
                justifyContent={"space-between"}
                alignItems={"center"}
@@ -55,16 +64,14 @@ const EventNameCard = ({ event, loading }: Props) => {
                spacing={1}
                sx={styles.details}
             >
-               <CardMedia sx={styles.logo} title={event?.company}>
-                  {loading ? (
-                     <Skeleton
-                        animation="wave"
-                        variant="rectangular"
-                        sx={{ borderRadius: 2 }}
-                        width={180}
-                        height={60}
-                     />
-                  ) : (
+               {loading ? (
+                  <Skeleton
+                     animation={animation}
+                     variant="rectangular"
+                     sx={styles.logo}
+                  />
+               ) : (
+                  <CardMedia sx={styles.logo} title={event?.company}>
                      <div
                         style={{
                            position: "relative",
@@ -78,11 +85,14 @@ const EventNameCard = ({ event, loading }: Props) => {
                            objectFit="contain"
                         />
                      </div>
-                  )}
-               </CardMedia>
+                  </CardMedia>
+               )}
                <Typography sx={styles.eventName}>
                   {loading ? (
-                     <Skeleton />
+                     <>
+                        <Skeleton animation={animation} width={"60%"} />
+                        <Skeleton animation={animation} width={"20%"} />
+                     </>
                   ) : (
                      event?.title + event?.title + event?.title
                   )}
@@ -96,6 +106,8 @@ const EventNameCard = ({ event, loading }: Props) => {
 interface Props {
    event?: LiveStreamEvent;
    loading?: boolean;
+   // Animate the loading animation, defaults to the "wave" prop
+   animation?: false | "wave" | "pulse";
 }
 
 export default EventNameCard;

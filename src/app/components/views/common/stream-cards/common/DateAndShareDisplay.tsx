@@ -15,7 +15,12 @@ const styles = {
       color: "text.primary",
    },
 } as const;
-const DateAndShareDisplay = ({ startDate, loading, onShareClick }: Props) => {
+const DateAndShareDisplay = ({
+   startDate,
+   loading,
+   onShareClick,
+   animation,
+}: Props) => {
    return (
       <Stack
          spacing={2}
@@ -26,13 +31,18 @@ const DateAndShareDisplay = ({ startDate, loading, onShareClick }: Props) => {
       >
          <Typography component={"div"} variant={"h6"} sx={styles.date}>
             {loading ? (
-               <Skeleton width={120} />
+               <Skeleton animation={animation} width={120} />
             ) : (
                DateUtil.eventPreviewDate(startDate)
             )}
          </Typography>
          {loading ? (
-            <Skeleton variant={"circular"} height={20} width={20} />
+            <Skeleton
+               variant={"circular"}
+               animation={animation}
+               height={20}
+               width={20}
+            />
          ) : onShareClick ? (
             <>
                <IconButton onClick={onShareClick}>
@@ -45,9 +55,11 @@ const DateAndShareDisplay = ({ startDate, loading, onShareClick }: Props) => {
 };
 
 interface Props {
-   loading: boolean;
+   loading?: boolean;
    onShareClick?: () => void;
    startDate?: Date;
+   // Animate the loading animation, defaults to the "wave" prop
+   animation?: false | "wave" | "pulse";
 }
 
 export default DateAndShareDisplay;

@@ -14,13 +14,12 @@ import {
    getResizedUrl,
 } from "components/helperFunctions/HelperFunctions";
 import WhiteTagChip from "../chips/TagChip";
-import { existingDummyInterests } from "../../events/dummyData";
 import { LiveStreamEvent } from "types/event";
 import Image from "next/image";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import Avatar from "@mui/material/Avatar";
 import { useRouter } from "next/router";
-import Link from "next/link";
+import Link from "components/views/common/Link";
 import { chekIfPast, getRelevantHosts } from "util/StreamUtil";
 import { useCopyToClipboard } from "react-use";
 import { useDispatch } from "react-redux";
@@ -29,8 +28,9 @@ import { useAuth } from "HOCs/AuthProvider";
 import LiveIcon from "@mui/icons-material/RadioButtonChecked";
 import Skeleton from "@mui/material/Skeleton";
 
-import { Chip } from "@mui/material";
+import { Chip, useMediaQuery } from "@mui/material";
 import DateAndShareDisplay from "./common/DateAndShareDisplay";
+import { Interest } from "../../../../types/interests";
 
 const logosWrapperSpacing = 12;
 const styles = {
@@ -62,17 +62,19 @@ const styles = {
       height: "auto",
    },
    mainContentHoverStyles: {
-      "&:hover, &:focus": {
-         // "&:hover, &:focus-within": {
+      // "&:hover": {
+      "&:hover, &:focus-within": {
          "& .statusWrapper": {
             opacity: 0,
          },
          "& .backgroundImage": {
             transform: "scale(1.1)",
          },
-         "& .title": {
-            ...getMaxLineStyles(3),
-         },
+         "& .title": (theme) => ({
+            [theme.breakpoints.up("md")]: {
+               ...getMaxLineStyles(3),
+            },
+         }),
          "& .chipsWrapper": {
             display: "none",
          },
@@ -205,9 +207,12 @@ const EventPreviewCard = ({
    light,
    onRegisterClick,
    registering,
+   interests,
+   animation,
 }: EventPreviewCardProps) => {
-   const getStartDate = () => event?.start?.toDate?.();
+   const mobile = useMediaQuery("(max-width:700px)");
 
+   const getStartDate = () => event?.start?.toDate?.();
    const [eventInterests, setSetEventInterests] = useState([]);
    const [hasRegistered, setHasRegistered] = useState(false);
    const firebase = useFirebaseService();
@@ -230,14 +235,14 @@ const EventPreviewCard = ({
    }, [hosts]);
 
    useEffect(() => {
-      if (!loading) {
+      if (!loading && interests) {
          setSetEventInterests(
-            existingDummyInterests.filter((interest) =>
+            interests.filter((interest) =>
                event?.interestsIds?.includes(interest.id)
             )
          );
       }
-   }, [event?.interestsIds, loading]);
+   }, [event?.interestsIds, loading, interests]);
 
    useEffect(() => {
       if (!loading) {
@@ -312,7 +317,7 @@ const EventPreviewCard = ({
                >
                   {loading ? (
                      <Skeleton
-                        animation="wave"
+                        animation={animation ?? "wave"}
                         variant="rectangular"
                         sx={styles.backgroundImageLoader}
                      />
@@ -336,11 +341,14 @@ const EventPreviewCard = ({
                   >
                      {loading ? (
                         <>
-                           <Skeleton sx={styles.chipLoader} />
+                           <Skeleton
+                              animation={animation}
+                              sx={styles.chipLoader}
+                           />
                         </>
                      ) : (
                         <>
-                           {event?.hasStarted && (
+                           {event?.hasStarted && !isPast && (
                               <Chip
                                  icon={<LiveIcon />}
                                  color="error"
@@ -369,7 +377,11 @@ const EventPreviewCard = ({
                            className="title"
                            sx={styles.title}
                         >
-                           {loading ? <Skeleton /> : event?.title}
+                           {loading ? (
+                              <Skeleton animation={animation} />
+                           ) : (
+                              event?.title
+                           )}
                         </Typography>
                         <Stack
                            alignItems={"center"}
@@ -381,8 +393,14 @@ const EventPreviewCard = ({
                         >
                            {loading ? (
                               <>
-                                 <Skeleton sx={styles.chipLoader} />
-                                 <Skeleton sx={styles.chipLoader} />
+                                 <Skeleton
+                                    animation={animation}
+                                    sx={styles.chipLoader}
+                                 />
+                                 <Skeleton
+                                    animation={animation}
+                                    sx={styles.chipLoader}
+                                 />
                               </>
                            ) : (
                               <>
@@ -432,10 +450,19 @@ const EventPreviewCard = ({
                                     disabled={registering}
                                     size={"small"}
                                  >
-                                    {hasRegistered ? "cancel" : "I'll attend"}
+                                    {hasRegistered
+                                       ? "cancel"
+                                       : mobile
+                                       ? "attend"
+                                       : "I'll attend"}
                                  </Button>
                               )}
-                              <Link
+
+                              <Button
+                                 sx={styles.btn}
+                                 component={Link}
+                                 /*
+                                 // @ts-ignore */
                                  href={{
                                     pathname: `/upcoming-livestream/${event?.id}`,
                                     hash: isPast && "#about",
@@ -445,18 +472,12 @@ const EventPreviewCard = ({
                                        ) && { groupId }),
                                     },
                                  }}
+                                 variant={"contained"}
+                                 color={"secondary"}
+                                 size={"small"}
                               >
-                                 <a>
-                                    <Button
-                                       sx={styles.btn}
-                                       variant={"contained"}
-                                       color={"secondary"}
-                                       size={"small"}
-                                    >
-                                       see details
-                                    </Button>
-                                 </a>
-                              </Link>
+                                 {mobile ? "details" : "see details"}
+                              </Button>
                            </Stack>
                         </>
                      )}
@@ -470,7 +491,7 @@ const EventPreviewCard = ({
                      >
                         {loading ? (
                            <Skeleton
-                              animation="wave"
+                              animation={animation ?? "wave"}
                               variant="rectangular"
                               sx={{ borderRadius: 2 }}
                               width={180}
@@ -541,11 +562,14 @@ interface EventPreviewCardProps {
    loading?: boolean;
    light?: boolean;
    registering?: boolean;
+   interests?: Interest[];
    onRegisterClick?: (
       event: LiveStreamEvent,
       targetGroupId: string,
       groups: any[],
       hasRegistered: boolean
    ) => any;
+   // Animate the loading animation, defaults to the "wave" prop
+   animation?: false | "wave" | "pulse";
 }
 export default EventPreviewCard;

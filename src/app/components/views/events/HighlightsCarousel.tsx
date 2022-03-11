@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import HighlightItem, { HighLightType } from "./HighlightItem";
+import HighlightItem from "./HighlightItem";
 import BasicCarousel from "components/views/common/carousels/BasicCarousel";
 import HighlightVideoDialog from "./HighlightVideoDialog";
 import { useWindowSize } from "react-use";
 import { dummyHighlights } from "./dummyData";
+import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext";
 
 const arrowFontSize = 30;
 const styles = {
@@ -28,8 +29,15 @@ const styles = {
    },
 };
 const HighlightsCarousel = () => {
+   const { shouldShowHighlightsCarousel } = useFirebaseService();
    const [isTouchScreen, setIsTouchScreen] = useState(false);
    const dimensions = useWindowSize();
+   const [showCarousel, setShowCarousel] = useState(false);
+   useEffect(() => {
+      (async function () {
+         setShowCarousel(await shouldShowHighlightsCarousel());
+      })();
+   }, []);
 
    useEffect(() => {
       const touch = matchMedia("(hover: none)").matches;
@@ -44,6 +52,9 @@ const HighlightsCarousel = () => {
    const handleCloseVideoDialog = () => {
       setVideoUrl(null);
    };
+   if (!showCarousel) {
+      return null;
+   }
 
    return (
       <>

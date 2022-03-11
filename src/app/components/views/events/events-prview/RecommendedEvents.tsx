@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import EventsPreview from "./EventsPreview";
+import EventsPreview, { EventsTypes } from "./EventsPreview";
 import livestreamRepo from "../../../../data/firebase/LivestreamRepository";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 import { LiveStreamEvent } from "types/event";
@@ -63,6 +63,10 @@ const RecommendedEvents = ({ limit, maxLimitIncreaseTimes }: Props) => {
          title={"RECOMMENDED FOR YOU"}
          events={nonRegisteredRecommendedEvents}
          loading={isLoading}
+         type={EventsTypes.recommended}
+         hidePreview={Boolean(
+            !isLoading && !nonRegisteredRecommendedEvents.length
+         )}
       />
    );
 };

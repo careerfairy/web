@@ -5,9 +5,8 @@ import GroupStreams from "../GroupStreams/GroupStreams";
 import { useTheme } from "@mui/material/styles";
 
 // FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => (WrappedComponent) => (props) => (
-   <WrappedComponent {...props} width="xs" />
-);
+const withWidth = () => (WrappedComponent) => (props) =>
+   <WrappedComponent {...props} width="xs" />;
 
 const DesktopFeed = ({
    groupData,
@@ -32,6 +31,7 @@ const DesktopFeed = ({
             <Grid
                container
                spacing={4}
+               ju
                sx={{ margin: (theme) => theme.spacing(1) }}
             >
                <GroupCategories

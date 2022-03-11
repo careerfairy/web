@@ -6,6 +6,7 @@ import EventPreviewCard from "../../common/stream-cards/EventPreviewCard";
 import RegistrationModal from "../../common/registration-modal";
 import { useRouter } from "next/router";
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal";
+import { useInterests } from "../../../custom-hook/useCollection";
 
 const styles = {
    root: {
@@ -47,7 +48,6 @@ const Wrapper = ({ children, streamId }) => {
          style={{ width: "100%" }}
          height={405}
          debounce={100}
-         unmountIfInvisible
          scroll
          offset={[0, 600]}
          placeholder={<EventPreviewCard loading />}
@@ -73,6 +73,7 @@ const GroupStreams = ({
    } = useRouter();
    const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
       useRegistrationModal();
+   const { data: existingInterests } = useInterests();
    const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false);
    const searchedButNoResults =
       selectedOptions?.length && !searching && !livestreams?.length;
@@ -94,14 +95,15 @@ const GroupStreams = ({
                sx={[styles.streamGridItem, mobile && styles.dynamicHeight]}
                key={livestream.id}
                xs={12}
-               md={6}
-               lg={6}
+               sm={6}
+               lg={4}
                xl={4}
                item
             >
                <Wrapper streamId={livestream.id}>
                   <EventPreviewCard
                      onRegisterClick={handleClickRegister}
+                     interests={existingInterests}
                      event={livestream}
                   />
                </Wrapper>
@@ -112,8 +114,8 @@ const GroupStreams = ({
 
    return (
       <>
-         <Box sx={{ p: { xs: 0, sm: 2 } }}>
-            <Grid container spacing={mobile ? 2 : 4}>
+         <Box sx={{ p: { xs: 0, md: 2 }, width: "100%" }}>
+            <Grid container spacing={mobile ? 2 : 3}>
                {groupData.id || listenToUpcoming ? (
                   searching ? (
                      <Grid xs={12} item sx={styles.loaderWrapper}>

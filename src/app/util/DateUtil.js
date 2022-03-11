@@ -24,7 +24,7 @@ export default class DateUtil {
    }
 
    static eventPreviewDate(JSDate) {
-      return dayjs(JSDate).format("MMMM Do, HH:mm z");
+      return dayjs(JSDate).format("MMMM Do, HH:mm");
    }
 
    static getUpcomingDate(JSDate) {

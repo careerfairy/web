@@ -2920,6 +2920,15 @@ class FirebaseService {
          .doc(breakoutRoomId);
       return ref.get();
    };
+   // User Interface API
+
+   shouldShowHighlightsCarousel = async () => {
+      const snap = await this.firestore
+         .collection("userInterface")
+         .doc("eventsPortal")
+         .get();
+      return Boolean(snap?.data?.().showHighlights);
+   };
 
    // Livestream Referral methods
    private markLivestreamReferralAsCompleted = async (
