@@ -28,6 +28,8 @@ import { useEffect, useState } from "react";
 import firebaseApp from "../data/firebase/FirebaseInstance";
 
 import "../util/FirebaseUtils";
+import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams";
+import UserRewardsNotifications from "../HOCs/UserRewardsNotifications";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -149,6 +151,8 @@ function MyApp(props) {
       return Boolean(activeStep === property);
    };
 
+   useStoreReferralQueryParams();
+
    return (
       <CacheProvider value={emotionCache}>
          <Head>
@@ -181,21 +185,26 @@ function MyApp(props) {
                         <FirebaseServiceContext.Provider
                            value={firebaseServiceInstance}
                         >
-                           <LocalizationProvider dateAdapter={AdapterDateFns}>
-                              <ErrorContext.Provider
-                                 value={{ generalError, setGeneralError }}
+                           <UserRewardsNotifications>
+                              <LocalizationProvider
+                                 dateAdapter={AdapterDateFns}
                               >
-                                 {disableCookies || isRecordingWindow ? null : (
-                                    <CFCookieConsent />
-                                 )}
-                                 <Component {...pageProps} />
-                                 <Notifier />
-                                 <ErrorSnackBar
-                                    handleClose={() => setGeneralError("")}
-                                    errorMessage={generalError}
-                                 />
-                              </ErrorContext.Provider>
-                           </LocalizationProvider>
+                                 <ErrorContext.Provider
+                                    value={{ generalError, setGeneralError }}
+                                 >
+                                    {disableCookies ||
+                                    isRecordingWindow ? null : (
+                                       <CFCookieConsent />
+                                    )}
+                                    <Component {...pageProps} />
+                                    <Notifier />
+                                    <ErrorSnackBar
+                                       handleClose={() => setGeneralError("")}
+                                       errorMessage={generalError}
+                                    />
+                                 </ErrorContext.Provider>
+                              </LocalizationProvider>
+                           </UserRewardsNotifications>
                         </FirebaseServiceContext.Provider>
                      </ThemeProviderWrapper>
                   </AuthProvider>

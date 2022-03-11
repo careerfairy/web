@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useSelector } from "react-redux";
 import { useFirestoreConnect } from "react-redux-firebase";
 import * as Sentry from "@sentry/nextjs";
+import { firebaseServiceInstance } from "../data/firebase/FirebaseService";
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -74,6 +75,27 @@ const AuthProvider = ({ children }) => {
          }
       }
    }, [auth, userData, pathname]);
+
+   // Backfill missing userData fields (if they don't exist)
+   useEffect(() => {
+      if (!userData) return;
+
+      const missingFields = ["referralCode"];
+
+      if (
+         Object.keys(userData).filter((f) => missingFields.includes(f))
+            .length === 0
+      ) {
+         // There are missing fields
+         firebaseServiceInstance
+            .backfillUserData(userData.authId)
+            .then((_) => console.log("Missing user data added."))
+            .catch((e) => {
+               Sentry.captureException(e);
+               console.error(e);
+            });
+      }
+   }, [userData]);
 
    const isSecurePath = () => {
       return Boolean(securePaths.includes(pathname));
