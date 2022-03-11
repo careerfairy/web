@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from "react";
 import { pdfjs } from "react-pdf";
-var { Document, Page } = require("react-pdf/dist/esm/entry.webpack");
+import { Document, Page } from "react-pdf";
 
 import { useWindowSize } from "components/custom-hook/useWindowSize";
 import {
@@ -18,7 +18,7 @@ import FilePickerContainer from "components/ssr/FilePickerContainer";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import Box from "@mui/material/Box";
 import AutoSizer from "react-virtualized-auto-sizer";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams";
 
 const useStyles = makeStyles((theme) => ({

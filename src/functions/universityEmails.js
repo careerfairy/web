@@ -4,7 +4,7 @@ const { admin } = require("./api/firestoreAdmin");
 const { client } = require("./api/postmark");
 
 const { setHeaders } = require("./util");
-const { emailsToRemove } = require("./emailsToRemove");
+const { emailsToRemove } = require("./misc/emailsToRemove");
 
 exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(
    async (req, res) => {

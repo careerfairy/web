@@ -27,6 +27,7 @@ import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/Stre
 import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker";
 import Streams from "./Streams";
 import DraggableComponent from "../../banners/DraggableComponent";
+import { useRouter } from "next/router";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -56,6 +57,9 @@ function VideoContainer({
    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
    const [streamerConnected, setStreamerConnected] = useState(false);
    const [streamerReady, setStreamerReady] = useState(false);
+   const {
+      query: { withHighQuality },
+   } = useRouter();
 
    const [connectionEstablished, setConnectionEstablished] = useState(false);
    const [isStreaming, setIsStreaming] = useState(false);
@@ -151,10 +155,10 @@ function VideoContainer({
    const [timeoutState, setTimeoutState] = useState(null);
 
    useEffect(() => {
-      if (localMediaStream && externalMediaStreams) {
+      if (localMediaStream && externalMediaStreams && !withHighQuality) {
          if (externalMediaStreams.length > 3) {
             if (
-               streamerId === currentLivestream.currentSpeakerId &&
+               streamerId === currentSpeakerId &&
                currentLivestream.mode !== "desktop" &&
                currentLivestream.mode !== "presentation"
             ) {
@@ -171,7 +175,7 @@ function VideoContainer({
                }
                let newTimeout = setTimeout(() => {
                   localMediaStream.stream.setVideoProfile("180p");
-               }, 20000);
+               }, 15000);
                setTimeoutState(newTimeout);
             }
          } else {
@@ -181,7 +185,7 @@ function VideoContainer({
    }, [
       localMediaStream,
       externalMediaStreams,
-      currentLivestream.currentSpeakerId,
+      currentSpeakerId,
       currentLivestream.mode,
    ]);
 
@@ -202,13 +206,11 @@ function VideoContainer({
             ) {
                createDemoStream({
                   streamId: "demoStream",
-                  url:
-                     "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media",
+                  url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media",
                });
                setAddedStream({
                   streamId: "demoStream",
-                  url:
-                     "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media",
+                  url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media",
                });
             }
          } else {

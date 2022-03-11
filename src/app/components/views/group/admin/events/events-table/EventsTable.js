@@ -55,9 +55,8 @@ const EventsTable = ({
    const [deletingEvent, setDeletingEvent] = useState(false);
    const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null);
    const [allGroups, setAllGroups] = useState([]);
-   const [toolbarActionsDialogOpen, setToolbarActionsDialogOpen] = useState(
-      false
-   );
+   const [toolbarActionsDialogOpen, setToolbarActionsDialogOpen] =
+      useState(false);
    const [endOfEventDialogData, setEndOfEventDialogData] = useState(null);
 
    const {
@@ -77,10 +76,8 @@ const EventsTable = ({
 
    const dispatch = useDispatch();
 
-   const [
-      targetLivestreamStreamerLinksId,
-      setTargetLivestreamStreamerLinksId,
-   ] = useState("");
+   const [targetLivestreamStreamerLinksId, setTargetLivestreamStreamerLinksId] =
+      useState("");
 
    useEffect(() => {
       if (eventId) {
@@ -248,8 +245,11 @@ const EventsTable = ({
             tooltip: isDraft ? "Delete Draft" : "Delete Event",
             onClick: () => handleClickDeleteStream(rowData.id),
             hintTitle: isDraft ? "Delete Draft" : "Delete Event",
-            hintDescription:
-               "Deleting an event is a permanent action and cannot be undone.",
+            hidden:
+               rowData.author?.groupId !== group.groupId && !userData?.isAdmin,
+            hintDescription: userData?.isAdmin
+               ? "You can delete this event because you are a CF admin"
+               : "Deleting an event is a permanent action and cannot be undone.",
          },
          {
             icon: publishingDraft ? (
@@ -280,7 +280,7 @@ const EventsTable = ({
                />
             ),
             tooltip: "More options",
-            hidden: isDraft || !userData.isAdmin,
+            hidden: isDraft || !userData?.isAdmin,
          },
       ],
       [

@@ -61,6 +61,11 @@ export default {
    highlighted: {
       border: (theme) => `12px solid ${theme.palette.primary.main}`,
    },
+   buttonsWrapper: {
+      mt: 1,
+      display: "flex",
+      alignItems: "center",
+   },
    content: {
       bottom: 0,
       width: "100%",
@@ -71,12 +76,12 @@ export default {
       justifyContent: "space-evenly",
    },
    avatar: {
-      width: "48px",
-      height: "48px",
+      width: 45,
+      height: 45,
    },
    groupLogo: {
-      width: "75px",
-      height: "75px",
+      width: { xs: 60, lg: 60 },
+      height: { xs: 60, lg: 60 },
       background: (theme) => theme.palette.common.white,
       "& img": {
          objectFit: "contain",

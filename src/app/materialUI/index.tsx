@@ -28,6 +28,7 @@ declare module "@mui/material/styles" {
    interface ThemeOptions {
       whiteShadow?: string;
       drawerWidth?: { small?: string; medium?: string };
+      darkTextShadow?: string;
    }
    interface PaletteColor {
       gradient?: string;
@@ -114,6 +115,10 @@ export const rootThemeObj = (mode: PaletteMode) =>
       whiteShadow:
          "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)",
       drawerWidth: { small: "256px", medium: "300px" },
+      darkTextShadow:
+         "0px 3px 3px rgba(0,0,0,0.4)," +
+         "0px 8px 13px rgba(0,0,0,0.1)," +
+         "0px 18px 23px rgba(0,0,0,0.1);",
    });
 
 const getComponents = (theme: Theme) => ({

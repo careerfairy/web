@@ -14,6 +14,7 @@ import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
 import HeroHosts from "./HeroHosts";
 import {
    InPersonEventBadge,
+   LanguageBadge,
    LimitedRegistrationsBadge,
 } from "../../NextLivestreams/GroupStreams/groupStreamCard/badges";
 
@@ -109,6 +110,17 @@ const styles = {
    streamStatuses: {
       paddingTop: (theme) => theme.spacing(2),
       display: "flex",
+      flexWrap: "wrap",
+   },
+   chip: {
+      height: { sm: "2.78rem" },
+      margin: { sm: "0.6em" },
+      "& svg": {
+         fontSize: { sm: "2.25rem" },
+      },
+      "& span": {
+         fontSize: { sm: "1.7rem" },
+      },
    },
 };
 
@@ -122,6 +134,7 @@ const HeroSection = ({
    hosts,
    numberOfSpotsRemaining,
    streamAboutToStart,
+   streamLanguage,
 }) => {
    return (
       <Box
@@ -136,21 +149,36 @@ const HeroSection = ({
             <Container sx={styles.container}>
                <Grid sx={styles.gridContainer} spacing={2} container>
                   <Grid sx={styles.leftGridItem} item xs={12} md={6}>
-                     <Typography variant="h2" sx={styles.title}>
+                     <Typography
+                        variant={stream?.title?.length > 120 ? "h4" : "h2"}
+                        sx={styles.title}
+                     >
                         {stream.title}
                      </Typography>
-                     {(stream.isFaceToFace || stream.maxRegistrants) && (
+                     {(stream.isFaceToFace ||
+                        stream.maxRegistrants ||
+                        streamLanguage) && (
                         <Box sx={styles.streamStatuses}>
-                           {stream.isFaceToFace && <InPersonEventBadge white />}
+                           {stream.isFaceToFace && (
+                              <InPersonEventBadge sx={styles.chip} white />
+                           )}
                            {stream.maxRegistrants && (
                               <LimitedRegistrationsBadge
+                                 sx={styles.chip}
                                  white
                                  numberOfSpotsRemaining={numberOfSpotsRemaining}
                               />
                            )}
+                           {streamLanguage && (
+                              <LanguageBadge
+                                 sx={styles.chip}
+                                 white
+                                 streamLanguage={streamLanguage}
+                              />
+                           )}
                         </Box>
                      )}
-                     {!!stream.speakers.length && (
+                     {!!stream?.speakers?.length && (
                         <Hidden smDown>
                            <Box
                               component="a"

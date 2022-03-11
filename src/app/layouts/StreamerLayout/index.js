@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import StreamerTopBar from "./StreamerTopBar";
 import PreparationOverlay from "../../components/views/streaming/preparation-overlay/PreparationOverlay";
@@ -17,6 +17,8 @@ import useStreamRef from "../../components/custom-hook/useStreamRef";
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
+import useNextGenRedirect from "../../components/custom-hook/useNextGenRedirect";
+import useStreamAdminPreferences from "../../components/custom-hook/useStreamAdminPreferences";
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -90,7 +92,6 @@ const StreamerLayout = (props) => {
    const [notifications, setNotifications] = useState([]);
    const [streamerId, setStreamerId] = useState(null);
    const dispatch = useDispatch();
-
    const [streamerReady, setStreamerReady] = useState(false);
    const [tokenChecked, setTokenChecked] = useState(false);
    const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen);
@@ -99,6 +100,8 @@ const StreamerLayout = (props) => {
    const [sliding, setSliding] = useState(false);
 
    const currentLivestream = useStreamConnect();
+   const streamAdminPreferences = useStreamAdminPreferences(baseStreamId);
+   useNextGenRedirect(streamAdminPreferences?.isNextGen);
    useStreamerActiveHandRaisesConnect();
 
    const classes = useStyles({
@@ -244,6 +247,7 @@ const StreamerLayout = (props) => {
                isMainStreamer,
                isStreamer: true,
                streamerId,
+               streamAdminPreferences,
             }}
          >
             <div className={classes.root}>

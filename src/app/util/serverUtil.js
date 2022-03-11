@@ -4,12 +4,13 @@ export const getServerStreamData = (livestreamSnap) => {
    const streamData = livestreamSnap.data();
    return {
       id: livestreamSnap.id,
-      company: streamData.company,
-      title: streamData.title,
-      companyLogoUrl: streamData.companyLogoUrl,
-      backgroundImageUrl: streamData.backgroundImageUrl,
-      speakers: streamData.speakers,
-      summary: streamData.summary,
+      company: streamData.company || null,
+      title: streamData.title || null,
+      companyLogoUrl: streamData.companyLogoUrl || null,
+      backgroundImageUrl: streamData.backgroundImageUrl || null,
+      isBeta: streamData.isBeta ?? null,
+      speakers: streamData.speakers || [],
+      summary: streamData.summary || null,
       createdDateString: streamData.created?.toDate?.().toString() || null,
       lastUpdatedDateString:
          streamData.lastUpdated?.toDate?.().toString() || null,
@@ -29,6 +30,26 @@ export const getServerSideStream = async (livestreamId) => {
       }
    }
    return serverSideStream;
+};
+
+export const getServerSideStreamAdminPreferences = async (livestreamId) => {
+   let streamAdminPreferences = null;
+   if (livestreamId) {
+      const preferenceSnap = await store.firestore.get({
+         collection: "livestreams",
+         doc: livestreamId,
+         subcollections: [
+            {
+               collection: "preferences",
+               doc: "adminPreference",
+            },
+         ],
+      });
+      if (preferenceSnap.exists) {
+         streamAdminPreferences = preferenceSnap.data();
+      }
+   }
+   return streamAdminPreferences;
 };
 
 export const serializeServerSideStream = (serverSideStream) => {
