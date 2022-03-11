@@ -817,8 +817,7 @@ exports.joinGroupDashboard = functions.https.onCall(async (data, context) => {
 
    if (
       notification.details.requester !== data.groupId ||
-      notification.details.receiver.toLowerCase() !==
-         data.userEmail.toLowerCase()
+      notification.details.receiver !== data.userEmail
    ) {
       functions.logger.error(
          `User ${data.userEmail} trying to connect to group ${data.groupId} did not pass the notification check ${notification.details}`

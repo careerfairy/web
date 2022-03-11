@@ -51,11 +51,11 @@ exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(
          });
       });
       console.log(recipients.size);
-      let testEmails = ["mvoss.private@gmail.com"];
+      let testEmails = ["maximilian@careerfairy.io"];
       let templates = [];
       recipients.forEach((recipient) => {
          const email = {
-            TemplateId: 25434445,
+            TemplateId: 22748248,
             From: "CareerFairy <noreply@careerfairy.io>",
             To: recipient,
             TemplateModel: {

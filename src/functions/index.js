@@ -21,6 +21,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // Imported Individual Cloud functions
+const hosting = require("./hosting");
 const auth = require("./auth");
 const agora = require("./agora");
 const backup = require("./backup");
@@ -35,10 +36,15 @@ const breakoutRooms = require("./breakoutRooms");
 const recording = require("./recording");
 const slack = require("./slack");
 
+// Hosting
+exports.production = hosting.production;
+exports.testing = hosting.testing;
+exports.testing2 = hosting.testing2;
+exports.personalHabib = hosting.personalHabib;
+
 // Auth
 exports.createNewUserAccount = auth.createNewUserAccount;
 exports.updateFakeUser = auth.updateFakeUser;
-exports.createUserCopy = auth.createUserCopy;
 exports.verifyEmailWithPin = auth.verifyEmailWithPin;
 exports.validateUserEmailWithPin = auth.validateUserEmailWithPin;
 exports.sendPostmarkResetPasswordEmail = auth.sendPostmarkResetPasswordEmail;
@@ -47,8 +53,6 @@ exports.sendPostmarkEmailUserDataAndUniWithName =
    auth.sendPostmarkEmailUserDataAndUniWithName;
 exports.resendPostmarkEmailVerificationEmailWithPin =
    auth.resendPostmarkEmailVerificationEmailWithPin;
-exports.updateUsersCollectionOnUserDataUpdated =
-   auth.updateUsersCollectionOnUserDataUpdated;
 
 // Agora
 exports.generateAgoraToken = agora.generateAgoraToken;
@@ -56,8 +60,8 @@ exports.generateAgoraTokenSecureOnCall = agora.generateAgoraTokenSecureOnCall;
 exports.fetchAgoraRtcToken = agora.fetchAgoraRtcToken;
 exports.fetchAgoraRtmToken = agora.fetchAgoraRtmToken;
 
-// // Backup
-// exports.exportFirestoreBackup = backup.exportFirestoreBackup;
+// Backup
+exports.exportFirestoreBackup = backup.exportFirestoreBackup;
 
 // Admin Functions
 exports.sendBasicTemplateEmail = admin.sendBasicTemplateEmail;
