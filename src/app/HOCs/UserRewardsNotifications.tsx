@@ -11,7 +11,7 @@ const UserRewardsNotifications = ({ children }) => {
    const { enqueueSnackbar } = useSnackbar();
 
    useEffect(() => {
-      if (!userData) return;
+      if (!userData || !userData.id) return;
 
       return firebaseService.rewardListenToUnSeenUserRewards(
          userData.id,
@@ -40,18 +40,25 @@ const UserRewardsNotifications = ({ children }) => {
                const notification = `You have received ${total} ${rewardsPlural} for ${actionHumanString}!`;
                enqueueSnackbar(notification, {
                   variant: "success",
-                  preventDuplicate: true,
+                  preventDuplicate: false,
                });
             }
 
             // Mark rewards as seen
             const refs = querySnapshot.docs.map((d) => d.ref);
             if (refs.length > 0) {
-               firebaseService.rewardMarkManyAsSeen(refs).catch(console.error);
+               setTimeout(() => {
+                  firebaseService
+                     .rewardMarkManyAsSeen(refs)
+                     .then((_) =>
+                        console.log(`${refs.length} rewards marked as seen`)
+                     )
+                     .catch(console.error);
+               }, 3000); // wait for the notifications to popup
             }
          }
       );
-   }, [userData]);
+   }, [userData?.id]);
 
    return children;
 };

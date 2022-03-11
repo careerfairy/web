@@ -1,2 +1,2 @@
-export const queryReferralCode = "referralCode";
+export const queryReferralCode = "referral";
 export const queryInvite = "invite"; // livestream id

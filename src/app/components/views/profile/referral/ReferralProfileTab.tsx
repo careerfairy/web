@@ -110,7 +110,7 @@ const localStyles = {
 };
 
 const RewardsTable = ({ userDataId }) => {
-   const { isLoading, data } = useCollection<Reward>(
+   let { isLoading, data } = useCollection<Reward>(
       (firestore) =>
          firestore.collection("userData").doc(userDataId).collection("rewards"),
       true
@@ -125,6 +125,10 @@ const RewardsTable = ({ userDataId }) => {
          </Box>
       );
    }
+
+   data = data.sort((a, b) => {
+      return b.createdAt.toMillis() - a.createdAt.toMillis();
+   });
 
    return (
       <TableContainer>

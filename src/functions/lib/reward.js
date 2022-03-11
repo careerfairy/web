@@ -15,7 +15,7 @@ exports.rewardCreateReferralSignUpFollower = (
 ) => {
    return rewardCreate(
       justRegisteredUserId,
-      RewardActions.REFERRAL_SIGNUP_LEADER,
+      RewardActions.REFERRAL_SIGNUP_FOLLOWER,
       {
          userId: leaderUserData.id,
          userData: pickDetailsFromUserData(leaderUserData),

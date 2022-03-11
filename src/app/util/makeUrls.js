@@ -1,4 +1,5 @@
 import { getHost } from "../constants/domains";
+import { queryInvite, queryReferralCode } from "../constants/queryStringParams";
 
 const makeDuration = function (event) {
    const minutes = Math.floor(
@@ -102,10 +103,10 @@ export const makeLivestreamEventDetailsInviteUrl = (
 ) => {
    return (
       makeLivestreamEventDetailsUrl(livestreamId) +
-      `?referralCode=${referralCode}&invite=${livestreamId}`
+      `?${queryReferralCode}=${referralCode}&${queryInvite}=${livestreamId}`
    );
 };
 
 export const makeReferralUrl = (userReferralCode) => {
-   return `${getHost()}/?referral=${userReferralCode}`;
+   return `${getHost()}/?${queryReferralCode}=${userReferralCode}`;
 };

@@ -24,6 +24,8 @@ export function getMaxSlides(intendedSlidesToShow, numberOfElements) {
  * @param {number} minimumTimeElapsed - Minimum time (minutes) that must have passed since the start of the stream
  */
 export function streamIsOld(streamStartDate, minimumTimeElapsed = 120) {
+   if (!streamStartDate) return false;
+
    let streamDate;
    if (typeof streamStartDate.toDate === "function") {
       streamDate = streamStartDate.toDate(); // firestore timestamp conversion

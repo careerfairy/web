@@ -185,26 +185,23 @@ function MyApp(props) {
                         <FirebaseServiceContext.Provider
                            value={firebaseServiceInstance}
                         >
-                           <UserRewardsNotifications>
-                              <LocalizationProvider
-                                 dateAdapter={AdapterDateFns}
+                           <LocalizationProvider dateAdapter={AdapterDateFns}>
+                              <ErrorContext.Provider
+                                 value={{ generalError, setGeneralError }}
                               >
-                                 <ErrorContext.Provider
-                                    value={{ generalError, setGeneralError }}
-                                 >
-                                    {disableCookies ||
-                                    isRecordingWindow ? null : (
-                                       <CFCookieConsent />
-                                    )}
+                                 {disableCookies || isRecordingWindow ? null : (
+                                    <CFCookieConsent />
+                                 )}
+                                 <UserRewardsNotifications>
                                     <Component {...pageProps} />
-                                    <Notifier />
-                                    <ErrorSnackBar
-                                       handleClose={() => setGeneralError("")}
-                                       errorMessage={generalError}
-                                    />
-                                 </ErrorContext.Provider>
-                              </LocalizationProvider>
-                           </UserRewardsNotifications>
+                                 </UserRewardsNotifications>
+                                 <Notifier />
+                                 <ErrorSnackBar
+                                    handleClose={() => setGeneralError("")}
+                                    errorMessage={generalError}
+                                 />
+                              </ErrorContext.Provider>
+                           </LocalizationProvider>
                         </FirebaseServiceContext.Provider>
                      </ThemeProviderWrapper>
                   </AuthProvider>
