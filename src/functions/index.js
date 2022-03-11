@@ -44,7 +44,7 @@ exports.testing2 = hosting.testing2;
 exports.personalHabib = hosting.personalHabib;
 
 // Auth
-exports.createNewUserAccount = auth.createNewUserAccount;
+exports.createNewUserAccount_v2 = auth.createNewUserAccount_v2;
 exports.backfillUserData = auth.backfillUserData;
 exports.updateFakeUser = auth.updateFakeUser;
 exports.verifyEmailWithPin = auth.verifyEmailWithPin;

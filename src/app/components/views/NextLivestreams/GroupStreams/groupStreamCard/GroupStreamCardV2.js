@@ -616,15 +616,19 @@ const GroupStreamCardV2 = memo(
                   <Box sx={[styles.shadow, styles.shadow2]} />
                </Card>
             </ClickAwayListener>
-            <RegistrationModal
-               open={Boolean(joinGroupModalData)}
-               handleClose={handleCloseJoinModal}
-               onFinish={handleCloseJoinModal}
-               promptOtherEventsOnFinal={!query.groupId}
-               livestream={joinGroupModalData?.livestream}
-               groups={joinGroupModalData?.groups}
-               targetGroupId={joinGroupModalData?.targetGroupId}
-            />
+            {Boolean(joinGroupModalData) ? (
+               <RegistrationModal
+                  open={Boolean(joinGroupModalData)}
+                  handleClose={handleCloseJoinModal}
+                  onFinish={handleCloseJoinModal}
+                  promptOtherEventsOnFinal={!query.groupId}
+                  livestream={joinGroupModalData?.livestream}
+                  groups={joinGroupModalData?.groups}
+                  targetGroupId={joinGroupModalData?.targetGroupId}
+               />
+            ) : (
+               ""
+            )}
          </Fragment>
       );
    }
