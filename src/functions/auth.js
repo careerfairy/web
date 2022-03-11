@@ -2,7 +2,13 @@ const functions = require("firebase-functions");
 const { client } = require("./api/postmark");
 const { admin } = require("./api/firestoreAdmin");
 
-const { setHeaders } = require("./util");
+const { setHeaders, generateReferralCode } = require("./util");
+const {
+   userGetByReferralCode,
+   userGetByEmail,
+   userUpdateFields,
+} = require("./lib/user");
+const { rewardCreateReferralSignUpFollower } = require("./lib/reward");
 
 const getRandomInt = (max) => {
    let variable = Math.floor(Math.random() * Math.floor(max));
@@ -34,21 +40,49 @@ exports.createNewUserAccount = functions.https.onCall(async (data, context) => {
          console.log(
             `Starting firestore account creation process for ${recipient_email}`
          );
+
+         // Check if the user was referred by someone
+         const referralData = {};
+         let referralUser = null;
+         if (userData.referralCode) {
+            referralUser = await userGetByReferralCode(userData.referralCode);
+
+            if (referralUser) {
+               referralData.referredBy = {
+                  uid: referralUser.id,
+                  name: `${referralUser.firstName} ${referralUser.lastName}`,
+               };
+               functions.logger.info(
+                  `Adding referral information to the new user.`
+               );
+            } else {
+               functions.logger.warn(
+                  `Invalid referral code: ${userData.referralCode}, no corresponding user.`
+               );
+            }
+         }
+
          await admin
             .firestore()
             .collection("userData")
             .doc(recipient_email)
-            .set({
-               authId: user.uid,
-               id: recipient_email,
-               validationPin: pinCode,
-               firstName: userData.firstName,
-               lastName: userData.lastName,
-               userEmail: recipient_email,
-               university: userData.university,
-               universityCountryCode: userData.universityCountryCode,
-               unsubscribed: !userData.subscribed,
-            })
+            .set(
+               Object.assign(
+                  {
+                     authId: user.uid,
+                     id: recipient_email,
+                     validationPin: pinCode,
+                     firstName: userData.firstName,
+                     lastName: userData.lastName,
+                     userEmail: recipient_email,
+                     university: userData.university,
+                     universityCountryCode: userData.universityCountryCode,
+                     unsubscribed: !userData.subscribed,
+                     referralCode: generateReferralCode(),
+                  },
+                  referralData
+               )
+            )
             .then(async () => {
                console.log(`Starting sending email for ${recipient_email}`);
                const email = {
@@ -58,6 +92,19 @@ exports.createNewUserAccount = functions.https.onCall(async (data, context) => {
                   TemplateModel: { pinCode: pinCode },
                };
                try {
+                  // Create the referral follower reward if the user was referred by someone
+                  if (referralData.referredBy) {
+                     try {
+                        await rewardCreateReferralSignUpFollower(
+                           recipient_email,
+                           referralUser
+                        );
+                     } catch (e) {
+                        // We don't want to fail the registration just because the reward failed
+                        functions.logger.error(e);
+                     }
+                  }
+
                   let response = await client.sendEmailWithTemplate(email);
                   console.log(`Sent email successfully for ${recipient_email}`);
                   return response;
@@ -375,4 +422,35 @@ exports.updateFakeUser = functions.https.onRequest(async (req, res) => {
       .catch(function (error) {
          console.log("Error updating user:", error);
       });
+});
+
+exports.backfillUserData = functions.https.onCall(async (data, context) => {
+   const email = context?.auth?.token?.email;
+   functions.logger.debug(email, context?.auth);
+
+   if (!email) {
+      functions.logger.error(
+         `The user calling the function is not authenticated`
+      );
+      throw new functions.https.HttpsError(
+         "invalid-argument",
+         "Something wrong happened"
+      );
+   }
+
+   const userData = await userGetByEmail(email);
+   const dataToUpdate = {};
+
+   if (!userData.referralCode) {
+      dataToUpdate.referralCode = generateReferralCode();
+      functions.logger.info("Adding referralCode to user");
+   }
+
+   if (Object.keys(dataToUpdate).length > 0) {
+      await userUpdateFields(email, dataToUpdate);
+      functions.logger.info(
+         "User updated with the following fields",
+         dataToUpdate
+      );
+   }
 });

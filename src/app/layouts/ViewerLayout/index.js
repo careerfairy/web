@@ -21,6 +21,7 @@ import StatsUtil from "../../data/util/StatsUtil";
 import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu";
 import useNextGenRedirect from "../../components/custom-hook/useNextGenRedirect";
 import useStreamAdminPreferences from "../../components/custom-hook/useStreamAdminPreferences";
+import useRewardLivestreamAttendance from "../../components/custom-hook/useRewardLivestreamAttendance";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -253,6 +254,8 @@ const ViewerLayout = (props) => {
 
       checkForCategoryData();
    }, [Boolean(userData), Boolean(currentLivestream)]);
+
+   useRewardLivestreamAttendance(currentLivestream);
 
    if (notAuthorized) {
       replace({

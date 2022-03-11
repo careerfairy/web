@@ -6,6 +6,7 @@ import {
 import DateUtil from "util/DateUtil";
 import firebaseApp from "./FirebaseInstance";
 import firebase from "firebase/app";
+import DocumentReference = firebase.firestore.DocumentReference;
 
 class FirebaseService {
    public readonly app: firebase.app.App;
@@ -3043,6 +3044,45 @@ class FirebaseService {
             lastName: "Streamer",
          }
       );
+   };
+
+   // Rewards
+
+   rewardLivestreamAttendance = async (
+      livestreamId: string,
+      referralCode: string // invite from user owner of the referral code
+   ) => {
+      return this.functions.httpsCallable("rewardLivestreamAttendance")({
+         livestreamId,
+         referralCode,
+      });
+   };
+
+   rewardListenToUnSeenUserRewards = (
+      userDataId,
+      callback: (QuerySnapshot) => void
+   ) => {
+      let ref = this.firestore
+         .collection("userData")
+         .doc(userDataId)
+         .collection("rewards")
+         .where("seenByUser", "==", false);
+      return ref.onSnapshot(callback);
+   };
+
+   rewardMarkManyAsSeen = (rewardRefs: DocumentReference[]) => {
+      let batch = this.firestore.batch();
+
+      for (let rewardRef of rewardRefs) {
+         batch.update(rewardRef, { seenByUser: true });
+      }
+
+      return batch.commit();
+   };
+
+   // Backfill user data
+   backfillUserData = async () => {
+      return this.functions.httpsCallable("backfillUserData")();
    };
 
    // DB functions

@@ -35,6 +35,7 @@ const analytics = require("./analytics");
 const breakoutRooms = require("./breakoutRooms");
 const recording = require("./recording");
 const slack = require("./slack");
+const rewards = require("./rewards");
 
 // Hosting
 exports.production = hosting.production;
@@ -44,6 +45,7 @@ exports.personalHabib = hosting.personalHabib;
 
 // Auth
 exports.createNewUserAccount = auth.createNewUserAccount;
+exports.backfillUserData = auth.backfillUserData;
 exports.updateFakeUser = auth.updateFakeUser;
 exports.verifyEmailWithPin = auth.verifyEmailWithPin;
 exports.validateUserEmailWithPin = auth.validateUserEmailWithPin;
@@ -142,3 +144,7 @@ exports.updateBreakoutRoomStatusOnWrite =
 
 // Slack Interaction Handler
 exports.slackHandleInteractions = slack.slackHandleInteractions;
+
+// Rewards
+exports.rewardApply = rewards.rewardApply;
+exports.rewardLivestreamAttendance = rewards.rewardLivestreamAttendance;
