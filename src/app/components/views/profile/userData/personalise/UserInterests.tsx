@@ -44,7 +44,7 @@ const UserInterests = ({userData}) => {
       </Typography>
 
       <Typography variant="body2" component="p">
-        Select some to improve your site experience
+         Select 5 to improve your site experience:
       </Typography>
 
       <Box my={3}>
