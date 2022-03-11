@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { withFirebase } from "../context/firebase/FirebaseServiceContext";
 import Loader from "../components/views/loader/Loader";
 
 import Head from "next/head";
-import { Container } from "@mui/material";
+import {Container, Typography} from "@mui/material"
 import Groups from "../components/views/groups/Groups";
 import { useAuth } from "../HOCs/AuthProvider";
 import GeneralLayout from "../layouts/GeneralLayout";
@@ -53,6 +53,9 @@ const JoinGroup = (props) => {
                   minHeight: "60vh",
                }}
             >
+               <Typography align="center" variant="h3" gutterBottom>
+                  Follow More Career&nbsp;Groups
+               </Typography>
                <Groups userData={userData} groups={groups} />
             </Container>
          </GeneralLayout>

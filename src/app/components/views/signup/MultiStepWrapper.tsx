@@ -16,6 +16,10 @@ export const MultiStepContext = createContext<IMultiStepContext>(null)
 
 const MultiStepWrapper = ({steps, currentStep, setCurrentStep, componentData}: Props) => {
 
+  if(currentStep >= steps.length) {
+    return null
+  }
+
   const context: IMultiStepContext = {
     steps,
     currentStep,

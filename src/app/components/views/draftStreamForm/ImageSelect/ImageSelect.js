@@ -55,7 +55,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ImageSelect = ({
-   options,
    error,
    value,
    formName,
@@ -68,28 +67,11 @@ const ImageSelect = ({
 }) => {
    const firebase = useFirebaseService();
    const classes = useStyles();
-   const [open, setOpen] = useState(false);
    const [filePickerError, setFilePickerError] = useState(null);
 
    useEffect(() => {
       setFilePickerError(error);
    }, [error]);
-
-   const getSelectedItem = () => {
-      // Autocomplete will always complain because of async filtering... :( So ignore the warning
-      const item = options.find((option) => option.value === value);
-      // console.log("-> item", item);
-      if (item) {
-         return item;
-      } else {
-         return {};
-      }
-   };
-
-   const handleSelect = (event, value) => {
-      const actualValue = value ? value.value : "";
-      setFieldValue(formName, actualValue, true);
-   };
 
    const renderImage = isAvatar ? (
       <div className={classes.avaWrapper}>

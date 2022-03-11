@@ -16,7 +16,7 @@ import {
    Button,
    Paper,
 } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import TheatersRoundedIcon from "@mui/icons-material/TheatersRounded";
 import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded";
 import MicOutlinedIcon from "@mui/icons-material/MicOutlined";
@@ -156,8 +156,7 @@ export function LogInFormBase({
       setGeneralLoading(true);
       axios({
          method: "post",
-         url:
-            "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmail",
+         url: "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmail",
          data: {
             recipientEmail: email,
             redirect_link: "https://careerfairy.io/login",

@@ -5,13 +5,9 @@ import {
    Collapse,
    Grid,
    TextField,
-   FormHelperText,
-   Box,
-   Typography,
    Button,
 } from "@mui/material";
 import makeStyles from '@mui/styles/makeStyles';
-import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
 const useStyles = makeStyles((theme) => ({
@@ -30,7 +26,6 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 const SpeakerForm = ({
-   options,
    firstNameError,
    lastNameError,
    positionError,
@@ -183,7 +178,6 @@ const SpeakerForm = ({
                handleBlur={handleBlur}
                isSubmitting={isSubmitting}
                loading={loading}
-               options={options}
                value={speaker.avatar}
                isAvatar
                firebase={firebase}

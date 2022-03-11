@@ -54,9 +54,8 @@ export default function useAgoraAsStreamer(
       type: "INFO",
       msg: "RTM_INITIAL",
    });
-   const [agoraRtcConnectionStatus, setAgoraRtcConnectionStatus] = useState(
-      "INITIAL"
-   );
+   const [agoraRtcConnectionStatus, setAgoraRtcConnectionStatus] =
+      useState("INITIAL");
    const agoraToken = useAgoraToken(
       roomId,
       userUid,
