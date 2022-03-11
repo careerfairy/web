@@ -22,7 +22,7 @@ import {
 } from "../../../../../helperFunctions/HelperFunctions";
 import { useTheme, alpha } from "@mui/material/styles";
 
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -55,7 +55,6 @@ const LatestEvents = ({
 }) => {
    const classes = useStyles();
    const theme = useTheme();
-
    const lineConfig = {
       fill: false,
       lineTension: 0.1,
@@ -106,7 +105,7 @@ const LatestEvents = ({
             pointBackgroundColor: colorsArray[0],
             backgroundColor: theme.palette.primary.dark,
             borderColor: colorsArray[0],
-            data: handlePastStreams("registeredUsers"),
+            data: handlePastStreams("registeredUsersData"),
             label: "Registrations",
             ...lineConfig,
          },
@@ -117,7 +116,7 @@ const LatestEvents = ({
             pointBackgroundColor: colorsArray[1],
             backgroundColor: colorsArray[1],
             borderColor: colorsArray[1],
-            data: handlePastStreams("participatingStudents"),
+            data: handlePastStreams("participatingStudentsData"),
             label: "Participation",
             ...lineConfig,
          },
@@ -128,7 +127,7 @@ const LatestEvents = ({
             pointBackgroundColor: colorsArray[2],
             backgroundColor: colorsArray[2],
             borderColor: colorsArray[2],
-            data: handlePastStreams("talentPool"),
+            data: handlePastStreams("talentPoolData"),
             label: "Talent Pool",
             ...lineConfig,
          },
@@ -140,7 +139,7 @@ const LatestEvents = ({
             pointBackgroundColor: colorsArray[0],
             backgroundColor: alpha(theme.palette.primary.dark, 0.5),
             borderColor: alpha(colorsArray[0], 0.5),
-            data: handleFutureStreams("registeredUsers"),
+            data: handleFutureStreams("registeredUsersData"),
             label: "Registrations (upcoming event)",
             spanGaps: true,
             ...lineConfig,
@@ -153,7 +152,7 @@ const LatestEvents = ({
             pointBackgroundColor: colorsArray[2],
             backgroundColor: alpha(colorsArray[2], 0.5),
             borderColor: alpha(colorsArray[2], 0.5),
-            data: handleFutureStreams("talentPool"),
+            data: handleFutureStreams("talentPoolData"),
             label: "Talent Pool (upcoming event)",
             spanGaps: true,
             ...lineConfig,
