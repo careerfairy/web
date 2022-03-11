@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import {
    Alert,
    Box,
@@ -17,6 +17,9 @@ import CheckIcon from "@mui/icons-material/Check";
 import CalendarIcon from "@mui/icons-material/CalendarToday";
 import { useRouter } from "next/router";
 import { AddToCalendar } from "../../common/AddToCalendar";
+import { ShareOutlined } from "@mui/icons-material";
+import ShareLivestreamModal from "../../common/ShareLivestreamModal";
+import { streamIsOld } from "../../../../util/CommonUtil";
 
 const styles = {
    root: (theme) => ({
@@ -52,6 +55,7 @@ const styles = {
    },
    dateTime: {
       fontWeight: 500,
+      flexGrow: 1,
    },
    streamStartingNoticeWrapper: (theme) => ({
       paddingBottom: theme.spacing(1),
@@ -141,6 +145,12 @@ const CountDown = ({
       };
    }, [stream, livestreamId, groupId]);
 
+   const [shareEventDialog, setShareEventDialog] = useState(null);
+
+   const handleShareEventDialogClose = useCallback(() => {
+      setShareEventDialog(null);
+   }, [setShareEventDialog]);
+
    return (
       <Paper sx={styles.root}>
          <Grid container spacing={2}>
@@ -158,10 +168,23 @@ const CountDown = ({
                   </Box>
                </Collapse>
                <Box sx={styles.dateTimeWrapper}>
-                  <Typography align="center" sx={styles.dateTime} variant="h6">
+                  <Typography align="left" sx={styles.dateTime} variant="h6">
                      {DateUtil.getUpcomingDate(time)}
                   </Typography>
                   <Hidden smDown>
+                     <Box mr={1}>
+                        <Tooltip arrow placement="top" title={"Share Event"}>
+                           <IconButton
+                              sx={styles.addToCalendarIconBtn}
+                              variant="outlined"
+                              size="large"
+                              onClick={() => setShareEventDialog(stream)}
+                           >
+                              <ShareOutlined />
+                           </IconButton>
+                        </Tooltip>
+                     </Box>
+
                      <AddToCalendar
                         event={event}
                         filename={`${stream.company}-event`}
@@ -191,29 +214,50 @@ const CountDown = ({
             </Grid>
             <Hidden smUp>
                <Grid item xs={12}>
-                  <AddToCalendar
-                     event={event}
-                     filename={`${stream.company}-event`}
-                  >
-                     {(handleClick) => (
-                        <Tooltip
-                           arrow
-                           placement="top"
-                           title={"Add to calendar"}
+                  {streamIsOld(stream.start) ? (
+                     ""
+                  ) : (
+                     <>
+                        <Box mb={1}>
+                           <Tooltip arrow placement="top" title={"Share Event"}>
+                              <Button
+                                 onClick={() => setShareEventDialog(stream)}
+                                 variant="outlined"
+                                 fullWidth
+                                 size="large"
+                                 sx={styles.addToCalendarBtn}
+                                 startIcon={<ShareOutlined />}
+                              >
+                                 Share Event
+                              </Button>
+                           </Tooltip>
+                        </Box>
+
+                        <AddToCalendar
+                           event={event}
+                           filename={`${stream.company}-event`}
                         >
-                           <Button
-                              onClick={handleClick}
-                              variant="outlined"
-                              fullWidth
-                              size="large"
-                              sx={styles.addToCalendarBtn}
-                              startIcon={<CalendarIcon />}
-                           >
-                              ADD TO CALENDAR
-                           </Button>
-                        </Tooltip>
-                     )}
-                  </AddToCalendar>
+                           {(handleClick) => (
+                              <Tooltip
+                                 arrow
+                                 placement="top"
+                                 title={"Add to calendar"}
+                              >
+                                 <Button
+                                    onClick={handleClick}
+                                    variant="outlined"
+                                    fullWidth
+                                    size="large"
+                                    sx={styles.addToCalendarBtn}
+                                    startIcon={<CalendarIcon />}
+                                 >
+                                    ADD TO CALENDAR
+                                 </Button>
+                              </Tooltip>
+                           )}
+                        </AddToCalendar>
+                     </>
+                  )}
                </Grid>
             </Hidden>
             <Grid item xs={12}>
@@ -240,6 +284,14 @@ const CountDown = ({
                </Button>
             </Grid>
          </Grid>
+         {shareEventDialog ? (
+            <ShareLivestreamModal
+               livestreamData={shareEventDialog}
+               handleClose={handleShareEventDialogClose}
+            />
+         ) : (
+            ""
+         )}
       </Paper>
    );
 };

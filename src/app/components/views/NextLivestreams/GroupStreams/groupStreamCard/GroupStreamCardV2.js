@@ -15,7 +15,9 @@ import {
    ClickAwayListener,
    Collapse,
    Grow,
+   IconButton,
    Stack,
+   Tooltip,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -24,7 +26,6 @@ import Typography from "@mui/material/Typography";
 import { speakerPlaceholder } from "../../../../util/constants";
 import Tag from "./Tag";
 import Fade from "@stahl.luke/react-reveal/Fade";
-import CopyToClipboard from "../../../common/CopyToClipboard";
 import { DateTimeDisplay } from "./TimeDisplay";
 import { AttendButton, DetailsButton } from "./actionButtons";
 import LogoElement from "../LogoElement";
@@ -37,6 +38,7 @@ import {
 import RegistrationModal from "../../../common/registration-modal";
 import styles from "./GroupStreamCardV2Styles";
 import { languageCodesDict } from "../../../../helperFunctions/streamFormFunctions";
+import { ShareOutlined } from "@mui/icons-material";
 
 const maxOptions = 2;
 const GroupStreamCardV2 = memo(
@@ -54,6 +56,7 @@ const GroupStreamCardV2 = memo(
       isPastLivestreams,
       globalCardHighlighted,
       isAdmin,
+      openShareDialog,
    }) => {
       const firebase = useFirebaseService();
       const { absolutePath, pathname, push, query } = useRouter();
@@ -407,9 +410,9 @@ const GroupStreamCardV2 = memo(
                               />
                            }
                            action={
-                              <CopyToClipboard
-                                 color="white"
-                                 value={linkToStream}
+                              <ShareEventIcon
+                                 openShareDialog={openShareDialog}
+                                 livestreamData={livestream}
                               />
                            }
                         />
@@ -626,6 +629,26 @@ const GroupStreamCardV2 = memo(
       );
    }
 );
+
+const ShareEventIcon = ({ openShareDialog, livestreamData }) => {
+   return (
+      <Tooltip title="Share this event" placement="bottom" arrow>
+         <IconButton
+            size="large"
+            sx={{ marginTop: "25px" }}
+            onClick={() => {
+               openShareDialog(livestreamData);
+            }}
+         >
+            <ShareOutlined
+               fontSize="large"
+               sx={{ color: "white" }}
+               color="inherit"
+            />
+         </IconButton>
+      </Tooltip>
+   );
+};
 
 GroupStreamCardV2.propTypes = {
    careerCenterId: PropTypes.string,

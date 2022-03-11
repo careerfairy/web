@@ -1,4 +1,4 @@
-import { mainProductionDomain } from "../constants/domains";
+import { getHost } from "../constants/domains";
 
 const makeDuration = function (event) {
    const minutes = Math.floor(
@@ -92,6 +92,20 @@ export const makeUrls = function (event) {
    };
 };
 
+export const makeLivestreamEventDetailsUrl = (livestreamId) => {
+   return `${getHost()}/upcoming-livestream/${livestreamId}`;
+};
+
+export const makeLivestreamEventDetailsInviteUrl = (
+   livestreamId,
+   referralCode
+) => {
+   return (
+      makeLivestreamEventDetailsUrl(livestreamId) +
+      `?referralCode=${referralCode}&invite=${livestreamId}`
+   );
+};
+
 export const makeReferralUrl = (userReferralCode) => {
-   return `https://${mainProductionDomain}/?referral=${userReferralCode}`;
+   return `${getHost()}/?referral=${userReferralCode}`;
 };
