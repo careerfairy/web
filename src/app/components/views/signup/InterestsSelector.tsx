@@ -34,7 +34,7 @@ const InterestsSelector = () => {
     <Box px={6}>
       <Typography variant='h6'>What are your interests?</Typography>
       <Typography variant="body2" component="p">
-        Select some to improve your site experience:
+        Select 5 to improve your site experience:
       </Typography>
 
       <Box my={2}>
@@ -95,6 +95,12 @@ export const InterestsChipsSelector = ({
   }, [userData, allInterests])
 
   const toggleInterest = (id: string) => {
+
+    // select 5 at max
+    if(!interests[id].isSelected && Object.values(interests).filter(i => i.isSelected).length >= 5) {
+      return
+    }
+
     setInterests(prevState => ({
       ...prevState,
       [id]: {
