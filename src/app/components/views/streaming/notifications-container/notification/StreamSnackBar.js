@@ -36,7 +36,18 @@ const StreamSnackBar = ({ notification, handRaiseMenuOpen }) => {
       return (
          <>
             <Button
-               style={{ marginRight: "1rem" }}
+               disabled={isOpen(10)}
+               color="grey"
+               sx={{ mr: 1 }}
+               size="small"
+               onClick={() => {
+                  notification.cancel();
+                  closeSnackbar(key);
+               }}
+            >
+               {notification.cancelMessage}
+            </Button>
+            <Button
                color="primary"
                variant="contained"
                size="small"
@@ -49,17 +60,6 @@ const StreamSnackBar = ({ notification, handRaiseMenuOpen }) => {
                }}
             >
                {notification.confirmMessage}
-            </Button>
-            <Button
-               disabled={isOpen(10)}
-               variant="contained"
-               size="small"
-               onClick={() => {
-                  notification.cancel();
-                  closeSnackbar(key);
-               }}
-            >
-               {notification.cancelMessage}
             </Button>
          </>
       );

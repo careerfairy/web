@@ -6,7 +6,7 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import Link from "materialUI/NextNavLink";
 import { MainLogo } from "components/logos";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import useGeneralLinks from "components/custom-hook/useGeneralLinks";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -14,8 +14,7 @@ import { useAuth } from "../../../HOCs/AuthProvider";
 import LoginButton from "../../../components/views/common/LoginButton";
 import GeneralHeader from "../../../components/views/header/GeneralHeader";
 import NavLinks from "../../../components/views/header/NavLinks";
-import MissingDataButton
-   from "../../../components/views/missingData/MissingDataButton";
+import MissingDataButton from "../../../components/views/missingData/MissingDataButton";
 const useStyles = makeStyles((theme) => ({
    header: {
       color: theme.palette.common.white,
@@ -40,7 +39,8 @@ const TopBar = () => {
                style={{ marginRight: "1rem" }}
                color="inherit"
                onClick={handleDrawerOpen}
-               size="large">
+               size="large"
+            >
                <MenuIcon />
             </IconButton>
             <MainLogo white />
@@ -65,7 +65,8 @@ const TopBar = () => {
                      component={Link}
                      color="inherit"
                      href="/profile"
-                     size="large">
+                     size="large"
+                  >
                      <AccountCircleOutlinedIcon
                         className={classes.accountIcon}
                         color="inherit"

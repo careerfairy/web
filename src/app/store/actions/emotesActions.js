@@ -14,7 +14,7 @@ const buildEmoteAction = (message, memberId) => {
    };
 };
 // Send an emote through the channel reference in the store
-export const createEmote = (emoteType) => async (dispatch, getState) => {
+export const createEmote = (emoteType) => (dispatch, getState) => {
    const {
       firebase: { auth },
    } = getState();

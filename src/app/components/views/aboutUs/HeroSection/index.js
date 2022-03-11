@@ -1,8 +1,8 @@
-import PropTypes from "prop-types";
-import React from "react";
-import { Box, Container, Typography } from "@mui/material";
-import Section from "../../common/Section";
-import SectionHeader from "../../common/SectionHeader";
+import PropTypes from "prop-types"
+import React from "react"
+import { Box, Container, Typography } from "@mui/material"
+import Section from "../../common/Section"
+import SectionHeader from "../../common/SectionHeader"
 
 const styles = {
    section: {
@@ -31,7 +31,7 @@ const styles = {
          lg: "2rem",
       },
    },
-};
+}
 
 const HeroSection = (props) => {
    return (
@@ -60,8 +60,8 @@ const HeroSection = (props) => {
             </Box>
          </Container>
       </Section>
-   );
-};
+   )
+}
 
 HeroSection.propTypes = {
    backgroundColor: PropTypes.string,
@@ -70,5 +70,5 @@ HeroSection.propTypes = {
    color: PropTypes.string,
    subtitle: PropTypes.string,
    title: PropTypes.string,
-};
-export default HeroSection;
+}
+export default HeroSection

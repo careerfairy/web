@@ -1,13 +1,13 @@
-import React from "react";
-import HeroSection from "../components/views/aboutUs/HeroSection";
-import TeamBiosSection from "../components/views/aboutUs/TeamBiosSection";
-import { useTheme } from "@mui/material/styles";
-import UpcomingLayout from "../layouts/UpcomingLayout";
-import ValuesSection from "../components/views/aboutUs/ValuesSection";
-import { honestyShape, ideaShape, qualityShape } from "../constants/images";
+import React from "react"
+import HeroSection from "../components/views/aboutUs/HeroSection"
+import TeamBiosSection from "../components/views/aboutUs/TeamBiosSection"
+import { useTheme } from "@mui/material/styles"
+import UpcomingLayout from "../layouts/UpcomingLayout"
+import ValuesSection from "../components/views/aboutUs/ValuesSection"
+import { honestyShape, ideaShape, qualityShape } from "../constants/images"
 
 const teamPhoto =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fgroup-photo-cropped.jpg?alt=media&token=35319d7b-38a0-474f-935f-4f5890c37717";
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fgroup-photo-cropped.jpg?alt=media&token=35319d7b-38a0-474f-935f-4f5890c37717"
 const TeamPage = () => {
    const {
       palette: {
@@ -15,7 +15,7 @@ const TeamPage = () => {
          navyBlue,
          background,
       },
-   } = useTheme();
+   } = useTheme()
 
    const valuesData = [
       {
@@ -42,7 +42,7 @@ const TeamPage = () => {
             "ideas and a strong environment.",
          imageUrl: honestyShape,
       },
-   ];
+   ]
    return (
       <UpcomingLayout>
          <HeroSection
@@ -68,7 +68,7 @@ work at the company."
             title="Meet our team"
          />
       </UpcomingLayout>
-   );
-};
+   )
+}
 
-export default TeamPage;
+export default TeamPage

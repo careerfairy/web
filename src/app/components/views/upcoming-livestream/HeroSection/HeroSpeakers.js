@@ -1,7 +1,7 @@
-import React from "react";
-import { Avatar, AvatarGroup, Box, Typography } from "@mui/material";
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
-import { speakerPlaceholder } from "../../../util/constants";
+import React from "react"
+import { Avatar, AvatarGroup, Box, Typography } from "@mui/material"
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
+import { speakerPlaceholder } from "../../../util/constants"
 
 const styles = {
    avatar: (theme) => ({
@@ -29,7 +29,7 @@ const styles = {
    speakerInfo: {
       padding: (theme) => theme.spacing(0, 2),
    },
-};
+}
 
 const HeroSpeakers = ({ speakers }) => {
    return speakers.length === 1 ? (
@@ -69,7 +69,7 @@ const HeroSpeakers = ({ speakers }) => {
             />
          ))}
       </AvatarGroup>
-   );
-};
+   )
+}
 
-export default HeroSpeakers;
+export default HeroSpeakers

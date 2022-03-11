@@ -1,5 +1,5 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { Button, Tooltip, Typography } from "@mui/material";
 
 const useStyles = makeStyles((theme) => {
@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => {
          boxShadow: theme.shadows[1],
          fontSize: 11,
          padding: theme.spacing(2),
-         [theme.breakpoints.down('sm')]: {
+         [theme.breakpoints.down("sm")]: {
             padding: theme.spacing(1.5),
             maxWidth: 150,
          },
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => {
       text: {},
       buttonWrapper: {
          marginTop: theme.spacing(1),
-         [theme.breakpoints.down('sm')]: {
+         [theme.breakpoints.down("sm")]: {
             marginTop: theme.spacing(0.5),
          },
          width: "100%",
@@ -52,7 +52,6 @@ export const WhiteTooltip = ({ title, children, open, style, ...props }) => {
       <Tooltip
          arrow
          open={open}
-         interactive
          {...props}
          classes={{ arrow: classes.arrow, tooltip: classes.tooltip }}
          title={title}
@@ -71,7 +70,6 @@ export const StandartTooltip = ({ title, children, open, ...props }) => {
       <Tooltip
          arrow
          open={open}
-         interactive
          {...props}
          classes={{ arrow: classes.arrow, tooltip: classes.tooltip }}
          title={title}

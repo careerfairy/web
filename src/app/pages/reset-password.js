@@ -87,7 +87,6 @@ export function ResetPasswordBase(props) {
                         return errors;
                      }}
                      onSubmit={(values, { setSubmitting }) => {
-                        debugger;
                         setCompleted(false);
                         axios({
                            method: "post",

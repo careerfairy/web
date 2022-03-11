@@ -1,9 +1,9 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import UserResume from "./user-resume/UserResume";
 import PersonalInfo from "./personal-info/PersonalInfo";
 import { Box, Container } from "@mui/material";
-import UserInterests from "./personalise/UserInterests"
+import UserInterests from "./personalise/UserInterests";
 
 const useStyles = makeStyles((theme) => ({
    paper: {

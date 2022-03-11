@@ -1,8 +1,8 @@
-import React from "react";
-import { alpha } from "@mui/material/styles";
-import { Avatar, AvatarGroup, Box, Paper, Typography } from "@mui/material";
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions";
-import { grey } from "@mui/material/colors";
+import React from "react"
+import { alpha } from "@mui/material/styles"
+import { Avatar, AvatarGroup, Box, Paper, Typography } from "@mui/material"
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
+import { grey } from "@mui/material/colors"
 
 const styles = {
    root: {},
@@ -56,7 +56,7 @@ const styles = {
    hostedText: {
       color: (theme) => theme.palette.common.white,
    },
-};
+}
 
 const HeroHosts = ({ hosts }) => {
    return hosts.length === 1 ? (
@@ -93,7 +93,7 @@ const HeroHosts = ({ hosts }) => {
             </AvatarGroup>
          </Paper>
       </>
-   );
-};
+   )
+}
 
-export default HeroHosts;
+export default HeroHosts

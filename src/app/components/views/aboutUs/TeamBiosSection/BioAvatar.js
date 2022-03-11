@@ -1,8 +1,8 @@
-import PropTypes from "prop-types";
-import { Avatar, Badge } from "@mui/material";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import React from "react";
-import withStyles from "@mui/styles/withStyles";
+import PropTypes from "prop-types"
+import { Avatar, Badge } from "@mui/material"
+import LinkedInIcon from "@mui/icons-material/LinkedIn"
+import React from "react"
+import withStyles from "@mui/styles/withStyles"
 
 export const SmallAvatar = withStyles((theme) => ({
    root: {
@@ -13,7 +13,7 @@ export const SmallAvatar = withStyles((theme) => ({
       background: theme.palette.background.default,
       color: "#0072b1",
    },
-}))(Avatar);
+}))(Avatar)
 
 const BioAvatar = ({ styles, hovered, person }) => (
    <Badge
@@ -39,7 +39,7 @@ const BioAvatar = ({ styles, hovered, person }) => (
          alt={person.name}
       />
    </Badge>
-);
+)
 
 BioAvatar.propTypes = {
    styles: PropTypes.any,
@@ -49,6 +49,6 @@ BioAvatar.propTypes = {
       avatar: PropTypes.string,
       name: PropTypes.string,
    }),
-};
+}
 
-export default BioAvatar;
+export default BioAvatar

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { shouldWeRedirectNextGen } from "../../util/StreamUtil";
+import { shouldWeRedirectNextGen } from "../../util/streamUtil";
 
 const useNextGenRedirect = (isBeta: boolean) => {
    useEffect(() => {

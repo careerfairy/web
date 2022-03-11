@@ -1,12 +1,9 @@
-
 const SignUpListOfInterests = () => {
-  return (
-    <>
-      <div>SignUpListOfInterests</div>
+   return (
+      <>
+         <div>SignUpListOfInterests</div>
+      </>
+   );
+};
 
-    
-    </>
-  )
-}
-
-export default SignUpListOfInterests
+export default SignUpListOfInterests;

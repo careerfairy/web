@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import clsx from "clsx";
-import PropTypes from "prop-types";
-import { Box, Card, Divider, Grow, Tabs, Tab, IconButton } from "@mui/material";
-import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext";
+import React, { useEffect, useState } from "react"
+import clsx from "clsx"
+import PropTypes from "prop-types"
+import { Box, Card, Divider, Grow, Tabs, Tab, IconButton } from "@mui/material"
+import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext"
 import {
    addMinutes,
    prettyDate,
-} from "../../../../../../helperFunctions/HelperFunctions";
+} from "../../../../../../helperFunctions/HelperFunctions"
 import {
    defaultTableOptions,
    exportSelectionAction,
@@ -14,14 +14,14 @@ import {
    renderRatingStars,
    StarRatingInputValue,
    tableIcons,
-} from "../../common/TableUtils";
-import EditFeedbackModal from "./EditFeedbackModal";
-import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal";
-import { useSnackbar } from "notistack";
-import FeedbackGraph from "../FeedbackGraph";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import makeStyles from "@mui/styles/makeStyles";
-import ExportTable from "../../../../../common/Tables/ExportTable";
+} from "../../common/TableUtils"
+import EditFeedbackModal from "./EditFeedbackModal"
+import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal"
+import { useSnackbar } from "notistack"
+import FeedbackGraph from "../FeedbackGraph"
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward"
+import makeStyles from "@mui/styles/makeStyles"
+import ExportTable from "../../../../../common/Tables/ExportTable"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
    deleteButton: {
       color: theme.palette.error.main,
    },
-}));
+}))
 
 const FeedbackTable = ({
    groupOptions,
@@ -61,50 +61,50 @@ const FeedbackTable = ({
    setUserType,
    ...rest
 }) => {
-   const classes = useStyles();
-   const [tableData, setTableData] = useState({ data: [], columns: [] });
+   const classes = useStyles()
+   const [tableData, setTableData] = useState({ data: [], columns: [] })
    const [feedbackModal, setFeedbackModal] = useState({
       data: {},
       open: false,
-   });
+   })
    const [areYouSureModal, setAreYouSureModal] = useState({
       data: {},
       open: false,
       warning: "",
-   });
-   const [deletingFeedback, setDeletingFeedback] = useState(false);
-   const { enqueueSnackbar } = useSnackbar();
+   })
+   const [deletingFeedback, setDeletingFeedback] = useState(false)
+   const { enqueueSnackbar } = useSnackbar()
 
    useEffect(() => {
-      const dataType = streamDataType.propertyName;
-      const newData = currentStream?.[dataType] || [];
-      let newColumns = tableData.columns;
+      const dataType = streamDataType.propertyName
+      const newData = currentStream?.[dataType] || []
+      let newColumns = tableData.columns
       if (dataType === "pollEntries") {
-         newColumns = pollColumns;
+         newColumns = pollColumns
       } else if (dataType === "questions") {
-         newColumns = questionColumns;
+         newColumns = questionColumns
       } else if (dataType === "feedback") {
-         newColumns = feedbackColumns;
+         newColumns = feedbackColumns
       }
       setTableData({
          data: newData,
          columns: newColumns,
-      });
-   }, [streamDataType.propertyName, currentStream]);
+      })
+   }, [streamDataType.propertyName, currentStream])
 
    const handleDisplayTable = (rowData) => {
-      setCurrentRating(rowData);
-      handleScrollToSideRef();
-   };
+      setCurrentRating(rowData)
+      handleScrollToSideRef()
+   }
 
    const DisplayButton = (rowData) => {
       const hasNoData = () => {
-         return Boolean(!rowData.voters?.length);
-      };
+         return Boolean(!rowData.voters?.length)
+      }
       const handleClick = () => {
-         setCurrentRating(rowData);
-         handleScrollToSideRef();
-      };
+         setCurrentRating(rowData)
+         handleScrollToSideRef()
+      }
       return (
          <Box display="flex" justifyContent="center">
             <IconButton
@@ -116,46 +116,46 @@ const FeedbackTable = ({
                <ArrowDownwardIcon />
             </IconButton>
          </Box>
-      );
-   };
+      )
+   }
 
    const handleEditFeedback = (row) => {
-      setFeedbackModal({ data: row, open: true });
-   };
+      setFeedbackModal({ data: row, open: true })
+   }
    const handleCloseFeedbackModal = () => {
-      setFeedbackModal({ data: {}, open: false });
-   };
+      setFeedbackModal({ data: {}, open: false })
+   }
 
    const handleCreateFeedback = () => {
-      setFeedbackModal({ data: {}, open: true });
-   };
+      setFeedbackModal({ data: {}, open: true })
+   }
    const handleOpenAreYouSureModal = (row) => {
-      const warning = `Are you sure you want to delete the question "${row.question}"? You wont be able to revert this action`;
-      setAreYouSureModal({ data: row, open: true, warning });
-   };
+      const warning = `Are you sure you want to delete the question "${row.question}"? You wont be able to revert this action`
+      setAreYouSureModal({ data: row, open: true, warning })
+   }
 
    const handleDeleteFeedback = async () => {
       try {
-         setDeletingFeedback(true);
-         const { id: livestreamId } = currentStream;
-         const { id: feedbackId } = areYouSureModal.data;
+         setDeletingFeedback(true)
+         const { id: livestreamId } = currentStream
+         const { id: feedbackId } = areYouSureModal.data
          if (livestreamId && feedbackId) {
-            await firebase.deleteFeedbackQuestion(livestreamId, feedbackId);
+            await firebase.deleteFeedbackQuestion(livestreamId, feedbackId)
          }
-         handleCloseAreYouSureModal();
+         handleCloseAreYouSureModal()
       } catch (e) {
          enqueueSnackbar("Something went wrong, please refresh the page", {
             variant: "error",
             preventDuplicate: true,
-         });
-         handleCloseAreYouSureModal();
+         })
+         handleCloseAreYouSureModal()
       }
-      setDeletingFeedback(false);
-   };
+      setDeletingFeedback(false)
+   }
 
    const handleCloseAreYouSureModal = () => {
-      setAreYouSureModal({ data: {}, open: false, warning: "" });
-   };
+      setAreYouSureModal({ data: {}, open: false, warning: "" })
+   }
 
    const pollColumns = [
       {
@@ -179,7 +179,7 @@ const FeedbackTable = ({
          type: "date",
          render: (rowData) => prettyDate(rowData.timestamp),
       },
-   ];
+   ]
 
    const questionColumns = [
       {
@@ -205,7 +205,7 @@ const FeedbackTable = ({
          title: "status",
          lookup: { done: "Answered", new: "New", current: "Answering" },
       },
-   ];
+   ]
    const feedbackColumns = [
       {
          field: "question",
@@ -253,44 +253,44 @@ const FeedbackTable = ({
          title: "Ask on Stream End",
          type: "boolean",
       },
-   ];
+   ]
 
    // const customOptions = {...defaultTableOptions}
    // customOptions.selection = false
 
    const handleMenuItemClick = (event, index) => {
-      setStreamDataType(streamDataTypes[index]);
-   };
+      setStreamDataType(streamDataTypes[index])
+   }
 
    const active = () => {
-      return Boolean(currentStream && !currentRating && !currentPoll);
-   };
+      return Boolean(currentStream && !currentRating && !currentPoll)
+   }
 
    const isFeedback = () => {
-      return Boolean(streamDataType.propertyName === "feedback");
-   };
+      return Boolean(streamDataType.propertyName === "feedback")
+   }
    const isPoll = () => {
-      return Boolean(streamDataType.propertyName === "pollEntries");
-   };
+      return Boolean(streamDataType.propertyName === "pollEntries")
+   }
 
    const canEdit = ({ appearAfter, isForEnd }) => {
       if (currentStream && appearAfter) {
-         const { start, hasEnded } = currentStream;
+         const { start, hasEnded } = currentStream
          if (hasEnded) {
-            return false;
+            return false
          }
-         const now = new Date();
-         const streamStart = start?.toDate();
-         const editDeadline = addMinutes(streamStart, appearAfter);
-         const editHardDeadline = addMinutes(streamStart, 720);
+         const now = new Date()
+         const streamStart = start?.toDate()
+         const editDeadline = addMinutes(streamStart, appearAfter)
+         const editHardDeadline = addMinutes(streamStart, 720)
          if (now > editDeadline) {
-            return false;
+            return false
          }
-         return !(isForEnd && now > editHardDeadline);
+         return !(isForEnd && now > editHardDeadline)
       } else {
-         return false;
+         return false
       }
-   };
+   }
 
    return (
       <>
@@ -394,7 +394,7 @@ const FeedbackTable = ({
                                          />
                                       </span>
                                    </Grow>
-                                );
+                                )
                              },
                           },
                        ]
@@ -416,11 +416,11 @@ const FeedbackTable = ({
             title="Warning"
          />
       </>
-   );
-};
+   )
+}
 
 FeedbackTable.propTypes = {
    className: PropTypes.string,
-};
+}
 
-export default withFirebase(FeedbackTable);
+export default withFirebase(FeedbackTable)
