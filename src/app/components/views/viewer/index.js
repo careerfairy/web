@@ -69,7 +69,9 @@ const ViewerOverview = ({
       (state) => state.stream.layout.focusModeEnabled
    );
 
-   const { query: { isRecordingWindow }} = useRouter()
+   const {
+      query: { isRecordingWindow },
+   } = useRouter();
    const { currentLivestream, isBreakout } = useCurrentStream();
    const dispatch = useDispatch();
    const { videoIsMuted, videoIsPaused } = useSelector(

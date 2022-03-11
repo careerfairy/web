@@ -3,6 +3,8 @@ import { Identifiable } from "../../types/commonTypes";
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext";
 import firebase from "firebase";
 import CollectionReference = firebase.firestore.CollectionReference;
+import { Interest } from "types/interests";
+import { Group } from "types/groups";
 
 /**
  * Fetch a Firestore collection
@@ -67,5 +69,10 @@ interface CollectionResponse<T> {
    data: T[];
    error: Error | null;
 }
+
+export const useInterests = (realtime: boolean = false) =>
+   useCollection<Interest>("interests", realtime);
+export const useGroups = (realtime: boolean = false) =>
+   useCollection<Group>("careerCenterData", realtime);
 
 export default useCollection;
