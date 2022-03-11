@@ -1,0 +1,418 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isCFAdmin() {
+      return get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data.isAdmin == true;
+    }
+  	match /interests/{interest} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /IcBoostDayUsers/{user} {
+      match /{document=**} {
+        allow read, write: if false;
+      }
+    }
+    match /analytics/userData {
+      allow read, write: if true;
+    }
+    match /filterGroups/{filterGroup} {
+      allow read, write: if true;
+    }
+    match /userData/{userId} {
+
+    	function authUserAccessesOwnUserData() {
+      	return request.auth.token.email == userId;
+      }
+
+      function adminUserAccessesUser() {
+      	let requestUserData = get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data;
+      	return requestUserData.isAdmin || requestUserData.adminIds.size() > 0
+      }
+
+      function validateUser() {
+      		return (request.resource.data.isAdmin == resource.data.isAdmin ||
+          	!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false);
+      }
+
+      allow read: if true;
+      //allow read: if authUserAccessesOwnUserData() || adminUserAccessesUser();
+      allow update: if request.auth.token.email == userId && validateUser();
+      allow create: if request.auth.token.email == userId && validateUser();
+			allow delete: if false;
+    }
+    match /userData/{userId}/registeredGroups/{group} {
+      allow read: if true;
+      allow update: if true;
+      allow create: if true;
+			allow delete: if true;
+    }
+
+    match /userData/{userId}/rewards/{rewardId} {
+      allow read: if request.auth.token.email == userId;
+      allow update: if request.auth.token.email == userId;
+      allow create: if false; // Only the admin sdk creates rewards
+      allow delete: if false;
+    }
+
+    match /universitiesByCountry/{countryId} {
+      allow read: if true;
+      allow update: if false;
+      allow create: if false;
+			allow delete: if false;
+    }
+    match /notifications/{notification} {
+      allow read: if true;
+      allow update: if true;
+      allow create: if true;
+			allow delete: if true;
+    }
+    match /livestreamReferrals/{referral} {
+      allow read: if true;
+      allow update: if true;
+      allow create: if true;
+			allow delete: if true;
+    }
+    match /userData/{userId}/registeredGroups/{group}/categories/{category} {
+      allow read: if true;
+      allow update: if true;
+      allow create: if true;
+			allow delete: if false;
+    }
+    match /companyData/{company} {
+      allow read: if true;
+      allow write: if false;
+      //allow write: if resource.data.adminEmail == request.auth.token.email;
+
+      //function companyData() {
+      // 	return get(/databases/$(database)/documents/companyData/$(company)).data
+      //}
+
+      match /currentPositions/{position} {
+            allow read: if true;
+            allow write: if false;
+      }
+			match /admins/{admin}{
+            allow read: if true;
+            allow write: if false;
+      }
+      match /usersInPolicy/{user}{
+            allow read: if true;
+            allow write: if request.auth != null;
+      }
+    }
+
+    match /careerCenterData/{careerCenter} {
+    	allow read, write: if true;
+      //allow create : if true;
+      //allow update: if true;
+      //allow delete: if request.auth.token.email in resource.data.adminEmails;
+
+      function careerCenterData() {
+            return get(/databases/$(database)/documents/careerCenterData/$(careerCenter)).data
+      }
+
+      match /bookingSlots/{slot} {
+            allow read: if true;
+            allow write: if careerCenterData().adminEmail == request.auth.token.email;
+      }
+
+      match /categories/{category} {
+            allow read: if true;
+            allow write: if true;
+      }
+
+      match /categories/{category}/elements/{element} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /admins/{admin}{
+            allow read: if true;
+            allow write: if true;
+      }
+      match /usersInPolicy/{user}{
+            allow read: if true;
+            allow write: if request.auth != null;
+      }
+
+      match /authUsersInPolicy/{authUser}{
+            allow read: if true;
+            allow write: if request.auth != null;
+      }
+    }
+
+    match /videos/{video} {
+      allow read: if true;
+      allow write: if false;
+      match /{document=**} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+    match /mentors/{mentor} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /livestreams/{livestream} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+
+      match /registeredStudents/{student} {
+            allow read: if true;
+            allow write: if true;
+      }
+
+      match /registrants/{registrant} {
+            allow read: if true;
+            allow write: if true;
+      }
+
+      match /preferences/{adminPreference} {
+            allow read: if true;
+            allow write: if isCFAdmin();
+      }
+
+      match /talentPool/{student} {
+            allow read: if true;
+            allow write: if true;
+      }
+
+      match /participatingStudents/{student} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /breakoutRoomsSettings/{breakoutRoomsSetting} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /tokens/{secureToken} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /recordingToken/{token} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /icons/{icon} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /like/{icon} {
+            allow read: if true;
+            allow write: if true;
+      }
+			match /clapping/{icon} {
+            allow read: if true;
+            allow write: if true;
+      }
+			match /heart/{icon} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /speakers/{speaker} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /liveSpeakers/{liveSpeaker} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /presentations/{presentation} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /videos/{video} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /chatEntries/{chatEntry} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /handRaises/{handRaise} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /polls/{poll} {
+            allow read: if true;
+            allow write: if true;
+
+            match /options/{option} {
+            allow read: if true;
+            allow write: if true;
+            }
+      }
+      match /polls/{poll}/voters/{voter} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /questions/{question} {
+        allow read, write: if true;
+
+          match /comments/{comment} {
+          allow read: if true;
+          allow write: if true;
+        }
+      }
+      match /rating/{rating}/voters/{voter} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /rating/{rating}/nonVoters/{nonVoter} {
+            allow read: if true;
+            allow write: if true;
+      }
+			match /rating/{ratingDoc} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /callToActions/{callToAction} {
+            allow read: if true;
+            allow write: if true;
+
+            match /usersWhoClickedLink/{userWhoClickedLink} {
+            		allow read: if true;
+            		allow write: if true;
+      			}
+
+            match /usersWhoDismissed/{userWhoDismissed} {
+            		allow read: if true;
+            		allow write: if true;
+      			}
+
+      }
+    }
+
+    match /livestreams/{livestream}/breakoutRooms/{breakoutRoom} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+
+      match /participatingStudents/{student} {
+            allow read: if true;
+            allow write: if true;
+      }
+
+      match /chatEntries/{chatEntry} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /handRaises/{handRaise} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /polls/{poll} {
+            allow read: if true;
+            allow write: if true;
+
+            match /options/{option} {
+            allow read: if true;
+            allow write: if true;
+            }
+      }
+      match /polls/{poll}/voters/{voter} {
+            allow read: if true;
+            allow write: if true;
+      }
+			match /callToActions/{callToAction} {
+            allow read: if true;
+            allow write: if true;
+
+            match /usersWhoClickedLink/{userWhoClickedLink} {
+            		allow read: if true;
+            		allow write: if true;
+      			}
+
+            match /usersWhoDismissed/{userWhoDismissed} {
+            		allow read: if true;
+            		allow write: if true;
+      			}
+
+      }
+      match /questions/{question} {
+        allow read, write: if true;
+
+          match /comments/{comment} {
+          allow read: if true;
+          allow write: if true;
+        }
+      }
+
+      match /rating/{rating}/voters/{voter} {
+            allow read: if true;
+            allow write: if true;
+      }
+      match /rating/{rating}/nonVoters/{nonVoter} {
+            allow read: if true;
+            allow write: if true;
+      }
+			match /rating/{ratingDoc} {
+            allow read: if true;
+            allow write: if true;
+      }
+
+    	match /tokens/{secureToken} {
+            allow read: if true;
+            allow write: if true;
+            allow update: if true;
+      }
+
+      match /preferences/{adminPreference} {
+            allow read: if true;
+            allow write: if isCFAdmin();
+      }
+    }
+
+    match /draftLivestreams/{draftLivstream} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+      match /speakers/{speaker} {
+            allow read: if true;
+            allow write: if true;
+            allow update: if true;
+      }
+      match /rating/{ratingDoc} {
+            allow read: if true;
+            allow write: if true;
+            allow update: if true;
+      }
+      match /tokens/{secureToken} {
+            allow read: if true;
+            allow write: if true;
+            allow update: if true;
+      }
+    }
+
+    match /pastLivestreams/{pastLivestream} {
+      allow read: if true;
+      allow write: if false;
+      match /{document=**} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+    match /scheduledLivestreams/{scheduledLivestream} {
+      allow read: if true;
+      allow write: if true;
+      match /questions/{question} {
+        allow read, write: if true;
+        match /comments/{comment} {
+          allow read, write: if true;
+        }
+      }
+      match /comments/{comment} {
+        allow read, write: if true;
+      }
+    }
+    match /wishList/{wish} {
+        allow read, write: if true;
+    }
+  }
+}

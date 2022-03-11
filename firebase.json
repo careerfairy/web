@@ -12,6 +12,9 @@
          "**/.next/cache/**"
       ]
    },
+   "firestore": {
+      "rules": "firestore.rules"
+   },
    "hosting": [
       {
          "target": "production",
