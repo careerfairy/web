@@ -2150,15 +2150,13 @@ class FirebaseService {
     * @param {string} livestreamId
     * @param userData
     * @param {*[]} groupsWithPolicies
-    * @param {string} [referrerAuthId]
     */
    registerToLivestream = async (
       livestreamId,
       userData,
-      groupsWithPolicies = [],
-      referrerAuthId
+      groupsWithPolicies = []
    ) => {
-      const { id: userId, authId } = userData;
+      const { id: userId } = userData;
       const idsOfGroupsWithPolicies = groupsWithPolicies.map(
          (group) => group.id
       );
@@ -2171,11 +2169,6 @@ class FirebaseService {
          .doc(livestreamId)
          .collection("registeredStudents")
          .doc(userId);
-      const referralPromise = this.createLivestreamReferral(
-         referrerAuthId,
-         authId,
-         livestreamId
-      );
       const transactionPromise = this.firestore.runTransaction(
          (transaction) => {
             return transaction.get(userRef).then((userDoc) => {
@@ -2207,7 +2200,7 @@ class FirebaseService {
             });
          }
       );
-      return await Promise.all([referralPromise, transactionPromise]);
+      return await Promise.all([transactionPromise]);
    };
 
    deregisterFromLivestream = (livestreamId, userId) => {
@@ -2335,14 +2328,6 @@ class FirebaseService {
       });
       const participationPromise = batch.commit();
       let promises = [participationPromise];
-      if (userData.authId && livestreamId) {
-         const referralCompletionPromise =
-            this.markLivestreamReferralAsCompleted(
-               livestreamId,
-               userData.authId
-            );
-         promises.push(referralCompletionPromise);
-      }
       return await Promise.all(promises);
    };
 
@@ -2944,102 +2929,6 @@ class FirebaseService {
          .collection("breakoutRooms")
          .doc(breakoutRoomId);
       return ref.get();
-   };
-
-   // Livestream Referral methods
-   private markLivestreamReferralAsCompleted = async (
-      livestreamId,
-      recipientAuthId
-   ) => {
-      try {
-         return await this.firestore
-            .collection("livestreamReferrals")
-            .doc(this.getReferralDocId(livestreamId, recipientAuthId))
-            .update({
-               attendedStreamAt: this.getServerTimestamp(),
-               recipientAttendedLivestream: true,
-            });
-      } catch (e) {}
-   };
-
-   /**
-    * Check to see weather a referral doc already exists
-    * @param {String} referrerAuthId
-    * @param {string} recipientAuthId
-    * @param {string} livestreamId
-    */
-   private createLivestreamReferral = async (
-      referrerAuthId,
-      recipientAuthId,
-      livestreamId
-   ) => {
-      // You should not be able to refer your self, so we return early here
-      if (referrerAuthId === recipientAuthId) {
-         return false;
-      }
-
-      if (!referrerAuthId || !recipientAuthId || !livestreamId) {
-         return false;
-      }
-
-      const [refAlreadyExists, data]: any =
-         await this.checkIfReferralAlreadyExists(
-            referrerAuthId,
-            recipientAuthId,
-            livestreamId
-         );
-      // if the livestream has already been attended by the invited that means that the referral if complete, no need to update anything
-      if (data?.recipientAttendedLivestream) {
-         return false;
-      }
-
-      const referralRef = this.firestore
-         .collection("livestreamReferrals")
-         .doc(this.getReferralDocId(livestreamId, recipientAuthId));
-
-      if (refAlreadyExists) {
-         // If it's the same referer, then just return out of this function, no need to update anything
-         if (data.referrerAuthId === referrerAuthId) {
-            return false;
-         }
-         // Else if it's a new referrer then update the referrerAuthId on the document
-         return referralRef.update({
-            referrerAuthId,
-            updated: this.getServerTimestamp(),
-         });
-      }
-
-      const referralData = {
-         created: this.getServerTimestamp(),
-         referrerAuthId,
-         recipientAuthId,
-         livestreamId,
-      };
-      // console.log("-> creating new referral!");
-      return await referralRef.set(referralData);
-   };
-
-   /**
-    * Check to see weather a referral doc already exists
-    * @param {String} referrerAuthId
-    * @param {string} recipientAuthId
-    * @param {string} livestreamId
-    */
-   checkIfReferralAlreadyExists = async (
-      referrerAuthId,
-      recipientAuthId,
-      livestreamId
-   ) => {
-      if (!referrerAuthId || !recipientAuthId || !livestreamId) return false;
-      const referralSnap = await this.firestore
-         .collection("livestreamReferrals")
-         .doc(this.getReferralDocId(livestreamId, recipientAuthId))
-         .get();
-      return [referralSnap.exists, referralSnap.data?.()];
-   };
-
-   private getReferralDocId = (livestreamId, recipientAuthId) => {
-      return `${livestreamId}-${recipientAuthId}`;
    };
 
    // Streamer Helpers

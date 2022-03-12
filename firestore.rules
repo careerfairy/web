@@ -69,12 +69,7 @@ service cloud.firestore {
       allow create: if true;
 			allow delete: if true;
     }
-    match /livestreamReferrals/{referral} {
-      allow read: if true;
-      allow update: if true;
-      allow create: if true;
-			allow delete: if true;
-    }
+
     match /userData/{userId}/registeredGroups/{group}/categories/{category} {
       allow read: if true;
       allow update: if true;
