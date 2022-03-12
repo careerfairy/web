@@ -28,6 +28,8 @@ import { useCallback, useEffect, useState } from "react";
 import firebaseApp from "../data/firebase/FirebaseInstance";
 
 import "../util/FirebaseUtils";
+import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams";
+import UserRewardsNotifications from "../HOCs/UserRewardsNotifications";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -149,6 +151,8 @@ function MyApp(props) {
       return Boolean(activeStep === property);
    };
 
+   useStoreReferralQueryParams();
+
    return (
       <CacheProvider value={emotionCache}>
          <Head>
@@ -188,7 +192,9 @@ function MyApp(props) {
                                  {disableCookies || isRecordingWindow ? null : (
                                     <CFCookieConsent />
                                  )}
-                                 <Component {...pageProps} />
+                                 <UserRewardsNotifications>
+                                    <Component {...pageProps} />
+                                 </UserRewardsNotifications>
                                  <Notifier />
                                  <ErrorSnackBar
                                     handleClose={() => setGeneralError("")}

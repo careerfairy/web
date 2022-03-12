@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import SwipeableViews from "react-swipeable-views";
 import { useTheme } from "@mui/material/styles";
 
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 
 import {
    Container,
@@ -20,6 +20,7 @@ import UserData from "./userData";
 import { useFirestoreConnect } from "react-redux-firebase";
 import { useSelector } from "react-redux";
 import { useAuth } from "../../../HOCs/AuthProvider";
+import ReferralProfileTab from "./referral/ReferralProfileTab";
 
 function TabPanel(props) {
    const { children, value, index, ...other } = props;
@@ -31,7 +32,7 @@ function TabPanel(props) {
          aria-labelledby={`full-width-tab-${index}`}
          {...other}
       >
-         {value === index && <Box p={3}>{children}</Box>}
+         {value === index && <Box py={3}>{children}</Box>}
       </div>
    );
 }
@@ -52,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
 const ProfileNav = ({ userData }) => {
    const classes = useStyles();
    const theme = useTheme();
-   const native = useMediaQuery(theme.breakpoints.down('sm'));
+   const native = useMediaQuery(theme.breakpoints.down("sm"));
    const [value, setValue] = useState(0);
    const { authenticatedUser } = useAuth();
 
@@ -91,6 +92,9 @@ const ProfileNav = ({ userData }) => {
       <TabPanel key={1} value={value} index={1} dir={theme.direction}>
          <JoinedGroups userData={userData} />
       </TabPanel>,
+      <TabPanel key={2} value={value} index={2} dir={theme.direction}>
+         <ReferralProfileTab userData={userData} />
+      </TabPanel>,
    ];
    const tabsArray = [
       <Tab
@@ -110,6 +114,16 @@ const ProfileNav = ({ userData }) => {
          label={
             <Typography variant="h5">
                {native ? "Groups" : "Joined Groups"}
+            </Typography>
+         }
+      />,
+      <Tab
+         key={2}
+         wrapped
+         fullWidth
+         label={
+            <Typography variant="h5">
+               {native ? "Referrals" : "Refer a friend"}
             </Typography>
          }
       />,

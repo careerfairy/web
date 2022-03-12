@@ -2,16 +2,10 @@ import React, { useCallback } from "react";
 import { useLocalStorage } from "react-use";
 
 const useLocalStorageMediaSources = () => {
-   const [
-      storedAudioSourceId,
-      setAudioSourceId,
-      removeAudioSourceId,
-   ] = useLocalStorage("audioSourceId");
-   const [
-      storedVideoSourceId,
-      setVideoSourceId,
-      removeVideoSourceId,
-   ] = useLocalStorage("videoSourceId");
+   const [storedAudioSourceId, setAudioSourceId, removeAudioSourceId] =
+      useLocalStorage("audioSourceId");
+   const [storedVideoSourceId, setVideoSourceId, removeVideoSourceId] =
+      useLocalStorage("videoSourceId");
 
    const storeNewMediaSources = useCallback(
       ({ audioSourceId, videoSourceId }) => {

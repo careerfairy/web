@@ -16,9 +16,8 @@ const useStreamActiveHandRaises = () => {
    const handRaises = useSelector(
       (state) => state.firestore.ordered["handRaises"]
    );
-   const [numberOfActiveHandRaisers, setNumberOfActiveHandRaisers] = useState(
-      0
-   );
+   const [numberOfActiveHandRaisers, setNumberOfActiveHandRaisers] =
+      useState(0);
 
    useEffect(() => {
       if (handRaises) {
@@ -42,10 +41,10 @@ const useStreamActiveHandRaises = () => {
       [streamRef]
    );
 
-   const hasRoom = useMemo(() => numberOfActiveHandRaisers < maxHandRaisers, [
-      maxHandRaisers,
-      numberOfActiveHandRaisers,
-   ]);
+   const hasRoom = useMemo(
+      () => numberOfActiveHandRaisers < maxHandRaisers,
+      [maxHandRaisers, numberOfActiveHandRaisers]
+   );
 
    return {
       handRaises,

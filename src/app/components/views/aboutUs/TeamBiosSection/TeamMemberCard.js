@@ -1,7 +1,7 @@
-import { Card, CardContent, Collapse } from "@mui/material"
-import BioAvatar from "./BioAvatar"
-import Typography from "@mui/material/Typography"
-import React from "react"
+import { Card, CardContent, Collapse } from "@mui/material";
+import BioAvatar from "./BioAvatar";
+import Typography from "@mui/material/Typography";
+import React from "react";
 
 const styles = {
    root: {
@@ -31,16 +31,16 @@ const styles = {
    bio: {
       whiteSpace: "pre-line",
    },
-}
+};
 export const TeamMemberCard = (props) => {
-   const [hovered, setHovered] = React.useState(false)
+   const [hovered, setHovered] = React.useState(false);
 
    const handleMouseEnter = () => {
-      setHovered(true)
-   }
+      setHovered(true);
+   };
    const handleMouseLeave = () => {
-      setHovered(false)
-   }
+      setHovered(false);
+   };
 
    return (
       <Card
@@ -67,5 +67,5 @@ export const TeamMemberCard = (props) => {
             </Collapse>
          </CardContent>
       </Card>
-   )
-}
+   );
+};

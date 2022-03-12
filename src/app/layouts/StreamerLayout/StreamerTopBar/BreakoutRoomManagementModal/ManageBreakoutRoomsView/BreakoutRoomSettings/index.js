@@ -19,10 +19,8 @@ const BreakoutRoomSettings = ({ classes, handleClose, onClick }) => {
    const {
       query: { livestreamId },
    } = useRouter();
-   const {
-      listenToBreakoutRoomSettings,
-      updateCanReturnToMainStream,
-   } = useFirebaseService();
+   const { listenToBreakoutRoomSettings, updateCanReturnToMainStream } =
+      useFirebaseService();
    const [breakoutRoomSettings, setBreakoutRoomSettings] = useState({});
 
    useEffect(() => {

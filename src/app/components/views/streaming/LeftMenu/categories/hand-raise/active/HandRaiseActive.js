@@ -73,9 +73,8 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
 
    const closeSnackbar = (...args) => dispatch(actions.closeSnackbar(...args));
 
-   const { setNewNotification, setNotificationToRemove } = useContext(
-      NotificationsContext
-   );
+   const { setNewNotification, setNotificationToRemove } =
+      useContext(NotificationsContext);
    const {
       tutorialSteps,
       setTutorialSteps,

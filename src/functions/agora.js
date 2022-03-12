@@ -134,13 +134,8 @@ exports.generateAgoraTokenSecure = functions.https.onRequest(
 
 exports.generateAgoraTokenSecureOnCall = functions.https.onCall(
    async (data, context) => {
-      const {
-         isStreamer,
-         uid,
-         sentToken,
-         channelName,
-         streamDocumentPath,
-      } = data;
+      const { isStreamer, uid, sentToken, channelName, streamDocumentPath } =
+         data;
       const rtcRole = isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
       const rtmRole = 0;
       const expirationTimeInSeconds = 21600;

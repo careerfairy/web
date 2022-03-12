@@ -56,9 +56,8 @@ const BreakoutRoomAccordionContent = ({
             const newState = { ...prevState };
             liveSpeakers.forEach((speakerData) => {
                if (speakerData.speakerUuid) {
-                  newState[speakerData.speakerUuid] = getDisplayData(
-                     speakerData
-                  );
+                  newState[speakerData.speakerUuid] =
+                     getDisplayData(speakerData);
                }
             });
             return newState;

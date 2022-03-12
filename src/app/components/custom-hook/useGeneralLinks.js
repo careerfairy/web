@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react"
-import { User as ProfileIcon } from "react-feather"
-import { useAuth } from "../../HOCs/AuthProvider"
-import NextLivestreamsIcon from "@mui/icons-material/Contacts"
-import FollowGroupIcon from "@mui/icons-material/GroupAdd"
-import WishlistIcon from "@mui/icons-material/Stars"
+import React, { useEffect, useState } from "react";
+import { User as ProfileIcon } from "react-feather";
+import { useAuth } from "../../HOCs/AuthProvider";
+import NextLivestreamsIcon from "@mui/icons-material/Contacts";
+import FollowGroupIcon from "@mui/icons-material/GroupAdd";
+import WishlistIcon from "@mui/icons-material/Stars";
 
 const initialMainLinks = [
    {
@@ -24,7 +24,7 @@ const initialMainLinks = [
       basePath: "/groups",
       icon: FollowGroupIcon,
    },
-]
+];
 const initialSecondaryLinks = [
    {
       href: `/students`,
@@ -46,14 +46,14 @@ const initialSecondaryLinks = [
       title: "About Us",
       basePath: "/about-us",
    },
-]
+];
 
-const landingLinks = [...initialSecondaryLinks]
+const landingLinks = [...initialSecondaryLinks];
 const useGeneralLinks = () => {
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser } = useAuth();
 
-   const [mainLinks] = useState(initialMainLinks)
-   const [secondaryLinks, setSecondaryLinks] = useState(initialSecondaryLinks)
+   const [mainLinks] = useState(initialMainLinks);
+   const [secondaryLinks, setSecondaryLinks] = useState(initialSecondaryLinks);
 
    useEffect(() => {
       if (authenticatedUser?.emailVerified) {
@@ -65,11 +65,11 @@ const useGeneralLinks = () => {
                icon: ProfileIcon,
                basePath: "/profile",
             },
-         ])
+         ]);
       }
-   }, [authenticatedUser?.emailVerified])
+   }, [authenticatedUser?.emailVerified]);
 
-   return { secondaryLinks, mainLinks, landingLinks }
-}
+   return { secondaryLinks, mainLinks, landingLinks };
+};
 
-export default useGeneralLinks
+export default useGeneralLinks;

@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
-import { Identifiable } from "types/commonTypes";
+import { Identifiable } from "../../types/commonTypes";
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext";
-import { Interest } from "../../types/interests";
-import { Group } from "../../types/groups";
+import firebase from "firebase";
+import CollectionReference = firebase.firestore.CollectionReference;
+import { Interest } from "types/interests";
+import { Group } from "types/groups";
 
 /**
  * Fetch a Firestore collection
  *
  * We should migrate to something like ReactFire
- * TODO: Add query support
+ *
  * @param collection Name of the collection
  * @param realtime Listens for updates on the documents
  */
 function useCollection<T extends Identifiable>(
-   collection: string,
+   collection: string | GetReferenceFn,
    realtime: boolean = false
 ): CollectionResponse<T> {
    const { firestore } = useFirebaseService();
@@ -25,7 +27,13 @@ function useCollection<T extends Identifiable>(
       setLoading(true);
 
       try {
-         const ref = firestore.collection(collection);
+         let ref;
+         if (typeof collection === "string") {
+            ref = firestore.collection(collection);
+         } else {
+            ref = collection(firestore);
+         }
+
          if (realtime) {
             return ref.onSnapshot(updateLocal);
          } else {
@@ -47,10 +55,14 @@ function useCollection<T extends Identifiable>(
          setDocuments(list);
          setLoading(false);
       }
-   }, [realtime, collection]);
+   }, [realtime]);
 
    return { isLoading: isLoading, data: documents, error: error };
 }
+
+type GetReferenceFn = (
+   firestore: firebase.firestore.Firestore
+) => CollectionReference;
 
 interface CollectionResponse<T> {
    isLoading: boolean;

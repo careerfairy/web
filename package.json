@@ -11,10 +11,10 @@
       "setup": "npm run firebase use --add",
       "deploy:next3": "npm run firebase deploy --only functions:next3",
       "build:app": "next build src/app --debug",
-      "build:functions": "babel src/functions --out-dir dist/functions --source-maps && npm run copy-files",
+      "build:functions": "rimraf dist && babel src/functions --out-dir dist/functions --source-maps --copy-files && babel src/shared --out-dir dist/shared --source-maps --copy-files",
       "build": "npm run rm-prior-build && npm install && npm run build:app && npm run build:functions",
       "watch:app": "next src/app",
-      "watch:functions": "babel src/functions --out-dir dist/functions --source-maps --watch",
+      "watch:functions": "babel src/functions --out-dir dist/functions --copy-files --watch",
       "watch": "npm run watch:app & npm run watch:functions",
       "serve": "firebase serve --only functions,hosting",
       "copy-files": "cpx \"src/functions/**\" \"dist/functions\" -C",
@@ -39,6 +39,7 @@
       "lodash.debounce": "^4.0.8",
       "luxon": "^1.22.0",
       "mailgun-js": "^0.22.0",
+      "nanoid": "^3.3.1",
       "next": "^12.1.0",
       "postmark": "^2.3.5",
       "react": "^17.0.2"
@@ -64,6 +65,7 @@
       "husky": "^7.0.4",
       "lint-staged": "^12.3.4",
       "prettier": "^2.5.1",
+      "rimraf": "^3.0.2",
       "webpack": "^5.69.1"
    }
 }

@@ -1,6 +1,6 @@
-import React, { useState } from "react"
-import GroupAddIcon from "@mui/icons-material/GroupAdd"
-import EditIcon from "@mui/icons-material/Edit"
+import React, { useState } from "react";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import EditIcon from "@mui/icons-material/Edit";
 import {
    Button,
    Card,
@@ -10,10 +10,10 @@ import {
    Grid,
    Tooltip,
    Typography,
-} from "@mui/material"
-import GroupJoinModal from "./GroupJoinModal"
-import Fade from "@stahl.luke/react-reveal/Fade"
-import { getMaxLineStyles } from "../../helperFunctions/HelperFunctions"
+} from "@mui/material";
+import GroupJoinModal from "./GroupJoinModal";
+import Fade from "@stahl.luke/react-reveal/Fade";
+import { getMaxLineStyles } from "../../helperFunctions/HelperFunctions";
 
 const styles = {
    media: {
@@ -33,17 +33,17 @@ const styles = {
    groupDesc: {
       ...getMaxLineStyles(2),
    },
-}
+};
 
 const NewGroup = ({ group, userData, makeSix, selected }) => {
-   const [openJoinModal, setOpenJoinModal] = useState(false)
+   const [openJoinModal, setOpenJoinModal] = useState(false);
 
    const handleCloseJoinModal = () => {
-      setOpenJoinModal(false)
-   }
+      setOpenJoinModal(false);
+   };
    const handleOpenJoinModal = () => {
-      setOpenJoinModal(true)
-   }
+      setOpenJoinModal(true);
+   };
 
    return (
       <Grid
@@ -115,7 +115,7 @@ const NewGroup = ({ group, userData, makeSix, selected }) => {
             </Card>
          </Fade>
       </Grid>
-   )
-}
+   );
+};
 
-export default NewGroup
+export default NewGroup;
