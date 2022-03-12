@@ -275,10 +275,8 @@ const BreakoutRoom = ({
    } = useRouter();
    const [editRoomNameModalOpen, setEditRoomNameModalOpen] = useState(false);
    const [loading, setLoading] = useState(false);
-   const [
-      deleteBreakoutRoomModalOpen,
-      setDeleteBreakoutRoomModalOpen,
-   ] = useState(false);
+   const [deleteBreakoutRoomModalOpen, setDeleteBreakoutRoomModalOpen] =
+      useState(false);
    const [breakoutRoomLink, setBreakoutRoomLink] = useState("");
    const [joinAsMenuData, setJoinAsMenuData] = useState(initialJoinAsData);
 

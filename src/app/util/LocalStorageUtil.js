@@ -1,3 +1,8 @@
+import {
+   localStorageInvite,
+   localStorageReferralCode,
+} from "../constants/localStorageKeys";
+
 export default class LocalStorageUtil {
    static getAudioInputFromLocalStorage = () => {
       return localStorage.getItem("selectedAudioInput");
@@ -21,5 +26,13 @@ export default class LocalStorageUtil {
 
    static setVideoInputFromLocalStorage = (deviceId) => {
       return localStorage.setItem("selectedVideoInput", deviceId);
+   };
+
+   static setInviteLivestream = (livestreamId) => {
+      return localStorage?.setItem(localStorageInvite, livestreamId);
+   };
+
+   static setReferralCode = (referralCode) => {
+      return localStorage?.setItem(localStorageReferralCode, referralCode);
    };
 }

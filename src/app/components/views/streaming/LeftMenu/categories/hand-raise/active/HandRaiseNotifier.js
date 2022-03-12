@@ -78,11 +78,8 @@ function ConnectedHandRaiseElement(props) {
 }
 
 const HandRaiseNotifier = memo(({ handRaiseMenuOpen }) => {
-   const {
-      handRaises,
-      handlers,
-      numberOfActiveHandRaisers,
-   } = useStreamActiveHandRaises();
+   const { handRaises, handlers, numberOfActiveHandRaisers } =
+      useStreamActiveHandRaises();
 
    const dispatch = useDispatch();
    const { setNewNotification } = useContext(NotificationsContext);

@@ -58,7 +58,7 @@ export interface AgoraRTMContextInterface {
 }
 
 const AgoraRTMContext = createContext(
-   (null as unknown) as AgoraRTMContextInterface
+   null as unknown as AgoraRTMContextInterface
 );
 
 export default AgoraRTMContext;

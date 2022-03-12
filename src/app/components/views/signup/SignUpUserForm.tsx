@@ -1,6 +1,6 @@
-import { useRouter } from "next/router"
-import React, { Fragment, useContext, useState } from "react"
-import { Formik } from "formik"
+import { useRouter } from "next/router";
+import React, { Fragment, useContext, useState } from "react";
+import { Formik } from "formik";
 import {
    Button,
    Checkbox,
@@ -12,15 +12,17 @@ import {
    Grid,
    TextField,
    Typography,
-} from "@mui/material"
-import UniversityCountrySelector from "../universitySelect/UniversityCountrySelector"
-import UniversitySelector from "../universitySelect/UniversitySelector"
-import Link from "next/link"
-import makeStyles from "@mui/styles/makeStyles"
-import { createStyles } from "@mui/styles"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import * as yup from "yup"
-import { IMultiStepContext, MultiStepContext } from "./MultiStepWrapper"
+} from "@mui/material";
+import UniversityCountrySelector from "../universitySelect/UniversityCountrySelector";
+import UniversitySelector from "../universitySelect/UniversitySelector";
+import Link from "next/link";
+import makeStyles from "@mui/styles/makeStyles";
+import { createStyles } from "@mui/styles";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
+import * as yup from "yup";
+import { IMultiStepContext, MultiStepContext } from "./MultiStepWrapper";
+import { useLocalStorage } from "react-use";
+import { localStorageReferralCode } from "../../../constants/localStorageKeys";
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -32,7 +34,7 @@ const useStyles = makeStyles((theme) =>
          textAlign: "center",
       },
    })
-)
+);
 
 const schema = yup.object().shape({
    email: yup
@@ -50,6 +52,9 @@ const schema = yup.object().shape({
       .max(50, "Cannot be longer than 50 characters")
       .matches(/^\D+$/i, "Please enter a valid last name"),
    universityCountryCode: yup.string().required("Please chose a country code"),
+   referralCode: yup
+      .string()
+      .matches(/^[A-Za-z0-9]{11}$/, "That code seems invalid"),
    password: yup
       .string()
       .required("A password is required")
@@ -67,38 +72,41 @@ const schema = yup.object().shape({
    agreeTerm: yup
       .boolean()
       .oneOf([true], "Please agree to our T&C and our Privacy Policy"),
-})
+});
 
 function SignUpUserForm() {
-   const firebase = useFirebaseService()
-   const classes = useStyles()
+   const firebase = useFirebaseService();
+   const classes = useStyles();
    const {
       query: { absolutePath },
       push,
-   } = useRouter()
-   const { nextStep } = useContext<IMultiStepContext>(MultiStepContext)
+   } = useRouter();
+   const { nextStep } = useContext<IMultiStepContext>(MultiStepContext);
 
-   const [emailSent, setEmailSent] = useState(false)
-   const [errorMessage, setErrorMessage] = useState(null)
-   const [generalLoading, setGeneralLoading] = useState(false)
-   const [open, setOpen] = React.useState(false)
+   const [emailSent, setEmailSent] = useState(false);
+   const [errorMessage, setErrorMessage] = useState(null);
+   const [generalLoading, setGeneralLoading] = useState(false);
+   const [open, setOpen] = React.useState(false);
+
+   const [existingReferralCode, _, removeExistingReferralcode] =
+      useLocalStorage(localStorageReferralCode, "", { raw: true });
 
    const submitting = (isSubmitting) => {
-      return isSubmitting || emailSent || generalLoading
-   }
+      return isSubmitting || emailSent || generalLoading;
+   };
 
    const handleClose = () => {
-      setOpen(false)
-   }
+      setOpen(false);
+   };
 
    const handleOpen = () => {
-      setOpen(true)
-   }
+      setOpen(true);
+   };
 
    const handleSubmit = (values, { setSubmitting }) => {
-      setErrorMessage(null)
-      setEmailSent(false)
-      setGeneralLoading(true)
+      setErrorMessage(null);
+      setEmailSent(false);
+      setGeneralLoading(true);
 
       firebase
          .createUserInAuthAndFirebase(values)
@@ -106,25 +114,27 @@ function SignUpUserForm() {
             firebase
                .signInWithEmailAndPassword(values.email, values.password)
                .then(() => {
-                  setSubmitting(false)
-                  setGeneralLoading(false)
-                  nextStep()
+                  removeExistingReferralcode();
+                  setSubmitting(false);
+                  setGeneralLoading(false);
+                  nextStep();
                })
                .catch((e) => {
-                  console.error(e)
-                  void push("/login")
-               })
+                  console.error(e);
+                  void push("/login");
+               });
          })
          .catch((error) => {
-            setErrorMessage(error)
-            setGeneralLoading(false)
-            setSubmitting(false)
-         })
-   }
+            setErrorMessage(error);
+            setGeneralLoading(false);
+            setSubmitting(false);
+         });
+   };
 
    return (
       <Fragment>
          <Formik
+            enableReinitialize={true}
             initialValues={{
                firstName: "",
                lastName: "",
@@ -135,6 +145,7 @@ function SignUpUserForm() {
                subscribed: false,
                university: { code: "other", name: "Other" },
                universityCountryCode: "",
+               referralCode: `${existingReferralCode}`,
             }}
             validationSchema={schema}
             onSubmit={handleSubmit}
@@ -345,6 +356,37 @@ function SignUpUserForm() {
                         </FormControl>
                      </Grid>
                      <Grid item xs={12}>
+                        <FormControl fullWidth>
+                           <TextField
+                              variant="outlined"
+                              fullWidth
+                              error={Boolean(
+                                 errors.referralCode && touched.referralCode
+                              )}
+                              id="referralCode"
+                              name="referralCode"
+                              placeholder="Enter a Referral Code"
+                              InputLabelProps={{ shrink: true }}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              value={values.referralCode}
+                              disabled={submitting(isSubmitting)}
+                              label="Referral Code (Optional)"
+                           />
+                           <Collapse
+                              in={Boolean(
+                                 errors.referralCode &&
+                                    touched.referralCode &&
+                                    errors.referralCode
+                              )}
+                           >
+                              <FormHelperText error>
+                                 {errors.referralCode}
+                              </FormHelperText>
+                           </Collapse>
+                        </FormControl>
+                     </Grid>
+                     <Grid item xs={12}>
                         <FormControlLabel
                            control={
                               <Checkbox
@@ -452,7 +494,7 @@ function SignUpUserForm() {
             )}
          </Formik>
       </Fragment>
-   )
+   );
 }
 
-export default SignUpUserForm
+export default SignUpUserForm;

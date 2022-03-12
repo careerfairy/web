@@ -5,7 +5,7 @@ import {
    DialogContent,
    Typography,
 } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { ErrorOutline } from "@mui/icons-material";
 import React, { useState, useEffect, useRef, memo } from "react";
 

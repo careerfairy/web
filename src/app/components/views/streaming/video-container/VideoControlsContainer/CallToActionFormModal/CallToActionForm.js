@@ -1,33 +1,33 @@
-import PropTypes from "prop-types"
-import { Button, DialogActions, DialogContent } from "@mui/material"
-import React, { memo, useContext, useMemo } from "react"
-import * as yup from "yup"
-import { URL_REGEX } from "components/util/constants"
-import { useFormik } from "formik"
-import * as actions from "store/actions"
-import { useDispatch } from "react-redux"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import useStreamRef from "components/custom-hook/useStreamRef"
-import TutorialContext from "context/tutorials/TutorialContext"
-import { StyledTooltipWithButton } from "materialUI/GlobalTooltips"
+import PropTypes from "prop-types";
+import { Button, DialogActions, DialogContent } from "@mui/material";
+import React, { memo, useContext, useMemo } from "react";
+import * as yup from "yup";
+import { URL_REGEX } from "components/util/constants";
+import { useFormik } from "formik";
+import * as actions from "store/actions";
+import { useDispatch } from "react-redux";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
+import useStreamRef from "components/custom-hook/useStreamRef";
+import TutorialContext from "context/tutorials/TutorialContext";
+import { StyledTooltipWithButton } from "materialUI/GlobalTooltips";
 
-import { jobDescription } from "./exampleFormData"
-import useSliderFullyOpened from "components/custom-hook/useSliderFullyOpened"
-import JobPostingCtaForm from "./CallToActionForms/JobPostingCtaForm"
-import SocialCtaForm from "./CallToActionForms/SocialCtaForm"
-import CustomMessageCtaForm from "./CallToActionForms/CustomMessageCtaForm"
+import { jobDescription } from "./exampleFormData";
+import useSliderFullyOpened from "components/custom-hook/useSliderFullyOpened";
+import JobPostingCtaForm from "./CallToActionForms/JobPostingCtaForm";
+import SocialCtaForm from "./CallToActionForms/SocialCtaForm";
+import CustomMessageCtaForm from "./CallToActionForms/CustomMessageCtaForm";
 
-const MAX_BUTTON_TEXT_LENGTH = 45
-const MAX_MESSAGE_LENGTH = 1000
-const MAX_JOB_TITLE_LENGTH = 1000
-const MAX_SALARY_LENGTH = 200
+const MAX_BUTTON_TEXT_LENGTH = 45;
+const MAX_MESSAGE_LENGTH = 1000;
+const MAX_JOB_TITLE_LENGTH = 1000;
+const MAX_SALARY_LENGTH = 200;
 
 const getMaxLengthError = (maxLength) => [
    maxLength,
    `This value is too long. It should have ${maxLength} characters or fewer.`,
-]
+];
 
-const now = new Date()
+const now = new Date();
 const validationSchema = (type) =>
    yup.object({
       message: yup
@@ -58,7 +58,7 @@ const validationSchema = (type) =>
             .nullable()
             .min(now, `The date must be in the future`),
       }),
-   })
+   });
 
 const CallToActionForm = memo(
    ({
@@ -69,25 +69,25 @@ const CallToActionForm = memo(
       isJobPosting,
       isSocial,
    }) => {
-      const [fullyOpened, onEntered, onExited] = useSliderFullyOpened()
+      const [fullyOpened, onEntered, onExited] = useSliderFullyOpened();
 
-      const { handleConfirmStep, isOpen } = useContext(TutorialContext)
-      const isActiveTutorialStep = isOpen(20, isTestStream)
+      const { handleConfirmStep, isOpen } = useContext(TutorialContext);
+      const isActiveTutorialStep = isOpen(20, isTestStream);
 
-      const streamRef = useStreamRef()
-      const dispatch = useDispatch()
+      const streamRef = useStreamRef();
+      const dispatch = useDispatch();
       const {
          createCallToAction,
          updateCallToAction,
          activateCallToAction,
          clickOnCallToAction,
          dismissCallToAction,
-      } = useFirebaseService()
+      } = useFirebaseService();
 
       const canChangeMessage = useMemo(
          () => Boolean(isCustom || isJobPosting),
          [isCustom, isJobPosting]
-      )
+      );
 
       const getInitialValues = (
          isJobPosting,
@@ -103,10 +103,10 @@ const CallToActionForm = memo(
                },
                buttonUrl: "https://www.linkedin.com/jobs/",
                message: jobDescription,
-            }
+            };
          }
-         return { ...initialValues, isForTutorial: false }
-      }
+         return { ...initialValues, isForTutorial: false };
+      };
 
       const buildFormikForm = (type, validationSchema) => {
          return useFormik({
@@ -119,25 +119,25 @@ const CallToActionForm = memo(
             validationSchema: validationSchema,
             onSubmit: async (values, { setSubmitting }) => {
                try {
-                  setSubmitting(true)
+                  setSubmitting(true);
                   if (values.isToBeSaved) {
-                     await handleSave(values)
+                     await handleSave(values);
                   } else {
-                     await handleSend(values)
+                     await handleSend(values);
                   }
 
                   if (isActiveTutorialStep) {
-                     handleConfirmStep(20)
+                     handleConfirmStep(20);
                   }
                } catch (e) {
-                  dispatch(actions.sendGeneralError(e))
-                  console.error("-> Error: failed in submitting CTA", e)
+                  dispatch(actions.sendGeneralError(e));
+                  console.error("-> Error: failed in submitting CTA", e);
                }
-               setSubmitting(false)
-               handleClose()
+               setSubmitting(false);
+               handleClose();
             },
-         })
-      }
+         });
+      };
 
       const formik = useFormik({
          initialValues: getInitialValues(
@@ -149,57 +149,57 @@ const CallToActionForm = memo(
          validationSchema: validationSchema(initialValues.type),
          onSubmit: async (values, { setSubmitting }) => {
             try {
-               setSubmitting(true)
+               setSubmitting(true);
                if (values.isToBeSaved) {
-                  await handleSave(values)
+                  await handleSave(values);
                } else {
-                  await handleSend(values)
+                  await handleSend(values);
                }
                if (isActiveTutorialStep) {
-                  handleConfirmStep(20)
+                  handleConfirmStep(20);
                }
             } catch (e) {
-               dispatch(actions.sendGeneralError(e))
-               console.error("-> Error: failed in submitting CTA", e)
+               dispatch(actions.sendGeneralError(e));
+               console.error("-> Error: failed in submitting CTA", e);
             }
-            setSubmitting(false)
-            handleClose()
+            setSubmitting(false);
+            handleClose();
          },
-      })
+      });
 
       const handleSubmitTutorialJobPosting = async () => {
          try {
-            await formik.handleSubmit()
+            await formik.handleSubmit();
          } catch (e) {
-            console.error("-> Error: failed in submitting tutorial CTA", e)
+            console.error("-> Error: failed in submitting tutorial CTA", e);
          }
-      }
+      };
 
       const handleSend = async (formData) => {
-         let values = { ...formData }
+         let values = { ...formData };
          if (values.id) {
-            await updateCallToAction(streamRef, values.id, values)
-            return await activateCallToAction(streamRef, values.id)
+            await updateCallToAction(streamRef, values.id, values);
+            return await activateCallToAction(streamRef, values.id);
          }
          const callToActionId = await createCallToAction(streamRef, {
             ...values,
             isForTutorial: Boolean(isActiveTutorialStep),
-         })
+         });
          if (isActiveTutorialStep) {
             const closeSnack = () =>
-               dispatch(actions.closeSnackbar(callToActionId))
+               dispatch(actions.closeSnackbar(callToActionId));
             const handleDismissCallToAction = async () => {
-               await dismissCallToAction(streamRef, callToActionId)
-               closeSnack()
-            }
+               await dismissCallToAction(streamRef, callToActionId);
+               closeSnack();
+            };
 
             const handleClickCallToAction = async () => {
-               await clickOnCallToAction(streamRef, callToActionId)
-               closeSnack()
+               await clickOnCallToAction(streamRef, callToActionId);
+               closeSnack();
                if (window) {
-                  window.open(values.buttonUrl, "_blank")
+                  window.open(values.buttonUrl, "_blank");
                }
-            }
+            };
 
             dispatch(
                actions.enqueueJobPostingCta(
@@ -211,17 +211,17 @@ const CallToActionForm = memo(
                   handleClickCallToAction,
                   handleDismissCallToAction
                )
-            )
+            );
          }
-         return await activateCallToAction(streamRef, callToActionId)
-      }
+         return await activateCallToAction(streamRef, callToActionId);
+      };
 
       const handleSave = async (values) => {
          if (values.id) {
-            return await updateCallToAction(streamRef, values.id, values)
+            return await updateCallToAction(streamRef, values.id, values);
          }
-         return await createCallToAction(streamRef, values)
-      }
+         return await createCallToAction(streamRef, values);
+      };
 
       return (
          <React.Fragment>
@@ -261,8 +261,8 @@ const CallToActionForm = memo(
                <Button
                   disabled={formik.isSubmitting || isActiveTutorialStep}
                   onClick={async () => {
-                     await formik.setFieldValue("isToBeSaved", true)
-                     await formik.handleSubmit()
+                     await formik.setFieldValue("isToBeSaved", true);
+                     await formik.handleSubmit();
                   }}
                   variant="outlined"
                   color="secondary"
@@ -272,8 +272,8 @@ const CallToActionForm = memo(
                <Button
                   disabled={formik.isSubmitting}
                   onClick={async () => {
-                     await formik.setFieldValue("isToBeSaved", false)
-                     await formik.handleSubmit()
+                     await formik.setFieldValue("isToBeSaved", false);
+                     await formik.handleSubmit();
                   }}
                   variant="contained"
                   color="primary"
@@ -282,15 +282,15 @@ const CallToActionForm = memo(
                </Button>
             </DialogActions>
          </React.Fragment>
-      )
+      );
    }
-)
+);
 
 CallToActionForm.propTypes = {
    handleClose: PropTypes.func,
    initialValues: PropTypes.object.isRequired,
    isCustom: PropTypes.bool,
    isJobPosting: PropTypes.bool,
-}
+};
 
-export default CallToActionForm
+export default CallToActionForm;

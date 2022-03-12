@@ -7,10 +7,16 @@
          ".firebase/**",
          ".firebaserc",
          "firebase.json",
+         "*.log",
+         ".git",
+         "emulatorData",
          "**/node_modules/**",
          "**/public/**",
          "**/.next/cache/**"
       ]
+   },
+   "firestore": {
+      "rules": "firestore.rules"
    },
    "hosting": [
       {

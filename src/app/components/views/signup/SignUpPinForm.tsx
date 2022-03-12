@@ -1,7 +1,7 @@
-import { useRouter } from "next/router"
-import React, { Fragment, useContext, useState } from "react"
-import axios from "axios"
-import { Formik } from "formik"
+import { useRouter } from "next/router";
+import React, { Fragment, useContext, useState } from "react";
+import axios from "axios";
+import { Formik } from "formik";
 import {
    Box,
    Button,
@@ -10,11 +10,11 @@ import {
    Paper,
    TextField,
    Typography,
-} from "@mui/material"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import * as yup from "yup"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import { IMultiStepContext, MultiStepContext } from "./MultiStepWrapper"
+} from "@mui/material";
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
+import * as yup from "yup";
+import { useAuth } from "../../../HOCs/AuthProvider";
+import { IMultiStepContext, MultiStepContext } from "./MultiStepWrapper";
 
 const schema = yup.object().shape({
    pinCode: yup
@@ -24,53 +24,52 @@ const schema = yup.object().shape({
          /^[0-9]{4}$/,
          "The PIN code must be a number between 0 and 9999"
       ),
-})
+});
 
 const SignUpPinForm = () => {
    const {
       push,
       query: { absolutePath },
-   } = useRouter()
-   const firebase = useFirebaseService()
-   const [errorMessageShown] = useState(false)
-   const [incorrectPin, setIncorrectPin] = useState(false)
-   const [generalLoading, setGeneralLoading] = useState(false)
-   const { authenticatedUser: user } = useAuth()
-   const { nextStep } = useContext<IMultiStepContext>(MultiStepContext)
+   } = useRouter();
+   const firebase = useFirebaseService();
+   const [errorMessageShown] = useState(false);
+   const [incorrectPin, setIncorrectPin] = useState(false);
+   const [generalLoading, setGeneralLoading] = useState(false);
+   const { authenticatedUser: user } = useAuth();
+   const { nextStep } = useContext<IMultiStepContext>(MultiStepContext);
 
    function resendVerificationEmail() {
-      setGeneralLoading(true)
+      setGeneralLoading(true);
       axios({
          method: "post",
-         url:
-            "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/resendPostmarkEmailVerificationEmailWithPin",
+         url: "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/resendPostmarkEmailVerificationEmailWithPin",
          data: {
             recipientEmail: user.email,
          },
       })
          .then((response) => {
-            setIncorrectPin(false)
-            setGeneralLoading(false)
+            setIncorrectPin(false);
+            setGeneralLoading(false);
          })
          .catch((error) => {
-            console.error(error)
-            setIncorrectPin(false)
-            setGeneralLoading(false)
-         })
+            console.error(error);
+            setIncorrectPin(false);
+            setGeneralLoading(false);
+         });
    }
 
    const updateActiveStep = () => {
       setTimeout(() => {
-         nextStep()
-      }, 500)
-   }
+         nextStep();
+      }, 500);
+   };
 
    const handleSubmit = (values, { setSubmitting }) => {
-      setIncorrectPin(false)
+      setIncorrectPin(false);
       const userInfo = {
          recipientEmail: user.email,
          pinCode: parseInt(values.pinCode),
-      }
+      };
       firebase
          .validateUserEmailWithPin(userInfo)
          .then(() => {
@@ -78,21 +77,21 @@ const SignUpPinForm = () => {
             setTimeout(() => {
                firebase.auth.currentUser.reload().then(() => {
                   if (absolutePath) {
-                     void push(absolutePath as any)
+                     void push(absolutePath as any);
                   } else {
-                     updateActiveStep()
+                     updateActiveStep();
                   }
-               })
-            }, 200)
+               });
+            }, 200);
          })
          .catch((error) => {
-            console.log("error", error)
-            setIncorrectPin(true)
-            setGeneralLoading(false)
-            setSubmitting(false)
-            return
-         })
-   }
+            console.log("error", error);
+            setIncorrectPin(true);
+            setGeneralLoading(false);
+            setSubmitting(false);
+            return;
+         });
+   };
 
    return (
       <Fragment>
@@ -222,7 +221,7 @@ const SignUpPinForm = () => {
             )}
          </Formik>
       </Fragment>
-   )
-}
+   );
+};
 
-export default SignUpPinForm
+export default SignUpPinForm;

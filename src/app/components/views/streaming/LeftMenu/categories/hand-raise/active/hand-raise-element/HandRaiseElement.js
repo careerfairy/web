@@ -176,9 +176,8 @@ const getId = ({ request: { id, timestamp } }) => {
 
 function RequestedHandRaiseElement(props) {
    const [notificationId] = useState(getId(props));
-   const { getActiveTutorialStepKey, handleConfirmStep, isOpen } = useContext(
-      TutorialContext
-   );
+   const { getActiveTutorialStepKey, handleConfirmStep, isOpen } =
+      useContext(TutorialContext);
    const activeStep = getActiveTutorialStepKey();
 
    function updateHandRaiseRequest(state) {
@@ -271,9 +270,8 @@ function ConnectingHandRaiseElement(props) {
 
 function ConnectedHandRaiseElement(props) {
    const [notificationId] = useState(getId(props));
-   const { getActiveTutorialStepKey, handleConfirmStep, isOpen } = useContext(
-      TutorialContext
-   );
+   const { getActiveTutorialStepKey, handleConfirmStep, isOpen } =
+      useContext(TutorialContext);
 
    const activeStep = getActiveTutorialStepKey();
 

@@ -1,5 +1,5 @@
 import { CircularProgress, Dialog, DialogContent } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import React, { useState, useEffect, useRef } from "react";
 
 const useStyles = makeStyles((theme) => ({

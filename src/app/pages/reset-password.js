@@ -13,13 +13,7 @@ import axios from "axios";
 
 import Head from "next/head";
 import { useAuth } from "../HOCs/AuthProvider";
-import {
-   Button,
-   Card,
-   Container,
-   TextField,
-   Typography,
-} from "@mui/material";
+import { Button, Card, Container, TextField, Typography } from "@mui/material";
 
 function ResetPasswordPage(props) {
    const { authenticatedUser: user } = useAuth();
@@ -90,8 +84,7 @@ export function ResetPasswordBase(props) {
                         setCompleted(false);
                         axios({
                            method: "post",
-                           url:
-                              "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkResetPasswordEmail",
+                           url: "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkResetPasswordEmail",
                            data: {
                               recipientEmail: values.email,
                               redirect_link: "https://careerfairy.io/login",
