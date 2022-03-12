@@ -1,21 +1,31 @@
 import React, { useState } from "react";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import {
+   Box,
    Button,
+   Checkbox,
    CircularProgress,
    DialogActions,
    DialogContent,
    DialogContentText,
    DialogTitle,
+   FormControlLabel,
 } from "@mui/material";
 import { GlassDialog } from "materialUI/GlobalModals";
 import { v4 as uuid } from "uuid";
 import useStreamRef from "../../../custom-hook/useStreamRef";
+import { useLocalStorage } from "react-use";
 
 const DemoIntroModal = ({ open, handleClose }) => {
    const firebase = useFirebaseService();
    const [loading, setLoading] = useState(false);
    const streamRef = useStreamRef();
+   const [_, setHasDismissedStreamTutorial] = useLocalStorage(
+      "hasDismissedStreamTutorial",
+      false
+   );
+
+   const [dismissTutorial, setDismissTutorial] = useState(false);
 
    const createTestLivestream = async () => {
       const testChatEntries = [
@@ -90,6 +100,7 @@ const DemoIntroModal = ({ open, handleClose }) => {
    };
 
    const handleStartDemo = async () => {
+      setHasDismissedStreamTutorial(dismissTutorial);
       await createTestLivestream();
    };
 
@@ -99,6 +110,20 @@ const DemoIntroModal = ({ open, handleClose }) => {
          <DialogContent>
             <DialogContentText>
                Would you like to partake in the tutorial?
+               <Box sx={{ pt: 1 }}>
+                  <FormControlLabel
+                     control={
+                        <Checkbox
+                           checked={dismissTutorial}
+                           onChange={(event) => {
+                              setDismissTutorial(event.target.checked);
+                           }}
+                           name="stream-tutorial-prompt-dismiss"
+                        />
+                     }
+                     label="Don't prompt me again."
+                  />
+               </Box>
             </DialogContentText>
          </DialogContent>
 
@@ -115,7 +140,10 @@ const DemoIntroModal = ({ open, handleClose }) => {
                Yes Please
             </Button>
             <Button
-               onClick={() => handleClose(false)}
+               onClick={() => {
+                  setHasDismissedStreamTutorial(dismissTutorial);
+                  handleClose(false);
+               }}
                color="grey"
                disabled={loading}
             >

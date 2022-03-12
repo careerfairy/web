@@ -58,8 +58,9 @@ exports.resendPostmarkEmailVerificationEmailWithPin =
 
 // Agora
 exports.generateAgoraToken = agora.generateAgoraToken;
-exports.generateAgoraTokenSecure = agora.generateAgoraTokenSecure;
 exports.generateAgoraTokenSecureOnCall = agora.generateAgoraTokenSecureOnCall;
+exports.fetchAgoraRtcToken = agora.fetchAgoraRtcToken;
+exports.fetchAgoraRtmToken = agora.fetchAgoraRtmToken;
 
 // Backup
 exports.exportFirestoreBackup = backup.exportFirestoreBackup;

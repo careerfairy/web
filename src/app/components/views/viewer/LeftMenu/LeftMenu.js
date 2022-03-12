@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import { alpha, useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import SwipeableViews from "react-swipeable-views";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import { Drawer, Fab } from "@mui/material";
@@ -59,7 +59,6 @@ const useStyles = makeStyles((theme) => ({
 
 const states = ["questions", "polls", "hand", "chat"];
 const LeftMenu = ({
-   streamerId,
    handRaiseActive,
    setHandRaiseActive,
    streamer,
@@ -135,7 +134,6 @@ const LeftMenu = ({
       <TabPanel key={2} value={value} index={2} dir={theme.direction}>
          <HandRaiseCategory
             streamer={streamer}
-            streamerId={streamerId}
             livestream={livestream}
             selectedState={selectedState}
             user={user}

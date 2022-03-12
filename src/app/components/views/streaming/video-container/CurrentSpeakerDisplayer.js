@@ -208,25 +208,22 @@ function CurrentSpeakerDisplayer(props) {
 
    if (props.streams.length > 4) {
       let currentSpeakerStream = props.streams.find(
-         (stream) => stream.streamId === props.currentSpeaker
+         (stream) => stream.uid === props.currentSpeaker
       );
       let rearrangedVideoStreams = props.streams.filter(
-         (stream) => stream.streamId !== props.currentSpeaker
+         (stream) => stream.uid !== props.currentSpeaker
       );
 
       if (currentSpeakerStream) {
          rearrangedVideoStreams.unshift(currentSpeakerStream);
       }
       externalVideoElements = rearrangedVideoStreams
-         .filter((stream) => !stream.streamId.includes("screen"))
+         .filter((stream) => !stream.uid.includes("screen"))
          .map((stream, index) => {
-            const videoClass = getVideoContainerClass(
-               stream.streamId,
-               "external"
-            );
+            const videoClass = getVideoContainerClass(stream.uid, "external");
             return (
                <div
-                  key={stream.streamId}
+                  key={stream.uid}
                   className={classes[videoClass]}
                   style={{ padding: 0 }}
                >
@@ -234,7 +231,7 @@ function CurrentSpeakerDisplayer(props) {
                      {...props}
                      isPlayMode={props.isPlayMode}
                      stream={stream}
-                     height={getVideoContainerHeight(stream.streamId)}
+                     height={getVideoContainerHeight(stream.uid)}
                      small={videoClass.includes("QuarterWidth")}
                      index={index}
                   />
@@ -243,15 +240,12 @@ function CurrentSpeakerDisplayer(props) {
          });
    } else {
       externalVideoElements = props.streams
-         .filter((stream) => !stream.streamId.includes("screen"))
+         .filter((stream) => !stream.uid.includes("screen"))
          .map((stream, index) => {
-            const videoClass = getVideoContainerClass(
-               stream.streamId,
-               "external"
-            );
+            const videoClass = getVideoContainerClass(stream.uid, "external");
             return (
                <div
-                  key={stream.streamId}
+                  key={stream.uid}
                   className={classes[videoClass]}
                   style={{ padding: 0 }}
                >
@@ -259,7 +253,7 @@ function CurrentSpeakerDisplayer(props) {
                      {...props}
                      isPlayMode={props.isPlayMode}
                      stream={stream}
-                     height={getVideoContainerHeight(stream.streamId)}
+                     height={getVideoContainerHeight(stream.uid)}
                      small={videoClass.includes("QuarterWidth")}
                      index={index}
                   />

@@ -1,5 +1,5 @@
-import {useRouter} from "next/router";
-import React, {Fragment, useContext, useState} from "react";
+import { useRouter } from "next/router";
+import React, { Fragment, useContext, useState } from "react";
 import axios from "axios";
 import { Formik } from "formik";
 import {
@@ -13,8 +13,8 @@ import {
 } from "@mui/material";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import * as yup from "yup";
-import {useAuth} from "../../../HOCs/AuthProvider";
-import {IMultiStepContext, MultiStepContext} from "./MultiStepWrapper";
+import { useAuth } from "../../../HOCs/AuthProvider";
+import { IMultiStepContext, MultiStepContext } from "./MultiStepWrapper";
 
 const schema = yup.object().shape({
    pinCode: yup
@@ -27,23 +27,22 @@ const schema = yup.object().shape({
 });
 
 const SignUpPinForm = () => {
-  const {
-    push,
-    query: {absolutePath},
-  } = useRouter();
-  const firebase = useFirebaseService();
-  const [errorMessageShown] = useState(false);
-  const [incorrectPin, setIncorrectPin] = useState(false);
-  const [generalLoading, setGeneralLoading] = useState(false);
-  const {authenticatedUser: user} = useAuth();
-  const {nextStep} = useContext<IMultiStepContext>(MultiStepContext)
+   const {
+      push,
+      query: { absolutePath },
+   } = useRouter();
+   const firebase = useFirebaseService();
+   const [errorMessageShown] = useState(false);
+   const [incorrectPin, setIncorrectPin] = useState(false);
+   const [generalLoading, setGeneralLoading] = useState(false);
+   const { authenticatedUser: user } = useAuth();
+   const { nextStep } = useContext<IMultiStepContext>(MultiStepContext);
 
    function resendVerificationEmail() {
       setGeneralLoading(true);
       axios({
          method: "post",
-         url:
-            "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/resendPostmarkEmailVerificationEmailWithPin",
+         url: "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/resendPostmarkEmailVerificationEmailWithPin",
          data: {
             recipientEmail: user.email,
          },
@@ -59,162 +58,170 @@ const SignUpPinForm = () => {
          });
    }
 
-  const updateActiveStep = () => {
-    setTimeout(() => {
-      nextStep()
-    }, 500);
-  };
+   const updateActiveStep = () => {
+      setTimeout(() => {
+         nextStep();
+      }, 500);
+   };
 
-  const handleSubmit = (values, {setSubmitting}) => {
-    setIncorrectPin(false);
-    const userInfo = {
-      recipientEmail: user.email,
-      pinCode: parseInt(values.pinCode),
-    };
-    firebase
-      .validateUserEmailWithPin(userInfo)
-      .then(() => {
-        // TODO: improve these timeouts
-        setTimeout(() => {
-          firebase.auth.currentUser.reload().then(() => {
-            if (absolutePath) {
-              void push(absolutePath as any);
-            } else {
-              updateActiveStep();
-            }
-          });
-        }, 200);
-      })
-      .catch((error) => {
-        console.log("error", error);
-        setIncorrectPin(true);
-        setGeneralLoading(false);
-        setSubmitting(false);
-        return;
-      });
-  }
+   const handleSubmit = (values, { setSubmitting }) => {
+      setIncorrectPin(false);
+      const userInfo = {
+         recipientEmail: user.email,
+         pinCode: parseInt(values.pinCode),
+      };
+      firebase
+         .validateUserEmailWithPin(userInfo)
+         .then(() => {
+            // TODO: improve these timeouts
+            setTimeout(() => {
+               firebase.auth.currentUser.reload().then(() => {
+                  if (absolutePath) {
+                     void push(absolutePath as any);
+                  } else {
+                     updateActiveStep();
+                  }
+               });
+            }, 200);
+         })
+         .catch((error) => {
+            console.log("error", error);
+            setIncorrectPin(true);
+            setGeneralLoading(false);
+            setSubmitting(false);
+            return;
+         });
+   };
 
-  return (
-    <Fragment>
-      <Formik
-        initialValues={{pinCode: ""}}
-        validationSchema={schema}
-        onSubmit={handleSubmit}
-      >
-        {({
-            values,
-            errors,
-            touched,
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            setFieldValue,
-            isSubmitting,
-            /* and other goodies */
-          }) => (
-          <form id="signUpForm" onSubmit={handleSubmit}>
-            <Paper
-              elevation={3}
-              style={{
-                color: "#2c662d",
-                padding: "1rem",
-                backgroundColor: "#fcfff5",
-                marginBottom: "0.5rem",
-              }}
-            >
-              <Typography variant="h6" gutterBottom>
-                Check your mailbox!
-              </Typography>
-              <p>
-                We have just sent you an email containing a 4-digit PIN
-                code. Please enter this code below to start your journey
-                on CareerFairy.{" "}
-                <MuiLink
-                  style={{cursor: "pointer"}}
-                  underline="always"
-                  onClick={() => resendVerificationEmail()}
-                >
-                  Resend the email verification link to{" "}
-                  <strong>{user.email}</strong>
-                </MuiLink>
-              </p>
-            </Paper>
-            <Box style={{margin: "1rem 0"}}>
-              <TextField
-                label="PIN Code"
-                placeholder="Enter the pin code"
-                variant="outlined"
-                id="pinCode"
-                name="pinCode"
-                fullWidth
-                inputProps={{maxLength: 4}}
-                disabled={isSubmitting || generalLoading}
-                value={values.pinCode}
-                onBlur={handleBlur}
-                onChange={handleChange}
-                error={Boolean(
-                  errors.pinCode && touched.pinCode && errors.pinCode
-                )}
-                helperText={
-                  errors.pinCode && touched.pinCode && errors.pinCode
-                }
-              />
-            </Box>
-            <Button
-              size="large"
-              type="submit"
-              fullWidth
-              color="primary"
-              variant="contained"
-              disabled={isSubmitting || generalLoading}
-              endIcon={
-                (isSubmitting || generalLoading) && (
-                  <CircularProgress color="inherit" size={20}/>
-                )
-              }
-            >
-              {isSubmitting
-                ? "Checking"
-                : generalLoading
-                  ? "Resending"
-                  : "Validate Email"}
-            </Button>
-            {/* @ts-ignore */}
-            <Typography
-              style={{marginTop: "0.5rem"}}
-              align="center"
-              hidden={!incorrectPin}
-              color="error"
-              margin="dense"
-            >
-              <strong>Incorrect PIN</strong> <br/>
-              The PIN code you entered appears to be incorrect.{" "}
-              <MuiLink
-                href="#"
-                onClick={() => resendVerificationEmail()}
-              >
-                <br/>
-                Resend the verification email.
-              </MuiLink>
-            </Typography>
-            <div style={{margin: "20px auto 0 auto", textAlign: "center"}}>
-              <div style={{marginBottom: "5px"}}>
-                Having issues signing up?{" "}
-                <MuiLink style={{cursor: "pointer"}}
-                         href="mailto:maximilian@careerfairy.io"
-                >{" "}Let us know
-                </MuiLink>
-              </div>
-            </div>
-            <Typography align="center" color="error"
-                        hidden={!errorMessageShown}>
-              An error occurred while creating to your account
-            </Typography>
-          </form>
-        )}
-      </Formik>
-    </Fragment>
-  );
-}
+   return (
+      <Fragment>
+         <Formik
+            initialValues={{ pinCode: "" }}
+            validationSchema={schema}
+            onSubmit={handleSubmit}
+         >
+            {({
+               values,
+               errors,
+               touched,
+               handleChange,
+               handleBlur,
+               handleSubmit,
+               setFieldValue,
+               isSubmitting,
+               /* and other goodies */
+            }) => (
+               <form id="signUpForm" onSubmit={handleSubmit}>
+                  <Paper
+                     elevation={3}
+                     style={{
+                        color: "#2c662d",
+                        padding: "1rem",
+                        backgroundColor: "#fcfff5",
+                        marginBottom: "0.5rem",
+                     }}
+                  >
+                     <Typography variant="h6" gutterBottom>
+                        Check your mailbox!
+                     </Typography>
+                     <p>
+                        We have just sent you an email containing a 4-digit PIN
+                        code. Please enter this code below to start your journey
+                        on CareerFairy.{" "}
+                        <MuiLink
+                           style={{ cursor: "pointer" }}
+                           underline="always"
+                           onClick={() => resendVerificationEmail()}
+                        >
+                           Resend the email verification link to{" "}
+                           <strong>{user.email}</strong>
+                        </MuiLink>
+                     </p>
+                  </Paper>
+                  <Box style={{ margin: "1rem 0" }}>
+                     <TextField
+                        label="PIN Code"
+                        placeholder="Enter the pin code"
+                        variant="outlined"
+                        id="pinCode"
+                        name="pinCode"
+                        fullWidth
+                        inputProps={{ maxLength: 4 }}
+                        disabled={isSubmitting || generalLoading}
+                        value={values.pinCode}
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        error={Boolean(
+                           errors.pinCode && touched.pinCode && errors.pinCode
+                        )}
+                        helperText={
+                           errors.pinCode && touched.pinCode && errors.pinCode
+                        }
+                     />
+                  </Box>
+                  <Button
+                     size="large"
+                     type="submit"
+                     fullWidth
+                     color="primary"
+                     variant="contained"
+                     disabled={isSubmitting || generalLoading}
+                     endIcon={
+                        (isSubmitting || generalLoading) && (
+                           <CircularProgress color="inherit" size={20} />
+                        )
+                     }
+                  >
+                     {isSubmitting
+                        ? "Checking"
+                        : generalLoading
+                        ? "Resending"
+                        : "Validate Email"}
+                  </Button>
+                  {/* @ts-ignore */}
+                  <Typography
+                     style={{ marginTop: "0.5rem" }}
+                     align="center"
+                     hidden={!incorrectPin}
+                     color="error"
+                     margin="dense"
+                  >
+                     <strong>Incorrect PIN</strong> <br />
+                     The PIN code you entered appears to be incorrect.{" "}
+                     <MuiLink
+                        href="#"
+                        onClick={() => resendVerificationEmail()}
+                     >
+                        <br />
+                        Resend the verification email.
+                     </MuiLink>
+                  </Typography>
+                  <div
+                     style={{ margin: "20px auto 0 auto", textAlign: "center" }}
+                  >
+                     <div style={{ marginBottom: "5px" }}>
+                        Having issues signing up?{" "}
+                        <MuiLink
+                           style={{ cursor: "pointer" }}
+                           href="mailto:maximilian@careerfairy.io"
+                        >
+                           {" "}
+                           Let us know
+                        </MuiLink>
+                     </div>
+                  </div>
+                  <Typography
+                     align="center"
+                     color="error"
+                     hidden={!errorMessageShown}
+                  >
+                     An error occurred while creating to your account
+                  </Typography>
+               </form>
+            )}
+         </Formik>
+      </Fragment>
+   );
+};
 
 export default SignUpPinForm;

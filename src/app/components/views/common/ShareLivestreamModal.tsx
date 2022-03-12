@@ -17,15 +17,16 @@ import {
    Typography,
 } from "@mui/material";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { getPoints, RewardActions } from "../../../../shared/rewards";
 import { streamIsOld } from "../../../util/CommonUtil";
 
 const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
    const { enqueueSnackbar } = useSnackbar();
    const { userData } = useAuth();
+   const [referralLink, setReferralLink] = useState(null);
 
-   const copyReferralLinkToClipboard = () => {
+   const copyReferralLinkToClipboard = (link) => {
       copyStringToClipboard(link);
       enqueueSnackbar("Link has been copied to your clipboard", {
          variant: "success",
@@ -34,17 +35,23 @@ const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
       handleClose();
    };
 
-   let link = makeLivestreamEventDetailsUrl(livestreamData.id);
-   const isReferralLink = userData && !streamIsOld(livestreamData.start);
-   if (isReferralLink) {
-      link = makeLivestreamEventDetailsInviteUrl(
-         livestreamData.id,
-         userData.referralCode
-      );
-   } else {
-      copyReferralLinkToClipboard();
-      return <div />;
-   }
+   useEffect(() => {
+      const isReferralLink = userData && !streamIsOld(livestreamData.start);
+      if (isReferralLink) {
+         setReferralLink(
+            makeLivestreamEventDetailsInviteUrl(
+               livestreamData.id,
+               userData.referralCode
+            )
+         );
+      } else {
+         copyReferralLinkToClipboard(
+            makeLivestreamEventDetailsUrl(livestreamData.id)
+         );
+      }
+   }, [livestreamData.id, livestreamData.start, userData]);
+
+   if (!referralLink) return "";
 
    return (
       <Dialog
@@ -57,33 +64,28 @@ const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
       >
          <DialogTitle>Share Event: {livestreamData.title}</DialogTitle>
          <DialogContent dividers>
-            {isReferralLink ? (
-               <Typography variant="body2" my={1}>
-                  Earn{" "}
-                  {getPoints(RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER)}{" "}
-                  points for each friend who attends this event with your link.
-                  You can trade your points for awesome rewards.
-               </Typography>
-            ) : (
-               ""
-            )}
+            <Typography variant="body2" my={1}>
+               Earn {getPoints(RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER)}{" "}
+               points for each friend who attends this event with your link. You
+               can trade your points for awesome rewards.
+            </Typography>
 
             <Typography variant="h6" my={2}>
-               {isReferralLink ? "Your Referral Link:" : "Link:"}
+               Your Referral Link:
             </Typography>
 
             <Box sx={{ display: "flex", flexWrap: "wrap" }}>
                <TextField
                   sx={{ flex: 1, marginRight: "10px" }}
                   variant="outlined"
-                  value={link}
+                  value={referralLink}
                   disabled
                />
                <Button
                   variant="contained"
                   sx={{ boxShadow: "none" }}
                   startIcon={<ContentPasteIcon />}
-                  onClick={copyReferralLinkToClipboard}
+                  onClick={() => copyReferralLinkToClipboard(referralLink)}
                >
                   Copy
                </Button>
