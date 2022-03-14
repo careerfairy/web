@@ -121,11 +121,7 @@ const ProfileNav = ({ userData }) => {
          key={2}
          wrapped
          fullWidth
-         label={
-            <Typography variant="h5">
-               {native ? "Referrals" : "Refer a friend"}
-            </Typography>
-         }
+         label={<Typography variant="h5">Referrals</Typography>}
       />,
    ];
 

@@ -9,7 +9,6 @@ import {
    getResizedUrl,
 } from "../../helperFunctions/HelperFunctions";
 import {
-   Avatar,
    Box,
    Button,
    Dialog,
@@ -24,6 +23,7 @@ import {
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import React, { useEffect, useState } from "react";
 import { streamIsOld } from "../../../util/CommonUtil";
+import Image from "next/image";
 
 const styles = {
    title: {
@@ -104,7 +104,7 @@ const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
             <Box>
                <Stack sx={styles.stack} spacing={4} direction="row">
                   <Box sx={styles.imageBox}>
-                     <img
+                     <Image
                         src={getResizedUrl(livestreamData.companyLogoUrl)}
                         alt={livestreamData.company}
                      />
