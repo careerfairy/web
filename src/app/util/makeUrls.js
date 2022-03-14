@@ -1,3 +1,6 @@
+import { getHost } from "../constants/domains";
+import { queryInvite, queryReferralCode } from "../constants/queryStringParams";
+
 const makeDuration = function (event) {
    const minutes = Math.floor(
       (+new Date(event.endsAt) - +new Date(event.startsAt)) / 60 / 1000
@@ -88,4 +91,22 @@ export const makeUrls = function (event) {
       yahoo: makeYahooCalendarUrl(event),
       ics: makeICSCalendarUrl(event),
    };
+};
+
+export const makeLivestreamEventDetailsUrl = (livestreamId) => {
+   return `${getHost()}/upcoming-livestream/${livestreamId}`;
+};
+
+export const makeLivestreamEventDetailsInviteUrl = (
+   livestreamId,
+   referralCode
+) => {
+   return (
+      makeLivestreamEventDetailsUrl(livestreamId) +
+      `?${queryReferralCode}=${referralCode}&${queryInvite}=${livestreamId}`
+   );
+};
+
+export const makeReferralUrl = (userReferralCode) => {
+   return `${getHost()}/?${queryReferralCode}=${userReferralCode}`;
 };

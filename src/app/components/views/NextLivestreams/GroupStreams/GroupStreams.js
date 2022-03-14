@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Grid, LinearProgress, Typography } from "@mui/material";
 import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 import LazyLoad from "react-lazyload";
 import Spinner from "./groupStreamCard/Spinner";
 import { useAuth } from "../../../../HOCs/AuthProvider";
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers";
+import ShareLivestreamModal from "../../common/ShareLivestreamModal";
 
 const gridItemHeight = 530;
 const styles = {
@@ -82,6 +83,13 @@ const GroupStreams = ({
          setGlobalCardHighlighted(false);
       }
    }, [groupData]);
+
+   const [shareEventDialog, setShareEventDialog] = useState(null);
+
+   const handleShareEventDialogClose = useCallback(() => {
+      setShareEventDialog(null);
+   }, [setShareEventDialog]);
+
    const renderStreamCards = slicedLivestreams?.map((livestream, index) => {
       if (livestream) {
          return (
@@ -109,6 +117,7 @@ const GroupStreams = ({
                      id={livestream.id}
                      key={livestream.id}
                      livestream={livestream}
+                     openShareDialog={setShareEventDialog}
                   />
                </Wrapper>
             </Grid>
@@ -147,6 +156,14 @@ const GroupStreams = ({
                   </Grid>
                )
             ) : null}
+            {shareEventDialog ? (
+               <ShareLivestreamModal
+                  livestreamData={shareEventDialog}
+                  handleClose={handleShareEventDialogClose}
+               />
+            ) : (
+               ""
+            )}
          </Grid>
       </Grid>
    );

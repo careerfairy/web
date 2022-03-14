@@ -1,7 +1,7 @@
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import React from "react";
 import { alpha, useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { grey } from "@mui/material/colors";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import PropTypes from "prop-types";
@@ -24,7 +24,7 @@ import {
 const useStyles = makeStyles((theme) => ({
    sendIcon: {
       background: "white",
-      color: ({ isEmpty }) => (isEmpty ? "grey" : theme.palette.primary.main),
+      color: ({ disabled }) => (disabled ? "grey" : theme.palette.primary.main),
       borderRadius: "50%",
       fontSize: 15,
    },
@@ -63,12 +63,12 @@ const useStyles = makeStyles((theme) => ({
 
 export const PlayIconButton = ({
    addNewComment,
-   isEmpty,
+   disabled,
    IconProps,
    IconButtonProps,
    ...props
 }) => {
-   const classes = useStyles({ isEmpty });
+   const classes = useStyles({ disabled });
 
    return (
       <div {...props}>
@@ -78,9 +78,10 @@ export const PlayIconButton = ({
                root: classes.sendBtn,
                disabled: classes.buttonDisabled,
             }}
-            disabled={isEmpty}
+            disabled={disabled}
             onClick={() => addNewComment()}
-            size="large">
+            size="large"
+         >
             <ChevronRightRoundedIcon
                {...IconProps}
                className={classes.sendIcon}

@@ -1,15 +1,15 @@
 import * as React from "react";
 import "styles.css";
-import FirebaseServiceContext from "context/firebase/FirebaseServiceContext";
+import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext";
 import config from "@stahl.luke/react-reveal/globals";
 import { newStore, wrapper } from "../store";
-
-import firebase from "../Firebase/Firebase";
+import NextNProgress from "nextjs-progressbar";
+import { brandedLightTheme } from "../materialUI";
 import Head from "next/head";
 import TagManager from "react-gtm-module";
 import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar";
 import ErrorContext from "../context/error/ErrorContext";
-import TutorialContext from "context/tutorials/TutorialContext";
+import TutorialContext from "../context/tutorials/TutorialContext";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import { AuthProvider } from "../HOCs/AuthProvider";
@@ -17,14 +17,19 @@ import { ReactReduxFirebaseProvider } from "react-redux-firebase";
 import { createFirestoreInstance } from "redux-firestore";
 import { Provider } from "react-redux";
 import { CacheProvider } from "@emotion/react";
-import createEmotionCache from "materialUI/createEmotionCache";
+import createEmotionCache from "../materialUI/createEmotionCache";
 import Notifier from "../components/views/notifier";
 import { getCookieConsentValue } from "react-cookie-consent";
-import CFCookieConsent from "components/views/common/cookie-consent/CFCookieConsent";
+import CFCookieConsent from "../components/views/common/cookie-consent/CFCookieConsent";
 import { useRouter } from "next/router";
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService";
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import firebaseApp from "../data/firebase/FirebaseInstance";
+
+import "../util/FirebaseUtils";
+import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams";
+import UserRewardsNotifications from "../HOCs/UserRewardsNotifications";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -40,7 +45,7 @@ const rrfConfig = {
 
 export const store = newStore();
 const rrfProps = {
-   firebase,
+   firebase: firebaseApp,
    config: rrfConfig,
    dispatch: store.dispatch,
    createFirestoreInstance,
@@ -114,14 +119,14 @@ function MyApp(props) {
       );
    }, [pathname]);
 
-   const getActiveTutorialStepKey = () => {
+   const getActiveTutorialStepKey = useCallback(() => {
       const activeStep = Object.keys(tutorialSteps).find((key) => {
          if (tutorialSteps[key]) {
             return key;
          }
       });
       return Number(activeStep);
-   };
+   }, [tutorialSteps]);
 
    const endTutorial = () => {
       setTutorialSteps((prevState) => ({
@@ -146,6 +151,8 @@ function MyApp(props) {
       return Boolean(activeStep === property);
    };
 
+   useStoreReferralQueryParams();
+
    return (
       <CacheProvider value={emotionCache}>
          <Head>
@@ -155,6 +162,10 @@ function MyApp(props) {
             />
             <title>CareerFairy | Watch live streams. Get hired.</title>
          </Head>
+         <NextNProgress
+            color={brandedLightTheme.palette.primary.main}
+            options={{ showSpinner: false }}
+         />
          <Provider store={store}>
             <ReactReduxFirebaseProvider {...rrfProps}>
                <TutorialContext.Provider
@@ -181,7 +192,9 @@ function MyApp(props) {
                                  {disableCookies || isRecordingWindow ? null : (
                                     <CFCookieConsent />
                                  )}
-                                 <Component {...pageProps} />
+                                 <UserRewardsNotifications>
+                                    <Component {...pageProps} />
+                                 </UserRewardsNotifications>
                                  <Notifier />
                                  <ErrorSnackBar
                                     handleClose={() => setGeneralError("")}

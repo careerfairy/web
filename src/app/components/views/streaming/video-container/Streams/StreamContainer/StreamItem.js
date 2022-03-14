@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useRef } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import SpeakerInfoOverlay from "../../SpeakerInfoOverlay";
 import { Tooltip } from "@mui/material";
 import VideoCamOffIcon from "@mui/icons-material/VideocamOff";
@@ -62,22 +62,31 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
-   const classes = useStyles({ big, streamId: stream.streamId });
+const StreamItem = ({
+   stream,
+   big,
+   speaker,
+   videoMutedBackgroundImg,
+   videoMuted,
+   audioMuted,
+}) => {
+   const classes = useStyles({ big, streamId: stream.uid });
+
    const vidDiv = useRef(null);
+
    return (
       <div className={classes.root}>
          <div
-            id={stream.streamId}
+            id={stream.uid}
             className={clsx(classes.videoElement, {
-               [classes.demoVideo]: stream.streamId === "demoStream",
+               [classes.demoVideo]: stream.uid === "demoStream",
             })}
             ref={vidDiv}
          />
          {speaker && (
             <SpeakerInfoOverlay speaker={speaker} zIndex={1} small={!big} />
          )}
-         {stream?.videoMuted && (
+         {videoMuted && (
             <div className={classes.mutedOverlay}>
                <div className={classes.mutedOverlayContent}>
                   <div>
@@ -99,7 +108,7 @@ const StreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
                </div>
             </div>
          )}
-         {stream?.audioMuted && (
+         {audioMuted && (
             <div className={classes.audioMuted}>
                <Tooltip title={"The streamer has muted his microphone"}>
                   <VolumeOffIcon

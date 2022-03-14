@@ -1,17 +1,7 @@
 import React, { Fragment, useEffect, useState } from "react";
 import ImageSelect from "../ImageSelect/ImageSelect";
-import {
-   FormControl,
-   Collapse,
-   Grid,
-   TextField,
-   FormHelperText,
-   Box,
-   Typography,
-   Button,
-} from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
-import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import { FormControl, Collapse, Grid, TextField, Button } from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
 const useStyles = makeStyles((theme) => ({
@@ -30,7 +20,6 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 const SpeakerForm = ({
-   options,
    firstNameError,
    lastNameError,
    positionError,
@@ -183,7 +172,6 @@ const SpeakerForm = ({
                handleBlur={handleBlur}
                isSubmitting={isSubmitting}
                loading={loading}
-               options={options}
                value={speaker.avatar}
                isAvatar
                firebase={firebase}

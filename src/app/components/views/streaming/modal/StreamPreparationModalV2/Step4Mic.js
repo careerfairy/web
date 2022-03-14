@@ -10,7 +10,7 @@ import {
    Select,
    Typography,
 } from "@mui/material";
-import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
+import SoundLevelDisplay from "../../../common/SoundLevelDisplay";
 import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
@@ -189,7 +189,7 @@ const Step4Mic = ({
                </b>
             </Typography>
             <div style={{ textAlign: "center", margin: "20px auto" }}>
-               <SoundLevelDisplayer audioLevel={audioLevel} />
+               <SoundLevelDisplay audioLevel={audioLevel} />
             </div>
             <div className={classes.buttons}>
                {allTested ? (

@@ -1,7 +1,19 @@
 import React from "react";
-import StreamerOverview from "../../../components/views/streaming";
-import StreamerLayout from "../../../layouts/StreamerLayout";
+import dynamic from "next/dynamic";
+import StreamingLoader from "components/views/loader/StreamingLoader";
 import { handleRedirectToNextGen } from "../../../util/serverSidePropsMethods";
+
+const StreamerOverview = dynamic(
+   () => import("../../../components/views/streaming"),
+   {
+      ssr: false,
+      loading: () => <StreamingLoader />,
+   }
+);
+const StreamerLayout = dynamic(
+   () => import("../../../layouts/StreamerLayout"),
+   { ssr: false }
+);
 
 const StreamerPage = () => {
    return (

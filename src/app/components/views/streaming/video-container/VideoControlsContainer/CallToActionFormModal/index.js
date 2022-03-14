@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import React, { memo, useCallback, useEffect, useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
 import {
    Box,
    Dialog,
@@ -12,12 +11,6 @@ import CallToActionForm from "./CallToActionForm";
 import CloseIcon from "@mui/icons-material/Close";
 import CallToActionTypeMenu from "./CallToActionTypeMenu";
 import { callToActionsDictionary } from "../../../../../util/constants/callToActions";
-
-const useStyles = makeStyles((theme) => ({
-   closeBtn: {
-      marginLeft: "auto",
-   },
-}));
 
 const { social } = callToActionsDictionary;
 
@@ -145,11 +138,11 @@ const CallToActionFormModal = memo(
                      </IconButton>
                   </Box>
                </Box>
+               <CallToActionTypeMenu
+                  initialValues={initialValues}
+                  handleSetCallToActionType={handleSetCallToActionType}
+               />
             </DialogTitle>
-            <CallToActionTypeMenu
-               initialValues={initialValues}
-               handleSetCallToActionType={handleSetCallToActionType}
-            />
             <CallToActionForm
                initialValues={initialValues}
                isTestStream={isTestStream}

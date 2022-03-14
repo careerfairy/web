@@ -73,9 +73,8 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
 
    const closeSnackbar = (...args) => dispatch(actions.closeSnackbar(...args));
 
-   const { setNewNotification, setNotificationToRemove } = useContext(
-      NotificationsContext
-   );
+   const { setNewNotification, setNotificationToRemove } =
+      useContext(NotificationsContext);
    const {
       tutorialSteps,
       setTutorialSteps,
@@ -86,6 +85,8 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
       handRaises,
       handlers,
       numberOfActiveHandRaisers,
+      hasRoom,
+      maxHandRaisers,
    } = useStreamActiveHandRaises();
    const [hasEntered, setHasEntered] = useState(false);
    const [hasExited, setHasExited] = useState(false);
@@ -110,7 +111,7 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
          .filter((handRaise) => FILTER_MAP[filterMapProperty](handRaise))
          .map((handRaise) => ({
             ...handRaise,
-            date: handRaise.timestamp.toDate(),
+            date: handRaise.timestamp?.toDate() || new Date(),
          }))
          .sort(dynamicSort("date", sortByNew));
       setFilteredHandRaises(newFilteredHandRaises);
@@ -217,6 +218,8 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
                               hasEntered={hasEntered}
                               updateHandRaiseRequest={handlers.updateRequest}
                               closeSnackbar={closeSnackbar}
+                              hasRoom={hasRoom}
+                              maxHandRaisers={maxHandRaisers}
                               setNewNotification={setNewNotification}
                               numberOfActiveHandRaisers={
                                  numberOfActiveHandRaisers
@@ -274,7 +277,7 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
                         }}
                         align="center"
                      >
-                        You can invite up to 8 hand raisers
+                        You can invite up to {maxHandRaisers} hand raisers
                      </Typography>
                      <WhiteTooltip
                         placement="right-end"

@@ -3,7 +3,7 @@ import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import VolumeOffIcon from "@mui/icons-material/MicOff";
 import SignalCellularConnectedNoInternet2BarIcon from "@mui/icons-material/SignalCellularConnectedNoInternet2Bar";
 import React, { useEffect, useRef, useContext } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import {
    TooltipButtonComponent,
    TooltipText,
@@ -49,22 +49,6 @@ const useStyles = makeStyles((theme) => ({
       left: "50%",
       transform: "translate(-50%, -50%)",
    },
-   videoWrapper: {
-      "& video": {
-         position: "absolute",
-         top: "50%",
-         left: "50%",
-         transform: "translate(-50%, -50%)",
-         maxHeight: "100%",
-         maxWidth: "100%",
-         // zIndex: 9900,
-         backgroundColor: "black",
-         // objectFit: "contain !important",
-         // [theme.breakpoints.down("xs")]: {
-         //     objectPosition: props => props.isScreenShareVideo ? "top" : "center",
-         // }
-      },
-   },
    svgShadow: {
       filter: `drop-shadow(0px 0px 2px rgba(0,0,0,0.4))`,
    },
@@ -79,36 +63,32 @@ const RemoteVideoContainer = ({
    speakerSource,
    stream,
 }) => {
-   const { playAllRemoteVideos, muteAllRemoteVideos } = useSelector((state) => state.stream.streaming);
-   const { getActiveTutorialStepKey, handleConfirmStep } = useContext(
-      TutorialContext
+   const { playAllRemoteVideos, muteAllRemoteVideos } = useSelector(
+      (state) => state.stream.streaming
    );
+   const { getActiveTutorialStepKey, handleConfirmStep } =
+      useContext(TutorialContext);
    const activeStep = getActiveTutorialStepKey();
    const videoElement = useRef({ current: {} });
 
-   const isScreenShareVideo = stream.streamId.includes("screen");
+   const isScreenShareVideo = stream.uid.includes("screen");
    const classes = useStyles({ isScreenShareVideo });
 
    useEffect(() => {
-      if (stream.streamId === "demoStream") {
+      if (stream.uid === "demoStream") {
          generateDemoHandRaiser();
       } else {
-         if (!stream.stream.isPlaying()) {
-            stream?.stream?.play(
-               stream.streamId,
-               { fit: isScreenShareVideo ? "contain" : "cover" },
-               (err) => {
-                  if (err) {
-                  }
-               }
-            );
+         if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
+            stream.videoTrack?.play(stream.uid, {
+               fit: isScreenShareVideo ? "contain" : "cover",
+            });
          }
       }
-   }, [stream.streamId]);
+   }, [stream.uid, stream.videoTrack]);
 
    useEffect(() => {
       if (!muteAllRemoteVideos) {
-         stream.stream?.play(stream.streamId, { muted: false });
+         stream?.audioTrack?.play();
       }
    }, [muteAllRemoteVideos]);
 
@@ -120,52 +100,36 @@ const RemoteVideoContainer = ({
 
    useEffect(() => {
       if (muteAllRemoteVideos) {
-         stream?.stream?.muteAudio();
+         stream?.stream?.audioTrack?.stop();
       } else {
-         stream?.stream?.unmuteAudio();
+         stream?.stream?.audioTrack?.play();
       }
    }, [muteAllRemoteVideos]);
 
    useEffect(() => {
       if (stream?.stream?.audio === false && stream?.stream?.video === false) {
-         setRemovedStream(stream.streamId);
+         setRemovedStream(stream.uid);
       }
    }, [stream?.stream?.audio, stream?.stream?.video]);
 
    function generateDemoHandRaiser() {
       let video = document.createElement("video");
-      const videoContainer = document.querySelector("#" + stream.streamId);
+      const videoContainer = document.querySelector("#" + stream.uid);
       videoContainer.appendChild(video);
       video.src = stream.url;
       video.loop = true;
       video.play();
    }
 
-   function playVideo() {
-      if (!stream.stream.isPlaying()) {
-         stream.stream.play(
-            stream.streamId,
-            {
-               fit: isScreenShareVideo ? "contain" : "cover",
-               muted: true,
-            },
-            (err) => {
-               if (err) {
-               }
-            }
-         );
-      }
-   }
-
    const speaker = !isScreenShareVideo
-      ? currentLivestream.liveSpeakers?.find(
-           (speaker) => speaker.speakerUuid === stream.streamId
+      ? currentLivestream.liveSpeakers.find(
+           (speaker) => speaker.speakerUuid === stream.uid
         )
       : null;
 
    return (
       <WhiteTooltip
-         placement="bottom"
+         placement="left"
          title={
             <React.Fragment>
                <TooltipTitle>Hand Raise (3/5)</TooltipTitle>
@@ -183,12 +147,12 @@ const RemoteVideoContainer = ({
                )}
             </React.Fragment>
          }
-         open={activeStep === 11 && stream.streamId === "demoStream"}
+         open={activeStep === 11 && stream.uid === "demoStream"}
       >
          <div className={classes.videoContainer} style={{ height: height }}>
             <div
                ref={videoElement}
-               id={stream.streamId}
+               id={stream.uid}
                className={classes.videoWrapper}
                style={{ width: "100%", height: "100%" }}
             />
@@ -199,12 +163,12 @@ const RemoteVideoContainer = ({
                   small={small}
                />
             )}
-            {stream.videoMuted && (
+            {!stream.videoTrack && (
                <div className={classes.mutedOverlay}>
                   <div className={classes.mutedOverlayContent}>
                      <div>
                         <img
-                           src={currentLivestream.companyLogoUrl}
+                           src={currentLivestream?.companyLogoUrl}
                            className={classes.companyIcon}
                         />
                      </div>
@@ -218,7 +182,7 @@ const RemoteVideoContainer = ({
                   </div>
                </div>
             )}
-            {stream.audioMuted && (
+            {!stream.audioTrack && (
                <div className={classes.audioMuted}>
                   <Tooltip title={"The streamer has muted his microphone"}>
                      <VolumeOffIcon
@@ -234,7 +198,7 @@ const RemoteVideoContainer = ({
                   <div className={classes.mutedOverlayContent}>
                      <div>
                         <img
-                           src={currentLivestream.companyLogoUrl}
+                           src={currentLivestream?.companyLogoUrl}
                            className={classes.companyIcon}
                         />
                      </div>
