@@ -10,8 +10,17 @@ import WidgetsWrapper from "../components/views/portal/WidgetsWrapper";
 
 const PortalPage = () => {
    return (
-      <GeneralLayout hideNavOnScroll fullScreen>
-         <Container>
+      <GeneralLayout backgroundColor={"#FFF"} hideNavOnScroll fullScreen>
+         <Container
+            disableGutters
+            sx={{
+               px: {
+                  xs: 0.5,
+                  sm: 1,
+                  md: 2,
+               },
+            }}
+         >
             <WidgetsWrapper>
                <HighlightsCarousel />
                <FeaturedAndNextEvents />

@@ -14,6 +14,7 @@ import RegistrationModal from "../common/registration-modal";
 import { useRouter } from "next/router";
 import { alpha } from "@mui/material/styles";
 import Link from "../common/Link";
+import EmptyMessageOverlay from "./events-prview/EmptyMessageOverlay";
 
 const styles = {
    root: {
@@ -104,34 +105,21 @@ const FeaturedAndNextEvents = () => {
                <Heading sx={styles.verticalHeading}>MY NEXT EVENTS</Heading>
                <Stack sx={styles.eventsStack} spacing={1}>
                   {noEvents && (
-                     <Box sx={styles.stackOverlay}>
-                        <Typography
-                           sx={styles.overlayText}
-                           align="center"
-                           variant="h5"
-                           component={"div"}
-                        >
-                           {isLoggedOut
+                     <EmptyMessageOverlay
+                        buttonLink={
+                           isLoggedOut
+                              ? `/signup?absolutePath=${asPath}`
+                              : "#upcoming-events"
+                        }
+                        buttonText={
+                           isLoggedOut ? "Register now!" : "Browse Events"
+                        }
+                        message={
+                           isLoggedOut
                               ? "Don't have an account?"
-                              : "You don't seem to have registered to any events..."}
-                           <br />
-                           <Button
-                              sx={{ mt: 2 }}
-                              component={Link}
-                              href={
-                                 isLoggedOut
-                                    ? `/signup?absolutePath=${asPath}`
-                                    : "#upcoming-events"
-                              }
-                              variant="contained"
-                              size="large"
-                           >
-                              {isLoggedOut
-                                 ? "Register and start your journey!"
-                                 : "Start Registering to events!"}
-                           </Button>
-                        </Typography>
-                     </Box>
+                              : "Time to register to your next event!\n"
+                        }
+                     />
                   )}
                   {nextEvents.length
                      ? nextEvents.map((nextEvent) => (
