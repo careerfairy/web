@@ -1,4 +1,5 @@
 const { DateTime } = require("luxon");
+const { customAlphabet } = require("nanoid");
 
 const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*");
@@ -355,6 +356,17 @@ const createNestedArrayOfTemplates = (arrayOfTemplates, chunkSize = 500) => {
    return nestedArrayOfTemplates;
 };
 
+const generateReferralCode = () => {
+   // 1 generation per second (3600 signups per hour) would need ~32 years to have
+   // a 1% chance of at least 1 collision https://zelark.github.io/nano-id-cc/
+   const nanoid = customAlphabet(
+      "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+      11
+   );
+
+   return nanoid();
+};
+
 module.exports = {
    setHeaders,
    generateEmailData,
@@ -371,4 +383,5 @@ module.exports = {
    getDateString,
    markStudentStatsInUse,
    createNestedArrayOfTemplates,
+   generateReferralCode,
 };

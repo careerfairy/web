@@ -1,8 +1,9 @@
 import React from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import UserResume from "./user-resume/UserResume";
 import PersonalInfo from "./personal-info/PersonalInfo";
 import { Box, Container } from "@mui/material";
+import UserInterests from "./personalise/UserInterests";
 
 const useStyles = makeStyles((theme) => ({
    paper: {
@@ -33,6 +34,11 @@ const UserData = ({ userData }) => {
          <Container component="main" maxWidth="md">
             <Box boxShadow={1} p={4} className={classes.box}>
                <UserResume userData={userData} />
+            </Box>
+         </Container>
+         <Container component="main" maxWidth="md">
+            <Box boxShadow={1} p={4} className={classes.box}>
+               <UserInterests userData={userData} />
             </Box>
          </Container>
       </>

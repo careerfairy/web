@@ -15,7 +15,7 @@ const securityHeaders = [
          "default-src blob: 'self' *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; " +
          "script-src blob: 'self' *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com; " +
          "style-src 'self' *.vitals.vercel-insights.com *.googleapis.com 'unsafe-inline'; " +
-         "connect-src vitals.vercel-insights.com *.careerfairy.io wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io;" +
+         "connect-src vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io;" +
          "img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com;",
    },
    {
@@ -99,12 +99,19 @@ const sentryWebpackPluginOptions = {
    // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
-/**
- * withSentryConfig() docs:
- *
- * Automatically call the code in sentry.server.config.js and sentry.client.config.js, at server start up and client
- * page load, respectively. Using withSentryConfig is the only way to guarantee that the SDK is initialized early
- * enough to catch all errors and start performance monitoring.
- * Generate and upload source maps to Sentry, so that your stacktraces contain original, demangled code.
- */
-module.exports = withSentryConfig(moduleExports, sentryWebpackPluginOptions);
+// Only use sentry if we're building the app from continuous integration (Vercel)
+// This allows us to build the app locally without having a SENTRY_AUTH_TOKEN variable
+// which is required for sentry to upload the sourcemaps files
+if (process.env.CI) {
+   /**
+    * withSentryConfig() docs:
+    *
+    * Automatically call the code in sentry.server.config.js and sentry.client.config.js, at server start up and client
+    * page load, respectively. Using withSentryConfig is the only way to guarantee that the SDK is initialized early
+    * enough to catch all errors and start performance monitoring.
+    * Generate and upload source maps to Sentry, so that your stacktraces contain original, demangled code.
+    */
+   module.exports = withSentryConfig(moduleExports, sentryWebpackPluginOptions);
+} else {
+   module.exports = moduleExports;
+}

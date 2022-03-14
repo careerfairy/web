@@ -19,6 +19,9 @@ import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions";
 import useNextGenRedirect from "../../components/custom-hook/useNextGenRedirect";
 import useStreamAdminPreferences from "../../components/custom-hook/useStreamAdminPreferences";
+import AgoraRTMProvider from "context/agoraRTM/AgoraRTMProvider";
+import AgoraRTC from "agora-rtc-sdk-ng";
+import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay";
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -79,6 +82,7 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamerLayout = (props) => {
    const { children, isBreakout, isMainStreamer } = props;
+   const [browserIsCompatible] = useState(AgoraRTC.checkSystemRequirements);
    const firebase = useFirebaseService();
    const {
       query: { token, livestreamId: baseStreamId, breakoutRoomId, auto },
@@ -92,6 +96,7 @@ const StreamerLayout = (props) => {
    const [notifications, setNotifications] = useState([]);
    const [streamerId, setStreamerId] = useState(null);
    const dispatch = useDispatch();
+
    const [streamerReady, setStreamerReady] = useState(false);
    const [tokenChecked, setTokenChecked] = useState(false);
    const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen);
@@ -218,6 +223,10 @@ const StreamerLayout = (props) => {
       }
    };
 
+   if (!browserIsCompatible) {
+      return <BrowserIncompatibleOverlay />;
+   }
+
    if (
       !isLoaded(currentLivestream) ||
       !tokenIsValidated() ||
@@ -237,59 +246,62 @@ const StreamerLayout = (props) => {
    }
 
    return (
-      <NotificationsContext.Provider
-         value={{ setNewNotification, setNotificationToRemove }}
-      >
-         <CurrentStreamContext.Provider
-            value={{
-               currentLivestream,
-               isBreakout,
-               isMainStreamer,
-               isStreamer: true,
-               streamerId,
-               streamAdminPreferences,
-            }}
+      <AgoraRTMProvider roomId={currentLivestream.id} userId={streamerId}>
+         <NotificationsContext.Provider
+            value={{ setNewNotification, setNotificationToRemove }}
          >
-            <div className={classes.root}>
-               <StreamerTopBar
-                  firebase={firebase}
-                  showAudience={showAudience}
-               />
-               <LeftMenu
-                  handleStateChange={handleStateChange}
-                  selectedState={selectedState}
-                  smallScreen={smallScreen}
-                  streamer={true}
-                  sliding={sliding}
-                  setSliding={setSliding}
-                  livestream={currentLivestream}
-               />
+            <CurrentStreamContext.Provider
+               value={{
+                  currentLivestream,
+                  isBreakout,
+                  isMainStreamer,
+                  isStreamer: true,
+                  streamerId,
+                  isMobile: undefined,
+                  streamAdminPreferences,
+               }}
+            >
+               <div className={classes.root}>
+                  <StreamerTopBar
+                     firebase={firebase}
+                     showAudience={showAudience}
+                  />
+                  <LeftMenu
+                     handleStateChange={handleStateChange}
+                     selectedState={selectedState}
+                     smallScreen={smallScreen}
+                     streamer={true}
+                     sliding={sliding}
+                     setSliding={setSliding}
+                     livestream={currentLivestream}
+                  />
 
-               <div className={classes.wrapper}>
-                  <div className={classes.contentContainer}>
-                     <div className={classes.content}>
-                        {React.cloneElement(children, {
-                           ...props,
-                           newNotification,
-                           isMainStreamer,
-                           isStreamer: true,
-                           hideAudience,
-                           audienceDrawerOpen,
-                           setSliding,
-                           smallScreen,
-                           selectedState,
-                           handleStateChange,
-                           showAudience,
-                           showMenu,
-                           notifications,
-                           streamerId,
-                        })}
+                  <div className={classes.wrapper}>
+                     <div className={classes.contentContainer}>
+                        <div className={classes.content}>
+                           {React.cloneElement(children, {
+                              ...props,
+                              newNotification,
+                              isMainStreamer,
+                              isStreamer: true,
+                              hideAudience,
+                              audienceDrawerOpen,
+                              setSliding,
+                              smallScreen,
+                              selectedState,
+                              handleStateChange,
+                              showAudience,
+                              showMenu,
+                              notifications,
+                              streamerId,
+                           })}
+                        </div>
                      </div>
                   </div>
                </div>
-            </div>
-         </CurrentStreamContext.Provider>
-      </NotificationsContext.Provider>
+            </CurrentStreamContext.Provider>
+         </NotificationsContext.Provider>
+      </AgoraRTMProvider>
    );
 };
 

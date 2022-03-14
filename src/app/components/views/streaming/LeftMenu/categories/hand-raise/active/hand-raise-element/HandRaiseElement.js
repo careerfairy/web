@@ -18,7 +18,7 @@ import {
    WhiteTooltip,
 } from "materialUI/GlobalTooltips";
 import { alpha, useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { getTimeFromNow } from "../../../../../../../helperFunctions/HelperFunctions";
 import clsx from "clsx";
 
@@ -83,7 +83,6 @@ const HandRaiseListItem = ({
    timestamp,
 }) => {
    const classes = useStyles({ backgroundColor });
-
    return (
       <React.Fragment>
          <ListItem color="blue" className={classes.root}>
@@ -119,19 +118,22 @@ const HandRaiseListItem = ({
                   <Grid item>
                      <Tooltip
                         title={
-                           (primaryButtonDisabled && primaryDisabledMessage) ||
-                           ""
+                           primaryButtonDisabled && primaryDisabledMessage
+                              ? primaryDisabledMessage
+                              : ""
                         }
                      >
-                        <Button
-                           size="small"
-                           onClick={primaryOnClick}
-                           color="primary"
-                           disabled={primaryButtonDisabled}
-                           variant="outlined"
-                        >
-                           {primaryButtonText}
-                        </Button>
+                        <span>
+                           <Button
+                              size="small"
+                              onClick={primaryOnClick}
+                              color="primary"
+                              disabled={primaryButtonDisabled}
+                              variant="outlined"
+                           >
+                              {primaryButtonText}
+                           </Button>
+                        </span>
                      </Tooltip>
                   </Grid>
                )}
@@ -169,14 +171,13 @@ HandRaiseListItem.propTypes = {
    timestamp: PropTypes.object,
 };
 const getId = ({ request: { id, timestamp } }) => {
-   return `${id}-${timestamp.seconds}`;
+   return `${id}-${timestamp?.seconds || "new"}`;
 };
 
 function RequestedHandRaiseElement(props) {
    const [notificationId] = useState(getId(props));
-   const { getActiveTutorialStepKey, handleConfirmStep, isOpen } = useContext(
-      TutorialContext
-   );
+   const { getActiveTutorialStepKey, handleConfirmStep, isOpen } =
+      useContext(TutorialContext);
    const activeStep = getActiveTutorialStepKey();
 
    function updateHandRaiseRequest(state) {
@@ -220,14 +221,12 @@ function RequestedHandRaiseElement(props) {
                }
             }}
             primaryButtonText={"Invite to speak"}
-            primaryButtonDisabled={props.numberOfActiveHandRaisers > 7}
+            primaryButtonDisabled={!props.hasRoom}
             title={"HAND RAISED"}
             secondaryOnClick={() => updateHandRaiseRequest("denied")}
             secondaryButtonText={"Deny"}
             secondaryButtonDisabled={isOpen(10)}
-            primaryDisabledMessage={
-               "You cannot invite more than 8 people simultaneously in hand raise"
-            }
+            primaryDisabledMessage={`You cannot invite more than ${props.maxHandRaisers} people simultaneously in hand raise`}
             subtitle={props.request.name}
          />
       </WhiteTooltip>
@@ -271,9 +270,8 @@ function ConnectingHandRaiseElement(props) {
 
 function ConnectedHandRaiseElement(props) {
    const [notificationId] = useState(getId(props));
-   const { getActiveTutorialStepKey, handleConfirmStep, isOpen } = useContext(
-      TutorialContext
-   );
+   const { getActiveTutorialStepKey, handleConfirmStep, isOpen } =
+      useContext(TutorialContext);
 
    const activeStep = getActiveTutorialStepKey();
 

@@ -161,7 +161,9 @@ const QuestionContainer = memo(
       const [showAllReactions, setShowAllReactions] = useState(false);
       const { authenticatedUser, userData } = useAuth();
       const { tutorialSteps, handleConfirmStep } = useContext(TutorialContext);
-      const [loading, setLoading] = useState(false);
+      const [loadingQuestions, setLoadingQuestions] = useState(false);
+      const [disableComments, setDisableComments] = useState(false);
+
       const isEmpty =
          !newCommentTitle.trim() ||
          (!userData && !(livestream?.test || livestream.openStream));
@@ -180,7 +182,7 @@ const QuestionContainer = memo(
 
       useEffect(() => {
          if (livestream.id && question.id && showAllReactions) {
-            setLoading(true);
+            setLoadingQuestions(true);
             const unsubscribe = firebase.listenToQuestionComments(
                streamRef,
                question.id,
@@ -191,7 +193,7 @@ const QuestionContainer = memo(
                         ...doc.data(),
                      }))
                   );
-                  setLoading(false);
+                  setLoadingQuestions(false);
                }
             );
             return () => unsubscribe();
@@ -223,6 +225,7 @@ const QuestionContainer = memo(
                return;
             }
 
+            setDisableComments(true);
             const newComment = streamer
                ? {
                     title: newCommentTitle,
@@ -250,9 +253,11 @@ const QuestionContainer = memo(
             }
 
             setNewCommentTitle("");
+            setDisableComments(false);
             makeGloballyActive();
          } catch (error) {
-            console.log("Error: " + error);
+            console.error(error);
+            setDisableComments(false);
          }
       }
 
@@ -383,7 +388,7 @@ const QuestionContainer = memo(
                      style={{ width: "100%" }}
                      in={
                         showAllReactions &&
-                        !loading &&
+                        !loadingQuestions &&
                         question.id === openQuestionId
                      }
                   >
@@ -394,7 +399,7 @@ const QuestionContainer = memo(
                         handleToggle={handleToggle}
                         active={active}
                         showAllReactions={showAllReactions}
-                        loading={loading}
+                        loading={loadingQuestions}
                      />
                   )}
                </div>
@@ -422,6 +427,7 @@ const QuestionContainer = memo(
                         className={classes.chatInput}
                         onKeyPress={addNewCommentOnEnter}
                         placeholder="Send a reaction..."
+                        disabled={disableComments}
                         fullWidth
                         size="small"
                         variant="outlined"
@@ -429,7 +435,7 @@ const QuestionContainer = memo(
                            maxLength: 340,
                            endAdornment: (
                               <PlayIconButton
-                                 isEmpty={isEmpty}
+                                 disabled={isEmpty || disableComments}
                                  addNewComment={() => {
                                     addNewComment();
                                     isOpen(2) && handleConfirmStep(2);
