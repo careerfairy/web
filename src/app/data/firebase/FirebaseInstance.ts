@@ -33,15 +33,15 @@ export const createFirebaseInstance = (
 
    app.firestore().settings(getFirestoreSettings(firestoreSettings));
 
-   // we'll want to use the emulators at some point
-   // if (
-   //    process.env.NODE_ENV === "development" &&
-   //    process.env.FIREBASE_EMULATORS
-   // ) {
-   //    app.auth().useEmulator("http://localhost:9099");
-   //    app.firestore().useEmulator("localhost", 8080);
-   //    app.functions().useEmulator("localhost", 5001);
-   // }
+   if (
+      process.env.NODE_ENV === "development" &&
+      process.env.NEXT_PUBLIC_FIREBASE_EMULATORS
+   ) {
+      app.auth().useEmulator("http://localhost:9099");
+      app.firestore().useEmulator("localhost", 8080);
+      app.functions().useEmulator("localhost", 5001);
+      console.log("You're connected to the emulators!");
+   }
 
    return app;
 };
@@ -49,7 +49,7 @@ export const createFirebaseInstance = (
 const getFirestoreSettings = (
    firestoreSettings?: firebase.firestore.Settings
 ) => {
-   const firestoreDefaultSettings = {};
+   const firestoreDefaultSettings = { merge: true };
 
    // The user doesn't seem to have Firestore connectivity, let's enable the long polling mode
    // This mode is set on FirebaseUtils.js

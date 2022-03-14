@@ -6,14 +6,13 @@ import { URL_REGEX } from "components/util/constants";
 import { useFormik } from "formik";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
-import makeStyles from '@mui/styles/makeStyles';
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useStreamRef from "components/custom-hook/useStreamRef";
-import TutorialContext from "../../../../../../context/tutorials/TutorialContext";
-import { StyledTooltipWithButton } from "../../../../../../materialUI/GlobalTooltips";
+import TutorialContext from "context/tutorials/TutorialContext";
+import { StyledTooltipWithButton } from "materialUI/GlobalTooltips";
 
 import { jobDescription } from "./exampleFormData";
-import useSliderFullyOpened from "../../../../../custom-hook/useSliderFullyOpened";
+import useSliderFullyOpened from "components/custom-hook/useSliderFullyOpened";
 import JobPostingCtaForm from "./CallToActionForms/JobPostingCtaForm";
 import SocialCtaForm from "./CallToActionForms/SocialCtaForm";
 import CustomMessageCtaForm from "./CallToActionForms/CustomMessageCtaForm";
@@ -61,12 +60,6 @@ const validationSchema = (type) =>
       }),
    });
 
-const useStyles = makeStyles((theme) => ({
-   dialogContent: {
-      overflowY: "hidden",
-   },
-}));
-
 const CallToActionForm = memo(
    ({
       handleClose,
@@ -82,7 +75,6 @@ const CallToActionForm = memo(
       const isActiveTutorialStep = isOpen(20, isTestStream);
 
       const streamRef = useStreamRef();
-      const classes = useStyles();
       const dispatch = useDispatch();
       const {
          createCallToAction,
@@ -233,60 +225,62 @@ const CallToActionForm = memo(
 
       return (
          <React.Fragment>
-            <StyledTooltipWithButton
-               open={isActiveTutorialStep && fullyOpened}
-               tooltipTitle="Share Job Posts (4/8)"
-               buttonDisabled={formik.isSubmitting}
-               placement="top"
-               buttonText="Send Job Posting!"
-               onConfirm={handleSubmitTutorialJobPosting}
-               tooltipText="Here, we have pre-filled an imaginary job posting for your audience. Go ahead and send this job posting so that your audience can engage with it."
-            >
-               <DialogContent className={classes.dialogContent}>
-                  {isSocial && <SocialCtaForm formik={formik} />}
-                  {isJobPosting && (
-                     <JobPostingCtaForm
-                        formik={formik}
-                        maxMessageLength={MAX_MESSAGE_LENGTH}
-                        onEntered={onEntered}
-                        onExited={onExited}
-                     />
-                  )}
-                  {isCustom && (
-                     <CustomMessageCtaForm
-                        formik={formik}
-                        onEntered={onEntered}
-                        onExited={onExited}
-                        maxButtonTextLength={MAX_BUTTON_TEXT_LENGTH}
-                        maxMessageLength={MAX_MESSAGE_LENGTH}
-                     />
-                  )}
-               </DialogContent>
-               <DialogActions>
-                  <Button
-                     disabled={formik.isSubmitting || isActiveTutorialStep}
-                     onClick={async () => {
-                        await formik.setFieldValue("isToBeSaved", true);
-                        await formik.handleSubmit();
-                     }}
-                     variant="outlined"
-                     color="secondary"
-                  >
-                     {initialValues.id ? "Update" : "Save"}
-                  </Button>
-                  <Button
-                     disabled={formik.isSubmitting}
-                     onClick={async () => {
-                        await formik.setFieldValue("isToBeSaved", false);
-                        await formik.handleSubmit();
-                     }}
-                     variant="contained"
-                     color="primary"
-                  >
-                     Send now
-                  </Button>
-               </DialogActions>
-            </StyledTooltipWithButton>
+            <DialogContent>
+               <StyledTooltipWithButton
+                  open={isActiveTutorialStep && fullyOpened}
+                  tooltipTitle="Share Job Posts (4/8)"
+                  buttonDisabled={formik.isSubmitting}
+                  placement="top"
+                  buttonText="Send Job Posting!"
+                  onConfirm={handleSubmitTutorialJobPosting}
+                  tooltipText="Here, we have pre-filled an imaginary job posting for your audience. Go ahead and send this job posting so that your audience can engage with it."
+               >
+                  <span>
+                     {isSocial && <SocialCtaForm formik={formik} />}
+                     {isJobPosting && (
+                        <JobPostingCtaForm
+                           formik={formik}
+                           maxMessageLength={MAX_MESSAGE_LENGTH}
+                           onEntered={onEntered}
+                           onExited={onExited}
+                        />
+                     )}
+                     {isCustom && (
+                        <CustomMessageCtaForm
+                           formik={formik}
+                           onEntered={onEntered}
+                           onExited={onExited}
+                           maxButtonTextLength={MAX_BUTTON_TEXT_LENGTH}
+                           maxMessageLength={MAX_MESSAGE_LENGTH}
+                        />
+                     )}
+                  </span>
+               </StyledTooltipWithButton>
+            </DialogContent>
+            <DialogActions>
+               <Button
+                  disabled={formik.isSubmitting || isActiveTutorialStep}
+                  onClick={async () => {
+                     await formik.setFieldValue("isToBeSaved", true);
+                     await formik.handleSubmit();
+                  }}
+                  variant="outlined"
+                  color="secondary"
+               >
+                  {initialValues.id ? "Update" : "Save"}
+               </Button>
+               <Button
+                  disabled={formik.isSubmitting}
+                  onClick={async () => {
+                     await formik.setFieldValue("isToBeSaved", false);
+                     await formik.handleSubmit();
+                  }}
+                  variant="contained"
+                  color="primary"
+               >
+                  Send now
+               </Button>
+            </DialogActions>
          </React.Fragment>
       );
    }

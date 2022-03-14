@@ -14,8 +14,10 @@ import {
    Button,
 } from "@mui/material";
 import { GlassDialog } from "../../../../materialUI/GlobalModals";
+import useStreamActiveHandRaises from "../../../custom-hook/useStreamActiveHandRaises";
 
 function SpeakerManagementModal({ open, setOpen, joiningStreamerLink }) {
+   const { maxHandRaisers } = useStreamActiveHandRaises();
    return (
       <GlassDialog
          TransitionComponent={Slide}
@@ -41,11 +43,11 @@ function SpeakerManagementModal({ open, setOpen, joiningStreamerLink }) {
          </DialogTitle>
          <MuiDialogContent dividers>
             <DialogContentText>
-               You can invite up to 6 speakers to join your stream. You should
-               do this before starting your stream, to ensure that all streamer
-               have joined before the event starts. When an invited speaker has
-               successfully joined, you will be able to see and hear him/her in
-               the stream overview.
+               You can invite up to {maxHandRaisers} speakers to join your
+               stream. You should do this before starting your stream, to ensure
+               that all streamer have joined before the event starts. When an
+               invited speaker has successfully joined, you will be able to see
+               and hear him/her in the stream overview.
             </DialogContentText>
             <TextField
                variant="outlined"

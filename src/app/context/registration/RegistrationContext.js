@@ -110,9 +110,6 @@ export function RegistrationContextProvider({
       sendRegistrationConfirmationEmail,
       livestreamQuestionsQuery,
    } = useFirebaseService();
-   const {
-      query: { referrerId },
-   } = useRouter();
    const { authenticatedUser, userData } = useAuth();
    const [sliding, setSliding] = useState(false);
    const [gettingPolicyStatus, setGettingPolicyStatus] = useState(false);
@@ -233,8 +230,7 @@ export function RegistrationContextProvider({
             await registerToLivestream(
                livestream.id,
                authenticatedUser,
-               groupsWithPolicies,
-               referrerId
+               groupsWithPolicies
             );
          }
          handleSendConfirmEmail();

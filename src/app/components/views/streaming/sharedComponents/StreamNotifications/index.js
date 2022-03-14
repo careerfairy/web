@@ -51,23 +51,24 @@ const StreamNotifications = ({ isStreamer, firebase }) => {
 
    useEffect(() => {
       if (currentLivestream?.id && isStreamer) {
-         const unsubscribeRatings = firebase.listenToLivestreamRatingsWithStreamRef(
-            streamRef,
-            async (querySnapshot) => {
-               setFeedbackQuestions((prevState) => {
-                  return querySnapshot.docs.map((doc) => {
-                     const oldQuestion = prevState.find(
-                        (ratingObj) => ratingObj.id === doc.id
-                     );
-                     return {
-                        id: doc.id,
-                        ...doc.data(),
-                        hasBeenAsked: Boolean(oldQuestion?.hasBeenAsked),
-                     };
+         const unsubscribeRatings =
+            firebase.listenToLivestreamRatingsWithStreamRef(
+               streamRef,
+               async (querySnapshot) => {
+                  setFeedbackQuestions((prevState) => {
+                     return querySnapshot.docs.map((doc) => {
+                        const oldQuestion = prevState.find(
+                           (ratingObj) => ratingObj.id === doc.id
+                        );
+                        return {
+                           id: doc.id,
+                           ...doc.data(),
+                           hasBeenAsked: Boolean(oldQuestion?.hasBeenAsked),
+                        };
+                     });
                   });
-               });
-            }
-         );
+               }
+            );
          return () => unsubscribeRatings();
       }
    }, [currentLivestream?.id, isStreamer]);

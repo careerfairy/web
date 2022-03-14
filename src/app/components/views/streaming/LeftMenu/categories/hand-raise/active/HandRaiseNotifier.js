@@ -1,11 +1,11 @@
 import React, { memo, useContext, useEffect, useState } from "react";
-import useStreamActiveHandRaises from "../../../../../../custom-hook/useStreamActiveHandRaises";
+import useStreamActiveHandRaises from "components/custom-hook/useStreamActiveHandRaises";
 import { useDispatch } from "react-redux";
 import * as actions from "store/actions";
-import NotificationsContext from "../../../../../../../context/notifications/NotificationsContext";
+import NotificationsContext from "context/notifications/NotificationsContext";
 
 const getId = ({ request: { id, timestamp } }) => {
-   return `${id}-${timestamp.seconds}`;
+   return `${id}-${timestamp?.seconds || "new"}`;
 };
 
 function RequestedHandRaiseElement(props) {
@@ -78,17 +78,13 @@ function ConnectedHandRaiseElement(props) {
 }
 
 const HandRaiseNotifier = memo(({ handRaiseMenuOpen }) => {
-   const {
-      handRaises,
-      handlers,
-      numberOfActiveHandRaisers,
-   } = useStreamActiveHandRaises();
+   const { handRaises, handlers, numberOfActiveHandRaisers } =
+      useStreamActiveHandRaises();
 
    const dispatch = useDispatch();
    const { setNewNotification } = useContext(NotificationsContext);
 
    const closeSnackbar = (...args) => dispatch(actions.closeSnackbar(...args));
-
 
    // useEffect(() => {
    //

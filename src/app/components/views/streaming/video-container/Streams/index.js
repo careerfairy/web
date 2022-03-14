@@ -31,9 +31,7 @@ const Streams = memo(
       sharingPdf,
       showMenu,
       livestreamId,
-      setRemovedStream,
       presenter,
-      openStream,
       videoMutedBackgroundImg,
       handRaiseActive,
       mobile,
@@ -55,7 +53,11 @@ const Streams = memo(
          const allStreams = [...externalMediaStreams];
          const newHasManySpeakers = Boolean(allStreams?.length > 4);
          setHasManySpeakers(newHasManySpeakers);
-         if (localMediaStream && isBroadCasting) {
+         if (
+            localMediaStream &&
+            localMediaStream.isAudioPublished &&
+            isBroadCasting
+         ) {
             allStreams.unshift(localMediaStream);
          }
          if (!hasManySpeakers && sharingPdf) {
@@ -87,10 +89,10 @@ const Streams = memo(
          let localStream;
 
          for (const stream of allStreams) {
-            if (stream.streamId.includes("screen")) {
+            if (stream.uid.includes("screen")) {
                screenShareStream = stream;
             }
-            if (stream.streamId === currentSpeakerId) {
+            if (stream.uid === currentSpeakerId) {
                currentSpeakerStream = stream;
             }
 
@@ -112,17 +114,14 @@ const Streams = memo(
       };
 
       const handleGetSmallStream = (allStreams, largeStream) => {
-         return allStreams.filter(
-            (stream) => stream.streamId !== largeStream.streamId
-         );
+         return allStreams.filter((stream) => stream.uid !== largeStream.uid);
       };
-
       return (
          <div className={classes.root}>
             {!bannersBottom && (
                <Banners
                   presenter={presenter}
-                  handRaiseActive={handRaiseActive && !openStream}
+                  handRaiseActive={handRaiseActive}
                   mobile={mobile}
                />
             )}
@@ -134,7 +133,6 @@ const Streams = memo(
                   hasManySpeakers={hasManySpeakers}
                   sharingScreen={sharingScreen}
                   videoMutedBackgroundImg={videoMutedBackgroundImg}
-                  setRemovedStream={setRemovedStream}
                   currentSpeakerId={currentSpeakerId}
                   showMenu={showMenu}
                   livestreamId={livestreamId}
@@ -146,7 +144,7 @@ const Streams = memo(
                <Banners
                   isBottom
                   presenter={presenter}
-                  handRaiseActive={handRaiseActive && !openStream}
+                  handRaiseActive={handRaiseActive}
                   mobile={mobile}
                />
             )}

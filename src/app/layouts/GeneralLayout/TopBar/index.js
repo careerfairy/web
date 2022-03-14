@@ -6,7 +6,7 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import Link from "materialUI/NextNavLink";
 import { MainLogo } from "components/logos";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import useGeneralLinks from "components/custom-hook/useGeneralLinks";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -14,6 +14,7 @@ import { useAuth } from "../../../HOCs/AuthProvider";
 import LoginButton from "../../../components/views/common/LoginButton";
 import useGeneralHeader from "../../../components/custom-hook/useGeneralHeader";
 import NavLinks from "../../../components/views/header/NavLinks";
+import MissingDataButton from "../../../components/views/missingData/MissingDataButton";
 
 const useStyles = makeStyles((theme) => ({
    navIconButton: {
@@ -41,7 +42,8 @@ const TopBar = () => {
                style={{ marginRight: "1rem" }}
                color="primary"
                onClick={handleDrawerOpen}
-               size="large">
+               size="large"
+            >
                <MenuIcon />
             </IconButton>
             <MainLogo />
@@ -52,8 +54,10 @@ const TopBar = () => {
                navLinksActiveColor={theme.palette.primary.main}
             />
          </Hidden>
-         <Box display="flex" alignItems="center">
+         s
+         <Box sx={{ display: "flex", alignItems: "center" }}>
             <Hidden lgDown>
+               <MissingDataButton />
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <div>
                      <LoginButton />
@@ -65,7 +69,8 @@ const TopBar = () => {
                      className={classes.navIconButton}
                      color="primary"
                      href="/profile"
-                     size="large">
+                     size="large"
+                  >
                      <AccountCircleOutlinedIcon />
                   </IconButton>
                )}

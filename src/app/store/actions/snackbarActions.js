@@ -48,32 +48,31 @@ export const removeSnackbar = (key) => ({
    key,
 });
 
-export const sendGeneralError =
-   (error = "") =>
-   async (dispatch) => {
-      console.error("error", error);
-      Sentry.captureException(error);
-      let message = GENERAL_ERROR;
-      if (process.env.NODE_ENV === "development") {
-         const devInfo =
-            "This type of error only appears in development, it will just show a general error in production.";
-         if (typeof error === "string") {
-            message = `${error} - ${devInfo}`;
-         }
-         if (typeof error?.message === "string") {
-            message = `${error.message} - ${devInfo}`;
-         }
+export const sendGeneralError = (errorInstance) => async (dispatch) => {
+   const error = errorInstance || "";
+   console.error("error", error);
+   Sentry.captureException(error);
+   let message = GENERAL_ERROR;
+   if (process.env.NODE_ENV === "development") {
+      const devInfo =
+         "This type of error only appears in development, it will just show a general error in production.";
+      if (typeof error === "string") {
+         message = `${error} - ${devInfo}`;
       }
-      dispatch(
-         enqueueSnackbar({
-            message: message,
-            options: {
-               variant: "error",
-               preventDuplicate: true,
-            },
-         })
-      );
-   };
+      if (typeof error?.message === "string") {
+         message = `${error.message} - ${devInfo}`;
+      }
+   }
+   dispatch(
+      enqueueSnackbar({
+         message: message,
+         options: {
+            variant: "error",
+            preventDuplicate: true,
+         },
+      })
+   );
+};
 
 export const sendSuccessMessage =
    (message = "Success") =>
