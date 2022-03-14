@@ -228,10 +228,8 @@ const UpcomingLivestreamCard = ({
    }, [isLandscapeOnMobile]);
    const handleMouseLeave = debounce(() => setHovered(false), throttle_speed);
 
-   const {
-      getFollowingGroupsWithCache,
-      deregisterFromLivestream,
-   } = useFirebaseService();
+   const { getFollowingGroupsWithCache, deregisterFromLivestream } =
+      useFirebaseService();
 
    useEffect(() => {
       (async function () {
@@ -367,7 +365,7 @@ const UpcomingLivestreamCard = ({
 
          return await deregisterFromLivestream(
             livestream?.id,
-            authenticatedUser.email
+            authenticatedUser
          );
       } catch (e) {}
    };

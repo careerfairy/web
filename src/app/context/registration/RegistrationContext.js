@@ -229,7 +229,7 @@ export function RegistrationContextProvider({
          if (livestream) {
             await registerToLivestream(
                livestream.id,
-               userData,
+               authenticatedUser,
                groupsWithPolicies
             );
          }
