@@ -34,8 +34,6 @@ import { Interest } from "../../../../types/interests";
 
 const logosWrapperSpacing = 12;
 const styles = {
-   root: {},
-
    hideOnHoverContent: {
       position: "absolute",
       inset: 0,
@@ -69,7 +67,6 @@ const styles = {
       height: "auto",
    },
    mainContentHoverStyles: {
-      // "&:hover": {
       "&:hover, &:focus-within": {
          "& .hideOnHoverContent": {
             opacity: 0,
@@ -105,10 +102,10 @@ const styles = {
    mainAndLowerContentWrapper: {
       backgroundColor: (theme: Theme) => theme.palette.background.paper,
       borderRadius: (theme) => theme.spacing(0.2, 0.2, 1, 1),
-      boxShadow: 2,
       overflow: "hidden",
    },
    mainContentWrapper: {
+      boxShadow: 3,
       position: "relative",
       height: (theme) => theme.spacing(32),
       display: "flex",
@@ -172,14 +169,50 @@ const styles = {
       flex: 0.5,
       borderRadius: 1,
    },
-   logosWrapper: {
-      p: 1,
+   bottomContentWrapper: {
+      py: 1,
       display: "flex",
       justifyContent: "space-between",
+      flexDirection: "row",
       height: (theme) => theme.spacing(logosWrapperSpacing),
    },
+   bottomLogoWrapper: {
+      display: "grid",
+      placeItems: "center",
+      flex: 0.2,
+   },
+   bottomLogoAvatar: {
+      p: 1,
+      height: "-webkit-fill-available",
+      width: "-webkit-fill-available",
+      borderRadius: 2,
+      background: "white",
+      "& img": {
+         maxHeight: 45,
+         maxWidth: 140,
+      },
+   },
    interestsWrapper: {
-      flex: 0.7,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      flex: 0.8,
+   },
+   eventsInterest: {
+      display: "flex",
+      flexWrap: "wrap",
+      alignItems: "center",
+      "& .MuiChip-root": {
+         margin: 0.5,
+         // borderColor: "black",
+         color: "black",
+         // boxShadow: 2,
+         // borderRadius: (theme) => theme.spacing(0.7),
+      },
+   },
+   interestChip: {
+      fontWeight: 500,
+      fontSize: "1rem",
    },
    hostsInnerWrapper: {
       display: "flex",
@@ -248,6 +281,9 @@ const EventPreviewCard = ({
    useEffect(() => {
       if (!loading && interests) {
          setSetEventInterests([
+            ...interests.filter((interest) =>
+               event?.interestsIds?.includes(interest.id)
+            ),
             ...interests.filter((interest) =>
                event?.interestsIds?.includes(interest.id)
             ),
@@ -342,7 +378,7 @@ const EventPreviewCard = ({
 
    return (
       <>
-         <Box sx={styles.root}>
+         <Box>
             <DateAndShareDisplay
                startDate={getStartDate()}
                loading={loading}
@@ -437,6 +473,7 @@ const EventPreviewCard = ({
                                                    "lg"
                                                 )}
                                                 layout="fill"
+                                                quality={100}
                                                 objectFit="contain"
                                              />
                                           </Box>
@@ -475,16 +512,10 @@ const EventPreviewCard = ({
                            className="chipsWrapper"
                         >
                            {loading ? (
-                              <>
-                                 <Skeleton
-                                    animation={animation}
-                                    sx={styles.chipLoader}
-                                 />
-                                 <Skeleton
-                                    animation={animation}
-                                    sx={styles.chipLoader}
-                                 />
-                              </>
+                              <Skeleton
+                                 animation={animation}
+                                 sx={styles.chipLoader}
+                              />
                            ) : (
                               <>
                                  {event?.language?.code && (
@@ -552,67 +583,84 @@ const EventPreviewCard = ({
                   </Stack>
                </Box>
                {!light && (
-                  <Stack spacing={2} direction={"row"} sx={styles.logosWrapper}>
-                     <CardMedia
-                        sx={{
-                           p: 1,
-                           display: "grid",
-                           placeItems: "center",
-                           flex: 0.3,
-                        }}
-                        title={event?.company}
-                     >
-                        {loading ? (
-                           <Skeleton
-                              animation={animation ?? "wave"}
-                              variant="rectangular"
-                              sx={{ borderRadius: 2 }}
-                              width={180}
-                              height={60}
-                           />
-                        ) : (
-                           <div
-                              style={{
-                                 position: "relative",
-                                 width: "100%",
-                                 height: "100%",
-                              }}
-                           >
-                              <Image
-                                 src={getResizedUrl(
-                                    event?.companyLogoUrl,
-                                    "lg"
-                                 )}
-                                 layout="fill"
-                                 objectFit="contain"
+                  <Box sx={styles.bottomContentWrapper}>
+                     <Box sx={styles.bottomLogoWrapper}>
+                        <CardMedia
+                           sx={styles.bottomLogoAvatar}
+                           title={event?.company}
+                        >
+                           {loading ? (
+                              <Skeleton
+                                 animation={animation ?? "wave"}
+                                 variant="rectangular"
+                                 sx={{ borderRadius: 2 }}
+                                 width={100}
+                                 height={"100%"}
                               />
-                           </div>
-                        )}
-                     </CardMedia>
-                     <Stack
-                        spacing={1}
-                        flexWrap={"wrap"}
-                        direction={"row"}
-                        alignItems={"center"}
-                        sx={styles.interestsWrapper}
-                     >
-                        {eventInterests.slice(0, 2).map((interest) => (
-                           <Chip
-                              key={interest.id}
-                              variant="outlined"
-                              size="small"
-                              label={interest.name}
-                           />
-                        ))}
-                        {eventInterests.length > 4 && (
-                           <Chip
-                              size="small"
-                              variant="outlined"
-                              label={`+ ${eventInterests.length - 3} more`}
-                           />
-                        )}
-                     </Stack>
-                  </Stack>
+                           ) : (
+                              <div
+                                 style={{
+                                    position: "relative",
+                                    width: "100%",
+                                    height: "100%",
+                                 }}
+                              >
+                                 <Image
+                                    src={getResizedUrl(
+                                       event?.companyLogoUrl,
+                                       "lg"
+                                    )}
+                                    layout="fill"
+                                    objectFit="contain"
+                                    quality={100}
+                                 />
+                              </div>
+                           )}
+                        </CardMedia>
+                     </Box>
+                     <Box sx={styles.interestsWrapper}>
+                        <Box sx={styles.eventsInterest}>
+                           {loading ? (
+                              <Skeleton
+                                 animation={animation}
+                                 width={90}
+                                 height={40}
+                                 sx={styles.interestChip}
+                              />
+                           ) : (
+                              <>
+                                 {!loading && !eventInterests.length && (
+                                    <Chip
+                                       sx={styles.interestChip}
+                                       variant={"outlined"}
+                                       label={"For all users"}
+                                       size={mobile ? "small" : "medium"}
+                                    />
+                                 )}
+                                 {eventInterests.slice(0, 2).map((interest) => (
+                                    <Chip
+                                       sx={styles.interestChip}
+                                       key={interest.id}
+                                       variant={"outlined"}
+                                       size={mobile ? "small" : "medium"}
+                                       label={interest.name}
+                                    />
+                                 ))}
+                                 {eventInterests.length > 3 && (
+                                    <Chip
+                                       sx={styles.interestChip}
+                                       size={mobile ? "small" : "medium"}
+                                       variant={"outlined"}
+                                       label={`+ ${
+                                          eventInterests.length - 3
+                                       } more`}
+                                    />
+                                 )}
+                              </>
+                           )}
+                        </Box>
+                     </Box>
+                  </Box>
                )}
             </Box>
          </Box>

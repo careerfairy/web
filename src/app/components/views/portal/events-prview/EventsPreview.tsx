@@ -182,6 +182,7 @@ const EventsPreview = ({
                         : events.map((event, index) => (
                              <Box key={event.id} sx={{ pr: { xs: 0, sm: 2 } }}>
                                 <EventPreviewCard
+                                   // loading={true}
                                    loading={!cardsLoaded[index]}
                                    interests={existingInterests}
                                    autoRegister
