@@ -97,6 +97,11 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
                      TemplateModel: { pinCode: pinCode },
                   };
                   try {
+                     let response = await client.sendEmailWithTemplate(email);
+                     console.log(
+                        `Sent email successfully for ${recipient_email}`
+                     );
+
                      // Create the referral follower reward if the user was referred by someone
                      if (referralData.referredBy) {
                         try {
@@ -104,16 +109,15 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
                               recipient_email,
                               referralUser
                            );
+                           functions.logger.info(
+                              "Created referral follower reward for this user."
+                           );
                         } catch (e) {
                            // We don't want to fail the registration just because the reward failed
                            functions.logger.error(e);
                         }
                      }
 
-                     let response = await client.sendEmailWithTemplate(email);
-                     console.log(
-                        `Sent email successfully for ${recipient_email}`
-                     );
                      return response;
                   } catch (error) {
                      console.error(
