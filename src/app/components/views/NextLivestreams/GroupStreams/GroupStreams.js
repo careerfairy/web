@@ -46,7 +46,7 @@ const Wrapper = ({ children, streamId }) => {
       <LazyLoad
          key={streamId}
          style={{ width: "100%" }}
-         height={405}
+         height={309}
          debounce={100}
          scroll
          offset={[0, 600]}
