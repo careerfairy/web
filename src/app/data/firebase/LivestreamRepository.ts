@@ -164,7 +164,11 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          .where("start", ">", this.earliestEventBufferTime)
          .where("test", "==", false)
          .where("hidden", "==", false)
-         .where("interestsIds", "array-contains-any", userInterestsIds || [])
+         .where(
+            "interestsIds",
+            "array-contains-any",
+            userInterestsIds?.length ? userInterestsIds : [""]
+         )
          .orderBy("start", "asc");
    }
 

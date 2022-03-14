@@ -12,7 +12,7 @@ const WidgetsWrapper: FC = ({ children }) => (
             py: {
                xs: smallPadding,
                sm: largePadding,
-               borderTop: `0.5px solid ${theme.palette.grey["400"]}`,
+               // borderTop: `0.5px solid ${theme.palette.grey["400"]}`,
             },
          },
          "& > *": {

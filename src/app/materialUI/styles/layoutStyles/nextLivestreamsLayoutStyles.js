@@ -18,7 +18,7 @@ export const styles = {
       },
    }),
    root: (theme) => ({
-      backgroundColor: theme.palette.background.dark,
+      backgroundColor: theme.palette.common.white,
       display: "flex",
       overflow: "hidden",
       width: "100%",

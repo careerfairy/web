@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { LiveStreamEvent } from "../../../../types/event";
@@ -13,8 +13,6 @@ import Stack from "@mui/material/Stack";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Heading from "../common/Heading";
 import { useInterests } from "../../../custom-hook/useCollection";
-import SearchIcon from "@mui/icons-material/Search";
-import { Button } from "@mui/material";
 import EmptyMessageOverlay from "./EmptyMessageOverlay";
 
 const arrowFontSize = 30;
@@ -91,7 +89,6 @@ const EventsPreview = ({
    id,
    isEmpty,
 }: EventsProps) => {
-   const sliderRef = useRef(null);
    const {
       query: { groupId },
    } = useRouter();
@@ -142,12 +139,12 @@ const EventsPreview = ({
                      <EmptyMessageOverlay
                         message={
                            type === EventsTypes.myNext
-                              ? "You’re not registered for any event yet."
+                              ? "Time to register to your next event!"
                               : "There currently aren't any scheduled events"
                         }
                         buttonText={
                            type === EventsTypes.myNext
-                              ? "Find an event"
+                              ? "Browse Events"
                               : "See Past Events"
                         }
                         buttonLink={
@@ -159,7 +156,6 @@ const EventsPreview = ({
                   )}
                   <Box
                      sx={styles.carousel}
-                     ref={sliderRef}
                      component={Slider}
                      autoplay={false}
                      lazyLoad
@@ -182,7 +178,6 @@ const EventsPreview = ({
                         : events.map((event, index) => (
                              <Box key={event.id} sx={{ pr: { xs: 0, sm: 2 } }}>
                                 <EventPreviewCard
-                                   // loading={true}
                                    loading={!cardsLoaded[index]}
                                    interests={existingInterests}
                                    autoRegister

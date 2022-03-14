@@ -100,7 +100,6 @@ const styles = {
       },
    },
    mainAndLowerContentWrapper: {
-      backgroundColor: (theme: Theme) => theme.palette.background.paper,
       borderRadius: (theme) => theme.spacing(0.2, 0.2, 1, 1),
       overflow: "hidden",
    },
@@ -186,7 +185,6 @@ const styles = {
       height: "-webkit-fill-available",
       width: "-webkit-fill-available",
       borderRadius: 2,
-      background: "white",
       "& img": {
          maxHeight: 45,
          maxWidth: 140,
@@ -428,13 +426,13 @@ const EventPreviewCard = ({
                            </>
                         ) : (
                            <>
-                              {event?.hasStarted && !isPast && (
-                                 <Chip
-                                    icon={<LiveIcon />}
-                                    color="error"
-                                    label={"LIVE"}
-                                 />
-                              )}
+                              {/*{event?.hasStarted && !isPast && (*/}
+                              <Chip
+                                 icon={<LiveIcon />}
+                                 color="error"
+                                 label={"LIVE"}
+                              />
+                              {/*)}*/}
                               {hasRegistered && (
                                  <Chip
                                     icon={<CheckIcon />}
