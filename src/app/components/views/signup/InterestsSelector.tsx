@@ -138,7 +138,7 @@ export const InterestsChipsSelector = ({
             <Chip
                key={id}
                label={interests[id].name}
-               size="small"
+               size="medium"
                variant={interests[id].isSelected ? "filled" : "outlined"}
                color={interests[id].isSelected ? "primary" : "default"}
                onClick={() => toggleInterest(id)}
