@@ -52,7 +52,7 @@ const styles = {
          fontWeight: "800",
       },
    },
-};
+} as const;
 
 const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
    const { enqueueSnackbar } = useSnackbar();
