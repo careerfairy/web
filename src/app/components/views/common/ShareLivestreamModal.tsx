@@ -9,7 +9,6 @@ import {
    getResizedUrl,
 } from "../../helperFunctions/HelperFunctions";
 import {
-   Avatar,
    Box,
    Button,
    Dialog,
