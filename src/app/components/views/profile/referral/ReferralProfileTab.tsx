@@ -23,11 +23,7 @@ import {
    getTimeFromNow,
 } from "../../../helperFunctions/HelperFunctions";
 import * as Sentry from "@sentry/nextjs";
-import {
-   getPoints,
-   RewardActions,
-   getHumanStringDescriptionForAction,
-} from "../../../../../shared/rewards";
+import { getHumanStringDescriptionForAction } from "../../../../../shared/rewards";
 import useCollection from "../../../custom-hook/useCollection";
 import { Reward } from "../../../../types/reward";
 
@@ -58,13 +54,14 @@ const ReferralProfileTab = ({ userData }) => {
       <Container component="main" maxWidth="md">
          <Box boxShadow={1} p={4} sx={styles.box}>
             <Typography sx={{ color: "text.secondary" }} variant="h5">
-               Earn Points by Referring Friends
+               Refer your friends!
             </Typography>
 
             <p>
-               Earn {getPoints(RewardActions.REFERRAL_SIGNUP_LEADER)} points for
-               each friend who sign up with your link. You can trade your points
-               for awesome rewards.
+               Share your personal referral link with friends who want to sign
+               up to the platform. Very soon, you will earn a special status and
+               will get access to exclusive features if you refer at least 3
+               friends!
             </p>
 
             <Grid container spacing={2} mt={2}>
@@ -86,12 +83,6 @@ const ReferralProfileTab = ({ userData }) => {
                   >
                      Copy
                   </Button>
-               </Grid>
-
-               <Grid item xs={12}>
-                  <Typography sx={{ color: "text.secondary" }} variant="h6">
-                     Total points won: {userData.points ?? 0}
-                  </Typography>
                </Grid>
 
                <Grid item xs={12}>
@@ -138,9 +129,9 @@ const RewardsTable = ({ userDataId }) => {
                   <TableCell sx={localStyles.cell}>Description</TableCell>
                   <TableCell sx={localStyles.cell}>User</TableCell>
                   <TableCell sx={localStyles.cell}>Updated</TableCell>
-                  <TableCell sx={localStyles.cell} align="right">
+                  {/*<TableCell sx={localStyles.cell} align="right">
                      Reward
-                  </TableCell>
+                  </TableCell>*/}
                </TableRow>
             </TableHead>
             <TableBody>
@@ -156,7 +147,7 @@ const RewardsTable = ({ userDataId }) => {
                         colSpan={4}
                         align="center"
                      >
-                        No rewards yet
+                        No referrals recorded yet!
                      </TableCell>
                   </TableRow>
                )}
@@ -178,9 +169,9 @@ const RewardsTable = ({ userDataId }) => {
                      <TableCell sx={localStyles.cell}>
                         {getTimeFromNow(reward.createdAt)}
                      </TableCell>
-                     <TableCell sx={localStyles.cell} align="right">
+                     {/*<TableCell sx={localStyles.cell} align="right">
                         +{reward.points} pts
-                     </TableCell>
+                     </TableCell>*/}
                   </TableRow>
                ))}
             </TableBody>
