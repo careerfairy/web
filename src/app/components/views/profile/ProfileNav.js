@@ -131,7 +131,7 @@ const ProfileNav = ({ userData }) => {
 
    if (adminGroups.length) {
       views.push(
-         <TabPanel key={2} value={value} index={2} dir={theme.direction}>
+         <TabPanel key={3} value={value} index={3} dir={theme.direction}>
             <AdminGroups userData={userData} adminGroups={adminGroups} />
          </TabPanel>
       );
