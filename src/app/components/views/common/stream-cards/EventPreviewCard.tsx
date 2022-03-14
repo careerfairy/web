@@ -34,20 +34,27 @@ import { Interest } from "../../../../types/interests";
 
 const logosWrapperSpacing = 12;
 const styles = {
-   root: {
+   root: {},
+
+   hideOnHoverContent: {
+      position: "absolute",
+      inset: 0,
       "& .MuiChip-root": {
          boxShadow: 2,
       },
-   },
-
-   statusWrapper: {
-      position: "absolute",
-      "& .MuiChip-root": {
-         // margin: 0,
-      },
-      inset: 0,
       padding: (theme) => theme.spacing(3),
       transition: (theme: Theme) => theme.transitions.create(["opacity"]),
+      display: "flex",
+      flexWrap: "nowrap",
+      zIndex: 1,
+      "& > *": {
+         flex: 0.5,
+      },
+   },
+   hostsWrapper: {
+      display: "flex",
+      justifyContent: "flex-end",
+      alignItems: "flex-start",
    },
    backgroundImage: {
       transition: (theme: Theme) =>
@@ -64,7 +71,7 @@ const styles = {
    mainContentHoverStyles: {
       // "&:hover": {
       "&:hover, &:focus-within": {
-         "& .statusWrapper": {
+         "& .hideOnHoverContent": {
             opacity: 0,
          },
          "& .backgroundImage": {
@@ -163,19 +170,18 @@ const styles = {
    },
    btn: {
       flex: 0.5,
-      borderRadius: 0.3,
+      borderRadius: 1,
    },
    logosWrapper: {
       p: 1,
       display: "flex",
       justifyContent: "space-between",
       height: (theme) => theme.spacing(logosWrapperSpacing),
-      "& > *": {
-         flex: 0.5,
-         // mx: "auto",
-      },
    },
-   hostsWrapper: {
+   interestsWrapper: {
+      flex: 0.7,
+   },
+   hostsInnerWrapper: {
       display: "flex",
       alignItems: "flex-end",
       justifyContent: "center",
@@ -183,11 +189,15 @@ const styles = {
    },
    hostedText: {
       fontWeight: 600,
+      color: "white",
+      textShadow: (theme) => theme.darkTextShadow,
    },
    hostAvatar: {
       padding: 1,
       backgroundColor: "white",
       width: (theme) => theme.spacing(logosWrapperSpacing * 0.6),
+      boxShadow: 3,
+      border: "none !important",
    },
    nextImageWrapper: {
       position: "relative",
@@ -237,11 +247,14 @@ const EventPreviewCard = ({
 
    useEffect(() => {
       if (!loading && interests) {
-         setSetEventInterests(
-            interests.filter((interest) =>
+         setSetEventInterests([
+            ...interests.filter((interest) =>
                event?.interestsIds?.includes(interest.id)
-            )
-         );
+            ),
+            ...interests.filter((interest) =>
+               event?.interestsIds?.includes(interest.id)
+            ),
+         ]);
       }
    }, [event?.interestsIds, loading, interests]);
 
@@ -365,38 +378,76 @@ const EventPreviewCard = ({
                         objectFit="cover"
                      />
                   )}
-                  <Stack
-                     direction={"row"}
-                     className="statusWrapper"
-                     spacing={2}
-                     sx={[styles.statusWrapper]}
+                  <Box
+                     className="hideOnHoverContent"
+                     sx={[styles.hideOnHoverContent]}
                   >
-                     {loading ? (
-                        <>
-                           <Skeleton
-                              animation={animation}
-                              sx={styles.chipLoader}
-                           />
-                        </>
-                     ) : (
-                        <>
-                           {event?.hasStarted && !isPast && (
-                              <Chip
-                                 icon={<LiveIcon />}
-                                 color="error"
-                                 label={"LIVE"}
+                     <Stack direction={"row"} spacing={2}>
+                        {loading ? (
+                           <>
+                              <Skeleton
+                                 animation={animation}
+                                 sx={styles.chipLoader}
                               />
-                           )}
-                           {hasRegistered && (
-                              <Chip
-                                 icon={<CheckIcon />}
-                                 color="primary"
-                                 label={"Booked!"}
-                              />
-                           )}
-                        </>
-                     )}
-                  </Stack>
+                           </>
+                        ) : (
+                           <>
+                              {event?.hasStarted && !isPast && (
+                                 <Chip
+                                    icon={<LiveIcon />}
+                                    color="error"
+                                    label={"LIVE"}
+                                 />
+                              )}
+                              {hasRegistered && (
+                                 <Chip
+                                    icon={<CheckIcon />}
+                                    color="primary"
+                                    label={"Booked!"}
+                                 />
+                              )}
+                           </>
+                        )}
+                     </Stack>
+                     <Box sx={styles.hostsWrapper}>
+                        {!loading && hosts && showHosts && (
+                           <Box sx={styles.hostsInnerWrapper}>
+                              <Box>
+                                 <Typography
+                                    sx={styles.hostedText}
+                                    color="text.secondary"
+                                 >
+                                    HOSTED BY
+                                 </Typography>
+                                 <AvatarGroup
+                                    sx={{ width: "fit-content" }}
+                                    variant="rounded"
+                                    max={2}
+                                 >
+                                    {hosts.map((host) => (
+                                       <Avatar
+                                          key={host.id}
+                                          title={`${host.universityName}`}
+                                          sx={styles.hostAvatar}
+                                       >
+                                          <Box sx={styles.nextImageWrapper}>
+                                             <Image
+                                                src={getResizedUrl(
+                                                   host.logoUrl,
+                                                   "lg"
+                                                )}
+                                                layout="fill"
+                                                objectFit="contain"
+                                             />
+                                          </Box>
+                                       </Avatar>
+                                    ))}
+                                 </AvatarGroup>
+                              </Box>
+                           </Box>
+                        )}
+                     </Box>
+                  </Box>
                   <Stack
                      spacing={2}
                      className="mainContent"
@@ -444,21 +495,6 @@ const EventPreviewCard = ({
                                        label={event?.language.code.toUpperCase()}
                                     />
                                  )}
-                                 {eventInterests.slice(0, 1).map((interest) => (
-                                    <WhiteTagChip
-                                       key={interest.id}
-                                       variant="filled"
-                                       label={interest.name}
-                                    />
-                                 ))}
-                                 {eventInterests.length > 2 && (
-                                    <WhiteTagChip
-                                       variant="outlined"
-                                       label={`+ ${
-                                          eventInterests.length - 2
-                                       } more`}
-                                    />
-                                 )}
                               </>
                            )}
                         </Stack>
@@ -480,7 +516,7 @@ const EventPreviewCard = ({
                                     }
                                     color={hasRegistered ? "info" : "primary"}
                                     disabled={registering}
-                                    size={"small"}
+                                    size={"medium"}
                                  >
                                     {hasRegistered
                                        ? "cancel"
@@ -553,39 +589,29 @@ const EventPreviewCard = ({
                            </div>
                         )}
                      </CardMedia>
-                     {!loading && hosts && showHosts && (
-                        <Box sx={styles.hostsWrapper}>
-                           <Box>
-                              <Typography
-                                 sx={styles.hostedText}
-                                 color="text.secondary"
-                              >
-                                 HOSTED BY
-                              </Typography>
-                              <AvatarGroup max={2}>
-                                 {hosts.map((host) => (
-                                    <Avatar
-                                       variant="rounded"
-                                       key={host.id}
-                                       title={`${host.universityName}`}
-                                       sx={styles.hostAvatar}
-                                    >
-                                       <Box sx={styles.nextImageWrapper}>
-                                          <Image
-                                             src={getResizedUrl(
-                                                host.logoUrl,
-                                                "lg"
-                                             )}
-                                             layout="fill"
-                                             objectFit="contain"
-                                          />
-                                       </Box>
-                                    </Avatar>
-                                 ))}
-                              </AvatarGroup>
-                           </Box>
-                        </Box>
-                     )}
+                     <Stack
+                        spacing={1}
+                        flexWrap={"wrap"}
+                        direction={"row"}
+                        alignItems={"center"}
+                        sx={styles.interestsWrapper}
+                     >
+                        {eventInterests.slice(0, 2).map((interest) => (
+                           <Chip
+                              key={interest.id}
+                              variant="outlined"
+                              size="small"
+                              label={interest.name}
+                           />
+                        ))}
+                        {eventInterests.length > 4 && (
+                           <Chip
+                              size="small"
+                              variant="outlined"
+                              label={`+ ${eventInterests.length - 3} more`}
+                           />
+                        )}
+                     </Stack>
                   </Stack>
                )}
             </Box>

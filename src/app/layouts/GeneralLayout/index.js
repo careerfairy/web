@@ -6,12 +6,18 @@ import FooterV2 from "../../components/views/footer/FooterV2";
 import { Box } from "@mui/material";
 
 const drawerWidth = 300;
-const GeneralLayout = ({ children, fullScreen, hideNavOnScroll = false }) => {
+const GeneralLayout = ({
+   children,
+   fullScreen,
+   hideNavOnScroll = false,
+   backgroundColor = undefined,
+}) => {
    return (
       <Box
          sx={(theme) => ({
             ...styles.root(theme),
             minHeight: fullScreen && "100vh",
+            backgroundColor,
          })}
       >
          <TopBar hideNavOnScroll={hideNavOnScroll} />

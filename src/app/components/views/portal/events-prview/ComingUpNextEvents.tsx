@@ -56,7 +56,7 @@ const ComingUpNextEvents = ({ limit }: Props) => {
       return (
          <EventsPreviewGrid
             id={"upcoming-events"}
-            title={"COMING UP NEXT GRID"}
+            title={"COMING UP NEXT"}
             type={EventsTypes.comingUp}
             seeMoreLink={"/next-livestreams"}
             loading={isLoading}
@@ -71,7 +71,6 @@ const ComingUpNextEvents = ({ limit }: Props) => {
          limit={limit}
          title={"COMING UP NEXT"}
          type={EventsTypes.comingUp}
-         autoRegister
          events={localEvents}
          seeMoreLink={"/next-livestreams"}
          loading={isLoading}

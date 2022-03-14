@@ -24,8 +24,9 @@ const MyNextEvents = ({ limit }: Props) => {
          limit={limit}
          type={EventsTypes.myNext}
          events={events}
+         isEmpty={Boolean(!isLoading && !events.length)}
          title={"MY NEXT EVENTS"}
-         loading={isLoading}
+         loading={isLoading || (!isLoading && !events.length)}
       />
    );
 };
