@@ -4,8 +4,12 @@ import {
    makeLivestreamEventDetailsInviteUrl,
    makeLivestreamEventDetailsUrl,
 } from "../../../util/makeUrls";
-import { copyStringToClipboard } from "../../helperFunctions/HelperFunctions";
 import {
+   copyStringToClipboard,
+   getResizedUrl,
+} from "../../helperFunctions/HelperFunctions";
+import {
+   Avatar,
    Box,
    Button,
    Dialog,
@@ -13,13 +17,42 @@ import {
    DialogContent,
    DialogTitle,
    Grow,
+   Stack,
    TextField,
    Typography,
 } from "@mui/material";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import React, { useEffect, useState } from "react";
-import { getPoints, RewardActions } from "../../../../shared/rewards";
 import { streamIsOld } from "../../../util/CommonUtil";
+
+const styles = {
+   title: {
+      textTransform: "uppercase",
+      fontWeight: "800",
+   },
+   body2: {
+      fontSize: "1rem",
+      mb: 3,
+   },
+   stack: {
+      mt: 6,
+      mb: 6,
+   },
+   imageBox: {
+      p: 0,
+      "& img": {
+         height: 50,
+      },
+   },
+   titleBox: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      "& p": {
+         fontWeight: "800",
+      },
+   },
+};
 
 const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
    const { enqueueSnackbar } = useSnackbar();
@@ -32,7 +65,6 @@ const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
          variant: "success",
          preventDuplicate: true,
       });
-      handleClose();
    };
 
    useEffect(() => {
@@ -62,16 +94,28 @@ const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
          open={true}
          onClose={handleClose}
       >
-         <DialogTitle>Share Event: {livestreamData.title}</DialogTitle>
+         <DialogTitle>
+            <Typography sx={styles.title}>Share Event</Typography>
+         </DialogTitle>
          <DialogContent dividers>
-            <Typography variant="body2" my={1}>
-               Earn {getPoints(RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER)}{" "}
-               points for each friend who attends this event with your link. You
-               can trade your points for awesome rewards.
+            <Typography sx={styles.body2} variant="body2" my={1}>
+               Share this event with friends who need to see this!
             </Typography>
-
+            <Box>
+               <Stack sx={styles.stack} spacing={4} direction="row">
+                  <Box sx={styles.imageBox}>
+                     <img
+                        src={getResizedUrl(livestreamData.companyLogoUrl)}
+                        alt={livestreamData.company}
+                     />
+                  </Box>
+                  <Box sx={styles.titleBox}>
+                     <Typography>{livestreamData.title}</Typography>
+                  </Box>
+               </Stack>
+            </Box>
             <Typography variant="h6" my={2}>
-               Your Referral Link:
+               Your Personal Referral Link:
             </Typography>
 
             <Box sx={{ display: "flex", flexWrap: "wrap" }}>
@@ -91,7 +135,7 @@ const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
                </Button>
             </Box>
          </DialogContent>
-         <DialogActions sx={{ justifyContent: "center" }}>
+         <DialogActions sx={{ justifyContent: "right" }}>
             <Button variant="outlined" onClick={handleClose}>
                Close
             </Button>
