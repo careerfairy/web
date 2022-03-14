@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import AvatarGroup from "@mui/material/AvatarGroup";
 import Button from "@mui/material/Button";
-import CardMedia from "@mui/material/CardMedia";
 import { alpha, Theme } from "@mui/material/styles";
 import LanguageIcon from "@mui/icons-material/Language";
 import CheckIcon from "@mui/icons-material/CheckCircle";
@@ -32,7 +30,6 @@ import { Chip, useMediaQuery } from "@mui/material";
 import DateAndShareDisplay from "./common/DateAndShareDisplay";
 import { Interest } from "../../../../types/interests";
 
-const logosWrapperSpacing = 12;
 const styles = {
    hideOnHoverContent: {
       position: "absolute",
@@ -51,7 +48,6 @@ const styles = {
    },
    hostsWrapper: {
       display: "flex",
-      justifyContent: "flex-end",
       alignItems: "flex-start",
    },
    backgroundImage: {
@@ -102,9 +98,9 @@ const styles = {
    mainAndLowerContentWrapper: {
       borderRadius: (theme) => theme.spacing(0.2, 0.2, 1, 1),
       overflow: "hidden",
+      boxShadow: 2,
    },
    mainContentWrapper: {
-      boxShadow: 3,
       position: "relative",
       height: (theme) => theme.spacing(32),
       display: "flex",
@@ -130,8 +126,8 @@ const styles = {
          backgroundImage: (theme) =>
             `linear-gradient(0deg, ${alpha(
                theme.palette.common.black,
-               0.7
-            )}, ${alpha(theme.palette.common.black, 0)})`,
+               1
+            )}, ${alpha(theme.palette.common.black, 0.1)})`,
          transform: "translateY(0)",
       },
    },
@@ -168,67 +164,19 @@ const styles = {
       flex: 0.5,
       borderRadius: 1,
    },
-   bottomContentWrapper: {
-      py: 1,
-      display: "flex",
-      justifyContent: "space-between",
-      flexDirection: "row",
-      height: (theme) => theme.spacing(logosWrapperSpacing),
-   },
    bottomLogoWrapper: {
       display: "grid",
       placeItems: "center",
       flex: 0.2,
    },
-   bottomLogoAvatar: {
-      p: 1,
-      height: "-webkit-fill-available",
-      width: "-webkit-fill-available",
-      borderRadius: 2,
-      "& img": {
-         maxHeight: 45,
-         maxWidth: 140,
-      },
-   },
-   interestsWrapper: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      flex: 0.8,
-   },
-   eventsInterest: {
-      display: "flex",
-      flexWrap: "wrap",
-      alignItems: "center",
-      "& .MuiChip-root": {
-         margin: 0.5,
-         // borderColor: "black",
-         color: "black",
-         // boxShadow: 2,
-         // borderRadius: (theme) => theme.spacing(0.7),
-      },
-   },
-   interestChip: {
-      fontWeight: 500,
-      fontSize: "1rem",
-   },
-   hostsInnerWrapper: {
-      display: "flex",
-      alignItems: "flex-end",
-      justifyContent: "center",
-      flexDirection: "column",
-   },
-   hostedText: {
-      fontWeight: 600,
-      color: "white",
-      textShadow: (theme) => theme.darkTextShadow,
-   },
-   hostAvatar: {
+   companyAvatar: {
       padding: 1,
       backgroundColor: "white",
-      width: (theme) => theme.spacing(logosWrapperSpacing * 0.6),
       boxShadow: 3,
       border: "none !important",
+      width: 80,
+      height: 80,
+      borderRadius: 3,
    },
    nextImageWrapper: {
       position: "relative",
@@ -261,7 +209,6 @@ const EventPreviewCard = ({
    const { authenticatedUser } = useAuth();
    const [hosts, setHosts] = useState(undefined);
    const [isPast, setIsPast] = useState(chekIfPast(getStartDate()));
-   const [showHosts, setShowHosts] = useState(false);
    const [_, copyToClipboard] = useCopyToClipboard();
    const dispatch = useDispatch();
 
@@ -270,25 +217,12 @@ const EventPreviewCard = ({
    } = useRouter();
 
    useEffect(() => {
-      const shouldHide = Boolean(
-         hosts?.length === 1 && !hosts[0]?.universityCode
-      );
-      setShowHosts(!shouldHide);
-   }, [hosts]);
-
-   useEffect(() => {
       if (!loading && interests) {
-         setSetEventInterests([
-            ...interests.filter((interest) =>
+         setSetEventInterests(
+            interests.filter((interest) =>
                event?.interestsIds?.includes(interest.id)
-            ),
-            ...interests.filter((interest) =>
-               event?.interestsIds?.includes(interest.id)
-            ),
-            ...interests.filter((interest) =>
-               event?.interestsIds?.includes(interest.id)
-            ),
-         ]);
+            )
+         );
       }
    }, [event?.interestsIds, loading, interests]);
 
@@ -416,9 +350,42 @@ const EventPreviewCard = ({
                      className="hideOnHoverContent"
                      sx={[styles.hideOnHoverContent]}
                   >
-                     <Stack direction={"row"} spacing={2}>
+                     <Box sx={styles.hostsWrapper}>
+                        {loading ? (
+                           <Skeleton
+                              animation={animation ?? "wave"}
+                              variant="rectangular"
+                              sx={{ borderRadius: 3 }}
+                              width={80}
+                              height={80}
+                           />
+                        ) : (
+                           <Avatar
+                              title={`${event?.company}`}
+                              variant="rounded"
+                              sx={styles.companyAvatar}
+                           >
+                              <Box sx={styles.nextImageWrapper}>
+                                 <Image
+                                    src={getResizedUrl(
+                                       event?.companyLogoUrl,
+                                       "lg"
+                                    )}
+                                    layout="fill"
+                                    objectFit="contain"
+                                    quality={100}
+                                 />
+                              </Box>
+                           </Avatar>
+                        )}
+                     </Box>
+                     <Stack justifyContent="end" direction={"row"} spacing={2}>
                         {loading ? (
                            <>
+                              <Skeleton
+                                 animation={animation}
+                                 sx={styles.chipLoader}
+                              />
                               <Skeleton
                                  animation={animation}
                                  sx={styles.chipLoader}
@@ -426,13 +393,13 @@ const EventPreviewCard = ({
                            </>
                         ) : (
                            <>
-                              {/*{event?.hasStarted && !isPast && (*/}
-                              <Chip
-                                 icon={<LiveIcon />}
-                                 color="error"
-                                 label={"LIVE"}
-                              />
-                              {/*)}*/}
+                              {event?.hasStarted && !isPast && (
+                                 <Chip
+                                    icon={<LiveIcon />}
+                                    color="error"
+                                    label={"LIVE"}
+                                 />
+                              )}
                               {hasRegistered && (
                                  <Chip
                                     icon={<CheckIcon />}
@@ -443,45 +410,6 @@ const EventPreviewCard = ({
                            </>
                         )}
                      </Stack>
-                     <Box sx={styles.hostsWrapper}>
-                        {!loading && hosts && showHosts && (
-                           <Box sx={styles.hostsInnerWrapper}>
-                              <Box>
-                                 <Typography
-                                    sx={styles.hostedText}
-                                    color="text.secondary"
-                                 >
-                                    HOSTED BY
-                                 </Typography>
-                                 <AvatarGroup
-                                    sx={{ width: "fit-content" }}
-                                    variant="rounded"
-                                    max={2}
-                                 >
-                                    {hosts.map((host) => (
-                                       <Avatar
-                                          key={host.id}
-                                          title={`${host.universityName}`}
-                                          sx={styles.hostAvatar}
-                                       >
-                                          <Box sx={styles.nextImageWrapper}>
-                                             <Image
-                                                src={getResizedUrl(
-                                                   host.logoUrl,
-                                                   "lg"
-                                                )}
-                                                layout="fill"
-                                                quality={100}
-                                                objectFit="contain"
-                                             />
-                                          </Box>
-                                       </Avatar>
-                                    ))}
-                                 </AvatarGroup>
-                              </Box>
-                           </Box>
-                        )}
-                     </Box>
                   </Box>
                   <Stack
                      spacing={2}
@@ -510,10 +438,16 @@ const EventPreviewCard = ({
                            className="chipsWrapper"
                         >
                            {loading ? (
-                              <Skeleton
-                                 animation={animation}
-                                 sx={styles.chipLoader}
-                              />
+                              <>
+                                 <Skeleton
+                                    animation={animation}
+                                    sx={styles.chipLoader}
+                                 />
+                                 <Skeleton
+                                    animation={animation}
+                                    sx={styles.chipLoader}
+                                 />
+                              </>
                            ) : (
                               <>
                                  {event?.language?.code && (
@@ -522,6 +456,21 @@ const EventPreviewCard = ({
                                        variant="filled"
                                        tooltipText={`This event is in ${event?.language.name}`}
                                        label={event?.language.code.toUpperCase()}
+                                    />
+                                 )}
+                                 {eventInterests.slice(0, 1).map((interest) => (
+                                    <WhiteTagChip
+                                       key={interest.id}
+                                       variant="filled"
+                                       label={interest.name}
+                                    />
+                                 ))}
+                                 {eventInterests.length > 2 && (
+                                    <WhiteTagChip
+                                       variant="outlined"
+                                       label={`+ ${
+                                          eventInterests.length - 2
+                                       } more`}
                                     />
                                  )}
                               </>
@@ -580,86 +529,6 @@ const EventPreviewCard = ({
                      )}
                   </Stack>
                </Box>
-               {!light && (
-                  <Box sx={styles.bottomContentWrapper}>
-                     <Box sx={styles.bottomLogoWrapper}>
-                        <CardMedia
-                           sx={styles.bottomLogoAvatar}
-                           title={event?.company}
-                        >
-                           {loading ? (
-                              <Skeleton
-                                 animation={animation ?? "wave"}
-                                 variant="rectangular"
-                                 sx={{ borderRadius: 2 }}
-                                 width={100}
-                                 height={"100%"}
-                              />
-                           ) : (
-                              <div
-                                 style={{
-                                    position: "relative",
-                                    width: "100%",
-                                    height: "100%",
-                                 }}
-                              >
-                                 <Image
-                                    src={getResizedUrl(
-                                       event?.companyLogoUrl,
-                                       "lg"
-                                    )}
-                                    layout="fill"
-                                    objectFit="contain"
-                                    quality={100}
-                                 />
-                              </div>
-                           )}
-                        </CardMedia>
-                     </Box>
-                     <Box sx={styles.interestsWrapper}>
-                        <Box sx={styles.eventsInterest}>
-                           {loading ? (
-                              <Skeleton
-                                 animation={animation}
-                                 width={90}
-                                 height={40}
-                                 sx={styles.interestChip}
-                              />
-                           ) : (
-                              <>
-                                 {!loading && !eventInterests.length && (
-                                    <Chip
-                                       sx={styles.interestChip}
-                                       variant={"outlined"}
-                                       label={"For all users"}
-                                       size={mobile ? "small" : "medium"}
-                                    />
-                                 )}
-                                 {eventInterests.slice(0, 2).map((interest) => (
-                                    <Chip
-                                       sx={styles.interestChip}
-                                       key={interest.id}
-                                       variant={"outlined"}
-                                       size={mobile ? "small" : "medium"}
-                                       label={interest.name}
-                                    />
-                                 ))}
-                                 {eventInterests.length > 3 && (
-                                    <Chip
-                                       sx={styles.interestChip}
-                                       size={mobile ? "small" : "medium"}
-                                       variant={"outlined"}
-                                       label={`+ ${
-                                          eventInterests.length - 3
-                                       } more`}
-                                    />
-                                 )}
-                              </>
-                           )}
-                        </Box>
-                     </Box>
-                  </Box>
-               )}
             </Box>
          </Box>
       </>
