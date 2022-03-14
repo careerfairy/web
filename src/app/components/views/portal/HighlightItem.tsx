@@ -9,6 +9,9 @@ const mobileFactor = 0.8;
 const styles = {
    root: {
       cursor: "pointer",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
    },
    circleRoot: {
       borderRadius: "50%",
@@ -26,15 +29,12 @@ const styles = {
       }),
       display: "flex",
       color: "white",
-      m: 1,
+      // m: 1,
       "&:hover": {
-         background: (theme: Theme) =>
-            `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.primary.gradient})`,
          "& svg": {
-            color: (theme) => theme.palette.primary.main,
             fontSize: (theme) => ({
-               xs: theme.spacing(itemSpacingSize * 0.5),
-               md: theme.spacing(itemSpacingSize * 0.8),
+               xs: theme.spacing(itemSpacingSize * 0.3),
+               md: theme.spacing(itemSpacingSize * 0.5),
             }),
             textShadow: (theme) => theme.darkTextShadow,
          },
@@ -77,8 +77,8 @@ const styles = {
    icon: {
       zIndex: 2,
       fontSize: (theme) => ({
-         xs: theme.spacing(itemSpacingSize * 0.4),
-         md: theme.spacing(itemSpacingSize * 0.7),
+         xs: theme.spacing(itemSpacingSize * 0.2),
+         md: theme.spacing(itemSpacingSize * 0.4),
       }),
       transition: (theme) => theme.transitions.create(["color", "font-size"]),
    },
@@ -93,10 +93,7 @@ const styles = {
    logoWrapper: {
       flex: 1,
       display: "flex",
-      boxShadow: 1,
-      borderRadius: 1,
       p: 0.5,
-      background: "white",
       "& > *": {
          position: "relative",
          flex: 1,
