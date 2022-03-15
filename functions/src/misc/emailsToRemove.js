@@ -44,8 +44,8 @@ const emailsToRemove = [
    "kathrin.neumann@uni-graz.at",
    "melanie.koeppel@uni-graz.at",
    "angela.messner-lipp@uni-graz.at",
-];
+]
 
 module.exports = {
    emailsToRemove,
-};
+}

@@ -1,7 +1,7 @@
-const functions = require("firebase-functions");
-const { client } = require("./api/postmark");
-const { createNestedArrayOfTemplates } = require("./util");
-const { emailsToRemove } = require("./misc/emailsToRemove");
+const functions = require("firebase-functions")
+const { client } = require("./api/postmark")
+const { createNestedArrayOfTemplates } = require("./util")
+const { emailsToRemove } = require("./misc/emailsToRemove")
 
 exports.sendBasicTemplateEmail = functions.https.onCall(
    async (data, context) => {
@@ -17,28 +17,28 @@ exports.sendBasicTemplateEmail = functions.https.onCall(
          senderEmail,
          // Stick to server side/cloud function templateId for now
          templateId,
-      } = data;
+      } = data
 
       let emailsArray =
-         emails.filter((email) => !emailsToRemove.includes(email)) || [];
+         emails.filter((email) => !emailsToRemove.includes(email)) || []
       if (senderEmail) {
-         emailsArray.push(senderEmail);
+         emailsArray.push(senderEmail)
       }
 
       // Remove the sender email if the sender is already in the emails list
-      emailsArray = [...new Set(emailsArray)];
+      emailsArray = [...new Set(emailsArray)]
 
       functions.logger.log(
          "number of emails in sendBasicTemplateEmail",
          emailsArray.length
-      );
+      )
 
       //TODO remove before deploying to prod
       // functions.logger.log("Total emails in sendBasicTemplateEmail", emailsArray);
 
       // Will use the server side of the templateId for more
       // security instead of getting it from the client
-      const templateIdentifier = templateId;
+      const templateIdentifier = templateId
 
       const emailObjects = emailsArray.map((email) => ({
          TemplateId: templateIdentifier,
@@ -57,19 +57,19 @@ exports.sendBasicTemplateEmail = functions.https.onCall(
             userEmail: email,
             subject,
          },
-      }));
+      }))
 
       const nestedArrayOfEmailTemplates = createNestedArrayOfTemplates(
          emailObjects,
          500
-      );
+      )
       functions.logger.log(
          "-> Total number of Batches:",
          nestedArrayOfEmailTemplates.length
-      );
-      let count = 0;
+      )
+      let count = 0
       for (const arrayOfTemplateEmails of nestedArrayOfEmailTemplates) {
-         count += 1;
+         count += 1
          try {
             await client
                .sendEmailBatchWithTemplates(arrayOfTemplateEmails)
@@ -77,22 +77,22 @@ exports.sendBasicTemplateEmail = functions.https.onCall(
                   (response) => {
                      functions.logger.log(
                         `Successfully sent email to ${arrayOfTemplateEmails.length}`
-                     );
+                     )
                   },
                   (error) => {
-                     functions.logger.error("error:" + error);
-                     console.log("error:" + error);
+                     functions.logger.error("error:" + error)
+                     console.log("error:" + error)
                      throw new functions.https.HttpsError(
                         "unknown",
                         `Unhandled error: ${error.message}`
-                     );
+                     )
                   }
-               );
+               )
          } catch (batchError) {
             functions.logger.error(
                `error in sending batch ${count}: ${batchError}`
-            );
+            )
          }
       }
    }
-);
+)

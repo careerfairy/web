@@ -1,18 +1,18 @@
-const functions = require("firebase-functions");
-const { admin } = require("./api/firestoreAdmin");
-const { client } = require("./api/postmark");
-const config = require("./config");
+const functions = require("firebase-functions")
+const { admin } = require("./api/firestoreAdmin")
+const { client } = require("./api/postmark")
+const config = require("./config")
 const {
    notifyLivestreamStarting,
    notifyLivestreamCreated,
-} = require("./api/slack");
+} = require("./api/slack")
 
 exports.assertLivestreamRegistrationWasCompleted = functions.firestore
    .document("livestreams/{livestreamId}/registeredStudents/{studentId}")
    .onCreate((snapshot, context) => {
       console.log(
          `Documents created in registeredStudents in ${context.params.livestreamId}`
-      );
+      )
       if (snapshot.exists) {
          admin
             .firestore()
@@ -26,17 +26,17 @@ exports.assertLivestreamRegistrationWasCompleted = functions.firestore
             .then(() => {
                console.log(
                   `Successfully updated registeredUsers in ${context.params.livestreamId}`
-               );
-            });
+               )
+            })
       }
-   });
+   })
 
 exports.assertLivestreamDeregistrationWasCompleted = functions.firestore
    .document("livestreams/{livestreamId}/registeredStudents/{studentId}")
    .onDelete((snapshot, context) => {
       console.log(
          `Documents deleted in registeredStudents in ${context.params.livestreamId}`
-      );
+      )
       admin
          .firestore()
          .collection("livestreams")
@@ -49,9 +49,9 @@ exports.assertLivestreamDeregistrationWasCompleted = functions.firestore
          .then(() => {
             console.log(
                `Successfully removed user from registeredUsers in ${context.params.livestreamId}`
-            );
-         });
-   });
+            )
+         })
+   })
 
 exports.scheduleTestLivestreamDeletion = functions.pubsub
    .schedule("every sunday 09:00")
@@ -63,7 +63,7 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub
          .where("test", "==", true)
          .get()
          .then((querySnapshot) => {
-            console.log("querysnapshot size: " + querySnapshot.size);
+            console.log("querysnapshot size: " + querySnapshot.size)
             querySnapshot.forEach((doc) => {
                admin
                   .firestore()
@@ -71,11 +71,11 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub
                   .doc(doc.id)
                   .delete()
                   .catch((e) => {
-                     console.log(e);
-                  });
-            });
-         });
-   });
+                     console.log(e)
+                  })
+            })
+         })
+   })
 
 exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
    async (data, context) => {
@@ -121,19 +121,19 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
          //        ContentType: "text/calendar; charset=utf-8; method=REQUEST",
          //     },
          //  ],
-      };
+      }
 
       client.sendEmailWithTemplate(email).then(
          (response) => {
-            return { status: 200 };
+            return { status: 200 }
          },
          (error) => {
-            console.log("error:" + error);
-            return { status: 500, error: error };
+            console.log("error:" + error)
+            return { status: 500, error: error }
          }
-      );
+      )
    }
-);
+)
 
 exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onCall(
    async (data, context) => {
@@ -149,23 +149,23 @@ exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onCall(
             event_title: data.event_title,
             event_address: data.event_address,
          },
-      };
+      }
 
       client.sendEmailWithTemplate(email).then(
          (response) => {
-            return { status: 200 };
+            return { status: 200 }
          },
          (error) => {
-            console.log("error:" + error);
-            return { status: 500, error: error };
+            console.log("error:" + error)
+            return { status: 500, error: error }
          }
-      );
+      )
    }
-);
+)
 
 exports.sendHybridEventRegistrationConfirmationEmail = functions.https.onCall(
    async (data, context) => {
-      console.log("Starting");
+      console.log("Starting")
       const email = {
          TemplateId: 25768238,
          From: "CareerFairy <noreply@careerfairy.io>",
@@ -179,107 +179,104 @@ exports.sendHybridEventRegistrationConfirmationEmail = functions.https.onCall(
             event_address: data.event_address,
             livestream_link: data.livestream_link,
          },
-      };
+      }
 
       client.sendEmailWithTemplate(email).then(
          (response) => {
-            return { status: 200 };
+            return { status: 200 }
          },
          (error) => {
-            console.log("error:" + error);
-            return { status: 500, error: error };
+            console.log("error:" + error)
+            return { status: 500, error: error }
          }
-      );
+      )
    }
-);
+)
 
 exports.setFirstCommentOfQuestionOnCreate = functions.firestore
    .document("livestreams/{livestream}/questions/{question}/comments/{comment}")
    .onCreate(async (commentSnap) => {
       try {
-         const commentData = commentSnap.data();
-         const questionRef = commentSnap.ref.parent.parent;
-         const questionSnap = await questionRef.get();
+         const commentData = commentSnap.data()
+         const questionRef = commentSnap.ref.parent.parent
+         const questionSnap = await questionRef.get()
          if (questionSnap.exists) {
-            const questionData = questionSnap.data();
+            const questionData = questionSnap.data()
             let questionDataToUpdate = {
                numberOfComments: admin.firestore.FieldValue.increment(1),
-            };
+            }
             if (!questionData.firstComment) {
-               questionDataToUpdate.firstComment = commentData;
+               questionDataToUpdate.firstComment = commentData
             }
             const successMessage = questionData.firstComment
                ? "Question already has first comment, only increment"
-               : `Updated question doc (${questionRef.path}) with new first comment`;
-            await questionRef.update(questionDataToUpdate);
-            functions.logger.log(successMessage);
+               : `Updated question doc (${questionRef.path}) with new first comment`
+            await questionRef.update(questionDataToUpdate)
+            functions.logger.log(successMessage)
          } else {
             functions.logger.warn(
                `The question (${questionRef.path}) does not exist for comment ${commentSnap.ref.path}`
-            );
+            )
          }
       } catch (e) {
-         functions.logger.error(
-            "error in setFirstCommentOfQuestionOnCreate",
-            e
-         );
+         functions.logger.error("error in setFirstCommentOfQuestionOnCreate", e)
       }
-   });
+   })
 
 exports.notifySlackWhenALivestreamStarts = functions
    .region(config.region)
    .firestore.document("livestreams/{livestreamId}")
    .onUpdate(async (change, context) => {
-      const previousValue = change.before.data();
-      const newValue = change.after.data();
+      const previousValue = change.before.data()
+      const newValue = change.after.data()
 
       if (!newValue.test && !previousValue.hasStarted && newValue.hasStarted) {
-         functions.logger.log("Detected the livestream has started");
-         const webhookUrl = config.slackWebhooks.livestreamAlerts;
+         functions.logger.log("Detected the livestream has started")
+         const webhookUrl = config.slackWebhooks.livestreamAlerts
 
          // cancel notification if the event start date is more than 1h away than now
          if (Math.abs(Date.now() - newValue.start?.toMillis()) > 3600 * 1000) {
             functions.logger.log(
                "The livestream start date is too far from now, skipping the notification"
-            );
-            return;
+            )
+            return
          }
 
          try {
-            await notifyLivestreamStarting(webhookUrl, newValue);
+            await notifyLivestreamStarting(webhookUrl, newValue)
          } catch (e) {
             functions.logger.error(
                "error in notifySlackWhenALivestreamStarts",
                e
-            );
+            )
          }
       } else {
-         functions.logger.log("The livestream has not started yet");
+         functions.logger.log("The livestream has not started yet")
       }
-   });
+   })
 
 exports.notifySlackWhenALivestreamIsCreated = functions
    .region(config.region)
    .firestore.document("livestreams/{livestreamId}")
    .onCreate(async (snap, context) => {
-      const event = snap.data();
-      let publisherEmailOrName = event.author?.email;
+      const event = snap.data()
+      let publisherEmailOrName = event.author?.email
 
       if (event.test) {
          functions.logger.log(
             "The livestream is a test, skipping the notification"
-         );
-         return;
+         )
+         return
       }
 
       // cancel notification if the event start date is more than 1w in the past
       // we create events in the past to test, we don't want to notify in that case
-      const oneWeekMs = 7 * 24 * 3600 * 1000;
+      const oneWeekMs = 7 * 24 * 3600 * 1000
       if (event.start?.toMillis() - Date.now() < -oneWeekMs) {
          functions.logger.log(
             "The livestream start date is more than 7 days in the past, skipping the notification"
-         );
-         return;
+         )
+         return
       }
 
       try {
@@ -289,20 +286,20 @@ exports.notifySlackWhenALivestreamIsCreated = functions
                .firestore()
                .collection("userData")
                .doc(publisherEmailOrName)
-               .get();
+               .get()
 
             if (userDoc.exists) {
-               const user = userDoc.data();
-               publisherEmailOrName = `${user.firstName} ${user.lastName}`;
+               const user = userDoc.data()
+               publisherEmailOrName = `${user.firstName} ${user.lastName}`
             }
          }
 
-         const webhookUrl = config.slackWebhooks.livestreamAlerts;
-         await notifyLivestreamCreated(webhookUrl, publisherEmailOrName, event);
+         const webhookUrl = config.slackWebhooks.livestreamAlerts
+         await notifyLivestreamCreated(webhookUrl, publisherEmailOrName, event)
       } catch (e) {
          functions.logger.error(
             "error in notifySlackWhenALivestreamIsCreated",
             e
-         );
+         )
       }
-   });
+   })

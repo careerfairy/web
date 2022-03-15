@@ -1,18 +1,18 @@
-const { admin } = require("../api/firestoreAdmin");
+const { admin } = require("../api/firestoreAdmin")
 
 exports.livestreamGetById = async (id) => {
    let documentSnap = await admin
       .firestore()
       .collection("livestreams")
       .doc(id)
-      .get();
+      .get()
 
    if (!documentSnap.exists) {
-      return null;
+      return null
    }
 
    return {
       ...documentSnap.data(),
       id: id,
-   };
-};
+   }
+}

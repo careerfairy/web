@@ -1,4 +1,4 @@
-const { admin } = require("../api/firestoreAdmin");
+const { admin } = require("../api/firestoreAdmin")
 
 exports.userGetByReferralCode = async (referralCode) => {
    let querySnapshot = await admin
@@ -6,45 +6,45 @@ exports.userGetByReferralCode = async (referralCode) => {
       .collection("userData")
       .where("referralCode", "==", referralCode)
       .limit(1)
-      .get();
+      .get()
 
    if (querySnapshot.empty) {
-      return null;
+      return null
    }
 
-   return querySnapshot.docs[0].data();
-};
+   return querySnapshot.docs[0].data()
+}
 
 exports.userGetByEmail = async (email) => {
    let documentSnap = await admin
       .firestore()
       .collection("userData")
       .doc(email)
-      .get();
+      .get()
 
    if (!documentSnap.exists) {
-      return null;
+      return null
    }
 
-   return documentSnap.data();
-};
+   return documentSnap.data()
+}
 
 exports.userAddPoints = (email, points) => {
-   return userIncrementField(email, "points", points);
-};
+   return userIncrementField(email, "points", points)
+}
 
 exports.userIncrementReferralsCount = (email) => {
-   return userIncrementField(email, "referralsCount", 1);
-};
+   return userIncrementField(email, "referralsCount", 1)
+}
 
 exports.userUpdateFields = (userDataId, fields) => {
-   let docRef = admin.firestore().collection("userData").doc(userDataId);
+   let docRef = admin.firestore().collection("userData").doc(userDataId)
 
-   return docRef.update(fields);
-};
+   return docRef.update(fields)
+}
 
 const userIncrementField = (userDataId, field, amount) => {
    return exports.userUpdateFields(userDataId, {
       [field]: admin.firestore.FieldValue.increment(amount),
-   });
-};
+   })
+}

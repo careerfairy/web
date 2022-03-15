@@ -10,7 +10,7 @@ const RewardActions = {
    REFERRAL_SIGNUP_FOLLOWER: "REFERRAL_SIGNUP_FOLLOWER",
    LIVESTREAM_INVITE_COMPLETE_LEADER: "LIVESTREAM_INVITE_COMPLETE_LEADER",
    LIVESTREAM_INVITE_COMPLETE_FOLLOWER: "LIVESTREAM_INVITE_COMPLETE_FOLLOWER",
-};
+}
 
 /**
  * Points
@@ -20,26 +20,26 @@ const RewardPoints = {
    [RewardActions.REFERRAL_SIGNUP_FOLLOWER]: 20,
    [RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER]: 40,
    [RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER]: 20,
-};
+}
 
-const REWARD_LIVESTREAM_ATTENDANCE_SECONDS = 5 * 60; // 5 minutes
+const REWARD_LIVESTREAM_ATTENDANCE_SECONDS = 5 * 60 // 5 minutes
 
-const getPoints = (action) => RewardPoints[action];
+const getPoints = (action) => RewardPoints[action]
 
 const getHumanStringDescriptionForAction = (action) => {
    switch (action) {
       case RewardActions.REFERRAL_SIGNUP_FOLLOWER:
-         return "SignUp through a referral";
+         return "SignUp through a referral"
       case RewardActions.REFERRAL_SIGNUP_LEADER:
-         return "Referral SignUp Successful";
+         return "Referral SignUp Successful"
       case RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER:
-         return "Attended an invited event";
+         return "Attended an invited event"
       case RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER:
-         return "Event Invitation Successful";
+         return "Event Invitation Successful"
       default:
-         return action;
+         return action
    }
-};
+}
 
 module.exports = {
    RewardActions,
@@ -47,4 +47,4 @@ module.exports = {
    getPoints,
    getHumanStringDescriptionForAction,
    REWARD_LIVESTREAM_ATTENDANCE_SECONDS,
-};
+}

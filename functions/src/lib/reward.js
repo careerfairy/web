@@ -1,13 +1,13 @@
-const { admin } = require("../api/firestoreAdmin");
-const { RewardActions, getPoints } = require("../shared/rewards");
-const pick = require("lodash/pick");
+const { admin } = require("../api/firestoreAdmin")
+const { RewardActions, getPoints } = require("../shared/rewards")
+const pick = require("lodash/pick")
 
 exports.rewardCreateReferralSignUpLeader = (leaderId, followerUserData) => {
    return rewardCreate(leaderId, RewardActions.REFERRAL_SIGNUP_LEADER, {
       userId: followerUserData.id,
       userData: pickDetailsFromUserData(followerUserData),
-   });
-};
+   })
+}
 
 exports.rewardCreateReferralSignUpFollower = (
    justRegisteredUserId,
@@ -20,8 +20,8 @@ exports.rewardCreateReferralSignUpFollower = (
          userId: leaderUserData.id,
          userData: pickDetailsFromUserData(leaderUserData),
       }
-   );
-};
+   )
+}
 
 exports.rewardCreateLivestreamInviteCompleteFollower = (
    userThatAttendedTheEventId,
@@ -33,7 +33,7 @@ exports.rewardCreateLivestreamInviteCompleteFollower = (
       livestreamId: livestreamData.id,
       userData: pickDetailsFromUserData(leaderUserData),
       livestreamData: pickDetailsFromLivestreamData(livestreamData),
-   });
+   })
    return rewardCreate(
       userThatAttendedTheEventId,
       RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER,
@@ -43,8 +43,8 @@ exports.rewardCreateLivestreamInviteCompleteFollower = (
          userData: pickDetailsFromUserData(leaderUserData),
          livestreamData: pickDetailsFromLivestreamData(livestreamData),
       }
-   );
-};
+   )
+}
 
 exports.rewardCreateLivestreamInviteCompleteLeader = (
    leaderId,
@@ -60,8 +60,8 @@ exports.rewardCreateLivestreamInviteCompleteLeader = (
          userData: pickDetailsFromUserData(followerUserData),
          livestreamData: pickDetailsFromLivestreamData(livestreamData),
       }
-   );
-};
+   )
+}
 
 const rewardCreate = async (rewardedUserId, action, otherData = {}) => {
    return admin
@@ -79,8 +79,8 @@ const rewardCreate = async (rewardedUserId, action, otherData = {}) => {
             },
             otherData
          )
-      );
-};
+      )
+}
 
 exports.rewardGetInvitationForLivestream = async (userDataId, livestreamId) => {
    let querySnapshot = await admin
@@ -91,18 +91,18 @@ exports.rewardGetInvitationForLivestream = async (userDataId, livestreamId) => {
       .where("livestreamId", "==", livestreamId)
       .where("action", "==", RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER)
       .limit(1)
-      .get();
+      .get()
 
    if (querySnapshot.empty) {
-      return null;
+      return null
    }
 
-   return querySnapshot.docs[0].data();
-};
+   return querySnapshot.docs[0].data()
+}
 
 const pickDetailsFromUserData = (userData) => {
-   return pick(userData, ["firstName", "lastName"]);
-};
+   return pick(userData, ["firstName", "lastName"])
+}
 
 const pickDetailsFromLivestreamData = (livestreamData) => {
    return pick(livestreamData, [
@@ -111,5 +111,5 @@ const pickDetailsFromLivestreamData = (livestreamData) => {
       "company",
       "companyLogoUrl",
       "start",
-   ]);
-};
+   ])
+}

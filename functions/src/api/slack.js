@@ -1,8 +1,8 @@
-const { axios } = require("./axios");
-const { DateTime } = require("luxon");
+const { axios } = require("./axios")
+const { DateTime } = require("luxon")
 
 const notifyLivestreamStarting = (webhookUrl, livestreamObj) => {
-   const link = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`;
+   const link = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`
 
    const body = {
       Company: livestreamObj.company,
@@ -10,7 +10,7 @@ const notifyLivestreamStarting = (webhookUrl, livestreamObj) => {
       Duration: `${livestreamObj.duration} minutes`,
       "Registered Users": livestreamObj.registeredUsers?.length ?? 0,
       "Talent Pool": livestreamObj.talentPool?.length ?? 0,
-   };
+   }
 
    return generateRequest(webhookUrl, {
       blocks: [
@@ -34,16 +34,16 @@ const notifyLivestreamStarting = (webhookUrl, livestreamObj) => {
             },
          },
       ],
-   });
-};
+   })
+}
 
 const notifyLivestreamCreated = (
    webhookUrl,
    publisherEmailOrName,
    livestreamObj
 ) => {
-   const adminLink = `https://www.careerfairy.io/group/${livestreamObj.author?.groupId}/admin/events?eventId=${livestreamObj.id}`;
-   const eventLink = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`;
+   const adminLink = `https://www.careerfairy.io/group/${livestreamObj.author?.groupId}/admin/events?eventId=${livestreamObj.id}`
+   const eventLink = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`
 
    const body = {
       "Start Date": formatEventStartDate(livestreamObj.start.toDate()),
@@ -51,7 +51,7 @@ const notifyLivestreamCreated = (
       Company: livestreamObj.company,
       Speakers: livestreamObj.speakers?.length,
       Duration: `${livestreamObj.duration} minutes`,
-   };
+   }
 
    return generateRequest(webhookUrl, {
       blocks: [
@@ -98,22 +98,22 @@ const notifyLivestreamCreated = (
             ],
          },
       ],
-   });
-};
+   })
+}
 
 function formatEventStartDate(date) {
-   const luxonDate = DateTime.fromJSDate(date);
-   return luxonDate.toLocaleString(DateTime.DATETIME_FULL);
+   const luxonDate = DateTime.fromJSDate(date)
+   return luxonDate.toLocaleString(DateTime.DATETIME_FULL)
 }
 
 function generateBodyStr(fieldsObj) {
-   let result = "";
+   let result = ""
 
    for (let key in fieldsObj) {
-      result += `*${key}:* ${fieldsObj[key]}\n`;
+      result += `*${key}:* ${fieldsObj[key]}\n`
    }
 
-   return result;
+   return result
 }
 
 function generateRequest(url, body) {
@@ -124,10 +124,10 @@ function generateRequest(url, body) {
       headers: {
          "Content-Type": "application/json",
       },
-   });
+   })
 }
 
 module.exports = {
    notifyLivestreamStarting,
    notifyLivestreamCreated,
-};
+}

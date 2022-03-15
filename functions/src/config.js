@@ -8,4 +8,4 @@ module.exports = {
       livestreamAlerts:
          "https://hooks.slack.com/services/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",
    },
-};
+}

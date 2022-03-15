@@ -1,42 +1,42 @@
-const functions = require("firebase-functions");
+const functions = require("firebase-functions")
 
-const { admin } = require("./api/firestoreAdmin");
-const { client } = require("./api/postmark");
+const { admin } = require("./api/firestoreAdmin")
+const { client } = require("./api/postmark")
 
-const { setHeaders } = require("./util");
-const { emailsToRemove } = require("./misc/emailsToRemove");
+const { setHeaders } = require("./util")
+const { emailsToRemove } = require("./misc/emailsToRemove")
 
 exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(
    async (req, res) => {
-      setHeaders(req, res);
+      setHeaders(req, res)
 
       const recipientsGroupsAndCategories =
-         req.body.recipientsGroupsAndCategories;
-      console.log(req.body);
-      const groups = Object.keys(recipientsGroupsAndCategories);
+         req.body.recipientsGroupsAndCategories
+      console.log(req.body)
+      const groups = Object.keys(recipientsGroupsAndCategories)
 
-      console.log(groups);
-      let recipients = new Set();
+      console.log(groups)
+      let recipients = new Set()
 
       let snapshot = await admin
          .firestore()
          .collection("userData")
          .where("groupIds", "array-contains-any", groups)
-         .get();
-      console.log(snapshot.size);
+         .get()
+      console.log(snapshot.size)
       snapshot.forEach((doc) => {
-         let student = doc.data();
+         let student = doc.data()
          groups.forEach((group) => {
             let registeredGroup = student.registeredGroups.find(
                (registeredGroup) => registeredGroup.groupId === group
-            );
+            )
             if (registeredGroup) {
-               let categoryId = recipientsGroupsAndCategories[group].categoryId;
+               let categoryId = recipientsGroupsAndCategories[group].categoryId
                let selectedOptions =
-                  recipientsGroupsAndCategories[group].selectedOptions;
+                  recipientsGroupsAndCategories[group].selectedOptions
                let registeredCategory = registeredGroup.categories.find(
                   (category) => category.id === categoryId
-               );
+               )
                if (
                   registeredCategory &&
                   selectedOptions.includes(
@@ -45,14 +45,14 @@ exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(
                   !emailsToRemove.includes(student.userEmail) &&
                   !student.unsubscribed
                ) {
-                  recipients.add(student.userEmail);
+                  recipients.add(student.userEmail)
                }
             }
-         });
-      });
-      console.log(recipients.size);
-      let testEmails = ["maximilian@careerfairy.io"];
-      let templates = [];
+         })
+      })
+      console.log(recipients.size)
+      let testEmails = ["maximilian@careerfairy.io"]
+      let templates = []
       recipients.forEach((recipient) => {
          const email = {
             TemplateId: 22748248,
@@ -61,30 +61,30 @@ exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(
             TemplateModel: {
                userEmail: recipient,
             },
-         };
-         templates.push(email);
-      });
-      let arraysOfTemplates = [];
+         }
+         templates.push(email)
+      })
+      let arraysOfTemplates = []
       for (index = 0; index < templates.length; index += 500) {
-         myChunk = templates.slice(index, index + 500);
+         myChunk = templates.slice(index, index + 500)
          // Do something if you want with the group
-         arraysOfTemplates.push(myChunk);
+         arraysOfTemplates.push(myChunk)
       }
-      console.log(arraysOfTemplates.length);
+      console.log(arraysOfTemplates.length)
       arraysOfTemplates.forEach((arrayOfTemplates) => {
          client.sendEmailBatchWithTemplates(arrayOfTemplates).then(
             (response) => {
                console.log(
                   `Successfully sent email to ${arrayOfTemplates.length}`
-               );
+               )
             },
             (error) => {
                console.error(
                   `Error sending email to ${arrayOfTemplates.length}`,
                   error
-               );
+               )
             }
-         );
-      });
+         )
+      })
    }
-);
+)

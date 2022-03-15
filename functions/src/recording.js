@@ -1,28 +1,28 @@
-const functions = require("firebase-functions");
+const functions = require("firebase-functions")
 
-const { axios } = require("./api/axios");
-const { admin } = require("./api/firestoreAdmin");
-const { RtcTokenBuilder, RtcRole } = require("agora-access-token");
+const { axios } = require("./api/axios")
+const { admin } = require("./api/firestoreAdmin")
+const { RtcTokenBuilder, RtcRole } = require("agora-access-token")
 
 exports.startRecordingLivestream = functions.https.onCall(
    async (data, context) => {
-      const appID = "53675bc6d3884026a72ecb1de3d19eb1";
-      const appCertificate = "286a21681469490783ab75247de35f37";
+      const appID = "53675bc6d3884026a72ecb1de3d19eb1"
+      const appCertificate = "286a21681469490783ab75247de35f37"
 
-      const customerKey = "fd45e86c6ffe445ebb87571344e945b1";
-      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0";
+      const customerKey = "fd45e86c6ffe445ebb87571344e945b1"
+      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0"
 
-      const awsSecretKey = "tenlla/MPorZigMkl+wa7OGoxe63MuVYn7lgwrhW";
-      const awsAccessKey = "AKIAIUSA7ZDE4TYSY3RA";
+      const awsSecretKey = "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"
+      const awsAccessKey = "AKIAIUSA7ZDE4TYSY3RA"
 
-      let plainCredentials = `${customerKey}:${customerSecret}`;
-      let base64Credentials = Buffer.from(plainCredentials).toString("base64");
+      let plainCredentials = `${customerKey}:${customerSecret}`
+      let base64Credentials = Buffer.from(plainCredentials).toString("base64")
 
-      let authorizationHeader = `Basic ${base64Credentials}`;
-      let streamId = data.streamId;
-      let token = data.token;
+      let authorizationHeader = `Basic ${base64Credentials}`
+      let streamId = data.streamId
+      let token = data.token
 
-      let acquire = null;
+      let acquire = null
       try {
          acquire = await axios({
             method: "post",
@@ -39,15 +39,15 @@ exports.startRecordingLivestream = functions.https.onCall(
                Authorization: authorizationHeader,
                "Content-Type": "application/json",
             },
-         });
+         })
       } catch (e) {
-         throw new functions.https.HttpsError("unknown");
+         throw new functions.https.HttpsError("unknown")
       }
 
-      let resourceId = acquire.data.resourceId;
-      const expirationTimeInSeconds = 21600;
-      const currentTimestamp = Math.floor(Date.now() / 1000);
-      const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+      let resourceId = acquire.data.resourceId
+      const expirationTimeInSeconds = 21600
+      const currentTimestamp = Math.floor(Date.now() / 1000)
+      const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
       const rtcToken = RtcTokenBuilder.buildTokenWithUid(
          appID,
          appCertificate,
@@ -55,9 +55,9 @@ exports.startRecordingLivestream = functions.https.onCall(
          "1234232",
          RtcRole.SUBSCRIBER,
          privilegeExpiredTs
-      );
+      )
 
-      let start = null;
+      let start = null
 
       let storedTokenDoc = await admin
          .firestore()
@@ -65,11 +65,11 @@ exports.startRecordingLivestream = functions.https.onCall(
          .doc(streamId)
          .collection("tokens")
          .doc("secureToken")
-         .get();
+         .get()
 
-      let storedToken = storedTokenDoc.data().value;
+      let storedToken = storedTokenDoc.data().value
       if (storedToken !== token) {
-         throw new functions.https.HttpsError("permission-denied");
+         throw new functions.https.HttpsError("permission-denied")
       }
 
       try {
@@ -114,14 +114,14 @@ exports.startRecordingLivestream = functions.https.onCall(
                Authorization: authorizationHeader,
                "Content-Type": "application/json",
             },
-         });
+         })
       } catch (e) {
-         throw new functions.https.HttpsError("unknown");
+         throw new functions.https.HttpsError("unknown")
       }
 
-      let startResponse = start.data;
+      let startResponse = start.data
 
-      let sid = startResponse.sid;
+      let sid = startResponse.sid
 
       await admin
          .firestore()
@@ -132,35 +132,35 @@ exports.startRecordingLivestream = functions.https.onCall(
          .set({
             sid: sid,
             resourceId: resourceId,
-         });
+         })
 
       await admin.firestore().collection("livestreams").doc(streamId).update({
          isRecording: true,
-      });
-      return;
+      })
+      return
    }
-);
+)
 
 exports.startRecordingBreakoutRoom = functions.https.onCall(
    async (data, context) => {
-      const appID = "53675bc6d3884026a72ecb1de3d19eb1";
-      const appCertificate = "286a21681469490783ab75247de35f37";
+      const appID = "53675bc6d3884026a72ecb1de3d19eb1"
+      const appCertificate = "286a21681469490783ab75247de35f37"
 
-      const customerKey = "fd45e86c6ffe445ebb87571344e945b1";
-      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0";
+      const customerKey = "fd45e86c6ffe445ebb87571344e945b1"
+      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0"
 
-      const awsSecretKey = "tenlla/MPorZigMkl+wa7OGoxe63MuVYn7lgwrhW";
-      const awsAccessKey = "AKIAIUSA7ZDE4TYSY3RA";
+      const awsSecretKey = "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"
+      const awsAccessKey = "AKIAIUSA7ZDE4TYSY3RA"
 
-      let plainCredentials = `${customerKey}:${customerSecret}`;
-      let base64Credentials = Buffer.from(plainCredentials).toString("base64");
+      let plainCredentials = `${customerKey}:${customerSecret}`
+      let base64Credentials = Buffer.from(plainCredentials).toString("base64")
 
-      let authorizationHeader = `Basic ${base64Credentials}`;
-      let streamId = data.streamId;
-      let breakoutRoomId = data.breakoutRoomId;
-      let token = data.token;
+      let authorizationHeader = `Basic ${base64Credentials}`
+      let streamId = data.streamId
+      let breakoutRoomId = data.breakoutRoomId
+      let token = data.token
 
-      let acquire = null;
+      let acquire = null
       try {
          acquire = await axios({
             method: "post",
@@ -177,16 +177,16 @@ exports.startRecordingBreakoutRoom = functions.https.onCall(
                Authorization: authorizationHeader,
                "Content-Type": "application/json",
             },
-         });
+         })
       } catch (e) {
-         console.log("Error in Acquire");
-         throw new functions.https.HttpsError("unknown");
+         console.log("Error in Acquire")
+         throw new functions.https.HttpsError("unknown")
       }
 
-      let resourceId = acquire.data.resourceId;
-      const expirationTimeInSeconds = 21600;
-      const currentTimestamp = Math.floor(Date.now() / 1000);
-      const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+      let resourceId = acquire.data.resourceId
+      const expirationTimeInSeconds = 21600
+      const currentTimestamp = Math.floor(Date.now() / 1000)
+      const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
       const rtcToken = RtcTokenBuilder.buildTokenWithUid(
          appID,
          appCertificate,
@@ -194,9 +194,9 @@ exports.startRecordingBreakoutRoom = functions.https.onCall(
          "1234232",
          RtcRole.SUBSCRIBER,
          privilegeExpiredTs
-      );
+      )
 
-      let start = null;
+      let start = null
 
       let storedTokenDoc = await admin
          .firestore()
@@ -206,11 +206,11 @@ exports.startRecordingBreakoutRoom = functions.https.onCall(
          .doc(breakoutRoomId)
          .collection("tokens")
          .doc("secureToken")
-         .get();
+         .get()
 
-      let storedToken = storedTokenDoc.data().value;
+      let storedToken = storedTokenDoc.data().value
       if (storedToken !== token) {
-         throw new functions.https.HttpsError("permission-denied");
+         throw new functions.https.HttpsError("permission-denied")
       }
 
       try {
@@ -255,15 +255,15 @@ exports.startRecordingBreakoutRoom = functions.https.onCall(
                Authorization: authorizationHeader,
                "Content-Type": "application/json",
             },
-         });
+         })
       } catch (e) {
-         console.log("Error in Start", e);
-         throw new functions.https.HttpsError("unknown");
+         console.log("Error in Start", e)
+         throw new functions.https.HttpsError("unknown")
       }
 
-      let startResponse = start.data;
+      let startResponse = start.data
 
-      let sid = startResponse.sid;
+      let sid = startResponse.sid
 
       await admin
          .firestore()
@@ -276,7 +276,7 @@ exports.startRecordingBreakoutRoom = functions.https.onCall(
          .set({
             sid: sid,
             resourceId: resourceId,
-         });
+         })
 
       await admin
          .firestore()
@@ -286,24 +286,24 @@ exports.startRecordingBreakoutRoom = functions.https.onCall(
          .doc(breakoutRoomId)
          .update({
             isRecording: true,
-         });
-      return;
+         })
+      return
    }
-);
+)
 
 exports.stopRecordingLivestream = functions.https.onCall(
    async (data, context) => {
-      const appID = "53675bc6d3884026a72ecb1de3d19eb1";
+      const appID = "53675bc6d3884026a72ecb1de3d19eb1"
 
-      const customerKey = "fd45e86c6ffe445ebb87571344e945b1";
-      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0";
+      const customerKey = "fd45e86c6ffe445ebb87571344e945b1"
+      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0"
 
-      let plainCredentials = `${customerKey}:${customerSecret}`;
-      let base64Credentials = Buffer.from(plainCredentials).toString("base64");
+      let plainCredentials = `${customerKey}:${customerSecret}`
+      let base64Credentials = Buffer.from(plainCredentials).toString("base64")
 
-      let authorizationHeader = `Basic ${base64Credentials}`;
-      let streamId = data.streamId;
-      let token = data.token;
+      let authorizationHeader = `Basic ${base64Credentials}`
+      let streamId = data.streamId
+      let token = data.token
 
       let storedTokenDoc = await admin
          .firestore()
@@ -311,11 +311,11 @@ exports.stopRecordingLivestream = functions.https.onCall(
          .doc(streamId)
          .collection("tokens")
          .doc("secureToken")
-         .get();
+         .get()
 
-      let storedToken = storedTokenDoc.data().value;
+      let storedToken = storedTokenDoc.data().value
       if (storedToken !== token) {
-         return;
+         return
       }
 
       let recordingToken = await admin
@@ -324,10 +324,10 @@ exports.stopRecordingLivestream = functions.https.onCall(
          .doc(streamId)
          .collection("recordingToken")
          .doc("token")
-         .get();
-      let { resourceId, sid } = recordingToken.data();
+         .get()
+      let { resourceId, sid } = recordingToken.data()
 
-      console.log(resourceId, sid);
+      console.log(resourceId, sid)
 
       try {
          await axios({
@@ -342,35 +342,35 @@ exports.stopRecordingLivestream = functions.https.onCall(
                Authorization: authorizationHeader,
                "Content-Type": "application/json",
             },
-         });
+         })
          await admin
             .firestore()
             .collection("livestreams")
             .doc(streamId)
             .update({
                isRecording: false,
-            });
+            })
       } catch (e) {
-         throw new functions.https.HttpsError("unknown");
+         throw new functions.https.HttpsError("unknown")
       }
-      return;
+      return
    }
-);
+)
 
 exports.stopRecordingBreakoutRoom = functions.https.onCall(
    async (data, context) => {
-      const appID = "53675bc6d3884026a72ecb1de3d19eb1";
+      const appID = "53675bc6d3884026a72ecb1de3d19eb1"
 
-      const customerKey = "fd45e86c6ffe445ebb87571344e945b1";
-      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0";
+      const customerKey = "fd45e86c6ffe445ebb87571344e945b1"
+      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0"
 
-      let plainCredentials = `${customerKey}:${customerSecret}`;
-      let base64Credentials = Buffer.from(plainCredentials).toString("base64");
+      let plainCredentials = `${customerKey}:${customerSecret}`
+      let base64Credentials = Buffer.from(plainCredentials).toString("base64")
 
-      let authorizationHeader = `Basic ${base64Credentials}`;
-      let streamId = data.streamId;
-      let breakoutRoomId = data.breakoutRoomId;
-      let token = data.token;
+      let authorizationHeader = `Basic ${base64Credentials}`
+      let streamId = data.streamId
+      let breakoutRoomId = data.breakoutRoomId
+      let token = data.token
 
       let storedTokenDoc = await admin
          .firestore()
@@ -380,11 +380,11 @@ exports.stopRecordingBreakoutRoom = functions.https.onCall(
          .doc(breakoutRoomId)
          .collection("tokens")
          .doc("secureToken")
-         .get();
+         .get()
 
-      let storedToken = storedTokenDoc.data().value;
+      let storedToken = storedTokenDoc.data().value
       if (storedToken !== token) {
-         return;
+         return
       }
 
       let recordingToken = await admin
@@ -395,10 +395,10 @@ exports.stopRecordingBreakoutRoom = functions.https.onCall(
          .doc(breakoutRoomId)
          .collection("recordingToken")
          .doc("token")
-         .get();
-      let { resourceId, sid } = recordingToken.data();
+         .get()
+      let { resourceId, sid } = recordingToken.data()
 
-      console.log(resourceId, sid);
+      console.log(resourceId, sid)
 
       try {
          await axios({
@@ -413,7 +413,7 @@ exports.stopRecordingBreakoutRoom = functions.https.onCall(
                Authorization: authorizationHeader,
                "Content-Type": "application/json",
             },
-         });
+         })
          await admin
             .firestore()
             .collection("livestreams")
@@ -422,44 +422,44 @@ exports.stopRecordingBreakoutRoom = functions.https.onCall(
             .doc(breakoutRoomId)
             .update({
                isRecording: false,
-            });
+            })
       } catch (e) {
-         throw new functions.https.HttpsError("unknown");
+         throw new functions.https.HttpsError("unknown")
       }
-      return;
+      return
    }
-);
+)
 
 exports.startRecordingLivestreamApi = functions.https.onRequest(
    async (req, res) => {
-      res.set("Access-Control-Allow-Origin", "*");
-      res.set("Access-Control-Allow-Credentials", "true");
+      res.set("Access-Control-Allow-Origin", "*")
+      res.set("Access-Control-Allow-Credentials", "true")
 
       if (req.method === "OPTIONS") {
          // Send response to OPTIONS requests
-         res.set("Access-Control-Allow-Methods", "GET");
-         res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-         res.set("Access-Control-Max-Age", "3600");
-         res.status(204).send("");
+         res.set("Access-Control-Allow-Methods", "GET")
+         res.set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+         res.set("Access-Control-Max-Age", "3600")
+         res.status(204).send("")
       }
 
-      const appID = "53675bc6d3884026a72ecb1de3d19eb1";
-      const appCertificate = "286a21681469490783ab75247de35f37";
+      const appID = "53675bc6d3884026a72ecb1de3d19eb1"
+      const appCertificate = "286a21681469490783ab75247de35f37"
 
-      const customerKey = "fd45e86c6ffe445ebb87571344e945b1";
-      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0";
+      const customerKey = "fd45e86c6ffe445ebb87571344e945b1"
+      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0"
 
-      const awsSecretKey = "tenlla/MPorZigMkl+wa7OGoxe63MuVYn7lgwrhW";
-      const awsAccessKey = "AKIAIUSA7ZDE4TYSY3RA";
+      const awsSecretKey = "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"
+      const awsAccessKey = "AKIAIUSA7ZDE4TYSY3RA"
 
-      let plainCredentials = `${customerKey}:${customerSecret}`;
-      let base64Credentials = Buffer.from(plainCredentials).toString("base64");
+      let plainCredentials = `${customerKey}:${customerSecret}`
+      let base64Credentials = Buffer.from(plainCredentials).toString("base64")
 
-      let authorizationHeader = `Basic ${base64Credentials}`;
-      let streamId = req.body.streamId;
-      let token = req.body.token;
+      let authorizationHeader = `Basic ${base64Credentials}`
+      let streamId = req.body.streamId
+      let token = req.body.token
 
-      let acquire = null;
+      let acquire = null
       try {
          acquire = await axios({
             method: "post",
@@ -476,18 +476,18 @@ exports.startRecordingLivestreamApi = functions.https.onRequest(
                Authorization: authorizationHeader,
                "Content-Type": "application/json",
             },
-         });
+         })
       } catch (e) {
-         console.log("Massive error", e);
-         return res.status(400).send();
+         console.log("Massive error", e)
+         return res.status(400).send()
       }
 
-      console.log("We got this far");
+      console.log("We got this far")
 
-      let resourceId = acquire.data.resourceId;
-      const expirationTimeInSeconds = 21600;
-      const currentTimestamp = Math.floor(Date.now() / 1000);
-      const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+      let resourceId = acquire.data.resourceId
+      const expirationTimeInSeconds = 21600
+      const currentTimestamp = Math.floor(Date.now() / 1000)
+      const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
       const rtcToken = RtcTokenBuilder.buildTokenWithUid(
          appID,
          appCertificate,
@@ -495,9 +495,9 @@ exports.startRecordingLivestreamApi = functions.https.onRequest(
          "1234232",
          RtcRole.SUBSCRIBER,
          privilegeExpiredTs
-      );
+      )
 
-      let start = null;
+      let start = null
 
       let storedTokenDoc = await admin
          .firestore()
@@ -505,11 +505,11 @@ exports.startRecordingLivestreamApi = functions.https.onRequest(
          .doc(streamId)
          .collection("tokens")
          .doc("secureToken")
-         .get();
+         .get()
 
-      let storedToken = storedTokenDoc.data().value;
+      let storedToken = storedTokenDoc.data().value
       if (storedToken !== token) {
-         return res.status(400).send();
+         return res.status(400).send()
       }
 
       try {
@@ -554,16 +554,16 @@ exports.startRecordingLivestreamApi = functions.https.onRequest(
                Authorization: authorizationHeader,
                "Content-Type": "application/json",
             },
-         });
+         })
       } catch (e) {
-         return res.status(400).send();
+         return res.status(400).send()
       }
 
-      let startResponse = start.data;
+      let startResponse = start.data
 
-      console.log(startResponse);
+      console.log(startResponse)
 
-      let sid = startResponse.sid;
+      let sid = startResponse.sid
 
       await admin
          .firestore()
@@ -574,36 +574,36 @@ exports.startRecordingLivestreamApi = functions.https.onRequest(
          .set({
             sid: sid,
             resourceId: resourceId,
-         });
+         })
 
-      return res.status(200).send();
+      return res.status(200).send()
    }
-);
+)
 
 exports.stopRecordingLivestreamApi = functions.https.onRequest(
    async (req, res) => {
-      res.set("Access-Control-Allow-Origin", "*");
-      res.set("Access-Control-Allow-Credentials", "true");
+      res.set("Access-Control-Allow-Origin", "*")
+      res.set("Access-Control-Allow-Credentials", "true")
 
       if (req.method === "OPTIONS") {
          // Send response to OPTIONS requests
-         res.set("Access-Control-Allow-Methods", "GET");
-         res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-         res.set("Access-Control-Max-Age", "3600");
-         res.status(204).send("");
+         res.set("Access-Control-Allow-Methods", "GET")
+         res.set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+         res.set("Access-Control-Max-Age", "3600")
+         res.status(204).send("")
       }
 
-      const appID = "53675bc6d3884026a72ecb1de3d19eb1";
+      const appID = "53675bc6d3884026a72ecb1de3d19eb1"
 
-      const customerKey = "fd45e86c6ffe445ebb87571344e945b1";
-      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0";
+      const customerKey = "fd45e86c6ffe445ebb87571344e945b1"
+      const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0"
 
-      let plainCredentials = `${customerKey}:${customerSecret}`;
-      let base64Credentials = Buffer.from(plainCredentials).toString("base64");
+      let plainCredentials = `${customerKey}:${customerSecret}`
+      let base64Credentials = Buffer.from(plainCredentials).toString("base64")
 
-      let authorizationHeader = `Basic ${base64Credentials}`;
-      let streamId = req.body.streamId;
-      let token = req.body.token;
+      let authorizationHeader = `Basic ${base64Credentials}`
+      let streamId = req.body.streamId
+      let token = req.body.token
 
       let storedTokenDoc = await admin
          .firestore()
@@ -611,11 +611,11 @@ exports.stopRecordingLivestreamApi = functions.https.onRequest(
          .doc(streamId)
          .collection("tokens")
          .doc("secureToken")
-         .get();
+         .get()
 
-      let storedToken = storedTokenDoc.data().value;
+      let storedToken = storedTokenDoc.data().value
       if (storedToken !== token) {
-         return res.status(400).send();
+         return res.status(400).send()
       }
 
       let recordingToken = await admin
@@ -624,10 +624,10 @@ exports.stopRecordingLivestreamApi = functions.https.onRequest(
          .doc(streamId)
          .collection("recordingToken")
          .doc("token")
-         .get();
-      let { resourceId, sid } = recordingToken.data();
+         .get()
+      let { resourceId, sid } = recordingToken.data()
 
-      console.log(resourceId, sid);
+      console.log(resourceId, sid)
 
       axios({
          method: "post",
@@ -643,9 +643,9 @@ exports.stopRecordingLivestreamApi = functions.https.onRequest(
          },
       })
          .then((response) => {
-            console.log(response);
-            return res.status(200).send();
+            console.log(response)
+            return res.status(200).send()
          })
-         .catch((error) => console.log("Error in stop", error));
+         .catch((error) => console.log("Error in stop", error))
    }
-);
+)
