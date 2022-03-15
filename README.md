@@ -6,6 +6,7 @@ You need to install the root folder deps for the git pre-commit hook to work.
 Everytime there is a commit, the hook will run prettier to format the changed files.
 
 ```sh
+# Will also install deps on app/ and functions/
 npm install
 ```
 
@@ -53,6 +54,10 @@ env FIREBASE_AUTH_EMULATOR_HOST="localhost:9099" \
     npx firebase emulators:start --only firestore,auth,functions --export-on-exit \
     --import "./emulatorData/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)"
 ```
+
+### Emulator UI
+
+http://localhost:4000/
 
 # Firebase Functions
 

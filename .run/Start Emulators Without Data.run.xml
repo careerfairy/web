@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="App Dev" type="js.build_tools.npm">
-    <package-json value="$PROJECT_DIR$/app/package.json" />
+  <configuration default="false" name="Start Emulators Without Data" type="js.build_tools.npm">
+    <package-json value="$PROJECT_DIR$/package.json" />
     <command value="run" />
     <scripts>
-      <script value="dev" />
+      <script value="start:emulators" />
     </scripts>
     <node-interpreter value="project" />
     <envs />
