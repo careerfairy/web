@@ -4,7 +4,7 @@ import { useAuth } from "HOCs/AuthProvider";
 import { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { LiveStreamEvent } from "types/event";
-import { getLinkToStream } from "util/StreamUtil";
+import { getLinkToStream } from "util/streamUtil";
 import * as actions from "store/actions";
 
 const useRegistrationModal = (
@@ -52,7 +52,7 @@ const useRegistrationModal = (
                );
             } else {
                if (
-                  authenticatedUser.isLoggedOut ||
+                  (authenticatedUser.isLoaded && authenticatedUser.isEmpty) ||
                   !authenticatedUser.emailVerified
                ) {
                   return push({

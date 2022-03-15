@@ -3,12 +3,14 @@ import { User as ProfileIcon } from "react-feather";
 import { useAuth } from "../../HOCs/AuthProvider";
 import NextLivestreamsIcon from "@mui/icons-material/Contacts";
 import FollowGroupIcon from "@mui/icons-material/GroupAdd";
+import PortalIcon from "@mui/icons-material/DynamicFeed";
 
 const initialMainLinks = [
    {
       href: `/portal`,
       title: "PORTAL",
       basePath: "/portal",
+      icon: PortalIcon,
    },
    {
       href: `/next-livestreams`,

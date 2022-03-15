@@ -22,8 +22,8 @@ const PortalPage = () => {
             }}
          >
             <WidgetsWrapper>
-               <HighlightsCarousel />
-               {/*<FeaturedAndNextEvents />*/}
+               {/*<HighlightsCarousel />*/}
+               <FeaturedAndNextEvents />
                <RecommendedEvents maxLimitIncreaseTimes={5} limit={30} />
                <ComingUpNextEvents limit={20} />
                <MyNextEvents limit={20} />

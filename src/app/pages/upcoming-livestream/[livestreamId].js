@@ -27,7 +27,7 @@ import ContactSection from "../../components/views/upcoming-livestream/ContactSe
 import Navigation from "../../components/views/upcoming-livestream/Navigation";
 import { useMediaQuery } from "@mui/material";
 import { languageCodesDict } from "../../components/helperFunctions/streamFormFunctions";
-import { getRelevantHosts } from "../../util/StreamUtil";
+import { getRelevantHosts } from "../../util/streamUtil";
 import { useInterests } from "../../components/custom-hook/useCollection";
 
 const UpcomingLivestreamPage = ({ serverStream }) => {

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { LiveStreamEvent } from "../../../../types/event";
@@ -14,6 +14,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Heading from "../common/Heading";
 import { useInterests } from "../../../custom-hook/useCollection";
 import EmptyMessageOverlay from "./EmptyMessageOverlay";
+import ShareLivestreamModal from "../../common/ShareLivestreamModal";
 
 const arrowFontSize = 30;
 
@@ -102,7 +103,12 @@ const EventsPreview = ({
    const isSmall = useMediaQuery(up("xs"));
    const isMedium = useMediaQuery(up("md"));
    const isLarge = useMediaQuery(up("lg"));
+   const [shareEventDialog, setShareEventDialog] = useState(null);
+   console.log("-> shareEventDialog in prev", shareEventDialog);
 
+   const handleShareEventDialogClose = useCallback(() => {
+      setShareEventDialog(null);
+   }, [setShareEventDialog]);
    const numSlides: number = useMemo(() => {
       return isLarge ? 3 : isMedium ? 2 : 1;
    }, [isSmall, isMedium, isLarge]);
@@ -181,6 +187,7 @@ const EventsPreview = ({
                                    loading={!cardsLoaded[index]}
                                    interests={existingInterests}
                                    autoRegister
+                                   openShareDialog={setShareEventDialog}
                                    onRegisterClick={handleClickRegister}
                                    key={event.id}
                                    event={event}
@@ -201,6 +208,16 @@ const EventsPreview = ({
                targetGroupId={joinGroupModalData?.targetGroupId}
                handleClose={handleCloseJoinModal}
             />
+         )}
+         {shareEventDialog ? (
+            /*
+            // @ts-ignore */
+            <ShareLivestreamModal
+               livestreamData={shareEventDialog}
+               handleClose={handleShareEventDialogClose}
+            />
+         ) : (
+            ""
          )}
       </>
    );

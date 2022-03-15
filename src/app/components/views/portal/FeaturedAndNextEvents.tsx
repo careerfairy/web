@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { LiveStreamEvent } from "types/event";
 import EventPreviewCard from "../common/stream-cards/EventPreviewCard";
 import Stack from "@mui/material/Stack";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import { usePagination } from "use-pagination-firestore";
 import livestreamRepo from "../../../data/firebase/LivestreamRepository";
 import { useAuth } from "../../../HOCs/AuthProvider";
@@ -13,8 +13,8 @@ import useRegistrationModal from "../../custom-hook/useRegistrationModal";
 import RegistrationModal from "../common/registration-modal";
 import { useRouter } from "next/router";
 import { alpha } from "@mui/material/styles";
-import Link from "../common/Link";
 import EmptyMessageOverlay from "./events-prview/EmptyMessageOverlay";
+import ShareLivestreamModal from "../common/ShareLivestreamModal";
 
 const styles = {
    root: {
@@ -74,7 +74,11 @@ const FeaturedAndNextEvents = () => {
       }
    );
    const { authenticatedUser } = useAuth();
+   const [shareEventDialog, setShareEventDialog] = useState(null);
 
+   const handleShareEventDialogClose = useCallback(() => {
+      setShareEventDialog(null);
+   }, [setShareEventDialog]);
    const { items: nextEvents, isLoading: loadingNextEvents } =
       usePagination<LiveStreamEvent>(
          livestreamRepo.registeredEventsQuery(authenticatedUser.email),
@@ -96,6 +100,7 @@ const FeaturedAndNextEvents = () => {
                      loading={isLoading}
                      interests={existingInterests}
                      light
+                     openShareDialog={setShareEventDialog}
                      onRegisterClick={handleClickRegister}
                      event={featuredEvents[0]}
                   />
@@ -145,6 +150,16 @@ const FeaturedAndNextEvents = () => {
                targetGroupId={joinGroupModalData?.targetGroupId}
                handleClose={handleCloseJoinModal}
             />
+         )}
+         {shareEventDialog ? (
+            /*
+            // @ts-ignore */
+            <ShareLivestreamModal
+               livestreamData={shareEventDialog}
+               handleClose={handleShareEventDialogClose}
+            />
+         ) : (
+            ""
          )}
       </>
    );

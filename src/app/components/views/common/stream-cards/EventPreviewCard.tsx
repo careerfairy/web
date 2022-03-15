@@ -7,7 +7,6 @@ import { alpha, Theme } from "@mui/material/styles";
 import LanguageIcon from "@mui/icons-material/Language";
 import CheckIcon from "@mui/icons-material/CheckCircle";
 import {
-   getBaseUrl,
    getMaxLineStyles,
    getResizedUrl,
 } from "components/helperFunctions/HelperFunctions";
@@ -18,10 +17,7 @@ import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import Avatar from "@mui/material/Avatar";
 import { useRouter } from "next/router";
 import Link from "components/views/common/Link";
-import { chekIfPast, getRelevantHosts } from "util/StreamUtil";
-import { useCopyToClipboard } from "react-use";
-import { useDispatch } from "react-redux";
-import * as actions from "store/actions";
+import { chekIfPast, getRelevantHosts } from "util/streamUtil";
 import { useAuth } from "HOCs/AuthProvider";
 import LiveIcon from "@mui/icons-material/RadioButtonChecked";
 import Skeleton from "@mui/material/Skeleton";
@@ -199,6 +195,7 @@ const EventPreviewCard = ({
    interests,
    animation,
    autoRegister,
+   openShareDialog,
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)");
    const { query, push, pathname } = useRouter();
@@ -209,8 +206,6 @@ const EventPreviewCard = ({
    const { authenticatedUser } = useAuth();
    const [hosts, setHosts] = useState(undefined);
    const [isPast, setIsPast] = useState(chekIfPast(getStartDate()));
-   const [_, copyToClipboard] = useCopyToClipboard();
-   const dispatch = useDispatch();
 
    const {
       query: { groupId },
@@ -290,20 +285,7 @@ const EventPreviewCard = ({
    ]);
 
    const handleShareClick = () => {
-      const linkToEvent = event
-         ? groupId
-            ? `/next-livestreams/${groupId}?livestreamId=${event.id}`
-            : `/next-livestreams?livestreamId=${event.id}`
-         : "";
-      copyToClipboard(`${getBaseUrl()}${linkToEvent}`);
-      dispatch(
-         actions.enqueueSnackbar({
-            message: `Link to ${event?.title} has been copied!`,
-            options: {
-               variant: "success",
-            },
-         })
-      );
+      openShareDialog?.(event);
    };
 
    const onClickRegister = () => {
@@ -544,6 +526,7 @@ interface EventPreviewCardProps {
    registering?: boolean;
    autoRegister?: boolean;
    interests?: Interest[];
+   openShareDialog?: React.Dispatch<React.SetStateAction<LiveStreamEvent>>;
    onRegisterClick?: (
       event: LiveStreamEvent,
       targetGroupId: string,
