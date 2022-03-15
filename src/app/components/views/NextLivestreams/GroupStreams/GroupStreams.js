@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Box, Grid, LinearProgress, Typography } from "@mui/material";
 import LazyLoad from "react-lazyload";
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers";
+import ShareLivestreamModal from "../../common/ShareLivestreamModal";
 import EventPreviewCard from "../../common/stream-cards/EventPreviewCard";
 import RegistrationModal from "../../common/registration-modal";
 import { useRouter } from "next/router";
@@ -88,6 +89,13 @@ const GroupStreams = ({
          setGlobalCardHighlighted(false);
       }
    }, [groupData]);
+
+   const [shareEventDialog, setShareEventDialog] = useState(null);
+
+   const handleShareEventDialogClose = useCallback(() => {
+      setShareEventDialog(null);
+   }, [setShareEventDialog]);
+
    const renderStreamCards = slicedLivestreams?.map((livestream) => {
       if (livestream) {
          return (
@@ -106,6 +114,7 @@ const GroupStreams = ({
                      interests={existingInterests}
                      autoRegister
                      event={livestream}
+                     openShareDialog={setShareEventDialog}
                   />
                </Wrapper>
             </Grid>
@@ -148,6 +157,14 @@ const GroupStreams = ({
                      </Grid>
                   )
                ) : null}
+               {shareEventDialog ? (
+                  <ShareLivestreamModal
+                     livestreamData={shareEventDialog}
+                     handleClose={handleShareEventDialogClose}
+                  />
+               ) : (
+                  ""
+               )}
             </Grid>
          </Box>
          {joinGroupModalData && (

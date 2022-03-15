@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import { useCurrentStream } from "../../context/stream/StreamContext";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 import useStreamRef from "./useStreamRef";
 
 /**
  * @param {(null | Object)} localMediaStream - The employee who is responsible for the project.
- * @param {string} localMediaStream.stream.streamId - The name of the employee.
+ * @param {string} localMediaStream.stream.uid - The name of the employee.
  * @param {Object[]} externalMediaStreams - An Array of external stream Objects
  * @returns {{}} Returns the 3 stream link types
  */
@@ -40,22 +39,22 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
       const isFallback = Boolean(options.isFallback);
       let timeout = setTimeout(() => {
          let audioLevels = externalMediaStreams.map((stream) => {
-            if (stream.streamId !== "demoStream") {
+            if (stream.uid !== "demoStream" && stream.audioTrack) {
                return {
-                  streamId: stream.streamId,
-                  audioLevel: stream.stream.getAudioLevel(),
+                  streamId: stream.uid,
+                  audioLevel: stream.audioTrack.getVolumeLevel(),
                };
             } else {
                return {
-                  streamId: stream.streamId,
+                  streamId: stream.uid,
                   audioLevel: 0,
                };
             }
          });
-         if (localMediaStream) {
+         if (localMediaStream && localMediaStream.audioTrack) {
             audioLevels.push({
-               streamId: localMediaStream.stream.getId(),
-               audioLevel: localMediaStream.stream.getAudioLevel(),
+               streamId: localMediaStream.uid,
+               audioLevel: localMediaStream.audioTrack.getVolumeLevel(),
             });
          }
          if (audioLevels && audioLevels.length > 1) {
@@ -91,7 +90,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
       if (externalMediaStreams && firestoreCurrentSpeaker) {
          // TODO get rid of this
          let existingCurrentSpeaker = externalMediaStreams.find(
-            (stream) => stream.streamId === firestoreCurrentSpeaker
+            (stream) => stream.uid === firestoreCurrentSpeaker
          );
          if (!existingCurrentSpeaker) {
             handleChangeCurrentSpeakerId(streamId);
@@ -107,7 +106,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
 
    const handleChangeCurrentSpeakerId = useCallback(
       (id, isFallback) => {
-         if (isFallback) return setCurrentSpeakerId(id);
+         if (isFallback || !id) return setCurrentSpeakerId(id);
          setLivestreamCurrentSpeakerId(streamRef, id);
       },
       [streamRef]
@@ -126,7 +125,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
 
    const checkIfHasMainStreamer = useCallback(
       (streams) => {
-         return streams.some((stream) => stream.streamId === streamId);
+         return streams.some((stream) => stream.uid === streamId);
       },
       [streamId]
    );

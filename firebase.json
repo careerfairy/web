@@ -1,91 +1,84 @@
 {
-  "functions": {
-    "source": ".",
-    "ignore": [
-      "**/src/**",
-      "**/.vscode/**",
-      ".firebase/**",
-      ".firebaserc",
-      "firebase.json",
-      "**/node_modules/**",
-      "**/public/**",
-      "**/.next/cache/**"
-    ]
-  },
-  "hosting": [
-    {
-      "target": "production",
-      "public": "public",
+   "functions": {
+      "source": ".",
       "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        {
-          "source": "**",
-          "function": "production"
-        }
+         "**/src/**",
+         "**/.vscode/**",
+         ".firebase/**",
+         ".firebaserc",
+         "firebase.json",
+         "*.log",
+         ".git",
+         "emulatorData",
+         "**/node_modules/**",
+         "**/public/**",
+         "**/.next/cache/**"
       ]
-    },
-    {
-      "target": "testing",
-      "public": "public",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        {
-          "source": "**/**",
-          "function": "testing"
-        }
-      ]
-    },
-    {
-      "target": "testing2",
-      "public": "public",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        {
-          "source": "**/**",
-          "function": "testing2"
-        }
-      ]
-    },
-    {
-      "target": "personal-habib",
-      "public": "public",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        {
-          "source": "**/**",
-          "function": "personalHabib"
-        }
-      ]
-    }
-  ],
-  "emulators": {
-    "functions": {
-      "port": 5001
-    },
-    "firestore": {
-      "port": 8080
-    },
-    "hosting": {
-      "port": 5000
-    },
-    "ui": {
-      "enabled": true
-    }
-  }
+   },
+   "firestore": {
+      "rules": "firestore.rules"
+   },
+   "hosting": [
+      {
+         "target": "production",
+         "public": "public",
+         "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+         "rewrites": [
+            {
+               "source": "**",
+               "function": "production"
+            }
+         ]
+      },
+      {
+         "target": "testing",
+         "public": "public",
+         "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+         "rewrites": [
+            {
+               "source": "**/**",
+               "function": "testing"
+            }
+         ]
+      },
+      {
+         "target": "testing2",
+         "public": "public",
+         "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+         "rewrites": [
+            {
+               "source": "**/**",
+               "function": "testing2"
+            }
+         ]
+      },
+      {
+         "target": "personal-habib",
+         "public": "public",
+         "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+         "rewrites": [
+            {
+               "source": "**/**",
+               "function": "personalHabib"
+            }
+         ]
+      }
+   ],
+   "emulators": {
+      "functions": {
+         "port": 5001
+      },
+      "firestore": {
+         "port": 8080
+      },
+      "hosting": {
+         "port": 5000
+      },
+      "ui": {
+         "enabled": true
+      },
+      "auth": {
+         "port": 9099
+      }
+   }
 }

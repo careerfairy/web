@@ -3,7 +3,7 @@ import {
    getServerSideStream,
    getServerSideStreamAdminPreferences,
 } from "./serverUtil";
-import { shouldWeRedirectNextGen } from "./StreamUtil";
+import { shouldWeRedirectNextGen } from "./streamUtil";
 
 export const handleRedirectToNextGen = async (
    context: GetServerSidePropsContext
@@ -31,7 +31,7 @@ export const handleRedirectToNextGen = async (
       context.req.headers.host,
       currentEnv,
       isNextGen,
-      context.req.url
+      context.resolvedUrl
    );
 
    if (urlToRedirect) {

@@ -259,7 +259,7 @@ const BreakoutRoom = ({
    handleClose,
    refreshing,
    mobile,
-   agoraHandlers,
+   leaveAgoraRoom,
 }) => {
    const classes = useStyles();
    const dispatch = useDispatch();
@@ -275,10 +275,8 @@ const BreakoutRoom = ({
    } = useRouter();
    const [editRoomNameModalOpen, setEditRoomNameModalOpen] = useState(false);
    const [loading, setLoading] = useState(false);
-   const [
-      deleteBreakoutRoomModalOpen,
-      setDeleteBreakoutRoomModalOpen,
-   ] = useState(false);
+   const [deleteBreakoutRoomModalOpen, setDeleteBreakoutRoomModalOpen] =
+      useState(false);
    const [breakoutRoomLink, setBreakoutRoomLink] = useState("");
    const [joinAsMenuData, setJoinAsMenuData] = useState(initialJoinAsData);
 
@@ -491,7 +489,7 @@ const BreakoutRoom = ({
             </AccordionSummary>
             <BreakoutRoomAccordionContent
                roomId={id}
-               agoraHandlers={agoraHandlers}
+               leaveAgoraRoom={leaveAgoraRoom}
                liveSpeakers={liveSpeakers}
                updateMemberCount={updateMemberCount}
             />

@@ -27,9 +27,9 @@ const styles = {
       color: (theme) => theme.palette.common.white,
       opacity: 0.9,
       fontSize: {
-         md: '1.5rem',
-         lg: '2rem'
-      }
+         md: "1.5rem",
+         lg: "2rem",
+      },
    },
 };
 

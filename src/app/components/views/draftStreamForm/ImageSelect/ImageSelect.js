@@ -10,7 +10,7 @@ import {
 import PublishIcon from "@mui/icons-material/Publish";
 import { uploadLogo } from "../../../helperFunctions/HelperFunctions";
 import FilePickerContainer from "../../../ssr/FilePickerContainer";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 
 const logoPlaceholder =

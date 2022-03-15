@@ -18,7 +18,6 @@ const DraggableComponent = ({
       const existingDivPositions = JSON.parse(localStorage.getItem(elementId));
       setPosition(existingDivPositions);
       setHasLoaded(true);
-      console.log(existingDivPositions);
    }, []);
 
    function handleStop(e, data) {
@@ -46,10 +45,10 @@ const DraggableComponent = ({
          onStop={handleStop}
          bounds={bounds}
       >
-         <div style={{ zIndex, position: positionStyle,
-            left: "1%",
-            top: "1%",
-         }} ref={nodeRef}>
+         <div
+            style={{ zIndex, position: positionStyle, left: "1%", top: "1%" }}
+            ref={nodeRef}
+         >
             {children}
          </div>
       </Draggable>

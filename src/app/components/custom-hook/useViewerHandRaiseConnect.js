@@ -3,7 +3,7 @@ import { useFirestoreConnect } from "react-redux-firebase";
 import { useRouter } from "next/router";
 import { useAuth } from "../../HOCs/AuthProvider";
 
-const useViewerHandRaiseConnect = (currentLivestream, streamerId) => {
+const useViewerHandRaiseConnect = (currentLivestream, handRaiseId) => {
    const { authenticatedUser } = useAuth();
    const {
       query: { livestreamId, breakoutRoomId },
@@ -11,10 +11,6 @@ const useViewerHandRaiseConnect = (currentLivestream, streamerId) => {
 
    const query = useMemo(() => {
       let query = [];
-      const handRaiseDocId =
-         currentLivestream?.test || currentLivestream?.openStream
-            ? "anonymous" + streamerId
-            : authenticatedUser.email;
       if (livestreamId) {
          if (breakoutRoomId) {
             query = [
@@ -28,7 +24,7 @@ const useViewerHandRaiseConnect = (currentLivestream, streamerId) => {
                         subcollections: [
                            {
                               collection: "handRaises",
-                              doc: handRaiseDocId,
+                              doc: handRaiseId,
                            },
                         ],
                      },
@@ -45,7 +41,7 @@ const useViewerHandRaiseConnect = (currentLivestream, streamerId) => {
                   subcollections: [
                      {
                         collection: "handRaises",
-                        doc: handRaiseDocId,
+                        doc: handRaiseId,
                      },
                   ],
                },
@@ -56,7 +52,7 @@ const useViewerHandRaiseConnect = (currentLivestream, streamerId) => {
    }, [
       livestreamId,
       breakoutRoomId,
-      streamerId,
+      handRaiseId,
       authenticatedUser.email,
       currentLivestream?.test,
    ]);

@@ -1,10 +1,6 @@
 import IconButton from "@mui/material/IconButton";
 import { BadgeOutlined } from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  Tooltip
-} from "@mui/material";
+import { Box, Button, Tooltip } from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import usePulseStyles from "../../../materialUI/Misc/pulse";
 import { useAuth } from "../../../HOCs/AuthProvider";
@@ -12,126 +8,143 @@ import UserDataModal, { missingDataFields } from "./UserDataModal";
 import { useLocalStorage } from "react-use";
 
 const styles = {
-  containerIcon: {
-    width: "26px",
-    height: "26px",
-    backgroundColor: "primary.main",
-    borderRadius: "50%"
-  }
+   containerIcon: {
+      width: "26px",
+      height: "26px",
+      backgroundColor: "primary.main",
+      borderRadius: "50%",
+   },
 };
 
 export const MISSING_DATA_KEY = "cf_missing_data"; // localstorage key
 export const MISSING_DATA_DISMISS_PERIOD_MS = 3600 * 24 * 7; // 1 week
 
 const MissingDataButton = ({
-                             switchInterval = 15000 // 15s delay until a more intrusive button
-                           }: Props) => {
-  const { authenticatedUser: user, userData } = useAuth();
-  const pulseClasses = usePulseStyles();
-  const buttonRef = useRef(null);
-  const [missingFields, setMissingFields] = useState([]);
-  const [hidden, setHidden] = useState(true);
-  const [showLargeButton, setLargeButton] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [dismissedAt, setDismissedAt, removeDismissedAt] = useLocalStorage(MISSING_DATA_KEY, null);
+   switchInterval = 15000, // 15s delay until a more intrusive button
+}: Props) => {
+   const { authenticatedUser: user, userData } = useAuth();
+   const pulseClasses = usePulseStyles();
+   const buttonRef = useRef(null);
+   const [missingFields, setMissingFields] = useState([]);
+   const [hidden, setHidden] = useState(true);
+   const [showLargeButton, setLargeButton] = useState(false);
+   const [isModalOpen, setModalOpen] = useState(false);
+   const [dismissedAt, setDismissedAt, removeDismissedAt] = useLocalStorage(
+      MISSING_DATA_KEY,
+      null
+   );
 
-  // confirm with localstorage if we should hide or not
-  useEffect(() => {
-    if (missingFields.length === 0) {
-      setHidden(true);
-      return;
-    }
-
-    if (dismissedAt) {
-      try {
-        if (Date.now() - dismissedAt > MISSING_DATA_DISMISS_PERIOD_MS) {
-          setHidden(false);
-          removeDismissedAt();
-          return;
-        }
-      } catch (e) {
-        console.error(e);
+   // confirm with localstorage if we should hide or not
+   useEffect(() => {
+      if (missingFields.length === 0) {
+         setHidden(true);
+         return;
       }
-    } else {
-      setHidden(false);
-    }
-  }, [dismissedAt, missingFields]);
 
-  // check if we have any field missing
-  useEffect(() => {
-    if (!isModalOpen && user && userData) {
-      setMissingFields(missingDataFields.filter(f => f.isMissing(userData)));
-    }
-  }, [user, userData, isModalOpen]);
+      if (dismissedAt) {
+         try {
+            if (Date.now() - dismissedAt > MISSING_DATA_DISMISS_PERIOD_MS) {
+               setHidden(false);
+               removeDismissedAt();
+               return;
+            }
+         } catch (e) {
+            console.error(e);
+         }
+      } else {
+         setHidden(false);
+      }
+   }, [dismissedAt, missingFields]);
 
-  // switch to a more intrusive style after a while
-  useEffect(() => {
-    if (missingFields.length > 0 && !isModalOpen) {
-      const timer = setTimeout(() => {
-        setLargeButton(true);
-      }, switchInterval, missingFields);
+   // check if we have any field missing
+   useEffect(() => {
+      if (!isModalOpen && user && userData) {
+         setMissingFields(
+            missingDataFields.filter((f) => f.isMissing(userData))
+         );
+      }
+   }, [user, userData, isModalOpen]);
 
-      return () => clearTimeout(timer);
-    }
-  }, [switchInterval, missingFields, isModalOpen]);
+   // switch to a more intrusive style after a while
+   useEffect(() => {
+      if (missingFields.length > 0 && !isModalOpen) {
+         const timer = setTimeout(
+            () => {
+               setLargeButton(true);
+            },
+            switchInterval,
+            missingFields
+         );
 
-  const handleModalOpen = () => {
-    setModalOpen(true);
-  };
+         return () => clearTimeout(timer);
+      }
+   }, [switchInterval, missingFields, isModalOpen]);
 
-  const handleModalClose = useCallback((e, reason) => {
-    if (reason === undefined) { // dismiss button click
-      setDismissedAt(Date.now());
-      setHidden(true);
-    }
+   const handleModalOpen = () => {
+      setModalOpen(true);
+   };
 
-    if (reason === "end") { // save button click (last step)
-      setHidden(true);
-    }
+   const handleModalClose = useCallback((e, reason) => {
+      if (reason === undefined) {
+         // dismiss button click
+         setDismissedAt(Date.now());
+         setHidden(true);
+      }
 
-    setModalOpen(false);
-  }, []);
+      if (reason === "end") {
+         // save button click (last step)
+         setHidden(true);
+      }
 
-  if (hidden) return null;
+      setModalOpen(false);
+   }, []);
 
-  return (
-    <Box>
-      <Tooltip
-        title={`You have missing data in your profile`}
-      >
-        {showLargeButton ? (
-          <Button variant="contained" size="medium" disableElevation
+   if (hidden) return null;
+
+   return (
+      <Box>
+         <Tooltip title={`You have missing data in your profile`}>
+            {showLargeButton ? (
+               <Button
+                  variant="contained"
+                  size="medium"
+                  disableElevation
                   className={isModalOpen ? "" : pulseClasses.pulseAnimate}
-                  onClick={handleModalOpen}>
-            Fill in missing data
-          </Button>
-        ) : (
-          <IconButton
-            ref={buttonRef}
-            color="primary"
-            size="large"
-            onClick={handleModalOpen}
-          >
-            <Box component="span"
-                 sx={styles.containerIcon}
-                 className={isModalOpen ? "" : pulseClasses.pulseAnimate}>
-              <BadgeOutlined sx={{ color: "white" }} />
-            </Box>
-          </IconButton>
-        )}
-      </Tooltip>
+                  onClick={handleModalOpen}
+               >
+                  Fill in missing data
+               </Button>
+            ) : (
+               <IconButton
+                  ref={buttonRef}
+                  color="primary"
+                  size="large"
+                  onClick={handleModalOpen}
+               >
+                  <Box
+                     component="span"
+                     sx={styles.containerIcon}
+                     className={isModalOpen ? "" : pulseClasses.pulseAnimate}
+                  >
+                     <BadgeOutlined sx={{ color: "white" }} />
+                  </Box>
+               </IconButton>
+            )}
+         </Tooltip>
 
-      {isModalOpen && (
-        <UserDataModal handleModalClose={handleModalClose}
-                       isModalOpen={isModalOpen}
-                       missingFields={missingFields} />
-      )}
-    </Box>
-  );
+         {isModalOpen && (
+            <UserDataModal
+               handleModalClose={handleModalClose}
+               isModalOpen={isModalOpen}
+               missingFields={missingFields}
+            />
+         )}
+      </Box>
+   );
 };
 
 type Props = {
-  switchInterval?: number
-}
+   switchInterval?: number;
+};
 
 export default MissingDataButton;

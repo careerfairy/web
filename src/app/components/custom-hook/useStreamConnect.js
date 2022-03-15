@@ -55,8 +55,8 @@ const useStreamConnect = () => {
       (state) =>
          currentLivestreamSelector(state, {
             streamId: breakoutRoomId || livestreamId,
-         }),
-      shallowEqual
+         })
+      // shallowEqual
    );
 };
 

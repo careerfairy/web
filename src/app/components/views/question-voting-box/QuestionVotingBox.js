@@ -10,7 +10,7 @@ import {
    CardHeader,
    Typography,
 } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -67,6 +67,13 @@ function QuestionVotingBox(props) {
       return question.emailOfVoters.indexOf(user.email) > -1;
    }
 
+   function userHasVotedOnQuestion(user, question) {
+      if (!user || !question.emailOfVoters) {
+         return false;
+      }
+      return question.emailOfVoters.indexOf(user.email) > -1;
+   }
+
    return (
       <Card elevation={2} className={classes.root}>
          <CardHeader
@@ -97,7 +104,7 @@ function QuestionVotingBox(props) {
             <Button
                disabled={
                   userHasVotedOnQuestion(props.user, props.question) ||
-                  props.isPastEven
+                  props.isPastEvent
                }
                variant="contained"
                fullWidth

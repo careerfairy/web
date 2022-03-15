@@ -432,4 +432,8 @@ export const getMaxLineStyles = (maxLines = 2) => ({
    "-webkit-box-orient": "vertical",
 });
 
+export const sleep = (ms) => {
+   return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 export const delay = (t) => new Promise((resolve) => setTimeout(resolve, t));

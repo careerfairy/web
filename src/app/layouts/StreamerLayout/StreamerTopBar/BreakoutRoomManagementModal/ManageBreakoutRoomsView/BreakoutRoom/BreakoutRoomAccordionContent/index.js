@@ -1,6 +1,6 @@
 import { useCurrentStream } from "context/stream/StreamContext";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import useInfiniteScrollClient from "../../../../../../../components/custom-hook/useInfiniteScrollClient";
 import { AccordionDetails } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -8,7 +8,8 @@ import EmptyRoomIcon from "@mui/icons-material/SentimentDissatisfied";
 import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
 import UserList from "./UserList";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
+import AgoraRTMContext from "context/agoraRTM/AgoraRTMContext";
 
 const useStyles = makeStyles((theme) => ({
    listWrapper: {
@@ -26,12 +27,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const BreakoutRoomAccordionContent = ({
-   agoraHandlers,
    updateMemberCount,
    roomId,
    liveSpeakers,
    openRoom,
 }) => {
+   const { agoraHandlers } = useContext(AgoraRTMContext);
+
    const {
       currentLivestream: { id: livestreamId },
    } = useCurrentStream();
@@ -54,9 +56,8 @@ const BreakoutRoomAccordionContent = ({
             const newState = { ...prevState };
             liveSpeakers.forEach((speakerData) => {
                if (speakerData.speakerUuid) {
-                  newState[speakerData.speakerUuid] = getDisplayData(
-                     speakerData
-                  );
+                  newState[speakerData.speakerUuid] =
+                     getDisplayData(speakerData);
                }
             });
             return newState;

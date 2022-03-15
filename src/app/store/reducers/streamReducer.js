@@ -1,3 +1,4 @@
+import { AGORA_RTC_CONNECTION_STATE_CONNECTING } from "constants/agora";
 import * as actions from "../actions/actionTypes";
 
 const initialState = {
@@ -12,6 +13,7 @@ const initialState = {
       numberOfViewers: 0,
    },
    streaming: {
+      isPublished: false,
       videoIsPaused: false,
       videoIsMuted: false,
       playAllRemoteVideos: false,
@@ -22,10 +24,42 @@ const initialState = {
       unpauseFailedPlayRemoteVideos: false,
       spyModeEnabled: false,
    },
+   agoraState: {
+      rtcConnectionState: {
+         // curState: undefined,
+         curState: AGORA_RTC_CONNECTION_STATE_CONNECTING,
+         prevState: undefined,
+         reason: undefined,
+         warning: undefined,
+      },
+      rtcError: {
+         code: undefined,
+         message: undefined,
+         name: undefined,
+         data: undefined,
+      },
+      deviceErrors: {
+         cameraDenied: false,
+         microphoneDenied: false,
+         cameraIsUsedByOtherApp: false,
+         microphoneIsUsedByOtherApp: false,
+      },
+      screenSharePermissionDenied: false,
+      sessionIsUsingCloudProxy: false,
+      primaryClientJoined: false,
+   },
 };
 
 const streamReducer = (state = initialState, { type, payload }) => {
    switch (type) {
+      case actions.SET_STREAMER_PUBLISHED:
+         return {
+            ...state,
+            streaming: {
+               ...state.streaming,
+               isPublished: payload,
+            },
+         };
       case actions.SET_SPY_MODE:
          return {
             ...state,
@@ -40,6 +74,38 @@ const streamReducer = (state = initialState, { type, payload }) => {
             layout: {
                ...state.layout,
                focusModeEnabled: payload,
+            },
+         };
+      case actions.SET_AGORA_RTC_CONNECTION_STATE:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               rtcConnectionState: payload,
+            },
+         };
+      case actions.SET_AGORA_RTC_ERROR:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               rtcError: payload,
+            },
+         };
+      case actions.SET_SESSION_IS_USING_CLOUD_PROXY:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               sessionIsUsingCloudProxy: payload,
+            },
+         };
+      case actions.CLEAR_AGORA_RTC_ERROR:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               rtcError: initialState.agoraState.rtcError,
             },
          };
       case actions.TOGGLE_LEFT_MENU:
@@ -64,6 +130,33 @@ const streamReducer = (state = initialState, { type, payload }) => {
             layout: {
                ...state.layout,
                leftMenuOpen: false,
+            },
+         };
+      case actions.SET_DEVICE_ERROR:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               deviceErrors: {
+                  ...state.agoraState.deviceErrors,
+                  ...payload,
+               },
+            },
+         };
+      case actions.SET_SCREEN_SHARE_DENIED_ERROR:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               screenSharePermissionDenied: payload,
+            },
+         };
+      case actions.SET_AGORA_PRIMARY_CLIENT_JOINED:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               primaryClientJoined: payload,
             },
          };
       case actions.TOGGLE_LOCAL_VIDEO:
