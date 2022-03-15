@@ -1,6 +1,22 @@
 # CareerFairy Apps
 
-# Web App
+## Setup root folder
+
+You need to install the root folder deps for the git pre-commit hook to work.
+Everytime there is a commit, the hook will run prettier to format the changed files.
+
+```sh
+npm install
+```
+
+# Web App (NextJS)
+
+## Development
+
+```sh
+cd app
+npm run dev
+```
 
 ## Local Setup
 
@@ -25,4 +41,32 @@
    -  To save your firestore data changes, run the script with the arg `--export-on-exit`:
       -  `./scripts/run-locally-with-emulators.sh "./emulatorData/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)" --export-on-exit`
 -  Empty data:
+
    -  `./scripts/run-locally-with-emulators.sh` or `npm run start:emulators`
+
+-  Manually without scripts:
+
+```sh
+env FIREBASE_AUTH_EMULATOR_HOST="localhost:9099" \
+    FIRESTORE_EMULATOR_HOST="localhost:8080" \
+    JAVA_TOOL_OPTIONS="-Xmx10g" \
+    npx firebase emulators:start --only firestore,auth,functions --export-on-exit \
+    --import "./emulatorData/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)"
+```
+
+# Firebase Functions
+
+## Build
+
+```sh
+cd functions
+npm run build
+```
+
+## Deploy a function
+
+```sh
+# From the root folder
+# It will build before deploying
+npx firebase deploy --only functions:slackHandleInteractions
+```

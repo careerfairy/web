@@ -23,7 +23,7 @@ import {
    getTimeFromNow,
 } from "../../../helperFunctions/HelperFunctions"
 import * as Sentry from "@sentry/nextjs"
-import { getHumanStringDescriptionForAction } from "../../../../../shared/rewards"
+import { getHumanStringDescriptionForAction } from "../../../../../functions/src/shared/rewards"
 import useCollection from "../../../custom-hook/useCollection"
 import { Reward } from "../../../../types/reward"
 

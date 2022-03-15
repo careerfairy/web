@@ -6,7 +6,7 @@ const {
    userGetByReferralCode,
    userGetByEmail,
 } = require("./lib/user");
-const { RewardActions } = require("../../shared/rewards");
+const { RewardActions } = require("./shared/rewards");
 const {
    rewardCreateReferralSignUpLeader,
    rewardCreateLivestreamInviteCompleteLeader,
