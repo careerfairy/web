@@ -13,7 +13,7 @@ import useRegistrationModal from "../../custom-hook/useRegistrationModal";
 import RegistrationModal from "../common/registration-modal";
 import { useRouter } from "next/router";
 import { alpha } from "@mui/material/styles";
-import EmptyMessageOverlay from "./events-prview/EmptyMessageOverlay";
+import EmptyMessageOverlay from "./events-preview/EmptyMessageOverlay";
 import ShareLivestreamModal from "../common/ShareLivestreamModal";
 
 const styles = {

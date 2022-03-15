@@ -5,6 +5,7 @@ import GroupStreams from "../GroupStreams/GroupStreams";
 import { useTheme } from "@mui/material/styles";
 
 // FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+// eslint-disable-next-line react/display-name
 const withWidth = () => (WrappedComponent) => (props) =>
    <WrappedComponent {...props} width="xs" />;
 
@@ -31,7 +32,6 @@ const DesktopFeed = ({
             <Grid
                container
                spacing={4}
-               ju
                sx={{ margin: (theme) => theme.spacing(1) }}
             >
                <GroupCategories
