@@ -48,7 +48,7 @@ const useRegistrationModal = (
             if (hasRegistered) {
                await firebase.deregisterFromLivestream(
                   event.id,
-                  authenticatedUser.email
+                  authenticatedUser
                );
             } else {
                if (

@@ -415,7 +415,7 @@ const EventPreviewCard = ({
                         </Typography>
                         <Stack
                            alignItems={"center"}
-                           flexWrap="wrap"
+                           flexWrap="nowrap"
                            sx={{ mt: 1 }}
                            direction={"row"}
                            spacing={1}
@@ -452,9 +452,7 @@ const EventPreviewCard = ({
                                  {eventInterests.length > 2 && (
                                     <WhiteTagChip
                                        variant="outlined"
-                                       label={`+ ${
-                                          eventInterests.length - 2
-                                       } more`}
+                                       label={`+ ${eventInterests.length - 2}`}
                                     />
                                  )}
                               </>

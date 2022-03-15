@@ -45,6 +45,7 @@ const styles = {
    eventsStack: {
       position: "relative",
       flex: 1,
+      alignSelf: "start",
    },
    stackOverlay: {
       position: "absolute",
