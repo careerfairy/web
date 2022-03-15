@@ -65,7 +65,11 @@ export default function useAgoraClientConfig(rtcClient: IAgoraRTCClient) {
                   if (mediaType === "audio") {
                      user.audioTrack = remoteUser.audioTrack;
                      user.audioMuted = false;
-                     remoteUser.audioTrack.play();
+                     try {
+                        remoteUser?.audioTrack?.play?.();
+                     } catch (e) {
+                        dispatch(actions.sendGeneralError(e));
+                     }
                   } else if (mediaType === "video") {
                      user.videoTrack = remoteUser.videoTrack;
                      user.videoMuted = false;
