@@ -21,7 +21,7 @@ import MultiStepWrapper, {
 import PersonaliseSteps from "../components/views/signup/PersonaliseSteps";
 import { MainLogo } from "./../components/logos";
 
-export const SIGNUP_REDIRECT_PATH = "/profile";
+export const SIGNUP_REDIRECT_PATH = "/portal";
 
 const initialStates: MultiStepComponentType[] = [
    {
