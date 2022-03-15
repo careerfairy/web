@@ -229,7 +229,7 @@ const UpcomingLivestreamCard = ({
    const handleMouseLeave = debounce(() => setHovered(false), throttle_speed)
 
    const { getFollowingGroupsWithCache, deregisterFromLivestream } =
-      useFirebaseService();
+      useFirebaseService()
 
    useEffect(() => {
       ;(async function () {
@@ -366,7 +366,7 @@ const UpcomingLivestreamCard = ({
          return await deregisterFromLivestream(
             livestream?.id,
             authenticatedUser
-         );
+         )
       } catch (e) {}
    }
 

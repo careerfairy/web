@@ -3,11 +3,11 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import {
    makeLivestreamEventDetailsInviteUrl,
    makeLivestreamEventDetailsUrl,
-} from "../../../util/makeUrls";
+} from "../../../util/makeUrls"
 import {
    copyStringToClipboard,
    getResizedUrl,
-} from "../../helperFunctions/HelperFunctions";
+} from "../../helperFunctions/HelperFunctions"
 import {
    Box,
    Button,
@@ -19,10 +19,10 @@ import {
    Stack,
    TextField,
    Typography,
-} from "@mui/material";
-import ContentPasteIcon from "@mui/icons-material/ContentPaste";
-import React, { useEffect, useState } from "react";
-import { streamIsOld } from "../../../util/CommonUtil";
+} from "@mui/material"
+import ContentPasteIcon from "@mui/icons-material/ContentPaste"
+import React, { useEffect, useState } from "react"
+import { streamIsOld } from "../../../util/CommonUtil"
 
 const styles = {
    title: {
@@ -51,7 +51,7 @@ const styles = {
          fontWeight: "800",
       },
    },
-} as const;
+} as const
 
 const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
    const { enqueueSnackbar } = useSnackbar()
@@ -63,8 +63,8 @@ const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
       enqueueSnackbar("Link has been copied to your clipboard", {
          variant: "success",
          preventDuplicate: true,
-      });
-   };
+      })
+   }
 
    useEffect(() => {
       const isReferralLink = userData && !streamIsOld(livestreamData.start)

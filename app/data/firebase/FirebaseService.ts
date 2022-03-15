@@ -2152,11 +2152,11 @@ class FirebaseService {
       authenticatedUser,
       groupsWithPolicies = []
    ) => {
-      const { uid, email } = authenticatedUser;
+      const { uid, email } = authenticatedUser
       const idsOfGroupsWithPolicies = groupsWithPolicies.map(
          (group) => group.id
-      );
-      let userRef = this.firestore.collection("userData").doc(email);
+      )
+      let userRef = this.firestore.collection("userData").doc(email)
       let livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -2164,12 +2164,12 @@ class FirebaseService {
          .collection("livestreams")
          .doc(livestreamId)
          .collection("registeredStudents")
-         .doc(email);
+         .doc(email)
       let registrantSubCollectionRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("registrants")
-         .doc(uid);
+         .doc(uid)
       const transactionPromise = this.firestore.runTransaction(
          (transaction) => {
             return transaction.get(userRef).then((userDoc) => {
@@ -2178,7 +2178,7 @@ class FirebaseService {
                   // To be depreciated
                   registeredUsers:
                      firebase.firestore.FieldValue.arrayUnion(email),
-               });
+               })
 
                for (const groupId of idsOfGroupsWithPolicies) {
                   // to be depreciated
@@ -2186,21 +2186,21 @@ class FirebaseService {
                      .collection("careerCenterData")
                      .doc(groupId)
                      .collection("usersInPolicy")
-                     .doc(email);
+                     .doc(email)
                   // to be used from now on
                   let authUserInPolicyRef = this.firestore
                      .collection("careerCenterData")
                      .doc(groupId)
                      .collection("authUsersInPolicy")
-                     .doc(uid);
+                     .doc(uid)
                   transaction.set(userInPolicyRef, {
                      ...user,
                      dateAgreed: this.getServerTimestamp(),
-                  });
+                  })
                   transaction.set(authUserInPolicyRef, {
                      ...user,
                      dateAgreed: this.getServerTimestamp(),
-                  });
+                  })
                }
                // To be depreciated
                transaction.set(registeredUsersRef, {
@@ -2208,7 +2208,7 @@ class FirebaseService {
                   livestreamId,
                   dateRegistered: this.getServerTimestamp(),
                   authId: uid,
-               });
+               })
 
                // To be used from now on
                transaction.set(registrantSubCollectionRef, {
@@ -2216,15 +2216,15 @@ class FirebaseService {
                   livestreamId,
                   dateRegistered: this.getServerTimestamp(),
                   authId: uid,
-               });
-            });
+               })
+            })
          }
       )
       return await Promise.all([transactionPromise])
    }
 
    deregisterFromLivestream = (livestreamId, authenticatedUser) => {
-      const { uid, email } = authenticatedUser;
+      const { uid, email } = authenticatedUser
       let livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -2232,22 +2232,22 @@ class FirebaseService {
          .collection("livestreams")
          .doc(livestreamId)
          .collection("registeredStudents")
-         .doc(email);
+         .doc(email)
       let registrantSubCollectionRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("registrants")
-         .doc(uid);
-      let batch = this.firestore.batch();
+         .doc(uid)
+      let batch = this.firestore.batch()
       batch.update(livestreamRef, {
          registeredUsers: firebase.firestore.FieldValue.arrayRemove(email),
-      });
+      })
       // To be depreciated
-      batch.delete(registeredUsersRef);
+      batch.delete(registeredUsersRef)
       // To be used from now on
-      batch.delete(registrantSubCollectionRef);
-      return batch.commit();
-   };
+      batch.delete(registrantSubCollectionRef)
+      return batch.commit()
+   }
 
    joinCompanyTalentPool = (companyId, userData, mainStreamId) => {
       let userRef = this.firestore
@@ -2272,7 +2272,7 @@ class FirebaseService {
                   talentPool: firebase.firestore.FieldValue.arrayUnion(
                      userData.userEmail
                   ),
-               });
+               })
                transaction.set(userInTalentPoolCollectionRef, {
                   ...userData,
                   dateJoinedTalentPool: this.getServerTimestamp(),

@@ -34,12 +34,12 @@ import {
    InPersonEventBadge,
    LanguageBadge,
    LimitedRegistrationsBadge,
-} from "./badges";
-import RegistrationModal from "../../../common/registration-modal";
-import styles from "./GroupStreamCardV2Styles";
-import { languageCodesDict } from "../../../../helperFunctions/streamFormFunctions";
-import { ShareOutlined } from "@mui/icons-material";
-import { useAuth } from "../../../../../HOCs/AuthProvider";
+} from "./badges"
+import RegistrationModal from "../../../common/registration-modal"
+import styles from "./GroupStreamCardV2Styles"
+import { languageCodesDict } from "../../../../helperFunctions/streamFormFunctions"
+import { ShareOutlined } from "@mui/icons-material"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
 
 const maxOptions = 2
 const GroupStreamCardV2 = memo(
@@ -59,9 +59,9 @@ const GroupStreamCardV2 = memo(
       isAdmin,
       openShareDialog,
    }) => {
-      const firebase = useFirebaseService();
-      const { authenticatedUser } = useAuth();
-      const { absolutePath, pathname, push, query } = useRouter();
+      const firebase = useFirebaseService()
+      const { authenticatedUser } = useAuth()
+      const { absolutePath, pathname, push, query } = useRouter()
       const linkToStream = useMemo(() => {
          const notLoggedIn =
             (user.isLoaded && user.isEmpty) || !user.emailVerified
@@ -246,7 +246,7 @@ const GroupStreamCardV2 = memo(
             })
          }
 
-         firebase.deregisterFromLivestream(livestream.id, authenticatedUser);
+         firebase.deregisterFromLivestream(livestream.id, authenticatedUser)
       }
 
       async function startRegistrationProcess() {
