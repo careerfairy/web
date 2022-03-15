@@ -1,8 +1,7 @@
 {
-   "name": "careerfairy-ssr-webapp",
+   "name": "careerfairy-webapp",
    "version": "1.0.0",
    "private": true,
-   "description": "ssr app",
    "main": "server.js",
    "scripts": {
       "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 next",
@@ -128,7 +127,6 @@
       "eslint-config-prettier": "^8.3.0",
       "jscodeshift": "^0.11.0",
       "node-sass": "^6.0.0",
-      "prettier": "^2.5.1",
       "prop-types": "^15.7.2",
       "react-perfect-scrollbar": "^1.5.8",
       "typescript": "^4.5.5",
