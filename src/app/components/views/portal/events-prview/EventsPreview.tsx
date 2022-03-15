@@ -104,7 +104,6 @@ const EventsPreview = ({
    const isMedium = useMediaQuery(up("md"));
    const isLarge = useMediaQuery(up("lg"));
    const [shareEventDialog, setShareEventDialog] = useState(null);
-   console.log("-> shareEventDialog in prev", shareEventDialog);
 
    const handleShareEventDialogClose = useCallback(() => {
       setShareEventDialog(null);
