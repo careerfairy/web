@@ -1,18 +1,8 @@
 {
    "functions": {
-      "source": ".",
-      "ignore": [
-         "**/src/**",
-         "**/.vscode/**",
-         ".firebase/**",
-         ".firebaserc",
-         "firebase.json",
-         "*.log",
-         ".git",
-         "emulatorData",
-         "**/node_modules/**",
-         "**/public/**",
-         "**/.next/cache/**"
+      "predeploy": [
+         "npm --prefix \"$RESOURCE_DIR\" run lint",
+         "npm --prefix \"$RESOURCE_DIR\" run build"
       ]
    },
    "firestore": {
