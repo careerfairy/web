@@ -13,6 +13,7 @@ import Slider from "react-slick";
 const arrowFontSize = 30;
 const styles = {
    carousel: {
+      pt: 4,
       "& .slick-track": {
          ml: 0,
          mr: 0,
