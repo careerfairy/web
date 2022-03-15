@@ -1,5 +1,5 @@
 const { admin } = require("../api/firestoreAdmin");
-const { RewardActions, getPoints } = require("../../src/shared/rewards");
+const { RewardActions, getPoints } = require("../../../shared/rewards");
 const pick = require("lodash/pick");
 
 exports.rewardCreateReferralSignUpLeader = (leaderId, followerUserData) => {
