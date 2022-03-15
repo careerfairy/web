@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { LiveStreamEvent } from "../../../../types/event";
@@ -14,6 +14,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Button, Grid } from "@mui/material";
 import LazyLoad from "react-lazyload";
 import useInfiniteScrollClientWithHandlers from "components/custom-hook/useInfiniteScrollClientWithHandlers";
+import ShareLivestreamModal from "../../common/ShareLivestreamModal";
 
 const arrowFontSize = 30;
 
@@ -80,6 +81,11 @@ const EventsPreviewGrid = ({
       useRegistrationModal(true);
    const { data: existingInterests } = useInterests();
    const [slicedEvents] = useInfiniteScrollClientWithHandlers(events, 6, 3);
+   const [shareEventDialog, setShareEventDialog] = useState(null);
+
+   const handleShareEventDialogClose = useCallback(() => {
+      setShareEventDialog(null);
+   }, [setShareEventDialog]);
 
    return (
       <>
@@ -140,6 +146,7 @@ const EventsPreviewGrid = ({
                            >
                               <EventPreviewCard
                                  interests={existingInterests}
+                                 openShareDialog={setShareEventDialog}
                                  onRegisterClick={handleClickRegister}
                                  key={event.id}
                                  event={event}
@@ -162,6 +169,16 @@ const EventsPreviewGrid = ({
                targetGroupId={joinGroupModalData?.targetGroupId}
                handleClose={handleCloseJoinModal}
             />
+         )}
+         {shareEventDialog ? (
+            /*
+            // @ts-ignore */
+            <ShareLivestreamModal
+               livestreamData={shareEventDialog}
+               handleClose={handleShareEventDialogClose}
+            />
+         ) : (
+            ""
          )}
       </>
    );

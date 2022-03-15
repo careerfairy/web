@@ -1,5 +1,7 @@
 import { DeviceOption } from "../types/streaming";
 import { mainProductionDomain, nextGenSubDomain } from "../constants/domains";
+import { LiveStreamEvent } from "../types/event";
+import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../constants/streams";
 
 const getDeviceKindLabel = (deviceKind: MediaDeviceInfo["kind"]) => {
    if (deviceKind === "audioinput") return "microphone";
@@ -76,4 +78,46 @@ export const shouldWeRedirectNextGen = (
 
    // we don't need to redirect
    return null;
+};
+
+export const chekIfPast = (eventStartDate: Date) =>
+   eventStartDate >
+   new Date(NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST);
+
+export const getRelevantHosts = (
+   targetHostGroupId: string,
+   event: LiveStreamEvent,
+   groupList: any[]
+) => {
+   if (!event) return [];
+   let targetGroupId = targetHostGroupId;
+   if (!targetGroupId) {
+      const listIsAllCompanies = groupList.every(
+         (group) => !group.universityCode
+      );
+      if (!listIsAllCompanies) {
+         const companyThatPublishedStream = groupList.find(
+            (group) =>
+               !group.universityCode && group.id === event?.author?.groupId
+         );
+         if (companyThatPublishedStream?.id) {
+            targetGroupId = companyThatPublishedStream.id;
+         }
+      }
+   }
+   const relevantHost = groupList.find((group) => group.id === targetGroupId);
+   return relevantHost ? [relevantHost] : groupList;
+};
+
+export const getLinkToStream = (
+   event: LiveStreamEvent,
+   groupId: string,
+   shouldAutoRegister?: boolean,
+   asPath?: string
+) => {
+   const registerQuery = shouldAutoRegister ? `&register=${event.id}` : "";
+   if (asPath) return `${asPath}?livestreamId=${event.id}${registerQuery}`;
+   return groupId
+      ? `/next-livestreams/${groupId}?livestreamId=${event.id}${registerQuery}`
+      : `/next-livestreams?livestreamId=${event.id}${registerQuery}`;
 };
