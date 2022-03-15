@@ -287,7 +287,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
          <CardContent>
             {stream.isRecording && (
                <Typography sx={styles.recording}>
-                  Recording in progress
+                  {stream?.hasEnded ? "Recorded" : "Recording in progress"}
                </Typography>
             )}
             <List dense sx={styles.list}>
