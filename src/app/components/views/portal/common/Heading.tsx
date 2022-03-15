@@ -4,15 +4,15 @@ import { Theme, SxProps } from "@mui/material/styles";
 const styles = {
    root: {
       color: "text.secondary",
-      fontWeight: 500,
-      opacity: 0.8,
+      fontWeight: 300,
+      opacity: 0.3,
    },
 } as const;
 
 const Heading = ({ sx, children }: Props) => {
    return (
       <Typography
-         variant={"h4"}
+         variant={"h5"}
          sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
       >
          {children}

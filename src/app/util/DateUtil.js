@@ -8,7 +8,6 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(advancedFormat);
 dayjs.extend(calendar);
-dayjs.tz.setDefault("Europe/Paris");
 
 export default class DateUtil {
    static getTodaysISODate() {

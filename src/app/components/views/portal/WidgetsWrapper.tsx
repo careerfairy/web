@@ -1,8 +1,8 @@
 import { Box } from "@mui/material";
 import { FC } from "react";
 
-const smallPadding = 2;
-const largePadding = 4;
+const smallPadding = 1;
+const largePadding = 2;
 // @ts-ignore
 const WidgetsWrapper: FC = ({ children }) => (
    <Box

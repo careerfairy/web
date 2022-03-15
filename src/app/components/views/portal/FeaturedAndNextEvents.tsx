@@ -25,12 +25,13 @@ const styles = {
    verticalHeading: {
       writingMode: { xs: "", md: "vertical-rl" },
       textOrientation: { xs: "", md: "mixed" },
-      p: (theme) => ({ xs: theme.spacing(1, 0), md: 1 }),
+      pl: (theme) => ({ xs: theme.spacing(1, 0), md: 2 }),
       transform: { xs: "", md: "rotate(180deg)" },
-      textAlign: { xs: "start", md: "center" },
+      textAlign: { xs: "start", md: "start" },
    },
    section: {
       display: "flex",
+      alignItems: { md: "end", xs: undefined },
       flexDirection: {
          xs: "column",
          md: "row",
@@ -56,7 +57,14 @@ const styles = {
       zIndex: 1,
    },
    overlayText: {
+      fontSize: "1.2rem",
       fontWeight: 600,
+   },
+   cardWrapper: {
+      flex: 1,
+      display: "flex",
+      alignItems: "flex-end",
+      "& > *": { width: "100%" },
    },
 } as const;
 const FeaturedAndNextEvents = () => {
@@ -73,7 +81,7 @@ const FeaturedAndNextEvents = () => {
          limit: 1,
       }
    );
-   const { authenticatedUser } = useAuth();
+   const { authenticatedUser, isLoggedOut } = useAuth();
    const [shareEventDialog, setShareEventDialog] = useState(null);
 
    const handleShareEventDialogClose = useCallback(() => {
@@ -87,15 +95,14 @@ const FeaturedAndNextEvents = () => {
          }
       );
 
-   const isLoggedOut = authenticatedUser.isLoaded && authenticatedUser.isEmpty;
    const noEvents = Boolean(!isLoading && (isLoggedOut || !nextEvents.length));
 
    return (
       <>
-         <Grid container sx={styles.root}>
+         <Grid container spacing={{ xs: 2, md: 10 }} sx={styles.root}>
             <Grid item xs={12} md={6} sx={[styles.section]}>
                <Heading sx={styles.verticalHeading}>FEATURED EVENT</Heading>
-               <Box sx={{ flex: 1 }}>
+               <Box sx={styles.cardWrapper}>
                   <EventPreviewCard
                      loading={isLoading}
                      interests={existingInterests}

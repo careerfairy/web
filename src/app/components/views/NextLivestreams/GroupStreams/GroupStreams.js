@@ -10,18 +10,6 @@ import useRegistrationModal from "../../../custom-hook/useRegistrationModal";
 import { useInterests } from "../../../custom-hook/useCollection";
 
 const styles = {
-   root: {
-      flex: 1,
-      paddingTop: 0,
-      display: "flex",
-      flexDirection: "column",
-   },
-   followButton: {
-      position: "sticky",
-      top: "165px",
-      zIndex: 101,
-      marginBottom: "14px",
-   },
    emptyMessage: {
       maxWidth: "400px",
       margin: "0 auto",
@@ -32,13 +20,6 @@ const styles = {
       alignItems: "center",
       justifyContent: "center",
       minHeight: "50vh",
-   },
-   streamGridItem: {
-      // height: gridItemHeight,
-      // display: "flex",
-   },
-   dynamicHeight: {
-      // height: "auto",
    },
 };
 
@@ -63,8 +44,6 @@ const GroupStreams = ({
    livestreams,
    mobile,
    searching,
-   livestreamId,
-   careerCenterId,
    listenToUpcoming,
    selectedOptions,
    isPastLivestreams,
@@ -99,15 +78,7 @@ const GroupStreams = ({
    const renderStreamCards = slicedLivestreams?.map((livestream) => {
       if (livestream) {
          return (
-            <Grid
-               sx={[styles.streamGridItem, mobile && styles.dynamicHeight]}
-               key={livestream.id}
-               xs={12}
-               sm={6}
-               lg={4}
-               xl={4}
-               item
-            >
+            <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={4} item>
                <Wrapper streamId={livestream.id}>
                   <EventPreviewCard
                      onRegisterClick={handleClickRegister}

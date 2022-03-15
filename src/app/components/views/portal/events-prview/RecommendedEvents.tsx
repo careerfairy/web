@@ -24,6 +24,7 @@ const RecommendedEvents = ({ limit, maxLimitIncreaseTimes }: Props) => {
          limit: currentLimit,
       }
    );
+
    useEffect(() => {
       if (
          !isEnd &&

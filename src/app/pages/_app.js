@@ -1,7 +1,5 @@
 import * as React from "react";
 import "styles.css";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext";
 import config from "@stahl.luke/react-reveal/globals";
 import { newStore, wrapper } from "../store";

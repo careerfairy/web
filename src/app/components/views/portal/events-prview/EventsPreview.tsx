@@ -15,6 +15,8 @@ import Heading from "../common/Heading";
 import { useInterests } from "../../../custom-hook/useCollection";
 import EmptyMessageOverlay from "./EmptyMessageOverlay";
 import ShareLivestreamModal from "../../common/ShareLivestreamModal";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const arrowFontSize = 30;
 
