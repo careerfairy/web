@@ -21,11 +21,11 @@ import { useSnackbar } from "notistack"
 import {
    copyStringToClipboard,
    getTimeFromNow,
-} from "../../../helperFunctions/HelperFunctions";
-import * as Sentry from "@sentry/nextjs";
-import { getHumanStringDescriptionForAction } from "../../../../../shared/rewards";
-import useCollection from "../../../custom-hook/useCollection";
-import { Reward } from "../../../../types/reward";
+} from "../../../helperFunctions/HelperFunctions"
+import * as Sentry from "@sentry/nextjs"
+import { getHumanStringDescriptionForAction } from "../../../../../functions/src/shared/rewards"
+import useCollection from "../../../custom-hook/useCollection"
+import { Reward } from "../../../../types/reward"
 
 const ReferralProfileTab = ({ userData }) => {
    const { enqueueSnackbar } = useSnackbar()
