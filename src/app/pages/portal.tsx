@@ -7,8 +7,18 @@ import RecommendedEvents from "../components/views/portal/events-prview/Recommen
 import ComingUpNextEvents from "../components/views/portal/events-prview/ComingUpNextEvents";
 import MyNextEvents from "../components/views/portal/events-prview/MyNextEvents";
 import WidgetsWrapper from "../components/views/portal/WidgetsWrapper";
+import { useAuth } from "../HOCs/AuthProvider";
+import { useRouter } from "next/router";
 
 const PortalPage = () => {
+   const { authenticatedUser, userData } = useAuth();
+   const {
+      query: { hideFeatured, hideHighlights },
+   } = useRouter();
+   const hasInterests = Boolean(
+      authenticatedUser.email || userData?.interestsIds
+   );
+
    return (
       <GeneralLayout backgroundColor={"#FFF"} hideNavOnScroll fullScreen>
          <Container
@@ -22,9 +32,11 @@ const PortalPage = () => {
             }}
          >
             <WidgetsWrapper>
-               {/*<HighlightsCarousel />*/}
-               <FeaturedAndNextEvents />
-               <RecommendedEvents maxLimitIncreaseTimes={5} limit={30} />
+               {!hideHighlights && <HighlightsCarousel />}
+               {!hideFeatured && <FeaturedAndNextEvents />}
+               {hasInterests && (
+                  <RecommendedEvents maxLimitIncreaseTimes={5} limit={30} />
+               )}
                <ComingUpNextEvents limit={20} />
                <MyNextEvents limit={20} />
             </WidgetsWrapper>

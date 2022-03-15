@@ -8,16 +8,13 @@ import EventsPreviewGrid from "./EventsPreviewGrid";
 import { useRouter } from "next/router";
 
 const ComingUpNextEvents = ({ limit }: Props) => {
-   const { authenticatedUser } = useAuth();
+   const { isLoggedOut } = useAuth();
    const {
       query: { livestreamId },
    } = useRouter();
    const [localEvents, setLocalEvents] = useState([]);
    const [eventFromQuery, setEventFromQuery] = useState(null);
 
-   const isLoggedOut = Boolean(
-      authenticatedUser.isEmpty && authenticatedUser.isLoaded
-   );
    const { items: events, isLoading } = usePagination<LiveStreamEvent>(
       livestreamRepo.upcomingEventsQuery(),
       {

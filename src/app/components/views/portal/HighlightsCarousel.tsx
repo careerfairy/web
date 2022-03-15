@@ -7,8 +7,9 @@ import { useFirebaseService } from "../../../context/firebase/FirebaseServiceCon
 import { Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-
 const arrowFontSize = 30;
 const styles = {
    carousel: {

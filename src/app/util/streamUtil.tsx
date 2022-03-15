@@ -84,9 +84,15 @@ export const chekIfPast = (eventStartDate: Date) =>
    eventStartDate >
    new Date(NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST);
 
+// This function tries to find whom the event is hosted by from the fetched groups from the groupIds array field on the livestream document
 export const getRelevantHosts = (
+   // The most common scenario is a company group and a university group
+   // In this scenario we will want to the users to register through the university group
+   // by providing the university group ID the function will try and find the university in the group list
+   // and register only through that university and not any other groups attached to the event
    targetHostGroupId: string,
    event: LiveStreamEvent,
+   // groups returned from fetching the group IDs array field on the livestream Document
    groupList: any[]
 ) => {
    if (!event) return [];
