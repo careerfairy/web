@@ -4,7 +4,7 @@ import { withFirebase } from "../context/firebase/FirebaseServiceContext";
 import Loader from "../components/views/loader/Loader";
 
 import Head from "next/head";
-import {Container, Typography} from "@mui/material"
+import { Container, Typography } from "@mui/material";
 import Groups from "../components/views/groups/Groups";
 import { useAuth } from "../HOCs/AuthProvider";
 import GeneralLayout from "../layouts/GeneralLayout";

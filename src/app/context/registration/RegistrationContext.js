@@ -110,9 +110,6 @@ export function RegistrationContextProvider({
       sendRegistrationConfirmationEmail,
       livestreamQuestionsQuery,
    } = useFirebaseService();
-   const {
-      query: { referrerId },
-   } = useRouter();
    const { authenticatedUser, userData } = useAuth();
    const [sliding, setSliding] = useState(false);
    const [gettingPolicyStatus, setGettingPolicyStatus] = useState(false);
@@ -211,14 +208,12 @@ export function RegistrationContextProvider({
       (async function () {
          if (groups?.length) {
             setGettingPolicyStatus(true);
-            const {
-               hasAgreedToAll,
-               groupsWithPolicies,
-            } = await GroupsUtil.getPolicyStatus(
-               groups,
-               authenticatedUser.email,
-               checkIfUserAgreedToGroupPolicy
-            );
+            const { hasAgreedToAll, groupsWithPolicies } =
+               await GroupsUtil.getPolicyStatus(
+                  groups,
+                  authenticatedUser.email,
+                  checkIfUserAgreedToGroupPolicy
+               );
             setPolicyGroups(groupsWithPolicies);
             setHasAgreedToAll(hasAgreedToAll);
          } else {
@@ -234,9 +229,8 @@ export function RegistrationContextProvider({
          if (livestream) {
             await registerToLivestream(
                livestream.id,
-               userData,
-               groupsWithPolicies,
-               referrerId
+               authenticatedUser,
+               groupsWithPolicies
             );
          }
          handleSendConfirmEmail();

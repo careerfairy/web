@@ -81,7 +81,13 @@ export const Highlights = ({
    );
 };
 
-const Groups = ({ groups, userData, makeSix, absolutePath, hideNextLiveStreamsButton }) => {
+const Groups = ({
+   groups,
+   userData,
+   makeSix,
+   absolutePath,
+   hideNextLiveStreamsButton,
+}) => {
    const [selectedGroup, setSelectedGroup] = useState(null);
 
    const handleSelectGroup = (event, value) => {

@@ -77,6 +77,7 @@ const useStyles = makeStyles((theme) => ({
       right: 0,
       bottom: 0,
       padding: theme.spacing(STREAM_ELEMENT_SPACING),
+      marginLeft: "0 !important",
       transition: theme.transitions.create(["top"], {
          duration: theme.transitions.duration.standard,
          easing: theme.transitions.easing.easeInOut,
@@ -111,7 +112,6 @@ const StreamElementWrapper = ({ children, large, index, squished, first }) => {
 const StreamsLayout = ({
    streamData,
    liveSpeakers,
-   setRemovedStream,
    sharingPdf,
    showMenu,
    livestreamId,
@@ -168,12 +168,12 @@ const StreamsLayout = ({
                            <StreamElementWrapper
                               index={index}
                               first={
-                                 currentSpeakerId === stream.streamId &&
+                                 currentSpeakerId === stream.uid &&
                                  (sharingPdf || sharingScreen) &&
                                  hasManySpeakers
                               }
                               large={isLarge}
-                              key={stream.streamId}
+                              key={stream.uid}
                               squished={hasSmallStreams}
                            >
                               <StreamContainer
@@ -183,7 +183,6 @@ const StreamsLayout = ({
                                  videoMutedBackgroundImg={
                                     videoMutedBackgroundImg
                                  }
-                                 setRemovedStream={setRemovedStream}
                                  liveSpeakers={liveSpeakers}
                               />
                            </StreamElementWrapper>

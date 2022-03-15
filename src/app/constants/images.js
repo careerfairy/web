@@ -86,3 +86,9 @@ export const honestyShape =
 
 export const placeholderBanner =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0";
+export const chromeLogo =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fchrome.svg?alt=media&token=516e705a-bafa-4a43-99f7-e184cc85b557";
+export const edgeLogo =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fedge.svg?alt=media&token=f4165230-170e-454f-9fca-adea53798b9f";
+export const safariLogo =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fsafari-logo.svg?alt=media&token=d939e1f5-424e-44be-91d1-78b0e171f1de";

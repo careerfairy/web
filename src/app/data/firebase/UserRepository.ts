@@ -1,5 +1,5 @@
+import { firebaseServiceInstance } from "./FirebaseService";
 import firebase from "firebase/app";
-import firebaseApp from "./FirebaseInstance";
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>;
@@ -19,7 +19,7 @@ class FirebaseUserRepository implements IUserRepository {
 
 // Singleton
 const userRepo: IUserRepository = new FirebaseUserRepository(
-   firebaseApp.firestore()
+   firebaseServiceInstance.firestore
 );
 
 export default userRepo;

@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
 import clsx from "clsx";
 
@@ -46,7 +46,7 @@ export const GreyPermanentMarker = ({ className, ...props }) => {
    );
 };
 
-export const ThemedPermanentMarker = ({ className, ...props }) => {
+export const ThemedPermanentMarker = ({ className = "", ...props }) => {
    const classes = useStyles();
    return (
       <Typography
@@ -55,7 +55,7 @@ export const ThemedPermanentMarker = ({ className, ...props }) => {
       />
    );
 };
-export const CategorySubtitle = ({ className, ...props }) => {
+export const CategorySubtitle = ({ className = "", ...props }) => {
    const classes = useStyles();
    return (
       <Typography

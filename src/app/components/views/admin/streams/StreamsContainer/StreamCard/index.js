@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import makeStyles from "@mui/styles/makeStyles";
 import {
    Avatar,
@@ -35,11 +35,11 @@ import { useDispatch, useSelector } from "react-redux";
 import * as actions from "store/actions/index";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog";
-import { streamType } from "../../../../../../types";
 import ConfirmRecordingDialog from "./ConfirmRecordingDialog";
 import useStreamAdminPreferences from "../../../../../custom-hook/useStreamAdminPreferences";
 import NextGenIcon from "@mui/icons-material/FiberNew";
 import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
+import PropTypes from "prop-types";
 
 const styles = {
    root: {
@@ -81,12 +81,13 @@ const styles = {
    },
 };
 
-const StreamCard = ({ stream }) => {
+const StreamCard = ({ isUpcoming, stream }) => {
    const firestore = useFirestore();
    const firebase = useFirebaseService();
    const dispatch = useDispatch();
    const [togglingNextGen, setTogglingNextGen] = useState(false);
    const [nextGenModalOpen, setNextGenModalOpen] = useState(false);
+   const [recordingSid, setRecordingSid] = useState(false);
    const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] =
       useState(false);
    const [anchorEl, setAnchorEl] = React.useState(null);
@@ -97,6 +98,16 @@ const StreamCard = ({ stream }) => {
    );
 
    const streamAdminPreferences = useStreamAdminPreferences(stream.id);
+
+   useEffect(async () => {
+      if (stream?.id) {
+         const tokenDoc = await firebase.getLivestreamRecordingSid(stream.id);
+         const recordingSid = tokenDoc.data()?.sid;
+         if (recordingSid) {
+            setRecordingSid(recordingSid);
+         }
+      }
+   }, [stream?.id]);
 
    const handleClick = (event) => {
       setAnchorEl(event.currentTarget);
@@ -202,31 +213,55 @@ const StreamCard = ({ stream }) => {
                            onClick={handleClose}
                            href={`https://console.firebase.google.com/u/0/project/careerfairy-e1fd9/firestore/data/~2Flivestreams~2F${stream.id}`}
                         >
-                           View in firebase
+                           View in Firestore
                         </MenuItem>
-                        <MenuItem
-                           onClick={() => setOpenStreamerLinksDialog(true)}
-                        >
-                           Get streamer links
-                        </MenuItem>
-                        <MenuItem
-                           onClick={() => {
-                              setNextGenModalOpen(true);
-                              handleClose();
-                           }}
-                        >
-                           {streamAdminPreferences?.isNextGen
-                              ? "Disable NextGen Mode"
-                              : "Enable NextGen Mode"}
-                        </MenuItem>
-                        <MenuItem
-                           disabled={recordingRequestOngoing}
-                           onClick={handleOpenConfirmRecordingDialog}
-                        >
-                           {stream.isRecording
-                              ? "Stop recording stream"
-                              : "Start recording stream"}
-                        </MenuItem>
+                        {isUpcoming && (
+                           <>
+                              <MenuItem
+                                 onClick={() =>
+                                    setOpenStreamerLinksDialog(true)
+                                 }
+                              >
+                                 Get streamer links
+                              </MenuItem>
+                              <MenuItem
+                                 onClick={() => {
+                                    setNextGenModalOpen(true);
+                                    handleClose();
+                                 }}
+                              >
+                                 {streamAdminPreferences?.isNextGen
+                                    ? "Disable NextGen Mode"
+                                    : "Enable NextGen Mode"}
+                              </MenuItem>
+                              <MenuItem
+                                 disabled={recordingRequestOngoing}
+                                 onClick={handleOpenConfirmRecordingDialog}
+                              >
+                                 {stream.isRecording
+                                    ? "Stop recording stream"
+                                    : "Start recording stream"}
+                              </MenuItem>
+                           </>
+                        )}
+                        {!isUpcoming && stream.isRecording && (
+                           <MenuItem
+                              disabled={recordingRequestOngoing}
+                              onClick={handleOpenConfirmRecordingDialog}
+                           >
+                              Stop recording stream
+                           </MenuItem>
+                        )}
+                        {!isUpcoming && recordingSid && (
+                           <MenuItem
+                              component="a"
+                              target="_blank"
+                              onClick={handleClose}
+                              href={`https://agora-cf-cloud-recordings.s3.eu-central-1.amazonaws.com/directory1/directory5/${recordingSid}_${stream.id}_0.mp4`}
+                           >
+                              Download Recording
+                           </MenuItem>
+                        )}
                         {stream.isRecording ? (
                            <ConfirmRecordingDialog
                               confirmText="Are you sure that you want to stop recording this live stream?"
@@ -343,7 +378,8 @@ const StreamCard = ({ stream }) => {
 };
 
 StreamCard.propTypes = {
-   stream: streamType.isRequired,
+   stream: PropTypes.object,
+   isUpcoming: PropTypes.bool,
 };
 
 export default StreamCard;

@@ -1,5 +1,5 @@
-import React, { Fragment, useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import React, { Fragment, useEffect, useState } from "react";
+import makeStyles from "@mui/styles/makeStyles";
 import VideoContainer from "./video-container/VideoContainer";
 import NotificationsContainer from "./notifications-container/NotificationsContainer";
 import MiniChatContainer from "./LeftMenu/categories/chat/MiniChatContainer";
@@ -66,11 +66,18 @@ const StreamerOverview = ({
    audienceDrawerOpen,
 }) => {
    const { currentLivestream, isBreakout } = useCurrentStream();
+   const [mounted, setMounted] = useState(false);
    const classes = useStyles();
    const dispatch = useDispatch();
    const { videoIsMuted, videoIsPaused } = useSelector(
       (state) => state.stream.streaming
    );
+
+   useEffect(() => {
+      setMounted(true);
+   }, []);
+
+   if (!mounted) return null;
 
    return (
       <Fragment>
