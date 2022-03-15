@@ -258,6 +258,7 @@ const EventPreviewCard = ({
 
    useEffect(() => {
       if (
+         !loading &&
          autoRegister &&
          query.register &&
          query.register === event?.id &&
@@ -285,6 +286,7 @@ const EventPreviewCard = ({
       event?.registeredUsers,
       authenticatedUser.email,
       autoRegister,
+      loading,
    ]);
 
    const handleShareClick = () => {

@@ -43,11 +43,17 @@ export const getRelevantHosts = (
    if (!event) return [];
    let targetGroupId = targetHostGroupId;
    if (!targetGroupId) {
-      const companyThatPublishedStream = groupList.find(
-         (group) => !group.universityCode && group.id === event?.author?.groupId
+      const listIsAllCompanies = groupList.every(
+         (group) => !group.universityCode
       );
-      if (companyThatPublishedStream?.id) {
-         targetGroupId = companyThatPublishedStream.id;
+      if (!listIsAllCompanies) {
+         const companyThatPublishedStream = groupList.find(
+            (group) =>
+               !group.universityCode && group.id === event?.author?.groupId
+         );
+         if (companyThatPublishedStream?.id) {
+            targetGroupId = companyThatPublishedStream.id;
+         }
       }
    }
    const relevantHost = groupList.find((group) => group.id === targetGroupId);

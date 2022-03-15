@@ -27,6 +27,8 @@ import ContactSection from "../../components/views/upcoming-livestream/ContactSe
 import Navigation from "../../components/views/upcoming-livestream/Navigation";
 import { useMediaQuery } from "@mui/material";
 import { languageCodesDict } from "../../components/helperFunctions/streamFormFunctions";
+import { getRelevantHosts } from "../../util/StreamUtil";
+import { useInterests } from "../../components/custom-hook/useCollection";
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null);
@@ -44,7 +46,8 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const [filteredGroups, setFilteredGroups] = useState([]);
    const [targetGroupId, setTargetGroupId] = useState("");
    const [questionSortType, setQuestionSortType] = useState("timestamp");
-   const [targetOptions, setTargetOptions] = useState([]);
+   const { data: totalInterests } = useInterests();
+   const [eventInterests, setSetEventInterests] = useState([]);
 
    const [unfilteredGroups, setUnfilteredGroups] = useState([]);
 
@@ -85,6 +88,16 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    });
 
    useEffect(() => {
+      if (totalInterests) {
+         setSetEventInterests(
+            totalInterests.filter((interest) =>
+               stream?.interestsIds?.includes(interest.id)
+            )
+         );
+      }
+   }, [stream?.interestsIds, totalInterests]);
+
+   useEffect(() => {
       window.scrollTo(0, 0);
    }, []);
 
@@ -112,29 +125,6 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          return () => unsubscribe();
       }
    }, [stream?.id]);
-
-   useEffect(() => {
-      if (
-         currentGroup &&
-         currentGroup.categories &&
-         stream &&
-         stream.targetCategories
-      ) {
-         const { groupId, categories } = currentGroup;
-         let totalOptions = [];
-         categories.forEach((category) => totalOptions.push(category.options));
-         const flattenedOptions = totalOptions.reduce(function (a, b) {
-            return a.concat(b);
-         }, []);
-         const matchedOptions = stream.targetCategories[groupId];
-         if (matchedOptions) {
-            const filteredOptions = flattenedOptions.filter((option) =>
-               matchedOptions.includes(option.id)
-            );
-            setTargetOptions(filteredOptions);
-         }
-      }
-   }, [currentGroup, stream]);
 
    useEffect(() => {
       if (query.groupId) {
@@ -170,26 +160,15 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                   id: doc.id,
                   ...doc.data(),
                }));
-
-               let targetGroupId = currentGroup?.groupId;
-
-               if (!targetGroupId) {
-                  const companyThatPublishedStream = groupList.find(
-                     (group) =>
-                        !group.universityCode &&
-                        group.id === stream?.author?.groupId
-                  );
-                  // TODO Dont think including the publishing company as the default group
-                  //  if none is provided to be the best choice
-                  if (companyThatPublishedStream?.id) {
-                     targetGroupId = companyThatPublishedStream.id;
-                  }
-               }
-               const targetGroup = groupList.find(
-                  (group) => group.id === targetGroupId
+               const filteredHosts = getRelevantHosts(
+                  currentGroup?.groupId,
+                  stream,
+                  groupList
                );
-               setTargetGroupId(targetGroup?.id);
-               setFilteredGroups(targetGroup ? [targetGroup] : groupList);
+               setTargetGroupId(
+                  filteredHosts.length === 1 ? filteredHosts[0].id : ""
+               );
+               setFilteredGroups(filteredHosts);
                setUnfilteredGroups(groupList);
             }
          );
@@ -369,6 +348,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          <HeroSection
             backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}
             stream={stream}
+            eventInterests={eventInterests}
             streamAboutToStart={streamAboutToStart}
             registerButtonLabel={registerButtonLabel}
             disabled={isRegistrationDisabled}
