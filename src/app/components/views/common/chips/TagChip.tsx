@@ -3,6 +3,7 @@ import { Chip, Tooltip } from "@mui/material";
 import React from "react";
 import { SxProps } from "@mui/system";
 import { Theme } from "@mui/material/styles";
+import { ChipProps } from "@mui/material/Chip/Chip";
 
 const WhiteTagChip = ({
    variant = "outlined",
@@ -48,7 +49,7 @@ const WhiteTagChip = ({
    );
 };
 
-interface TagChipProps {
+interface TagChipProps extends ChipProps {
    sx?: SxProps<Theme>;
    tooltipText?: string;
    label: string;
