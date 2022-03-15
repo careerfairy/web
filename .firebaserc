@@ -1,26 +1,5 @@
 {
   "projects": {
     "default": "careerfairy-e1fd9"
-  },
-  "targets": {
-    "careerfairy-e1fd9": {
-      "hosting": {
-        "personal-habib": [
-          "personal-habib"
-        ],
-        "testing": [
-          "testing-careerfairy"
-        ],
-        "testing2": [
-          "testing2-careerfairy"
-        ],
-        "production": [
-          "careerfairy-e1fd9"
-        ]
-      }
-    }
-  },
-  "functions": {
-
   }
 }
