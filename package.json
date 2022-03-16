@@ -7,10 +7,7 @@
     "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi",
     "install:app": "cd app && npm install",
     "install:functions": "cd functions && npm install",
-    "postinstall": "cross-env run-p install:*",
-    "dev:app": "cd ./app && npm run dev",
-    "start:app": "cd ./app && npm run start",
-    "test:app": "playwright test"
+    "postinstall": "cross-env run-p install:*"
   },
   "devDependencies": {
     "@playwright/test": "^1.20.0",
