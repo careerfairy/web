@@ -8,7 +8,10 @@
 const RewardActions = {
    REFERRAL_SIGNUP_LEADER: "REFERRAL_SIGNUP_LEADER",
    REFERRAL_SIGNUP_FOLLOWER: "REFERRAL_SIGNUP_FOLLOWER",
-   LIVESTREAM_INVITE_COMPLETE_LEADER: "LIVESTREAM_INVITE_COMPLETE_LEADER",
+   LIVESTREAM_REGISTER_COMPLETE_LEADER: "LIVESTREAM_REGISTER_COMPLETE_LEADER",
+   LIVESTREAM_REGISTER_COMPLETE_FOLLOWER:
+      "LIVESTREAM_REGISTER_COMPLETE_FOLLOWER",
+   LIVESTREAM_INVITE_COMPLETE_LEADER: "LIVESTREAM_INVITE_COMPLETE_LEADER", // event attendance complete
    LIVESTREAM_INVITE_COMPLETE_FOLLOWER: "LIVESTREAM_INVITE_COMPLETE_FOLLOWER",
 };
 
@@ -18,7 +21,9 @@ const RewardActions = {
 const RewardPoints = {
    [RewardActions.REFERRAL_SIGNUP_LEADER]: 20,
    [RewardActions.REFERRAL_SIGNUP_FOLLOWER]: 20,
-   [RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER]: 40,
+   [RewardActions.LIVESTREAM_REGISTER_COMPLETE_LEADER]: 0,
+   [RewardActions.LIVESTREAM_REGISTER_COMPLETE_FOLLOWER]: 0,
+   [RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER]: 20,
    [RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER]: 20,
 };
 
@@ -32,6 +37,10 @@ const getHumanStringDescriptionForAction = (action) => {
          return "SignUp through a referral";
       case RewardActions.REFERRAL_SIGNUP_LEADER:
          return "Referral SignUp Successful";
+      case RewardActions.LIVESTREAM_REGISTER_COMPLETE_LEADER:
+         return "Registered an invited event";
+      case RewardActions.LIVESTREAM_REGISTER_COMPLETE_FOLLOWER:
+         return "Event Registration Successful";
       case RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER:
          return "Attended an invited event";
       case RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER:
