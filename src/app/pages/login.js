@@ -92,7 +92,7 @@ function LogInPage({ firebase }) {
                   : "/signup"
             );
          } else {
-            replace(absolutePath || "/next-livestreams");
+            replace(absolutePath || "/portal");
          }
       }
    }, [authenticatedUser, absolutePath, userData]);

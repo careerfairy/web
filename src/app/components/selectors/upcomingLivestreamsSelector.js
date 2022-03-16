@@ -27,7 +27,9 @@ const upcomingLivestreamsSelector = createSelector(
             );
          }
       }
-      return newLivestreams.filter((livestream) => !livestream.hidden);
+      return newLivestreams
+         .filter((livestream) => !livestream.hidden)
+         .map((e) => ({ ...e, startDate: e.start?.toDate() }));
    }
 );
 
