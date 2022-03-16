@@ -22,8 +22,6 @@ import AgoraRTMProvider from "context/agoraRTM/AgoraRTMProvider";
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect";
 import AgoraRTC from "agora-rtc-sdk-ng";
 import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay";
-import useNextGenRedirect from "../../components/custom-hook/useNextGenRedirect";
-import useStreamAdminPreferences from "../../components/custom-hook/useStreamAdminPreferences";
 import useRewardLivestreamAttendance from "../../components/custom-hook/useRewardLivestreamAttendance";
 
 const useStyles = makeStyles((theme) => ({
@@ -112,8 +110,6 @@ const ViewerLayout = (props) => {
       setJoinGroupModalData({ groups });
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined);
    const currentLivestream = useStreamConnect();
-   const streamAdminPreferences = useStreamAdminPreferences(livestreamId);
-   useNextGenRedirect(streamAdminPreferences?.isNextGen);
    const handRaiseId =
       (currentLivestream?.test || currentLivestream?.openStream) &&
       !authenticatedUser?.email
@@ -323,7 +319,6 @@ const ViewerLayout = (props) => {
                currentLivestream,
                isBreakout,
                streamerId,
-               streamAdminPreferences,
                isStreamer: false,
                handRaiseId,
                isMobile: mobile,
