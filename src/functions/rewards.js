@@ -93,7 +93,7 @@ exports.rewardApply = functions
       }
    });
 
-exports.rewardLivestreamRegistrance = functions
+exports.rewardLivestreamRegistrant = functions
    .region(config.region)
    .firestore.document("livestreams/{livestreamId}/registrants/{userId}")
    .onCreate(async (snap, context) => {
