@@ -146,7 +146,7 @@ const ProfileNav = ({ userData }) => {
    }
 
    return (
-      <Container style={{ marginTop: "50px", marginBottom: "auto" }}>
+      <Container disableGutters sx={{ mt: "50px", mb: "auto" }}>
          <AppBar className={classes.bar} position="static" color="default">
             <Tabs
                value={value}

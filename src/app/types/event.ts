@@ -1,4 +1,5 @@
 import { Identifiable } from "./commonTypes";
+import { Timestamp } from "@firebase/firestore-types";
 
 export interface LiveStreamEvent extends Identifiable {
    author?: {
@@ -15,13 +16,17 @@ export interface LiveStreamEvent extends Identifiable {
    duration?: number;
    groupIds?: string[];
    interestsIds?: string[];
+   registeredUsers?: string[];
    isRecording?: boolean;
    language?: {
       code?: string;
       name?: string;
    };
    talentPool?: string[];
+   hasStarted?: boolean;
    test?: boolean;
    title?: string;
    type?: string;
+   start?: Timestamp;
+   startDate?: Date;
 }

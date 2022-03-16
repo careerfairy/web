@@ -11,12 +11,12 @@ import { useAuth } from "../../HOCs/AuthProvider";
 
 const initialHeaderLinks = [
    {
-      href: `/next-livestreams`,
-      title: "NEXT LIVE STREAMS",
+      href: `/portal`,
+      title: "PORTAL",
    },
    {
-      href: `/wishlist`,
-      title: "WISHLIST",
+      href: `/next-livestreams`,
+      title: "NEXT LIVE STREAMS",
    },
 ];
 const initialDrawerBottomLinks = [
