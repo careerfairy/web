@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { prettyDate } from "../../../../../helperFunctions/HelperFunctions";
 import MaterialTable from "@material-table/core";
 import {
@@ -37,6 +37,12 @@ const columns = [
       field: "title",
       title: "Title",
       description: "Title of the event",
+      flex: 1,
+   },
+   {
+      field: "company",
+      title: "Company",
+      description: "Company of the event",
       flex: 1,
    },
    {
