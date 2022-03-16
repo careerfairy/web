@@ -149,3 +149,4 @@ exports.slackHandleInteractions = slack.slackHandleInteractions;
 // Rewards
 exports.rewardApply = rewards.rewardApply;
 exports.rewardLivestreamAttendance = rewards.rewardLivestreamAttendance;
+exports.rewardLivestreamRegistrance = rewards.rewardLivestreamRegistrance;
