@@ -23,6 +23,7 @@ import ImageSelect from "./ImageSelect/ImageSelect";
 import makeStyles from "@mui/styles/makeStyles";
 import DateTimePicker from "@mui/lab/DateTimePicker";
 import SpeakerForm from "./SpeakerForm/SpeakerForm";
+import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 import { useRouter } from "next/router";
 import FormGroup from "./FormGroup";
 import WarningIcon from "@mui/icons-material/Warning";
@@ -111,7 +112,9 @@ const DraftStreamForm = ({
    submitted,
    onSubmit,
    isActualLivestream,
+   // eslint-disable-next-line react-hooks/rules-of-hooks
    formRef = useRef(),
+   // eslint-disable-next-line react-hooks/rules-of-hooks
    saveChangesButtonRef = useRef(),
    currentStream,
 }) => {
@@ -132,6 +135,7 @@ const DraftStreamForm = ({
       isGroupAdmin: isGroupAdmin(),
    });
 
+   const [targetCategories, setTargetCategories] = useState({});
    const [selectedGroups, setSelectedGroups] = useState([]);
    const [selectedInterests, setSelectedInterests] = useState([]);
    const [allFetched, setAllFetched] = useState(false);
@@ -310,6 +314,12 @@ const DraftStreamForm = ({
       return `By enabling this you are making this stream only visible to members of ${groupNames}.`;
    };
 
+   const handleSetGroupCategories = (groupId, targetOptionIds) => {
+      const newTargetCategories = { ...targetCategories };
+      newTargetCategories[groupId] = targetOptionIds;
+      setTargetCategories(newTargetCategories);
+   };
+
    const handleSetOnlyUrlIds = async () => {
       // @ts-ignore
       const arrayOfUrlIds = careerCenterIds?.split(",") || [group.id];
@@ -465,6 +475,7 @@ const DraftStreamForm = ({
                      validateForm,
                      /* and other goodies */
                   }) => {
+                     // @ts-ignore
                      return (
                         <form
                            onSubmit={async (event) => {
@@ -819,6 +830,30 @@ const DraftStreamForm = ({
                                           }
                                        />
                                     </Grid>
+                                    {selectedGroups.map((group) => {
+                                       return (
+                                          <Grid
+                                             key={group.groupId}
+                                             xs={12}
+                                             sm={12}
+                                             md={12}
+                                             lg={12}
+                                             xl={12}
+                                             item
+                                          >
+                                             <GroupCategorySelect
+                                                handleSetGroupCategories={
+                                                   handleSetGroupCategories
+                                                }
+                                                targetCategories={
+                                                   targetCategories
+                                                }
+                                                isSubmitting={isSubmitting}
+                                                group={group}
+                                             />
+                                          </Grid>
+                                       );
+                                    })}
 
                                     <Grid
                                        xs={12}
