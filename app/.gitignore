@@ -6,3 +6,5 @@ semantic/dist/
 
 # Sentry
 .sentryclirc
+test-results/
+playwright-report/

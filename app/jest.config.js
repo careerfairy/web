@@ -24,6 +24,9 @@ module.exports = {
       "<rootDir>/node_modules/",
       "<rootDir>/.next/",
       "/streaming/test",
+      // Jest should ignore e2e tests,
+      // that job is for playwright ;)
+      "<rootDir>/e2e/",
    ],
    testEnvironment: "jsdom",
    transform: {
