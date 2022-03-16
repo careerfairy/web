@@ -23,44 +23,18 @@ exports.rewardCreateReferralSignUpFollower = (
    );
 };
 
-exports.rewardCreateLivestreamInviteCompleteFollower = (
-   userThatAttendedTheEventId,
-   leaderUserData,
-   livestreamData
+exports.rewardCreateLivestream = (
+   userBeingRewardedId,
+   action,
+   relatedUserData,
+   relatedLivestreamData
 ) => {
-   console.log({
-      userId: leaderUserData.id,
-      livestreamId: livestreamData.id,
-      userData: pickDetailsFromUserData(leaderUserData),
-      livestreamData: pickDetailsFromLivestreamData(livestreamData),
+   return rewardCreate(userBeingRewardedId, action, {
+      userId: relatedUserData.id,
+      livestreamId: relatedLivestreamData.id,
+      userData: pickDetailsFromUserData(relatedUserData),
+      livestreamData: pickDetailsFromLivestreamData(relatedLivestreamData),
    });
-   return rewardCreate(
-      userThatAttendedTheEventId,
-      RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER,
-      {
-         userId: leaderUserData.id,
-         livestreamId: livestreamData.id,
-         userData: pickDetailsFromUserData(leaderUserData),
-         livestreamData: pickDetailsFromLivestreamData(livestreamData),
-      }
-   );
-};
-
-exports.rewardCreateLivestreamInviteCompleteLeader = (
-   leaderId,
-   followerUserData,
-   livestreamData
-) => {
-   return rewardCreate(
-      leaderId,
-      RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER,
-      {
-         userId: followerUserData.id,
-         livestreamId: livestreamData.id,
-         userData: pickDetailsFromUserData(followerUserData),
-         livestreamData: pickDetailsFromLivestreamData(livestreamData),
-      }
-   );
 };
 
 const rewardCreate = async (rewardedUserId, action, otherData = {}) => {
@@ -82,14 +56,18 @@ const rewardCreate = async (rewardedUserId, action, otherData = {}) => {
       );
 };
 
-exports.rewardGetInvitationForLivestream = async (userDataId, livestreamId) => {
+exports.rewardGetRelatedToLivestream = async (
+   userDataId,
+   livestreamId,
+   action
+) => {
    let querySnapshot = await admin
       .firestore()
       .collection("userData")
       .doc(userDataId)
       .collection("rewards")
       .where("livestreamId", "==", livestreamId)
-      .where("action", "==", RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER)
+      .where("action", "==", action)
       .limit(1)
       .get();
 
