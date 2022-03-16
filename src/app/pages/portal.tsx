@@ -30,7 +30,7 @@ const PortalPage = () => {
          >
             <WidgetsWrapper>
                <HighlightsCarousel />
-               <FeaturedAndNextEvents />
+               {/*<FeaturedAndNextEvents />*/}
                {hasInterests && (
                   <RecommendedEvents maxLimitIncreaseTimes={5} limit={30} />
                )}
