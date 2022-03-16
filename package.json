@@ -1,22 +1,26 @@
 {
-   "private": true,
-   "scripts": {
-      "start:emulators": "cross-env FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 NEXT_PUBLIC_FIREBASE_EMULATORS=true npm run start:emulators:helper",
-      "start:emulators:helper": "firebase emulators:exec --ui --only auth,firestore,functions \"cd ./app && npm run dev\"",
-      "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi",
-      "install:app": "cd app && npm install",
-      "install:functions": "cd functions && npm install",
-      "postinstall": "run-p install:*"
-   },
-   "devDependencies": {
-      "cross-env": "^7.0.3",
-      "firebase-tools": "^10.2.2",
-      "husky": "^7.0.4",
-      "lint-staged": "^12.3.4",
-      "npm-run-all": "^4.1.5",
-      "prettier": "^2.5.1"
-   },
-   "lint-staged": {
-      "**/*": "prettier --write --ignore-unknown"
-   }
+  "private": true,
+  "name": "careerfairy-root",
+  "scripts": {
+    "start:emulators": "cross-env FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 NEXT_PUBLIC_FIREBASE_EMULATORS=true npm run start:emulators:helper",
+    "start:emulators:helper": "firebase emulators:exec --ui --only auth,firestore,functions \"cd ./app && npm run dev\"",
+    "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi",
+    "install:app": "cd app && npm install",
+    "install:functions": "cd functions && npm install",
+    "postinstall": "cross-env run-p install:*",
+    "dev:app": "cd ./app && npm run dev",
+    "start:app": "cd ./app && npm run start",
+    "test:app": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.20.0",
+    "cross-env": "^7.0.3",
+    "firebase-tools": "^10.2.2",
+    "husky": "^7.0.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.5.1"
+  },
+  "lint-staged": {
+    "*.js": "prettier --write --ignore-unknown"
+  }
 }

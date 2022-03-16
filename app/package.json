@@ -99,7 +99,6 @@
       "redux-thunk": "^2.3.0",
       "reselect": "^4.0.0",
       "slick-carousel": "^1.8.1",
-      "smoothscroll-polyfill": "^0.4.4",
       "use-pagination-firestore": "0.0.2",
       "uuid": "^8.3.0",
       "validate-color": "^2.1.1",
