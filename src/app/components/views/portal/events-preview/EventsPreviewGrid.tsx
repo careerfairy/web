@@ -134,7 +134,7 @@ const EventsPreviewGrid = ({
                   <Grid container spacing={2}>
                      {/*@ts-ignore*/}
                      {slicedEvents.map((event) => (
-                        <Grid item xs={12} sm={6} lg={4}>
+                        <Grid item key={event.id} xs={12} sm={6} lg={4}>
                            <LazyLoad
                               key={event.id}
                               style={{ width: "100%" }}
@@ -172,7 +172,7 @@ const EventsPreviewGrid = ({
          )}
          {shareEventDialog ? (
             /*
-            // @ts-ignore */
+                // @ts-ignore */
             <ShareLivestreamModal
                livestreamData={shareEventDialog}
                handleClose={handleShareEventDialogClose}
