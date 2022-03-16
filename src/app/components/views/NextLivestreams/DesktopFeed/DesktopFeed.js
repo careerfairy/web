@@ -5,9 +5,9 @@ import GroupStreams from "../GroupStreams/GroupStreams";
 import { useTheme } from "@mui/material/styles";
 
 // FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => (WrappedComponent) => (props) => (
-   <WrappedComponent {...props} width="xs" />
-);
+// eslint-disable-next-line react/display-name
+const withWidth = () => (WrappedComponent) => (props) =>
+   <WrappedComponent {...props} width="xs" />;
 
 const DesktopFeed = ({
    groupData,

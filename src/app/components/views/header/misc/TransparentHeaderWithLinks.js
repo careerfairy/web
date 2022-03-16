@@ -6,7 +6,7 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import Link from "materialUI/NextNavLink";
 import { MainLogo } from "components/logos";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import useGeneralLinks from "components/custom-hook/useGeneralLinks";
 import * as actions from "store/actions";
 import { useDispatch } from "react-redux";
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
    },
    animated: {
       transition: theme.transitions.create(["background", "box-shadow"], {
-         duration: theme.transitions.duration.complex,
+         duration: theme.transitions.duration.standard,
          easing: theme.transitions.easing.easeInOut,
       }),
    },
@@ -114,13 +114,18 @@ const TransparentHeaderWithLinks = ({ className, ...rest }) => {
                      className={classes.navIconButton}
                      color="primary"
                      href="/profile"
-                     size="large">
+                     size="large"
+                  >
                      <AccountCircleOutlinedIcon />
                   </IconButton>
                )}
             </Hidden>
             <Hidden lgUp>
-               <IconButton color="primary" onClick={handleDrawerOpen} size="large">
+               <IconButton
+                  color="primary"
+                  onClick={handleDrawerOpen}
+                  size="large"
+               >
                   <MenuIcon />
                </IconButton>
             </Hidden>

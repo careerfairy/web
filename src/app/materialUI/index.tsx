@@ -22,6 +22,9 @@ declare module "@mui/material" {
       main: string;
       dark: string;
    }
+   interface Transition {
+      long: number;
+   }
 }
 
 declare module "@mui/material/styles" {
@@ -50,6 +53,11 @@ declare module "@mui/material/styles" {
 
 export const rootThemeObj = (mode: PaletteMode) =>
    createTheme({
+      transitions: {
+         duration: {
+            complex: 700,
+         },
+      },
       palette: {
          mode,
          primary: {
@@ -183,8 +191,8 @@ const getComponents = (theme: Theme) => ({
             fontSize: "1rem",
          },
          root: {
-            margin: "0.5em",
-            marginLeft: 0,
+            // margin: "0.5em",
+            // marginLeft: 0,
          },
       },
    },
