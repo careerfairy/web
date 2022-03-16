@@ -5,6 +5,12 @@ service cloud.firestore {
     function isCFAdmin() {
       return get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data.isAdmin == true;
     }
+
+    match /userInterface/{interface} {
+        allow read: if true;
+        allow write: if isCFAdmin();
+    }
+
   	match /interests/{interest} {
       allow read: if true;
       allow write: if false;
@@ -68,6 +74,13 @@ service cloud.firestore {
       allow update: if true;
       allow create: if true;
 			allow delete: if true;
+    }
+
+    match /livestreamReferrals/{referral} {
+        allow read: if true;
+        allow update: if true;
+        allow create: if true;
+        allow delete: if true;
     }
 
     match /userData/{userId}/registeredGroups/{group}/categories/{category} {

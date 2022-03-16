@@ -1,3 +1,5 @@
+import LocalStorageUtil from "./LocalStorageUtil";
+
 export function getRandom(arr, n) {
    var result = new Array(n),
       len = arr.length,
@@ -46,4 +48,23 @@ export function dateIsInUnder24Hours(date) {
       new Date(date).getTime() - Date.now() < 1000 * 60 * 60 * 24 ||
       Date.now() > new Date(date).getTime()
    );
+}
+
+/**
+ * Get referralCode and livestreamId invitation from localstorage
+ */
+export function getReferralInformation() {
+   try {
+      if (typeof window !== "undefined") {
+         return {
+            referralCode: LocalStorageUtil.getReferralCode(),
+            inviteLivestream: LocalStorageUtil.getInviteLivestream(),
+         };
+      }
+   } catch (e) {
+      console.error(e);
+      return null;
+   }
+
+   return null;
 }
