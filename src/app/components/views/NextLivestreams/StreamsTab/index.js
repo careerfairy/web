@@ -15,7 +15,7 @@ const styles = {
       fontWeight: (theme) => theme.typography.fontWeightBold,
    },
 };
-
+//
 const StreamsTab = ({ handleChange, value, tabsColor }) => {
    return (
       <AppBar sx={styles.root} position="static" color="transparent">
@@ -26,6 +26,7 @@ const StreamsTab = ({ handleChange, value, tabsColor }) => {
             TabIndicatorProps={{
                sx: {
                   ...styles.indicator,
+                  backgroundColor: tabsColor,
                },
             }}
             variant="fullWidth"
@@ -34,6 +35,7 @@ const StreamsTab = ({ handleChange, value, tabsColor }) => {
             <SimpleTab
                sx={{
                   ...styles.tab,
+                  color: tabsColor,
                }}
                label="Upcoming Events"
                value="upcomingEvents"
@@ -42,6 +44,7 @@ const StreamsTab = ({ handleChange, value, tabsColor }) => {
             <SimpleTab
                sx={{
                   ...styles.tab,
+                  color: tabsColor,
                }}
                label="Past Events"
                value="pastEvents"
