@@ -31,6 +31,7 @@ import {
    handleAddSpeaker,
    handleDeleteSpeaker,
    handleError,
+   handleFlattenOptions,
    languageCodes,
    validateStreamForm,
 } from "../../helperFunctions/streamFormFunctions";
@@ -39,6 +40,8 @@ import { LanguageSelect } from "../../helperFunctions/streamFormFunctions/compon
 import MultiListSelect from "../common/MultiListSelect";
 import { useGroups, useInterests } from "../../custom-hook/useCollection";
 import StreamDurationSelect from "../draftStreamForm/StreamDurationSelect";
+import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
+import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams";
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -97,6 +100,7 @@ const NewLivestreamForm = () => {
    const [fetchingAvatars, setFetchingAvatars] = useState(true);
    const [allFetched, setAllFetched] = useState(false);
    const [updateMode, setUpdateMode] = useState(undefined);
+   const [targetCategories, setTargetCategories] = useState({});
 
    const { data: existingGroups, isLoading: fetchingGroups } = useGroups();
    const { data: existingInterests, isLoading: fetchingInterests } =
@@ -111,6 +115,7 @@ const NewLivestreamForm = () => {
       company: "",
       companyId: "",
       title: "",
+      targetCategories: {},
       interestsIds: [],
       groupIds: [],
       start: new Date(),
@@ -118,6 +123,7 @@ const NewLivestreamForm = () => {
       summary: "",
       speakers: { [uuidv4()]: speakerObj },
       language: languageCodes[0],
+      duration: DEFAULT_STREAM_DURATION_MINUTES,
    });
 
    useEffect(() => {
@@ -156,9 +162,11 @@ const NewLivestreamForm = () => {
                   backgroundImageUrl: livestream.backgroundImageUrl || "",
                   company: livestream.company || "",
                   companyId: livestream.companyId || "",
-                  duration: livestream.duration,
+                  duration:
+                     livestream.duration || DEFAULT_STREAM_DURATION_MINUTES,
                   title: livestream.title || "",
                   groupIds: livestream.groupIds || [],
+                  targetCategories: {},
                   interestsIds: livestream.interestsIds || [],
                   start: livestream.start.toDate() || new Date(),
                   hidden: livestream.hidden || false,
@@ -176,10 +184,11 @@ const NewLivestreamForm = () => {
                   )
                );
                setSelectedGroups(
-                  existingGroups.filter((g) =>
-                     newFormData.groupIds.includes(g.id)
-                  )
+                  existingGroups
+                     .filter((g) => newFormData.groupIds.includes(g.id))
+                     .map(groupAddFlattenOptions)
                );
+               setTargetCategories(livestream.targetCategories || {});
                if (forLivestream) {
                   setUpdateMode(true);
                }
@@ -192,6 +201,13 @@ const NewLivestreamForm = () => {
             }
          })();
       } else {
+         if (groupId) {
+            setSelectedGroups(
+               existingGroups
+                  .filter((g) => [groupId].includes(g.id))
+                  .map(groupAddFlattenOptions)
+            );
+         }
          setUpdateMode(false);
       }
    }, [
@@ -242,6 +258,20 @@ const NewLivestreamForm = () => {
       }
    };
 
+   const handleSelectGroups = (groups) => {
+      setSelectedGroups(groups.map(groupAddFlattenOptions));
+   };
+
+   const groupAddFlattenOptions = (group) => {
+      return { ...group, flattenedOptions: handleFlattenOptions(group) };
+   };
+
+   const handleSetGroupCategories = (groupId, targetOptionIds) => {
+      const newTargetCategories = { ...targetCategories };
+      newTargetCategories[groupId] = targetOptionIds;
+      setTargetCategories(newTargetCategories);
+   };
+
    const handleGetFiles = (path, setFetchingCallback, setDataCallback) => {
       firebase
          .getStorageRef()
@@ -266,6 +296,7 @@ const NewLivestreamForm = () => {
          setSubmitting(true);
          const livestream: any = buildLivestreamObject(
             values,
+            targetCategories,
             updateMode,
             livestreamId,
             firebase
@@ -647,13 +678,13 @@ const NewLivestreamForm = () => {
                         );
                      })}
                      <Typography style={{ color: "white" }} variant="h4">
-                        Groups & Categories:
+                        Groups & Audience:
                      </Typography>
                      <FormGroup>
                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                            <MultiListSelect
                               inputName="groupIds"
-                              onSelectItems={setSelectedGroups}
+                              onSelectItems={handleSelectGroups}
                               selectedItems={selectedGroups}
                               allValues={existingGroups}
                               disabled={isSubmitting}
@@ -666,6 +697,34 @@ const NewLivestreamForm = () => {
                            />
                         </Grid>
 
+                        {selectedGroups.map((group) => {
+                           return (
+                              <Grid
+                                 key={group.groupId}
+                                 xs={12}
+                                 sm={12}
+                                 md={12}
+                                 lg={12}
+                                 xl={12}
+                                 item
+                              >
+                                 <GroupCategorySelect
+                                    handleSetGroupCategories={
+                                       handleSetGroupCategories
+                                    }
+                                    targetCategories={targetCategories}
+                                    isSubmitting={isSubmitting}
+                                    group={group}
+                                 />
+                              </Grid>
+                           );
+                        })}
+                     </FormGroup>
+
+                     <Typography style={{ color: "white" }} variant="h4">
+                        Event Categories:
+                     </Typography>
+                     <FormGroup>
                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                            <MultiListSelect
                               inputName="interestsIds"
