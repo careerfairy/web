@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 next",
     "build": "cross-env NODE_ENV=production next build --debug",
-    "start": "next start",
+    "start": "next start -p 5000",
     "lint": "next lint",
     "test:units": "jest --passWithNoTests",
     "test:e2e": "playwright test"
