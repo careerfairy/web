@@ -123,6 +123,7 @@ const NewLivestreamForm = () => {
       summary: "",
       speakers: { [uuidv4()]: speakerObj },
       language: languageCodes[0],
+      duration: DEFAULT_STREAM_DURATION_MINUTES,
    });
 
    useEffect(() => {
