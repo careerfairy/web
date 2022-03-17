@@ -18,12 +18,13 @@ jobs:
         run: npm ci
       - name: Build App
         run: npm run build:app
-      - name: Start Built App With Emulators
-        run: npm run start:app:build:with:emulators
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
           NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+      - name: Start Built App With Emulators
+        run: npm run start:app:build:with:emulators
+
   test:
     name: "Run e2e and units tests"
     needs: build
