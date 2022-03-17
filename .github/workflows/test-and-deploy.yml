@@ -10,6 +10,13 @@ jobs:
     name: "Build and start App"
     runs-on: ubuntu-latest
     steps:
+      - name: Cache multiple paths
+      uses: actions/cache@v2.1.7
+      with:
+        path: |
+          ~/cache
+          !~/cache/exclude
+        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
       - name: Cache
         uses: actions/cache@v2.1.7
         with:
@@ -34,11 +41,6 @@ jobs:
         run: npm run build:app
       - name: Build Functions
         run: npm run build:functions
-      - name: Start Built App With Emulators
-        uses: w9jds/firebase-action@master
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN}}
-        run: npm run start:app:build:with:emulators
 
   test:
     name: "Run e2e and units tests"
@@ -52,6 +54,9 @@ jobs:
       - name: Run Jest Unit Tests
         run: npm run test:units
       - name: Run Playwright End to End tests
+        uses: w9jds/firebase-action@master
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN}}
         run: npm run test:e2e
 
   deploy:
