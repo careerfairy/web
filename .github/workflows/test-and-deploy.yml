@@ -24,6 +24,8 @@ jobs:
           NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
       - name: Start Built App With Emulators
         run: npm run start:app:build:with:emulators
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN}}
 
   test:
     name: "Run e2e and units tests"
