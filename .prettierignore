@@ -5,3 +5,4 @@ node_modules
 emulatorData
 functions/dist
 app/.next
+dist/
