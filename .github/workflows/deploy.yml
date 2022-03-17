@@ -5,8 +5,7 @@ on:
     types:
       - published
   push:
-    branches:
-      - dev
+    branches: [main, develop, feature/**]
   workflow_dispatch:
 
 jobs:
