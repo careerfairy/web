@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
    },
    orderIcon: {
       transition: theme.transitions.create(["transform"], {
-         duration: theme.transitions.duration.complex,
+         duration: theme.transitions.duration.standard,
          easing: theme.transitions.easing.easeInOut,
       }),
       transform: ({ up }) => up && `rotate(180deg)`,

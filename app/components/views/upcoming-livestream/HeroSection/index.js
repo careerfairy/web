@@ -7,9 +7,10 @@ import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import HeroHosts from "./HeroHosts"
 import {
    InPersonEventBadge,
-   LanguageBadge,
    LimitedRegistrationsBadge,
 } from "../../NextLivestreams/GroupStreams/groupStreamCard/badges"
+import WhiteTagChip from "../../common/chips/TagChip"
+import LanguageIcon from "@mui/icons-material/Language"
 
 const styles = {
    root: (theme) => ({
@@ -100,10 +101,17 @@ const styles = {
       textDecoration: "none !important",
       display: "flex",
    },
-   streamStatuses: {
+   tagsWrapper: {
       paddingTop: (theme) => theme.spacing(2),
       display: "flex",
       flexWrap: "wrap",
+      "& .MuiChip-root": {
+         margin: {
+            xs: 0.5,
+            md: 1,
+         },
+         marginLeft: 0,
+      },
    },
    chip: {
       height: { sm: "2.78rem" },
@@ -126,9 +134,16 @@ const HeroSection = ({
    stream,
    hosts,
    numberOfSpotsRemaining,
+   eventInterests,
    streamAboutToStart,
    streamLanguage,
 }) => {
+   const renderTagsContainer = Boolean(
+      stream.isFaceToFace ||
+         stream.maxRegistrants ||
+         streamLanguage ||
+         eventInterests?.length
+   )
    return (
       <Box
          sx={[
@@ -148,10 +163,8 @@ const HeroSection = ({
                      >
                         {stream.title}
                      </Typography>
-                     {(stream.isFaceToFace ||
-                        stream.maxRegistrants ||
-                        streamLanguage) && (
-                        <Box sx={styles.streamStatuses}>
+                     {renderTagsContainer && (
+                        <Box sx={styles.tagsWrapper}>
                            {stream.isFaceToFace && (
                               <InPersonEventBadge sx={styles.chip} white />
                            )}
@@ -163,12 +176,22 @@ const HeroSection = ({
                               />
                            )}
                            {streamLanguage && (
-                              <LanguageBadge
+                              <WhiteTagChip
                                  sx={styles.chip}
-                                 white
-                                 streamLanguage={streamLanguage}
+                                 icon={<LanguageIcon />}
+                                 variant={"outlined"}
+                                 tooltipText={`This event is in ${streamLanguage.name}`}
+                                 label={streamLanguage.code.toUpperCase()}
                               />
                            )}
+                           {eventInterests.map((interest) => (
+                              <WhiteTagChip
+                                 key={interest.id}
+                                 sx={styles.chip}
+                                 variant={"outlined"}
+                                 label={interest.name}
+                              />
+                           ))}
                         </Box>
                      )}
                      {!!stream?.speakers?.length && (

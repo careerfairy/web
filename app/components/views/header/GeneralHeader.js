@@ -18,7 +18,7 @@ const styles = {
       transition: theme.transitions.create(
          ["background", "box-shadow", "border-bottom-color"],
          {
-            duration: theme.transitions.duration.complex,
+            duration: theme.transitions.duration.standard,
             easing: theme.transitions.easing.easeInOut,
          }
       ),

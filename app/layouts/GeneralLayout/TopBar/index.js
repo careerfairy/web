@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const TopBar = () => {
+const TopBar = ({ hideNavOnScroll }) => {
    const theme = useTheme()
    const { GeneralHeader, headerColors } = useGeneralHeader()
    const classes = useStyles({
@@ -36,12 +36,13 @@ const TopBar = () => {
    const { authenticatedUser } = useAuth()
 
    return (
-      <GeneralHeader permanent>
+      <GeneralHeader permanent={!hideNavOnScroll}>
          <Box display="flex" alignItems="center">
             <IconButton
                style={{ marginRight: "1rem" }}
                color="primary"
                onClick={handleDrawerOpen}
+               autoFocus
                size="large"
             >
                <MenuIcon />

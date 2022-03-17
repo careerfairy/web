@@ -1,26 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { Grid, LinearProgress, Typography } from "@mui/material"
-import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2"
+import { Box, Grid, LinearProgress, Typography } from "@mui/material"
 import LazyLoad from "react-lazyload"
-import Spinner from "./groupStreamCard/Spinner"
-import { useAuth } from "../../../../HOCs/AuthProvider"
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
+import EventPreviewCard from "../../common/stream-cards/EventPreviewCard"
+import RegistrationModal from "../../common/registration-modal"
+import { useRouter } from "next/router"
+import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
+import { useInterests } from "../../../custom-hook/useCollection"
 
-const gridItemHeight = 530
 const styles = {
-   root: {
-      flex: 1,
-      paddingTop: 0,
-      display: "flex",
-      flexDirection: "column",
-   },
-   followButton: {
-      position: "sticky",
-      top: "165px",
-      zIndex: 101,
-      marginBottom: "14px",
-   },
    emptyMessage: {
       maxWidth: "400px",
       margin: "0 auto",
@@ -32,25 +21,18 @@ const styles = {
       justifyContent: "center",
       minHeight: "50vh",
    },
-   streamGridItem: {
-      height: gridItemHeight,
-      display: "flex",
-   },
-   dynamicHeight: {
-      height: "auto",
-   },
 }
 
 const Wrapper = ({ children, streamId }) => {
    return (
       <LazyLoad
-         style={{ flex: 1, display: "flex", width: "-webkit-fill-available" }}
          key={streamId}
-         height={gridItemHeight}
-         // unmountIfInvisible
+         style={{ width: "100%" }}
+         height={309}
+         debounce={100}
          scroll
-         offset={[0, 0]}
-         placeholder={<Spinner />}
+         offset={[0, 600]}
+         placeholder={<EventPreviewCard loading />}
       >
          {children}
       </LazyLoad>
@@ -62,13 +44,16 @@ const GroupStreams = ({
    livestreams,
    mobile,
    searching,
-   livestreamId,
-   careerCenterId,
    listenToUpcoming,
    selectedOptions,
    isPastLivestreams,
 }) => {
-   const { userData, authenticatedUser: user } = useAuth()
+   const {
+      query: { groupId },
+   } = useRouter()
+   const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
+      useRegistrationModal()
+   const { data: existingInterests } = useInterests()
    const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
    const searchedButNoResults =
       selectedOptions?.length && !searching && !livestreams?.length
@@ -90,33 +75,16 @@ const GroupStreams = ({
       setShareEventDialog(null)
    }, [setShareEventDialog])
 
-   const renderStreamCards = slicedLivestreams?.map((livestream, index) => {
+   const renderStreamCards = slicedLivestreams?.map((livestream) => {
       if (livestream) {
          return (
-            <Grid
-               sx={[styles.streamGridItem, mobile && styles.dynamicHeight]}
-               key={livestream.id}
-               xs={12}
-               md={6}
-               lg={6}
-               xl={4}
-               item
-            >
-               <Wrapper index={index} streamId={livestream.id}>
-                  <GroupStreamCardV2
-                     mobile={mobile}
-                     isPastLivestreams={isPastLivestreams}
-                     setGlobalCardHighlighted={setGlobalCardHighlighted}
-                     globalCardHighlighted={globalCardHighlighted}
-                     groupData={groupData}
-                     listenToUpcoming={listenToUpcoming}
-                     careerCenterId={careerCenterId}
-                     livestreamId={livestreamId}
-                     user={user}
-                     userData={userData}
-                     id={livestream.id}
-                     key={livestream.id}
-                     livestream={livestream}
+            <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={4} item>
+               <Wrapper streamId={livestream.id}>
+                  <EventPreviewCard
+                     onRegisterClick={handleClickRegister}
+                     interests={existingInterests}
+                     autoRegister
+                     event={livestream}
                      openShareDialog={setShareEventDialog}
                   />
                </Wrapper>
@@ -126,46 +94,62 @@ const GroupStreams = ({
    })
 
    return (
-      <Grid item xs={12}>
-         <Grid container spacing={mobile ? 2 : 4}>
-            {groupData.id || listenToUpcoming ? (
-               searching ? (
-                  <Grid xs={12} item sx={styles.loaderWrapper}>
-                     <LinearProgress style={{ width: "80%" }} color="primary" />
-                  </Grid>
-               ) : livestreams.length ? (
-                  renderStreamCards
+      <>
+         <Box sx={{ p: { xs: 0, md: 2 }, width: "100%" }}>
+            <Grid container spacing={mobile ? 2 : 3}>
+               {groupData.id || listenToUpcoming ? (
+                  searching ? (
+                     <Grid xs={12} item sx={styles.loaderWrapper}>
+                        <LinearProgress
+                           style={{ width: "80%" }}
+                           color="primary"
+                        />
+                     </Grid>
+                  ) : livestreams.length ? (
+                     renderStreamCards
+                  ) : (
+                     <Grid xs={12} item sx={styles.loaderWrapper}>
+                        <Typography
+                           sx={styles.emptyMessage}
+                           align="center"
+                           variant="h5"
+                           style={{ marginTop: 100 }}
+                        >
+                           {searchedButNoResults ? (
+                              "We couldn't find anything... 😕"
+                           ) : (
+                              <strong>
+                                 {groupData.universityName} currently has no{" "}
+                                 {isPastLivestreams ? "past" : "scheduled"} live
+                                 streams
+                              </strong>
+                           )}
+                        </Typography>
+                     </Grid>
+                  )
+               ) : null}
+               {shareEventDialog ? (
+                  <ShareLivestreamModal
+                     livestreamData={shareEventDialog}
+                     handleClose={handleShareEventDialogClose}
+                  />
                ) : (
-                  <Grid xs={12} item sx={styles.loaderWrapper}>
-                     <Typography
-                        sx={styles.emptyMessage}
-                        align="center"
-                        variant="h5"
-                        style={{ marginTop: 100 }}
-                     >
-                        {searchedButNoResults ? (
-                           "We couldn't find anything... 😕"
-                        ) : (
-                           <strong>
-                              {groupData.universityName} currently has no{" "}
-                              {isPastLivestreams ? "past" : "scheduled"} live
-                              streams
-                           </strong>
-                        )}
-                     </Typography>
-                  </Grid>
-               )
-            ) : null}
-            {shareEventDialog ? (
-               <ShareLivestreamModal
-                  livestreamData={shareEventDialog}
-                  handleClose={handleShareEventDialogClose}
-               />
-            ) : (
-               ""
-            )}
-         </Grid>
-      </Grid>
+                  ""
+               )}
+            </Grid>
+         </Box>
+         {joinGroupModalData && (
+            <RegistrationModal
+               open={Boolean(joinGroupModalData)}
+               onFinish={handleCloseJoinModal}
+               promptOtherEventsOnFinal={!groupId}
+               livestream={joinGroupModalData?.livestream}
+               groups={joinGroupModalData?.groups}
+               targetGroupId={joinGroupModalData?.targetGroupId}
+               handleClose={handleCloseJoinModal}
+            />
+         )}
+      </>
    )
 }
 export default GroupStreams

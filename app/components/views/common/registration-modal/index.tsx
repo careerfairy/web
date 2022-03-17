@@ -1,12 +1,12 @@
-import PropTypes from "prop-types"
 import React, { memo } from "react"
 import { Dialog, Grow } from "@mui/material"
 import { RegistrationContextProvider } from "context/registration/RegistrationContext"
 import RegistrationForm from "./RegistrationForm"
+import { LiveStreamEvent } from "../../../../types/event"
 
 const RegistrationModal = memo(
    ({
-      open,
+      open = false,
       handleClose,
       livestream,
       groups,
@@ -14,7 +14,7 @@ const RegistrationModal = memo(
       onGroupJoin,
       onFinish,
       targetGroupId,
-   }) => {
+   }: Props) => {
       const cancelable = Boolean(handleClose)
       const onClose = () => {
          handleClose?.()
@@ -46,11 +46,14 @@ const RegistrationModal = memo(
    }
 )
 
-RegistrationModal.propTypes = {
-   open: PropTypes.bool.isRequired,
-   onGroupJoin: PropTypes.func,
-   handleClose: PropTypes.func,
-   onFinish: PropTypes.func,
+interface Props {
+   open?: boolean
+   onGroupJoin?: () => any
+   handleClose: () => any
+   onFinish: () => any
+   livestream: LiveStreamEvent
+   groups: any[]
+   promptOtherEventsOnFinal?: boolean
+   targetGroupId?: string
 }
-
 export default RegistrationModal

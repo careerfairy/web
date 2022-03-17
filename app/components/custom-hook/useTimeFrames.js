@@ -18,13 +18,15 @@ const sixMonths = new Date().setMonth(new Date().getMonth() - 6)
 
 const oneYear = new Date().setFullYear(new Date().getFullYear() - 1)
 const twoYears = new Date().setFullYear(new Date().getFullYear() - 2)
+const threeYears = new Date().setFullYear(new Date().getFullYear() - 3)
 const fourYears = new Date().setFullYear(new Date().getFullYear() - 4)
+const sixYears = new Date().setFullYear(new Date().getFullYear() - 6)
 
 const timeFrames = [
    {
-      name: "2 Years",
-      pastName: "2 years",
-      date: twoYears,
+      name: "3 Years",
+      pastName: "3 years",
+      date: threeYears,
       id: uuid(),
    },
    {
@@ -67,11 +69,11 @@ const timeFrames = [
 
 const globalTimeFrames = [
    {
-      globalDate: twoYears,
-      timeFrames: timeFrames.filter((timeOb) => timeOb.date >= twoYears),
-      name: "2 years",
+      globalDate: threeYears,
+      timeFrames: timeFrames.filter((timeOb) => timeOb.date >= threeYears),
+      name: "3 years",
       id: uuid(),
-      double: fourYears,
+      double: sixYears,
    },
    {
       globalDate: oneYear,

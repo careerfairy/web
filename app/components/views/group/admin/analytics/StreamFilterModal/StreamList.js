@@ -37,6 +37,12 @@ const columns = [
       flex: 1,
    },
    {
+      field: "company",
+      title: "Company",
+      description: "Company of the event",
+      flex: 1,
+   },
+   {
       field: "date",
       title: "Date",
       flex: 0.2,

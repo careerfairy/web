@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
    },
    animated: {
       transition: theme.transitions.create(["background", "box-shadow"], {
-         duration: theme.transitions.duration.complex,
+         duration: theme.transitions.duration.standard,
          easing: theme.transitions.easing.easeInOut,
       }),
    },

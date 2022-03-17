@@ -26,8 +26,6 @@ const StreamsTab = ({ handleChange, value, tabsColor }) => {
             TabIndicatorProps={{
                sx: {
                   ...styles.indicator,
-                  backgroundColor: (theme) =>
-                     tabsColor || theme.palette.common.white,
                },
             }}
             variant="fullWidth"
@@ -36,7 +34,6 @@ const StreamsTab = ({ handleChange, value, tabsColor }) => {
             <SimpleTab
                sx={{
                   ...styles.tab,
-                  color: tabsColor || "white",
                }}
                label="Upcoming Events"
                value="upcomingEvents"
@@ -45,7 +42,6 @@ const StreamsTab = ({ handleChange, value, tabsColor }) => {
             <SimpleTab
                sx={{
                   ...styles.tab,
-                  color: tabsColor || "white",
                }}
                label="Past Events"
                value="pastEvents"
