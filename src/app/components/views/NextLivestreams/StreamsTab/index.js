@@ -15,7 +15,7 @@ const styles = {
       fontWeight: (theme) => theme.typography.fontWeightBold,
    },
 };
-
+//
 const StreamsTab = ({ handleChange, value, tabsColor }) => {
    return (
       <AppBar sx={styles.root} position="static" color="transparent">
