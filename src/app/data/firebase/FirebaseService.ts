@@ -2976,7 +2976,7 @@ class FirebaseService {
          .collection("userInterface")
          .doc("eventsPortal")
          .get();
-      return Boolean(snap?.data?.().showHighlights);
+      return Boolean(snap?.data?.()?.showHighlights);
    };
 
    // Streamer Helpers

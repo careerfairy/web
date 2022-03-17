@@ -166,6 +166,7 @@ const EventsPreview = ({
                      component={Slider}
                      autoplay={false}
                      lazyLoad
+                     key={events?.length}
                      infinite={false}
                      onLazyLoad={handleCardsLoaded}
                      arrows

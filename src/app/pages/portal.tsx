@@ -1,14 +1,13 @@
 import React from "react";
 import GeneralLayout from "layouts/GeneralLayout";
-import HighlightsCarousel from "../components/views/portal/HighlightsCarousel";
+// import HighlightsCarousel from "../components/views/portal/HighlightsCarousel";
 import Container from "@mui/material/Container";
-import FeaturedAndNextEvents from "../components/views/portal/FeaturedAndNextEvents";
+// import FeaturedAndNextEvents from "../components/views/portal/FeaturedAndNextEvents";
 import RecommendedEvents from "../components/views/portal/events-preview/RecommendedEvents";
 import ComingUpNextEvents from "../components/views/portal/events-preview/ComingUpNextEvents";
 import MyNextEvents from "../components/views/portal/events-preview/MyNextEvents";
 import WidgetsWrapper from "../components/views/portal/WidgetsWrapper";
 import { useAuth } from "../HOCs/AuthProvider";
-import { useRouter } from "next/router";
 
 const PortalPage = () => {
    const { authenticatedUser, userData } = useAuth();
@@ -29,7 +28,7 @@ const PortalPage = () => {
             }}
          >
             <WidgetsWrapper>
-               <HighlightsCarousel />
+               {/*<HighlightsCarousel />*/}
                {/*<FeaturedAndNextEvents />*/}
                {hasInterests && (
                   <RecommendedEvents maxLimitIncreaseTimes={5} limit={30} />
