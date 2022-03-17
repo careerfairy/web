@@ -116,7 +116,8 @@ const TimerText = memo(({ time }) => {
       </Box>
    );
 });
-
+const mobileSpacing = 1;
+const desktopSpacing = 2;
 const CountDown = ({
    time,
    registerButtonLabel,
@@ -153,7 +154,7 @@ const CountDown = ({
 
    return (
       <Paper sx={styles.root}>
-         <Grid container spacing={2}>
+         <Grid container spacing={{ xs: mobileSpacing, md: desktopSpacing }}>
             <Grid item xs={12}>
                <Collapse in={streamAboutToStart}>
                   <Box sx={styles.streamStartingNoticeWrapper}>
@@ -212,13 +213,40 @@ const CountDown = ({
 
                <TimerText time={time} />
             </Grid>
+            <Grid item xs={12}>
+               <Button
+                  id="register-button"
+                  sx={{
+                     "&:disabled": {
+                        color: (theme) =>
+                           registered && theme.palette.common.white,
+                        backgroundColor: (theme) =>
+                           registered && theme.palette.secondary.main,
+                     },
+                  }}
+                  color={registered ? "secondary" : "primary"}
+                  variant={"contained"}
+                  fullWidth
+                  startIcon={registered && <CheckIcon />}
+                  disabled={disabled || registered}
+                  onClick={onRegisterClick}
+                  disableElevation
+                  size="large"
+               >
+                  {registerButtonLabel}
+               </Button>
+            </Grid>
             <Hidden smUp>
                <Grid item xs={12}>
                   {streamIsOld(stream.start) ? (
                      ""
                   ) : (
                      <>
-                        <Box mb={1}>
+                        <Box
+                           sx={{
+                              mb: { xs: mobileSpacing, md: desktopSpacing },
+                           }}
+                        >
                            <Tooltip arrow placement="top" title={"Share Event"}>
                               <Button
                                  onClick={() => setShareEventDialog(stream)}
@@ -260,29 +288,6 @@ const CountDown = ({
                   )}
                </Grid>
             </Hidden>
-            <Grid item xs={12}>
-               <Button
-                  id="register-button"
-                  sx={{
-                     "&:disabled": {
-                        color: (theme) =>
-                           registered && theme.palette.common.white,
-                        backgroundColor: (theme) =>
-                           registered && theme.palette.secondary.main,
-                     },
-                  }}
-                  color={registered ? "secondary" : "primary"}
-                  variant={"contained"}
-                  fullWidth
-                  startIcon={registered && <CheckIcon />}
-                  disabled={disabled || registered}
-                  onClick={onRegisterClick}
-                  disableElevation
-                  size="large"
-               >
-                  {registerButtonLabel}
-               </Button>
-            </Grid>
          </Grid>
          {shareEventDialog ? (
             <ShareLivestreamModal

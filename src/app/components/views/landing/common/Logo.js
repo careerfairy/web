@@ -7,7 +7,7 @@ const styles = {
       maxWidth: "100%",
       maxHeight: 50,
       transition: theme.transitions.create(["transform", "filter"], {
-         duration: theme.transitions.duration.complex,
+         duration: theme.transitions.duration.standard,
          easing: theme.transitions.easing.easeInOut,
       }),
       "&:hover": {
