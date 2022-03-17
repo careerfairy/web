@@ -11,13 +11,14 @@ import {
    SAVE_WITH_NO_VALIDATION,
    SUBMIT_FOR_APPROVAL,
 } from "../components/util/constants";
-import { withFirebase } from "../context/firebase/FirebaseServiceContext";
+import { useFirebaseService } from "../context/firebase/FirebaseServiceContext";
 import { useAuth } from "../HOCs/AuthProvider";
 import EnterDetailsModal from "../components/views/draftStreamForm/EnterDetailsModal";
 import { prettyLocalizedDate } from "../components/helperFunctions/HelperFunctions";
 import GeneralLayout from "../layouts/GeneralLayout";
 
-const draftStream = ({ firebase }) => {
+const DraftStream = () => {
+   const firebaseService = useFirebaseService();
    const [showEnterDetailsModal, setShowEnterDetailsModal] = useState(false);
    const [submitted, setSubmitted] = useState(false);
    const { authenticatedUser, userData } = useAuth();
@@ -66,7 +67,7 @@ const draftStream = ({ firebase }) => {
             draftId: streamId,
             type: "draftApprovalRequest",
          };
-         const notificationRef = await firebase.createNotification(
+         const notificationRef = await firebaseService.createNotification(
             notificationDetails,
             { force: true }
          );
@@ -79,6 +80,7 @@ const draftStream = ({ firebase }) => {
    const onSubmit = async (
       values,
       { setSubmitting },
+      targetCategories,
       updateMode,
       draftStreamId,
       setFormData,
@@ -89,9 +91,10 @@ const draftStream = ({ firebase }) => {
          setSubmitting(true);
          const livestream = buildLivestreamObject(
             values,
+            targetCategories,
             updateMode,
             draftStreamId,
-            firebase
+            firebaseService
          );
          if (status === SUBMIT_FOR_APPROVAL) {
             if (!userInfo.email || !userInfo.name) {
@@ -114,14 +117,17 @@ const draftStream = ({ firebase }) => {
                      authenticatedUser?.email || userInfo.email || "anonymous",
                };
             }
-            await firebase.updateLivestream(livestream, "draftLivestreams");
+            await firebaseService.updateLivestream(
+               livestream,
+               "draftLivestreams"
+            );
 
             // console.log("-> Draft livestream was updated with id", id);
          } else {
             const author = {
                email: authenticatedUser?.email || userInfo.email || "anonymous",
             };
-            id = await firebase.addLivestream(
+            id = await firebaseService.addLivestream(
                livestream,
                "draftLivestreams",
                author
@@ -132,13 +138,13 @@ const draftStream = ({ firebase }) => {
 
          if (status === SUBMIT_FOR_APPROVAL) {
             const submitTime = prettyLocalizedDate(new Date());
-            const adminsInfo = await firebase.getAllGroupAdminInfo(
+            const adminsInfo = await firebaseService.getAllGroupAdminInfo(
                livestream.groupIds || [],
                id
             );
             const senderName = userInfo.name;
             const senderEmail = userInfo.email;
-            await firebase.sendDraftApprovalRequestEmail({
+            await firebaseService.sendDraftApprovalRequestEmail({
                adminsInfo,
                senderName,
                livestream,
@@ -209,4 +215,4 @@ const draftStream = ({ firebase }) => {
    );
 };
 
-export default withFirebase(draftStream);
+export default DraftStream;

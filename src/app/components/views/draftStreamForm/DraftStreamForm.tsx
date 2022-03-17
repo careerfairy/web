@@ -152,6 +152,7 @@ const DraftStreamForm = ({
       company: "",
       companyId: "",
       title: "",
+      targetCategories: {},
       interestsIds: [],
       groupIds: [],
       start: new Date(),
@@ -249,6 +250,7 @@ const DraftStreamForm = ({
                   company: livestream.company || "",
                   companyId: livestream.companyId || "",
                   title: livestream.title || "",
+                  targetCategories: {},
                   groupIds: livestream.groupIds || [],
                   interestsIds: livestream.interestsIds || [],
                   start: livestream.start.toDate() || new Date(),
@@ -275,6 +277,7 @@ const DraftStreamForm = ({
                } else {
                   await handleSetGroupIds([], livestream.groupIds, newFormData);
                }
+               setTargetCategories(livestream.targetCategories || {});
                setSelectedInterests(
                   existingInterests.filter((i) =>
                      newFormData.interestsIds.includes(i.id)
@@ -453,6 +456,7 @@ const DraftStreamForm = ({
                      await onSubmit(
                         values,
                         { setSubmitting },
+                        targetCategories,
                         updateMode,
                         draftStreamId,
                         setFormData,
@@ -795,7 +799,7 @@ const DraftStreamForm = ({
                                     style={{ color: "white" }}
                                     variant="h4"
                                  >
-                                    Groups & Categories:
+                                    Groups & Audience:
                                  </Typography>
                                  <FormGroup>
                                     <Grid
@@ -854,37 +858,43 @@ const DraftStreamForm = ({
                                           </Grid>
                                        );
                                     })}
-
-                                    <Grid
-                                       xs={12}
-                                       sm={12}
-                                       md={12}
-                                       lg={12}
-                                       xl={12}
-                                       item
-                                    >
-                                       <MultiListSelect
-                                          inputName="interestsIds"
-                                          onSelectItems={setSelectedInterests}
-                                          selectedItems={selectedInterests}
-                                          allValues={existingInterests}
-                                          disabled={isSubmitting}
-                                          limit={5}
-                                          setFieldValue={setFieldValue}
-                                          inputProps={{
-                                             label: "Add some Categories",
-                                             placeholder:
-                                                "Choose 5 categories that best describe this event",
-                                          }}
-                                          chipProps={{
-                                             variant: "outlined",
-                                          }}
-                                          isCheckbox={true}
-                                       />
-                                    </Grid>
                                  </FormGroup>
                               </>
                            )}
+
+                           <Typography style={{ color: "white" }} variant="h4">
+                              Event Categories:
+                           </Typography>
+                           <FormGroup>
+                              <Grid
+                                 xs={12}
+                                 sm={12}
+                                 md={12}
+                                 lg={12}
+                                 xl={12}
+                                 item
+                              >
+                                 <MultiListSelect
+                                    inputName="interestsIds"
+                                    onSelectItems={setSelectedInterests}
+                                    selectedItems={selectedInterests}
+                                    allValues={existingInterests}
+                                    disabled={isSubmitting}
+                                    limit={5}
+                                    setFieldValue={setFieldValue}
+                                    inputProps={{
+                                       label: "Add some Categories",
+                                       placeholder:
+                                          "Choose 5 categories that best describe this event",
+                                    }}
+                                    chipProps={{
+                                       variant: "outlined",
+                                    }}
+                                    isCheckbox={true}
+                                 />
+                              </Grid>
+                           </FormGroup>
+
                            <ButtonGroup
                               className={classes.buttonGroup}
                               fullWidth

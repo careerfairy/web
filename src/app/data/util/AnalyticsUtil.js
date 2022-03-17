@@ -1,5 +1,4 @@
 import { toTitleCase } from "../../components/helperFunctions/HelperFunctions";
-import { livestream } from "../../constants/images";
 
 const getCategoryOptionName = (targetCategoryId, user, groupContext) => {
    if (user.registeredGroups) {
@@ -219,7 +218,7 @@ const arraysOfIdsEqual = (array1, array2) => {
 
 const getUsersFromDictionaryWithIds = (arrayOfIds = [], dictionary = {}) => {
    return arrayOfIds.reduce((acc, id) => {
-      if (!dictionary[id]) return acc;
+      if (!dictionary?.[id]) return acc;
       return acc.concat(dictionary[id]);
    }, []);
 };
