@@ -28,6 +28,14 @@ export default class LocalStorageUtil {
       return localStorage.setItem("selectedVideoInput", deviceId);
    };
 
+   static getInviteLivestream = () => {
+      return localStorage?.getItem(localStorageInvite);
+   };
+
+   static getReferralCode = () => {
+      return localStorage?.getItem(localStorageReferralCode);
+   };
+
    static setInviteLivestream = (livestreamId) => {
       return localStorage?.setItem(localStorageInvite, livestreamId);
    };

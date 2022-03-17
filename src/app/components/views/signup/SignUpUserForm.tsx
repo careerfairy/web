@@ -88,8 +88,11 @@ function SignUpUserForm() {
    const [generalLoading, setGeneralLoading] = useState(false);
    const [open, setOpen] = React.useState(false);
 
-   const [existingReferralCode, _, removeExistingReferralcode] =
-      useLocalStorage(localStorageReferralCode, "", { raw: true });
+   const [existingReferralCode] = useLocalStorage(
+      localStorageReferralCode,
+      "",
+      { raw: true }
+   );
 
    const submitting = (isSubmitting) => {
       return isSubmitting || emailSent || generalLoading;
@@ -114,7 +117,6 @@ function SignUpUserForm() {
             firebase
                .signInWithEmailAndPassword(values.email, values.password)
                .then(() => {
-                  removeExistingReferralcode();
                   setSubmitting(false);
                   setGeneralLoading(false);
                   nextStep();

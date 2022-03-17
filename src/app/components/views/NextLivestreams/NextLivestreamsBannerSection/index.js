@@ -13,7 +13,7 @@ const styles = {
       },
    },
    section: {
-      pb: [1, "!important"],
+      p: [0, "!important"],
    },
    defaultTitle: {
       fontSize: "1.8rem",
@@ -23,22 +23,8 @@ const styles = {
 
 const NextLivestreamsBannerSection = (props) => {
    return (
-      <Section
-         sx={styles.section}
-         big={props.big}
-         color={props.color}
-         backgroundImageClassName={props.backgroundImageClassName}
-         backgroundImage={props.backgroundImage}
-         backgroundImageOpacity={props.backgroundImageOpacity}
-         backgroundColor={props.backgroundColor}
-      >
+      <Section sx={styles.section} big={props.big} color={props.color}>
          <Container sx={styles.container}>
-            <SectionHeader
-               color={props.color}
-               title={props.title}
-               subtitle={props.subtitle}
-               subTitleSx={styles.defaultTitle}
-            />
             <StreamsTab handleChange={props.handleChange} value={props.value} />
          </Container>
       </Section>

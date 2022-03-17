@@ -8,6 +8,7 @@ import firebaseApp from "./FirebaseInstance";
 import firebase from "firebase/app";
 import { HandRaiseState } from "types/handraise";
 import DocumentReference = firebase.firestore.DocumentReference;
+import { getReferralInformation } from "../../util/CommonUtil";
 
 class FirebaseService {
    public readonly app: firebase.app.App;
@@ -2215,12 +2216,20 @@ class FirebaseService {
                });
 
                // To be used from now on
-               transaction.set(registrantSubCollectionRef, {
-                  ...user,
-                  livestreamId,
-                  dateRegistered: this.getServerTimestamp(),
-                  authId: uid,
-               });
+               transaction.set(
+                  registrantSubCollectionRef,
+                  Object.assign(
+                     {
+                        ...user,
+                        livestreamId,
+                        dateRegistered: this.getServerTimestamp(),
+                        authId: uid,
+                     },
+                     // We store the referral info so that it can be used by a cloud function
+                     // that applies the rewards
+                     { referral: getReferralInformation() }
+                  )
+               );
             });
          }
       );
@@ -2959,6 +2968,15 @@ class FirebaseService {
          .collection("breakoutRooms")
          .doc(breakoutRoomId);
       return ref.get();
+   };
+   // User Interface API
+
+   shouldShowHighlightsCarousel = async () => {
+      const snap = await this.firestore
+         .collection("userInterface")
+         .doc("eventsPortal")
+         .get();
+      return Boolean(snap?.data?.().showHighlights);
    };
 
    // Streamer Helpers
