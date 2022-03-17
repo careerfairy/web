@@ -7,7 +7,7 @@ on:
     branches: [main, develop, feature/**]
 jobs:
   build:
-    name: "Build and start App"
+    name: "Build and Test App"
     runs-on: ubuntu-latest
     steps:
       - name: Cache multiple paths
@@ -41,14 +41,6 @@ jobs:
         run: npm run build:app
       - name: Build Functions
         run: npm run build:functions
-
-  test:
-    name: "Run e2e and units tests"
-    needs: build
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    steps:
-
       - name: Install Playwright
         run: npx playwright install --with-deps
       - name: Run Jest Unit Tests
