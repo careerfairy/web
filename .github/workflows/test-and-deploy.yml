@@ -35,6 +35,7 @@ jobs:
       - name: Build Functions
         run: npm run build:functions
       - name: Start Built App With Emulators
+        uses: w9jds/firebase-action@master
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN}}
         run: npm run start:app:build:with:emulators
