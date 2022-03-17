@@ -4,7 +4,7 @@
   "scripts": {
     "start:emulators": "cross-env FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 NEXT_PUBLIC_FIREBASE_EMULATORS=true npm run start:emulators:helper",
     "start:emulators:helper": "firebase emulators:exec --ui --only auth,firestore,functions \"cd ./app && npm run dev\"",
-    "start:emulators:helper:build": "firebase emulators:exec --ui --only auth,firestore,functions --token \"$FIREBASE_TOKEN\" \"cd ./app && npm run start\"",
+    "start:emulators:helper:build": "firebase emulators:exec --token \"$FIREBASE_TOKEN\" --ui --only auth,firestore,functions \"cd ./app && npm run start\"",
     "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi",
     "build:app": "cd app && npm run build",
     "start:app:build:with:emulators": "cross-env FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 NEXT_PUBLIC_FIREBASE_EMULATORS=true npm run start:emulators:helper:build",
