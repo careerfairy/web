@@ -157,7 +157,7 @@ const styles = {
       ...getMaxLineStyles(3),
    },
    btn: {
-      flex: 0.5,
+      flex: 1,
       borderRadius: 1,
    },
    bottomLogoWrapper: {
@@ -166,11 +166,11 @@ const styles = {
       flex: 0.2,
    },
    companyAvatar: {
-      padding: 1,
+      padding: 1.5,
       backgroundColor: "white",
       boxShadow: 3,
       border: "none !important",
-      width: 80,
+      width: 130,
       height: 80,
       borderRadius: 3,
    },
@@ -340,7 +340,7 @@ const EventPreviewCard = ({
                               animation={animation ?? "wave"}
                               variant="rectangular"
                               sx={{ borderRadius: 3 }}
-                              width={80}
+                              width={130}
                               height={80}
                            />
                         ) : (
@@ -467,7 +467,7 @@ const EventPreviewCard = ({
                               {event?.summary}
                            </Typography>
                            <Stack spacing={1} direction="row">
-                              {onRegisterClick && (
+                              {onRegisterClick && !isPast && (
                                  <Button
                                     sx={styles.btn}
                                     onClick={onClickRegister}
