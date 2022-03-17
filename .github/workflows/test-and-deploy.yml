@@ -44,7 +44,7 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps
       - name: Run Jest Unit Tests
-        run: npm run test:units
+        run: npm run test
       - name: Run Playwright End to End tests
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN}}

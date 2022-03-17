@@ -13,7 +13,7 @@
     "install:functions": "cd functions && npm install",
     "postinstall": "cross-env run-p install:*",
     "test:e2e": "cd app && npm run test:e2e",
-    "test:units": "cd app && npm run test:units"
+    "test": "cd app && npm run test"
   },
   "devDependencies": {
     "@playwright/test": "^1.20.0",
