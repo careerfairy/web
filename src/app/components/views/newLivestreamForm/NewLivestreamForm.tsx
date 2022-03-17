@@ -677,7 +677,7 @@ const NewLivestreamForm = () => {
                         );
                      })}
                      <Typography style={{ color: "white" }} variant="h4">
-                        Groups & Categories:
+                        Groups & Audience:
                      </Typography>
                      <FormGroup>
                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
@@ -718,7 +718,12 @@ const NewLivestreamForm = () => {
                               </Grid>
                            );
                         })}
+                     </FormGroup>
 
+                     <Typography style={{ color: "white" }} variant="h4">
+                        Event Categories:
+                     </Typography>
+                     <FormGroup>
                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                            <MultiListSelect
                               inputName="interestsIds"
