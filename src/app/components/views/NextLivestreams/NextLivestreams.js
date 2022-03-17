@@ -18,7 +18,7 @@ const NextLivestreams = ({
 }) => {
    const { userData } = useAuth();
    const theme = useTheme();
-   const mobile = useMediaQuery(theme.breakpoints.down('md'));
+   const mobile = useMediaQuery(theme.breakpoints.down("md"));
    const router = useRouter();
 
    const careerCenterId = getServerSideRouterQuery("careerCenterId", router);

@@ -9,9 +9,8 @@ const {
 const { RewardActions } = require("../shared/rewards");
 const {
    rewardCreateReferralSignUpLeader,
-   rewardCreateLivestreamInviteCompleteLeader,
-   rewardGetInvitationForLivestream,
-   rewardCreateLivestreamInviteCompleteFollower,
+   rewardCreateLivestream,
+   rewardGetRelatedToLivestream,
 } = require("./lib/reward");
 const { livestreamGetById } = require("./lib/livestream");
 
@@ -28,10 +27,12 @@ exports.rewardApply = functions
       const email = context.params.userEmail;
 
       // Apply points to the user owner of the reward
-      await userAddPoints(email, rewardDoc.points);
-      functions.logger.info(
-         `Added ${rewardDoc.points} points to ${email} for ${rewardDoc.action}`
-      );
+      if (rewardDoc?.points && rewardDoc.points > 0) {
+         await userAddPoints(email, rewardDoc.points);
+         functions.logger.info(
+            `Added ${rewardDoc.points} points to ${email} for ${rewardDoc.action}`
+         );
+      }
 
       switch (rewardDoc.action) {
          /**
@@ -47,12 +48,27 @@ exports.rewardApply = functions
             break;
 
          /**
+          * When a user registers a livestream after being invited by someone (leader)
+          */
+         case RewardActions.LIVESTREAM_REGISTER_COMPLETE_FOLLOWER:
+            // Also reward the user (leader) that created the invite
+            await rewardCreateLivestream(
+               rewardDoc.userId, // leader id
+               RewardActions.LIVESTREAM_REGISTER_COMPLETE_LEADER,
+               await userGetByEmail(email), // this follower data
+               await livestreamGetById(rewardDoc.livestreamId)
+            );
+
+            break;
+
+         /**
           * When a user attends a livestream after being invited by someone (leader)
           */
          case RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER:
             // Also reward the user (leader) that created the invite
-            await rewardCreateLivestreamInviteCompleteLeader(
+            await rewardCreateLivestream(
                rewardDoc.userId, // leader id
+               RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER,
                await userGetByEmail(email), // this follower data
                await livestreamGetById(rewardDoc.livestreamId)
             );
@@ -77,6 +93,66 @@ exports.rewardApply = functions
       }
    });
 
+exports.rewardLivestreamRegistrant = functions
+   .region(config.region)
+   .firestore.document("livestreams/{livestreamId}/registrants/{userId}")
+   .onCreate(async (snap, context) => {
+      const documentData = snap.data();
+
+      if (
+         !documentData.referral ||
+         !documentData.referral.referralCode ||
+         !documentData.referral.inviteLivestream
+      ) {
+         functions.logger.info("No referral information to reward.");
+         return;
+      }
+
+      if (
+         documentData.referral.inviteLivestream !== context.params.livestreamId
+      ) {
+         functions.logger.info("The invite wasn't for this event, ignoring.");
+         return;
+      }
+
+      const userInviteOwner = await userGetByReferralCode(
+         documentData.referral.referralCode
+      );
+
+      if (
+         !userInviteOwner ||
+         userInviteOwner.authId === context.params.userId
+      ) {
+         functions.logger.info(
+            "The user owner of the invite is the same attending or does not exist."
+         );
+         return;
+      }
+
+      const registerReward = await rewardGetRelatedToLivestream(
+         documentData.id,
+         context.params.livestreamId,
+         RewardActions.LIVESTREAM_REGISTER_COMPLETE_FOLLOWER
+      );
+
+      if (registerReward) {
+         functions.logger.info(
+            "The user has already been rewarded for this event registration."
+         );
+         return;
+      }
+
+      await rewardCreateLivestream(
+         documentData.id,
+         RewardActions.LIVESTREAM_REGISTER_COMPLETE_FOLLOWER,
+         userInviteOwner,
+         await livestreamGetById(context.params.livestreamId)
+      );
+      functions.logger.info(
+         "Created a new reward for the livestream registration."
+      );
+   });
+
 exports.rewardLivestreamAttendance = functions.https.onCall(
    async (data, context) => {
       const userEmail = context.auth?.token?.email;
@@ -93,9 +169,20 @@ exports.rewardLivestreamAttendance = functions.https.onCall(
       }
 
       const userInviteOwner = await userGetByReferralCode(referralCode);
-      if (!userInviteOwner || userInviteOwner.id === userEmail) {
+      if (!userInviteOwner) {
          functions.logger.error(
-            `Invalid referral user! Referral Code: ${referralCode}`
+            `There isn't a user owner of the Referral Code: ${referralCode}.`
+         );
+         throw new functions.https.HttpsError(
+            "failed-precondition",
+            // generic error message on purpose, we can't give clues to the ones trying to bypass
+            "Something wrong happened"
+         );
+      }
+
+      if (userInviteOwner.id === userEmail) {
+         functions.logger.error(
+            `User invited himself to the event, referralCode: ${referralCode}.`
          );
          throw new functions.https.HttpsError(
             "failed-precondition",
@@ -127,9 +214,10 @@ exports.rewardLivestreamAttendance = functions.https.onCall(
          );
       }
 
-      const invitationReward = await rewardGetInvitationForLivestream(
+      const invitationReward = await rewardGetRelatedToLivestream(
          userEmail,
-         livestreamId
+         livestreamId,
+         RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER
       );
 
       if (invitationReward) {
@@ -145,8 +233,9 @@ exports.rewardLivestreamAttendance = functions.https.onCall(
       // TODO: check for invitations on livestreamEmailInvites collection (when referralCode is missing)
 
       // all validations have passed, create the reward for the user
-      await rewardCreateLivestreamInviteCompleteFollower(
+      await rewardCreateLivestream(
          userEmail,
+         RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER,
          userInviteOwner,
          livestreamDoc
       );

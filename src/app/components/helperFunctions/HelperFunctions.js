@@ -424,7 +424,6 @@ export const dataURLtoFile = (dataUrl, filename) => {
 
 export const getMaxLineStyles = (maxLines = 2) => ({
    display: "-webkit-box",
-   boxOrient: "vertical",
    lineClamp: maxLines,
    WebkitLineClamp: maxLines,
    overflow: "hidden",
@@ -436,3 +435,5 @@ export const getMaxLineStyles = (maxLines = 2) => ({
 export const sleep = (ms) => {
    return new Promise((resolve) => setTimeout(resolve, ms));
 };
+
+export const delay = (t) => new Promise((resolve) => setTimeout(resolve, t));
