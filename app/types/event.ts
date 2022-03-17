@@ -1,4 +1,5 @@
 import { Identifiable } from "./commonTypes"
+import firebase from "firebase/app"
 
 export interface LiveStreamEvent extends Identifiable {
    author?: {
@@ -24,4 +25,8 @@ export interface LiveStreamEvent extends Identifiable {
    test?: boolean
    title?: string
    type?: string
+   start: firebase.firestore.Timestamp
+   registeredUsers?: string[]
+   hasStarted?: boolean
+   hasEnded?: boolean
 }

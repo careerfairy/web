@@ -5,7 +5,7 @@
 /**
  * Actions
  */
-const RewardActions = {
+export const RewardActions = {
    REFERRAL_SIGNUP_LEADER: "REFERRAL_SIGNUP_LEADER",
    REFERRAL_SIGNUP_FOLLOWER: "REFERRAL_SIGNUP_FOLLOWER",
    LIVESTREAM_REGISTER_COMPLETE_LEADER: "LIVESTREAM_REGISTER_COMPLETE_LEADER",
@@ -18,7 +18,7 @@ const RewardActions = {
 /**
  * Points
  */
-const RewardPoints = {
+export const RewardPoints = {
    [RewardActions.REFERRAL_SIGNUP_LEADER]: 20,
    [RewardActions.REFERRAL_SIGNUP_FOLLOWER]: 20,
    [RewardActions.LIVESTREAM_REGISTER_COMPLETE_LEADER]: 0,
@@ -27,11 +27,11 @@ const RewardPoints = {
    [RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER]: 20,
 }
 
-const REWARD_LIVESTREAM_ATTENDANCE_SECONDS = 5 * 60 // 5 minutes
+export const REWARD_LIVESTREAM_ATTENDANCE_SECONDS = 5 * 60 // 5 minutes
 
-const getPoints = (action) => RewardPoints[action]
+export const getPoints = (action) => RewardPoints[action]
 
-const getHumanStringDescriptionForAction = (action) => {
+export const getHumanStringDescriptionForAction = (action) => {
    switch (action) {
       case RewardActions.REFERRAL_SIGNUP_FOLLOWER:
          return "SignUp through a referral"
@@ -48,12 +48,4 @@ const getHumanStringDescriptionForAction = (action) => {
       default:
          return action
    }
-}
-
-module.exports = {
-   RewardActions,
-   RewardPoints,
-   getPoints,
-   getHumanStringDescriptionForAction,
-   REWARD_LIVESTREAM_ATTENDANCE_SECONDS,
 }

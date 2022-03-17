@@ -6,7 +6,7 @@ import {
 } from "../../constants/localStorageKeys"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import * as Sentry from "@sentry/nextjs"
-import { REWARD_LIVESTREAM_ATTENDANCE_SECONDS } from "../../../functions/src/shared/rewards"
+import { REWARD_LIVESTREAM_ATTENDANCE_SECONDS } from "../../../shared/rewards"
 
 const useRewardLivestreamAttendance = (livestreamData) => {
    const [invite] = useLocalStorage(localStorageInvite, null, { raw: true })

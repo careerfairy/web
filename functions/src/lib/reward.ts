@@ -1,15 +1,18 @@
-const { admin } = require("../api/firestoreAdmin")
-const { RewardActions, getPoints } = require("../../shared/rewards")
-const pick = require("lodash/pick")
+import { admin } from "../api/firestoreAdmin"
+import { RewardActions, getPoints } from "../../../shared/rewards"
+import pick = require("lodash/pick")
 
-exports.rewardCreateReferralSignUpLeader = (leaderId, followerUserData) => {
+export const rewardCreateReferralSignUpLeader = (
+   leaderId,
+   followerUserData
+) => {
    return rewardCreate(leaderId, RewardActions.REFERRAL_SIGNUP_LEADER, {
       userId: followerUserData.id,
       userData: pickDetailsFromUserData(followerUserData),
    })
 }
 
-exports.rewardCreateReferralSignUpFollower = (
+export const rewardCreateReferralSignUpFollower = (
    justRegisteredUserId,
    leaderUserData
 ) => {
@@ -23,7 +26,7 @@ exports.rewardCreateReferralSignUpFollower = (
    )
 }
 
-exports.rewardCreateLivestream = (
+export const rewardCreateLivestream = (
    userBeingRewardedId,
    action,
    relatedUserData,
@@ -56,12 +59,12 @@ const rewardCreate = async (rewardedUserId, action, otherData = {}) => {
       )
 }
 
-exports.rewardGetRelatedToLivestream = async (
+export const rewardGetRelatedToLivestream = async (
    userDataId,
    livestreamId,
    action
 ) => {
-   let querySnapshot = await admin
+   const querySnapshot = await admin
       .firestore()
       .collection("userData")
       .doc(userDataId)

@@ -1,25 +1,25 @@
-const functions = require("firebase-functions")
-const config = require("./config")
-const {
+import functions = require("firebase-functions")
+import config = require("./config")
+import {
    userAddPoints,
    userIncrementReferralsCount,
    userGetByReferralCode,
    userGetByEmail,
-} = require("./lib/user")
-const { RewardActions } = require("../shared/rewards")
-const {
+} from "./lib/user"
+import { RewardActions } from "../../shared/rewards"
+import {
    rewardCreateReferralSignUpLeader,
    rewardCreateLivestream,
    rewardGetRelatedToLivestream,
-} = require("./lib/reward")
-const { livestreamGetById } = require("./lib/livestream")
+} from "./lib/reward"
+import { livestreamGetById } from "./lib/livestream"
 
 /**
  * Everytime there is a new reward document, apply the reward depending on the action
  *
  * Watch-out when creating new rewards on this function, make sure it doesn't enter in infinite loop
  */
-exports.rewardApply = functions
+export const rewardApply = functions
    .region(config.region)
    .firestore.document("userData/{userEmail}/rewards/{rewardId}")
    .onCreate(async (snap, context) => {
@@ -93,7 +93,7 @@ exports.rewardApply = functions
       }
    })
 
-exports.rewardLivestreamRegistrant = functions
+export const rewardLivestreamRegistrant = functions
    .region(config.region)
    .firestore.document("livestreams/{livestreamId}/registrants/{userId}")
    .onCreate(async (snap, context) => {
@@ -153,7 +153,7 @@ exports.rewardLivestreamRegistrant = functions
       )
    })
 
-exports.rewardLivestreamAttendance = functions.https.onCall(
+export const rewardLivestreamAttendance = functions.https.onCall(
    async (data, context) => {
       const userEmail = context.auth?.token?.email
       const livestreamId = data.livestreamId
@@ -191,7 +191,7 @@ exports.rewardLivestreamAttendance = functions.https.onCall(
          )
       }
 
-      const livestreamDoc = await livestreamGetById(livestreamId)
+      const livestreamDoc: any = await livestreamGetById(livestreamId)
       if (
          !livestreamDoc ||
          !livestreamDoc.hasStarted ||

@@ -3,7 +3,7 @@ import { useEffect } from "react"
 import { useSnackbar } from "notistack"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { Reward } from "../types/reward"
-import { getHumanStringDescriptionForAction } from "../../functions/src/shared/rewards"
+import { getHumanStringDescriptionForAction } from "../../shared/rewards"
 
 const UserRewardsNotifications = ({ children }) => {
    const { userData } = useAuth()

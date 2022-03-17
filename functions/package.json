@@ -1,12 +1,12 @@
 {
    "name": "careerfairy-functions",
    "private": true,
-   "main": "dist/index.js",
+   "main": "dist/functions/src/index.js",
    "scripts": {
       "lint": "eslint --ext .ts .",
       "build": "npm run clean && npm run copy-files && tsc",
       "start": "npm run build && firebase emulators:start --only functions",
-      "copy-files": "cpx \"src/**/*.{json,html}\" dist/",
+      "copy-files": "cpx \"src/**/*.{json,html}\" dist/functions/src",
       "clean": "rimraf dist/",
       "logs": "firebase functions:log"
    },
