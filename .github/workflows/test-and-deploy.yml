@@ -29,17 +29,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build App
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: npm run build:app
       - name: Build Functions
         run: npm run build:functions
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
       - name: Start Built App With Emulators
-        run: npm run start:app:build:with:emulators
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN}}
+        run: npm run start:app:build:with:emulators
 
   test:
     name: "Run e2e and units tests"
