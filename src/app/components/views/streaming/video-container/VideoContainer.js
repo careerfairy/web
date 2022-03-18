@@ -43,6 +43,7 @@ const labels = {
    joinWithoutCameraConfirmDescription:
       "You intend to join this stream with only with your microphone?",
 };
+
 function VideoContainer({
    currentLivestream,
    isPlayMode,
@@ -86,6 +87,7 @@ function VideoContainer({
       localStream,
       localMediaControls,
       remoteStreams,
+      screenShareStreamRef,
       publishScreenShareStream,
       unPublishScreenShareStream,
       leaveAgoraRoom,
@@ -114,6 +116,15 @@ function VideoContainer({
          }
       }
    }, [streamerId, currentLivestream.id]);
+
+   useEffect(() => {
+      if (
+         currentLivestream.mode === "presentation" &&
+         screenShareStreamRef?.current
+      ) {
+         void unPublishScreenShareStream();
+      }
+   }, [currentLivestream.mode, screenShareStreamRef]);
 
    useEffect(() => {
       if (
