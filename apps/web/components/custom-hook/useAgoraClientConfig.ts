@@ -8,7 +8,10 @@ import {
 } from "agora-rtc-sdk-ng"
 import { RemoteStreamUser } from "types/streaming"
 
-export default function useAgoraClientConfig(rtcClient: IAgoraRTCClient) {
+export default function useAgoraClientConfig(
+   rtcClient: IAgoraRTCClient,
+   streamerId: string
+) {
    const [remoteStreams, setRemoteStreams] = useState([])
    const [networkQuality, setNetworkQuality] = useState<NetworkQuality>({
       downlinkNetworkQuality: 0,
@@ -66,7 +69,11 @@ export default function useAgoraClientConfig(rtcClient: IAgoraRTCClient) {
                      user.audioTrack = remoteUser.audioTrack
                      user.audioMuted = false
                      try {
-                        remoteUser?.audioTrack?.play?.()
+                        // We don't play the audiotrack for the screen share track if its being shared by the local
+                        // client, else it echoes with the sound of the original media player.
+                        if (user.uid !== `${streamerId}screen`) {
+                           remoteUser?.audioTrack?.play?.()
+                        }
                      } catch (e) {
                         dispatch(actions.sendGeneralError(e))
                      }

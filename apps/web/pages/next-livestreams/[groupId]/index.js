@@ -129,6 +129,7 @@ const GroupPage = ({
             <div>
                <GroupBannerSection
                   color={white}
+                  tabsColor={white}
                   backgroundImageClassName=""
                   backgroundColor={navyBlue.main}
                   groupLogo={currentGroup.logoUrl}

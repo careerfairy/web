@@ -2,7 +2,6 @@ import React from "react"
 import Head from "next/head"
 import dynamic from "next/dynamic"
 import StreamingLoader from "../../../../../components/views/loader/StreamingLoader"
-import { handleRedirectToNextGen } from "../../../../../util/serverSidePropsMethods"
 
 const ViewerLayout = dynamic(
    () => import("../../../../../layouts/ViewerLayout"),
@@ -28,10 +27,6 @@ const ViewerPage = () => {
          </ViewerLayout>
       </React.Fragment>
    )
-}
-
-export async function getServerSideProps(context) {
-   return handleRedirectToNextGen(context)
 }
 
 export default ViewerPage

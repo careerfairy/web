@@ -17,8 +17,6 @@ import useStreamRef from "../../components/custom-hook/useStreamRef"
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import useNextGenRedirect from "../../components/custom-hook/useNextGenRedirect"
-import useStreamAdminPreferences from "../../components/custom-hook/useStreamAdminPreferences"
 import AgoraRTMProvider from "context/agoraRTM/AgoraRTMProvider"
 import AgoraRTC from "agora-rtc-sdk-ng"
 import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay"
@@ -105,8 +103,6 @@ const StreamerLayout = (props) => {
    const [sliding, setSliding] = useState(false)
 
    const currentLivestream = useStreamConnect()
-   const streamAdminPreferences = useStreamAdminPreferences(baseStreamId)
-   useNextGenRedirect(streamAdminPreferences?.isNextGen)
    useStreamerActiveHandRaisesConnect()
 
    const classes = useStyles({
@@ -258,7 +254,6 @@ const StreamerLayout = (props) => {
                   isStreamer: true,
                   streamerId,
                   isMobile: undefined,
-                  streamAdminPreferences,
                }}
             >
                <div className={classes.root}>

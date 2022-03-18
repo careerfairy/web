@@ -1,5 +1,4 @@
 import { DeviceOption } from "../types/streaming"
-import { mainProductionDomain, nextGenSubDomain } from "../constants/domains"
 import { LiveStreamEvent } from "../types/event"
 import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../constants/streams"
 
@@ -51,38 +50,14 @@ export const mapDevices = (deviceInfos: MediaDeviceInfo[]) => {
    }
 }
 
-export const shouldWeRedirectNextGen = (
-   currentHost: string,
-   currentEnv: string,
-   livestreamIsBeta: boolean,
-   requestDetails: string
-) => {
-   const isInProdEnvironment = currentEnv === "production"
-
-   const isInNextGenSubDomain = currentHost === nextGenSubDomain
-   const isBeta = livestreamIsBeta
-   // if we should redirect, we return a string with the URL to redirect
-
-   if (!isInProdEnvironment || typeof isBeta !== "boolean") {
-      return null
-   }
-   if (isBeta) {
-      if (!isInNextGenSubDomain) {
-         return `https://${nextGenSubDomain}${requestDetails}`
-      }
-   } else {
-      if (isInNextGenSubDomain) {
-         return `https://${mainProductionDomain}${requestDetails}`
-      }
-   }
-
-   // we don't need to redirect
-   return null
+export const chekIfPast = (eventStartDate: Date) => {
+   return (
+      eventStartDate <
+      new Date(
+         Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
+      )
+   )
 }
-
-export const chekIfPast = (eventStartDate: Date) =>
-   eventStartDate >
-   new Date(NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST)
 
 // This function tries to find whom the event is hosted by from the fetched groups from the groupIds array field on the livestream document
 export const getRelevantHosts = (

@@ -1,7 +1,6 @@
 import React from "react"
 import dynamic from "next/dynamic"
 import StreamingLoader from "../../../../../components/views/loader/StreamingLoader"
-import { handleRedirectToNextGen } from "../../../../../util/serverSidePropsMethods"
 
 const StreamerOverview = dynamic(
    () => import("../../../../../components/views/streaming"),
@@ -20,10 +19,6 @@ const StreamerPage = () => {
          <StreamerOverview />
       </StreamerLayout>
    )
-}
-
-export async function getServerSideProps(context) {
-   return handleRedirectToNextGen(context)
 }
 
 export default StreamerPage

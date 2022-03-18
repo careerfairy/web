@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react"
-import makeStyles from "@mui/styles/makeStyles"
 import {
    Avatar,
    Box,
@@ -36,9 +35,6 @@ import * as actions from "store/actions/index"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog"
 import ConfirmRecordingDialog from "./ConfirmRecordingDialog"
-import useStreamAdminPreferences from "../../../../../custom-hook/useStreamAdminPreferences"
-import NextGenIcon from "@mui/icons-material/FiberNew"
-import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal"
 import PropTypes from "prop-types"
 
 const styles = {
@@ -85,8 +81,6 @@ const StreamCard = ({ isUpcoming, stream }) => {
    const firestore = useFirestore()
    const firebase = useFirebaseService()
    const dispatch = useDispatch()
-   const [togglingNextGen, setTogglingNextGen] = useState(false)
-   const [nextGenModalOpen, setNextGenModalOpen] = useState(false)
    const [recordingSid, setRecordingSid] = useState(false)
    const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] =
       useState(false)
@@ -96,8 +90,6 @@ const StreamCard = ({ isUpcoming, stream }) => {
    const recordingRequestOngoing = useSelector(
       (state) => state.streamAdmin.recording.recordingRequestOngoing
    )
-
-   const streamAdminPreferences = useStreamAdminPreferences(stream.id)
 
    useEffect(async () => {
       if (stream?.id) {
@@ -157,32 +149,8 @@ const StreamCard = ({ isUpcoming, stream }) => {
       dispatch(actions.handleStopRecording({ firebase, streamId: stream.id }))
    }
 
-   const handleToggleNextGen = async () => {
-      try {
-         setTogglingNextGen(true)
-         const wasNextGen = Boolean(streamAdminPreferences?.isNextGen)
-         await firebase.toggleNextGenMode(stream.id)
-         dispatch(
-            actions.sendSuccessMessage(
-               `NextGen mode has been ${
-                  wasNextGen ? "disabled" : "enabled"
-               } for ${stream.title}`
-            )
-         )
-      } catch (e) {
-         console.error(e)
-      }
-      setTogglingNextGen(false)
-      setNextGenModalOpen(false)
-   }
-
    return (
       <Card sx={styles.root}>
-         <Box sx={styles.chipContainer}>
-            {streamAdminPreferences?.isNextGen && (
-               <Chip icon={<NextGenIcon />} color="warning" label={"NEXTGEN"} />
-            )}
-         </Box>
          <CardMedia
             component="img"
             alt="Contemplative Reptile"
@@ -223,16 +191,6 @@ const StreamCard = ({ isUpcoming, stream }) => {
                                  }
                               >
                                  Get streamer links
-                              </MenuItem>
-                              <MenuItem
-                                 onClick={() => {
-                                    setNextGenModalOpen(true)
-                                    handleClose()
-                                 }}
-                              >
-                                 {streamAdminPreferences?.isNextGen
-                                    ? "Disable NextGen Mode"
-                                    : "Enable NextGen Mode"}
                               </MenuItem>
                               <MenuItem
                                  disabled={recordingRequestOngoing}
@@ -287,7 +245,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
          <CardContent>
             {stream.isRecording && (
                <Typography sx={styles.recording}>
-                  Recording in progress
+                  {stream?.hasEnded ? "Recorded" : "Recording in progress"}
                </Typography>
             )}
             <List dense sx={styles.list}>
@@ -335,26 +293,6 @@ const StreamCard = ({ isUpcoming, stream }) => {
                Join as streamer
             </Button>
          </CardActions>
-         <AreYouSureModal
-            message={
-               streamAdminPreferences?.isNextGen ? (
-                  <>
-                     Are you sure you want to <b>disable</b> the NextGen mode
-                     for <b>{stream.title}</b> and switch back to the normal
-                     mode?
-                  </>
-               ) : (
-                  <>
-                     Are you sure you want to <b>enable</b> the NextGen mode for{" "}
-                     <b>{stream.title}</b> and all its participants and hosts?
-                  </>
-               )
-            }
-            loading={togglingNextGen}
-            handleClose={() => setNextGenModalOpen(false)}
-            open={nextGenModalOpen}
-            handleConfirm={handleToggleNextGen}
-         />
          <StreamerLinksDialog
             onClose={handleClose}
             livestreamId={stream.id}
