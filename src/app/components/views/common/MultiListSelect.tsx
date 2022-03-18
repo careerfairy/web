@@ -73,6 +73,7 @@ const MultiListSelect = ({
          renderTags={(value, getTagProps) =>
             value.map((option, index) => (
                <Chip
+                  key={index}
                   label={getLabelFn(option)}
                   {...getTagProps({ index })}
                   {...chipProps}

@@ -65,7 +65,7 @@ export default function useAgoraRtc(
    const screenShareStreamRef = useRef(screenShareStream);
 
    const { remoteStreams, networkQuality, demoStreamHandlers } =
-      useAgoraClientConfig(rtcClient);
+      useAgoraClientConfig(rtcClient, streamerId);
 
    useEffect(() => {
       AgoraRTC.onAutoplayFailed = () => {
@@ -613,6 +613,7 @@ export default function useAgoraRtc(
       localMediaHandlers,
       localMediaControls: { setLocalAudioEnabled, setLocalVideoEnabled },
       remoteStreams,
+      screenShareStreamRef,
       publishLocalStreamTracks,
       handlePublishLocalStream,
       publishScreenShareStream,

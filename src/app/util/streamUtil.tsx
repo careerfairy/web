@@ -50,9 +50,14 @@ export const mapDevices = (deviceInfos: MediaDeviceInfo[]) => {
    };
 };
 
-export const chekIfPast = (eventStartDate: Date) =>
-   eventStartDate >
-   new Date(NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST);
+export const chekIfPast = (eventStartDate: Date) => {
+   return (
+      eventStartDate <
+      new Date(
+         Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
+      )
+   );
+};
 
 // This function tries to find whom the event is hosted by from the fetched groups from the groupIds array field on the livestream document
 export const getRelevantHosts = (
