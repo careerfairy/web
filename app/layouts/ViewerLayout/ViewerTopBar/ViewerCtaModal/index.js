@@ -14,13 +14,13 @@ import {
 } from "@mui/material"
 import { ThemedPermanentMarker } from "../../../../materialUI/GlobalTitles"
 import CloseIcon from "@mui/icons-material/Close"
-import { useCurrentStream } from "context/stream/StreamContext"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import useStreamRef from "components/custom-hook/useStreamRef"
-import { getCtaSnackBarProps } from "components/util/constants/callToActions"
-import CallToActionSnackbar from "components/views/streaming/sharedComponents/StreamNotifications/CallToActionSnackbar"
+import { useCurrentStream } from "../../../../context/stream/StreamContext"
+import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
+import useStreamRef from "../../../../components/custom-hook/useStreamRef"
+import { getCtaSnackBarProps } from "../../../../components/util/constants/callToActions"
+import CallToActionSnackbar from "../../../../components/views/streaming/sharedComponents/StreamNotifications/CallToActionSnackbar"
 import { TransitionGroup } from "react-transition-group"
-import { useAuth } from "HOCs/AuthProvider"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 
 const useStyles = makeStyles((theme) => ({
    glass: {

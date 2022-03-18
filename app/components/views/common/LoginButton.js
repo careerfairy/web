@@ -1,6 +1,6 @@
 import React from "react"
 import { Button } from "@mui/material"
-import Link from "materialUI/NextNavLink"
+import Link from "../../../materialUI/NextNavLink"
 
 const styles = {
    root: {

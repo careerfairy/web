@@ -32,10 +32,10 @@ const RoundButton = ({ withGradient, className, color, sx, ...props }) => {
    } = useTheme()
    const colors = useMemo(() => {
       if (color === "primary") {
-         return [primary.main, primary.gradient]
+         return [primary.main, primary.dark]
       }
       if (color === "secondary") {
-         return [secondary.main, secondary.gradient]
+         return [secondary.main, secondary.dark]
       }
 
       return [grey["300"], grey["700"]]

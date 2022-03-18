@@ -1,6 +1,7 @@
-// jest.config.js
+// jest.config.ts
+import type { Config } from "@jest/types"
 
-module.exports = {
+const config: Config.InitialOptions = {
    collectCoverageFrom: [
       "**/*.{js,jsx,ts,tsx}",
       "!**/*.d.ts",
@@ -9,19 +10,20 @@ module.exports = {
       "!**/public/**",
       "!**/types/**",
    ],
-   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+   setupFiles: ["<rootDir>/.jest/setEnvVars.ts"],
+   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
    moduleNameMapper: {
-      /* Handle CSS imports (with CSS modules)
+      /* Handle CSS imports (with CSS modules)clear
       https://jestjs.io/docs/webpack#mocking-css-modules */
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
 
       // Handle CSS imports (without CSS modules)
-      "^.+\\.(css|sass|scss)$": "<rootDir>/__mocks__/styleMock.js",
+      "^.+\\.(css|sass|scss)$": "<rootDir>/tests/__mocks__/styleMock.js",
 
       /* Handle image imports
       https://jestjs.io/docs/webpack#handling-static-assets */
       "^.+\\.(jpg|jpeg|png|gif|webp|avif|svg)$":
-         "<rootDir>/__mocks__/fileMock.js",
+         "<rootDir>/tests/__mocks__/fileMock.js",
    },
    testPathIgnorePatterns: [
       "<rootDir>/node_modules/",
@@ -29,8 +31,10 @@ module.exports = {
       "/streaming/test",
       // Jest should ignore e2e tests,
       // that job is for playwright ;)
-      "<rootDir>/e2e/",
+      "<rootDir>/tests/e2e/",
    ],
+   moduleDirectories: ["node_modules", "<rootDir>"],
+   // roots: ["<rootDir>/e2e/"],
    testEnvironment: "jsdom",
    transform: {
       /* Use babel-jest to transpile tests with the next/babel preset
@@ -43,3 +47,4 @@ module.exports = {
    ],
    coverageThreshold: null,
 }
+export default config

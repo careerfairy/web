@@ -32,9 +32,9 @@ import {
 import { prettyLocalizedDate } from "../../../../helperFunctions/HelperFunctions"
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips"
 import TutorialContext from "../../../../../context/tutorials/TutorialContext"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { useAuth } from "HOCs/AuthProvider"
-import { useCurrentStream } from "context/stream/StreamContext"
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 
 const useStyles = makeStyles((theme) => ({
    root: {

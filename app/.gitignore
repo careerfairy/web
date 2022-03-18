@@ -8,3 +8,4 @@ semantic/dist/
 .sentryclirc
 test-results/
 playwright-report/
+.jest/
