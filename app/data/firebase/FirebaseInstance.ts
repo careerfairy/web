@@ -32,6 +32,7 @@ export const createFirebaseInstance = (
    const app = firebase.initializeApp(config, name)
 
    app.firestore().settings(getFirestoreSettings(firestoreSettings))
+   console.log("-> process.env.NODE_ENV", process.env.NODE_ENV)
    if (
       (process.env.NODE_ENV === "development" &&
          process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) ||
