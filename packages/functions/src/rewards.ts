@@ -6,7 +6,7 @@ import {
    userGetByReferralCode,
    userGetByEmail,
 } from "./lib/user"
-import { RewardActions } from "../../shared/rewards"
+import { RewardActions } from "@careerfairy/shared-lib/dist/rewards"
 import {
    rewardCreateReferralSignUpLeader,
    rewardCreateLivestream,

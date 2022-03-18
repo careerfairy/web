@@ -1,5 +1,5 @@
 import { admin } from "../api/firestoreAdmin"
-import { RewardActions, getPoints } from "../../../shared/rewards"
+import { RewardActions, getPoints } from "@careerfairy/shared-lib/dist/rewards"
 import pick = require("lodash/pick")
 
 export const rewardCreateReferralSignUpLeader = (

@@ -1,6 +1,6 @@
 {
    "name": "careerfairy-webapp",
-   "version": "1.0.0",
+   "version": "0.0.0",
    "private": true,
    "main": "server.js",
    "scripts": {
@@ -9,9 +9,8 @@
       "start": "next start",
       "lint": "next lint"
    },
-   "author": "",
-   "license": "ISC",
    "dependencies": {
+      "@careerfairy/shared-lib": "*",
       "@date-io/date-fns": "^1.3.11",
       "@emotion/cache": "^11.7.1",
       "@emotion/react": "^11.7.1",

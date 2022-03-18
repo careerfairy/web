@@ -1,16 +1,22 @@
 {
    "name": "careerfairy-functions",
    "private": true,
-   "main": "dist/functions/src/index.js",
+   "main": "dist/index.js",
    "scripts": {
       "lint": "eslint --ext .ts .",
       "build": "npm run clean && npm run copy-files && tsc",
-      "start": "npm run build && firebase emulators:start --only functions",
-      "copy-files": "cpx \"src/**/*.{json,html}\" dist/functions/src",
+      "dev": "npm run watch | npm run start:emulators",
+      "start:emulators": "cross-env FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 firebase emulators:start --only auth,firestore,functions",
+      "watch": "npm run clean && npm run copy-files && tsc --watch",
+      "copy-files": "cpx \"src/**/*.{json,html}\" dist/",
       "clean": "rimraf dist/",
       "logs": "firebase functions:log"
    },
+   "fireDependencies": {
+      "@careerfairy/shared-lib": "../shared-lib"
+   },
    "dependencies": {
+      "@careerfairy/shared-lib": "*",
       "agora-access-token": "^2.0.4",
       "algoliasearch": "^4.12.1",
       "axios": "^0.26.0",
@@ -40,6 +46,8 @@
       "eslint-plugin-import": "^2.25.4",
       "firebase-functions-test": "^0.3.3",
       "rimraf": "^3.0.2",
-      "typescript": "^4.5.4"
-   }
+      "typescript": "^4.5.4",
+      "cross-env": "^7.0.3"
+   },
+   "fireConfig": {}
 }
