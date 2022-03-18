@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext";
 
-interface StreamAdminPreferences {
-   isNextGen?: boolean;
-}
+interface StreamAdminPreferences {}
 
 const useStreamAdminPreferences = (mainStreamId?: string) => {
    const firebase = useFirebaseService();
