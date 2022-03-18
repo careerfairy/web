@@ -5,6 +5,9 @@ module.exports = {
       "**/*.{js,jsx,ts,tsx}",
       "!**/*.d.ts",
       "!**/node_modules/**",
+      "!**/.next/**",
+      "!**/public/**",
+      "!**/types/**",
    ],
    setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
    moduleNameMapper: {
@@ -38,4 +41,6 @@ module.exports = {
       "/node_modules/",
       "^.+\\.module\\.(css|sass|scss)$",
    ],
+   coveragePathIgnorePatterns: [],
+   coverageThreshold: null,
 }
