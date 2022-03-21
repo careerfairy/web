@@ -11,6 +11,13 @@ jobs:
          - uses: actions/setup-node@v2
            with:
               node-version: "14.x"
+         - name: Cache multiple paths
+           uses: actions/cache@v3
+           with:
+              path: |
+                 ~/cache
+                 !~/cache/exclude
+              key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
          - name: install latest npm
            run: |
               npm install -g npm@8.5.5 &&
@@ -18,8 +25,6 @@ jobs:
               npm list -g --depth 0
          - name: Install dependencies
            run: npm install
-         - name: Check npm version
-           run: npm -v
          - name: Build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
