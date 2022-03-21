@@ -11,6 +11,11 @@ jobs:
          - uses: actions/setup-node@v2
            with:
               node-version: "14.x"
+         - name: install latest npm
+           run: |
+              npm install -g npm@8.5.5 &&
+              npm --version &&
+              npm list -g --depth 0
          - name: Install dependencies
            run: npm install
          - name: Check npm version
