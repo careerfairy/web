@@ -1,6 +1,7 @@
 {
-  "version": 2,
-  "github": {
-    "enabled": false
-  }
+   "version": 2,
+   "github": {
+      "enabled": false
+   },
+   "builds": [{ "src": "{{apps/web}}", "use": "@vercel/static" }]
 }
