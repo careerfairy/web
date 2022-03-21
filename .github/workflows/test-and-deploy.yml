@@ -13,6 +13,8 @@ jobs:
               node-version: "14.x"
          - name: Install dependencies
            run: npm install
+         - name: Check npm version
+           run: npm -v
          - name: Build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
