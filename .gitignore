@@ -1,16 +1,20 @@
-/dist/
+dist/
+.next/
 node_modules/
 
-/emulatorData/
-/firebase-export-*/
+emulatorData/
+firebase-export-*/
 
-/.firebase/
-/firebase-debug.log
+.firebase/
 
-/.idea/
+.turbo/
+
+.idea/
 .DS_Store
 
 *.log
+
+.packages/.turbo
 test-results/
 playwright-report/
 .vercel

@@ -1,49 +1,69 @@
 # CareerFairy Apps
 
+Monorepo with all the apps, managed by npm workspaces and turborepo.
+
+### Requirements
+
+-  `node` v14 (webapp), v16 (functions)
+-  `npm` (>v7)
+
 ## Setup root folder
 
-You need to install the root folder deps for the git pre-commit hook to work.
-Everytime there is a commit, the hook will run prettier to format the changed files.
+Since we're using npm workspaces, only run `npm` commands on the root folder. There will be a shared `node_modules` folder at the root folder for all the apps/packages.
 
 ```sh
-# Will also install deps on app/ and functions/
+# install deps for all workspaces (app/*, packages/*)
 npm install
+
+# runs only once after cloning, will setup husky hooks
+npm prepare
 ```
+
+## NPM Commands
+
+```sh
+# Builds all the workspaces
+npm run build
+
+# Dev environment (web app + local emulators without data) with hot reload
+npm run dev
+
+# Installing a dependency, you need to specify the workspace
+npm install --workspace careerfairy-webapp lodash
+```
+
+## Existing Git Hooks
+
+-  Pre-commit: will run prettier formater
+-  Pre-push: will run unit tests
 
 # Web App (NextJS)
 
 ## Development
 
 ```sh
-cd app
-npm run dev
+npm run dev -w careerfairy-webapp
 ```
 
-## Local Setup
+# Firebase Functions
 
-### Requirements
+## Build
 
--  `node` (v14, v16)
--  `gcloud` [Install instructions](https://cloud.google.com/storage/docs/gsutil_install)
+```sh
+npm run build -w careerfairy-functions
+# or npm run build
+```
 
-### Fetch a remote backup
+## Deploy a function
 
--  `gcloud init`: google authentication, select the careerfairy project
--  `gsutil ls "gs://careerfairy-backup/Thu Mar 03 2022*"`: Find the most recent backup folder
-   -  Modify the date to your current time
-   -  Or check the most recent job on the [Google Cloud Dashboard](https://console.cloud.google.com/firestore/import-export?authuser=1&project=careerfairy-e1fd9)
--  `gsutil -m cp -r "gs://careerfairy-backup/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)/" emulatorData/`: Will download the backup folder into the local folder `emulatorData/` (you need to create this folder)
+```sh
+cd packages/functions
+npx firelink deploy --only functions:slackHandleInteractions
+```
 
-### Start the emulators
+## Start the firebase emulators with data
 
--  With backup data:
-   -  `./scripts/run-locally-with-emulators.sh "./emulatorData/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)"`
-   -  Heads up! Importing data into the emulator could take a while, you also need at least ~10GB of free memory for the emulator heap.
-   -  To save your firestore data changes, run the script with the arg `--export-on-exit`:
-      -  `./scripts/run-locally-with-emulators.sh "./emulatorData/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)" --export-on-exit`
--  Empty data:
-
-   -  `./scripts/run-locally-with-emulators.sh` or `npm run start:emulators`
+Check below how to fetch a remote backup to use it as import data to the emulators.
 
 -  Manually without scripts:
 
@@ -55,23 +75,26 @@ env FIREBASE_AUTH_EMULATOR_HOST="localhost:9099" \
     --import "./emulatorData/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)"
 ```
 
+-  With backup data:
+   -  `./scripts/run-locally-with-emulators.sh "./emulatorData/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)"`
+   -  Heads up! Importing data into the emulator could take a while, you also need at least ~10GB of free memory for the emulator heap.
+   -  To save your firestore data changes, run the script with the arg `--export-on-exit`:
+      -  `./scripts/run-locally-with-emulators.sh "./emulatorData/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)" --export-on-exit`
+-  Empty data:
+   -  `./scripts/run-locally-with-emulators.sh` or `npm run start:emulators`
+
 ### Emulator UI
 
 http://localhost:4000/
 
-# Firebase Functions
+### Fetch a remote backup
 
-## Build
+-  `gcloud init`: google authentication, select the careerfairy project
+-  `gsutil ls "gs://careerfairy-backup/Thu Mar 03 2022*"`: Find the most recent backup folder
+   -  Modify the date to your current time
+   -  Or check the most recent job on the [Google Cloud Dashboard](https://console.cloud.google.com/firestore/import-export?authuser=1&project=careerfairy-e1fd9)
+-  `gsutil -m cp -r "gs://careerfairy-backup/Thu Mar 03 2022-18:31:04 GMT+0000 (Coordinated Universal Time)/" emulatorData/`: Will download the backup folder into the local folder `emulatorData/` (you need to create this folder)
 
-```sh
-cd functions
-npm run build
-```
+### Requirements
 
-## Deploy a function
-
-```sh
-# From the root folder
-# It will build before deploying
-npx firebase deploy --only functions:slackHandleInteractions
-```
+-  `gcloud` [Install instructions](https://cloud.google.com/storage/docs/gsutil_install)
