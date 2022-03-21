@@ -1,65 +1,63 @@
 name: "Deploy"
 
 on:
-  push:
-    branches: [main, develop, feature/**]
-  pull_request:
-    types: [opened, synchronize, reopened]
+   push:
+      branches: [main, develop, feature/**]
+   pull_request:
+      types: [opened, synchronize, reopened]
 jobs:
-  build:
-    name: "Build and Test App"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache multiple paths
-        uses: actions/cache@v2.1.7
-        with:
-          path: |
-            ~/cache
-            !~/cache/exclude
-          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-      - name: Cache
-        uses: actions/cache@v2.1.7
-        with:
-          # See here for caching with `yarn` https://github.com/actions/cache/blob/main/examples.md#node---yarn or you can leverage caching with actions/setup-node https://github.com/actions/setup-node
-          path: |
-            ~/.npm
-            ${{ github.workspace }}/.next/cache
-          # Generate a new cache whenever packages or source files change.
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          # If source files changed but packages didn't, rebuild from a prior cache.
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "14.x"
-      - name: Install dependencies
-        run: npm install
-      - name: Build App
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        run: npm run build:app
-      - name: Build Functions
-        run: npm run build:functions
-      - name: Install Playwright
-        run: npx playwright install --with-deps
-      - name: Run Jest Unit Tests
-        run: npm run test
-      - name: Run Playwright End to End tests
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN}}
-        run: npm run test:e2e
+   build:
+      name: "Build and Test App"
+      runs-on: ubuntu-latest
+      steps:
+         - name: Cache multiple paths
+           uses: actions/cache@v2.1.7
+           with:
+              path: |
+                 ~/cache
+                 !~/cache/exclude
+              key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+         - name: Cache Vercel
+           uses: actions/cache@v2.1.7
+           with:
+              # See here for caching with `yarn` https://github.com/actions/cache/blob/main/examples.md#node---yarn or you can leverage caching with actions/setup-node https://github.com/actions/setup-node
+              path: |
+                 ~/.npm
+                 ${{ github.workspace }}/.next/cache
+              # Generate a new cache whenever packages or source files change.
+              key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+              # If source files changed but packages didn't, rebuild from a prior cache.
+              restore-keys: |
+                 ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+         - uses: actions/checkout@v2
+         - uses: actions/setup-node@v2
+           with:
+              node-version: "14.x"
+         - name: Install dependencies
+           run: npm install
+         - name: Build
+           env:
+              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+           run: npm run build
+         - name: Run Jest Unit Tests
+           run: npm run test
+         - name: Install Playwright
+           run: npx playwright install --with-deps
+         - name: Run Playwright End to End tests
+           env:
+              FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN}}
+           run: npm run test:e2e
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Deploy to Vercel Action
-        uses: BetaHuhn/deploy-to-vercel-action@v1
-        with:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+   deploy:
+      needs: build
+      runs-on: ubuntu-latest
+      if: "!contains(github.event.head_commit.message, '[skip ci]')"
+      steps:
+         - name: Checkout
+           uses: actions/checkout@v2
+         - name: Deploy to Vercel Action
+           uses: BetaHuhn/deploy-to-vercel-action@v1
+           with:
+              VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+              VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+              VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

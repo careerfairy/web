@@ -7,7 +7,19 @@
          "outputs": ["dist/**", ".next/**"]
       },
       "test": {
-         "dependsOn": ["build"]
+         "outputs": ["coverage/**"]
+      },
+      "test:e2e": {
+         "dependsOn": ["build"],
+         "outputs": ["test-results/**"]
+      },
+      "test:e2e-debug": {
+         "dependsOn": ["build"],
+         "outputs": ["test-results/**"]
+      },
+      "start:emulators": {
+         "dependsOn": ["build"],
+         "cache": false
       },
       "lint": {},
       "dev": {

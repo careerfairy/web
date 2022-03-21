@@ -32,11 +32,7 @@ export const createFirebaseInstance = (
    const app = firebase.initializeApp(config, name)
 
    app.firestore().settings(getFirestoreSettings(firestoreSettings))
-   if (
-      (process.env.NODE_ENV === "development" &&
-         process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) ||
-      process.env.CI
-   ) {
+   if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
       app.auth().useEmulator("http://localhost:9099")
       app.firestore().useEmulator("localhost", 8080)
       app.functions().useEmulator("localhost", 5001)

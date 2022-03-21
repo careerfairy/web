@@ -1,29 +1,51 @@
 {
-  "private": true,
-  "name": "careerfairy-root",
-  "scripts": {
-    "start:emulators": "cross-env FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 NEXT_PUBLIC_FIREBASE_EMULATORS=true npm run start:emulators:helper",
-    "start:emulators:helper": "firebase emulators:exec --ui --only auth,firestore,functions \"cd ./app && npm run dev\"",
-    "start:emulators:helper:build": "firebase emulators:exec --ui --only auth,firestore,functions \"cd ./app && npm run start\"",
-    "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi",
-    "build:app": "cd app && npm run build",
-    "build:functions": "cd functions && npm run build",
-    "start:app:build:with:emulators": "cross-env FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 NEXT_PUBLIC_FIREBASE_EMULATORS=true npm run start:emulators:helper:build",
-    "install:app": "cd app && npm install",
-    "install:functions": "cd functions && npm install",
-    "postinstall": "cross-env run-p install:*",
-    "test:e2e": "cd app && npm run test:e2e",
-    "test": "cd app && npm run test"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.20.0",
-    "cross-env": "^7.0.3",
-    "firebase-tools": "^10.2.2",
-    "husky": "^7.0.4",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^2.5.1"
-  },
-  "lint-staged": {
-    "*.js": "prettier --write --ignore-unknown"
-  }
+   "name": "careerfairy-monorepo",
+   "version": "0.0.0",
+   "private": true,
+   "workspaces": [
+      "apps/*",
+      "packages/*"
+   ],
+   "scripts": {
+      "build": "turbo run build",
+      "dev": "turbo run dev --parallel",
+      "test": "turbo run test",
+      "start:emulators": "turbo run start:emulators --parallel",
+      "test:e2e": "turbo run test:e2e",
+      "test:e2e-debug": "turbo run test:e2e-debug",
+      "lint": "turbo run lint --parallel",
+      "format": "prettier --write --ignore-unknown",
+      "prepare": "husky install",
+      "build:functions": "turbo run build --scope=careerfairy-functions --include-dependencies",
+      "lint:functions": "turbo run lint --scope=careerfairy-functions",
+      "build:webapp": "turbo run build --scope=careerfairy-webapp --include-dependencies --no-deps",
+      "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi"
+   },
+   "devDependencies": {
+      "@rxdi/firelink": "^0.8.0",
+      "cross-env": "^7.0.3",
+      "firebase-tools": "^10.2.2",
+      "husky": "^7.0.4",
+      "lint-staged": "^12.3.4",
+      "prettier": "^2.5.1",
+      "turbo": "^1.1.6",
+      "identity-obj-proxy": "^3.0.0",
+      "jest": "^27.4.7",
+      "jest-watch-typeahead": "^1.0.0",
+      "@testing-library/jest-dom": "^5.16.1",
+      "@testing-library/react": "^12.1.2",
+      "@testing-library/react-hooks": "^7.0.2",
+      "@testing-library/user-event": "^13.5.0",
+      "@types/jest": "^27.4.0",
+      "@playwright/test": "^1.20.0",
+      "esbuild": "^0.14.10",
+      "esbuild-jest": "^0.5.0"
+   },
+   "lint-staged": {
+      "**/*": "prettier --write --ignore-unknown"
+   },
+   "packageManager": "npm@8.5.5",
+   "engines": {
+      "npm": ">=7"
+   }
 }

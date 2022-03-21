@@ -56,13 +56,12 @@ const config: PlaywrightTestConfig = {
             ...devices["Desktop Firefox"],
          },
       },
-      //
-      // {
-      //    name: "webkit",
-      //    use: {
-      //       ...devices["Desktop Safari"],
-      //    },
-      // },
+      {
+         name: "webkit",
+         use: {
+            ...devices["Desktop Safari"],
+         },
+      },
 
       /* Test against mobile viewports. */
       // {
@@ -98,8 +97,8 @@ const config: PlaywrightTestConfig = {
 
    /* Run your local dev server before starting the tests */
    webServer: {
-      command: "cd .. && npm run start:app:build:with:emulators",
-      port: 5000,
+      command: "cd ../../ && npm run start:emulators",
+      port: 3000,
    },
 }
 
