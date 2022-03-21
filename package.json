@@ -15,7 +15,7 @@
       "prepare": "husky install",
       "build:functions": "turbo run build --scope=careerfairy-functions --include-dependencies",
       "lint:functions": "turbo run lint --scope=careerfairy-functions",
-      "build:webapp": "turbo run build --scope=careerfairy-webapp --include-dependencies",
+      "build:webapp": "turbo run build --scope=careerfairy-webapp --include-dependencies --no-deps",
       "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi"
    },
    "devDependencies": {
