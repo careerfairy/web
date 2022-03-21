@@ -2,12 +2,12 @@
    "name": "careerfairy-webapp",
    "version": "0.0.0",
    "private": true,
-   "main": "server.js",
    "scripts": {
-      "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 next",
+      "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=\"true\" next",
       "build": "cross-env NODE_ENV=production next build --debug",
       "start": "next start",
-      "lint": "next lint"
+      "lint": "next lint",
+      "clean": "rimraf .next"
    },
    "dependencies": {
       "@careerfairy/shared-lib": "*",
@@ -128,6 +128,7 @@
       "node-sass": "^6.0.0",
       "prop-types": "^15.7.2",
       "react-perfect-scrollbar": "^1.5.8",
+      "rimraf": "^3.0.2",
       "typescript": "^4.5.5",
       "webpack": "^5.32.0",
       "webpack-bundle-analyzer": "^4.4.0"
