@@ -13,8 +13,9 @@
       "lint": "turbo run lint --parallel",
       "format": "prettier --write --ignore-unknown",
       "prepare": "husky install",
-      "build:functions": "turbo run build --scope=careerfairy-functions",
+      "build:functions": "turbo run build --scope=careerfairy-functions --include-dependencies",
       "lint:functions": "turbo run lint --scope=careerfairy-functions",
+      "build:webapp": "turbo run build --scope=careerfairy-webapp --include-dependencies",
       "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi"
    },
    "devDependencies": {
