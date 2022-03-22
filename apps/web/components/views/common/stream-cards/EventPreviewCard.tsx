@@ -199,7 +199,7 @@ const EventPreviewCard = ({
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
    const { query, push, pathname } = useRouter()
-   const getStartDate = () => event?.start?.toDate?.()
+   const getStartDate = () => event?.startDate || event?.start?.toDate?.()
    const [eventInterests, setSetEventInterests] = useState([])
    const [hasRegistered, setHasRegistered] = useState(false)
    const firebase = useFirebaseService()

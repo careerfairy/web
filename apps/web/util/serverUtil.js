@@ -1,20 +1,19 @@
 import { store } from "../pages/_app"
 
-export const getServerStreamData = (livestreamSnap) => {
-   const streamData = livestreamSnap.data()
+export const mapServerSideStream = (livestream) => {
    return {
-      id: livestreamSnap.id,
-      company: streamData.company || null,
-      title: streamData.title || null,
-      companyLogoUrl: streamData.companyLogoUrl || null,
-      backgroundImageUrl: streamData.backgroundImageUrl || null,
-      isBeta: streamData.isBeta ?? null,
-      speakers: streamData.speakers || [],
-      summary: streamData.summary || null,
-      createdDateString: streamData.created?.toDate?.().toString() || null,
+      id: livestream.id,
+      company: livestream.company || null,
+      title: livestream.title || null,
+      companyLogoUrl: livestream.companyLogoUrl || null,
+      backgroundImageUrl: livestream.backgroundImageUrl || null,
+      isBeta: livestream.isBeta ?? null,
+      speakers: livestream.speakers || [],
+      summary: livestream.summary || null,
+      createdDateString: livestream.created?.toDate?.().toString() || null,
       lastUpdatedDateString:
-         streamData.lastUpdated?.toDate?.().toString() || null,
-      startDateString: streamData.start?.toDate?.().toString() || null,
+         livestream.lastUpdated?.toDate?.().toString() || null,
+      startDateString: livestream.start?.toDate?.().toString() || null,
    }
 }
 
@@ -26,7 +25,10 @@ export const getServerSideStream = async (livestreamId) => {
          doc: livestreamId,
       })
       if (livestreamSnap.exists) {
-         serverSideStream = getServerStreamData(livestreamSnap)
+         serverSideStream = mapServerSideStream({
+            id: livestreamSnap.id,
+            ...livestreamSnap.data(),
+         })
       }
    }
    return serverSideStream

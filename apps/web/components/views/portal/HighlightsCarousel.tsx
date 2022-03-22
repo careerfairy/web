@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react"
 import HighlightItem from "./HighlightItem"
 import HighlightVideoDialog from "./HighlightVideoDialog"
-import { useWindowSize } from "react-use"
-import { dummyHighlights } from "./dummyData"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import { Box } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
@@ -10,10 +8,11 @@ import useMediaQuery from "@mui/material/useMediaQuery"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
 import Slider from "react-slick"
+import { HighLight } from "../../../types/Highlight"
 const arrowFontSize = 30
 const styles = {
    carousel: {
-      pt: 4,
+      pt: { xs: 1, md: 4 },
       "& .slick-track": {
          ml: 0,
          mr: 0,
@@ -56,11 +55,11 @@ const styles = {
       },
    },
 }
-const HighlightsCarousel = () => {
+const HighlightsCarousel = ({ serverSideHighlights }: Props) => {
    const {
       breakpoints: { up },
    } = useTheme()
-
+   const [highlights] = useState<HighLight[]>(serverSideHighlights)
    const isExtraSmall = useMediaQuery(up("xs"))
    const isSmall = useMediaQuery(up("sm"))
    const isMedium = useMediaQuery(up("md"))
@@ -71,19 +70,13 @@ const HighlightsCarousel = () => {
    }, [isExtraSmall, isSmall, isMedium, isLarge])
 
    const { shouldShowHighlightsCarousel } = useFirebaseService()
-   const [isTouchScreen, setIsTouchScreen] = useState(false)
-   const dimensions = useWindowSize()
-   const [showCarousel, setShowCarousel] = useState(false)
+   const [showCarousel, setShowCarousel] = useState(true)
+
    useEffect(() => {
       ;(async function () {
          setShowCarousel(await shouldShowHighlightsCarousel())
       })()
    }, [])
-
-   useEffect(() => {
-      const touch = matchMedia("(hover: none)").matches
-      setIsTouchScreen(touch)
-   }, [dimensions])
 
    const [videoUrl, setVideoUrl] = useState(null)
    const handleOpenVideoDialog = (videoUrl: string) => {
@@ -93,7 +86,7 @@ const HighlightsCarousel = () => {
    const handleCloseVideoDialog = () => {
       setVideoUrl(null)
    }
-   if (!showCarousel) {
+   if (!showCarousel || !highlights?.length) {
       return null
    }
 
@@ -106,14 +99,12 @@ const HighlightsCarousel = () => {
             lazyLoad
             infinite={false}
             arrows
-            swipeToSlide
-            swipe={isTouchScreen}
             slidesToShow={numSlides}
             slidesToScroll={numSlides}
             initialSlide={0}
          >
-            {dummyHighlights.map((highlight, index) => (
-               <Box key={index}>
+            {highlights.map((highlight) => (
+               <Box key={highlight.id}>
                   <HighlightItem
                      handleOpenVideoDialog={handleOpenVideoDialog}
                      highLight={highlight}
@@ -127,6 +118,10 @@ const HighlightsCarousel = () => {
          />
       </>
    )
+}
+
+interface Props {
+   serverSideHighlights: HighLight[]
 }
 
 export default HighlightsCarousel

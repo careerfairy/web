@@ -26,6 +26,7 @@ export interface LiveStreamEvent extends Identifiable {
    title?: string
    type?: string
    start: firebase.firestore.Timestamp
+   startDate?: Date
    registeredUsers?: string[]
    hasStarted?: boolean
    hasEnded?: boolean

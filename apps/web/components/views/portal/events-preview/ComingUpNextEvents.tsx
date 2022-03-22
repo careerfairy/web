@@ -6,13 +6,17 @@ import { usePagination } from "use-pagination-firestore"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import EventsPreviewGrid from "./EventsPreviewGrid"
 import { useRouter } from "next/router"
+import { parseStreamDates } from "../../../../util/serverUtil"
 
-const ComingUpNextEvents = ({ limit }: Props) => {
+const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    const { isLoggedOut } = useAuth()
    const {
       query: { livestreamId },
    } = useRouter()
-   const [localEvents, setLocalEvents] = useState([])
+   const [mounted, setMounted] = useState(false)
+   const [localEvents, setLocalEvents] = useState(
+      serverSideEvents.map((event) => parseStreamDates(event)) || []
+   )
    const [eventFromQuery, setEventFromQuery] = useState(null)
 
    const { items: events, isLoading } = usePagination<LiveStreamEvent>(
@@ -21,6 +25,10 @@ const ComingUpNextEvents = ({ limit }: Props) => {
          limit: isLoggedOut ? 80 : limit,
       }
    )
+   useEffect(() => {
+      setMounted(true)
+   }, [])
+
    useEffect(() => {
       if (livestreamId) {
          const unsubscribe = livestreamRepo.listenToSingleEvent(
@@ -36,10 +44,11 @@ const ComingUpNextEvents = ({ limit }: Props) => {
       }
    }, [livestreamId])
    useEffect(() => {
-      const newEventFromQuery = events.find(
+      const newLocalEvents =
+         localEvents.length && !events.length ? [...localEvents] : [...events]
+      const newEventFromQuery = newLocalEvents.find(
          (event) => event.id === eventFromQuery?.id
       )
-      const newLocalEvents = [...events]
       if (newEventFromQuery) {
          newLocalEvents.filter((event) => event.id === newEventFromQuery.id)
       }
@@ -49,7 +58,7 @@ const ComingUpNextEvents = ({ limit }: Props) => {
       setLocalEvents(newLocalEvents)
    }, [eventFromQuery, events])
 
-   if (isLoggedOut) {
+   if (isLoggedOut || !mounted) {
       return (
          <EventsPreviewGrid
             id={"upcoming-events"}
@@ -62,6 +71,7 @@ const ComingUpNextEvents = ({ limit }: Props) => {
       )
    }
 
+   // Only render carousel component on client side, it starts to bug out when SSR is being used
    return (
       <EventsPreview
          id={"upcoming-events"}
@@ -70,13 +80,15 @@ const ComingUpNextEvents = ({ limit }: Props) => {
          type={EventsTypes.comingUp}
          events={localEvents}
          seeMoreLink={"/next-livestreams"}
-         loading={isLoading}
+         // No need to show loading as these events have already been queried server side
+         loading={false}
       />
    )
 }
 
 interface Props {
    limit?: number
+   serverSideEvents?: LiveStreamEvent[]
 }
 
 export default ComingUpNextEvents

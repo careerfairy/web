@@ -141,7 +141,8 @@ const EventsPreviewGrid = ({
                               height={309}
                               debounce={100}
                               scroll
-                              offset={[0, 600]}
+                              once
+                              offset={600}
                               placeholder={<EventPreviewCard loading />}
                            >
                               <EventPreviewCard

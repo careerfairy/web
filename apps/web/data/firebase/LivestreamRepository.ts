@@ -92,6 +92,7 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          .collection("livestreams")
          .where("start", ">", this.earliestEventBufferTime)
          .where("test", "==", false)
+         .where("hidden", "==", false)
          .orderBy("start", "asc")
       if (limit) {
          livestreamRef = livestreamRef.limit(limit)
