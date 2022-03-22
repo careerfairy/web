@@ -57,6 +57,8 @@ jobs:
            run: npm run test:e2e
          - name: Deploy to Vercel
            uses: amondnet/vercel-action@v20 #deploy
+           env:
+              VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN}}
            with:
               vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
               github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
