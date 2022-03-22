@@ -1,4 +1,4 @@
-name: "Test and Deploy"
+name: "Test Build and Deploy"
 
 on:
    push:
@@ -48,15 +48,11 @@ jobs:
            env:
               FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN}}
            run: npm run test:e2e
-   deploy:
-      needs: build
-      runs-on: ubuntu-latest
-      steps:
-         - uses: actions/checkout@v2
-         - uses: actions/setup-node@v2
-         - uses: amondnet/vercel-action@v20 #deploy
+         - name: build
+           uses: amondnet/vercel-action@v20 #deploy
            with:
               vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
               github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
               vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
               vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
+
