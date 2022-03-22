@@ -11,13 +11,6 @@ jobs:
          - uses: actions/setup-node@v2
            with:
               node-version: "14.x"
-         - name: Cache multiple paths
-           uses: actions/cache@v3
-           with:
-              path: |
-                 ~/cache
-                 !~/cache/exclude
-              key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
          - name: cache node_modules
            uses: actions/cache@v3
            with:
@@ -60,6 +53,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
          - uses: actions/checkout@v2
+         - uses: actions/setup-node@v2
          - uses: amondnet/vercel-action@v20 #deploy
            with:
               vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
