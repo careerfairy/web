@@ -51,7 +51,7 @@ jobs:
            uses: actions/upload-artifact@v2
            with:
               name: playwright-results
-              path: apps/web/playwright-report
+              path: test-results
          - name: Deploy to Vercel
            uses: amondnet/vercel-action@v20 #deploy
            with:

@@ -6,13 +6,13 @@
       "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=\"true\" next",
       "start:emulators": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=\"true\" next start",
       "build": "next build",
-      "start": "next start",
+      "start": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=\"true\" next start",
       "lint": "next lint",
       "clean": "rimraf .next",
       "test": "jest",
       "test:watch": "jest --watch",
       "test:coverage": "jest --coverage",
-      "test:e2e": "playwright test",
+      "test:e2e-web-app": "playwright test",
       "test:e2e-debug": "playwright test --debug"
    },
    "dependencies": {
