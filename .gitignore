@@ -18,3 +18,4 @@ firebase-export-*/
 test-results/
 playwright-report/
 .vercel
+.turbo
