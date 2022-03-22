@@ -1,7 +1,5 @@
 name: "Test Build and Deploy"
-
-on:
-   push:
+on: [pull_request, push]
 jobs:
    build:
       name: "Build and Test Deploy"
@@ -48,11 +46,16 @@ jobs:
            env:
               FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN}}
            run: npm run test:e2e
-         - name: build
+         - name: Upload test results
+           if: always()
+           uses: actions/upload-artifact@v2
+           with:
+              name: playwright-results
+              path: test-results
+         - name: Deploy to Vercel
            uses: amondnet/vercel-action@v20 #deploy
            with:
               vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
               github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
               vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
               vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
-              vercel-args: "--debug"
