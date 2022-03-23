@@ -38,6 +38,7 @@ import rewards = require("./rewards")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount_v2
+exports.onUserUpdate = auth.onUserUpdate
 exports.backfillUserData = auth.backfillUserData
 exports.updateFakeUser = auth.updateFakeUser
 exports.validateUserEmailWithPin = auth.validateUserEmailWithPin

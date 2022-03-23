@@ -9,8 +9,6 @@ import {
    Button,
    Grid,
    CircularProgress,
-   Box,
-   Container,
    Collapse,
    FormHelperText,
    FormControl,
@@ -23,6 +21,8 @@ import { GENERAL_ERROR, URL_REGEX } from "components/util/constants"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import { useSnackbar } from "notistack"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges"
+import BadgeSimpleButton from "../../BadgeSimpleButton"
 
 const useStyles = makeStyles((theme) => ({
    avatar: {
@@ -47,11 +47,12 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const PersonalInfo = ({ firebase, userData }) => {
+const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
    const classes = useStyles()
    const [open, setOpen] = useState(false)
    const { enqueueSnackbar } = useSnackbar()
    const dispatch = useDispatch()
+   // @ts-ignore
    const { loading, error } = useSelector((state) => state.auth.profileEdit)
 
    useEffect(() => {
@@ -67,7 +68,9 @@ const PersonalInfo = ({ firebase, userData }) => {
          })
       }
 
-      return () => dispatch(actions.clean())
+      return () => {
+         dispatch(actions.clean())
+      }
    }, [loading, error])
 
    const handleClose = () => {
@@ -95,7 +98,7 @@ const PersonalInfo = ({ firebase, userData }) => {
          }}
          enableReinitialize
          validate={(values) => {
-            let errors = {}
+            let errors: any = {}
             if (!values.firstName) {
                errors.firstName = "Required"
             } else if (!/^\D+$/i.test(values.firstName)) {
@@ -138,9 +141,22 @@ const PersonalInfo = ({ firebase, userData }) => {
             userData ? (
                <form onSubmit={handleSubmit}>
                   <>
-                     <Typography className={classes.title} variant="h4">
-                        Personal Info
-                     </Typography>
+                     <Grid container spacing={2}>
+                        <Grid item xs={8}>
+                           <Typography className={classes.title} variant="h4">
+                              Personal Info
+                           </Typography>
+                        </Grid>
+                        <Grid item xs={4} sx={{ textAlign: "right" }}>
+                           <BadgeSimpleButton
+                              badge={NetworkerBadge}
+                              isActive={userData?.badges?.includes(
+                                 NetworkerBadge.key
+                              )}
+                              onClick={redirectToReferralsTab}
+                           />
+                        </Grid>
+                     </Grid>
                      <Grid container spacing={2}>
                         <Grid item xs={12}>
                            <TextField
