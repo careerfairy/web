@@ -12,8 +12,8 @@
       "test": "jest",
       "test:watch": "jest --watch",
       "test:coverage": "jest --coverage",
-      "test:e2e-web-app": "playwright test",
-      "test:e2e-debug": "playwright test --debug"
+      "test:e2e-webapp": "playwright test",
+      "test:e2e-webapp-debug": "playwright test --debug"
    },
    "dependencies": {
       "@careerfairy/shared-lib": "*",

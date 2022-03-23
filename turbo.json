@@ -9,11 +9,11 @@
       "test": {
          "outputs": ["coverage/**"]
       },
-      "test:e2e-web-app": {
+      "test:e2e-webapp": {
          "dependsOn": ["build"],
          "outputs": ["test-results/**", "playwright-report/**"]
       },
-      "test:e2e-debug": {
+      "test:e2e-webapp-debug": {
          "dependsOn": ["build"],
          "outputs": ["test-results/**"]
       },

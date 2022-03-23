@@ -45,13 +45,13 @@ jobs:
          - name: Run Playwright End to End tests
            env:
               FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN}}
-           run: npm run test:e2e-web-app
+           run: npm run test:e2e-webapp
          - name: Upload test results
            if: always()
-           uses: actions/upload-artifact@v2
+           uses: actions/upload-artifact@v3
            with:
-              name: playwright-results
-              path: test-results
+              name: playwright-report
+              path: apps/web/playwright-report
          - name: Deploy to Vercel
            uses: amondnet/vercel-action@v20.0.1 #deploy
            with:
