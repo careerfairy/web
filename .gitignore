@@ -19,3 +19,7 @@ test-results/
 playwright-report/
 .vercel
 .turbo
+
+# local env files
+.env.local
+.env.test.local
