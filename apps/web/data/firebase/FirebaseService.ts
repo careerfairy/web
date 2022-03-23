@@ -3,10 +3,10 @@ import {
    FORTY_FIVE_MINUTES_IN_MILLISECONDS,
    START_DATE_FOR_REPORTED_EVENTS,
 } from "../constants/streamContants"
-import DateUtil from "../../util/DateUtil"
+import DateUtil from "util/DateUtil"
 import firebaseApp from "./FirebaseInstance"
 import firebase from "firebase/app"
-import { HandRaiseState } from "../../types/handraise"
+import { HandRaiseState } from "types/handraise"
 import DocumentReference = firebase.firestore.DocumentReference
 import { getReferralInformation } from "../../util/CommonUtil"
 

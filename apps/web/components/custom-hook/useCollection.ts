@@ -2,9 +2,9 @@ import { useEffect, useState } from "react"
 import { Identifiable } from "../../types/commonTypes"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import firebase from "firebase"
+import CollectionReference = firebase.firestore.CollectionReference
 import { Interest } from "types/interests"
 import { Group } from "types/groups"
-import { CollectionReference } from "@firebase/firestore-types"
 
 /**
  * Fetch a Firestore collection
