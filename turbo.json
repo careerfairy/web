@@ -9,6 +9,7 @@
       "test": {
          "outputs": ["coverage/**"]
       },
+      "webapp:report": {},
       "test:e2e-webapp": {
          "dependsOn": ["build"],
          "outputs": ["test-results/**", "playwright-report/**"]

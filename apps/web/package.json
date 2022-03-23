@@ -8,6 +8,7 @@
       "build": "next build",
       "start": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=\"true\" next start",
       "lint": "next lint",
+      "webapp:report": "npx playwright show-report",
       "clean": "rimraf .next",
       "test": "jest",
       "test:watch": "jest --watch",
