@@ -7,6 +7,9 @@ const styles = {
    disabled: {
       filter: "grayscale(1)",
    },
+   noLink: {
+      cursor: "default",
+   },
 }
 
 const BadgeSimpleButton = ({ badge, isActive, onClick }: Props) => {
@@ -16,13 +19,19 @@ const BadgeSimpleButton = ({ badge, isActive, onClick }: Props) => {
 
    const isXS = useMediaQuery((theme: any) => theme.breakpoints.down("sm"))
 
+   let buttonStyles = isActive ? {} : styles.disabled
+   if (!onClick) {
+      buttonStyles = { ...buttonStyles, ...styles.noLink }
+   }
+
    return (
       <Tooltip title={title}>
          <span>
             {isXS ? (
                <Button
                   variant="outlined"
-                  sx={isActive ? {} : styles.disabled}
+                  sx={buttonStyles}
+                  disableRipple={!onClick}
                   onClick={onClick}
                >
                   <BadgeIcon badgeKey={badge.key} />
@@ -31,7 +40,8 @@ const BadgeSimpleButton = ({ badge, isActive, onClick }: Props) => {
                <Button
                   variant="outlined"
                   startIcon={<BadgeIcon badgeKey={badge.key} />}
-                  sx={isActive ? {} : styles.disabled}
+                  sx={buttonStyles}
+                  disableRipple={!onClick}
                   onClick={onClick}
                >
                   {badge.name} Badge
