@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import Dialog from "@mui/material/Dialog"
 import { useVideo } from "react-use"
 import Box from "@mui/material/Box"
@@ -27,26 +27,40 @@ const styles = {
       color: "white",
    },
 } as const
-const Content = ({ videoUrl, onClose }: ContentProps) => {
-   const [video, _, controls] = useVideo(
-      <Box
-         sx={styles.video}
-         component="video"
-         controls
-         src={videoUrl}
-         autoPlay
-      />
-   )
-
-   return <>{video}</>
-}
 const HighlightVideoDialog = ({
    videoUrl,
    handleClose,
 }: HighlightVideoDialogProps) => {
+   const [video, state, controls] = useVideo(
+      <Box
+         sx={styles.video}
+         webkit-playsInline
+         // @ts-ignore
+         webkitPlaysInline
+         playsInline
+         component="video"
+         controls
+         src={videoUrl}
+      />
+   )
    const onClose = () => {
+      controls.mute()
+      controls.pause()
       handleClose()
    }
+
+   useEffect(() => {
+      ;(async function startPlaying() {
+         if (state.duration) {
+            try {
+               await controls.play()
+            } catch (e) {
+               console.log("-> e in play highlight vid", e)
+            }
+         }
+      })()
+   }, [Boolean(state.duration)])
+
    return (
       <Dialog
          onClose={onClose}
@@ -61,17 +75,13 @@ const HighlightVideoDialog = ({
          <IconButton sx={styles.closeIconButton} onClick={onClose} autoFocus>
             <CloseIcon sx={{ fontSize: "2rem" }} color={"inherit"} />
          </IconButton>
-         <Content onClose={onClose} videoUrl={videoUrl} />
+         <>{video}</>
       </Dialog>
    )
 }
 interface HighlightVideoDialogProps {
    videoUrl?: string
    handleClose: () => void
-}
-interface ContentProps {
-   videoUrl: string
-   onClose: () => void
 }
 
 export default HighlightVideoDialog

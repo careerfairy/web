@@ -5,13 +5,14 @@ import { HighLight } from "types/Highlight"
 
 export interface IHighlightRepository {
    getDocumentData(documentSnapshot: QuerySnapshot): HighLight[] | null
-   getHighlights(limit: number): Promise<HighLight[]>
+   getHighlights(limit?: number): Promise<HighLight[]>
+   shouldShowHighlightsCarousel(): Promise<Boolean>
 }
 
 class FirebaseHighlightRepository implements IHighlightRepository {
    constructor(private readonly firestore: firebase.firestore.Firestore) {}
 
-   async getHighlights(limit: number): Promise<HighLight[]> {
+   async getHighlights(limit?: number): Promise<HighLight[]> {
       let ref: firebase.firestore.Query<firebase.firestore.DocumentData> =
          this.firestore.collection("highlights")
       if (limit) {
@@ -19,6 +20,13 @@ class FirebaseHighlightRepository implements IHighlightRepository {
       }
       const snapshots = await ref.get()
       return this.getDocumentData(snapshots)
+   }
+   async shouldShowHighlightsCarousel(): Promise<Boolean> {
+      const snap = await this.firestore
+         .collection("userInterface")
+         .doc("eventsPortal")
+         .get()
+      return Boolean(snap?.data?.()?.showHighlights)
    }
    // @ts-ignore
    getDocumentData(documentSnapshot: QuerySnapshot): HighLight[] | null {

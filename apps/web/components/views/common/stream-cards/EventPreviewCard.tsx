@@ -155,6 +155,7 @@ const styles = {
    },
    summary: {
       ...getMaxLineStyles(3),
+      minHeight: 50,
    },
    btn: {
       flex: 1,
@@ -446,6 +447,12 @@ const EventPreviewCard = ({
                                     <WhiteTagChip
                                        key={interest.id}
                                        variant="filled"
+                                       sx={{
+                                          maxWidth:
+                                             eventInterests.length > 2
+                                                ? "50%"
+                                                : "80%",
+                                       }}
                                        label={interest.name}
                                     />
                                  ))}

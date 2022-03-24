@@ -10,7 +10,6 @@ const itemSpacingSize = 14
 const mobileFactor = 1
 const styles = {
    root: {
-      cursor: "pointer",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -58,6 +57,7 @@ const styles = {
       display: "flex",
    },
    imageWrapper: {
+      cursor: "pointer",
       borderRadius: "50%",
       position: "relative",
       flex: 1,

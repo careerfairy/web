@@ -89,7 +89,7 @@ const EventsPreviewGrid = ({
 
    return (
       <>
-         <Box id={id}>
+         <Box sx={{ px: 2 }} id={id}>
             <Box sx={styles.eventsHeader}>
                <Heading>{title}</Heading>
                <Link href={seeMoreLink}>

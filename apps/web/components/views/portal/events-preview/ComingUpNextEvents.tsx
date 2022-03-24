@@ -7,15 +7,17 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import EventsPreviewGrid from "./EventsPreviewGrid"
 import { useRouter } from "next/router"
 import { parseStreamDates } from "../../../../util/serverUtil"
+import { useMountedState } from "react-use"
 
 const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    const { isLoggedOut } = useAuth()
    const {
       query: { livestreamId },
    } = useRouter()
-   const [mounted, setMounted] = useState(false)
+   const mounted = useMountedState()
+
    const [localEvents, setLocalEvents] = useState(
-      serverSideEvents.map((event) => parseStreamDates(event)) || []
+      serverSideEvents?.map((event) => parseStreamDates(event)) || []
    )
    const [eventFromQuery, setEventFromQuery] = useState(null)
 
@@ -25,9 +27,6 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
          limit: isLoggedOut ? 80 : limit,
       }
    )
-   useEffect(() => {
-      setMounted(true)
-   }, [])
 
    useEffect(() => {
       if (livestreamId) {

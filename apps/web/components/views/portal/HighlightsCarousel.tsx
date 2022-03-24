@@ -1,61 +1,21 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useMemo, useState } from "react"
 import HighlightItem from "./HighlightItem"
 import HighlightVideoDialog from "./HighlightVideoDialog"
-import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
-import { Box } from "@mui/material"
+import Box from "@mui/material/Box"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
-import Slider from "react-slick"
 import { HighLight } from "../../../types/Highlight"
-const arrowFontSize = 30
+import CustomButtonCarousel from "../common/carousels/CustomButtonCarousel"
+
 const styles = {
-   carousel: {
-      pt: { xs: 1, md: 4 },
-      "& .slick-track": {
-         ml: 0,
-         mr: 0,
-      },
-      "& .slick-next": {
-         right: "10px",
-         "&:before": {
-            opacity: 1,
-            fontSize: arrowFontSize,
-            textShadow: (theme) => theme.darkTextShadow,
-         },
-      },
-      "& .slick-prev": {
-         left: "10px",
-         zIndex: 1,
-         "&:before": {
-            opacity: 1,
-            fontSize: arrowFontSize,
-            textShadow: (theme) => theme.darkTextShadow,
-         },
-      },
-   },
    root: {
-      "& .slick-next": {
-         right: "10px",
-         "&:before": {
-            opacity: 1,
-            fontSize: arrowFontSize,
-            textShadow: (theme) => theme.darkTextShadow,
-         },
-      },
-      "& .slick-prev": {
-         left: "10px",
-         zIndex: 1,
-         "&:before": {
-            opacity: 1,
-            fontSize: arrowFontSize,
-            textShadow: (theme) => theme.darkTextShadow,
-         },
-      },
+      pt: { xs: 1, md: 4 },
    },
 }
-const HighlightsCarousel = ({ serverSideHighlights }: Props) => {
+const HighlightsCarousel = ({
+   serverSideHighlights,
+   showHighlights,
+}: Props) => {
    const {
       breakpoints: { up },
    } = useTheme()
@@ -69,15 +29,6 @@ const HighlightsCarousel = ({ serverSideHighlights }: Props) => {
       return isLarge ? 5 : isMedium ? 4 : isSmall ? 3 : 1
    }, [isExtraSmall, isSmall, isMedium, isLarge])
 
-   const { shouldShowHighlightsCarousel } = useFirebaseService()
-   const [showCarousel, setShowCarousel] = useState(true)
-
-   useEffect(() => {
-      ;(async function () {
-         setShowCarousel(await shouldShowHighlightsCarousel())
-      })()
-   }, [])
-
    const [videoUrl, setVideoUrl] = useState(null)
    const handleOpenVideoDialog = (videoUrl: string) => {
       setVideoUrl(videoUrl)
@@ -86,22 +37,18 @@ const HighlightsCarousel = ({ serverSideHighlights }: Props) => {
    const handleCloseVideoDialog = () => {
       setVideoUrl(null)
    }
-   if (!showCarousel || !highlights?.length) {
+   if (!showHighlights || !highlights?.length) {
       return null
    }
 
    return (
-      <>
-         <Box
-            sx={styles.carousel}
-            component={Slider}
-            autoplay={false}
-            lazyLoad
-            infinite={false}
-            arrows
-            slidesToShow={numSlides}
-            slidesToScroll={numSlides}
-            initialSlide={0}
+      <Box sx={styles.root}>
+         <CustomButtonCarousel
+            numChildren={highlights.length}
+            numSlides={numSlides}
+            carouselProps={{
+               autoPlay: true,
+            }}
          >
             {highlights.map((highlight) => (
                <Box key={highlight.id}>
@@ -111,17 +58,20 @@ const HighlightsCarousel = ({ serverSideHighlights }: Props) => {
                   />
                </Box>
             ))}
-         </Box>
-         <HighlightVideoDialog
-            videoUrl={videoUrl}
-            handleClose={handleCloseVideoDialog}
-         />
-      </>
+         </CustomButtonCarousel>
+         {videoUrl && (
+            <HighlightVideoDialog
+               videoUrl={videoUrl}
+               handleClose={handleCloseVideoDialog}
+            />
+         )}
+      </Box>
    )
 }
 
 interface Props {
    serverSideHighlights: HighLight[]
+   showHighlights: Boolean
 }
 
 export default HighlightsCarousel
