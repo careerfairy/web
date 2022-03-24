@@ -110,6 +110,7 @@ const CreateGroup = ({ firebase }) => {
          let fullPath = "group-logos" + "/" + fileObject.name;
          let companyLogoRef = storageRef.child(fullPath);
          var uploadTask = companyLogoRef.put(fileObject);
+         await uploadTask.then();
          return uploadTask.snapshot.ref.getDownloadURL();
       } catch (e) {
          console.log("error in async", e);
