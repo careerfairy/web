@@ -29,9 +29,8 @@ const CreateGroup = ({ firebase }) => {
    const { enqueueSnackbar } = useSnackbar();
    const [activeStep, setActiveStep] = useState(0);
    const [baseGroupInfo, setBaseGroupInfo] = useState({});
-   const [arrayOfCategories, setArrayOfCategories] = useState(
-      defaultCategories
-   );
+   const [arrayOfCategories, setArrayOfCategories] =
+      useState(defaultCategories);
    const { userData, authenticatedUser: user, loading } = useAuth();
 
    useEffect(() => {
@@ -111,8 +110,8 @@ const CreateGroup = ({ firebase }) => {
          let fullPath = "group-logos" + "/" + fileObject.name;
          let companyLogoRef = storageRef.child(fullPath);
          var uploadTask = companyLogoRef.put(fileObject);
-         const snapshot = await uploadTask.then();
-         return snapshot.ref.getDownloadURL();
+         await uploadTask.then();
+         return uploadTask.snapshot.ref.getDownloadURL();
       } catch (e) {
          console.log("error in async", e);
       }
