@@ -639,6 +639,41 @@ class FirebaseService {
       return adminPreferenceRef.onSnapshot(callback)
    }
 
+   toggleNextGenMode = async (mainStreamId) => {
+      const adminPreferenceRef = this.firestore
+         .collection("livestreams")
+         .doc(mainStreamId)
+         .collection("preferences")
+         .doc("adminPreference")
+
+      return this.firestore.runTransaction((transaction) => {
+         return transaction
+            .get(adminPreferenceRef)
+            .then((adminPreferenceSnap) => {
+               if (adminPreferenceSnap.exists) {
+                  const isNextGen = Boolean(
+                     adminPreferenceSnap.data().isNextGen
+                  )
+                  transaction.set(
+                     adminPreferenceRef,
+                     {
+                        isNextGen: !isNextGen,
+                     },
+                     { merge: true }
+                  )
+               } else {
+                  transaction.set(
+                     adminPreferenceRef,
+                     {
+                        isNextGen: true,
+                     },
+                     { merge: true }
+                  )
+               }
+            })
+      })
+   }
+
    addLivestreamSpeaker = (livestreamId, speaker) => {
       let speakersRef = this.firestore
          .collection("livestreams")
