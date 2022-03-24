@@ -16,7 +16,8 @@ export const handleUserBadges = async (
 
    // Networker badge
    if (!newValue.badges?.includes(NetworkerBadge.key)) {
-      if (newValue.referralsCount >= 3 && newValue.referralsCount < 6) {
+      if (newValue.referralsCount >= 3) {
+         // add upper limit when having more badges
          await userAddEntryToArrayField(
             userDataId,
             "badges",
