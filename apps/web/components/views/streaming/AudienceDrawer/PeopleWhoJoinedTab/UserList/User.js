@@ -141,7 +141,12 @@ const User = ({ user, style, inTalentPool }) => {
                               currentBadge.achievementDescription
                            }
                         >
-                           <SmallAvatar>
+                           <SmallAvatar
+                              sx={{
+                                 boxShadow:
+                                    "0px 2px 5px 0px rgba(91, 91, 91, 0.30)",
+                              }}
+                           >
                               <BadgeIcon
                                  badgeKey={currentBadge.key}
                                  noBg={true}
