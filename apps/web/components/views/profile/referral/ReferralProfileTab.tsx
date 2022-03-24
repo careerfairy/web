@@ -72,9 +72,8 @@ const ReferralProfileTab = ({ userData }) => {
 
             <p>
                Share your personal referral link with friends who want to sign
-               up to the platform. Very soon, you will earn a special status and
-               will get access to exclusive features if you refer at least 3
-               friends!
+               up to the platform. You will stand out from the crowd with very
+               cool badges!
             </p>
 
             <Grid container spacing={2} mt={2}>
