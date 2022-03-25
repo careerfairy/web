@@ -1,0 +1,124 @@
+import React, { useState } from "react"
+import { useTheme } from "@mui/material/styles"
+import LandingLayout from "../layouts/LandingLayout"
+import BookADemoSection from "../components/views/landing/BookADemoSection"
+import TestimonialsSection from "../components/views/landing/TestimonialsSection"
+import AnalyticsSection from "../components/views/landing/AnalyticsSection"
+import StreamSection from "../components/views/landing/StreamSection"
+import UniversitySection from "../components/views/landing/UniversitySection"
+import BenefitsSection from "../components/views/landing/BenefitsSection"
+import CompaniesSection from "../components/views/landing/CompaniesSection"
+import HeroSection from "../components/views/landing/HeroSection"
+import CalendlyModal from "../components/views/landing/CalendlyModal"
+import ScrollToTop from "../components/views/common/ScrollToTop"
+import {
+   rectangle1,
+   mainBackground,
+   engageShape,
+   reachShape,
+   measureShape,
+} from "../constants/images"
+
+const LandingPage = ({}) => {
+   const {
+      palette: { secondary, common, grey },
+   } = useTheme()
+
+   const [calendlyModalOpen, setCalendlyModalOpen] = useState(false)
+
+   const handleOpenCalendly = () => {
+      setCalendlyModalOpen(true)
+   }
+
+   const handleCloseCalendly = () => setCalendlyModalOpen(false)
+
+   const companyBenefitsData = [
+      {
+         name: "Create fun career events",
+         description:
+            "A highly interactive format " +
+            "developed for a young " +
+            "audience worldwide",
+         imageUrl: engageShape,
+      },
+      {
+         name: "Reach more talents",
+         description:
+            "We promote your events to " +
+            "the CareerFairy community " +
+            "and universities",
+         imageUrl: reachShape,
+      },
+      {
+         name: "Easily measure success",
+         description:
+            "Demonstrate the success of " +
+            "your events through " +
+            "detailed analytics",
+         imageUrl: measureShape,
+      },
+   ]
+
+   return (
+      <LandingLayout topImage={mainBackground}>
+         <HeroSection big handleOpenCalendly={handleOpenCalendly} />
+         <CompaniesSection overheadText="Over 200+ happy customers" />
+         <BenefitsSection
+            title={"Why CareerFairy?"}
+            benefits={companyBenefitsData}
+         />
+         <UniversitySection
+            subtitle="The best talent is evenly distributed, which makes it
+            hard to reach. With CareerFairy live streams,
+            you can reach students at multiple top universities in a
+            single one hour-long event. No travel, no logistics, no days off work."
+            title="Some universities that we work with"
+         />
+         <StreamSection
+            title={
+               <>
+                  Showcase your best ambassadors <b>- your employees.</b>
+               </>
+            }
+            subtitle="We believe that your employees are your biggest asset, and their insights provide
+                an authentic look into the opportunities that your company has to offer."
+         />
+         <AnalyticsSection
+            title={
+               <>
+                  Boost your <b>employer brand</b>, measure the results with{" "}
+                  <b>data</b>
+               </>
+            }
+            backgroundImage={rectangle1}
+            subtitle="Evaluate the success of your events, gather live feedback from your audience and follow up easily with interesting candidates"
+         />
+         <TestimonialsSection
+            title="What They Are Saying"
+            backgroundColor={grey["200"]}
+         />
+         <BookADemoSection
+            backgroundColor={`linear-gradient(-8deg, ${secondary.main} 1%, ${secondary.light} 100%)`}
+            color={common.white}
+            big
+            handleOpenCalendly={handleOpenCalendly}
+            title={"Join the ranks of leading organisations today"}
+         />
+         <CalendlyModal
+            open={calendlyModalOpen}
+            onClose={handleCloseCalendly}
+         />
+         <ScrollToTop />
+      </LandingLayout>
+   )
+}
+
+export const getServerSideProps = () => {
+   return {
+      redirect: {
+         destination: "/",
+      },
+   }
+}
+
+export default LandingPage

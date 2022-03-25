@@ -1,2 +1,0 @@
-export const MAX_BREAKOUT_ROOMS = 10;
-export const BREAKOUT_BANNER_HEIGHT = 50;
