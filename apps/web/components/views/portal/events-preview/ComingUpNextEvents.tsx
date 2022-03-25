@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react"
 import EventsPreview, { EventsTypes } from "./EventsPreview"
-import livestreamRepo from "../../../../data/firebase/LivestreamRepository"
+import livestreamRepo, {
+   LivestreamsDataParser,
+} from "../../../../data/firebase/LivestreamRepository"
 import { LiveStreamEvent } from "../../../../types/event"
 import { usePagination } from "use-pagination-firestore"
 import { useAuth } from "../../../../HOCs/AuthProvider"
@@ -46,7 +48,10 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
 
    useEffect(() => {
       const newLocalEvents =
-         localEvents.length && !events.length ? [...localEvents] : [...events]
+         localEvents.length && !events.length
+            ? [...localEvents]
+            : new LivestreamsDataParser(events).removeEndedEvents().get()
+
       const newEventFromQuery = newLocalEvents.find(
          (event) => event.id === eventFromQuery?.id
       )
