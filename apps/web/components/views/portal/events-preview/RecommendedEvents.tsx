@@ -13,8 +13,6 @@ const RecommendedEvents = ({ limit, maxLimitIncreaseTimes }: Props) => {
    const [nonRegisteredRecommendedEvents, setNonRegisteredRecommendedEvents] =
       useState<LiveStreamEvent[]>([])
 
-   console.log(userData?.interestsIds)
-
    const query = useMemo(() => {
       return livestreamRepo.recommendEventsQuery(userData?.interestsIds)
    }, [userData?.interestsIds])
