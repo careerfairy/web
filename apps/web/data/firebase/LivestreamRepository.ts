@@ -3,6 +3,7 @@ import firebaseApp from "./FirebaseInstance"
 import { DocumentSnapshot, QuerySnapshot } from "@firebase/firestore-types"
 import { LiveStreamEvent } from "../../types/event"
 import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../../constants/streams"
+import { getStreamDocumentData } from "../../util/FirebaseUtils"
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LiveStreamEvent[] | null>
@@ -15,7 +16,6 @@ export interface ILivestreamRepository {
       userInterestsIds?: string[],
       limit?: number
    ): Promise<LiveStreamEvent[] | null>
-   getDocumentData(documentSnapshot: QuerySnapshot): LiveStreamEvent[] | null
    listenToRecommendedEvents(
       userEmail: string,
       userInterestsIds: string[],
@@ -55,18 +55,6 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
       )
    }
 
-   getDocumentData(documentSnapshot: QuerySnapshot): LiveStreamEvent[] | null {
-      let docs = null
-      if (!documentSnapshot.empty) {
-         docs = documentSnapshot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-            startDate: doc.data().start?.toDate?.(),
-         }))
-      }
-      return docs
-   }
-
    upcomingEventsQuery() {
       return this.firestore
          .collection("livestreams")
@@ -92,12 +80,13 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          .collection("livestreams")
          .where("start", ">", this.earliestEventBufferTime)
          .where("test", "==", false)
+         .where("hidden", "==", false)
          .orderBy("start", "asc")
       if (limit) {
          livestreamRef = livestreamRef.limit(limit)
       }
       const snapshots = await livestreamRef.get()
-      return this.getDocumentData(snapshots)
+      return getStreamDocumentData(snapshots)
    }
 
    listenToUpcomingEvents(
@@ -138,7 +127,7 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          livestreamRef = livestreamRef.limit(limit)
       }
       const snapshots = await livestreamRef.get()
-      return this.getDocumentData(snapshots)
+      return getStreamDocumentData(snapshots)
    }
 
    listenToRegisteredEvents(
@@ -196,7 +185,7 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          livestreamRef = livestreamRef.limit(limit)
       }
       const snapshots = await livestreamRef.get()
-      let interestedEvents = this.getDocumentData(snapshots)
+      let interestedEvents = getStreamDocumentData(snapshots)
       if (interestedEvents) {
          interestedEvents = interestedEvents.filter(
             (event) => !event.registeredUsers?.includes(userEmail)

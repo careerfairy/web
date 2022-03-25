@@ -3,12 +3,13 @@ import Box from "@mui/material/Box"
 import { Theme } from "@mui/material/styles"
 import Image from "next/image"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
+import { HighLight } from "../../../types/Highlight"
+import { getResizedUrl } from "../../helperFunctions/HelperFunctions"
 
 const itemSpacingSize = 14
-const mobileFactor = 0.8
+const mobileFactor = 1
 const styles = {
    root: {
-      cursor: "pointer",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -56,6 +57,7 @@ const styles = {
       display: "flex",
    },
    imageWrapper: {
+      cursor: "pointer",
       borderRadius: "50%",
       position: "relative",
       flex: 1,
@@ -77,26 +79,26 @@ const styles = {
    icon: {
       zIndex: 2,
       fontSize: (theme) => ({
-         xs: theme.spacing(itemSpacingSize * 0.2),
+         xs: theme.spacing(itemSpacingSize * 0.4),
          md: theme.spacing(itemSpacingSize * 0.4),
       }),
       transition: (theme) => theme.transitions.create(["color", "font-size"]),
    },
    logoRoot: {
       height: (theme) => ({
-         xs: theme.spacing(7),
+         xs: theme.spacing(10),
       }),
       width: "100%",
-      p: 1,
       display: "flex",
    },
    logoWrapper: {
       flex: 1,
       display: "flex",
-      p: 0.5,
+      p: 1,
+      justifyContent: "center",
       "& > *": {
          position: "relative",
-         flex: 1,
+         flex: 0.4,
       },
    },
 } as const
@@ -105,14 +107,18 @@ const HighlightItem = ({
    handleOpenVideoDialog,
 }: HighlightItemProps) => {
    return (
-      <Box onClick={() => handleOpenVideoDialog(videoUrl)} sx={styles.root}>
+      <Box sx={styles.root}>
          <Box sx={styles.circleRoot}>
             <Box className="innerWrapper" sx={styles.innerWrapper}>
-               <Box sx={styles.imageWrapper}>
+               <Box
+                  onClick={() => handleOpenVideoDialog(videoUrl)}
+                  sx={styles.imageWrapper}
+               >
                   <Box
                      sx={styles.thumbnailImage}
                      layout="fill"
-                     src={thumbnail}
+                     objectFit={"cover"}
+                     src={getResizedUrl(thumbnail, "lg")}
                      component={Image}
                   />
                   <Box className={"overlay"} sx={styles.imageOverlay} />
@@ -127,7 +133,7 @@ const HighlightItem = ({
                      alt="logo"
                      objectFit={"contain"}
                      layout="fill"
-                     src={logo}
+                     src={getResizedUrl(logo, "lg")}
                   />
                </Box>
             </Box>
@@ -136,14 +142,8 @@ const HighlightItem = ({
    )
 }
 
-export interface HighLightType {
-   videoUrl: string
-   id: string
-   thumbnail: string
-   logo: string
-}
 interface HighlightItemProps {
-   highLight: HighLightType
+   highLight: HighLight
    handleOpenVideoDialog: (videoUrl: string) => void
 }
 

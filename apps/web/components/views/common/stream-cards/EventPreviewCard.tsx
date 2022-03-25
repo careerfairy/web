@@ -155,6 +155,7 @@ const styles = {
    },
    summary: {
       ...getMaxLineStyles(3),
+      minHeight: 50,
    },
    btn: {
       flex: 1,
@@ -199,7 +200,7 @@ const EventPreviewCard = ({
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
    const { query, push, pathname } = useRouter()
-   const getStartDate = () => event?.start?.toDate?.()
+   const getStartDate = () => event?.startDate || event?.start?.toDate?.()
    const [eventInterests, setSetEventInterests] = useState([])
    const [hasRegistered, setHasRegistered] = useState(false)
    const firebase = useFirebaseService()
@@ -446,6 +447,12 @@ const EventPreviewCard = ({
                                     <WhiteTagChip
                                        key={interest.id}
                                        variant="filled"
+                                       sx={{
+                                          maxWidth:
+                                             eventInterests.length > 2
+                                                ? "50%"
+                                                : "80%",
+                                       }}
                                        label={interest.name}
                                     />
                                  ))}
