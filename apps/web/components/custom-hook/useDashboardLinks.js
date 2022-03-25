@@ -7,7 +7,7 @@ import {
    User as ProfileIcon,
    Users as RolesIcon,
 } from "react-feather"
-import { useAuth } from "../../HOCs/AuthProvider"
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 
 const initialHeaderLinks = [
    {
@@ -35,7 +35,7 @@ const initialDrawerBottomLinks = [
    },
 ]
 const useDashboardLinks = (group) => {
-   const { authenticatedUser } = useAuth()
+   const firebase = useFirebaseService()
 
    const [headerLinks, setHeaderLinks] = useState(initialHeaderLinks)
    const [drawerBottomLinks, setDrawerBottomLinks] = useState(
@@ -44,7 +44,7 @@ const useDashboardLinks = (group) => {
    const [drawerTopLinks, setDrawerTopLinks] = useState([])
 
    useEffect(() => {
-      if (authenticatedUser?.emailVerified) {
+      if (firebase.auth?.currentUser?.emailVerified) {
          setHeaderLinks([
             ...initialHeaderLinks,
             {
@@ -64,7 +64,7 @@ const useDashboardLinks = (group) => {
             },
          ])
       }
-   }, [authenticatedUser?.emailVerified])
+   }, [firebase.auth?.currentUser?.emailVerified])
 
    useEffect(() => {
       if (isLoaded(group) && !isEmpty(group)) {

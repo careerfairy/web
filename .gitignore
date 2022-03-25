@@ -14,4 +14,4 @@ firebase-export-*/
 
 *.log
 
-.packages/.turbo
+.packages/

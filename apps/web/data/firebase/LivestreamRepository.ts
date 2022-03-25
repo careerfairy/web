@@ -3,6 +3,7 @@ import firebaseApp from "./FirebaseInstance"
 import { DocumentSnapshot, QuerySnapshot } from "@firebase/firestore-types"
 import { LiveStreamEvent } from "../../types/event"
 import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../../constants/streams"
+import { mapFirestoreDocuments } from "../../util/FirebaseUtils"
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LiveStreamEvent[] | null>
@@ -56,17 +57,10 @@ export interface ILivestreamRepository {
 class FirebaseLivestreamRepository implements ILivestreamRepository {
    constructor(private readonly firestore: firebase.firestore.Firestore) {}
 
-   private parseSnapshotDocuments(
+   private mapLivestreamCollections(
       documentSnapshot: QuerySnapshot
    ): LivestreamsDataParser {
-      let docs = null
-      if (!documentSnapshot.empty) {
-         docs = documentSnapshot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-         }))
-      }
-
+      const docs = mapFirestoreDocuments<LiveStreamEvent>(documentSnapshot)
       return new LivestreamsDataParser(docs).complementaryFields()
    }
 
@@ -98,7 +92,7 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          livestreamRef = livestreamRef.limit(limit)
       }
       const snapshots = await livestreamRef.get()
-      return this.parseSnapshotDocuments(snapshots).get()
+      return this.mapLivestreamCollections(snapshots).removeEndedEvents().get()
    }
 
    async getPastEventsFrom(fromDate: Date, limit?: number) {
@@ -112,7 +106,7 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          query = query.limit(limit)
       }
 
-      return this.parseSnapshotDocuments(await query.get())
+      return this.mapLivestreamCollections(await query.get())
          .removeLiveEvents()
          .get()
    }
@@ -141,7 +135,7 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          livestreamRef = livestreamRef.limit(limit)
       }
       const snapshots = await livestreamRef.get()
-      return this.parseSnapshotDocuments(snapshots).get()
+      return this.mapLivestreamCollections(snapshots).get()
    }
 
    listenToRegisteredEvents(
@@ -201,7 +195,7 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          livestreamRef = livestreamRef.limit(limit)
       }
       const snapshots = await livestreamRef.get()
-      let interestedEvents = this.parseSnapshotDocuments(snapshots).get()
+      let interestedEvents = this.mapLivestreamCollections(snapshots).get()
       if (interestedEvents) {
          interestedEvents = interestedEvents.filter(
             (event) => !event.registeredUsers?.includes(userEmail)
@@ -251,13 +245,6 @@ export class LivestreamsDataParser {
    removeLiveEvents() {
       this.livestreams = this.livestreams?.filter(
          (e) => !(e.hasStarted && !e.hasEnded)
-      )
-      return this
-   }
-
-   removeNotStartedEvents() {
-      this.livestreams = this.livestreams?.filter(
-         (e) => !(!e.hasStarted && !e.hasEnded)
       )
       return this
    }

@@ -1,4 +1,6 @@
 import SessionStorageUtil from "./SessionStorageUtil"
+import { QuerySnapshot } from "@firebase/firestore-types"
+import { LiveStreamEvent } from "../types/event"
 
 /**
  * Patch console.error() function to listen for Firestore connectivity issues
@@ -34,4 +36,22 @@ if (typeof window !== "undefined") {
 
       return originalFn.apply(console, args)
    }
+}
+
+/**
+ * Add the document id to the document itself
+ *
+ * @param documentSnapshot
+ */
+export function mapFirestoreDocuments<T>(
+   documentSnapshot: QuerySnapshot
+): T[] | null {
+   let docs = null
+   if (!documentSnapshot.empty) {
+      docs = documentSnapshot.docs.map((doc) => ({
+         ...doc.data(),
+         id: doc.id,
+      }))
+   }
+   return docs
 }

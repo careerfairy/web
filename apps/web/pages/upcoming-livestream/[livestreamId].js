@@ -69,6 +69,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       getDetailLivestreamCareerCenters,
       livestreamQuestionsQuery,
       upvoteLivestreamQuestion,
+      auth,
    } = useFirebaseService()
 
    const questionsQuery = useMemo(
@@ -170,12 +171,8 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [stream?.groupIds, currentGroup?.groupId])
 
    useEffect(() => {
-      if (
-         query.register === stream?.id &&
-         unfilteredGroups.length &&
-         !stream?.registeredUsers.includes(authenticatedUser.email)
-      ) {
-         ;(async function handleAutoRegister() {
+      ;(async function handleAutoRegister() {
+         if (stream?.registeredUsers?.includes(authenticatedUser.email)) {
             const newQuery = { ...query }
             if (newQuery.register) {
                delete newQuery.register
@@ -186,12 +183,18 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                   ...newQuery,
                },
             })
+         }
+         if (
+            query.register === stream?.id &&
+            unfilteredGroups.length &&
+            !stream?.registeredUsers?.includes(authenticatedUser.email)
+         ) {
             handleOpenJoinModal({
                groups: unfilteredGroups,
                livestream: stream,
             })
-         })()
-      }
+         }
+      })()
    }, [
       query.register,
       stream?.id,
@@ -240,7 +243,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const linkToStream = useMemo(() => {
       const notLoggedIn =
          (authenticatedUser.isLoaded && authenticatedUser.isEmpty) ||
-         !authenticatedUser.emailVerified
+         !auth?.currentUser?.emailVerified
       const registerQuery = notLoggedIn ? `&register=${stream.id}` : ""
       const referrerQuery = query.referrerId
          ? `&referrerId=${query.referrerId}`
@@ -249,7 +252,14 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       const queries = `${registerQuery}${referrerQuery}${groupIdQuery}`
       const basePath = `/upcoming-livestream/${stream.id}`
       return queries ? `${basePath}?${queries}` : basePath
-   }, [asPath, stream?.id, query.groupId, authenticatedUser, query.referrerId])
+   }, [
+      asPath,
+      stream?.id,
+      query.groupId,
+      authenticatedUser,
+      query.referrerId,
+      auth?.currentUser?.emailVerified,
+   ])
 
    const numberOfSpotsRemaining = useMemo(() => {
       if (!stream.maxRegistrants) return 0
@@ -268,7 +278,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [isPastEvent, stream?.isFaceToFace, stream?.startDate])
 
    const startRegistrationProcess = async () => {
-      if (isLoggedOut || !authenticatedUser.emailVerified) {
+      if (isLoggedOut || !auth?.currentUser?.emailVerified) {
          return push(
             asPath
                ? {

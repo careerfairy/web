@@ -26,5 +26,6 @@ module.exports = {
       quotes: ["error", "double"],
       "import/no-unresolved": 0,
       "@typescript-eslint/no-explicit-any": "off",
+      "valid-jsdoc": "off",
    },
 }

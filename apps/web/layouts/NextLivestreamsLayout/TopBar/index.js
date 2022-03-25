@@ -7,7 +7,6 @@ import { Button, Hidden, useMediaQuery } from "@mui/material"
 import Box from "@mui/material/Box"
 import { MainLogo } from "../../../components/logos"
 import Link from "../../../materialUI/NextNavLink"
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
 import MenuIcon from "@mui/icons-material/Menu"
 import FilterIcon from "@mui/icons-material/Tune"
 import { useDispatch } from "react-redux"
@@ -16,6 +15,7 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import useGeneralHeader from "../../../components/custom-hook/useGeneralHeader"
 import NavLinks from "../../../components/views/header/NavLinks"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
+import UserProfileButton from "../../../components/views/common/topbar/UserProfileButton"
 
 const useStyles = makeStyles((theme) => ({
    navIconButton: {
@@ -33,7 +33,7 @@ const TopBar = ({ links, onMobileNavOpen, currentGroup }) => {
       navLinksActiveColor: headerColors.navLinksActiveColor,
    })
    const dispatch = useDispatch()
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, userData } = useAuth()
 
    const handleToggleNextLivestreamsFilter = () =>
       dispatch(actions.toggleNextLivestreamsFilter())
@@ -74,16 +74,7 @@ const TopBar = ({ links, onMobileNavOpen, currentGroup }) => {
                      Login
                   </Button>
                ) : (
-                  <IconButton
-                     id="profile_icon"
-                     component={Link}
-                     color="primary"
-                     className={classes.navIconButton}
-                     href="/profile"
-                     size="large"
-                  >
-                     <AccountCircleOutlinedIcon />
-                  </IconButton>
+                  <UserProfileButton userBadges={userData?.badges} />
                )}
             </Hidden>
             {currentGroup?.categories && (

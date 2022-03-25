@@ -21,12 +21,15 @@ const styles = {
    container: { px: { xs: 0.5, sm: 1, md: 2 } },
 }
 
-const UserData = ({ userData }) => {
+const UserData = ({ userData, redirectToReferralsTab }) => {
    return (
       <>
          <Container sx={styles.container} component="main" maxWidth="md">
             <Box boxShadow={1} p={4} sx={styles.box}>
-               <PersonalInfo userData={userData} />
+               <PersonalInfo
+                  userData={userData}
+                  redirectToReferralsTab={redirectToReferralsTab}
+               />
             </Box>
          </Container>
          <Container sx={styles.container} component="main" maxWidth="md">
