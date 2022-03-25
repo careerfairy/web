@@ -38,22 +38,14 @@ if (typeof window !== "undefined") {
    }
 }
 
-export const getStreamDocumentData = (
+/**
+ * Add the document id to the document itself
+ *
+ * @param documentSnapshot
+ */
+export function mapFirestoreDocuments<T>(
    documentSnapshot: QuerySnapshot
-): LiveStreamEvent[] | null => {
-   let docs = null
-   if (!documentSnapshot.empty) {
-      docs = documentSnapshot.docs.map((doc) => ({
-         ...doc.data(),
-         id: doc.id,
-         startDate: doc.data().start?.toDate?.(),
-      }))
-   }
-   return docs
-}
-export const getDocumentData = (
-   documentSnapshot: QuerySnapshot
-): any[] | null => {
+): T[] | null {
    let docs = null
    if (!documentSnapshot.empty) {
       docs = documentSnapshot.docs.map((doc) => ({

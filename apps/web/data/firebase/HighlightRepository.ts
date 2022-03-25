@@ -1,7 +1,7 @@
 import firebase from "firebase/app"
 import firebaseApp from "./FirebaseInstance"
 import { HighLight } from "types/Highlight"
-import { getDocumentData } from "../../util/FirebaseUtils"
+import { mapFirestoreDocuments } from "../../util/FirebaseUtils"
 
 export interface IHighlightRepository {
    getHighlights(limit?: number): Promise<HighLight[]>
@@ -18,8 +18,9 @@ class FirebaseHighlightRepository implements IHighlightRepository {
          ref = ref.limit(limit)
       }
       const snapshots = await ref.get()
-      return getDocumentData(snapshots)
+      return mapFirestoreDocuments<HighLight>(snapshots)
    }
+
    async shouldShowHighlightsCarousel(): Promise<Boolean> {
       const snap = await this.firestore
          .collection("userInterface")
@@ -30,7 +31,6 @@ class FirebaseHighlightRepository implements IHighlightRepository {
 }
 
 // Singleton
-// @ts-ignore
 const highlightRepo: IHighlightRepository = new FirebaseHighlightRepository(
    firebaseApp.firestore()
 )

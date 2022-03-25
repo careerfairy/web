@@ -2,9 +2,10 @@ import { useEffect, useState } from "react"
 import { Identifiable } from "../../types/commonTypes"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import firebase from "firebase"
-import CollectionReference = firebase.firestore.CollectionReference
 import { Interest } from "types/interests"
 import { Group } from "types/groups"
+import Query = firebase.firestore.Query
+import Firestore = firebase.firestore.Firestore
 
 /**
  * Fetch a Firestore collection
@@ -15,7 +16,7 @@ import { Group } from "types/groups"
  * @param realtime Listens for updates on the documents
  */
 function useCollection<T extends Identifiable>(
-   collection: string | GetReferenceFn,
+   collection: string | GetReferenceFn | Query,
    realtime: boolean = false
 ): CollectionResponse<T> {
    const { firestore } = useFirebaseService()
@@ -30,8 +31,10 @@ function useCollection<T extends Identifiable>(
          let ref
          if (typeof collection === "string") {
             ref = firestore.collection(collection)
-         } else {
+         } else if (typeof collection === "function") {
             ref = collection(firestore)
+         } else {
+            ref = collection
          }
 
          if (realtime) {
@@ -60,9 +63,7 @@ function useCollection<T extends Identifiable>(
    return { isLoading: isLoading, data: documents, error: error }
 }
 
-type GetReferenceFn = (
-   firestore: firebase.firestore.Firestore
-) => CollectionReference
+type GetReferenceFn = (firestore: Firestore) => Query
 
 interface CollectionResponse<T> {
    isLoading: boolean

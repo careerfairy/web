@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import EventsPreview, { EventsTypes } from "./EventsPreview"
 import livestreamRepo from "../../../../data/firebase/LivestreamRepository"
 import { useAuth } from "../../../../HOCs/AuthProvider"
@@ -13,17 +13,17 @@ const RecommendedEvents = ({ limit, maxLimitIncreaseTimes }: Props) => {
    const [nonRegisteredRecommendedEvents, setNonRegisteredRecommendedEvents] =
       useState<LiveStreamEvent[]>([])
 
+   const query = useMemo(() => {
+      return livestreamRepo.recommendEventsQuery(userData?.interestsIds)
+   }, [userData?.interestsIds])
+
    const {
       items: recommendedEvents,
       isLoading,
       isEnd,
-   } = usePagination<LiveStreamEvent>(
-      userData?.interestsIds &&
-         livestreamRepo.recommendEventsQuery(userData?.interestsIds),
-      {
-         limit: currentLimit,
-      }
-   )
+   } = usePagination<LiveStreamEvent>(userData?.interestsIds && query, {
+      limit: currentLimit,
+   })
 
    useEffect(() => {
       if (
