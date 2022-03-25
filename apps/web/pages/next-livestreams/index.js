@@ -1,7 +1,6 @@
 import { withFirebase } from "../../context/firebase/FirebaseServiceContext"
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout"
-import useUpcomingStreams from "../../components/custom-hook/useUpcomingStreams"
-import usePastStreams from "../../components/custom-hook/usePastStreams"
+import useListenToUpcomingStreams from "../../components/custom-hook/useListenToUpcomingStreams"
 import NextLivestreamsBannerSection from "../../components/views/NextLivestreams/NextLivestreamsBannerSection"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useTheme } from "@mui/material/styles"
@@ -11,80 +10,45 @@ import {
    NEXT_LIVESTREAMS_PATH,
    PRODUCTION_BASE_URL,
 } from "../../constants/routes"
-import { getServerSideStream } from "../../util/serverUtil"
-import { getResizedUrl } from "../../components/helperFunctions/HelperFunctions"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
+import livestreamRepo from "../../data/firebase/LivestreamRepository"
 
 const placeholderBanner =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
 
-const NextLivestreamsPage = ({
-   livestreamId,
-   serverSideStream,
-   initialTabValue,
-}) => {
+const pageMetadata = {
+   description: "Catch the upcoming streams on CareerFairy.",
+   title: `CareerFairy | Upcoming Livestreams`,
+   image: "https://careerfairy.io/logo_teal.png",
+   fullPath: `${PRODUCTION_BASE_URL}}${NEXT_LIVESTREAMS_PATH}`,
+}
+
+const NextLivestreamsPage = ({ initialTabValue }) => {
    const {
       palette: {
          common: { white },
          navyBlue,
       },
    } = useTheme()
-   const upcomingLivestreams = useUpcomingStreams(livestreamId)
-   const pastLivestreams = usePastStreams(livestreamId)
    const [value, setValue] = useState(initialTabValue || "upcomingEvents")
 
-   useEffect(() => {
-      ;(function handleFindHighlightedStreamTab() {
-         if (livestreamIdIsIn(upcomingLivestreams)) {
-            setUpcomingEvents()
-         } else if (livestreamIdIsIn(pastLivestreams)) {
-            setPastEvents()
-         }
-      })()
-   }, [livestreamId, Boolean(upcomingLivestreams), Boolean(pastLivestreams)])
+   const upcomingLivestreams = useListenToUpcomingStreams()
+   const [pastLivestreams, setPastLivestreams] = useState(undefined)
 
    useEffect(() => {
-      if (initialTabValue) {
-         return
+      // load past events when changing tabs
+      if (value === "pastEvents" && !pastLivestreams) {
+         const sixMonthsAgo = new Date(
+            new Date().setMonth(new Date().getMonth() - 6)
+         )
+         livestreamRepo
+            .getPastEventsFrom(sixMonthsAgo)
+            .then((data) => {
+               setPastLivestreams(data)
+            })
+            .catch(console.error)
       }
-      if (!livestreamId) {
-         // Only find tab with streams if there isn't a livestreamId in query
-         ;(function handleFindTabWithStreams() {
-            if (!upcomingLivestreams?.length && pastLivestreams?.length) {
-               setPastEvents()
-            } else {
-               setUpcomingEvents()
-            }
-         })()
-      }
-   }, [Boolean(upcomingLivestreams), Boolean(pastLivestreams)])
-
-   const livestreamIdIsIn = (streams) => {
-      return Boolean(streams?.some((stream) => stream.id === livestreamId))
-   }
-
-   const setPastEvents = () => setValue("pastEvents")
-   const setUpcomingEvents = () => setValue("upcomingEvents")
-   const metaInfo = useMemo(
-      () =>
-         serverSideStream
-            ? {
-                 title: `CareerFairy | Live Stream with ${serverSideStream.company}`,
-                 description: serverSideStream.title,
-                 image: getResizedUrl(
-                    serverSideStream.backgroundImageUrl,
-                    "lg"
-                 ),
-                 fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}?livestreamId=${serverSideStream.id}`,
-              }
-            : {
-                 description: "Catch the upcoming streams on CareerFairy.",
-                 title: `CareerFairy | Upcoming Livestreams`,
-                 image: "https://careerfairy.io/logo_teal.png",
-                 fullPath: `${PRODUCTION_BASE_URL}}${NEXT_LIVESTREAMS_PATH}`,
-              },
-      [serverSideStream]
-   )
+   }, [value, pastLivestreams])
 
    const handleChange = useCallback((event, newValue) => {
       setValue(newValue)
@@ -92,7 +56,7 @@ const NextLivestreamsPage = ({
 
    return (
       <React.Fragment>
-         <HeadWithMeta {...metaInfo} />
+         <HeadWithMeta {...pageMetadata} />
          <NextLivestreamsLayout>
             <NextLivestreamsBannerSection
                color={white}
@@ -112,7 +76,6 @@ const NextLivestreamsPage = ({
             <StreamsSection
                value={value}
                upcomingLivestreams={upcomingLivestreams}
-               livestreamId={livestreamId}
                listenToUpcoming
                pastLivestreams={pastLivestreams}
             />
@@ -122,13 +85,9 @@ const NextLivestreamsPage = ({
    )
 }
 
-export async function getServerSideProps({
-   query: { livestreamId, careerCenterId, type },
-}) {
+export async function getServerSideProps({ query: { careerCenterId, type } }) {
    if (careerCenterId) {
-      let destination = livestreamId
-         ? `/next-livestreams/${careerCenterId}?livestreamId=${livestreamId}`
-         : `/next-livestreams/${careerCenterId}`
+      let destination = `/next-livestreams/${careerCenterId}`
       return {
          props: {},
          redirect: {
@@ -142,12 +101,8 @@ export async function getServerSideProps({
       initialTabValue = type
    }
 
-   const serverSideStream = await getServerSideStream(livestreamId)
-
    return {
       props: {
-         serverSideStream,
-         livestreamId: livestreamId || "",
          initialTabValue,
       }, // will be passed to the page component as props
    }
