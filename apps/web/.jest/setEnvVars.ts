@@ -1,3 +1,1 @@
-require("dotenv").config({
-   ...(!process.env.CI && { path: "../../.env.test.local" }),
-})
+process.env.REACT_APP_FIREBASE_API_KEY = "123"
