@@ -15,6 +15,7 @@ import LoginButton from "../../../components/views/common/LoginButton"
 import GeneralHeader from "../../../components/views/header/GeneralHeader"
 import NavLinks from "../../../components/views/header/NavLinks"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
+import UserProfileButton from "../../../components/views/common/topbar/UserProfileButton"
 const useStyles = makeStyles((theme) => ({
    header: {
       color: theme.palette.common.white,
@@ -30,7 +31,7 @@ const TopBar = () => {
    const { mainLinks } = useGeneralLinks()
    const dispatch = useDispatch()
    const handleDrawerOpen = () => dispatch(actions.openNavDrawer())
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, userData } = useAuth()
 
    return (
       <GeneralHeader position="absolute" transparent className={classes.header}>
@@ -60,18 +61,7 @@ const TopBar = () => {
                      <LoginButton />
                   </div>
                ) : (
-                  <IconButton
-                     id="profile_icon"
-                     component={Link}
-                     color="inherit"
-                     href="/profile"
-                     size="large"
-                  >
-                     <AccountCircleOutlinedIcon
-                        className={classes.accountIcon}
-                        color="inherit"
-                     />
-                  </IconButton>
+                  <UserProfileButton userBadges={userData?.badges} white />
                )}
             </Hidden>
          </Box>

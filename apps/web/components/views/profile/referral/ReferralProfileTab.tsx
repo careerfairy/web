@@ -26,6 +26,9 @@ import * as Sentry from "@sentry/nextjs"
 import { getHumanStringDescriptionForAction } from "@careerfairy/shared-lib/dist/rewards"
 import useCollection from "../../../custom-hook/useCollection"
 import { Reward } from "../../../../types/reward"
+import BadgeSimpleButton from "../BadgeSimpleButton"
+import BadgeProgress from "./BadgeProgress"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges"
 
 const ReferralProfileTab = ({ userData }) => {
    const { enqueueSnackbar } = useSnackbar()
@@ -53,15 +56,24 @@ const ReferralProfileTab = ({ userData }) => {
    return (
       <Container component="main" maxWidth="md">
          <Box boxShadow={1} p={4} sx={styles.box}>
-            <Typography sx={{ color: "text.secondary" }} variant="h5">
-               Refer your friends!
-            </Typography>
+            <Grid container spacing={2}>
+               <Grid item xs={8}>
+                  <Typography sx={{ color: "text.secondary" }} variant="h5">
+                     Refer your friends!
+                  </Typography>
+               </Grid>
+               <Grid item xs={4} sx={{ textAlign: "right" }}>
+                  <BadgeSimpleButton
+                     badge={NetworkerBadge}
+                     isActive={userData?.badges?.includes(NetworkerBadge.key)}
+                  />
+               </Grid>
+            </Grid>
 
             <p>
                Share your personal referral link with friends who want to sign
-               up to the platform. Very soon, you will earn a special status and
-               will get access to exclusive features if you refer at least 3
-               friends!
+               up to the platform. You will stand out from the crowd with very
+               cool badges!
             </p>
 
             <Grid container spacing={2} mt={2}>
@@ -83,6 +95,10 @@ const ReferralProfileTab = ({ userData }) => {
                   >
                      Copy
                   </Button>
+               </Grid>
+
+               <Grid item xs={12}>
+                  <BadgeProgress userData={userData} />
                </Grid>
 
                <Grid item xs={12}>
