@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { User as ProfileIcon } from "react-feather";
-import { useAuth } from "../../HOCs/AuthProvider";
 import NextLivestreamsIcon from "@mui/icons-material/Contacts";
 import FollowGroupIcon from "@mui/icons-material/GroupAdd";
 import PortalIcon from "@mui/icons-material/DynamicFeed";
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext";
 
 const initialMainLinks = [
    {
@@ -50,13 +50,13 @@ const initialSecondaryLinks = [
 
 const landingLinks = [...initialSecondaryLinks];
 const useGeneralLinks = () => {
-   const { authenticatedUser } = useAuth();
+   const firebase = useFirebaseService();
 
    const [mainLinks] = useState(initialMainLinks);
    const [secondaryLinks, setSecondaryLinks] = useState(initialSecondaryLinks);
 
    useEffect(() => {
-      if (authenticatedUser?.emailVerified) {
+      if (firebase.auth?.currentUser?.emailVerified) {
          setSecondaryLinks([
             ...initialSecondaryLinks,
             {
@@ -67,7 +67,7 @@ const useGeneralLinks = () => {
             },
          ]);
       }
-   }, [authenticatedUser?.emailVerified]);
+   }, [firebase.auth?.currentUser?.emailVerified]);
 
    return { secondaryLinks, mainLinks, landingLinks };
 };

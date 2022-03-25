@@ -289,7 +289,7 @@ const EventPreviewCard = ({
    };
 
    const onClickRegister = () => {
-      onRegisterClick(event, hosts[0]?.id, hosts, hasRegistered);
+      onRegisterClick(event, hosts?.[0]?.id, hosts, hasRegistered);
    };
 
    return (
