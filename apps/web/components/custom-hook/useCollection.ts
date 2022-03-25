@@ -4,9 +4,7 @@ import { useFirebaseService } from "../../context/firebase/FirebaseServiceContex
 import firebase from "firebase"
 import { Interest } from "types/interests"
 import { Group } from "types/groups"
-import Query = firebase.firestore.Query
-import Firestore = firebase.firestore.Firestore
-import { CollectionReference } from "@firebase/firestore-types"
+import { Query, FirebaseFirestore } from "@firebase/firestore-types"
 
 /**
  * Fetch a Firestore collection
@@ -64,7 +62,7 @@ function useCollection<T extends Identifiable>(
    return { isLoading: isLoading, data: documents, error: error }
 }
 
-type GetReferenceFn = (firestore: Firestore) => Query
+type GetReferenceFn = (firestore: FirebaseFirestore) => Query
 
 interface CollectionResponse<T> {
    isLoading: boolean
