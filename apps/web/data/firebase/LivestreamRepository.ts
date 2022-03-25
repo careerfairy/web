@@ -107,7 +107,6 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          .where("start", ">", fromDate)
          .where("start", "<", new Date())
          .where("test", "==", false)
-         .where("hidden", "==", false)
          .orderBy("start", "desc")
       if (limit) {
          query = query.limit(limit)
