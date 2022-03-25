@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import EventsPreview, { EventsTypes } from "./EventsPreview"
 import livestreamRepo from "../../../../data/firebase/LivestreamRepository"
 import { LiveStreamEvent } from "../../../../types/event"
@@ -21,12 +21,13 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    )
    const [eventFromQuery, setEventFromQuery] = useState(null)
 
-   const { items: events, isLoading } = usePagination<LiveStreamEvent>(
-      livestreamRepo.upcomingEventsQuery(),
-      {
-         limit: isLoggedOut ? 80 : limit,
-      }
-   )
+   const query = useMemo(() => {
+      return livestreamRepo.upcomingEventsQuery()
+   }, [])
+
+   const { items: events, isLoading } = usePagination<LiveStreamEvent>(query, {
+      limit: isLoggedOut ? 80 : limit,
+   })
 
    useEffect(() => {
       if (livestreamId) {
@@ -42,6 +43,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
          return () => unsubscribe()
       }
    }, [livestreamId])
+
    useEffect(() => {
       const newLocalEvents =
          localEvents.length && !events.length ? [...localEvents] : [...events]

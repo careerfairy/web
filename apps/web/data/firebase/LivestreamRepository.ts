@@ -38,9 +38,7 @@ export interface ILivestreamRepository {
       userInterestsIds?: string[]
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
 
-   upcomingEventsQuery(
-      userInterestsIds?: string[]
-   ): firebase.firestore.Query<firebase.firestore.DocumentData>
+   upcomingEventsQuery(): firebase.firestore.Query<firebase.firestore.DocumentData>
 
    registeredEventsQuery(
       userEmail: string

@@ -3,9 +3,12 @@ import { LiveStreamEvent } from "../../types/event"
 import livestreamRepo, {
    LivestreamsDataParser,
 } from "../../data/firebase/LivestreamRepository"
+import { useMemo } from "react"
 
 const useListenToUpcomingStreams = () => {
-   const query = livestreamRepo.upcomingEventsQuery()
+   const query = useMemo(() => {
+      return livestreamRepo.upcomingEventsQuery()
+   }, [])
 
    let { data, isLoading } = useCollection<LiveStreamEvent>(query, true)
 
