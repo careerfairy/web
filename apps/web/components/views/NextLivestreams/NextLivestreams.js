@@ -8,7 +8,6 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import MobileFeed from "./MobileFeed"
 
 const NextLivestreams = ({
-   livestreamId,
    livestreams,
    currentGroup,
    selectedOptions,
@@ -90,7 +89,6 @@ const NextLivestreams = ({
          livestreams={livestreams}
          listenToUpcoming={listenToUpcoming}
          careerCenterId={careerCenterId}
-         livestreamId={livestreamId}
          alreadyJoined={groupData.alreadyJoined}
          handleToggleActive={handleToggleActive}
          userData={userData}
@@ -101,7 +99,6 @@ const NextLivestreams = ({
          handleToggleActive={handleToggleActive}
          hasCategories={hasCategories()}
          listenToUpcoming={listenToUpcoming}
-         livestreamId={livestreamId}
          selectedOptions={selectedOptions}
          careerCenterId={careerCenterId}
          livestreams={livestreams}

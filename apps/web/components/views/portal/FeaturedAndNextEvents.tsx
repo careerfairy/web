@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import { LiveStreamEvent } from "types/event"
 import EventPreviewCard from "../common/stream-cards/EventPreviewCard"
 import Stack from "@mui/material/Stack"
@@ -76,8 +76,13 @@ const FeaturedAndNextEvents = () => {
       query: { groupId },
       asPath,
    } = useRouter()
+
+   const featuredEventQuery = useMemo(() => {
+      return livestreamRepo.featuredEventQuery()
+   }, [])
+
    const { items: featuredEvents, isLoading } = usePagination<LiveStreamEvent>(
-      livestreamRepo.featuredEventQuery(),
+      featuredEventQuery,
       {
          limit: 1,
       }
@@ -88,13 +93,15 @@ const FeaturedAndNextEvents = () => {
    const handleShareEventDialogClose = useCallback(() => {
       setShareEventDialog(null)
    }, [setShareEventDialog])
+
+   const registeredEventsQuery = useMemo(() => {
+      return livestreamRepo.registeredEventsQuery(authenticatedUser.email)
+   }, [authenticatedUser?.email])
+
    const { items: nextEvents, isLoading: loadingNextEvents } =
-      usePagination<LiveStreamEvent>(
-         livestreamRepo.registeredEventsQuery(authenticatedUser.email),
-         {
-            limit: 3,
-         }
-      )
+      usePagination<LiveStreamEvent>(registeredEventsQuery, {
+         limit: 3,
+      })
 
    const noEvents = Boolean(!isLoading && (isLoggedOut || !nextEvents.length))
 
@@ -161,7 +168,7 @@ const FeaturedAndNextEvents = () => {
          )}
          {shareEventDialog ? (
             /*
-            // @ts-ignore */
+                    // @ts-ignore */
             <ShareLivestreamModal
                livestreamData={shareEventDialog}
                handleClose={handleShareEventDialogClose}

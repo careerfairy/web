@@ -50,9 +50,11 @@ const HighlightVideoDialog = ({
    }
 
    useEffect(() => {
-     if(state.duration) {
-           controls.play().catch(e => console.log("-> e in play highlight vid", e))
-       }
+      if (state.duration) {
+         controls
+            .play()
+            .catch((e) => console.log("-> e in play highlight vid", e))
+      }
    }, [Boolean(state.duration)])
 
    return (
