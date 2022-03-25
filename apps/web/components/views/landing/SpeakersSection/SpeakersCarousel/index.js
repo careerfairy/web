@@ -1,0 +1,129 @@
+import React, { useState } from "react"
+import { alpha } from "@mui/material/styles"
+import "slick-carousel/slick/slick.css"
+import "slick-carousel/slick/slick-theme.css"
+import Slider from "react-slick"
+import NextIcon from "@mui/icons-material/NavigateNextRounded"
+import PrevIcon from "@mui/icons-material/NavigateBeforeRounded"
+import { Box, Fab } from "@mui/material"
+import SpeakerCard from "./SpeakerCard"
+
+const styles = {
+   arrow: (theme) => ({
+      [theme.breakpoints.down("lg")]: {
+         display: "none !important",
+      },
+      zIndex: 1,
+      "&:before": {
+         display: "none !important",
+      },
+      "& button": {
+         boxShadow: "none",
+         color: theme.palette.primary.main,
+         background: "transparent",
+         border: `2px solid ${theme.palette.primary.main}`,
+         "&:hover": {
+            background: alpha(theme.palette.primary.main, 0.3),
+         },
+      },
+   }),
+}
+
+function SampleNextArrow(props) {
+   const { className, onClick } = props
+   return (
+      <Box sx={styles.arrow} className={className}>
+         <Fab
+            size="small"
+            onClick={onClick}
+            color="primary"
+            aria-label="next-testimonial"
+         >
+            <NextIcon />
+         </Fab>
+      </Box>
+   )
+}
+
+function SamplePrevArrow(props) {
+   const { className, onClick } = props
+   return (
+      <Box sx={styles.arrow} className={className}>
+         <Fab
+            size="small"
+            onClick={onClick}
+            color="primary"
+            aria-label="previous-testimonial"
+         >
+            <PrevIcon />
+         </Fab>
+      </Box>
+   )
+}
+
+const SpeakersCarousel = ({ speakers }) => {
+   const [settings] = useState({
+      infinite: true,
+      speed: 500,
+      lazyLoad: true,
+      nextArrow: <SampleNextArrow />,
+      prevArrow: <SamplePrevArrow />,
+      autoplay: true,
+      autoplaySpeed: 10000,
+      dots: true,
+      pauseOnHover: true,
+      appendDots: (dots) => (
+         <div
+            style={{
+               borderRadius: "10px",
+               padding: "10px",
+               position: "static",
+            }}
+         >
+            <ul style={{ margin: "0px" }}> {dots} </ul>
+         </div>
+      ),
+      slidesToShow: 3,
+      slidesToScroll: 3,
+      initialSlide: 0,
+      responsive: [
+         {
+            breakpoint: 1400,
+            settings: {
+               slidesToShow: 3,
+               slidesToScroll: 3,
+               infinite: true,
+            },
+         },
+         {
+            breakpoint: 1024,
+            settings: {
+               slidesToShow: 2,
+               slidesToScroll: 2,
+               dots: false,
+               infinite: true,
+            },
+         },
+         {
+            breakpoint: 600,
+            settings: {
+               slidesToShow: 1,
+               dots: false,
+               slidesToScroll: 1,
+            },
+         },
+      ],
+   })
+
+   return (
+      <div>
+         <Slider {...settings}>
+            {speakers?.map((speaker) => (
+               <SpeakerCard key={speaker.avatarUrl} {...speaker} />
+            ))}
+         </Slider>
+      </div>
+   )
+}
+
+export default SpeakersCarousel
