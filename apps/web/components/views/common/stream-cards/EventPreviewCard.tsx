@@ -17,7 +17,7 @@ import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import Avatar from "@mui/material/Avatar"
 import { useRouter } from "next/router"
 import Link from "components/views/common/Link"
-import { chekIfPast, getRelevantHosts } from "util/streamUtil"
+import { checkIfPast, getRelevantHosts } from "util/streamUtil"
 import { useAuth } from "HOCs/AuthProvider"
 import LiveIcon from "@mui/icons-material/RadioButtonChecked"
 import Skeleton from "@mui/material/Skeleton"
@@ -205,7 +205,7 @@ const EventPreviewCard = ({
    const firebase = useFirebaseService()
    const { authenticatedUser } = useAuth()
    const [hosts, setHosts] = useState(undefined)
-   const [isPast, setIsPast] = useState(chekIfPast(getStartDate()))
+   const [isPast, setIsPast] = useState(checkIfPast(event))
 
    const {
       query: { groupId },
@@ -247,7 +247,7 @@ const EventPreviewCard = ({
 
    useEffect(() => {
       if (!loading) {
-         setIsPast(chekIfPast(getStartDate()))
+         setIsPast(checkIfPast(event))
       }
    }, [event?.start, loading])
 
@@ -490,7 +490,7 @@ const EventPreviewCard = ({
                                  sx={styles.btn}
                                  component={Link}
                                  /*
-                                 // @ts-ignore */
+                                            // @ts-ignore */
                                  href={{
                                     pathname: `/upcoming-livestream/${event?.id}`,
                                     hash: isPast && "#about",
@@ -534,4 +534,5 @@ interface EventPreviewCardProps {
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
 }
+
 export default EventPreviewCard
