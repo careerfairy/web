@@ -1,0 +1,15 @@
+{
+   "compilerOptions": {
+      "noImplicitReturns": true,
+      "noUnusedLocals": true,
+      "outDir": "dist",
+      "sourceMap": true,
+      "strict": false,
+      "target": "es5",
+      "lib": ["es6", "esnext"],
+      "allowJs": false,
+      "declaration": true
+   },
+   "compileOnSave": true,
+   "include": ["src"]
+}

@@ -1,0 +1,100 @@
+import React, { useEffect, useMemo, useState } from "react"
+import EventsPreview, { EventsTypes } from "./EventsPreview"
+import livestreamRepo, {
+   LivestreamsDataParser,
+} from "../../../../data/firebase/LivestreamRepository"
+import { LiveStreamEvent } from "../../../../types/event"
+import { usePagination } from "use-pagination-firestore"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import EventsPreviewGrid from "./EventsPreviewGrid"
+import { useRouter } from "next/router"
+import { parseStreamDates } from "../../../../util/serverUtil"
+import { useMountedState } from "react-use"
+
+const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
+   const { isLoggedOut } = useAuth()
+   const {
+      query: { livestreamId },
+   } = useRouter()
+   const mounted = useMountedState()
+
+   const [localEvents, setLocalEvents] = useState(
+      serverSideEvents?.map((event) => parseStreamDates(event)) || []
+   )
+   const [eventFromQuery, setEventFromQuery] = useState(null)
+
+   const query = useMemo(() => {
+      return livestreamRepo.upcomingEventsQuery()
+   }, [])
+
+   const { items: events, isLoading } = usePagination<LiveStreamEvent>(query, {
+      limit: isLoggedOut ? 80 : limit,
+   })
+
+   useEffect(() => {
+      if (livestreamId) {
+         const unsubscribe = livestreamRepo.listenToSingleEvent(
+            livestreamId as string,
+            (docSnap) => {
+               setEventFromQuery(
+                  docSnap.exists ? { id: docSnap.id, ...docSnap.data() } : null
+               )
+            }
+         )
+
+         return () => unsubscribe()
+      }
+   }, [livestreamId])
+
+   useEffect(() => {
+      const newLocalEvents =
+         localEvents.length && !events.length
+            ? [...localEvents]
+            : new LivestreamsDataParser(events).removeEndedEvents().get()
+
+      const newEventFromQuery = newLocalEvents.find(
+         (event) => event.id === eventFromQuery?.id
+      )
+      if (newEventFromQuery) {
+         newLocalEvents.filter((event) => event.id === newEventFromQuery.id)
+      }
+      if (eventFromQuery) {
+         newLocalEvents.unshift(eventFromQuery)
+      }
+      setLocalEvents(newLocalEvents)
+   }, [eventFromQuery, events])
+
+   if (isLoggedOut || !mounted) {
+      return (
+         <EventsPreviewGrid
+            id={"upcoming-events"}
+            title={"COMING UP NEXT"}
+            type={EventsTypes.comingUp}
+            seeMoreLink={"/next-livestreams"}
+            loading={isLoading}
+            events={localEvents}
+         />
+      )
+   }
+
+   // Only render carousel component on client side, it starts to bug out when SSR is being used
+   return (
+      <EventsPreview
+         id={"upcoming-events"}
+         limit={limit}
+         title={"COMING UP NEXT"}
+         type={EventsTypes.comingUp}
+         events={localEvents}
+         seeMoreLink={"/next-livestreams"}
+         // No need to show loading as these events have already been queried server side
+         loading={false}
+      />
+   )
+}
+
+interface Props {
+   limit?: number
+   serverSideEvents?: LiveStreamEvent[]
+}
+
+export default ComingUpNextEvents
