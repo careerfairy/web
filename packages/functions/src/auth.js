@@ -214,42 +214,41 @@ exports.validateUserEmailWithPin = functions
             .collection("userData")
             .doc(recipient_email)
             .get()
-         if (!querySnapshot.isEmpty) {
+         if (querySnapshot.exists) {
             let user = querySnapshot.data()
             functions.logger.log(`Acquired user data for ${recipient_email}`)
             if (user.validationPin === pinCode) {
                functions.logger.log(
                   `Provided Pin code for ${recipient_email} is correct`
                )
-               admin
+               const userRecord = await admin
                   .auth()
                   .getUserByEmail(recipient_email)
-                  .then((userRecord) => {
-                     admin
-                        .auth()
-                        .updateUser(userRecord.uid, {
-                           emailVerified: true,
-                        })
-                        .then((userRecord) => {
-                           functions.logger.log(
-                              `Auth user ${recipient_email} has been validated`
-                           )
-                           return
-                           //res.sendStatus(200);
-                        })
+
+               const updatedUserRecord = await admin
+                  .auth()
+                  .updateUser(userRecord.uid, {
+                     emailVerified: true,
                   })
+
+               functions.logger.log(
+                  `Auth user ${recipient_email} has been validated`
+               )
+
+               functions.logger.log(`Updated User Record`, updatedUserRecord)
+
+               return updatedUserRecord
             } else {
                functions.logger.warn(
                   `User ${recipient_email} has failed to provide the correct Pin code, provided ${pinCode} instead of ${user.validationPin}`
                )
-               throw new functions.https.HttpsError("permission-denied")
             }
          }
       } catch (error) {
          functions.logger.warn(
-            `An error has occured fetching userData for ${recipient_email}`
+            `An error has occurred fetching userData for ${recipient_email}`
          )
-         throw new functions.https.HttpsError("unknown")
+         throw new functions.https.HttpsError("unknown", "")
       }
    })
 

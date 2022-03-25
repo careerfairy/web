@@ -1,5 +1,8 @@
 import React, { Fragment, useState, useEffect } from "react"
-import { withFirebase } from "../context/firebase/FirebaseServiceContext"
+import {
+   useFirebaseService,
+   withFirebase,
+} from "../context/firebase/FirebaseServiceContext"
 
 import MicIcon from "@mui/icons-material/Mic"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
@@ -18,16 +21,17 @@ import { Button, Card, Container, TextField, Typography } from "@mui/material"
 function ResetPasswordPage(props) {
    const { authenticatedUser: user } = useAuth()
    const router = useRouter()
+   const firebase = useFirebaseService()
 
    useEffect(() => {
       if (user.isLoaded && !user.isEmpty) {
-         if (!user.emailVerified) {
+         if (!firebase.auth?.currentUser?.emailVerified) {
             router.replace("/signup")
          } else {
             router.replace("/profile")
          }
       }
-   }, [user])
+   }, [user, firebase.auth?.currentUser?.emailVerified])
 
    return (
       <div className="tealBackground">
