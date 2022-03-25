@@ -56,10 +56,6 @@ const SignUp = () => {
       }
    }, [steps, absolutePath])
 
-   console.log(
-      "-> firebase.auth?.currentUser?.emailVerified",
-      firebase.auth?.currentUser?.emailVerified
-   )
    useEffect(() => {
       if (!user.isLoaded || user.isEmpty) return
 
