@@ -51,9 +51,11 @@ const useRegistrationModal = (
                   authenticatedUser
                );
             } else {
+               const emailVerified = firebase.auth?.currentUser?.emailVerified;
                if (
                   (authenticatedUser.isLoaded && authenticatedUser.isEmpty) ||
-                  !authenticatedUser.emailVerified
+                  // TODO Must re-enable this after fixing the cloud function validateUserEmailWithPin promise bug
+                  !emailVerified
                ) {
                   return push({
                      pathname: `/login`,
@@ -73,7 +75,13 @@ const useRegistrationModal = (
             dispatch(actions.sendGeneralError(e));
          }
       },
-      [authenticatedUser, groupId, asPath, useCurrentPath]
+      [
+         authenticatedUser,
+         groupId,
+         asPath,
+         useCurrentPath,
+         firebase?.auth?.currentUser?.emailVerified,
+      ]
    );
 
    return { handleClickRegister, joinGroupModalData, handleCloseJoinModal };
