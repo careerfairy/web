@@ -8,48 +8,19 @@ import RegistrationModal from "components/views/common/registration-modal"
 import { useRouter } from "next/router"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import { alpha, useTheme } from "@mui/material/styles"
-import Slider from "react-slick"
 import Stack from "@mui/material/Stack"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import Heading from "../common/Heading"
 import { useInterests } from "../../../custom-hook/useCollection"
 import EmptyMessageOverlay from "./EmptyMessageOverlay"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
-
-const arrowFontSize = 30
+import CustomButtonCarousel from "../../common/carousels/CustomButtonCarousel"
 
 const styles = {
-   carouselButtonDisabled: {
-      width: 0,
-   },
-   buttonLeft: {
-      left: 0,
-   },
-   buttonRight: {
-      right: 0,
-   },
    carousel: {
-      "& .slick-track": {
-         ml: 0,
-         mr: 0,
-      },
-      "& .slick-next": {
-         right: "10px",
-         "&:before": {
-            opacity: 1,
-            fontSize: arrowFontSize,
-            textShadow: (theme) => theme.darkTextShadow,
-         },
-      },
-      "& .slick-prev": {
-         left: "10px",
-         zIndex: 1,
-         "&:before": {
-            opacity: 1,
-            fontSize: arrowFontSize,
-            textShadow: (theme) => theme.darkTextShadow,
+      "& .slick-slide": {
+         "& > *": {
+            display: "flex",
          },
       },
    },
@@ -57,6 +28,7 @@ const styles = {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
+      px: 2,
    },
    seeMoreText: {
       color: "text.secondary",
@@ -65,19 +37,6 @@ const styles = {
    },
    previewContent: {
       position: "relative",
-   },
-   emptyContentOverlay: {
-      position: "absolute",
-      inset: 0,
-      display: "grid",
-      placeItems: "center",
-      backgroundColor: (theme) => alpha(theme.palette.common.white, 0.2),
-      backdropFilter: "blur(2px)",
-      p: 3,
-      zIndex: 1,
-   },
-   noEventsWrapper: {
-      p: 2,
    },
 } as const
 
@@ -113,8 +72,16 @@ const EventsPreview = ({
    const numSlides: number = useMemo(() => {
       return isLarge ? 3 : isMedium ? 2 : 1
    }, [isSmall, isMedium, isLarge])
+   const numLoadingSlides = numSlides + 2
+   const numElements = numSlides
+   const numChildrenElements = loading ? numLoadingSlides : events?.length
 
    const [cardsLoaded, setCardsLoaded] = useState({})
+   const shouldCenter = Boolean(
+      numChildrenElements > 1 &&
+         numChildrenElements > numElements &&
+         numElements > 1
+   )
 
    const handleCardsLoaded = (cardsIndexLoaded: number[]) => {
       setCardsLoaded((prev) => ({
@@ -161,32 +128,35 @@ const EventsPreview = ({
                         }
                      />
                   )}
-                  <Box
-                     sx={styles.carousel}
-                     component={Slider}
-                     autoplay={false}
-                     lazyLoad
-                     key={events?.length}
-                     infinite={false}
-                     onLazyLoad={handleCardsLoaded}
-                     arrows
-                     slidesToShow={numSlides}
-                     slidesToScroll={numSlides}
-                     initialSlide={0}
+                  <CustomButtonCarousel
+                     numChildren={numChildrenElements}
+                     numSlides={numElements}
+                     shouldCenter={shouldCenter}
+                     carouselProps={{
+                        onLazyLoad: handleCardsLoaded,
+                        initialSlide: 0,
+                        lazyLoad: true,
+                        centerMode: shouldCenter,
+                        infinite: shouldCenter,
+                     }}
+                     carouselStyles={styles.carousel}
                   >
                      {loading
-                        ? [...Array(numSlides)].map((_, i) => (
-                             <Box key={i} sx={{ pr: { xs: 0, sm: 2 } }}>
+                        ? [...Array(numLoadingSlides)].map((_, i) => (
+                             <Box key={i} sx={{ px: { xs: 1, sm: 1 } }}>
                                 <EventPreviewCard
                                    animation={isEmpty ? false : undefined}
                                    loading
                                 />
                              </Box>
                           ))
-                        : events.map((event, index) => (
-                             <Box key={event.id} sx={{ pr: { xs: 0, sm: 2 } }}>
+                        : events.map((event, index, arr) => (
+                             <Box key={event.id} sx={{ px: { xs: 1, sm: 1 } }}>
                                 <EventPreviewCard
-                                   loading={!cardsLoaded[index]}
+                                   loading={
+                                      !cardsLoaded[index] &&
+                                      !cardsLoaded[arr.length - (index + 1)]
+                                   }
                                    interests={existingInterests}
                                    autoRegister
                                    openShareDialog={setShareEventDialog}
@@ -196,7 +166,7 @@ const EventsPreview = ({
                                 />
                              </Box>
                           ))}
-                  </Box>
+                  </CustomButtonCarousel>
                </Stack>
             </Box>
          )}
