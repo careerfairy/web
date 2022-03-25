@@ -22,7 +22,7 @@ export const MISSING_DATA_DISMISS_PERIOD_MS = 3600 * 24 * 7 // 1 week
 const MissingDataButton = ({
    switchInterval = 15000, // 15s delay until a more intrusive button
 }: Props) => {
-   const { authenticatedUser: user, userData } = useAuth()
+   const { authenticatedUser: user, userData, isLoggedOut } = useAuth()
    const pulseClasses = usePulseStyles()
    const buttonRef = useRef(null)
    const [missingFields, setMissingFields] = useState([])
@@ -99,7 +99,7 @@ const MissingDataButton = ({
       setModalOpen(false)
    }, [])
 
-   if (hidden) return null
+   if (hidden || isLoggedOut) return null
 
    return (
       <Box>

@@ -1,10 +1,13 @@
-import React, { Fragment, useState, useEffect, useContext } from "react"
+import React, { Fragment, useState, useEffect } from "react"
 import { useRouter } from "next/router"
 import Link from "next/link"
 import { Formik } from "formik"
 import axios from "axios"
 import Head from "next/head"
-import { withFirebase } from "context/firebase/FirebaseServiceContext"
+import {
+   useFirebaseService,
+   withFirebase,
+} from "context/firebase/FirebaseServiceContext"
 import { TealBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import {
    Box,
@@ -67,8 +70,10 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-function LogInPage({ firebase }) {
+function LogInPage() {
    const { authenticatedUser, userData } = useAuth()
+   const firebase = useFirebaseService()
+
    const [userEmailNotValidated, setUserEmailNotValidated] = useState(false)
    const [generalLoading, setGeneralLoading] = useState(false)
    const {
@@ -82,7 +87,7 @@ function LogInPage({ firebase }) {
          !authenticatedUser.isEmpty &&
          userData !== undefined
       ) {
-         if (!authenticatedUser.emailVerified) {
+         if (!firebase.auth?.currentUser?.emailVerified) {
             replace(
                absolutePath
                   ? {
@@ -95,7 +100,12 @@ function LogInPage({ firebase }) {
             replace(absolutePath || "/portal")
          }
       }
-   }, [authenticatedUser, absolutePath, userData])
+   }, [
+      authenticatedUser,
+      absolutePath,
+      userData,
+      firebase.auth?.currentUser?.emailVerified,
+   ])
 
    useEffect(() => {
       if (userEmailNotValidated) {
