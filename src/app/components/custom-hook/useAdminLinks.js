@@ -6,6 +6,7 @@ import {
    Search as FindIcon,
 } from "react-feather";
 import { useAuth } from "../../HOCs/AuthProvider";
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext";
 
 const initialHeaderLinks = [
    {
@@ -33,7 +34,8 @@ const initialDrawerBottomLinks = [
    },
 ];
 const useAdminLinks = () => {
-   const { authenticatedUser, userData } = useAuth();
+   const { userData } = useAuth();
+   const firebase = useFirebaseService();
 
    const [headerLinks, setHeaderLinks] = useState(initialHeaderLinks);
    const [drawerBottomLinks, setDrawerBottomLinks] = useState(
@@ -42,7 +44,7 @@ const useAdminLinks = () => {
    const [drawerTopLinks, setDrawerTopLinks] = useState([]);
 
    useEffect(() => {
-      if (authenticatedUser?.emailVerified) {
+      if (firebase.auth?.currentUser?.emailVerified) {
          setHeaderLinks([
             ...initialHeaderLinks,
             {
@@ -62,7 +64,7 @@ const useAdminLinks = () => {
             },
          ]);
       }
-   }, [authenticatedUser?.emailVerified]);
+   }, [firebase.auth?.currentUser?.emailVerified]);
 
    useEffect(() => {
       if (userData?.isAdmin) {

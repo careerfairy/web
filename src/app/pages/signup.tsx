@@ -20,6 +20,7 @@ import MultiStepWrapper, {
 } from "../components/views/signup/MultiStepWrapper";
 import PersonaliseSteps from "../components/views/signup/PersonaliseSteps";
 import { MainLogo } from "./../components/logos";
+import { useFirebaseService } from "../context/firebase/FirebaseServiceContext";
 
 export const SIGNUP_REDIRECT_PATH = "/portal";
 
@@ -40,6 +41,8 @@ const initialStates: MultiStepComponentType[] = [
 
 const SignUp = () => {
    const { authenticatedUser: user } = useAuth();
+   const firebase = useFirebaseService();
+
    const [currentStep, setCurrentStep] = useState(0);
    const [steps, setSteps] = useState(initialStates);
    const {
@@ -53,13 +56,17 @@ const SignUp = () => {
       }
    }, [steps, absolutePath]);
 
+   console.log(
+      "-> firebase.auth?.currentUser?.emailVerified",
+      firebase.auth?.currentUser?.emailVerified
+   );
    useEffect(() => {
       if (!user.isLoaded || user.isEmpty) return;
 
-      if (!user.emailVerified) {
+      if (!firebase.auth?.currentUser?.emailVerified) {
          return setCurrentStep(1);
       }
-   }, [user]);
+   }, [user, firebase.auth?.currentUser?.emailVerified]);
 
    return (
       <SignUpPageLayout>
