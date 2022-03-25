@@ -1,10 +1,9 @@
 import firebase from "firebase/app"
 import firebaseApp from "./FirebaseInstance"
-import { QuerySnapshot } from "@firebase/firestore-types"
 import { HighLight } from "types/Highlight"
+import { getDocumentData } from "../../util/FirebaseUtils"
 
 export interface IHighlightRepository {
-   getDocumentData(documentSnapshot: QuerySnapshot): HighLight[] | null
    getHighlights(limit?: number): Promise<HighLight[]>
    shouldShowHighlightsCarousel(): Promise<Boolean>
 }
@@ -19,7 +18,7 @@ class FirebaseHighlightRepository implements IHighlightRepository {
          ref = ref.limit(limit)
       }
       const snapshots = await ref.get()
-      return this.getDocumentData(snapshots)
+      return getDocumentData(snapshots)
    }
    async shouldShowHighlightsCarousel(): Promise<Boolean> {
       const snap = await this.firestore
@@ -27,17 +26,6 @@ class FirebaseHighlightRepository implements IHighlightRepository {
          .doc("eventsPortal")
          .get()
       return Boolean(snap?.data?.()?.showHighlights)
-   }
-   // @ts-ignore
-   getDocumentData(documentSnapshot: QuerySnapshot): HighLight[] | null {
-      let docs = null
-      if (!documentSnapshot.empty) {
-         docs = documentSnapshot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-         }))
-      }
-      return docs
    }
 }
 
