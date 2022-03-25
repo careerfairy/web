@@ -43,8 +43,14 @@ exports.userUpdateFields = (userDataId, fields) => {
    return docRef.update(fields)
 }
 
-const userIncrementField = (userDataId, field, amount) => {
+exports.userIncrementField = (userDataId, field, amount) => {
    return exports.userUpdateFields(userDataId, {
       [field]: admin.firestore.FieldValue.increment(amount),
+   })
+}
+
+exports.userAddEntryToArrayField = (userDataId, field, entry) => {
+   return exports.userUpdateFields(userDataId, {
+      [field]: admin.firestore.FieldValue.arrayUnion(entry),
    })
 }

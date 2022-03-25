@@ -16,7 +16,6 @@ const DesktopFeed = ({
    mobile,
    livestreams,
    searching,
-   livestreamId,
    careerCenterId,
    listenToUpcoming,
    selectedOptions,
@@ -43,7 +42,6 @@ const DesktopFeed = ({
                <GroupStreams
                   mobile={false}
                   isPastLivestreams={isPastLivestreams}
-                  livestreamId={livestreamId}
                   listenToUpcoming={listenToUpcoming}
                   careerCenterId={careerCenterId}
                   selectedOptions={selectedOptions}

@@ -28,7 +28,6 @@ const MobileFeed = ({
    livestreams,
    searching,
    scrollToTop,
-   livestreamId,
    careerCenterId,
    listenToUpcoming,
    selectedOptions,
@@ -100,7 +99,6 @@ const MobileFeed = ({
             )}
          <GroupStreams
             mobile={true}
-            livestreamId={livestreamId}
             listenToUpcoming={listenToUpcoming}
             careerCenterId={careerCenterId}
             isPastLivestreams={isPastLivestreams}

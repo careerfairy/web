@@ -2,8 +2,6 @@ import React from "react"
 import PropTypes from "prop-types"
 import { Box, Hidden, IconButton } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
-import Link from "materialUI/NextNavLink"
 import { MainLogo } from "components/logos"
 import { useTheme } from "@mui/material/styles"
 import useGeneralLinks from "components/custom-hook/useGeneralLinks"
@@ -14,6 +12,7 @@ import LoginButton from "../../../components/views/common/LoginButton"
 import GeneralHeader from "../../../components/views/header/GeneralHeader"
 import NavLinks from "../../../components/views/header/NavLinks"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
+import UserProfileButton from "../../../components/views/common/topbar/UserProfileButton"
 
 const TopBar = () => {
    const theme = useTheme()
@@ -21,7 +20,7 @@ const TopBar = () => {
    const { landingLinks } = useGeneralLinks()
    const dispatch = useDispatch()
    const handleDrawerOpen = () => dispatch(actions.openNavDrawer())
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, userData } = useAuth()
 
    return (
       <GeneralHeader permanent transparent>
@@ -62,15 +61,7 @@ const TopBar = () => {
                      <LoginButton />
                   </div>
                ) : (
-                  <IconButton
-                     id="profile_icon"
-                     component={Link}
-                     color="primary"
-                     href="/profile"
-                     size="large"
-                  >
-                     <AccountCircleOutlinedIcon />
-                  </IconButton>
+                  <UserProfileButton userBadges={userData?.badges} />
                )}
             </Hidden>
          </Box>

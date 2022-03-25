@@ -20,7 +20,6 @@ const styles = {
 
 export function StreamsSection({
    currentGroup,
-   livestreamId,
    pastLivestreams,
    selectedOptions,
    setSelectedOptions,
@@ -36,7 +35,6 @@ export function StreamsSection({
          <SwipeablePanel value={value} index={"upcomingEvents"}>
             {isLoaded(upcomingLivestreams) ? (
                <NextLivestreams
-                  livestreamId={livestreamId}
                   setSelectedOptions={setSelectedOptions}
                   selectedOptions={selectedOptions}
                   listenToUpcoming={listenToUpcoming}
@@ -52,7 +50,6 @@ export function StreamsSection({
          <SwipeablePanel value={value} index={"pastEvents"}>
             {isLoaded(pastLivestreams) ? (
                <NextLivestreams
-                  livestreamId={livestreamId}
                   setSelectedOptions={setSelectedOptions}
                   selectedOptions={selectedOptions}
                   listenToUpcoming={listenToUpcoming}
@@ -74,7 +71,6 @@ StreamsSection.propTypes = {
    value: PropTypes.string.isRequired,
    dir: PropTypes.any,
    upcomingLivestreams: PropTypes.arrayOf(PropTypes.any),
-   livestreamId: PropTypes.any,
    setSelectedOptions: PropTypes.func,
    selectedOptions: PropTypes.arrayOf(PropTypes.any),
    currentGroup: PropTypes.any,

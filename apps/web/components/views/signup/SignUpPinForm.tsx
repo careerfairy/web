@@ -64,33 +64,27 @@ const SignUpPinForm = () => {
       }, 500)
    }
 
-   const handleSubmit = (values, { setSubmitting }) => {
+   const handleSubmit = async (values, { setSubmitting }) => {
       setIncorrectPin(false)
       const userInfo = {
          recipientEmail: user.email,
          pinCode: parseInt(values.pinCode),
       }
-      firebase
-         .validateUserEmailWithPin(userInfo)
-         .then(() => {
-            // TODO: improve these timeouts
-            setTimeout(() => {
-               firebase.auth.currentUser.reload().then(() => {
-                  if (absolutePath) {
-                     void push(absolutePath as any)
-                  } else {
-                     updateActiveStep()
-                  }
-               })
-            }, 200)
-         })
-         .catch((error) => {
-            console.log("error", error)
-            setIncorrectPin(true)
-            setGeneralLoading(false)
-            setSubmitting(false)
-            return
-         })
+      try {
+         await firebase.validateUserEmailWithPin(userInfo)
+         await firebase.auth.currentUser.reload()
+         if (absolutePath) {
+            void (await push(absolutePath as any))
+         } else {
+            updateActiveStep()
+         }
+      } catch (error) {
+         console.log("error", error)
+         setIncorrectPin(true)
+         setGeneralLoading(false)
+         setSubmitting(false)
+      }
+      return
    }
 
    return (

@@ -50,12 +50,13 @@ export const mapDevices = (deviceInfos: MediaDeviceInfo[]) => {
    }
 }
 
-export const chekIfPast = (eventStartDate: Date) => {
+export const checkIfPast = (event: LiveStreamEvent) => {
    return (
-      eventStartDate <
-      new Date(
-         Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
-      )
+      event?.hasEnded ||
+      event?.start?.toDate?.() <
+         new Date(
+            Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
+         )
    )
 }
 

@@ -1,66 +1,25 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useMemo, useState } from "react"
 import HighlightItem from "./HighlightItem"
 import HighlightVideoDialog from "./HighlightVideoDialog"
-import { useWindowSize } from "react-use"
-import { dummyHighlights } from "./dummyData"
-import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
-import { Box } from "@mui/material"
+import Box from "@mui/material/Box"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
-import Slider from "react-slick"
-const arrowFontSize = 30
+import { HighLight } from "../../../types/Highlight"
+import CustomButtonCarousel from "../common/carousels/CustomButtonCarousel"
+
 const styles = {
-   carousel: {
-      pt: 4,
-      "& .slick-track": {
-         ml: 0,
-         mr: 0,
-      },
-      "& .slick-next": {
-         right: "10px",
-         "&:before": {
-            opacity: 1,
-            fontSize: arrowFontSize,
-            textShadow: (theme) => theme.darkTextShadow,
-         },
-      },
-      "& .slick-prev": {
-         left: "10px",
-         zIndex: 1,
-         "&:before": {
-            opacity: 1,
-            fontSize: arrowFontSize,
-            textShadow: (theme) => theme.darkTextShadow,
-         },
-      },
-   },
    root: {
-      "& .slick-next": {
-         right: "10px",
-         "&:before": {
-            opacity: 1,
-            fontSize: arrowFontSize,
-            textShadow: (theme) => theme.darkTextShadow,
-         },
-      },
-      "& .slick-prev": {
-         left: "10px",
-         zIndex: 1,
-         "&:before": {
-            opacity: 1,
-            fontSize: arrowFontSize,
-            textShadow: (theme) => theme.darkTextShadow,
-         },
-      },
+      pt: { xs: 1, md: 4 },
    },
 }
-const HighlightsCarousel = () => {
+const HighlightsCarousel = ({
+   serverSideHighlights,
+   showHighlights,
+}: Props) => {
    const {
       breakpoints: { up },
    } = useTheme()
-
+   const [highlights] = useState<HighLight[]>(serverSideHighlights)
    const isExtraSmall = useMediaQuery(up("xs"))
    const isSmall = useMediaQuery(up("sm"))
    const isMedium = useMediaQuery(up("md"))
@@ -70,21 +29,6 @@ const HighlightsCarousel = () => {
       return isLarge ? 5 : isMedium ? 4 : isSmall ? 3 : 1
    }, [isExtraSmall, isSmall, isMedium, isLarge])
 
-   const { shouldShowHighlightsCarousel } = useFirebaseService()
-   const [isTouchScreen, setIsTouchScreen] = useState(false)
-   const dimensions = useWindowSize()
-   const [showCarousel, setShowCarousel] = useState(false)
-   useEffect(() => {
-      ;(async function () {
-         setShowCarousel(await shouldShowHighlightsCarousel())
-      })()
-   }, [])
-
-   useEffect(() => {
-      const touch = matchMedia("(hover: none)").matches
-      setIsTouchScreen(touch)
-   }, [dimensions])
-
    const [videoUrl, setVideoUrl] = useState(null)
    const handleOpenVideoDialog = (videoUrl: string) => {
       setVideoUrl(videoUrl)
@@ -93,40 +37,41 @@ const HighlightsCarousel = () => {
    const handleCloseVideoDialog = () => {
       setVideoUrl(null)
    }
-   if (!showCarousel) {
+   if (!showHighlights || !highlights?.length) {
       return null
    }
 
    return (
-      <>
-         <Box
-            sx={styles.carousel}
-            component={Slider}
-            autoplay={false}
-            lazyLoad
-            infinite={false}
-            arrows
-            swipeToSlide
-            swipe={isTouchScreen}
-            slidesToShow={numSlides}
-            slidesToScroll={numSlides}
-            initialSlide={0}
+      <Box sx={styles.root}>
+         <CustomButtonCarousel
+            numChildren={highlights.length}
+            numSlides={numSlides}
+            carouselProps={{
+               autoPlay: true,
+            }}
          >
-            {dummyHighlights.map((highlight, index) => (
-               <Box key={index}>
+            {highlights.map((highlight) => (
+               <Box key={highlight.id}>
                   <HighlightItem
                      handleOpenVideoDialog={handleOpenVideoDialog}
                      highLight={highlight}
                   />
                </Box>
             ))}
-         </Box>
-         <HighlightVideoDialog
-            videoUrl={videoUrl}
-            handleClose={handleCloseVideoDialog}
-         />
-      </>
+         </CustomButtonCarousel>
+         {videoUrl && (
+            <HighlightVideoDialog
+               videoUrl={videoUrl}
+               handleClose={handleCloseVideoDialog}
+            />
+         )}
+      </Box>
    )
+}
+
+interface Props {
+   serverSideHighlights: HighLight[]
+   showHighlights: Boolean
 }
 
 export default HighlightsCarousel

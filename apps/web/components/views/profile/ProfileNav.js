@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
 
@@ -85,15 +85,22 @@ const ProfileNav = ({ userData }) => {
       setValue(index)
    }
 
+   const redirectToReferralsTab = useCallback(() => {
+      handleChangeIndex(1)
+   }, [])
+
    const views = [
       <TabPanel key={0} value={value} index={0} dir={theme.direction}>
-         <UserData userData={userData} />
+         <UserData
+            userData={userData}
+            redirectToReferralsTab={redirectToReferralsTab}
+         />
       </TabPanel>,
       <TabPanel key={1} value={value} index={1} dir={theme.direction}>
-         <JoinedGroups userData={userData} />
+         <ReferralProfileTab userData={userData} />
       </TabPanel>,
       <TabPanel key={2} value={value} index={2} dir={theme.direction}>
-         <ReferralProfileTab userData={userData} />
+         <JoinedGroups userData={userData} />
       </TabPanel>,
    ]
    const tabsArray = [
@@ -111,17 +118,17 @@ const ProfileNav = ({ userData }) => {
          key={1}
          wrapped
          fullWidth
-         label={
-            <Typography variant="h5">
-               {native ? "Groups" : "Joined Groups"}
-            </Typography>
-         }
+         label={<Typography variant="h5">Referrals</Typography>}
       />,
       <Tab
          key={2}
          wrapped
          fullWidth
-         label={<Typography variant="h5">Referrals</Typography>}
+         label={
+            <Typography variant="h5">
+               {native ? "Groups" : "Joined Groups"}
+            </Typography>
+         }
       />,
    ]
 
@@ -133,7 +140,7 @@ const ProfileNav = ({ userData }) => {
       )
       tabsArray.push(
          <Tab
-            key={2}
+            key={3}
             wrapped
             fullWidth
             label={

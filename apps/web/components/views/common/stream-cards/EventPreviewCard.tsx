@@ -17,7 +17,7 @@ import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import Avatar from "@mui/material/Avatar"
 import { useRouter } from "next/router"
 import Link from "components/views/common/Link"
-import { chekIfPast, getRelevantHosts } from "util/streamUtil"
+import { checkIfPast, getRelevantHosts } from "util/streamUtil"
 import { useAuth } from "HOCs/AuthProvider"
 import LiveIcon from "@mui/icons-material/RadioButtonChecked"
 import Skeleton from "@mui/material/Skeleton"
@@ -155,6 +155,7 @@ const styles = {
    },
    summary: {
       ...getMaxLineStyles(3),
+      minHeight: 50,
    },
    btn: {
       flex: 1,
@@ -199,13 +200,13 @@ const EventPreviewCard = ({
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
    const { query, push, pathname } = useRouter()
-   const getStartDate = () => event?.start?.toDate?.()
+   const getStartDate = () => event?.startDate || event?.start?.toDate?.()
    const [eventInterests, setSetEventInterests] = useState([])
    const [hasRegistered, setHasRegistered] = useState(false)
    const firebase = useFirebaseService()
    const { authenticatedUser } = useAuth()
    const [hosts, setHosts] = useState(undefined)
-   const [isPast, setIsPast] = useState(chekIfPast(getStartDate()))
+   const [isPast, setIsPast] = useState(checkIfPast(event))
 
    const {
       query: { groupId },
@@ -247,7 +248,7 @@ const EventPreviewCard = ({
 
    useEffect(() => {
       if (!loading) {
-         setIsPast(chekIfPast(getStartDate()))
+         setIsPast(checkIfPast(event))
       }
    }, [event?.start, loading])
 
@@ -289,7 +290,7 @@ const EventPreviewCard = ({
    }
 
    const onClickRegister = () => {
-      onRegisterClick(event, hosts[0]?.id, hosts, hasRegistered)
+      onRegisterClick(event, hosts?.[0]?.id, hosts, hasRegistered)
    }
 
    return (
@@ -446,6 +447,12 @@ const EventPreviewCard = ({
                                     <WhiteTagChip
                                        key={interest.id}
                                        variant="filled"
+                                       sx={{
+                                          maxWidth:
+                                             eventInterests.length > 2
+                                                ? "50%"
+                                                : "80%",
+                                       }}
                                        label={interest.name}
                                     />
                                  ))}
@@ -490,7 +497,7 @@ const EventPreviewCard = ({
                                  sx={styles.btn}
                                  component={Link}
                                  /*
-                                 // @ts-ignore */
+                                            // @ts-ignore */
                                  href={{
                                     pathname: `/upcoming-livestream/${event?.id}`,
                                     hash: isPast && "#about",
@@ -534,4 +541,5 @@ interface EventPreviewCardProps {
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
 }
+
 export default EventPreviewCard
