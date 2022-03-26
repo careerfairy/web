@@ -50,7 +50,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
       const newLocalEvents =
          localEvents.length && !events.length
             ? [...localEvents]
-            : new LivestreamsDataParser(events).removeEndedEvents().get()
+            : new LivestreamsDataParser(events).filterByNotEndedEvents().get()
 
       const newEventFromQuery = newLocalEvents.find(
          (event) => event.id === eventFromQuery?.id
