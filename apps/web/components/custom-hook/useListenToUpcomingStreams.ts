@@ -5,19 +5,34 @@ import livestreamRepo, {
 } from "../../data/firebase/LivestreamRepository"
 import { useMemo } from "react"
 
-const useListenToUpcomingStreams = () => {
-   const query = useMemo(() => {
-      return livestreamRepo.upcomingEventsQuery()
-   }, [])
+const useListenToUpcomingStreams = (
+   filterByGroupId?: string,
+   selectedCategories?: string[]
+) => {
+   const upcomingEventsQuery = useMemo(() => {
+      let query = livestreamRepo.upcomingEventsQuery()
 
-   let { data, isLoading } = useCollection<LiveStreamEvent>(query, true)
+      if (filterByGroupId) {
+         query = query.where("groupIds", "array-contains", filterByGroupId)
+      }
+
+      return query
+   }, [filterByGroupId])
+
+   let { data, isLoading } = useCollection<LiveStreamEvent>(
+      upcomingEventsQuery,
+      true
+   )
 
    if (isLoading) return undefined
 
-   return new LivestreamsDataParser(data)
-      .removeEndedEvents()
-      .complementaryFields()
-      .get()
+   let res = new LivestreamsDataParser(data).filterByNotEndedEvents()
+
+   if (filterByGroupId && selectedCategories) {
+      res = res.filterByTargetCategories(filterByGroupId, selectedCategories)
+   }
+
+   return res.complementaryFields().get()
 }
 
 export default useListenToUpcomingStreams
