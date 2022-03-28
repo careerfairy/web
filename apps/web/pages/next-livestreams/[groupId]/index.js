@@ -53,6 +53,18 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
 
    const [pastLivestreams, setPastLivestreams] = useState(undefined)
 
+   const [switchedToPastTab, setSwitchedToPastTab] = useState(false)
+   useEffect(() => {
+      if (
+         !switchedToPastTab &&
+         upcomingLivestreams &&
+         upcomingLivestreams.length === 0
+      ) {
+         setValue("pastEvents")
+         setSwitchedToPastTab(true)
+      }
+   }, [upcomingLivestreams, switchedToPastTab])
+
    useEffect(() => {
       // load past events when changing tabs
       if (value === "pastEvents") {
@@ -66,7 +78,7 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
             })
             .catch(console.error)
       }
-   }, [value, pastLivestreams, currentGroup.groupId])
+   }, [value, currentGroup.groupId])
 
    const metaInfo = useMemo(() => {
       return {
