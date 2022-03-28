@@ -30,4 +30,5 @@ export interface LiveStreamEvent extends Identifiable {
    registeredUsers?: string[]
    hasStarted?: boolean
    hasEnded?: boolean
+   targetCategories?: string[]
 }
