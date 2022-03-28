@@ -15,3 +15,5 @@ firebase-export-*/
 *.log
 
 .packages/
+
+.DS_Store
