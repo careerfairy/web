@@ -9,7 +9,7 @@ import { NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL } from "constants/routes"
 import { StreamsSection } from "components/views/NextLivestreams/StreamsSection"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import { getServerSideGroup, getServerSideStream } from "util/serverUtil"
+import { getServerSideGroup } from "util/serverUtil"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import ScrollToTop from "components/views/common/ScrollToTop"
 import { placeholderBanner } from "../../../constants/images"
@@ -24,7 +24,7 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
       },
    } = useTheme()
    const [value, setValue] = useState(initialTabValue || "upcomingEvents")
-
+   const [switchedToPastTab, setSwitchedToPastTab] = useState(false)
    const [selectedOptions, setSelectedOptions] = useState([])
 
    const currentGroup = useSelector(
@@ -36,10 +36,6 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
 
    useEffect(() => {
       dispatch(actions.closeNextLivestreamsFilter())
-
-      if (value === "pastEvents") {
-         setValue("upcomingEvents")
-      }
    }, [currentGroup.groupId])
 
    useFirestoreConnect(() => [
@@ -57,17 +53,19 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
 
    const [pastLivestreams, setPastLivestreams] = useState(undefined)
 
-   const [switchedToPastTab, setSwitchedToPastTab] = useState(false)
+   // switch to upcoming tab when switching groups
    useEffect(() => {
-      if (
-         !switchedToPastTab &&
-         upcomingLivestreams &&
-         upcomingLivestreams.length === 0
-      ) {
+      setValue("upcomingEvents")
+      setSwitchedToPastTab(false)
+   }, [currentGroup.groupId])
+
+   // switch to past tab when there are no upcoming events
+   useEffect(() => {
+      if (upcomingLivestreams?.length === 0 && !switchedToPastTab) {
          setValue("pastEvents")
          setSwitchedToPastTab(true)
       }
-   }, [upcomingLivestreams, switchedToPastTab])
+   }, [upcomingLivestreams])
 
    useEffect(() => {
       // load past events when changing tabs
