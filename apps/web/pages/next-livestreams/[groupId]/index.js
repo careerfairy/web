@@ -36,6 +36,10 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
 
    useEffect(() => {
       dispatch(actions.closeNextLivestreamsFilter())
+
+      if (value === "pastEvents") {
+         setValue("upcomingEvents")
+      }
    }, [currentGroup.groupId])
 
    useFirestoreConnect(() => [
