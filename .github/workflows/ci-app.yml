@@ -12,14 +12,6 @@ jobs:
       steps:
          - uses: actions/checkout@v2
 
-         - name: Cache playwright browsers and Firebase Runners
-           uses: actions/cache@v3
-           with:
-              path: |
-                 ~/.cache/ms-playwright
-                 ~/.cache/firebase/emulators
-              key: ${{ runner.os }}-playwright-firebase
-
          - uses: actions/setup-node@v2
            with:
               node-version: "16"
@@ -47,8 +39,8 @@ jobs:
          - name: Run Jest Unit Tests
            run: npm run test
 
-         #         - name: Install Playwright deps
-         #           run: npx playwright install
+         - name: Install Playwright deps
+           run: npx playwright install
          - name: Run Playwright End to End tests
            env:
               DEBUG: pw:webserver
