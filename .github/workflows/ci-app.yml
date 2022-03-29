@@ -23,7 +23,8 @@ jobs:
            uses: actions/cache@v3
            with:
               path: |
-                 ${{ github.workspace }}/apps/web/.next/cache
+                 ~/.npm
+                  ${{ github.workspace }}/apps/web/.next/cache
               key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('packages/shared-lib/**/*.[jt]s', 'apps/web/**/*.[jt]s?') }}
               restore-keys: |
                  ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
