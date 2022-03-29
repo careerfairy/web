@@ -2,25 +2,21 @@ import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useTheme } from "@mui/material/styles"
 import NextLivestreamsLayout from "layouts/NextLivestreamsLayout"
 import GroupBannerSection from "components/views/NextLivestreams/GroupBannerSection"
-import useListenToGroupStreams from "components/custom-hook/useGroupUpcomingStreams"
 import { useFirestoreConnect } from "react-redux-firebase"
-import { PAST_LIVESTREAMS_NAME } from "data/constants/streamContants"
+import { START_DATE_FOR_REPORTED_EVENTS } from "data/constants/streamContants"
 import HeadWithMeta from "components/page/HeadWithMeta"
 import { NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL } from "constants/routes"
 import { StreamsSection } from "components/views/NextLivestreams/StreamsSection"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import { getServerSideGroup, getServerSideStream } from "util/serverUtil"
+import { getServerSideGroup } from "util/serverUtil"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import ScrollToTop from "components/views/common/ScrollToTop"
 import { placeholderBanner } from "../../../constants/images"
+import useListenToUpcomingStreams from "../../../components/custom-hook/useListenToUpcomingStreams"
+import livestreamRepo from "../../../data/firebase/LivestreamRepository"
 
-const GroupPage = ({
-   serverSideGroup,
-   livestreamId,
-   serverSideStream,
-   initialTabValue,
-}) => {
+const GroupPage = ({ serverSideGroup, initialTabValue }) => {
    const {
       palette: {
          common: { white },
@@ -28,8 +24,9 @@ const GroupPage = ({
       },
    } = useTheme()
    const [value, setValue] = useState(initialTabValue || "upcomingEvents")
-
+   const [switchedToPastTab, setSwitchedToPastTab] = useState(false)
    const [selectedOptions, setSelectedOptions] = useState([])
+
    const currentGroup = useSelector(
       (state) =>
          state.firestore.data[`group ${serverSideGroup.groupId}`] ||
@@ -48,75 +45,51 @@ const GroupPage = ({
          storeAs: "currentGroup",
       },
    ])
-   const upcomingLivestreams = useListenToGroupStreams(
-      livestreamId,
+
+   const upcomingLivestreams = useListenToUpcomingStreams(
       currentGroup.groupId,
       selectedOptions
    )
-   const pastLivestreams = useListenToGroupStreams(
-      livestreamId,
-      currentGroup.groupId,
-      selectedOptions,
-      PAST_LIVESTREAMS_NAME
-   )
+
+   const [pastLivestreams, setPastLivestreams] = useState(undefined)
+
+   // switch to upcoming tab when switching groups
+   useEffect(() => {
+      setValue("upcomingEvents")
+      setSwitchedToPastTab(false)
+   }, [currentGroup.groupId])
+
+   // switch to past tab when there are no upcoming events
+   useEffect(() => {
+      if (upcomingLivestreams?.length === 0 && !switchedToPastTab) {
+         setValue("pastEvents")
+         setSwitchedToPastTab(true)
+      }
+   }, [upcomingLivestreams])
 
    useEffect(() => {
-      ;(function handleFindHighlightedStreamTab() {
-         if (livestreamIdIsIn(upcomingLivestreams)) {
-            setUpcomingEvents()
-         } else if (livestreamIdIsIn(pastLivestreams)) {
-            setPastEvents()
-         }
-      })()
-   }, [livestreamId, Boolean(upcomingLivestreams), Boolean(pastLivestreams)])
-
-   useEffect(() => {
-      if (initialTabValue) {
-         return
+      // load past events when changing tabs
+      if (value === "pastEvents") {
+         livestreamRepo
+            .getPastEventsFrom(
+               new Date(START_DATE_FOR_REPORTED_EVENTS),
+               currentGroup.groupId
+            )
+            .then((data) => {
+               setPastLivestreams(data)
+            })
+            .catch(console.error)
       }
-      if (!livestreamId) {
-         // Only find tab with streams if there isn't a livestreamId in query
-         ;(function handleFindTabWithStreams() {
-            if (!upcomingLivestreams?.length && pastLivestreams?.length) {
-               setPastEvents()
-            } else {
-               setUpcomingEvents()
-            }
-         })()
+   }, [value, currentGroup.groupId])
+
+   const metaInfo = useMemo(() => {
+      return {
+         description: currentGroup.description,
+         title: `CareerFairy | Next Livestreams of ${currentGroup.universityName}`,
+         image: getResizedUrl(currentGroup.logoUrl, "lg"),
+         fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}`,
       }
-   }, [
-      Boolean(upcomingLivestreams),
-      Boolean(pastLivestreams),
-      currentGroup.groupId,
-   ])
-
-   const setPastEvents = () => setValue("pastEvents")
-   const setUpcomingEvents = () => setValue("upcomingEvents")
-
-   const livestreamIdIsIn = (streams) => {
-      return Boolean(streams?.some((stream) => stream.id === livestreamId))
-   }
-
-   const metaInfo = useMemo(
-      () =>
-         serverSideStream
-            ? {
-                 title: `CareerFairy | Live Stream with ${serverSideStream.company}`,
-                 description: serverSideStream.title,
-                 image: getResizedUrl(
-                    serverSideStream.backgroundImageUrl,
-                    "lg"
-                 ),
-                 fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}?livestreamId=${serverSideStream.id}`,
-              }
-            : {
-                 description: currentGroup.description,
-                 title: `CareerFairy | Next Livestreams of ${currentGroup.universityName}`,
-                 image: getResizedUrl(currentGroup.logoUrl, "lg"),
-                 fullPath: `${PRODUCTION_BASE_URL}${NEXT_LIVESTREAMS_PATH}/${currentGroup.groupId}`,
-              },
-      [serverSideStream]
-   )
+   }, [currentGroup])
 
    const handleChange = useCallback((event, newValue) => {
       setValue(newValue)
@@ -147,7 +120,6 @@ const GroupPage = ({
                <StreamsSection
                   value={value}
                   upcomingLivestreams={upcomingLivestreams}
-                  livestreamId={livestreamId}
                   setSelectedOptions={setSelectedOptions}
                   selectedOptions={selectedOptions}
                   currentGroup={currentGroup}
@@ -162,9 +134,8 @@ const GroupPage = ({
 
 export async function getServerSideProps({
    params: { groupId },
-   query: { livestreamId, type },
+   query: { type },
 }) {
-   const serverSideStream = await getServerSideStream(livestreamId)
    const serverSideGroup = await getServerSideGroup(groupId)
 
    if (!serverSideGroup || Object.keys(serverSideGroup)?.length === 0) {
@@ -180,8 +151,6 @@ export async function getServerSideProps({
    return {
       props: {
          serverSideGroup,
-         livestreamId: livestreamId || "",
-         serverSideStream,
          initialTabValue,
       }, // will be passed to the page component as props
    }

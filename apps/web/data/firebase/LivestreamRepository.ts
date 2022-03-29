@@ -32,7 +32,11 @@ export interface ILivestreamRepository {
       callback: (snapshot: QuerySnapshot) => void
    )
 
-   getPastEventsFrom(fromDate: Date, limit?: number): Promise<LiveStreamEvent[]>
+   getPastEventsFrom(
+      fromDate: Date,
+      filterByGroupId?: string,
+      limit?: number
+   ): Promise<LiveStreamEvent[]>
 
    recommendEventsQuery(
       userInterestsIds?: string[]
@@ -90,22 +94,33 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          livestreamRef = livestreamRef.limit(limit)
       }
       const snapshots = await livestreamRef.get()
-      return this.mapLivestreamCollections(snapshots).removeEndedEvents().get()
+      return this.mapLivestreamCollections(snapshots)
+         .filterByNotEndedEvents()
+         .get()
    }
 
-   async getPastEventsFrom(fromDate: Date, limit?: number) {
+   async getPastEventsFrom(
+      fromDate: Date,
+      filterByGroupId?: string,
+      limit?: number
+   ) {
       let query = this.firestore
          .collection("livestreams")
          .where("start", ">", fromDate)
          .where("start", "<", new Date())
          .where("test", "==", false)
          .orderBy("start", "desc")
+
       if (limit) {
          query = query.limit(limit)
       }
 
+      if (filterByGroupId) {
+         query = query.where("groupIds", "array-contains", filterByGroupId)
+      }
+
       return this.mapLivestreamCollections(await query.get())
-         .removeLiveEvents()
+         .filterByEndedEvents()
          .get()
    }
 
@@ -235,15 +250,52 @@ function getEarliestEventBufferTime() {
 export class LivestreamsDataParser {
    constructor(private livestreams: LiveStreamEvent[]) {}
 
-   removeEndedEvents() {
+   filterByNotEndedEvents() {
       this.livestreams = this.livestreams?.filter((e) => !e.hasEnded)
       return this
    }
 
-   removeLiveEvents() {
-      this.livestreams = this.livestreams?.filter(
-         (e) => !(e.hasStarted && !e.hasEnded)
+   filterByEndedEvents() {
+      this.livestreams = this.livestreams?.filter((e) => {
+         if (e.hasEnded) return true
+
+         // check if event is some time in the past
+         if (e.start) {
+            const pastTime = new Date(
+               Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
+            )
+
+            return e.start.toDate() < pastTime
+         }
+
+         return true
+      })
+      return this
+   }
+
+   filterByTargetCategories(groupId: string, categories: string[]) {
+      this.livestreams = this.livestreams.reduce(
+         (accumulator, currentLivestream) => {
+            if (currentLivestream.targetCategories) {
+               const livestreamCategories =
+                  currentLivestream.targetCategories[groupId]
+               if (categories.length && livestreamCategories) {
+                  if (
+                     categories.some((v) => livestreamCategories.includes(v))
+                  ) {
+                     return accumulator.concat(currentLivestream)
+                  }
+               } else if (!categories.length) {
+                  return accumulator.concat(currentLivestream)
+               }
+            } else {
+               return accumulator.concat(currentLivestream)
+            }
+            return accumulator
+         },
+         []
       )
+
       return this
    }
 

@@ -77,11 +77,7 @@ const EventsPreview = ({
    const numChildrenElements = loading ? numLoadingSlides : events?.length
 
    const [cardsLoaded, setCardsLoaded] = useState({})
-   const shouldCenter = Boolean(
-      numChildrenElements > 1 &&
-         numChildrenElements > numElements &&
-         numElements > 1
-   )
+   const shouldCenter = false
 
    const handleCardsLoaded = (cardsIndexLoaded: number[]) => {
       setCardsLoaded((prev) => ({

@@ -57,7 +57,7 @@ function useCollection<T extends Identifiable>(
          setDocuments(list)
          setLoading(false)
       }
-   }, [realtime])
+   }, [collection, realtime])
 
    return { isLoading: isLoading, data: documents, error: error }
 }

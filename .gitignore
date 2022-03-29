@@ -1,5 +1,4 @@
 dist/
-.next/
 node_modules/
 
 emulatorData/
@@ -9,13 +8,15 @@ firebase-export-*/
 
 .turbo/
 
+.vercel/
 .idea/
-.DS_Store
+.next/
 
 *.log
 
 .packages/
-.turbo
+
 test-results/
 playwright-report/
-.vercel
+
+.DS_Store
