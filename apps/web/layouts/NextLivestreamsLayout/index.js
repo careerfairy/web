@@ -30,7 +30,7 @@ const NextLivestreamsLayout = (props) => {
             <NavBar
                drawerTopLinks={mainLinks}
                handleDrawerToggle={handleDrawerToggle}
-               drawerWidth={"300px"}
+               drawerWidth={theme.drawerWidth.medium}
                drawerBottomLinks={secondaryLinks}
                onMobileNavOpen={handleDrawerOpen}
                onMobileClose={handleDrawerClose}
