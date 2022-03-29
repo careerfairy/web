@@ -51,8 +51,8 @@ const TeamPage = () => {
             backgroundImagePosition="center center"
             backgroundImage={teamPhoto}
             backgroundImageOpacity={0.2}
-            title="About 2Us"
-            bodyText="We are a fast-growing HR-Tech startup with the mission to empower talents from all over
+            title="About Us"
+            bodyText="1We are a fast-growing HR-Tech startup with the mission to empower talents from all over
 the world to find a career path that they'll love! On our platform, employees from some of
 the world's leading companies host interactive live streams for students and young
 professionals. Companies are able to showcase their projects, office and what it's like to
