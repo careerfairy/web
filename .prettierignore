@@ -6,3 +6,7 @@ emulatorData
 functions/dist
 app/.next
 dist/
+
+# local env files
+.env.local
+.env.test.local
