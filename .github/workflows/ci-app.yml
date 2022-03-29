@@ -12,21 +12,20 @@ jobs:
       steps:
          - uses: actions/checkout@v2
 
-         - name: Cache playwright browsers and Firebase Runners
-           uses: actions/cache@v3
-           with:
-              path: |
-                 ~/.cache/ms-playwright
-                 ~/.cache/firebase/emulators
-              key: ${{ runner.os }}-playwright-firebase
+         #         - name: Cache playwright browsers and Firebase Runners
+         #           uses: actions/cache@v3
+         #           with:
+         #              path: |
+         #                 ~/.cache/ms-playwright
+         #                 ~/.cache/firebase/emulators
+         #              key: ${{ runner.os }}-playwright-firebase
 
          - uses: actions/setup-node@v2
            with:
               node-version: "16"
-              cache: "npm"
 
          - name: Install dependencies
-           run: npm install
+           run: npm ci --include=dev
 
          - name: Cache NextJS cache folder
            uses: actions/cache@v3
