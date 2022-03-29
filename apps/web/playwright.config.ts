@@ -42,6 +42,7 @@ const config: PlaywrightTestConfig = {
       screenshot: "only-on-failure",
       video: "retain-on-failure",
    },
+   globalTeardown: "./playwright.teardown",
 
    /* Configure projects for major browsers */
    projects: [
@@ -99,8 +100,17 @@ const config: PlaywrightTestConfig = {
 
    /* Run your local dev server before starting the tests */
    webServer: {
-      command: "cd ../.. && npm run start",
+      command:
+         'npx firebase emulators:exec "npm run start -w careerfairy-webapp" --only auth,firestore,functions',
+      cwd: "../../",
+      env: {
+         FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099",
+         FIRESTORE_EMULATOR_HOST: "localhost:8080",
+         NEXT_PUBLIC_FIREBASE_EMULATORS: "true",
+      },
       port: 3000,
+      // emulators need some time to boot
+      timeout: 40 * 1000,
    },
 }
 
