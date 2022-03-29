@@ -41,7 +41,7 @@ jobs:
            run: npm run test
 
          - name: Install Playwright deps
-           run: npx playwright install --with-deps webkit
+           run: npx playwright install --with-deps
          - name: Run Playwright End to End tests
            run: npm run test:e2e-webapp
          - name: Upload test results
