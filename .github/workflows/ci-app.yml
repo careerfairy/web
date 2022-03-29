@@ -25,9 +25,7 @@ jobs:
               path: |
                  ~/.npm
                   ${{ github.workspace }}/apps/web/.next/cache
-              # Generate a new cache whenever packages or source files change.
               key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('packages/shared-lib/**/*.[jt]s', 'apps/web/**/*.[jt]s?') }}
-              # If source files changed but packages didn't, rebuild from a prior cache.
               restore-keys: |
                  ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
 
@@ -38,13 +36,6 @@ jobs:
 
          - name: Run Jest Unit Tests
            run: npm run test
-
-         - name: Cache Playwright Browsers
-           uses: actions/cache@v3
-           with:
-              path: |
-                 node_modules/playwright-core/.local-browsers/
-              key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
 
          - name: Install Playwright deps
            run: npx playwright install --with-deps
@@ -64,4 +55,4 @@ jobs:
               github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
               vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
               vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
-              vercel-args: ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
+              vercel-args: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && '--prod' || '' }}
