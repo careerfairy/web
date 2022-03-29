@@ -1,8 +1,8 @@
-name: "Test Build and Deploy"
+name: "Build, Test and Deploy"
 on: [pull_request, push]
 jobs:
    build:
-      name: "Build and Test Deploy"
+      name: "Build, Test and Deploy"
       runs-on: ubuntu-latest
       env:
          # https://turborepo.org/docs/guides/continuous-integration
@@ -24,13 +24,12 @@ jobs:
            uses: actions/cache@v3
            with:
               path: |
-                 ~/.npm
-                  ${{ github.workspace }}/apps/web/.next/cache
+                 ${{ github.workspace }}/apps/web/.next/cache
               # Generate a new cache whenever packages or source files change.
-              key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+              key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
               # If source files changed but packages didn't, rebuild from a prior cache.
               restore-keys: |
-                 ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+                 ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
 
          - name: Build
            env:

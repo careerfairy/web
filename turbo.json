@@ -9,6 +9,10 @@
       "test": {
          "outputs": ["coverage/**"]
       },
+      "start": {
+         "dependsOn": ["build"],
+         "cache": false
+      },
       "webapp:report": {},
       "test:e2e-webapp": {
          "dependsOn": ["build"],
