@@ -42,13 +42,14 @@ jobs:
          - name: Build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              DEBUG: pw:webserver
            run: npm run build
 
          - name: Run Jest Unit Tests
            run: npm run test
 
          - name: Run Playwright End to End tests
+           env:
+              DEBUG: pw:webserver
            run: npm run test:e2e-webapp
          - name: Upload test results
            if: always()
