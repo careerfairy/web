@@ -173,6 +173,9 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    useEffect(() => {
       ;(async function handleAutoRegister() {
          if (stream?.registeredUsers?.includes(authenticatedUser.email)) {
+            if (stream?.hasStarted) {
+               return;
+            }
             const newQuery = { ...query }
             if (newQuery.register) {
                delete newQuery.register
@@ -198,6 +201,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [
       query.register,
       stream?.id,
+      stream?.hasStarted,
       unfilteredGroups,
       stream?.registeredUsers,
       authenticatedUser.email,
