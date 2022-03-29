@@ -11,6 +11,7 @@ jobs:
          PLAYWRIGHT_BROWSERS_PATH: 0
       steps:
          - uses: actions/checkout@v2
+
          - name: Cache playwright browsers and Firebase Runners
            uses: actions/cache@v3
            with:
@@ -26,9 +27,22 @@ jobs:
 
          - name: Install dependencies
            run: npm install
+
+         - name: Cache NextJS cache folder
+           uses: actions/cache@v3
+           with:
+              path: |
+                 ${{ github.workspace }}/apps/web/.next/cache
+              # Generate a new cache whenever packages or source files change.
+              key: ${{ runner.os }}-nextjs-${{ hashFiles('./apps/web/package-lock.json') }}-${{ hashFiles('./apps/web/**.[jt]s', './apps/web/**.[jt]sx') }}
+              # If source files changed but packages didn't, rebuild from a prior cache.
+              restore-keys: |
+                 ${{ runner.os }}-nextjs-${{ hashFiles('./apps/web/package-lock.json') }}-
+
          - name: Build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              DEBUG: pw:webserver
            run: npm run build
 
          - name: Run Jest Unit Tests
