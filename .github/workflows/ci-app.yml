@@ -8,7 +8,6 @@ jobs:
          # https://turborepo.org/docs/guides/continuous-integration
          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-         PLAYWRIGHT_BROWSERS_PATH: 0
       steps:
          - uses: actions/checkout@v2
 
@@ -39,6 +38,13 @@ jobs:
 
          - name: Run Jest Unit Tests
            run: npm run test
+
+         - name: Cache Playwright Browsers
+           uses: actions/cache@v3
+           with:
+              path: |
+                 node_modules/playwright-core/.local-browsers/
+              key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
 
          - name: Install Playwright deps
            run: npx playwright install --with-deps
