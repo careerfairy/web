@@ -52,14 +52,12 @@ jobs:
               npm --version &&
               npm list -g --depth 0
          - name: Install dependencies
-           run: npm install
+           run: npm ci --include=dev
          - name: Build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
            run: npm run build
          - name: Run Jest Unit Tests
-           env:
-              REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY}}
            run: npm run test
          - name: Install Playwright
            run: npx playwright install --with-deps
