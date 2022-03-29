@@ -42,8 +42,6 @@ jobs:
          - name: Install Playwright deps
            run: npx playwright install
          - name: Run Playwright End to End tests
-           env:
-              DEBUG: pw:webserver
            run: npm run test:e2e-webapp
          - name: Upload test results
            if: always()

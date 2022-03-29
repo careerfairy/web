@@ -7,6 +7,6 @@ test.describe("Landing Page Functionality", () => {
       await page.goto("/")
       await page.locator('a[role="tab"]:has-text("About Us")').click()
       // Expect to be on the about us page
-      await expect(page.locator("text=Meet2 our team")).toBeVisible()
+      await expect(page.locator("text=Meet our team")).toBeVisible()
    })
 })
