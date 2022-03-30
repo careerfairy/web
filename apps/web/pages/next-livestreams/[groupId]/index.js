@@ -76,7 +76,7 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
                currentGroup.groupId
             )
             .then((data) => {
-               setPastLivestreams(data)
+               setPastLivestreams(data ?? [])
             })
             .catch(console.error)
       }
