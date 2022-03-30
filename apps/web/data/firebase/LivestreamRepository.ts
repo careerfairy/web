@@ -42,7 +42,9 @@ export interface ILivestreamRepository {
       userInterestsIds?: string[]
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
 
-   upcomingEventsQuery(): firebase.firestore.Query<firebase.firestore.DocumentData>
+   upcomingEventsQuery(
+      showHidden?: boolean
+   ): firebase.firestore.Query<firebase.firestore.DocumentData>
 
    registeredEventsQuery(
       userEmail: string
@@ -79,13 +81,18 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
       )
    }
 
-   upcomingEventsQuery() {
-      return this.firestore
+   upcomingEventsQuery(showHidden: boolean = false) {
+      let query = this.firestore
          .collection("livestreams")
          .where("start", ">", getEarliestEventBufferTime())
          .where("test", "==", false)
-         .where("hidden", "==", false)
          .orderBy("start", "asc")
+
+      if (showHidden === false) {
+         query = query.where("hidden", "==", false)
+      }
+
+      return query
    }
 
    async getUpcomingEvents(limit?: number): Promise<LiveStreamEvent[] | null> {

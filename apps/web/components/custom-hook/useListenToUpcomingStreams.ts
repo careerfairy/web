@@ -10,7 +10,7 @@ const useListenToUpcomingStreams = (
    selectedCategories?: string[]
 ) => {
    const upcomingEventsQuery = useMemo(() => {
-      let query = livestreamRepo.upcomingEventsQuery()
+      let query = livestreamRepo.upcomingEventsQuery(!!filterByGroupId)
 
       if (filterByGroupId) {
          query = query.where("groupIds", "array-contains", filterByGroupId)
