@@ -82,12 +82,17 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
    }
 
    upcomingEventsQuery(showHidden: boolean = false) {
-      return this.firestore
+      let query = this.firestore
          .collection("livestreams")
          .where("start", ">", getEarliestEventBufferTime())
          .where("test", "==", false)
-         .where("hidden", "==", showHidden)
          .orderBy("start", "asc")
+
+      if (showHidden === false) {
+         query = query.where("hidden", "==", false)
+      }
+
+      return query
    }
 
    async getUpcomingEvents(limit?: number): Promise<LiveStreamEvent[] | null> {
