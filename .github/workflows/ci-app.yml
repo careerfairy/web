@@ -7,8 +7,23 @@ concurrency:
    cancel-in-progress: true
 
 jobs:
+   # Check for duplicated jobs (sometimes when merging, there are duplicated runs for the same commit)
+   should_skip:
+      name: "Pre-Check"
+      runs-on: ubuntu-latest
+      outputs:
+         should_skip: ${{ steps.skip_check.outputs.should_skip }}
+      steps:
+         - id: skip_check
+           uses: fkirc/skip-duplicate-actions@v3.4.1
+           with:
+              skip_after_successful_duplicate: "true"
+              paths_ignore: '["**/README.md"]'
+
    build:
       name: "Build, Test and Deploy"
+      needs: should_skip
+      if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest
       env:
          # https://turborepo.org/docs/guides/continuous-integration
