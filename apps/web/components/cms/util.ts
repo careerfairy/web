@@ -22,8 +22,10 @@ export const GraphCMSImageLoader = ({
 }
 
 export const parseIndustryTag = (industryTag: string) => {
+   console.log("-> industryTag", industryTag)
    return industryTag
-      .replaceAll("_", " ")
+      .split("_")
+      .join(" ")
       .toLowerCase()
       .replace(/\b(\w)/g, (s) => s.toUpperCase())
 }

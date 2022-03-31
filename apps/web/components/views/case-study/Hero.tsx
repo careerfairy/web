@@ -64,7 +64,8 @@ const Hero = ({ company, coverVideoUrl, coverImage, title }: Props) => {
                      width={caseStudyCompanyLogoDimensions.width}
                      objectFit={"contain"}
                      height={caseStudyCompanyLogoDimensions.height}
-                     src={company.logo.url}
+                     src={company?.logo?.url}
+                     alt={company?.name}
                   />
                   <Typography sx={styles.title} component="h1" variant="h3">
                      {title}
@@ -81,7 +82,7 @@ const Hero = ({ company, coverVideoUrl, coverImage, title }: Props) => {
                         objectFit={"contain"}
                         width={caseStudyCompanyCoverImageDimensions.width}
                         height={caseStudyCompanyCoverImageDimensions.height}
-                        src={coverImage.url}
+                        src={coverImage?.url}
                      />
                   )}
                </Fade>

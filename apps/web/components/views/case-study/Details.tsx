@@ -5,12 +5,7 @@ import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { parseIndustryTag } from "../../cms/util"
 const styles = {
-   root: {
-      py: {
-         xs: 2,
-         md: 4,
-      },
-   },
+   root: {},
    chip: {},
 }
 interface Props {
@@ -19,7 +14,7 @@ interface Props {
 }
 const Details = ({ industries, published }: Props) => {
    return (
-      <Section sx={styles.root}>
+      <Section verticalSpacing={3} disableBottomPadding sx={styles.root}>
          <Stack direction={"row"} spacing={2}>
             <Chip
                variant="outlined"
@@ -27,7 +22,7 @@ const Details = ({ industries, published }: Props) => {
                color="primary"
                label={published}
             />
-            {industries.map((industry) => (
+            {industries?.map((industry) => (
                <Chip
                   key={industry}
                   variant="outlined"

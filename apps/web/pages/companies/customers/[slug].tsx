@@ -6,6 +6,7 @@ import CaseStudyLayout from "../../../layouts/CaseStudyLayout"
 import Hero from "../../../components/views/case-study/Hero"
 import { parseCaseStudy } from "../../../components/cms/util"
 import Details from "../../../components/views/case-study/Details"
+import About from "../../../components/views/case-study/About"
 
 export default function CaseStudy({
    companyCaseStudy,
@@ -13,7 +14,7 @@ export default function CaseStudy({
    preview,
 }) {
    const router = useRouter()
-   console.log("-> companyCaseStudy", companyCaseStudy)
+   // console.log("-> companyCaseStudy", companyCaseStudy)
    if (!router.isFallback && !companyCaseStudy?.slug) {
       return <ErrorPage statusCode={404} />
    }
@@ -23,13 +24,17 @@ export default function CaseStudy({
          <SEO {...companyCaseStudy?.seo} />
          <Hero
             company={companyCaseStudy?.company}
-            title={companyCaseStudy.title}
-            coverVideoUrl={companyCaseStudy.coverVideo.url}
-            coverImage={companyCaseStudy.coverImage}
+            title={companyCaseStudy?.title}
+            coverVideoUrl={companyCaseStudy?.coverVideo?.url}
+            coverImage={companyCaseStudy?.coverImage}
          />
          <Details
-            published={companyCaseStudy.formattedPublished}
-            industries={companyCaseStudy.industry}
+            published={companyCaseStudy?.formattedPublished}
+            industries={companyCaseStudy?.industry}
+         />
+         <About
+            companyName={companyCaseStudy?.company?.name}
+            content={companyCaseStudy?.aboutTheCompany}
          />
          <div>hi</div>
       </CaseStudyLayout>

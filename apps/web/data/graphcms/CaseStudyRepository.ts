@@ -52,6 +52,7 @@ class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
                          }
                      }
                      industry
+                     aboutTheCompany
                      storyContentSection {
                          raw
                      }
