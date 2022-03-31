@@ -20,3 +20,10 @@ export const GraphCMSImageLoader = ({
    const relativeSrc = (src) => src.split("/").pop()
    return `https://media.graphcms.com/resize=width:${width}/${relativeSrc(src)}`
 }
+
+export const parseIndustryTag = (industryTag: string) => {
+   return industryTag
+      .replaceAll("_", " ")
+      .toLowerCase()
+      .replace(/\b(\w)/g, (s) => s.toUpperCase())
+}

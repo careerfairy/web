@@ -2,6 +2,8 @@ import React from "react"
 import Section from "./Section"
 import Chip from "@mui/material/Chip"
 import Stack from "@mui/material/Stack"
+import Typography from "@mui/material/Typography"
+import { parseIndustryTag } from "../../cms/util"
 const styles = {
    root: {
       py: {
@@ -9,15 +11,34 @@ const styles = {
          md: 4,
       },
    },
+   chip: {},
 }
-const Details = ({}) => {
+interface Props {
+   industries: string[]
+   published: string
+}
+const Details = ({ industries, published }: Props) => {
    return (
       <Section sx={styles.root}>
          <Stack direction={"row"} spacing={2}>
-            <Chip variant="outlined" color="primary" label={"May 22, 2020"} />
-            <Chip variant="outlined" color={"secondary"} label={"Buisness"} />
-            <Chip variant="outlined" color={"secondary"} label={"Coaching"} />
-            <Chip variant="outlined" color={"secondary"} label={"Marketing"} />
+            <Chip
+               variant="outlined"
+               size={"medium"}
+               color="primary"
+               label={published}
+            />
+            {industries.map((industry) => (
+               <Chip
+                  key={industry}
+                  variant="outlined"
+                  size={"medium"}
+                  sx={{
+                     textTransform: "",
+                  }}
+                  color={"secondary"}
+                  label={parseIndustryTag(industry)}
+               />
+            ))}
          </Stack>
       </Section>
    )

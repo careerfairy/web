@@ -14,6 +14,7 @@ const CaseStudyLayout: FC<Props> = ({ children, preview }) => {
             minHeight: "100vh",
             display: "flex",
             flexDirection: "column",
+            bgcolor: "white",
          }}
       >
          <GenericHeader

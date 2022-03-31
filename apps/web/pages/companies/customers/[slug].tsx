@@ -13,6 +13,7 @@ export default function CaseStudy({
    preview,
 }) {
    const router = useRouter()
+   console.log("-> companyCaseStudy", companyCaseStudy)
    if (!router.isFallback && !companyCaseStudy?.slug) {
       return <ErrorPage statusCode={404} />
    }
@@ -21,12 +22,15 @@ export default function CaseStudy({
       <CaseStudyLayout preview={preview}>
          <SEO {...companyCaseStudy?.seo} />
          <Hero
-            company={companyCaseStudy.company}
+            company={companyCaseStudy?.company}
             title={companyCaseStudy.title}
             coverVideoUrl={companyCaseStudy.coverVideo.url}
             coverImage={companyCaseStudy.coverImage}
          />
-         <Details />
+         <Details
+            published={companyCaseStudy.formattedPublished}
+            industries={companyCaseStudy.industry}
+         />
          <div>hi</div>
       </CaseStudyLayout>
    )
