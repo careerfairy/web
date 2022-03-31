@@ -5,6 +5,7 @@ import SEO from "../../../components/util/SEO"
 import CaseStudyLayout from "../../../layouts/CaseStudyLayout"
 import Hero from "../../../components/views/case-study/Hero"
 import { parseCaseStudy } from "../../../components/cms/util"
+import Details from "../../../components/views/case-study/Details"
 
 export default function CaseStudy({
    companyCaseStudy,
@@ -15,17 +16,17 @@ export default function CaseStudy({
    if (!router.isFallback && !companyCaseStudy?.slug) {
       return <ErrorPage statusCode={404} />
    }
-   console.log("-> companyCaseStudy", companyCaseStudy)
 
    return (
       <CaseStudyLayout preview={preview}>
-         <SEO {...companyCaseStudy.seo} />
+         <SEO {...companyCaseStudy?.seo} />
          <Hero
             company={companyCaseStudy.company}
             title={companyCaseStudy.title}
             coverVideoUrl={companyCaseStudy.coverVideo.url}
             coverImage={companyCaseStudy.coverImage}
          />
+         <Details />
          <div>hi</div>
       </CaseStudyLayout>
    )
