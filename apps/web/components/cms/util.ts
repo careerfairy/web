@@ -22,7 +22,6 @@ export const GraphCMSImageLoader = ({
 }
 
 export const parseIndustryTag = (industryTag: string) => {
-   console.log("-> industryTag", industryTag)
    return industryTag
       .split("_")
       .join(" ")

@@ -52,7 +52,7 @@ const Section: FC<SectionProps> = ({
          ]}
          component={"section"}
       >
-         <Container sx={styles.container} disableGutters maxWidth={"lg"}>
+         <Container sx={styles.container} disableGutters maxWidth={"md"}>
             {children}
          </Container>
          {backgroundImages && (

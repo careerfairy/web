@@ -7,6 +7,8 @@ import Hero from "../../../components/views/case-study/Hero"
 import { parseCaseStudy } from "../../../components/cms/util"
 import Details from "../../../components/views/case-study/Details"
 import About from "../../../components/views/case-study/About"
+import Story from "../../../components/views/case-study/Story"
+import Statistics from "../../../components/views/case-study/Statistics"
 
 export default function CaseStudy({
    companyCaseStudy,
@@ -14,7 +16,7 @@ export default function CaseStudy({
    preview,
 }) {
    const router = useRouter()
-   // console.log("-> companyCaseStudy", companyCaseStudy)
+   console.log("-> companyCaseStudy", companyCaseStudy)
    if (!router.isFallback && !companyCaseStudy?.slug) {
       return <ErrorPage statusCode={404} />
    }
@@ -36,7 +38,10 @@ export default function CaseStudy({
             companyName={companyCaseStudy?.company?.name}
             content={companyCaseStudy?.aboutTheCompany}
          />
-         <div>hi</div>
+         <Story rawContent={companyCaseStudy?.storyContentSection?.raw} />
+         <Statistics
+            rawContent={companyCaseStudy?.statisticsContentSection?.raw}
+         />
       </CaseStudyLayout>
    )
 }
