@@ -16,6 +16,9 @@ const styles = {
       position: "absolute",
       inset: 0,
    },
+   container: {
+      px: { xs: 0.5, sm: 2 },
+   },
 }
 const Section: FC<SectionProps> = ({
    children,
@@ -35,7 +38,9 @@ const Section: FC<SectionProps> = ({
          ]}
          component={"section"}
       >
-         <Container maxWidth={"lg"}>{children}</Container>
+         <Container sx={styles.container} disableGutters maxWidth={"lg"}>
+            {children}
+         </Container>
          {backgroundImages && (
             <Box sx={styles.imagesWrapper}>{backgroundImages}</Box>
          )}

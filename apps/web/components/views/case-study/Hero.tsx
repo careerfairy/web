@@ -17,14 +17,14 @@ const maxVideoWidth = 600
 const styles = {
    root: {
       background: "black",
-      px: gridSpacing,
+      px: { xs: 0.2, sm: gridSpacing },
       color: "white",
       pt: {
          xs: 12,
          md: 15,
       },
       pb: {
-         xs: 12,
+         xs: 8,
          md: 15,
       },
    },
