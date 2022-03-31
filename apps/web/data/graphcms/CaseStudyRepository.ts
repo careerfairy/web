@@ -1,8 +1,13 @@
 import { fetchAPI } from "./index"
 import { gql } from "graphql-request"
+import {
+   caseStudyCompanyCoverImageDimensions,
+   caseStudyCompanyLogoDimensions,
+} from "../../components/cms/constants"
 
 export interface ICaseStudyRepository {
    getAllCaseStudiesWithSlug(): Promise<{ slug: string }[]>
+
    getCaseStudyAndMoreCaseStudies(
       slug: string,
       preview: boolean
@@ -22,98 +27,121 @@ class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
       `)
       return data.companyCaseStudies
    }
+
    async getCaseStudyAndMoreCaseStudies(
       slug,
       preview
    ): Promise<{ companyCaseStudy: object; moreCompanyCaseStudies: object[] }> {
-      const data = await fetchAPI(
+      return await fetchAPI(
          gql`
-            query CompanyCaseStudyBySlug($slug: String!, $stage: Stage!) {
-               companyCaseStudy(stage: $stage, where: { slug: $slug }) {
-                  title
-                  company {
-                     name
-                  }
-                  storyContentSection {
-                     raw
-                  }
-                  statisticsContentSection {
-                     raw
-                  }
-                  storySideImage {
-                     url
-                  }
-                  statisticStats {
-                     label
-                     value
-                     id
-                  }
-                  published
-                  ogImage: coverImage {
-                     url
-                  }
-                  coverImage {
-                     url
-                  }
-                  authors {
-                     name
-                     photo {
-                        url
-                     }
-                  }
-                  slug
-                  seo {
+             query CompanyCaseStudyBySlug($slug: String!, $stage: Stage!) {
+                 companyCaseStudy(stage: $stage, where: { slug: $slug }) {
                      title
-                     description
-                     keywords
-                     noIndex
-                     image {
-                        url(
-                           transformation: {
-                              image: {
-                                 resize: {
-                                    fit: clip
-                                    width: 2000
-                                    height: 1000
+                     company {
+                         name
+                         logo {
+                             height
+                             width
+                             url(
+                                 transformation: {
+                                     image: {
+                                         resize: { fit: clip, width: ${caseStudyCompanyLogoDimensions.width}, height: ${caseStudyCompanyLogoDimensions.height} }
+                                     }
                                  }
-                              }
-                           }
-                        )
+                             )
+                         }
                      }
-                  }
-               }
-               moreCompanyCaseStudies: companyCaseStudies(
-                  where: { slug_not: $slug }
-                  orderBy: published_ASC
-                  first: 3
-               ) {
-                  title
-                  company {
-                     name
-                  }
-                  published
-                  ogImage: coverImage {
-                     url
-                  }
-                  coverImage {
-                     url
-                  }
-                  authors {
-                     name
-                     photo {
-                        url
+                     storyContentSection {
+                         raw
                      }
-                  }
-                  slug
-               }
-            }
+                     coverVideo {
+                         url
+                     }
+                     statisticsContentSection {
+                         raw
+                     }
+                     storySideImage {
+                         url
+                     }
+                     statisticStats {
+                         label
+                         value
+                         id
+                     }
+                     published
+                     ogImage: coverImage {
+                         url
+                     }
+                     coverImage {
+                         url(
+                             transformation: {
+                                 image: {
+                                     resize: { fit: clip, width: ${caseStudyCompanyCoverImageDimensions.width},
+                                         height: ${caseStudyCompanyCoverImageDimensions.height} }
+                                 }
+                             }
+                         )
+                         width
+                         height
+                     }
+                     authors {
+                         name
+                         photo {
+                             url
+                         }
+                     }
+                     slug
+                     seo {
+                         title
+                         description
+                         keywords
+                         noIndex
+                         image {
+                             url(
+                                 transformation: {
+                                     image: {
+                                         resize: {
+                                             fit: clip
+                                             width: 2000
+                                             height: 1000
+                                         }
+                                     }
+                                 }
+                             )
+                         }
+                     }
+                 }
+                 moreCompanyCaseStudies: companyCaseStudies(
+                     where: { slug_not: $slug }
+                     orderBy: published_ASC
+                     first: 3
+                 ) {
+                     title
+                     company {
+                         name
+                     }
+                     published
+                     ogImage: coverImage {
+                         url
+                     }
+                     coverImage {
+                         url
+                     }
+                     authors {
+                         name
+                         photo {
+                             url
+                         }
+                     }
+                     slug
+                 }
+             }
          `,
          {
             variables: { slug, stage: preview ? "DRAFT" : "PUBLISHED" },
             preview,
          }
       )
-      return data
    }
 }
 

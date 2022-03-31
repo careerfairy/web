@@ -7,10 +7,12 @@ type Props = {
 const Alert = ({ preview }: Props) => {
    return (
       <Box
-         className={cn("border-b", {
-            "bg-accent-7 border-accent-7 text-white": preview,
-            "bg-accent-1 border-accent-2": !preview,
-         })}
+         sx={{
+            borderBottom: "thin",
+            bgcolor: preview ? "warning.dark" : "white",
+            color: preview ? "white" : "black",
+            borderRadius: 2,
+         }}
       >
          <Container>
             <Box
@@ -40,12 +42,21 @@ const Alert = ({ preview }: Props) => {
                ) : (
                   <>
                      The source code for this case study is{" "}
-                     <a
-                        href={`https://github.com/vercel/next.js/tree/canary/examples/${EXAMPLE_PATH}`}
-                        className="underline hover:text-success duration-200 transition-colors"
+                     <Box
+                        component={"a"}
+                        sx={{
+                           textDecoration: "underline",
+                           transition: (theme) =>
+                              theme.transitions.create(["color"]),
+                           color: "primary",
+                           ":hover": {
+                              color: "secondary",
+                           },
+                        }}
+                        href={`https://github.com/careerfairy/web/blob/feature/setup_case_studies/apps/web/pages/companies/customers/%5Bslug%5D.tsx`}
                      >
                         available on GitHub
-                     </a>
+                     </Box>
                      .
                   </>
                )}

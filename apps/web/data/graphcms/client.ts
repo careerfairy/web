@@ -1,4 +1,3 @@
-import { RequestDocument, Variables } from "graphql-request"
 import { GraphQLClient } from "graphql-request"
 
 const graphcmsClient = (preview = false) =>
@@ -15,18 +14,4 @@ const graphcmsClient = (preview = false) =>
       },
    })
 
-interface Options {
-   variables: Variables
-   preview: boolean
-}
-
-const fetchAPI = async (query: RequestDocument, options?: Options) => {
-   try {
-      const client = graphcmsClient(options?.preview)
-      return await client.request(query, options?.variables)
-   } catch (errors) {
-      console.error(errors)
-      throw new Error("Failed to fetch API")
-   }
-}
-export { graphcmsClient, fetchAPI }
+export { graphcmsClient }

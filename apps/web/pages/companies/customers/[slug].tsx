@@ -2,6 +2,9 @@ import caseStudyRepo from "../../../data/graphcms/CaseStudyRepository"
 import { useRouter } from "next/router"
 import ErrorPage from "next/error"
 import SEO from "../../../components/util/SEO"
+import CaseStudyLayout from "../../../layouts/CaseStudyLayout"
+import Hero from "../../../components/views/case-study/Hero"
+import { parseCaseStudy } from "../../../components/cms/util"
 
 export default function CaseStudy({
    companyCaseStudy,
@@ -15,33 +18,57 @@ export default function CaseStudy({
    console.log("-> companyCaseStudy", companyCaseStudy)
 
    return (
-      <>
+      <CaseStudyLayout preview={preview}>
          <SEO {...companyCaseStudy.seo} />
+         <Hero
+            company={companyCaseStudy.company}
+            title={companyCaseStudy.title}
+            coverVideoUrl={companyCaseStudy.coverVideo.url}
+            coverImage={companyCaseStudy.coverImage}
+         />
          <div>hi</div>
-      </>
+      </CaseStudyLayout>
    )
 }
 
 export async function getStaticProps({ params, preview = false }) {
-   const data = await caseStudyRepo.getCaseStudyAndMoreCaseStudies(
-      params.slug,
-      preview
-   )
+   const { companyCaseStudy, moreCompanyCaseStudies } =
+      await caseStudyRepo.getCaseStudyAndMoreCaseStudies(params.slug, preview)
+
+   // @ts-ignore
+   const parsedCaseStudyData = await parseCaseStudy(companyCaseStudy)
+
    return {
       props: {
          preview,
-         companyCaseStudy: data.companyCaseStudy,
-         moreCompanyCaseStudies: data.moreCompanyCaseStudies || [],
+         companyCaseStudy: parsedCaseStudyData,
+         moreCompanyCaseStudies: moreCompanyCaseStudies || [],
       },
    }
 }
 
-export async function getStaticPaths() {
+export async function getStaticPaths({ locales }) {
+   let paths = []
+
    const caseStudies = await caseStudyRepo.getAllCaseStudiesWithSlug()
+
+   if (locales) {
+      for (const locale of locales) {
+         paths = [
+            ...paths,
+            ...caseStudies.map((caseStudy) => ({
+               params: { slug: caseStudy.slug },
+               locale,
+            })),
+         ]
+      }
+   } else {
+      paths = caseStudies.map((caseStudy) => ({
+         params: { slug: caseStudy.slug },
+      }))
+   }
    return {
-      paths: caseStudies.map(({ slug }) => ({
-         params: { slug },
-      })),
+      paths,
       fallback: true,
    }
 }

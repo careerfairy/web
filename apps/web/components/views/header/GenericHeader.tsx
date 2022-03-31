@@ -1,6 +1,7 @@
 import React from "react"
-import PropTypes from "prop-types"
-import { Box, Hidden, IconButton } from "@mui/material"
+import IconButton from "@mui/material/IconButton"
+import Hidden from "@mui/material/Hidden"
+import Box from "@mui/material/Box"
 import MenuIcon from "@mui/icons-material/Menu"
 import { MainLogo } from "components/logos"
 import { useTheme } from "@mui/material/styles"
@@ -14,7 +15,13 @@ import NavLinks from "../../../components/views/header/NavLinks"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
 import UserProfileButton from "../../../components/views/common/topbar/UserProfileButton"
 
-const TopBar = ({ hideNavOnScroll }) => {
+const GenericHeader = ({
+   hideNavOnScroll = false,
+   position = "static",
+   transparent = false,
+   darkMode = false,
+   links = [],
+}: Props) => {
    const theme = useTheme()
    const { GeneralHeader } = useGeneralHeader()
    const { mainLinks } = useGeneralLinks()
@@ -23,10 +30,15 @@ const TopBar = ({ hideNavOnScroll }) => {
    const { authenticatedUser, userData } = useAuth()
 
    return (
-      <GeneralHeader permanent={!hideNavOnScroll}>
+      <GeneralHeader
+         permanent={!hideNavOnScroll}
+         className={undefined}
+         position={position}
+         transparent={transparent}
+      >
          <Box display="flex" alignItems="center">
             <IconButton
-               style={{ marginRight: "1rem" }}
+               sx={{ mr: 1, color: darkMode && "white" }}
                color="primary"
                onClick={handleDrawerOpen}
                autoFocus
@@ -34,12 +46,17 @@ const TopBar = ({ hideNavOnScroll }) => {
             >
                <MenuIcon />
             </IconButton>
-            <MainLogo />
+            <MainLogo white={darkMode} />
          </Box>
          <Hidden mdDown>
             <NavLinks
                links={mainLinks}
-               navLinksActiveColor={theme.palette.primary.main}
+               navLinksActiveColor={
+                  darkMode
+                     ? theme.palette.common.white
+                     : theme.palette.primary.main
+               }
+               navLinksBaseColor={darkMode && theme.palette.common.white}
             />
          </Hidden>
          <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -58,13 +75,14 @@ const TopBar = ({ hideNavOnScroll }) => {
    )
 }
 
-TopBar.propTypes = {
-   className: PropTypes.string,
-   links: PropTypes.array,
-   onMobileNavOpen: PropTypes.func,
+interface Props {
+   className?: string
+   links?: any[]
+   onMobileNavOpen?: () => void
+   darkMode: boolean
+   hideNavOnScroll: boolean
+   position: "absolute" | "fixed" | "sticky" | "static"
+   transparent: boolean
 }
 
-TopBar.defaultProps = {
-   links: [],
-}
-export default TopBar
+export default GenericHeader
