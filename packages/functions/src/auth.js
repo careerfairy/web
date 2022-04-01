@@ -91,7 +91,8 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
                .then(async () => {
                   console.log(`Starting sending email for ${recipient_email}`)
                   const email = {
-                     TemplateId: 17669843,
+                     TemplateId:
+                        process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
                      From: "CareerFairy <noreply@careerfairy.io>",
                      To: recipient_email,
                      TemplateModel: { pinCode: pinCode },
@@ -179,7 +180,7 @@ exports.resendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(
          .update({ validationPin: pinCode })
 
       const email = {
-         TemplateId: 17669843,
+         TemplateId: process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: recipient_email,
          TemplateModel: { pinCode: pinCode },
@@ -282,7 +283,7 @@ exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(
          )
          .then((link) => {
             const email = {
-               TemplateId: 16531013,
+               TemplateId: process.env.POSTMARK_TEMPLATE_PASSWORD_RESET,
                From: "CareerFairy <noreply@careerfairy.io>",
                To: recipient_email,
                TemplateModel: { action_url: link },
@@ -328,7 +329,7 @@ exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(
          })
          .then(() => {
             const email = {
-               TemplateId: 17669843,
+               TemplateId: process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
                From: "CareerFairy <noreply@careerfairy.io>",
                To: recipient_email,
                TemplateModel: { pinCode: pinCode },
@@ -389,7 +390,7 @@ exports.sendPostmarkEmailUserDataAndUniWithName = functions.https.onRequest(
          })
          .then(() => {
             const email = {
-               TemplateId: 17669843,
+               TemplateId: process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
                From: "CareerFairy <noreply@careerfairy.io>",
                To: recipient_email,
                TemplateModel: { pinCode: pinCode },

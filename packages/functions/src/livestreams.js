@@ -103,7 +103,8 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
       //   let calBase64Str = Buffer.from(calStr).toString("base64");
 
       const email = {
-         TemplateId: 16533319,
+         TemplateId:
+            process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: data.recipientEmail,
          TemplateModel: {
@@ -138,7 +139,7 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
 exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onCall(
    async (data, context) => {
       const email = {
-         TemplateId: 25020829,
+         TemplateId: process.env.POSTMARK_TEMPLATE_F2F_EVENT_REGISTRATION,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: data.recipientEmail,
          TemplateModel: {
@@ -167,7 +168,9 @@ exports.sendHybridEventRegistrationConfirmationEmail = functions.https.onCall(
    async (data, context) => {
       console.log("Starting")
       const email = {
-         TemplateId: 25768238,
+         TemplateId:
+            process.env
+               .POSTMARK_TEMPLATE_HYBRID_EVENT_REGISTRATION_CONFIRMATION,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: data.recipientEmail,
          TemplateModel: {

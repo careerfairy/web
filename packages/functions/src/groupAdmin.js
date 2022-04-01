@@ -28,7 +28,8 @@ exports.sendDraftApprovalRequestEmail = functions.https.onCall(async (data) => {
       functions.logger.log("admins Info in approval request", adminsInfo)
 
       const emails = adminsInfo.map(({ email, eventDashboardLink }) => ({
-         TemplateId: 22299429,
+         TemplateId:
+            process.env.POSTMARK_TEMPLATE_DRAFT_STREAM_APPROVAL_REQUEST,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: email,
          TemplateModel: {
@@ -82,7 +83,7 @@ exports.sendNewlyPublishedEventEmail = functions.https.onCall(async (data) => {
 
       const emails = [...adminsInfo, ...marketingTeamInfo].map(
          ({ email, eventDashboardLink, nextLivestreamsLink }) => ({
-            TemplateId: 25484780,
+            TemplateId: process.env.POSTMARK_TEMPLATE_NEWLY_PUBLISHED_EVENT,
             From: "CareerFairy <noreply@careerfairy.io>",
             To: email,
             TemplateModel: {
@@ -715,7 +716,7 @@ exports.sendDashboardInviteEmail = functions.https.onRequest(
       setHeaders(req, res)
 
       const email = {
-         TemplateId: 22272783,
+         TemplateId: process.env.POSTMARK_TEMPLATE_GROUP_ADMIN_INVITATION,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: req.body.recipientEmail,
          TemplateModel: {

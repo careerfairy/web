@@ -10,6 +10,6 @@ if (isLocalEnvironment()) {
    )
 }
 
-export default {
+module.exports = {
    client: new postmark.ServerClient(serverToken),
 }
