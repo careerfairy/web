@@ -1,7 +1,7 @@
 import React from "react"
 import Section from "./Section"
 import Typography from "@mui/material/Typography"
-import { CmsImage } from "../../../types/cmsTypes"
+import { CmsImage, Company } from "../../../types/cmsTypes"
 import Image from "next/image"
 import { GraphCMSImageLoader } from "../../cms/util"
 import Grid from "@mui/material/Grid"
@@ -51,6 +51,9 @@ const styles = {
       display: "flex",
       alignItems: "center",
       justifyContent: { xs: "center", md: "flex-end" },
+      "& img": {
+         borderRadius: 5,
+      },
    },
 }
 const Hero = ({ company, coverVideoUrl, coverImage, title }: Props) => {
@@ -82,7 +85,7 @@ const Hero = ({ company, coverVideoUrl, coverImage, title }: Props) => {
                         objectFit={"contain"}
                         width={caseStudyCompanyCoverImageDimensions.width}
                         height={caseStudyCompanyCoverImageDimensions.height}
-                        src={coverImage?.url}
+                        src={coverImage?.url || ""}
                      />
                   )}
                </Fade>
@@ -95,9 +98,6 @@ interface Props {
    title: string
    coverImage: CmsImage
    coverVideoUrl: string
-   company: {
-      name: string
-      logo: CmsImage
-   }
+   company: Company
 }
 export default Hero

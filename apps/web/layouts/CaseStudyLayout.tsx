@@ -1,6 +1,6 @@
 import React, { FC } from "react"
 import Box from "@mui/material/Box"
-// import Alert from "../components/cms/Alert"
+import Alert from "../components/cms/Alert"
 import FooterV2 from "../components/views/footer/FooterV2"
 import GenericHeader from "../components/views/header/GenericHeader"
 
@@ -23,7 +23,7 @@ const CaseStudyLayout: FC<Props> = ({ children, preview }) => {
             transparent
             hideNavOnScroll={true}
          />
-         {/*<Alert preview={preview} />*/}
+         {preview && <Alert />}
          <Box component={"main"}>{children}</Box>
          <FooterV2 sx={{ mt: "auto" }} />
       </Box>

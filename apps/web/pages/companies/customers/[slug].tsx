@@ -9,21 +9,33 @@ import Details from "../../../components/views/case-study/Details"
 import About from "../../../components/views/case-study/About"
 import Story from "../../../components/views/case-study/Story"
 import Statistics from "../../../components/views/case-study/Statistics"
+import {
+   CompanyCaseStudyPreview,
+   CompanyCaseStudy,
+} from "../../../types/cmsTypes"
 
+interface Props {
+   companyCaseStudy: CompanyCaseStudy
+   moreCompanyCaseStudies: CompanyCaseStudyPreview[]
+   preview: boolean
+}
 export default function CaseStudy({
    companyCaseStudy,
    moreCompanyCaseStudies,
    preview,
-}) {
+}: Props) {
    const router = useRouter()
-   console.log("-> companyCaseStudy", companyCaseStudy)
    if (!router.isFallback && !companyCaseStudy?.slug) {
       return <ErrorPage statusCode={404} />
    }
 
    return (
       <CaseStudyLayout preview={preview}>
-         <SEO {...companyCaseStudy?.seo} />
+         <SEO
+            id={companyCaseStudy?.id}
+            {...companyCaseStudy?.seo}
+            title={`${companyCaseStudy?.company?.name} - CareerFairy Customer Story`}
+         />
          <Hero
             company={companyCaseStudy?.company}
             title={companyCaseStudy?.title}
@@ -49,6 +61,12 @@ export default function CaseStudy({
 export async function getStaticProps({ params, preview = false }) {
    const { companyCaseStudy, moreCompanyCaseStudies } =
       await caseStudyRepo.getCaseStudyAndMoreCaseStudies(params.slug, preview)
+
+   if (!companyCaseStudy) {
+      return {
+         notFound: true,
+      }
+   }
 
    // @ts-ignore
    const parsedCaseStudyData = await parseCaseStudy(companyCaseStudy)

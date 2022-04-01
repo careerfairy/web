@@ -4,20 +4,28 @@ import {
    caseStudyCompanyCoverImageDimensions,
    caseStudyCompanyLogoDimensions,
 } from "../../components/cms/constants"
+import {
+   CompanyCaseStudy,
+   CompanyCaseStudyPreview,
+   Slug,
+} from "../../types/cmsTypes"
 
 export interface ICaseStudyRepository {
-   getAllCaseStudiesWithSlug(): Promise<{ slug: string }[]>
+   getAllCaseStudiesWithSlug(): Promise<{ slug: Slug }[]>
 
    getCaseStudyAndMoreCaseStudies(
       slug: string,
       preview: boolean
-   ): Promise<{ companyCaseStudy: object; moreCompanyCaseStudies: object[] }>
+   ): Promise<{
+      companyCaseStudy: CompanyCaseStudy
+      moreCompanyCaseStudies: CompanyCaseStudyPreview[]
+   }>
 }
 
 class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
    constructor() {}
 
-   async getAllCaseStudiesWithSlug(): Promise<{ slug: string }[]> {
+   async getAllCaseStudiesWithSlug(): Promise<{ slug: Slug }[]> {
       const data = await fetchAPI(gql`
          {
             companyCaseStudies {
@@ -31,12 +39,16 @@ class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
    async getCaseStudyAndMoreCaseStudies(
       slug,
       preview
-   ): Promise<{ companyCaseStudy: object; moreCompanyCaseStudies: object[] }> {
+   ): Promise<{
+      companyCaseStudy: CompanyCaseStudy
+      moreCompanyCaseStudies: CompanyCaseStudyPreview[]
+   }> {
       return await fetchAPI(
          gql`
              query CompanyCaseStudyBySlug($slug: String!, $stage: Stage!) {
                  companyCaseStudy(stage: $stage, where: { slug: $slug }) {
                      title
+                     id
                      company {
                          name
                          logo {
@@ -119,6 +131,7 @@ class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
                      first: 3
                  ) {
                      title
+                     id
                      company {
                          name
                      }

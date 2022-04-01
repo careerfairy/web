@@ -4,8 +4,7 @@ import { GraphQLClient } from "graphql-request"
 const graphcmsClient = (preview = false) =>
    new GraphQLClient(process.env.GRAPHCMS_PROJECT_API, {
       headers: {
-         "Content-Type": "application/json",
-         ...(process.env.GRAPHCMS_TOKEN && {
+         ...(process.env.GRAPHCMS_PROD_AUTH_TOKEN && {
             Authorization: `Bearer ${
                preview
                   ? process.env.GRAPHCMS_DEV_AUTH_TOKEN
@@ -29,4 +28,5 @@ const fetchAPI = async (query: RequestDocument, options?: Options) => {
       throw new Error("Failed to fetch API")
    }
 }
+
 export { graphcmsClient, fetchAPI }

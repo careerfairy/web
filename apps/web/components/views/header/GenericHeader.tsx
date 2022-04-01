@@ -10,10 +10,11 @@ import * as actions from "store/actions"
 import { useDispatch } from "react-redux"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import LoginButton from "../../../components/views/common/LoginButton"
-import useGeneralHeader from "../../../components/custom-hook/useGeneralHeader"
 import NavLinks from "../../../components/views/header/NavLinks"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
 import UserProfileButton from "../../../components/views/common/topbar/UserProfileButton"
+import GeneralHeader from "./GeneralHeader"
+import { useWindowScroll } from "react-use"
 
 const GenericHeader = ({
    hideNavOnScroll = false,
@@ -23,40 +24,41 @@ const GenericHeader = ({
    links = [],
 }: Props) => {
    const theme = useTheme()
-   const { GeneralHeader } = useGeneralHeader()
    const { mainLinks } = useGeneralLinks()
    const dispatch = useDispatch()
    const handleDrawerOpen = () => dispatch(actions.openNavDrawer())
    const { authenticatedUser, userData } = useAuth()
+   const { y: verticalOffset } = useWindowScroll()
+   const scrolledDown = verticalOffset > 40
 
    return (
       <GeneralHeader
          permanent={!hideNavOnScroll}
-         className={undefined}
          position={position}
          transparent={transparent}
       >
          <Box display="flex" alignItems="center">
             <IconButton
-               sx={{ mr: 1, color: darkMode && "white" }}
+               sx={{ mr: 1, color: darkMode && !scrolledDown && "white" }}
                color="primary"
                onClick={handleDrawerOpen}
-               autoFocus
                size="large"
             >
                <MenuIcon />
             </IconButton>
-            <MainLogo white={darkMode} />
+            <MainLogo white={darkMode && !scrolledDown} />
          </Box>
          <Hidden mdDown>
             <NavLinks
                links={mainLinks}
                navLinksActiveColor={
-                  darkMode
+                  darkMode && !scrolledDown
                      ? theme.palette.common.white
                      : theme.palette.primary.main
                }
-               navLinksBaseColor={darkMode && theme.palette.common.white}
+               navLinksBaseColor={
+                  darkMode && !scrolledDown && theme.palette.common.white
+               }
             />
          </Hidden>
          <Box sx={{ display: "flex", alignItems: "center" }}>
