@@ -1,6 +1,5 @@
 import * as path from "path"
 import {
-   spawn,
    ChildProcessWithoutNullStreams,
    SpawnOptionsWithoutStdio,
 } from "child_process"
@@ -9,6 +8,7 @@ import { readFile } from "fs/promises"
 import { existsSync, mkdirSync } from "fs"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import config from "./config"
+import * as spawn from "cross-spawn"
 
 const DEBUG = process.env.DEBUG
 const DRY_RUN = process.env.DRY_RUN
