@@ -30,20 +30,41 @@ async function run(): Promise<void> {
    emulatorsProcess = await runEmulatorsInBackground()
    h1Text(`Emulators ready to receive commands`)
 
-   h1Text(`Removing userData and users collections`)
-   await removeExistingCollections(["userData", "users"])
+   const collections = ["userData"]
+   h1Text(`Removing collections: ${collections.join(",")}`)
+   await removeExistingCollections(collections)
 
    h1Text(`Seeding data`)
-   await UserSeed.createUser("carlos@test.com")
+   await createUser("carlos@careerfairy.io")
+   await createUser("habib@careerfairy.io")
+   await createUser("maximilian@careerfairy.io")
+
+   emulatorsProcess.on("exit", () => {
+      h1Text(
+         `The data is ready to be used! Start your emulators with the arg --import "./${config.LOCAL_FOLDER}/${config.finalBackupFolder}".`
+      )
+   })
 
    emulatorsProcess.kill()
-
-   h1Text(
-      `The data is ready to be used! Start your emulators with the arg --import "./${config.LOCAL_FOLDER}/${config.finalBackupFolder}".`
-   )
 }
 
 run().catch(console.error)
+
+/**
+ * Create a user, skip if already exists
+ * @param email
+ */
+async function createUser(email: string) {
+   try {
+      return await UserSeed.createUser(email)
+   } catch (e) {
+      if (e.errorInfo?.code === "auth/email-already-exists") {
+         return null
+      }
+
+      throw e
+   }
+}
 
 /**
  * Deletes collections from the emulators
@@ -88,7 +109,6 @@ async function runEmulatorsInBackground(): Promise<ChildProcessWithoutNullStream
                   "All emulators ready! It is now safe to connect your app."
                ) !== -1
             ) {
-               log("msg", msg)
                // emulators ready to be used!
                resolved = true
                resolve(childProcess)
@@ -97,7 +117,7 @@ async function runEmulatorsInBackground(): Promise<ChildProcessWithoutNullStream
 
          // shouldn't get here if all goes well, this is only reached when manually killed
          childProcess.on("close", (code) => {
-            log("Emulators shutting down!")
+            debug("Emulators shutting down!")
             if (!resolved) {
                reject(code)
             }
@@ -213,11 +233,15 @@ function execute(
       let stderr: string = ""
 
       childProcess.stdout?.on("data", (data: any) => {
-         stdout += data.toString()
+         try {
+            stdout += data.toString()
+         } catch (e) {}
          process.stdout.write(data)
       })
       childProcess.stderr?.on("data", (data: any) => {
-         stderr += data.toString()
+         try {
+            stderr += data.toString()
+         } catch (e) {}
          process.stderr.write(data)
       })
 

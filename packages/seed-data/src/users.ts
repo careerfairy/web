@@ -18,14 +18,14 @@ class UserFirebaseSeed implements UserSeed {
     * Creates a user on firebase auth (already verified) and a corresponding
     * userData document
     *
-    * @param email The password will be the string on the left side of the @
+    * @param email email, the password will be "password"
     * @param extraData fields that will be stored on the userData document
     */
    async createUser(email: string, extraData?: UserData) {
       const username = email.split("@")[0]
       const userRecord = await auth.createUser({
          email: email,
-         password: username,
+         password: "password",
          emailVerified: true,
       })
 
