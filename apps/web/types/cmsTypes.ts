@@ -39,7 +39,7 @@ export interface CompanyCaseStudyPreview {
    company: Company
    title: string
    id: string
-   published?: Date
+   published: Date
    formattedPublished?: string
    coverImage: CmsImage
    slug: Slug
@@ -49,7 +49,7 @@ export interface CompanyCaseStudyPreview {
 export interface CompanyCaseStudy {
    id: string
    formattedPublished?: string
-   published?: Date
+   published: Date
    title: string
    company: Company
    industry: string[]

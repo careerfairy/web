@@ -1,4 +1,4 @@
-export const parseCaseStudy = async ({ published, ...caseStudy }) => ({
+export const parseCaseStudy = ({ published, ...caseStudy }) => ({
    ...(published && {
       formattedPublished: new Intl.DateTimeFormat("en-US", {
          weekday: "long",

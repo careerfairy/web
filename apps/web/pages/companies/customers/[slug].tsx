@@ -1,6 +1,4 @@
 import caseStudyRepo from "../../../data/graphcms/CaseStudyRepository"
-import { useRouter } from "next/router"
-import ErrorPage from "next/error"
 import SEO from "../../../components/util/SEO"
 import CaseStudyLayout from "../../../layouts/CaseStudyLayout"
 import Hero from "../../../components/views/case-study/Hero"
@@ -13,6 +11,7 @@ import {
    CompanyCaseStudyPreview,
    CompanyCaseStudy,
 } from "../../../types/cmsTypes"
+import { GetStaticPaths, GetStaticProps } from "next"
 
 interface Props {
    companyCaseStudy: CompanyCaseStudy
@@ -24,11 +23,6 @@ export default function CaseStudy({
    moreCompanyCaseStudies,
    preview,
 }: Props) {
-   const router = useRouter()
-   if (!router.isFallback && !companyCaseStudy?.slug) {
-      return <ErrorPage statusCode={404} />
-   }
-
    return (
       <CaseStudyLayout preview={preview}>
          <SEO
@@ -58,29 +52,37 @@ export default function CaseStudy({
    )
 }
 
-export async function getStaticProps({ params, preview = false }) {
+export const getStaticProps: GetStaticProps = async ({
+   params,
+   preview = false,
+}) => {
    const { companyCaseStudy, moreCompanyCaseStudies } =
-      await caseStudyRepo.getCaseStudyAndMoreCaseStudies(params.slug, preview)
+      await caseStudyRepo.getCaseStudyAndMoreCaseStudies(
+         params.slug as string,
+         preview
+      )
 
    if (!companyCaseStudy) {
       return {
          notFound: true,
       }
    }
-
-   // @ts-ignore
-   const parsedCaseStudyData = await parseCaseStudy(companyCaseStudy)
+   const parsedMoreCompanyCaseStudies = moreCompanyCaseStudies?.map((study) =>
+      parseCaseStudy(study)
+   )
+   const parsedCaseStudyData = parseCaseStudy(companyCaseStudy)
 
    return {
       props: {
          preview,
          companyCaseStudy: parsedCaseStudyData,
-         moreCompanyCaseStudies: moreCompanyCaseStudies || [],
+         moreCompanyCaseStudies: parsedMoreCompanyCaseStudies || [],
       },
+      revalidate: 60,
    }
 }
 
-export async function getStaticPaths({ locales }) {
+export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
    let paths = []
 
    const caseStudies = await caseStudyRepo.getAllCaseStudiesWithSlug()
@@ -102,6 +104,6 @@ export async function getStaticPaths({ locales }) {
    }
    return {
       paths,
-      fallback: true,
+      fallback: "blocking",
    }
 }

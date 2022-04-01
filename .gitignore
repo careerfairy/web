@@ -19,4 +19,7 @@ firebase-export-*/
 test-results/
 playwright-report/
 
-.DS_Store!/apps/web/.env.local
+.DS_Store
+!/apps/web/.env.local
+!/apps/web/
+.env.local
