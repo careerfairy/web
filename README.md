@@ -29,7 +29,7 @@ npm run build
 npm run dev
 
 # Installing a dependency, you need to specify the workspace
-npm install --workspace careerfairy-webapp lodash
+npm install --workspace @careerfairy/webapp lodash
 ```
 
 ## Existing Git Hooks
@@ -42,7 +42,7 @@ npm install --workspace careerfairy-webapp lodash
 ## Development
 
 ```sh
-npm run dev -w careerfairy-webapp
+npm run dev -w @careerfairy/webapp
 ```
 
 ## Testing
@@ -86,7 +86,7 @@ in a zip file attached to the pipeline as seen below:
 ## Build
 
 ```sh
-npm run build -w careerfairy-functions
+npm run build -w @careerfairy/functions
 # or npm run build
 ```
 

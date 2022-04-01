@@ -1,5 +1,5 @@
 {
-   "name": "careerfairy-functions",
+   "name": "@careerfairy/functions",
    "private": true,
    "main": "dist/index.js",
    "scripts": {
