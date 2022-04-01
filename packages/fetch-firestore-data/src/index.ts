@@ -186,11 +186,17 @@ async function downloadRemoteBucket(): Promise<CommandOutput> {
 
    // copy remote folder into the tmp folder
    await execute("gsutil", [
-      "-m",
       "cp",
       "-r",
       `gs://${config.BUCKET}/${config.BUCKET_FOLDER}`,
       `gs://${config.BUCKET}/${config.finalBackupFolder}`,
+   ])
+
+   // rename backup file
+   await execute("gsutil", [
+      "mv",
+      `gs://${config.BUCKET}/${config.finalBackupFolder}/${config.BUCKET_FOLDER}.overall_export_metadata`,
+      `gs://${config.BUCKET}/${config.finalBackupFolder}/backup.overall_export_metadata`,
    ])
 
    // download remote folder
