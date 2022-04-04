@@ -1,11 +1,17 @@
 import React from "react"
 import { RichText } from "@graphcms/rich-text-react-renderer"
-import { RichTextContent, EmbedReferences } from "@graphcms/rich-text-types"
+import {
+   RichTextContent,
+   EmbedReferences,
+   EmbedProps,
+} from "@graphcms/rich-text-types"
 import Link from "next/link"
 import Image from "next/image"
 import Typography from "@mui/material/Typography"
 import Box from "@mui/material/Box"
 import { GraphCMSImageLoader } from "./util"
+import BlogCarousel from "../views/common/carousels/BlogCarousel"
+import { Carousel } from "../../types/cmsTypes"
 
 type Props = {
    rawContent: RichTextContent
@@ -18,10 +24,9 @@ const ThemedRichTextRenderer = ({ rawContent, references }: Props) => {
          references={references}
          renderers={{
             embed: {
-               Carousel: (props) => {
-                  console.log("-> Carousel props", props)
-                  return <h1 className="post">Carousel</h1>
-               },
+               Carousel: (props: EmbedProps<Carousel>) => (
+                  <BlogCarousel {...props} />
+               ),
             },
             blockquote: ({ children }) => (
                <Box
@@ -75,7 +80,7 @@ const ThemedRichTextRenderer = ({ rawContent, references }: Props) => {
                   sx={{
                      listStyleImage: "url(/check-icon.svg)",
                      "&:not(:last-child)": {
-                        mb: 1,
+                        mb: 2,
                      },
                   }}
                >

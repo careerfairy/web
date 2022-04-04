@@ -5,6 +5,8 @@ export interface CmsImage {
    height?: number
    width?: number
    url: string
+   alt?: string
+   caption?: string
 }
 
 export interface Company {
@@ -70,4 +72,9 @@ export interface CompanyCaseStudy {
    authors: Author[]
    slug: Slug
    seo: Seo
+}
+
+export interface Carousel {
+   images: CmsImage[]
+   title: string
 }

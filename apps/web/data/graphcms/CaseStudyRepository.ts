@@ -74,15 +74,15 @@ class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
                      statisticsContentSection {
                          raw
                          references {
-                             # Your post query
+                             # Your Carousel query
                              ... on Carousel {
                                  id
                                  images {
-                                     imagesCarousel {
-                                         images {
-                                             url
-                                         }
-                                     }
+                                     url
+                                     width
+                                     height
+                                     caption
+                                     alt
                                  }
                              }
                          }
