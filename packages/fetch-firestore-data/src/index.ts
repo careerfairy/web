@@ -45,6 +45,8 @@ async function run(): Promise<void> {
       )
    })
 
+   await emulatorExport()
+
    emulatorsProcess.kill()
 }
 
@@ -131,7 +133,6 @@ async function runEmulatorsInBackground(): Promise<ChildProcessWithoutNullStream
             "emulators:start",
             "--only",
             "firestore,auth",
-            "--export-on-exit",
             "--import",
             `./${config.LOCAL_FOLDER}/${config.finalBackupFolder}`,
          ],
@@ -155,6 +156,17 @@ function gracefulShutdown(signal) {
    log(`${signal} signal received, trying to clear resources.`)
    emulatorsProcess?.kill()
    currentRunningProcess?.kill()
+}
+
+function emulatorExport() {
+   const fullPath = path.join(
+      config.rootFolder,
+      config.LOCAL_FOLDER,
+      config.finalBackupFolder
+   )
+   return axios.post("http://localhost:4400/_admin/export", {
+      path: fullPath,
+   })
 }
 
 /**
