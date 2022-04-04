@@ -23,6 +23,12 @@ let currentRunningProcess: ChildProcessWithoutNullStreams
  * Not catching exceptions on purpose, we should look into the error and fix it
  */
 async function run(): Promise<void> {
+   if (!process.env.JAVA_TOOL_OPTIONS) {
+      h1Text(
+         `Warning! JAVA_TOOL_OPTIONS not detected in your environment variables, the firebase emulators need a bigger heap to work with the imported data, you may need to set JAVA_TOOL_OPTIONS=-Xmx10g.`
+      )
+   }
+
    h1Text(`Starting downloading remote backup: ${config.BUCKET_FOLDER}`)
    await downloadRemoteBucket()
 
@@ -39,13 +45,17 @@ async function run(): Promise<void> {
    await createUser("habib@careerfairy.io")
    await createUser("maximilian@careerfairy.io")
 
+   await emulatorExport()
+
    emulatorsProcess.on("exit", () => {
       h1Text(
          `The data is ready to be used! Start your emulators with the arg --import "./${config.LOCAL_FOLDER}/${config.finalBackupFolder}".`
       )
-   })
 
-   await emulatorExport()
+      if (process.platform === "win32") {
+         h1Text(`Type CTRL+C to quit, ignore further errors.`)
+      }
+   })
 
    emulatorsProcess.kill()
 }
@@ -138,11 +148,6 @@ async function runEmulatorsInBackground(): Promise<ChildProcessWithoutNullStream
          ],
          {
             cwd: config.rootFolder,
-            env: {
-               ...process.env,
-               // emulators need a big heap to load the data
-               JAVA_TOOL_OPTIONS: "-Xmx10g",
-            },
          },
          handleProcess
       )

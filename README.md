@@ -30,6 +30,7 @@ npm run start -w @careerfairy/fetch-firestore-data
 
 # Dev environment with hot reload
 # web app + local emulators with data imported from emulatorData/fetched
+# Since this runs the firebase emulators, you may need to increase the JVM Heap memory available, check (/packages/fetch-firestore-data/README.md)
 npm run dev
 
 # Installing a dependency, you need to specify the workspace

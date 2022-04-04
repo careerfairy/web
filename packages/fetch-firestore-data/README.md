@@ -18,10 +18,34 @@ These binaries should be on your shell PATH:
 -  `gsutil` (with login, careerfairy project selected)
    -  [Install instructions](https://cloud.google.com/storage/docs/gsutil_install)
 
+### Java Heap Memory Increase
+
+The firebase emulators are a java app, since they will need to import the data into memory, we need to increase the available heap for the JVM to work fine.
+If the JVM doesn't have enough heap size, it will crash or be very slow because it needs to do a lot of GC's to free memory.
+
+Increase the available heap by setting an environment variable in your development shell:
+`JAVA_TOOL_OPTIONS=-Xmx8g` (any value above 7GB should be fine)
+
+-  Windows:
+   -  Shell: `$env:JAVA_TOOL_OPTIONS = '-Xmx8g'` (will be set only for the shell lifetime)
+   -  Global: OS Environment Variables (will be permanently set)
+-  Linux/MacOS:
+   -  Shell: `env JAVA_TOOL_OPTIONS=-Xmx6g`
+   -  Global: Edit your shell rc file to update the default environment variables (e.g `.bashrc`, `.zshrc`)
+
 ## Run
 
 ```sh
 npm run start -w @careerfairy/fetch-firestore-data
+
+# If you need to set the JVM Heap:
+
+# Windows
+$env:JAVA_TOOL_OPTIONS = '-Xmx8g'
+npm run start -w @careerfairy/fetch-firestore-data
+
+# Linux
+env JAVA_TOOL_OPTIONS=-Xmx8g npm run start -w @careerfairy/fetch-firestore-data
 ```
 
 ## Update data
