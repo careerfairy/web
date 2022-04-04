@@ -1,13 +1,13 @@
 import React from "react"
 import Section from "./Section"
-import { RichTextContent, Reference } from "@graphcms/rich-text-types"
+import { EmbedReferences, RichTextContent } from "@graphcms/rich-text-types"
 import Grid from "@mui/material/Grid"
 import ThemedRichTextRenderer from "../../cms/ThemedRichTextRenderer"
 import Typography from "@mui/material/Typography"
 
 interface Props {
    rawContent: RichTextContent
-   references: Reference[]
+   references: EmbedReferences
 }
 
 const Statistics = ({ rawContent, references }: Props) => {

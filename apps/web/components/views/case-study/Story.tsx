@@ -1,15 +1,16 @@
 import React from "react"
 import Section from "./Section"
-import { RichTextContent } from "@graphcms/rich-text-types"
+import { EmbedReferences, RichTextContent } from "@graphcms/rich-text-types"
 import Grid from "@mui/material/Grid"
 import ThemedRichTextRenderer from "../../cms/ThemedRichTextRenderer"
 import Typography from "@mui/material/Typography"
 
 interface Props {
    rawContent: RichTextContent
+   references: EmbedReferences
 }
 
-const Story = ({ rawContent }: Props) => {
+const Story = ({ rawContent, references }: Props) => {
    return (
       <Section verticalSpacing={5}>
          <Grid container spacing={2}>
@@ -22,7 +23,10 @@ const Story = ({ rawContent }: Props) => {
                >
                   The story
                </Typography>
-               <ThemedRichTextRenderer rawContent={rawContent} />
+               <ThemedRichTextRenderer
+                  references={references}
+                  rawContent={rawContent}
+               />
             </Grid>
          </Grid>
       </Section>

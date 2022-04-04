@@ -1,5 +1,14 @@
-export const parseCaseStudy = ({ published, ...caseStudy }) => ({
+import { CompanyCaseStudy, CompanyCaseStudyPreview } from "../../types/cmsTypes"
+
+export const parseCaseStudy = ({
+   published,
+   ...caseStudy
+}: CompanyCaseStudy | CompanyCaseStudyPreview):
+   | CompanyCaseStudy
+   | CompanyCaseStudyPreview => ({
+   ...caseStudy,
    ...(published && {
+      published,
       formattedPublished: new Intl.DateTimeFormat("en-US", {
          weekday: "long",
          year: "numeric",
@@ -7,7 +16,6 @@ export const parseCaseStudy = ({ published, ...caseStudy }) => ({
          day: "numeric",
       }).format(new Date(published)),
    }),
-   ...caseStudy,
 })
 interface GraphCMSImageLoaderProps {
    src: string

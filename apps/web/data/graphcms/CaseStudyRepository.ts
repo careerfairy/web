@@ -85,6 +85,21 @@ class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
                                      alt
                                  }
                              }
+                             # Your Testimonial query
+                             ... on Testimonial {
+                                 id
+                                 content,
+                                 person {
+                                     name,
+                                     photo{
+                                         url
+                                         width
+                                         height
+                                         caption
+                                         alt
+                                     }
+                                 }
+                             }
                          }
                      }
                      storySideImage {

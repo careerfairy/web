@@ -11,7 +11,8 @@ import Typography from "@mui/material/Typography"
 import Box from "@mui/material/Box"
 import { GraphCMSImageLoader } from "./util"
 import BlogCarousel from "../views/common/carousels/BlogCarousel"
-import { Carousel } from "../../types/cmsTypes"
+import { Carousel, Testimonial } from "../../types/cmsTypes"
+import BlogTestimonial from "../views/common/testimonial/BlogTestimonial"
 
 type Props = {
    rawContent: RichTextContent
@@ -25,7 +26,10 @@ const ThemedRichTextRenderer = ({ rawContent, references }: Props) => {
          renderers={{
             embed: {
                Carousel: (props: EmbedProps<Carousel>) => (
-                  <BlogCarousel {...props} />
+                  <BlogCarousel key={props.nodeId} {...props} />
+               ),
+               Testimonial: (props: EmbedProps<Testimonial>) => (
+                  <BlogTestimonial key={props.nodeId} {...props} />
                ),
             },
             blockquote: ({ children }) => (

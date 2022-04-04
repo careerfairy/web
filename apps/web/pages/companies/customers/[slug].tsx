@@ -23,14 +23,6 @@ export default function CaseStudy({
    moreCompanyCaseStudies,
    preview,
 }: Props) {
-   console.log(
-      "-> companyCaseStudy?.statisticsContentSection?.raw",
-      companyCaseStudy?.statisticsContentSection?.raw
-   )
-   console.log(
-      "-> companyCaseStudy?.statisticsContentSection?.references",
-      companyCaseStudy?.statisticsContentSection?.references
-   )
    return (
       <CaseStudyLayout preview={preview}>
          <SEO
@@ -52,10 +44,13 @@ export default function CaseStudy({
             companyName={companyCaseStudy?.company?.name}
             content={companyCaseStudy?.aboutTheCompany}
          />
-         <Story rawContent={companyCaseStudy?.storyContentSection?.raw} />
+         <Story
+            rawContent={companyCaseStudy?.storyContentSection?.raw}
+            references={companyCaseStudy?.statisticsContentSection?.references}
+         />
          <Statistics
             rawContent={companyCaseStudy?.statisticsContentSection?.raw}
-            references={companyCaseStudy?.statisticsContentSection.references}
+            references={companyCaseStudy?.statisticsContentSection?.references}
          />
       </CaseStudyLayout>
    )
@@ -76,10 +71,15 @@ export const getStaticProps: GetStaticProps = async ({
          notFound: true,
       }
    }
-   const parsedMoreCompanyCaseStudies = moreCompanyCaseStudies?.map((study) =>
-      parseCaseStudy(study)
-   )
-   const parsedCaseStudyData = parseCaseStudy(companyCaseStudy)
+
+   let parsedMoreCompanyCaseStudies = []
+
+   for (const moreCaseStudy of moreCompanyCaseStudies) {
+      const parsed = await parseCaseStudy(moreCaseStudy)
+      parsedMoreCompanyCaseStudies.push(parsed)
+   }
+
+   const parsedCaseStudyData = await parseCaseStudy(companyCaseStudy)
 
    return {
       props: {

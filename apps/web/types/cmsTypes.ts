@@ -24,9 +24,11 @@ export interface StatisticStat {
    id: string
 }
 
-export interface Author {
+export interface Person {
    name: string
    photo: CmsImage
+   role?: string
+   company?: Company
 }
 
 export interface Seo {
@@ -45,7 +47,7 @@ export interface CompanyCaseStudyPreview {
    formattedPublished?: string
    coverImage: CmsImage
    slug: Slug
-   authors: Author[]
+   authors: Person[]
 }
 
 export interface CompanyCaseStudy {
@@ -69,7 +71,7 @@ export interface CompanyCaseStudy {
    statisticStats: StatisticStat[]
    ogImage: CmsImage
    coverImage: CmsImage
-   authors: Author[]
+   authors: Person[]
    slug: Slug
    seo: Seo
 }
@@ -77,4 +79,9 @@ export interface CompanyCaseStudy {
 export interface Carousel {
    images: CmsImage[]
    title: string
+}
+
+export interface Testimonial {
+   content: string
+   person: Person
 }

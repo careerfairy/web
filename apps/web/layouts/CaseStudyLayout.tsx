@@ -15,6 +15,7 @@ const CaseStudyLayout: FC<Props> = ({ children, preview }) => {
             display: "flex",
             flexDirection: "column",
             bgcolor: "white",
+            position: "relative",
          }}
       >
          <GenericHeader
