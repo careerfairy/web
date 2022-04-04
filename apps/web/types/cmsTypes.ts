@@ -1,4 +1,4 @@
-import { RichTextContent } from "@graphcms/rich-text-types"
+import { RichTextContent, EmbedReferences } from "@graphcms/rich-text-types"
 
 export type Slug = string
 export interface CmsImage {
@@ -56,10 +56,12 @@ export interface CompanyCaseStudy {
    aboutTheCompany: string
    storyContentSection: {
       raw: RichTextContent
+      references: EmbedReferences
    }
    coverVideo: CmsVideo
    statisticsContentSection: {
       raw: RichTextContent
+      references: EmbedReferences
    }
    storySideImage: CmsImage
    statisticStats: StatisticStat[]

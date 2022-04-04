@@ -1,7 +1,6 @@
 import React from "react"
 import { RichText } from "@graphcms/rich-text-react-renderer"
-import { RichTextContent } from "@graphcms/rich-text-types"
-import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded"
+import { RichTextContent, EmbedReferences } from "@graphcms/rich-text-types"
 import Link from "next/link"
 import Image from "next/image"
 import Typography from "@mui/material/Typography"
@@ -10,12 +9,20 @@ import { GraphCMSImageLoader } from "./util"
 
 type Props = {
    rawContent: RichTextContent
+   references: EmbedReferences
 }
-const ThemedRichTextRenderer = ({ rawContent }: Props) => {
+const ThemedRichTextRenderer = ({ rawContent, references }: Props) => {
    return (
       <RichText
          content={rawContent}
+         references={references}
          renderers={{
+            embed: {
+               Carousel: (props) => {
+                  console.log("-> Carousel props", props)
+                  return <h1 className="post">Carousel</h1>
+               },
+            },
             blockquote: ({ children }) => (
                <Box
                   component={"blockquote"}
