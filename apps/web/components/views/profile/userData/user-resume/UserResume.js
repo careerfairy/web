@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
 
 const buttonChoices = ["Download CV", "Upload New CV [.pdf]", "Delete CV"]
 
-const UserResume = ({ firebase, userData }) => {
+const UserResume = ({ firebase, userData, outsideProfile }) => {
    const dispatch = useDispatch()
    const anchorRef = useRef(null)
 
@@ -166,9 +166,11 @@ const UserResume = ({ firebase, userData }) => {
 
    return (
       <>
-         <Typography className={classes.title} variant="h4">
-            Your CV
-         </Typography>
+         {!outsideProfile && (
+            <Typography className={classes.title} variant="h4">
+               Your CV
+            </Typography>
+         )}
          {userData && userData.userResume ? (
             <div className={classes.uploadedContainer}>
                <div className={classes.cvButton}>
@@ -271,15 +273,17 @@ const UserResume = ({ firebase, userData }) => {
                         </Grow>
                      )}
                   </Popper>
-                  <div className={classes.switch}>
-                     <Switch
-                        checked={userData?.shareResume}
-                        onChange={updateShareCvStatus}
-                        color="primary"
-                     />
-                     I want to share my CV with a company when joining their
-                     Talent Pool.
-                  </div>
+                  {!outsideProfile && (
+                     <div className={classes.switch}>
+                        <Switch
+                           checked={userData?.shareResume}
+                           onChange={updateShareCvStatus}
+                           color="primary"
+                        />
+                        I want to share my CV with a company when joining their
+                        Talent Pool.
+                     </div>
+                  )}
                </div>
             </div>
          ) : (
