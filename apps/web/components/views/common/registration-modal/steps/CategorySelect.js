@@ -186,7 +186,7 @@ const CategorySelect = () => {
                      ? `${group.universityName} Would Like To Know More About You`
                      : "Join live streams from"}
                </DialogTitle>
-               <GroupLogo logoUrl={livestream.companyLogoUrl} />
+               <GroupLogo logoUrl={livestream?.companyLogoUrl} />
                <DialogContent>
                   <DialogContentText align="center" noWrap>
                      {group.description}
