@@ -1,19 +1,15 @@
 import MultiStepWrapper, { MultiStepComponentType } from "./MultiStepWrapper"
-import React, { useContext, useState } from "react"
-import GroupProvider from "./GroupProvider"
+import React, { useState } from "react"
 import { Box, Button, Grid, Typography } from "@mui/material"
 import { SIGNUP_REDIRECT_PATH, SignupStepper } from "../../../pages/signup"
 import InterestsSelector from "./InterestsSelector"
 import { useRouter } from "next/router"
+import LoadingButton from "@mui/lab/LoadingButton"
 
 const steps: MultiStepComponentType[] = [
    {
       component: () => InterestsSelector,
       description: "Interests",
-   },
-   {
-      component: () => GroupProvider,
-      description: "Join Groups",
    },
 ]
 
@@ -22,9 +18,12 @@ const PersonaliseSteps = () => {
    const { push } = useRouter()
    const isLastStep = currentStep === steps.length - 1
    const isFirstStep = currentStep === 0
+   const [isLoadingRedirectPage, setIsLoadingRedirectPage] = useState(false)
 
    const handleContinue = () => {
       if (isLastStep) {
+         // set a loading state in the Finalise button, the next page may take some seconds to render
+         setIsLoadingRedirectPage(true)
          void push(SIGNUP_REDIRECT_PATH)
       } else {
          setCurrentStep((prev) => prev + 1)
@@ -39,9 +38,11 @@ const PersonaliseSteps = () => {
 
    return (
       <>
-         <Box mb={2}>
-            <SignupStepper steps={steps} currentStep={currentStep} />
-         </Box>
+         {steps.length > 1 && (
+            <Box mb={2}>
+               <SignupStepper steps={steps} currentStep={currentStep} />
+            </Box>
+         )}
 
          <MultiStepWrapper
             steps={steps}
@@ -58,9 +59,13 @@ const PersonaliseSteps = () => {
             <Grid item style={{ textAlign: "right" }} xs={6}>
                {!isFirstStep && <Button onClick={handlePrevious}>Back</Button>}
 
-               <Button variant="contained" onClick={handleContinue}>
+               <LoadingButton
+                  variant="contained"
+                  onClick={handleContinue}
+                  loading={isLoadingRedirectPage}
+               >
                   {isLastStep ? "Finalise" : "Continue"}
-               </Button>
+               </LoadingButton>
             </Grid>
          </Grid>
       </>
