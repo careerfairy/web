@@ -29,7 +29,7 @@ const styles = {
    },
 } as const
 
-export const UserResumeSelect = ({}) => {
+const UserResumeSelect = ({}) => {
    const { handleNext, handleClose, livestream, verifyResumeRequirement } =
       useContext(RegistrationContext)
    const { userData } = useAuth()
@@ -68,3 +68,5 @@ export const UserResumeSelect = ({}) => {
       </>
    )
 }
+
+export default UserResumeSelect

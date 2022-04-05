@@ -9,7 +9,7 @@ import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
-import { UserResumeSelect } from "./steps/UserResumeSelect"
+import UserResumeSelect from "./steps/UserResumeSelect"
 
 const styles = {
    panel: {
