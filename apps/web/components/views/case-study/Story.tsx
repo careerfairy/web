@@ -3,8 +3,8 @@ import Section from "./Section"
 import { EmbedReferences, RichTextContent } from "@graphcms/rich-text-types"
 import Grid from "@mui/material/Grid"
 import ThemedRichTextRenderer from "../../cms/ThemedRichTextRenderer"
-import Typography from "@mui/material/Typography"
 import Fade from "@stahl.luke/react-reveal/Fade"
+import SectionTitle from "./SectionTitle"
 
 interface Props {
    rawContent: RichTextContent
@@ -17,14 +17,7 @@ const Story = ({ rawContent, references }: Props) => {
          <Grid container spacing={2}>
             <Grid item>
                <Fade bottom>
-                  <Typography
-                     color={"text.secondary"}
-                     gutterBottom
-                     variant={"h4"}
-                     component={"h4"}
-                  >
-                     The story
-                  </Typography>
+                  <SectionTitle title={"The Story"} />
                </Fade>
                <Fade bottom>
                   <ThemedRichTextRenderer

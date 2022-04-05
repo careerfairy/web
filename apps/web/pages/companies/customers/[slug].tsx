@@ -52,6 +52,7 @@ export default function CaseStudy({
          <Statistics
             rawContent={companyCaseStudy?.statisticsContentSection?.raw}
             references={companyCaseStudy?.statisticsContentSection?.references}
+            stats={companyCaseStudy.statisticStats}
          />
          <SeeMore moreCompanyCaseStudies={moreCompanyCaseStudies} />
       </CaseStudyLayout>
