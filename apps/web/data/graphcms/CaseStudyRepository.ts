@@ -91,6 +91,7 @@ class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
                                  content,
                                  person {
                                      name,
+                                     role,
                                      photo{
                                          url
                                          width
@@ -162,6 +163,17 @@ class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
                      id
                      company {
                          name
+                         logo {
+                             height
+                             width
+                             url(
+                                 transformation: {
+                                     image: {
+                                         resize: { fit: clip, width: ${caseStudyCompanyLogoDimensions.width}, height: ${caseStudyCompanyLogoDimensions.height} }
+                                     }
+                                 }
+                             )
+                         }
                      }
                      published
                      ogImage: coverImage {

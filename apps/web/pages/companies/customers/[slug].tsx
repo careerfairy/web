@@ -12,6 +12,7 @@ import {
    CompanyCaseStudy,
 } from "../../../types/cmsTypes"
 import { GetStaticPaths, GetStaticProps } from "next"
+import SeeMore from "../../../components/views/case-study/SeeMore"
 
 interface Props {
    companyCaseStudy: CompanyCaseStudy
@@ -52,6 +53,7 @@ export default function CaseStudy({
             rawContent={companyCaseStudy?.statisticsContentSection?.raw}
             references={companyCaseStudy?.statisticsContentSection?.references}
          />
+         <SeeMore moreCompanyCaseStudies={moreCompanyCaseStudies} />
       </CaseStudyLayout>
    )
 }

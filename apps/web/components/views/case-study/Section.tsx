@@ -1,5 +1,5 @@
 import React, { FC, ReactElement } from "react"
-import Container from "@mui/material/Container"
+import Container, { ContainerProps } from "@mui/material/Container"
 import Box from "@mui/material/Box"
 import { SxProps } from "@mui/material"
 import { Theme } from "@mui/material/styles"
@@ -25,6 +25,7 @@ const Section: FC<SectionProps> = ({
    sx,
    disableBottomPadding,
    disableTopPadding,
+   maxWidth = "md",
    ...props
 }) => {
    return (
@@ -52,7 +53,7 @@ const Section: FC<SectionProps> = ({
          ]}
          component={"section"}
       >
-         <Container sx={styles.container} disableGutters maxWidth={"md"}>
+         <Container sx={styles.container} disableGutters maxWidth={maxWidth}>
             {children}
          </Container>
          {backgroundImages && (
@@ -69,6 +70,7 @@ interface SectionProps {
    verticalSpacing?: number
    disableBottomPadding?: boolean
    disableTopPadding?: boolean
+   maxWidth?: ContainerProps["maxWidth"]
 }
 
 export default Section

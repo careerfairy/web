@@ -6,10 +6,7 @@ import Image from "next/image"
 import { GraphCMSImageLoader } from "../../cms/util"
 import Grid from "@mui/material/Grid"
 import Fade from "@stahl.luke/react-reveal/Fade"
-import {
-   caseStudyCompanyCoverImageDimensions,
-   caseStudyCompanyLogoDimensions,
-} from "../../cms/constants"
+import { caseStudyCompanyLogoDimensions } from "../../cms/constants"
 import Video from "../../cms/Video"
 
 const gridSpacing = 3
@@ -58,10 +55,10 @@ const styles = {
 }
 const Hero = ({ company, coverVideoUrl, coverImage, title }: Props) => {
    return (
-      <Section sx={styles.root}>
+      <Section maxWidth={"lg"} sx={styles.root}>
          <Grid container spacing={gridSpacing}>
             <Grid item xs={12} md={5} sx={styles.detailsWrapper}>
-               <Fade up>
+               <Fade bottom>
                   <Image
                      loader={GraphCMSImageLoader}
                      width={caseStudyCompanyLogoDimensions.width}
@@ -76,18 +73,12 @@ const Hero = ({ company, coverVideoUrl, coverImage, title }: Props) => {
                </Fade>
             </Grid>
             <Grid item xs={12} md={7} sx={styles.coverMediaWrapper}>
-               <Fade>
-                  {coverVideoUrl ? (
-                     <Video maxWidth={maxVideoWidth} url={coverVideoUrl} />
-                  ) : (
-                     <Image
-                        loader={GraphCMSImageLoader}
-                        objectFit={"contain"}
-                        width={caseStudyCompanyCoverImageDimensions.width}
-                        height={caseStudyCompanyCoverImageDimensions.height}
-                        src={coverImage?.url || ""}
-                     />
-                  )}
+               <Fade bottom>
+                  <Video
+                     maxWidth={maxVideoWidth}
+                     coverImageUrl={coverImage?.url}
+                     videoUrl={coverVideoUrl}
+                  />
                </Fade>
             </Grid>
          </Grid>

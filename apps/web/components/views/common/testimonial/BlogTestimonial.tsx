@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography"
 import { EmbedProps } from "@graphcms/rich-text-types"
 import Image from "next/image"
 import Box from "@mui/material/Box"
+import { alpha } from "@mui/material/styles"
 const borderRadius = 5
 const styles = {
    root: {
@@ -20,7 +21,7 @@ const styles = {
       maxWidth: 500,
       marginLeft: "auto",
       overflow: "initial",
-      background: "#ffffff",
+      background: alpha("#ffffff", 0.5),
       display: "flex",
       flexDirection: { xs: "column", md: "row" },
       alignItems: "center",

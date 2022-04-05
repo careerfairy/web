@@ -2,6 +2,7 @@ import React from "react"
 import Section from "./Section"
 import Typography from "@mui/material/Typography"
 import Paper from "@mui/material/Paper"
+import Fade from "@stahl.luke/react-reveal/Fade"
 
 interface Props {
    content: string
@@ -13,6 +14,7 @@ const styles = {
       p: 2,
       borderRadius: 3,
       width: "fit-content",
+      backgroundColor: "background.default",
    },
    content: {
       whiteSpace: "pre-line",
@@ -21,17 +23,19 @@ const styles = {
 const About = ({ content, companyName }: Props) => {
    return (
       <Section verticalSpacing={3} disableBottomPadding>
-         <Paper sx={styles.wrapper} variant={"outlined"}>
-            <Typography
-               color={"text.secondary"}
-               gutterBottom
-               variant={"h4"}
-               component={"h4"}
-            >
-               About {companyName}
-            </Typography>
-            <Typography sx={styles.content}>{content}</Typography>
-         </Paper>
+         <Fade bottom>
+            <Paper sx={styles.wrapper} elevation={0}>
+               <Typography
+                  color={"text.secondary"}
+                  gutterBottom
+                  variant={"h4"}
+                  component={"h4"}
+               >
+                  About {companyName}
+               </Typography>
+               <Typography sx={styles.content}>{content}</Typography>
+            </Paper>
+         </Fade>
       </Section>
    )
 }

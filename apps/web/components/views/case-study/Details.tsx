@@ -2,7 +2,7 @@ import React from "react"
 import Section from "./Section"
 import Chip from "@mui/material/Chip"
 import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
+import Fade from "@stahl.luke/react-reveal/Fade"
 import { parseIndustryTag } from "../../cms/util"
 const styles = {
    root: {},
@@ -15,26 +15,28 @@ interface Props {
 const Details = ({ industries, published }: Props) => {
    return (
       <Section verticalSpacing={3} disableBottomPadding sx={styles.root}>
-         <Stack direction={"row"} spacing={2}>
-            <Chip
-               variant="outlined"
-               size={"medium"}
-               color="primary"
-               label={published}
-            />
-            {industries?.map((industry) => (
+         <Fade bottom>
+            <Stack direction={"row"} spacing={2}>
                <Chip
-                  key={industry}
                   variant="outlined"
                   size={"medium"}
-                  sx={{
-                     textTransform: "",
-                  }}
-                  color={"secondary"}
-                  label={parseIndustryTag(industry)}
+                  color="primary"
+                  label={published}
                />
-            ))}
-         </Stack>
+               {industries?.map((industry) => (
+                  <Chip
+                     key={industry}
+                     variant="outlined"
+                     size={"medium"}
+                     sx={{
+                        textTransform: "",
+                     }}
+                     color={"secondary"}
+                     label={parseIndustryTag(industry)}
+                  />
+               ))}
+            </Stack>
+         </Fade>
       </Section>
    )
 }

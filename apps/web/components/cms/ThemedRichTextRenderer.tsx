@@ -13,6 +13,7 @@ import { GraphCMSImageLoader } from "./util"
 import BlogCarousel from "../views/common/carousels/BlogCarousel"
 import { Carousel, Testimonial } from "../../types/cmsTypes"
 import BlogTestimonial from "../views/common/testimonial/BlogTestimonial"
+import Fade from "@stahl.luke/react-reveal/Fade"
 
 type Props = {
    rawContent: RichTextContent
@@ -26,23 +27,29 @@ const ThemedRichTextRenderer = ({ rawContent, references }: Props) => {
          renderers={{
             embed: {
                Carousel: (props: EmbedProps<Carousel>) => (
-                  <BlogCarousel key={props.nodeId} {...props} />
+                  <Fade bottom>
+                     <BlogCarousel key={props.nodeId} {...props} />
+                  </Fade>
                ),
                Testimonial: (props: EmbedProps<Testimonial>) => (
-                  <BlogTestimonial key={props.nodeId} {...props} />
+                  <Fade bottom>
+                     <BlogTestimonial key={props.nodeId} {...props} />
+                  </Fade>
                ),
             },
             blockquote: ({ children }) => (
-               <Box
-                  component={"blockquote"}
-                  sx={{
-                     pl: 2,
-                     borderLeft: "4px solid",
-                     borderColor: "primary.dark",
-                  }}
-               >
-                  <Typography>{children}</Typography>
-               </Box>
+               <Fade bottom>
+                  <Box
+                     component={"blockquote"}
+                     sx={{
+                        pl: 2,
+                        borderLeft: "4px solid",
+                        borderColor: "primary.dark",
+                     }}
+                  >
+                     <Typography>{children}</Typography>
+                  </Box>
+               </Fade>
             ),
             bold: ({ children }) => <b>{children}</b>,
             italic: ({ children }) => <em>{children}</em>,

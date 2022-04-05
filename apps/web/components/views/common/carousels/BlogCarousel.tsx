@@ -20,6 +20,12 @@ const styles = {
          pb: 4,
          my: 2,
       },
+      "& .slick-prev": {
+         left: 0,
+      },
+      "& .slick-next": {
+         right: 0,
+      },
       "& .slick-track": {
          display: "flex",
          alignItems: "center",
