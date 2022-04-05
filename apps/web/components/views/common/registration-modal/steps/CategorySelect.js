@@ -80,7 +80,7 @@ const CategorySelect = () => {
             setCheckingCategories(false)
          })()
       }
-   }, [group, alreadyJoined, userData, hasAgreedToAll])
+   }, [group, userData.id, hasAgreedToAll])
 
    useEffect(() => {
       if (categories) {
@@ -186,7 +186,7 @@ const CategorySelect = () => {
                      ? `${group.universityName} Would Like To Know More About You`
                      : "Join live streams from"}
                </DialogTitle>
-               <GroupLogo logoUrl={group.logoUrl} />
+               <GroupLogo logoUrl={livestream.companyLogoUrl} />
                <DialogContent>
                   <DialogContentText align="center" noWrap>
                      {group.description}
