@@ -4,6 +4,7 @@ import { Box, Button, Grid, Typography } from "@mui/material"
 import { SIGNUP_REDIRECT_PATH, SignupStepper } from "../../../pages/signup"
 import InterestsSelector from "./InterestsSelector"
 import { useRouter } from "next/router"
+import LoadingButton from "@mui/lab/LoadingButton/LoadingButton"
 
 const steps: MultiStepComponentType[] = [
    {
@@ -17,9 +18,12 @@ const PersonaliseSteps = () => {
    const { push } = useRouter()
    const isLastStep = currentStep === steps.length - 1
    const isFirstStep = currentStep === 0
+   const [isLoadingRedirectPage, setIsLoadingRedirectPage] = useState(false)
 
    const handleContinue = () => {
       if (isLastStep) {
+         // set a loading state in the Finalise button, the next page may take some seconds to render
+         setIsLoadingRedirectPage(true)
          void push(SIGNUP_REDIRECT_PATH)
       } else {
          setCurrentStep((prev) => prev + 1)
@@ -55,9 +59,13 @@ const PersonaliseSteps = () => {
             <Grid item style={{ textAlign: "right" }} xs={6}>
                {!isFirstStep && <Button onClick={handlePrevious}>Back</Button>}
 
-               <Button variant="contained" onClick={handleContinue}>
+               <LoadingButton
+                  variant="contained"
+                  onClick={handleContinue}
+                  loading={isLoadingRedirectPage}
+               >
                   {isLastStep ? "Finalise" : "Continue"}
-               </Button>
+               </LoadingButton>
             </Grid>
          </Grid>
       </>
