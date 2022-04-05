@@ -127,11 +127,10 @@ exports.sendReminderEmailAboutApplicationLink = functions
       minInstances: 1,
    })
    .https.onCall(async (data, context) => {
-      const TEMPLATE_ID = "25152103"
-
       functions.logger.log("data", data)
       const email = {
-         TemplateId: TEMPLATE_ID,
+         TemplateId:
+            process.env.POSTMARK_TEMPLATE_REMINDER_JOB_POSTING_APPLICATION,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: data.recipient,
          TemplateModel: {
