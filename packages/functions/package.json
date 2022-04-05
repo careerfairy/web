@@ -1,12 +1,12 @@
 {
-   "name": "careerfairy-functions",
+   "name": "@careerfairy/functions",
    "private": true,
    "main": "dist/index.js",
    "scripts": {
       "lint": "eslint --ext .ts .",
       "build": "npm run clean && npm run copy-files && tsc",
       "dev": "npm run watch | npm run start:emulators",
-      "start:emulators": "cross-env FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 firebase emulators:start --only auth,firestore,functions",
+      "start:emulators": "cross-env JAVA_TOOL_OPTIONS=-Xmx10g FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 firebase emulators:start --only auth,firestore,functions --export-on-exit --import ../../emulatorData/fetched",
       "watch": "npm run clean && npm run copy-files && tsc --watch",
       "copy-files": "cpx \"src/**/*.{json,html}\" dist/",
       "clean": "rimraf dist/",
