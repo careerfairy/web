@@ -23,12 +23,6 @@ let currentRunningProcess: ChildProcessWithoutNullStreams
  * Not catching exceptions on purpose, we should look into the error and fix it
  */
 async function run(): Promise<void> {
-   if (!process.env.JAVA_TOOL_OPTIONS) {
-      h1Text(
-         `Warning! JAVA_TOOL_OPTIONS not detected in your environment variables, the firebase emulators need a bigger heap to work with the imported data, you may need to set JAVA_TOOL_OPTIONS=-Xmx10g.`
-      )
-   }
-
    h1Text(`Starting downloading remote backup: ${config.BUCKET_FOLDER}`)
    await downloadRemoteBucket()
 
