@@ -1,6 +1,5 @@
 import MultiStepWrapper, { MultiStepComponentType } from "./MultiStepWrapper"
-import React, { useContext, useState } from "react"
-import GroupProvider from "./GroupProvider"
+import React, { useState } from "react"
 import { Box, Button, Grid, Typography } from "@mui/material"
 import { SIGNUP_REDIRECT_PATH, SignupStepper } from "../../../pages/signup"
 import InterestsSelector from "./InterestsSelector"
@@ -10,10 +9,6 @@ const steps: MultiStepComponentType[] = [
    {
       component: () => InterestsSelector,
       description: "Interests",
-   },
-   {
-      component: () => GroupProvider,
-      description: "Join Groups",
    },
 ]
 
@@ -39,9 +34,11 @@ const PersonaliseSteps = () => {
 
    return (
       <>
-         <Box mb={2}>
-            <SignupStepper steps={steps} currentStep={currentStep} />
-         </Box>
+         {steps.length > 1 && (
+            <Box mb={2}>
+               <SignupStepper steps={steps} currentStep={currentStep} />
+            </Box>
+         )}
 
          <MultiStepWrapper
             steps={steps}
