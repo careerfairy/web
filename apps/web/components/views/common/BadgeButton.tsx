@@ -29,7 +29,7 @@ const BadgeButton = ({
    badgeIconProps = {},
    buttonProps = {},
 }: Props) => {
-   buttonProps = Object.assign(buttonProps, { variant: "outlined" })
+   buttonProps = Object.assign({ variant: "outlined" }, buttonProps)
 
    const title = isActive ? activeTooltip(badge) : inactiveTooltip(badge)
 

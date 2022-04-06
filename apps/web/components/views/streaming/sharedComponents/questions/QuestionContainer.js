@@ -383,8 +383,9 @@ const QuestionContainer = memo(
                               `${badge.name} Badge, this user has referred more than 3 people.`
                            }
                            buttonProps={{
-                              color: active ? "info" : "primary",
+                              color: active ? "secondary" : "error",
                               size: "small",
+                              variant: "contained",
                            }}
                            badgeIconProps={{
                               noBg: true,
