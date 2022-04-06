@@ -13,7 +13,7 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import React from "react"
+import React, { useCallback } from "react"
 import { styles } from "../profileStyles"
 import ContentPasteIcon from "@mui/icons-material/ContentPaste"
 import { makeReferralUrl } from "../../../../util/makeUrls"
@@ -117,11 +117,12 @@ const localStyles = {
 }
 
 const RewardsTable = ({ userDataId }) => {
-   let { isLoading, data } = useCollection<Reward>(
+   const query = useCallback(
       (firestore) =>
          firestore.collection("userData").doc(userDataId).collection("rewards"),
-      true
+      [userDataId]
    )
+   let { isLoading, data } = useCollection<Reward>(query, true)
 
    if (isLoading) {
       return (
