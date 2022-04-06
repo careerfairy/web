@@ -174,7 +174,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       ;(async function handleAutoRegister() {
          if (stream?.registeredUsers?.includes(authenticatedUser.email)) {
             if (stream?.hasStarted) {
-               return;
+               return
             }
             const newQuery = { ...query }
             if (newQuery.register) {
