@@ -35,6 +35,7 @@ export const RegistrationContext = createContext({
    handleClientSideQuestionUpdate() {},
    groupsWithPolicies: [],
    hasAgreedToAll: false,
+   verifyResumeRequirement() {},
    completeRegistrationProcess() {},
    labels: [],
    promptOtherEventsOnFinal: false,
@@ -224,6 +225,16 @@ export function RegistrationContextProvider({
       })()
    }, [groups])
 
+   const verifyResumeRequirement = () => {
+      if (livestream) {
+         if (!livestream.withResume) {
+            handleNext()
+         }
+      } else {
+         handleClose()
+      }
+   }
+
    const completeRegistrationProcess = async () => {
       try {
          if (livestream) {
@@ -265,6 +276,7 @@ export function RegistrationContextProvider({
             handleClientSideQuestionUpdate,
             livestream,
             handleClose,
+            verifyResumeRequirement,
             completeRegistrationProcess,
             handleSkipNext,
             setTotalSteps,
