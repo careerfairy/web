@@ -2,6 +2,7 @@ import { Button, Tooltip } from "@mui/material"
 import React, { memo } from "react"
 import { Badge } from "@careerfairy/shared-lib/dist/badges"
 import BadgeIcon from "../common/BadgeIcon"
+import isEqual from "react-fast-compare"
 
 const styles = {
    disabled: {
@@ -37,6 +38,13 @@ const BadgeButton = ({
    if (!onClick) {
       buttonStyles = { ...buttonStyles, ...styles.noLink }
    }
+
+   // add styles to incoming sx object
+   if (buttonProps.sx) {
+      buttonProps.sx = Object.assign(buttonProps.sx, buttonStyles)
+   }
+
+   console.log("styles", buttonStyles)
 
    return (
       <Tooltip title={title}>
@@ -84,4 +92,4 @@ type Props = {
    buttonProps?: any
 }
 
-export default memo(BadgeButton)
+export default memo(BadgeButton, isEqual)

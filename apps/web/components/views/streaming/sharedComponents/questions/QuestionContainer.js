@@ -34,7 +34,6 @@ import { compose } from "redux"
 import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 import BadgeButton from "../../../common/BadgeButton"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges"
-import BadgeIcon from "../../../common/BadgeIcon"
 
 const useStyles = makeStyles((theme) => ({
    chatInput: {
@@ -379,13 +378,21 @@ const QuestionContainer = memo(
                         <BadgeButton
                            badge={NetworkerBadge}
                            showBadgeSuffix={false}
+                           onlyIcon
                            activeTooltip={(badge) =>
                               `${badge.name} Badge, this user has referred more than 3 people.`
                            }
                            buttonProps={{
-                              color: active ? "secondary" : "error",
+                              color: "gold",
                               size: "small",
                               variant: "contained",
+                              sx: {
+                                 minWidth: "30px",
+                                 width: "30px",
+                                 height: "30px",
+                                 borderRadius: "100%",
+                                 padding: 0,
+                              },
                            }}
                            badgeIconProps={{
                               noBg: true,
