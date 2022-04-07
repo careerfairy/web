@@ -105,7 +105,8 @@ const ViewerLayout = (props) => {
    const [hasCheckedForCategoryData, setHasCheckedForCategoryData] =
       useState(false)
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
-   const handleOpenJoinModal = ({ groups }) => setJoinGroupModalData({ groups })
+   const handleOpenJoinModal = ({ groups, livestream }) =>
+      setJoinGroupModalData({ groups, livestream })
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined)
    const currentLivestream = useStreamConnect()
    const handRaiseId =
@@ -235,7 +236,10 @@ const ViewerLayout = (props) => {
                   // Open the follow group dialog...
                   if (livestreamGroups?.length) {
                      // Only open dialog when there are groups
-                     handleOpenJoinModal({ groups: livestreamGroups })
+                     handleOpenJoinModal({
+                        groups: livestreamGroups,
+                        livestream: currentLivestream,
+                     })
                   }
                } else {
                   // If user is following one of the groups, please check if the user has all the categories of the group
@@ -246,7 +250,10 @@ const ViewerLayout = (props) => {
                      )
                   if (!userHasAllCategoriesOfGroup) {
                      // Open the category select dialog...
-                     handleOpenJoinModal({ groups: [groupThatUserFollows] })
+                     handleOpenJoinModal({
+                        groups: [groupThatUserFollows],
+                        livestream: currentLivestream,
+                     })
                   }
                }
             }
