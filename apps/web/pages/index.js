@@ -206,7 +206,6 @@ const StudentLandingPage = ({}) => {
 export const getServerSideProps = async (ctx) => {
    try {
       const cookies = nookies.get(ctx)
-      console.log("-> cookies", cookies)
 
       // const token = await firebaseAdmin.auth().verifyIdToken(cookies.token);
       //
