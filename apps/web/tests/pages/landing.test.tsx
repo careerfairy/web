@@ -8,11 +8,10 @@ describe("Landing Page Tests", () => {
       render(<LandingPage />)
       expect(screen.getByText("Our Next Events")).toBeInTheDocument()
    })
-   it("Should render the book a demo button with a link to the demo portal", () => {
+   it("Should render the 'View Upcoming Livestreams' button with a link to the next livestreams page", () => {
       render(<LandingPage />)
-      expect(screen.getAllByText("Book a Demo")[0]).toHaveAttribute(
-         "href",
-         "https://library.careerfairy.io/demo-request-1"
-      )
+      expect(
+         screen.getAllByText("View Upcoming Livestreams")[0]
+      ).toHaveAttribute("href", "/next-livestreams")
    })
 })
