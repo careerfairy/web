@@ -231,7 +231,7 @@ export function RegistrationContextProvider({
             handleNext()
          }
       } else {
-         handleNext()
+         handleClose()
       }
    }
 

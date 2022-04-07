@@ -3,6 +3,10 @@ node_modules
 .run
 .idea
 emulatorData
-functions/dist
-app/.next
 dist/
+.next/
+.turbo/
+
+# local env files
+.env.local
+.env.test.local

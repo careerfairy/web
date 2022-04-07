@@ -1,13 +1,20 @@
 {
-   "name": "careerfairy-webapp",
+   "name": "@careerfairy/webapp",
    "version": "0.0.0",
    "private": true,
    "scripts": {
-      "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 next",
+      "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=true next",
+      "start:emulators": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=true next start",
       "build": "cross-env NODE_ENV=production next build --debug",
       "start": "next start",
       "lint": "next lint",
-      "clean": "rimraf .next"
+      "playwright:report": "npx playwright show-report",
+      "clean": "rimraf .next",
+      "test": "jest",
+      "test:watch": "jest --watch",
+      "test:coverage": "jest --coverage",
+      "test:e2e-webapp": "playwright test",
+      "test:e2e-webapp-debug": "playwright test --debug"
    },
    "dependencies": {
       "@careerfairy/shared-lib": "*",
@@ -98,11 +105,11 @@
       "redux-thunk": "^2.3.0",
       "reselect": "^4.0.0",
       "slick-carousel": "^1.8.1",
-      "smoothscroll-polyfill": "^0.4.4",
       "use-pagination-firestore": "0.5.0",
       "uuid": "^8.3.0",
       "validate-color": "^2.1.1",
-      "yup": "^0.32.11"
+      "yup": "^0.32.11",
+      "smoothscroll-polyfill": "^0.4.4"
    },
    "browserslist": [
       "defaults",
@@ -128,10 +135,24 @@
       "node-sass": "^6.0.0",
       "prop-types": "^15.7.2",
       "react-perfect-scrollbar": "^1.5.8",
+      "react-test-renderer": "^17.0.2",
+      "ts-node": "^10.7.0",
       "rimraf": "^3.0.2",
       "typescript": "^4.5.5",
       "webpack": "^5.32.0",
-      "webpack-bundle-analyzer": "^4.4.0"
+      "webpack-bundle-analyzer": "^4.4.0",
+      "identity-obj-proxy": "^3.0.0",
+      "jest": "^27.5.1",
+      "jest-watch-typeahead": "^1.0.0",
+      "@testing-library/jest-dom": "^5.16.1",
+      "@testing-library/react": "^12.1.2",
+      "@testing-library/react-hooks": "^7.0.2",
+      "@testing-library/user-event": "^13.5.0",
+      "@types/jest": "^27.4.0",
+      "babel-jest": "^27.5.1",
+      "@playwright/test": "^1.20.0",
+      "esbuild": "^0.14.10",
+      "esbuild-jest": "^0.5.0"
    },
    "engines": {
       "node": "14.x"

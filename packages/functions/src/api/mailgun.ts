@@ -1,0 +1,21 @@
+import { isLocalEnvironment } from "../util"
+import * as mailgun from "mailgun-js"
+
+const apiKey = "13db35c5779d693ddad243d21e9d5cba-e566273b-b2967fc4"
+const host = "api.eu.mailgun.net"
+let domain = "mail.careerfairy.io"
+
+// on local emulators use the sandbox environment (emails whitelisted in mailgun)
+if (isLocalEnvironment()) {
+   domain =
+      "https://api.mailgun.net/v3/sandbox6105d057d95146d6ac6d5389bd1b44eb.mailgun.org"
+   console.log("Using mailgun sandbox environment")
+}
+
+export default {
+   mailgun: mailgun({
+      apiKey,
+      domain: domain,
+      host: host,
+   }),
+}

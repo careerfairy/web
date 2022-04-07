@@ -55,7 +55,7 @@ exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(
       let templates = []
       recipients.forEach((recipient) => {
          const email = {
-            TemplateId: 22748248,
+            TemplateId: process.env.POSTMARK_TEMPLATE_GARTNER,
             From: "CareerFairy <noreply@careerfairy.io>",
             To: recipient,
             TemplateModel: {
