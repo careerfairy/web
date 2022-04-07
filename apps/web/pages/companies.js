@@ -17,9 +17,11 @@ import {
    engageShape,
    reachShape,
    measureShape,
+   landingBottomBackground,
 } from "../constants/images"
+import HeadWithMeta from "../components/page/HeadWithMeta"
 
-const LandingPage = ({}) => {
+const CompanyLandingPage = () => {
    const {
       palette: { secondary, common, grey },
    } = useTheme()
@@ -60,65 +62,67 @@ const LandingPage = ({}) => {
    ]
 
    return (
-      <LandingLayout topImage={mainBackground}>
-         <HeroSection big handleOpenCalendly={handleOpenCalendly} />
-         <CompaniesSection overheadText="Over 200+ happy customers" />
-         <BenefitsSection
-            title={"Why CareerFairy?"}
-            benefits={companyBenefitsData}
+      <React.Fragment>
+         <HeadWithMeta
+            title={`CareerFairy | Watch live streams. Get hired.`}
+            fullPath={`https://careerfairy.io/`}
+            image={"https://careerfairy.io/logo_padding_teal.png"}
+            description={""}
          />
-         <UniversitySection
-            subtitle="The best talent is evenly distributed, which makes it
-            hard to reach. With CareerFairy live streams,
-            you can reach students at multiple top universities in a
-            single one hour-long event. No travel, no logistics, no days off work."
-            title="Some universities that we work with"
-         />
-         <StreamSection
-            title={
-               <>
-                  Showcase your best ambassadors <b>- your employees.</b>
-               </>
-            }
-            subtitle="We believe that your employees are your biggest asset, and their insights provide
+         <LandingLayout
+            bottomImage={landingBottomBackground}
+            topImage={mainBackground}
+         >
+            <HeroSection big handleOpenCalendly={handleOpenCalendly} />
+            <CompaniesSection overheadText="Over 200+ happy customers" />
+            <BenefitsSection
+               title={"Why CareerFairy?"}
+               benefits={companyBenefitsData}
+            />
+            <UniversitySection
+               title={"Some of the universities we work with"}
+               subtitle="Reach students at multiple universities with a single event. No travel, no logistics, no days off work."
+            />
+            {/*<iframe frameBorder="0" height="600" src="https://personal-habib.web.app/next-livestreams/GXW3MtpTehSmAe0aP1J4/embed" title="Events"/>*/}
+            <StreamSection
+               title={
+                  <>
+                     Showcase your best ambassadors <b>- your employees.</b>
+                  </>
+               }
+               subtitle="We believe that your employees are your biggest asset, and their insights provide
                 an authentic look into the opportunities that your company has to offer."
-         />
-         <AnalyticsSection
-            title={
-               <>
-                  Boost your <b>employer brand</b>, measure the results with{" "}
-                  <b>data</b>
-               </>
-            }
-            backgroundImage={rectangle1}
-            subtitle="Evaluate the success of your events, gather live feedback from your audience and follow up easily with interesting candidates"
-         />
-         <TestimonialsSection
-            title="What They Are Saying"
-            backgroundColor={grey["200"]}
-         />
-         <BookADemoSection
-            backgroundColor={`linear-gradient(-8deg, ${secondary.main} 1%, ${secondary.light} 100%)`}
-            color={common.white}
-            big
-            handleOpenCalendly={handleOpenCalendly}
-            title={"Join the ranks of leading organisations today"}
-         />
-         <CalendlyModal
-            open={calendlyModalOpen}
-            onClose={handleCloseCalendly}
-         />
-         <ScrollToTop />
-      </LandingLayout>
+            />
+            <AnalyticsSection
+               title={
+                  <>
+                     Boost your <b>employer brand</b>, measure the results with{" "}
+                     <b>data</b>
+                  </>
+               }
+               backgroundImage={rectangle1}
+               subtitle="Evaluate the success of your events, gather live feedback from your audience and follow up easily with interesting candidates"
+            />
+            <TestimonialsSection
+               title="What They Are Saying"
+               backgroundColor={grey["200"]}
+            />
+            <BookADemoSection
+               backgroundColor={`linear-gradient(-8deg, ${secondary.main} 1%, ${secondary.light} 100%)`}
+               color={common.white}
+               big
+               bookingWhite
+               handleOpenCalendly={handleOpenCalendly}
+               title={"Join the ranks of leading organisations today"}
+            />
+            <CalendlyModal
+               open={calendlyModalOpen}
+               onClose={handleCloseCalendly}
+            />
+            <ScrollToTop />
+         </LandingLayout>
+      </React.Fragment>
    )
 }
 
-export const getServerSideProps = () => {
-   return {
-      redirect: {
-         destination: "/",
-      },
-   }
-}
-
-export default LandingPage
+export default CompanyLandingPage
