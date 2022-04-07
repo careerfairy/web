@@ -107,6 +107,19 @@ const ChatCategory = ({ isStreamer, livestream, selectedState }) => {
       }
    }, [livestream.id])
 
+   const getAuthorName = () => {
+      if (isStreamer || livestream.test) return "Streamer"
+      if (userData)
+         return userData.firstName + " " + userData.lastName.charAt(0)
+      return "anonymous"
+   }
+
+   const getAuthorEmail = () => {
+      if (isStreamer || livestream.test) return "Streamer"
+      if (authenticatedUser.email) return authenticatedUser.email
+      return "anonymous"
+   }
+
    function addNewChatEntry() {
       if (!newChatEntry.trim() || submitting) {
          return
@@ -115,14 +128,8 @@ const ChatCategory = ({ isStreamer, livestream, selectedState }) => {
 
       const newChatEntryObject = {
          message: newChatEntry,
-         authorName:
-            isStreamer || livestream.test
-               ? "Streamer"
-               : userData.firstName + " " + userData.lastName.charAt(0),
-         authorEmail:
-            isStreamer || livestream.test
-               ? "Streamer"
-               : authenticatedUser.email,
+         authorName: getAuthorName(),
+         authorEmail: getAuthorEmail(),
          votes: 0,
       }
 
