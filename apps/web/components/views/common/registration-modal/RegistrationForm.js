@@ -9,6 +9,7 @@ import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
+import UserResumeSelect from "./steps/UserResumeSelect"
 
 const styles = {
    panel: {
@@ -20,30 +21,36 @@ const styles = {
 const steps = [
    {
       index: 0,
+      step: <UserResumeSelect />,
+      label: "Upload your resume",
+      id: "resumeUpload",
+   },
+   {
+      index: 1,
       step: <CategorySelect />,
       label: "Select your categories",
       id: "categorySelect",
    },
    {
-      index: 1,
+      index: 2,
       step: <QuestionUpvote />,
       label: "Add a Question",
       id: "questionsUpvote",
    },
    {
-      index: 2,
+      index: 3,
       step: <QuestionCreateForm />,
       label: "Upvote questions",
       id: "questionCreate",
    },
    {
-      index: 3,
+      index: 4,
       step: <TalentPoolJoin />,
       label: "Join Talent Pool",
       id: "talentPoolJoin",
    },
    {
-      index: 4,
+      index: 5,
       step: <RegistrationComplete />,
       label: "Finish",
       id: "registrationComplete",

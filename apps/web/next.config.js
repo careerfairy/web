@@ -12,10 +12,10 @@ const securityHeaders = [
    {
       key: "Content-Security-Policy",
       value:
-         "default-src blob: 'self' js.hs-scripts *.vitals.vercel-insights.com *.googleapis.com *.graphassets.com *.graphcms.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; " +
-         "script-src blob: 'self' static.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com; " +
+         "default-src blob: 'self' *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; " +
+         "script-src blob: 'self' *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com; " +
          "style-src 'self' *.vitals.vercel-insights.com *.googleapis.com 'unsafe-inline'; " +
-         "connect-src vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io;" +
+         "connect-src *.hotjar.com vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io;" +
          "img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com;",
    },
    {
