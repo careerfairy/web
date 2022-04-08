@@ -27,14 +27,14 @@ const initialMainLinks = [
 ]
 const initialSecondaryLinks = [
    {
-      href: `/students`,
+      href: `/`,
       title: "For Students",
-      basePath: "/students",
+      basePath: "/",
    },
    {
-      href: `/`,
+      href: `/companies`,
       title: "For Companies",
-      basePath: "/",
+      basePath: "/companies",
    },
    {
       href: `/career-center`,
