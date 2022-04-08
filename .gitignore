@@ -20,6 +20,3 @@ test-results/
 playwright-report/
 
 .DS_Store
-!/apps/web/.env.local
-!/apps/web/
-.env.local

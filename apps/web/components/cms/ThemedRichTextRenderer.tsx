@@ -27,13 +27,13 @@ const ThemedRichTextRenderer = ({ rawContent, references }: Props) => {
          renderers={{
             embed: {
                Carousel: (props: EmbedProps<Carousel>) => (
-                  <Fade bottom>
-                     <BlogCarousel key={props.nodeId} {...props} />
+                  <Fade key={props.nodeId} bottom>
+                     <BlogCarousel {...props} />
                   </Fade>
                ),
                Testimonial: (props: EmbedProps<Testimonial>) => (
-                  <Fade bottom>
-                     <BlogTestimonial key={props.nodeId} {...props} />
+                  <Fade key={props.nodeId} bottom>
+                     <BlogTestimonial {...props} />
                   </Fade>
                ),
             },

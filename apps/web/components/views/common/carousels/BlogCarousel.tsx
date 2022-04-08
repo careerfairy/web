@@ -94,7 +94,7 @@ const BlogCarousel = ({ images, nodeId }: EmbedProps<Carousel>) => {
    return (
       <>
          <Box sx={styles.root}>
-            <Slider key={nodeId} {...settings}>
+            <Slider {...settings}>
                {images.map(({ url, height, width, alt }, index) => (
                   <Box sx={styles.imageWrapper}>
                      <Image

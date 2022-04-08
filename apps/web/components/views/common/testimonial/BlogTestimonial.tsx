@@ -47,19 +47,9 @@ const styles = {
       backgroundColor: "#fff",
       position: "relative",
       transform: { md: "translateX(-8px)" },
-      "&:after": {
-         content: '" "',
-         position: "absolute",
-         top: 0,
-         left: 0,
-         width: "100%",
-         height: "100%",
-         borderRadius,
-         opacity: 0.5,
-      },
    },
    content: {
-      padding: 4,
+      maxWidth: { md: "70%" },
    },
    cta: {
       marginTop: 4,
@@ -81,7 +71,7 @@ const BlogTestimonial = ({ person, content }: EmbedProps<Testimonial>) => {
                <Image src={person.photo.url} layout="fill" objectFit="cover" />
             </Box>
          </CardMedia>
-         <CardContent>
+         <CardContent sx={styles.content}>
             <Typography gutterBottom variant={"body1"} sx={styles.contentText}>
                {content}
             </Typography>

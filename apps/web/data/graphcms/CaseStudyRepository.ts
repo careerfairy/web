@@ -1,5 +1,4 @@
 import { fetchAPI } from "./index"
-import { gql } from "graphql-request"
 import {
    caseStudyCompanyCoverImageDimensions,
    caseStudyCompanyLogoDimensions,
@@ -26,7 +25,7 @@ class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
    constructor() {}
 
    async getAllCaseStudiesWithSlug(): Promise<{ slug: Slug }[]> {
-      const data = await fetchAPI(gql`
+      const data = await fetchAPI(`
          {
             companyCaseStudies {
                slug
@@ -44,7 +43,7 @@ class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
       moreCompanyCaseStudies: CompanyCaseStudyPreview[]
    }> {
       return await fetchAPI(
-         gql`
+         `
              query CompanyCaseStudyBySlug($slug: String!, $stage: Stage!) {
                  companyCaseStudy(stage: $stage, where: { slug: $slug }) {
                      title

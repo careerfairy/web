@@ -1,6 +1,6 @@
 import { NextSeo, NextSeoProps } from "next-seo"
 import { useRouter } from "next/router"
-import { getBaseUrlV2 } from "../helperFunctions/HelperFunctions"
+import { getBaseUrl } from "../helperFunctions/HelperFunctions"
 
 const SEO = ({
    id,
@@ -23,7 +23,7 @@ const SEO = ({
                },
             ],
          }),
-         url: getBaseUrlV2() + router.asPath,
+         url: getBaseUrl() + router.asPath,
          ...props,
       },
       ...props,
