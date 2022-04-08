@@ -20,11 +20,11 @@ const initialHeaderLinks = [
 ]
 const initialDrawerBottomLinks = [
    {
-      href: `https://corporate.careerfairy.io/companies`,
+      href: `/companies`,
       title: "FOR COMPANIES",
    },
    {
-      href: `https://corporate.careerfairy.io/career-center`,
+      href: `/career-center`,
       title: "FOR CAREER CENTERS",
    },
    {

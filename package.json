@@ -38,5 +38,8 @@
    "packageManager": "npm@8.5.5",
    "engines": {
       "npm": ">=7"
+   },
+   "dependencies": {
+      "nookies": "^2.5.2"
    }
 }
