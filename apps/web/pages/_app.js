@@ -6,7 +6,6 @@ import { newStore, wrapper } from "../store"
 import NextNProgress from "nextjs-progressbar"
 import { brandedLightTheme } from "../materialUI"
 import Head from "next/head"
-import TagManager from "react-gtm-module"
 import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar"
 import ErrorContext from "../context/error/ErrorContext"
 import TutorialContext from "../context/tutorials/TutorialContext"
@@ -19,7 +18,6 @@ import { Provider } from "react-redux"
 import { CacheProvider } from "@emotion/react"
 import createEmotionCache from "../materialUI/createEmotionCache"
 import Notifier from "../components/views/notifier"
-import { getCookieConsentValue } from "react-cookie-consent"
 import CFCookieConsent from "../components/views/common/cookie-consent/CFCookieConsent"
 import { useRouter } from "next/router"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
@@ -30,6 +28,7 @@ import firebaseApp from "../data/firebase/FirebaseInstance"
 import "../util/FirebaseUtils"
 import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
 import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
+import GoogleTagManager from "../HOCs/GoogleTagManager"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -96,18 +95,6 @@ function MyApp(props) {
 
    const [showBubbles, setShowBubbles] = useState(false)
    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
-
-   const tagManagerArgs = {
-      gtmId: "GTM-P29VCWC",
-   }
-
-   const cookieValue = getCookieConsentValue()
-
-   useEffect(() => {
-      if (Boolean(cookieValue === "true" && !disableCookies)) {
-         TagManager.initialize(tagManagerArgs)
-      }
-   }, [cookieValue, disableCookies])
 
    useEffect(() => {
       setDisableCookies(
@@ -177,29 +164,34 @@ function MyApp(props) {
                   }}
                >
                   <AuthProvider>
-                     <ThemeProviderWrapper>
-                        <FirebaseServiceContext.Provider
-                           value={firebaseServiceInstance}
-                        >
-                           <LocalizationProvider dateAdapter={AdapterDateFns}>
-                              <ErrorContext.Provider
-                                 value={{ generalError, setGeneralError }}
+                     <GoogleTagManager disableCookies={disableCookies}>
+                        <ThemeProviderWrapper>
+                           <FirebaseServiceContext.Provider
+                              value={firebaseServiceInstance}
+                           >
+                              <LocalizationProvider
+                                 dateAdapter={AdapterDateFns}
                               >
-                                 {disableCookies || isRecordingWindow ? null : (
-                                    <CFCookieConsent />
-                                 )}
-                                 <UserRewardsNotifications>
-                                    <Component {...pageProps} />
-                                 </UserRewardsNotifications>
-                                 <Notifier />
-                                 <ErrorSnackBar
-                                    handleClose={() => setGeneralError("")}
-                                    errorMessage={generalError}
-                                 />
-                              </ErrorContext.Provider>
-                           </LocalizationProvider>
-                        </FirebaseServiceContext.Provider>
-                     </ThemeProviderWrapper>
+                                 <ErrorContext.Provider
+                                    value={{ generalError, setGeneralError }}
+                                 >
+                                    {disableCookies ||
+                                    isRecordingWindow ? null : (
+                                       <CFCookieConsent />
+                                    )}
+                                    <UserRewardsNotifications>
+                                       <Component {...pageProps} />
+                                    </UserRewardsNotifications>
+                                    <Notifier />
+                                    <ErrorSnackBar
+                                       handleClose={() => setGeneralError("")}
+                                       errorMessage={generalError}
+                                    />
+                                 </ErrorContext.Provider>
+                              </LocalizationProvider>
+                           </FirebaseServiceContext.Provider>
+                        </ThemeProviderWrapper>
+                     </GoogleTagManager>
                   </AuthProvider>
                </TutorialContext.Provider>
             </ReactReduxFirebaseProvider>
