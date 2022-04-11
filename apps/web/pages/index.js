@@ -2,30 +2,37 @@ import React, { useState } from "react"
 import { useTheme } from "@mui/material/styles"
 import LandingLayout from "../layouts/LandingLayout"
 import BookADemoSection from "../components/views/landing/BookADemoSection"
-import TestimonialsSection from "../components/views/landing/TestimonialsSection"
-import AnalyticsSection from "../components/views/landing/AnalyticsSection"
-import StreamSection from "../components/views/landing/StreamSection"
-import UniversitySection from "../components/views/landing/UniversitySection"
-import BenefitsSection from "../components/views/landing/BenefitsSection"
 import CompaniesSection from "../components/views/landing/CompaniesSection"
-import HeroSection from "../components/views/landing/HeroSection"
 import CalendlyModal from "../components/views/landing/CalendlyModal"
 import ScrollToTop from "../components/views/common/ScrollToTop"
 import {
-   rectangle1,
-   mainBackground,
-   engageShape,
-   reachShape,
-   measureShape,
+   alternateStudentBackground,
    landingBottomBackground,
+   lightBulbShape,
+   locationShape,
+   suitCaseShape,
 } from "../constants/images"
 import HeadWithMeta from "../components/page/HeadWithMeta"
+import StudentHeroSection from "../components/views/landing/HeroSection/StudentHeroSection"
+import UpcomingLivestreamsSection from "../components/views/landing/UpcomingLivestreamsSection"
+import FollowCompaniesSection from "../components/views/landing/FollowCompaniesSection"
+import StudentBenefitsSection from "../components/views/landing/StudentBenefitsSection"
+import Link from "materialUI/NextNavLink"
+import NumbersSection from "../components/views/landing/NumbersSection"
+import { useAuth } from "../HOCs/AuthProvider"
+import SpeakersSection from "../components/views/landing/SpeakersSection"
+import RegistrationModal from "../components/views/common/registration-modal"
+import nookies from "nookies"
 
-const LandingPage = () => {
+const StudentLandingPage = ({}) => {
    const {
-      palette: { secondary, common, grey },
+      palette: { secondary, common },
    } = useTheme()
 
+   const { userData } = useAuth()
+   const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
+   const handleCloseJoinModal = () => setJoinGroupModalData(undefined)
+   const handleOpenJoinModal = ({ groups }) => setJoinGroupModalData({ groups })
    const [calendlyModalOpen, setCalendlyModalOpen] = useState(false)
 
    const handleOpenCalendly = () => {
@@ -34,30 +41,95 @@ const LandingPage = () => {
 
    const handleCloseCalendly = () => setCalendlyModalOpen(false)
 
-   const companyBenefitsData = [
+   const studentBenefitsData = [
       {
-         name: "Create fun career events",
+         name: "Get inspired",
          description:
-            "A highly interactive format " +
-            "developed for a young " +
-            "audience worldwide",
-         imageUrl: engageShape,
+            "Discover who's hiring and meet people in different workplaces",
+         imageUrl: lightBulbShape, // personShape might give better context
+         buttonProps: !userData && {
+            children: "Discover",
+            href: "/next-livestreams",
+            component: Link,
+         },
       },
       {
-         name: "Reach more talents",
+         name: "Land your dream job",
          description:
-            "We promote your events to " +
-            "the CareerFairy community " +
-            "and universities",
-         imageUrl: reachShape,
+            "Connect with recruiters that will give you valuable tips & tricks to stand out",
+         imageUrl: suitCaseShape,
       },
       {
-         name: "Easily measure success",
+         name: "Connect from anywhere",
          description:
-            "Demonstrate the success of " +
-            "your events through " +
-            "detailed analytics",
-         imageUrl: measureShape,
+            "Connect via your laptop or phone - anytime, from anywhere",
+         imageUrl: locationShape,
+      },
+   ]
+
+   const numbersData = [
+      {
+         id: 1,
+         amount: "250+",
+         label: "Companies",
+      },
+      {
+         id: 2,
+         amount: "700+",
+         label: "Live Streaming Events",
+      },
+      {
+         id: 3,
+         amount: "80+",
+         label: "Universities",
+      },
+   ]
+
+   const speakers = [
+      {
+         avatarUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2F23581989-66fc-4de8-8a73-75d9614df8f7_Theresa_Wang.jpg?alt=media",
+         position: "Project Leader",
+         name: "Theresa",
+         companyName: "Consultant",
+         companyUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2F997c48b1-8b5d-4670-b2c7-b59d52563a24_BCG_LOCKUP_CMYK_BLACK.png?alt=media",
+      },
+      {
+         avatarUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fe03205ff-516b-4ddb-bb33-a39517ac1def__Mauer.png?alt=media",
+         position: "CEO of Aisight und KI-Experte",
+         name: "Matthias",
+         companyUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2F01ce5c5c-8e72-44de-a3ac-bf5c31542f26_logo.jpg?alt=media",
+      },
+      {
+         avatarUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fe67a2e65-8ac9-4ab6-92f0-bfd8b706af12_IA.jpg?alt=media",
+         position:
+            "Analyst, Structured & Solutions Global Market Sales Switzerland",
+         name: "Ines",
+         companyName: "UBS",
+         companyUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Ff0967998-3ef3-4942-be6e-b9ddd11c06aa_b_2018.jpg?alt=media",
+      },
+      {
+         avatarUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fdeb6bccd-3463-4107-86c9-babb90be0c29_anager.jpg?alt=media",
+         position: "Senior Innovation Manager",
+         name: "Dirk",
+         companyName: "NIVEA",
+         companyUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fnivea-logo.png?alt=media&token=c8b982c6-4a9d-4bad-bbd9-607e0d2f213d",
+      },
+      {
+         avatarUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2F8f75bb7f-c6ae-4cea-b531-d9c8986b2de9_la_009.jpg?alt=media",
+         position: "Campus Recruiter",
+         name: "Manuela",
+         companyName: "KPMG",
+         companyUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2F68d9a71d-cacd-46da-ac03-deabc74c7e77_ne__1_.jpg?alt=media",
       },
    ]
 
@@ -71,58 +143,92 @@ const LandingPage = () => {
          />
          <LandingLayout
             bottomImage={landingBottomBackground}
-            topImage={mainBackground}
+            topImage={alternateStudentBackground}
          >
-            <HeroSection big handleOpenCalendly={handleOpenCalendly} />
-            <CompaniesSection overheadText="Over 200+ happy customers" />
-            <BenefitsSection
-               title={"Why CareerFairy?"}
-               benefits={companyBenefitsData}
+            <StudentHeroSection big />
+            <CompaniesSection
+               title={"250+ companies and startups are waiting for you."}
             />
-            <UniversitySection
-               title={"Some of the universities we work with"}
-               subtitle="Reach students at multiple universities with a single event. No travel, no logistics, no days off work."
+            <SpeakersSection
+               speakers={speakers}
+               title={"Meet your future colleagues."}
+               subtitle={"Recent speakers that you might have missed"}
             />
-            {/*<iframe frameBorder="0" height="600" src="https://personal-habib.web.app/next-livestreams/GXW3MtpTehSmAe0aP1J4/embed" title="Events"/>*/}
-            <StreamSection
+            <UpcomingLivestreamsSection
+               title={"Next events"}
+               handleOpenJoinModal={handleOpenJoinModal}
+            />
+            <FollowCompaniesSection
+               title={
+                  "See your favourite companies missing? Let's change that."
+               }
+            />
+            <StudentBenefitsSection
                title={
                   <>
-                     Showcase your best ambassadors <b>- your employees.</b>
+                     Connecting <b>students</b> and <b>companies</b> in a
+                     meaningful way.
                   </>
                }
-               subtitle="We believe that your employees are your biggest asset, and their insights provide
-                an authentic look into the opportunities that your company has to offer."
+               benefits={studentBenefitsData}
             />
-            <AnalyticsSection
-               title={
-                  <>
-                     Boost your <b>employer brand</b>, measure the results with{" "}
-                     <b>data</b>
-                  </>
-               }
-               backgroundImage={rectangle1}
-               subtitle="Evaluate the success of your events, gather live feedback from your audience and follow up easily with interesting candidates"
-            />
-            <TestimonialsSection
-               title="What They Are Saying"
-               backgroundColor={grey["200"]}
-            />
+            <NumbersSection numbersData={numbersData} />
             <BookADemoSection
-               backgroundColor={`linear-gradient(-8deg, ${secondary.main} 1%, ${secondary.light} 100%)`}
-               color={common.white}
+               backgroundColor={`transparent`}
+               color={common.black}
                big
-               bookingWhite
+               goToNextLivestreams
+               goTo={userData ? "/next-livestreams" : "/signup"}
                handleOpenCalendly={handleOpenCalendly}
-               title={"Join the ranks of leading organisations today"}
+               title={
+                  userData
+                     ? "Register for your first event today"
+                     : "Start finding your dream job today!"
+               }
+               dividerColor={secondary.light}
             />
             <CalendlyModal
                open={calendlyModalOpen}
                onClose={handleCloseCalendly}
             />
             <ScrollToTop />
+            <RegistrationModal
+               open={Boolean(joinGroupModalData)}
+               handleClose={handleCloseJoinModal}
+               livestream={joinGroupModalData?.livestream}
+               groups={joinGroupModalData?.groups}
+            />
          </LandingLayout>
       </React.Fragment>
    )
 }
 
-export default LandingPage
+export const getServerSideProps = async (ctx) => {
+   try {
+      const cookies = nookies.get(ctx)
+
+      // const token = await firebaseAdmin.auth().verifyIdToken(cookies.token);
+      //
+      // // the user is authenticated!
+      // const { uid, email } = token;
+
+      // FETCH STUFF HERE!! 🚀
+
+      const firebaseToken = cookies.token
+
+      if (firebaseToken) {
+         return {
+            redirect: {
+               destination: "/portal",
+               permanent: false,
+            },
+         }
+      }
+
+      return { props: {} }
+   } catch (err) {
+      return { props: {} }
+   }
+}
+
+export default StudentLandingPage

@@ -70,6 +70,7 @@ interface Schema {
 }
 
 export default interface RootState extends DefaultRootState {
+   generalLayout: any
    auth: AuthReducer
    stream: StreamReducer
    firebase: FirebaseReducer.Reducer<{}, Schema>

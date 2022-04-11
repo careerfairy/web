@@ -6,6 +6,7 @@ import { FirebaseReducer, useFirestoreConnect } from "react-redux-firebase"
 import RootState from "../store/reducers"
 import * as Sentry from "@sentry/nextjs"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
+import nookies from "nookies"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -113,6 +114,17 @@ const AuthProvider = ({ children }) => {
             })
       }
    }, [userData])
+
+   useEffect(() => {
+      return firebaseServiceInstance.auth.onIdTokenChanged(async (user) => {
+         if (!user) {
+            nookies.set(undefined, "token", "", { path: "/" })
+         } else {
+            const token = await user.getIdToken()
+            nookies.set(undefined, "token", token, { path: "/" })
+         }
+      })
+   }, [])
 
    const isSecurePath = () => {
       return Boolean(securePaths.includes(pathname))

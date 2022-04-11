@@ -12,7 +12,7 @@ const securityHeaders = [
    {
       key: "Content-Security-Policy",
       value:
-         "default-src blob: 'self' *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; " +
+         "default-src blob: 'self' *.graphassets.com *.graphcms.com *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com; " +
          "script-src blob: 'self' *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com; " +
          "style-src 'self' *.vitals.vercel-insights.com *.googleapis.com 'unsafe-inline'; " +
          "connect-src *.hotjar.com vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io;" +
@@ -64,7 +64,11 @@ const moduleExports = {
       ]
    },
    images: {
-      domains: ["firebasestorage.googleapis.com"],
+      domains: [
+         "firebasestorage.googleapis.com",
+         "media.graphcms.com",
+         "media.graphassets.com",
+      ],
    },
    webpackDevMiddleware: (config) => {
       config.watchOptions = {

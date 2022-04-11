@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react"
 import { Identifiable } from "../../types/commonTypes"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import firebase from "firebase"
 import { Interest } from "types/interests"
 import { Group } from "types/groups"
-import Query = firebase.firestore.Query
-import Firestore = firebase.firestore.Firestore
+import { Query, FirebaseFirestore } from "@firebase/firestore-types"
 
 /**
  * Fetch a Firestore collection
@@ -63,7 +61,7 @@ function useCollection<T extends Identifiable>(
    return { isLoading: isLoading, data: documents, error: error }
 }
 
-type GetReferenceFn = (firestore: Firestore) => Query
+type GetReferenceFn = (firestore: FirebaseFirestore) => Query
 
 interface CollectionResponse<T> {
    isLoading: boolean

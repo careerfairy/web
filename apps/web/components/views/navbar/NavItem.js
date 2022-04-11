@@ -5,14 +5,14 @@ import { useRouter } from "next/router"
 import Link from "../../../materialUI/NextNavLink"
 
 const NavItem = ({
-   className,
-   basePath,
+   className = undefined,
+   basePath = undefined,
    black,
    href,
    icon: Icon,
    title,
-   svgIcon,
-   onClick,
+   svgIcon = undefined,
+   onClick = undefined,
    ...rest
 }) => {
    const { pathname } = useRouter()

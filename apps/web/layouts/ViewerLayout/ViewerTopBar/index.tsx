@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import {
@@ -34,6 +34,12 @@ import ViewerCtaModal from "./ViewerCtaModal"
 import FocusModeButton from "./buttons/FocusModeButton"
 import JoinTalentPoolButton from "./buttons/JoinTalentPoolButton"
 import { localStorageAudienceDrawerKey } from "constants/localStorageKeys"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import BadgeButton from "../../../components/views/common/BadgeButton"
+import {
+   getUserBadges,
+   Badge as BadgeType,
+} from "@careerfairy/shared-lib/dist/badges"
 
 const useStyles = makeStyles((theme) => ({
    toolbar: {
@@ -89,11 +95,11 @@ const ViewerTopBar = ({
    const links = useStreamToken({ forStreamType: "mainLivestream" })
    const theme = useTheme()
    const { currentLivestream } = useCurrentStream()
-   const numberOfViewers = useSelector((state) =>
+   const numberOfViewers = useSelector((state: any) =>
       currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0
    )
 
-   const breakoutRoomOpen = useSelector((state) =>
+   const breakoutRoomOpen = useSelector((state: any) =>
       Boolean(
          breakoutRoomsSelector(
             state.firestore.ordered[`Active BreakoutRooms of ${livestreamId}`]
@@ -101,7 +107,7 @@ const ViewerTopBar = ({
       )
    )
    const focusModeEnabled = useSelector(
-      (state) => state.stream.layout.focusModeEnabled
+      (state: any) => state.stream.layout.focusModeEnabled
    )
 
    const careerCenters = useStreamGroups(currentLivestream?.groupIds)
@@ -184,13 +190,10 @@ const ViewerTopBar = ({
                   tooltipText="Click here to see who's joined the stream since the start"
                   localStorageKey={localStorageAudienceDrawerKey}
                   tooltipTitle="Hint"
+                  hide={false}
                >
                   <Tooltip title="See who joined">
-                     <IconButton
-                        onClick={showAudience}
-                        className={classes.floatingButton}
-                        size="large"
-                     >
+                     <IconButton onClick={showAudience} size="large">
                         <Badge
                            max={999999}
                            color="secondary"
@@ -218,10 +221,10 @@ const ViewerTopBar = ({
    }
 
    const logoElements = careerCenters
+      .filter((cc) => cc.logoUrl || cc.groupId)
       .map((cc) => {
          return <Logo key={cc.groupId} src={cc.logoUrl} />
       })
-      .filter((cc) => cc.logoUrl || cc.groupId)
 
    return (
       <React.Fragment>
@@ -229,10 +232,16 @@ const ViewerTopBar = ({
             <Toolbar className={classes.toolbar}>
                <MainLogo white={theme.palette.mode === "dark"} />
                {logoElements}
+
+               <Box ml={logoElements.length > 0 ? 0 : 1}>
+                  <UserBadge />
+               </Box>
+
                <Box flexGrow={1} />
                {currentLivestream.companyLogoUrl && (
                   <Logo src={currentLivestream.companyLogoUrl} />
                )}
+
                <Box display="flex" alignItems="center">
                   {breakoutRoomId && (
                      <Tooltip title="Back to main room">
@@ -297,6 +306,7 @@ const ViewerTopBar = ({
                      tooltipText="Click here to see who's joined the stream since the start"
                      localStorageKey={localStorageAudienceDrawerKey}
                      tooltipTitle="Hint"
+                     hide={false}
                   >
                      <Box className={classes.viewCount}>
                         <Tooltip title="See who joined">
@@ -326,6 +336,7 @@ const ViewerTopBar = ({
          <ViewerBreakoutRoomModal
             localStorageAudienceDrawerKey={localStorageAudienceDrawerKey}
             handleBackToMainRoom={handleBackToMainRoom}
+            mobile={false}
          />
          <ViewerCtaModal mobile={mobile} />
       </React.Fragment>
@@ -337,6 +348,31 @@ ViewerTopBar.propTypes = {
    showAudience: PropTypes.func.isRequired,
    showMenu: PropTypes.bool.isRequired,
    selectedState: PropTypes.string,
+}
+
+const UserBadge = () => {
+   const { userData } = useAuth()
+
+   const tooltipText = useCallback(
+      (badge: BadgeType) =>
+         `You earned the ${badge.name} badge! Your questions during this event will be highlighted!`,
+      []
+   )
+
+   if (!userData) return null
+
+   const networkerBadge = getUserBadges(userData.badges)?.networkerBadge()
+
+   if (!networkerBadge) return null
+
+   return (
+      <BadgeButton
+         badge={networkerBadge}
+         showBadgeSuffix={false}
+         showIcon={false}
+         activeTooltip={tooltipText}
+      />
+   )
 }
 
 export default ViewerTopBar
