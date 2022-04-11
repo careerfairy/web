@@ -223,7 +223,6 @@ const StreamsLayout = ({
                                  streamerId={streamerId}
                                  presenter={presenter}
                                  viewer={viewer}
-                                 showMenu={!viewer}
                               />
                            )}
                         </StreamElementWrapper>
