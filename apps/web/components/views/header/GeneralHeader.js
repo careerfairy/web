@@ -30,11 +30,11 @@ const styles = {
    }),
 }
 const GeneralHeader = ({
-   transparent,
+   transparent = false,
    children,
-   permanent,
-   className,
-   position,
+   permanent = false,
+   className = "",
+   position = "static",
    ...rest
 }) => {
    const absolute = position === "absolute"

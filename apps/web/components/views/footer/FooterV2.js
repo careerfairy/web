@@ -1,11 +1,14 @@
 import React from "react"
 import { alpha, useTheme } from "@mui/material/styles"
-import { Box, Container, Grid, Typography } from "@mui/material"
+import Box from "@mui/material/Box"
+import Container from "@mui/material/Container"
+import Grid from "@mui/material/Grid"
+import Typography from "@mui/material/Typography"
 import Link from "next/link"
 import footerLinks from "./footerLinks"
 import icons from "./icons"
 
-const FooterV2 = ({ background, sx }) => {
+const FooterV2 = ({ background = undefined, sx }) => {
    const theme = useTheme()
    const greyColor = alpha(theme.palette.text.secondary, 0.5)
    return (

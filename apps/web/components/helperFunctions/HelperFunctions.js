@@ -274,10 +274,8 @@ export const truncate = (str, n) => {
 
 export const getBaseUrl = () => {
    let baseUrl = "https://careerfairy.io"
-   if (window?.location?.origin) {
-      baseUrl = window.location.origin
-   }
-   return baseUrl
+   if (typeof window === "undefined") return baseUrl
+   return window?.location?.origin
 }
 
 export const maybePluralize = (count, noun, suffix = "s") =>
