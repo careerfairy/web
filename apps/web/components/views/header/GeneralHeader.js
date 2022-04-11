@@ -34,7 +34,7 @@ const GeneralHeader = ({
    children,
    permanent = false,
    className = "",
-   position = "static",
+   position = undefined,
    ...rest
 }) => {
    const absolute = position === "absolute"
