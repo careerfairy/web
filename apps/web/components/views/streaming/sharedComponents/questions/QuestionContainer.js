@@ -10,12 +10,13 @@ import {
    Button,
    Card,
    CircularProgress,
-   ClickAwayListener,
    Collapse,
    Grow,
+   Link,
    Paper,
    Slide,
    TextField,
+   Tooltip,
    Typography,
 } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
@@ -31,6 +32,8 @@ import { useAuth } from "../../../../../HOCs/AuthProvider"
 import useStreamRef from "../../../../custom-hook/useStreamRef"
 import { compose } from "redux"
 import { useCurrentStream } from "../../../../../context/stream/StreamContext"
+import BadgeButton from "../../../common/BadgeButton"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges"
 
 const useStyles = makeStyles((theme) => ({
    chatInput: {
@@ -90,6 +93,16 @@ const useStyles = makeStyles((theme) => ({
       fontSize: "1.2em",
       display: "inline-block",
       margin: "0 0 0 30px",
+      fontWeight: 700,
+      color: ({ active }) => (active ? "white" : theme.palette.primary.main),
+   },
+   badge: {
+      position: "absolute",
+      top: 10,
+      left: 0,
+      fontSize: "1.2em",
+      display: "inline-block",
+      margin: "0 0 0 10px",
       fontWeight: 700,
       color: ({ active }) => (active ? "white" : theme.palette.primary.main),
    },
@@ -360,6 +373,33 @@ const QuestionContainer = memo(
          >
             <Paper elevation={4} className={classes.questionContainer}>
                <div style={{ padding: "20px 20px 5px 20px" }}>
+                  {question?.badges?.includes(NetworkerBadge.key) && (
+                     <div className={classes.badge}>
+                        <BadgeButton
+                           badge={NetworkerBadge}
+                           showBadgeSuffix={false}
+                           onlyIcon
+                           activeTooltip={(badge) =>
+                              `${badge.name} Badge, this user has referred more than 3 people.`
+                           }
+                           buttonProps={{
+                              color: "gold",
+                              size: "small",
+                              variant: "contained",
+                              sx: {
+                                 minWidth: "30px",
+                                 width: "30px",
+                                 height: "30px",
+                                 borderRadius: "100%",
+                                 padding: 0,
+                              },
+                           }}
+                           badgeIconProps={{
+                              noBg: true,
+                           }}
+                        />
+                     </div>
+                  )}
                   <div className={classes.upVotes}>
                      <span>{question.votes}</span>
                      <ThumbUpRoundedIcon

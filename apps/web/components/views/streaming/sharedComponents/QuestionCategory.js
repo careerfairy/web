@@ -45,9 +45,12 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { useDispatch } from "react-redux"
 import { compose } from "redux"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
-// import { truncate } from "../../../helperFunctions/HelperFunctions";
 import useStreamRef from "../../../custom-hook/useStreamRef"
 import { v4 as uuidv4 } from "uuid"
+import {
+   getUserBadges,
+   NetworkerBadge,
+} from "@careerfairy/shared-lib/dist/badges"
 
 const useStyles = makeStyles((theme) => ({
    view: {
@@ -103,8 +106,6 @@ const EmptyList = ({ isUpcoming }) => {
       </GreyPermanentMarker>
    )
 }
-
-const now = new Date()
 
 const QuestionCategory = (props) => {
    const { selectedState, sliding, streamer, firebase, showMenu, isMobile } =
@@ -245,6 +246,10 @@ const QuestionCategory = (props) => {
                ? `${userData.firstName} ${userData.lastName}`
                : "A viewer",
          }
+         // save the user badges on the question
+         if (userData?.badges?.length > 0) {
+            newQuestion.badges = userData?.badges
+         }
          await firebase.addLivestreamQuestion(streamRef, newQuestion)
       } catch (e) {
          dispatch(actions.sendGeneralError(e))
@@ -254,46 +259,50 @@ const QuestionCategory = (props) => {
       handleClose()
    }
 
-   let upcomingQuestionsElements = itemsUpcoming.map((question, index) => {
-      return (
-         <QuestionContainer
-            key={question.id}
-            sessionUuid={sessionUuid}
-            streamer={streamer}
-            goToThisQuestion={goToThisQuestion}
-            isNextQuestions={value === 0}
-            setOpenQuestionId={setOpenQuestionId}
-            index={index}
-            sliding={sliding}
-            showMenu={showMenu}
-            openQuestionId={openQuestionId}
-            selectedState={selectedState}
-            question={question}
-            user={authenticatedUser}
-            userData={userData}
-         />
-      )
-   })
+   let upcomingQuestionsElements = itemsUpcoming
+      .sort(sortByNetworkerBadge)
+      .map((question, index) => {
+         return (
+            <QuestionContainer
+               key={question.id}
+               sessionUuid={sessionUuid}
+               streamer={streamer}
+               goToThisQuestion={goToThisQuestion}
+               isNextQuestions={value === 0}
+               setOpenQuestionId={setOpenQuestionId}
+               index={index}
+               sliding={sliding}
+               showMenu={showMenu}
+               openQuestionId={openQuestionId}
+               selectedState={selectedState}
+               question={question}
+               user={authenticatedUser}
+               userData={userData}
+            />
+         )
+      })
 
-   let pastQuestionsElements = itemsPast.map((question, index) => {
-      return (
-         <QuestionContainer
-            key={question.id}
-            streamer={streamer}
-            isNextQuestions={value === 1}
-            index={index}
-            openQuestionId={openQuestionId}
-            sliding={sliding}
-            setOpenQuestionId={setOpenQuestionId}
-            showMenu={showMenu}
-            goToThisQuestion={goToThisQuestion}
-            selectedState={selectedState}
-            question={question}
-            user={authenticatedUser}
-            userData={userData}
-         />
-      )
-   })
+   let pastQuestionsElements = itemsPast
+      .sort(sortByNetworkerBadge)
+      .map((question, index) => {
+         return (
+            <QuestionContainer
+               key={question.id}
+               streamer={streamer}
+               isNextQuestions={value === 1}
+               index={index}
+               openQuestionId={openQuestionId}
+               sliding={sliding}
+               setOpenQuestionId={setOpenQuestionId}
+               showMenu={showMenu}
+               goToThisQuestion={goToThisQuestion}
+               selectedState={selectedState}
+               question={question}
+               user={authenticatedUser}
+               userData={userData}
+            />
+         )
+      })
    const getCount = (isUpcoming) => {
       const elements = isUpcoming
          ? upcomingQuestionsElements
@@ -301,6 +310,9 @@ const QuestionCategory = (props) => {
       const hasMore = isUpcoming ? hasMoreUpcoming : hasMorePast
       return elements.length ? `${elements.length}${hasMore ? "+" : ""}` : 0
    }
+
+   const networkerBadge = getUserBadges(userData?.badges)?.networkerBadge()
+
    return (
       <CategoryContainerTopAligned>
          <QuestionContainerHeader>
@@ -385,58 +397,71 @@ const QuestionCategory = (props) => {
                )}
             </TabPanel>
          </SwipeableViews>
-         <Dialog
-            TransitionComponent={Slide}
-            PaperProps={{ className: `${classes.dialog} notranslate` }}
-            fullWidth
-            onClose={handleClose}
-            open={showQuestionModal}
-         >
-            <DialogTitle style={{ color: "white" }}>Add a Question</DialogTitle>
-            <DialogContent>
-               <TextField
-                  autoFocus={showQuestionModal}
-                  InputProps={{ className: classes.dialogInput }}
-                  error={Boolean(touched && newQuestionTitle.length < 5)}
-                  onBlur={() => setTouched(true)}
-                  variant="outlined"
-                  value={newQuestionTitle}
-                  placeholder="Your question goes here"
-                  onChange={({ currentTarget: { value } }, element) => {
-                     setNewQuestionTitle(value)
-                  }}
-                  fullWidth
-               />
-               <Collapse in={Boolean(touched && newQuestionTitle.length < 4)}>
-                  <Typography style={{ paddingLeft: "1rem" }} color="error">
-                     Needs to be at least 5 characters
-                  </Typography>
-               </Collapse>
-            </DialogContent>
-            <DialogActions>
-               <Button
-                  sx={{ color: "white" }}
-                  size="large"
-                  color="grey"
-                  onClick={handleClose}
-               >
-                  Cancel
-               </Button>
-               <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  disabled={submittingQuestion}
-                  onClick={() => addNewQuestion()}
-               >
-                  {submittingQuestion ? (
-                     <CircularProgress color="inherit" size={20} />
-                  ) : (
-                     "Submit"
+         {showQuestionModal && (
+            <Dialog
+               TransitionComponent={Slide}
+               PaperProps={{ className: `${classes.dialog} notranslate` }}
+               fullWidth
+               onClose={handleClose}
+               open={showQuestionModal}
+            >
+               <DialogTitle style={{ color: "white" }}>
+                  Add a Question
+               </DialogTitle>
+               <DialogContent>
+                  <TextField
+                     autoFocus={showQuestionModal}
+                     InputProps={{ className: classes.dialogInput }}
+                     error={Boolean(touched && newQuestionTitle.length < 5)}
+                     onBlur={() => setTouched(true)}
+                     variant="outlined"
+                     value={newQuestionTitle}
+                     placeholder="Your question goes here"
+                     onChange={({ currentTarget: { value } }, element) => {
+                        setNewQuestionTitle(value)
+                     }}
+                     fullWidth
+                  />
+                  <Collapse
+                     in={Boolean(touched && newQuestionTitle.length < 5)}
+                  >
+                     <Typography style={{ paddingLeft: "1rem" }} color="error">
+                        Needs to be at least 5 characters
+                     </Typography>
+                  </Collapse>
+
+                  {networkerBadge && (
+                     <Typography color="lightgrey" mt={1}>
+                        Your question will be highlighted with your{" "}
+                        {networkerBadge.name} badge.
+                     </Typography>
                   )}
-               </Button>
-            </DialogActions>
-         </Dialog>
+               </DialogContent>
+               <DialogActions>
+                  <Button
+                     sx={{ color: "white" }}
+                     size="large"
+                     color="grey"
+                     onClick={handleClose}
+                  >
+                     Cancel
+                  </Button>
+                  <Button
+                     variant="contained"
+                     color="primary"
+                     size="large"
+                     disabled={submittingQuestion}
+                     onClick={() => addNewQuestion()}
+                  >
+                     {submittingQuestion ? (
+                        <CircularProgress color="inherit" size={20} />
+                     ) : (
+                        "Submit"
+                     )}
+                  </Button>
+               </DialogActions>
+            </Dialog>
+         )}
       </CategoryContainerTopAligned>
    )
 }
@@ -448,6 +473,25 @@ QuestionCategory.propTypes = {
    showMenu: PropTypes.bool.isRequired,
    sliding: PropTypes.bool,
    streamer: PropTypes.bool,
+}
+
+/**
+ * When two questions have the same number of votes, the question with
+ * the Networker Badge should come first
+ *
+ * @param left
+ * @param right
+ * @returns {number}
+ */
+function sortByNetworkerBadge(left, right) {
+   if (
+      left.votes === right.votes &&
+      left?.badges?.includes(NetworkerBadge.key)
+   ) {
+      return -1
+   }
+
+   return 0 // keep original order
 }
 
 export default compose(withFirebase, memo)(QuestionCategory)
