@@ -42,7 +42,6 @@ const TopBar = ({ hideNavOnScroll }) => {
                navLinksActiveColor={theme.palette.primary.main}
             />
          </Hidden>
-         s
          <Box sx={{ display: "flex", alignItems: "center" }}>
             <Hidden lgDown>
                <MissingDataButton />

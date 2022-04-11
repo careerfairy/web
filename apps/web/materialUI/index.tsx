@@ -22,6 +22,7 @@ declare module "@mui/material" {
       main: string
       dark: string
    }
+
    interface Transition {
       long: number
    }
@@ -33,19 +34,25 @@ declare module "@mui/material/styles" {
       drawerWidth?: { small?: string; medium?: string }
       darkTextShadow?: string
    }
+
    interface PaletteColor {
       gradient?: string
    }
+
    interface SimplePaletteColorOptions {
       gradient?: string
    }
 
    interface Palette {
       navyBlue: Palette["primary"]
+      gold: Palette["primary"]
    }
+
    interface PaletteOptions {
       navyBlue: PaletteOptions["primary"]
+      gold: PaletteOptions["primary"]
    }
+
    interface BreakpointOverrides {
       mobile: true // adds the `mobile` breakpoint
    }
@@ -86,6 +93,9 @@ export const rootThemeObj = (mode: PaletteMode) =>
          navyBlue: {
             main: "#2C4251",
             contrastText: "#FFFFFF",
+         },
+         gold: {
+            main: "#FFC34F",
          },
          info: {
             ...(mode === "light"

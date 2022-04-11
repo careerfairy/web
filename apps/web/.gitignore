@@ -1,3 +1,10 @@
 # Sentry
 .sentryclirc
 package-lock.json
+# playwrights
+test-results/
+playwright-report/
+# jest
+.jest/
+.vercel
+.env.local

@@ -4,7 +4,7 @@ import PropTypes from "prop-types"
 import clsx from "clsx"
 import { useRouter } from "next/router"
 import NextLink from "next/link"
-import { Link as MuiLink } from "@mui/material"
+import MuiLink from "@mui/material/Link"
 
 const NextComposed = React.forwardRef(function NextComposed(props, ref) {
    const { as, href, ...other } = props

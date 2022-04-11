@@ -40,6 +40,12 @@ const BadgeProgress = ({ userData }) => {
                <BadgeIcon badgeKey={nextBadge.key} /> &nbsp; {nextBadge.name}
             </Typography>
             <p>Objective: {nextBadge.achievementDescription}</p>
+            <p>
+               {nextBadge.rewardsDescription.length === 1
+                  ? "Reward"
+                  : "Rewards"}
+               : {nextBadge.rewardsDescription.join(", ")}
+            </p>
          </Grid>
          <Grid item xs={12}>
             <Box sx={{ width: "100%" }}>

@@ -7,7 +7,20 @@
          "outputs": ["dist/**", ".next/**"]
       },
       "test": {
-         "dependsOn": ["build"]
+         "outputs": ["coverage/**"]
+      },
+      "start": {
+         "dependsOn": ["build"],
+         "cache": false
+      },
+      "webapp:report": {},
+      "test:e2e-webapp": {
+         "dependsOn": ["build"],
+         "outputs": ["test-results/**", "playwright-report/**"]
+      },
+      "test:e2e-webapp-debug": {
+         "dependsOn": ["build"],
+         "outputs": ["test-results/**"]
       },
       "lint": {},
       "dev": {
