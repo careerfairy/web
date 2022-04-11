@@ -1,5 +1,7 @@
 import React from "react"
-import { Tab, Tabs, Typography } from "@mui/material"
+import Typography from "@mui/material/Typography"
+import Tabs from "@mui/material/Tabs"
+import Tab from "@mui/material/Tab"
 import Link from "../../../materialUI/NextNavLink"
 import { useRouter } from "next/router"
 
