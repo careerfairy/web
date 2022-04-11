@@ -8,6 +8,7 @@ import React, {
 } from "react"
 import MicOffIcon from "@mui/icons-material/MicOff"
 import MicIcon from "@mui/icons-material/Mic"
+import YoutubeIcon from "@mui/icons-material/Youtube"
 import VideocamIcon from "@mui/icons-material/Videocam"
 import VideocamOffIcon from "@mui/icons-material/VideocamOff"
 import ScreenShareIcon from "@mui/icons-material/ScreenShare"
@@ -169,6 +170,7 @@ const VideoControlsContainer = ({
    const [fullyOpened, onEntered, onExited] = useSliderFullyOpened()
    const presentMode = mode === "presentation"
    const desktopMode = mode === "desktop"
+   const videoMode = mode === "video"
 
    useEffect(() => {
       if (isOpen(16)) {
@@ -404,6 +406,13 @@ const VideoControlsContainer = ({
                onClick: () =>
                   setLivestreamMode(presentMode ? "default" : "presentation"),
                id: "sharePdfAction",
+            },
+            {
+               icon: <YoutubeIcon color={videoMode ? "primary" : "inherit"} />,
+               name: videoMode ? "Stop sharing video" : "Share video",
+               onClick: () =>
+                  setLivestreamMode(videoMode ? "default" : "video"),
+               id: "sendCtaAction",
             },
             {
                icon: <CallToActionIcon />,

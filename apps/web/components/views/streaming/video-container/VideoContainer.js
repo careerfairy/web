@@ -297,6 +297,7 @@ function VideoContainer({
             isBroadCasting={!isPlayMode}
             sharingScreen={currentLivestream.mode === "desktop"}
             sharingPdf={currentLivestream.mode === "presentation"}
+            sharingVideo={currentLivestream.mode === "video"}
             showMenu={showMenu}
             livestreamId={currentLivestream.id}
             presenter

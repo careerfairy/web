@@ -37,7 +37,7 @@ export interface StreamData {
    start: Timestamp
    created: Timestamp
    summary: string
-   mode?: "presentation" | "desktop"
+   mode?: "presentation" | "desktop" | "video"
    targetCategories: object
    test: boolean
    title: string

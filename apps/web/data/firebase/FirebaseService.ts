@@ -462,6 +462,29 @@ class FirebaseService {
          })
    }
 
+   listenToCurrentVideo = (streamRef, callback) => {
+      let ref = streamRef.collection("videos").doc("video")
+      return ref.onSnapshot(callback)
+   }
+
+   updateCurrentVideoState = (streamRef, state) => {
+      let ref = streamRef.collection("videos").doc("video")
+      return ref.update({
+         ...state,
+         lastPlayed:
+            state.state === "playing" ? this.getServerTimestamp() : null,
+      })
+   }
+
+   updateCurrentVideo = (streamRef, url) => {
+      let ref = streamRef.collection("videos").doc("video")
+      return ref.set({
+         url: url,
+         second: 0,
+         state: "playing",
+      })
+   }
+
    // MENTORS
 
    getMentors = () => {
