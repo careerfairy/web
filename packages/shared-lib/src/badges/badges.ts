@@ -15,6 +15,7 @@ export interface Badge {
    key: string
    name: string
    achievementDescription: string
+   rewardsDescription: string[]
    progress: (userData) => number // 0 to 100
    next?: Badge
    prev?: Badge
@@ -25,6 +26,7 @@ export const NetworkerBadge: Badge = {
    key: "Networker",
    name: "Networker",
    achievementDescription: "Refer at least 3 friends",
+   rewardsDescription: ["Questions during an event will be highlighted"],
    progress: (userData) => {
       if (!userData.referralsCount) return 0
       if (userData.referralsCount >= 3) return 100
@@ -37,6 +39,7 @@ export const NetworkerAdvancedBadge: Badge = {
    key: "NetworkerAdvanced",
    name: "Networker Advanced",
    achievementDescription: "Refer at least 6 friends",
+   rewardsDescription: ["Questions during an event will be highlighted"],
    progress: (userData) => {
       if (!userData.referralsCount) return 0
       if (userData.referralsCount >= 6) return 100
