@@ -8,7 +8,7 @@ import React, {
 } from "react"
 import MicOffIcon from "@mui/icons-material/MicOff"
 import MicIcon from "@mui/icons-material/Mic"
-import YoutubeIcon from "@mui/icons-material/Youtube"
+import YouTubeIcon from "@mui/icons-material/YouTube"
 import VideocamIcon from "@mui/icons-material/Videocam"
 import VideocamOffIcon from "@mui/icons-material/VideocamOff"
 import ScreenShareIcon from "@mui/icons-material/ScreenShare"
@@ -408,7 +408,7 @@ const VideoControlsContainer = ({
                id: "sharePdfAction",
             },
             {
-               icon: <YoutubeIcon color={videoMode ? "primary" : "inherit"} />,
+               icon: <YouTubeIcon color={videoMode ? "primary" : "inherit"} />,
                name: videoMode ? "Stop sharing video" : "Share video",
                onClick: () =>
                   setLivestreamMode(videoMode ? "default" : "video"),
