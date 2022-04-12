@@ -221,7 +221,6 @@ const StreamsLayout = ({
                               <SynchronisedVideoViewer
                                  livestreamId={livestreamId}
                                  streamerId={streamerId}
-                                 presenter={presenter}
                                  viewer={viewer}
                               />
                            )}

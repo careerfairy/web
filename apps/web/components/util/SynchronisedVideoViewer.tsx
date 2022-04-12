@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import ReactPlayer from "react-player/youtube"
 import { useFormik } from "formik"
@@ -23,25 +23,21 @@ const schema = yup.object().shape({
       .required("Must be a valid url"),
 })
 
-const SynchronisedVideoViewer = ({
-   livestreamId,
-   presenter,
-   streamerId,
-   viewer,
-}) => {
+const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
    const { unpauseFailedPlayRemoteVideos } = useSelector(
       // @ts-ignore
       (state) => state.stream.streaming
    )
    const streamRef = useStreamRef()
-   const reactPlayerRef = useRef(null)
    const { listenToCurrentVideo, updateCurrentVideo, updateCurrentVideoState } =
       useFirebaseService()
+   const [reactPlayerInstance, setReactPlayerInstance] = useState(null)
    const [loading, setLoading] = useState(false)
    const [muted, setMuted] = useState(viewer)
    const [openModal, setOpenModal] = useState(false)
    const [initialized, setInitialized] = useState(false)
    const [currentVideo, setCurrentVideo] = useState(null)
+   const isVideoSharer = currentVideo && streamerId === currentVideo?.updater
 
    const dispatch = useDispatch()
 
@@ -66,7 +62,7 @@ const SynchronisedVideoViewer = ({
    }
 
    const handleSeek = (seconds: number) => {
-      return reactPlayerRef.current.seekTo(seconds, "seconds")
+      return reactPlayerInstance.seekTo(seconds, "seconds")
    }
 
    useEffect(() => {
@@ -82,7 +78,7 @@ const SynchronisedVideoViewer = ({
    }, [unpauseFailedPlayRemoteVideos])
 
    useEffect(() => {
-      if (!currentVideo || !reactPlayerRef.current) return
+      if (!currentVideo || !reactPlayerInstance) return
       if (
          !initialized &&
          currentVideo.state === "playing" &&
@@ -90,10 +86,19 @@ const SynchronisedVideoViewer = ({
       ) {
          handleInitialize()
       }
-      if (initialized && streamerId !== currentVideo.updater) {
+   }, [Boolean(currentVideo), Boolean(reactPlayerInstance)])
+
+   useEffect(() => {
+      if (!initialized && currentVideo?.state === "paused") {
+         setInitialized(true)
+      }
+   }, [currentVideo?.state])
+
+   useEffect(() => {
+      if (initialized && !isVideoSharer) {
          handleSeek(currentVideo.second)
       }
-   }, [currentVideo, reactPlayerRef.current, streamerId])
+   }, [currentVideo?.second])
 
    const handleInitialize = () => {
       const secondsDiff = getTimeBetweenDates(
@@ -101,7 +106,6 @@ const SynchronisedVideoViewer = ({
          new Date()
       )
       handleSeek(currentVideo.second + secondsDiff)
-      setInitialized(true)
    }
 
    useEffect(() => {
@@ -125,18 +129,22 @@ const SynchronisedVideoViewer = ({
    }
 
    const handlePlay = async () => {
-      if (!presenter) {
+      if (!initialized) {
+         setInitialized(true)
+      }
+      if (!isVideoSharer || !initialized) {
          return
       }
+
       return updateYoutubeVideoState({
          state: "playing",
-         second: reactPlayerRef.current?.getCurrentTime() || 0,
+         second: reactPlayerInstance?.getCurrentTime() || 0,
          updater: streamerId,
       })
    }
 
    const handlePause = () => {
-      if (!presenter) {
+      if (!isVideoSharer) {
          return
       }
       updateYoutubeVideoState({ state: "paused" })
@@ -173,22 +181,30 @@ const SynchronisedVideoViewer = ({
             </div>
             <ReactPlayer
                playing={currentVideo?.state === "playing"}
-               ref={reactPlayerRef}
                style={{
                   position: "absolute",
                   top: "50%",
                   left: "0",
                   transform: "translateY(-50%)",
-                  pointerEvents: presenter ? "all" : "none",
+                  pointerEvents: isVideoSharer ? "visibleFill" : "none",
+               }}
+               config={{
+                  playerVars: {
+                     controls: isVideoSharer ? 1 : 0,
+                     fs: 0,
+                     modestbranding: 1,
+                     disablekb: isVideoSharer ? 0 : 1,
+                  },
                }}
                muted={muted}
-               controls={presenter}
+               controls={isVideoSharer}
                url={currentVideo?.url}
                onError={(error) => {
                   console.error(error)
                }}
                width="100%"
                height={"100%"}
+               onReady={(player) => setReactPlayerInstance(player)}
                onPlay={handlePlay}
                onPause={handlePause}
             />
