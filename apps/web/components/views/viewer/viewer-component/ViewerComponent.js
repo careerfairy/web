@@ -301,7 +301,10 @@ function ViewerComponent({
             isBroadCasting={handRaiseActive}
             sharingScreen={currentLivestream.mode === "desktop"}
             sharingPdf={currentLivestream.mode === "presentation"}
-            sharingVideo={currentLivestream.mode === "video"}
+            sharingVideo={
+               currentLivestream.mode === "video" &&
+               (currentLivestream.hasStarted || spyModeEnabled)
+            }
             showMenu={showMenu}
             livestreamId={currentLivestream.id}
             viewer

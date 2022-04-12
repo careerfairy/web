@@ -1,8 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from "react"
-
-import { useWindowSize } from "components/custom-hook/useWindowSize"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import ReactPlayer from "react-player/youtube"
+import { useFormik } from "formik"
 
 import {
    Button,
@@ -14,6 +13,15 @@ import {
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "../../store/actions"
 import useStreamRef from "../custom-hook/useStreamRef"
+import * as yup from "yup"
+import { YOUTUBE_URL_REGEX } from "../../components/util/constants"
+
+const schema = yup.object().shape({
+   youtubeUrl: yup
+      .string()
+      .matches(YOUTUBE_URL_REGEX, { message: "Must be a valid url" })
+      .required("Must be a valid url"),
+})
 
 const SynchronisedVideoViewer = ({
    livestreamId,
@@ -21,11 +29,10 @@ const SynchronisedVideoViewer = ({
    streamerId,
    viewer,
 }) => {
-   const { unmuteFailedMutedRemoteVideos } = useSelector(
+   const { unpauseFailedPlayRemoteVideos } = useSelector(
       // @ts-ignore
       (state) => state.stream.streaming
    )
-   const windowSize = useWindowSize()
    const streamRef = useStreamRef()
    const reactPlayerRef = useRef(null)
    const { listenToCurrentVideo, updateCurrentVideo, updateCurrentVideoState } =
@@ -33,12 +40,26 @@ const SynchronisedVideoViewer = ({
    const [loading, setLoading] = useState(false)
    const [muted, setMuted] = useState(viewer)
    const [openModal, setOpenModal] = useState(false)
-   const [newUrl, setNewUrl] = useState("")
    const [initialized, setInitialized] = useState(false)
    const [currentVideo, setCurrentVideo] = useState(null)
 
    const dispatch = useDispatch()
-   const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted())
+
+   const formik = useFormik({
+      initialValues: {
+         youtubeUrl: "",
+      },
+      validationSchema: schema,
+      onSubmit: async (values) => {
+         try {
+            await updateCurrentVideo(streamRef, values.youtubeUrl)
+            setOpenModal(false)
+         } catch (e) {
+            console.log("-> error in setting video", e)
+         }
+      },
+   })
+   const setAVideoIsMuted = () => dispatch(actions.setVideoIsPaused())
 
    const getTimeBetweenDates = (startDate, endDate) => {
       return (endDate.getTime() - startDate.getTime()) / 1000
@@ -55,10 +76,10 @@ const SynchronisedVideoViewer = ({
    }, [])
 
    useEffect(() => {
-      if (unmuteFailedMutedRemoteVideos) {
+      if (unpauseFailedPlayRemoteVideos) {
          setMuted(false)
       }
-   }, [unmuteFailedMutedRemoteVideos])
+   }, [unpauseFailedPlayRemoteVideos])
 
    useEffect(() => {
       if (!currentVideo || !reactPlayerRef.current) return
@@ -99,17 +120,6 @@ const SynchronisedVideoViewer = ({
       }
    }, [livestreamId])
 
-   const shareNewYoutubeVideo = async () => {
-      try {
-         await updateCurrentVideo(streamRef, newUrl).then(() => {
-            setNewUrl("")
-            setOpenModal(false)
-         })
-      } catch (e) {
-         console.log("-> error in setting video", e)
-      }
-   }
-
    const updateYoutubeVideoState = (state) => {
       return updateCurrentVideoState(streamRef, state)
    }
@@ -131,6 +141,7 @@ const SynchronisedVideoViewer = ({
       }
       updateYoutubeVideoState({ state: "paused" })
    }
+
    return (
       <Fragment>
          <div
@@ -150,13 +161,15 @@ const SynchronisedVideoViewer = ({
                   zIndex: "9000",
                }}
             >
-               <Button
-                  color="primary"
-                  variant="contained"
-                  onClick={() => setOpenModal(!openModal)}
-               >
-                  Share New Video
-               </Button>
+               {!viewer && (
+                  <Button
+                     color="primary"
+                     variant="contained"
+                     onClick={() => setOpenModal(!openModal)}
+                  >
+                     Share New Video
+                  </Button>
+               )}
             </div>
             <ReactPlayer
                playing={currentVideo?.state === "playing"}
@@ -190,17 +203,29 @@ const SynchronisedVideoViewer = ({
                <Typography variant="h5">SHARE A NEW YOUTUBE VIDEO</Typography>
                <TextField
                   style={{ margin: "20px 0" }}
-                  value={newUrl}
-                  onChange={(event) => setNewUrl(event.target.value)}
-                  fullWidth={true}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  fullWidth
+                  id={"youtubeUrl"}
+                  type={"url"}
+                  name={"youtubeUrl"}
+                  value={formik.values.youtubeUrl}
                   variant="outlined"
+                  error={
+                     formik.touched.youtubeUrl &&
+                     Boolean(formik.errors.youtubeUrl)
+                  }
+                  helperText={
+                     formik.touched.youtubeUrl && formik.errors.youtubeUrl
+                  }
                   label="Full YouTube video URL"
                   placeholder="https://www.youtube.com/watch?v=cNZNR-wmBxI"
                />
                <Button
                   color="primary"
                   variant="contained"
-                  onClick={shareNewYoutubeVideo}
+                  type={"submit"}
+                  onClick={() => formik.handleSubmit()}
                >
                   Share Now
                </Button>
