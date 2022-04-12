@@ -2,7 +2,15 @@ import StatsUtil from "data/util/StatsUtil"
 import React, { useCallback, useEffect, useState } from "react"
 import TalentPoolIcon from "@mui/icons-material/HowToRegRounded"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import { CircularProgress } from "@mui/material"
+import {
+   Button,
+   CircularProgress,
+   Dialog,
+   DialogActions,
+   DialogContent,
+   DialogContentText,
+   DialogTitle,
+} from "@mui/material"
 import { CSVLink } from "react-csv"
 import GetAppIcon from "@mui/icons-material/GetApp"
 import PDFIcon from "@mui/icons-material/PictureAsPdf"
@@ -12,6 +20,7 @@ import * as actions from "store/actions"
 import { useDispatch } from "react-redux"
 import ButtonWithHint from "../views/group/admin/events/events-table/ButtonWithHint"
 import { useTheme } from "@mui/material/styles"
+import { getListSeparator } from "../../util/CommonUtil"
 
 export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    const firebase = useFirebaseService()
@@ -242,6 +251,8 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
       (rowData) => {
          const targetStreamTalentPoolData = talentPoolDictionary[rowData?.id]
          const actionLoading = loadingTalentPool[rowData?.id]
+
+         const hintTitle = "Download Talent Pool"
          return {
             icon: targetStreamTalentPoolData ? (
                <GetAppIcon color="primary" />
@@ -250,24 +261,22 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
             ) : (
                <TalentPoolIcon color="action" />
             ),
-            hintTitle: "Download Talent Pool",
+            hintTitle,
             hintDescription:
                "Download a CSV with the details of the students who opted to put themselves in the talent pool",
             loadedButton: targetStreamTalentPoolData && (
-               <CSVLink
+               <CSVDialogDownload
+                  title={hintTitle}
                   data={targetStreamTalentPoolData}
-                  separator={";"}
                   filename={
                      "TalentPool " + rowData.company + " " + rowData.id + ".csv"
                   }
-                  style={{ color: "red" }}
                >
                   <ButtonWithHint
-                     hintTitle={"Download Talent Pool"}
+                     hintTitle={hintTitle}
                      style={{
                         marginTop: theme.spacing(0.5),
                      }}
-                     onClick={(e) => e.stopPropagation()}
                      hintDescription={
                         "Download a CSV with the details of the students who opted to put themselves in the talent pool"
                      }
@@ -275,7 +284,7 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                   >
                      Download Talent Pool
                   </ButtonWithHint>
-               </CSVLink>
+               </CSVDialogDownload>
             ),
             tooltip: targetStreamTalentPoolData
                ? "Download Talent Pool"
@@ -330,13 +339,16 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                   group.privacyPolicyActive ||
                   userData?.isAdmin)
          )
+
+         const hintTitle = "Download Registered Users"
+
          return {
             icon: actionLoading ? (
                <CircularProgress size={15} color="inherit" />
             ) : (
                <RegisteredUsersIcon color="action" />
             ),
-            hintTitle: "Download Registered Users",
+            hintTitle,
             hintDescription:
                "Download a CSV with the details of the students who registered to your event",
             tooltip: registeredStudentsData
@@ -348,9 +360,9 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
             hidden: !canDownloadRegisteredStudents,
             disabled: actionLoading || !canDownloadRegisteredStudents,
             loadedButton: registeredStudentsData && (
-               <CSVLink
+               <CSVDialogDownload
+                  title={hintTitle}
                   data={registeredStudentsData}
-                  separator={";"}
                   filename={
                      "Registered Students " +
                      rowData.company +
@@ -358,12 +370,10 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                      rowData.id +
                      ".csv"
                   }
-                  style={{ color: "red" }}
                >
                   <ButtonWithHint
                      startIcon={<RegisteredUsersIcon color="action" />}
-                     hintTitle={"Download Registered Users"}
-                     onClick={(e) => e.stopPropagation()}
+                     hintTitle={hintTitle}
                      style={{
                         marginTop: theme.spacing(0.5),
                      }}
@@ -373,7 +383,7 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                   >
                      Download Registered Students
                   </ButtonWithHint>
-               </CSVLink>
+               </CSVDialogDownload>
             ),
          }
       },
@@ -396,4 +406,68 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
       setTargetStream,
       registeredStudentsFromGroupDictionary,
    }
+}
+
+const CSVDialogDownload = ({ title, children, data, filename }) => {
+   const [open, setOpen] = useState(false)
+
+   const handleOpen = useCallback((e) => {
+      e.stopPropagation()
+      setOpen(true)
+   }, [])
+
+   const handleClose = useCallback((e) => {
+      e.stopPropagation()
+      setOpen(false)
+   }, [])
+
+   const stopClickPropagation = useCallback((e) => {
+      e.stopPropagation()
+   }, [])
+
+   // try to use right separator at the first try
+   const mainSeparator = getListSeparator()
+   const alternativeSeparator = mainSeparator === "," ? ";" : ","
+
+   return (
+      <>
+         {React.cloneElement(children, { onClick: handleOpen })}
+         <Dialog open={open} onBackdropClick={handleClose}>
+            <DialogTitle onClickCapture={stopClickPropagation}>
+               {title}
+            </DialogTitle>
+            <DialogContent onClickCapture={stopClickPropagation}>
+               <DialogContentText>
+                  You will download a file in the .csv format. This file uses a
+                  separator character that can vary with your regional settings.
+                  <p>
+                     Try the alternative version if have issues opening the
+                     downloaded file.
+                  </p>
+               </DialogContentText>
+            </DialogContent>
+            <DialogActions sx={{ justifyContent: "center" }}>
+               <CSVLink
+                  data={data}
+                  separator={mainSeparator}
+                  filename={filename}
+                  style={{ color: "red" }}
+                  onClick={handleClose}
+               >
+                  <Button variant="contained">Download</Button>
+               </CSVLink>
+
+               <CSVLink
+                  data={data}
+                  separator={alternativeSeparator}
+                  filename={filename}
+                  style={{ color: "red" }}
+                  onClick={handleClose}
+               >
+                  <Button autoFocus>Alternative</Button>
+               </CSVLink>
+            </DialogActions>
+         </Dialog>
+      </>
+   )
 }
