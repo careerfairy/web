@@ -4,11 +4,11 @@ const footerLinks = [
       links: [
          {
             label: "For Students",
-            href: "/students",
+            href: "/",
          },
          {
             label: "For Companies",
-            href: "/",
+            href: "/companies",
          },
          {
             label: "For Career Centers",
@@ -39,10 +39,6 @@ const footerLinks = [
          {
             label: "About us",
             href: "/about-us",
-         },
-         {
-            label: "Companies",
-            href: "/companies",
          },
          {
             label: "Wishlist",
