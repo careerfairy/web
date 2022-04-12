@@ -1,61 +1,60 @@
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, useCallback, useEffect, useState } from "react"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import ReactPlayer from "react-player/youtube"
-import { useFormik } from "formik"
 
-import {
-   Button,
-   Dialog,
-   DialogContent,
-   TextField,
-   Typography,
-} from "@mui/material"
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "../../store/actions"
 import useStreamRef from "../custom-hook/useStreamRef"
-import * as yup from "yup"
-import { YOUTUBE_URL_REGEX } from "../../components/util/constants"
+import AreYouSureModal from "../../materialUI/GlobalModals/AreYouSureModal"
 
-const schema = yup.object().shape({
-   youtubeUrl: yup
-      .string()
-      .matches(YOUTUBE_URL_REGEX, { message: "Must be a valid url" })
-      .required("Must be a valid url"),
-})
-
+const styles = {
+   root: {
+      width: "100%",
+      backgroundColor: "black",
+      position: "relative",
+      height: "calc(100% - 48px)",
+   },
+   muteButton: {
+      position: "absolute",
+      top: 5,
+      left: "50%",
+      transform: "translateX(-50%)",
+      zIndex: "9000",
+   },
+   stopSharingButton: {
+      top: 5,
+      position: "absolute",
+      zIndex: "9000",
+      right: 5,
+      opacity: 0.5,
+      "&:hover": {
+         opacity: 1,
+      },
+   },
+}
 const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
    const { unpauseFailedPlayRemoteVideos } = useSelector(
       // @ts-ignore
       (state) => state.stream.streaming
    )
    const streamRef = useStreamRef()
-   const { listenToCurrentVideo, updateCurrentVideo, updateCurrentVideoState } =
-      useFirebaseService()
+   const {
+      listenToCurrentVideo,
+      updateCurrentVideoState,
+      stopSharingYoutubeVideo,
+   } = useFirebaseService()
+   const [removingVideo, setRemovingVideo] = useState(false)
    const [reactPlayerInstance, setReactPlayerInstance] = useState(null)
+   const [removeYoutubeVideoModalOpen, setRemoveYoutubeVideoModalOpen] =
+      useState(false)
    const [loading, setLoading] = useState(false)
    const [muted, setMuted] = useState(viewer)
-   const [openModal, setOpenModal] = useState(false)
    const [initialized, setInitialized] = useState(false)
-   const [currentVideo, setCurrentVideo] = useState(null)
-   const isVideoSharer = currentVideo && streamerId === currentVideo?.updater
-
+   const [videoData, setVideoData] = useState(null)
+   const isVideoSharer = videoData && streamerId === videoData?.updater
    const dispatch = useDispatch()
-
-   const formik = useFormik({
-      initialValues: {
-         youtubeUrl: "",
-      },
-      validationSchema: schema,
-      onSubmit: async (values) => {
-         try {
-            await updateCurrentVideo(streamRef, values.youtubeUrl)
-            setOpenModal(false)
-         } catch (e) {
-            console.log("-> error in setting video", e)
-         }
-      },
-   })
-   const setAVideoIsMuted = () => dispatch(actions.setVideoIsPaused())
 
    const getTimeBetweenDates = (startDate, endDate) => {
       return (endDate.getTime() - startDate.getTime()) / 1000
@@ -64,12 +63,16 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
    const handleSeek = (seconds: number) => {
       return reactPlayerInstance.seekTo(seconds, "seconds")
    }
+   const handleOpenConfirmRemoveVideoModal = () =>
+      setRemoveYoutubeVideoModalOpen(true)
+   const handleCloseConfirmRemoveVideoModal = () =>
+      setRemoveYoutubeVideoModalOpen(false)
 
    useEffect(() => {
       if (viewer) {
-         setAVideoIsMuted()
+         dispatch(actions.setVideoIsPaused())
       }
-   }, [])
+   }, [dispatch])
 
    useEffect(() => {
       if (unpauseFailedPlayRemoteVideos) {
@@ -78,34 +81,34 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
    }, [unpauseFailedPlayRemoteVideos])
 
    useEffect(() => {
-      if (!currentVideo || !reactPlayerInstance) return
+      if (!videoData || !reactPlayerInstance) return
       if (
          !initialized &&
-         currentVideo.state === "playing" &&
-         currentVideo.lastPlayed
+         videoData.state === "playing" &&
+         videoData.lastPlayed
       ) {
          handleInitialize()
       }
-   }, [Boolean(currentVideo), Boolean(reactPlayerInstance)])
+   }, [Boolean(videoData), Boolean(reactPlayerInstance)])
 
    useEffect(() => {
-      if (!initialized && currentVideo?.state === "paused") {
+      if (!initialized && videoData?.state === "paused") {
          setInitialized(true)
       }
-   }, [currentVideo?.state])
+   }, [videoData?.state])
 
    useEffect(() => {
       if (initialized && !isVideoSharer) {
-         handleSeek(currentVideo.second)
+         handleSeek(videoData.second)
       }
-   }, [currentVideo?.second])
+   }, [videoData?.second])
 
    const handleInitialize = () => {
       const secondsDiff = getTimeBetweenDates(
-         currentVideo.lastPlayed.toDate(),
+         videoData.lastPlayed.toDate(),
          new Date()
       )
-      handleSeek(currentVideo.second + secondsDiff)
+      handleSeek(videoData.second + secondsDiff)
    }
 
    useEffect(() => {
@@ -115,7 +118,7 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
             streamRef,
             (querySnapshot) => {
                if (querySnapshot.exists) {
-                  setCurrentVideo(querySnapshot.data())
+                  setVideoData(querySnapshot.data())
                }
                setLoading(false)
             }
@@ -128,7 +131,7 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
       return updateCurrentVideoState(streamRef, state)
    }
 
-   const handlePlay = async () => {
+   const handlePlay = useCallback(async () => {
       if (!initialized) {
          setInitialized(true)
       }
@@ -141,46 +144,56 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
          second: reactPlayerInstance?.getCurrentTime() || 0,
          updater: streamerId,
       })
-   }
+   }, [reactPlayerInstance, initialized, streamerId])
 
-   const handlePause = () => {
+   const handlePause = useCallback(() => {
       if (!isVideoSharer) {
          return
       }
       updateYoutubeVideoState({ state: "paused" })
-   }
+   }, [isVideoSharer, streamRef])
+
+   const handleError = useCallback((error) => {
+      console.error(error)
+   }, [])
+
+   const handleOnReady = useCallback((player) => {
+      setReactPlayerInstance(player)
+   }, [])
+
+   const handleStopSharingVideo = useCallback(async () => {
+      try {
+         setRemovingVideo(true)
+         await stopSharingYoutubeVideo(streamRef)
+         setRemovingVideo(false)
+      } catch (e) {
+         console.error(e)
+      }
+   }, [])
 
    return (
       <Fragment>
-         <div
-            style={{
-               width: "100%",
-               backgroundColor: "black",
-               position: "relative",
-               height: "calc(100% - 48px)",
-            }}
-         >
-            <div
-               style={{
-                  position: "absolute",
-                  top: "10px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  zIndex: "9000",
-               }}
-            >
-               {!viewer && (
-                  <Button
-                     color="primary"
-                     variant="contained"
-                     onClick={() => setOpenModal(!openModal)}
-                  >
-                     Share New Video
-                  </Button>
-               )}
-            </div>
+         <Box sx={styles.root}>
+            {!isVideoSharer && reactPlayerInstance && videoData && (
+               <Button
+                  sx={styles.muteButton}
+                  onClick={() => setMuted((prev) => !prev)}
+               >
+                  {muted ? "Unmute" : "Mute"}
+               </Button>
+            )}
+            {(isVideoSharer || !viewer) && videoData && (
+               <Button
+                  variant={"contained"}
+                  color={"secondary"}
+                  onClick={handleOpenConfirmRemoveVideoModal}
+                  sx={styles.stopSharingButton}
+               >
+                  Stop Sharing
+               </Button>
+            )}
             <ReactPlayer
-               playing={currentVideo?.state === "playing"}
+               playing={videoData?.state === "playing"}
                style={{
                   position: "absolute",
                   top: "50%",
@@ -192,61 +205,30 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
                   playerVars: {
                      controls: isVideoSharer ? 1 : 0,
                      fs: 0,
-                     modestbranding: 1,
                      disablekb: isVideoSharer ? 0 : 1,
                   },
                }}
                muted={muted}
                controls={isVideoSharer}
-               url={currentVideo?.url}
-               onError={(error) => {
-                  console.error(error)
-               }}
+               url={videoData?.url}
+               onError={handleError}
                width="100%"
                height={"100%"}
-               onReady={(player) => setReactPlayerInstance(player)}
+               onReady={handleOnReady}
                onPlay={handlePlay}
                onPause={handlePause}
             />
-         </div>
-         <Dialog
-            open={openModal}
-            maxWidth="sm"
-            fullWidth={true}
-            onClose={() => setOpenModal(!openModal)}
-         >
-            <DialogContent style={{ padding: 30 }}>
-               <Typography variant="h5">SHARE A NEW YOUTUBE VIDEO</Typography>
-               <TextField
-                  style={{ margin: "20px 0" }}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  fullWidth
-                  id={"youtubeUrl"}
-                  type={"url"}
-                  name={"youtubeUrl"}
-                  value={formik.values.youtubeUrl}
-                  variant="outlined"
-                  error={
-                     formik.touched.youtubeUrl &&
-                     Boolean(formik.errors.youtubeUrl)
-                  }
-                  helperText={
-                     formik.touched.youtubeUrl && formik.errors.youtubeUrl
-                  }
-                  label="Full YouTube video URL"
-                  placeholder="https://www.youtube.com/watch?v=cNZNR-wmBxI"
-               />
-               <Button
-                  color="primary"
-                  variant="contained"
-                  type={"submit"}
-                  onClick={() => formik.handleSubmit()}
-               >
-                  Share Now
-               </Button>
-            </DialogContent>
-         </Dialog>
+         </Box>
+         {removeYoutubeVideoModalOpen && (
+            <AreYouSureModal
+               title="Are you sure you want to stop sharing the video?"
+               handleConfirm={handleStopSharingVideo}
+               open={removeYoutubeVideoModalOpen}
+               handleClose={handleCloseConfirmRemoveVideoModal}
+               loading={removingVideo}
+               confirmButtonText={"Stop Sharing"}
+            />
+         )}
       </Fragment>
    )
 }

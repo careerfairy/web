@@ -51,6 +51,7 @@ import LoadingButton from "@mui/lab/LoadingButton"
 import { StreamData } from "types/streaming"
 import useHandRaiseState from "components/custom-hook/useHandRaiseState"
 import { HandRaiseState } from "types/handraise"
+import ShareYoutubeVideoModal from "../../modal/ShareYoutubeVideoModal"
 
 const styles = {
    root: {
@@ -155,6 +156,7 @@ const VideoControlsContainer = ({
    const { tutorialSteps, setTutorialSteps } = useContext(TutorialContext)
    const theme = useTheme()
    const DELAY = 3000 //3 seconds
+   const [shareVideoModalOpen, setShareVideoModalOpen] = useState(false)
    const [open, setOpen] = useState(true)
    const [openModal, setOpenModal] = useState(false)
    const [delayHandler, setDelayHandler] = useState(null)
@@ -178,6 +180,11 @@ const VideoControlsContainer = ({
       }
    }, [tutorialSteps])
 
+   const handleOpenShareVideoModal = () => setShareVideoModalOpen(true)
+   const handleCloseShareVideoModal = useCallback(
+      () => setShareVideoModalOpen(false),
+      []
+   )
    const handleOpenShare = (shareButtonRef) => {
       setShareMenuAnchorEl(shareButtonRef.current)
    }
@@ -380,6 +387,14 @@ const VideoControlsContainer = ({
       shareActions.length,
    ])
 
+   const handleClickShareYoutubeVideo = useCallback(async () => {
+      if (videoMode) {
+         await firebase.stopSharingYoutubeVideo(streamRef)
+      } else {
+         handleOpenShareVideoModal()
+      }
+   }, [streamRef, videoMode])
+
    useEffect(() => {
       const newShareActions: Action[] = []
 
@@ -410,9 +425,8 @@ const VideoControlsContainer = ({
             {
                icon: <YouTubeIcon color={videoMode ? "primary" : "inherit"} />,
                name: videoMode ? "Stop sharing video" : "Share video",
-               onClick: () =>
-                  setLivestreamMode(videoMode ? "default" : "video"),
-               id: "sendCtaAction",
+               onClick: handleClickShareYoutubeVideo,
+               id: "shareYoutubeAction",
             },
             {
                icon: <CallToActionIcon />,
@@ -434,6 +448,8 @@ const VideoControlsContainer = ({
       screenSharerId,
       streamerId,
       handRaiseState?.state,
+      videoMode,
+      streamRef,
    ])
 
    return (
@@ -581,6 +597,12 @@ const VideoControlsContainer = ({
                </LoadingButton>
             </DialogActions>
          </Dialog>
+         {shareVideoModalOpen && (
+            <ShareYoutubeVideoModal
+               open={shareVideoModalOpen}
+               onClose={handleCloseShareVideoModal}
+            />
+         )}
       </>
    )
 }

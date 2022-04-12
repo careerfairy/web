@@ -12,7 +12,10 @@ import {
 } from "constants/streams"
 import Typography from "@mui/material/Typography"
 import { Stack } from "@mui/material"
-import SynchronisedVideoViewer from "../../../../util/SynchronisedVideoViewer"
+import dynamic from "next/dynamic"
+const SynchronisedVideoViewer = dynamic(() =>
+   import("../../../../util/SynchronisedVideoViewer")
+)
 
 const STREAMS_ROW_HEIGHT = 125
 const WIDE_SCREEN_ROW_HEIGHT = 180

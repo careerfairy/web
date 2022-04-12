@@ -476,13 +476,24 @@ class FirebaseService {
       })
    }
 
-   updateCurrentVideo = (streamRef, url) => {
+   setCurrentVideo = (streamRef, url, updater) => {
       let ref = streamRef.collection("videos").doc("video")
       return ref.set({
          url: url,
          second: 0,
          state: "playing",
+         updater,
       })
+   }
+
+   stopSharingYoutubeVideo = (streamRef) => {
+      const batch = this.firestore.batch()
+      const videoRef = streamRef.collection("videos").doc("video")
+      batch.delete(videoRef)
+      batch.update(streamRef, {
+         mode: "default",
+      })
+      return batch.commit()
    }
 
    // MENTORS
