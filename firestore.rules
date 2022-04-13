@@ -31,14 +31,14 @@ service cloud.firestore {
         }
         match /userData/{userId} {
 
-            function authUserAccessesOwnUserData() {
-                return request.auth.token.email == userId;
-            }
+//            function authUserAccessesOwnUserData() {
+//                return request.auth.token.email == userId;
+//            }
 
-            function adminUserAccessesUser() {
-                let requestUserData = get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data;
-                return requestUserData.isAdmin || requestUserData.adminIds.size() > 0;
-            }
+//            function adminUserAccessesUser() {
+//                let requestUserData = get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data;
+//                return requestUserData.isAdmin || requestUserData.adminIds.size() > 0;
+//            }
 
             function validateUser() {
                 return (request.resource.data.isAdmin == resource.data.isAdmin || !('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false);
