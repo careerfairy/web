@@ -1,4 +1,5 @@
 import LocalStorageUtil from "./LocalStorageUtil"
+import { string } from "yup"
 
 export function getRandom(arr, n) {
    var result = new Array(n),
@@ -67,4 +68,9 @@ export function getReferralInformation() {
    }
 
    return null
+}
+
+export const getQueryStringFromUrl = (url = "", queryParam = "") => {
+   let params = new URL(url).searchParams
+   return params.get(queryParam)
 }

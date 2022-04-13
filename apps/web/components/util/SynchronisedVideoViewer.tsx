@@ -1,14 +1,15 @@
 import { Fragment, useCallback, useEffect, useState } from "react"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import ReactPlayer from "react-player/youtube"
-
+import MuteIcon from "@mui/icons-material/VolumeOff"
+import UnmuteIcon from "@mui/icons-material/VolumeUp"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "../../store/actions"
 import useStreamRef from "../custom-hook/useStreamRef"
 import AreYouSureModal from "../../materialUI/GlobalModals/AreYouSureModal"
-
+import CloseIcon from "@mui/icons-material/Close"
 const styles = {
    root: {
       width: "100%",
@@ -18,9 +19,8 @@ const styles = {
    },
    muteButton: {
       position: "absolute",
-      top: 5,
-      left: "50%",
-      transform: "translateX(-50%)",
+      bottom: 5,
+      left: 5,
       zIndex: "9000",
    },
    stopSharingButton: {
@@ -28,7 +28,6 @@ const styles = {
       position: "absolute",
       zIndex: "9000",
       right: 5,
-      opacity: 0.5,
       "&:hover": {
          opacity: 1,
       },
@@ -177,6 +176,8 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
             {!isVideoSharer && reactPlayerInstance && videoData && (
                <Button
                   sx={styles.muteButton}
+                  color={"grey"}
+                  startIcon={muted ? <MuteIcon /> : <UnmuteIcon />}
                   onClick={() => setMuted((prev) => !prev)}
                >
                   {muted ? "Unmute" : "Mute"}
@@ -184,8 +185,9 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
             )}
             {(isVideoSharer || !viewer) && videoData && (
                <Button
-                  variant={"contained"}
-                  color={"secondary"}
+                  color={"grey"}
+                  size={"large"}
+                  startIcon={<CloseIcon />}
                   onClick={handleOpenConfirmRemoveVideoModal}
                   sx={styles.stopSharingButton}
                >
@@ -202,10 +204,12 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
                   pointerEvents: isVideoSharer ? "visibleFill" : "none",
                }}
                config={{
+                  // https://developers.google.com/youtube/player_parameters
                   playerVars: {
                      controls: isVideoSharer ? 1 : 0,
                      fs: 0,
                      disablekb: isVideoSharer ? 0 : 1,
+                     rel: 0,
                   },
                }}
                muted={muted}

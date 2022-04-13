@@ -8,7 +8,10 @@ import firebaseApp from "./FirebaseInstance"
 import firebase from "firebase/app"
 import { HandRaiseState } from "types/handraise"
 import DocumentReference = firebase.firestore.DocumentReference
-import { getReferralInformation } from "../../util/CommonUtil"
+import {
+   getQueryStringFromUrl,
+   getReferralInformation,
+} from "../../util/CommonUtil"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -478,11 +481,13 @@ class FirebaseService {
 
    setCurrentVideo = (streamRef, url, updater) => {
       let ref = streamRef.collection("videos").doc("video")
+      const secondsIn = Number(getQueryStringFromUrl(url, "t"))
       return ref.set({
          url: url,
-         second: 0,
+         second: secondsIn || 0,
          state: "playing",
          updater,
+         lastPlayed: this.getServerTimestamp(),
       })
    }
 
