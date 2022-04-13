@@ -441,7 +441,7 @@ const CSVDialogDownload = ({ title, children, data, filename }) => {
                   You will download a file in the .csv format. This file uses a
                   separator character that can vary with your regional settings.
                   <p>
-                     Try the alternative version if have issues opening the
+                     Try the alternative version if having issues opening the
                      downloaded file.
                   </p>
                </DialogContentText>
