@@ -2,6 +2,7 @@ import MaterialTable from "@material-table/core"
 import ExportCsv from "@material-table/exporters/csv"
 import { defaultTableOptions } from "components/util/tableUtils"
 import { useEffect, useState } from "react"
+import { getListSeparator } from "../../../../util/CommonUtil"
 
 const ExportTable = (props) => {
    const [tableOptions, setTableOptions] = useState(defaultTableOptions)
@@ -17,7 +18,7 @@ const ExportTable = (props) => {
                      cols,
                      data,
                      props.title || "Table",
-                     props.delimiter || ";"
+                     props.delimiter || getListSeparator()
                   ),
             },
          ],
