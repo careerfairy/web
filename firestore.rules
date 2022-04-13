@@ -37,7 +37,7 @@ service cloud.firestore {
 
             function adminUserAccessesUser() {
                 let requestUserData = get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data;
-                return requestUserData.isAdmin || requestUserData.adminIds.size() > 0
+                return requestUserData.isAdmin || requestUserData.adminIds.size() > 0;
             }
 
             function validateUser() {
@@ -118,7 +118,7 @@ service cloud.firestore {
             //allow delete: if request.auth.token.email in resource.data.adminEmails;
 
             function careerCenterData() {
-                return get(/databases/$(database)/documents/careerCenterData/$(careerCenter)).data
+                return get(/databases/$(database)/documents/careerCenterData/$(careerCenter)).data;
             }
 
             match /bookingSlots/{slot} {

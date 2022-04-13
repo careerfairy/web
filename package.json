@@ -15,11 +15,12 @@
       "test:e2e-webapp-debug": "turbo run test:e2e-webapp-debug --scope=@careerfairy/webapp --include-dependencies --no-deps",
       "webapp:report": "npm run playwright:report -w @careerfairy/webapp",
       "lint": "turbo run lint --parallel",
-      "format": "prettier --write --ignore-unknown",
+      "format": "prettier --write --ignore-unknown .",
       "prepare": "husky install",
       "build:functions": "turbo run build --scope=@careerfairy/functions --include-dependencies",
       "lint:functions": "turbo run lint --scope=@careerfairy/functions",
       "build:webapp": "turbo run build --scope=@careerfairy/webapp --include-dependencies --no-deps",
+      "deploy:rules": "firebase deploy --only firestore:rules",
       "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi"
    },
    "devDependencies": {
