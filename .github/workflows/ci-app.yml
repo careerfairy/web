@@ -18,7 +18,7 @@ jobs:
            uses: fkirc/skip-duplicate-actions@v3.4.1
            with:
               skip_after_successful_duplicate: "false"
-              paths_ignore: '["**/README.md"]'
+              paths_ignore: '["**/README.md", "firestore.rules"]'
 
    build:
       name: "Build, Test and Deploy"
