@@ -148,6 +148,7 @@ export const exportSelectionAction = (
          const tableTitle = title.split(" ").join("_")
          const builder = new CsvBuilder(tableTitle + ".csv")
          builder
+            .setDelimeter(getListSeparator())
             .setColumns(columns.map((columnDef) => columnDef.title))
             .addRows(
                rowData.map((rowData) =>
