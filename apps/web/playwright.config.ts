@@ -54,19 +54,19 @@ const config: PlaywrightTestConfig = {
             ...devices["Desktop Chrome"],
          },
       },
-
-      {
-         name: "firefox",
-         use: {
-            ...devices["Desktop Firefox"],
-         },
-      },
-      {
-         name: "webkit",
-         use: {
-            ...devices["Desktop Safari"],
-         },
-      },
+      //
+      // {
+      //    name: "firefox",
+      //    use: {
+      //       ...devices["Desktop Firefox"],
+      //    },
+      // },
+      // {
+      //    name: "webkit",
+      //    use: {
+      //       ...devices["Desktop Safari"],
+      //    },
+      // },
 
       /* Test against mobile viewports. */
       // {
@@ -108,7 +108,6 @@ const config: PlaywrightTestConfig = {
       env: {
          FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099",
          FIRESTORE_EMULATOR_HOST: "localhost:8080",
-         NEXT_PUBLIC_FIREBASE_EMULATORS: "true",
       },
       port: 3000,
       // emulators need some time to boot

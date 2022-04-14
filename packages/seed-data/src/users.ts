@@ -11,6 +11,7 @@ interface UserSeed {
     * @param extraData fields that will be stored on the userData document
     */
    createUser(email: string, extraData?: UserData): Promise<UserData>
+   deleteUser(email: string): Promise<any>
 }
 
 class UserFirebaseSeed implements UserSeed {
@@ -49,6 +50,18 @@ class UserFirebaseSeed implements UserSeed {
       await firestore.collection("userData").doc(email).set(userData)
 
       return userData
+   }
+
+   async deleteUser(email: string) {
+      const userSnap = await firestore.collection("userData").doc(email).get()
+      const authId = userSnap.data()?.authId
+      const promises: Promise<any>[] = [
+         firestore.collection("userData").doc(email).delete(),
+      ]
+      if (authId) {
+         promises.push(auth.deleteUser(authId))
+      }
+      return Promise.all(promises)
    }
 }
 

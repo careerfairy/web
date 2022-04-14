@@ -109,6 +109,15 @@ class FirebaseService {
       )
       return validateUserEmailWithPin({ userInfo })
    }
+   sendPasswordResetEmail = async (data: {
+      recipientEmail: string
+      redirectLink: string
+   }) => {
+      const sendPasswordResetEmail = this.functions.httpsCallable(
+         "sendPostmarkResetPasswordEmail_V2"
+      )
+      return sendPasswordResetEmail(data)
+   }
 
    sendReminderEmailAboutApplicationLink = async (data) => {
       const sendReminderEmailAboutApplicationLink =

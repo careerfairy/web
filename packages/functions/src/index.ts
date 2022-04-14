@@ -43,6 +43,8 @@ exports.backfillUserData = auth.backfillUserData
 exports.updateFakeUser = auth.updateFakeUser
 exports.validateUserEmailWithPin = auth.validateUserEmailWithPin
 exports.sendPostmarkResetPasswordEmail = auth.sendPostmarkResetPasswordEmail
+exports.sendPostmarkResetPasswordEmail_V2 =
+   auth.sendPostmarkResetPasswordEmail_V2
 exports.sendPostmarkEmailUserDataAndUni = auth.sendPostmarkEmailUserDataAndUni
 exports.sendPostmarkEmailUserDataAndUniWithName =
    auth.sendPostmarkEmailUserDataAndUniWithName

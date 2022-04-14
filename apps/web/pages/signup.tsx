@@ -143,7 +143,12 @@ export const SignUpPageLayout = ({ children }) => {
             </header>
             <Typography className={classes.title}>Sign Up</Typography>
             <Container maxWidth="sm">
-               <Box boxShadow={1} p={3} className={classes.box}>
+               <Box
+                  data-testid={"signup-page-form"}
+                  boxShadow={1}
+                  p={3}
+                  className={classes.box}
+               >
                   {children}
                </Box>
             </Container>

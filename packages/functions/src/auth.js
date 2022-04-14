@@ -302,6 +302,43 @@ exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(
          })
    }
 )
+exports.sendPostmarkResetPasswordEmail_V2 = functions.https.onCall(
+   async (data) => {
+      try {
+         const recipientEmail = data.recipientEmail
+         const redirectLink = data.redirectLink
+
+         const actionCodeSettings = {
+            url: redirectLink,
+         }
+
+         functions.logger.log("recipient_email", recipientEmail)
+
+         const link = await admin
+            .auth()
+            .generatePasswordResetLink(
+               redirectLink.toLowerCase(),
+               actionCodeSettings
+            )
+         const email = {
+            TemplateId: process.env.POSTMARK_TEMPLATE_PASSWORD_RESET,
+            From: "CareerFairy <noreply@careerfairy.io>",
+            To: recipientEmail,
+            TemplateModel: { action_url: link },
+         }
+         const response = await client.sendEmailWithTemplate(email)
+         if (response.ErrorCode) {
+            functions.logger.error(
+               "error in sendEmailWithTemplate response",
+               response
+            )
+         }
+      } catch (e) {
+         functions.logger.error("error in sending password reset link", e)
+         // The client should not know if this request was successful or not, so we just log it on the server
+      }
+   }
+)
 
 exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(
    async (req, res) => {
