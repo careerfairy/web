@@ -116,3 +116,9 @@ npm run start -w @careerfairy/fetch-firestore-data
 When running `npm run dev` or `npm run dev -w @careerfairy-functions` the emulators will be started.
 
 http://localhost:4000/
+
+## Firestore Rules
+
+Update the `firestore.rules` file with your new rules, test them using the local emulators.
+
+Create a Pull Request with the new changes, and only after approval, you should deploy them using `npm run deploy:rules`.
