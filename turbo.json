@@ -26,5 +26,6 @@
       "dev": {
          "cache": false
       }
-   }
+   },
+   "globalDependencies": ["$NODE_ENV"]
 }
