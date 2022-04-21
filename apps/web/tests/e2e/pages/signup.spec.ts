@@ -26,6 +26,7 @@ test.describe("Signup Page Functionality", () => {
 
    test.afterAll(async () => {
       await Promise.all([
+         UserSeed.deleteUser(credentials.correctEmail),
          UniversitiesSeed.deleteUniversities(),
          InterestSeed.deleteInterests(),
       ])

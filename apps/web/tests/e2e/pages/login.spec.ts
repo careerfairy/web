@@ -8,6 +8,9 @@ import { SignupPage } from "../page-object-models/SignupPage"
 import { PasswordResetPage } from "../page-object-models/PasswordResetPage"
 
 test.describe("Login Page Functionality", () => {
+   test.afterAll(async () => {
+      await UserSeed.deleteUser(credentials.correctEmail)
+   })
    test.beforeEach(async ({ page }) => {
       await UserSeed.deleteUser(credentials.correctEmail)
       await UserSeed.createUser(credentials.correctEmail, undefined, {
