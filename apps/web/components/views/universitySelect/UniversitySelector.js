@@ -63,6 +63,7 @@ const UniversitySelector = ({
          id="university"
          name="university"
          fullWidth
+         data-testid={"university-selector"}
          disabled={submitting}
          selectOnFocus
          onBlur={handleBlur}

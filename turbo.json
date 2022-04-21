@@ -4,17 +4,22 @@
    "pipeline": {
       "build": {
          "dependsOn": ["^build"],
-         "outputs": ["dist/**", ".next/**"]
+         "outputs": ["dist/**", ".next/**", ".packages/**"]
       },
       "test": {
          "outputs": ["coverage/**"]
       },
-      "start": {},
+      "start": {
+         "dependsOn": ["build"],
+         "cache": false
+      },
       "webapp:report": {},
       "test:e2e-webapp": {
+         "dependsOn": ["build"],
          "outputs": ["test-results/**", "playwright-report/**"]
       },
       "test:e2e-webapp-debug": {
+         "dependsOn": ["build"],
          "outputs": ["test-results/**", "playwright-report/**"]
       },
       "lint": {},

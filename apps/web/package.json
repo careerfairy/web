@@ -17,6 +17,7 @@
       "test:e2e-webapp-debug": "playwright test --debug"
    },
    "dependencies": {
+      "@careerfairy/seed-data": "*",
       "@careerfairy/shared-lib": "*",
       "@emotion/cache": "^11.7.1",
       "@emotion/react": "^11.7.1",

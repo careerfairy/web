@@ -59,7 +59,10 @@ const SignUp = () => {
    useEffect(() => {
       if (!user.isLoaded || user.isEmpty) return
 
-      if (!firebase.auth?.currentUser?.emailVerified) {
+      if (
+         firebase.auth?.currentUser &&
+         !firebase.auth.currentUser.emailVerified
+      ) {
          return setCurrentStep(1)
       }
    }, [user, firebase.auth?.currentUser?.emailVerified])

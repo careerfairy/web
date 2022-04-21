@@ -16,7 +16,8 @@ const config: PlaywrightTestConfig = {
    /* Maximum time one test can run for. */
    timeout: 30 * 1000,
    // Increase the number of workers on CI (github runners have 2 cores), use default locally (cpus/2)
-   workers: process.env.CI ? 2 : undefined,
+   workers: 1,
+   // workers: process.env.CI ? 2 : undefined,
    expect: {
       /**
        * Maximum time expect() should wait for the condition to be met.
@@ -54,19 +55,18 @@ const config: PlaywrightTestConfig = {
             ...devices["Desktop Chrome"],
          },
       },
-      //
-      // {
-      //    name: "firefox",
-      //    use: {
-      //       ...devices["Desktop Firefox"],
-      //    },
-      // },
-      // {
-      //    name: "webkit",
-      //    use: {
-      //       ...devices["Desktop Safari"],
-      //    },
-      // },
+      {
+         name: "firefox",
+         use: {
+            ...devices["Desktop Firefox"],
+         },
+      },
+      {
+         name: "webkit",
+         use: {
+            ...devices["Desktop Safari"],
+         },
+      },
 
       /* Test against mobile viewports. */
       // {

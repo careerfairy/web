@@ -166,11 +166,9 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
    }
 )
 
-exports.resendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(
-   async (req, res) => {
-      setHeaders(req, res)
-
-      const recipient_email = req.body.recipientEmail
+exports.TEMP_resendPostmarkEmailVerificationEmailWithPin =
+   functions.https.onCall(async (data) => {
+      const recipient_email = data.recipientEmail
       const pinCode = getRandomInt(9999)
 
       await admin
@@ -185,17 +183,12 @@ exports.resendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(
          To: recipient_email,
          TemplateModel: { pinCode: pinCode },
       }
-
-      return client.sendEmailWithTemplate(email).then(
-         (response) => {
-            res.sendStatus(200)
-         },
-         (error) => {
-            res.sendStatus(500)
-         }
-      )
-   }
-)
+      try {
+         await client.sendEmailWithTemplate(email)
+      } catch (e) {
+         throw new functions.https.HttpsError("invalid-argument", e)
+      }
+   })
 
 exports.validateUserEmailWithPin = functions
    .runWith({
@@ -204,6 +197,7 @@ exports.validateUserEmailWithPin = functions
    .https.onCall(async (data, context) => {
       const recipient_email = data.userInfo.recipientEmail
       const pinCode = data.userInfo.pinCode
+      let error
 
       functions.logger.log(
          `Starting user email validation for ${recipient_email}`
@@ -240,69 +234,36 @@ exports.validateUserEmailWithPin = functions
 
                return updatedUserRecord
             } else {
-               functions.logger.warn(
-                  `User ${recipient_email} has failed to provide the correct Pin code, provided ${pinCode} instead of ${user.validationPin}`
+               functions.logger.error(
+                  `The User ${recipient_email} has failed to provide the correct Pin code, provided ${pinCode} instead of ${user.validationPin}`
                )
+               error = {
+                  code: "invalid-argument",
+                  message: `Failed to provide the correct Pin code`,
+               }
+            }
+         } else {
+            functions.logger.error(
+               `Was unable to find any userData with ${recipient_email}`
+            )
+            error = {
+               code: "not-found",
+               message: `Was unable to find any userData with ${recipient_email}`,
             }
          }
       } catch (error) {
          functions.logger.warn(
             `An error has occurred fetching userData for ${recipient_email}`
          )
-         throw new functions.https.HttpsError("unknown", "")
+         throw new functions.https.HttpsError("unknown", error)
+      }
+
+      if (error) {
+         throw new functions.https.HttpsError(error.code, error.message)
       }
    })
 
-exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(
-   async (req, res) => {
-      res.set("Access-Control-Allow-Origin", "*")
-      res.set("Access-Control-Allow-Credentials", "true")
-
-      if (req.method === "OPTIONS") {
-         // Send response to OPTIONS requests
-         res.set("Access-Control-Allow-Methods", "GET")
-         res.set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-         res.set("Access-Control-Max-Age", "3600")
-         return res.sendStatus(204)
-      }
-
-      const recipient_email = req.body.recipientEmail
-      const redirect_link = req.body.redirect_link
-
-      const actionCodeSettings = {
-         url: redirect_link,
-      }
-
-      console.log("recipient_email", recipient_email)
-
-      admin
-         .auth()
-         .generatePasswordResetLink(
-            recipient_email.toLowerCase(),
-            actionCodeSettings
-         )
-         .then((link) => {
-            const email = {
-               TemplateId: process.env.POSTMARK_TEMPLATE_PASSWORD_RESET,
-               From: "CareerFairy <noreply@careerfairy.io>",
-               To: recipient_email,
-               TemplateModel: { action_url: link },
-            }
-            return client.sendEmailWithTemplate(email).then(
-               (response) => {
-                  res.sendStatus(200)
-               },
-               (error) => {
-                  res.send("Error: " + error)
-               }
-            )
-         })
-         .catch((error) => {
-            console.log(error)
-         })
-   }
-)
-exports.sendPostmarkResetPasswordEmail_V2 = functions.https.onCall(
+exports.TEMP_sendPostmarkResetPasswordEmail = functions.https.onCall(
    async (data) => {
       try {
          const recipientEmail = data.recipientEmail
@@ -312,7 +273,7 @@ exports.sendPostmarkResetPasswordEmail_V2 = functions.https.onCall(
             url: redirectLink,
          }
 
-         functions.logger.log("recipient_email", recipientEmail)
+         functions.logger.info("recipient_email", recipientEmail)
 
          const link = await admin
             .auth()
