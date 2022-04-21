@@ -8,13 +8,90 @@ import * as admin from "firebase-admin"
 import { firestore } from "./lib/firebase"
 
 interface LivestreamSeed {
-   createLivestream(
+   create(overrideFields?: Partial<LivestreamEvent>): Promise<LivestreamEvent>
+
+   createPast(
       overrideFields?: Partial<LivestreamEvent>
    ): Promise<LivestreamEvent>
+
+   createLive(
+      overrideFields?: Partial<LivestreamEvent>
+   ): Promise<LivestreamEvent>
+
+   getWithSubcollections(
+      livestreamId: string,
+      subCollections?: string[]
+   ): Promise<LivestreamEventWithSubcollections>
 }
 
 class LivestreamFirebaseSeed implements LivestreamSeed {
-   async createLivestream(
+   async getWithSubcollections(
+      livestreamId: string,
+      subCollections = [
+         "registeredStudents",
+         "registrants",
+         "talentPool",
+         "questions",
+      ]
+   ): Promise<LivestreamEventWithSubcollections> {
+      let res = {}
+
+      subCollections.forEach((name) => {
+         res[name] = null
+      })
+
+      const livestreamRef = firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+
+      const livestream = await livestreamRef.get()
+
+      for (let subCollectionsKey in res) {
+         const querySnapshot = await livestreamRef
+            .collection(subCollectionsKey)
+            .get()
+
+         if (!querySnapshot.empty) {
+            res[subCollectionsKey] = querySnapshot.docs.map((d) => ({
+               ...d.data(),
+               id: d.id,
+            }))
+         }
+      }
+
+      return {
+         // @ts-ignore
+         livestream: {
+            ...livestream.data(),
+            id: livestream.id,
+         },
+         ...res,
+      }
+   }
+
+   createPast(
+      overrideFields?: Partial<LivestreamEvent>
+   ): Promise<LivestreamEvent> {
+      return this.create({
+         start: admin.firestore.Timestamp.fromDate(
+            faker.date.recent(faker.datatype.number({ min: 0, max: 60 }))
+         ),
+         hasEnded: true,
+      })
+   }
+
+   createLive(
+      overrideFields?: Partial<LivestreamEvent>
+   ): Promise<LivestreamEvent> {
+      return this.create({
+         start: admin.firestore.Timestamp.fromDate(
+            faker.date.soon(faker.datatype.number({ min: 1, max: 60 }))
+         ),
+         hasStarted: true,
+      })
+   }
+
+   async create(
       overrideFields?: Partial<LivestreamEvent>
    ): Promise<LivestreamEvent> {
       const registeredUsers = Array.from(
@@ -48,7 +125,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
             groupId: uuidv4(),
          },
          registeredUsers,
-         registrants: registeredUsers.map((s) => uuidv4()),
+         registrants: registeredUsers.map((_) => uuidv4()),
          speakers: Array.from(
             {
                length: faker.datatype.number({ min: 1, max: 5 }),
@@ -78,6 +155,14 @@ const generateSpeaker = (): Speaker => ({
    lastName: faker.name.lastName(),
    position: faker.name.jobTitle(),
 })
+
+type LivestreamEventWithSubcollections = {
+   livestream: LivestreamEvent
+   registeredStudents: any
+   registrants: any
+   talentPool: any
+   questions: any
+}
 
 const instance: LivestreamSeed = new LivestreamFirebaseSeed()
 
