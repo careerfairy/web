@@ -14,7 +14,7 @@ const config: PlaywrightTestConfig = {
    testDir: "./tests/e2e",
    testIgnore: "**/streaming/test**",
    /* Maximum time one test can run for. */
-   timeout: 30 * 1000,
+   timeout: 300 * 1000,
    // Increase the number of workers on CI (github runners have 2 cores), use default locally (cpus/2)
    workers: process.env.CI ? 2 : undefined,
    expect: {
@@ -103,7 +103,7 @@ const config: PlaywrightTestConfig = {
    /* Run your local dev server before starting the tests */
    webServer: {
       command:
-         'npx firebase emulators:exec "npm run start -w @careerfairy/webapp" --only auth,firestore,functions',
+         'npx firebase emulators:exec "npm run start -w @careerfairy/webapp" --ui --only auth,firestore,functions',
       cwd: "../../",
       env: {
          FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099",

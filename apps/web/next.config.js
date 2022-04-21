@@ -94,6 +94,12 @@ const moduleExports = {
    },
 }
 
+// test or development environment
+if (process.env.NODE_ENV !== "production") {
+   // add image domains used by faker.js
+   moduleExports.images.domains.push("loremflickr.com")
+}
+
 const sentryWebpackPluginOptions = {
    // Additional config options for the Sentry Webpack plugin. Keep in mind that
    // the following options are set automatically, and overriding them is not
