@@ -38,24 +38,19 @@ const SignUpPinForm = () => {
    const { authenticatedUser: user } = useAuth()
    const { nextStep } = useContext<IMultiStepContext>(MultiStepContext)
 
-   function resendVerificationEmail() {
+   async function resendVerificationEmail() {
       setGeneralLoading(true)
-      axios({
-         method: "post",
-         url: "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/resendPostmarkEmailVerificationEmailWithPin",
-         data: {
+      try {
+         await firebase.resendPostmarkEmailVerificationEmailWithPin({
             recipientEmail: user.email,
-         },
-      })
-         .then((response) => {
-            setIncorrectPin(false)
-            setGeneralLoading(false)
          })
-         .catch((error) => {
-            console.error(error)
-            setIncorrectPin(false)
-            setGeneralLoading(false)
-         })
+         setIncorrectPin(false)
+         setGeneralLoading(false)
+      } catch (error) {
+         console.error(error)
+         setIncorrectPin(false)
+         setGeneralLoading(false)
+      }
    }
 
    const updateActiveStep = () => {
@@ -72,12 +67,12 @@ const SignUpPinForm = () => {
       }
       try {
          await firebase.validateUserEmailWithPin(userInfo)
-         await firebase.auth.currentUser.reload()
          if (absolutePath) {
             void (await push(absolutePath as any))
          } else {
             updateActiveStep()
          }
+         await firebase.auth.currentUser.reload()
       } catch (error) {
          console.log("error", error)
          setIncorrectPin(true)
@@ -157,6 +152,7 @@ const SignUpPinForm = () => {
                      size="large"
                      type="submit"
                      fullWidth
+                     data-testid={"validate-email-button"}
                      color="primary"
                      variant="contained"
                      disabled={isSubmitting || generalLoading}
@@ -182,10 +178,7 @@ const SignUpPinForm = () => {
                   >
                      <strong>Incorrect PIN</strong> <br />
                      The PIN code you entered appears to be incorrect.{" "}
-                     <MuiLink
-                        href="#"
-                        onClick={() => resendVerificationEmail()}
-                     >
+                     <MuiLink onClick={() => resendVerificationEmail()}>
                         <br />
                         Resend the verification email.
                      </MuiLink>

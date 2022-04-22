@@ -28,6 +28,7 @@ const UniversityCountrySelector = ({
          id="universityCountryCode"
          name="universityCountryCode"
          fullWidth
+         data-testid={"university-country-selector"}
          disabled={submitting}
          selectOnFocus
          onBlur={handleBlur}

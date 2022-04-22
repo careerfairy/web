@@ -20,7 +20,7 @@
       },
       "test:e2e-webapp-debug": {
          "dependsOn": ["build"],
-         "outputs": ["test-results/**"]
+         "outputs": ["test-results/**", "playwright-report/**"]
       },
       "lint": {},
       "dev": {
