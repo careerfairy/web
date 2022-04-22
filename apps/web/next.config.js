@@ -109,7 +109,7 @@ const sentryWebpackPluginOptions = {
 // Only use sentry if we're building the app from continuous integration (Vercel)
 // This allows us to build the app locally without having a SENTRY_AUTH_TOKEN variable
 // which is required for sentry to upload the sourcemaps files
-if (process.env.CI) {
+if (process.env.CI && process.env.NODE_ENV === "production") {
    /**
     * withSentryConfig() docs:
     *
