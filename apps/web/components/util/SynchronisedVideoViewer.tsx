@@ -55,10 +55,6 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
    const isVideoSharer = videoData && streamerId === videoData?.updater
    const dispatch = useDispatch()
 
-   const getTimeBetweenDates = (startDate, endDate) => {
-      return (endDate.getTime() - startDate.getTime()) / 1000
-   }
-
    const handleSeek = (seconds: number) => {
       return reactPlayerInstance.seekTo(seconds, "seconds")
    }
@@ -103,7 +99,7 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
    }, [videoData?.second])
 
    const handleInitialize = () => {
-      const secondsDiff = getTimeBetweenDates(
+      const secondsDiff = getSecondsBetweenDates(
          videoData.lastPlayed.toDate(),
          new Date()
       )
@@ -235,6 +231,10 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
          )}
       </Fragment>
    )
+}
+
+const getSecondsBetweenDates = (startDate: Date, endDate: Date) => {
+   return (endDate.getTime() - startDate.getTime()) / 1000
 }
 
 export default SynchronisedVideoViewer
