@@ -15,6 +15,7 @@ import {
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { sleep } from "../utils"
 
 test.beforeEach(async () => {
    await clearAuthData()
@@ -158,7 +159,8 @@ test("livestream has already started, confirm the redirection without any regist
    // open page
    await livestreamPage.open(livestream.id)
 
-   // to confirm that we're on the streaming page
+   // https://github.com/microsoft/playwright/issues/13640
+   await sleep(500)
    await page.reload()
 
    // assert we're on the streaming page

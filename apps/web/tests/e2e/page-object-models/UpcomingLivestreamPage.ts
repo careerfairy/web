@@ -1,5 +1,5 @@
 import { Locator, Page } from "@playwright/test"
-import CommonPage from "./CommonPage"
+import { CommonPage } from "./CommonPage"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 
 export default class UpcomingLivestreamPage extends CommonPage {

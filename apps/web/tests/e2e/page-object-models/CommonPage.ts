@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test"
 
-export default class CommonPage {
+export class CommonPage {
    constructor(protected readonly page: Page) {}
 
    exactText(str: string) {
