@@ -61,7 +61,7 @@ const ShareYoutubeVideoModal = ({ open, onClose }: Props) => {
                onChange={formik.handleChange}
                onBlur={formik.handleBlur}
                fullWidth
-               sx={{ my: 1 }}
+               sx={{ mb: 1 }}
                id={"youtubeUrl"}
                type={"url"}
                name={"youtubeUrl"}
