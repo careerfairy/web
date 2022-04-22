@@ -17,7 +17,6 @@ const config: PlaywrightTestConfig = {
    timeout: 30 * 1000,
    // Increase the number of workers on CI (github runners have 2 cores), use default locally (cpus/2)
    workers: 1,
-   // workers: process.env.CI ? 2 : undefined,
    expect: {
       /**
        * Maximum time expect() should wait for the condition to be met.
