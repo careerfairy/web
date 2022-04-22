@@ -1,4 +1,5 @@
 import { Locator, Page, expect } from "@playwright/test"
+import { sleep } from "../utils"
 
 export class SignupPage {
    readonly page: Page
@@ -195,6 +196,7 @@ export class SignupPage {
       await this.enterPassword(formData.password)
       await this.enterConfirmPassword(formData.confirmPassword)
       await this.agreeToTerms(formData.agreeToTerms)
+      await sleep(300)
       await this.subscribeToEmails(formData.subscribeEmails)
    }
 
