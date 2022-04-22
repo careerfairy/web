@@ -119,7 +119,7 @@ function VideoContainer({
 
    useEffect(() => {
       if (
-         currentLivestream.mode === "presentation" &&
+         ["presentation", "video"].includes(currentLivestream.mode) &&
          screenShareStreamRef?.current
       ) {
          void unPublishScreenShareStream()
@@ -138,7 +138,8 @@ function VideoContainer({
             const IAmCurrentlySpeakingAndBig =
                streamerId === currentSpeakerId &&
                currentLivestream.mode !== "desktop" &&
-               currentLivestream.mode !== "presentation"
+               currentLivestream.mode !== "presentation" &&
+               currentLivestream.mode !== "video"
             if (IAmCurrentlySpeakingAndBig) {
                const makeStreamerHigherQualityTimeout = setTimeout(() => {
                   void setVideoQuality("480p_9")
