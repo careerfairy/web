@@ -45,7 +45,6 @@ export class LoginPage {
       await this.page.goto("/login")
    }
    async createUserAndLogin(options?: { emailVerified?: boolean }) {
-      await UserSeed.deleteUser(credentials.correctEmail)
       const userData = await UserSeed.createUser(
          credentials.correctEmail,
          undefined,

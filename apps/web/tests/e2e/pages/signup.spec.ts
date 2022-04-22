@@ -4,7 +4,6 @@ import { CommonPage } from "../page-object-models/CommonPage"
 import { SignupPage } from "../page-object-models/SignupPage"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import InterestSeed from "@careerfairy/seed-data/dist/interests"
-import { dummyInterests } from "@careerfairy/shared-lib/dist/interests"
 import { credentials } from "../../constants"
 import { PortalPage } from "../page-object-models/PortalPage"
 import { checkIfArraysAreEqual } from "../utils"
@@ -56,6 +55,7 @@ test.describe("Signup Page Functionality", () => {
       await signup.enterPinCode(`${validationPin}`)
       await signup.clickValidateEmail()
       await expect(signup.interestsTitle).toBeVisible()
+      const dummyInterests = InterestSeed.getDummyInterests()
       const targetInterests = [
          dummyInterests["Startups"],
          dummyInterests["Research & Development"],
@@ -88,7 +88,7 @@ test.describe("Signup Page Functionality", () => {
       )
       expect(
          areEqual,
-         `User's interests should match the selected interests: User's interests -> (${first}) Selected Interests -> (${second})`
+         `User's interests on userData Doc should match the selected interests: userData Doc interests -> (${first}) Selected Interests -> (${second})`
       ).toBe(true)
    })
    test("It fails to sign up with missing fields", async ({ page }) => {

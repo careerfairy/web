@@ -166,8 +166,8 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
    }
 )
 
-exports.TEMP_resendPostmarkEmailVerificationEmailWithPin =
-   functions.https.onCall(async (data) => {
+exports.resendPostmarkEmailVerificationEmailWithPin_v2 = functions.https.onCall(
+   async (data) => {
       const recipient_email = data.recipientEmail
       const pinCode = getRandomInt(9999)
 
@@ -188,7 +188,8 @@ exports.TEMP_resendPostmarkEmailVerificationEmailWithPin =
       } catch (e) {
          throw new functions.https.HttpsError("invalid-argument", e)
       }
-   })
+   }
+)
 
 exports.validateUserEmailWithPin = functions
    .runWith({
@@ -263,7 +264,7 @@ exports.validateUserEmailWithPin = functions
       }
    })
 
-exports.TEMP_sendPostmarkResetPasswordEmail = functions.https.onCall(
+exports.sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
    async (data) => {
       try {
          const recipientEmail = data.recipientEmail

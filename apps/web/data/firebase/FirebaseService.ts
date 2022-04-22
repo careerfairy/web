@@ -114,7 +114,7 @@ class FirebaseService {
       redirectLink: string
    }) => {
       const sendPasswordResetEmail = this.functions.httpsCallable(
-         "TEMP_sendPostmarkResetPasswordEmail"
+         "sendPostmarkResetPasswordEmail_v2"
       )
       return sendPasswordResetEmail(data)
    }
@@ -123,7 +123,7 @@ class FirebaseService {
    }) => {
       const resendPostmarkEmailVerificationEmailWithPin =
          this.functions.httpsCallable(
-            "TEMP_resendPostmarkEmailVerificationEmailWithPin"
+            "resendPostmarkEmailVerificationEmailWithPin_v2"
          )
       return resendPostmarkEmailVerificationEmailWithPin(data)
    }

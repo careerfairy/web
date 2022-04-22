@@ -105,6 +105,7 @@ test.describe("Login Page Functionality", () => {
    test("It redirects to portal page when logged in", async ({ page }) => {
       const login = new LoginPage(page)
       const portal = new PortalPage(page)
+      await UserSeed.deleteUser(credentials.correctEmail)
       await login.createUserAndLogin()
       await expect(portal.UpcomingEventsHeader).toBeVisible({ timeout: 15000 })
    })
@@ -113,6 +114,7 @@ test.describe("Login Page Functionality", () => {
    }) => {
       const login = new LoginPage(page)
       const signup = new SignupPage(page)
+      await UserSeed.deleteUser(credentials.correctEmail)
       await login.createUserAndLogin({ emailVerified: false })
       await expect(signup.emailVerificationStepMessage).toBeVisible()
    })
