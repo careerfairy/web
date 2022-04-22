@@ -1,5 +1,6 @@
 const { axios } = require("./axios")
 const { DateTime } = require("luxon")
+const { isLocalEnvironment } = require("../util")
 
 const notifyLivestreamStarting = (webhookUrl, livestreamObj) => {
    const link = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`
@@ -117,6 +118,10 @@ function generateBodyStr(fieldsObj) {
 }
 
 function generateRequest(url, body) {
+   if (isLocalEnvironment()) {
+      return {}
+   }
+
    return axios({
       method: "post",
       data: body,

@@ -57,6 +57,7 @@ jobs:
          - name: Build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              NODE_ENV: test
            run: npm run build
 
          - name: Run Jest Unit Tests

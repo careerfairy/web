@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
    // Closest to our Firestore region
    // https://firebase.google.com/docs/functions/locations#selecting-regions_firestore-storage
    region: "europe-west1",
@@ -9,3 +9,10 @@ module.exports = {
          "https://hooks.slack.com/services/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",
    },
 }
+
+if (process.env.NODE_ENV !== "production") {
+   // avoid real slack notifications during development/testing
+   config.slackWebhooks.livestreamAlerts = "http://localhost:9"
+}
+
+module.exports = config

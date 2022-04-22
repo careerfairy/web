@@ -356,6 +356,9 @@ export const getResizedUrl = (url, size = "sm") => {
       return ""
    }
 
+   // don't transform the url if it's not a firebase storage url
+   if (url.indexOf("firebasestorage") === -1) return url
+
    const targetSize = imageSizes[size]
 
    if (!targetSize) {

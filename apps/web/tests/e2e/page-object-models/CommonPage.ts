@@ -1,15 +1,17 @@
-import { Locator, Page } from "@playwright/test"
+import { Page } from "@playwright/test"
 
 export class CommonPage {
-   readonly page: Page
-   readonly cookieAcceptButton: Locator
+   constructor(protected readonly page: Page) {}
 
-   constructor(page: Page) {
-      this.page = page
-      this.cookieAcceptButton = page.locator("id=rcc-confirm-button")
+   exactText(str: string) {
+      return this.page.locator(`text="${str}"`)
    }
 
-   async acceptCookies() {
-      return this?.cookieAcceptButton.click()
+   text(str: string) {
+      return this.page.locator(`text=${str}`)
+   }
+
+   acceptCookies() {
+      return this.page.locator("id=rcc-confirm-button").click()
    }
 }

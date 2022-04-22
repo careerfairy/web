@@ -1,0 +1,169 @@
+import {
+   LivestreamEvent,
+   Speaker,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { faker } from "@faker-js/faker"
+import { v4 as uuidv4 } from "uuid"
+import * as admin from "firebase-admin"
+import { firestore } from "./lib/firebase"
+
+interface LivestreamSeed {
+   create(overrideFields?: Partial<LivestreamEvent>): Promise<LivestreamEvent>
+
+   createPast(
+      overrideFields?: Partial<LivestreamEvent>
+   ): Promise<LivestreamEvent>
+
+   createLive(
+      overrideFields?: Partial<LivestreamEvent>
+   ): Promise<LivestreamEvent>
+
+   getWithSubcollections(
+      livestreamId: string,
+      subCollections?: string[]
+   ): Promise<LivestreamEventWithSubcollections>
+}
+
+class LivestreamFirebaseSeed implements LivestreamSeed {
+   async getWithSubcollections(
+      livestreamId: string,
+      subCollections = [
+         "registeredStudents",
+         "registrants",
+         "talentPool",
+         "questions",
+      ]
+   ): Promise<LivestreamEventWithSubcollections> {
+      let res = {}
+
+      subCollections.forEach((name) => {
+         res[name] = null
+      })
+
+      const livestreamRef = firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+
+      const livestream = await livestreamRef.get()
+
+      for (let subCollectionsKey in res) {
+         const querySnapshot = await livestreamRef
+            .collection(subCollectionsKey)
+            .get()
+
+         if (!querySnapshot.empty) {
+            res[subCollectionsKey] = querySnapshot.docs.map((d) => ({
+               ...d.data(),
+               id: d.id,
+            }))
+         }
+      }
+
+      return {
+         // @ts-ignore
+         livestream: {
+            ...livestream.data(),
+            id: livestream.id,
+         },
+         ...res,
+      }
+   }
+
+   createPast(
+      overrideFields?: Partial<LivestreamEvent>
+   ): Promise<LivestreamEvent> {
+      return this.create({
+         start: admin.firestore.Timestamp.fromDate(
+            faker.date.recent(faker.datatype.number({ min: 1, max: 60 }))
+         ),
+         hasEnded: true,
+      })
+   }
+
+   createLive(
+      overrideFields?: Partial<LivestreamEvent>
+   ): Promise<LivestreamEvent> {
+      return this.create({
+         start: admin.firestore.Timestamp.fromDate(
+            faker.date.recent(faker.datatype.number({ min: 0, max: 1 }))
+         ),
+         hasStarted: true,
+      })
+   }
+
+   async create(
+      overrideFields?: Partial<LivestreamEvent>
+   ): Promise<LivestreamEvent> {
+      const registeredUsers = Array.from(
+         {
+            length: faker.datatype.number({ min: 0, max: 100 }),
+         },
+         () => faker.internet.email()
+      )
+
+      let data: LivestreamEvent = {
+         author: {
+            email: faker.internet.email(),
+            groupId: uuidv4(),
+         },
+         backgroundImageUrl: faker.image.abstract(),
+         company: faker.company.companyName(),
+         companyId: uuidv4(),
+         companyLogoUrl: faker.image.business(),
+         created: admin.firestore.Timestamp.fromDate(faker.date.recent()),
+         duration: faker.random.arrayElement([30, 60, 90, 120]),
+         groupIds: [uuidv4()],
+         hidden: false,
+         id: uuidv4(),
+         language: {
+            code: faker.address.countryCode(),
+            name: faker.address.country(),
+         },
+         lastUpdated: admin.firestore.Timestamp.fromDate(faker.date.recent()),
+         lastUpdatedAuthorInfo: {
+            email: faker.internet.email(),
+            groupId: uuidv4(),
+         },
+         registeredUsers,
+         registrants: registeredUsers.map((_) => uuidv4()),
+         speakers: Array.from(
+            {
+               length: faker.datatype.number({ min: 1, max: 5 }),
+            },
+            generateSpeaker
+         ),
+         start: admin.firestore.Timestamp.fromDate(faker.date.soon()),
+         test: false,
+         title: faker.lorem.sentence(),
+         type: "upcoming",
+         universities: [],
+      }
+
+      data = Object.assign(data, overrideFields)
+
+      await firestore.collection("livestreams").doc(data.id).set(data)
+
+      return data
+   }
+}
+
+const generateSpeaker = (): Speaker => ({
+   id: uuidv4(),
+   avatar: faker.image.people(),
+   background: faker.lorem.paragraph(),
+   firstName: faker.name.firstName(),
+   lastName: faker.name.lastName(),
+   position: faker.name.jobTitle(),
+})
+
+type LivestreamEventWithSubcollections = {
+   livestream: LivestreamEvent
+   registeredStudents: any
+   registrants: any
+   talentPool: any
+   questions: any
+}
+
+const instance: LivestreamSeed = new LivestreamFirebaseSeed()
+
+export default instance
