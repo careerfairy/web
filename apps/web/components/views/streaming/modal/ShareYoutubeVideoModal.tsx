@@ -1,8 +1,9 @@
 import React from "react"
 import {
-   Button,
    Dialog,
+   DialogActions,
    DialogContent,
+   DialogTitle,
    TextField,
    Typography,
 } from "@mui/material"
@@ -52,13 +53,15 @@ const ShareYoutubeVideoModal = ({ open, onClose }: Props) => {
 
    return (
       <Dialog open={open} maxWidth="sm" fullWidth onClose={onClose}>
-         <DialogContent style={{ padding: 30 }}>
-            <Typography variant="h5">SHARE A NEW YOUTUBE VIDEO</Typography>
+         <DialogTitle>
+            <Typography variant="h5">Share a new youtube video</Typography>
+         </DialogTitle>
+         <DialogContent>
             <TextField
-               style={{ margin: "20px 0" }}
                onChange={formik.handleChange}
                onBlur={formik.handleBlur}
                fullWidth
+               sx={{ my: 1 }}
                id={"youtubeUrl"}
                type={"url"}
                name={"youtubeUrl"}
@@ -73,15 +76,21 @@ const ShareYoutubeVideoModal = ({ open, onClose }: Props) => {
                label="Full YouTube video URL"
                placeholder="https://www.youtube.com/watch?v=cNZNR-wmBxI"
             />
-            <LoadingButton
-               color="primary"
-               variant="contained"
-               loading={formik.isSubmitting}
-               type={"submit"}
-               onClick={() => formik.handleSubmit()}
-            >
-               Share Now
-            </LoadingButton>
+            <Typography color="text.secondary" variant={"subtitle1"}>
+               When sharing a video, the player actions (play, pause, etc) will
+               be replayed on the viewer's screens as well.
+            </Typography>
+            <DialogActions sx={{ pr: 0 }}>
+               <LoadingButton
+                  color="primary"
+                  variant="contained"
+                  loading={formik.isSubmitting}
+                  type={"submit"}
+                  onClick={() => formik.handleSubmit()}
+               >
+                  Share Now
+               </LoadingButton>
+            </DialogActions>
          </DialogContent>
       </Dialog>
    )

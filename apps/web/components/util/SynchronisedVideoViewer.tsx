@@ -10,27 +10,39 @@ import * as actions from "../../store/actions"
 import useStreamRef from "../custom-hook/useStreamRef"
 import AreYouSureModal from "../../materialUI/GlobalModals/AreYouSureModal"
 import CloseIcon from "@mui/icons-material/Close"
+import { alpha } from "@mui/material/styles"
+
 const styles = {
    root: {
       width: "100%",
       backgroundColor: "black",
       position: "relative",
       height: "calc(100% - 48px)",
+      "& button": {
+         backgroundColor: (theme) => alpha(theme.palette.common.black, 0.4),
+         color: "white",
+         "&:hover": {
+            backgroundColor: (theme) => alpha(theme.palette.common.black, 0.8),
+            opacity: 1,
+            color: "white",
+         },
+      },
    },
    muteButton: {
       position: "absolute",
       bottom: 5,
       left: 5,
       zIndex: "9000",
+      color: "white",
+      borderColor: "white !important",
+      textShadow: (theme) => theme.darkTextShadow,
    },
+
    stopSharingButton: {
       top: 5,
-      position: "absolute",
       zIndex: "9000",
       right: 5,
-      "&:hover": {
-         opacity: 1,
-      },
+      position: "absolute",
    },
 }
 const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
