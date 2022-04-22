@@ -1,6 +1,7 @@
 import { Locator, Page } from "@playwright/test"
 import { CommonPage } from "./CommonPage"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { sleep } from "../utils"
 
 export default class UpcomingLivestreamPage extends CommonPage {
    public readonly buttonEventOver: Locator
@@ -36,10 +37,9 @@ export default class UpcomingLivestreamPage extends CommonPage {
       }
    }
 
-   modalAttend() {
-      return this.page
-         .locator('div[role="dialog"] >> text=I\'ll attend')
-         .click()
+   async modalAttend() {
+      await this.page.locator('div[role="dialog"] >> text=I\'ll attend').click()
+      await sleep(200)
    }
 
    modalSubmit() {
