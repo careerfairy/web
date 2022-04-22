@@ -70,6 +70,24 @@ export function getReferralInformation() {
    return null
 }
 
+/**
+ * Get list separator character from OS Regional Settings
+ *
+ * Useful to generate csv files
+ * @returns {string}
+ */
+export function getListSeparator() {
+   let list = ["a", "b"],
+      str
+   if (list.toLocaleString) {
+      str = list.toLocaleString()
+      if (str.indexOf(";") > 0 && str.indexOf(",") === -1) {
+         return ";"
+      }
+   }
+   return ","
+}
+
 export const getQueryStringFromUrl = (url = "", queryParam = "") => {
    let params = new URL(url).searchParams
    return params.get(queryParam)
