@@ -34,7 +34,7 @@ function LoginButton() {
 }
 
 const NavBar = memo(({ drawerWidth, anchor = "left" }) => {
-   const { userData, authenticatedUser } = useAuth()
+   const { userData, authenticatedUser, isLoggedOut } = useAuth()
    const dispatch = useDispatch()
    const signOut = () => dispatch(actions.signOut())
    const { secondaryLinks, mainLinks } = useGeneralLinks()
@@ -79,7 +79,7 @@ const NavBar = memo(({ drawerWidth, anchor = "left" }) => {
                      black
                   />
                ))}
-               {userData && (
+               {!isLoggedOut && (
                   <NavItem
                      href="#"
                      onClick={signOut}

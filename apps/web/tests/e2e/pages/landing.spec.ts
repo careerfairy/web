@@ -1,4 +1,4 @@
-import { test, expect, Page } from "@playwright/test"
+import { test, expect } from "@playwright/test"
 
 test.describe("Landing Page Functionality", () => {
    test("should take me to the about us page after clicking on About Us", async ({
