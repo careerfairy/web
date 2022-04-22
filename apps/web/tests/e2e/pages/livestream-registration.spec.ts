@@ -61,11 +61,10 @@ test("successful registration on a livestream event", async ({ page }) => {
    await expect(await livestreamPage.buttonAlreadyBooked).toBeDisabled()
 
    // assert firestore data is right
-   const finalLivestreamData =
-      await LivestreamSeed.getLivestreamWithSubcollections(livestream.id, [
-         "registrants",
-         "registeredStudents",
-      ])
+   const finalLivestreamData = await LivestreamSeed.getWithSubcollections(
+      livestream.id,
+      ["registrants", "registeredStudents"]
+   )
    expect(finalLivestreamData.registrants[0].userEmail).toBe(user.userEmail)
    expect(finalLivestreamData.registeredStudents[0].userEmail).toBe(
       user.userEmail
@@ -77,7 +76,7 @@ test("successful registration on a livestream event", async ({ page }) => {
 
 test("past event shouldn't be able to register", async ({ page }) => {
    const livestreamPage = new UpcomingLivestreamPage(page)
-   const { livestream } = await setupData({}, {}, "createPastLivestream")
+   const { livestream } = await setupData({}, {}, "createPast")
 
    await livestreamPage.open(livestream.id)
    await expect(await livestreamPage.buttonEventOver).toBeDisabled()
@@ -112,11 +111,10 @@ test("register to an event and fill out a question and join talent pool", async 
    await livestreamPage.finish()
 
    // assert firestore data is right
-   const finalLivestreamData =
-      await LivestreamSeed.getLivestreamWithSubcollections(livestream.id, [
-         "questions",
-         "talentPool",
-      ])
+   const finalLivestreamData = await LivestreamSeed.getWithSubcollections(
+      livestream.id,
+      ["questions", "talentPool"]
+   )
    expect(finalLivestreamData.questions[0].title).toBe(question)
    expect(finalLivestreamData.talentPool[0].userEmail).toBe(user.userEmail)
 })
@@ -153,7 +151,7 @@ test("livestream has already started, confirm the redirection without any regist
    browserName,
 }) => {
    const livestreamPage = new UpcomingLivestreamPage(page)
-   const { livestream } = await setupData({}, {}, "createLiveLivestream")
+   const { livestream } = await setupData({}, {}, "createLive")
 
    await login(page)
 
@@ -198,10 +196,7 @@ async function login(page, preventRedirection = false): Promise<UserData> {
 async function setupData(
    overrideGroupDetails: Partial<Group> = {},
    overrideLivestreamDetails: Partial<LivestreamEvent> = {},
-   livestreamType:
-      | "createLivestream"
-      | "createPastLivestream"
-      | "createLiveLivestream" = "createLivestream"
+   livestreamType: "create" | "createPast" | "createLive" = "create"
 ) {
    const group = await GroupSeed.createGroup(
       Object.assign(

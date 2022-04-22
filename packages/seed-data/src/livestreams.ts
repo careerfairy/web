@@ -74,7 +74,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
    ): Promise<LivestreamEvent> {
       return this.create({
          start: admin.firestore.Timestamp.fromDate(
-            faker.date.recent(faker.datatype.number({ min: 0, max: 60 }))
+            faker.date.recent(faker.datatype.number({ min: 1, max: 60 }))
          ),
          hasEnded: true,
       })
@@ -85,7 +85,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
    ): Promise<LivestreamEvent> {
       return this.create({
          start: admin.firestore.Timestamp.fromDate(
-            faker.date.soon(faker.datatype.number({ min: 1, max: 60 }))
+            faker.date.recent(faker.datatype.number({ min: 0, max: 1 }))
          ),
          hasStarted: true,
       })
