@@ -1,5 +1,4 @@
 import LocalStorageUtil from "./LocalStorageUtil"
-import { string } from "yup"
 
 export function getRandom(arr, n) {
    var result = new Array(n),
