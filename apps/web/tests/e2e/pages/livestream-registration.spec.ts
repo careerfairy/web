@@ -171,7 +171,7 @@ test("livestream has already started, confirm the redirection without any regist
 | Setup Data
 |--------------------------------------------------------------------------
 */
-const userEmail = "john.doe@careerfairy.io"
+const userEmail = "carlos@careerfairy.io"
 
 async function login(page, preventRedirection = false): Promise<UserData> {
    const user = await UserSeed.createUser(userEmail)
