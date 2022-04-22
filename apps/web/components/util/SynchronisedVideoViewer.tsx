@@ -68,7 +68,7 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
       setRemoveYoutubeVideoModalOpen(false)
 
    useEffect(() => {
-      if (viewer) {
+      if (viewer && !unpauseFailedPlayRemoteVideos) {
          dispatch(actions.setVideoIsPaused())
       }
    }, [dispatch])
