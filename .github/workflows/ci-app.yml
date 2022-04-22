@@ -73,7 +73,7 @@ jobs:
               name: playwright-report
               path: apps/web/playwright-report
          - name: Upload debug logs
-           if: always()
+           if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
               name: debug logs
