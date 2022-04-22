@@ -97,23 +97,26 @@ export const getStaticProps: GetStaticProps = async ({
 export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
    let paths = []
 
-   const caseStudies = await caseStudyRepo.getAllCaseStudiesWithSlug()
+   if (process.env.APP_ENV !== "test") {
+      const caseStudies = await caseStudyRepo.getAllCaseStudiesWithSlug()
 
-   if (locales) {
-      for (const locale of locales) {
-         paths = [
-            ...paths,
-            ...caseStudies.map((caseStudy) => ({
-               params: { slug: caseStudy.slug },
-               locale,
-            })),
-         ]
+      if (locales) {
+         for (const locale of locales) {
+            paths = [
+               ...paths,
+               ...caseStudies.map((caseStudy) => ({
+                  params: { slug: caseStudy.slug },
+                  locale,
+               })),
+            ]
+         }
+      } else {
+         paths = caseStudies.map((caseStudy) => ({
+            params: { slug: caseStudy.slug },
+         }))
       }
-   } else {
-      paths = caseStudies.map((caseStudy) => ({
-         params: { slug: caseStudy.slug },
-      }))
    }
+
    return {
       paths,
       fallback: "blocking",

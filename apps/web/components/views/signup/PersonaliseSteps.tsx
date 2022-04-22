@@ -62,6 +62,7 @@ const PersonaliseSteps = () => {
                <LoadingButton
                   variant="contained"
                   onClick={handleContinue}
+                  data-testid={"user-personalise-continue-button"}
                   loading={isLoadingRedirectPage}
                >
                   {isLastStep ? "Finalise" : "Continue"}

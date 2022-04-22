@@ -450,6 +450,7 @@ function SignUpUserForm() {
                      fullWidth
                      size="large"
                      variant="contained"
+                     data-testid={"signup-button"}
                      color="primary"
                      disabled={isSubmitting || emailSent}
                      endIcon={

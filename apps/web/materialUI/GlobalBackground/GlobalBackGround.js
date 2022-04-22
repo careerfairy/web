@@ -1,22 +1,21 @@
 import React from "react"
 import { Box } from "@mui/material"
-import makeStyles from "@mui/styles/makeStyles"
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
    globalBackgroundStyles: {
       height: "100%",
       minHeight: "100vh",
-      backgroundColor:
+      backgroundColor: (theme) =>
          theme.palette.mode === "dark"
-            ? theme.palette.background.default
+            ? "background.default"
             : "rgb(250,250,250)",
    },
    greyBackgroundStyles: {
       display: "flex",
       flexDirection: "column",
-      backgroundColor:
+      backgroundColor: (theme) =>
          theme.palette.mode === "dark"
-            ? theme.palette.background.default
+            ? "background.default"
             : "rgb(230,230,230)",
       height: "100%",
       minHeight: "100vh",
@@ -30,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
       height: "100%",
    },
    tealBackgroundStyles: {
-      backgroundColor: "rgb(0, 210, 170)",
+      backgroundColor: "primary.main",
       height: "100%",
       minHeight: "100vh",
       padding: "0 0 40px 0",
@@ -38,13 +37,13 @@ const useStyles = makeStyles((theme) => ({
       flexDirection: "column",
    },
    themedBackgroundStyles: {
-      backgroundColor: theme.palette.primary.main,
+      backgroundColor: "primary.main",
       height: "100%",
       minHeight: "100vh",
       padding: "0 0 40px 0",
    },
    darkThemedBackgroundStyles: {
-      backgroundColor: theme.palette.primary.dark,
+      backgroundColor: "primary.dark",
       height: "100%",
       minHeight: "100vh",
       padding: "0 0 40px 0",
@@ -55,41 +54,34 @@ const useStyles = makeStyles((theme) => ({
       minHeight: "100vh",
       display: "flex",
       flexDirection: "column",
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: "background.paper",
       height: "100%",
    },
-}))
+}
 
 export const GlobalBackground = ({ ...props }) => {
-   const classes = useStyles()
-   return <Box className={classes.globalBackgroundStyles} {...props} />
+   return <Box sx={styles.globalBackgroundStyles} {...props} />
 }
 
 export const GreyBackground = ({ ...props }) => {
-   const classes = useStyles()
-   return <Box className={classes.greyBackgroundStyles} {...props} />
+   return <Box sx={styles.greyBackgroundStyles} {...props} />
 }
 
 export const DarkBackground = ({ ...props }) => {
-   const classes = useStyles()
-   return <Box className={classes.darkBackgroundStyles} {...props} />
+   return <Box sx={styles.darkBackgroundStyles} {...props} />
 }
 
 export const MobileBackground = ({ ...props }) => {
-   const classes = useStyles()
-   return <Box className={classes.mobileBackgroundStyles} {...props} />
+   return <Box sx={styles.mobileBackgroundStyles} {...props} />
 }
 
 export const TealBackground = ({ ...props }) => {
-   const classes = useStyles()
-   return <Box className={classes.tealBackgroundStyles} {...props} />
+   return <Box sx={styles.tealBackgroundStyles} {...props} />
 }
 export const DarkThemedBackground = ({ ...props }) => {
-   const classes = useStyles()
-   return <Box className={classes.darkThemedBackgroundStyles} {...props} />
+   return <Box sx={styles.darkThemedBackgroundStyles} {...props} />
 }
 
 export const PaperBackground = ({ ...props }) => {
-   const classes = useStyles()
-   return <Box classes={{ root: classes.paperBackground }} {...props} />
+   return <Box sx={styles.paperBackground} {...props} />
 }
