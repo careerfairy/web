@@ -158,10 +158,8 @@ test("livestream has already started, confirm the redirection without any regist
    // open page
    await livestreamPage.open(livestream.id)
 
-   // seems required for firefox, it wouldn't detect the js redirect
-   if (browserName === "firefox") {
-      await page.reload()
-   }
+   // to confirm that we're on the streaming page
+   await page.reload()
 
    // assert we're on the streaming page
    expect(page.url()).toContain(`/streaming/${livestream.id}/viewer`)
@@ -173,7 +171,7 @@ test("livestream has already started, confirm the redirection without any regist
 | Setup Data
 |--------------------------------------------------------------------------
 */
-const userEmail = "carlos@careerfairy.io"
+const userEmail = "john.doe@careerfairy.io"
 
 async function login(page, preventRedirection = false): Promise<UserData> {
    const user = await UserSeed.createUser(userEmail)
