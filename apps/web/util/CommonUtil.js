@@ -86,3 +86,8 @@ export function getListSeparator() {
    }
    return ","
 }
+
+export const getQueryStringFromUrl = (url = "", queryParam = "") => {
+   let params = new URL(url).searchParams
+   return params.get(queryParam)
+}
