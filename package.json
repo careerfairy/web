@@ -8,18 +8,20 @@
    ],
    "scripts": {
       "build": "turbo run build",
+      "build:packages": "turbo run build --ignore=\"apps/**/*\" --no-deps",
       "dev": "turbo run dev --parallel",
       "test": "turbo run test",
       "start": "turbo run start --parallel",
-      "test:e2e-webapp": "turbo run test:e2e-webapp --scope=@careerfairy/webapp --scope=@careerfairy/functions --include-dependencies --no-deps",
-      "test:e2e-webapp-debug": "turbo run test:e2e-webapp-debug --scope=@careerfairy/webapp --include-dependencies --no-deps",
+      "test:e2e-webapp": "cross-env NODE_ENV=test turbo run test:e2e-webapp --scope=@careerfairy/webapp --scope=@careerfairy/functions --include-dependencies --no-deps",
+      "test:e2e-webapp-debug": "cross-env NODE_ENV=test turbo run test:e2e-webapp-debug --scope=@careerfairy/webapp --include-dependencies --no-deps",
       "webapp:report": "npm run playwright:report -w @careerfairy/webapp",
       "lint": "turbo run lint --parallel",
-      "format": "prettier --write --ignore-unknown",
+      "format": "prettier --write --ignore-unknown .",
       "prepare": "husky install",
       "build:functions": "turbo run build --scope=@careerfairy/functions --include-dependencies",
       "lint:functions": "turbo run lint --scope=@careerfairy/functions",
       "build:webapp": "turbo run build --scope=@careerfairy/webapp --include-dependencies --no-deps",
+      "deploy:rules": "firebase deploy --only firestore:rules",
       "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi"
    },
    "devDependencies": {

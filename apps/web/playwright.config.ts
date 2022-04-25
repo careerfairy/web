@@ -16,7 +16,7 @@ const config: PlaywrightTestConfig = {
    /* Maximum time one test can run for. */
    timeout: 30 * 1000,
    // Increase the number of workers on CI (github runners have 2 cores), use default locally (cpus/2)
-   workers: process.env.CI ? 2 : undefined,
+   workers: 1,
    expect: {
       /**
        * Maximum time expect() should wait for the condition to be met.
@@ -54,7 +54,6 @@ const config: PlaywrightTestConfig = {
             ...devices["Desktop Chrome"],
          },
       },
-
       {
          name: "firefox",
          use: {
@@ -102,13 +101,13 @@ const config: PlaywrightTestConfig = {
 
    /* Run your local dev server before starting the tests */
    webServer: {
-      command:
-         'npx firebase emulators:exec "npm run start -w @careerfairy/webapp" --only auth,firestore,functions',
+      command: `npx firebase emulators:exec "npm run start -w @careerfairy/webapp" ${
+         process.env.CI ? "" : "--ui"
+      } --only auth,firestore,functions`,
       cwd: "../../",
       env: {
          FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099",
          FIRESTORE_EMULATOR_HOST: "localhost:8080",
-         NEXT_PUBLIC_FIREBASE_EMULATORS: "true",
       },
       port: 3000,
       // emulators need some time to boot

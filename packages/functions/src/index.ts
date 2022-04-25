@@ -42,12 +42,13 @@ exports.onUserUpdate = auth.onUserUpdate
 exports.backfillUserData = auth.backfillUserData
 exports.updateFakeUser = auth.updateFakeUser
 exports.validateUserEmailWithPin = auth.validateUserEmailWithPin
-exports.sendPostmarkResetPasswordEmail = auth.sendPostmarkResetPasswordEmail
+exports.sendPostmarkResetPasswordEmail_v2 =
+   auth.sendPostmarkResetPasswordEmail_v2
 exports.sendPostmarkEmailUserDataAndUni = auth.sendPostmarkEmailUserDataAndUni
 exports.sendPostmarkEmailUserDataAndUniWithName =
    auth.sendPostmarkEmailUserDataAndUniWithName
-exports.resendPostmarkEmailVerificationEmailWithPin =
-   auth.resendPostmarkEmailVerificationEmailWithPin
+exports.resendPostmarkEmailVerificationEmailWithPin_v2 =
+   auth.resendPostmarkEmailVerificationEmailWithPin_v2
 
 // Agora
 exports.generateAgoraToken = agora.generateAgoraToken

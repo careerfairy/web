@@ -37,7 +37,7 @@ const InterestsSelector = () => {
             Select 5 to improve your site experience:
          </Typography>
 
-         <Box my={2}>
+         <Box data-testid={"signup-interests-selector"} my={2}>
             <InterestsChipsSelector
                interests={interests}
                setInterests={setInterests}

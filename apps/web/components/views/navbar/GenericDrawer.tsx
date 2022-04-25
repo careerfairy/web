@@ -67,7 +67,7 @@ interface Props {
    drawerWidth: number
 }
 const GenericDrawer = memo(({ drawerWidth = 300 }: Props) => {
-   const { userData, authenticatedUser } = useAuth()
+   const { userData, authenticatedUser, isLoggedOut } = useAuth()
    const dispatch = useDispatch()
    const signOut = () => dispatch(actions.signOut())
    const { secondaryLinks, mainLinks } = useGeneralLinks()
@@ -114,7 +114,7 @@ const GenericDrawer = memo(({ drawerWidth = 300 }: Props) => {
                      black
                   />
                ))}
-               {userData && (
+               {!isLoggedOut && (
                   <NavItem
                      href="#"
                      onClick={signOut}

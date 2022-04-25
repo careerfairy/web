@@ -377,7 +377,8 @@ const isLocalEnvironment = () => {
       process.env.FIREBASE_AUTH_EMULATOR_HOST ||
       process.env.FIRESTORE_EMULATOR_HOST ||
       process.env.FUNCTIONS_EMULATOR ||
-      process.env.NODE_ENV === "development"
+      process.env.NODE_ENV === "development" ||
+      process.env.NODE_ENV === "test"
    )
 }
 

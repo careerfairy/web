@@ -6,7 +6,7 @@
       "sourceMap": true,
       "strict": false,
       "target": "es5",
-      "lib": ["es6", "esnext"],
+      "lib": ["es6", "esnext", "dom"],
       "allowJs": false,
       "declaration": true
    },
