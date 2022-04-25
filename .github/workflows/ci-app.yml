@@ -18,7 +18,7 @@ jobs:
            uses: fkirc/skip-duplicate-actions@v3.4.1
            with:
               skip_after_successful_duplicate: "false"
-              paths_ignore: '["**/README.md"]'
+              paths_ignore: '["**/README.md", "firestore.rules"]'
 
    build:
       name: "Build, Test and Deploy"
@@ -57,6 +57,7 @@ jobs:
          - name: Build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              NODE_ENV: test
            run: npm run build
 
          - name: Run Jest Unit Tests
@@ -72,7 +73,12 @@ jobs:
            with:
               name: playwright-report
               path: apps/web/playwright-report
-
+         - name: Upload debug logs
+           if: ${{ failure() }}
+           uses: actions/upload-artifact@v3
+           with:
+              name: debug logs
+              path: firebase-debug.log
          - name: Deploy to Vercel
            uses: amondnet/vercel-action@v20.0.1 #deploy
            with:

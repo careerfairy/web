@@ -20,11 +20,12 @@
       },
       "test:e2e-webapp-debug": {
          "dependsOn": ["build"],
-         "outputs": ["test-results/**"]
+         "outputs": ["test-results/**", "playwright-report/**"]
       },
       "lint": {},
       "dev": {
          "cache": false
       }
-   }
+   },
+   "globalDependencies": ["$NODE_ENV"]
 }

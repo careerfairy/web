@@ -35,6 +35,9 @@ const Streams = memo(
       videoMutedBackgroundImg,
       handRaiseActive,
       mobile,
+      viewer,
+      streamerId,
+      sharingVideo,
    }) => {
       const focusModeEnabled = useSelector(
          (state) => state.stream.layout.focusModeEnabled
@@ -78,6 +81,7 @@ const Streams = memo(
          isBroadCasting,
          sharingScreen,
          sharingPdf,
+         sharingVideo,
       ])
 
       const handleGetLargeStream = (allStreams, currentSpeakerId) => {
@@ -134,6 +138,9 @@ const Streams = memo(
                   showMenu={showMenu}
                   livestreamId={livestreamId}
                   presenter={presenter}
+                  sharingVideo={sharingVideo}
+                  viewer={viewer}
+                  streamerId={streamerId}
                />
                {userData?.isAdmin && <SuperAdminControls />}
             </div>

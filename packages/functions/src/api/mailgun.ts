@@ -17,5 +17,6 @@ export default {
       apiKey,
       domain: domain,
       host: host,
+      testMode: isLocalEnvironment(),
    }),
 }

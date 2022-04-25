@@ -12,6 +12,10 @@ import {
 } from "constants/streams"
 import Typography from "@mui/material/Typography"
 import { Stack } from "@mui/material"
+import dynamic from "next/dynamic"
+const SynchronisedVideoViewer = dynamic(() =>
+   import("../../../../util/SynchronisedVideoViewer")
+)
 
 const STREAMS_ROW_HEIGHT = 125
 const WIDE_SCREEN_ROW_HEIGHT = 180
@@ -58,6 +62,11 @@ const useStyles = makeStyles((theme) => ({
       paddingTop: 0,
       paddingBottom: 0,
       display: "flex",
+      "& > *": {
+         overflow: "hidden",
+         borderRadius: STREAM_ELEMENT_BORDER_RADIUS,
+         boxShadow: theme.shadows[5],
+      },
    },
    videoElement: {
       width: "100%",
@@ -75,6 +84,11 @@ const useStyles = makeStyles((theme) => ({
       top: 0,
       left: 0,
       right: 0,
+      "& > *": {
+         overflow: "hidden",
+         borderRadius: STREAM_ELEMENT_BORDER_RADIUS,
+         boxShadow: theme.shadows[5],
+      },
       bottom: 0,
       padding: theme.spacing(STREAM_ELEMENT_SPACING),
       marginLeft: "0 !important",
@@ -120,6 +134,9 @@ const StreamsLayout = ({
    videoMutedBackgroundImg,
    sharingScreen,
    hasManySpeakers,
+   sharingVideo,
+   streamerId,
+   viewer,
 }) => {
    const hasSmallStreams = streamData.length > 1
    const classes = useStyles({ hasSmallStreams })
@@ -140,7 +157,8 @@ const StreamsLayout = ({
                <div
                   className={clsx(classes.smallStreamsContainerGridItem, {
                      [classes.grow]:
-                        hasSmallStreams || (sharingPdf && streamData.length),
+                        hasSmallStreams ||
+                        ((sharingPdf || sharingVideo) && streamData.length),
                   })}
                >
                   <Stack
@@ -163,13 +181,15 @@ const StreamsLayout = ({
                      />
                      {streamData.map((stream, index) => {
                         const isLast = index === streamData.length - 1
-                        const isLarge = isLast && !sharingPdf
+                        const isLarge = isLast && !sharingPdf && !sharingVideo
                         return (
                            <StreamElementWrapper
                               index={index}
                               first={
                                  currentSpeakerId === stream.uid &&
-                                 (sharingPdf || sharingScreen) &&
+                                 (sharingVideo ||
+                                    sharingPdf ||
+                                    sharingScreen) &&
                                  hasManySpeakers
                               }
                               large={isLarge}
@@ -188,17 +208,25 @@ const StreamsLayout = ({
                            </StreamElementWrapper>
                         )
                      })}
-                     {sharingPdf && (
+                     {(sharingPdf || sharingVideo) && (
                         <StreamElementWrapper
                            index={1}
                            large
                            squished={streamData.length}
                         >
-                           <LivestreamPdfViewer
-                              livestreamId={livestreamId}
-                              presenter={presenter}
-                              showMenu={showMenu}
-                           />
+                           {sharingPdf ? (
+                              <LivestreamPdfViewer
+                                 livestreamId={livestreamId}
+                                 presenter={presenter}
+                                 showMenu={showMenu}
+                              />
+                           ) : (
+                              <SynchronisedVideoViewer
+                                 livestreamId={livestreamId}
+                                 streamerId={streamerId}
+                                 viewer={viewer}
+                              />
+                           )}
                         </StreamElementWrapper>
                      )}
                      {waitingForStreamer && (

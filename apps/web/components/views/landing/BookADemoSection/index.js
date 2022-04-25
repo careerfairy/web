@@ -73,7 +73,7 @@ const BookADemoSection = (props) => {
                >
                   {props.goTo ? (
                      <RoundButton
-                        sx={[styles.goToBtn, styles.linkBtn]}
+                        sx={{ ...styles.goToBtn, ...styles.linkBtn }}
                         color="secondary"
                         size="large"
                         variant="contained"

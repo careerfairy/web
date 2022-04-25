@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Identifiable } from "../../types/commonTypes"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import { Interest } from "types/interests"
-import { Group } from "types/groups"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { Query, FirebaseFirestore } from "@firebase/firestore-types"
 
 /**

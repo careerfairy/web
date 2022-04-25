@@ -59,7 +59,10 @@ const SignUp = () => {
    useEffect(() => {
       if (!user.isLoaded || user.isEmpty) return
 
-      if (!firebase.auth?.currentUser?.emailVerified) {
+      if (
+         firebase.auth?.currentUser &&
+         !firebase.auth.currentUser.emailVerified
+      ) {
          return setCurrentStep(1)
       }
    }, [user, firebase.auth?.currentUser?.emailVerified])
@@ -143,7 +146,12 @@ export const SignUpPageLayout = ({ children }) => {
             </header>
             <Typography className={classes.title}>Sign Up</Typography>
             <Container maxWidth="sm">
-               <Box boxShadow={1} p={3} className={classes.box}>
+               <Box
+                  data-testid={"signup-page-form"}
+                  boxShadow={1}
+                  p={3}
+                  className={classes.box}
+               >
                   {children}
                </Box>
             </Container>
