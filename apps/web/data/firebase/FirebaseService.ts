@@ -8,7 +8,10 @@ import firebaseApp from "./FirebaseInstance"
 import firebase from "firebase/app"
 import { HandRaiseState } from "types/handraise"
 import DocumentReference = firebase.firestore.DocumentReference
-import { getReferralInformation } from "../../util/CommonUtil"
+import {
+   getQueryStringFromUrl,
+   getReferralInformation,
+} from "../../util/CommonUtil"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -478,6 +481,42 @@ class FirebaseService {
             })
             return batch.commit()
          })
+   }
+
+   listenToCurrentVideo = (streamRef, callback) => {
+      let ref = streamRef.collection("videos").doc("video")
+      return ref.onSnapshot(callback)
+   }
+
+   updateCurrentVideoState = (streamRef, state) => {
+      let ref = streamRef.collection("videos").doc("video")
+      return ref.update({
+         ...state,
+         lastPlayed:
+            state.state === "playing" ? this.getServerTimestamp() : null,
+      })
+   }
+
+   setCurrentVideo = (streamRef, url, updater) => {
+      let ref = streamRef.collection("videos").doc("video")
+      const secondsIn = Number(getQueryStringFromUrl(url, "t"))
+      return ref.set({
+         url: url,
+         second: secondsIn || 0,
+         state: "playing",
+         updater,
+         lastPlayed: this.getServerTimestamp(),
+      })
+   }
+
+   stopSharingYoutubeVideo = (streamRef) => {
+      const batch = this.firestore.batch()
+      const videoRef = streamRef.collection("videos").doc("video")
+      batch.delete(videoRef)
+      batch.update(streamRef, {
+         mode: "default",
+      })
+      return batch.commit()
    }
 
    // MENTORS
