@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test"
+import { test, expect, Page } from "@playwright/test"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
@@ -175,7 +175,10 @@ test("livestream has already started, confirm the redirection without any regist
 */
 const userEmail = "john.doe@careerfairy.io"
 
-async function login(page, preventRedirection = false): Promise<UserData> {
+async function login(
+   page: Page,
+   preventRedirection = false
+): Promise<UserData> {
    const user = await UserSeed.createUser(userEmail)
 
    if (!preventRedirection) {
@@ -187,7 +190,7 @@ async function login(page, preventRedirection = false): Promise<UserData> {
    await page.click("text=Log in")
 
    if (!preventRedirection) {
-      await page.waitForURL("/portal")
+      await page.waitForURL("/portal", { waitUntil: "domcontentloaded" })
    }
 
    return user

@@ -4,7 +4,7 @@ import makeStyles from "@mui/styles/makeStyles"
 import { CircularProgress, Container, Grid, Typography } from "@mui/material"
 import { isLoaded, useFirestoreConnect, isEmpty } from "react-redux-firebase"
 import { useSelector } from "react-redux"
-import Search from "./Search"
+// import Search from "./Search"
 import StreamsContainer from "./StreamsContainer"
 
 const useStyles = makeStyles((theme) => ({
@@ -54,9 +54,9 @@ const AdminStreams = ({ typeOfStream }) => {
       <Fragment>
          <Container className={classes.root} maxWidth={false}>
             <Grid container spacing={2}>
-               <Grid item xs={12}>
-                  <Search />
-               </Grid>
+               {/*<Grid item xs={12}>*/}
+               {/*   <Search />*/}
+               {/*</Grid>*/}
                <Grid item xs={12}>
                   <Grid container spacing={2}>
                      {!isLoaded(streams) ? (
