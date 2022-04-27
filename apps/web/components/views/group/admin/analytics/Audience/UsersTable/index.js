@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import clsx from "clsx"
 import PropTypes from "prop-types"
 import { Button, Card, Slide, Tab, Tabs } from "@mui/material"
@@ -11,11 +11,7 @@ import {
 } from "../../../../../../helperFunctions/HelperFunctions"
 import { useSnackbar } from "notistack"
 
-import {
-   exportSelectionAction,
-   LinkifyText,
-   tableIcons,
-} from "../../common/TableUtils"
+import { LinkifyText, tableIcons } from "../../common/TableUtils"
 import makeStyles from "@mui/styles/makeStyles"
 import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil"
 import { useDispatch, useSelector } from "react-redux"
@@ -27,6 +23,8 @@ import Link from "materialUI/NextNavLink"
 import JSZip from "jszip"
 import * as actions from "store/actions"
 import ExportTable from "../../../../../common/Tables/ExportTable"
+import { CSVDialogDownload } from "../../../../../../custom-hook/useMetaDataActions"
+import { exportSelectionAction } from "../../../../../../util/tableUtils"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -289,168 +287,185 @@ const UsersTable = ({
       />
    )
 
-   return (
-      <Slide direction="up" unmountOnExit mountOnEnter in={true}>
-         <Card
-            raised={Boolean(currentStream)}
-            className={clsx(classes.root, className)}
-            ref={breakdownRef}
-            {...rest}
-         >
-            <Tabs
-               value={userType.propertyName}
-               indicatorColor="primary"
-               textColor="primary"
-               scrollButtons="auto"
-               aria-label="disabled tabs example"
-            >
-               {userTypes.map(({ displayName, propertyName }, index) => (
-                  <Tab
-                     key={propertyName}
-                     value={propertyName}
-                     onClick={(event) => handleMenuItemClick(event, index)}
-                     label={displayName}
-                  />
-               ))}
-               {dataPrivacyTab}
-            </Tabs>
-            <ExportTable
-               icons={tableIcons}
-               tableRef={dataTableRef}
-               isLoading={fetchingStreams || processingCVs}
-               data={users}
-               columns={[
-                  {
-                     field: "firstName",
-                     title: "First Name",
-                  },
-                  {
-                     field: "lastName",
-                     title: "Last Name",
-                  },
-                  {
-                     field: "university.name",
-                     title: "University",
-                  },
-                  {
-                     field: "universityCountryCode",
-                     title: "University Country",
-                     lookup: universityCountriesMap,
-                  },
-                  ...categoryFields,
-                  {
-                     field: "numberOfStreamsWatched",
-                     title: "Events Attended",
-                     type: "numeric",
-                  },
-                  {
-                     field: "isInTalentPool",
-                     title: "Is In TalentPool",
-                     type: "boolean",
-                     hidden: Boolean(
-                        userType.propertyName === "talentPool" || !currentStream
-                     ),
-                  },
-                  {
-                     field: "numberOfStreamsRegistered",
-                     title: "Events Registered To",
-                     type: "numeric",
-                  },
-                  {
-                     field: "userResume",
-                     title: "CV",
-                     type: "boolean",
-                     searchable: false,
-                     render: (rowData) =>
-                        rowData.userResume ? (
-                           <Button
-                              size="small"
-                              startIcon={<PDFIcon />}
-                              onClick={() =>
-                                 handleDownload({
-                                    url: rowData.userResume,
-                                    fileName: getFileName(rowData),
-                                 })
-                              }
-                              variant="contained"
-                              color="primary"
-                           >
-                              Download
-                           </Button>
-                        ) : null,
-                     cellStyle: {
-                        width: 300,
-                     },
-                  },
-                  {
-                     field: "userEmail",
-                     title: "Email",
-                     render: ({ id }) => <a href={`mailto:${id}`}>{id}</a>,
-                     cellStyle: {
-                        width: 300,
-                     },
-                  },
-                  {
-                     field: "linkedinUrl",
-                     title: "LinkedIn",
-                     render: (rowData) => LinkifyText(rowData.linkedinUrl),
-                     cellStyle: {
-                        width: 300,
-                     },
-                  },
+   const [csvDownloadData, setCsvDownloadData] = useState(null)
 
-                  {
-                     field: "watchedEvent",
-                     title: "Attended Event",
-                     type: "boolean",
-                     width: 170,
-                     export: Boolean(currentStream),
-                     hidden: Boolean(!currentStream),
-                  },
-               ]}
-               actions={[
-                  exportSelectionAction(
-                     dataTableRef?.current?.props?.columns || [],
-                     getTitle()
-                  ),
-                  (rowData) => ({
-                     tooltip: !(rowData.length === 0) && "Copy Emails",
-                     position: "toolbarOnSelect",
-                     icon: tableIcons.EmailIcon,
-                     disabled: rowData.length === 0,
-                     onClick: handleCopyEmails,
-                  }),
-                  (rowData) => ({
-                     tooltip:
-                        !(rowData.length === 0) && "Copy LinkedIn Addresses",
-                     position: "toolbarOnSelect",
-                     icon: tableIcons.LinkedInIcon,
-                     disabled: rowData.length === 0,
-                     onClick: handleCopyLinkedin,
-                  }),
-                  (rowData) => ({
-                     tooltip: !(rowData.length === 0) && "Download CVs",
-                     position: "toolbarOnSelect",
-                     icon: tableIcons.PictureAsPdfIcon,
-                     disabled: rowData.length === 0 || processingCVs,
-                     onClick: handleDownloadCVs,
-                  }),
-                  {
-                     disabled: !Boolean(currentStream),
-                     tooltip: currentStream && "Set back to overall",
-                     isFreeAction: true,
-                     icon: tableIcons.RotateLeftIcon,
-                     hidden: !Boolean(currentStream),
-                     onClick: handleReset,
-                  },
-               ]}
-               onSelectionChange={(rows) => {
-                  setSelection(rows)
-               }}
-               title={getTitle()}
-            />
-         </Card>
-      </Slide>
+   const handleCloseCsvDialog = useCallback(() => {
+      setCsvDownloadData(null)
+   }, [])
+
+   return (
+      <>
+         <Slide direction="up" unmountOnExit mountOnEnter in={true}>
+            <Card
+               raised={Boolean(currentStream)}
+               className={clsx(classes.root, className)}
+               ref={breakdownRef}
+               {...rest}
+            >
+               <Tabs
+                  value={userType.propertyName}
+                  indicatorColor="primary"
+                  textColor="primary"
+                  scrollButtons="auto"
+                  aria-label="disabled tabs example"
+               >
+                  {userTypes.map(({ displayName, propertyName }, index) => (
+                     <Tab
+                        key={propertyName}
+                        value={propertyName}
+                        onClick={(event) => handleMenuItemClick(event, index)}
+                        label={displayName}
+                     />
+                  ))}
+                  {dataPrivacyTab}
+               </Tabs>
+               <ExportTable
+                  icons={tableIcons}
+                  tableRef={dataTableRef}
+                  isLoading={fetchingStreams || processingCVs}
+                  data={users}
+                  columns={[
+                     {
+                        field: "firstName",
+                        title: "First Name",
+                     },
+                     {
+                        field: "lastName",
+                        title: "Last Name",
+                     },
+                     {
+                        field: "university.name",
+                        title: "University",
+                     },
+                     {
+                        field: "universityCountryCode",
+                        title: "University Country",
+                        lookup: universityCountriesMap,
+                     },
+                     ...categoryFields,
+                     {
+                        field: "numberOfStreamsWatched",
+                        title: "Events Attended",
+                        type: "numeric",
+                     },
+                     {
+                        field: "isInTalentPool",
+                        title: "Is In TalentPool",
+                        type: "boolean",
+                        hidden: Boolean(
+                           userType.propertyName === "talentPool" ||
+                              !currentStream
+                        ),
+                     },
+                     {
+                        field: "numberOfStreamsRegistered",
+                        title: "Events Registered To",
+                        type: "numeric",
+                     },
+                     {
+                        field: "userResume",
+                        title: "CV",
+                        type: "boolean",
+                        searchable: false,
+                        render: (rowData) =>
+                           rowData.userResume ? (
+                              <Button
+                                 size="small"
+                                 startIcon={<PDFIcon />}
+                                 onClick={() =>
+                                    handleDownload({
+                                       url: rowData.userResume,
+                                       fileName: getFileName(rowData),
+                                    })
+                                 }
+                                 variant="contained"
+                                 color="primary"
+                              >
+                                 Download
+                              </Button>
+                           ) : null,
+                        cellStyle: {
+                           width: 300,
+                        },
+                     },
+                     {
+                        field: "userEmail",
+                        title: "Email",
+                        render: ({ id }) => <a href={`mailto:${id}`}>{id}</a>,
+                        cellStyle: {
+                           width: 300,
+                        },
+                     },
+                     {
+                        field: "linkedinUrl",
+                        title: "LinkedIn",
+                        render: (rowData) => LinkifyText(rowData.linkedinUrl),
+                        cellStyle: {
+                           width: 300,
+                        },
+                     },
+
+                     {
+                        field: "watchedEvent",
+                        title: "Attended Event",
+                        type: "boolean",
+                        width: 170,
+                        export: Boolean(currentStream),
+                        hidden: Boolean(!currentStream),
+                     },
+                  ]}
+                  actions={[
+                     exportSelectionAction(
+                        dataTableRef?.current?.props?.columns || [],
+                        getTitle(),
+                        setCsvDownloadData
+                     ),
+                     (rowData) => ({
+                        tooltip: !(rowData.length === 0) && "Copy Emails",
+                        position: "toolbarOnSelect",
+                        icon: tableIcons.EmailIcon,
+                        disabled: rowData.length === 0,
+                        onClick: handleCopyEmails,
+                     }),
+                     (rowData) => ({
+                        tooltip:
+                           !(rowData.length === 0) && "Copy LinkedIn Addresses",
+                        position: "toolbarOnSelect",
+                        icon: tableIcons.LinkedInIcon,
+                        disabled: rowData.length === 0,
+                        onClick: handleCopyLinkedin,
+                     }),
+                     (rowData) => ({
+                        tooltip: !(rowData.length === 0) && "Download CVs",
+                        position: "toolbarOnSelect",
+                        icon: tableIcons.PictureAsPdfIcon,
+                        disabled: rowData.length === 0 || processingCVs,
+                        onClick: handleDownloadCVs,
+                     }),
+                     {
+                        disabled: !Boolean(currentStream),
+                        tooltip: currentStream && "Set back to overall",
+                        isFreeAction: true,
+                        icon: tableIcons.RotateLeftIcon,
+                        hidden: !Boolean(currentStream),
+                        onClick: handleReset,
+                     },
+                  ]}
+                  onSelectionChange={(rows) => {
+                     setSelection(rows)
+                  }}
+                  title={getTitle()}
+               />
+            </Card>
+         </Slide>
+         <CSVDialogDownload
+            title={csvDownloadData?.title}
+            data={csvDownloadData?.data}
+            filename={`${csvDownloadData?.filename}.csv`}
+            defaultOpen={!!csvDownloadData}
+            onClose={handleCloseCsvDialog}
+         />
+      </>
    )
 }
 UsersTable.propTypes = {
