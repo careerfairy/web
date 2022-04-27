@@ -40,7 +40,7 @@ export default class UpcomingLivestreamPage extends CommonPage {
    async modalAttend() {
       await this.page
          .locator('div[role="dialog"] >> text=I\'ll attend')
-         .click({ delay: 200 })
+         .click({ delay: 200, force: true })
    }
 
    modalSubmit() {
