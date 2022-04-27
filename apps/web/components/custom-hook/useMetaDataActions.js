@@ -20,7 +20,7 @@ import * as actions from "store/actions"
 import { useDispatch } from "react-redux"
 import ButtonWithHint from "../views/group/admin/events/events-table/ButtonWithHint"
 import { useTheme } from "@mui/material/styles"
-import { getListSeparator } from "../../util/CommonUtil"
+import { getCSVDelimiterBasedOnOS } from "../../util/CommonUtil"
 
 export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    const firebase = useFirebaseService()
@@ -408,66 +408,84 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    }
 }
 
-const CSVDialogDownload = ({ title, children, data, filename }) => {
-   const [open, setOpen] = useState(false)
+export const CSVDialogDownload = ({
+   title,
+   children,
+   data,
+   filename,
+   defaultOpen = false,
+   onClose = null,
+}) => {
+   const [open, setOpen] = useState(defaultOpen)
+
+   useEffect(() => {
+      setOpen(defaultOpen)
+   }, [defaultOpen])
 
    const handleOpen = useCallback((e) => {
       e.stopPropagation()
       setOpen(true)
    }, [])
 
-   const handleClose = useCallback((e) => {
-      e.stopPropagation()
-      setOpen(false)
-   }, [])
+   const handleClose = useCallback(
+      (e) => {
+         e.stopPropagation()
+         setOpen(false)
+         if (onClose) onClose()
+      },
+      [onClose]
+   )
 
    const stopClickPropagation = useCallback((e) => {
       e.stopPropagation()
    }, [])
 
    // try to use right separator at the first try
-   const mainSeparator = getListSeparator()
+   const mainSeparator = getCSVDelimiterBasedOnOS()
    const alternativeSeparator = mainSeparator === "," ? ";" : ","
 
    return (
       <>
-         {React.cloneElement(children, { onClick: handleOpen })}
-         <Dialog open={open} onBackdropClick={handleClose}>
-            <DialogTitle onClickCapture={stopClickPropagation}>
-               {title}
-            </DialogTitle>
-            <DialogContent onClickCapture={stopClickPropagation}>
-               <DialogContentText>
-                  You will download a file in the .csv format. This file uses a
-                  separator character that can vary with your regional settings.
-                  <p>
+         {!!children && React.cloneElement(children, { onClick: handleOpen })}
+         {open && (
+            <Dialog open={open} onBackdropClick={handleClose}>
+               <DialogTitle onClickCapture={stopClickPropagation}>
+                  {title}
+               </DialogTitle>
+               <DialogContent onClickCapture={stopClickPropagation}>
+                  <DialogContentText>
+                     You will download a file in the .csv format. This file uses
+                     a separator character that can vary with your regional
+                     settings.
+                  </DialogContentText>
+                  <DialogContentText mt={2}>
                      Try the alternative version if having issues opening the
                      downloaded file.
-                  </p>
-               </DialogContentText>
-            </DialogContent>
-            <DialogActions sx={{ justifyContent: "center" }}>
-               <CSVLink
-                  data={data}
-                  separator={mainSeparator}
-                  filename={filename}
-                  style={{ color: "red" }}
-                  onClick={handleClose}
-               >
-                  <Button variant="contained">Download</Button>
-               </CSVLink>
+                  </DialogContentText>
+               </DialogContent>
+               <DialogActions sx={{ justifyContent: "center" }}>
+                  <CSVLink
+                     data={data}
+                     separator={mainSeparator}
+                     filename={filename}
+                     style={{ color: "red" }}
+                     onClick={handleClose}
+                  >
+                     <Button variant="contained">Download</Button>
+                  </CSVLink>
 
-               <CSVLink
-                  data={data}
-                  separator={alternativeSeparator}
-                  filename={filename}
-                  style={{ color: "red" }}
-                  onClick={handleClose}
-               >
-                  <Button autoFocus>Alternative</Button>
-               </CSVLink>
-            </DialogActions>
-         </Dialog>
+                  <CSVLink
+                     data={data}
+                     separator={alternativeSeparator}
+                     filename={filename}
+                     style={{ color: "red" }}
+                     onClick={handleClose}
+                  >
+                     <Button autoFocus>Alternative</Button>
+                  </CSVLink>
+               </DialogActions>
+            </Dialog>
+         )}
       </>
    )
 }

@@ -87,6 +87,16 @@ export function getListSeparator() {
    return ","
 }
 
+/**
+ * We need to use the opposite list separator char for the csv
+ * @returns {string}
+ */
+export function getCSVDelimiterBasedOnOS() {
+   const separator = getListSeparator()
+
+   return separator === "," ? ";" : ","
+}
+
 export const getQueryStringFromUrl = (url = "", queryParam = "") => {
    let params = new URL(url).searchParams
    return params.get(queryParam)

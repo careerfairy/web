@@ -42,7 +42,7 @@ import AllInboxIcon from "@mui/icons-material/AllInbox"
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import Linkify from "react-linkify"
-import { getListSeparator } from "../../../util/CommonUtil"
+import { getCSVDelimiterBasedOnOS } from "../../../util/CommonUtil"
 
 export const tableIcons = {
    Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -138,7 +138,8 @@ export const tableIcons = {
 
 export const exportSelectionAction = (
    columns = [],
-   title = "Selected_Table"
+   title = "Selected_Table",
+   setCsvDownloadData = null
 ) => {
    return {
       position: "toolbarOnSelect",
@@ -146,16 +147,33 @@ export const exportSelectionAction = (
       tooltip: "Export the selected rows!",
       onClick: (e, rowData) => {
          const tableTitle = title.split(" ").join("_")
-         const builder = new CsvBuilder(tableTitle + ".csv")
-         builder
-            .setDelimeter(getListSeparator())
-            .setColumns(columns.map((columnDef) => columnDef.title))
-            .addRows(
-               rowData.map((rowData) =>
-                  columns.map((columnDef) => rowData[columnDef.field])
+
+         if (!setCsvDownloadData) {
+            const builder = new CsvBuilder(tableTitle + ".csv")
+            builder
+               .setDelimeter(getCSVDelimiterBasedOnOS())
+               .setColumns(columns.map((columnDef) => columnDef.title))
+               .addRows(
+                  rowData.map((rowData) =>
+                     columns.map((columnDef) => rowData[columnDef.field])
+                  )
                )
-            )
-            .exportFile()
+               .exportFile()
+            return
+         }
+
+         setCsvDownloadData({
+            data: rowData.map((rowData) =>
+               columns
+                  .map((columnDef) => ({
+                     title: columnDef.title,
+                     value: rowData[columnDef.field],
+                  }))
+                  .reduce((a, v) => ({ ...a, [v.title]: v.value }), {})
+            ),
+            title: title,
+            filename: tableTitle,
+         })
       },
    }
 }
@@ -195,7 +213,7 @@ export const defaultTableOptions = {
    pageSizeOptions: [3, 5, 10, 25, 50, 100, 200],
    minBodyHeight: 200,
    exportAllData: true,
-   exportDelimiter: getListSeparator(),
+   exportDelimiter: getCSVDelimiterBasedOnOS(),
    exportButton: { csv: true, pdf: true }, // PDF is false because its buggy and throws errors
    searchFieldVariant: "standard",
 }
