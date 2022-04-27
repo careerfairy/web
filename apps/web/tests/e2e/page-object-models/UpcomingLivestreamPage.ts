@@ -38,9 +38,10 @@ export default class UpcomingLivestreamPage extends CommonPage {
    }
 
    async modalAttend() {
-      await this.page
-         .locator('div[role="dialog"] >> text=I\'ll attend')
-         .click({ delay: 200, force: true })
+      return Promise.all([
+         this.page.waitForNavigation(),
+         this.page.locator('div[role="dialog"] >> text=I\'ll attend').click(),
+      ])
    }
 
    modalSubmit() {
