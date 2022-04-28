@@ -81,10 +81,10 @@ interface Props {
    className?: string
    links?: any[]
    onMobileNavOpen?: () => void
-   darkMode: boolean
-   hideNavOnScroll: boolean
-   position: "absolute" | "fixed" | "sticky" | "static"
-   transparent: boolean
+   darkMode?: boolean
+   hideNavOnScroll?: boolean
+   position?: "absolute" | "fixed" | "sticky" | "static"
+   transparent?: boolean
 }
 
 export default GenericHeader

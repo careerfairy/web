@@ -421,5 +421,14 @@ service cloud.firestore {
         match /wishList/{wish} {
             allow read, write: if true;
         }
+        match /wishes/{slug} {
+            allow read: if true;
+            allow create: if request.auth != null;
+            allow update, delete: if request.auth.uid == resource.data.authorUid || isCFAdmin();
+            match /flags/{uid} {
+                         allow create: if request.auth != null;
+                         allow read, update, delete: if request.auth.uid == uid || isCFAdmin();
+                     }
+        }
     }
 }
