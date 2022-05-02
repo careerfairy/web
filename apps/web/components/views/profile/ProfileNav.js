@@ -13,7 +13,6 @@ import {
    Tab,
    Box,
 } from "@mui/material"
-import { withFirebase } from "context/firebase/FirebaseServiceContext"
 import JoinedGroups from "./my-groups/JoinedGroups"
 import AdminGroups from "./my-groups/AdminGroups"
 import UserData from "./userData"
@@ -21,6 +20,7 @@ import { useFirestoreConnect } from "react-redux-firebase"
 import { useSelector } from "react-redux"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import ReferralProfileTab from "./referral/ReferralProfileTab"
+import MyRecruitersTab from "./MyRecruitersTab"
 
 function TabPanel(props) {
    const { children, value, index, ...other } = props
@@ -100,6 +100,9 @@ const ProfileNav = ({ userData }) => {
          <ReferralProfileTab userData={userData} />
       </TabPanel>,
       <TabPanel key={2} value={value} index={2} dir={theme.direction}>
+         <MyRecruitersTab userData={userData} />
+      </TabPanel>,
+      <TabPanel key={3} value={value} index={3} dir={theme.direction}>
          <JoinedGroups userData={userData} />
       </TabPanel>,
    ]
@@ -108,11 +111,7 @@ const ProfileNav = ({ userData }) => {
          key={0}
          wrapped
          fullWidth
-         label={
-            <Typography noWrap variant="h5">
-               {native ? "Personal" : "Personal Information"}
-            </Typography>
-         }
+         label={<Typography variant="h5">Personal</Typography>}
       />,
       <Tab
          key={1}
@@ -122,6 +121,12 @@ const ProfileNav = ({ userData }) => {
       />,
       <Tab
          key={2}
+         wrapped
+         fullWidth
+         label={<Typography variant="h5">My Recruiters</Typography>}
+      />,
+      <Tab
+         key={3}
          wrapped
          fullWidth
          label={
@@ -134,13 +139,13 @@ const ProfileNav = ({ userData }) => {
 
    if (adminGroups.length) {
       views.push(
-         <TabPanel key={3} value={value} index={3} dir={theme.direction}>
+         <TabPanel key={4} value={value} index={4} dir={theme.direction}>
             <AdminGroups userData={userData} adminGroups={adminGroups} />
          </TabPanel>
       )
       tabsArray.push(
          <Tab
-            key={3}
+            key={4}
             wrapped
             fullWidth
             label={
@@ -152,6 +157,11 @@ const ProfileNav = ({ userData }) => {
       )
    }
 
+   // make the tabs scrollable on mobile, centered when on desktop
+   const tabsProps = native
+      ? { variant: "scrollable", scrollButtons: true }
+      : { centered: true }
+
    return (
       <Container disableGutters sx={{ mt: "50px", mb: "auto" }}>
          <AppBar className={classes.bar} position="static" color="default">
@@ -161,7 +171,7 @@ const ProfileNav = ({ userData }) => {
                indicatorColor="primary"
                textColor="primary"
                selectionFollowsFocus
-               centered
+               {...tabsProps}
             >
                {tabsArray}
             </Tabs>

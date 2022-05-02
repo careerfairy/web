@@ -28,7 +28,7 @@ import useCollection from "../../../custom-hook/useCollection"
 import { Reward } from "../../../../types/reward"
 import BadgeSimpleButton from "../BadgeSimpleButton"
 import BadgeProgress from "./BadgeProgress"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 
 const ReferralProfileTab = ({ userData }) => {
    const { enqueueSnackbar } = useSnackbar()

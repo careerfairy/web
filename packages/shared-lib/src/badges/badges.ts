@@ -1,3 +1,7 @@
+import { NetworkerAdvancedBadge, NetworkerBadge } from "./NetworkBadges"
+import { UserData } from "../users"
+import { ResearchBadge } from "./ResearchBadges"
+
 /**
  * Badges are a linked list to allow multiple levels per badge type
  *
@@ -14,42 +18,13 @@
 export interface Badge {
    key: string
    name: string
+   level: number // 1, 2, 3, etc
    achievementDescription: string
    rewardsDescription: string[]
-   progress: (userData) => number // 0 to 100
+   progress: (userData: UserData) => number // 0 to 100
    next?: Badge
    prev?: Badge
 }
-
-// Networker Badges
-export const NetworkerBadge: Badge = {
-   key: "Networker",
-   name: "Networker",
-   achievementDescription: "Refer at least 3 friends",
-   rewardsDescription: ["Questions during an event will be highlighted"],
-   progress: (userData) => {
-      if (!userData.referralsCount) return 0
-      if (userData.referralsCount >= 3) return 100
-      return Math.round((userData.referralsCount / 3) * 100)
-   },
-}
-
-// not used atm, just an example
-export const NetworkerAdvancedBadge: Badge = {
-   key: "NetworkerAdvanced",
-   name: "Networker Advanced",
-   achievementDescription: "Refer at least 6 friends",
-   rewardsDescription: ["Questions during an event will be highlighted"],
-   progress: (userData) => {
-      if (!userData.referralsCount) return 0
-      if (userData.referralsCount >= 6) return 100
-      return Math.round((userData.referralsCount / 6) * 100)
-   },
-}
-
-// Relations
-NetworkerBadge.next = NetworkerAdvancedBadge
-NetworkerAdvancedBadge.prev = NetworkerBadge
 
 /**
  * All active Badges
@@ -58,44 +33,22 @@ NetworkerAdvancedBadge.prev = NetworkerBadge
 export const Badges: Record<string, Badge> = {
    [NetworkerBadge.key]: NetworkerBadge,
    [NetworkerAdvancedBadge.key]: NetworkerAdvancedBadge,
+   [ResearchBadge.key]: ResearchBadge,
 }
 
 export type ExistingBadgesKeys = keyof typeof Badges
 
 /**
- * Convert a userData.badges[] field (that contains only keys)
- * to an object that contains the Badges objects
+ * Calculate the % progress of a field considering a target value
  *
- * {[key: ExistingBadgesKeys]: Badge}
- * @param userDataBadgesArray
+ * @param fieldValue
+ * @param targetNumber
  */
-export const getUserBadges = (userDataBadgesArray: string[]): UserBadges => {
-   if (!userDataBadgesArray || userDataBadgesArray.length === 0)
-      return new UserBadges({})
-
-   return new UserBadges(
-      // convert user badges array to object key -> Badge
-      userDataBadgesArray.reduce((acc, curr) => {
-         if (Badges[curr]) {
-            return { ...acc, [curr]: Badges[curr] }
-         } else {
-            return acc
-         }
-      }, {})
-   )
-}
-
-class UserBadges {
-   constructor(public readonly badges: Record<ExistingBadgesKeys, Badge>) {}
-
-   networkerBadge() {
-      const currentNetworkerLevel = Object.keys(this.badges).find((key) =>
-         /^Networker/.test(key)
-      )
-      return this.badges?.[currentNetworkerLevel]
-   }
-
-   hasAnyBadge() {
-      return Object.keys(this.badges).length > 0
-   }
+export const calculateProgressForNumericField = (
+   fieldValue: number | undefined | null,
+   targetNumber: number
+) => {
+   if (!fieldValue) return 0
+   if (fieldValue >= targetNumber) return 100
+   return Math.round((fieldValue / targetNumber) * 100)
 }

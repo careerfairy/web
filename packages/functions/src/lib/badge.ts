@@ -1,4 +1,4 @@
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import { userAddEntryToArrayField } from "./user"
 import functions = require("firebase-functions")
 

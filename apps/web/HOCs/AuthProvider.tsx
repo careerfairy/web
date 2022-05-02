@@ -7,6 +7,7 @@ import RootState from "../store/reducers"
 import * as Sentry from "@sentry/nextjs"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import nookies from "nookies"
+import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -16,11 +17,13 @@ type DefaultContext = {
    authenticatedUser?: FirebaseReducer.AuthState
    userData?: any
    isLoggedOut: boolean
+   userPresenter?: UserPresenter
 }
 const AuthContext = createContext<DefaultContext>({
    authenticatedUser: undefined,
    userData: undefined,
    isLoggedOut: undefined,
+   userPresenter: undefined,
 })
 
 const securePaths = [
@@ -145,6 +148,7 @@ const AuthProvider = ({ children }) => {
             authenticatedUser: auth,
             userData,
             isLoggedOut: Boolean(auth.isLoaded && auth.isEmpty),
+            userPresenter: userData ? new UserPresenter(userData) : undefined,
          }}
       >
          {children}
@@ -152,6 +156,6 @@ const AuthProvider = ({ children }) => {
    )
 }
 
-const useAuth = () => useContext(AuthContext)
+const useAuth = () => useContext<DefaultContext>(AuthContext)
 
 export { AuthProvider, useAuth }

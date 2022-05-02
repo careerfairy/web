@@ -7,7 +7,7 @@ import React from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import useGeneralHeader from "components/custom-hook/useGeneralHeader"
 import Link from "../../../../materialUI/NextNavLink"
-import { getUserBadges } from "@careerfairy/shared-lib/dist/badges"
+import { getUserBadges } from "@careerfairy/shared-lib/dist/users/UserBadges"
 
 const useStyles = makeStyles((theme) => ({
    navIconButton: {

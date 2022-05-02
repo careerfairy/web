@@ -23,7 +23,7 @@ import EmailIcon from "@mui/icons-material/Email"
 import GetAppIcon from "@mui/icons-material/GetApp"
 import { makeExternalLink } from "../../../../../helperFunctions/HelperFunctions"
 import BadgeIcon from "../../../../common/BadgeIcon"
-import { getUserBadges } from "@careerfairy/shared-lib/dist/badges"
+import { getUserBadges } from "@careerfairy/shared-lib/dist/users/UserBadges"
 
 const useStyles = makeStyles((theme) => ({
    root: {

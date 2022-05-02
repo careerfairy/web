@@ -11,12 +11,9 @@ import {
    Card,
    CircularProgress,
    Collapse,
-   Grow,
-   Link,
    Paper,
    Slide,
    TextField,
-   Tooltip,
    Typography,
 } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
@@ -33,7 +30,7 @@ import useStreamRef from "../../../../custom-hook/useStreamRef"
 import { compose } from "redux"
 import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 import BadgeButton from "../../../common/BadgeButton"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 
 const useStyles = makeStyles((theme) => ({
    chatInput: {

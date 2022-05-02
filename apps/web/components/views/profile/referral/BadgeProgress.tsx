@@ -1,12 +1,10 @@
 import Box from "@mui/material/Box"
 import { LinearProgress, Typography } from "@mui/material"
 import Grid from "@mui/material/Grid"
-import {
-   Badge,
-   getUserBadges,
-   NetworkerBadge,
-} from "@careerfairy/shared-lib/dist/badges"
+import { Badge } from "@careerfairy/shared-lib/dist/badges"
 import BadgeIcon from "../../common/BadgeIcon"
+import { getUserBadges } from "@careerfairy/shared-lib/dist/users/UserBadges"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 
 const BadgeProgress = ({ userData }) => {
    const userBadges = getUserBadges(userData.badges)

@@ -21,7 +21,7 @@ import { GENERAL_ERROR, URL_REGEX } from "components/util/constants"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import { useSnackbar } from "notistack"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import BadgeSimpleButton from "../../BadgeSimpleButton"
 
 const useStyles = makeStyles((theme) => ({

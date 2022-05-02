@@ -20,4 +20,7 @@ export interface UserData extends Identifiable {
       name: string
    }
    referralsCount?: number
+   livestreamsAttendances?: number
+   badges?: string[]
+   isAdmin?: boolean
 }
