@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import clsx from "clsx"
 import PropTypes from "prop-types"
 import { Box, Card, Divider, Grow, Tabs, Tab, IconButton } from "@mui/material"
@@ -8,8 +8,6 @@ import {
    prettyDate,
 } from "../../../../../../helperFunctions/HelperFunctions"
 import {
-   defaultTableOptions,
-   exportSelectionAction,
    renderAppearAfter,
    renderRatingStars,
    StarRatingInputValue,
@@ -22,6 +20,8 @@ import FeedbackGraph from "../FeedbackGraph"
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward"
 import makeStyles from "@mui/styles/makeStyles"
 import ExportTable from "../../../../../common/Tables/ExportTable"
+import { exportSelectionAction } from "../../../../../../util/tableUtils"
+import { CSVDialogDownload } from "../../../../../../custom-hook/useMetaDataActions"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -292,6 +292,30 @@ const FeedbackTable = ({
       }
    }
 
+   const getTitle = () => {
+      let prefix = "Questions"
+
+      if (isFeedback()) {
+         prefix = "Feedback"
+      }
+
+      if (isPoll()) {
+         prefix = "Polls"
+      }
+
+      const stream = currentStream
+         ? `For ${currentStream.company} on ${prettyDate(currentStream.start)}`
+         : "For all events"
+
+      return `${prefix} - ${stream}`
+   }
+
+   const [csvDownloadData, setCsvDownloadData] = useState(null)
+
+   const handleCloseCsvDialog = useCallback(() => {
+      setCsvDownloadData(null)
+   }, [])
+
    return (
       <>
          <Card
@@ -327,7 +351,11 @@ const FeedbackTable = ({
                isLoading={fetchingStreams}
                // options={customOptions}
                actions={[
-                  exportSelectionAction(tableData.columns),
+                  exportSelectionAction(
+                     tableData.columns,
+                     getTitle(),
+                     setCsvDownloadData
+                  ),
                   (rowData) => ({
                      icon: tableIcons.ThemedEditIcon,
                      iconProps: { color: "primary" },
@@ -414,6 +442,13 @@ const FeedbackTable = ({
             loading={deletingFeedback}
             handleClose={handleCloseAreYouSureModal}
             title="Warning"
+         />
+         <CSVDialogDownload
+            title={csvDownloadData?.title}
+            data={csvDownloadData?.data}
+            filename={`${csvDownloadData?.filename}.csv`}
+            defaultOpen={!!csvDownloadData}
+            onClose={handleCloseCsvDialog}
          />
       </>
    )
