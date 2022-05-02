@@ -200,10 +200,12 @@ const getComponents = (theme: Theme) => ({
             fontWeight: 500,
             fontSize: "1rem",
          },
-         root: {
-            // margin: "0.5em",
-            // marginLeft: 0,
-         },
+         root: ({ stacked }) => ({
+            ...(stacked && {
+               margin: "0.5em",
+               marginLeft: 0,
+            }),
+         }),
       },
    },
    MuiTooltip: {

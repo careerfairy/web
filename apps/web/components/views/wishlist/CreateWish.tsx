@@ -61,7 +61,7 @@ const CreateWish = () => {
                         )}
                      />
                      <TextField
-                        label="Create Wish"
+                        label="What would you like to wish for?"
                         sx={styles.textField}
                         variant="outlined"
                         name="title"

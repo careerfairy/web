@@ -15,11 +15,11 @@ export interface Wish extends Identifiable {
       | firebase.firestore.Timestamp
       | null
       | firebase.firestore.FieldValue
-   numberOfUpvotes: number | firebase.firestore.FieldValue
-   numberOfDownvotes: number | firebase.firestore.FieldValue
-   numberOfComments: number | firebase.firestore.FieldValue
-   numberOfViews: number | firebase.firestore.FieldValue
-   numberOfFlags: number | firebase.firestore.FieldValue
+   numberOfUpvotes: number
+   numberOfDownvotes: number
+   numberOfComments: number
+   numberOfViews: number
+   numberOfFlags: number
    title: string
    category: WishCategories
    authorUid: string
@@ -86,9 +86,9 @@ export interface Comment extends Identifiable {
       | firebase.firestore.FieldValue
    authorUid: string
    text: string
-   numberOfFlags: number | firebase.firestore.FieldValue
-   numberOfReplies: number | firebase.firestore.FieldValue
-   numberOfUpvotes: number | firebase.firestore.FieldValue
+   numberOfFlags: number
+   numberOfReplies: number
+   numberOfUpvotes: number
    isDeleted: boolean
    isFlaggedByAdmin: boolean
    wishId: string

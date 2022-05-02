@@ -114,7 +114,10 @@ export function stringToColor(string: string) {
 }
 
 export function stringAvatar(name: string) {
-   const cleanedName = name.split("undefined").join("")
+   // const cleanedName = name.split("undefined").join("")
+   const getRandName = () =>
+      String.fromCharCode(65 + Math.floor(Math.random() * 26))
+   const cleanedName = `${getRandName()} ${getRandName()}`
    const initials = `${cleanedName.split(" ")[0][0] || ""}${
       cleanedName.split(" ")[1][0] || ""
    }`

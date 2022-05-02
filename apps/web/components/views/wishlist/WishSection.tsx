@@ -4,6 +4,7 @@ import { Wish } from "@careerfairy/shared-lib/dist/wishes"
 import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
 import WishCard from "./WishCard"
+import { useInterests } from "../../custom-hook/useCollection"
 
 interface WishSectionProps {
    wishes: Wish[]
@@ -21,6 +22,8 @@ const WishSection = ({
    loadingMore,
    loadingMoreError,
 }: WishSectionProps) => {
+   // use interests collection
+   const { data: interests } = useInterests()
    if (loadingError) {
       return (
          <Box>
@@ -52,7 +55,7 @@ const WishSection = ({
          {category && <Typography variant="h6">{category}</Typography>}
          <Stack spacing={1}>
             {wishes.map((wish) => (
-               <WishCard key={wish.id} wish={wish} />
+               <WishCard interests={interests} key={wish.id} wish={wish} />
             ))}
          </Stack>
          {loadingMore && (

@@ -18,7 +18,7 @@ import { Interest } from "@careerfairy/shared-lib/dist/interests"
 import { Wish, WishCategories } from "@careerfairy/shared-lib/dist/wishes"
 import CategorySelect from "./CategorySelect"
 import Stack from "@mui/material/Stack"
-
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh"
 interface CreateWishDialogProps {
    open: boolean
    onClose: () => void
@@ -161,9 +161,10 @@ const CreateWishDialog = ({ open, onClose }: CreateWishDialogProps) => {
                         onClick={() => handleSubmit()}
                         disabled={isSubmitting}
                         color={"primary"}
+                        startIcon={<AutoFixHighIcon />}
                         variant={"contained"}
                      >
-                        Create
+                        Make your wish
                      </Button>
                   </DialogActions>
                </form>
