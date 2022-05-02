@@ -266,7 +266,9 @@ exports.validateUserEmailWithPin = functions
 
 exports.sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
    async (data) => {
+      let emailInError
       try {
+         emailInError = data.recipientEmail
          const recipientEmail = data.recipientEmail
          const redirectLink = data.redirectLink
 
@@ -275,13 +277,11 @@ exports.sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
          }
 
          functions.logger.info("recipient_email", recipientEmail)
+         functions.logger.info("actionCodeSettings", actionCodeSettings)
 
          const link = await admin
             .auth()
-            .generatePasswordResetLink(
-               redirectLink.toLowerCase(),
-               actionCodeSettings
-            )
+            .generatePasswordResetLink(recipientEmail, actionCodeSettings)
          const email = {
             TemplateId: process.env.POSTMARK_TEMPLATE_PASSWORD_RESET,
             From: "CareerFairy <noreply@careerfairy.io>",
@@ -289,6 +289,8 @@ exports.sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
             TemplateModel: { action_url: link },
          }
          const response = await client.sendEmailWithTemplate(email)
+         functions.logger.info("response", response)
+
          if (response.ErrorCode) {
             functions.logger.error(
                "error in sendEmailWithTemplate response",
@@ -296,7 +298,10 @@ exports.sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
             )
          }
       } catch (e) {
-         functions.logger.error("error in sending password reset link", e)
+         functions.logger.error(
+            `Error in sending password reset link with email ${emailInError}`,
+            e
+         )
          // The client should not know if this request was successful or not, so we just log it on the server
       }
    }
