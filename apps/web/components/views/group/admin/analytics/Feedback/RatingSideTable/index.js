@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import clsx from "clsx"
 import PropTypes from "prop-types"
 import { Card } from "@mui/material"
 import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext"
 import {
    defaultTableOptions,
-   exportSelectionAction,
    getPageSize,
    renderRatingStars,
    StarRatingInputValue,
@@ -15,6 +14,8 @@ import { prettyDate } from "../../../../../../helperFunctions/HelperFunctions"
 import { alpha, useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import ExportTable from "../../../../../common/Tables/ExportTable"
+import { CSVDialogDownload } from "../../../../../../custom-hook/useMetaDataActions"
+import { exportSelectionAction } from "../../../../../../util/tableUtils"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -92,47 +93,68 @@ const RatingSideTable = ({
    customOptions.exportButton.pdf = true
    customOptions.pageSize = getPageSize(customOptions.pageSizeOptions, data)
 
+   const [csvDownloadData, setCsvDownloadData] = useState(null)
+
+   const handleCloseCsvDialog = useCallback(() => {
+      setCsvDownloadData(null)
+   }, [])
+
    return (
-      <Card
-         raised={active()}
-         ref={sideRef}
-         className={clsx(classes.root, className)}
-         {...rest}
-      >
-         <ExportTable
-            key={data.length}
-            icons={tableIcons}
-            tableRef={dataTableRef}
-            columns={[
-               {
-                  field: "rating",
-                  title: "Rating",
-                  width: 160,
-                  render: renderRatingStars,
-                  filterComponent: StarRatingInputValue,
-                  customFilterAndSearch: (term, rowData) =>
-                     Number(term) >= Number(rowData.rating),
-               },
-               {
-                  field: "date",
-                  title: "Voted",
-                  width: 200,
-                  render: (rowData) => prettyDate(rowData.timestamp),
-                  type: "date",
-               },
-               {
-                  field: "message",
-                  title: "Message",
-                  width: 250,
-               },
-            ]}
-            data={data}
-            options={customOptions}
-            isLoading={fetchingStreams}
-            actions={[exportSelectionAction(columns)]}
-            title={currentRating?.question}
+      <>
+         <Card
+            raised={active()}
+            ref={sideRef}
+            className={clsx(classes.root, className)}
+            {...rest}
+         >
+            <ExportTable
+               key={data.length}
+               icons={tableIcons}
+               tableRef={dataTableRef}
+               columns={[
+                  {
+                     field: "rating",
+                     title: "Rating",
+                     width: 160,
+                     render: renderRatingStars,
+                     filterComponent: StarRatingInputValue,
+                     customFilterAndSearch: (term, rowData) =>
+                        Number(term) >= Number(rowData.rating),
+                  },
+                  {
+                     field: "date",
+                     title: "Voted",
+                     width: 200,
+                     render: (rowData) => prettyDate(rowData.timestamp),
+                     type: "date",
+                  },
+                  {
+                     field: "message",
+                     title: "Message",
+                     width: 250,
+                  },
+               ]}
+               data={data}
+               options={customOptions}
+               isLoading={fetchingStreams}
+               actions={[
+                  exportSelectionAction(
+                     columns,
+                     "Feedback",
+                     setCsvDownloadData
+                  ),
+               ]}
+               title={currentRating?.question}
+            />
+         </Card>
+         <CSVDialogDownload
+            title={csvDownloadData?.title}
+            data={csvDownloadData?.data}
+            filename={`${csvDownloadData?.filename}.csv`}
+            defaultOpen={!!csvDownloadData}
+            onClose={handleCloseCsvDialog}
          />
-      </Card>
+      </>
    )
 }
 
