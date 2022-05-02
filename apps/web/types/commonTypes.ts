@@ -7,6 +7,6 @@ export interface Identifiable {
    id: string
 }
 
-export type Styles = {
+export type StylesProps = {
    [key: string]: SxProps<Theme>
 }

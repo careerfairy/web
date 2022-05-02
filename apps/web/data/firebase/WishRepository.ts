@@ -5,19 +5,16 @@ import {
    WishOrderByFields,
    FlagReason,
 } from "@careerfairy/shared-lib/dist/wishes"
-
-type CreateAndUpdateWishData = Pick<
-   Wish,
-   "title" | "companyNames" | "interests" | "category"
->
+import { CreateWishFormValues } from "../../components/views/wishlist/CreateWishDialog"
 
 export interface IWishRepository {
    getWishesQuery(
-      orderBy?: [WishOrderByFields, firebase.firestore.OrderByDirection]
+      options?: GetWishesOptions
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
-   createWish(data: CreateAndUpdateWishData): Promise<Wish>
+   getWishes(options?: GetWishesOptions): Promise<Wish[]>
+   createWish(data: CreateWishFormValues): Promise<Wish>
    updateWish(
-      wishData: CreateAndUpdateWishData,
+      wishData: CreateWishFormValues,
       wishId: string
    ): Promise<Partial<Wish>>
 
@@ -25,7 +22,7 @@ export interface IWishRepository {
    toggleRateWish(wishId: string, type: "upvote" | "downvote"): Promise<void>
    deleteWish(wishId: string): Promise<Partial<Wish>>
    restoreDeletedWish(wishId: string): Promise<Partial<Wish>>
-   flagWish(wishId: string, reason: FlagReason): Promise<Partial<Wish>>
+   flagWish(wishId: string, reasons: FlagReason[]): Promise<Partial<Wish>>
    listenToWishRating(
       wishId: string,
       callback: {
@@ -37,27 +34,70 @@ export interface IWishRepository {
       }
    ): firebase.Unsubscribe
 }
-
+interface GetWishesOptions {
+   orderBy?: [WishOrderByFields, firebase.firestore.OrderByDirection]
+   targetInterestIds?: string[]
+   targetCategories?: Wish["category"][]
+   startAfter?: firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>
+   // Don't use the limit property if you are
+   // using a hook that already has it's own limit property
+   // use the hook's limit property instead
+   limit?: number
+}
 class FirebaseWishRepository implements IWishRepository {
    constructor(private readonly firestore: firebase.firestore.Firestore) {}
 
-   getWishesQuery(
-      orderBy: [WishOrderByFields, firebase.firestore.OrderByDirection] = [
-         "created",
-         "desc",
-      ]
-   ): firebase.firestore.Query<firebase.firestore.DocumentData> {
+   getWishesQuery({
+      orderBy,
+      targetCategories,
+      targetInterestIds,
+      limit,
+      startAfter,
+   }: GetWishesOptions = {}): firebase.firestore.Query<firebase.firestore.DocumentData> {
       let query: firebase.firestore.Query<firebase.firestore.DocumentData> =
-         this.firestore.collection("wishes").where("isDeleted", "==", false)
+         this.firestore
+            .collection("wishes")
+            .where("isDeleted", "==", false)
+            .where("isPublic", "==", true)
+      if (targetCategories?.length > 0) {
+         query = query.where("category", "in", targetCategories)
+      }
+
+      if (targetInterestIds?.length > 0) {
+         query = query.where(
+            "interests",
+            "array-contains-any",
+            targetInterestIds
+         )
+      }
+      // startAfter is used to paginate
+      if (startAfter) {
+         query = query.startAfter(startAfter)
+      }
       if (orderBy) {
          query = query.orderBy(`${orderBy[0]}`, orderBy[1])
+      }
+
+      if (limit) {
+         query = query.limit(limit)
       }
       return query
    }
 
-   async createWish(wishData: CreateAndUpdateWishData): Promise<Wish> {
-      const newWish: Wish = {
+   async getWishes(options?: GetWishesOptions): Promise<Wish[]> {
+      const query = this.getWishesQuery(options)
+      const snapshot = await query.get()
+      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Wish))
+   }
+
+   async createWish(wishFormValues: CreateWishFormValues): Promise<Wish> {
+      const newWish: Omit<Wish, "id"> = {
+         title: wishFormValues.title.trim(),
+         companyNames: wishFormValues.companyNames,
+         interestIds: wishFormValues.interests.map((interest) => interest.id),
+         category: wishFormValues.category,
          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+         authorUid: firebase.auth().currentUser?.uid,
          updatedAt: null,
          deletedAt: null,
          isDeleted: false,
@@ -65,26 +105,25 @@ class FirebaseWishRepository implements IWishRepository {
          numberOfUpvotes: 0,
          numberOfDownvotes: 0,
          numberOfComments: 0,
-         isPublic: Boolean(wishData.isPublic),
-         title: wishData.title.trim(),
-         authorUid: firebase.auth().currentUser?.uid,
+         isPublic: true,
          isFlaggedByAdmin: false,
-         companyNames: wishData.companyNames,
+         numberOfFlags: 0,
+         flaggedByAdminAt: null,
       }
       const ref = await this.firestore.collection("wishes").add(newWish)
       return { ...newWish, id: ref.id }
    }
    async updateWish(
-      wishData: CreateAndUpdateWishData,
+      wishFormValues: CreateWishFormValues,
       wishId: string
    ): Promise<Partial<Wish>> {
       const wishRef = this.firestore.collection("wishes").doc(wishId)
       // update wish ref
       const updatedWish: Partial<Wish> = {
          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-         isPublic: Boolean(wishData.isPublic),
-         title: wishData.title.trim(),
-         companyNames: wishData.companyNames,
+         title: wishFormValues.title.trim(),
+         companyNames: wishFormValues.companyNames,
+         interestIds: wishFormValues.interests.map((interest) => interest.id),
       }
       await wishRef.update(updatedWish)
       return updatedWish
@@ -231,7 +270,7 @@ class FirebaseWishRepository implements IWishRepository {
             }
             const isAdmin = userDoc.data()?.isAdmin
             const updatedWish: Partial<Wish> = {
-               updated: firebase.firestore.FieldValue.serverTimestamp(),
+               updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                isFlaggedByAdmin: Boolean(isAdmin),
                numberOfFlags: firebase.firestore.FieldValue.increment(1),
             }

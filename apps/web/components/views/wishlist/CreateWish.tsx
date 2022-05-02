@@ -1,6 +1,6 @@
 import React from "react"
 import Paper from "@mui/material/Paper"
-import { Styles } from "../../../types/commonTypes"
+import { StylesProps } from "../../../types/commonTypes"
 import Stack from "@mui/material/Stack"
 import Avatar from "@mui/material/Avatar"
 import { useAuth } from "../../../HOCs/AuthProvider"
@@ -12,7 +12,7 @@ import { wishListBorderRadius } from "../../../constants/pages"
 import useDialog from "../../custom-hook/useDialog"
 import CreateWishDialog from "./CreateWishDialog"
 
-const styles: Styles = {
+const styles: StylesProps = {
    paper: {
       p: 1,
       borderRadius: wishListBorderRadius,
@@ -29,7 +29,7 @@ const CreateWish = () => {
    return (
       <>
          <Paper
-            onClick={handleOpenWishDialog}
+            onClick={() => !isLoggedOut && handleOpenWishDialog()}
             sx={styles.paper}
             variant={"outlined"}
          >
@@ -37,6 +37,7 @@ const CreateWish = () => {
                {isLoggedOut ? (
                   <Button
                      component={Link}
+                     fullWidth
                      // @ts-ignore
                      href={{
                         pathname: "login",
@@ -50,8 +51,8 @@ const CreateWish = () => {
                ) : (
                   <>
                      <Avatar
-                        // src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
-                        src={userData?.avatarUrl}
+                        src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+                        // src={userData?.avatarUrl}
                         component={Link}
                         noLinkStyle
                         href={"/profile"}

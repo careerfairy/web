@@ -1,6 +1,7 @@
 import React from "react"
 import {
    Button,
+   Collapse,
    Dialog,
    DialogActions,
    DialogContent,
@@ -13,6 +14,10 @@ import { useInterests } from "../../custom-hook/useCollection"
 import CompanyNamesSelect from "./CompanyNamesSelect"
 import InterestSelect from "./InterestSelect"
 import wishlistRepo from "../../../data/firebase/WishRepository"
+import { Interest } from "@careerfairy/shared-lib/dist/interests"
+import { Wish, WishCategories } from "@careerfairy/shared-lib/dist/wishes"
+import CategorySelect from "./CategorySelect"
+import Stack from "@mui/material/Stack"
 
 interface CreateWishDialogProps {
    open: boolean
@@ -23,13 +28,19 @@ const schema = yup.object().shape({
    title: yup
       .string()
       .required("The title is required")
-      .max(50, "The title is too long")
-      .min(5, "The title is too short"),
+      .max(255, "The title is too long")
+      .min(10, "The title is too short"),
    isPublic: yup.boolean(),
    category: yup.string().required("A category is required"),
    interests: yup
       .array()
-      .of(yup.string().required("A valid interest must be selected"))
+      .of(
+         yup.object().shape({
+            id: yup.string().required("An interest is required"),
+            name: yup.string().required("An interest is required"),
+         })
+      )
+      .required("A valid interest must be selected")
       .max(5, "You can only add up to 5 interests"),
    companyNames: yup
       .array()
@@ -41,17 +52,17 @@ const schema = yup.object().shape({
       }),
 })
 
-interface FormValues {
-   title: string
-   category: string
-   interests: string[]
-   companyNames: string[]
+export interface CreateWishFormValues {
+   title: Wish["title"]
+   category: Wish["category"]
+   interests: Interest[]
+   companyNames: Wish["companyNames"]
 }
 const CreateWishDialog = ({ open, onClose }: CreateWishDialogProps) => {
    // Material dialog
-   const initialValues: FormValues = {
+   const initialValues: CreateWishFormValues = {
       title: "",
-      category: "",
+      category: WishCategories.OTHER,
       interests: [],
       companyNames: [],
    }
@@ -61,7 +72,7 @@ const CreateWishDialog = ({ open, onClose }: CreateWishDialogProps) => {
       onClose()
    }
 
-   const onSubmit = async (values: FormValues) => {
+   const onSubmit = async (values: CreateWishFormValues) => {
       try {
          // create wish
          await wishlistRepo.createWish(values)
@@ -73,7 +84,13 @@ const CreateWishDialog = ({ open, onClose }: CreateWishDialogProps) => {
    }
 
    return (
-      <Dialog maxWidth={"md"} fullWidth onClose={handleClose} open={open}>
+      <Dialog
+         maxWidth={"md"}
+         PaperProps={{ sx: { borderRadius: 2 } }}
+         fullWidth
+         onClose={handleClose}
+         open={open}
+      >
          <Formik
             initialValues={initialValues}
             validationSchema={schema}
@@ -88,13 +105,11 @@ const CreateWishDialog = ({ open, onClose }: CreateWishDialogProps) => {
                handleChange,
                errors,
                handleSubmit,
-            }) => {
-               console.log("-> errors", errors)
-               console.log("-> values", values)
-               return (
-                  <form>
-                     <DialogTitle>Create Wish</DialogTitle>
-                     <DialogContent>
+            }) => (
+               <form>
+                  <DialogTitle>Create Wish</DialogTitle>
+                  <DialogContent>
+                     <Stack spacing={2}>
                         <TextField
                            autoFocus
                            margin="dense"
@@ -112,40 +127,47 @@ const CreateWishDialog = ({ open, onClose }: CreateWishDialogProps) => {
                            multiline
                            fullWidth
                         />
-                        <CompanyNamesSelect
-                           setFieldValue={setFieldValue}
-                           disabled={isSubmitting}
-                           touched={touched.companyNames}
-                           error={errors.companyNames as string}
-                           handleBlur={handleBlur}
-                           selectedCompanyNames={values.companyNames}
-                        />
                         <InterestSelect
                            setFieldValue={setFieldValue}
                            disabled={isSubmitting}
-                           touched={touched.companyNames}
-                           error={errors.companyNames as string}
+                           touched={Boolean(touched.interests)}
+                           error={errors.interests as string}
                            handleBlur={handleBlur}
                            selectedInterests={values.interests}
                            totalInterests={allInterests}
                         />
-                     </DialogContent>
-                     <DialogActions>
-                        <Button color={"grey"} onClick={handleClose}>
-                           Cancel
-                        </Button>
-                        <Button
-                           onClick={handleSubmit}
-                           disabled={isSubmitting}
-                           color={"primary"}
-                           variant={"contained"}
-                        >
-                           Create
-                        </Button>
-                     </DialogActions>
-                  </form>
-               )
-            }}
+                        <CategorySelect
+                           handleChange={handleChange}
+                           selectedCategory={values.category}
+                           setFieldValue={setFieldValue}
+                        />
+                        <Collapse in={values.category === "company"}>
+                           <CompanyNamesSelect
+                              setFieldValue={setFieldValue}
+                              disabled={isSubmitting}
+                              touched={touched.companyNames}
+                              error={errors.companyNames as string}
+                              handleBlur={handleBlur}
+                              selectedCompanyNames={values.companyNames}
+                           />
+                        </Collapse>
+                     </Stack>
+                  </DialogContent>
+                  <DialogActions>
+                     <Button color={"grey"} onClick={handleClose}>
+                        Cancel
+                     </Button>
+                     <Button
+                        onClick={() => handleSubmit()}
+                        disabled={isSubmitting}
+                        color={"primary"}
+                        variant={"contained"}
+                     >
+                        Create
+                     </Button>
+                  </DialogActions>
+               </form>
+            )}
          </Formik>
       </Dialog>
    )

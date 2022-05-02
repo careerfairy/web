@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 import { Autocomplete, Chip, TextField } from "@mui/material"
 interface CompanyNamesSelectProps {
    selectedCompanyNames: string[]
@@ -7,6 +7,7 @@ interface CompanyNamesSelectProps {
    setFieldValue: (field: string, value: any) => void
    handleBlur: (event: any) => void
    disabled: boolean
+   limit?: number
 }
 const CompanyNamesSelect = ({
    selectedCompanyNames,
@@ -15,18 +16,24 @@ const CompanyNamesSelect = ({
    touched,
    handleBlur,
    disabled,
+   limit = 5,
 }: CompanyNamesSelectProps) => {
+   const limitReached = selectedCompanyNames.length >= limit
+   const checkDisable = useCallback(
+      (option) => limitReached && !selectedCompanyNames.includes(option),
+      [limitReached, selectedCompanyNames]
+   )
    return (
       <Autocomplete
          multiple
          id="companyNames"
          disabled={disabled}
-         limitTags={5}
          options={selectedCompanyNames.map((companyName) => companyName)}
          value={selectedCompanyNames}
          onChange={(event, newValue) => {
             setFieldValue("companyNames", newValue)
          }}
+         getOptionDisabled={checkDisable}
          onBlur={handleBlur}
          defaultValue={[]}
          freeSolo
@@ -42,7 +49,6 @@ const CompanyNamesSelect = ({
          renderInput={(params) => (
             <TextField
                {...params}
-               variant="filled"
                name={"companyNames"}
                error={Boolean(error && touched && error)}
                helperText={error && touched && error}

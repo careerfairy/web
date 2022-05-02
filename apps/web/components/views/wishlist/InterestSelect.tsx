@@ -1,14 +1,17 @@
-import React from "react"
-import { Autocomplete, Chip, TextField } from "@mui/material"
+import React, { useCallback } from "react"
+import { Autocomplete, Checkbox, Chip, TextField } from "@mui/material"
 import { Interest } from "@careerfairy/shared-lib/dist/interests"
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
+import CheckBoxIcon from "@mui/icons-material/CheckBox"
 interface InterestSelectProps {
-   selectedInterests: string[]
+   selectedInterests: Interest[]
    totalInterests: Interest[]
    error: string
    touched: boolean
    setFieldValue: (field: string, value: any) => void
    handleBlur: (event: any) => void
    disabled: boolean
+   limit?: number
 }
 const InterestSelect = ({
    selectedInterests,
@@ -18,36 +21,43 @@ const InterestSelect = ({
    touched,
    handleBlur,
    disabled,
+   limit = 5,
 }: InterestSelectProps) => {
+   const limitReached = selectedInterests.length >= limit
+   const checkDisable = useCallback(
+      (option) => limitReached && !selectedInterests.includes(option),
+      [limitReached, selectedInterests]
+   )
    return (
       <Autocomplete
          multiple
          id="interests"
-         limitTags={5}
          disabled={disabled}
+         getOptionDisabled={checkDisable}
+         disableCloseOnSelect
          options={totalInterests}
          getOptionLabel={(interest) => interest.name}
          value={selectedInterests}
          onChange={(event, newValue) => {
-            console.log("-> newValue", newValue)
             setFieldValue("interests", newValue)
          }}
          onBlur={handleBlur}
          defaultValue={[]}
          freeSolo
-         renderTags={(value: readonly Interest[], getTagProps) =>
-            value.map((option: Interest, index: number) => (
-               <Chip
-                  variant="outlined"
-                  label={option.name}
-                  {...getTagProps({ index })}
+         renderOption={(props, option, { selected }) => (
+            <li {...props}>
+               <Checkbox
+                  icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                  checkedIcon={<CheckBoxIcon fontSize="small" />}
+                  style={{ marginRight: 8 }}
+                  checked={selected}
                />
-            ))
-         }
+               {option.name}
+            </li>
+         )}
          renderInput={(params) => (
             <TextField
                {...params}
-               variant="filled"
                name={"interests"}
                error={Boolean(error && touched && error)}
                helperText={error && touched && error}

@@ -21,14 +21,26 @@ export interface Wish extends Identifiable {
    numberOfViews: number | firebase.firestore.FieldValue
    numberOfFlags: number | firebase.firestore.FieldValue
    title: string
-   category: "company" | "other"
+   category: WishCategories
    authorUid: string
    companyNames: string[]
+   /*
+    * This field should only be updated by a trigger
+    * cloud function that listens to new upvotes.
+    * It should also be limited to ONLY the 4 most recent
+    * upvotes.
+    * */
+   uidsOfRecentUpvoters: string[]
    isPublic: boolean
    isDeleted: boolean
    isFlaggedByAdmin: boolean
    // array of interests ids
-   interests: string[]
+   interestIds: string[]
+}
+
+export enum WishCategories {
+   COMPANY = "company",
+   OTHER = "other",
 }
 export type WishOrderByFields =
    | Wish["createdAt"]
@@ -56,4 +68,29 @@ export interface Flag {
 export interface Rating {
    type: "upvote" | "downvote"
    createdAt: firebase.firestore.Timestamp | firebase.firestore.FieldValue
+}
+
+export interface Comment extends Identifiable {
+   createdAt: firebase.firestore.Timestamp | firebase.firestore.FieldValue
+   updatedAt:
+      | firebase.firestore.Timestamp
+      | null
+      | firebase.firestore.FieldValue
+   flaggedByAdminAt:
+      | firebase.firestore.Timestamp
+      | null
+      | firebase.firestore.FieldValue
+   deletedAt:
+      | firebase.firestore.Timestamp
+      | null
+      | firebase.firestore.FieldValue
+   authorUid: string
+   text: string
+   numberOfFlags: number | firebase.firestore.FieldValue
+   numberOfReplies: number | firebase.firestore.FieldValue
+   numberOfUpvotes: number | firebase.firestore.FieldValue
+   isDeleted: boolean
+   isFlaggedByAdmin: boolean
+   wishId: string
+   parentCommentId: string | null
 }
