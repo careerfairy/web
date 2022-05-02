@@ -7,7 +7,7 @@ const tagManagerArgs = {
    gtmId: "GTM-P29VCWC",
 }
 
-const GoogleTagManager = ({ disableCookies, children }) => {
+const GoogleTagManagerLoader = ({ disableCookies, children }) => {
    const { userData, isLoggedOut } = useAuth()
 
    const cookieValue = getCookieConsentValue()
@@ -25,6 +25,18 @@ const GoogleTagManager = ({ disableCookies, children }) => {
    }, [cookieValue, disableCookies, userData, isLoggedOut])
 
    return children
+}
+
+const GoogleTagManager = ({ disableCookies, children }) => {
+   if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+      return children
+   } else {
+      return (
+         <GoogleTagManagerLoader disableCookies={disableCookies}>
+            {children}
+         </GoogleTagManagerLoader>
+      )
+   }
 }
 
 export default GoogleTagManager

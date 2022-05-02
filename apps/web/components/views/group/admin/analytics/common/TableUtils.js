@@ -5,8 +5,7 @@ import {
    prettyDate,
 } from "../../../../../helperFunctions/HelperFunctions"
 import { Rating } from "@mui/material"
-import { Box, Button, Tooltip, Typography } from "@mui/material"
-import { CsvBuilder } from "filefy"
+import { Box, Tooltip, Typography } from "@mui/material"
 
 import AddBox from "@mui/icons-material/AddBox"
 import ArrowDownward from "@mui/icons-material/ArrowDownward"
@@ -41,7 +40,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import RotateLeftIcon from "@mui/icons-material/RotateLeft"
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf"
 import Linkify from "react-linkify"
-import { getListSeparator } from "../../../../../../util/CommonUtil"
+import { getCSVDelimiterBasedOnOS } from "../../../../../../util/CommonUtil"
 
 export const tableIcons = {
    Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -123,29 +122,6 @@ export const tableIcons = {
    )),
 }
 
-export const exportSelectionAction = (
-   columns = [],
-   title = "Selected_Table"
-) => {
-   return {
-      position: "toolbarOnSelect",
-      icon: SaveAlt,
-      tooltip: "Export the selected rows!",
-      onClick: (e, rowData) => {
-         const tableTitle = title.split(" ").join("_")
-         const builder = new CsvBuilder(tableTitle + ".csv")
-         builder
-            .setColumns(columns.map((columnDef) => columnDef.title))
-            .addRows(
-               rowData.map((rowData) =>
-                  columns.map((columnDef) => rowData[columnDef.field])
-               )
-            )
-            .exportFile()
-      },
-   }
-}
-
 const componentDecorator = (href, text, key) => (
    <a href={href} key={key} target="_blank">
       {text}
@@ -181,7 +157,7 @@ export const defaultTableOptions = {
    pageSizeOptions: [3, 5, 10, 25, 50, 100, 200],
    minBodyHeight: 200,
    exportAllData: true,
-   exportDelimiter: getListSeparator(),
+   exportDelimiter: getCSVDelimiterBasedOnOS(),
    exportButton: { csv: true, pdf: true }, // PDF is false because its buggy and throws errors
 }
 

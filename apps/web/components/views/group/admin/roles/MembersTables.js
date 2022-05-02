@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import clsx from "clsx"
 import PropTypes from "prop-types"
 import { Avatar, Badge, Box, Card, Typography } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
-import { defaultTableOptions, tableIcons } from "../../../../util/tableUtils"
+import {
+   defaultTableOptions,
+   exportSelectionAction,
+   tableIcons,
+} from "../../../../util/tableUtils"
 import { useSelector } from "react-redux"
-import { exportSelectionAction } from "../analytics/common/TableUtils"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { convertCamelToSentence } from "../../../../helperFunctions/HelperFunctions"
 import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal"
 import ExportTable from "../../../common/Tables/ExportTable"
+import { CSVDialogDownload } from "../../../../custom-hook/useMetaDataActions"
 
 const customOptions = { ...defaultTableOptions }
 customOptions.selection = false
@@ -184,66 +188,86 @@ const MembersTable = ({
 
    const getTitle = () => `Admin Members of ${group.universityName}`
 
+   const [csvDownloadData, setCsvDownloadData] = useState(null)
+
+   const handleCloseCsvDialog = useCallback(() => {
+      setCsvDownloadData(null)
+   }, [])
+
    return (
-      <Card className={clsx(classes.root, className)} {...rest}>
-         <ExportTable
-            icons={tableIcons}
-            data={data}
-            columns={columns}
-            options={customOptions}
-            actions={[
-               exportSelectionAction(columns, getTitle()),
-               {
-                  tooltip: "Invite a Member",
-                  icon: tableIcons.ThemedAdd,
-                  isFreeAction: true,
-                  iconProps: { color: "primary" },
-                  onClick: openAddMemberModal,
-               },
-               (rowData) => ({
-                  icon: tableIcons.RemoveCircleOutlineIcon,
-                  iconProps: { color: "primary" },
-                  position: "row",
-                  tooltip: "Kick from dashboard",
-                  onClick: (event, rowData) => handleClickKickButton(rowData),
-                  disabled:
-                     rowData.role === "mainAdmin" ||
-                     userRole.role !== "mainAdmin" ||
-                     loading,
-                  hidden:
-                     rowData.role === "mainAdmin" ||
-                     userRole.role !== "mainAdmin",
-               }),
-               (rowData) => ({
-                  icon: tableIcons.SupervisorAccountIcon,
-                  iconProps: { color: "primary" },
-                  position: "row",
-                  tooltip: "Make main Admin",
-                  onClick: (event, rowData) =>
-                     handleClickPromoteButton(rowData),
-                  disabled:
-                     rowData.role === "mainAdmin" ||
-                     userRole.role !== "mainAdmin" ||
-                     loading,
-                  hidden:
-                     rowData.role === "mainAdmin" ||
-                     userRole.role !== "mainAdmin",
-               }),
-            ]}
-            onSelectionChange={(rows) => {
-               setSelection(rows)
-            }}
-            title={getTitle()}
+      <>
+         <Card className={clsx(classes.root, className)} {...rest}>
+            <ExportTable
+               icons={tableIcons}
+               data={data}
+               columns={columns}
+               options={customOptions}
+               actions={[
+                  exportSelectionAction(
+                     columns,
+                     getTitle(),
+                     setCsvDownloadData
+                  ),
+                  {
+                     tooltip: "Invite a Member",
+                     icon: tableIcons.ThemedAdd,
+                     isFreeAction: true,
+                     iconProps: { color: "primary" },
+                     onClick: openAddMemberModal,
+                  },
+                  (rowData) => ({
+                     icon: tableIcons.RemoveCircleOutlineIcon,
+                     iconProps: { color: "primary" },
+                     position: "row",
+                     tooltip: "Kick from dashboard",
+                     onClick: (event, rowData) =>
+                        handleClickKickButton(rowData),
+                     disabled:
+                        rowData.role === "mainAdmin" ||
+                        userRole.role !== "mainAdmin" ||
+                        loading,
+                     hidden:
+                        rowData.role === "mainAdmin" ||
+                        userRole.role !== "mainAdmin",
+                  }),
+                  (rowData) => ({
+                     icon: tableIcons.SupervisorAccountIcon,
+                     iconProps: { color: "primary" },
+                     position: "row",
+                     tooltip: "Make main Admin",
+                     onClick: (event, rowData) =>
+                        handleClickPromoteButton(rowData),
+                     disabled:
+                        rowData.role === "mainAdmin" ||
+                        userRole.role !== "mainAdmin" ||
+                        loading,
+                     hidden:
+                        rowData.role === "mainAdmin" ||
+                        userRole.role !== "mainAdmin",
+                  }),
+               ]}
+               onSelectionChange={(rows) => {
+                  setSelection(rows)
+               }}
+               title={getTitle()}
+            />
+            <AreYouSureModal
+               open={areYouSureModalOpen}
+               handleClose={handleCloseAreYouSureModal}
+               loading={loading}
+               title="Are you sure?"
+               handleConfirm={handleConfirm}
+               message={areYouSureModalMessage}
+            />
+         </Card>
+         <CSVDialogDownload
+            title={csvDownloadData?.title}
+            data={csvDownloadData?.data}
+            filename={`${csvDownloadData?.filename}.csv`}
+            defaultOpen={!!csvDownloadData}
+            onClose={handleCloseCsvDialog}
          />
-         <AreYouSureModal
-            open={areYouSureModalOpen}
-            handleClose={handleCloseAreYouSureModal}
-            loading={loading}
-            title="Are you sure?"
-            handleConfirm={handleConfirm}
-            message={areYouSureModalMessage}
-         />
-      </Card>
+      </>
    )
 }
 
