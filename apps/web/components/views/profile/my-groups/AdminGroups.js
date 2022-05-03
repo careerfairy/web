@@ -5,6 +5,7 @@ import CurrentGroup from "components/views/profile/CurrentGroup"
 import makeStyles from "@mui/styles/makeStyles"
 import { Highlights } from "../../groups/Groups"
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers"
+import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 
 const useStyles = makeStyles((theme) => ({
    header: {
@@ -57,7 +58,7 @@ const AdminGroups = ({ userData, adminGroups }) => {
 
    return (
       <Fragment>
-         <div>
+         <ContentCard>
             <div className={classes.header}>
                <Typography className={classes.title} variant="h5">
                   Admin Groups
@@ -81,7 +82,7 @@ const AdminGroups = ({ userData, adminGroups }) => {
                   You are currently not an admin of any career group.
                </Typography>
             )}
-         </div>
+         </ContentCard>
       </Fragment>
    )
 }

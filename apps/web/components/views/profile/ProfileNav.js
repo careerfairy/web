@@ -32,7 +32,7 @@ function TabPanel(props) {
          aria-labelledby={`full-width-tab-${index}`}
          {...other}
       >
-         {value === index && <Box py={3}>{children}</Box>}
+         {value === index && <Box sx={{ pb: 3 }}>{children}</Box>}
       </div>
    )
 }
@@ -109,7 +109,7 @@ const ProfileNav = ({ userData }) => {
          wrapped
          fullWidth
          label={
-            <Typography noWrap variant="h5">
+            <Typography noWrap variant="h6">
                {native ? "Personal" : "Personal Information"}
             </Typography>
          }
@@ -118,14 +118,14 @@ const ProfileNav = ({ userData }) => {
          key={1}
          wrapped
          fullWidth
-         label={<Typography variant="h5">Referrals</Typography>}
+         label={<Typography variant="h6">Referrals</Typography>}
       />,
       <Tab
          key={2}
          wrapped
          fullWidth
          label={
-            <Typography variant="h5">
+            <Typography variant="h6">
                {native ? "Groups" : "Joined Groups"}
             </Typography>
          }
@@ -144,7 +144,7 @@ const ProfileNav = ({ userData }) => {
             wrapped
             fullWidth
             label={
-               <Typography variant="h5">
+               <Typography variant="h6">
                   {native ? "Admin" : "Admin Groups"}
                </Typography>
             }
@@ -153,7 +153,7 @@ const ProfileNav = ({ userData }) => {
    }
 
    return (
-      <Container disableGutters sx={{ mt: "50px", mb: "auto" }}>
+      <>
          <AppBar className={classes.bar} position="static" color="default">
             <Tabs
                value={value}
@@ -162,6 +162,9 @@ const ProfileNav = ({ userData }) => {
                textColor="primary"
                selectionFollowsFocus
                centered
+               sx={{ mb: 2 }}
+               variant="scrollable"
+               scrollButtons={false}
             >
                {tabsArray}
             </Tabs>
@@ -173,7 +176,7 @@ const ProfileNav = ({ userData }) => {
          >
             {views}
          </SwipeableViews>
-      </Container>
+      </>
    )
 }
 

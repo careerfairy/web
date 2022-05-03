@@ -39,6 +39,11 @@ class UserFirebaseSeed implements UserSeed {
       const pinCode = getRandomInt(9999)
 
       const username = email.split("@")[0]
+      const users = await auth.listUsers(10)
+      const oldUser = users.users.find((user) => user.email === email)
+      if (oldUser) {
+         await auth.deleteUser(oldUser.uid)
+      }
       const userRecord = await auth.createUser({
          email: email,
          password: "password",

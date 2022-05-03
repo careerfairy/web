@@ -1,11 +1,10 @@
 import React from "react"
 import makeStyles from "@mui/styles/makeStyles"
-import { withFirebase } from "context/firebase/FirebaseServiceContext"
 import Head from "next/head"
 import ProfileNav from "../components/views/profile/ProfileNav"
 import { useAuth } from "../HOCs/AuthProvider"
-import GeneralLayout from "../layouts/GeneralLayout"
 import ScrollToTop from "../components/views/common/ScrollToTop"
+import UserLayout from "../layouts/UserLayout"
 
 const useStyles = makeStyles((theme) => ({
    content: {
@@ -22,16 +21,16 @@ const UserProfile = () => {
          <Head>
             <title key="title">CareerFairy | My Profile</title>
          </Head>
-         <GeneralLayout fullScreen>
+         <UserLayout>
             {userData ? (
                <ProfileNav user={user} userData={userData} />
             ) : (
                <div className={classes.content} />
             )}
-         </GeneralLayout>
+         </UserLayout>
          <ScrollToTop />
       </React.Fragment>
    )
 }
 
-export default withFirebase(UserProfile)
+export default UserProfile

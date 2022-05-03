@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react"
 import { Box, Button, Grid, Typography } from "@mui/material"
 import { useRouter } from "next/router"
-import {
-   useFirebaseService,
-   withFirebase,
-} from "context/firebase/FirebaseServiceContext"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import AddIcon from "@mui/icons-material/Add"
 import CurrentGroup from "components/views/profile/CurrentGroup"
 import makeStyles from "@mui/styles/makeStyles"
 import { Highlights } from "../../groups/Groups"
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers"
+import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 
 const useStyles = makeStyles((theme) => ({
    header: {
@@ -68,7 +66,7 @@ const JoinedGroups = ({ userData }) => {
    }
 
    return (
-      <Box px={3}>
+      <ContentCard>
          <div className={classes.header}>
             <Typography className={classes.title} variant="h5">
                My Groups
@@ -99,8 +97,8 @@ const JoinedGroups = ({ userData }) => {
                You are currently not a member of any career group.
             </Typography>
          )}
-      </Box>
+      </ContentCard>
    )
 }
 
-export default withFirebase(JoinedGroups)
+export default JoinedGroups

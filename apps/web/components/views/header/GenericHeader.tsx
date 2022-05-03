@@ -26,7 +26,7 @@ const GenericHeader = ({
    const theme = useTheme()
    const { mainLinks } = useGeneralLinks()
    const dispatch = useDispatch()
-   const handleDrawerOpen = () => dispatch(actions.openNavDrawer())
+   const handleDrawerToggle = () => dispatch(actions.toggleNavDrawer())
    const { authenticatedUser, userData } = useAuth()
    const { y: verticalOffset } = useWindowScroll()
    const scrolledDown = verticalOffset > 40
@@ -41,7 +41,7 @@ const GenericHeader = ({
             <IconButton
                sx={{ mr: 1, color: darkMode && !scrolledDown && "white" }}
                color="primary"
-               onClick={handleDrawerOpen}
+               onClick={handleDrawerToggle}
                size="large"
             >
                <MenuIcon />
@@ -81,10 +81,10 @@ interface Props {
    className?: string
    links?: any[]
    onMobileNavOpen?: () => void
-   darkMode: boolean
-   hideNavOnScroll: boolean
-   position: "absolute" | "fixed" | "sticky" | "static"
-   transparent: boolean
+   darkMode?: boolean
+   hideNavOnScroll?: boolean
+   position?: "absolute" | "fixed" | "sticky" | "static"
+   transparent?: boolean
 }
 
 export default GenericHeader
