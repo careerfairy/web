@@ -143,11 +143,7 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
                   <>
                      <Grid container spacing={2}>
                         <Grid item xs={8}>
-                           <Typography
-                              sx={{ color: "text.secondary" }}
-                              variant="h5"
-                              gutterBottom
-                           >
+                           <Typography className={classes.title} variant="h4">
                               Personal Info
                            </Typography>
                         </Grid>
@@ -162,7 +158,7 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
                         </Grid>
                      </Grid>
                      <Grid container spacing={2}>
-                        <Grid item sx={{ mt: 1 }} xs={12}>
+                        <Grid item xs={12}>
                            <TextField
                               variant="outlined"
                               disabled

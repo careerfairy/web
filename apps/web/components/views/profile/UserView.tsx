@@ -1,19 +1,17 @@
-import React, { useCallback, useMemo, useState } from "react"
-import SwipeableViews from "react-swipeable-views"
+import React, { useCallback, useMemo } from "react"
 import { useTheme } from "@mui/material/styles"
 
 import makeStyles from "@mui/styles/makeStyles"
 
 import {
-   Container,
+   AppBar,
+   Box,
+   Tab,
+   TabProps,
+   Tabs,
    Typography,
    useMediaQuery,
-   AppBar,
-   Tabs,
-   Tab,
-   Box,
 } from "@mui/material"
-import { withFirebase } from "context/firebase/FirebaseServiceContext"
 import JoinedGroups from "./my-groups/JoinedGroups"
 import AdminGroups from "./my-groups/AdminGroups"
 import UserData from "./userData"
@@ -21,21 +19,37 @@ import { useFirestoreConnect } from "react-redux-firebase"
 import { useSelector } from "react-redux"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import ReferralProfileTab from "./referral/ReferralProfileTab"
+import RootState from "../../../store/reducers"
+import Link from "next/link"
+import { useRouter } from "next/router"
 
 function TabPanel(props) {
-   const { children, value, index, ...other } = props
+   const { children, value, path, ...other } = props
    return (
       <div
          role="tabpanel"
-         hidden={value !== index}
-         id={`full-width-tabpanel-${index}`}
-         aria-labelledby={`full-width-tab-${index}`}
+         hidden={value !== path}
+         id={`full-width-tabpanel-${path}`}
+         aria-labelledby={`full-width-tab-${path}`}
          {...other}
       >
-         {value === index && <Box sx={{ pb: 3 }}>{children}</Box>}
+         {value === path && <Box sx={{ pb: 3 }}>{children}</Box>}
       </div>
    )
 }
+
+interface LinkTabProps extends TabProps {
+   href?: string
+}
+
+const LinkTab = ({ href, ...props }: LinkTabProps) => (
+   // @ts-ignore
+   <Link shallow as={href} href={href}>
+      <a>
+         <Tab {...props} />
+      </a>
+   </Link>
+)
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -50,11 +64,16 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const ProfileNav = ({ userData }) => {
+interface Props {
+   path: "/profile" | "/referrals" | "/my-groups" | "/admin-groups"
+}
+
+const UserView = ({ path }: Props) => {
+   const { userData } = useAuth()
+   const { push } = useRouter()
    const classes = useStyles()
    const theme = useTheme()
    const native = useMediaQuery(theme.breakpoints.down("sm"))
-   const [value, setValue] = useState(0)
    const { authenticatedUser } = useAuth()
 
    const query = useMemo(() => {
@@ -74,56 +93,50 @@ const ProfileNav = ({ userData }) => {
    useFirestoreConnect(query)
 
    const adminGroups = useSelector(
-      (state) => state.firestore.ordered["adminGroups"] || []
+      (state: RootState) => state.firestore.ordered["adminGroups"] || []
    )
 
-   const handleChange = (event, newValue) => {
-      setValue(newValue)
-   }
-
-   const handleChangeIndex = (index) => {
-      setValue(index)
-   }
-
    const redirectToReferralsTab = useCallback(() => {
-      handleChangeIndex(1)
+      return push("/referrals", undefined, {
+         shallow: true,
+      })
    }, [])
 
    const views = [
-      <TabPanel key={0} value={value} index={0} dir={theme.direction}>
+      <TabPanel key={0} value={path} path={"/profile"} dir={theme.direction}>
          <UserData
             userData={userData}
             redirectToReferralsTab={redirectToReferralsTab}
          />
       </TabPanel>,
-      <TabPanel key={1} value={value} index={1} dir={theme.direction}>
+      <TabPanel key={1} value={path} path={"/referrals"} dir={theme.direction}>
          <ReferralProfileTab userData={userData} />
       </TabPanel>,
-      <TabPanel key={2} value={value} index={2} dir={theme.direction}>
+      <TabPanel key={2} value={path} path={"/my-groups"} dir={theme.direction}>
          <JoinedGroups userData={userData} />
       </TabPanel>,
    ]
    const tabsArray = [
-      <Tab
-         key={0}
+      <LinkTab
          wrapped
-         fullWidth
+         href="/profile"
+         value="/profile"
          label={
             <Typography noWrap variant="h6">
                {native ? "Personal" : "Personal Information"}
             </Typography>
          }
       />,
-      <Tab
-         key={1}
+      <LinkTab
+         href="/referrals"
+         value="/referrals"
          wrapped
-         fullWidth
          label={<Typography variant="h6">Referrals</Typography>}
       />,
-      <Tab
-         key={2}
+      <LinkTab
          wrapped
-         fullWidth
+         href="/my-groups"
+         value="/my-groups"
          label={
             <Typography variant="h6">
                {native ? "Groups" : "Joined Groups"}
@@ -134,15 +147,20 @@ const ProfileNav = ({ userData }) => {
 
    if (adminGroups.length) {
       views.push(
-         <TabPanel key={3} value={value} index={3} dir={theme.direction}>
+         <TabPanel
+            key={3}
+            value={path}
+            path={"/admin-groups"}
+            dir={theme.direction}
+         >
             <AdminGroups userData={userData} adminGroups={adminGroups} />
          </TabPanel>
       )
       tabsArray.push(
-         <Tab
-            key={3}
+         <LinkTab
             wrapped
-            fullWidth
+            href="/admin-groups"
+            value="/admin-groups"
             label={
                <Typography variant="h6">
                   {native ? "Admin" : "Admin Groups"}
@@ -156,12 +174,10 @@ const ProfileNav = ({ userData }) => {
       <>
          <AppBar className={classes.bar} position="static" color="default">
             <Tabs
-               value={value}
-               onChange={handleChange}
+               value={path}
                indicatorColor="primary"
                textColor="primary"
                selectionFollowsFocus
-               centered
                sx={{ mb: 2 }}
                variant="scrollable"
                scrollButtons={false}
@@ -169,15 +185,9 @@ const ProfileNav = ({ userData }) => {
                {tabsArray}
             </Tabs>
          </AppBar>
-         <SwipeableViews
-            axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-            index={value}
-            onChangeIndex={handleChangeIndex}
-         >
-            {views}
-         </SwipeableViews>
+         {views}
       </>
    )
 }
 
-export default ProfileNav
+export default UserView

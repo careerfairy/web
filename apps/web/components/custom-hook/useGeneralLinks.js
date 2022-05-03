@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react"
 import { User as ProfileIcon } from "react-feather"
 import NextLivestreamsIcon from "@mui/icons-material/Contacts"
-import FollowGroupIcon from "@mui/icons-material/GroupAdd"
 import PortalIcon from "@mui/icons-material/DynamicFeed"
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import { useAuth } from "../../HOCs/AuthProvider"
 
 const initialMainLinks = [
    {
@@ -17,12 +16,6 @@ const initialMainLinks = [
       title: "NEXT LIVE STREAMS",
       basePath: "/next-livestreams",
       icon: NextLivestreamsIcon,
-   },
-   {
-      href: `/groups`,
-      title: "FOLLOW GROUPS",
-      basePath: "/groups",
-      icon: FollowGroupIcon,
    },
 ]
 const initialSecondaryLinks = [
@@ -50,24 +43,23 @@ const initialSecondaryLinks = [
 
 const landingLinks = [...initialSecondaryLinks]
 const useGeneralLinks = () => {
-   const firebase = useFirebaseService()
-
+   const { isLoggedOut } = useAuth()
    const [mainLinks] = useState(initialMainLinks)
    const [secondaryLinks, setSecondaryLinks] = useState(initialSecondaryLinks)
 
    useEffect(() => {
-      if (firebase.auth?.currentUser?.emailVerified) {
+      if (!isLoggedOut) {
          setSecondaryLinks([
-            ...initialSecondaryLinks,
             {
                href: `/profile`,
                title: "PROFILE",
                icon: ProfileIcon,
                basePath: "/profile",
             },
+            ...initialSecondaryLinks,
          ])
       }
-   }, [firebase.auth?.currentUser?.emailVerified])
+   }, [isLoggedOut])
 
    return { secondaryLinks, mainLinks, landingLinks }
 }

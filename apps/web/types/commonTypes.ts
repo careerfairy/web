@@ -8,4 +8,6 @@ export interface Identifiable {
    id: string
 }
 
-export type StylesProps = Record<string, SystemStyleObject<DefaultTheme>>
+export type StylesProps = {
+   [propName: string]: SystemStyleObject<DefaultTheme>
+}

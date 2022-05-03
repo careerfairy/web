@@ -51,7 +51,6 @@ const UserLayout: FC<Props> = ({ children }) => {
             <PersistentDrawer
                drawerTopLinks={mainLinks}
                drawerBottomLinks={secondaryLinks}
-               headerLinks={mainLinks}
             />
             <Box sx={{ p: { xs: 0.5, sm: 1, md: 2 }, width: "100%" }}>
                {children}

@@ -32,17 +32,23 @@ import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 const ReferralProfileTab = ({ userData }) => {
    const { enqueueSnackbar } = useSnackbar()
 
-   if (!userData.referralCode) {
+   if (!userData?.referralCode) {
       // This shouldn't happen, but if it does, we record it to later analyse
       Sentry.captureException(new Error("ReferralCode missing"), {
          extra: {
-            uid: userData.authId as string,
+            uid: userData?.authId as string,
          },
       })
-      return "Your referral information is being generated, if this message persists talk to us."
+      return (
+         <>
+            {
+               "Your referral information is being generated, if this message persists talk to us."
+            }
+         </>
+      )
    }
 
-   const referralLink = makeReferralUrl(userData.referralCode)
+   const referralLink = makeReferralUrl(userData?.referralCode)
 
    const copyReferralLinkToClipboard = () => {
       copyStringToClipboard(referralLink)

@@ -1,24 +1,21 @@
 import React, { useEffect } from "react"
-import Avatar from "@mui/material/Avatar"
 import Box from "@mui/material/Box"
-import Divider from "@mui/material/Divider"
 import Drawer from "@mui/material/Drawer"
-import Hidden from "@mui/material/Hidden"
 import List from "@mui/material/List"
-import Typography from "@mui/material/Typography"
 import { LogOut as LogoutIcon } from "react-feather"
 import { useRouter } from "next/router"
 import { useTheme } from "@mui/material/styles"
 import * as actions from "../../../store/actions"
 import { useDispatch, useSelector } from "react-redux"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import { stringAvatar } from "../../../util/CommonUtil"
 import NavElement from "./NavElement"
 import { StylesProps } from "../../../types/commonTypes"
 import RootState from "../../../store/reducers"
 import { useMediaQuery } from "@mui/material"
+import { MainLogo } from "../../logos"
+import UserAvatarAndDetails from "../../../layouts/UserLayout/UserAvatarAndDetails"
 
 const desktopProp = "md"
+
 const styles: StylesProps = {
    tempDrawer: {
       zIndex: (theme) => theme.zIndex.drawer + 1,
@@ -36,59 +33,65 @@ const styles: StylesProps = {
       width: (theme) => theme.drawerWidth.small,
       flexShrink: 0,
       zIndex: (theme) => theme.zIndex.drawer + 1,
-      transition: (theme) =>
-         theme.transitions.create(["width"], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-         }),
+      transition: (theme) => theme.transitions.create("width"),
       "& > .MuiDrawer-paper": {
+         transition: (theme) =>
+            `${theme.transitions.create("width")} !important`,
          boxSizing: "border-box",
          top: 64,
          height: "calc(100% - 64px)",
-         transition: "inherit",
       },
    },
-   avatar: {
-      padding: 1,
-      cursor: "pointer",
-      background: "white",
-      height: 100,
-      width: "100%",
-      boxShadow: 15,
-      "& img": {
-         objectFit: "contain",
-      },
-   },
+
    name: {
       marginTop: 1,
    },
    drawerText: {
       color: "white",
    },
+   logoWrapper: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      py: 2,
+   },
+   drawer: {
+      flexShrink: 0,
+      whiteSpace: "nowrap",
+      "& ::-webkit-scrollbar": {
+         width: "3px",
+         backgroundColor: "transparent",
+      },
+      "& ::-webkit-scrollbar-thumb": {
+         borderRadius: "10px",
+         WebkitBoxShadow: "inset 0 0 6px rgba(0,0,0,.3)",
+         backgroundColor: "secondary.light",
+      },
+   },
 }
 
 interface PersistentDrawerProps {
    drawerTopLinks: any[]
-   headerLinks: any[]
    drawerBottomLinks: any[]
 }
 
 const PersistentDrawer = ({
    drawerTopLinks,
-   headerLinks,
    drawerBottomLinks,
 }: PersistentDrawerProps) => {
-   const { userData } = useAuth()
    const dispatch = useDispatch()
    const theme = useTheme()
-   const isDesktop = useMediaQuery(theme.breakpoints.up(desktopProp))
+
+   const isDesktop = useMediaQuery(theme.breakpoints.up(desktopProp), {
+      noSsr: true,
+   })
 
    const { pathname } = useRouter()
    const drawerOpen = useSelector(
       (state: RootState) => state.generalLayout.layout.drawerOpen
    )
    useEffect(() => {
-      if (drawerOpen) {
+      if (drawerOpen && !isDesktop) {
          closeDrawer()
       }
    }, [pathname])
@@ -113,59 +116,20 @@ const PersistentDrawer = ({
    const content = (
       <Box height="100%" display="flex" flexDirection="column">
          <Box alignItems="center" display="flex" flexDirection="column" p={2}>
-            <Avatar
-               sx={styles.avatar}
-               {...stringAvatar(`${userData?.firstName} ${userData?.lastName}`)}
-               variant="rounded"
-            />
-            <Typography
-               sx={[styles.name, styles.drawerText]}
-               color="textPrimary"
-               variant="h5"
-            >
-               SUB NAME
-            </Typography>
-            <Typography
-               color="textSecondary"
-               variant="body2"
-               sx={styles.drawerText}
-            >
-               DESC
-            </Typography>
+            <UserAvatarAndDetails />
          </Box>
-         <Divider />
          <Box p={2}>
             <List>
                {drawerTopLinks.map((item) => (
-                  <NavElement
-                     href={item.href}
-                     key={item.title}
-                     title={item.title}
-                     icon={item.icon}
-                     basePath={item.basePath}
-                  />
+                  <NavElement key={item.title} {...item} />
                ))}
             </List>
          </Box>
          <Box flexGrow={1} />
          <Box p={2}>
             <List>
-               <Hidden lgUp>
-                  {headerLinks.map((item) => (
-                     <NavElement
-                        href={item.href}
-                        key={item.title}
-                        title={item.title}
-                     />
-                  ))}
-               </Hidden>
                {drawerBottomLinks.map((item) => (
-                  <NavElement
-                     href={item.href}
-                     key={item.title}
-                     title={item.title}
-                     icon={item.icon}
-                  />
+                  <NavElement key={item.title} {...item} />
                ))}
                <NavElement
                   href=""
@@ -184,6 +148,7 @@ const PersistentDrawer = ({
             <Drawer
                anchor="left"
                sx={[
+                  styles.drawer,
                   styles.persistentDrawer,
                   drawerOpen ? styles.drawerOpen : styles.drawerClosed,
                ]}
@@ -193,18 +158,19 @@ const PersistentDrawer = ({
                }}
                variant="persistent"
             >
-               DESKTOP
                {content}
             </Drawer>
          ) : (
             <Drawer
                anchor="left"
-               sx={styles.tempDrawer}
+               sx={[styles.drawer, styles.tempDrawer]}
                onClose={closeDrawer}
                open={drawerOpen}
                variant="temporary"
             >
-               MOBILE
+               <Box sx={styles.logoWrapper}>
+                  <MainLogo />
+               </Box>
                {content}
             </Drawer>
          )}

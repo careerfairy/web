@@ -1,13 +1,11 @@
 import React, { useRef, useState } from "react"
 import FilePickerContainer from "components/ssr/FilePickerContainer"
-import {
-   Add,
-   ArrowDropDown,
-   CheckCircleOutline,
-   DeleteForever,
-   GetApp,
-   Publish,
-} from "@mui/icons-material"
+import Add from "@mui/icons-material/Add"
+import ArrowDropDown from "@mui/icons-material/ArrowDropDown"
+import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline"
+import DeleteForever from "@mui/icons-material/DeleteForever"
+import GetApp from "@mui/icons-material/GetApp"
+import Publish from "@mui/icons-material/Publish"
 import {
    Button,
    ButtonGroup,

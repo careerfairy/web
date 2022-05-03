@@ -45,7 +45,7 @@ const JoinedGroups = ({ userData }) => {
             setJoinedGroups([])
          }
       })()
-   }, [userData.groupIds])
+   }, [userData?.groupIds])
 
    useEffect(() => {
       if (selectedGroup) {
