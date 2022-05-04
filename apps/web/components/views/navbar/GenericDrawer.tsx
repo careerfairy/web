@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from "react"
+import React, { FC, memo, useEffect } from "react"
 import Drawer from "@mui/material/Drawer"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "../../../store/actions"
@@ -36,7 +36,7 @@ const styles: StylesProps = {
    },
 }
 
-const GenericDrawer = memo(() => {
+const GenericDrawer: FC = ({ children }) => {
    const dispatch = useDispatch()
    const openMobile = useSelector(
       (state: RootState) => state.generalLayout.layout.drawerOpen
@@ -59,9 +59,9 @@ const GenericDrawer = memo(() => {
          open={openMobile}
          variant="temporary"
       >
-         <DrawerContent />
+         {children}
       </Drawer>
    )
-})
+}
 
 export default GenericDrawer

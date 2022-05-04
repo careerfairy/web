@@ -55,7 +55,7 @@ const GenericHeader = ({
          </Box>
          <Hidden mdDown>
             <NavLinks
-               links={mainLinks}
+               links={links.length ? links : mainLinks}
                navLinksActiveColor={
                   darkMode && !scrolledDown
                      ? theme.palette.common.white

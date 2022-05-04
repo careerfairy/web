@@ -21,4 +21,23 @@ const Page: FC<Props> = ({ sx, ...props }) => {
    )
 }
 
+export const PageContentWrapper: FC = ({ children }) => {
+   return (
+      <Box
+         sx={{
+            display: "flex",
+         }}
+         children={children}
+      />
+   )
+}
+export const PageChildrenWrapper: FC = ({ children }) => {
+   return (
+      <Box
+         sx={{ p: { xs: 0.5, sm: 1, md: 2 }, width: "100%" }}
+         children={children}
+      />
+   )
+}
+
 export default Page

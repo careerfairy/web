@@ -27,5 +27,6 @@ export const styles = {
    content: {
       ...basicStyles.content,
       overflowX: "hidden",
+      display: "flex",
    },
 }

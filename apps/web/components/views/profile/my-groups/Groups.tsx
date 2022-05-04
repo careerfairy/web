@@ -128,7 +128,7 @@ const Groups = () => {
    }, [value, userData?.groupIds, userData?.isAdmin])
 
    useEffect(() => {
-      handleSelectGroup(undefined, null)
+      resetInput()
    }, [value])
 
    useEffect(() => {
@@ -141,6 +141,9 @@ const Groups = () => {
       }
    }, [groups, selectedGroup])
 
+   const resetInput = () => {
+      handleSelectGroup(undefined, null)
+   }
    const handleSelectGroup = (event, value) => {
       setSelectedGroup(value)
    }
@@ -170,7 +173,6 @@ const Groups = () => {
             <Tabs
                value={value || "joined"}
                onChange={handleChange}
-               // variant="scrollable"
                scrollButtons
                allowScrollButtonsMobile
                aria-label="group tabs"

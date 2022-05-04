@@ -26,6 +26,7 @@ interface NavElementProps {
 const styles: StylesProps = {
    active: {
       backgroundColor: (theme) => alpha(theme.palette.secondary.main, 0.1),
+      color: "secondary.main",
       "& svg": {
          color: "secondary.main",
       },
@@ -48,12 +49,8 @@ const styles: StylesProps = {
       fontWeight: "bold",
       fontSize: "1rem",
       borderRadius: 5,
-      "&:hover": {
-         backgroundColor: (theme) => alpha(theme.palette.secondary.main, 0.1),
-         color: "secondary.main",
-         "& svg": {
-            color: "secondary.main",
-         },
+      "&:after": {
+         transition: (theme) => theme.transitions.create(["filter"]),
       },
    },
 }
@@ -74,7 +71,11 @@ const NavElement = ({
             href={onClick ? undefined : href}
             onClick={onClick}
             component={onClick ? "button" : Link}
-            sx={[styles.button, isActive && styles.active]}
+            sx={[
+               styles.button,
+               isActive && styles.active,
+               { "&:hover , &:focus": styles.active },
+            ]}
          >
             {(svgIcon || Icon) && (
                <ListItemIcon>

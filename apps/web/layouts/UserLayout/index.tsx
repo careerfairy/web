@@ -1,12 +1,15 @@
 import React, { FC, useEffect } from "react"
-import Box from "@mui/material/Box"
-import Page from "../../components/views/common/Page"
+import Page, {
+   PageChildrenWrapper,
+   PageContentWrapper,
+} from "../../components/views/common/Page"
 import GenericHeader from "../../components/views/header/GenericHeader"
-import PersistentDrawer from "../../components/views/navbar/PersistentDrawer"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import { CircularProgress, useMediaQuery } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
+import ScrollToTop from "../../components/views/common/ScrollToTop"
+import GeneralNavDrawer from "../../components/views/navbar/GeneralNavDrawer"
 
 type Props = {}
 const desktopProp = "md"
@@ -46,20 +49,12 @@ const UserLayout: FC<Props> = ({ children }) => {
 
    return (
       <Page>
-         <GenericHeader isDesktop={isDesktop} position={"sticky"} />
-         <Box
-            sx={{
-               flex: "1 1 auto",
-               height: "100%",
-               overflow: "auto",
-               display: "flex",
-            }}
-         >
-            <PersistentDrawer isDesktop={isDesktop} />
-            <Box sx={{ p: { xs: 0.5, sm: 1, md: 2 }, width: "100%" }}>
-               {children}
-            </Box>
-         </Box>
+         <GenericHeader position={"sticky"} />
+         <PageContentWrapper>
+            <GeneralNavDrawer isPersistent={isDesktop} />
+            <PageChildrenWrapper>{children}</PageChildrenWrapper>
+         </PageContentWrapper>
+         <ScrollToTop />
       </Page>
    )
 }

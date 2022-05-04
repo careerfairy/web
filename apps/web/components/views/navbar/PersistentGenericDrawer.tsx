@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { FC, useEffect } from "react"
 import Box from "@mui/material/Box"
 import Drawer from "@mui/material/Drawer"
 import { useRouter } from "next/router"
@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux"
 import { StylesProps } from "../../../types/commonTypes"
 import RootState from "../../../store/reducers"
 import { MainLogo } from "../../logos"
-import DrawerContent from "./DrawerContent"
 
 const styles: StylesProps = {
    tempDrawer: {
@@ -64,10 +63,13 @@ const styles: StylesProps = {
 }
 
 interface PersistentDrawerProps {
-   isDesktop: boolean
+   isPersistent: boolean
 }
 
-const PersistentDrawer = ({ isDesktop }: PersistentDrawerProps) => {
+const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
+   isPersistent,
+   children,
+}) => {
    const dispatch = useDispatch()
 
    const { pathname } = useRouter()
@@ -75,20 +77,20 @@ const PersistentDrawer = ({ isDesktop }: PersistentDrawerProps) => {
       (state: RootState) => state.generalLayout.layout.drawerOpen
    )
    useEffect(() => {
-      if (drawerOpen && !isDesktop) {
+      if (drawerOpen && !isPersistent) {
          closeDrawer()
       }
 
       return () => {
          closeDrawer()
       }
-   }, [pathname, isDesktop])
+   }, [pathname, isPersistent])
 
    useEffect(() => {
-      if (isDesktop) {
+      if (isPersistent) {
          openDrawer()
       }
-   }, [isDesktop])
+   }, [isPersistent])
 
    const closeDrawer = () => {
       dispatch(actions.closeNavDrawer())
@@ -97,7 +99,7 @@ const PersistentDrawer = ({ isDesktop }: PersistentDrawerProps) => {
       dispatch(actions.openNavDrawer())
    }
 
-   return isDesktop ? (
+   return isPersistent ? (
       <Drawer
          anchor="left"
          sx={[
@@ -111,7 +113,7 @@ const PersistentDrawer = ({ isDesktop }: PersistentDrawerProps) => {
          }}
          variant="persistent"
       >
-         <DrawerContent isDesktop={isDesktop} />
+         {children}
       </Drawer>
    ) : (
       <Drawer
@@ -124,9 +126,9 @@ const PersistentDrawer = ({ isDesktop }: PersistentDrawerProps) => {
          <Box sx={styles.logoWrapper}>
             <MainLogo />
          </Box>
-         <DrawerContent />
+         {children}
       </Drawer>
    )
 }
 
-export default PersistentDrawer
+export default PersistentGenericDrawer
