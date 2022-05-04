@@ -2,9 +2,9 @@ import React from "react"
 import { styles as landingLayoutStyles } from "../../materialUI/styles/layoutStyles/landingLayoutStyles"
 import { useTheme } from "@mui/material/styles"
 import TopBar from "./TopBar"
-import NavBar from "./NavBar"
 import FooterV2 from "../../components/views/footer/FooterV2"
 import { Box } from "@mui/material"
+import GenericDrawer from "../../components/views/navbar/GenericDrawer"
 
 const layoutStyles = landingLayoutStyles({})
 const styles = {
@@ -36,7 +36,7 @@ const UpcomingLayout = ({ children }) => {
    return (
       <Box sx={styles.root}>
          <TopBar />
-         <NavBar anchor="left" drawerWidth={drawerWidth} />
+         <GenericDrawer drawerWidth={drawerWidth} />
          <Box sx={styles.wrapper}>
             <Box sx={styles.contentContainer}>
                <Box sx={styles.content}>

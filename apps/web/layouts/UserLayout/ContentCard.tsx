@@ -13,9 +13,6 @@ const styles: StylesProps = {
       borderRadius: 0.8,
       p: 2,
       transition: (theme) => theme.transitions.create(["box-shadow"]),
-      "&:hover": {
-         boxShadow: 2,
-      },
    },
 }
 

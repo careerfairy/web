@@ -5,14 +5,12 @@ import { styles } from "../../materialUI/styles/layoutStyles/nextLivestreamsLayo
 import TopBar from "./TopBar"
 import useGeneralLinks from "../../components/custom-hook/useGeneralLinks"
 import FooterV2 from "../../components/views/footer/FooterV2"
-import { useTheme } from "@mui/material/styles"
 import { Box } from "@mui/material"
 
 const NextLivestreamsLayout = (props) => {
    const { children, currentGroup } = props
 
-   const { mainLinks, secondaryLinks } = useGeneralLinks()
-   const theme = useTheme()
+   const { mainLinks, secondaryLinks, eventLinks } = useGeneralLinks()
 
    const [isMobileNavOpen, setMobileNavOpen] = useState(false)
    const handleDrawerOpen = () => setMobileNavOpen(true)
@@ -28,9 +26,8 @@ const NextLivestreamsLayout = (props) => {
                onMobileNavOpen={handleDrawerOpen}
             />
             <NavBar
-               drawerTopLinks={mainLinks}
+               drawerTopLinks={eventLinks}
                handleDrawerToggle={handleDrawerToggle}
-               drawerWidth={theme.drawerWidth.medium}
                drawerBottomLinks={secondaryLinks}
                onMobileNavOpen={handleDrawerOpen}
                onMobileClose={handleDrawerClose}

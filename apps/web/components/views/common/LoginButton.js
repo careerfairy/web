@@ -1,6 +1,7 @@
 import React from "react"
 import Button from "@mui/material/Button"
-import Link from "materialUI/NextNavLink"
+import Link from "./Link"
+import { useRouter } from "next/router"
 
 const styles = {
    root: {
@@ -8,12 +9,18 @@ const styles = {
    },
 }
 const LoginButton = ({}) => {
+   const { asPath } = useRouter()
    return (
       <Button
          fullWidth
          sx={styles.root}
          component={Link}
-         href="/login"
+         href={{
+            pathname: `/login`,
+            query: {
+               absolutePath: asPath,
+            },
+         }}
          style={{ textDecoration: "none" }}
          color="primary"
          variant="contained"

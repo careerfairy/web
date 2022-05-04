@@ -5,7 +5,9 @@ import Box from "@mui/material/Box"
 import MenuIcon from "@mui/icons-material/Menu"
 import { MainLogo } from "components/logos"
 import { useTheme } from "@mui/material/styles"
-import useGeneralLinks from "components/custom-hook/useGeneralLinks"
+import useGeneralLinks, {
+   PageLinkProps,
+} from "components/custom-hook/useGeneralLinks"
 import * as actions from "store/actions"
 import { useDispatch } from "react-redux"
 import { useAuth } from "../../../HOCs/AuthProvider"
@@ -22,6 +24,7 @@ const GenericHeader = ({
    transparent = false,
    darkMode = false,
    links = [],
+   isDesktop,
 }: Props) => {
    const theme = useTheme()
    const { mainLinks } = useGeneralLinks()
@@ -38,14 +41,16 @@ const GenericHeader = ({
          transparent={transparent}
       >
          <Box display="flex" alignItems="center">
-            <IconButton
-               sx={{ mr: 1, color: darkMode && !scrolledDown && "white" }}
-               color="primary"
-               onClick={handleDrawerToggle}
-               size="large"
-            >
-               <MenuIcon />
-            </IconButton>
+            {!isDesktop && (
+               <IconButton
+                  sx={{ mr: 1, color: darkMode && !scrolledDown && "white" }}
+                  color="primary"
+                  onClick={handleDrawerToggle}
+                  size="large"
+               >
+                  <MenuIcon />
+               </IconButton>
+            )}
             <MainLogo white={darkMode && !scrolledDown} />
          </Box>
          <Hidden mdDown>
@@ -79,12 +84,13 @@ const GenericHeader = ({
 
 interface Props {
    className?: string
-   links?: any[]
+   links?: PageLinkProps[]
    onMobileNavOpen?: () => void
    darkMode?: boolean
    hideNavOnScroll?: boolean
    position?: "absolute" | "fixed" | "sticky" | "static"
    transparent?: boolean
+   isDesktop?: boolean
 }
 
 export default GenericHeader

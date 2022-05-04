@@ -1,22 +1,18 @@
-import React, { useEffect, useState, Fragment } from "react"
+import React, { Fragment, useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import {
-   useFirebaseService,
-   withFirebase,
-} from "context/firebase/FirebaseServiceContext"
-import {
+   Button,
    Card,
+   CardActions,
    CardContent,
    CardMedia,
-   Typography,
-   Button,
-   Grow,
-   IconButton,
    Grid,
-   CardActions,
+   IconButton,
    Menu,
    MenuItem,
+   Typography,
 } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
 import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal"
@@ -42,7 +38,12 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const CurrentGroup = ({ userData, group, isAdmin, groupId }) => {
+const CurrentGroup = ({
+   userData,
+   group,
+   isAdmin = false,
+   groupId = undefined,
+}) => {
    const { push } = useRouter()
    const firebase = useFirebaseService()
    const [open, setOpen] = useState(false)
@@ -179,9 +180,9 @@ const CurrentGroup = ({ userData, group, isAdmin, groupId }) => {
 
    return (
       <Fragment key={localGroup.id}>
-         <Grid item xs={12} sm={6} md={4} lg={4}>
+         <Grid item xs={12} sm={6} lg={4}>
             <Fade>
-               <Card style={{ position: "relative" }}>
+               <Card variant={"outlined"} style={{ position: "relative" }}>
                   {!localGroup.logoUrl ? (
                      <Skeleton
                         className={classes.media}

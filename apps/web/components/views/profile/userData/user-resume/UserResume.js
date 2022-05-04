@@ -22,14 +22,9 @@ import makeStyles from "@mui/styles/makeStyles"
 import * as actions from "store/actions"
 import { useDispatch } from "react-redux"
 import { withFirebase } from "context/firebase/FirebaseServiceContext"
+import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle"
 
 const useStyles = makeStyles((theme) => ({
-   title: {
-      color: theme.palette.text.secondary,
-      textTransform: "uppercase",
-      fontSize: "1.8rem",
-      marginBottom: 30,
-   },
    cvContainer: {
       textAlign: "center",
       padding: "40px 20px",
@@ -164,11 +159,7 @@ const UserResume = ({ firebase, userData, outsideProfile }) => {
 
    return (
       <>
-         {!outsideProfile && (
-            <Typography className={classes.title} variant="h4">
-               Your CV
-            </Typography>
-         )}
+         {!outsideProfile && <ContentCardTitle>Your CV</ContentCardTitle>}
          {userData && userData.userResume ? (
             <div className={classes.uploadedContainer}>
                <div className={classes.cvButton}>

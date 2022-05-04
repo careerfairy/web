@@ -5,8 +5,7 @@ import { useAuth } from "../../HOCs/AuthProvider"
 import { Divider, Tooltip, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
-import ArticleIcon from "@mui/icons-material/Article"
-
+import ResumeIcon from "@mui/icons-material/PictureAsPdf"
 const styles: StylesProps = {
    root: {
       width: "100%",
@@ -41,33 +40,35 @@ const UserAvatarAndDetails = () => {
          <Typography sx={styles.name} align="center" variant="h5">
             {userData?.firstName} {userData?.lastName}
          </Typography>
-         <Stack
-            direction="row"
-            divider={<Divider orientation="vertical" flexItem />}
-            spacing={2}
-            justifyContent="center"
-         >
-            {userData?.linkedinUrl && (
-               <a
-                  href={userData.linkedinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-               >
-                  <LinkedInIcon sx={styles.linkedinIcon} />
-               </a>
-            )}
-            {userData?.userResume && (
-               <a
-                  href={userData.userResume}
-                  target="_blank"
-                  rel="noopener noreferrer"
-               >
-                  <Tooltip arrow title="Download Resume" placement="top">
-                     <ArticleIcon color={"action"} />
-                  </Tooltip>
-               </a>
-            )}
-         </Stack>
+         {(userData?.linkedinUrl || userData?.userResume) && (
+            <Stack
+               direction="row"
+               divider={<Divider orientation="vertical" flexItem />}
+               spacing={2}
+               justifyContent="center"
+            >
+               {userData?.linkedinUrl && (
+                  <a
+                     href={userData.linkedinUrl}
+                     target="_blank"
+                     rel="noopener noreferrer"
+                  >
+                     <LinkedInIcon sx={styles.linkedinIcon} />
+                  </a>
+               )}
+               {userData?.userResume && (
+                  <a
+                     href={userData.userResume}
+                     target="_blank"
+                     rel="noopener noreferrer"
+                  >
+                     <Tooltip arrow title="Download Resume" placement="top">
+                        <ResumeIcon color={"secondary"} />
+                     </Tooltip>
+                  </a>
+               )}
+            </Stack>
+         )}
       </Stack>
    )
 }

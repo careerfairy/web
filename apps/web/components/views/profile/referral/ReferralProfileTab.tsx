@@ -10,7 +10,6 @@ import {
    TableHead,
    TableRow,
    TextField,
-   Typography,
 } from "@mui/material"
 import React, { useCallback } from "react"
 import ContentPasteIcon from "@mui/icons-material/ContentPaste"
@@ -28,6 +27,7 @@ import BadgeSimpleButton from "../BadgeSimpleButton"
 import BadgeProgress from "./BadgeProgress"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges"
 import ContentCard from "../../../../layouts/UserLayout/ContentCard"
+import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
 
 const ReferralProfileTab = ({ userData }) => {
    const { enqueueSnackbar } = useSnackbar()
@@ -62,9 +62,7 @@ const ReferralProfileTab = ({ userData }) => {
       <ContentCard>
          <Grid container spacing={2}>
             <Grid item xs={8}>
-               <Typography sx={{ color: "text.secondary" }} variant="h5">
-                  Refer your friends!
-               </Typography>
+               <ContentCardTitle>Refer your friends!</ContentCardTitle>
             </Grid>
             <Grid item xs={4} sx={{ textAlign: "right" }}>
                <BadgeSimpleButton

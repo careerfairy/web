@@ -1,5 +1,5 @@
 import React from "react"
-import UserView from "../components/views/profile/UserView"
+import UserView from "../layouts/UserLayout/UserView"
 import UserLayout from "../layouts/UserLayout"
 import SEO from "../components/util/SEO"
 

@@ -1,9 +1,9 @@
 import React from "react"
 import TopBar from "./TopBar"
-import NavBar from "./NavBar"
 import { styles } from "../../materialUI/styles/layoutStyles/generalLayoutStyles"
 import FooterV2 from "../../components/views/footer/FooterV2"
 import { Box } from "@mui/material"
+import GenericDrawer from "../../components/views/navbar/GenericDrawer"
 
 const drawerWidth = 300
 const GeneralLayout = ({
@@ -21,7 +21,7 @@ const GeneralLayout = ({
          })}
       >
          <TopBar hideNavOnScroll={hideNavOnScroll} />
-         <NavBar drawerWidth={drawerWidth} />
+         <GenericDrawer drawerWidth={drawerWidth} />
          <Box sx={styles.wrapper}>
             <Box sx={styles.contentContainer}>
                <Box sx={styles.content}>

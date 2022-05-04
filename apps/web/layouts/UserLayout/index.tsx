@@ -3,15 +3,22 @@ import Box from "@mui/material/Box"
 import Page from "../../components/views/common/Page"
 import GenericHeader from "../../components/views/header/GenericHeader"
 import PersistentDrawer from "../../components/views/navbar/PersistentDrawer"
-import useGeneralLinks from "../../components/custom-hook/useGeneralLinks"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
-import { CircularProgress } from "@mui/material"
+import { CircularProgress, useMediaQuery } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
 
 type Props = {}
+const desktopProp = "md"
+
 const UserLayout: FC<Props> = ({ children }) => {
-   const { secondaryLinks, mainLinks } = useGeneralLinks()
-   const { authenticatedUser, isLoggedOut } = useAuth()
+   const theme = useTheme()
+
+   const isDesktop = useMediaQuery(theme.breakpoints.up(desktopProp), {
+      noSsr: true,
+   })
+
+   const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { push, asPath } = useRouter()
    useEffect(() => {
       if (isLoggedOut) {
@@ -24,7 +31,7 @@ const UserLayout: FC<Props> = ({ children }) => {
       }
    }, [isLoggedOut])
 
-   if (!authenticatedUser.isLoaded || isLoggedOut) {
+   if (!authenticatedUser.isLoaded || isLoggedOut || !userData) {
       return (
          <Page
             sx={{
@@ -39,7 +46,7 @@ const UserLayout: FC<Props> = ({ children }) => {
 
    return (
       <Page>
-         <GenericHeader position={"sticky"} />
+         <GenericHeader isDesktop={isDesktop} position={"sticky"} />
          <Box
             sx={{
                flex: "1 1 auto",
@@ -48,10 +55,7 @@ const UserLayout: FC<Props> = ({ children }) => {
                display: "flex",
             }}
          >
-            <PersistentDrawer
-               drawerTopLinks={mainLinks}
-               drawerBottomLinks={secondaryLinks}
-            />
+            <PersistentDrawer isDesktop={isDesktop} />
             <Box sx={{ p: { xs: 0.5, sm: 1, md: 2 }, width: "100%" }}>
                {children}
             </Box>

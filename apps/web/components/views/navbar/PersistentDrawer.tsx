@@ -1,20 +1,13 @@
 import React, { useEffect } from "react"
 import Box from "@mui/material/Box"
 import Drawer from "@mui/material/Drawer"
-import List from "@mui/material/List"
-import { LogOut as LogoutIcon } from "react-feather"
 import { useRouter } from "next/router"
-import { useTheme } from "@mui/material/styles"
 import * as actions from "../../../store/actions"
 import { useDispatch, useSelector } from "react-redux"
-import NavElement from "./NavElement"
 import { StylesProps } from "../../../types/commonTypes"
 import RootState from "../../../store/reducers"
-import { useMediaQuery } from "@mui/material"
 import { MainLogo } from "../../logos"
-import UserAvatarAndDetails from "../../../layouts/UserLayout/UserAvatarAndDetails"
-
-const desktopProp = "md"
+import DrawerContent from "./DrawerContent"
 
 const styles: StylesProps = {
    tempDrawer: {
@@ -71,20 +64,11 @@ const styles: StylesProps = {
 }
 
 interface PersistentDrawerProps {
-   drawerTopLinks: any[]
-   drawerBottomLinks: any[]
+   isDesktop: boolean
 }
 
-const PersistentDrawer = ({
-   drawerTopLinks,
-   drawerBottomLinks,
-}: PersistentDrawerProps) => {
+const PersistentDrawer = ({ isDesktop }: PersistentDrawerProps) => {
    const dispatch = useDispatch()
-   const theme = useTheme()
-
-   const isDesktop = useMediaQuery(theme.breakpoints.up(desktopProp), {
-      noSsr: true,
-   })
 
    const { pathname } = useRouter()
    const drawerOpen = useSelector(
@@ -94,7 +78,11 @@ const PersistentDrawer = ({
       if (drawerOpen && !isDesktop) {
          closeDrawer()
       }
-   }, [pathname])
+
+      return () => {
+         closeDrawer()
+      }
+   }, [pathname, isDesktop])
 
    useEffect(() => {
       if (isDesktop) {
@@ -109,72 +97,35 @@ const PersistentDrawer = ({
       dispatch(actions.openNavDrawer())
    }
 
-   const signOut = () => {
-      dispatch(actions.signOut())
-   }
-
-   const content = (
-      <Box height="100%" display="flex" flexDirection="column">
-         <Box alignItems="center" display="flex" flexDirection="column" p={2}>
-            <UserAvatarAndDetails />
+   return isDesktop ? (
+      <Drawer
+         anchor="left"
+         sx={[
+            styles.drawer,
+            styles.persistentDrawer,
+            drawerOpen ? styles.drawerOpen : styles.drawerClosed,
+         ]}
+         open
+         PaperProps={{
+            sx: [drawerOpen ? styles.drawerOpen : styles.drawerClosed],
+         }}
+         variant="persistent"
+      >
+         <DrawerContent isDesktop={isDesktop} />
+      </Drawer>
+   ) : (
+      <Drawer
+         anchor="left"
+         sx={[styles.drawer, styles.tempDrawer]}
+         onClose={closeDrawer}
+         open={drawerOpen}
+         variant="temporary"
+      >
+         <Box sx={styles.logoWrapper}>
+            <MainLogo />
          </Box>
-         <Box p={2}>
-            <List>
-               {drawerTopLinks.map((item) => (
-                  <NavElement key={item.title} {...item} />
-               ))}
-            </List>
-         </Box>
-         <Box flexGrow={1} />
-         <Box p={2}>
-            <List>
-               {drawerBottomLinks.map((item) => (
-                  <NavElement key={item.title} {...item} />
-               ))}
-               <NavElement
-                  href=""
-                  onClick={signOut}
-                  icon={LogoutIcon}
-                  title="LOGOUT"
-               />
-            </List>
-         </Box>
-      </Box>
-   )
-
-   return (
-      <>
-         {isDesktop ? (
-            <Drawer
-               anchor="left"
-               sx={[
-                  styles.drawer,
-                  styles.persistentDrawer,
-                  drawerOpen ? styles.drawerOpen : styles.drawerClosed,
-               ]}
-               open
-               PaperProps={{
-                  sx: [drawerOpen ? styles.drawerOpen : styles.drawerClosed],
-               }}
-               variant="persistent"
-            >
-               {content}
-            </Drawer>
-         ) : (
-            <Drawer
-               anchor="left"
-               sx={[styles.drawer, styles.tempDrawer]}
-               onClose={closeDrawer}
-               open={drawerOpen}
-               variant="temporary"
-            >
-               <Box sx={styles.logoWrapper}>
-                  <MainLogo />
-               </Box>
-               {content}
-            </Drawer>
-         )}
-      </>
+         <DrawerContent />
+      </Drawer>
    )
 }
 
