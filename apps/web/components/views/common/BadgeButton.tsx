@@ -1,6 +1,6 @@
 import { Button, Tooltip } from "@mui/material"
 import React, { memo } from "react"
-import { Badge } from "@careerfairy/shared-lib/dist/badges"
+import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
 import BadgeIcon from "../common/BadgeIcon"
 import isEqual from "react-fast-compare"
 
@@ -14,9 +14,9 @@ const styles = {
 }
 
 const defaultActiveTooltip = (badge: Badge) =>
-   `You've been granted the ${badge.name} Badge! (${badge.achievementDescription}) Congrats!`
+   `You've been granted the ${badge.name} Badge! (${badge.requirements[0].description}) Congrats!`
 const defaultInactiveTooltip = (badge: Badge) =>
-   `You need to ${badge.achievementDescription} to activate this badge.`
+   `You need to ${badge.requirements[0].description} to activate this badge.`
 
 const BadgeButton = ({
    badge,

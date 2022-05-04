@@ -15,6 +15,26 @@ class FirebaseUserRepository implements IUserRepository {
          interestsIds: Array.from(new Set(interestIds)),
       })
    }
+
+   /*
+   |--------------------------------------------------------------------------
+   | Saved Recruiters
+   |--------------------------------------------------------------------------
+   */
+   getSavedRecruiters(userEmail: string): Promise<string[]> {
+      let userRef = this.firestore.collection("userData").doc(userEmail)
+
+      return userRef.get().then((userDoc) => {
+         if (!userDoc.exists) {
+            return []
+         }
+
+         return userDoc.data().savedRecruiters
+      })
+   }
+
+   // addSavedRecruiter
+   // deleteSavedRecruiter
 }
 
 // Singleton

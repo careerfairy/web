@@ -138,7 +138,7 @@ const User = ({ user, style, inTalentPool }) => {
                            title={
                               currentBadge.name +
                               " Badge - " +
-                              currentBadge.achievementDescription
+                              currentBadge.requirements[0].description
                            }
                         >
                            <SmallAvatar

@@ -100,7 +100,7 @@ const ProfileNav = ({ userData }) => {
          <ReferralProfileTab userData={userData} />
       </TabPanel>,
       <TabPanel key={2} value={value} index={2} dir={theme.direction}>
-         <MyRecruitersTab userData={userData} />
+         <MyRecruitersTab />
       </TabPanel>,
       <TabPanel key={3} value={value} index={3} dir={theme.direction}>
          <JoinedGroups userData={userData} />

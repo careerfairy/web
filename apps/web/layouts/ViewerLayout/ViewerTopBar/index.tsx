@@ -36,10 +36,7 @@ import JoinTalentPoolButton from "./buttons/JoinTalentPoolButton"
 import { localStorageAudienceDrawerKey } from "constants/localStorageKeys"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import BadgeButton from "../../../components/views/common/BadgeButton"
-import {
-   getUserBadges,
-   Badge as BadgeType,
-} from "@careerfairy/shared-lib/dist/badges"
+import { Badge as BadgeType } from "@careerfairy/shared-lib/dist/badges/badges"
 
 const useStyles = makeStyles((theme) => ({
    toolbar: {
@@ -351,7 +348,7 @@ ViewerTopBar.propTypes = {
 }
 
 const UserBadge = () => {
-   const { userData } = useAuth()
+   const { userPresenter } = useAuth()
 
    const tooltipText = useCallback(
       (badge: BadgeType) =>
@@ -359,9 +356,9 @@ const UserBadge = () => {
       []
    )
 
-   if (!userData) return null
+   if (!userPresenter) return null
 
-   const networkerBadge = getUserBadges(userData.badges)?.networkerBadge()
+   const networkerBadge = userPresenter.badges?.networkerBadge()
 
    if (!networkerBadge) return null
 

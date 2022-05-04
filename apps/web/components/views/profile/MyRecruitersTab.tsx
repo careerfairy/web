@@ -1,5 +1,6 @@
 import { styles } from "./profileStyles"
 import {
+   CardHeader,
    Grid,
    ListItem,
    ListItemIcon,
@@ -13,10 +14,18 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import Image from "next/image"
 import List from "@mui/material/List"
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked"
-import { Badge } from "@careerfairy/shared-lib/dist/badges"
+import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import CheckIcon from "@mui/icons-material/Check"
+import Link from "../common/Link"
+import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
+import Card from "@mui/material/Card"
+import IconButton from "@mui/material/IconButton"
+import ColorizedAvatar from "../common/ColorizedAvatar"
+import LinkedInIcon from "@mui/icons-material/LinkedIn"
+import DeleteIcon from "@mui/icons-material/Delete"
 
-const MyRecruitersTab = ({ userData }) => {
+const MyRecruitersTab = () => {
    const { userPresenter } = useAuth()
 
    return (
@@ -30,18 +39,129 @@ const MyRecruitersTab = ({ userData }) => {
                </Grid>
             </Grid>
 
-            <p>
-               During a Livestream event you can save your favourite recruiters
-               and they will appear here.
-            </p>
+            <Box mb={3}>
+               <p>
+                  During a Livestream event you can save your favourite
+                  recruiters and they will appear here.
+               </p>
+            </Box>
 
-            {userPresenter.canSaveRecruiters() && <p>show</p>}
+            {userPresenter.canSaveRecruiters() && <RecruiterList />}
 
             {!userPresenter.canSaveRecruiters() && (
                <NoAccess userPresenter={userPresenter} />
             )}
          </Box>
       </Container>
+   )
+}
+
+const data = [
+   {
+      id: "sdfsdf",
+      livestreamId: "livestream-id-1",
+      userId: "user-id-1",
+      savedAt: new Date(),
+      livestreamDetails: {
+         title: "Livestream 1",
+         companyName: "Facebook",
+         description: "Livestream 1 description",
+         start: new Date(),
+         location: "Livestream 1 location",
+         imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2F043996e8-e633-4351-9e04-5a4714ddf3ca_091386.jpg?alt=media",
+      },
+      streamerDetails: {
+         profilePic: null,
+         linkedinUrl: "https://www.linkedin.com/in/james-bond-1/",
+         firstName: "Carlos",
+         lastName: "Florencio",
+         occupation: "Dev",
+      },
+   },
+   {
+      id: "sdfsdf",
+      livestreamId: "livestream-id-1",
+      userId: "user-id-1",
+      savedAt: new Date(),
+      livestreamDetails: {
+         title: "Livestream 1",
+         companyName: "Facebook",
+         description: "Livestream 1 description",
+         start: new Date(),
+         location: "Livestream 1 location",
+         imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2F043996e8-e633-4351-9e04-5a4714ddf3ca_091386.jpg?alt=media",
+      },
+      streamerDetails: {
+         profilePic: null,
+         linkedinUrl: "https://www.linkedin.com/in/james-bond-1/",
+         firstName: "Carlos",
+         lastName: "Florencio",
+         occupation: "Dev",
+      },
+   },
+   {
+      id: "sdfsdf",
+      livestreamId: "livestream-id-1",
+      userId: "user-id-1",
+      savedAt: new Date(),
+      livestreamDetails: {
+         title: "Livestream 1",
+         companyName: "Facebook",
+         description: "Livestream 1 description",
+         start: new Date(),
+         location: "Livestream 1 location",
+         imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2F043996e8-e633-4351-9e04-5a4714ddf3ca_091386.jpg?alt=media",
+      },
+      streamerDetails: {
+         profilePic: null,
+         linkedinUrl: "https://www.linkedin.com/in/james-bond-1/",
+         firstName: "Carlos",
+         lastName: "Florencio",
+         occupation: "Dev",
+      },
+   },
+]
+
+const RecruiterList = () => {
+   return (
+      <Box>
+         {data.map((recruiter, i) => (
+            <Box mb={2} key={i}>
+               <RecruiterCard recruiter={recruiter} />
+            </Box>
+         ))}
+      </Box>
+   )
+}
+
+const RecruiterCard = ({ recruiter }: { recruiter: SavedRecruiter }) => {
+   return (
+      <Card>
+         <CardHeader
+            avatar={
+               <ColorizedAvatar
+                  firstName={recruiter.streamerDetails.firstName}
+                  lastName={recruiter.streamerDetails.lastName}
+                  imageUrl={recruiter.streamerDetails.profilePic}
+               />
+            }
+            action={
+               <Box>
+                  <IconButton aria-label="settings">
+                     <LinkedInIcon style={{ color: "#0E76A8" }} />
+                  </IconButton>
+                  <IconButton aria-label="settings">
+                     <DeleteIcon />
+                  </IconButton>
+               </Box>
+            }
+            title={`${recruiter.streamerDetails.firstName} ${recruiter.streamerDetails.lastName}`}
+            subheader={`${recruiter.streamerDetails.occupation} - ${recruiter.livestreamDetails.companyName}`}
+         />
+      </Card>
    )
 }
 
@@ -65,6 +185,7 @@ const NoAccess = ({ userPresenter }: { userPresenter: UserPresenter }) => {
                      src="/illustrations/undraw_access_denied_re_awnf.svg"
                      width="600"
                      height="200"
+                     alt="Access denied illustration"
                   />
                </Box>
 
@@ -73,8 +194,8 @@ const NoAccess = ({ userPresenter }: { userPresenter: UserPresenter }) => {
                   variant="h6"
                >
                   You need to unlock the{" "}
-                  <strong>{requiredBadge.name} Badge</strong> to access this
-                  feature.
+                  <Link href="#">{requiredBadge.name} Badge</Link> to access
+                  this feature.
                </Typography>
                <Typography
                   sx={{ color: "text.secondary", textAlign: "center" }}
@@ -87,15 +208,21 @@ const NoAccess = ({ userPresenter }: { userPresenter: UserPresenter }) => {
          <Grid container alignItems="center" justifyContent="center">
             <Grid item>
                <List>
-                  <ListItem>
-                     <ListItemIcon sx={{ minWidth: "30px" }}>
-                        <RadioButtonUncheckedIcon />
-                     </ListItemIcon>
-                     <ListItemText
-                        primary={requiredBadge.achievementDescription}
-                        sx={{ color: "text.secondary" }}
-                     />
-                  </ListItem>
+                  {requiredBadge.requirements.map((r, i) => (
+                     <ListItem key={i}>
+                        <ListItemIcon sx={{ minWidth: "30px" }}>
+                           {r.isComplete(userPresenter.model) ? (
+                              <CheckIcon color="success" />
+                           ) : (
+                              <RadioButtonUncheckedIcon />
+                           )}
+                        </ListItemIcon>
+                        <ListItemText
+                           primary={r.description}
+                           sx={{ color: "text.secondary" }}
+                        />
+                     </ListItem>
+                  ))}
                </List>
             </Grid>
          </Grid>

@@ -1,6 +1,4 @@
-import { NetworkerAdvancedBadge, NetworkerBadge } from "./NetworkBadges"
 import { UserData } from "../users"
-import { ResearchBadge } from "./ResearchBadges"
 
 /**
  * Badges are a linked list to allow multiple levels per badge type
@@ -15,28 +13,58 @@ import { ResearchBadge } from "./ResearchBadges"
  * We store the current badge level of each type in the array
  * from those we can navigate to the prev/next levels
  */
-export interface Badge {
-   key: string
-   name: string
-   level: number // 1, 2, 3, etc
-   achievementDescription: string
-   rewardsDescription: string[]
-   progress: (userData: UserData) => number // 0 to 100
-   next?: Badge
-   prev?: Badge
+export class Badge {
+   public next?: Badge
+   public prev?: Badge
+
+   constructor(
+      public readonly key: string,
+      public readonly name: string,
+      public readonly level: number, // 1, 2, 3, etc
+      public readonly requirements: Requirement[],
+      public readonly rewardsDescription: string[]
+   ) {}
+
+   /**
+    * Total average progress of all requirements
+    */
+   progress(userData: UserData): number {
+      const sum = this.requirements.reduce(
+         (acc, cur) => acc + cur.progress(userData),
+         0
+      )
+      return Math.round(sum / this.requirements.length)
+   }
+
+   /**
+    * Check if the badge has all requirements met
+    * The previous badge must be complete too
+    *
+    * @param userData
+    */
+   isComplete(userData: UserData): boolean {
+      const prevBadgeComplete = this.prev
+         ? this.prev.isComplete(userData)
+         : true
+
+      if (!prevBadgeComplete) {
+         return false
+      }
+
+      return this.requirements.every((r) => r.isComplete(userData))
+   }
+
+   setNextBadge(badge: Badge) {
+      this.next = badge
+      badge.prev = this
+   }
 }
 
-/**
- * All active Badges
- * These keys are stored in the userData.badges[] field
- */
-export const Badges: Record<string, Badge> = {
-   [NetworkerBadge.key]: NetworkerBadge,
-   [NetworkerAdvancedBadge.key]: NetworkerAdvancedBadge,
-   [ResearchBadge.key]: ResearchBadge,
+export interface Requirement {
+   description: string
+   isComplete: (userData: UserData) => boolean
+   progress: (userData: UserData) => number
 }
-
-export type ExistingBadgesKeys = keyof typeof Badges
 
 /**
  * Calculate the % progress of a field considering a target value
@@ -47,8 +75,16 @@ export type ExistingBadgesKeys = keyof typeof Badges
 export const calculateProgressForNumericField = (
    fieldValue: number | undefined | null,
    targetNumber: number
-) => {
-   if (!fieldValue) return 0
-   if (fieldValue >= targetNumber) return 100
-   return Math.round((fieldValue / targetNumber) * 100)
+): number => {
+   let res = 0
+
+   if (fieldValue) {
+      if (fieldValue >= targetNumber) {
+         res = 100
+      } else {
+         res = Math.round((fieldValue / targetNumber) * 100)
+      }
+   }
+
+   return res
 }

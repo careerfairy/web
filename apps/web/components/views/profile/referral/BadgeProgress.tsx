@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box"
 import { LinearProgress, Typography } from "@mui/material"
 import Grid from "@mui/material/Grid"
-import { Badge } from "@careerfairy/shared-lib/dist/badges"
+import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
 import BadgeIcon from "../../common/BadgeIcon"
 import { getUserBadges } from "@careerfairy/shared-lib/dist/users/UserBadges"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
@@ -37,7 +37,7 @@ const BadgeProgress = ({ userData }) => {
                Earn your first badge: &nbsp;
                <BadgeIcon badgeKey={nextBadge.key} /> &nbsp; {nextBadge.name}
             </Typography>
-            <p>Objective: {nextBadge.achievementDescription}</p>
+            <p>Objective: {nextBadge.requirements[0].description}</p>
             <p>
                {nextBadge.rewardsDescription.length === 1
                   ? "Reward"

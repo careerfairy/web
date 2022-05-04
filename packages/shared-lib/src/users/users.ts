@@ -24,3 +24,25 @@ export interface UserData extends Identifiable {
    badges?: string[]
    isAdmin?: boolean
 }
+
+export interface SavedRecruiter extends Identifiable {
+   livestreamId: string
+   userId: string
+   savedAt: Date
+
+   livestreamDetails: {
+      title: string
+      companyName: string
+      description: string
+      start: Date
+      imageUrl: string
+   }
+
+   streamerDetails: {
+      profilePic: string
+      linkedinUrl: string
+      firstName: string
+      lastName: string
+      occupation: string
+   }
+}

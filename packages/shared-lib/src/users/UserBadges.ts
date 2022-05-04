@@ -1,4 +1,17 @@
-import { Badge, Badges, ExistingBadgesKeys } from "../badges"
+import { NetworkerBadge } from "../badges/NetworkBadges"
+import { ResearchBadge } from "../badges/ResearchBadges"
+import { Badge } from "../badges/badges"
+
+/**
+ * All active Badges
+ * These keys are stored in the userData.badges[] field
+ */
+export const Badges: Record<string, Badge> = {
+   [NetworkerBadge.key]: NetworkerBadge,
+   [ResearchBadge.key]: ResearchBadge,
+}
+
+export type ExistingBadgesKeys = keyof typeof Badges
 
 export class UserBadges {
    constructor(public readonly badges: Record<ExistingBadgesKeys, Badge>) {}

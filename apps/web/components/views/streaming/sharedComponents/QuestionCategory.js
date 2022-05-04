@@ -47,10 +47,8 @@ import { compose } from "redux"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import useStreamRef from "../../../custom-hook/useStreamRef"
 import { v4 as uuidv4 } from "uuid"
-import {
-   getUserBadges,
-   NetworkerBadge,
-} from "@careerfairy/shared-lib/dist/badges"
+import { getUserBadges } from "@careerfairy/shared-lib/dist/users/UserBadges"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 
 const useStyles = makeStyles((theme) => ({
    view: {
