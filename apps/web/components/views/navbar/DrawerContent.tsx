@@ -1,6 +1,5 @@
 import React from "react"
 import Box from "@mui/material/Box"
-import UserAvatarAndDetails from "../../../layouts/UserLayout/UserAvatarAndDetails"
 import List from "@mui/material/List"
 import NavElement from "./NavElement"
 import { LogOut as LogoutIcon } from "react-feather"
@@ -13,6 +12,7 @@ import NavPrompt from "../common/NavPrompt"
 import Stack from "@mui/material/Stack"
 import { StylesProps } from "../../../types/commonTypes"
 import { Divider, ListItem } from "@mui/material"
+import UserAvatarAndDetails from "../common/UserAvatarAndDetails"
 
 const styles: StylesProps = {
    root: {
@@ -32,17 +32,7 @@ const DrawerContent = () => {
 
    return (
       <Stack divider={<Divider flexItem />} sx={styles.root} spacing={1}>
-         {!isLoggedOut && (
-            <>
-               <UserAvatarAndDetails />
-               <Divider flexItem />
-               <List>
-                  {authenticatedUserTopLinks.map((item) => (
-                     <NavElement key={item.title} {...item} />
-                  ))}
-               </List>
-            </>
-         )}
+         {!isLoggedOut && <UserAvatarAndDetails />}
          <Stack spacing={1}>
             <List>
                {isLoggedOut && (
@@ -55,6 +45,16 @@ const DrawerContent = () => {
                ))}
             </List>
          </Stack>
+         {!isLoggedOut && (
+            <>
+               <List>
+                  {authenticatedUserTopLinks.map((item) => (
+                     <NavElement key={item.title} {...item} />
+                  ))}
+               </List>
+            </>
+         )}
+
          {isLoggedOut && <NavPrompt />}
          <Box sx={{ mt: "auto !important" }}>
             <List>

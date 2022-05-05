@@ -1,19 +1,31 @@
 import React, { FC } from "react"
 import Box from "@mui/material/Box"
 import { SxProps } from "@mui/material"
-import { Theme } from "@mui/material/styles"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
+
 const styles = {
    root: {
       minHeight: "100vh",
       display: "flex",
       flexDirection: "column",
-      bgcolor: "white",
       position: "relative",
    },
+   contentWrapper: {
+      display: "flex",
+      flex: 1,
+   },
+   childrenWrapper: {
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      flex: 1,
+      flexDirection: "column",
+   },
+   childrenWrapperPadded: { p: { xs: 0.5, sm: 1, md: 2 } },
 }
 interface Props {
    children: React.ReactNode
-   sx?: SxProps<Theme>
+   sx?: SxProps<DefaultTheme>
 }
 const Page: FC<Props> = ({ sx, ...props }) => {
    return (
@@ -22,19 +34,25 @@ const Page: FC<Props> = ({ sx, ...props }) => {
 }
 
 export const PageContentWrapper: FC = ({ children }) => {
-   return (
-      <Box
-         sx={{
-            display: "flex",
-         }}
-         children={children}
-      />
-   )
+   return <Box sx={[styles.contentWrapper]} children={children} />
 }
-export const PageChildrenWrapper: FC = ({ children }) => {
+
+interface PageChildrenProps {
+   sx?: SxProps<DefaultTheme>
+   padding?: boolean
+}
+export const PageChildrenWrapper: FC<PageChildrenProps> = ({
+   children,
+   padding,
+   sx,
+}) => {
    return (
       <Box
-         sx={{ p: { xs: 0.5, sm: 1, md: 2 }, width: "100%" }}
+         sx={[
+            styles.childrenWrapper,
+            padding && styles.childrenWrapperPadded,
+            ...(Array.isArray(sx) ? sx : [sx]),
+         ]}
          children={children}
       />
    )

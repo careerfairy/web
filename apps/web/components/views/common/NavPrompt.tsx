@@ -1,10 +1,11 @@
 import { CardContent, Typography } from "@mui/material"
 import CardMedia from "@mui/material/CardMedia"
-import { searchImage, signInImage } from "../../../constants/images"
+import { signInImage } from "../../../constants/images"
 import React from "react"
 import Box from "@mui/material/Box"
 import Link from "./Link"
 import { useRouter } from "next/router"
+import { LinkProps } from "next/link"
 
 const styles = {
    media: {
@@ -18,43 +19,67 @@ const styles = {
       whiteSpace: "pre-wrap",
    },
    root: {
-      cursor: "pointer",
       display: "flex",
       flexDirection: "column",
+   },
+   title: {
+      color: "text.primary",
+      whiteSpace: "normal",
    },
 }
 
 interface NavPromptProps {
    imageSrc?: string
+   noLink?: boolean
+   title?: string
+   subtitle?: string
+   href?: LinkProps["href"]
 }
 
-const NavPrompt = ({ imageSrc = signInImage }: NavPromptProps) => {
+const NavPrompt = ({
+   imageSrc = signInImage,
+   subtitle = "click here to register",
+   title = "Don't have an account?",
+   noLink,
+   href,
+}: NavPromptProps) => {
    const { asPath } = useRouter()
 
    return (
       <Box
          noLinkStyle
-         component={Link}
-         href={{
-            pathname: `/signup`,
-            query: {
-               absolutePath: asPath,
-            },
-         }}
+         component={!noLink && Link}
+         href={
+            noLink
+               ? undefined
+               : href || {
+                    pathname: `/signup`,
+                    query: {
+                       absolutePath: asPath,
+                    },
+                 }
+         }
          sx={styles.root}
       >
-         <Typography align={"center"} variant={"h6"} gutterBottom>
-            Don't have an account?
-         </Typography>
-         <Typography
-            sx={styles.subheader}
-            variant={"body1"}
-            align={"center"}
-            color="text.secondary"
-            gutterBottom
-         >
-            click here to register
-         </Typography>
+         <Box>
+            <Typography
+               sx={styles.title}
+               align={"center"}
+               variant={"h5"}
+               gutterBottom
+            >
+               {title}
+            </Typography>
+            <Typography
+               sx={styles.subheader}
+               variant={"body1"}
+               align={"center"}
+               color="text.secondary"
+               gutterBottom
+            >
+               {subtitle}
+            </Typography>
+         </Box>
          <CardContent>
             <CardMedia sx={styles.media}>
                <img alt="Find Groups" src={imageSrc} />

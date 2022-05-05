@@ -21,6 +21,7 @@ import LoginButtonComponent from "components/views/common/LoginButton"
 import { StylesProps } from "../../../types/commonTypes"
 import { PageLinkProps } from "../../../components/custom-hook/useGeneralLinks"
 import Stack from "@mui/material/Stack"
+import { registerIllustrationSvg } from "../../../constants/images"
 
 const styles: StylesProps = {
    root: {
@@ -92,6 +93,7 @@ const FeedDrawer = memo(
       } = useRouter()
       const { userData, isLoggedOut } = useAuth()
       const [groups, setGroups] = useState(null)
+      console.log("-> groups", groups)
       const dispatch = useDispatch()
       const signOut = () => dispatch(actions.signOut())
       const [followingGroups, loading] = useFollowingGroups()
@@ -132,16 +134,27 @@ const FeedDrawer = memo(
                   <CircularProgress style={{ margin: "auto" }} />
                ) : (
                   <List>
-                     {groups?.map(({ universityName, groupId, logoUrl }) => (
-                        <GroupNavLink
-                           key={groupId}
-                           groupId={groupId}
-                           onClick={onMobileClose}
-                           groupIdInQuery={groupIdInQuery as string}
-                           alt={universityName}
-                           src={getResizedUrl(logoUrl, "xs")}
-                        />
-                     ))}
+                     {groups?.length ? (
+                        groups?.map(({ universityName, groupId, logoUrl }) => (
+                           <GroupNavLink
+                              key={groupId}
+                              groupId={groupId}
+                              onClick={onMobileClose}
+                              groupIdInQuery={groupIdInQuery as string}
+                              alt={universityName}
+                              src={getResizedUrl(logoUrl, "xs")}
+                           />
+                        ))
+                     ) : (
+                        <ListItem>
+                           <NavPrompt
+                              title={"Start registering"}
+                              subtitle={"And track your events here"}
+                              imageSrc={registerIllustrationSvg}
+                              noLink
+                           />
+                        </ListItem>
+                     )}
                   </List>
                )}
             </Box>

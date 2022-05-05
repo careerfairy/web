@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux"
 import { StylesProps } from "../../../types/commonTypes"
 import RootState from "../../../store/reducers"
 import { MainLogo } from "../../logos"
+import { SxProps } from "@mui/material"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 
 const styles: StylesProps = {
    tempDrawer: {
@@ -28,7 +30,11 @@ const styles: StylesProps = {
       transition: (theme) => theme.transitions.create("width"),
       "& > .MuiDrawer-paper": {
          transition: (theme) =>
-            `${theme.transitions.create("width")} !important`,
+            `${theme.transitions.create([
+               "width",
+               "top",
+               "height",
+            ])} !important`,
          boxSizing: "border-box",
          top: 64,
          height: "calc(100% - 64px)",
@@ -64,11 +70,13 @@ const styles: StylesProps = {
 
 interface PersistentDrawerProps {
    isPersistent: boolean
+   sx?: SxProps<DefaultTheme>
 }
 
 const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
    isPersistent,
    children,
+   sx,
 }) => {
    const dispatch = useDispatch()
 
@@ -106,6 +114,7 @@ const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
             styles.drawer,
             styles.persistentDrawer,
             drawerOpen ? styles.drawerOpen : styles.drawerClosed,
+            ...(Array.isArray(sx) ? sx : [sx]),
          ]}
          open
          PaperProps={{
@@ -118,7 +127,11 @@ const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
    ) : (
       <Drawer
          anchor="left"
-         sx={[styles.drawer, styles.tempDrawer]}
+         sx={[
+            styles.drawer,
+            styles.tempDrawer,
+            ...(Array.isArray(sx) ? sx : [sx]),
+         ]}
          onClose={closeDrawer}
          open={drawerOpen}
          variant="temporary"

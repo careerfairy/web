@@ -30,6 +30,9 @@ const styles: StylesProps = {
       "& svg": {
          color: "secondary.main",
       },
+   },
+   hovered: {
+      backgroundColor: (theme) => alpha(theme.palette.secondary.main, 0.2),
       "&:after": {
          content: '""',
          width: "100%",
@@ -74,7 +77,7 @@ const NavElement = ({
             sx={[
                styles.button,
                isActive && styles.active,
-               { "&:hover , &:focus": styles.active },
+               { "&:hover , &:focus": { ...styles.active, ...styles.hovered } },
             ]}
          >
             {(svgIcon || Icon) && (

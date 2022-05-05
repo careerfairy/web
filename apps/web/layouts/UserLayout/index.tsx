@@ -52,7 +52,7 @@ const UserLayout: FC<Props> = ({ children }) => {
          <GenericHeader position={"sticky"} />
          <PageContentWrapper>
             <GeneralNavDrawer isPersistent={isDesktop} />
-            <PageChildrenWrapper>{children}</PageChildrenWrapper>
+            <PageChildrenWrapper padding>{children}</PageChildrenWrapper>
          </PageContentWrapper>
          <ScrollToTop />
       </Page>

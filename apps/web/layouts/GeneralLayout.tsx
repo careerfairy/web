@@ -7,18 +7,25 @@ import Page, {
    PageContentWrapper,
 } from "../components/views/common/Page"
 
+interface Props {
+   children: React.ReactNode
+   fullScreen?: boolean
+   backgroundColor?: string
+   hideNavOnScroll?: boolean
+}
 const GeneralLayout = ({
    children,
    fullScreen,
    backgroundColor = undefined,
-}) => {
+   hideNavOnScroll = false,
+}: Props) => {
    return (
       <Page
          sx={{
             backgroundColor,
          }}
       >
-         <GenericHeader position={"sticky"} />
+         <GenericHeader hideNavOnScroll={hideNavOnScroll} position={"sticky"} />
          <PageContentWrapper>
             <GeneralNavDrawer />
             <PageChildrenWrapper>{children}</PageChildrenWrapper>

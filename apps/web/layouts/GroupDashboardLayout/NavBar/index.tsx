@@ -1,17 +1,44 @@
 import React from "react"
-import { Box, Hidden, List } from "@mui/material"
+import { Avatar, Box, Divider, Hidden, List, Typography } from "@mui/material"
 import { LogOut as LogoutIcon } from "react-feather"
 import * as actions from "../../../store/actions"
 import { useDispatch } from "react-redux"
 import PersistentGenericDrawer from "../../../components/views/navbar/PersistentGenericDrawer"
 import NavElement from "../../../components/views/navbar/NavElement"
+import { StylesProps } from "../../../types/commonTypes"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { PageLinkProps } from "../../../components/custom-hook/useGeneralLinks"
 
+const styles: StylesProps = {
+   avatar: {
+      padding: 1,
+      cursor: "pointer",
+      background: "white",
+      height: 100,
+      width: "100%",
+      "& img": {
+         objectFit: "contain",
+      },
+   },
+   name: {
+      marginTop: 1,
+   },
+}
+
+interface Props {
+   group: Group
+   drawerTopLinks: PageLinkProps[]
+   headerLinks: PageLinkProps[]
+   drawerBottomLinks: PageLinkProps[]
+   isDesktop: boolean
+}
 const NavBar = ({
+   group,
    drawerTopLinks,
    headerLinks,
    drawerBottomLinks,
    isDesktop,
-}) => {
+}: Props) => {
    const dispatch = useDispatch()
 
    const signOut = () => {
@@ -20,6 +47,16 @@ const NavBar = ({
 
    const content = (
       <Box height="100%" display="flex" flexDirection="column">
+         <Box alignItems="center" display="flex" flexDirection="column" p={2}>
+            <Avatar sx={styles.avatar} src={group.logoUrl} variant="rounded" />
+            <Typography sx={[styles.name]} color="textPrimary" variant="h5">
+               {group.universityName}
+            </Typography>
+            <Typography color="textSecondary" variant="body2">
+               {group.description}
+            </Typography>
+         </Box>
+         <Divider />
          <Box p={2}>
             <List>
                {drawerTopLinks.map((item) => (

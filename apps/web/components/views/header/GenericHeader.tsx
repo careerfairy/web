@@ -25,6 +25,7 @@ const GenericHeader = ({
    darkMode = false,
    links = [],
    isDesktop,
+   endContent,
 }: Props) => {
    const theme = useTheme()
    const { mainLinks } = useGeneralLinks()
@@ -67,6 +68,7 @@ const GenericHeader = ({
             />
          </Hidden>
          <Box sx={{ display: "flex", alignItems: "center" }}>
+            {endContent}
             <Hidden lgDown>
                <MissingDataButton />
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
@@ -91,6 +93,7 @@ interface Props {
    position?: "absolute" | "fixed" | "sticky" | "static"
    transparent?: boolean
    isDesktop?: boolean
+   endContent?: React.ReactNode
 }
 
 export default GenericHeader

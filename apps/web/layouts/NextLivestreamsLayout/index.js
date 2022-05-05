@@ -6,6 +6,7 @@ import TopBar from "./TopBar"
 import useGeneralLinks from "../../components/custom-hook/useGeneralLinks"
 import FooterV2 from "../../components/views/footer/FooterV2"
 import { Box } from "@mui/material"
+import Page from "../../components/views/common/Page"
 
 const NextLivestreamsLayout = (props) => {
    const { children, currentGroup } = props
@@ -18,31 +19,29 @@ const NextLivestreamsLayout = (props) => {
    const handleDrawerToggle = () => setMobileNavOpen(!isMobileNavOpen)
 
    return (
-      <React.Fragment>
-         <Box sx={styles.root}>
-            <TopBar
-               links={mainLinks}
-               currentGroup={currentGroup}
-               onMobileNavOpen={handleDrawerOpen}
-            />
-            <NavBar
-               drawerTopLinks={eventLinks}
-               handleDrawerToggle={handleDrawerToggle}
-               drawerBottomLinks={secondaryLinks}
-               onMobileNavOpen={handleDrawerOpen}
-               onMobileClose={handleDrawerClose}
-               openMobile={isMobileNavOpen}
-            />
-            <Box sx={styles.wrapper}>
-               <Box sx={styles.contentContainer}>
-                  <Box sx={styles.content}>
-                     {children}
-                     <FooterV2 />
-                  </Box>
+      <Page>
+         <TopBar
+            links={mainLinks}
+            currentGroup={currentGroup}
+            onMobileNavOpen={handleDrawerOpen}
+         />
+         <NavBar
+            drawerTopLinks={eventLinks}
+            handleDrawerToggle={handleDrawerToggle}
+            drawerBottomLinks={secondaryLinks}
+            onMobileNavOpen={handleDrawerOpen}
+            onMobileClose={handleDrawerClose}
+            openMobile={isMobileNavOpen}
+         />
+         <Box sx={styles.wrapper}>
+            <Box sx={styles.contentContainer}>
+               <Box sx={styles.content}>
+                  {children}
+                  <FooterV2 />
                </Box>
             </Box>
          </Box>
-      </React.Fragment>
+      </Page>
    )
 }
 

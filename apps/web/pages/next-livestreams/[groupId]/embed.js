@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { store } from "pages/_app"
-import { getServerSideGroup, serializeServerSideStream } from "util/serverUtil"
+import { getServerSideGroup, mapServerSideStream } from "util/serverUtil"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import { NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL } from "constants/routes"
 import HeadWithMeta from "components/page/HeadWithMeta"
@@ -15,7 +15,10 @@ import EmbedBannerSection from "../../../components/views/NextLivestreams/emebed
 import StreamsSwipeableView from "../../../components/views/NextLivestreams/emebed/StreamsSwipeableView"
 
 {
-   /*TODO Example link for embedding here*/
+   /*TODO Example link for embedding here
+    * Example link:
+    * https://careerfairy.io/next-livestreams/[groupId]/embed
+    * */
 }
 {
    /*TODO fix speaker info text overflow*/
@@ -141,7 +144,7 @@ export async function getServerSideProps({ query: { groupId } }) {
    const groupStreams = groupStreamSnaps.docs
       .filter((streamDoc) => streamDoc.exists)
       .map((streamDoc) =>
-         serializeServerSideStream({ id: streamDoc.id, ...streamDoc.data() })
+         mapServerSideStream({ id: streamDoc.id, ...streamDoc.data() })
       )
 
    return {
