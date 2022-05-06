@@ -48,7 +48,7 @@ const UserLayout: FC<Props> = ({ children }) => {
    }
 
    return (
-      <Page>
+      <Page backgroundColor={"white"}>
          <GenericHeader position={"sticky"} />
          <PageContentWrapper>
             <GeneralNavDrawer isPersistent={isDesktop} />

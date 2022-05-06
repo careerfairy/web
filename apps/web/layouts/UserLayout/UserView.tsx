@@ -35,6 +35,7 @@ const styles: StylesProps = {
    bar: {
       backgroundColor: "transparent",
       boxShadow: "none",
+      mb: 2,
    },
 }
 
@@ -107,14 +108,11 @@ const UserView = ({ path }: Props) => {
          <AppBar sx={styles.bar} position="static" color="default">
             <Tabs
                value={path}
-               centered
-               variant={"fullWidth"}
+               variant={"scrollable"}
                indicatorColor="primary"
                textColor="primary"
                selectionFollowsFocus
-               sx={{ mb: 2 }}
                allowScrollButtonsMobile
-               scrollButtons={false}
             >
                {tabsArray}
             </Tabs>

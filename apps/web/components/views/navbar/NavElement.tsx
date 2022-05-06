@@ -47,7 +47,10 @@ const styles: StylesProps = {
    button: {
       position: "relative",
       transition: (theme) => theme.transitions.create("background-color"),
-      color: "text.primary",
+      color: "black",
+      "& svg": {
+         color: "black",
+      },
       textTransform: "none",
       fontWeight: "bold",
       fontSize: "1rem",
@@ -81,7 +84,7 @@ const NavElement = ({
             ]}
          >
             {(svgIcon || Icon) && (
-               <ListItemIcon>
+               <ListItemIcon color={"inherit"}>
                   {svgIcon ? (
                      <Box sx={styles.icon}>{svgIcon}</Box>
                   ) : (

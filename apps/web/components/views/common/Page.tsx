@@ -26,10 +26,18 @@ const styles = {
 interface Props {
    children: React.ReactNode
    sx?: SxProps<DefaultTheme>
+   backgroundColor?: string
 }
-const Page: FC<Props> = ({ sx, ...props }) => {
+const Page: FC<Props> = ({ sx, backgroundColor, ...props }) => {
    return (
-      <Box sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]} {...props} />
+      <Box
+         sx={[
+            styles.root,
+            { backgroundColor },
+            ...(Array.isArray(sx) ? sx : [sx]),
+         ]}
+         {...props}
+      />
    )
 }
 

@@ -26,6 +26,7 @@ const styles: StylesProps = {
    name: {
       fontSize: "1.5em",
       fontWeight: "bold",
+      whiteSpace: "pre-wrap",
    },
 }
 const UserAvatarAndDetails = () => {

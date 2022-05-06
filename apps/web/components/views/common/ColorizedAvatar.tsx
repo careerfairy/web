@@ -59,11 +59,11 @@ const ColorizedAvatar = ({
 }: ColorizedAvatarProps) => {
    let name = ""
    if (firstName) {
-      name += firstName
+      name += firstName.charAt(0)
    }
 
    if (lastName) {
-      name += ` ${lastName}`
+      name += ` ${lastName.charAt(0)}`
    }
    const avaProps = useMemo(() => stringAvatar(name), [name])
 
