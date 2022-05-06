@@ -545,7 +545,7 @@ exports.getLivestreamReportData_TEMP_NAME = functions.https.onCall(
                ]
             })
 
-         ratings.forEach(async (rating) => {
+         for (const rating of ratings) {
             const individualRatingSnap = await streamSnap.ref
                .collection("rating")
                .doc(rating.id)
@@ -561,9 +561,35 @@ exports.getLivestreamReportData_TEMP_NAME = functions.https.onCall(
                rating.ratings.length > 0
                   ? getRatingsAverage(rating.ratings).toFixed(2)
                   : "N.A."
-         })
+         }
 
          // Extraction of snap Data
+         const getMostCommonUniversities = (students = [], max = 3) => {
+            const universitiesCount = students.reduce((acc, currentStudent) => {
+               if (!currentStudent?.university?.code) return acc
+               if (currentStudent?.university?.code in acc) {
+                  acc[currentStudent.university.code].count += 1
+               } else {
+                  acc[currentStudent.university.code] = {
+                     code: currentStudent.university.code,
+                     name: currentStudent.university.name,
+                     count: 1,
+                  }
+               }
+               return acc
+            }, {})
+
+            const universitiesArray = Object.keys(universitiesCount)
+               .map((key) => ({
+                  code: key,
+                  name: universitiesCount[key].name,
+                  count: universitiesCount[key].count,
+               }))
+               .filter((university) => university.count > 0)
+               .sort((a, b) => b.count - a.count)
+
+            return universitiesArray.slice(0, max)
+         }
 
          // Its let since this array will be modified
          let participatingStudents = await getUsersByEmail(
@@ -697,6 +723,10 @@ exports.getLivestreamReportData_TEMP_NAME = functions.https.onCall(
                   participatingStudents.length -
                   (totalSumOfUniversityStudents +
                      numberOfStudentsFollowingCompany),
+               mostCommonUniversities: getMostCommonUniversities(
+                  participatingStudents,
+                  5
+               ),
             },
          }
       } catch (e) {
