@@ -411,7 +411,7 @@ exports.getLivestreamReportData = functions.https.onCall(
    }
 )
 
-exports.getLivestreamReportData_TEMP_NAME = functions.https.onCall(
+exports.getLivestreamReportData_v2 = functions.https.onCall(
    async (data, context) => {
       const { targetStreamId, targetGroupId, userEmail } = data
       const universityReports = []

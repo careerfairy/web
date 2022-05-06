@@ -182,7 +182,7 @@ class FirebaseService {
     */
    getLivestreamReportData = async (data) => {
       const handleGetLivestreamReportData = this.functions.httpsCallable(
-         "getLivestreamReportData_TEMP_NAME"
+         "getLivestreamReportData_v2"
       )
       return handleGetLivestreamReportData(data)
    }
