@@ -49,7 +49,9 @@ export class CommonPage {
             }
          }
       }
-      throw new Error("Could not click, exceeded tries")
+      if (await this.page.locator(locator).isVisible()) {
+         throw new Error("Could not click, exceeded tries")
+      }
    }
 
    async resilientCheck(locator: Locator, check: boolean = true) {
