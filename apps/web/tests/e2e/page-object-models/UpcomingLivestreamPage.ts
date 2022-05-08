@@ -14,8 +14,16 @@ export default class UpcomingLivestreamPage extends CommonPage {
       this.buttonAlreadyBooked = this.text("You're booked")
    }
 
-   open(livestreamId: string) {
-      return this.page.goto(`/upcoming-livestream/${livestreamId}`)
+   async open(livestreamId: string) {
+      try {
+         await this.page.goto(`/upcoming-livestream/${livestreamId}`)
+      } catch (e) {
+         console.log(e)
+         // this error is thrown randomly
+         if (!e.message.includes("Navigation interrupted by another one")) {
+            throw e
+         }
+      }
    }
 
    attend() {
@@ -38,32 +46,27 @@ export default class UpcomingLivestreamPage extends CommonPage {
    }
 
    async modalAttend() {
-      return Promise.all([
-         this.page.waitForNavigation(),
-         this.page.locator('div[role="dialog"] >> text=I\'ll attend').click(),
-      ])
+      return this.resilientClick('div[role="dialog"] >> text=I\'ll attend')
    }
 
    modalSubmit() {
-      return this.page.locator('div[role="dialog"] >> text=Submit').click()
+      return this.resilientClick('div[role="dialog"] >> text=Submit')
    }
 
    joinTalentPool() {
-      return this.page
-         .locator('div[role="dialog"] >> text=Join Talent Pool')
-         .click()
+      return this.resilientClick('div[role="dialog"] >> text=Join Talent Pool')
    }
 
    skip() {
-      return this.page.locator("text=Skip").click()
+      return this.resilientClick("text=Skip", 3, 1000, false)
    }
 
    finish() {
-      return this.page.locator("text=See all our events").click()
+      return this.resilientClick("text=See all our events")
    }
 
    cancel() {
-      return this.page.locator("text=Cancel").click()
+      return this.resilientClick("text=Cancel")
    }
 
    async fillQuestion(question: string) {
