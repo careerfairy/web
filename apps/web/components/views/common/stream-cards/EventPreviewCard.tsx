@@ -60,6 +60,9 @@ const styles = {
    },
    mainContentHoverStyles: {
       "&:hover, &:focus-within": {
+         "& .titleWrapper": {
+            transform: "translateY(0)",
+         },
          "& .hideOnHoverContent": {
             opacity: 0,
          },
@@ -75,7 +78,6 @@ const styles = {
             display: "none",
          },
          "& .mainContent": {
-            transform: "translateY(0)",
             opacity: 1,
             "& > *:not(.titleWrapper)": {
                opacity: 1,
@@ -128,11 +130,6 @@ const styles = {
       },
    },
    mainContent: {
-      transform: {
-         xs: "translateY(calc(100% - 10rem))",
-         sm: "translateY(calc(100% - 10rem))",
-      },
-
       "& > *:not(& .titleWrapper)": {
          opacity: 0,
       },
@@ -147,7 +144,10 @@ const styles = {
          `transform ${theme.transitions.duration.complex}ms cubic-bezier(0.19, 1, 0.22, 1)`,
       zIndex: 1,
    },
-   titleWrapper: {},
+   titleWrapper: {
+      transition: (theme: Theme) => theme.transitions.create("transform"),
+      transform: "translateY(120px)",
+   },
    title: {
       fontWeight: 600,
       ...getMaxLineStyles(2),
@@ -499,9 +499,10 @@ const EventPreviewCard = ({
                                  /*
                                             // @ts-ignore */
                                  href={{
-                                    pathname: `/upcoming-livestream/${event?.id}`,
+                                    pathname: `/upcoming-livestream/[livestreamId]`,
                                     hash: isPast && "#about",
                                     query: {
+                                       livestreamId: event?.id,
                                        ...(event?.groupIds?.includes(
                                           groupId as string
                                        ) && { groupId }),

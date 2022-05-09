@@ -12,6 +12,7 @@ import { GetServerSideProps } from "next"
 import highlightRepo from "../data/firebase/HighlightRepository"
 import livestreamRepo from "../data/firebase/LivestreamRepository"
 import { mapServerSideStream } from "../util/serverUtil"
+import SEO from "../components/util/SEO"
 
 const PortalPage = ({ highlights, comingUpNextEvents, showHighlights }) => {
    const { authenticatedUser, userData } = useAuth()
@@ -20,25 +21,34 @@ const PortalPage = ({ highlights, comingUpNextEvents, showHighlights }) => {
    )
 
    return (
-      <GeneralLayout backgroundColor={"#FFF"} hideNavOnScroll fullScreen>
-         <Container disableGutters>
-            <WidgetsWrapper>
-               <HighlightsCarousel
-                  showHighlights={showHighlights}
-                  serverSideHighlights={highlights}
-               />
-               {/*<FeaturedAndNextEvents />*/}
-               {hasInterests && (
-                  <RecommendedEvents maxLimitIncreaseTimes={5} limit={30} />
-               )}
-               <ComingUpNextEvents
-                  serverSideEvents={comingUpNextEvents}
-                  limit={20}
-               />
-               <MyNextEvents limit={20} />
-            </WidgetsWrapper>
-         </Container>
-      </GeneralLayout>
+      <>
+         <SEO
+            id={"CareerFairy | Portal"}
+            description={
+               "To find the greatest virtual career events, use the CareerFairy Portal. Through our events, meet potential future colleagues live and land your dream job!"
+            }
+            title={"CareerFairy | Portal"}
+         />
+         <GeneralLayout backgroundColor={"#FFF"} hideNavOnScroll fullScreen>
+            <Container disableGutters>
+               <WidgetsWrapper>
+                  <HighlightsCarousel
+                     showHighlights={showHighlights}
+                     serverSideHighlights={highlights}
+                  />
+                  {/*<FeaturedAndNextEvents />*/}
+                  {hasInterests && (
+                     <RecommendedEvents maxLimitIncreaseTimes={5} limit={30} />
+                  )}
+                  <ComingUpNextEvents
+                     serverSideEvents={comingUpNextEvents}
+                     limit={20}
+                  />
+                  <MyNextEvents limit={20} />
+               </WidgetsWrapper>
+            </Container>
+         </GeneralLayout>
+      </>
    )
 }
 
