@@ -454,6 +454,7 @@ const EventsTable = ({
       <>
          <Box onClick={handleRemoveEventId}>
             <MaterialTable
+               style={{ display: "inline-grid" }}
                actions={actions}
                columns={columns}
                data={streams}

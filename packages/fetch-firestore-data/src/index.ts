@@ -66,6 +66,8 @@ async function createUser(email: string) {
    } catch (e) {
       if (e.errorInfo?.code === "auth/email-already-exists") {
          return null
+      } else {
+         h1Text(e)
       }
 
       throw e

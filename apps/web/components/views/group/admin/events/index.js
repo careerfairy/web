@@ -17,7 +17,6 @@ import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { v4 as uuidv4 } from "uuid"
 import * as actions from "store/actions"
 import { useDispatch } from "react-redux"
-import DataAccessUtil from "../../../../../util/DataAccessUtil"
 
 const useStyles = makeStyles((theme) => ({
    containerRoot: {
@@ -29,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
       boxShadow: "none",
       background: theme.palette.common.white,
       borderBottom: `1px solid ${alpha(theme.palette.text.secondary, 0.3)}`,
+      top: 64,
    },
    tab: {
       fontWeight: 600,

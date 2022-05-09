@@ -36,6 +36,7 @@ export function streamIsOld(streamStartDate, minimumTimeElapsed = 120) {
    }
 
    const now = new Date()
+   // @ts-ignore
    const timeElapsed = now - streamDate
    return timeElapsed > minimumTimeElapsed * 60 * 1000
 }
@@ -100,4 +101,53 @@ export function getCSVDelimiterBasedOnOS() {
 export const getQueryStringFromUrl = (url = "", queryParam = "") => {
    let params = new URL(url).searchParams
    return params.get(queryParam)
+}
+
+export function stringToColor(string: string) {
+   let hash = 0
+   let i
+
+   /* eslint-disable no-bitwise */
+   for (i = 0; i < string.length; i += 1) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash)
+   }
+
+   let color = "#"
+
+   for (i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff
+      color += `00${value.toString(16)}`.slice(-2)
+   }
+   /* eslint-enable no-bitwise */
+
+   return color
+}
+
+export function stringAvatar(firstName: string, lastName: string) {
+   let name = ""
+   // we trim the last name to avoid
+   // too initials for the avatar component causing an ugly overflow
+   // before: "${John Doe} ${Bane Philip}" -> "JDBP"
+   // Now: "${John Doe} ${Dane Philip}" -> "JD"
+   if (firstName) {
+      name += firstName.trim()
+   }
+
+   if (lastName) {
+      name += ` ${lastName.trim()}`
+   }
+   if (name === "") {
+      name = "Anonymous"
+   }
+   const initials = name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+
+   return {
+      sx: {
+         bgcolor: stringToColor(name),
+      },
+      children: initials,
+   }
 }

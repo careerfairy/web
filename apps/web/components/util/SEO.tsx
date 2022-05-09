@@ -32,7 +32,7 @@ const SEO = ({
    return <NextSeo {...SEO} />
 }
 interface Props extends NextSeoProps {
-   id: string
+   id?: string
    image?: {
       width?: number
       height?: number

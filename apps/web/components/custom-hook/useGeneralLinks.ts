@@ -1,0 +1,143 @@
+import React, { useEffect, useState } from "react"
+import { User as ProfileIcon } from "react-feather"
+import NextLivestreamsIcon from "@mui/icons-material/Contacts"
+import PortalIcon from "@mui/icons-material/DynamicFeed"
+import { useAuth } from "../../HOCs/AuthProvider"
+import { OverridableComponent } from "@mui/material/OverridableComponent"
+import { SvgIconTypeMap } from "@mui/material"
+import ReferralIcon from "@mui/icons-material/GroupAdd"
+import GroupsIcon from "@mui/icons-material/Groups"
+const initialMainLinks = [
+   {
+      href: `/portal`,
+      title: "PORTAL",
+      basePath: "/portal",
+      icon: PortalIcon,
+   },
+   {
+      href: `/next-livestreams`,
+      title: "NEXT LIVE STREAMS",
+      basePath: "/next-livestreams",
+      icon: NextLivestreamsIcon,
+   },
+]
+const initialSecondaryLinks = [
+   {
+      href: `/`,
+      title: "For Students",
+      basePath: "/",
+   },
+   {
+      href: `/companies`,
+      title: "For Companies",
+      basePath: "/companies",
+   },
+   {
+      href: `/career-center`,
+      title: "For Career Centers",
+      basePath: "/career-center",
+   },
+   {
+      href: `/about-us`,
+      title: "About Us",
+      basePath: "/about-us",
+   },
+]
+
+const authenticatedUserTopLinks: PageLinkProps[] = [
+   {
+      href: `/profile`,
+      title: "Profile",
+      basePath: "/profile",
+      icon: ProfileIcon,
+   },
+   {
+      href: "/referrals",
+      title: "Referrals",
+      basePath: "/referrals",
+      icon: ReferralIcon,
+   },
+   {
+      href: "/groups",
+      title: "Groups",
+      basePath: "/groups",
+      icon: GroupsIcon,
+   },
+]
+const authenticatedUserBottomLinks: PageLinkProps[] = [
+   {
+      href: `/`,
+      title: "For Students",
+      basePath: "/",
+   },
+   {
+      href: `/companies`,
+      title: "For Companies",
+      basePath: "/companies",
+   },
+   {
+      href: `/career-center`,
+      title: "For Career Centers",
+      basePath: "/career-center",
+   },
+   {
+      href: `/about-us`,
+      title: "About Us",
+      basePath: "/about-us",
+   },
+]
+
+export interface PageLinkProps {
+   href: string
+   title: string
+   basePath?: string
+   icon?: React.ReactElement | OverridableComponent<SvgIconTypeMap<{}, "svg">>
+}
+
+const landingLinks: PageLinkProps[] = [...initialSecondaryLinks]
+const eventLinks: PageLinkProps[] = [
+   {
+      href: `/portal`,
+      title: "Portal",
+      basePath: "/portal",
+      icon: PortalIcon,
+   },
+   {
+      href: `/next-livestreams`,
+      title: "NEXT LIVE STREAMS",
+      basePath: "/next-livestreams",
+      icon: NextLivestreamsIcon,
+   },
+]
+const useGeneralLinks = () => {
+   const { isLoggedOut } = useAuth()
+   const [mainLinks] = useState<PageLinkProps[]>(initialMainLinks)
+   const [secondaryLinks, setSecondaryLinks] = useState<PageLinkProps[]>(
+      initialSecondaryLinks
+   )
+
+   useEffect(() => {
+      if (!isLoggedOut) {
+         setSecondaryLinks([
+            {
+               href: `/profile`,
+               title: "PROFILE",
+               icon: ProfileIcon,
+               basePath: "/profile",
+            },
+            ...initialSecondaryLinks,
+         ])
+      }
+   }, [isLoggedOut])
+
+   return {
+      secondaryLinks,
+      mainLinks,
+      landingLinks,
+      authenticatedUserTopLinks,
+      authenticatedUserBottomLinks,
+      eventLinks,
+   }
+}
+
+export default useGeneralLinks

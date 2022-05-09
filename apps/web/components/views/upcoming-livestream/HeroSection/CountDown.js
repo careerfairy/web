@@ -17,7 +17,7 @@ import CheckIcon from "@mui/icons-material/Check"
 import CalendarIcon from "@mui/icons-material/CalendarToday"
 import { useRouter } from "next/router"
 import { AddToCalendar } from "../../common/AddToCalendar"
-import { ShareOutlined } from "@mui/icons-material"
+import ShareOutlined from "@mui/icons-material/ShareOutlined"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
 import { streamIsOld } from "../../../../util/CommonUtil"
 

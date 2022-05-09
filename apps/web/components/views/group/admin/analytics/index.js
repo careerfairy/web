@@ -31,6 +31,7 @@ import useUserDataSet from "../../../../custom-hook/useUserDataSet"
 import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDictionary"
 import { repositionElement } from "../../../../helperFunctions/HelperFunctions"
 import StreamFilterModal from "./StreamFilterModal"
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 
 const useStyles = makeStyles((theme) => ({
    indicator: {
@@ -41,6 +42,7 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: 600,
    },
    appBar: {
+      top: 64,
       boxShadow: "none",
       background: theme.palette.common.white,
       borderBottom: `1px solid ${alpha(theme.palette.text.secondary, 0.3)}`,
@@ -139,7 +141,7 @@ const streamsSelector = createSelector(
       return streams
    }
 )
-const AnalyticsOverview = ({ firebase, group, firestore }) => {
+const AnalyticsOverview = ({ group, firestore }) => {
    const userDataSets = [
       {
          id: uuid(),
@@ -159,6 +161,7 @@ const AnalyticsOverview = ({ firebase, group, firestore }) => {
       userDataSets.shift()
    }
 
+   const firebase = useFirebaseService()
    const { globalTimeFrames } = useTimeFrames()
 
    const dispatch = useDispatch()
