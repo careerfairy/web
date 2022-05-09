@@ -22,6 +22,10 @@ const styles: StylesProps = {
    },
    name: {
       marginTop: 1,
+      whiteSpace: "pre-line",
+   },
+   description: {
+      whiteSpace: "pre-line",
    },
 }
 
@@ -49,10 +53,20 @@ const NavBar = ({
       <Box height="100%" display="flex" flexDirection="column">
          <Box alignItems="center" display="flex" flexDirection="column" p={2}>
             <Avatar sx={styles.avatar} src={group.logoUrl} variant="rounded" />
-            <Typography sx={[styles.name]} color="textPrimary" variant="h5">
+            <Typography
+               align={"center"}
+               sx={[styles.name]}
+               color="textPrimary"
+               variant="h5"
+            >
                {group.universityName}
             </Typography>
-            <Typography color="textSecondary" variant="body2">
+            <Typography
+               align={"center"}
+               sx={styles.description}
+               color="textSecondary"
+               variant="body2"
+            >
                {group.description}
             </Typography>
          </Box>
