@@ -1,7 +1,8 @@
 import { Locator, Page, expect } from "@playwright/test"
 import { sleep } from "../utils"
+import { CommonPage } from "./CommonPage"
 
-export class SignupPage {
+export class SignupPage extends CommonPage {
    readonly page: Page
    readonly emailTextField: Locator
    readonly firstNameTextField: Locator
@@ -37,6 +38,8 @@ export class SignupPage {
    readonly incorrectEmailWarning: Locator
 
    constructor(page: Page) {
+      super(page)
+
       this.incorrectEmailWarning = page.locator(
          "text=Please enter a valid email address"
       )
@@ -148,14 +151,10 @@ export class SignupPage {
       return pinCode && this.pinCodeTextField.fill(pinCode)
    }
    async agreeToTerms(agree: boolean) {
-      if (agree) {
-         return this.termsOfConditionsCheckBox.check()
-      } else return this.termsOfConditionsCheckBox.uncheck()
+      return this.resilientCheck(this.termsOfConditionsCheckBox, agree)
    }
-   async subscribeToEmails(agree: boolean) {
-      if (agree) {
-         return this.subscribeEmailsCheckBox.check()
-      } else return this.subscribeEmailsCheckBox.uncheck()
+   subscribeToEmails(agree: boolean) {
+      return this.resilientCheck(this.subscribeEmailsCheckBox, agree)
    }
 
    async clickValidateEmail() {
@@ -195,9 +194,9 @@ export class SignupPage {
       await this.selectUniversity(formData.universityName)
       await this.enterPassword(formData.password)
       await this.enterConfirmPassword(formData.confirmPassword)
-      await this.agreeToTerms(formData.agreeToTerms)
+      await this.agreeToTerms(formData.agreeToTerms ?? false)
       await sleep(300)
-      await this.subscribeToEmails(formData.subscribeEmails)
+      await this.subscribeToEmails(formData.subscribeEmails ?? false)
    }
 
    async clickOnMultipleInterests(interests: string[]) {
