@@ -1,10 +1,9 @@
-import React, { FC, memo, useEffect } from "react"
+import React, { FC, useEffect } from "react"
 import Drawer from "@mui/material/Drawer"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "../../../store/actions"
 import RootState from "../../../store/reducers"
 import { StylesProps } from "../../../types/commonTypes"
-import DrawerContent from "./DrawerContent"
 
 const styles: StylesProps = {
    paperStyles: {

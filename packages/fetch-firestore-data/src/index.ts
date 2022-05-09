@@ -36,8 +36,7 @@ async function run(): Promise<void> {
 
    h1Text(`Seeding data`)
    await createUser("carlos@careerfairy.io")
-   const habibData = await createUser("habib@careerfairy.io")
-   h1Text(`${habibData}`)
+   await createUser("habib@careerfairy.io")
    await createUser("maximilian@careerfairy.io")
 
    await emulatorExport()
@@ -65,9 +64,10 @@ async function createUser(email: string) {
    try {
       return await UserSeed.createUser(email)
    } catch (e) {
-      h1Text(e)
       if (e.errorInfo?.code === "auth/email-already-exists") {
          return null
+      } else {
+         h1Text(e)
       }
 
       throw e

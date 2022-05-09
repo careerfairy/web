@@ -50,7 +50,7 @@ const adminTab = {
 }
 const Groups = () => {
    const classes = useStyles()
-   const { userData } = useAuth()
+   const { userData, authenticatedUser } = useAuth()
 
    const {
       query: { type },
@@ -71,7 +71,8 @@ const Groups = () => {
    useEffect(() => {
       ;(async () => {
          const hasAdminGroups =
-            userData?.isAdmin || (await groupRepo.checkIfUserHasAdminGroups())
+            userData?.isAdmin ||
+            (await groupRepo.checkIfUserHasAdminGroups(authenticatedUser.email))
          setHasAdminGroups(hasAdminGroups)
          if (hasAdminGroups && (!type || type === "admin")) {
             addAdminTab()
@@ -111,6 +112,7 @@ const Groups = () => {
             setLoading(true)
             if (value === "admin") {
                const adminGroups = await groupRepo.getAdminGroups(
+                  authenticatedUser.email,
                   Boolean(userData?.isAdmin)
                )
                setGroups(adminGroups)

@@ -5,8 +5,8 @@ import { Group } from "@careerfairy/shared-lib/dist/groups"
 export interface IGroupRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
    getGroupsByIds(groupIds: string[]): Promise<Group[]>
-   getAdminGroups(isAdmin: boolean): Promise<Group[]>
-   checkIfUserHasAdminGroups(): Promise<boolean>
+   getAdminGroups(userEmail: string, isAdmin: boolean): Promise<Group[]>
+   checkIfUserHasAdminGroups(userEmail: string): Promise<boolean>
 }
 
 class FirebaseGroupRepository implements IGroupRepository {
@@ -36,8 +36,7 @@ class FirebaseGroupRepository implements IGroupRepository {
          })) as Group[]
    }
 
-   async getAdminGroups(isAdmin: boolean): Promise<Group[]> {
-      const userEmail = this.firestore.app.auth().currentUser?.email
+   async getAdminGroups(userEmail: string, isAdmin: boolean): Promise<Group[]> {
       let query: firebase.firestore.Query<firebase.firestore.DocumentData> =
          this.firestore.collection("careerCenterData")
       if (!isAdmin) {
@@ -50,8 +49,7 @@ class FirebaseGroupRepository implements IGroupRepository {
       })) as Group[]
    }
 
-   async checkIfUserHasAdminGroups(): Promise<boolean> {
-      const userEmail = this.firestore.app.auth().currentUser?.email
+   async checkIfUserHasAdminGroups(userEmail: string): Promise<boolean> {
       const adminGroups = await this.firestore
          .collection("careerCenterData")
          .where("adminEmails", "array-contains", userEmail)
