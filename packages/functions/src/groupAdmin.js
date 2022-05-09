@@ -9,6 +9,7 @@ const {
    getRatingsAverage,
    getDateString,
    markStudentStatsInUse,
+   partition,
 } = require("./util")
 const { client } = require("./api/postmark")
 const { admin } = require("./api/firestoreAdmin")
@@ -564,20 +565,24 @@ exports.getLivestreamReportData_v2 = functions.https.onCall(
          }
 
          // Extraction of snap Data
-         const getMostCommonUniversities = (students = [], max = 3) => {
-            const universitiesCount = students.reduce((acc, currentStudent) => {
-               if (!currentStudent?.university?.code) return acc
-               if (currentStudent?.university?.code in acc) {
-                  acc[currentStudent.university.code].count += 1
-               } else {
-                  acc[currentStudent.university.code] = {
-                     code: currentStudent.university.code,
-                     name: currentStudent.university.name,
-                     count: 1,
+         const getMostCommonUniversities = (students = [], max = 5) => {
+            const universitiesCount = students.reduce(
+               (acc, currentStudent) => {
+                  if (!currentStudent?.university?.code) {
+                     acc["other"].count += 1
+                  } else if (currentStudent?.university?.code in acc) {
+                     acc[currentStudent.university.code].count += 1
+                  } else {
+                     acc[currentStudent.university.code] = {
+                        code: currentStudent.university.code,
+                        name: currentStudent.university.name,
+                        count: 1,
+                     }
                   }
-               }
-               return acc
-            }, {})
+                  return acc
+               },
+               { other: { code: "other", name: "Other", count: 0 } }
+            )
 
             const universitiesArray = Object.keys(universitiesCount)
                .map((key) => ({
@@ -587,8 +592,25 @@ exports.getLivestreamReportData_v2 = functions.https.onCall(
                }))
                .filter((university) => university.count > 0)
                .sort((a, b) => b.count - a.count)
-
-            return universitiesArray.slice(0, max)
+            const otherCodes = ["other", "othe"]
+            // remove others from the list
+            const [topNamedUniversities, otherUniversities] = partition(
+               universitiesArray,
+               (university, index) =>
+                  !otherCodes.includes(university.code) && index < max + 1
+            )
+            const other = otherUniversities.reduce(
+               (acc, curr) => ({ ...acc, count: acc.count + curr.count }),
+               {
+                  code: "others",
+                  name: "Other Universities",
+                  count: 0,
+               }
+            )
+            if (other.count > 0) {
+               return [...topNamedUniversities, other]
+            }
+            return topNamedUniversities
          }
 
          // Its let since this array will be modified
