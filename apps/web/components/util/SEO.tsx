@@ -39,8 +39,8 @@ interface Props extends NextSeoProps {
       type?: string
       url: string
    }
-   keywords: string
-   noIndex: boolean
+   keywords?: string
+   noIndex?: boolean
 }
 
 export default SEO
