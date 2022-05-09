@@ -8,14 +8,7 @@ import {
    userInterestsDidNotChange,
 } from "../../../signup/InterestsSelector"
 import { useDispatch } from "react-redux"
-
-const styles = {
-   title: {
-      color: "text.secondary",
-      textTransform: "uppercase",
-      fontSize: "1.8rem",
-   },
-}
+import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle"
 
 const UserInterests = ({ userData }) => {
    const [isLoading, setLoading] = useState(false)
@@ -49,10 +42,7 @@ const UserInterests = ({ userData }) => {
 
    return (
       <>
-         <Typography sx={styles.title} variant="h4">
-            Interests
-         </Typography>
-
+         <ContentCardTitle gutterBottom>Interests</ContentCardTitle>
          <Typography variant="body2" component="p">
             Select 5 to improve your site experience:
          </Typography>

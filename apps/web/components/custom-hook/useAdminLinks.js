@@ -90,7 +90,7 @@ const useAdminLinks = () => {
             {
                href: `/admin/query-users`,
                icon: FindIcon,
-               title: "Query and Manage Users",
+               title: "Query Users",
                basePath: `/admin/query-users`,
             },
          ])

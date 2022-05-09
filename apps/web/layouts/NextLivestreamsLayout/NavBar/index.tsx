@@ -1,48 +1,54 @@
 import React, { memo, useEffect, useState } from "react"
-import clsx from "clsx"
-import makeStyles from "@mui/styles/makeStyles"
 import Drawer from "@mui/material/Drawer"
 import List from "@mui/material/List"
 import Divider from "@mui/material/Divider"
 import ListItem from "@mui/material/ListItem"
-import { Box, CircularProgress, Grow, Hidden } from "@mui/material"
+import { Box, CircularProgress, Hidden } from "@mui/material"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import {
    getResizedUrl,
    repositionElementInArray,
 } from "../../../components/helperFunctions/HelperFunctions"
-import NavItem from "../../../components/views/navbar/NavItem"
+import NavElement from "../../../components/views/navbar/NavElement"
 import { LogOut as LogoutIcon } from "react-feather"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../store/actions"
 import GroupNavLink from "./groupNavLink"
-import NavPrompt from "./navPrompt"
-import { signInImage } from "../../../constants/images"
+import NavPrompt from "../../../components/views/common/NavPrompt"
 import useFollowingGroups from "../../../components/custom-hook/useFollowingGroups"
 import LoginButtonComponent from "components/views/common/LoginButton"
+import { StylesProps } from "../../../types/commonTypes"
+import { PageLinkProps } from "../../../components/custom-hook/useGeneralLinks"
+import Stack from "@mui/material/Stack"
+import { registerIllustrationSvg } from "../../../constants/images"
 
-const useStyles = makeStyles((theme) => ({
+const styles: StylesProps = {
+   root: {
+      height: "100%",
+      p: 2,
+      display: "flex",
+      flexDirection: "column",
+   },
    mobileDrawer: {
-      width: (props) => props.drawerWidth || 256,
+      width: (theme) => theme.drawerWidth.small,
    },
    desktopDrawer: {
-      width: (props) => props.drawerWidth || 256,
+      width: (theme) => theme.drawerWidth.small,
       top: 64,
       height: "calc(100% - 64px)",
-      boxShadow: theme.shadows[1],
+      boxShadow: 1,
    },
    background: {
       borderRight: "none",
       backgroundSize: "cover",
       backgroundPosition: "center center",
-      // background: `linear-gradient(0deg, ${alpha(theme.palette.common.black, 0.3)}, ${alpha(theme.palette.common.black, 0.3)}), url(/next-livestreams-side.jpg)`,
    },
    name: {
-      marginTop: theme.spacing(1),
+      marginTop: 1,
    },
    drawerText: {
-      color: theme.palette.common.white,
+      color: "white",
    },
 
    drawer: {
@@ -58,7 +64,7 @@ const useStyles = makeStyles((theme) => ({
          backgroundColor: "#555",
       },
    },
-}))
+}
 
 function LoginButton() {
    return (
@@ -68,23 +74,26 @@ function LoginButton() {
    )
 }
 
+interface FeedDrawerProps {
+   onMobileClose: () => any
+   openMobile: boolean
+   drawerBottomLinks: PageLinkProps[]
+   drawerTopLinks: PageLinkProps[]
+}
+
 const FeedDrawer = memo(
    ({
-      onMobileNavOpen,
       onMobileClose,
       openMobile,
-      handleDrawerToggle,
       drawerBottomLinks,
       drawerTopLinks,
-      drawerWidth,
-   }) => {
-      const classes = useStyles({ drawerWidth })
+   }: FeedDrawerProps) => {
       const {
          query: { groupId: groupIdInQuery },
-         asPath,
       } = useRouter()
-      const { userData, authenticatedUser } = useAuth()
+      const { userData, isLoggedOut } = useAuth()
       const [groups, setGroups] = useState(null)
+      console.log("-> groups", groups)
       const dispatch = useDispatch()
       const signOut = () => dispatch(actions.signOut())
       const [followingGroups, loading] = useFollowingGroups()
@@ -109,72 +118,58 @@ const FeedDrawer = memo(
       }, [groupIdInQuery, followingGroups])
 
       const content = (
-         <Box height="100%" display="flex" flexDirection="column">
-            <Hidden lgUp>
-               <Box p={2}>
-                  <List>
-                     {authenticatedUser.isLoaded &&
-                        authenticatedUser.isEmpty && <LoginButton />}
-                     {drawerTopLinks.map(({ title, href, icon }) => (
-                        <NavItem
-                           href={href}
-                           key={title}
-                           title={title}
-                           icon={icon}
-                           black
-                        />
-                     ))}
-                     <Divider />
-                  </List>
-               </Box>
-            </Hidden>
-            <Box display="flex" flexDirection="column" p={2}>
+         <Box sx={styles.root}>
+            <Stack spacing={1}>
+               <List sx={{ display: { lg: "none" } }}>
+                  {isLoggedOut && <LoginButton />}
+                  {drawerTopLinks.map((link) => (
+                     <NavElement {...link} />
+                  ))}
+                  <Divider />
+               </List>
+               {isLoggedOut && <NavPrompt />}
+            </Stack>
+            <Box>
                {loading ? (
                   <CircularProgress style={{ margin: "auto" }} />
-               ) : authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
-                  <NavPrompt
-                     title="Don't have an account?"
-                     subheader="Click here to register"
-                     href={`/signup?absolutePath=${asPath}`}
-                     imageSrc={signInImage}
-                  />
-               ) : groups?.length ? (
-                  <List>
-                     {groups?.map(({ universityName, groupId, logoUrl }) => (
-                        <GroupNavLink
-                           key={groupId}
-                           groupId={groupId}
-                           onClick={onMobileClose}
-                           groupIdInQuery={groupIdInQuery}
-                           alt={universityName}
-                           src={getResizedUrl(logoUrl, "xs")}
-                        />
-                     ))}
-                  </List>
                ) : (
-                  <NavPrompt />
+                  <List>
+                     {groups?.length ? (
+                        groups?.map(({ universityName, groupId, logoUrl }) => (
+                           <GroupNavLink
+                              key={groupId}
+                              groupId={groupId}
+                              onClick={onMobileClose}
+                              groupIdInQuery={groupIdInQuery as string}
+                              alt={universityName}
+                              src={getResizedUrl(logoUrl, "xs")}
+                           />
+                        ))
+                     ) : (
+                        <ListItem>
+                           <NavPrompt
+                              title={"Start registering"}
+                              subtitle={"And track your events here"}
+                              imageSrc={registerIllustrationSvg}
+                              noLink
+                           />
+                        </ListItem>
+                     )}
+                  </List>
                )}
             </Box>
-            <Box flexGrow={1} />
-            <Box p={2}>
+            <Box sx={{ mt: "auto !important" }}>
+               <Divider />
                <List>
-                  <Divider />
-                  {drawerBottomLinks.map((item) => (
-                     <NavItem
-                        href={item.href}
-                        key={item.title}
-                        title={item.title}
-                        icon={item.icon}
-                        black
-                     />
+                  {drawerBottomLinks.map((link) => (
+                     <NavElement {...link} />
                   ))}
                   {userData && (
-                     <NavItem
+                     <NavElement
                         href="#"
                         onClick={signOut}
                         icon={LogoutIcon}
                         title="LOGOUT"
-                        black
                      />
                   )}
                </List>
@@ -187,10 +182,10 @@ const FeedDrawer = memo(
             <Hidden lgUp>
                <Drawer
                   anchor="left"
-                  classes={{
-                     paper: clsx(classes.mobileDrawer, classes.background),
+                  PaperProps={{
+                     sx: [styles.mobileDrawer, styles.background],
                   }}
-                  className={classes.drawer}
+                  sx={styles.drawer}
                   onClose={onMobileClose}
                   open={openMobile}
                   variant="temporary"
@@ -201,10 +196,10 @@ const FeedDrawer = memo(
             <Hidden lgDown>
                <Drawer
                   anchor="left"
-                  classes={{
-                     paper: clsx(classes.desktopDrawer, classes.background),
+                  PaperProps={{
+                     sx: [styles.desktopDrawer, styles.background],
                   }}
-                  className={classes.drawer}
+                  sx={styles.drawer}
                   open
                   variant="persistent"
                >

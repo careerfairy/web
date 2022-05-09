@@ -8,7 +8,11 @@ import Link from "next/link"
 import footerLinks from "./footerLinks"
 import icons from "./icons"
 
-const FooterV2 = ({ background = undefined, sx }) => {
+const FooterV2 = ({
+   background = undefined,
+   sx = undefined,
+   bottom = undefined,
+}) => {
    const theme = useTheme()
    const greyColor = alpha(theme.palette.text.secondary, 0.5)
    return (
@@ -16,6 +20,7 @@ const FooterV2 = ({ background = undefined, sx }) => {
          sx={[
             { background: (theme) => background || theme.palette.common.white },
             sx,
+            bottom && { mt: "auto" },
          ]}
       >
          <Container

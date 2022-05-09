@@ -16,7 +16,7 @@ import {
    TextField,
    Grow,
 } from "@mui/material"
-import { BarChart } from "@mui/icons-material"
+import BarChart from "@mui/icons-material/BarChart"
 import { GlassDialog } from "../../../../../../../materialUI/GlobalModals"
 import { v4 as uuidv4 } from "uuid"
 import useStreamRef from "../../../../../../custom-hook/useStreamRef"

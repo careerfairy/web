@@ -10,7 +10,7 @@ import {
    getMaxLineStyles,
    getResizedUrl,
 } from "../../../helperFunctions/HelperFunctions"
-import { ChevronRight } from "@mui/icons-material"
+import ChevronRight from "@mui/icons-material/ChevronRight"
 import Link from "next/link"
 import { alpha, Theme } from "@mui/material/styles"
 

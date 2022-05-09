@@ -7,6 +7,7 @@ import RootState from "../store/reducers"
 import * as Sentry from "@sentry/nextjs"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import nookies from "nookies"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -14,7 +15,7 @@ const Loader = dynamic(() => import("../components/views/loader/Loader"), {
 
 type DefaultContext = {
    authenticatedUser?: FirebaseReducer.AuthState
-   userData?: any
+   userData?: UserData
    isLoggedOut: boolean
 }
 const AuthContext = createContext<DefaultContext>({
@@ -62,9 +63,11 @@ const AuthProvider = ({ children }) => {
       ({ firestore }: RootState) => firestore.data["userProfile"]
    )
 
+   const isLoggedOut = Boolean(auth.isLoaded && auth.isEmpty)
+
    useEffect(() => {
       // Check that initial route is OK
-      if (isSecurePath() && isLoggedOut()) {
+      if (isSecurePath() && isLoggedOut) {
          void replace({
             pathname: `/login`,
             query: { absolutePath: asPath },
@@ -133,8 +136,6 @@ const AuthProvider = ({ children }) => {
       return Boolean(adminPaths.includes(pathname))
    }
 
-   const isLoggedOut = () => auth.isLoaded && auth.isEmpty
-
    if ((isSecurePath() || isAdminPath()) && !auth.isLoaded) {
       return <Loader />
    }
@@ -143,8 +144,8 @@ const AuthProvider = ({ children }) => {
       <AuthContext.Provider
          value={{
             authenticatedUser: auth,
-            userData,
-            isLoggedOut: Boolean(auth.isLoaded && auth.isEmpty),
+            userData: isLoggedOut ? undefined : userData,
+            isLoggedOut,
          }}
       >
          {children}

@@ -1,14 +1,10 @@
 import React from "react"
-import Head from "next/head"
 import PropTypes from "prop-types"
+import SEO from "../../components/util/SEO"
 
 const DashboardHead = ({ title, group }) => {
    const pageTitle = `${title} ${group?.universityName}`
-   return (
-      <Head>
-         <title>{pageTitle}</title>
-      </Head>
-   )
+   return <SEO title={pageTitle} />
 }
 
 DashboardHead.propTypes = {
