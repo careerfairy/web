@@ -1,4 +1,5 @@
 import { Identifiable } from "../commonTypes"
+import firebase from "firebase"
 
 export interface UserData extends Identifiable {
    authId: string
@@ -28,21 +29,23 @@ export interface UserData extends Identifiable {
 export interface SavedRecruiter extends Identifiable {
    livestreamId: string
    userId: string
-   savedAt: Date
+   savedAt: firebase.firestore.Timestamp
 
    livestreamDetails: {
       title: string
-      companyName: string
-      description: string
-      start: Date
-      imageUrl: string
+      company: string
+      summary: string
+      start: firebase.firestore.Timestamp
+      companyLogoUrl: string
    }
 
    streamerDetails: {
-      profilePic: string
-      linkedinUrl: string
+      id: string
+      avatar: string
+      linkedIn: string
       firstName: string
       lastName: string
-      occupation: string
+      position: string
+      background: string
    }
 }

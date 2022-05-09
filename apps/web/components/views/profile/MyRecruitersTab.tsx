@@ -130,7 +130,10 @@ const RecruiterList = () => {
       <Box>
          {data.map((recruiter, i) => (
             <Box mb={2} key={i}>
-               <RecruiterCard recruiter={recruiter} />
+               <RecruiterCard
+                  // @ts-ignore
+                  recruiter={recruiter}
+               />
             </Box>
          ))}
       </Box>
@@ -166,7 +169,7 @@ const RecruiterCard = ({ recruiter }: { recruiter: SavedRecruiter }) => {
 }
 
 const NoAccess = ({ userPresenter }: { userPresenter: UserPresenter }) => {
-   const requiredBadge: Badge = userPresenter.saveRecruitersRequiredBadge()
+   const requiredBadge: Badge = UserPresenter.saveRecruitersRequiredBadge()
 
    return (
       <>

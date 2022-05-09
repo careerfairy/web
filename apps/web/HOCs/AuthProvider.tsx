@@ -8,6 +8,7 @@ import * as Sentry from "@sentry/nextjs"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import nookies from "nookies"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -15,7 +16,7 @@ const Loader = dynamic(() => import("../components/views/loader/Loader"), {
 
 type DefaultContext = {
    authenticatedUser?: FirebaseReducer.AuthState
-   userData?: any
+   userData?: UserData
    isLoggedOut: boolean
    userPresenter?: UserPresenter
 }

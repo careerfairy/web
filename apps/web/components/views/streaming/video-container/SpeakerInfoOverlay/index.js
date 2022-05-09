@@ -4,8 +4,6 @@ import makeStyles from "@mui/styles/makeStyles"
 import PropTypes from "prop-types"
 import dynamic from "next/dynamic"
 import { IconButton, Tooltip } from "@mui/material"
-import AccountBoxIcon from "@mui/icons-material/AccountBox"
-import AccountBoxOutlinedIcon from "@mui/icons-material/AccountBoxOutlined"
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
 
 const useStyles = makeStyles((theme) => ({
@@ -55,21 +53,18 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-// const SpeakerDetailsDialog = dynamic(() => import("./SpeakerDetailsDialog"))
-
 const SpeakerInfoOverlay = ({ speaker, small, zIndex }) => {
-   const [ShowDialog, setShowDialog] = React.useState(null)
+   const [DialogComponent, setDialogComponent] = React.useState(null)
 
    const closeDialog = useCallback(async () => {
-      setShowDialog(null)
+      setDialogComponent(null)
    }, [])
 
    const openDialog = useCallback(async () => {
       const SpeakerDetailsDialog = dynamic(() =>
          import("./SpeakerDetailsDialog")
       )
-      console.log("component", SpeakerDetailsDialog)
-      setShowDialog(SpeakerDetailsDialog)
+      setDialogComponent(SpeakerDetailsDialog)
    }, [])
 
    const classes = useStyles({ small: small, zIndex })
@@ -111,7 +106,9 @@ const SpeakerInfoOverlay = ({ speaker, small, zIndex }) => {
                </Tooltip>
             </div>
          </div>
-         {ShowDialog && <ShowDialog onClose={closeDialog} speaker={speaker} />}
+         {DialogComponent && (
+            <DialogComponent onClose={closeDialog} speaker={speaker} />
+         )}
       </>
    )
 }

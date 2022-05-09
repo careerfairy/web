@@ -16,10 +16,14 @@ import ColorizedAvatar from "../../../common/ColorizedAvatar"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import SaveIcon from "@mui/icons-material/Save"
-import React from "react"
+import React, { useState } from "react"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import Link from "../../../common/Link"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
+import { pick } from "lodash"
+import useRecruiterData from "./useRecruiterData"
+import LoadingButton from "@mui/lab/LoadingButton"
 
 const SpeakerDetailsDialog = ({ speaker, onClose }) => {
    const {
@@ -69,7 +73,7 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
                         </Button>
                      </Tooltip>
                   )}
-                  <SaveRecruiterButton />
+                  <SaveRecruiterButton speaker={matchedSpeaker} />
                </CardActions>
             </Card>
          </DialogContent>
@@ -89,8 +93,11 @@ const handleLinkedInClick = (url) => {
    window.open(url, "_blank")
 }
 
-const SaveRecruiterButton = () => {
+const SaveRecruiterButton = ({ speaker }) => {
    const { userPresenter, isLoggedOut } = useAuth()
+   const { currentLivestream } = useCurrentStream()
+   const { isLoading, recruiterData, saveRecruiter, recruiterSaved } =
+      useRecruiterData(speaker.id)
 
    let tooltipMessage =
       "The speaker details will be saved on the My Recruiters page under your profile."
@@ -99,21 +106,43 @@ const SaveRecruiterButton = () => {
       tooltipMessage = "You must be logged in to save a speaker."
    }
 
+   const isAlreadySaved = Boolean(recruiterData || recruiterSaved)
+
+   if (isAlreadySaved) {
+      tooltipMessage = "This Speaker is already on your saved list."
+   }
+
    if (!userPresenter?.canSaveRecruiters()) {
       return <SaveRecruiterButtonNoAccess />
    }
+
+   const onClick = () => {
+      const recruiter: SavedRecruiter = createSavedRecruiter(
+         userPresenter.model.id,
+         currentLivestream,
+         speaker
+      )
+
+      saveRecruiter(recruiter).catch(console.error)
+   }
+
+   const isButtonDisabled = Boolean(
+      isLoading || !userPresenter?.canSaveRecruiters()
+   )
 
    return (
       <>
          <Tooltip title={tooltipMessage}>
             <span>
-               <Button
+               <LoadingButton
                   variant="contained"
                   startIcon={<SaveIcon />}
-                  disabled={!userPresenter?.canSaveRecruiters()}
+                  disabled={isButtonDisabled || isAlreadySaved}
+                  onClick={onClick}
+                  loading={isLoading}
                >
-                  Save For Later
-               </Button>
+                  {isAlreadySaved ? "Saved" : "Save for later"}
+               </LoadingButton>
             </span>
          </Tooltip>
       </>
@@ -123,6 +152,7 @@ const SaveRecruiterButton = () => {
 const SaveRecruiterButtonNoAccess = () => {
    const [anchorEl, setAnchorEl] = React.useState(null)
    const [timeout, setTimeoutValue] = React.useState(null)
+
    const isMobile = useIsMobile()
 
    const requiredBadge = UserPresenter.saveRecruitersRequiredBadge()
@@ -187,6 +217,35 @@ const SaveRecruiterButtonNoAccess = () => {
          </Popover>
       </>
    )
+}
+
+const createSavedRecruiter = (userId, currentLivestream, speaker) => {
+   const recruiterInfo: SavedRecruiter = {
+      id: speaker.id,
+      livestreamId: currentLivestream.id,
+      userId: userId,
+      savedAt: null, // will be set by the server
+
+      livestreamDetails: pick(currentLivestream, [
+         "title",
+         "company",
+         "summary",
+         "start",
+         "companyLogoUrl",
+      ]),
+
+      streamerDetails: pick(speaker, [
+         "linkedIn",
+         "firstName",
+         "lastName",
+         "position",
+         "id",
+         "avatar",
+         "background",
+      ]),
+   }
+
+   return recruiterInfo
 }
 
 /**
