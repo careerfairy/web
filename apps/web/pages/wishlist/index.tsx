@@ -4,8 +4,9 @@ import wishRepo from "../../data/firebase/WishRepository"
 import Container from "@mui/material/Container"
 import useInfiniteScrollSubscribe from "../../components/custom-hook/useInfiniteScrollSubscribe"
 import { Grid, Typography } from "@mui/material"
-import CreateWish from "../../components/views/wishlist/CreateWish"
+import CreateAndFilter from "../../components/views/wishlist/CreateAndFilter"
 import WishSection from "../../components/views/wishlist/WishSection"
+import Header from "../../components/views/wishlist/Header"
 
 const pageSize = 10
 const Wishlist = () => {
@@ -22,10 +23,15 @@ const Wishlist = () => {
          <Container maxWidth={"md"}>
             <Grid container spacing={2}>
                <Grid item xs={12}>
-                  <Typography variant={"h1"}>Wishes</Typography>
+                  <Header
+                     title={"Wishlist"}
+                     subtitle={
+                        "Add a company or topic that you’d like to see hosted on CareerFairy"
+                     }
+                  />
                </Grid>
                <Grid item xs={12}>
-                  <CreateWish />
+                  <CreateAndFilter />
                </Grid>
                <Grid item xs={12}>
                   <WishSection

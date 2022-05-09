@@ -31,6 +31,9 @@ declare module "@mui/material" {
 declare module "@mui/material/styles" {
    interface ThemeOptions {
       whiteShadow?: string
+      customShadows?: {
+         softShadow: string
+      }
       drawerWidth?: { small?: string; medium?: string }
       darkTextShadow?: string
    }
@@ -132,6 +135,9 @@ export const rootThemeObj = (mode: PaletteMode) =>
       },
       whiteShadow:
          "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)",
+      customShadows: {
+         softShadow: `drop-shadow(0px 12px 30px ${alpha("#000", 0.12)})`,
+      },
       drawerWidth: { small: "256px", medium: "300px" },
       darkTextShadow:
          "0px 3px 3px rgba(0,0,0,0.4)," +
@@ -202,8 +208,8 @@ const getComponents = (theme: Theme) => ({
          },
          root: ({ stacked }) => ({
             ...(stacked && {
-               margin: "0.5em",
-               marginLeft: 0,
+               margin: "0.5em 0.5em 0 0",
+               // marginLeft: 0,
             }),
          }),
       },
