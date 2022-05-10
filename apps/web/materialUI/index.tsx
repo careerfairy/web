@@ -5,6 +5,7 @@ import { grey } from "@mui/material/colors"
 
 import React from "react"
 import { PaletteMode } from "@mui/material"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 
 declare module "@mui/styles/defaultTheme" {
    interface DefaultTheme extends Theme {
@@ -63,7 +64,7 @@ declare module "@mui/material/styles" {
    }
 }
 
-export const rootThemeObj = (mode: PaletteMode) =>
+export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
    createTheme({
       transitions: {
          duration: {
@@ -145,9 +146,9 @@ export const rootThemeObj = (mode: PaletteMode) =>
          "0px 3px 3px rgba(0,0,0,0.4)," +
          "0px 8px 13px rgba(0,0,0,0.1)," +
          "0px 18px 23px rgba(0,0,0,0.1);",
-   })
+   }) as DefaultTheme
 
-const getComponents = (theme: Theme): Components => ({
+const getComponents = (theme: DefaultTheme): Components => ({
    // Name of the component
    MuiButton: {
       styleOverrides: {
@@ -245,7 +246,7 @@ const getComponents = (theme: Theme): Components => ({
    },
 })
 
-export const getTheme = (rootThemeObj: Theme) => {
+export const getTheme = (rootThemeObj: DefaultTheme) => {
    const themeWithMode = createTheme({
       ...rootThemeObj,
       palette: {
@@ -269,7 +270,7 @@ export const getTheme = (rootThemeObj: Theme) => {
                  },
               }),
       },
-   })
+   }) as DefaultTheme
 
    return {
       ...themeWithMode,
