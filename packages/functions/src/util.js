@@ -367,6 +367,14 @@ const generateReferralCode = () => {
    return nanoid()
 }
 
+//Partition function
+function partition(array, filter) {
+   let pass = [],
+      fail = []
+   array.forEach((e, idx, arr) => (filter(e, idx, arr) ? pass : fail).push(e))
+   return [pass, fail]
+}
+
 /**
  * Detect if we're running the emulators
  *
@@ -400,4 +408,5 @@ module.exports = {
    createNestedArrayOfTemplates,
    generateReferralCode,
    isLocalEnvironment,
+   partition,
 }
