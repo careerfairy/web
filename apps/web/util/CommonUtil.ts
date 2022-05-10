@@ -88,6 +88,16 @@ export function getListSeparator() {
    return ","
 }
 
+/**
+ * We need to use the opposite list separator char for the csv
+ * @returns {string}
+ */
+export function getCSVDelimiterBasedOnOS() {
+   const separator = getListSeparator()
+
+   return separator === "," ? ";" : ","
+}
+
 export const getQueryStringFromUrl = (url = "", queryParam = "") => {
    let params = new URL(url).searchParams
    return params.get(queryParam)
@@ -113,18 +123,31 @@ export function stringToColor(string: string) {
    return color
 }
 
-export function stringAvatar(name: string) {
-   // const cleanedName = name.split("undefined").join("")
-   const getRandName = () =>
-      String.fromCharCode(65 + Math.floor(Math.random() * 26))
-   const cleanedName = `${getRandName()} ${getRandName()}`
-   const initials = `${cleanedName.split(" ")[0][0] || ""}${
-      cleanedName.split(" ")[1][0] || ""
-   }`
+export function stringAvatar(firstName: string, lastName: string) {
+   let name = ""
+   // we trim the last name to avoid
+   // too initials for the avatar component causing an ugly overflow
+   // before: "${John Doe} ${Bane Philip}" -> "JDBP"
+   // Now: "${John Doe} ${Dane Philip}" -> "JD"
+   if (firstName) {
+      name += firstName.trim()
+   }
+
+   if (lastName) {
+      name += ` ${lastName.trim()}`
+   }
+   if (name === "") {
+      name = "Anonymous"
+   }
+   const initials = name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+
    return {
       sx: {
-         bgcolor: stringToColor(cleanedName),
+         bgcolor: stringToColor(name),
       },
-      children: initials || "A",
+      children: initials,
    }
 }

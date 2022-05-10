@@ -38,7 +38,7 @@ import {
 import RegistrationModal from "../../../common/registration-modal"
 import styles from "./GroupStreamCardV2Styles"
 import { languageCodesDict } from "../../../../helperFunctions/streamFormFunctions"
-import { ShareOutlined } from "@mui/icons-material"
+import ShareOutlined from "@mui/icons-material/ShareOutlined"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 
 const maxOptions = 2

@@ -3,6 +3,7 @@ import { CircularProgress, Grid } from "@mui/material"
 import StreamCard from "./StreamCard"
 import { isEmpty, isLoaded } from "react-redux-firebase"
 import PropTypes from "prop-types"
+import { useSelector } from "react-redux"
 
 const StreamsContainer = ({ isUpcoming, streams }) => {
    if (!isLoaded(streams)) {
@@ -13,6 +14,10 @@ const StreamsContainer = ({ isUpcoming, streams }) => {
       return <span>No streams found</span>
    }
 
+   const drawerOpen = useSelector(
+      (state) => state.generalLayout.layout.drawerOpen
+   )
+
    return (
       <React.Fragment>
          {streams.map((stream) => (
@@ -21,7 +26,7 @@ const StreamsContainer = ({ isUpcoming, streams }) => {
                item
                xs={12}
                sm={6}
-               md={4}
+               md={drawerOpen ? 6 : 4}
                lg={4}
                xl={3}
             >

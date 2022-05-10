@@ -122,3 +122,11 @@ http://localhost:4000/
 Update the `firestore.rules` file with your new rules, test them using the local emulators.
 
 Create a Pull Request with the new changes, and only after approval, you should deploy them using `npm run deploy:rules`.
+
+### Run E2E tests on a linux docker container
+
+Useful to find test flaws that appear during CI.
+
+```sh
+docker build -t tests -f apps/web/Dockerfile.test . && docker run -p 9323:9323 -it tests
+```

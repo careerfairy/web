@@ -1,5 +1,6 @@
-import { Theme } from "@mui/material/styles"
-import { SxProps } from "@mui/system"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
+import { SystemStyleObject } from "@mui/system"
+
 /**
  * Every firebase document should have an ID
  */
@@ -8,5 +9,5 @@ export interface Identifiable {
 }
 
 export type StylesProps = {
-   [key: string]: SxProps<Theme>
+   [propName: string]: SystemStyleObject<DefaultTheme>
 }

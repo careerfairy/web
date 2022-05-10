@@ -32,15 +32,15 @@ const SEO = ({
    return <NextSeo {...SEO} />
 }
 interface Props extends NextSeoProps {
-   id: string
+   id?: string
    image?: {
       width?: number
       height?: number
       type?: string
       url: string
    }
-   keywords: string
-   noIndex: boolean
+   keywords?: string
+   noIndex?: boolean
 }
 
 export default SEO

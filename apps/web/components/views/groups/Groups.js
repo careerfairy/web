@@ -9,7 +9,7 @@ import Link from "next/link"
 export const Highlights = ({
    groups,
    handleSelectGroup,
-   absolutePath,
+   absolutePath = undefined,
    hideButton,
 }) => {
    return (
