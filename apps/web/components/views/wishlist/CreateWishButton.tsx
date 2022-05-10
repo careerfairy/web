@@ -2,8 +2,6 @@ import React from "react"
 import Stack from "@mui/material/Stack"
 import { darken } from "@mui/material"
 import Link from "../common/Link"
-import Avatar from "@mui/material/Avatar"
-import { stringAvatar } from "../../../util/CommonUtil"
 import { wishListBorderRadius } from "../../../constants/pages"
 import CreateWishDialog from "./CreateWishDialog"
 import { useAuth } from "../../../HOCs/AuthProvider"
@@ -13,6 +11,7 @@ import { StylesProps } from "../../../types/commonTypes"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { getMaxLineStyles } from "../../helperFunctions/HelperFunctions"
+import UserAvatar from "../common/UserAvatar"
 
 const styles: StylesProps = {
    paper: {
@@ -46,7 +45,7 @@ const styles: StylesProps = {
    },
 }
 const CreateWishButton = () => {
-   const { userData, isLoggedOut } = useAuth()
+   const { isLoggedOut } = useAuth()
    const { asPath } = useRouter()
    const [createWishDialogOpen, handleOpenWishDialog, handleCloseWishDialog] =
       useDialog()
@@ -59,16 +58,7 @@ const CreateWishButton = () => {
             alignItems={"center"}
             spacing={1}
          >
-            <Avatar
-               src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
-               // src={userData?.avatarUrl}
-               onClick={(e) => e.stopPropagation()}
-               component={Link}
-               noLinkStyle
-               sx={styles.avatar}
-               href={"/profile"}
-               {...stringAvatar(`${userData?.firstName} ${userData?.lastName}`)}
-            />
+            <UserAvatar size={"medium"} />
             <Box className={"prompt"} sx={styles.prompt}>
                <Typography sx={styles.promptText}>
                   What would you like to wish for?

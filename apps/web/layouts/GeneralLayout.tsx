@@ -6,19 +6,30 @@ import Page, {
    PageChildrenWrapper,
    PageContentWrapper,
 } from "../components/views/common/Page"
+import { useTheme } from "@mui/material/styles"
+import { useMediaQuery } from "@mui/material"
+import { desktopProp } from "../constants/pages"
 
 interface Props {
    children: React.ReactNode
    fullScreen?: boolean
    backgroundColor?: string
    hideNavOnScroll?: boolean
+   persistent?: boolean
 }
 const GeneralLayout = ({
    children,
    fullScreen,
    backgroundColor = undefined,
    hideNavOnScroll = false,
+   persistent = false,
 }: Props) => {
+   const theme = useTheme()
+
+   const isDesktop = useMediaQuery(theme.breakpoints.up(desktopProp), {
+      // noSsr: true,
+   })
+
    return (
       <Page
          sx={{
@@ -27,10 +38,12 @@ const GeneralLayout = ({
       >
          <GenericHeader hideNavOnScroll={hideNavOnScroll} position={"sticky"} />
          <PageContentWrapper>
-            <GeneralNavDrawer />
-            <PageChildrenWrapper>{children}</PageChildrenWrapper>
+            <GeneralNavDrawer isPersistent={isDesktop && persistent} />
+            <PageChildrenWrapper>
+               {children}
+               <FooterV2 bottom={fullScreen} />
+            </PageChildrenWrapper>
          </PageContentWrapper>
-         <FooterV2 bottom={fullScreen} />
       </Page>
    )
 }

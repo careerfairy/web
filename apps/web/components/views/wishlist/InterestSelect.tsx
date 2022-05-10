@@ -1,8 +1,9 @@
 import React, { useCallback } from "react"
-import { Autocomplete, Checkbox, Chip, TextField } from "@mui/material"
+import { Chip, FormHelperText } from "@mui/material"
 import { Interest } from "@careerfairy/shared-lib/dist/interests"
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
-import CheckBoxIcon from "@mui/icons-material/CheckBox"
+import Box from "@mui/material/Box"
+import { StylesProps } from "../../../types/commonTypes"
+
 interface InterestSelectProps {
    selectedInterests: Interest[]
    totalInterests: Interest[]
@@ -12,6 +13,13 @@ interface InterestSelectProps {
    handleBlur: (event: any) => void
    disabled: boolean
    limit?: number
+   id: string
+}
+
+const styles: StylesProps = {
+   interestChip: {
+      borderRadius: 1,
+   },
 }
 const InterestSelect = ({
    selectedInterests,
@@ -22,50 +30,67 @@ const InterestSelect = ({
    handleBlur,
    disabled,
    limit = 5,
+   id,
 }: InterestSelectProps) => {
+   const hasError = Boolean(error && touched && error)
    const limitReached = selectedInterests.length >= limit
    const checkDisable = useCallback(
-      (option) => limitReached && !selectedInterests.includes(option),
+      (interest: Interest) =>
+         (limitReached && !isInterestSelected(interest)) || disabled,
       [limitReached, selectedInterests]
    )
+
+   const handleClickInterest = useCallback(
+      (interest: Interest) => {
+         if (limitReached && !isInterestSelected(interest)) {
+            return
+         }
+         // check if interest is already selected
+         if (isInterestSelected(interest)) {
+            // remove interest from selected interests
+            setFieldValue(
+               "interests",
+               selectedInterests.filter(
+                  (selectedInterest) => selectedInterest.id !== interest.id
+               )
+            )
+         } else {
+            // add interest to selected interests
+            setFieldValue("interests", [...selectedInterests, interest])
+         }
+      },
+      [selectedInterests, limitReached]
+   )
+
+   const isInterestSelected = useCallback(
+      (interest: Interest) => {
+         return selectedInterests.find(
+            (selectedInterest) => selectedInterest.id === interest.id
+         )
+      },
+      [selectedInterests]
+   )
    return (
-      <Autocomplete
-         multiple
-         id="interests"
-         disabled={disabled}
-         getOptionDisabled={checkDisable}
-         disableCloseOnSelect
-         options={totalInterests}
-         getOptionLabel={(interest) => interest.name}
-         value={selectedInterests}
-         onChange={(event, newValue) => {
-            setFieldValue("interests", newValue)
-         }}
-         onBlur={handleBlur}
-         defaultValue={[]}
-         freeSolo
-         renderOption={(props, option, { selected }) => (
-            <li {...props}>
-               <Checkbox
-                  icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-                  checkedIcon={<CheckBoxIcon fontSize="small" />}
-                  style={{ marginRight: 8 }}
-                  checked={selected}
-               />
-               {option.name}
-            </li>
-         )}
-         renderInput={(params) => (
-            <TextField
-               {...params}
-               name={"interests"}
-               error={Boolean(error && touched && error)}
-               helperText={error && touched && error}
-               label="Interests"
-               placeholder="Chose some interests"
+      <Box id={id}>
+         {totalInterests.map((interest) => (
+            <Chip
+               sx={styles.interestChip}
+               onClick={() => handleClickInterest(interest)}
+               onBlur={handleBlur}
+               disabled={checkDisable(interest)}
+               color={isInterestSelected(interest) ? "primary" : "default"}
+               /*
+               // @ts-ignore */
+               variant={isInterestSelected(interest) ? "contained" : "outlined"}
+               stacked
+               label={interest.name}
+               key={interest.id}
             />
+         ))}
+         {hasError && (
+            <FormHelperText error>{error && touched && error}</FormHelperText>
          )}
-      />
+      </Box>
    )
 }
 

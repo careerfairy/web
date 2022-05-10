@@ -35,9 +35,9 @@ export interface IWishRepository {
    ): firebase.Unsubscribe
 }
 interface GetWishesOptions {
-   orderBy?: [WishOrderByFields, firebase.firestore.OrderByDirection]
+   orderByDate?: firebase.firestore.OrderByDirection
+   orderByUpvotes?: firebase.firestore.OrderByDirection
    targetInterestIds?: string[]
-   targetCategories?: Wish["category"][]
    startAfter?: firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>
    // Don't use the limit property if you are
    // using a hook that already has it's own limit property
@@ -47,39 +47,37 @@ interface GetWishesOptions {
 class FirebaseWishRepository implements IWishRepository {
    constructor(private readonly firestore: firebase.firestore.Firestore) {}
 
-   getWishesQuery({
-      orderBy,
-      targetCategories,
-      targetInterestIds,
-      limit,
-      startAfter,
-   }: GetWishesOptions = {}): firebase.firestore.Query<firebase.firestore.DocumentData> {
+   getWishesQuery(
+      getWishesOptions: GetWishesOptions = {}
+   ): firebase.firestore.Query<firebase.firestore.DocumentData> {
       let query: firebase.firestore.Query<firebase.firestore.DocumentData> =
          this.firestore
             .collection("wishes")
             .where("isDeleted", "==", false)
             .where("isPublic", "==", true)
-      if (targetCategories?.length > 0) {
-         query = query.where("category", "in", targetCategories)
-      }
-
-      if (targetInterestIds?.length > 0) {
+      if (getWishesOptions.targetInterestIds?.length > 0) {
          query = query.where(
-            "interests",
+            "interestIds",
             "array-contains-any",
-            targetInterestIds
+            getWishesOptions.targetInterestIds
          )
       }
       // startAfter is used to paginate
-      if (startAfter) {
-         query = query.startAfter(startAfter)
+      if (getWishesOptions.startAfter) {
+         query = query.startAfter(getWishesOptions.startAfter)
       }
-      if (orderBy) {
-         query = query.orderBy(`${orderBy[0]}`, orderBy[1])
+      if (getWishesOptions.orderByUpvotes) {
+         query = query.orderBy(
+            "numberOfUpvotes",
+            getWishesOptions.orderByUpvotes
+         )
+      }
+      if (getWishesOptions.orderByDate) {
+         query = query.orderBy("createdAt", getWishesOptions.orderByDate)
       }
 
-      if (limit) {
-         query = query.limit(limit)
+      if (getWishesOptions.limit) {
+         query = query.limit(getWishesOptions.limit)
       }
       return query
    }
@@ -92,14 +90,14 @@ class FirebaseWishRepository implements IWishRepository {
 
    async createWish(wishFormValues: CreateWishFormValues): Promise<Wish> {
       const newWish: Omit<Wish, "id"> = {
-         title: wishFormValues.title.trim(),
+         description: wishFormValues.description.trim(),
          companyNames: wishFormValues.companyNames,
          interestIds: wishFormValues.interests.map((interest) => interest.id),
-         category: wishFormValues.category,
          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
          authorUid: firebase.auth().currentUser?.uid,
          updatedAt: null,
          deletedAt: null,
+         uidsOfRecentUpvoters: [],
          isDeleted: false,
          numberOfViews: 0,
          numberOfUpvotes: 0,
@@ -121,7 +119,7 @@ class FirebaseWishRepository implements IWishRepository {
       // update wish ref
       const updatedWish: Partial<Wish> = {
          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-         title: wishFormValues.title.trim(),
+         description: wishFormValues.description.trim(),
          companyNames: wishFormValues.companyNames,
          interestIds: wishFormValues.interests.map((interest) => interest.id),
       }

@@ -1,26 +1,47 @@
-import WishListLayout from "../../layouts/WishListLayout"
 import { Wish } from "@careerfairy/shared-lib/dist/wishes"
 import wishRepo from "../../data/firebase/WishRepository"
 import Container from "@mui/material/Container"
-import useInfiniteScrollSubscribe from "../../components/custom-hook/useInfiniteScrollSubscribe"
-import { Grid, Typography } from "@mui/material"
+import { Grid } from "@mui/material"
 import CreateAndFilter from "../../components/views/wishlist/CreateAndFilter"
 import WishSection from "../../components/views/wishlist/WishSection"
 import Header from "../../components/views/wishlist/Header"
+import GeneralLayout from "../../layouts/GeneralLayout"
+import { useRouter } from "next/router"
+import {
+   DateSort,
+   UpvoteSort,
+} from "../../components/views/wishlist/FilterMenu"
+import useInfiniteScrollGet from "../../components/custom-hook/useInfiniteScrollGet"
+import { useMemo } from "react"
 
-const pageSize = 10
+const pageSize = 2
 const Wishlist = () => {
+   const { query } = useRouter()
+
+   const date = query.date as DateSort
+   const upvote = query.upvote as UpvoteSort
+   const interests = query.interests as string
+   const wishQuery = useMemo(() => {
+      return wishRepo.getWishesQuery({
+         ...(date && { orderByDate: date }),
+         ...(upvote && { orderByUpvotes: upvote }),
+         ...(interests && {
+            targetInterestIds: interests.split(","),
+         }),
+         limit: pageSize,
+      })
+   }, [date, upvote, interests])
    const {
       loading,
       loadingError,
       loadingMore,
       loadingMoreError,
-      mappedItems: wishes,
-   } = useInfiniteScrollSubscribe<Wish>(wishRepo.getWishesQuery(), pageSize)
+      data: wishes,
+   } = useInfiniteScrollGet<Wish>(wishQuery, pageSize)
 
    return (
-      <WishListLayout>
-         <Container maxWidth={"md"}>
+      <GeneralLayout backgroundColor={"white"} persistent>
+         <Container sx={{ py: 2 }} maxWidth={"md"}>
             <Grid container spacing={2}>
                <Grid item xs={12}>
                   <Header
@@ -44,7 +65,7 @@ const Wishlist = () => {
                </Grid>
             </Grid>
          </Container>
-      </WishListLayout>
+      </GeneralLayout>
    )
 }
 

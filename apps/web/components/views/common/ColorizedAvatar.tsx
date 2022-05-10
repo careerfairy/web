@@ -39,7 +39,7 @@ const ColorizedAvatar = ({
          sx={[avaProps.sx, ...(Array.isArray(sx) ? sx : [sx])]}
          {...rest}
          children={avaProps.children}
-         alt={name}
+         alt={`${firstName || ""} ${lastName || ""}`}
          src={imageUrl}
       />
    )

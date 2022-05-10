@@ -1,15 +1,24 @@
 // import { deepmerge } from "@mui/utils";
 // it could be your App.tsx file or theme file that is included in your tsconfig.json
-import { alpha, createTheme, Theme } from "@mui/material/styles"
+import { alpha, createTheme, PaletteOptions, Theme } from "@mui/material/styles"
 import { grey } from "@mui/material/colors"
 
 import React from "react"
-import { PaletteMode } from "@mui/material"
+import { PaletteMode, Components } from "@mui/material"
+import { DefaultTheme } from "@mui/styles"
 
 declare module "@mui/styles/defaultTheme" {
    // eslint-disable-next-line @typescript-eslint/no-empty-interface (remove this line if you don't have the rule enabled)
    interface DefaultTheme extends Theme {
-      drawerWidth: { small: string; medium: string }
+      drawerWidth?: { small: string; medium: string }
+      customShadows?: {
+         // color_y_blur_opacity
+         dark_12_13: string
+         dark_15_60: string
+         secondary_5_15_50: string
+         grey_5_15_50: string
+         primary_5_15_50: string
+      }
    }
 }
 
@@ -34,7 +43,12 @@ declare module "@mui/material/styles" {
    interface ThemeOptions {
       whiteShadow?: string
       customShadows?: {
-         softShadow: string
+         // color_y_blur_opacity
+         dark_12_13: string
+         dark_15_60: string
+         secondary_5_15_50: string
+         primary_5_15_50: string
+         grey_5_15_50: string
       }
       drawerWidth?: { small?: string; medium?: string }
       darkTextShadow?: string
@@ -63,33 +77,39 @@ declare module "@mui/material/styles" {
    }
 }
 
-export const rootThemeObj = (mode: PaletteMode) =>
+const secondary: PaletteOptions["secondary"] = {
+   light: "#b4a8ff",
+   main: "#7431e2",
+   dark: "#590db6",
+   gradient: "#644eec",
+   contrastText: "#FFFFFF",
+}
+const primary: PaletteOptions["primary"] = {
+   light: "#89c2ba",
+   main: "#00d2aa",
+   dark: "#00b08f",
+   contrastText: "#FFFFFF",
+   gradient: "#07c1a7",
+}
+
+export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
    createTheme({
       transitions: {
          duration: {
             complex: 700,
          },
       },
+      // shape: {
+      //    borderRadius: 20,
+      // },
       palette: {
          mode,
-         primary: {
-            light: "#89c2ba",
-            main: "#00d2aa",
-            dark: "#00b08f",
-            contrastText: "#FFFFFF",
-            gradient: "#07c1a7",
-         },
+         primary: primary,
          grey: {
             main: grey[300],
             dark: grey[400],
          },
-         secondary: {
-            light: "#b4a8ff",
-            main: "#7431e2",
-            dark: "#590db6",
-            gradient: "#644eec",
-            contrastText: "#FFFFFF",
-         },
+         secondary: secondary,
          error: {
             main: "#e70026",
             dark: "#b00024",
@@ -138,7 +158,17 @@ export const rootThemeObj = (mode: PaletteMode) =>
       whiteShadow:
          "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)",
       customShadows: {
-         softShadow: `drop-shadow(0px 12px 30px ${alpha("#000", 0.12)})`,
+         dark_12_13: `drop-shadow(0px 12px 30px ${alpha("#000", 0.12)})`,
+         dark_15_60: `drop-shadow(0px 12px 30px ${alpha("#000", 0.15)})`,
+         grey_5_15_50: `drop-shadow(0px 5px 15px ${alpha(grey[300], 0.5)})`,
+         secondary_5_15_50: `drop-shadow(0px 5px 15px ${alpha(
+            mode === "light" ? secondary.main : secondary.dark,
+            mode === "light" ? 0.5 : 0.2
+         )})`,
+         primary_5_15_50: `drop-shadow(0px 5px 15px ${alpha(
+            mode === "light" ? primary.main : primary.dark,
+            mode === "light" ? 0.5 : 0.2
+         )})`,
       },
       drawerWidth: { small: "256px", medium: "300px" },
       darkTextShadow:
@@ -147,17 +177,95 @@ export const rootThemeObj = (mode: PaletteMode) =>
          "0px 18px 23px rgba(0,0,0,0.1);",
    })
 
-const getComponents = (theme: Theme) => ({
+const getComponents = (theme: DefaultTheme): Components => ({
    // Name of the component
+   MuiBackdrop: {
+      styleOverrides: {
+         root: {
+            backgroundColor: alpha(theme.palette.common.black, 0.2),
+         },
+      },
+   },
+   MuiDialog: {
+      // Name of the style
+      styleOverrides: {
+         paper: {
+            borderRadius: 20,
+            boxShadow: "none",
+            filter: theme.customShadows.dark_15_60,
+         },
+      },
+   },
+   MuiPaper: {
+      styleOverrides: {
+         root: {
+            borderRadius: 15,
+         },
+      },
+   },
+   MuiOutlinedInput: {
+      styleOverrides: {
+         root: {
+            borderRadius: 15,
+         },
+      },
+   },
    MuiButton: {
       styleOverrides: {
          // Name of the slot
+         disableElevation: true,
          root: {
             // Some CSS
             fontWeight: 600,
+            padding: "1em 2em",
+            boxShadow: "none",
+            borderRadius: 30,
          },
       },
       variants: [
+         {
+            props: {
+               disableElevation: true,
+            },
+            style: {
+               filter: "none",
+            },
+         },
+         {
+            props: {
+               variant: "contained",
+            },
+            style: {
+               filter: theme.customShadows.primary_5_15_50,
+            },
+         },
+         {
+            props: {
+               variant: "contained",
+               color: "primary",
+            },
+            style: {
+               filter: theme.customShadows.primary_5_15_50,
+            },
+         },
+         {
+            props: {
+               variant: "contained",
+               color: "secondary",
+            },
+            style: {
+               filter: theme.customShadows.secondary_5_15_50,
+            },
+         },
+         {
+            props: {
+               variant: "contained",
+               color: "grey",
+            },
+            style: {
+               filter: theme.customShadows.grey_5_15_50,
+            },
+         },
          {
             props: { variant: "contained", color: "grey" },
             style: {
@@ -225,7 +333,7 @@ const getComponents = (theme: Theme) => ({
    },
 })
 
-export const getTheme = (rootThemeObj: Theme) => {
+export const getTheme = (rootThemeObj: DefaultTheme) => {
    const themeWithMode = createTheme({
       ...rootThemeObj,
       palette: {
@@ -249,7 +357,7 @@ export const getTheme = (rootThemeObj: Theme) => {
                  },
               }),
       },
-   })
+   }) as DefaultTheme
 
    return {
       ...themeWithMode,

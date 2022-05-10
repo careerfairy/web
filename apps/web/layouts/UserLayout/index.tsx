@@ -10,9 +10,9 @@ import { CircularProgress, useMediaQuery } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import GeneralNavDrawer from "../../components/views/navbar/GeneralNavDrawer"
+import { desktopProp } from "../../constants/pages"
 
 type Props = {}
-const desktopProp = "md"
 
 const UserLayout: FC<Props> = ({ children }) => {
    const theme = useTheme()

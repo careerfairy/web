@@ -6,12 +6,11 @@ import GenericDrawer from "../components/views/navbar/GenericDrawer"
 import Page from "../components/views/common/Page"
 
 type Props = {}
-const drawerWidth = 300
 const WishListLayout: FC<Props> = ({ children }) => {
    return (
-      <Page>
+      <Page backgroundColor={"white"}>
          <GenericHeader transparent />
-         <GenericDrawer drawerWidth={drawerWidth} />
+         <GenericDrawer />
          <Box component={"main"}>{children}</Box>
          <FooterV2 sx={{ mt: "auto" }} />
       </Page>

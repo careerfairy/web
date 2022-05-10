@@ -13,6 +13,8 @@ import Typography from "@mui/material/Typography"
 import { useRouter } from "next/router"
 import { ResponsiveOption, ResponsiveSelect } from "../common/ResponsiveSelect"
 import { useInterests } from "../../custom-hook/useCollection"
+import { StylesProps } from "../../../types/commonTypes"
+import firebase from "firebase/app"
 
 interface Props {
    open: boolean
@@ -21,11 +23,11 @@ interface Props {
    handleClose: () => any
 }
 
-const styles = {
+const styles: StylesProps = {
    paperRoot: {
       borderRadius: wishListBorderRadius,
       boxShadow: "none",
-      filter: (theme) => theme.customShadows.softShadow,
+      filter: (theme) => theme.customShadows.dark_12_13,
    },
    content: {
       p: 2,
@@ -47,8 +49,8 @@ interface SelectProps {
    options: { value: DateSort | UpvoteSort | InterestSort; label: string }[]
 }
 
-export type DateSort = "newest" | "oldest"
-export type UpvoteSort = "most" | "least"
+export type DateSort = firebase.firestore.OrderByDirection
+export type UpvoteSort = firebase.firestore.OrderByDirection
 export type InterestSort = string
 const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
    const { data: interests } = useInterests()
@@ -64,8 +66,8 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
                handleQuery("date", event.target.value)
             },
             options: [
-               { value: "newest", label: "Newest" },
-               { value: "oldest", label: "Oldest" },
+               { value: "desc", label: "Newest" },
+               { value: "asc", label: "Oldest" },
             ],
          },
          {
@@ -77,8 +79,8 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
                handleQuery("upvote", event.target.value)
             },
             options: [
-               { value: "most", label: "Most" },
-               { value: "least", label: "Least" },
+               { value: "desc", label: "Most" },
+               { value: "asc", label: "Least" },
             ],
          },
       ],
@@ -86,6 +88,7 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
    )
 
    const handleQuery = (queryParam: string, queryValue: string | string[]) => {
+      const otherOrderByParam = queryParam === "date" ? "upvote" : "date"
       const newQuery = {
          ...query,
          [queryParam]: Array.isArray(queryValue)
@@ -94,6 +97,8 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
       }
       if (!queryValue) {
          delete newQuery[queryParam]
+      } else {
+         delete newQuery[otherOrderByParam]
       }
       void push(
          {
@@ -132,7 +137,7 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
       void push({ pathname, query: {} }, undefined, { shallow: true })
    }
    const isSelected = useCallback(
-      (interestName) => query.interests?.includes(interestName),
+      (interestId) => query.interests?.includes(interestId),
       [query.interests]
    )
 
@@ -217,16 +222,14 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
                      {interests.map((interest) => (
                         <Chip
                            sx={styles.interestChip}
-                           onClick={() => handleClickInterest(interest.name)}
+                           onClick={() => handleClickInterest(interest.id)}
                            color={
-                              isSelected(interest.name) ? "primary" : "default"
+                              isSelected(interest.id) ? "primary" : "default"
                            }
                            /*
                            // @ts-ignore */
                            variant={
-                              isSelected(interest.name)
-                                 ? "contained"
-                                 : "outlined"
+                              isSelected(interest.id) ? "contained" : "outlined"
                            }
                            stacked
                            label={interest.name}

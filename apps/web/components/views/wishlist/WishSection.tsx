@@ -1,5 +1,5 @@
 import React from "react"
-import { CircularProgress, Grid, Typography } from "@mui/material"
+import { CircularProgress, Typography } from "@mui/material"
 import { Wish } from "@careerfairy/shared-lib/dist/wishes"
 import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
@@ -8,7 +8,6 @@ import { useInterests } from "../../custom-hook/useCollection"
 
 interface WishSectionProps {
    wishes: Wish[]
-   category?: Wish["category"]
    loading: boolean
    loadingMore: boolean
    loadingError: null | Error
@@ -16,7 +15,6 @@ interface WishSectionProps {
 }
 const WishSection = ({
    wishes,
-   category,
    loading,
    loadingError,
    loadingMore,
@@ -52,8 +50,7 @@ const WishSection = ({
 
    return (
       <Stack spacing={2}>
-         {category && <Typography variant="h6">{category}</Typography>}
-         <Stack spacing={1}>
+         <Stack spacing={2}>
             {wishes.map((wish) => (
                <WishCard interests={interests} key={wish.id} wish={wish} />
             ))}
