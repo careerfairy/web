@@ -9,10 +9,10 @@ export interface UserData extends Identifiable {
       code: string
       name: string
    }
-   badges: string[]
+   badges?: string[]
    groupIds: string[]
    linkedinUrl: string
-   isAdmin: boolean
+   isAdmin?: boolean
    userResume: string
    universityCountryCode: string
    unsubscribed?: boolean
@@ -27,8 +27,6 @@ export interface UserData extends Identifiable {
    }
    referralsCount?: number
    livestreamsAttendances?: number
-   badges?: string[]
-   isAdmin?: boolean
 }
 
 export interface SavedRecruiter extends Identifiable {

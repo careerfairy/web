@@ -1,13 +1,12 @@
 // import { deepmerge } from "@mui/utils";
 // it could be your App.tsx file or theme file that is included in your tsconfig.json
-import { alpha, createTheme, Theme } from "@mui/material/styles"
+import { alpha, Components, createTheme, Theme } from "@mui/material/styles"
 import { grey } from "@mui/material/colors"
 
 import React from "react"
 import { PaletteMode } from "@mui/material"
 
 declare module "@mui/styles/defaultTheme" {
-   // eslint-disable-next-line @typescript-eslint/no-empty-interface (remove this line if you don't have the rule enabled)
    interface DefaultTheme extends Theme {
       drawerWidth: { small: string; medium: string }
    }
@@ -33,6 +32,10 @@ declare module "@mui/material" {
 declare module "@mui/material/styles" {
    interface ThemeOptions {
       whiteShadow?: string
+      customShadows?: {
+         // color_y_blur
+         dark_8_25?: string
+      }
       drawerWidth?: { small?: string; medium?: string }
       darkTextShadow?: string
    }
@@ -132,6 +135,9 @@ export const rootThemeObj = (mode: PaletteMode) =>
          fontFamily: "Poppins,sans-serif",
          htmlFontSize: 16,
       },
+      customShadows: {
+         dark_8_25: `drop-shadow(0px 8px 25px ${alpha("#212020", 0.1)})`,
+      },
       whiteShadow:
          "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)",
       drawerWidth: { small: "256px", medium: "300px" },
@@ -141,7 +147,7 @@ export const rootThemeObj = (mode: PaletteMode) =>
          "0px 18px 23px rgba(0,0,0,0.1);",
    })
 
-const getComponents = (theme: Theme) => ({
+const getComponents = (theme: Theme): Components => ({
    // Name of the component
    MuiButton: {
       styleOverrides: {
@@ -149,6 +155,7 @@ const getComponents = (theme: Theme) => ({
          root: {
             // Some CSS
             fontWeight: 600,
+            borderRadius: 100,
          },
       },
       variants: [
@@ -212,6 +219,27 @@ const getComponents = (theme: Theme) => ({
       styleOverrides: {
          tooltip: {
             fontSize: "1rem",
+         },
+      },
+   },
+   MuiCard: {
+      styleOverrides: {
+         root: {
+            borderRadius: 15,
+         },
+      },
+   },
+   MuiPaper: {
+      styleOverrides: {
+         root: {
+            borderRadius: 15,
+         },
+      },
+   },
+   MuiOutlinedInput: {
+      styleOverrides: {
+         root: {
+            borderRadius: 15,
          },
       },
    },

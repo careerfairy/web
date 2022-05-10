@@ -159,7 +159,6 @@ const styles = {
    },
    btn: {
       flex: 1,
-      borderRadius: 1,
    },
    bottomLogoWrapper: {
       display: "grid",

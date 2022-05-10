@@ -64,63 +64,20 @@ const data = [
       savedAt: new Date(),
       livestreamDetails: {
          title: "Livestream 1",
-         companyName: "Facebook",
-         description: "Livestream 1 description",
+         company: "Facebook",
+         summary: "Livestream 1 description",
          start: new Date(),
-         location: "Livestream 1 location",
-         imageUrl:
+         companyLogoUrl:
             "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2F043996e8-e633-4351-9e04-5a4714ddf3ca_091386.jpg?alt=media",
       },
       streamerDetails: {
-         profilePic: null,
-         linkedinUrl: "https://www.linkedin.com/in/james-bond-1/",
+         id: "sdf",
+         avatar: null,
+         linkedIn: "https://www.linkedin.com/in/james-bond-1/",
          firstName: "Carlos",
          lastName: "Florencio",
-         occupation: "Dev",
-      },
-   },
-   {
-      id: "sdfsdf",
-      livestreamId: "livestream-id-1",
-      userId: "user-id-1",
-      savedAt: new Date(),
-      livestreamDetails: {
-         title: "Livestream 1",
-         companyName: "Facebook",
-         description: "Livestream 1 description",
-         start: new Date(),
-         location: "Livestream 1 location",
-         imageUrl:
-            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2F043996e8-e633-4351-9e04-5a4714ddf3ca_091386.jpg?alt=media",
-      },
-      streamerDetails: {
-         profilePic: null,
-         linkedinUrl: "https://www.linkedin.com/in/james-bond-1/",
-         firstName: "Carlos",
-         lastName: "Florencio",
-         occupation: "Dev",
-      },
-   },
-   {
-      id: "sdfsdf",
-      livestreamId: "livestream-id-1",
-      userId: "user-id-1",
-      savedAt: new Date(),
-      livestreamDetails: {
-         title: "Livestream 1",
-         companyName: "Facebook",
-         description: "Livestream 1 description",
-         start: new Date(),
-         location: "Livestream 1 location",
-         imageUrl:
-            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2F043996e8-e633-4351-9e04-5a4714ddf3ca_091386.jpg?alt=media",
-      },
-      streamerDetails: {
-         profilePic: null,
-         linkedinUrl: "https://www.linkedin.com/in/james-bond-1/",
-         firstName: "Carlos",
-         lastName: "Florencio",
-         occupation: "Dev",
+         position: "Dev",
+         background: "Dev",
       },
    },
 ]
@@ -148,7 +105,7 @@ const RecruiterCard = ({ recruiter }: { recruiter: SavedRecruiter }) => {
                <ColorizedAvatar
                   firstName={recruiter.streamerDetails.firstName}
                   lastName={recruiter.streamerDetails.lastName}
-                  imageUrl={recruiter.streamerDetails.profilePic}
+                  imageUrl={recruiter.streamerDetails.avatar}
                />
             }
             action={
@@ -162,7 +119,7 @@ const RecruiterCard = ({ recruiter }: { recruiter: SavedRecruiter }) => {
                </Box>
             }
             title={`${recruiter.streamerDetails.firstName} ${recruiter.streamerDetails.lastName}`}
-            subheader={`${recruiter.streamerDetails.occupation} - ${recruiter.livestreamDetails.companyName}`}
+            subheader={`${recruiter.streamerDetails.position} - ${recruiter.livestreamDetails.company}`}
          />
       </Card>
    )
