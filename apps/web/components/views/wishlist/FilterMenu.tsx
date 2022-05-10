@@ -154,14 +154,13 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
       >
          <Stack sx={styles.content} spacing={2}>
             {selects.map((select, index) => (
-               <FormControl variant={"outlined"} fullWidth>
+               <FormControl key={select.id} variant={"outlined"} fullWidth>
                   <Stack
                      direction={"row"}
                      justifyContent={"space-between"}
                      alignItems={"center"}
                      spacing={2}
                      sx={{ mb: 1 }}
-                     key={index}
                   >
                      <Typography
                         htmlFor={select.id}
