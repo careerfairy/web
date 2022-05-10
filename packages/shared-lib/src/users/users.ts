@@ -9,6 +9,11 @@ export interface UserData extends Identifiable {
       code: string
       name: string
    }
+   badges: string[]
+   groupIds: string[]
+   linkedinUrl: string
+   isAdmin: boolean
+   userResume: string
    universityCountryCode: string
    unsubscribed?: boolean
    userEmail: string

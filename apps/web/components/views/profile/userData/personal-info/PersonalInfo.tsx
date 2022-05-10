@@ -23,32 +23,33 @@ import * as actions from "store/actions"
 import { useSnackbar } from "notistack"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import BadgeSimpleButton from "../../BadgeSimpleButton"
+import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle"
+import { StylesProps } from "../../../../../types/commonTypes"
 
-const useStyles = makeStyles((theme) => ({
+const styles: StylesProps = {
    avatar: {
-      margin: theme.spacing(1),
-      backgroundColor: theme.palette.secondary.main,
+      margin: 1,
+      backgroundColor: (theme) => theme.palette.secondary.main,
    },
    submit: {
-      margin: theme.spacing(3, 0, 2),
+      margin: (theme) => theme.spacing(3, 0, 2),
       marginBottom: 0,
    },
    title: {
-      color: theme.palette.text.secondary,
+      color: "text.secondary",
       textTransform: "uppercase",
       fontSize: "1.8rem",
-      marginBottom: 30,
+      marginBottom: 3,
    },
    subtitle: {
       textTransform: "uppercase",
-      fontSize: "0.8rem",
+      fontSize: "0.8rem !important",
       fontWeight: "bold",
-      marginBottom: 20,
+      marginBottom: 1,
    },
-}))
+}
 
-const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
-   const classes = useStyles()
+const PersonalInfo = ({ userData, redirectToReferralsTab }) => {
    const [open, setOpen] = useState(false)
    const { enqueueSnackbar } = useSnackbar()
    const dispatch = useDispatch()
@@ -143,9 +144,9 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
                   <>
                      <Grid container spacing={2}>
                         <Grid item xs={8}>
-                           <Typography className={classes.title} variant="h4">
+                           <ContentCardTitle sx={styles.title}>
                               Personal Info
-                           </Typography>
+                           </ContentCardTitle>
                         </Grid>
                         <Grid item xs={4} sx={{ textAlign: "right" }}>
                            <BadgeSimpleButton
@@ -237,10 +238,7 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
                            </FormControl>
                         </Grid>
                         <Grid item xs={12}>
-                           <Typography
-                              className={classes.subtitle}
-                              variant="h5"
-                           >
+                           <Typography sx={styles.subtitle} variant="h5">
                               University
                            </Typography>
                         </Grid>
@@ -277,10 +275,7 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
                            />
                         </Grid>
                         <Grid item xs={12}>
-                           <Typography
-                              className={classes.subtitle}
-                              variant="h5"
-                           >
+                           <Typography sx={styles.subtitle} variant="h5">
                               Social
                            </Typography>
                         </Grid>
@@ -318,10 +313,7 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
                            </FormControl>
                         </Grid>
                         <Grid item xs={12}>
-                           <Typography
-                              className={classes.subtitle}
-                              variant="h5"
-                           >
+                           <Typography sx={styles.subtitle} variant="h5">
                               Newsletter
                            </Typography>
                         </Grid>
@@ -357,7 +349,7 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
                               <CircularProgress size={20} color="inherit" />
                            )
                         }
-                        className={classes.submit}
+                        sx={styles.submit}
                      >
                         {isSubmitting ? "Updating" : "Update"}
                      </Button>

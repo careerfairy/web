@@ -66,9 +66,11 @@ const AuthProvider = ({ children }) => {
       ({ firestore }: RootState) => firestore.data["userProfile"]
    )
 
+   const isLoggedOut = Boolean(auth.isLoaded && auth.isEmpty)
+
    useEffect(() => {
       // Check that initial route is OK
-      if (isSecurePath() && isLoggedOut()) {
+      if (isSecurePath() && isLoggedOut) {
          void replace({
             pathname: `/login`,
             query: { absolutePath: asPath },
@@ -137,8 +139,6 @@ const AuthProvider = ({ children }) => {
       return Boolean(adminPaths.includes(pathname))
    }
 
-   const isLoggedOut = () => auth.isLoaded && auth.isEmpty
-
    if ((isSecurePath() || isAdminPath()) && !auth.isLoaded) {
       return <Loader />
    }
@@ -147,8 +147,8 @@ const AuthProvider = ({ children }) => {
       <AuthContext.Provider
          value={{
             authenticatedUser: auth,
-            userData,
-            isLoggedOut: Boolean(auth.isLoaded && auth.isEmpty),
+            userData: isLoggedOut ? undefined : userData,
+            isLoggedOut,
             userPresenter: userData ? new UserPresenter(userData) : undefined,
          }}
       >

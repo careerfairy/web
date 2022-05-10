@@ -1,7 +1,6 @@
 import {
    Box,
    Button,
-   Container,
    Grid,
    Skeleton,
    Table,
@@ -11,10 +10,8 @@ import {
    TableHead,
    TableRow,
    TextField,
-   Typography,
 } from "@mui/material"
 import React, { useCallback } from "react"
-import { styles } from "../profileStyles"
 import ContentPasteIcon from "@mui/icons-material/ContentPaste"
 import { makeReferralUrl } from "../../../../util/makeUrls"
 import { useSnackbar } from "notistack"
@@ -29,21 +26,29 @@ import { Reward } from "../../../../types/reward"
 import BadgeSimpleButton from "../BadgeSimpleButton"
 import BadgeProgress from "./BadgeProgress"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
+import ContentCard from "../../../../layouts/UserLayout/ContentCard"
+import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
 
 const ReferralProfileTab = ({ userData }) => {
    const { enqueueSnackbar } = useSnackbar()
 
-   if (!userData.referralCode) {
+   if (!userData?.referralCode) {
       // This shouldn't happen, but if it does, we record it to later analyse
       Sentry.captureException(new Error("ReferralCode missing"), {
          extra: {
-            uid: userData.authId as string,
+            uid: userData?.authId as string,
          },
       })
-      return "Your referral information is being generated, if this message persists talk to us."
+      return (
+         <>
+            {
+               "Your referral information is being generated, if this message persists talk to us."
+            }
+         </>
+      )
    }
 
-   const referralLink = makeReferralUrl(userData.referralCode)
+   const referralLink = makeReferralUrl(userData?.referralCode)
 
    const copyReferralLinkToClipboard = () => {
       copyStringToClipboard(referralLink)
@@ -54,59 +59,55 @@ const ReferralProfileTab = ({ userData }) => {
    }
 
    return (
-      <Container component="main" maxWidth="md">
-         <Box boxShadow={1} p={4} sx={styles.box}>
-            <Grid container spacing={2}>
-               <Grid item xs={8}>
-                  <Typography sx={{ color: "text.secondary" }} variant="h5">
-                     Refer your friends!
-                  </Typography>
-               </Grid>
-               <Grid item xs={4} sx={{ textAlign: "right" }}>
-                  <BadgeSimpleButton
-                     badge={NetworkerBadge}
-                     isActive={userData?.badges?.includes(NetworkerBadge.key)}
-                  />
-               </Grid>
+      <ContentCard>
+         <Grid container spacing={2}>
+            <Grid item xs={8}>
+               <ContentCardTitle>Refer your friends!</ContentCardTitle>
+            </Grid>
+            <Grid item xs={4} sx={{ textAlign: "right" }}>
+               <BadgeSimpleButton
+                  badge={NetworkerBadge}
+                  isActive={userData?.badges?.includes(NetworkerBadge.key)}
+               />
+            </Grid>
+         </Grid>
+
+         <p>
+            Share your personal referral link with friends who want to sign up
+            to the platform. You will stand out from the crowd with very cool
+            badges!
+         </p>
+
+         <Grid container spacing={2} mt={2}>
+            <Grid item xs={12} sx={{ display: "flex", flexWrap: "wrap" }}>
+               <TextField
+                  sx={{ flex: 1, marginRight: "10px" }}
+                  variant="outlined"
+                  disabled
+                  value={referralLink}
+                  id="referralCode"
+                  label="Referral Link"
+                  name="referralCode"
+               />
+               <Button
+                  variant="contained"
+                  sx={{ boxShadow: "none" }}
+                  startIcon={<ContentPasteIcon />}
+                  onClick={copyReferralLinkToClipboard}
+               >
+                  Copy
+               </Button>
             </Grid>
 
-            <p>
-               Share your personal referral link with friends who want to sign
-               up to the platform. You will stand out from the crowd with very
-               cool badges!
-            </p>
-
-            <Grid container spacing={2} mt={2}>
-               <Grid item xs={12} sx={{ display: "flex", flexWrap: "wrap" }}>
-                  <TextField
-                     sx={{ flex: 1, marginRight: "10px" }}
-                     variant="outlined"
-                     disabled
-                     value={referralLink}
-                     id="referralCode"
-                     label="Referral Link"
-                     name="referralCode"
-                  />
-                  <Button
-                     variant="contained"
-                     sx={{ boxShadow: "none" }}
-                     startIcon={<ContentPasteIcon />}
-                     onClick={copyReferralLinkToClipboard}
-                  >
-                     Copy
-                  </Button>
-               </Grid>
-
-               <Grid item xs={12}>
-                  <BadgeProgress userData={userData} />
-               </Grid>
-
-               <Grid item xs={12}>
-                  <RewardsTable userDataId={userData.id} />
-               </Grid>
+            <Grid item xs={12}>
+               <BadgeProgress userData={userData} />
             </Grid>
-         </Box>
-      </Container>
+
+            <Grid item xs={12}>
+               <RewardsTable userDataId={userData.id} />
+            </Grid>
+         </Grid>
+      </ContentCard>
    )
 }
 

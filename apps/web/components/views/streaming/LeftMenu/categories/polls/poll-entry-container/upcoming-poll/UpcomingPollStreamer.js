@@ -16,7 +16,7 @@ import {
    Paper,
    Typography,
 } from "@mui/material"
-import { CloseRounded } from "@mui/icons-material"
+import CloseRounded from "@mui/icons-material/CloseRounded"
 import { colorsArray } from "../../../../../../../util/colors"
 import TutorialContext from "../../../../../../../../context/tutorials/TutorialContext"
 import {
