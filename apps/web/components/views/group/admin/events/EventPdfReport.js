@@ -650,6 +650,7 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
    let numberOfVotes = 0
    summary.questions.forEach((question) => (numberOfVotes += question.votes))
 
+   const isUniversity = Boolean(summary?.requestingGroup?.universityCode)
    return (
       <Document
          title={`General Report ${summary.livestream.company} ${summary.livestream.id}.pdf`}
@@ -731,30 +732,45 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                         </ColorText>
                      </View>
                   </View>
-                  <View wrap={false}>
-                     <SubTitle>Where They Came From</SubTitle>
-                     <PartnersWrapper>
-                        {[...universityReports]
-                           .sort(dynamicSort("totalParticipantsFromGroup"))
-                           .map((report) => (
+                  {isUniversity ? (
+                     <View wrap={false}>
+                        <SubTitle>Where They Came From</SubTitle>
+                        <PartnersWrapper>
+                           {[...universityReports]
+                              .sort(dynamicSort("totalParticipantsFromGroup"))
+                              .map((report) => (
+                                 <PartnerBreakdown
+                                    key={report.group.id}
+                                    name={report.group.universityName}
+                                    numberOfStudents={
+                                       report.numberOfStudentsFromUniversity
+                                    }
+                                 />
+                              ))}
+                           {companyReport && (
                               <PartnerBreakdown
-                                 key={report.group.id}
-                                 name={report.group.universityName}
+                                 name={companyReport.group.universityName}
                                  numberOfStudents={
-                                    report.numberOfStudentsFromUniversity
+                                    companyReport.numberOfStudentsFollowingCompany
                                  }
                               />
+                           )}
+                        </PartnersWrapper>
+                     </View>
+                  ) : (
+                     <View wrap={false}>
+                        <SubTitle>Most Popular Schools</SubTitle>
+                        <PartnersWrapper>
+                           {summary.mostCommonUniversities.map((uni) => (
+                              <PartnerBreakdown
+                                 key={uni.code}
+                                 name={uni.name}
+                                 numberOfStudents={uni.count}
+                              />
                            ))}
-                        {companyReport && (
-                           <PartnerBreakdown
-                              name={companyReport.group.universityName}
-                              numberOfStudents={
-                                 companyReport.numberOfStudentsFollowingCompany
-                              }
-                           />
-                        )}
-                     </PartnersWrapper>
-                  </View>
+                        </PartnersWrapper>
+                     </View>
+                  )}
                   <View wrap={false}>
                      <SubTitle>Viewer Ratings</SubTitle>
                      <FlexParent>{ratingsElements}</FlexParent>
