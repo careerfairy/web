@@ -67,8 +67,7 @@ exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail
 exports.sendDraftApprovalRequestEmail = groupAdmin.sendDraftApprovalRequestEmail
 exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail
 exports.getLivestreamReportData = groupAdmin.getLivestreamReportData
-exports.getLivestreamReportData_TEMP_NAME =
-   groupAdmin.getLivestreamReportData_TEMP_NAME
+exports.getLivestreamReportData_v2 = groupAdmin.getLivestreamReportData_v2
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus
 exports.joinGroupDashboard = groupAdmin.joinGroupDashboard
 
