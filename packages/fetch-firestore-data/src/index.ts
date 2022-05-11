@@ -147,7 +147,7 @@ async function runEmulatorsInBackground(): Promise<ChildProcessWithoutNullStream
             env: {
                ...process.env,
                // emulators need a big heap to load the data
-               JAVA_TOOL_OPTIONS: "-Xmx10g",
+               JAVA_TOOL_OPTIONS: "-Xmx20g",
             },
          },
          handleProcess

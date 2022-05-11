@@ -61,7 +61,7 @@ export interface Flag {
    createdAt: firebase.firestore.Timestamp | firebase.firestore.FieldValue
 }
 export interface Rating {
-   type: "upvote" | "downvote"
+   type: "upvote" | "downvote" | null
    createdAt: firebase.firestore.Timestamp | firebase.firestore.FieldValue
 }
 

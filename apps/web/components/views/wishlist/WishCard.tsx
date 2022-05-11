@@ -3,18 +3,27 @@ import { Wish } from "@careerfairy/shared-lib/dist/wishes"
 import Paper from "@mui/material/Paper"
 import { StylesProps } from "../../../types/commonTypes"
 import Box from "@mui/material/Box"
-import { AvatarGroup, Button, Typography } from "@mui/material"
+import {
+   AvatarGroup,
+   Button,
+   CircularProgress,
+   Typography,
+} from "@mui/material"
 import Avatar from "@mui/material/Avatar"
 import userRepo from "../../../data/firebase/UserRepository"
 import { getMaxLineStyles } from "../../helperFunctions/HelperFunctions"
 import { Interest } from "@careerfairy/shared-lib/dist/interests"
 import Stack from "@mui/material/Stack"
-import CommentIcon from "@mui/icons-material/ChatBubbleOutline"
 import { wishListBorderRadius } from "../../../constants/pages"
 import UserAvatar from "../common/UserAvatar"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import UpvoteIcon from "@mui/icons-material/ArrowUpward"
 import DownvoteIcon from "@mui/icons-material/ArrowDownward"
+import wishRepo from "../../../data/firebase/WishRepository"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import { useDispatch } from "react-redux"
+import * as actions from "../../../store/actions"
+import { Rating } from "@careerfairy/shared-lib/dist/wishes"
 
 interface WishCardProps {
    wish: Wish
@@ -29,11 +38,15 @@ const styles: StylesProps = {
       borderRadius: wishListBorderRadius,
       boxShadow: "0px 8px 25px rgba(33, 32, 32, 0.1)",
    },
+   rightContent: {
+      flex: 1,
+   },
    name: {
       fontWeight: 600,
    },
    title: {
       ...getMaxLineStyles(2),
+      wordBreak: "break-word",
    },
    totalLikes: {
       border: "none !important",
@@ -42,6 +55,12 @@ const styles: StylesProps = {
       fontWeight: 600,
       borderColor: "none",
       ml: "-2px !important",
+   },
+   actionsWrapper: {
+      display: "flex",
+      justifyContent: "space-between",
+      flexWrap: "wrap",
+      alignContent: "center",
    },
 }
 
@@ -60,9 +79,27 @@ const bull = (
 )
 const WishCard = ({ wish, interests }: WishCardProps) => {
    // get wish author from authorUid
-   const [authorData, setAuthorData] = useState<UserData>({} as UserData)
+   const [authorData, setAuthorData] = useState<UserData>(null)
+   const [userRating, setUserRating] = useState<Rating>(null)
    const [wishInterests, setWishInterests] = useState<Interest[]>([])
+   const [upvoters, setUpvoters] = useState<UserData[]>(
+      Array(wish.uidsOfRecentUpvoters.length || 0).fill(null)
+   )
+   const [numberOfUpvotes, setNumberOfUpvotes] = useState(wish.numberOfUpvotes)
+   const { authenticatedUser, userData } = useAuth()
+   const dispatch = useDispatch()
+   const [voting, setVoting] = useState(false)
 
+   useEffect(() => {
+      ;(async function getUpvotersData() {
+         if (wish.uidsOfRecentUpvoters.length) {
+            const upvotersData = await userRepo.getUsersDataByUids(
+               wish.uidsOfRecentUpvoters
+            )
+            setUpvoters(upvotersData)
+         }
+      })()
+   }, [wish.uidsOfRecentUpvoters])
    useEffect(() => {
       setWishInterests(
          interests.filter((interest) => wish.interestIds.includes(interest.id))
@@ -76,17 +113,85 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
       })()
    }, [])
 
+   useEffect(() => {
+      ;(async function getUserRating() {
+         const userRating = await wishRepo.getUserRating(
+            wish.id,
+            authenticatedUser.uid
+         )
+         setUserRating(userRating)
+      })()
+   }, [])
+
+   const handleRate = async (type: "upvote" | "downvote") => {
+      try {
+         setVoting(true)
+         const newRating = await wishRepo.toggleRateWish(
+            authenticatedUser.uid,
+            wish.id,
+            type
+         )
+         if (!newRating?.type) {
+            setUpvoters((prevUpvoters) => {
+               const filtered = prevUpvoters.filter(
+                  (upvoter) => upvoter.authId !== authenticatedUser.uid
+               )
+               if (filtered.length < prevUpvoters.length) {
+                  // @ts-ignore
+                  setNumberOfUpvotes(numberOfUpvotes - 1)
+               }
+               return filtered
+            })
+         } else if (newRating.type === "downvote") {
+            setUpvoters((prevUpvoters) => {
+               const filtered = prevUpvoters.filter(
+                  (upvoter) => upvoter.authId !== authenticatedUser.uid
+               )
+               if (filtered.length < prevUpvoters.length) {
+                  // @ts-ignore
+                  setNumberOfUpvotes(numberOfUpvotes - 1)
+               }
+               return filtered
+            })
+         } else {
+            setUpvoters((prevUpvoters) => {
+               const found = prevUpvoters.find(
+                  (upvoter) => upvoter.authId === authenticatedUser.uid
+               )
+               if (found) {
+                  return prevUpvoters
+               } else {
+                  // @ts-ignore
+                  setNumberOfUpvotes(numberOfUpvotes + 1)
+                  return [...prevUpvoters, userData]
+               }
+            })
+         }
+         setUserRating(newRating)
+      } catch (e) {
+         dispatch(actions.sendGeneralError(e))
+      }
+      setVoting(false)
+   }
+
+   const handleUpvote = async () => {
+      return handleRate("upvote")
+   }
+   const handleDownvote = async () => {
+      return handleRate("downvote")
+   }
+
    return (
       <Paper
          component={Stack}
          spacing={2}
-         justifyContent={"center"}
+         justifyContent={"start"}
          alignItems={{ xs: "center", sm: "start" }}
          direction={{ xs: "column", sm: "row" }}
          sx={styles.root}
       >
-         <UserAvatar size={"large"} differentUserData={authorData} />
-         <Stack spacing={2}>
+         <UserAvatar size={"large"} data={authorData} />
+         <Stack sx={styles.rightContent} spacing={2}>
             <Box>
                <Typography sx={styles.name} variant={"h6"}>{`${
                   authorData?.firstName || ""
@@ -97,6 +202,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                   variant={"subtitle1"}
                   gutterBottom
                >
+                  {wish.id}
                   {wish.description}
                </Typography>
                <Typography
@@ -112,60 +218,68 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                   ))}
                </Typography>
             </Box>
-            <Stack
-               spacing={2}
-               flexWrap={"wrap"}
-               alignContent={"center"}
-               direction={"row"}
-            >
+            <Box sx={styles.actionsWrapper}>
+               <Stack alignItems={"center"} direction={"row"} spacing={1}>
+                  <Button
+                     startIcon={
+                        voting ? (
+                           <CircularProgress size={15} color={"inherit"} />
+                        ) : (
+                           <UpvoteIcon />
+                        )
+                     }
+                     disabled={voting}
+                     size={"small"}
+                     onClick={handleUpvote}
+                     variant={"text"}
+                     color={
+                        userRating?.type === "upvote" ? "secondary" : "grey"
+                     }
+                  >
+                     upvote
+                  </Button>
+                  <AvatarGroup
+                     spacing={"small"}
+                     componentsProps={{
+                        additionalAvatar: { sx: styles.totalLikes },
+                     }}
+                     max={4}
+                     // @ts-ignore
+                     total={numberOfUpvotes}
+                  >
+                     {upvoters.map((upvoter, index) => (
+                        <UserAvatar
+                           key={upvoter?.id || index}
+                           size={"small"}
+                           data={upvoter}
+                        />
+                     ))}
+                  </AvatarGroup>
+               </Stack>
                <Button
-                  startIcon={<UpvoteIcon color={"secondary"} />}
+                  startIcon={
+                     voting ? (
+                        <CircularProgress size={15} color={"inherit"} />
+                     ) : (
+                        <DownvoteIcon color={"secondary"} />
+                     )
+                  }
+                  disabled={voting}
                   variant={"text"}
-                  color={"grey"}
-               >
-                  upvote
-               </Button>
-               <AvatarGroup
-                  spacing={"small"}
-                  componentsProps={{
-                     additionalAvatar: { sx: styles.totalLikes },
-                  }}
-                  max={4}
-                  // total={wish.numberOfUpvotes}
-                  total={20}
-               >
-                  <Avatar
-                     alt="Remy Sharp"
-                     src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
-                  />
-                  <Avatar
-                     alt="Travis Howard"
-                     src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
-                  />
-                  <Avatar
-                     alt="Agnes Walker"
-                     src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
-                  />
-                  <Avatar
-                     alt="Trevor Henderson"
-                     src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
-                  />
-               </AvatarGroup>
-               <Button
-                  startIcon={<DownvoteIcon color={"secondary"} />}
-                  variant={"text"}
-                  color={"grey"}
+                  size={"small"}
+                  color={userRating?.type === "downvote" ? "secondary" : "grey"}
+                  onClick={handleDownvote}
                >
                   downvote
                </Button>
-               <Button
-                  size={"large"}
-                  color={"grey"}
-                  startIcon={<CommentIcon color={"secondary"} />}
-               >
-                  {wish.numberOfComments} comments
-               </Button>
-            </Stack>
+               {/*<Button*/}
+               {/*   size={"large"}*/}
+               {/*   color={"grey"}*/}
+               {/*   startIcon={<CommentIcon />}*/}
+               {/*>*/}
+               {/*   {wish.numberOfComments} comments*/}
+               {/*</Button>*/}
+            </Box>
          </Stack>
       </Paper>
    )

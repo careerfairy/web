@@ -35,6 +35,7 @@ import breakoutRooms = require("./breakoutRooms")
 import recording = require("./recording")
 import slack = require("./slack")
 import rewards = require("./rewards")
+import wishes = require("./wishes")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount_v2
@@ -141,3 +142,7 @@ exports.slackHandleInteractions = slack.slackHandleInteractions
 exports.rewardApply = rewards.rewardApply
 exports.rewardLivestreamAttendance = rewards.rewardLivestreamAttendance
 exports.rewardLivestreamRegistrant = rewards.rewardLivestreamRegistrant
+
+// Ratings
+
+exports.onUserRateWish = wishes.onUserRateWish

@@ -5,6 +5,7 @@ import { UserData } from "@careerfairy/shared-lib/dist/users"
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
    getUserDataByUid(uid: string): Promise<null | UserData>
+   getUsersDataByUids(uids: string[]): Promise<UserData[]>
 }
 
 class FirebaseUserRepository implements IUserRepository {
@@ -17,14 +18,22 @@ class FirebaseUserRepository implements IUserRepository {
          interestsIds: Array.from(new Set(interestIds)),
       })
    }
-   async getUserDataByUid(uid: string) {
+   async getUserDataByUid(uid: string): Promise<UserData> {
       const snap = await this.firestore
          .collection("userData")
          .where("authId", "==", uid)
          .limit(1)
          .get()
+
       if (snap.empty) return null
       return { ...snap.docs[0].data(), id: snap.docs[0].id } as UserData
+   }
+
+   async getUsersDataByUids(uids: string[]): Promise<UserData[]> {
+      const users = await Promise.all(
+         uids.map((uid) => this.getUserDataByUid(uid))
+      )
+      return users.filter((user) => user !== null)
    }
 }
 

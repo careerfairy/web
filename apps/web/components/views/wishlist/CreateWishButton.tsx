@@ -11,7 +11,7 @@ import { StylesProps } from "../../../types/commonTypes"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { getMaxLineStyles } from "../../helperFunctions/HelperFunctions"
-import UserAvatar from "../common/UserAvatar"
+import LoggedInUserAvatar from "../common/LoggedInUserAvatar"
 
 const styles: StylesProps = {
    paper: {
@@ -58,7 +58,7 @@ const CreateWishButton = () => {
             alignItems={"center"}
             spacing={1}
          >
-            <UserAvatar size={"medium"} />
+            <LoggedInUserAvatar size={"medium"} />
             <Box className={"prompt"} sx={styles.prompt}>
                <Typography sx={styles.promptText}>
                   What would you like to wish for?

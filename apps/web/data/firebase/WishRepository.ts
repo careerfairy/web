@@ -1,10 +1,6 @@
 import { firebaseServiceInstance } from "./FirebaseService"
 import firebase from "firebase/app"
-import {
-   Wish,
-   WishOrderByFields,
-   FlagReason,
-} from "@careerfairy/shared-lib/dist/wishes"
+import { FlagReason, Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
 import { CreateWishFormValues } from "../../components/views/wishlist/CreateWishDialog"
 
 export interface IWishRepository {
@@ -19,7 +15,11 @@ export interface IWishRepository {
    ): Promise<Partial<Wish>>
 
    deleteWish(wishId: string): Promise<Partial<Wish>>
-   toggleRateWish(wishId: string, type: "upvote" | "downvote"): Promise<void>
+   toggleRateWish(
+      userUid: string,
+      wishId: string,
+      type: "upvote" | "downvote"
+   ): Promise<Rating>
    deleteWish(wishId: string): Promise<Partial<Wish>>
    restoreDeletedWish(wishId: string): Promise<Partial<Wish>>
    flagWish(wishId: string, reasons: FlagReason[]): Promise<Partial<Wish>>
@@ -33,6 +33,7 @@ export interface IWishRepository {
          complete?: () => void
       }
    ): firebase.Unsubscribe
+   getUserRating(wishId: string, userUid: string): Promise<Rating>
 }
 interface GetWishesOptions {
    orderByDate?: firebase.firestore.OrderByDirection
@@ -183,68 +184,57 @@ class FirebaseWishRepository implements IWishRepository {
    }
 
    async toggleRateWish(
+      userUid: string,
       wishId: string,
       type: "upvote" | "downvote"
-   ): Promise<void> {
-      const wishRef = this.firestore.collection("wishes").doc(wishId)
+   ): Promise<Rating> {
       const ratingRef = this.firestore
          .collection("wishes")
          .doc(wishId)
          .collection("ratings")
-         .doc(firebase.auth().currentUser?.uid)
+         .doc(userUid)
       // run transaction
-      const numberOfUpvotesField =
-         type === "upvote" ? "numberOfUpvotes" : "numberOfDownvotes"
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(ratingRef).then((ratingDoc) => {
-            let updatedWish: Partial<Wish> = {}
+            // @ts-ignore
+            let newRating: Rating = {}
             if (!ratingDoc.exists) {
-               // If never rated before
-               if (type === "upvote") {
-                  updatedWish.numberOfUpvotes =
-                     firebase.firestore.FieldValue.increment(1)
-               } else {
-                  updatedWish.numberOfDownvotes =
-                     firebase.firestore.FieldValue.increment(1)
-               }
-               transaction.set(ratingRef, {
+               newRating = {
                   type,
                   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-               })
+               }
             } else {
+               newRating = ratingDoc.data() as Rating
                const ratingType = ratingDoc.data()?.type
                if (ratingType === type) {
                   // if already rated with same type, undo rating
-                  transaction.delete(ratingRef) // delete rating
-                  updatedWish[numberOfUpvotesField] =
-                     firebase.firestore.FieldValue.increment(-1) // decrement
+                  // transaction.delete(ratingRef) // delete rating
+                  // TODO deleting and then creating a document in
+                  //  transaction with the same ID is bugged on emulators
+                  // https://github.com/firebase/firebase-tools/issues/1971
+                  // workaround: delete and create again
+
+                  newRating.type = null
                } else {
                   //    if rated with different type
-                  transaction.update(ratingRef, {
-                     type,
-                  })
-                  if (type === "upvote") {
-                     // if upvoting
-                     updatedWish.numberOfUpvotes =
-                        firebase.firestore.FieldValue.increment(1)
-                     // increment upvotes by 1 and decrement downvotes by 1
-                     // if downvoted before (if any) and vice versa if downvoted before
-                     updatedWish.numberOfDownvotes =
-                        firebase.firestore.FieldValue.increment(-1)
-                  } else {
-                     // if downvoting
-                     updatedWish.numberOfUpvotes =
-                        firebase.firestore.FieldValue.increment(-1)
-                     // decrement upvotes by 1 and increment downvotes by 1
-                     // (because we are downvoting)
-                     updatedWish.numberOfDownvotes =
-                        firebase.firestore.FieldValue.increment(1)
-                  }
+                  newRating.type = type
                }
             }
-            transaction.update(wishRef, updatedWish)
+            transaction.set(ratingRef, newRating, { merge: true })
+            return newRating
          })
       })
+   }
+
+   async getUserRating(wishId: string, userUid: string): Promise<Rating> {
+      const snap = await this.firestore
+         .collection("wishes")
+         .doc(wishId)
+         .collection("ratings")
+         .doc(userUid)
+         .get()
+      if (!snap.exists) return null
+      return snap.data() as Rating
    }
 
    async flagWish(
@@ -284,8 +274,8 @@ class FirebaseWishRepository implements IWishRepository {
 }
 
 // Singleton
-const userRepo: IWishRepository = new FirebaseWishRepository(
+const wishRepo: IWishRepository = new FirebaseWishRepository(
    firebaseServiceInstance.firestore
 )
 
-export default userRepo
+export default wishRepo

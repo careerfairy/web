@@ -76,7 +76,7 @@ const InterestSelect = ({
             <Chip
                sx={styles.interestChip}
                onClick={() => handleClickInterest(interest)}
-               onBlur={handleBlur}
+               onBlur={() => handleBlur(id)}
                disabled={checkDisable(interest)}
                color={isInterestSelected(interest) ? "primary" : "default"}
                /*

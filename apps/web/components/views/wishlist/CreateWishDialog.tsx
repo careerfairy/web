@@ -18,10 +18,10 @@ import { Wish } from "@careerfairy/shared-lib/dist/wishes"
 import Stack from "@mui/material/Stack"
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh"
 import { StylesProps } from "../../../types/commonTypes"
-import UserAvatar from "../common/UserAvatar"
 import Typography from "@mui/material/Typography"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import Box from "@mui/material/Box"
+import LoggedInUserAvatar from "../common/LoggedInUserAvatar"
 
 interface CreateWishDialogProps {
    open: boolean
@@ -147,12 +147,12 @@ const CreateWishDialog = ({ open, onClose }: CreateWishDialogProps) => {
                <form id={"creat-wish-form"}>
                   <DialogTitle sx={styles.title}>Create Wish</DialogTitle>
                   <DialogContent sx={styles.content} dividers>
-                     <UserAvatar size={"large"} />
+                     <LoggedInUserAvatar size={"large"} />
                      <Stack sx={styles.fields} spacing={2}>
                         <Box>
                            <Label
-                              title={`${userData.firstName || ""} ${
-                                 userData.lastName || ""
+                              title={`${userData?.firstName || ""} ${
+                                 userData?.lastName || ""
                               }`}
                               htmlFor={"description"}
                            />

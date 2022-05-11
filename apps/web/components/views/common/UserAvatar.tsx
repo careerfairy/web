@@ -1,23 +1,26 @@
 import { SxProps } from "@mui/material"
 import { DefaultTheme } from "@mui/styles"
 import { useAuth } from "HOCs/AuthProvider"
-import React, { useMemo } from "react"
+import React from "react"
 import ColorizedAvatar from "./ColorizedAvatar"
 import { StylesProps } from "../../../types/commonTypes"
 import Link from "./Link"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 type stringSizes = "small" | "medium" | "large"
-interface Props {
+export interface UserAvatarProps {
    sx?: SxProps<DefaultTheme>
    size?: stringSizes | number | string
-   differentUserData?: UserData
+   data?: UserData
 }
 const small = 30
 const medium = 50
 const large = 80
 const fontMultiplier = 0.5
 const styles: StylesProps = {
+   root: {
+      textDecoration: "none",
+   },
    small: {
       width: small,
       height: small,
@@ -35,26 +38,16 @@ const styles: StylesProps = {
    },
 }
 const sizes: stringSizes[] = ["small", "medium", "large"]
-interface UserDataProps {
-   firstName: string
-   lastName: string
-   imageUrl: string
-}
-const UserAvatar = ({ sx, size, differentUserData }: Props) => {
+const UserAvatar = ({ sx, size, data }: UserAvatarProps) => {
    const { userData } = useAuth()
-   const data = useMemo<UserDataProps>(
-      () => ({
-         firstName: differentUserData?.firstName || userData?.firstName,
-         lastName: differentUserData?.lastName || userData?.lastName,
-         // @ts-ignore
-         imageUrl: differentUserData?.imageUrl || userData?.imageUrl,
-      }),
-      [differentUserData, userData]
+   const isLoggedInUser = Boolean(
+      data?.authId && data?.authId === userData?.authId
    )
 
    return (
       <ColorizedAvatar
          sx={[
+            styles.root,
             size
                ? sizes.includes(size as stringSizes)
                   ? styles[size as stringSizes]
@@ -68,15 +61,17 @@ const UserAvatar = ({ sx, size, differentUserData }: Props) => {
                : undefined,
             ...(Array.isArray(sx) ? sx : [sx]),
          ]}
+         loading={Boolean(!data)}
          firstName={data?.firstName}
          lastName={data?.lastName}
-         // imageUrl={userData?.avatarUrl}
+         // @ts-ignore
+         imageUrl={userData?.avatarUrl}
          onClick={(e) => e.stopPropagation()}
          // @ts-ignore
-         component={differentUserData ? undefined : Link}
-         noLinkStyle
-         href={differentUserData ? undefined : "/profile"}
-         imageUrl="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+         component={isLoggedInUser ? Link : undefined}
+         // noLinkStyle={isLoggedInUser}
+         href={isLoggedInUser ? "/profile" : undefined}
+         // imageUrl="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
       />
    )
 }
