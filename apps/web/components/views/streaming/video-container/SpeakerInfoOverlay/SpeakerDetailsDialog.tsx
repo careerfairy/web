@@ -53,9 +53,6 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
    const matchedSpeaker =
       getLivestreamMatchingSpeaker(speaker, speakers) ?? speaker
 
-   console.log("speaker", matchedSpeaker)
-   console.log("userData", userData)
-
    const name = `${matchedSpeaker.firstName} ${matchedSpeaker.lastName}`
    let subtitle = matchedSpeaker.position
    if (matchedSpeaker.background) {

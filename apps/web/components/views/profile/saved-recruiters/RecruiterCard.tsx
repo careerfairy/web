@@ -69,7 +69,6 @@ export const RecruiterCard = ({
    }, [])
 
    const handleDeleteRecruiter = useCallback(async () => {
-      console.log("delete recruiter", recruiter, userEmail)
       try {
          await userRepo.removeSavedRecruiter(userEmail, recruiter.id)
          handleRemoveRecruiter(recruiter)
