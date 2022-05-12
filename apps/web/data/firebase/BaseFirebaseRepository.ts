@@ -1,6 +1,6 @@
-import firebase from "firebase"
-import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot
+import firebase from "firebase/app"
 import { Identifiable } from "@careerfairy/shared-lib/dist/commonTypes"
+type DocumentSnapshot = firebase.firestore.DocumentSnapshot
 
 /**
  * Utility methods for Firebase based repositories
@@ -11,7 +11,7 @@ export default class BaseFirebaseRepository {
     *
     * @param docs
     */
-   addIdToDocs<T extends Identifiable>(docs: QueryDocumentSnapshot[]): T[] {
+   addIdToDocs<T extends Identifiable>(docs: DocumentSnapshot[]): T[] {
       const result = []
 
       for (let doc of docs) {
@@ -25,7 +25,7 @@ export default class BaseFirebaseRepository {
     * Add the id property to a doc object
     * @param doc
     */
-   addIdToDoc<T extends Identifiable>(doc: QueryDocumentSnapshot): T {
+   addIdToDoc<T extends Identifiable>(doc: DocumentSnapshot): T {
       return {
          ...doc.data(),
          id: doc.id,

@@ -11,7 +11,7 @@ import { grey } from "@mui/material/colors"
 
 import React from "react"
 import { PaletteMode } from "@mui/material"
-import { DefaultTheme } from "@mui/styles/defaultTheme"
+import { DefaultTheme } from "@mui/styles"
 
 declare module "@mui/styles/defaultTheme" {
    interface DefaultTheme extends Theme {
