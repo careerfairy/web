@@ -21,9 +21,12 @@ import wishRepo from "../../../data/firebase/WishRepository"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../store/actions"
+import DateUtil from "../../../util/DateUtil"
+import { useRouter } from "next/router"
+import { Hit } from "../../../types/algolia"
 
 interface WishCardProps {
-   wish: Wish
+   wish: Hit<Wish>
    interests: Interest[]
 }
 
@@ -44,6 +47,9 @@ const styles: StylesProps = {
    title: {
       // ...getMaxLineStyles(2),
       wordBreak: "break-word",
+      "& em": {
+         fontWeight: 600,
+      },
    },
    totalLikes: {
       border: "none !important",
@@ -74,15 +80,23 @@ const bull = (
       •
    </Box>
 )
+
+interface WishInterest extends Interest {
+   highlighted: boolean
+}
+
 const WishCard = ({ wish, interests }: WishCardProps) => {
    // get wish author from authorUid
    const [authorData, setAuthorData] = useState<UserData>(null)
    const [userRating, setUserRating] = useState<Rating>(null)
-   const [wishInterests, setWishInterests] = useState<Interest[]>([])
+   const [wishInterests, setWishInterests] = useState<WishInterest[]>([])
    const [gettingAuthor, setGettingAuthor] = useState(false)
    const [upvoters, setUpvoters] = useState<UserData[]>(
       Array(wish.uidsOfRecentUpvoters.length || 0).fill(null)
    )
+   const { query } = useRouter()
+   // @ts-ignore
+   const [date] = useState(new Date(wish.createdAt))
    const [numberOfUpvotes, setNumberOfUpvotes] = useState(wish.numberOfUpvotes)
    const { authenticatedUser, userData } = useAuth()
    const dispatch = useDispatch()
@@ -100,9 +114,15 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
    }, [wish.uidsOfRecentUpvoters])
    useEffect(() => {
       setWishInterests(
-         interests.filter((interest) => wish.interestIds.includes(interest.id))
+         interests
+            .filter((interest) => wish.interestIds.includes(interest.id))
+            .map((interest) => ({
+               ...interest,
+               highlighted: Boolean(query.interests?.includes?.(interest.id)),
+            }))
+            .sort((a) => (a.highlighted ? -1 : 1))
       )
-   }, [])
+   }, [query.interests])
 
    useEffect(() => {
       ;(async () => {
@@ -212,9 +232,16 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                   variant={"subtitle1"}
                   gutterBottom
                >
-                  {wish.id}
-                  {wish.description}
+                  {DateUtil.eventPreviewDate(date)}
                </Typography>
+               <Typography
+                  dangerouslySetInnerHTML={{
+                     __html: wish._highlightResult.description.value,
+                  }}
+                  sx={styles.title}
+                  variant={"subtitle1"}
+                  gutterBottom
+               />
                <Typography
                   color={"text.secondary"}
                   variant="subtitle2"
@@ -223,7 +250,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                   {wishInterests.map((int, index) => (
                      <Fragment key={int.id}>
                         {!!index && bull}
-                        {int.name}
+                        {int.highlighted ? <b>{int.name}</b> : int.name}
                      </Fragment>
                   ))}
                </Typography>

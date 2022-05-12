@@ -3,7 +3,6 @@ import { SearchClient } from "algoliasearch"
 import { SortType } from "../../components/views/wishlist/FilterMenu"
 import { Wish } from "@careerfairy/shared-lib/dist/wishes"
 import { SearchResponse } from "../../types/algolia"
-import interests from "../../../../packages/seed-data/src/interests"
 
 export interface IAlgoliaRepository {
    searchWishes(
@@ -14,6 +13,8 @@ export interface IAlgoliaRepository {
 interface SearchWishesOptions {
    sortType?: SortType
    targetInterestIds?: string[]
+   hitsPerPage?: number
+   page?: number
 }
 class AlgoliaRepository implements IAlgoliaRepository {
    constructor(private readonly algoliaIndexes: SearchClient) {}
@@ -48,6 +49,8 @@ class AlgoliaRepository implements IAlgoliaRepository {
          ...(options?.targetInterestIds && {
             filters: filters,
          }),
+         ...(options?.hitsPerPage && { hitsPerPage: options.hitsPerPage }),
+         ...(options?.page && { page: options.page }),
       })
    }
 }

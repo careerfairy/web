@@ -133,6 +133,7 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
          [queryParam]: Array.isArray(queryValue)
             ? queryValue.join(",")
             : queryValue,
+         page: 0,
       }
       void push(
          {
@@ -156,6 +157,7 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
                  .filter((interest) => interest !== interestName)
                  .join(",")
             : currentInterests.concat(interestName).join(","),
+         page: 0,
       }
       void push(
          {

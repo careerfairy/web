@@ -1,7 +1,7 @@
 import functions = require("firebase-functions")
 import config = require("./config")
 import { Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
-const { admin } = require("./api/firestoreAdmin")
+import { admin } from "./api/firestoreAdmin"
 
 // Listen for changes in all documents in the 'users' collection
 const maxNumberOfUpvoterUids = 50
@@ -22,7 +22,7 @@ export const onUserRateWish = functions
          .doc(context.params.wishId)
       let wishUpdateData: Partial<Wish> = {}
       // if the rating hasn't changed, do nothing
-      if (prevRatingType === currentRatingType) return
+      if (prevRatingType === currentRatingType) return null
       // run transaction to update the wish
       return admin.firestore().runTransaction(async (transaction) => {
          const wish = await transaction.get(wishRef)
@@ -40,7 +40,7 @@ export const onUserRateWish = functions
                uidsOfRecentUpvoters: admin.firestore.FieldValue.arrayUnion(
                   ...limitedUpvoterUids,
                   userId
-               ),
+               ) as unknown as string[],
                numberOfUpvotes: admin.firestore.FieldValue.increment(1),
             }
          }
@@ -66,7 +66,9 @@ export const onUserRateWish = functions
                   admin.firestore.FieldValue.increment(1)
             }
             wishUpdateData.uidsOfRecentUpvoters =
-               admin.firestore.FieldValue.arrayRemove(userId)
+               admin.firestore.FieldValue.arrayRemove(
+                  userId
+               ) as unknown as string[]
          }
          // update the wish
          if (wishUpdateData) {

@@ -5,13 +5,29 @@ import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
 import WishCard from "./WishCard"
 import { useInterests } from "../../custom-hook/useCollection"
+import { StylesProps } from "../../../types/commonTypes"
+import { SearchResponse } from "../../../types/algolia"
 
 interface WishSectionProps {
-   wishes: Wish[]
+   wishes: SearchResponse<Wish>["hits"]
    loading: boolean
-   loadingMore: boolean
-   loadingError: null | Error
-   loadingMoreError: null | Error
+   loadingMore?: boolean
+   loadingError?: null | Error
+   loadingMoreError?: null | Error
+   empty?: boolean
+}
+const styles: StylesProps = {
+   wrapper: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+   },
+   image: {
+      width: 150,
+      height: 150,
+      my: 3,
+   },
 }
 const WishSection = ({
    wishes,
@@ -19,6 +35,7 @@ const WishSection = ({
    loadingError,
    loadingMore,
    loadingMoreError,
+   empty,
 }: WishSectionProps) => {
    // use interests collection
    const { data: interests } = useInterests()
@@ -33,7 +50,7 @@ const WishSection = ({
 
    if (loadingMoreError) {
       return (
-         <Box>
+         <Box sx={styles.wrapper}>
             <Typography variant="h6">Error loading more wishes</Typography>
             <Typography variant="body1">{loadingMoreError.message}</Typography>
          </Box>
@@ -42,8 +59,23 @@ const WishSection = ({
 
    if (loading) {
       return (
-         <Box>
-            <Typography variant="h6">Loading wishes...</Typography>
+         <Box sx={styles.wrapper}>
+            <CircularProgress />
+         </Box>
+      )
+   }
+
+   if (empty) {
+      return (
+         <Box sx={styles.wrapper}>
+            <Box
+               sx={styles.image}
+               component={"img"}
+               src={"/empty-search.svg"}
+            />
+            <Typography color={"text.secondary"} variant="body1">
+               No wishes found.
+            </Typography>
          </Box>
       )
    }

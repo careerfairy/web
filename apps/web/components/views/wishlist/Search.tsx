@@ -38,7 +38,7 @@ const styles = {
 }
 const Search = () => {
    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
-   const { query, push } = useRouter()
+   const { query, push, pathname } = useRouter()
    const [searchValue, setSearchValue] = useState<string>(
       (query.search as string) || ""
    )
@@ -67,6 +67,12 @@ const Search = () => {
    )
 
    const handleQuery = (searchQuery: string) => {
+      if (
+         (query.search === undefined && !searchValue) ||
+         searchValue === query.search
+      )
+         return
+
       const newQuery = {
          ...query,
       }
@@ -74,10 +80,11 @@ const Search = () => {
          delete newQuery.search
       } else {
          newQuery.search = searchQuery
+         newQuery.page = "0"
       }
       void push(
          {
-            pathname: "/wishlist",
+            pathname: pathname,
             query: newQuery,
          },
          undefined,
@@ -95,7 +102,6 @@ const Search = () => {
             <Paper
                component={"form"}
                onSubmit={(e) => {
-                  console.log("-> SUBMIT")
                   e.preventDefault()
                   cancelDebounce()
                   handleQuery(searchValue)

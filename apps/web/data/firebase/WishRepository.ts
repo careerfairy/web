@@ -87,7 +87,8 @@ class FirebaseWishRepository implements IWishRepository {
    }
 
    async createWish(wishFormValues: CreateWishFormValues): Promise<Wish> {
-      const newWish: Omit<Wish, "id"> = {
+      const docRef = await this.firestore.collection("wishes").doc()
+      const newWish: Wish = {
          description: wishFormValues.description.trim(),
          companyNames: wishFormValues.companyNames,
          interestIds: wishFormValues.interests.map((interest) => interest.id),
@@ -105,9 +106,10 @@ class FirebaseWishRepository implements IWishRepository {
          isFlaggedByAdmin: false,
          numberOfFlags: 0,
          flaggedByAdminAt: null,
+         id: docRef.id,
       }
-      const ref = await this.firestore.collection("wishes").add(newWish)
-      return { ...newWish, id: ref.id }
+      await this.firestore.collection("wishes").doc(newWish.id).set(newWish)
+      return { ...newWish }
    }
    async updateWish(
       wishFormValues: CreateWishFormValues,
