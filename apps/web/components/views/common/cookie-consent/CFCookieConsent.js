@@ -41,6 +41,11 @@ const CFCookieConsent = () => {
       }
    })
 
+   // disable cookie consent for tests / local environment
+   if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+      return null
+   }
+
    return (
       <CookieConsent
          location="bottom"

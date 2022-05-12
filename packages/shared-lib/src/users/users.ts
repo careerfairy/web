@@ -37,18 +37,17 @@ export interface SavedRecruiter extends Identifiable {
    livestreamDetails: {
       title: string
       company: string
-      summary: string
       start: firebase.firestore.Timestamp
       companyLogoUrl: string
    }
 
    streamerDetails: {
       id: string
-      avatar: string
-      linkedIn: string
+      avatar?: string
+      linkedIn?: string
       firstName: string
       lastName: string
       position: string
-      background: string
+      background?: string
    }
 }

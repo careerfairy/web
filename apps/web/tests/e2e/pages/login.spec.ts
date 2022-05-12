@@ -17,8 +17,6 @@ test.describe("Login Page Functionality", () => {
          password: credentials.correctPassword,
       })
       await new LoginPage(page).open()
-      // Accept cookies
-      await new CommonPage(page).acceptCookies()
    })
 
    test("It successfully logs in", async ({ page }) => {

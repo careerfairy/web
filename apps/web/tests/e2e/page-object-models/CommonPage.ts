@@ -12,10 +12,6 @@ export class CommonPage {
       return this.page.locator(`text=${str}`)
    }
 
-   acceptCookies() {
-      return this.page.locator("id=rcc-confirm-button").click()
-   }
-
    async resilientClick(
       locator: string,
       tries: number = 3,

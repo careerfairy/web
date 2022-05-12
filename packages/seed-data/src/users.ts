@@ -1,8 +1,11 @@
 import { auth, firestore } from "./lib/firebase"
 import { CreateRequest } from "firebase-admin/auth"
+import { v4 as uuidv4 } from "uuid"
+import * as admin from "firebase-admin"
 
 import { capitalizeFirstLetter, getRandomInt } from "./utils/utils"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { SavedRecruiter, UserData } from "@careerfairy/shared-lib/dist/users"
+import { faker } from "@faker-js/faker"
 
 interface UserSeed {
    /**
@@ -15,11 +18,18 @@ interface UserSeed {
     */
    createUser(
       email: string,
-      extraUserData?: UserData,
+      extraUserData?: Partial<UserData>,
       extraAuthData?: CreateRequest
    ): Promise<UserData>
+
    getUserData(email: string): Promise<UserData | null>
+
    deleteUser(email: string): Promise<any>
+
+   addSavedRecruiter(
+      user: UserData,
+      recruiterDetails?: Partial<SavedRecruiter>
+   ): Promise<SavedRecruiter>
 }
 
 class UserFirebaseSeed implements UserSeed {
@@ -33,9 +43,9 @@ class UserFirebaseSeed implements UserSeed {
     */
    async createUser(
       email: string,
-      extraUserData?: UserData,
+      extraUserData?: Partial<UserData>,
       extraAuthData?: CreateRequest
-   ) {
+   ): Promise<UserData> {
       const pinCode = getRandomInt(9999)
 
       const username = email.split("@")[0]
@@ -62,7 +72,7 @@ class UserFirebaseSeed implements UserSeed {
             unsubscribed: false,
          },
          extraUserData
-      )
+      ) as UserData
 
       await firestore.collection("userData").doc(email).set(userData)
 
@@ -84,6 +94,50 @@ class UserFirebaseSeed implements UserSeed {
    async getUserData(email: string) {
       const userSnap = await firestore.collection("userData").doc(email).get()
       return userSnap.exists ? (userSnap.data() as UserData) : null
+   }
+
+   async addSavedRecruiter(
+      user: UserData,
+      recruiterDetails?: Partial<SavedRecruiter>
+   ): Promise<SavedRecruiter> {
+      let recruiter = {
+         id: uuidv4(),
+         userId: user.authId,
+         livestreamId: uuidv4(),
+         savedAt: null,
+         livestreamDetails: {
+            title: faker.lorem.sentence(),
+            company: faker.company.companyName(),
+            companyLogoUrl: faker.image.business(),
+            start: admin.firestore.Timestamp.fromDate(faker.date.past()),
+         },
+         streamerDetails: {
+            id: uuidv4(),
+            avatar: faker.image.avatar(),
+            name: faker.name.firstName(),
+            linkedIn: "https://www.linkedin.com/in/john-doe/",
+            firstName: faker.name.firstName(),
+            lastName: faker.name.lastName(),
+            position: faker.name.jobTitle(),
+            background: faker.name.jobArea(),
+         },
+      }
+
+      if (recruiterDetails) {
+         recruiter = Object.assign(recruiter, recruiterDetails)
+      }
+
+      // @ts-ignore
+      recruiter.savedAt = admin.firestore.FieldValue.serverTimestamp()
+
+      await firestore
+         .collection("userData")
+         .doc(user.userEmail)
+         .collection("savedRecruiters")
+         .doc(recruiter.id)
+         .set(recruiter)
+
+      return recruiter
    }
 }
 

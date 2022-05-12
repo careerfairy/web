@@ -30,7 +30,6 @@ test("successful registration on a livestream event", async ({ page }) => {
 
    // open page
    await livestreamPage.open(livestream.id)
-   await livestreamPage.acceptCookies()
    await expectExactText(page, livestream.title)
 
    // click to attend
@@ -95,7 +94,6 @@ test("register to an event and fill out a question and join talent pool", async 
 
    // open page
    await livestreamPage.open(livestream.id)
-   await livestreamPage.acceptCookies()
 
    // click to attend
    await livestreamPage.attend()
@@ -130,7 +128,6 @@ test("register to an event without login, login and proceed with registration", 
 
    // open page
    await livestreamPage.open(livestream.id)
-   await livestreamPage.acceptCookies()
 
    await livestreamPage.attend()
 

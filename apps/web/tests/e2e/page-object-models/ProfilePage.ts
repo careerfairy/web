@@ -1,0 +1,23 @@
+import { Page } from "@playwright/test"
+import { CommonPage } from "./CommonPage"
+
+export default class ProfilePage extends CommonPage {
+   constructor(page: Page) {
+      super(page)
+   }
+
+   open() {
+      return this.page.goto(`/profile`)
+   }
+
+   openMyRecruiters() {
+      return this.page.goto(`/profile/saved-recruiters`)
+   }
+
+   clickBrowseAllEvents() {
+      return Promise.all([
+         this.page.waitForNavigation(),
+         this.page.locator("text=Browse Events").click(),
+      ])
+   }
+}
