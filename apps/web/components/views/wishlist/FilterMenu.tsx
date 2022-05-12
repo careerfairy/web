@@ -3,6 +3,7 @@ import {
    Button,
    Chip,
    FormControl,
+   IconProps,
    Popover,
    SelectChangeEvent,
 } from "@mui/material"
@@ -15,6 +16,8 @@ import { ResponsiveOption, ResponsiveSelect } from "../common/ResponsiveSelect"
 import { useInterests } from "../../custom-hook/useCollection"
 import { StylesProps } from "../../../types/commonTypes"
 import firebase from "firebase/app"
+import { Wish } from "@careerfairy/shared-lib/dist/wishes"
+import DownIcon from "@mui/icons-material/ArrowDropDown"
 
 interface Props {
    open: boolean
@@ -22,6 +25,11 @@ interface Props {
    anchorEl: HTMLElement
    handleClose: () => any
 }
+
+const UpIcon = (props: IconProps) => (
+   // @ts-ignore
+   <DownIcon {...props} style={{ transform: "rotate(180deg)" }} />
+)
 
 const styles: StylesProps = {
    paperRoot: {
@@ -40,65 +48,91 @@ const styles: StylesProps = {
    },
 }
 
+export type SortType = "dateAsc" | "dateDesc" | "upvotesAsc" | "upvotesDesc"
+
+export const getFirebaseSortType = (
+   sortType: SortType
+): [
+   Wish["numberOfUpvotes"] | Wish["createdAt"],
+   firebase.firestore.OrderByDirection
+] => {
+   switch (sortType) {
+      case "dateAsc":
+         // @ts-ignore
+         return ["createdAt", "asc"]
+      case "dateDesc":
+         // @ts-ignore
+         return ["createdAt", "desc"]
+      case "upvotesAsc":
+         // @ts-ignore
+         return ["numberOfUpvotes", "asc"]
+      case "upvotesDesc":
+         // @ts-ignore
+         return ["numberOfUpvotes", "desc"]
+      default:
+         // @ts-ignore
+         return ["createdAt", "desc"]
+   }
+}
+
 interface SelectProps {
    id: string
    labelId: string
-   value: DateSort | UpvoteSort | InterestSort
+   value: SortType
    label: string
    handleChange: (event: SelectChangeEvent<string>) => void
-   options: { value: DateSort | UpvoteSort | InterestSort; label: string }[]
+   options: { value: SortType; label: string; descending: boolean }[]
 }
 
-export type DateSort = firebase.firestore.OrderByDirection
-export type UpvoteSort = firebase.firestore.OrderByDirection
-export type InterestSort = string
 const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
    const { data: interests } = useInterests()
    const { pathname, push, query } = useRouter()
    const selects = useMemo<SelectProps[]>(
       () => [
          {
-            id: "date-select",
-            labelId: "date-select-label",
-            value: Array.isArray(query.date) ? query.date[0] : query.date,
-            label: "Date",
+            id: "sort-select",
+            labelId: "sort-select-label",
+            // @ts-ignore
+            value: Array.isArray(query.sortType)
+               ? query.sortType[0]
+               : query.sortType,
+            label: "Sort by",
             handleChange: (event) => {
-               handleQuery("date", event.target.value)
+               handleQuery("sortType", event.target.value)
             },
             options: [
-               { value: "desc", label: "Newest" },
-               { value: "asc", label: "Oldest" },
-            ],
-         },
-         {
-            id: "upvote-select",
-            labelId: "upvote-select-label",
-            value: Array.isArray(query.upvote) ? query.upvote[0] : query.upvote,
-            label: "Upvote",
-            handleChange: (event) => {
-               handleQuery("upvote", event.target.value)
-            },
-            options: [
-               { value: "desc", label: "Most" },
-               { value: "asc", label: "Least" },
+               {
+                  value: "dateDesc",
+                  label: "Date Descending",
+                  descending: true,
+               },
+               {
+                  value: "dateAsc",
+                  label: "Date Ascending",
+                  descending: false,
+               },
+               {
+                  value: "upvotesDesc",
+                  label: "Upvotes Descending",
+                  descending: true,
+               },
+               {
+                  value: "upvotesAsc",
+                  label: "Upvotes Ascending",
+                  descending: false,
+               },
             ],
          },
       ],
-      [query.date, query.interests, query.upvote]
+      [query.sortType]
    )
 
    const handleQuery = (queryParam: string, queryValue: string | string[]) => {
-      const otherOrderByParam = queryParam === "date" ? "upvote" : "date"
       const newQuery = {
          ...query,
          [queryParam]: Array.isArray(queryValue)
             ? queryValue.join(",")
             : queryValue,
-      }
-      if (!queryValue) {
-         delete newQuery[queryParam]
-      } else {
-         delete newQuery[otherOrderByParam]
       }
       void push(
          {
@@ -201,6 +235,7 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
                         <ResponsiveOption
                            key={option.value}
                            value={option.value}
+                           icon={option.descending ? <DownIcon /> : <UpIcon />}
                         >
                            {option.label}
                         </ResponsiveOption>

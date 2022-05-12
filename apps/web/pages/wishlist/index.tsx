@@ -1,43 +1,53 @@
 import { Wish } from "@careerfairy/shared-lib/dist/wishes"
-import wishRepo from "../../data/firebase/WishRepository"
 import Container from "@mui/material/Container"
 import { Grid } from "@mui/material"
 import CreateAndFilter from "../../components/views/wishlist/CreateAndFilter"
-import WishSection from "../../components/views/wishlist/WishSection"
 import Header from "../../components/views/wishlist/Header"
 import GeneralLayout from "../../layouts/GeneralLayout"
 import { useRouter } from "next/router"
-import {
-   DateSort,
-   UpvoteSort,
-} from "../../components/views/wishlist/FilterMenu"
-import useInfiniteScrollGet from "../../components/custom-hook/useInfiniteScrollGet"
-import { useMemo } from "react"
+import { SortType } from "../../components/views/wishlist/FilterMenu"
+import { useEffect, useState } from "react"
+import { SearchResponse } from "../../types/algolia"
+import algoliaRepo from "../../data/algolia/AlgoliaRepository"
 
 const pageSize = 2
 const Wishlist = () => {
    const { query } = useRouter()
-
-   const date = query.date as DateSort
-   const upvote = query.upvote as UpvoteSort
+   const [searchResponse, setSearchResponse] =
+      useState<SearchResponse<Wish> | null>(null)
+   const sortType = query.sortType as SortType
    const interests = query.interests as string
-   const wishQuery = useMemo(() => {
-      return wishRepo.getWishesQuery({
-         ...(date && { orderByDate: date }),
-         ...(upvote && { orderByUpvotes: upvote }),
-         ...(interests && {
-            targetInterestIds: interests.split(","),
-         }),
-         limit: pageSize,
-      })
-   }, [date, upvote, interests])
-   const {
-      loading,
-      loadingError,
-      loadingMore,
-      loadingMoreError,
-      data: wishes,
-   } = useInfiniteScrollGet<Wish>(wishQuery, pageSize)
+   const searchQuery = query.search as string
+
+   useEffect(() => {
+      ;(async function search() {
+         const searchResponse = await algoliaRepo.searchWishes(searchQuery, {
+            sortType: sortType,
+            ...(interests && {
+               targetInterestIds: interests.split(","),
+            }),
+         })
+         setSearchResponse(searchResponse)
+         console.log("-> searchResponse", searchResponse)
+      })()
+   }, [searchQuery, sortType, interests])
+   // const wishQuery = useMemo(() => {
+   //    return wishRepo.getWishesQuery({
+   //       sort: getFirebaseSortType(sortType),
+   //       ...(interests && {
+   //          targetInterestIds: interests.split(","),
+   //       }),
+   //       limit: pageSize,
+   //    })
+   // }, [sortType, interests])
+   //
+   // const {
+   //    loading,
+   //    loadingError,
+   //    loadingMore,
+   //    loadingMoreError,
+   //    data: wishes,
+   // } = useInfiniteScrollGet<Wish>(wishQuery, pageSize)
 
    return (
       <GeneralLayout backgroundColor={"white"} persistent>
@@ -55,13 +65,13 @@ const Wishlist = () => {
                   <CreateAndFilter />
                </Grid>
                <Grid item xs={12}>
-                  <WishSection
-                     loading={loading}
-                     loadingError={loadingError}
-                     loadingMore={loadingMore}
-                     loadingMoreError={loadingMoreError}
-                     wishes={wishes}
-                  />
+                  {/*<WishSection*/}
+                  {/*   loading={loading}*/}
+                  {/*   loadingError={loadingError}*/}
+                  {/*   loadingMore={loadingMore}*/}
+                  {/*   loadingMoreError={loadingMoreError}*/}
+                  {/*   wishes={wishes}*/}
+                  {/*/>*/}
                </Grid>
             </Grid>
          </Container>

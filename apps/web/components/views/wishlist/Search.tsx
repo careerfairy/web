@@ -8,6 +8,7 @@ import Paper from "@mui/material/Paper"
 import Stack from "@mui/material/Stack"
 import FilterMenu from "./FilterMenu"
 import { useRouter } from "next/router"
+import { useDebounce } from "react-use"
 const styles = {
    root: {
       height: "100%",
@@ -37,7 +38,11 @@ const styles = {
 }
 const Search = () => {
    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
-   const { query } = useRouter()
+   const { query, push } = useRouter()
+   const [searchValue, setSearchValue] = useState<string>(
+      (query.search as string) || ""
+   )
+
    const filterActive = Boolean(query.upvote || query.interests || query.date)
    const handleOpenFilterMenu = (
       event: React.MouseEvent<HTMLButtonElement>
@@ -51,13 +56,58 @@ const Search = () => {
 
    const open = Boolean(anchorEl)
    const id = open ? "wish-list-filter-popover" : undefined
+
+   const [, cancelDebounce] = useDebounce(
+      () => {
+         console.log("-> Typing stopped and started query")
+         handleQuery(searchValue)
+      },
+      2000,
+      [searchValue]
+   )
+
+   const handleQuery = (searchQuery: string) => {
+      const newQuery = {
+         ...query,
+      }
+      if (!searchQuery) {
+         delete newQuery.search
+      } else {
+         newQuery.search = searchQuery
+      }
+      void push(
+         {
+            pathname: "/wishlist",
+            query: newQuery,
+         },
+         undefined,
+         { shallow: true }
+      )
+   }
+
+   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target
+      setSearchValue(value)
+   }
    return (
       <>
          <Stack sx={styles.root} direction={"row"} spacing={2}>
-            <Paper variant="outlined" sx={styles.search}>
+            <Paper
+               component={"form"}
+               onSubmit={(e) => {
+                  console.log("-> SUBMIT")
+                  e.preventDefault()
+                  cancelDebounce()
+                  handleQuery(searchValue)
+               }}
+               variant="outlined"
+               sx={styles.search}
+            >
                <InputBase
                   sx={styles.inputRoot}
                   startAdornment={<SearchIcon />}
+                  value={searchValue}
+                  onChange={handleSearch}
                   placeholder="Search…"
                   inputProps={{ "aria-label": "search" }}
                />

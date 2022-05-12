@@ -8,6 +8,7 @@ import {
    SelectProps,
    useMediaQuery,
 } from "@mui/material"
+import Box from "@mui/material/Box"
 
 export const ResponsiveSelect = (
    props: Partial<SelectProps> | Partial<NativeSelectProps> | any
@@ -29,5 +30,12 @@ export const ResponsiveOption = (
             Select an option
          </option>
       )
-   return mobile ? <option {...props} /> : <MenuItem {...props} />
+   return mobile ? (
+      <option {...props} />
+   ) : (
+      <MenuItem {...props}>
+         {props.icon && <Box sx={{ mr: 1 }}>{props.icon}</Box>}
+         {props.children}
+      </MenuItem>
+   )
 }

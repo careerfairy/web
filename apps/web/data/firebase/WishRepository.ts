@@ -36,8 +36,10 @@ export interface IWishRepository {
    getUserRating(wishId: string, userUid: string): Promise<Rating>
 }
 interface GetWishesOptions {
-   orderByDate?: firebase.firestore.OrderByDirection
-   orderByUpvotes?: firebase.firestore.OrderByDirection
+   sort?: [
+      Wish["numberOfUpvotes"] | Wish["createdAt"],
+      firebase.firestore.OrderByDirection
+   ]
    targetInterestIds?: string[]
    startAfter?: firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>
    // Don't use the limit property if you are
@@ -67,14 +69,9 @@ class FirebaseWishRepository implements IWishRepository {
       if (getWishesOptions.startAfter) {
          query = query.startAfter(getWishesOptions.startAfter)
       }
-      if (getWishesOptions.orderByUpvotes) {
-         query = query.orderBy(
-            "numberOfUpvotes",
-            getWishesOptions.orderByUpvotes
-         )
-      }
-      if (getWishesOptions.orderByDate) {
-         query = query.orderBy("createdAt", getWishesOptions.orderByDate)
+      if (getWishesOptions.sort) {
+         // @ts-ignore
+         query = query.orderBy(...getWishesOptions.sort)
       }
 
       if (getWishesOptions.limit) {

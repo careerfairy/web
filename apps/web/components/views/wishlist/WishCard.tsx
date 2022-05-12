@@ -1,5 +1,5 @@
-import React, { FC, Fragment, useEffect, useState } from "react"
-import { Wish } from "@careerfairy/shared-lib/dist/wishes"
+import React, { Fragment, useEffect, useState } from "react"
+import { Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
 import Paper from "@mui/material/Paper"
 import { StylesProps } from "../../../types/commonTypes"
 import Box from "@mui/material/Box"
@@ -9,9 +9,7 @@ import {
    CircularProgress,
    Typography,
 } from "@mui/material"
-import Avatar from "@mui/material/Avatar"
 import userRepo from "../../../data/firebase/UserRepository"
-import { getMaxLineStyles } from "../../helperFunctions/HelperFunctions"
 import { Interest } from "@careerfairy/shared-lib/dist/interests"
 import Stack from "@mui/material/Stack"
 import { wishListBorderRadius } from "../../../constants/pages"
@@ -23,7 +21,6 @@ import wishRepo from "../../../data/firebase/WishRepository"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../store/actions"
-import { Rating } from "@careerfairy/shared-lib/dist/wishes"
 
 interface WishCardProps {
    wish: Wish
@@ -45,7 +42,7 @@ const styles: StylesProps = {
       fontWeight: 600,
    },
    title: {
-      ...getMaxLineStyles(2),
+      // ...getMaxLineStyles(2),
       wordBreak: "break-word",
    },
    totalLikes: {
@@ -82,6 +79,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
    const [authorData, setAuthorData] = useState<UserData>(null)
    const [userRating, setUserRating] = useState<Rating>(null)
    const [wishInterests, setWishInterests] = useState<Interest[]>([])
+   const [gettingAuthor, setGettingAuthor] = useState(false)
    const [upvoters, setUpvoters] = useState<UserData[]>(
       Array(wish.uidsOfRecentUpvoters.length || 0).fill(null)
    )
@@ -108,8 +106,16 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
 
    useEffect(() => {
       ;(async () => {
-         const newAuthorData = await userRepo.getUserDataByUid(wish.authorUid)
-         setAuthorData(newAuthorData)
+         try {
+            setGettingAuthor(true)
+            const newAuthorData = await userRepo.getUserDataByUid(
+               wish.authorUid
+            )
+            setAuthorData(newAuthorData)
+         } catch (error) {
+            dispatch(actions.sendGeneralError(error))
+         }
+         setGettingAuthor(false)
       })()
    }, [])
 
@@ -181,6 +187,10 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
       return handleRate("downvote")
    }
 
+   const authorDisplayName = gettingAuthor
+      ? "..."
+      : `${authorData?.firstName || ""} ${authorData?.lastName || ""}`
+
    return (
       <Paper
          component={Stack}
@@ -193,9 +203,9 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
          <UserAvatar size={"large"} data={authorData} />
          <Stack sx={styles.rightContent} spacing={2}>
             <Box>
-               <Typography sx={styles.name} variant={"h6"}>{`${
-                  authorData?.firstName || ""
-               } ${authorData?.lastName || ""}`}</Typography>
+               <Typography sx={styles.name} variant={"h6"}>
+                  {authorDisplayName || "Unknown"}
+               </Typography>
                <Typography
                   sx={styles.title}
                   color={"text.secondary"}
