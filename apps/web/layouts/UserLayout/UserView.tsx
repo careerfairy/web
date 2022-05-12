@@ -14,6 +14,7 @@ import { StylesProps } from "../../types/commonTypes"
 import Link from "../../components/views/common/Link"
 import { Container } from "@mui/material"
 import MyRecruitersTab from "../../components/views/profile/saved-recruiters/MyRecruitersTab"
+import CareerSkills from "../../components/views/profile/career-skills/CareerSkills"
 
 function TabPanel(props) {
    const { children, value, path, ...other } = props
@@ -45,6 +46,13 @@ const pages = {
          full: "Personal Information",
       },
       component: UserData,
+   },
+   "/profile/career-skills": {
+      title: {
+         compact: "Career Skills",
+         full: "My Career Skills",
+      },
+      component: CareerSkills,
    },
    "/profile/referrals": {
       title: {
