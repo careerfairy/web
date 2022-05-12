@@ -14,7 +14,6 @@ export interface IWishRepository {
       wishId: string
    ): Promise<Partial<Wish>>
 
-   deleteWish(wishId: string): Promise<Partial<Wish>>
    toggleRateWish(
       userUid: string,
       wishId: string,
@@ -22,7 +21,11 @@ export interface IWishRepository {
    ): Promise<Rating>
    deleteWish(wishId: string): Promise<Partial<Wish>>
    restoreDeletedWish(wishId: string): Promise<Partial<Wish>>
-   flagWish(wishId: string, reasons: FlagReason[]): Promise<Partial<Wish>>
+   flagWish(
+      wishId: string,
+      reasons: FlagReason[],
+      message?: string
+   ): Promise<Partial<Wish>>
    listenToWishRating(
       wishId: string,
       callback: {
@@ -238,7 +241,8 @@ class FirebaseWishRepository implements IWishRepository {
 
    async flagWish(
       wishId: string,
-      reasons: FlagReason[]
+      reasons: FlagReason[],
+      message?: string
    ): Promise<Partial<Wish>> {
       const wishRef = this.firestore.collection("wishes").doc(wishId)
       const userRef = this.firestore
@@ -265,6 +269,7 @@ class FirebaseWishRepository implements IWishRepository {
             transaction.set(flagRef, {
                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                reasons,
+               message: message || null,
             })
             return updatedWish
          })

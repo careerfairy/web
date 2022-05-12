@@ -59,6 +59,7 @@ export type FlagReason =
 export interface Flag {
    reasons: FlagReason[]
    createdAt: firebase.firestore.Timestamp | firebase.firestore.FieldValue
+   message?: string
 }
 export interface Rating {
    type: "upvote" | "downvote" | null

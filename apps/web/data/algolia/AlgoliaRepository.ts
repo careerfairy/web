@@ -41,14 +41,15 @@ class AlgoliaRepository implements IAlgoliaRepository {
       const index = this.algoliaIndexes.initIndex(
          this.getWishSortIndex(options?.sortType)
       )
-      const filters = options?.targetInterestIds
+      const interestFilters = options?.targetInterestIds
          ?.filter((s) => s.length)
          ?.map((interestId) => `interestIds:${interestId}`)
          .join(" OR ")
+      const filters =
+         "isPublic:true AND isDeleted:false" +
+         (interestFilters ? ` AND ${interestFilters}` : "")
       return index.search<Wish>(query, {
-         ...(options?.targetInterestIds && {
-            filters: filters,
-         }),
+         filters: filters,
          ...(options?.hitsPerPage && { hitsPerPage: options.hitsPerPage }),
          ...(options?.page && { page: options.page }),
       })

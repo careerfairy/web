@@ -14,6 +14,8 @@ import Link from "../../components/views/common/Link"
 import Box from "@mui/material/Box"
 import { GetServerSideProps } from "next"
 import { useUpdateEffect } from "react-use"
+import SEO from "../../components/util/SEO"
+import { getBaseUrl } from "../../components/helperFunctions/HelperFunctions"
 
 const pageSize = 5
 
@@ -60,60 +62,78 @@ const Wishlist = ({ serverSearchResponse }: Props) => {
          setLoading(false)
       })()
    }, [searchQuery, sortType, interests, currentPage])
+
    return (
-      <GeneralLayout backgroundColor={"white"} persistent>
-         <Container sx={{ py: 2 }} maxWidth={"md"}>
-            <Grid container spacing={2}>
-               <Grid item xs={12}>
-                  <Header
-                     title={"Wishlist"}
-                     subtitle={
-                        "Add a company or topic that you’d like to see hosted on CareerFairy"
-                     }
-                  />
-               </Grid>
-               <Grid item xs={12}>
-                  <CreateAndFilter />
-               </Grid>
-               <Grid item xs={12}>
-                  <WishSection
-                     loading={loading}
-                     loadingError={loadingError}
-                     wishes={searchResponse?.hits || []}
-                     empty={searchResponse?.nbHits === 0}
-                  />
-               </Grid>
-               <Grid item xs={12}>
-                  <Box sx={{ display: "flex", justifyContent: "center" }}>
-                     <Pagination
-                        defaultPage={currentPage + 1}
-                        variant={"outlined"}
-                        page={currentPage + 1}
-                        color={"primary"}
-                        hidden={loading}
-                        hideNextButton={searchResponse?.nbHits === 0}
-                        hidePrevButton={searchResponse?.nbHits === 0}
-                        count={searchResponse?.nbPages || 0}
-                        shape="rounded"
-                        renderItem={(item) => (
-                           <PaginationItem
-                              {...item}
-                              component={Link}
-                              href={{
-                                 pathname: pathname,
-                                 query: {
-                                    ...query,
-                                    page: item.page - 1,
-                                 },
-                              }}
-                           />
-                        )}
+      <>
+         <SEO
+            title="CareerFairy | Wishlist"
+            description={
+               "Are there any companies you’d like to see on CareerFairy? " +
+               "Add companies or topics that you wish to see hosted on CareerFairy."
+            }
+            canonical={`${getBaseUrl()}${pathname}`}
+         />
+         <GeneralLayout backgroundColor={"white"} persistent>
+            <Container sx={{ py: 2 }} maxWidth={"md"}>
+               <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                     <Header
+                        title={"Wishlist"}
+                        subtitle={
+                           "Add a company or topic that you’d like to see hosted on CareerFairy"
+                        }
                      />
-                  </Box>
+                  </Grid>
+                  <Grid item xs={12}>
+                     <CreateAndFilter />
+                  </Grid>
+                  <Grid item xs={12}>
+                     <WishSection
+                        loading={loading}
+                        loadingError={loadingError}
+                        wishes={searchResponse?.hits || []}
+                        empty={searchResponse?.nbHits === 0}
+                     />
+                  </Grid>
+                  <Grid item xs={12}>
+                     <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <Pagination
+                           defaultPage={currentPage + 1}
+                           variant={"outlined"}
+                           page={currentPage + 1}
+                           color={"primary"}
+                           hidden={loading}
+                           hideNextButton={searchResponse?.nbHits === 0}
+                           hidePrevButton={searchResponse?.nbHits === 0}
+                           count={searchResponse?.nbPages || 0}
+                           shape="rounded"
+                           renderItem={(item) => (
+                              <PaginationItem
+                                 {...item}
+                                 component={Link}
+                                 rel={
+                                    item.type === "next"
+                                       ? "next"
+                                       : item.type === "previous"
+                                       ? "prev"
+                                       : item.type
+                                 }
+                                 href={{
+                                    pathname: pathname,
+                                    query: {
+                                       ...query,
+                                       page: item.page - 1,
+                                    },
+                                 }}
+                              />
+                           )}
+                        />
+                     </Box>
+                  </Grid>
                </Grid>
-            </Grid>
-         </Container>
-      </GeneralLayout>
+            </Container>
+         </GeneralLayout>
+      </>
    )
 }
 

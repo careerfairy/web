@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react"
-import { Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
+import { FlagReason, Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
 import Paper from "@mui/material/Paper"
 import { StylesProps } from "../../../types/commonTypes"
 import Box from "@mui/material/Box"
@@ -7,6 +7,7 @@ import {
    AvatarGroup,
    Button,
    CircularProgress,
+   IconButton,
    Typography,
 } from "@mui/material"
 import userRepo from "../../../data/firebase/UserRepository"
@@ -24,6 +25,8 @@ import * as actions from "../../../store/actions"
 import DateUtil from "../../../util/DateUtil"
 import { useRouter } from "next/router"
 import { Hit } from "../../../types/algolia"
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
+import WishCardMenuButton from "./WishCardMenuButton"
 
 interface WishCardProps {
    wish: Hit<Wish>
@@ -31,12 +34,20 @@ interface WishCardProps {
 }
 
 const styles: StylesProps = {
-   root: {
+   paper: {
       p: 2,
       minHeight: "100px",
       display: "flex",
       borderRadius: wishListBorderRadius,
       boxShadow: "0px 8px 25px rgba(33, 32, 32, 0.1)",
+   },
+   root: {
+      position: "relative",
+   },
+   moreIconButton: {
+      position: "absolute",
+      top: 10,
+      right: 10,
    },
    rightContent: {
       flex: 1,
@@ -65,6 +76,11 @@ const styles: StylesProps = {
       flexWrap: "wrap",
       alignContent: "center",
    },
+   rating: {
+      position: "absolute",
+      opacity: 0,
+      visibility: "hidden",
+   },
 }
 
 const bull = (
@@ -88,6 +104,7 @@ interface WishInterest extends Interest {
 const WishCard = ({ wish, interests }: WishCardProps) => {
    // get wish author from authorUid
    const [authorData, setAuthorData] = useState<UserData>(null)
+   const [deleted, setDeleted] = useState(false)
    const [userRating, setUserRating] = useState<Rating>(null)
    const [wishInterests, setWishInterests] = useState<WishInterest[]>([])
    const [gettingAuthor, setGettingAuthor] = useState(false)
@@ -207,118 +224,158 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
       return handleRate("downvote")
    }
 
+   const handleDelete = async () => {
+      await wishRepo.deleteWish(wish.id)
+      setDeleted(true)
+   }
+   const getRatingValue = () => {
+      // @ts-ignore
+      const total = wish.numberOfUpvotes + wish.numberOfDownvotes
+      // @ts-ignore
+      return (total === 0 ? 1 : (wish.numberOfUpvotes / total) * 5).toFixed(2)
+   }
+
    const authorDisplayName = gettingAuthor
       ? "..."
       : `${authorData?.firstName || ""} ${authorData?.lastName || ""}`
 
+   if (deleted) return null
+
    return (
-      <Paper
-         component={Stack}
-         spacing={2}
-         justifyContent={"start"}
-         alignItems={{ xs: "center", sm: "start" }}
-         direction={{ xs: "column", sm: "row" }}
+      <Box
+         itemScope
+         itemType="https://schema.org/Review"
+         component={"article"}
          sx={styles.root}
       >
-         <UserAvatar size={"large"} data={authorData} />
-         <Stack sx={styles.rightContent} spacing={2}>
-            <Box>
-               <Typography sx={styles.name} variant={"h6"}>
-                  {authorDisplayName || "Unknown"}
-               </Typography>
-               <Typography
-                  sx={styles.title}
-                  color={"text.secondary"}
-                  variant={"subtitle1"}
-                  gutterBottom
-               >
-                  {DateUtil.eventPreviewDate(date)}
-               </Typography>
-               <Typography
-                  dangerouslySetInnerHTML={{
-                     __html: wish._highlightResult.description.value,
-                  }}
-                  sx={styles.title}
-                  variant={"subtitle1"}
-                  gutterBottom
-               />
-               <Typography
-                  color={"text.secondary"}
-                  variant="subtitle2"
-                  component="div"
-               >
-                  {wishInterests.map((int, index) => (
-                     <Fragment key={int.id}>
-                        {!!index && bull}
-                        {int.highlighted ? <b>{int.name}</b> : int.name}
-                     </Fragment>
-                  ))}
-               </Typography>
-            </Box>
-            <Box sx={styles.actionsWrapper}>
-               <Stack alignItems={"center"} direction={"row"} spacing={1}>
+         <WishCardMenuButton
+            authorUid={wish.authorUid}
+            wishId={wish.id}
+            sx={styles.moreIconButton}
+            handleDelete={handleDelete}
+         />
+         <Paper
+            component={Stack}
+            spacing={2}
+            justifyContent={"start"}
+            alignItems={{ xs: "center", sm: "start" }}
+            direction={{ xs: "column", sm: "row" }}
+            sx={styles.paper}
+         >
+            <UserAvatar size={"large"} data={authorData} />
+            <Stack sx={styles.rightContent} spacing={2}>
+               <Box component={"header"}>
+                  <Typography itemProp="author" sx={styles.name} variant={"h6"}>
+                     {authorDisplayName || "User"}
+                  </Typography>
+                  <Typography
+                     sx={styles.title}
+                     color={"text.secondary"}
+                     variant={"subtitle1"}
+                     gutterBottom
+                     component={"time"}
+                  >
+                     {DateUtil.eventPreviewDate(date)}
+                  </Typography>
+                  <Typography
+                     dangerouslySetInnerHTML={{
+                        __html: wish._highlightResult.description.value,
+                     }}
+                     itemProp="reviewBody"
+                     sx={styles.title}
+                     variant={"subtitle1"}
+                     gutterBottom
+                  />
+                  <Typography
+                     color={"text.secondary"}
+                     variant="subtitle2"
+                     component="div"
+                  >
+                     {wishInterests.map((int, index) => (
+                        <Fragment key={int.id}>
+                           {!!index && bull}
+                           {int.highlighted ? <b>{int.name}</b> : int.name}
+                        </Fragment>
+                     ))}
+                  </Typography>
+               </Box>
+               <Box sx={styles.actionsWrapper}>
+                  <Stack alignItems={"center"} direction={"row"} spacing={1}>
+                     <Button
+                        startIcon={
+                           voting ? (
+                              <CircularProgress size={15} color={"inherit"} />
+                           ) : (
+                              <UpvoteIcon />
+                           )
+                        }
+                        disabled={voting}
+                        size={"small"}
+                        onClick={handleUpvote}
+                        variant={"text"}
+                        color={
+                           userRating?.type === "upvote" ? "secondary" : "grey"
+                        }
+                     >
+                        upvote
+                     </Button>
+                     <AvatarGroup
+                        spacing={"small"}
+                        componentsProps={{
+                           additionalAvatar: { sx: styles.totalLikes },
+                        }}
+                        max={4}
+                        // @ts-ignore
+                        total={numberOfUpvotes}
+                     >
+                        {upvoters.map((upvoter, index) => (
+                           <UserAvatar
+                              key={upvoter?.id || index}
+                              size={"small"}
+                              data={upvoter}
+                           />
+                        ))}
+                     </AvatarGroup>
+                  </Stack>
                   <Button
                      startIcon={
                         voting ? (
                            <CircularProgress size={15} color={"inherit"} />
                         ) : (
-                           <UpvoteIcon />
+                           <DownvoteIcon color={"secondary"} />
                         )
                      }
                      disabled={voting}
-                     size={"small"}
-                     onClick={handleUpvote}
                      variant={"text"}
+                     size={"small"}
                      color={
-                        userRating?.type === "upvote" ? "secondary" : "grey"
+                        userRating?.type === "downvote" ? "secondary" : "grey"
                      }
+                     onClick={handleDownvote}
                   >
-                     upvote
+                     downvote
                   </Button>
-                  <AvatarGroup
-                     spacing={"small"}
-                     componentsProps={{
-                        additionalAvatar: { sx: styles.totalLikes },
-                     }}
-                     max={4}
-                     // @ts-ignore
-                     total={numberOfUpvotes}
-                  >
-                     {upvoters.map((upvoter, index) => (
-                        <UserAvatar
-                           key={upvoter?.id || index}
-                           size={"small"}
-                           data={upvoter}
-                        />
-                     ))}
-                  </AvatarGroup>
-               </Stack>
-               <Button
-                  startIcon={
-                     voting ? (
-                        <CircularProgress size={15} color={"inherit"} />
-                     ) : (
-                        <DownvoteIcon color={"secondary"} />
-                     )
-                  }
-                  disabled={voting}
-                  variant={"text"}
-                  size={"small"}
-                  color={userRating?.type === "downvote" ? "secondary" : "grey"}
-                  onClick={handleDownvote}
-               >
-                  downvote
-               </Button>
-               {/*<Button*/}
-               {/*   size={"large"}*/}
-               {/*   color={"grey"}*/}
-               {/*   startIcon={<CommentIcon />}*/}
-               {/*>*/}
-               {/*   {wish.numberOfComments} comments*/}
-               {/*</Button>*/}
-            </Box>
-         </Stack>
-      </Paper>
+                  {/*<Button*/}
+                  {/*   size={"large"}*/}
+                  {/*   color={"grey"}*/}
+                  {/*   startIcon={<CommentIcon />}*/}
+                  {/*>*/}
+                  {/*   {wish.numberOfComments} comments*/}
+                  {/*</Button>*/}
+               </Box>
+            </Stack>
+         </Paper>
+         <Box
+            sx={styles.rating}
+            itemProp="reviewRating"
+            itemScope
+            itemType="https://schema.org/Rating"
+         >
+            <meta itemProp="worstRating" content="1" />
+            <span itemProp="ratingValue">{getRatingValue()}</span>
+            <span itemProp="bestRating">5</span> stars
+         </Box>
+      </Box>
    )
 }
 
