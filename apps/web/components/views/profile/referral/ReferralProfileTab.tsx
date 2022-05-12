@@ -28,8 +28,10 @@ import BadgeProgress from "./BadgeProgress"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 
-const ReferralProfileTab = ({ userData }) => {
+const ReferralProfileTab = () => {
+   const { userData } = useAuth()
    const { enqueueSnackbar } = useSnackbar()
 
    if (!userData?.referralCode) {

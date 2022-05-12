@@ -1,6 +1,12 @@
 // import { deepmerge } from "@mui/utils";
 // it could be your App.tsx file or theme file that is included in your tsconfig.json
-import { alpha, Components, createTheme, Theme } from "@mui/material/styles"
+import {
+   alpha,
+   Components,
+   createTheme,
+   PaletteOptions,
+   Theme,
+} from "@mui/material/styles"
 import { grey } from "@mui/material/colors"
 
 import React from "react"
@@ -10,6 +16,17 @@ import { DefaultTheme } from "@mui/styles/defaultTheme"
 declare module "@mui/styles/defaultTheme" {
    interface DefaultTheme extends Theme {
       drawerWidth: { small: string; medium: string }
+      boxShadows?: {
+         // color_y_blur_opacity
+         dark_8_25_10?: string
+         grey_5_15_50?: string
+         secondary_5_15_50?: string
+         primary_5_15_50?: string
+      }
+      dropShadows?: {
+         // color_y_blur_opacity
+         dark_6_12_12?: string
+      }
    }
 }
 
@@ -31,12 +48,8 @@ declare module "@mui/material" {
 }
 
 declare module "@mui/material/styles" {
-   interface ThemeOptions {
+   interface ThemeOptions extends DefaultTheme {
       whiteShadow?: string
-      customShadows?: {
-         // color_y_blur
-         dark_8_25?: string
-      }
       drawerWidth?: { small?: string; medium?: string }
       darkTextShadow?: string
    }
@@ -64,6 +77,22 @@ declare module "@mui/material/styles" {
    }
 }
 
+const primary: PaletteOptions["primary"] = {
+   light: "#89c2ba",
+   main: "#00d2aa",
+   dark: "#00b08f",
+   contrastText: "#FFFFFF",
+   gradient: "#07c1a7",
+}
+
+const secondary: PaletteOptions["secondary"] = {
+   light: "#b4a8ff",
+   main: "#7431e2",
+   dark: "#590db6",
+   gradient: "#644eec",
+   contrastText: "#FFFFFF",
+}
+
 export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
    createTheme({
       transitions: {
@@ -73,24 +102,12 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
       },
       palette: {
          mode,
-         primary: {
-            light: "#89c2ba",
-            main: "#00d2aa",
-            dark: "#00b08f",
-            contrastText: "#FFFFFF",
-            gradient: "#07c1a7",
-         },
+         primary,
          grey: {
             main: grey[300],
             dark: grey[400],
          },
-         secondary: {
-            light: "#b4a8ff",
-            main: "#7431e2",
-            dark: "#590db6",
-            gradient: "#644eec",
-            contrastText: "#FFFFFF",
-         },
+         secondary,
          error: {
             main: "#e70026",
             dark: "#b00024",
@@ -136,8 +153,20 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
          fontFamily: "Poppins,sans-serif",
          htmlFontSize: 16,
       },
-      customShadows: {
-         dark_8_25: `drop-shadow(0px 8px 25px ${alpha("#212020", 0.1)})`,
+      boxShadows: {
+         dark_8_25_10: `0px 8px 25px rgba(33, 32, 32, 0.1)`,
+         grey_5_15_50: `0px 5px 15px ${alpha(grey[300], 0.5)}`,
+         secondary_5_15_50: `0px 5px 15px ${alpha(
+            mode === "light" ? secondary.main : secondary.dark,
+            mode === "light" ? 0.5 : 0.2
+         )}`,
+         primary_5_15_50: `0px 5px 15px ${alpha(
+            mode === "light" ? primary.main : primary.dark,
+            mode === "light" ? 0.5 : 0.2
+         )}`,
+      },
+      dropShadows: {
+         dark_6_12_12: "drop-shadow(0px 6px 12px rgba(0, 0, 0, 0.12))",
       },
       whiteShadow:
          "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)",
@@ -153,13 +182,59 @@ const getComponents = (theme: DefaultTheme): Components => ({
    MuiButton: {
       styleOverrides: {
          // Name of the slot
+         disableElevation: true,
          root: {
             // Some CSS
             fontWeight: 600,
-            borderRadius: 100,
+            padding: "0.7em 1.4em",
+            boxShadow: "none",
+            borderRadius: 20,
          },
       },
       variants: [
+         {
+            props: {
+               disableElevation: true,
+            },
+            style: {
+               filter: "none",
+            },
+         },
+         {
+            props: {
+               variant: "contained",
+            },
+            style: {
+               boxShadow: theme.boxShadows.primary_5_15_50,
+            },
+         },
+         {
+            props: {
+               variant: "contained",
+               color: "primary",
+            },
+            style: {
+               boxShadow: theme.boxShadows.primary_5_15_50,
+            },
+         },
+         {
+            props: {
+               variant: "contained",
+               color: "secondary",
+            },
+            style: {
+               boxShadow: theme.boxShadows.secondary_5_15_50,
+            },
+         },
+         {
+            props: {
+               variant: "contained",
+               color: "grey",
+            },
+            style: {
+               boxShadow: theme.boxShadows.grey_5_15_50,
+            },
+         },
          {
             props: { variant: "contained", color: "grey" },
             style: {
@@ -226,7 +301,8 @@ const getComponents = (theme: DefaultTheme): Components => ({
    MuiCard: {
       styleOverrides: {
          root: {
-            borderRadius: 15,
+            borderRadius: 10,
+            boxShadow: theme.boxShadows.dark_8_25_10,
          },
       },
    },
@@ -234,6 +310,18 @@ const getComponents = (theme: DefaultTheme): Components => ({
       styleOverrides: {
          root: {
             borderRadius: 15,
+            "MuiPopover-paper": {
+               border: "1px solid red",
+            },
+         },
+      },
+   },
+   MuiPopover: {
+      styleOverrides: {
+         paper: {
+            filter: theme.dropShadows.dark_6_12_12,
+            boxShadow: "none",
+            borderRadius: 8,
          },
       },
    },

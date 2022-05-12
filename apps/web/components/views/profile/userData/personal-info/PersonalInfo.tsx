@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { Formik } from "formik"
 
 import { withFirebase } from "context/firebase/FirebaseServiceContext"
-import makeStyles from "@mui/styles/makeStyles"
 import {
    Typography,
    TextField,
@@ -25,6 +24,7 @@ import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadge
 import BadgeSimpleButton from "../../BadgeSimpleButton"
 import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle"
 import { StylesProps } from "../../../../../types/commonTypes"
+import { useRouter } from "next/router"
 
 const styles: StylesProps = {
    avatar: {
@@ -49,9 +49,10 @@ const styles: StylesProps = {
    },
 }
 
-const PersonalInfo = ({ userData, redirectToReferralsTab }) => {
+const PersonalInfo = ({ userData }) => {
    const [open, setOpen] = useState(false)
    const { enqueueSnackbar } = useSnackbar()
+   const router = useRouter()
    const dispatch = useDispatch()
    // @ts-ignore
    const { loading, error } = useSelector((state) => state.auth.profileEdit)
@@ -85,6 +86,14 @@ const PersonalInfo = ({ userData, redirectToReferralsTab }) => {
    const handleUpdate = async (values) => {
       await dispatch(actions.editUserProfile(values))
    }
+
+   const navigateToReferrals = useCallback(() => {
+      void router.push({
+         pathname: "/profile/referrals",
+      })
+
+      return {} // match event handler signature
+   }, [router])
 
    return (
       <Formik
@@ -154,7 +163,7 @@ const PersonalInfo = ({ userData, redirectToReferralsTab }) => {
                               isActive={userData?.badges?.includes(
                                  NetworkerBadge.key
                               )}
-                              onClick={redirectToReferralsTab}
+                              onClick={navigateToReferrals}
                            />
                         </Grid>
                      </Grid>

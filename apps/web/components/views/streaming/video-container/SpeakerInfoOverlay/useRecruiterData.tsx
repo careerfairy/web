@@ -16,16 +16,13 @@ const useRecruiterData = (speakerId) => {
       // user needs to be logged in
       if (!userData?.userEmail) return
 
+      // fetch so that we can disable the save button if the recruiter is already saved
       userRepo
          .getSavedRecruiter(userData.userEmail, speakerId)
          .then((recruiter) => {
             setRecruiterData(recruiter)
          })
          .catch((err) => {
-            enqueueSnackbar(GENERAL_ERROR, {
-               variant: "error",
-               preventDuplicate: true,
-            })
             console.error(err)
          })
          .finally(() => {

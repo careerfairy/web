@@ -11,6 +11,8 @@ export interface IUserRepository {
    saveRecruiter(userEmail: string, recruiter: SavedRecruiter): Promise<void>
 
    getSavedRecruiter(userEmail: string, id: string): Promise<SavedRecruiter>
+
+   removeSavedRecruiter(userEmail: string, recruiterId: string): Promise<void>
 }
 
 class FirebaseUserRepository
@@ -79,7 +81,15 @@ class FirebaseUserRepository
          .set(recruiter)
    }
 
-   // deleteSavedRecruiter
+   removeSavedRecruiter(userEmail: string, recruiterId: string): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("savedRecruiters")
+         .doc(recruiterId)
+
+      return ref.delete()
+   }
 }
 
 // Singleton

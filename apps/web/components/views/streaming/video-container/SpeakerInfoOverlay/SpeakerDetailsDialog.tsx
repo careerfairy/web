@@ -4,10 +4,9 @@ import {
    CardActions,
    CardHeader,
    Dialog,
-   DialogActions,
    DialogContent,
    DialogTitle,
-   Popover,
+   Divider,
    Tooltip,
    Typography,
 } from "@mui/material"
@@ -15,17 +14,38 @@ import Card from "@mui/material/Card"
 import ColorizedAvatar from "../../../common/ColorizedAvatar"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
-import SaveIcon from "@mui/icons-material/Save"
 import React from "react"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
-import Link from "../../../common/Link"
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
 import { pick } from "lodash"
-import useRecruiterData from "./useRecruiterData"
-import LoadingButton from "@mui/lab/LoadingButton"
+import { createStyles } from "@mui/styles"
+import CloseIcon from "@mui/icons-material/Close"
+import IconButton from "@mui/material/IconButton"
+import { SaveRecruiterButton } from "./SaveRecruiterButton"
+
+const styles = createStyles({
+   dialogClose: {
+      position: "absolute",
+      top: "11px",
+      right: "5px",
+   },
+   subtitle: {
+      fontStyle: "italic",
+      fontWeight: 300,
+      fontSize: "14px",
+      color: "#545454",
+   },
+   linkedInbutton: {
+      boxShadow: "0px 3px 6px rgba(0, 70, 104, 0.5)",
+      backgroundColor: "#0E76A8",
+      marginRight: "10px",
+      "&:hover": {
+         backgroundColor: "#004464",
+      },
+   },
+})
 
 const SpeakerDetailsDialog = ({ speaker, onClose }) => {
+   const { userData } = useAuth()
    const {
       currentLivestream: { speakers },
    } = useCurrentStream()
@@ -33,55 +53,73 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
    const matchedSpeaker =
       getLivestreamMatchingSpeaker(speaker, speakers) ?? speaker
 
+   console.log("speaker", matchedSpeaker)
+   console.log("userData", userData)
+
    const name = `${matchedSpeaker.firstName} ${matchedSpeaker.lastName}`
    let subtitle = matchedSpeaker.position
    if (matchedSpeaker.background) {
       subtitle = `${subtitle} (${matchedSpeaker.background} background)`
    }
 
+   // user can't save himself if logged in
+   // logged out, we show the save button
+   const canSave = userData ? matchedSpeaker?.userId !== userData?.authId : true
+
    return (
-      <Dialog open={true} onClose={onClose}>
+      <Dialog open={true} onClose={onClose} fullWidth={true} maxWidth={"sm"}>
          <DialogTitle>Speaker Details</DialogTitle>
+         <IconButton onClick={onClose} sx={styles.dialogClose}>
+            <CloseIcon />
+         </IconButton>
+         <Divider />
          <DialogContent sx={{ paddingBottom: 0 }}>
             <Card sx={{ boxShadow: "none" }}>
                <CardHeader
-                  sx={{ padding: "16px 0" }}
+                  sx={{ padding: "16px 0", alignItems: "start" }}
                   avatar={
                      <ColorizedAvatar
+                        sx={{
+                           width: "70px",
+                           height: "70px",
+                        }}
                         firstName={matchedSpeaker.firstName}
                         lastName={matchedSpeaker.lastName}
                         imageUrl={matchedSpeaker.avatar}
                      />
                   }
                   title={name}
-                  subheader={subtitle}
-                  titleTypographyProps={{ variant: "h6" }}
+                  subheader={
+                     <Typography sx={styles.subtitle}>{subtitle}</Typography>
+                  }
+                  titleTypographyProps={{
+                     variant: "h6",
+                     sx: { marginTop: "5px", marginBottom: "2px" },
+                  }}
                />
-               <CardActions sx={{ padding: "8px 0", justifyContent: "center" }}>
+               <CardActions
+                  sx={{
+                     padding: "8px 0",
+                     justifyContent: "center",
+                     marginBottom: "15px",
+                  }}
+               >
                   {speaker.linkedIn && (
                      <Tooltip title={`Go to LinkedIn profile`}>
                         <Button
                            startIcon={<LinkedInIcon />}
                            variant="contained"
-                           style={{
-                              backgroundColor: "#0E76A8",
-                              marginRight: "10px",
-                           }}
+                           sx={styles.linkedInbutton}
                            onClick={() => handleLinkedInClick(speaker.linkedIn)}
                         >
                            LinkedIn
                         </Button>
                      </Tooltip>
                   )}
-                  <SaveRecruiterButton speaker={matchedSpeaker} />
+                  {canSave && <SaveRecruiterButton speaker={matchedSpeaker} />}
                </CardActions>
             </Card>
          </DialogContent>
-         <DialogActions>
-            <Button color="grey" onClick={onClose}>
-               Close
-            </Button>
-         </DialogActions>
       </Dialog>
    )
 }
@@ -91,161 +129,6 @@ const handleLinkedInClick = (url) => {
       url = "https://" + url
    }
    window.open(url, "_blank")
-}
-
-const SaveRecruiterButton = ({ speaker }) => {
-   const { userPresenter, isLoggedOut } = useAuth()
-   const { currentLivestream } = useCurrentStream()
-   const { isLoading, recruiterData, saveRecruiter, recruiterSaved } =
-      useRecruiterData(speaker.id)
-
-   let tooltipMessage =
-      "The speaker details will be saved on the My Recruiters page under your profile."
-
-   if (isLoggedOut) {
-      tooltipMessage = "You must be logged in to save a speaker."
-   }
-
-   const isAlreadySaved = Boolean(recruiterData || recruiterSaved)
-
-   if (isAlreadySaved) {
-      tooltipMessage = "This Speaker is already on your saved list."
-   }
-
-   if (!userPresenter?.canSaveRecruiters()) {
-      return <SaveRecruiterButtonNoAccess />
-   }
-
-   const onClick = () => {
-      const recruiter: SavedRecruiter = createSavedRecruiter(
-         userPresenter.model.id,
-         currentLivestream,
-         speaker
-      )
-
-      saveRecruiter(recruiter).catch(console.error)
-   }
-
-   const isButtonDisabled = Boolean(
-      isLoading || !userPresenter?.canSaveRecruiters()
-   )
-
-   return (
-      <>
-         <Tooltip title={tooltipMessage}>
-            <span>
-               <LoadingButton
-                  variant="contained"
-                  startIcon={<SaveIcon />}
-                  disabled={isButtonDisabled || isAlreadySaved}
-                  onClick={onClick}
-                  loading={isLoading}
-               >
-                  {isAlreadySaved ? "Saved" : "Save for later"}
-               </LoadingButton>
-            </span>
-         </Tooltip>
-      </>
-   )
-}
-
-const SaveRecruiterButtonNoAccess = () => {
-   const [anchorEl, setAnchorEl] = React.useState(null)
-   const [timeout, setTimeoutValue] = React.useState(null)
-
-   const isMobile = useIsMobile()
-
-   const requiredBadge = UserPresenter.saveRecruitersRequiredBadge()
-
-   const handlePopoverOpen = (event) => {
-      if (timeout) {
-         clearTimeout(timeout)
-      }
-      setAnchorEl(event.currentTarget)
-   }
-
-   const handlePopoverClose = () => {
-      // give some time for the user to click on the link
-      setTimeoutValue(
-         setTimeout(() => {
-            setAnchorEl(null)
-         }, 1000)
-      )
-   }
-
-   const open = Boolean(anchorEl)
-
-   return (
-      <>
-         <span
-            aria-owns={open ? "mouse-over-popover" : undefined}
-            aria-haspopup="true"
-            onMouseEnter={handlePopoverOpen}
-            onMouseLeave={handlePopoverClose}
-         >
-            <Button
-               variant="contained"
-               startIcon={<SaveIcon />}
-               disabled={true}
-            >
-               {isMobile ? "Save" : "Save For Later"}
-            </Button>
-         </span>
-         <Popover
-            id="mouse-over-popover"
-            sx={{
-               pointerEvents: "none",
-            }}
-            open={open}
-            anchorEl={anchorEl}
-            anchorOrigin={{
-               vertical: "bottom",
-               horizontal: "left",
-            }}
-            transformOrigin={{
-               vertical: "top",
-               horizontal: "left",
-            }}
-            onClose={handlePopoverClose}
-            disableRestoreFocus
-         >
-            <Typography sx={{ p: 1 }}>
-               You have to unlock the{" "}
-               <Link href="#">{requiredBadge.name} Badge</Link> to access this
-               feature.
-            </Typography>
-         </Popover>
-      </>
-   )
-}
-
-const createSavedRecruiter = (userId, currentLivestream, speaker) => {
-   const recruiterInfo: SavedRecruiter = {
-      id: speaker.id,
-      livestreamId: currentLivestream.id,
-      userId: userId,
-      savedAt: null, // will be set by the server
-
-      livestreamDetails: pick(currentLivestream, [
-         "title",
-         "company",
-         "summary",
-         "start",
-         "companyLogoUrl",
-      ]),
-
-      streamerDetails: pick(speaker, [
-         "linkedIn",
-         "firstName",
-         "lastName",
-         "position",
-         "id",
-         "avatar",
-         "background",
-      ]),
-   }
-
-   return recruiterInfo
 }
 
 /**
