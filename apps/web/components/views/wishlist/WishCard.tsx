@@ -27,6 +27,7 @@ import { useRouter } from "next/router"
 import { Hit } from "../../../types/algolia"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import WishCardMenuButton from "./WishCardMenuButton"
+import { getBaseUrl } from "../../helperFunctions/HelperFunctions"
 
 interface WishCardProps {
    wish: Hit<Wish>
@@ -113,7 +114,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
    )
    const { query } = useRouter()
    // @ts-ignore
-   const [date] = useState(new Date(wish.createdAt))
+   const [date] = useState<Date>(new Date(wish.createdAt))
    const [numberOfUpvotes, setNumberOfUpvotes] = useState(wish.numberOfUpvotes)
    const { authenticatedUser, userData } = useAuth()
    const dispatch = useDispatch()
@@ -279,6 +280,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                   >
                      {authorDisplayName || "User"}
                   </Typography>
+                  <br />
                   <Typography
                      sx={styles.title}
                      color={"text.secondary"}
@@ -286,7 +288,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                      gutterBottom
                      component={"time"}
                   >
-                     {DateUtil.eventPreviewDate(date)}
+                     {DateUtil.getISODateTime(date)}
                   </Typography>
                   <Typography
                      dangerouslySetInnerHTML={{
@@ -369,6 +371,8 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                   {/*<Button*/}
                   {/*   size={"large"}*/}
                   {/*   color={"grey"}*/}
+                  {/*   itemProp={"discussionUrl"}
+                  {/*   href={`${getBaseUrl()}/wish/${wish.id}`}
                   {/*   startIcon={<CommentIcon />}*/}
                   {/*>*/}
                   {/*   {wish.numberOfComments} comments*/}
@@ -377,12 +381,17 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
             </Stack>
          </Paper>
          <Box sx={styles.rating}>
+            <meta itemProp={"datePublished"} content={date.toISOString()} />
             <div
                itemProp="itemReviewed"
                itemScope
                itemType="https://schema.org/Organization"
             >
-               <img itemProp="image" src="/logo_teal.svg" alt="CareerFairy" />
+               <img
+                  itemProp="image"
+                  src={getBaseUrl() + "/logo_teal.svg"}
+                  alt="CareerFairy"
+               />
                <span itemProp="name">CareerFairy Wish</span>
             </div>
             <div
@@ -393,20 +402,23 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                <meta itemProp="name" content="CareerFairy" />
             </div>
             {parseInt(ratingValue) > 1 && (
-               <Box
-                  itemProp="reviewRating"
-                  itemScope
-                  itemType="https://schema.org/Rating"
+               <div
+                  itemProp="aggregateRating"
+                  itemType="https://schema.org/AggregateRating"
                >
+                  <meta
+                     itemProp="reviewCount"
+                     // @ts-ignore
+                     content={wish.numberOfUpvotes + wish.numberOfDownvotes}
+                  />
+                  <meta itemProp="ratingValue" content={ratingValue} />
+                  <meta
+                     itemProp="ratingExplanation"
+                     content="This rating measures how much users would like to see this wish come true"
+                  />
                   <meta itemProp="worstRating" content="1" />
-                  <span itemProp="ratingValue">{getRatingValue()}</span>
-                  <span itemProp="ratingExplanation">
-                     {
-                        "This rating measures how much users would like to see this wish come true"
-                     }
-                  </span>
-                  <span itemProp="bestRating">5</span> stars
-               </Box>
+                  <meta itemProp="bestRating" content="5" />
+               </div>
             )}
          </Box>
       </Box>
