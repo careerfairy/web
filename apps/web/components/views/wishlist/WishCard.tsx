@@ -231,9 +231,15 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
    const getRatingValue = () => {
       // @ts-ignore
       const total = wish.numberOfUpvotes + wish.numberOfDownvotes
-      // @ts-ignore
-      return (total === 0 ? 1 : (wish.numberOfUpvotes / total) * 5).toFixed(2)
+      return (
+         // @ts-ignore
+         ((total === 0 ? 1 : (wish.numberOfUpvotes / total) * 5) || 1).toFixed(
+            2
+         )
+      )
    }
+
+   const ratingValue = getRatingValue()
 
    const authorDisplayName = gettingAuthor
       ? "..."
@@ -265,7 +271,12 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
             <UserAvatar size={"large"} data={authorData} />
             <Stack sx={styles.rightContent} spacing={2}>
                <Box component={"header"}>
-                  <Typography itemProp="author" sx={styles.name} variant={"h6"}>
+                  <Typography
+                     itemProp={"author"}
+                     component={"span"}
+                     sx={styles.name}
+                     variant={"h6"}
+                  >
                      {authorDisplayName || "User"}
                   </Typography>
                   <Typography
@@ -365,15 +376,38 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                </Box>
             </Stack>
          </Paper>
-         <Box
-            sx={styles.rating}
-            itemProp="reviewRating"
-            itemScope
-            itemType="https://schema.org/Rating"
-         >
-            <meta itemProp="worstRating" content="1" />
-            <span itemProp="ratingValue">{getRatingValue()}</span>
-            <span itemProp="bestRating">5</span> stars
+         <Box sx={styles.rating}>
+            <div
+               itemProp="itemReviewed"
+               itemScope
+               itemType="https://schema.org/Organization"
+            >
+               <img itemProp="image" src="/logo_teal.svg" alt="CareerFairy" />
+               <span itemProp="name">CareerFairy Wish</span>
+            </div>
+            <div
+               itemProp="publisher"
+               itemScope
+               itemType="https://schema.org/Organization"
+            >
+               <meta itemProp="name" content="CareerFairy" />
+            </div>
+            {parseInt(ratingValue) > 1 && (
+               <Box
+                  itemProp="reviewRating"
+                  itemScope
+                  itemType="https://schema.org/Rating"
+               >
+                  <meta itemProp="worstRating" content="1" />
+                  <span itemProp="ratingValue">{getRatingValue()}</span>
+                  <span itemProp="ratingExplanation">
+                     {
+                        "This rating measures how much users would like to see this wish come true"
+                     }
+                  </span>
+                  <span itemProp="bestRating">5</span> stars
+               </Box>
+            )}
          </Box>
       </Box>
    )

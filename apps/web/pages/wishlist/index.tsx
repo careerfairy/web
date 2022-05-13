@@ -17,7 +17,7 @@ import { useUpdateEffect } from "react-use"
 import SEO from "../../components/util/SEO"
 import { getBaseUrl } from "../../components/helperFunctions/HelperFunctions"
 
-const pageSize = 5
+const pageSize = 10
 
 const getQueryVariables = (query) => {
    const sortType = query.sortType as SortType
