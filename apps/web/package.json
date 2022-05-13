@@ -94,6 +94,7 @@
       "redux-firestore": "^0.14.0",
       "redux-thunk": "^2.3.0",
       "reselect": "^4.0.0",
+      "schema-dts": "^1.1.0",
       "slick-carousel": "^1.8.1",
       "use-pagination-firestore": "0.5.0",
       "uuid": "^8.3.0",

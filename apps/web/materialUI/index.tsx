@@ -11,13 +11,17 @@ declare module "@mui/styles/defaultTheme" {
    // eslint-disable-next-line @typescript-eslint/no-empty-interface (remove this line if you don't have the rule enabled)
    interface DefaultTheme extends Theme {
       drawerWidth?: { small: string; medium: string }
-      customShadows?: {
+      boxShadows?: {
          // color_y_blur_opacity
-         dark_12_13: string
-         dark_15_60: string
-         secondary_5_15_50: string
-         grey_5_15_50: string
-         primary_5_15_50: string
+         dark_8_25_10?: string
+         dark_15_60_15?: string
+         secondary_5_15_50?: string
+         grey_5_15_50?: string
+         primary_5_15_50?: string
+      }
+      dropShadows?: {
+         // color_y_blur_opacity
+         dark_6_12_12?: string
       }
    }
 }
@@ -42,13 +46,17 @@ declare module "@mui/material" {
 declare module "@mui/material/styles" {
    interface ThemeOptions {
       whiteShadow?: string
-      customShadows?: {
+      boxShadows?: {
          // color_y_blur_opacity
-         dark_12_13: string
-         dark_15_60: string
-         secondary_5_15_50: string
-         primary_5_15_50: string
-         grey_5_15_50: string
+         dark_8_25_10?: string
+         grey_5_15_50?: string
+         dark_15_60_15?: string
+         secondary_5_15_50?: string
+         primary_5_15_50?: string
+      }
+      dropShadows?: {
+         // color_y_blur_opacity
+         dark_6_12_12?: string
       }
       drawerWidth?: { small?: string; medium?: string }
       darkTextShadow?: string
@@ -92,6 +100,9 @@ const primary: PaletteOptions["primary"] = {
    gradient: "#07c1a7",
 }
 
+const black = "#000000"
+const white = "#FFFFFF"
+
 export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
    createTheme({
       transitions: {
@@ -100,10 +111,14 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
          },
       },
       // shape: {
-      //    borderRadius: 20,
+      // borderRadius: 20,
       // },
       palette: {
          mode,
+         common: {
+            black,
+            white,
+         },
          primary: primary,
          grey: {
             main: grey[300],
@@ -157,18 +172,20 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
       },
       whiteShadow:
          "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)",
-      customShadows: {
-         dark_12_13: `drop-shadow(0px 12px 30px ${alpha("#000", 0.12)})`,
-         dark_15_60: `drop-shadow(0px 12px 30px ${alpha("#000", 0.15)})`,
-         grey_5_15_50: `drop-shadow(0px 5px 15px ${alpha(grey[300], 0.5)})`,
-         secondary_5_15_50: `drop-shadow(0px 5px 15px ${alpha(
+      boxShadows: {
+         dark_8_25_10: `0px 8px 25px rgba(33, 32, 32, 0.1)`,
+         grey_5_15_50: `0px 5px 15px ${alpha(grey[400], 0.5)}`,
+         secondary_5_15_50: `0px 5px 15px ${alpha(
             mode === "light" ? secondary.main : secondary.dark,
             mode === "light" ? 0.5 : 0.2
-         )})`,
-         primary_5_15_50: `drop-shadow(0px 5px 15px ${alpha(
+         )}`,
+         primary_5_15_50: `0px 5px 15px ${alpha(
             mode === "light" ? primary.main : primary.dark,
             mode === "light" ? 0.5 : 0.2
-         )})`,
+         )}`,
+      },
+      dropShadows: {
+         dark_6_12_12: "drop-shadow(0px 6px 12px rgba(0, 0, 0, 0.12))",
       },
       drawerWidth: { small: "256px", medium: "300px" },
       darkTextShadow:
@@ -192,14 +209,14 @@ const getComponents = (theme: DefaultTheme): Components => ({
          paper: {
             borderRadius: 20,
             boxShadow: "none",
-            filter: theme.customShadows.dark_15_60,
+            filter: theme.boxShadows.dark_15_60_15,
          },
       },
    },
    MuiPaper: {
       styleOverrides: {
          root: {
-            borderRadius: 15,
+            // borderRadius: 0,
          },
       },
    },
@@ -210,33 +227,21 @@ const getComponents = (theme: DefaultTheme): Components => ({
          },
       },
    },
-   MuiButton: {
+   MuiButtonGroup: {
       styleOverrides: {
          // Name of the slot
-         disableElevation: true,
          root: {
             // Some CSS
-            fontWeight: 600,
-            padding: "1em 2em",
-            boxShadow: "none",
             borderRadius: 30,
          },
       },
       variants: [
          {
             props: {
-               disableElevation: true,
-            },
-            style: {
-               filter: "none",
-            },
-         },
-         {
-            props: {
                variant: "contained",
             },
             style: {
-               filter: theme.customShadows.primary_5_15_50,
+               boxShadow: theme.boxShadows.grey_5_15_50,
             },
          },
          {
@@ -245,7 +250,7 @@ const getComponents = (theme: DefaultTheme): Components => ({
                color: "primary",
             },
             style: {
-               filter: theme.customShadows.primary_5_15_50,
+               boxShadow: theme.boxShadows.primary_5_15_50,
             },
          },
          {
@@ -254,7 +259,46 @@ const getComponents = (theme: DefaultTheme): Components => ({
                color: "secondary",
             },
             style: {
-               filter: theme.customShadows.secondary_5_15_50,
+               boxShadow: theme.boxShadows.secondary_5_15_50,
+            },
+         },
+      ],
+   },
+   MuiButton: {
+      styleOverrides: {
+         // Name of the slot
+         root: {
+            // Some CSS
+            fontWeight: 600,
+            padding: "1em 2em",
+            borderRadius: 30,
+         },
+      },
+      variants: [
+         {
+            props: {
+               variant: "contained",
+            },
+            style: {
+               boxShadow: theme.boxShadows.primary_5_15_50,
+            },
+         },
+         {
+            props: {
+               variant: "contained",
+               color: "primary",
+            },
+            style: {
+               boxShadow: theme.boxShadows.primary_5_15_50,
+            },
+         },
+         {
+            props: {
+               variant: "contained",
+               color: "secondary",
+            },
+            style: {
+               boxShadow: theme.boxShadows.secondary_5_15_50,
             },
          },
          {
@@ -263,7 +307,7 @@ const getComponents = (theme: DefaultTheme): Components => ({
                color: "grey",
             },
             style: {
-               filter: theme.customShadows.grey_5_15_50,
+               boxShadow: theme.boxShadows.grey_5_15_50,
             },
          },
          {
