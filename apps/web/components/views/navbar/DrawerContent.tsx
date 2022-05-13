@@ -36,7 +36,7 @@ const DrawerContent = () => {
          <Stack spacing={1}>
             <List>
                {isLoggedOut && (
-                  <ListItem>
+                  <ListItem disableGutters>
                      <LoginButton />
                   </ListItem>
                )}

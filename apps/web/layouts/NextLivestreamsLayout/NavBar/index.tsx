@@ -91,9 +91,8 @@ const FeedDrawer = memo(
       const {
          query: { groupId: groupIdInQuery },
       } = useRouter()
-      const { userData, isLoggedOut } = useAuth()
+      const { userData, isLoggedOut, isLoggedIn } = useAuth()
       const [groups, setGroups] = useState(null)
-      console.log("-> groups", groups)
       const dispatch = useDispatch()
       const signOut = () => dispatch(actions.signOut())
       const [followingGroups, loading] = useFollowingGroups()
@@ -145,7 +144,7 @@ const FeedDrawer = memo(
                               src={getResizedUrl(logoUrl, "xs")}
                            />
                         ))
-                     ) : (
+                     ) : isLoggedIn ? (
                         <ListItem>
                            <NavPrompt
                               title={"Start registering"}
@@ -154,7 +153,7 @@ const FeedDrawer = memo(
                               noLink
                            />
                         </ListItem>
-                     )}
+                     ) : null}
                   </List>
                )}
             </Box>
