@@ -18,6 +18,7 @@ declare module "@mui/styles/defaultTheme" {
          secondary_5_15_50?: string
          grey_5_15_50?: string
          primary_5_15_50?: string
+         dark_12_13?: string
       }
       dropShadows?: {
          // color_y_blur_opacity
@@ -53,6 +54,7 @@ declare module "@mui/material/styles" {
          dark_15_60_15?: string
          secondary_5_15_50?: string
          primary_5_15_50?: string
+         dark_12_13?: string
       }
       dropShadows?: {
          // color_y_blur_opacity
@@ -174,6 +176,7 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
          "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)",
       boxShadows: {
          dark_8_25_10: `0px 8px 25px rgba(33, 32, 32, 0.1)`,
+         dark_12_13: `0px 12px 13px ${alpha(black, 0.12)}`,
          grey_5_15_50: `0px 5px 15px ${alpha(grey[400], 0.5)}`,
          secondary_5_15_50: `0px 5px 15px ${alpha(
             mode === "light" ? secondary.main : secondary.dark,

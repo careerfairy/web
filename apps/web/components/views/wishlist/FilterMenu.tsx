@@ -34,8 +34,7 @@ const UpIcon = (props: IconProps) => (
 const styles: StylesProps = {
    paperRoot: {
       borderRadius: wishListBorderRadius,
-      boxShadow: "none",
-      filter: (theme) => theme.customShadows.dark_12_13,
+      boxShadow: (theme) => theme.boxShadows.dark_12_13,
    },
    content: {
       p: 2,
