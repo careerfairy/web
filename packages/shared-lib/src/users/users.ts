@@ -26,7 +26,14 @@ export interface UserData extends Identifiable {
       name: string
    }
    referralsCount?: number
-   livestreamsAttendances?: number
+}
+
+export interface UserStats {
+   userId: string
+   totalLivestreamAttendances?: number
+   totalQuestionsAsked?: number
+   totalHandRaises?: number
+   totalLivestreamInvites?: number
 }
 
 export interface SavedRecruiter extends Identifiable {
