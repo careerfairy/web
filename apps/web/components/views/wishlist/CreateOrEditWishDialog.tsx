@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useMemo } from "react"
 import {
    Button,
    CircularProgress,
@@ -22,10 +22,14 @@ import Typography from "@mui/material/Typography"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import Box from "@mui/material/Box"
 import LoggedInUserAvatar from "../common/LoggedInUserAvatar"
+import { useDispatch } from "react-redux"
+import * as actions from "../../../store/actions"
 
 interface CreateWishDialogProps {
    open: boolean
    onClose: () => void
+   wishToEdit?: Wish
+   onUpdateWish?: (newInterests: Interest[], newDescription: string) => void
 }
 
 const maxInterests = 5
@@ -102,15 +106,33 @@ const Label = ({ title, htmlFor }: LabelProps) => {
       </Typography>
    )
 }
-const CreateWishDialog = ({ open, onClose }: CreateWishDialogProps) => {
+const CreateOrEditWishDialog = ({
+   open,
+   onClose,
+   wishToEdit,
+   onUpdateWish,
+}: CreateWishDialogProps) => {
    // Material dialog
    const { userData } = useAuth()
-   const initialValues: CreateWishFormValues = {
-      description: "",
-      interests: [],
-      companyNames: [],
-   }
+   const dispatch = useDispatch()
    const { data: allInterests } = useInterests()
+   const initialValues = useMemo<CreateWishFormValues>(
+      () => ({
+         description: wishToEdit?.description || "",
+         interests: wishToEdit?.interestIds?.length
+            ? allInterests.filter((int) =>
+                 wishToEdit.interestIds.includes(int.id)
+              )
+            : [],
+         companyNames: wishToEdit?.companyNames || [],
+      }),
+      [
+         wishToEdit?.description,
+         wishToEdit?.interestIds,
+         wishToEdit?.companyNames,
+         allInterests,
+      ]
+   )
 
    const handleClose = () => {
       onClose()
@@ -118,8 +140,22 @@ const CreateWishDialog = ({ open, onClose }: CreateWishDialogProps) => {
 
    const onSubmit = async (values: CreateWishFormValues) => {
       try {
-         // create wish
-         await wishlistRepo.createWish(values)
+         if (wishToEdit?.id) {
+            await wishlistRepo.updateWish(values, wishToEdit.id)
+            if (onUpdateWish) {
+               onUpdateWish(values.interests, values.description)
+            }
+         } else {
+            // create wish
+            await wishlistRepo.createWish(values)
+         }
+         dispatch(
+            actions.sendSuccessMessage(
+               wishToEdit?.id
+                  ? "Your wish has been updated"
+                  : "Thanks for your wish!"
+            )
+         )
       } catch (e) {
          console.error("error in creating wish", e)
       }
@@ -127,11 +163,14 @@ const CreateWishDialog = ({ open, onClose }: CreateWishDialogProps) => {
       handleClose()
    }
 
+   const submitLabel = wishToEdit ? "Update Wish" : "Make You Wish"
+   const submitLoadingLabel = wishToEdit ? "Updating..." : "Creating..."
    return (
       <Dialog maxWidth={"sm"} fullWidth onClose={handleClose} open={open}>
          <Formik
             initialValues={initialValues}
             validationSchema={schema}
+            enableReinitialize={!!wishToEdit?.id}
             onSubmit={onSubmit}
          >
             {({
@@ -233,7 +272,7 @@ const CreateWishDialog = ({ open, onClose }: CreateWishDialogProps) => {
                         }
                         variant={"contained"}
                      >
-                        {isSubmitting ? "Making wish" : "Make your wish"}
+                        {isSubmitting ? submitLoadingLabel : submitLabel}
                      </Button>
                   </DialogActions>
                </form>
@@ -243,4 +282,4 @@ const CreateWishDialog = ({ open, onClose }: CreateWishDialogProps) => {
    )
 }
 
-export default CreateWishDialog
+export default CreateOrEditWishDialog

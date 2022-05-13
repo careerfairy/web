@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react"
-import { FlagReason, Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
+import { Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
 import Paper from "@mui/material/Paper"
 import { StylesProps } from "../../../types/commonTypes"
 import Box from "@mui/material/Box"
@@ -7,7 +7,6 @@ import {
    AvatarGroup,
    Button,
    CircularProgress,
-   IconButton,
    Typography,
 } from "@mui/material"
 import userRepo from "../../../data/firebase/UserRepository"
@@ -25,9 +24,9 @@ import * as actions from "../../../store/actions"
 import DateUtil from "../../../util/DateUtil"
 import { useRouter } from "next/router"
 import { Hit } from "../../../types/algolia"
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import WishCardMenuButton from "./WishCardMenuButton"
 import { getBaseUrl } from "../../helperFunctions/HelperFunctions"
+import { mainProductionDomain } from "../../../constants/domains"
 
 interface WishCardProps {
    wish: Hit<Wish>
@@ -77,7 +76,7 @@ const styles: StylesProps = {
       flexWrap: "wrap",
       alignContent: "center",
    },
-   rating: {
+   seo: {
       position: "absolute",
       opacity: 0,
       visibility: "hidden",
@@ -99,26 +98,33 @@ const bull = (
 )
 
 interface WishInterest extends Interest {
-   highlighted: boolean
+   highlighted?: boolean
 }
 
 const WishCard = ({ wish, interests }: WishCardProps) => {
    // get wish author from authorUid
    const [authorData, setAuthorData] = useState<UserData>(null)
    const [deleted, setDeleted] = useState(false)
+   const [description, setDescription] = useState(
+      wish._highlightResult.description.value
+   )
    const [userRating, setUserRating] = useState<Rating>(null)
    const [wishInterests, setWishInterests] = useState<WishInterest[]>([])
    const [gettingAuthor, setGettingAuthor] = useState(false)
    const [upvoters, setUpvoters] = useState<UserData[]>(
       Array(wish.uidsOfRecentUpvoters.length || 0).fill(null)
    )
-   const { query } = useRouter()
+   const { query, push, asPath } = useRouter()
    // @ts-ignore
    const [date] = useState<Date>(new Date(wish.createdAt))
    const [numberOfUpvotes, setNumberOfUpvotes] = useState(wish.numberOfUpvotes)
-   const { authenticatedUser, userData } = useAuth()
+   const { authenticatedUser, userData, isLoggedIn } = useAuth()
    const dispatch = useDispatch()
    const [voting, setVoting] = useState(false)
+
+   useEffect(() => {
+      setDescription(wish._highlightResult.description.value)
+   }, [wish._highlightResult.description.value])
 
    useEffect(() => {
       ;(async function getUpvotersData() {
@@ -159,16 +165,19 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
 
    useEffect(() => {
       ;(async function getUserRating() {
-         const userRating = await wishRepo.getUserRating(
-            wish.id,
-            authenticatedUser.uid
-         )
-         setUserRating(userRating)
+         if (isLoggedIn) {
+            const userRating = await wishRepo.getUserRating(
+               wish.id,
+               authenticatedUser.uid
+            )
+            setUserRating(userRating)
+         }
       })()
-   }, [])
+   }, [isLoggedIn])
 
    const handleRate = async (type: "upvote" | "downvote") => {
       try {
+         if (!isLoggedIn) return goToLogin()
          setVoting(true)
          const newRating = await wishRepo.toggleRateWish(
             authenticatedUser.uid,
@@ -229,6 +238,12 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
       await wishRepo.deleteWish(wish.id)
       setDeleted(true)
    }
+
+   const onUpdateWish = (newInterests: Interest[], newDescription: string) => {
+      setWishInterests(newInterests)
+      setDescription(newDescription)
+   }
+
    const getRatingValue = () => {
       // @ts-ignore
       const total = wish.numberOfUpvotes + wish.numberOfDownvotes
@@ -238,6 +253,15 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
             2
          )
       )
+   }
+
+   const goToLogin = () => {
+      void push({
+         pathname: "/login",
+         query: {
+            absolutePath: asPath,
+         },
+      })
    }
 
    const ratingValue = getRatingValue()
@@ -256,10 +280,10 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
          sx={styles.root}
       >
          <WishCardMenuButton
-            authorUid={wish.authorUid}
-            wishId={wish.id}
+            wish={wish}
             sx={styles.moreIconButton}
             handleDelete={handleDelete}
+            onUpdateWish={onUpdateWish}
          />
          <Paper
             component={Stack}
@@ -288,11 +312,11 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                      gutterBottom
                      component={"time"}
                   >
-                     {DateUtil.getISODateTime(date)}
+                     {DateUtil.getRelativeDate(date)}
                   </Typography>
                   <Typography
                      dangerouslySetInnerHTML={{
-                        __html: wish._highlightResult.description.value,
+                        __html: description,
                      }}
                      itemProp="reviewBody"
                      sx={styles.title}
@@ -380,7 +404,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                </Box>
             </Stack>
          </Paper>
-         <Box sx={styles.rating}>
+         <Box sx={styles.seo}>
             <meta itemProp={"datePublished"} content={date.toISOString()} />
             <div
                itemProp="itemReviewed"
@@ -389,7 +413,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
             >
                <img
                   itemProp="image"
-                  src={getBaseUrl() + "/logo_teal.svg"}
+                  src={`https://www.${mainProductionDomain}/logo_teal.svg`}
                   alt="CareerFairy"
                />
                <span itemProp="name">CareerFairy Wish</span>

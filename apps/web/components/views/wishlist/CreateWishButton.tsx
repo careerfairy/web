@@ -3,7 +3,7 @@ import Stack from "@mui/material/Stack"
 import { darken } from "@mui/material"
 import Link from "../common/Link"
 import { wishListBorderRadius } from "../../../constants/pages"
-import CreateWishDialog from "./CreateWishDialog"
+import CreateOrEditWishDialog from "./CreateOrEditWishDialog"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import useDialog from "../../custom-hook/useDialog"
@@ -45,29 +45,29 @@ const styles: StylesProps = {
    },
 }
 const CreateWishButton = () => {
-   const { isLoggedOut } = useAuth()
+   const { isLoggedIn } = useAuth()
    const { asPath } = useRouter()
    const [createWishDialogOpen, handleOpenWishDialog, handleCloseWishDialog] =
       useDialog()
    return (
       <>
          <Stack
-            onClick={() => !isLoggedOut && handleOpenWishDialog()}
+            onClick={() => isLoggedIn && handleOpenWishDialog()}
             sx={styles.paper}
             direction={"row"}
             alignItems={"center"}
             spacing={1}
          >
-            <LoggedInUserAvatar size={"medium"} />
+            {isLoggedIn && <LoggedInUserAvatar size={"medium"} />}
             <Box className={"prompt"} sx={styles.prompt}>
                <Typography sx={styles.promptText}>
                   What would you like to wish for?
                </Typography>
             </Box>
-            {isLoggedOut && (
+            {!isLoggedIn && (
                <Box
                   href={{
-                     pathname: "login",
+                     pathname: "/login",
                      query: {
                         absolutePath: asPath,
                      },
@@ -77,7 +77,7 @@ const CreateWishButton = () => {
                />
             )}
          </Stack>
-         <CreateWishDialog
+         <CreateOrEditWishDialog
             onClose={handleCloseWishDialog}
             open={createWishDialogOpen}
          />

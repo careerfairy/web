@@ -268,7 +268,7 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
                            variant={
                               isSelected(interest.id) ? "contained" : "outlined"
                            }
-                           stacked
+                           stacked={"true"}
                            label={interest.name}
                            key={interest.id}
                         />

@@ -427,8 +427,9 @@ service cloud.firestore {
             allow create: if request.auth != null;
             allow delete, update: if request.resource.data.authorUid == uid || isCFAdmin();
             match /flags/{uid} {
-                         allow create: if request.auth != null;
-                         allow read, update, delete: if request.auth.uid == uid || isCFAdmin();
+            allow read, write: if true;
+                  //      allow create: if request.auth != null;
+                    //     allow read, update, delete: if request.auth.uid == uid || isCFAdmin();
                      }
             match /ratings/{uid} {
                           allow read, write: if request.auth.uid == uid || isCFAdmin();

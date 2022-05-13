@@ -59,7 +59,6 @@ const Search = () => {
 
    const [, cancelDebounce] = useDebounce(
       () => {
-         console.log("-> Typing stopped and started query")
          handleQuery(searchValue)
       },
       2000,

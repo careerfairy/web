@@ -17,7 +17,7 @@ import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
 import { StylesProps } from "../../../types/commonTypes"
 import { useDispatch } from "react-redux"
-import * as action from "../../../store/actions"
+import * as actions from "../../../store/actions"
 import Typography from "@mui/material/Typography"
 
 interface Props {
@@ -71,8 +71,9 @@ const FlagDialog = ({ onClose, handleFlag, open }: Props) => {
    const handleSubmit = async (values: FormikValues) => {
       try {
          await handleFlag(values.reasons, values.flagMessage)
+         dispatch(actions.sendSuccessMessage("Thanks for reporting"))
       } catch (error) {
-         dispatch(action.sendGeneralError(error))
+         dispatch(actions.sendGeneralError(error))
       }
       onClose()
    }

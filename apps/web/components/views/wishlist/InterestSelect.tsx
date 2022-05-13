@@ -82,7 +82,7 @@ const InterestSelect = ({
                /*
                // @ts-ignore */
                variant={isInterestSelected(interest) ? "contained" : "outlined"}
-               stacked
+               stacked={"true"}
                label={interest.name}
                key={interest.id}
             />

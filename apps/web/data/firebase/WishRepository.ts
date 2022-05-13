@@ -1,7 +1,7 @@
 import { firebaseServiceInstance } from "./FirebaseService"
 import firebase from "firebase/app"
 import { FlagReason, Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
-import { CreateWishFormValues } from "../../components/views/wishlist/CreateWishDialog"
+import { CreateWishFormValues } from "../../components/views/wishlist/CreateOrEditWishDialog"
 
 export interface IWishRepository {
    getWishesQuery(

@@ -20,7 +20,10 @@ import { useDispatch } from "react-redux"
 import * as actions from "../../../store/actions"
 import FlagDialog from "./FlagDialog"
 import wishRepo from "../../../data/firebase/WishRepository"
-import { FlagReason } from "@careerfairy/shared-lib/dist/wishes"
+import { FlagReason, Wish } from "@careerfairy/shared-lib/dist/wishes"
+import CreateOrEditWishDialog from "./CreateOrEditWishDialog"
+import { Hit } from "../../../types/algolia"
+import { Interest } from "@careerfairy/shared-lib/dist/interests"
 
 const styles: StylesProps = {
    divider: {
@@ -36,9 +39,9 @@ const styles: StylesProps = {
 
 interface Props {
    sx?: SxProps<DefaultTheme>
-   wishId: string
-   authorUid: string
    handleDelete: () => Promise<void>
+   wish: Hit<Wish>
+   onUpdateWish: (newInterests: Interest[], newDescription: string) => void
 }
 
 interface Option {
@@ -47,7 +50,12 @@ interface Option {
    onClick: () => void
 }
 
-const WishCardMenuButton = ({ sx, wishId, authorUid, handleDelete }: Props) => {
+const WishCardMenuButton = ({
+   sx,
+   handleDelete,
+   wish,
+   onUpdateWish,
+}: Props) => {
    const [
       confirmDeleteModalOpen,
       handleOpenConfirmDeleteModal,
@@ -55,12 +63,20 @@ const WishCardMenuButton = ({ sx, wishId, authorUid, handleDelete }: Props) => {
    ] = useDialog()
    const [flagModalOpen, handleOpenFlagModal, handleCloseFlagModal] =
       useDialog()
+   const [
+      editWishModalOpen,
+      handleOpenEditWishModal,
+      handleCloseEditWishModal,
+   ] = useDialog()
    const dispatch = useDispatch()
    const [deleting, setDeleting] = useState(false)
    const { isLoggedIn, authenticatedUser, userData } = useAuth()
    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
    const handleClose = () => {
+      if (flagModalOpen) handleCloseFlagModal()
+      if (editWishModalOpen) handleCloseEditWishModal()
+      if (confirmDeleteModalOpen) handleCloseConfirmDeleteModal()
       setAnchorEl(null)
    }
    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -70,14 +86,14 @@ const WishCardMenuButton = ({ sx, wishId, authorUid, handleDelete }: Props) => {
    const options = useMemo<Option[]>(() => {
       const options = []
       const isAuthor = Boolean(
-         isLoggedIn && authenticatedUser.uid === authorUid
+         isLoggedIn && authenticatedUser.uid === wish.authorUid
       )
       const isAdmin = Boolean(isLoggedIn && userData?.isAdmin)
       if (isAuthor || isAdmin) {
          options.push({
             label: "Edit",
             icon: <EditIcon />,
-            onClick: () => {},
+            onClick: handleOpenEditWishModal,
          })
          options.push({
             label: "Remove this wish",
@@ -94,7 +110,13 @@ const WishCardMenuButton = ({ sx, wishId, authorUid, handleDelete }: Props) => {
       }
 
       return options
-   }, [wishId, authenticatedUser.uid, isLoggedIn, userData?.isAdmin])
+   }, [
+      wish.id,
+      wish.authorUid,
+      authenticatedUser.uid,
+      isLoggedIn,
+      userData?.isAdmin,
+   ])
 
    const handleDeleteWish = async () => {
       try {
@@ -113,7 +135,7 @@ const WishCardMenuButton = ({ sx, wishId, authorUid, handleDelete }: Props) => {
    ) => {
       try {
          setDeleting(true)
-         await wishRepo.flagWish(wishId, flagReasons, message)
+         await wishRepo.flagWish(wish.id, flagReasons, message)
       } catch (error) {
          dispatch(actions.sendGeneralError(error))
       }
@@ -153,7 +175,7 @@ const WishCardMenuButton = ({ sx, wishId, authorUid, handleDelete }: Props) => {
             ))}
          </Menu>
          <AreYouSureModal
-            handleClose={handleCloseConfirmDeleteModal}
+            handleClose={handleClose}
             handleConfirm={handleDeleteWish}
             loading={deleting}
             title={"Are you sure you want to remove this wish?"}
@@ -162,8 +184,14 @@ const WishCardMenuButton = ({ sx, wishId, authorUid, handleDelete }: Props) => {
          />
          <FlagDialog
             handleFlag={handleFlagWish}
-            onClose={handleCloseFlagModal}
+            onClose={handleClose}
             open={flagModalOpen}
+         />
+         <CreateOrEditWishDialog
+            open={editWishModalOpen}
+            onUpdateWish={onUpdateWish}
+            wishToEdit={wish}
+            onClose={handleClose}
          />
       </>
    )
