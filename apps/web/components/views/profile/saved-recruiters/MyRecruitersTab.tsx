@@ -11,6 +11,8 @@ import Skeleton from "@mui/material/Skeleton"
 import Card from "@mui/material/Card"
 import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
 import userRepo from "../../../../data/firebase/UserRepository"
+import { styles } from "../profileStyles"
+import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
 
 const MyRecruitersTab = () => {
    const { userPresenter } = useAuth()
@@ -19,20 +21,18 @@ const MyRecruitersTab = () => {
       <ContentCard>
          <Grid container spacing={2}>
             <Grid item xs={8}>
-               <Typography sx={{ color: "text.secondary" }} variant="h5">
-                  Your Saved Recruiters
+               <ContentCardTitle>Your Saved Recruiters</ContentCardTitle>
+            </Grid>
+
+            <Grid item xs={8}>
+               <Typography sx={styles.subtitle}>
+                  During a Livestream event you can save your favourite
+                  recruiters and they will appear here.
                </Typography>
             </Grid>
          </Grid>
 
-         <Box mb={4}>
-            <p>
-               During a Livestream event you can save your favourite recruiters
-               and they will appear here.
-            </p>
-         </Box>
-
-         <Box mb={4}>
+         <Box mt={4} mb={4}>
             <Button
                component={Link}
                // @ts-ignore

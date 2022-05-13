@@ -36,7 +36,6 @@ const styles: StylesProps = {
       marginBottom: 0,
    },
    title: {
-      color: "text.secondary",
       textTransform: "uppercase",
       fontSize: "1.8rem",
       marginBottom: 3,

@@ -13,4 +13,7 @@ export const styles = {
       fontSize: "1.8rem",
       marginBottom: "30px",
    },
+   subtitle: {
+      fontSize: "1rem",
+   },
 } as const
