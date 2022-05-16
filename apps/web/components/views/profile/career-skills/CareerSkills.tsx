@@ -3,12 +3,12 @@ import React from "react"
 import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 import Box from "@mui/material/Box"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
-import { createStyles } from "@mui/styles"
 import { styles as profileStyles } from "../profileStyles"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { SkillsStepper } from "./SkillsStepper"
+import { sxStyles } from "types/commonTypes"
 
-const styles = createStyles({
+const styles = sxStyles({
    laneTitle: {
       fontWeight: 700,
       fontSize: "1.5rem",
