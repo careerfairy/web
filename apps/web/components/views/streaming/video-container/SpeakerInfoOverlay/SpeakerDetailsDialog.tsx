@@ -48,13 +48,21 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
       currentLivestream: { speakers },
    } = useCurrentStream()
 
-   const matchedSpeaker =
+   let matchedSpeaker =
       getLivestreamMatchingSpeaker(speaker, speakers) ?? speaker
+
+   // merge fields
+   matchedSpeaker = {
+      ...matchedSpeaker,
+      linkedIn: speaker.linkedIn,
+      position: matchedSpeaker.position ?? speaker.position,
+      userId: matchedSpeaker.userId ?? speaker.userId,
+   }
 
    const name = `${matchedSpeaker.firstName} ${matchedSpeaker.lastName}`
    let subtitle = matchedSpeaker.position
    if (matchedSpeaker.background) {
-      subtitle = `${subtitle} (${matchedSpeaker.background} background)`
+      subtitle = `${subtitle} (${matchedSpeaker.background.trim()} background)`
    }
 
    // user can't save himself if logged in
@@ -141,9 +149,9 @@ const getLivestreamMatchingSpeaker = (
 
    const exactMatch = allLivestreamSpeakers.find(
       (speaker) =>
-         speaker.firstName === currentSpeaker.firstName &&
-         speaker.lastName === currentSpeaker.lastName &&
-         speaker.position === currentSpeaker.position
+         speaker?.firstName?.trim() === currentSpeaker?.firstName?.trim() &&
+         speaker?.lastName?.trim() === currentSpeaker?.lastName?.trim() &&
+         speaker?.position?.trim() === currentSpeaker?.position?.trim()
    )
 
    if (exactMatch) {
@@ -153,8 +161,8 @@ const getLivestreamMatchingSpeaker = (
    // partial match
    return allLivestreamSpeakers.find(
       (speaker) =>
-         speaker.firstName === currentSpeaker.firstName &&
-         speaker.lastName === currentSpeaker.lastName
+         speaker?.firstName?.trim() === currentSpeaker?.firstName?.trim() &&
+         speaker?.lastName?.trim() === currentSpeaker?.lastName?.trim()
    )
 }
 
