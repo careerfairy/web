@@ -25,9 +25,9 @@ import { localStorageReferralCode } from "../../../constants/localStorageKeys"
 import { sxStyles } from "../../../types/commonTypes"
 
 const styles = sxStyles({
-   submit: (theme) => ({
-      margin: theme.spacing(3, 0, 2),
-   }),
+   submit: {
+      margin: (theme) => theme.spacing(3, 0, 2),
+   },
    resetEmail: {
       margin: "20px auto 0 auto",
       textAlign: "center",
