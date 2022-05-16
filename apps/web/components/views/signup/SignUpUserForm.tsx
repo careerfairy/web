@@ -2,6 +2,7 @@ import { useRouter } from "next/router"
 import React, { Fragment, useContext, useState } from "react"
 import { Formik } from "formik"
 import {
+   Box,
    Button,
    Checkbox,
    CircularProgress,
@@ -16,25 +17,22 @@ import {
 import UniversityCountrySelector from "../universitySelect/UniversityCountrySelector"
 import UniversitySelector from "../universitySelect/UniversitySelector"
 import Link from "next/link"
-import makeStyles from "@mui/styles/makeStyles"
-import { createStyles } from "@mui/styles"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import * as yup from "yup"
 import { IMultiStepContext, MultiStepContext } from "./MultiStepWrapper"
 import { useLocalStorage } from "react-use"
 import { localStorageReferralCode } from "../../../constants/localStorageKeys"
+import { sxStyles } from "../../../types/commonTypes"
 
-const useStyles = makeStyles((theme) =>
-   createStyles({
-      submit: {
-         margin: theme.spacing(3, 0, 2),
-      },
-      resetEmail: {
-         margin: "20px auto 0 auto",
-         textAlign: "center",
-      },
-   })
-)
+const styles = sxStyles({
+   submit: (theme) => ({
+      margin: theme.spacing(3, 0, 2),
+   }),
+   resetEmail: {
+      margin: "20px auto 0 auto",
+      textAlign: "center",
+   },
+})
 
 const schema = yup.object().shape({
    email: yup
@@ -76,7 +74,6 @@ const schema = yup.object().shape({
 
 function SignUpUserForm() {
    const firebase = useFirebaseService()
-   const classes = useStyles()
    const {
       query: { absolutePath },
       push,
@@ -458,11 +455,11 @@ function SignUpUserForm() {
                            <CircularProgress size={20} color="inherit" />
                         )
                      }
-                     className={classes.submit}
+                     sx={styles.submit}
                   >
                      Sign up
                   </Button>
-                  <div className={classes.resetEmail}>
+                  <Box sx={styles.resetEmail}>
                      <div style={{ marginBottom: "5px" }}>
                         Already part of the family?
                      </div>
@@ -478,8 +475,8 @@ function SignUpUserForm() {
                      >
                         <a href="#">Log in</a>
                      </Link>
-                  </div>
-                  <div className={classes.resetEmail}>
+                  </Box>
+                  <Box sx={styles.resetEmail}>
                      <div style={{ marginBottom: "5px" }}>
                         Having issues signing up?
                         <a
@@ -489,7 +486,7 @@ function SignUpUserForm() {
                            Let us know
                         </a>
                      </div>
-                  </div>
+                  </Box>
                   <FormHelperText error hidden={!errorMessage}>
                      {errorMessage?.message}
                   </FormHelperText>

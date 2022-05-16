@@ -15,14 +15,12 @@ import ColorizedAvatar from "../../../common/ColorizedAvatar"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import React from "react"
-import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
-import { pick } from "lodash"
-import { createStyles } from "@mui/styles"
 import CloseIcon from "@mui/icons-material/Close"
 import IconButton from "@mui/material/IconButton"
 import { SaveRecruiterButton } from "./SaveRecruiterButton"
+import { sxStyles } from "../../../../../types/commonTypes"
 
-const styles = createStyles({
+const styles = sxStyles({
    dialogClose: {
       position: "absolute",
       top: "11px",

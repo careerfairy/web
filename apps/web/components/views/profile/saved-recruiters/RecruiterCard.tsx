@@ -14,15 +14,15 @@ import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import React, { useCallback, useState } from "react"
-import { createStyles } from "@mui/styles"
 import Link from "../../common/Link"
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import Image from "next/image"
 import userRepo from "../../../../data/firebase/UserRepository"
 import OpenInNewIcon from "@mui/icons-material/OpenInNew"
+import { sxStyles } from "../../../../types/commonTypes"
 
-const styles = createStyles({
+const styles = sxStyles({
    name: {
       fontStyle: "normal",
       fontWeight: 500,
