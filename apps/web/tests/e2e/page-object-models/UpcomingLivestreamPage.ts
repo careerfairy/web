@@ -14,15 +14,7 @@ export default class UpcomingLivestreamPage extends CommonPage {
    }
 
    async open(livestreamId: string) {
-      try {
-         await this.page.goto(`/upcoming-livestream/${livestreamId}`)
-      } catch (e) {
-         console.log(e)
-         // this error is thrown randomly
-         if (!e.message.includes("Navigation interrupted by another one")) {
-            throw e
-         }
-      }
+      return this.resilientGoto(`/upcoming-livestream/${livestreamId}`)
    }
 
    attend() {
@@ -57,7 +49,7 @@ export default class UpcomingLivestreamPage extends CommonPage {
    }
 
    skip() {
-      return this.resilientClick("text=Skip", 3, 1000, false)
+      return this.resilientClick("text=Skip", 1, 1000, false)
    }
 
    finish() {

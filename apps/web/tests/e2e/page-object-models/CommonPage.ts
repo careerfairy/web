@@ -50,6 +50,30 @@ export class CommonPage {
       }
    }
 
+   /**
+    * Sometimes the navigation fails randomly, e.g
+    * - Navigation interrupted by another one
+    *
+    * Try several times and ignore exceptions
+    *
+    * @param url
+    * @param tries
+    * @param finalWait
+    */
+   async resilientGoto(
+      url: string,
+      tries: number = 3,
+      finalWait: number = 500
+   ) {
+      while (tries-- > 0) {
+         try {
+            await this.page.goto(url)
+            await sleep(finalWait)
+            return
+         } catch (e) {}
+      }
+   }
+
    async resilientCheck(locator: Locator, check: boolean = true) {
       await locator.hover() // to ensure actionability
 

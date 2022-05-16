@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import { Button, Popover, Typography } from "@mui/material"
@@ -14,8 +14,15 @@ export const SaveRecruiterButtonNoAccess = () => {
    const [timeout, setTimeoutValue] = React.useState(null)
 
    const isMobile = useIsMobile()
-
    const requiredBadge = UserPresenter.saveRecruitersRequiredBadge()
+
+   useEffect(() => {
+      return () => {
+         if (timeout) {
+            clearTimeout(timeout)
+         }
+      }
+   }, [timeout])
 
    const openProfilePage = () => {
       const win = window.open("/profile", "_blank")
