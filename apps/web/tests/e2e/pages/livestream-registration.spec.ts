@@ -38,7 +38,6 @@ test("successful registration on a livestream event", async ({ page }) => {
    // Registration Modal
    await livestreamPage.selectRandomCategoriesFromGroup(group)
    await livestreamPage.modalAttend()
-   await sleep(1000)
 
    await expectText(page, "ASK YOUR QUESTION")
 
