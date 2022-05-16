@@ -23,6 +23,7 @@ import {
 import ContentPasteIcon from "@mui/icons-material/ContentPaste"
 import React, { useEffect, useState } from "react"
 import { streamIsOld } from "../../../util/CommonUtil"
+import ReferralWidget from "./ReferralWidget"
 
 const styles = {
    title: {
@@ -34,8 +35,8 @@ const styles = {
       mb: 3,
    },
    stack: {
-      mt: 6,
-      mb: 6,
+      // mt: 6,
+      // mb: 6,
    },
    imageBox: {
       p: 0,
@@ -97,42 +98,41 @@ const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
             <Typography sx={styles.title}>Share Event</Typography>
          </DialogTitle>
          <DialogContent dividers>
-            <Typography sx={styles.body2} variant="body2" my={1}>
-               Share this event with friends who need to see this!
-            </Typography>
-            <Box>
-               <Stack sx={styles.stack} spacing={4} direction="row">
-                  <Box sx={styles.imageBox}>
-                     <img
-                        src={getResizedUrl(livestreamData.companyLogoUrl)}
-                        alt={livestreamData.company}
-                     />
-                  </Box>
-                  <Box sx={styles.titleBox}>
-                     <Typography>{livestreamData.title}</Typography>
-                  </Box>
-               </Stack>
-            </Box>
-            <Typography variant="h6" my={2}>
-               Your Personal Referral Link:
-            </Typography>
-
-            <Box sx={{ display: "flex", flexWrap: "wrap" }}>
-               <TextField
-                  sx={{ flex: 1, marginRight: "10px" }}
-                  variant="outlined"
-                  value={referralLink}
-                  disabled
-               />
-               <Button
-                  variant="contained"
-                  sx={{ boxShadow: "none" }}
-                  startIcon={<ContentPasteIcon />}
-                  onClick={() => copyReferralLinkToClipboard(referralLink)}
-               >
-                  Copy
-               </Button>
-            </Box>
+            <Stack spacing={2}>
+               <Typography sx={styles.body2} variant="body2" my={1}>
+                  Share this event with friends who need to see this!
+               </Typography>
+               <Box>
+                  <Stack sx={styles.stack} spacing={4} direction="row">
+                     <Box sx={styles.imageBox}>
+                        <img
+                           src={getResizedUrl(livestreamData.companyLogoUrl)}
+                           alt={livestreamData.company}
+                        />
+                     </Box>
+                     <Box sx={styles.titleBox}>
+                        <Typography>{livestreamData.title}</Typography>
+                     </Box>
+                  </Stack>
+               </Box>
+               <ReferralWidget event={livestreamData} />
+               <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                  <TextField
+                     sx={{ flex: 1, marginRight: "10px" }}
+                     variant="outlined"
+                     value={referralLink}
+                     disabled
+                  />
+                  <Button
+                     variant="contained"
+                     sx={{ boxShadow: "none" }}
+                     startIcon={<ContentPasteIcon />}
+                     onClick={() => copyReferralLinkToClipboard(referralLink)}
+                  >
+                     Copy
+                  </Button>
+               </Box>
+            </Stack>
          </DialogContent>
          <DialogActions sx={{ justifyContent: "right" }}>
             <Button variant="outlined" onClick={handleClose}>
