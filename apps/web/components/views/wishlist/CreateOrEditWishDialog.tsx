@@ -38,7 +38,7 @@ const schema = yup.object().shape({
    description: yup
       .string()
       .required("The description is required")
-      .max(255, "The description is too long")
+      .max(350, "The description is too long")
       .min(10, "The description is too short"),
    isPublic: yup.boolean(),
    interests: yup

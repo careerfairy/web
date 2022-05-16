@@ -1,47 +1,48 @@
 import React from "react"
-import { Event } from "schema-dts"
+import { Review } from "schema-dts"
 
-interface EventSEOProps {
-   eventName: string
-   eventDate: Date
-   detailPageUrl: string
-   eventImageUrl: string
-   eventDescription: string
-   eventCompany: string
+interface WishSEOProps {
+   wishDescription: string
+   wishCreationDate: Date | null
+   wishUpdateDate: Date | null
+   wishAuthor: string
+   wishRating: string
+   wishRatingCount: number
 }
-const EventSEO = ({
-   eventDate,
-   eventDescription,
-   eventName,
-   eventImageUrl,
-   detailPageUrl,
-   eventCompany,
-}: EventSEOProps) => {
-   const event: Event = {
-      "@type": "Event",
-      name: eventName,
-      startDate: eventDate?.toISOString?.(),
-      endDate: eventDate?.toISOString?.(),
-      description: eventDescription,
-      url: detailPageUrl,
-      eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
-      eventStatus: "https://schema.org/EventScheduled",
-      location: {
-         "@type": "VirtualLocation",
-         url: detailPageUrl,
-         image: "https://www.careerfairy.io/logo_teal.svg",
-         name: "CareerFairy",
-         description:
-            "CareerFairy is a career platform for students and jobseekers.",
-      },
-      image: eventImageUrl,
-      organizer: {
+const WishSEO = ({
+   wishDescription,
+   wishCreationDate,
+   wishUpdateDate,
+   wishAuthor,
+   wishRating,
+   wishRatingCount,
+}: WishSEOProps) => {
+   const review: Review = {
+      "@type": "Review",
+      description: wishDescription,
+      // @ts-ignore
+      ratingValue: wishRating,
+      ratingCount: wishRatingCount,
+      worstRating: "1",
+      bestRating: "5",
+      ratingExplanation:
+         "This rating measures how much users would like to see this wish come true",
+      itemReviewed: {
          "@type": "Organization",
-
-         name: eventCompany,
-
-         url: detailPageUrl,
+         name: "CareerFairy Wish",
+         image: "https://www.careerfairy.io/logo_teal.svg",
       },
+      publisher: {
+         "@type": "Organization",
+         name: "CareerFairy",
+         image: "https://www.careerfairy.io/logo_teal.svg",
+      },
+      author: {
+         "@type": "Person",
+         name: wishAuthor,
+      },
+      dateCreated: wishCreationDate?.toISOString(),
+      dateModified: wishUpdateDate?.toISOString(),
    }
 
    return (
@@ -50,11 +51,11 @@ const EventSEO = ({
          dangerouslySetInnerHTML={{
             __html: JSON.stringify({
                "@context": "https://schema.org",
-               ...event,
+               ...review,
             }),
          }}
       />
    )
 }
 
-export default EventSEO
+export default WishSEO

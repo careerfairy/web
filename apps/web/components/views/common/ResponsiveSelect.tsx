@@ -10,13 +10,19 @@ import {
 } from "@mui/material"
 import Box from "@mui/material/Box"
 
-export const ResponsiveSelect = (
-   props: Partial<SelectProps> | Partial<NativeSelectProps> | any
-) => {
+export const ResponsiveSelect = ({
+   displayEmpty,
+   labelId,
+   ...props
+}: Partial<SelectProps> | Partial<NativeSelectProps> | any) => {
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("sm"))
 
-   return mobile ? <NativeSelect {...props} /> : <Select {...props} />
+   return mobile ? (
+      <NativeSelect {...props} />
+   ) : (
+      <Select labelId={labelId} displayEmpty={displayEmpty} {...props} />
+   )
 }
 
 export const ResponsiveOption = (

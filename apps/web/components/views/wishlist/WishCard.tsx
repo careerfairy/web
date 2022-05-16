@@ -25,8 +25,7 @@ import DateUtil from "../../../util/DateUtil"
 import { useRouter } from "next/router"
 import { Hit } from "../../../types/algolia"
 import WishCardMenuButton from "./WishCardMenuButton"
-import { getBaseUrl } from "../../helperFunctions/HelperFunctions"
-import { mainProductionDomain } from "../../../constants/domains"
+import WishSEO from "../common/WishSEO"
 
 interface WishCardProps {
    wish: Hit<Wish>
@@ -56,8 +55,8 @@ const styles: StylesProps = {
       fontWeight: 600,
    },
    title: {
-      // ...getMaxLineStyles(2),
       wordBreak: "break-word",
+      whiteSpace: "pre-line",
       "& em": {
          fontWeight: 600,
       },
@@ -75,11 +74,6 @@ const styles: StylesProps = {
       justifyContent: "space-between",
       flexWrap: "wrap",
       alignContent: "center",
-   },
-   seo: {
-      position: "absolute",
-      opacity: 0,
-      visibility: "hidden",
    },
 }
 
@@ -273,12 +267,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
    if (deleted) return null
 
    return (
-      <Box
-         itemScope
-         itemType="https://schema.org/Review"
-         component={"article"}
-         sx={styles.root}
-      >
+      <Box component={"article"} sx={styles.root}>
          <WishCardMenuButton
             wish={wish}
             sx={styles.moreIconButton}
@@ -297,7 +286,6 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
             <Stack sx={styles.rightContent} spacing={2}>
                <Box component={"header"}>
                   <Typography
-                     itemProp={"author"}
                      component={"span"}
                      sx={styles.name}
                      variant={"h6"}
@@ -318,7 +306,6 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                      dangerouslySetInnerHTML={{
                         __html: description,
                      }}
-                     itemProp="reviewBody"
                      sx={styles.title}
                      variant={"subtitle1"}
                      gutterBottom
@@ -343,7 +330,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                            voting ? (
                               <CircularProgress size={15} color={"inherit"} />
                            ) : (
-                              <UpvoteIcon />
+                              <UpvoteIcon color={"secondary"} />
                            )
                         }
                         disabled={voting}
@@ -404,47 +391,17 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                </Box>
             </Stack>
          </Paper>
-         <Box sx={styles.seo}>
-            <meta itemProp={"datePublished"} content={date.toISOString()} />
-            <div
-               itemProp="itemReviewed"
-               itemScope
-               itemType="https://schema.org/Organization"
-            >
-               <img
-                  itemProp="image"
-                  src={`https://www.${mainProductionDomain}/logo_teal.svg`}
-                  alt="CareerFairy"
-               />
-               <span itemProp="name">CareerFairy Wish</span>
-            </div>
-            <div
-               itemProp="publisher"
-               itemScope
-               itemType="https://schema.org/Organization"
-            >
-               <meta itemProp="name" content="CareerFairy" />
-            </div>
-            {parseInt(ratingValue) > 1 && (
-               <div
-                  itemProp="aggregateRating"
-                  itemType="https://schema.org/AggregateRating"
-               >
-                  <meta
-                     itemProp="reviewCount"
-                     // @ts-ignore
-                     content={wish.numberOfUpvotes + wish.numberOfDownvotes}
-                  />
-                  <meta itemProp="ratingValue" content={ratingValue} />
-                  <meta
-                     itemProp="ratingExplanation"
-                     content="This rating measures how much users would like to see this wish come true"
-                  />
-                  <meta itemProp="worstRating" content="1" />
-                  <meta itemProp="bestRating" content="5" />
-               </div>
-            )}
-         </Box>
+         <WishSEO
+            wishAuthor={authorDisplayName || "User"}
+            // @ts-ignore
+            wishCreationDate={new Date(wish.createdAt)}
+            // @ts-ignore
+            wishUpdateDate={wish.updatedAt ? new Date(wish.updatedAt) : null}
+            wishDescription={wish.description}
+            wishRating={`${parseInt(ratingValue)}`}
+            // @ts-ignore
+            wishRatingCount={wish.numberOfUpvotes + wish.numberOfDownvotes}
+         />
       </Box>
    )
 }
