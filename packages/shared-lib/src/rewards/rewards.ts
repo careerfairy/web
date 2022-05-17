@@ -1,9 +1,12 @@
+import firebase from "firebase"
+
 /**
  * When changing shared files, be sure to deploy both the webapp and the functions using this code
  */
 
 /**
- * Actions
+ * All Reward Actions
+ * Key Value instead of an Enum to be able to be used from js code
  */
 export const RewardActions = {
    REFERRAL_SIGNUP_LEADER: "REFERRAL_SIGNUP_LEADER",
@@ -15,21 +18,7 @@ export const RewardActions = {
    LIVESTREAM_INVITE_COMPLETE_FOLLOWER: "LIVESTREAM_INVITE_COMPLETE_FOLLOWER",
 }
 
-/**
- * Points
- */
-export const RewardPoints = {
-   [RewardActions.REFERRAL_SIGNUP_LEADER]: 20,
-   [RewardActions.REFERRAL_SIGNUP_FOLLOWER]: 20,
-   [RewardActions.LIVESTREAM_REGISTER_COMPLETE_LEADER]: 0,
-   [RewardActions.LIVESTREAM_REGISTER_COMPLETE_FOLLOWER]: 0,
-   [RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER]: 20,
-   [RewardActions.LIVESTREAM_INVITE_COMPLETE_FOLLOWER]: 20,
-}
-
 export const REWARD_LIVESTREAM_ATTENDANCE_SECONDS = 5 * 60 // 5 minutes
-
-export const getPoints = (action) => RewardPoints[action]
 
 export const getHumanStringDescriptionForAction = (action) => {
    switch (action) {
@@ -47,5 +36,29 @@ export const getHumanStringDescriptionForAction = (action) => {
          return "Event Invitation Successful"
       default:
          return action
+   }
+}
+
+export interface RewardDoc {
+   action: string
+   createdAt: firebase.firestore.Timestamp
+   seenByUser: boolean
+
+   // if the reward is related to a different user than the user owning the
+   // these fields will be populated
+   userId?: string
+   userData?: {
+      firstName: string
+      lastName: string
+   }
+
+   // if the reward is related to a livestream, will contain some details about the livestream
+   livestreamId?: string
+   livestreamData?: {
+      title: string
+      summary: string
+      company?: string
+      companyLogoUrl?: string
+      start: firebase.firestore.Timestamp
    }
 }

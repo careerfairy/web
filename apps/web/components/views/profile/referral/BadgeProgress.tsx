@@ -5,8 +5,10 @@ import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
 import BadgeIcon from "../../common/BadgeIcon"
 import { getUserBadges } from "@careerfairy/shared-lib/dist/users/UserBadges"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 
-const BadgeProgress = ({ userData }) => {
+const BadgeProgress = () => {
+   const { userData, userStats } = useAuth()
    const userBadges = getUserBadges(userData.badges)
 
    // hide the progress bar if the user already has the badge
@@ -21,7 +23,7 @@ const BadgeProgress = ({ userData }) => {
    if (!networkerBadge) {
       nextBadge = NetworkerBadge
    }
-   const progress = nextBadge.progress(userData)
+   const progress = nextBadge.progress(userData, userStats)
 
    return (
       <Grid container mt={2}>

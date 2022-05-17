@@ -1,7 +1,6 @@
 import functions = require("firebase-functions")
 import config = require("./config")
 import {
-   userAddPoints,
    userIncrementReferralsCount,
    userGetByReferralCode,
    userGetByEmail,
@@ -25,14 +24,6 @@ export const rewardApply = functions
    .onCreate(async (snap, context) => {
       const rewardDoc = snap.data()
       const email = context.params.userEmail
-
-      // Apply points to the user owner of the reward
-      if (rewardDoc?.points && rewardDoc.points > 0) {
-         await userAddPoints(email, rewardDoc.points)
-         functions.logger.info(
-            `Added ${rewardDoc.points} points to ${email} for ${rewardDoc.action}`
-         )
-      }
 
       switch (rewardDoc.action) {
          /**

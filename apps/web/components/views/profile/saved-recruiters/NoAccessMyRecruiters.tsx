@@ -14,12 +14,10 @@ import List from "@mui/material/List"
 import CheckIcon from "@mui/icons-material/Check"
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked"
 import React from "react"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 
-export const NoAccess = ({
-   userPresenter,
-}: {
-   userPresenter: UserPresenter
-}) => {
+export const NoAccessMyRecruiters = () => {
+   const { userStats, userData } = useAuth()
    const requiredBadge: Badge = UserPresenter.saveRecruitersRequiredBadge()
 
    return (
@@ -65,7 +63,7 @@ export const NoAccess = ({
                   {requiredBadge.requirements.map((r, i) => (
                      <ListItem key={i}>
                         <ListItemIcon sx={{ minWidth: "30px" }}>
-                           {r.isComplete(userPresenter.model) ? (
+                           {r.isComplete(userData, userStats) ? (
                               <CheckIcon color="success" />
                            ) : (
                               <RadioButtonUncheckedIcon />
