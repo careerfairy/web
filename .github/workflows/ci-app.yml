@@ -21,7 +21,11 @@ jobs:
               paths_ignore: '["**/README.md", "firestore.rules"]'
 
    build:
-      name: "Build, Test and Deploy"
+      name: "Build, Test and Deploy ${{ matrix.browser }}"
+      strategy:
+         fail-fast: false
+         matrix:
+            browser: [chromium, firefox, webkit]
       needs: should_skip
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest
@@ -64,20 +68,22 @@ jobs:
            run: npm run test
 
          - name: Install Playwright deps
-           run: npx playwright install --with-deps
+           run: npx playwright install --with-deps ${{ matrix.browser }} chromium
          - name: Run Playwright End to End tests
+           env:
+              BROWSER: ${{ matrix.browser }}
            run: npm run test:e2e-webapp
          - name: Upload test results
            if: always()
            uses: actions/upload-artifact@v3
            with:
-              name: playwright-report
+              name: ${{ matrix.browser }} - playwright-report
               path: apps/web/playwright-report
          - name: Upload debug logs
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: debug logs
+              name: ${{ matrix.browser }} - debug logs
               path: firebase-debug.log
          - name: Deploy to Vercel
            uses: amondnet/vercel-action@v20.0.1 #deploy
