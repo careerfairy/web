@@ -20,8 +20,38 @@ jobs:
               skip_after_successful_duplicate: "false"
               paths_ignore: '["**/README.md", "firestore.rules"]'
 
-   build:
-      name: "Build, Test and Deploy ${{ matrix.browser }}"
+   # Run Unit Tests
+   unit_tests:
+      name: "Unit Tests"
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v2
+         - uses: actions/setup-node@v2
+           with:
+              node-version: "16"
+              cache: "npm"
+
+         - name: Install dependencies
+           run: npm install
+
+         - name: Cache NextJS cache folder
+           uses: actions/cache@v3
+           with:
+              path: |
+                 ~/.npm
+                  ${{ github.workspace }}/apps/web/.next/cache
+              key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('packages/shared-lib/**/*.[jt]s', 'apps/web/**/*.[jt]s?') }}
+              restore-keys: |
+                 ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
+         - name: Run Jest Unit Tests
+           env:
+              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              NODE_ENV: test
+           run: npm run test
+
+   # Run E2E Tests
+   e2e_tests:
+      name: "E2E Tests - ${{ matrix.browser }}"
       strategy:
          fail-fast: false
          matrix:
@@ -59,18 +89,13 @@ jobs:
                  ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
 
          - name: Build
-           env:
-              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              NODE_ENV: test
            run: npm run build
-
-         - name: Run Jest Unit Tests
-           run: npm run test
-
          - name: Install Playwright deps
            run: npx playwright install --with-deps ${{ matrix.browser }} chromium
          - name: Run Playwright End to End tests
            env:
+              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              NODE_ENV: test
               BROWSER: ${{ matrix.browser }}
            run: npm run test:e2e-webapp
          - name: Upload test results
@@ -85,8 +110,14 @@ jobs:
            with:
               name: ${{ matrix.browser }} - debug logs
               path: firebase-debug.log
-         - name: Deploy to Vercel
-           uses: amondnet/vercel-action@v20.0.1 #deploy
+   # Deploy
+   deploy:
+      name: "Deploy"
+      needs: [e2e_tests, unit_tests]
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v2
+         - uses: amondnet/vercel-action@v20.0.1 #deploy
            with:
               vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
               github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
