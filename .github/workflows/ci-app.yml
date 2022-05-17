@@ -50,7 +50,7 @@ jobs:
 
          - name: Install Dependencies
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm ci
+           run: npm install
 
          - name: Build
            run: npm run build
@@ -122,7 +122,7 @@ jobs:
                  ${{ runner.os }}-
          - name: Install Dependencies
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm ci
+           run: npm install
          #      - name: Cache NextJS cache folder
          #        uses: actions/cache@v3
          #        with:
@@ -178,7 +178,7 @@ jobs:
                  ${{ runner.os }}-
          - name: Install Dependencies
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm ci
+           run: npm install
          #
          #      - name: Cache NextJS cache folder
          #        uses: actions/cache@v3
