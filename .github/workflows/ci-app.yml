@@ -23,6 +23,7 @@ jobs:
    # Run Unit Tests
    unit_tests:
       name: "Unit Tests"
+      needs: [should_skip]
       runs-on: ubuntu-latest
       steps:
          - uses: actions/checkout@v2
