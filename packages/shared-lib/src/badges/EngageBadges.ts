@@ -1,4 +1,8 @@
-import { Badge, calculateProgressForNumericField } from "./badges"
+import {
+   Badge,
+   calculateProgressForNumericField,
+   DEFAULT_REWARDS,
+} from "./badges"
 import { UserData, UserStats } from "../users"
 
 export const EngageBadge: Badge = new Badge(
@@ -14,7 +18,7 @@ export const EngageBadge: Badge = new Badge(
             calculateProgressForNumericField(userStats?.totalQuestionsAsked, 5),
       },
    ],
-   []
+   DEFAULT_REWARDS
 )
 
 export const EngageBadgeLevel2: Badge = new Badge(
@@ -40,7 +44,7 @@ export const EngageBadgeLevel2: Badge = new Badge(
             calculateProgressForNumericField(userStats?.totalHandRaises, 1),
       },
    ],
-   []
+   ["Questions during an event will be highlighted"]
 )
 
 export const EngageBadgeLevel3: Badge = new Badge(
@@ -66,7 +70,7 @@ export const EngageBadgeLevel3: Badge = new Badge(
             calculateProgressForNumericField(userStats?.totalHandRaises, 3),
       },
    ],
-   []
+   DEFAULT_REWARDS
 )
 
 // Links

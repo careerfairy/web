@@ -19,6 +19,7 @@ declare module "@mui/styles/defaultTheme" {
       boxShadows?: {
          // color_y_blur_opacity
          dark_8_25_10?: string
+         dark_3_7_20?: string
          grey_5_15_50?: string
          secondary_5_15_50?: string
          primary_5_15_50?: string
@@ -154,6 +155,7 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
          htmlFontSize: 16,
       },
       boxShadows: {
+         dark_3_7_20: `0px 3px 7px rgba(33 32 32 / 20%)`,
          dark_8_25_10: `0px 8px 25px rgba(33, 32, 32, 0.1)`,
          grey_5_15_50: `0px 5px 15px ${alpha(grey[300], 0.5)}`,
          secondary_5_15_50: `0px 5px 15px ${alpha(

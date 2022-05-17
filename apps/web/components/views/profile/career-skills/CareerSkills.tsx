@@ -1,15 +1,38 @@
-import { Grid, Tooltip, Typography } from "@mui/material"
+import {
+   Accordion,
+   AccordionDetails,
+   AccordionSummary,
+   Grid,
+   List,
+   ListItem,
+   ListItemAvatar,
+   ListItemText,
+   Tooltip,
+   Typography,
+} from "@mui/material"
 import React, { useCallback, useState } from "react"
 import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 import Box from "@mui/material/Box"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
 import { styles as profileStyles } from "../profileStyles"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import { BadgeStepper } from "./SkillsStepper"
+import { BadgeStepper } from "./BadgeStepper"
 import { sxStyles } from "types/commonTypes"
 import { ResearchBadge } from "@careerfairy/shared-lib/dist/badges/ResearchBadges"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import { EngageBadge } from "@careerfairy/shared-lib/dist/badges/EngageBadges"
+import Button from "@mui/material/Button"
+import Link from "../../common/Link"
+import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
+import { DefaultTheme } from "@mui/styles"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import ExpandLessIcon from "@mui/icons-material/ExpandLess"
+import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import CheckIcon from "@mui/icons-material/Check"
+import CircleIcon from "@mui/icons-material/Circle"
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
 
 const styles = sxStyles({
    laneTitle: {
@@ -27,11 +50,11 @@ const CareerSkills = () => {
    return (
       <ContentCard>
          <Grid container spacing={2} mb={4}>
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} lg={8}>
                <ContentCardTitle>My Career Skills</ContentCardTitle>
             </Grid>
 
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} lg={8}>
                <Box>
                   <Typography sx={profileStyles.subtitle}>
                      Boost your career by leveraging powerful features inside
@@ -41,18 +64,58 @@ const CareerSkills = () => {
                   </Typography>
                </Box>
             </Grid>
+
+            <Grid item xs={12} lg={8}>
+               <Box mt={4} mb={4}>
+                  <Button
+                     component={Link}
+                     // @ts-ignore
+                     href={{
+                        pathname: `/next-livestreams`,
+                     }}
+                     style={{ textDecoration: "none" }}
+                     color="secondary"
+                     variant="contained"
+                     sx={{
+                        padding: "10px 40px",
+                     }}
+                  >
+                     Browse Events
+                  </Button>
+               </Box>
+            </Grid>
+
+            {/*<Grid item xs={12} lg={8}>*/}
+            {/*   <Box mb={4}>*/}
+            {/*      <Card*/}
+            {/*         sx={{*/}
+            {/*            padding: 2,*/}
+            {/*            boxShadow: (theme: DefaultTheme) =>*/}
+            {/*               theme.boxShadows.dark_3_7_20,*/}
+            {/*         }}*/}
+            {/*      >*/}
+            {/*         Placeholder for context info*/}
+            {/*      </Card>*/}
+            {/*   </Box>*/}
+            {/*</Grid>*/}
          </Grid>
 
-         <Box mb={4}>Placeholder for context info</Box>
-
-         <BadgeProgress name="Research" badge={ResearchBadge} />
-         <BadgeProgress name="Network" badge={NetworkerBadge} />
-         <BadgeProgress name="Engage" badge={EngageBadge} />
+         <BadgeProgress
+            name="Research"
+            badge={ResearchBadge}
+            helperText="Research"
+         />
+         <BadgeProgress
+            name="Network"
+            badge={NetworkerBadge}
+            helperText="Network"
+         />
+         <BadgeProgress name="Engage" badge={EngageBadge} helperText="Engage" />
       </ContentCard>
    )
 }
 
-const BadgeProgress = ({ name, badge }) => {
+const BadgeProgress = ({ name, badge, helperText }) => {
    const [showTooltip, setShowTooltip] = useState(false)
    const openTooltip = useCallback(() => setShowTooltip(true), [])
    const hideTooltip = useCallback(() => setShowTooltip(false), [])
@@ -63,7 +126,7 @@ const BadgeProgress = ({ name, badge }) => {
             <Typography sx={styles.laneTitle}>{name}</Typography>
 
             <Tooltip
-               title="Helper text"
+               title={helperText}
                placement="right"
                open={showTooltip}
                onOpen={openTooltip}
@@ -77,16 +140,75 @@ const BadgeProgress = ({ name, badge }) => {
          </Box>
 
          <Grid container>
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} lg={8}>
                <BadgeStepper badge={badge} />
+
+               <Box mt={2}>
+                  <UnlockedRewardsAccordion badge={badge} />
+               </Box>
             </Grid>
          </Grid>
       </Box>
    )
 }
 
-// const IconContainer = ({ children }) => {
-//    return <InfoOutlinedIcon />
-// }
+const UnlockedRewardsAccordion = ({ badge }: { badge: Badge }) => {
+   const { userPresenter } = useAuth()
+   const currentUserBadgeLevel =
+      userPresenter.badges?.getCurrentBadgeLevelForBadgeType(badge)
+
+   const unlockedRewards = currentUserBadgeLevel?.getAllRewards() ?? []
+
+   return (
+      <Accordion elevation={0} disableGutters>
+         <AccordionSummary
+            expandIcon={<ExpandMoreIcon color="secondary" />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+            sx={{
+               justifyContent: "start",
+               paddingX: 1,
+               minHeight: 0,
+               ".MuiAccordionSummary-content": {
+                  flexGrow: 0,
+                  margin: 0,
+               },
+            }}
+         >
+            <Typography>Unlocked Rewards</Typography>
+         </AccordionSummary>
+         <AccordionDetails sx={{ paddingY: 0, marginTop: 1 }}>
+            <List sx={{ paddingY: 0 }}>
+               {unlockedRewards.map((reward, index) => (
+                  <ListItem key={`reward_${index}`} sx={{ padding: 0 }}>
+                     <ListItemAvatar
+                        sx={{
+                           minWidth: "25px",
+                           display: "flex",
+                           alignItems: "center",
+                        }}
+                     >
+                        <CheckCircleOutlineIcon
+                           color="primary"
+                           sx={{
+                              width: "0.9em",
+                              height: "0.9em",
+                           }}
+                        />
+                     </ListItemAvatar>
+                     <ListItemText primary={reward} />
+                  </ListItem>
+               ))}
+
+               {unlockedRewards.length === 0 && (
+                  <ListItem sx={{ padding: 0 }}>
+                     <ListItemText primary="You did not unlock any reward for this badge yet. Start now!" />
+                  </ListItem>
+               )}
+            </List>
+         </AccordionDetails>
+      </Accordion>
+   )
+}
 
 export default CareerSkills

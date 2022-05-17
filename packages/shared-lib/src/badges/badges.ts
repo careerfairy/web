@@ -63,6 +63,38 @@ export class Badge {
       this.next = badge
       badge.prev = this
    }
+
+   /**
+    * Get all the rewards for this badge chain
+    */
+   getAllRewards(): string[] {
+      const res: string[] = [...this.rewardsDescription]
+
+      let curr: Badge = this.prev
+      while (curr) {
+         const items = [...curr.rewardsDescription]
+         items.forEach((item) => res.push(item))
+
+         curr = curr.prev
+      }
+
+      return res
+   }
+
+   /**
+    * Convert the linked list of badges to an array
+    */
+   getBadgesArray(): Badge[] {
+      const badges: Badge[] = [this]
+
+      let curr: Badge = this.next
+      while (curr) {
+         badges.push(curr)
+         curr = curr.next
+      }
+
+      return badges
+   }
 }
 
 export interface Requirement {
@@ -93,3 +125,5 @@ export const calculateProgressForNumericField = (
 
    return res
 }
+
+export const DEFAULT_REWARDS = ["A cool badge!"]
