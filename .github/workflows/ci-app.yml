@@ -58,39 +58,6 @@ jobs:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
 
-   # Build the app in test mode
-   #   build_app_for_tests:
-   #      name: "Build app for tests"
-   #      runs-on: ubuntu-latest
-   #      if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
-   #      env:
-   #         # https://turborepo.org/docs/guides/continuous-integration
-   #         TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-   #         TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-   #      needs: [should_skip]
-   #      steps:
-   #         - uses: actions/checkout@v2
-   #         - uses: actions/setup-node@v2
-   #           with:
-   #              node-version: "16"
-   #              cache: "npm"
-   #         - name: Install dependencies
-   #           run: npm install
-   #         - name: Cache NextJS cache folder
-   #           uses: actions/cache@v3
-   #           with:
-   #              path: |
-   #                 ~/.npm
-   #                  ${{ github.workspace }}/apps/web/.next/cache
-   #              key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('packages/shared-lib/**/*.[jt]s', 'apps/web/**/*.[jt]s?') }}
-   #              restore-keys: |
-   #                 ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
-   #         - name: Build the app for Tests
-   #           run: npm run build
-   #           env:
-   #              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-   #              NODE_ENV: test
-
    # Run Unit Tests
    unit_tests:
       name: "Unit Tests"
@@ -126,15 +93,6 @@ jobs:
            run: npm install
          - name: Build
            run: npm run build
-         #      - name: Cache NextJS cache folder
-         #        uses: actions/cache@v3
-         #        with:
-         #          path: |
-         #            ~/.npm
-         #             ${{ github.workspace }}/apps/web/.next/cache
-         #          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('packages/shared-lib/**/*.[jt]s', 'apps/web/**/*.[jt]s?') }}
-         #          restore-keys: |
-         #            ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
          - name: Run Jest Unit Tests
            run: npm run test
 
@@ -179,16 +137,6 @@ jobs:
          - name: Install Dependencies
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm install
-         #
-         #      - name: Cache NextJS cache folder
-         #        uses: actions/cache@v3
-         #        with:
-         #          path: |
-         #            ~/.npm
-         #             ${{ github.workspace }}/apps/web/.next/cache
-         #          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('packages/shared-lib/**/*.[jt]s', 'apps/web/**/*.[jt]s?') }}
-         #          restore-keys: |
-         #            ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
          - name: Install Playwright deps
            run: npx playwright install --with-deps ${{ matrix.browser }} chromium
          - name: Run Playwright End to End tests
