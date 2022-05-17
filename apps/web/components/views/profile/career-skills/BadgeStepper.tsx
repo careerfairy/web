@@ -227,6 +227,7 @@ const IconContainer = ({
          open={showTooltip}
          onOpen={openTooltip}
          onClose={hideTooltip}
+         leaveDelay={300}
       >
          <IconButton
             sx={isCurrent ? styles.iconCurrent : undefined}

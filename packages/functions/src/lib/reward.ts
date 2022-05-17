@@ -1,5 +1,5 @@
 import { admin } from "../api/firestoreAdmin"
-import { RewardActions, getPoints } from "@careerfairy/shared-lib/dist/rewards"
+import { RewardActions, RewardDoc } from "@careerfairy/shared-lib/dist/rewards"
 import pick = require("lodash/pick")
 
 export const rewardCreateReferralSignUpLeader = (
@@ -40,23 +40,26 @@ export const rewardCreateLivestream = (
    })
 }
 
-const rewardCreate = async (rewardedUserId, action, otherData = {}) => {
+const rewardCreate = async (
+   rewardedUserId,
+   action: string,
+   otherData: Partial<RewardDoc> = {}
+) => {
+   const doc: RewardDoc = Object.assign(
+      {
+         action: action,
+         seenByUser: false,
+         createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      otherData
+   )
+
    return admin
       .firestore()
       .collection("userData")
       .doc(rewardedUserId)
       .collection("rewards")
-      .add(
-         Object.assign(
-            {
-               action: action,
-               points: getPoints(action),
-               seenByUser: false,
-               createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            },
-            otherData
-         )
-      )
+      .add(doc)
 }
 
 export const rewardGetRelatedToLivestream = async (

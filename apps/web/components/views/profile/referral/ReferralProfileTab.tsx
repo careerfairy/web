@@ -108,7 +108,7 @@ const ReferralProfileTab = () => {
             </Grid>
 
             <Grid item xs={12}>
-               <BadgeProgress userData={userData} />
+               <BadgeProgress />
             </Grid>
 
             <Grid item xs={12}>

@@ -5,7 +5,7 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import Link from "../../common/Link"
 import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 import Button from "@mui/material/Button"
-import { NoAccess } from "./NoAccess"
+import { NoAccessMyRecruiters } from "./NoAccessMyRecruiters"
 import { RecruiterCard } from "./RecruiterCard"
 import Skeleton from "@mui/material/Skeleton"
 import Card from "@mui/material/Card"
@@ -54,9 +54,7 @@ const MyRecruitersTab = () => {
             <RecruiterList userEmail={userPresenter.model.userEmail} />
          )}
 
-         {!userPresenter.canSaveRecruiters() && (
-            <NoAccess userPresenter={userPresenter} />
-         )}
+         {!userPresenter.canSaveRecruiters() && <NoAccessMyRecruiters />}
       </ContentCard>
    )
 }
