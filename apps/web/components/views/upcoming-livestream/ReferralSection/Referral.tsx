@@ -73,16 +73,19 @@ const Referral = ({ event }: Props) => {
             {socials.map((icon) =>
                mobile ? (
                   <Button
+                     key={icon.name}
                      fullWidth
                      color={"grey"}
                      variant={"outlined"}
+                     onClick={icon.onClick}
+                     href={icon.href}
                      size={"large"}
                      startIcon={<icon.icon />}
                   >
                      {icon.name}
                   </Button>
                ) : (
-                  <Tooltip arrow title={icon.name}>
+                  <Tooltip key={icon.name} arrow title={icon.name}>
                      <IconButton
                         sx={styles.iconButton}
                         onClick={icon.onClick}

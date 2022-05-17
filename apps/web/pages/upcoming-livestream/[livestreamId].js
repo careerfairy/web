@@ -24,6 +24,7 @@ import { languageCodesDict } from "../../components/helperFunctions/streamFormFu
 import { getRelevantHosts } from "../../util/streamUtil"
 import { useInterests } from "../../components/custom-hook/useCollection"
 import ReferralSection from "../../components/views/upcoming-livestream/ReferralSection"
+import SEO from "../../components/util/SEO"
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null)
@@ -351,9 +352,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
 
    return (
       <UpcomingLayout>
-         <HeadWithMeta
-            {...getStreamMetaInfo({ stream, groupId: query.groupId })}
-         />
+         <SEO {...getStreamMetaInfo(stream)} />
          <HeroSection
             backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}
             stream={stream}

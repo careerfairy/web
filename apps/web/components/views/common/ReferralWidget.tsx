@@ -62,6 +62,7 @@ const ReferralWidget = ({ event, title, subtitle }: Props) => {
                mobile ? (
                   <Button
                      fullWidth
+                     key={icon.name}
                      color={"secondary"}
                      variant={"outlined"}
                      size={"large"}
@@ -70,7 +71,7 @@ const ReferralWidget = ({ event, title, subtitle }: Props) => {
                      {icon.name}
                   </Button>
                ) : (
-                  <Tooltip arrow title={icon.name}>
+                  <Tooltip key={icon.name} arrow title={icon.name}>
                      <IconButton
                         sx={styles.iconButton}
                         onClick={icon.onClick}
