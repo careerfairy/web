@@ -22,17 +22,18 @@ jobs:
 
    # Build the app in test mode
    build_app_for_tests:
+      name: "Build app for tests"
       runs-on: ubuntu-latest
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       needs: [should_skip]
       steps:
-         - name: "Build the app for Tests"
          - uses: actions/checkout@v2
          - uses: actions/setup-node@v2
-           run: npm run build
            with:
               node-version: "16"
               cache: "npm"
+         - name: Build the app for Tests
+           run: npm run build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
