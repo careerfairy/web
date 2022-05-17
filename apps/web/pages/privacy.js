@@ -1,4 +1,3 @@
-import Header from "../components/views/header/Header"
 import { withFirebase } from "../context/firebase/FirebaseServiceContext"
 
 import Head from "next/head"
