@@ -41,6 +41,7 @@ const getBrowserProjects = (type: string): PlaywrightTestConfig["projects"] => {
          return [webkit, chromium, firefox]
    }
 }
+console.log("-> process.env.BROWSER", process.env.BROWSER)
 
 const config: PlaywrightTestConfig = {
    testDir: "./tests/e2e",
