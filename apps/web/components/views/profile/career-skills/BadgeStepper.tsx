@@ -23,6 +23,7 @@ import { DefaultTheme } from "@mui/styles/defaultTheme"
 import CircleIcon from "@mui/icons-material/Circle"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import CheckIcon from "@mui/icons-material/Check"
+import CelebrationIcon from "@mui/icons-material/Celebration"
 
 const styles = createStyles({
    step: {
@@ -74,17 +75,35 @@ const styles = createStyles({
 })
 
 export const BadgeStepper = ({ badge }: { badge: Badge }) => {
-   const steps = getBadgesArray(badge)
+   const steps = badge.getBadgesArray()
+   const { userPresenter } = useAuth()
 
+   const currentBadgeLevel =
+      userPresenter.badges?.getCurrentBadgeLevelForBadgeType(badge)
+
+   let activeStep = 0
+   if (currentBadgeLevel) {
+      activeStep = currentBadgeLevel.level - 1
+   }
    return (
-      <Stepper nonLinear activeStep={1} connector={<ColorlibConnector />}>
-         {steps.map((badge) => (
-            <Step key={badge.key} completed={false} disabled sx={styles.step}>
+      <Stepper
+         nonLinear
+         activeStep={activeStep}
+         connector={<ColorlibConnector />}
+      >
+         {steps.map((badge, index) => (
+            <Step
+               key={badge.key}
+               completed={index < activeStep}
+               disabled
+               sx={styles.step}
+            >
                <StepLabel
                   StepIconComponent={IconContainer}
                   StepIconProps={
                      {
                         badge,
+                        isCurrent: activeStep === index,
                      } as any
                   }
                   sx={styles.stepLabel}
@@ -95,46 +114,41 @@ export const BadgeStepper = ({ badge }: { badge: Badge }) => {
    )
 }
 
-/**
- * Convert a linked list badge to an array of badges
- *
- * @param badge
- */
-function getBadgesArray(badge: Badge): Badge[] {
-   const steps = [badge]
-
-   let curr = badge.next
-   while (curr) {
-      steps.push(curr)
-      curr = curr.next
-   }
-
-   return steps
-}
-
-const LevelInformationPopup = ({ badge }: { badge: Badge }) => {
+const LevelInformationPopup = ({
+   badge,
+   isComplete,
+}: {
+   badge: Badge
+   isComplete: boolean
+}) => {
    const finalRewards =
       badge.rewardsDescription.length > 0
          ? badge.rewardsDescription
          : ["A cool badge!"]
    const { userData, userStats } = useAuth()
 
+   let rewardText = "You will be rewarded"
+   if (isComplete) {
+      rewardText = "You have been rewarded with"
+   }
+
    return (
       <Box>
          <Typography variant="h6" mb={1}>
             Level {badge.level}
          </Typography>
-         <Typography>You will be rewarded:</Typography>
+         <Typography marginY={1}>{rewardText}:</Typography>
          <List disablePadding>
             {finalRewards.map((reward, index) => (
                <LevelInformationPopupListItem
                   key={`reward_${index}`}
                   description={reward}
+                  isAchieved={isComplete}
                />
             ))}
          </List>
 
-         <Typography>To reach this level:</Typography>
+         <Typography marginY={1}>To reach this level:</Typography>
          <List disablePadding>
             {badge.requirements.map((requirement, index) => (
                <LevelInformationPopupListItem
@@ -148,18 +162,28 @@ const LevelInformationPopup = ({ badge }: { badge: Badge }) => {
    )
 }
 
-const LevelInformationPopupListItem = ({ description, isComplete = false }) => (
-   <ListItem>
-      <ListItemAvatar sx={styles.listItemAvatar}>
-         {isComplete ? (
-            <CheckIcon color="primary" sx={styles.tooltipRequirementCheck} />
-         ) : (
-            <CircleIcon color="primary" sx={styles.tooltipRequirementCircle} />
-         )}
-      </ListItemAvatar>
-      <ListItemText primary={description} />
-   </ListItem>
-)
+const LevelInformationPopupListItem = ({
+   description,
+   isComplete = false,
+   isAchieved = false,
+}) => {
+   let Icon = isAchieved ? (
+      <CelebrationIcon color="primary" sx={styles.tooltipRequirementCheck} />
+   ) : (
+      <CircleIcon color="primary" sx={styles.tooltipRequirementCircle} />
+   )
+
+   if (isComplete) {
+      Icon = <CheckIcon color="primary" sx={styles.tooltipRequirementCheck} />
+   }
+
+   return (
+      <ListItem sx={{ paddingY: 0 }}>
+         <ListItemAvatar sx={styles.listItemAvatar}>{Icon}</ListItemAvatar>
+         <ListItemText primary={description} />
+      </ListItem>
+   )
+}
 
 const IconContainer = ({
    badge,
@@ -171,16 +195,24 @@ const IconContainer = ({
    const [showTooltip, setShowTooltip] = useState(false)
    const openTooltip = useCallback(() => setShowTooltip(true), [])
    const hideTooltip = useCallback(() => setShowTooltip(false), [])
-   const { userData, userStats } = useAuth()
+   const { userPresenter } = useAuth()
+   const currentBadgeLevel =
+      userPresenter.badges?.getCurrentBadgeLevelForBadgeType(badge)
 
    let Icon = <InfoIcon color="secondary" sx={styles.stepperIconInfo} />
-   if (badge.isComplete(userData, userStats)) {
+   if (currentBadgeLevel) {
+      // user has this badge
       Icon = <CheckIcon color="secondary" sx={styles.stepperIconCheck} />
    }
 
    return (
       <Tooltip
-         title={<LevelInformationPopup badge={badge} />}
+         title={
+            <LevelInformationPopup
+               badge={badge}
+               isComplete={Boolean(currentBadgeLevel)}
+            />
+         }
          componentsProps={{
             tooltip: {
                sx: styles.tooltip,

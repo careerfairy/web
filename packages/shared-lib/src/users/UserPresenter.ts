@@ -1,9 +1,9 @@
 import { UserData } from "./users"
 import BasePresenter from "../BasePresenter"
 import { getUserBadges, UserBadges } from "./UserBadges"
-import { ResearchBadge } from "../badges/ResearchBadges"
 import { Badge } from "../badges/badges"
-import { NetworkerBadge } from "../badges/NetworkBadges"
+import { NetworkerBadgeLevel2 } from "../badges/NetworkBadges"
+import { EngageBadgeLevel2 } from "../badges/EngageBadges"
 
 export default class UserPresenter extends BasePresenter<UserData> {
    public readonly badges: UserBadges
@@ -20,29 +20,27 @@ export default class UserPresenter extends BasePresenter<UserData> {
    /**
     * Highlight Event Questions functionality
     *
-    * User requires to have at least level 1 networker badge
+    * User requires to have at least level 2 Engage badge
     */
    questionsShouldBeHighlighted(): boolean {
-      // any networker badge is enough
-      return !!this.badges.networkerBadge()
+      return this.badges?.engageBadge()?.level >= 2
    }
 
    // static because we might need to display the badge when the user is not logged in
    static questionsHighlightedRequiredBadge(): Badge {
-      return NetworkerBadge
+      return EngageBadgeLevel2
    }
 
    /**
     * Save Recruiters functionality
     *
-    * User requires to have at least level 1 research badge
+    * User requires to have at least level 2 Networker badge
     */
    canSaveRecruiters(): boolean {
-      // any research badge is enough
-      return !!this.badges.researchBadge()
+      return this.badges?.networkerBadge()?.level >= 2
    }
 
    static saveRecruitersRequiredBadge(): Badge {
-      return ResearchBadge
+      return NetworkerBadgeLevel2
    }
 }

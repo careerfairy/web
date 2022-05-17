@@ -1,4 +1,8 @@
-import { Badge, calculateProgressForNumericField } from "./badges"
+import {
+   Badge,
+   calculateProgressForNumericField,
+   DEFAULT_REWARDS,
+} from "./badges"
 import { UserData, UserStats } from "../users"
 
 export const ResearchBadge: Badge = new Badge(
@@ -17,7 +21,7 @@ export const ResearchBadge: Badge = new Badge(
             ),
       },
    ],
-   ["Save Recruiters to a list you can access later"]
+   DEFAULT_REWARDS
 )
 
 export const ResearchBadgeLevel2: Badge = new Badge(
@@ -36,7 +40,7 @@ export const ResearchBadgeLevel2: Badge = new Badge(
             ),
       },
    ],
-   []
+   ["Unlimited Highlights views"]
 )
 
 export const ResearchBadgeLevel3: Badge = new Badge(
@@ -55,7 +59,7 @@ export const ResearchBadgeLevel3: Badge = new Badge(
             ),
       },
    ],
-   []
+   DEFAULT_REWARDS
 )
 
 // Links

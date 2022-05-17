@@ -20,11 +20,11 @@ const MyRecruitersTab = () => {
    return (
       <ContentCard>
          <Grid container spacing={2}>
-            <Grid item xs={8}>
+            <Grid item xs={12} lg={8}>
                <ContentCardTitle>Your Saved Recruiters</ContentCardTitle>
             </Grid>
 
-            <Grid item xs={8}>
+            <Grid item xs={12} lg={8}>
                <Typography sx={styles.subtitle}>
                   During a Livestream event you can save your favourite
                   recruiters and they will appear here.

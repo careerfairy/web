@@ -1,4 +1,8 @@
-import { Badge, calculateProgressForNumericField } from "./badges"
+import {
+   Badge,
+   calculateProgressForNumericField,
+   DEFAULT_REWARDS,
+} from "./badges"
 import { UserData, UserStats } from "../users"
 
 export const NetworkerBadge: Badge = new Badge(
@@ -14,7 +18,7 @@ export const NetworkerBadge: Badge = new Badge(
             calculateProgressForNumericField(userData?.referralsCount, 1),
       },
    ],
-   []
+   DEFAULT_REWARDS
 )
 
 export const NetworkerBadgeLevel2: Badge = new Badge(
@@ -30,7 +34,7 @@ export const NetworkerBadgeLevel2: Badge = new Badge(
             calculateProgressForNumericField(userData?.referralsCount, 3),
       },
    ],
-   ["Questions during an event will be highlighted"]
+   ["Save Recruiters during a livestream"]
 )
 
 export const NetworkerBadgeLevel3: Badge = new Badge(
@@ -56,7 +60,7 @@ export const NetworkerBadgeLevel3: Badge = new Badge(
             ),
       },
    ],
-   []
+   DEFAULT_REWARDS
 )
 
 // Links
