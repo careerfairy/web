@@ -20,10 +20,27 @@ jobs:
               skip_after_successful_duplicate: "false"
               paths_ignore: '["**/README.md", "firestore.rules"]'
 
+   # Build the app in test mode
+   build_app_for_tests:
+      runs-on: ubuntu-latest
+      if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
+      needs: [should_skip]
+      steps:
+         - name: "Build the app for Tests"
+         - uses: actions/checkout@v2
+         - uses: actions/setup-node@v2
+           run: npm run build
+           with:
+              node-version: "16"
+              cache: "npm"
+           env:
+              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              NODE_ENV: test
+
    # Run Unit Tests
    unit_tests:
       name: "Unit Tests"
-      needs: [should_skip]
+      needs: [should_skip, build_app_for_tests]
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest
       steps:
@@ -35,10 +52,6 @@ jobs:
 
          - name: Install dependencies
            run: npm install
-
-         - name: Build
-           run: npm run build
-
          - name: Cache NextJS cache folder
            uses: actions/cache@v3
            with:
@@ -61,7 +74,7 @@ jobs:
          fail-fast: false
          matrix:
             browser: [chromium, firefox, webkit]
-      needs: should_skip
+      needs: [should_skip, build_app_for_tests]
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest
       env:
