@@ -32,6 +32,17 @@ jobs:
            with:
               node-version: "16"
               cache: "npm"
+         - name: Install dependencies
+           run: npm install
+         - name: Cache NextJS cache folder
+           uses: actions/cache@v3
+           with:
+              path: |
+                 ~/.npm
+                  ${{ github.workspace }}/apps/web/.next/cache
+              key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('packages/shared-lib/**/*.[jt]s', 'apps/web/**/*.[jt]s?') }}
+              restore-keys: |
+                 ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
          - name: Build the app for Tests
            run: npm run build
            env:
