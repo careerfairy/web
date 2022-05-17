@@ -234,6 +234,8 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
    }
 
    const onUpdateWish = (newInterests: Interest[], newDescription: string) => {
+      wish.interestIds = newInterests.map((interest) => interest.id)
+      wish.description = newDescription
       setWishInterests(newInterests)
       setDescription(newDescription)
    }

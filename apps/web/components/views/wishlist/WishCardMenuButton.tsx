@@ -174,25 +174,31 @@ const WishCardMenuButton = ({
                </MenuItem>
             ))}
          </Menu>
-         <AreYouSureModal
-            handleClose={handleClose}
-            handleConfirm={handleDeleteWish}
-            loading={deleting}
-            title={"Are you sure you want to remove this wish?"}
-            open={confirmDeleteModalOpen}
-            confirmButtonText={"Delete this wish"}
-         />
-         <FlagDialog
-            handleFlag={handleFlagWish}
-            onClose={handleClose}
-            open={flagModalOpen}
-         />
-         <CreateOrEditWishDialog
-            open={editWishModalOpen}
-            onUpdateWish={onUpdateWish}
-            wishToEdit={wish}
-            onClose={handleClose}
-         />
+         {confirmDeleteModalOpen && (
+            <AreYouSureModal
+               handleClose={handleClose}
+               handleConfirm={handleDeleteWish}
+               loading={deleting}
+               title={"Are you sure you want to remove this wish?"}
+               open={confirmDeleteModalOpen}
+               confirmButtonText={"Delete this wish"}
+            />
+         )}
+         {flagModalOpen && (
+            <FlagDialog
+               handleFlag={handleFlagWish}
+               onClose={handleClose}
+               open={flagModalOpen}
+            />
+         )}
+         {editWishModalOpen && (
+            <CreateOrEditWishDialog
+               open={editWishModalOpen}
+               onUpdateWish={onUpdateWish}
+               wishToEdit={wish}
+               onClose={handleClose}
+            />
+         )}
       </>
    )
 }

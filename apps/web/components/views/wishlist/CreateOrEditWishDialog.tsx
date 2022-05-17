@@ -75,16 +75,29 @@ const styles: StylesProps = {
    content: {
       borderBottom: "none",
       display: "flex",
+      flexDirection: {
+         xs: "column",
+         sm: "row",
+      },
+      alignItems: {
+         xs: "center",
+         sm: "flex-start",
+      },
+   },
+   avatar: {
+      mr: 2,
+      mb: 2,
    },
    fields: {
-      pl: 2,
       flex: 1,
    },
    label: {
       fontWeight: 600,
    },
    actions: {
-      p: 2,
+      p: {
+         sm: 2,
+      },
    },
 }
 
@@ -163,30 +176,35 @@ const CreateOrEditWishDialog = ({
       handleClose()
    }
 
-   const submitLabel = wishToEdit ? "Update Wish" : "Make You Wish"
+   const submitLabel = wishToEdit ? "Update Wish" : "Make Your Wish"
    const submitLoadingLabel = wishToEdit ? "Updating..." : "Creating..."
    return (
-      <Dialog maxWidth={"sm"} fullWidth onClose={handleClose} open={open}>
-         <Formik
-            initialValues={initialValues}
-            validationSchema={schema}
-            enableReinitialize={!!wishToEdit?.id}
-            onSubmit={onSubmit}
-         >
-            {({
-               isSubmitting,
-               values,
-               touched,
-               handleBlur,
-               setFieldValue,
-               handleChange,
-               errors,
-               handleSubmit,
-            }) => (
-               <form id={"creat-wish-form"}>
+      <Formik
+         initialValues={initialValues}
+         validationSchema={schema}
+         enableReinitialize={!!wishToEdit?.id}
+         onSubmit={onSubmit}
+      >
+         {({
+            isSubmitting,
+            values,
+            touched,
+            handleBlur,
+            setFieldValue,
+            handleChange,
+            errors,
+            handleSubmit,
+         }) => (
+            <form id={"creat-wish-form"}>
+               <Dialog
+                  maxWidth={"sm"}
+                  fullWidth
+                  onClose={handleClose}
+                  open={open}
+               >
                   <DialogTitle sx={styles.title}>Create Wish</DialogTitle>
                   <DialogContent sx={styles.content} dividers>
-                     <LoggedInUserAvatar size={"large"} />
+                     <LoggedInUserAvatar sx={styles.avatar} size={"large"} />
                      <Stack sx={styles.fields} spacing={2}>
                         <Box>
                            <Label
@@ -251,18 +269,13 @@ const CreateOrEditWishDialog = ({
                      </Stack>
                   </DialogContent>
                   <DialogActions sx={styles.actions}>
-                     <Button
-                        size={"large"}
-                        color={"grey"}
-                        onClick={handleClose}
-                     >
+                     <Button color={"grey"} onClick={handleClose}>
                         Cancel
                      </Button>
                      <Button
                         onClick={() => handleSubmit()}
                         disabled={isSubmitting}
                         color={"secondary"}
-                        size={"large"}
                         startIcon={
                            isSubmitting ? (
                               <CircularProgress size={20} color={"inherit"} />
@@ -275,10 +288,10 @@ const CreateOrEditWishDialog = ({
                         {isSubmitting ? submitLoadingLabel : submitLabel}
                      </Button>
                   </DialogActions>
-               </form>
-            )}
-         </Formik>
-      </Dialog>
+               </Dialog>
+            </form>
+         )}
+      </Formik>
    )
 }
 

@@ -102,28 +102,33 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
             options: [
                {
                   value: "dateDesc",
-                  label: "Date Descending",
+                  label: "Date Descending (Newest First)",
                   descending: true,
                },
                {
                   value: "dateAsc",
-                  label: "Date Ascending",
+                  label: "Date Ascending (Oldest First)",
                   descending: false,
                },
                {
                   value: "upvotesDesc",
-                  label: "Upvotes Descending",
+                  label: "Upvotes Descending (Most Upvoted First)",
                   descending: true,
                },
                {
                   value: "upvotesAsc",
-                  label: "Upvotes Ascending",
+                  label: "Upvotes Ascending (Least Upvoted First)",
                   descending: false,
                },
             ],
          },
       ],
       [query.sortType]
+   )
+
+   const numberOfActiveFilters = useMemo(
+      () => [query.interests, query.sortType].filter((value) => value).length,
+      [query]
    )
 
    const handleQuery = (queryParam: string, queryValue: string | string[]) => {
@@ -210,14 +215,14 @@ const FilterMenu = ({ id, open, anchorEl, handleClose }: Props) => {
                      >
                         {select.label}
                      </Typography>
-                     {index === 0 && (
+                     {index === 0 && !!numberOfActiveFilters && (
                         <Button
                            onClick={handleClearQueries}
                            variant={"text"}
                            size={"small"}
                            color={"secondary"}
                         >
-                           Clear all (3)
+                           Clear all ({numberOfActiveFilters})
                         </Button>
                      )}
                   </Stack>

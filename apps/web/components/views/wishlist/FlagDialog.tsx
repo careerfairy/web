@@ -97,35 +97,35 @@ const FlagDialog = ({ onClose, handleFlag, open }: Props) => {
       }
    }
    return (
-      <Dialog
-         open={open}
-         onClose={onClose}
-         aria-labelledby="flag-wish-dialog-title"
-         aria-describedby="flag-wish-dialog-description"
-         maxWidth="xs"
-         fullWidth
+      <Formik
+         initialValues={initialValues}
+         validationSchema={schema}
+         onSubmit={handleSubmit}
       >
-         <Formik
-            initialValues={initialValues}
-            validationSchema={schema}
-            onSubmit={handleSubmit}
-         >
-            {({
-               isSubmitting,
-               values,
-               touched,
-               handleBlur,
-               setFieldValue,
-               handleChange,
-               errors,
-               handleSubmit,
-            }) => (
-               <form id={"flag-wish-form"}>
+         {({
+            isSubmitting,
+            values,
+            touched,
+            handleBlur,
+            setFieldValue,
+            handleChange,
+            errors,
+            handleSubmit,
+         }) => (
+            <form id={"flag-wish-form"}>
+               <Dialog
+                  open={open}
+                  onClose={onClose}
+                  aria-labelledby="flag-wish-dialog-title"
+                  aria-describedby="flag-wish-dialog-description"
+                  maxWidth="xs"
+                  fullWidth
+               >
                   <DialogTitle id="flag-wish-dialog-title">
                      Flag Wish
                   </DialogTitle>
                   <DialogContent dividers sx={styles.content}>
-                     <Stack spacing={2}>
+                     <Stack spacing={3}>
                         <Box>
                            <Typography variant="h6">
                               Select reasons for flagging this wish:
@@ -188,7 +188,7 @@ const FlagDialog = ({ onClose, handleFlag, open }: Props) => {
                               errors.flagMessage && touched.flagMessage
                            )}
                            disabled={isSubmitting}
-                           label="Reason for flagging"
+                           label="Explanation (optional)"
                            type="text"
                            multiline
                            fullWidth
@@ -200,7 +200,6 @@ const FlagDialog = ({ onClose, handleFlag, open }: Props) => {
                         color={"grey"}
                         disabled={isSubmitting}
                         onClick={onClose}
-                        size={"small"}
                      >
                         Cancel
                      </Button>
@@ -210,22 +209,21 @@ const FlagDialog = ({ onClose, handleFlag, open }: Props) => {
                            e.preventDefault()
                            handleSubmit()
                         }}
-                        size={"small"}
                         type={"submit"}
                         disabled={isSubmitting}
                         variant={"contained"}
                      >
                         {isSubmitting ? (
-                           <CircularProgress size={10} color={"inherit"} />
+                           <CircularProgress size={15} color={"inherit"} />
                         ) : (
                            "Submit"
                         )}
                      </Button>
                   </DialogActions>
-               </form>
-            )}
-         </Formik>
-      </Dialog>
+               </Dialog>
+            </form>
+         )}
+      </Formik>
    )
 }
 
