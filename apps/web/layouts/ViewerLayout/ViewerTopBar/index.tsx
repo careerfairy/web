@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
 import {
    AppBar,
    Badge,
@@ -37,11 +36,16 @@ import { localStorageAudienceDrawerKey } from "constants/localStorageKeys"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import BadgeButton from "../../../components/views/common/BadgeButton"
 import {
-   getUserBadges,
    Badge as BadgeType,
+   getUserBadges,
 } from "@careerfairy/shared-lib/dist/badges"
+import { StylesProps } from "../../../types/commonTypes"
 
-const useStyles = makeStyles((theme) => ({
+const styles: StylesProps = {
+   appBar: {
+      zIndex: (theme) => theme.zIndex.drawer + 1,
+      backgroundColor: (theme) => theme.palette.background.paper,
+   },
    toolbar: {
       minHeight: 55,
       display: "flex",
@@ -52,16 +56,16 @@ const useStyles = makeStyles((theme) => ({
       },
    },
    viewCount: {
-      color: theme.palette.primary.main,
+      color: "primary.main",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      margin: theme.spacing(0, 1),
+      margin: (theme) => theme.spacing(0, 1),
    },
    floatingWrapper: {
       position: "absolute",
-      top: theme.spacing(2.5),
-      right: theme.spacing(2.5),
+      top: 2.5,
+      right: 2.5,
       zIndex: 120,
       display: "flex",
       alignItems: "center",
@@ -69,12 +73,12 @@ const useStyles = makeStyles((theme) => ({
          filter: `drop-shadow(0px 0px 3px rgba(0,0,0,0.4))`,
       },
       "& .MuiIconButton-root": {
-         color: theme.palette.primary.main,
+         color: "primary.main",
          width: 35,
          height: 35,
       },
    },
-}))
+}
 
 const ViewerTopBar = ({
    mobile,
@@ -82,7 +86,6 @@ const ViewerTopBar = ({
    showMenu,
    audienceDrawerOpen,
 }) => {
-   const classes = useStyles()
    const [ctaStatus, setCtaStatus] = useState({
       active: false,
       numberActive: 0,
@@ -135,7 +138,7 @@ const ViewerTopBar = ({
    if (focusModeEnabled || (mobile && !showMenu)) {
       return (
          <React.Fragment>
-            <div className={classes.floatingWrapper}>
+            <Box sx={styles.floatingWrapper}>
                <FocusModeButton
                   audienceDrawerOpen={audienceDrawerOpen}
                   mobile={mobile}
@@ -205,7 +208,7 @@ const ViewerTopBar = ({
                   </Tooltip>
                </NewFeatureHint>
                <JoinTalentPoolButton mobile />
-            </div>
+            </Box>
             <ViewerBreakoutRoomModal
                mobile={mobile}
                localStorageAudienceDrawerKey={localStorageAudienceDrawerKey}
@@ -228,8 +231,8 @@ const ViewerTopBar = ({
 
    return (
       <React.Fragment>
-         <AppBar elevation={1} color="transparent">
-            <Toolbar className={classes.toolbar}>
+         <AppBar sx={styles.appBar} elevation={1}>
+            <Toolbar sx={styles.toolbar}>
                <MainLogo white={theme.palette.mode === "dark"} />
                {logoElements}
 
@@ -308,7 +311,7 @@ const ViewerTopBar = ({
                      tooltipTitle="Hint"
                      hide={false}
                   >
-                     <Box className={classes.viewCount}>
+                     <Box sx={styles.viewCount}>
                         <Tooltip title="See who joined">
                            <Button
                               color="primary"

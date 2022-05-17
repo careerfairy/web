@@ -16,7 +16,7 @@ declare module "@mui/styles/defaultTheme" {
          dark_8_25_10?: string
          dark_15_60_15?: string
          secondary_5_15_50?: string
-         grey_5_15_50?: string
+         grey_5_15?: string
          primary_5_15_50?: string
          dark_12_13?: string
       }
@@ -50,7 +50,7 @@ declare module "@mui/material/styles" {
       boxShadows?: {
          // color_y_blur_opacity
          dark_8_25_10?: string
-         grey_5_15_50?: string
+         grey_5_15?: string
          dark_15_60_15?: string
          secondary_5_15_50?: string
          primary_5_15_50?: string
@@ -177,7 +177,10 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
       boxShadows: {
          dark_8_25_10: `0px 8px 25px rgba(33, 32, 32, 0.1)`,
          dark_12_13: `0px 12px 13px ${alpha(black, 0.12)}`,
-         grey_5_15_50: `0px 5px 15px ${alpha(grey[400], 0.5)}`,
+         grey_5_15: `0px 5px 15px ${alpha(
+            grey[400],
+            mode === "light" ? 1 : 0.4
+         )}`,
          secondary_5_15_50: `0px 5px 15px ${alpha(
             mode === "light" ? secondary.main : secondary.dark,
             mode === "light" ? 0.5 : 0.2
@@ -244,7 +247,7 @@ const getComponents = (theme: DefaultTheme): Components => ({
                variant: "contained",
             },
             style: {
-               boxShadow: theme.boxShadows.grey_5_15_50,
+               boxShadow: theme.boxShadows.grey_5_15,
             },
          },
          {
@@ -310,12 +313,13 @@ const getComponents = (theme: DefaultTheme): Components => ({
                color: "grey",
             },
             style: {
-               boxShadow: theme.boxShadows.grey_5_15_50,
+               boxShadow: theme.boxShadows.grey_5_15,
             },
          },
          {
             props: { variant: "contained", color: "grey" },
             style: {
+               boxShadow: theme.boxShadows.grey_5_15,
                color: theme.palette.getContrastText(theme.palette.grey[300]),
             },
          },
