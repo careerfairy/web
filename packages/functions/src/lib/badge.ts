@@ -30,7 +30,11 @@ export const handleUserNetworkerBadges = async (
    }
    const badges = newValue.badges
    let newBadges
-   console.log("-> current badges", badges)
+
+   functions.logger.log(
+      `${userDataId} userData is being updated, current badges:`,
+      badges
+   )
 
    // Assign Networker badge level 3
    if (isEligibleForBadge(badges, NetworkerBadgeLevel3)) {
@@ -70,7 +74,11 @@ export const handleUserStatsBadges = async (
 ): Promise<void> => {
    const badges = (await userGetByEmail(userDataId)).badges
    let newBadges
-   console.log("-> current badges", badges)
+
+   functions.logger.log(
+      `${userDataId} stats are being updated, current badges:`,
+      badges
+   )
 
    // Research
 
@@ -139,7 +147,6 @@ const isEligibleForBadge = (badges: string[], badge: Badge): boolean => {
 }
 
 const updateUserWithNewBadges = async (userDataId, newBadges: string[]) => {
-   console.log("-> newBadges", newBadges)
    await userUpdateFields(userDataId, {
       badges: newBadges,
    })
