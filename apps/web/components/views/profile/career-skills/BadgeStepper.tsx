@@ -162,7 +162,7 @@ const LevelInformationPopup = ({
    )
 }
 
-const LevelInformationPopupListItem = ({
+export const LevelInformationPopupListItem = ({
    description,
    isComplete = false,
    isAchieved = false,

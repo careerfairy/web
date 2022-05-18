@@ -39,6 +39,12 @@ export const getHumanStringDescriptionForAction = (action) => {
          return "Attended an invited event"
       case RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER:
          return "Event Invitation Successful"
+      case RewardActions.LIVESTREAM_USER_ATTENDED:
+         return "You attended a livestream event"
+      case RewardActions.LIVESTREAM_USER_ASKED_QUESTION:
+         return "You asked a question during a livestream event"
+      case RewardActions.LIVESTREAM_USER_HAND_RAISED:
+         return "You have raised your hand during a livestream event"
       default:
          return action
    }
