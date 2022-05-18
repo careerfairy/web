@@ -68,7 +68,7 @@ jobs:
          - name: Run Playwright End to End tests
            run: npm run test:e2e-webapp
          - name: Upload test results
-           if: always()
+           if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
               name: playwright-report
