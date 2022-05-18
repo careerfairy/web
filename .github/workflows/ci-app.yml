@@ -147,16 +147,16 @@ jobs:
               BROWSER: ${{ matrix.browser }}
            run: npm run test:e2e-webapp
          - name: Upload test results
-           if: always()
+           if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: ${{ matrix.browser }} - playwright-report
+              name: ${{ matrix.browser }}-playwright-report
               path: apps/web/playwright-report
          - name: Upload debug logs
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: ${{ matrix.browser }} - debug logs
+              name: ${{ matrix.browser }}-debug-logs
               path: firebase-debug.log
    # Deploy
    deploy:
