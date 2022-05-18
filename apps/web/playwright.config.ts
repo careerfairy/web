@@ -79,7 +79,7 @@ const config: PlaywrightTestConfig = {
    globalTeardown: "./playwright.teardown",
 
    /* Configure projects for major browsers */
-   projects: getBrowserProjects(process.env.BROWSER || "chromium"),
+   projects: getBrowserProjects(process.env.BROWSER),
 
    /* Folder for test artifacts such as screenshots, videos, traces, etc. */
    outputDir: "./test-results",
