@@ -43,7 +43,7 @@ class AlgoliaRepository implements IAlgoliaRepository {
       )
       const interestFilters = options?.targetInterestIds
          ?.filter((s) => s.length)
-         ?.map((interestId) => `interestIds:${interestId}`)
+         ?.map((interestId) => `interestIds:"${interestId}"`)
          .join(" OR ")
       const filters =
          "isPublic:true AND isDeleted:false" +

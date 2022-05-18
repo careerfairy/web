@@ -77,10 +77,12 @@ const CreateWishButton = () => {
                />
             )}
          </Stack>
-         <CreateOrEditWishDialog
-            onClose={handleCloseWishDialog}
-            open={createWishDialogOpen}
-         />
+         {createWishDialogOpen && (
+            <CreateOrEditWishDialog
+               onClose={handleCloseWishDialog}
+               open={createWishDialogOpen}
+            />
+         )}
       </>
    )
 }

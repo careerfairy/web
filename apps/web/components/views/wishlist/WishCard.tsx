@@ -42,6 +42,9 @@ const styles: StylesProps = {
    },
    root: {
       position: "relative",
+      "& em": {
+         fontWeight: 600,
+      },
    },
    moreIconButton: {
       position: "absolute",
@@ -57,9 +60,6 @@ const styles: StylesProps = {
    title: {
       wordBreak: "break-word",
       whiteSpace: "pre-line",
-      "& em": {
-         fontWeight: 600,
-      },
    },
    totalLikes: {
       border: "none !important",
@@ -103,7 +103,10 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
       wish._highlightResult.description.value
    )
    const [userRating, setUserRating] = useState<Rating>(null)
-   const [wishInterests, setWishInterests] = useState<WishInterest[]>([])
+   const [wishInterests, setWishInterests] = useState<
+      Hit<Wish>["_highlightResult"]["interests"]
+   >([])
+   console.log("-> wishInterests", wishInterests)
    const [gettingAuthor, setGettingAuthor] = useState(false)
    const [upvoters, setUpvoters] = useState<UserData[]>(
       Array(wish.uidsOfRecentUpvoters.length || 0).fill(null)
@@ -132,15 +135,11 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
    }, [wish.uidsOfRecentUpvoters])
    useEffect(() => {
       setWishInterests(
-         interests
-            .filter((interest) => wish.interestIds.includes(interest.id))
-            .map((interest) => ({
-               ...interest,
-               highlighted: Boolean(query.interests?.includes?.(interest.id)),
-            }))
-            .sort((a) => (a.highlighted ? -1 : 1))
+         [...wish._highlightResult?.interests].sort((a) =>
+            a.name.matchedWords.length ? -1 : 1
+         ) || []
       )
-   }, [query.interests])
+   }, [wish._highlightResult?.interests])
 
    useEffect(() => {
       ;(async () => {
@@ -235,6 +234,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
 
    const onUpdateWish = (newInterests: Interest[], newDescription: string) => {
       wish.interestIds = newInterests.map((interest) => interest.id)
+      wish.interests = [...newInterests]
       wish.description = newDescription
       setWishInterests(newInterests)
       setDescription(newDescription)
@@ -318,9 +318,20 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                      component="div"
                   >
                      {wishInterests.map((int, index) => (
-                        <Fragment key={int.id}>
+                        <Fragment key={int.name + index}>
                            {!!index && bull}
-                           {int.highlighted ? <b>{int.name}</b> : int.name}
+                           {int.highlighted ? (
+                              <span>
+                                 <b>{int.name}</b>
+                              </span>
+                           ) : (
+                              <Box
+                                 component={"span"}
+                                 dangerouslySetInnerHTML={{
+                                    __html: int.name.value,
+                                 }}
+                              />
+                           )}
                         </Fragment>
                      ))}
                   </Typography>

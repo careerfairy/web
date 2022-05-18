@@ -95,6 +95,7 @@ class FirebaseWishRepository implements IWishRepository {
          description: wishFormValues.description.trim(),
          companyNames: wishFormValues.companyNames,
          interestIds: wishFormValues.interests.map((interest) => interest.id),
+         interests: wishFormValues.interests,
          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
          authorUid: firebase.auth().currentUser?.uid,
          updatedAt: null,
@@ -125,6 +126,7 @@ class FirebaseWishRepository implements IWishRepository {
          description: wishFormValues.description.trim(),
          companyNames: wishFormValues.companyNames,
          interestIds: wishFormValues.interests.map((interest) => interest.id),
+         interests: wishFormValues.interests,
       }
       await wishRef.update(updatedWish)
       return updatedWish

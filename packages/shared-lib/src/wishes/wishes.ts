@@ -1,5 +1,6 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase"
+import { Interest } from "../interests"
 
 export interface Wish extends Identifiable {
    createdAt: firebase.firestore.Timestamp | firebase.firestore.FieldValue
@@ -35,6 +36,8 @@ export interface Wish extends Identifiable {
    isFlaggedByAdmin: boolean
    // array of interests ids
    interestIds: string[]
+   // array of interest documents
+   interests: Interest[]
 }
 
 export type WishOrderByFields =
