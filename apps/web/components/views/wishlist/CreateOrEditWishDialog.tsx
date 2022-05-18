@@ -31,7 +31,7 @@ interface CreateWishDialogProps {
    onClose: () => void
    wishToEdit?: Wish
    onUpdateWish?: (newInterests: Interest[], newDescription: string) => void
-   handleAddNewWishToHits: HandleAddNewWishToHits
+   handleAddNewWishToHits?: HandleAddNewWishToHits
 }
 
 const maxInterests = 5
