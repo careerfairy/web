@@ -173,3 +173,5 @@ jobs:
               vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
               vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
               vercel-args: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && '--prod' || '' }}
+              alias-domains: | #Optional
+                 careerfairy-ssr-webapp-git-{{BRANCH}}-careerfairy-ssr.vercel.app
