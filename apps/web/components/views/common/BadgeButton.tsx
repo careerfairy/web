@@ -3,6 +3,7 @@ import React, { memo } from "react"
 import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
 import BadgeIcon from "../common/BadgeIcon"
 import isEqual from "react-fast-compare"
+import IconButton from "@mui/material/IconButton"
 
 const styles = {
    disabled: {
@@ -29,6 +30,7 @@ const BadgeButton = ({
    inactiveTooltip = defaultInactiveTooltip,
    badgeIconProps = {},
    buttonProps = {},
+   iconButton = false,
 }: Props) => {
    buttonProps = Object.assign({ variant: "outlined" }, buttonProps)
 
@@ -44,35 +46,46 @@ const BadgeButton = ({
       buttonProps.sx = Object.assign(buttonProps.sx, buttonStyles)
    }
 
+   let content = onlyIcon ? (
+      <Button
+         sx={buttonStyles}
+         disableRipple={!onClick}
+         onClick={onClick}
+         {...buttonProps}
+      >
+         <BadgeIcon badgeKey={badge.key} {...badgeIconProps} />
+      </Button>
+   ) : (
+      <Button
+         startIcon={
+            showIcon && <BadgeIcon badgeKey={badge.key} {...badgeIconProps} />
+         }
+         sx={buttonStyles}
+         disableRipple={!onClick}
+         onClick={onClick}
+         {...buttonProps}
+      >
+         {badge.name}
+         {showBadgeSuffix && " Badge"}
+      </Button>
+   )
+
+   if (iconButton) {
+      content = (
+         <IconButton
+            sx={buttonStyles}
+            disableRipple={!onClick}
+            onClick={onClick}
+            {...buttonProps}
+         >
+            <BadgeIcon badgeKey={badge.key} {...badgeIconProps} />
+         </IconButton>
+      )
+   }
+
    return (
       <Tooltip title={title}>
-         <span>
-            {onlyIcon ? (
-               <Button
-                  sx={buttonStyles}
-                  disableRipple={!onClick}
-                  onClick={onClick}
-                  {...buttonProps}
-               >
-                  <BadgeIcon badgeKey={badge.key} {...badgeIconProps} />
-               </Button>
-            ) : (
-               <Button
-                  startIcon={
-                     showIcon && (
-                        <BadgeIcon badgeKey={badge.key} {...badgeIconProps} />
-                     )
-                  }
-                  sx={buttonStyles}
-                  disableRipple={!onClick}
-                  onClick={onClick}
-                  {...buttonProps}
-               >
-                  {badge.name}
-                  {showBadgeSuffix && " Badge"}
-               </Button>
-            )}
-         </span>
+         <span>{content}</span>
       </Tooltip>
    )
 }
@@ -80,7 +93,7 @@ const BadgeButton = ({
 type Props = {
    badge: Badge
    isActive?: boolean
-   onClick?: () => {}
+   onClick?: () => any
    showIcon?: boolean
    showBadgeSuffix?: boolean
    onlyIcon?: boolean
@@ -88,6 +101,7 @@ type Props = {
    inactiveTooltip?: (badge: Badge) => string
    badgeIconProps?: any
    buttonProps?: any
+   iconButton?: boolean
 }
 
 export default memo(BadgeButton, isEqual)

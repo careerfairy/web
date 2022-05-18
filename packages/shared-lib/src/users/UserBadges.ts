@@ -64,6 +64,22 @@ export class UserBadges {
    }
 
    /**
+    * Fetch one badge from the user's badges
+    * From the most important to the least importan
+    */
+   getOneBadge() {
+      if (this.engageBadge()) {
+         return this.engageBadge()
+      }
+
+      if (this.networkerBadge()) {
+         return this.networkerBadge()
+      }
+
+      return this.networkerBadge()
+   }
+
+   /**
     * Check if the user has this badge
     * If the user is in a more advanced level of this badge, means it has this badge
     * @param badge
