@@ -1,17 +1,20 @@
 import functions = require("firebase-functions")
 import config = require("./config")
 import {
-   userIncrementReferralsCount,
    userGetByReferralCode,
    userGetByEmail,
+   userIncrementStat,
+   userIncrementField,
 } from "./lib/user"
 import { RewardActions } from "@careerfairy/shared-lib/dist/rewards"
 import {
    rewardCreateReferralSignUpLeader,
    rewardCreateLivestream,
    rewardGetRelatedToLivestream,
+   rewardCreateUserAction,
 } from "./lib/reward"
 import { livestreamGetById } from "./lib/livestream"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 /**
  * Everytime there is a new reward document, apply the reward depending on the action
@@ -72,14 +75,35 @@ export const rewardApply = functions
           */
          case RewardActions.REFERRAL_SIGNUP_LEADER:
             // This user just won a new referral
-            await userIncrementReferralsCount(email)
+            await userIncrementField(email, "referralsCount", 1)
             break
 
          /**
           * When a user (leader) successfully invited another user (follower) to attend a livestream
           */
          case RewardActions.LIVESTREAM_INVITE_COMPLETE_LEADER:
-            // nothing to do (points have already been applied)
+            await userIncrementField(email, "totalLivestreamInvites", 1)
+            break
+
+         /**
+          * User attended a livestream
+          */
+         case RewardActions.LIVESTREAM_USER_ATTENDED:
+            await userIncrementStat(email, "totalLivestreamAttendances")
+            break
+
+         /**
+          * User asked a question for a livestream
+          */
+         case RewardActions.LIVESTREAM_USER_ASKED_QUESTION:
+            await userIncrementStat(email, "totalQuestionsAsked")
+            break
+
+         /**
+          * User raised their hand for a livestream
+          */
+         case RewardActions.LIVESTREAM_USER_HAND_RAISED:
+            await userIncrementStat(email, "totalHandRaises")
             break
       }
    })
@@ -182,28 +206,11 @@ export const rewardLivestreamAttendance = functions.https.onCall(
          )
       }
 
-      const livestreamDoc: any = await livestreamGetById(livestreamId)
-      if (
-         !livestreamDoc ||
-         !livestreamDoc.hasStarted ||
-         livestreamDoc.hasEnded
-      ) {
-         functions.logger.error("The livestream is not live or does not exist")
-         throw new functions.https.HttpsError(
-            "failed-precondition",
-            "Something wrong happened"
-         )
-      }
-
-      if (!livestreamDoc.registeredUsers?.includes(userEmail)) {
-         functions.logger.error(
-            "The user is not registered in the livestream, someone trying to hack us?"
-         )
-         throw new functions.https.HttpsError(
-            "failed-precondition",
-            "Something wrong happened"
-         )
-      }
+      const livestreamDoc: any = await validateLivestreamEvent(
+         livestreamId,
+         userEmail,
+         true
+      )
 
       const invitationReward = await rewardGetRelatedToLivestream(
          userEmail,
@@ -235,3 +242,152 @@ export const rewardLivestreamAttendance = functions.https.onCall(
       )
    }
 )
+
+/**
+ * Generic function to create a reward for a user progression action
+ */
+export const rewardUserAction = functions.https.onCall(
+   async (data, context) => {
+      const userEmail = context.auth?.token?.email
+      const action = data.action
+
+      functions.logger.debug(userEmail, data)
+
+      if (!userEmail || !action || !RewardActions[action]) {
+         throw new functions.https.HttpsError(
+            "invalid-argument",
+            "Required data not present or invalid"
+         )
+      }
+
+      const flagsToCheck = {
+         livestreamMustBeLive: false,
+      }
+
+      switch (action) {
+         case RewardActions.LIVESTREAM_USER_ATTENDED:
+         case RewardActions.LIVESTREAM_USER_ASKED_QUESTION:
+         case RewardActions.LIVESTREAM_USER_HAND_RAISED:
+            validateLivestreamIdExists(data.livestreamId)
+
+            // this reward can only be created once per livestream
+            await validateDuplicatedReward(userEmail, data.livestreamId, action)
+
+            if (action === RewardActions.LIVESTREAM_USER_ATTENDED) {
+               // The livestream should be live during action
+               flagsToCheck.livestreamMustBeLive = true
+            }
+
+            break
+      }
+
+      // user must be registered in the livestream event
+      let livestreamDoc
+      if (data.livestreamId) {
+         livestreamDoc = await validateLivestreamEvent(
+            data.livestreamId,
+            userEmail,
+            flagsToCheck.livestreamMustBeLive
+         )
+      }
+
+      // all validations have passed, create the reward for the user
+      await rewardCreateUserAction(userEmail, action, livestreamDoc)
+      functions.logger.info("Created a new reward for the user action")
+   }
+)
+
+// Validation functions, should throw exceptions
+
+/**
+ * Validates if livestream exists, the user is registered, is live
+ *
+ * Throws if a condition is not met
+ *
+ * @param livestreamId
+ * @param userMustBeRegistered
+ * @param livestreamMustBeLive
+ */
+async function validateLivestreamEvent(
+   livestreamId: string,
+   userMustBeRegistered: string | null = null,
+   livestreamMustBeLive = false
+): Promise<LivestreamEvent> {
+   const livestreamDoc = (await livestreamGetById(
+      livestreamId
+   )) as LivestreamEvent
+
+   if (!livestreamDoc) {
+      functions.logger.error("The livestream does not exist")
+      throw new functions.https.HttpsError(
+         "failed-precondition",
+         "Something wrong happened"
+      )
+   }
+
+   if (
+      livestreamMustBeLive &&
+      (!livestreamDoc.hasStarted || livestreamDoc.hasEnded)
+   ) {
+      functions.logger.error("The livestream is not live or does not exist")
+      throw new functions.https.HttpsError(
+         "failed-precondition",
+         "Something wrong happened"
+      )
+   }
+
+   if (
+      userMustBeRegistered &&
+      !livestreamDoc.registeredUsers?.includes(userMustBeRegistered)
+   ) {
+      functions.logger.error(
+         "The user is not registered in the livestream, someone trying to hack us?"
+      )
+      throw new functions.https.HttpsError(
+         "failed-precondition",
+         "Something wrong happened"
+      )
+   }
+
+   return livestreamDoc
+}
+
+/**
+ * Confirm the livestreamId exists or throw an exception
+ * @param livestreamId
+ */
+function validateLivestreamIdExists(livestreamId) {
+   if (!livestreamId) {
+      functions.logger.error("The livestream is required")
+      throw new functions.https.HttpsError(
+         "failed-precondition",
+         "Something wrong happened"
+      )
+   }
+}
+
+/**
+ * Validate if the reward was already given to the user
+ * Related to a livestream
+ *
+ * @param userEmail
+ * @param livestreamId
+ * @param action
+ */
+async function validateDuplicatedReward(userEmail, livestreamId, action) {
+   const previousReward = await rewardGetRelatedToLivestream(
+      userEmail,
+      livestreamId,
+      action
+   )
+
+   if (previousReward) {
+      functions.logger.error("The user already received this award, ignoring")
+      throw new functions.https.HttpsError(
+         "failed-precondition",
+         "Duplicated" // client side can watch for duplicated errors
+      )
+   }
+
+   return previousReward
+}

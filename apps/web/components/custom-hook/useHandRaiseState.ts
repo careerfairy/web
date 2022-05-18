@@ -7,6 +7,7 @@ import useStreamRef from "./useStreamRef"
 import { MAX_STREAM_DEFAULT_ACTIVE_HAND_RAISERS } from "constants/streams"
 import RootState from "store/reducers"
 import { HandRaise } from "types/handraise"
+import { RewardActions } from "@careerfairy/shared-lib/dist/rewards"
 
 const useHandRaiseState = () => {
    const { currentLivestream, handRaiseId } = useCurrentStream()
@@ -14,7 +15,7 @@ const useHandRaiseState = () => {
    const prevHandRaiseState = useRef<HandRaise>(null)
 
    const streamRef = useStreamRef()
-   const { createHandRaiseRequest, updateHandRaiseRequest } =
+   const { createHandRaiseRequest, updateHandRaiseRequest, rewardUserAction } =
       useFirebaseService()
 
    const numberOfActiveHandRaises = useSelector(
@@ -48,6 +49,15 @@ const useHandRaiseState = () => {
             try {
                if (handRaise) {
                   await updateHandRaiseRequest(streamRef, handRaiseId, state)
+
+                  if (userData && state === "requested") {
+                     rewardUserAction(
+                        RewardActions.LIVESTREAM_USER_HAND_RAISED,
+                        currentLivestream.id
+                     )
+                        .then((_) => console.log("Rewarded Hand Raised"))
+                        .catch(console.error)
+                  }
                } else {
                   await createHandRaiseRequest(
                      streamRef,
