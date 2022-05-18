@@ -173,3 +173,25 @@ export const getUserBadges = (userDataBadgesArray: string[]): UserBadges => {
       }, {})
    )
 }
+
+/**
+ * Check if a badge or its parents are in an array of badge keys
+ * @param badges
+ * @param badge
+ */
+export const containsBadgeOrLevelsAbove = (
+   badges: string[],
+   badge: Badge
+): boolean => {
+   if (!badges) return false
+
+   let curr = badge
+
+   while (curr) {
+      if (badges.includes(curr.key)) {
+         return true
+      }
+      curr = curr.next
+   }
+   return false
+}
