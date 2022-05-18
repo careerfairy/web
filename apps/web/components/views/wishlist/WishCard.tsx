@@ -57,9 +57,12 @@ const styles: StylesProps = {
    name: {
       fontWeight: 600,
    },
-   title: {
+   text: {
       wordBreak: "break-word",
       whiteSpace: "pre-line",
+   },
+   description: {
+      fontWeight: 600,
    },
    totalLikes: {
       border: "none !important",
@@ -135,7 +138,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
    }, [wish.uidsOfRecentUpvoters])
    useEffect(() => {
       setWishInterests(
-         [...wish._highlightResult?.interests].sort((a) =>
+         [...(wish?._highlightResult?.interests || [])].sort((a) =>
             a.name.matchedWords.length ? -1 : 1
          ) || []
       )
@@ -287,16 +290,16 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
             <UserAvatar size={"large"} data={authorData} />
             <Stack sx={styles.rightContent} spacing={2}>
                <Box component={"header"}>
+                  {/*<Typography*/}
+                  {/*   component={"span"}*/}
+                  {/*   sx={styles.name}*/}
+                  {/*   variant={"h6"}*/}
+                  {/*>*/}
+                  {/*   {authorDisplayName || "User"}*/}
+                  {/*</Typography>*/}
+                  {/*<br />*/}
                   <Typography
-                     component={"span"}
-                     sx={styles.name}
-                     variant={"h6"}
-                  >
-                     {authorDisplayName || "User"}
-                  </Typography>
-                  <br />
-                  <Typography
-                     sx={styles.title}
+                     sx={styles.text}
                      color={"text.secondary"}
                      variant={"subtitle1"}
                      gutterBottom
@@ -308,8 +311,8 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                      dangerouslySetInnerHTML={{
                         __html: description,
                      }}
-                     sx={styles.title}
-                     variant={"subtitle1"}
+                     sx={[styles.text, styles.description]}
+                     variant={"h6"}
                      gutterBottom
                   />
                   <Typography
@@ -318,20 +321,14 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                      component="div"
                   >
                      {wishInterests.map((int, index) => (
-                        <Fragment key={int.name + index}>
+                        <Fragment key={int.name.value + index}>
                            {!!index && bull}
-                           {int.highlighted ? (
-                              <span>
-                                 <b>{int.name}</b>
-                              </span>
-                           ) : (
-                              <Box
-                                 component={"span"}
-                                 dangerouslySetInnerHTML={{
-                                    __html: int.name.value,
-                                 }}
-                              />
-                           )}
+                           <Box
+                              component={"span"}
+                              dangerouslySetInnerHTML={{
+                                 __html: int.name.value,
+                              }}
+                           />
                         </Fragment>
                      ))}
                   </Typography>
