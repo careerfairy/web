@@ -174,7 +174,6 @@ jobs:
               vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
               vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
               vercel-args: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && '--prod' || '' }}
-#      - name: preview-url
-#      run: |
-#        echo ${{ steps.vercel-action.outputs.preview-url }}
-
+         - name: preview-url
+           run: |
+              echo ${{ steps.vercel-action.outputs.preview-url }}
