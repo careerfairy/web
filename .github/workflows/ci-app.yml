@@ -20,19 +20,97 @@ jobs:
               skip_after_successful_duplicate: "false"
               paths_ignore: '["**/README.md", "firestore.rules"]'
 
-   build:
-      name: "Build, Test and Deploy"
-      needs: should_skip
+   build_app_for_tests:
+      name: "Pre-build cache for tests"
+      runs-on: ubuntu-latest
+      needs: [should_skip]
+      if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
+      env:
+         # https://turborepo.org/docs/guides/continuous-integration
+         TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+         TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+      steps:
+         - uses: actions/checkout@v2
+         - uses: actions/setup-node@v2
+           with:
+              node-version: "16"
+              cache: "npm"
+         - name: Cache node modules
+           id: cache-nodemodules
+           uses: actions/cache@v2
+           env:
+              cache-name: cache-node-modules
+           with:
+              # caching node_modules
+              path: node_modules
+              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+              restore-keys: |
+                 ${{ runner.os }}-build-${{ env.cache-name }}-
+                 ${{ runner.os }}-build-
+                 ${{ runner.os }}-
+
+         - name: Install Dependencies
+           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+           run: npm install
+
+         - name: Build
+           run: npm run build
+           env:
+              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              NODE_ENV: test
+
+   # Run Unit Tests
+   unit_tests:
+      name: "Unit Tests"
+      needs: [should_skip, build_app_for_tests]
+      if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
+      runs-on: ubuntu-latest
+      env:
+         TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+         TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+         NODE_ENV: test
+      steps:
+         - uses: actions/checkout@v2
+         - uses: actions/setup-node@v2
+           with:
+              node-version: "16"
+              cache: "npm"
+         - name: Cache node modules
+           id: cache-nodemodules
+           uses: actions/cache@v2
+           env:
+              cache-name: cache-node-modules
+           with:
+              # caching node_modules
+              path: node_modules
+              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+              restore-keys: |
+                 ${{ runner.os }}-build-${{ env.cache-name }}-
+                 ${{ runner.os }}-build-
+                 ${{ runner.os }}-
+         - name: Install Dependencies
+           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+           run: npm install
+         - name: Build
+           run: npm run build
+         - name: Run Jest Unit Tests
+           run: npm run test
+
+   # Run E2E Tests
+   e2e_tests:
+      name: "E2E Tests - ${{ matrix.browser }}"
+      strategy:
+         fail-fast: false
+         matrix:
+            browser: [chromium, firefox, webkit]
+      needs: [should_skip, build_app_for_tests]
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest
       env:
          # https://turborepo.org/docs/guides/continuous-integration
          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-         GRAPHCMS_PROJECT_API: ${{ secrets.GRAPHCMS_PROJECT_API }}
-         GRAPHCMS_PROD_AUTH_TOKEN: ${{ secrets.GRAPHCMS_PROD_AUTH_TOKEN }}
-         GRAPHCMS_DEV_AUTH_TOKEN: ${{ secrets.GRAPHCMS_DEV_AUTH_TOKEN }}
-         GRAPHCMS_PREVIEW_SECRET: ${{ secrets.GRAPHCMS_PREVIEW_SECRET }}
       steps:
          - uses: actions/checkout@v2
 
@@ -40,50 +118,58 @@ jobs:
            with:
               node-version: "16"
               cache: "npm"
-
-         - name: Install dependencies
-           run: npm install
-
-         - name: Cache NextJS cache folder
-           uses: actions/cache@v3
+         - name: Cache node modules
+           id: cache-nodemodules
+           uses: actions/cache@v2
+           env:
+              cache-name: cache-node-modules
            with:
-              path: |
-                 ~/.npm
-                  ${{ github.workspace }}/apps/web/.next/cache
-              key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('packages/shared-lib/**/*.[jt]s', 'apps/web/**/*.[jt]s?') }}
+              # caching node_modules
+              path: node_modules
+              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
               restore-keys: |
-                 ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
-
-         - name: Build
+                 ${{ runner.os }}-build-${{ env.cache-name }}-
+                 ${{ runner.os }}-build-
+                 ${{ runner.os }}-
+         - name: Install Dependencies
+           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+           run: npm install
+         - name: Install Playwright deps
+           run: npx playwright install --with-deps ${{ matrix.browser }} chromium
+         - name: Run Playwright End to End tests
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-           run: npm run build
-
-         - name: Run Jest Unit Tests
-           run: npm run test
-
-         - name: Install Playwright deps
-           run: npx playwright install --with-deps
-         - name: Run Playwright End to End tests
+              BROWSER: ${{ matrix.browser }}
            run: npm run test:e2e-webapp
          - name: Upload test results
-           if: always()
+           if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: playwright-report
+              name: ${{ matrix.browser }}-playwright-report
               path: apps/web/playwright-report
          - name: Upload debug logs
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: debug logs
+              name: ${{ matrix.browser }}-debug-logs
               path: firebase-debug.log
-         - name: Deploy to Vercel
-           uses: amondnet/vercel-action@v20.0.1 #deploy
+   # Deploy
+   deploy:
+      name: "Deploy"
+      if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
+      needs: [e2e_tests, unit_tests]
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v2
+         - uses: amondnet/vercel-action@v20.0.1 #deploy
+           id: vercel-action
            with:
               vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
               github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
               vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
               vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
               vercel-args: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && '--prod' || '' }}
+         - name: preview-url
+           run: |
+              echo ${{ steps.vercel-action.outputs.preview-url }}
