@@ -11,7 +11,11 @@ export default class ProfilePage extends CommonPage {
    }
 
    openMyRecruiters() {
-      return this.page.goto(`/profile/saved-recruiters`)
+      return this.resilientGoto(`/profile/saved-recruiters`)
+   }
+
+   openCareerSkills() {
+      return this.resilientGoto(`/profile/career-skills`)
    }
 
    clickBrowseAllEvents() {
